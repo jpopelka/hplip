@@ -1,0 +1,103 @@
+<!--
+/*
+ (c) Copyright 2001-2007 Hewlett-Packard Development Company, L.P.
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+ Author: Pete Parks
+*/ 
+-->
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 1 September 2005), see www.w3.org" />
+    <meta http-equiv="PRAGMA" content="NO-CACHE" />
+    <meta http-equiv="EXPIRES" content="Mon, 22 Jul 2002 11:12:01 GMT" />
+    <meta http-equiv="Content-Language" content="en-us" />
+    <meta http-equiv="content-type" content="text/html; charset=us-ascii" />
+    <link rel="stylesheet" type="text/css" href="../styles/hplip.css" />
+    <script type="text/javascript" src="../scripts/hplip.js"></script>
+    <script type="text/javascript">
+    <!--
+        function changeCheckbox(number) {
+            checkboxes = document.getElementsByName("component");
+            var cvalue = checkboxes[0].checked  ? checkboxes[0].value : checkboxes[1].value;
+            var path = "component_controller?component=" + cvalue;
+            setLocationRef(path);
+        };
+    -->
+    </script>
+
+<title>HP Linux Imaging and Printing (HPLIP) Installer</title>
+</head>
+
+<body onload="generateHeader();">
+    
+<!-- Header Div -->    
+<div id="header_box" class="background_box">
+</div>
+
+<!-- Body Div -->
+<div class="body_content">
+  
+<div id="message_title">
+    <a>Please choose the components to install:</a>
+</div>
+
+ 
+<div id="message_body">
+    <form action="">
+        <div id="radio1">
+            <input type="radio" onclick="changeCheckbox(0)" name="component" value="hplip" checked="checked" /><a>&nbsp;&nbsp;&nbsp;HPLIP (recommended full solution)</a>
+        </div>
+
+        <div id="radio2">
+            <input type="radio" onclick="changeCheckbox(1)" name="component" value="hpijs" /><a>&nbsp;&nbsp;&nbsp;HPIJS (printing support only)</a>
+        </div>
+    </form>
+</div>
+
+<div id="message_footer">
+    <a>&nbsp;</a>
+</div>
+
+
+</div>
+
+<!-- Button Div -->
+<div class="button_options">
+  
+  <div id="quit_button" OnSelectStart='return false;' onClick='indexClickActions( "quit_button", "quit");'>
+    <img src="../images/button1.png" width="100" height="35">
+    <div id="quitHiliteText"><a>Quit</a></div>
+    <div id="quitText"><a>Quit</a></div>
+  </div>
+
+  <div id="previous_button" OnSelectStart='return false;' onClick='indexClickActions( "previous_button", "previous");'>
+    <img src="../images/button1.png" width="100" height="35">
+    <div id="previousHiliteText"><a>Previous</a></div>
+    <div id="previousText"><a>Previous</a></div>
+  </div>
+  
+  <div id="next_button" OnSelectStart='return false;' onClick='indexClickActions( "next_button", "component_controller?component=hplip");'>
+    <img src="../images/button1.png" width="100" height="35">
+    <div id="nextHiliteText"><a>Next</a></div>
+    <div id="nextText"><a>Next</a></div>
+  </div>
+
+</div>
+
+</body>
+</html>

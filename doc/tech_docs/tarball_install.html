@@ -1,0 +1,271 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="shortcut icon" href="../images/favicon.ico" type="image/x-icon" />
+<title>HPLIP Technical Documentation - Portablity Reference</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="../styles/default.css" type="text/css" /> 
+<META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE" />
+<META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 22 Jul 2002 11:12:01 GMT" />
+<META NAME="DESCRIPTION" CONTENT="HP Linux Imaging and Printing - HPLIP is an HP developed solution for printing, scanning, and faxing with HP inkjet and laser based printers in Linux.">
+<META NAME="KEYWORDS" CONTENT="HPLIP, HP, Linux, Printing, HPIJS">
+</head>
+<body>
+<div id="page"><!-- start page -->
+<div id="container"><!-- start main container -->
+<!-- start banner -->
+
+<div id="banner">
+<div id="banner_graphics">
+        <div id="floatleft">
+        <img src="../images/hplogo2.png" alt="HP Logo" border="0" />
+        </div>
+        <div id="floatcenter">
+        <a href="../index.html">
+        <img src="../images/hpliplogo.png" alt="HP Logo" border="0" />
+        </a>
+        </div>
+        <div id="floatright">
+        <img src="../images/tuxlogo2.png" alt="Tux" border="0" />
+        </div>
+    </div>
+</div>
+<!-- end banner -->
+
+<div id="navbar">
+<table>
+    <tr>
+        <td valign="top">
+<div id="sidebar-a">
+<ul id="sidebar-a-list">
+    <menu compact="compact">
+        <div class="menuheader"><a href="../index.html" title="">Home</a></div>
+    </menu>
+
+<div class="menuheader">About</div>
+    <menu compact="compact">
+        <li><a href="../features.html" title="">Features</a></li> 
+        <li><a href="../screenshots.html" title="">Screenshots</a></li> 
+        <li><a href="../faqs.html" title="FAQs">FAQs</a></li> 
+        <li><a a href="../about.html" title="About">About HPLIP</a></li>
+    </menu>
+<div class="menuheader">Setup and Installation</div>
+    <menu compact="compact">
+        <li><a href="../downloads.html" title="Downloads">Download HPLIP</a></li>
+        <li><a href="../install/index.html" title="Installation Instructions">Installation Instructions</a></li> 
+        <li><a href="../system_requirements.html" title="System Requirements">System Requirements</a></li> 
+        <li><a href="../supported_devices/index.html" title="Supported Devices">Supported Devices</a></li> 
+    </menu>
+<div class="menuheader">Usage and Support</div>
+    <menu compact="compact">
+        <li><a href="../mailing_lists.html" title="Mailing Lists">Mailing Lists</a></li>
+        <li><a href="../howtos/index.html" title="How-Tos">How-Tos</a></li> 
+        <li><a href="../troubleshooting/index.html" title="Troubleshooting">Troubleshooting</a></li>
+        <li><a href="../release_notes.html" title="Release Notes">Release Notes</a></li>
+    </menu>
+<div class="menuheader">Resources</div>
+    <menu compact="compact">
+        <li><a href="../tech_docs/index.html" title="">Technical Documentation</a></li> 
+        <li><a href="http://sourceforge.net/projects/hplip/" title="Our project page on Sourceforge.net">Sourceforge Project Page</a></li> 
+        <li><a href="../license.html" title="Software License">Software License</a></li>
+        <li><a a href="../other_support.html" title="Other Support Information">Other Support Information</a></li>
+        <li><a href="../contacts.html" title="Contacts">Contacts</a></li>
+    </menu>
+</ul>
+</div>
+<!-- end sidebar --></td>
+</div>
+<td width=100%>
+<div id="content"><!-- start content -->
+        <a href="../index.html">Home</a>
+&gt;
+<a href="index.html">Technical Documentation</a>
+&gt;
+Portablity Reference
+
+<hr size="1"/>
+        <div class="document">
+<div class="section">
+<h1><a id="technical-documentation-portablity-reference" name="technical-documentation-portablity-reference">Technical Documentation: Portablity Reference</a></h1>
+<p>HPLIP uses GNU Autotools for building and installing. GNU Autotools simplify most portability issues automatically, but some customization may be desirable. This section documents different configuration options that are available and some caveats for building HPLIP on different distributions and platforms.</p>
+<p>This information is useful for package maintainers and users who want to build and install HPLIP from the source tar ball. Most users don't not need to build from source code and should get the latest HPLIP package from their distribution.</p>
+<p>This section assumes all System Requirements have been met and any pre-existing HPLIP install uses the same &quot;./configure --prefix=/usr&quot; parameters. For more detailed install instructions see <a class="reference" href="../install/index.html">Installation Instructions</a> .</p>
+<p>There are two major install configurations - foomatic-xml-install and foomatic-ppd-install. The default is the foomatic-xml-install. The foomatic-xml-install will install all necessary files for dynamic PPD file creation at runtime. Since the foomatic db builds HPIJS PPD files, only HPIJS PPD files are built-on-the-fly. HP postscript PPD files are always pre-built. The foomatic-ppd-install will install pre-built HPIJS PPD files and HP postscript PPD files.</p>
+<p>The foomatic-xml-install works with CUPS systems that use dynamic PPD file creation. Generally CUPS 1.2 uses dynamic PPD file creation. Use foomatic-ppd-install with CUPS 1.1.x. The following command displays the CUPS version.</p>
+<pre class="literal-block">
+cups-config --version
+</pre>
+<p>The following example is a foomatic-xml-install which is the default.</p>
+<pre class="literal-block">
+tar xzvf hplip-2.7.x.tar.gz
+cd hplip-2.7.x
+./configure --prefix=/usr
+make
+make install
+</pre>
+<p>Use this example for a foomatic-ppd-install.</p>
+<pre class="literal-block">
+tar xzvf hplip-2.7.x.tar.gz
+cd hplip-2.7.x
+./configure --prefix=/usr --disable-xml-install --enable-foomatic-ppd-install --with-hpppddir=/usr/share/cups/model
+make
+make install
+</pre>
+<p>If HPLIP built and installs correctly you now need to check device access privileges. HPLIP installs a udev rule /etc/udev/rules.d/55-hpmud.rules. This file assigns all HP devices to the &quot;lp&quot; group. This means by default all hotplug USB and parallel port HP devices belong to &quot;lp&quot; group. A user must be a member of the &quot;lp&quot; group in order to access the device.</p>
+<p>You can use the &quot;groups&quot; command along with &quot;cat /etc/group&quot; to see what groups you belong to. If you are not a member of the &quot;lp&quot; group you must add yourself to the &quot;lp&quot; group. Then logoff/login and verify your change by re-running the &quot;groups&quot; command.</p>
+<p>If your HP device was already pluged in and this was the first time 55-hpmud.rules was installed. Your device may not be a memember of the &quot;lp&quot; group yet. If this is the case you must unplug/plug your device so that the hotplug system assigns your device to the &quot;lp&quot; group.</p>
+<p>The following commands can be used to verify a USB device belongs to the &quot;lp&quot; group with proper access privileges.</p>
+<pre class="literal-block">
+$ lsusb
+Bus 003 Device 003: ID 03f0:5c11 Hewlett-Packard
+$ ls -l /dev/bus/usb/003/003
+crw-rw---- 1 root lp 189, 258 May 22 17:04 /dev/bus/usb/003/003
+</pre>
+<p>This example can be used to verify a parallel device belongs to the &quot;lp&quot; group with proper access privileges.</p>
+<pre class="literal-block">
+$ ls -l /dev/parport0
+crw-rw-rw- 1 root lp 99, 0 May 22 11:26 /dev/parport0
+</pre>
+<p>Note in the above examples the permissions for the &quot;lp&quot; group must set to &quot;rw&quot; otherwise HPLIP will not find the device. If device permissions are not correct you will have to modify the udev rule that sets the device permissions (ie: MODE=&quot;0660&quot;). For example with Fedora the usb_device rule in /etc/udev/rules.d/50-udev.rules should look like the following.</p>
+<pre class="literal-block">
+ACTION==&quot;add&quot;, SUBSYSTEM==&quot;usb_device&quot;,
+     PROGRAM=&quot;/bin/sh -c 'K=%k; K=$${K#usbdev}; printf bus/usb/%%03i/%%03i $${K%%%%.*} $${K#*.}'&quot;,
+     NAME=&quot;%c&quot;, MODE=&quot;0660&quot;
+</pre>
+<p>Now you should be able to use your HP device with HPLIP.</p>
+<p><strong>Caveats</strong></p>
+<ol class="arabic simple">
+<li>Network support requires libsnmp. HPLIP can be build without network support. At configure time use the following command.</li>
+</ol>
+<pre class="literal-block">
+./configure --prefix=/usr --disable-network-build
+</pre>
+<ol class="arabic simple" start="2">
+<li>In order to get HPLIP to compile with libsnmp on SUSE 9.1 you need add the following symlink for libcrypto.</li>
+</ol>
+<pre class="literal-block">
+ln -s /usr/lib/libcrypto.so.0.9.7 /usr/lib/libcrypto.so
+</pre>
+<ol class="arabic simple" start="3">
+<li>For distribution package managers the following ./configure options are available. This allows the package manager to configure these options.</li>
+</ol>
+<pre class="literal-block">
+--enable-doc-build              enable documentation build (default=yes)
+--enable-hpijs-only-build       enable hpijs only build (default=no)
+--enable-network-build          enable network build (default=yes)
+--enable-pp-build               enable parallel port build (default=yes)
+--enable-scan-build             enable scanner build (default=yes)
+--enable-gui-build              enable gui build (default=yes)
+--enable-fax-build              enable fax build (default=yes)
+--enable-cups11-build           enable cups 1.1.x build (default=no)
+--enable-shadow-build           enable shadow build (default=no)
+--enable-foomatic-ppd-install   enable foomatic ppd install, uses hpppddir (default=no)
+--enable-foomatic-xml-install   enable foomatic xml install, uses foomaticdir (default=yes)
+--with-cupsbackenddir=DIR       set cups backend install directory (default=/usr/lib/cups/backend)
+--with-icondir=DIR              set icon install directory (default=/usr/share/applications)
+--with-hpppddir=DIR             set hp ppd install directory (default=datadir/ppd/HP)
+--with-foomaticdir=DIR          set foomatic db install directory (default=datadir/foomatic)
+</pre>
+<ol class="arabic simple" start="4">
+<li>For Mandrake be sure to include the net-snmp-mibs package for network support.</li>
+<li>In order to run the HP Device Manager, PyQt needs to be installed. Also Fedora C3 requires the &quot;sip&quot; module, see the following Fedora C3 instructions.</li>
+</ol>
+<pre class="literal-block">
+yum install PyQt
+yum install sip
+</pre>
+<ol class="arabic simple" start="6">
+<li>In SUSE 9.2 and above PyQt is now part of kdebindings3-python.</li>
+<li>In order to run HPLIP with Fedora C4 you must disable SELinux protection. Under &quot;Security Level Configuration&quot;, select SELinux tab, un-click &quot;Enforcing Current:Permissive&quot;. The default SELinux policies will conflict with HPLIP I/O. If you want to run with SELinux enabled install the FC4 HPLIP rpm available at RH.</li>
+<li>HPLIP can be uninstalled with the &quot;make uninstall&quot; command.</li>
+<li>With FC4 64-bit systems use must use &quot;./configure --prefix=/usr --libdir=/usr/lib64&quot; in order to get libsane-hpaio installed correctly.</li>
+</ol>
+</div>
+<div class="section">
+<h1><a id="hpijs-portability-reference" name="hpijs-portability-reference">HPIJS Portability Reference</a></h1>
+<p>The previous section installed the complete HPLIP package which includes HPIJS. HPIJS predates HPLIP and some distributions package HPIJS separately. In order to support HPIJS only solution, HPIJS can be built and installed without HPLIP support. HPIJS has it's own configuration option --enable-hpijs-only-build.</p>
+<p>With the HPLIP master Makefile a standalone version of HPIJS can be compiled and installed using the following instructions.</p>
+<pre class="literal-block">
+tar xzvf hpip-0.9.x.tar.gz
+cd hplip-0.9.x/prnt/hpijs
+./configiure --prefix=/usr --enable-hpijs-only-build
+make
+make install
+</pre>
+<p>If you are running CUPS 1.1.x restart cupsd in order to cause the CUPS daemon to re-read all the PPD files in the PPD directory. You can skip this step if your are running CUPS 1.2 or higher.</p>
+<pre class="literal-block">
+/etc/init.d/cups restart
+</pre>
+<p>You can verify HPIJS was build and installed correctly with the following command.</p>
+<pre class="literal-block">
+hpijs -h
+Hewlett-Packard Co. Inkjet Server 2.x
+Copyright (c) 2001-2006, Hewlett-Packard Co.
+</pre>
+<p><strong>Caveats</strong></p>
+<ol class="arabic simple">
+<li>For distribution package managers the following ./configure options are available for HPIJS.</li>
+</ol>
+<pre class="literal-block">
+--enable-foomatic-ppd-install   enable foomatic ppd install, uses hpppddir (default=no)
+--enable-foomatic-xml-install   enable foomatic xml install, uses foomaticdir (default=yes)
+--with-hpppddir=DIR             set hp ppd install directory (default=datadir/ppd/HP)
+--with-foomaticdir=DIR          set foomatic db install directory (default=datadir/foomatic)
+
+Foomatic-ppd-install will (1) copy HPIJS PPD files to $(hpppddir) (2) copy HP postscript PPD files to $(hpppddir) (3) gzip all PPD files.
+
+Foomatic-xml-install will (1) copy HPIJS xml files to $(foomaticdir)/... (2) copy HP postscript PPD files to $(foomaticdir)/db/source/PPD/HP
+(3) gzip all postscript PPD files.
+</pre>
+<ol class="arabic simple" start="2">
+<li>If you are building Ghostscript from scratch and gs gets a missing font error message, try the following symbolic link. Ghostscript looks for fonts in hardcoded directories, see GS_LIB_DEFAULT in the Ghostscript Makefile. For Red Hat the following symbolic link will allow Ghostscript to find fonts with out modifying the makefile. Other distributions may have different font directories.</li>
+</ol>
+<pre class="literal-block">
+ln -s /usr/share/fonts/default/Type1 /usr/share/ghostscript/fonts
+</pre>
+</div>
+</div>
+
+<hr size="1"/>
+<center><small>Page last updated: Thu May 24 16:32:53 2007; HPLIP Version: 2.7.6</small></center>
+</div>
+</td></tr></table>
+</div>
+<!-- end content -->
+<!-- end container -->
+<div id="footer"><!-- start footer -->
+        <hr size="1"/>
+        <a href="../legal.html">Legal Notices</a>
+        Copyright &#169; 2003-2007, Hewlett-Packard Development Company, L.P.
+        <a href="mailto:hplip@hp.com">Contact Site Maintainer</a><br>
+        <a href="http://sourceforge.net/" alt="Hosted by Sourceforge.net"><img src="../images/sflogo.png" border="0"></a>
+</div>
+<!-- end footer -->
+</div><!-- end page -->
+
+<!-- google analytics -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1543832-1";
+urchinTracker();
+</script>
+<!-- start google analytics from hplip.marketing -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1543832-7";
+urchinTracker();
+</script>
+<!-- end google analytics -->
+
+
+<!-- START OF ACTIVEMETER CODE -->
+<script type="text/javascript" language="javascript">
+var __pid=30231;
+var __am_invisible=1;
+</script>
+<!-- END OF ACTIVEMETER CODE -->
+
+</body>
+</html>

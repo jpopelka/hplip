@@ -1,0 +1,205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="shortcut icon" href="../../../images/favicon.ico" type="image/x-icon" />
+<title>HPLIP Installation - Step 4 - SUSE</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="../../../styles/default.css" type="text/css" /> 
+<META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE" />
+<META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 22 Jul 2002 11:12:01 GMT" />
+<META NAME="DESCRIPTION" CONTENT="HP Linux Imaging and Printing - HPLIP is an HP developed solution for printing, scanning, and faxing with HP inkjet and laser based printers in Linux.">
+<META NAME="KEYWORDS" CONTENT="HPLIP, HP, Linux, Printing, HPIJS">
+</head>
+<body>
+<div id="page"><!-- start page -->
+<div id="container"><!-- start main container -->
+<!-- start banner -->
+
+<div id="banner">
+<div id="banner_graphics">
+        <div id="floatleft">
+        <img src="../../../images/hplogo2.png" alt="HP Logo" border="0" />
+        </div>
+        <div id="floatcenter">
+        <a href="../../../index.html">
+        <img src="../../../images/hpliplogo.png" alt="HP Logo" border="0" />
+        </a>
+        </div>
+        <div id="floatright">
+        <img src="../../../images/tuxlogo2.png" alt="Tux" border="0" />
+        </div>
+    </div>
+</div>
+<!-- end banner -->
+
+<div id="navbar">
+<table>
+    <tr>
+        <td valign="top">
+<div id="sidebar-a">
+<ul id="sidebar-a-list">
+    <menu compact="compact">
+        <div class="menuheader"><a href="../../../index.html" title="">Home</a></div>
+    </menu>
+
+<div class="menuheader">About</div>
+    <menu compact="compact">
+        <li><a href="../../../features.html" title="">Features</a></li> 
+        <li><a href="../../../screenshots.html" title="">Screenshots</a></li> 
+        <li><a href="../../../faqs.html" title="FAQs">FAQs</a></li> 
+        <li><a a href="../../../about.html" title="About">About HPLIP</a></li>
+    </menu>
+<div class="menuheader">Setup and Installation</div>
+    <menu compact="compact">
+        <li><a href="../../../downloads.html" title="Downloads">Download HPLIP</a></li>
+        <li><a href="../../../install/index.html" title="Installation Instructions">Installation Instructions</a></li> 
+        <li><a href="../../../system_requirements.html" title="System Requirements">System Requirements</a></li> 
+        <li><a href="../../../supported_devices/index.html" title="Supported Devices">Supported Devices</a></li> 
+    </menu>
+<div class="menuheader">Usage and Support</div>
+    <menu compact="compact">
+        <li><a href="../../../mailing_lists.html" title="Mailing Lists">Mailing Lists</a></li>
+        <li><a href="../../../howtos/index.html" title="How-Tos">How-Tos</a></li> 
+        <li><a href="../../../troubleshooting/index.html" title="Troubleshooting">Troubleshooting</a></li>
+        <li><a href="../../../release_notes.html" title="Release Notes">Release Notes</a></li>
+    </menu>
+<div class="menuheader">Resources</div>
+    <menu compact="compact">
+        <li><a href="../../../tech_docs/index.html" title="">Technical Documentation</a></li> 
+        <li><a href="http://sourceforge.net/projects/hplip/" title="Our project page on Sourceforge.net">Sourceforge Project Page</a></li> 
+        <li><a href="../../../license.html" title="Software License">Software License</a></li>
+        <li><a a href="../../../other_support.html" title="Other Support Information">Other Support Information</a></li>
+        <li><a href="../../../contacts.html" title="Contacts">Contacts</a></li>
+    </menu>
+</ul>
+</div>
+<!-- end sidebar --></td>
+</div>
+<td width=100%>
+<div id="content"><!-- start content -->
+        <a href="../../../index.html">Home</a>
+&gt;
+<a href="../../index.html">Installation</a>
+&gt;
+<a href="../index.html">Step 4</a>
+&gt;
+SUSE
+
+<hr size="1"/>
+        <div class="document" id="installation-step-4-suse">
+<h1 class="title">Installation - Step 4 - SUSE</h1>
+<p><em>Note:  The instructions hp-setup tool should be able to easily configure your printer in SUSE.  If you continue to have problems then please follow these instructions.</em></p>
+<ol class="arabic simple">
+<li>Use a USB/Parallel cable to connect the printer to the computer or connect the printer to a network.</li>
+</ol>
+<p><em>Note</em>: See your printer documentation for specific instructions on connecting the USB, Parallel or Network cable to your printer and computer.</p>
+<ol class="arabic simple" start="2">
+<li>If you are connecting your printer via a network interface use the above network instructions to determine the network printer address using the hp-makeuri process.</li>
+<li>Open a console/terminal window.</li>
+<li>Enter this command:</li>
+</ol>
+<pre class="literal-block">
+hp-info
+</pre>
+<ol class="arabic simple" start="5">
+<li>Copy the device URI for your printer. (Example: &quot;hp:/usb/OfficeJet_6100_Series?serial=MY27H134G22R&quot;)</li>
+</ol>
+<p>Follow these steps to open the YaST Printer Configuration tool:</p>
+<ol class="arabic simple" start="6">
+<li>Click the Menu button -&gt; System -&gt; YaST.</li>
+<li>In the left pane of the YaST dialog box, click Hardware.</li>
+</ol>
+<div align="center" class="align-center"><img src="../../../images/yast_opening_hw.png" alt="YAST"/></div><ol class="arabic simple" start="8">
+<li>In the right pane of the YaST dialog box, click Printer.</li>
+</ol>
+<div align="center" class="align-center"><img src="../../../images/yast_hardware.png" alt="YAST"/></div><p>Follow these steps to configure the printer:</p>
+<ol class="arabic simple" start="9">
+<li>On the YaST Printer Configuration dialog box, click Other in the Printers to Configure list, and then click Configure.</li>
+</ol>
+<div align="center" class="align-center"><img src="../../../images/yast_other_printer.png" alt="YAST"/></div><ol class="arabic simple" start="10">
+<li>In the Select your Printer Type list, click Other kind of setup, and then click Next.</li>
+</ol>
+<div align="center" class="align-center"><img src="../../../images/yast_other_kind.png" alt="YAST"/></div><ol class="arabic simple" start="11">
+<li>In the URI text box, paste the URI you copied in step 2c, and then click Next.</li>
+</ol>
+<p>On the Queue name dialog box do these steps:</p>
+<ol class="arabic simple" start="12">
+<li>Enter a name for your HP printer in the Name box.</li>
+</ol>
+<p><em>Note: The name you enter must not contain spaces.</em></p>
+<ol class="arabic simple" start="13">
+<li>Enter a description of the printer in the Description of Printer box.</li>
+<li>Click Next.</li>
+</ol>
+<p>On the Printer Model dialog box, do these steps:</p>
+<ol class="arabic simple" start="15">
+<li>Under Select manufacturer, click HP.</li>
+<li>Under Select model, click the printer model.</li>
+</ol>
+<div align="center" class="align-center"><img src="../../../images/yast_printer_model.png" alt="YAST"/></div><ol class="arabic simple" start="17">
+<li>Click Next.</li>
+<li>Review the configuration, and then click OK.</li>
+<li>Click Finish.</li>
+</ol>
+<p>The system saves the print queue.</p>
+<p>Follow these steps to print a test page:</p>
+<ol class="arabic simple" start="20">
+<li>Open the HP Device Manager:</li>
+<li>Open a console/terminal window.</li>
+</ol>
+<ol class="arabic simple" start="23">
+<li>Enter this command:</li>
+</ol>
+<pre class="literal-block">
+hp-toolbox
+</pre>
+<p><em>Note: You can also open the HP Device Manager by using the GNOME or KDE menu system.</em></p>
+<div align="center" class="align-center"><img src="../../../images/hplip_device_manager.png" alt="HPLIP"/></div><ol class="arabic simple" start="24">
+<li>Click your HP printer in the left pane.</li>
+<li>Click the Tools &amp; Settings tab, and then click Print Test Page.</li>
+</ol>
+</div>
+
+<hr size="1"/>
+<center><small>Page last updated: Wed Jun 28 15:56:40 2006; HPLIP Version: 2.7.6</small></center>
+</div>
+</td></tr></table>
+</div>
+<!-- end content -->
+<!-- end container -->
+<div id="footer"><!-- start footer -->
+        <hr size="1"/>
+        <a href="../../../legal.html">Legal Notices</a>
+        Copyright &#169; 2003-2007, Hewlett-Packard Development Company, L.P.
+        <a href="mailto:hplip@hp.com">Contact Site Maintainer</a><br>
+        <a href="http://sourceforge.net/" alt="Hosted by Sourceforge.net"><img src="../../../images/sflogo.png" border="0"></a>
+</div>
+<!-- end footer -->
+</div><!-- end page -->
+
+<!-- google analytics -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1543832-1";
+urchinTracker();
+</script>
+<!-- start google analytics from hplip.marketing -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1543832-7";
+urchinTracker();
+</script>
+<!-- end google analytics -->
+
+
+<!-- START OF ACTIVEMETER CODE -->
+<script type="text/javascript" language="javascript">
+var __pid=30231;
+var __am_invisible=1;
+</script>
+<!-- END OF ACTIVEMETER CODE -->
+
+</body>
+</html>

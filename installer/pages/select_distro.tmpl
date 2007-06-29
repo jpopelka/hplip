@@ -1,0 +1,157 @@
+<!--
+/*
+ (c) Copyright 2001-2007 Hewlett-Packard Development Company, L.P.
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+ Author: Pete Parks
+*/ 
+-->
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="PRAGMA" content="NO-CACHE"/>
+    <meta http-equiv="EXPIRES" content="Mon, 22 Jul 2002 11:12:01 GMT"/>
+    <meta http-equiv="Content-Language" content="en-us"/>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="styles/hplip.css"/>
+    <script type="text/javascript" src="scripts/hplip.js"></script>
+    <script type="text/javascript" src="scripts/xml_loader.js"></script>
+    <script type="text/javascript">
+    <!--
+    var distro_menu = new Array();
+    var last_menu_size = 0;
+    var distro = 0;
+    var version = 0.0;
+
+    function getDistroData() {
+        generateHeader();
+    #for $d in $distros
+        distro_menu['$distros[$d]'] = $d;
+    #end for
+        getDistroNumberData();
+    };
+
+    function onClickedNext() {
+        var index1 = document.getElementById("distros").options.selectedIndex;
+        var index2 = document.getElementById("versions").options.selectedIndex;
+        var item1 = document.getElementById("distros").options[index1].text;
+        var version = document.getElementById("versions").options[index2].text;
+        var distro = distro_menu[item1];
+        var path = "select_distro_controller?distro=" + distro + "&version=" + version;
+        setLocationRef(path);
+    };
+
+    function getDistroNumberData() {
+        var index1 = document.getElementById("distros").options.selectedIndex;
+        var distro_name = document.getElementById("distros").options[index1].text;
+        var filename = "select_distro_update_combo?index=" + distro_menu[distro_name];
+        var localPath = GetLocalDataFile(filename);
+        var http = new XmlLoader(localPath);
+        var serverResponse = http.submitLoaderRequest("POST", false);
+        var strarray = serverResponse.split(" ");
+        changeCombo('versions', strarray);
+        onClickedNext();
+    };
+
+    function changeCombo(id, strarray)
+    {
+        var domForm = document.getElementById(id);
+        var index_version = 0;
+        var len = domForm.options.length;
+
+        for (var loop = len; loop >= 0; loop--) {
+           domForm.options[loop] = null;
+        }
+
+        for (var index = 0; index < strarray.length ; index++) {
+           if($distro_version == strarray[index]) {
+               index_version = index;
+               domForm.options[index] = new Option(strarray[index]);
+           } else {
+               domForm.options[index] = new Option(strarray[index]);
+           }
+
+        }
+        domForm.options[index_version].selected = true;
+    };
+    -->
+    </script>
+
+    <title>HP Linux Imaging and Printing (HPLIP) Installer</title>
+</head>
+<body onload="getDistroData();">
+<!-- Header Div -->    
+<div id="header_box" class="background_box"></div>
+
+<!-- Body Div -->
+<div class="body_content">
+    
+    <div id="message_title">
+        <a>Choose your distro of Linux:</a>
+    </div>
+    
+    <div id="message_body">
+        <form action="">
+            <div id="header_distros">Distro
+                <div id="selector_distros">
+                    <select id="distros" onchange="getDistroNumberData();">
+                    #for $d in $distros
+                        #if $d == $distro
+                            <option selected >$distros[$d]</option>
+                        #else
+                            <option>$distros[$d]</option>
+                        #end if
+                    #end for
+                    </select>
+                </div>
+            </div>
+            <div id="header_versions">Version Number
+                <div id="selector_versions">
+                    <select id="versions" onchange="onClickedNext();"> 
+                        <option selected value="0.0">any</option> 
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <div id="message_footer">
+    </div>
+</div>
+
+<!-- Button Div -->
+<div class="button_options">
+    <div id="quit_button" OnSelectStart='return false;' onClick='todoOnQuit("quit");' >
+      <img src="../images/button1.png" width="100" height="35">
+      <div id="quitHiliteText"><a>Quit</a></div>
+      <div id="quitText"><a>Quit</a></div>
+    </div>
+    
+    <div id="previous_button" OnSelectStart='return false;' onClick='indexClickActions( "previous_button", "previous");' >
+      <img src="../images/button1.png" width="100" height="35">
+      <div id="previousHiliteText"><a>Previous</a></div>
+      <div id="previousText"><a>Previous</a></div>
+    </div>
+    
+    <div id="next_button" OnSelectStart='return false;' onClick='indexClickActions( "next_button", "select_distro_controller?distro=0&version=0.0");' >
+      <img src="../images/button1.png" width="100" height="35">
+      <div id="nextHiliteText"><a>Next</a></div>
+      <div id="nextText"><a>Next</a></div>
+    </div>
+</div>
+
+</body>
+</html>

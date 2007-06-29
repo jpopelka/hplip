@@ -1,0 +1,405 @@
+;
+; SANE Backend specification file
+;
+
+:backend "hpaio"                        ; name of backend
+:version ""                           ; version of backend
+:url "http://hpinkjet.sourceforge.net/" ; backend's web page
+:comment "This backend isn't included in SANE because it is included in the HPLIP software."
+
+:devicetype :scanner                    ; start of a list of devices....
+:mfg "Hewlett-Packard"                  ; name a manufacturer
+:url "http://www.hp.com/united-states/consumer/gateway/printing_multifunction.html"
+:model "915"
+:status :good
+
+:model "hp_color_laserjet_2800"
+:status :good
+
+:model "hp_color_laserjet_2820"
+:status :good
+
+:model "hp_color_laserjet_2830"
+:status :good
+
+:model "hp_color_laserjet_2840"
+:status :good
+
+:model "deskjet_f2100_series"
+:status :good
+
+:model "deskjet_f300_series"
+:status :good
+
+:model "deskjet_f4100_series"
+:status :good
+
+:model "hp_laserjet_1100"
+:status :good
+
+:model "hp_laserjet_1100a"
+:status :good
+
+:model "hp_laserjet_1100xi"
+:status :good
+
+:model "hp_laserjet_1220"
+:status :good
+
+:model "hp_laserjet_1220se"
+:status :good
+
+:model "hp_laserjet_3015"
+:status :good
+
+:model "hp_laserjet_3020"
+:status :good
+
+:model "hp_laserjet_3030"
+:status :good
+
+:model "hp_laserjet_3050"
+:status :good
+
+:model "hp_laserjet_3052"
+:status :good
+
+:model "hp_laserjet_3055"
+:status :good
+
+:model "hp_laserjet_3200"
+:status :good
+
+:model "hp_laserjet_3200m"
+:status :good
+
+:model "hp_laserjet_3200se"
+:status :good
+
+:model "hp_laserjet_3300_3310_3320"
+:status :good
+
+:model "hp_laserjet_3330"
+:status :good
+
+:model "hp_laserjet_3380"
+:status :good
+
+:model "hp_laserjet_3390"
+:status :good
+
+:model "hp_laserjet_3392"
+:status :good
+
+:model "hp_laserjet_4100_mfp"
+:status :good
+
+:model "officejet_4100_series"
+:status :good
+
+:model "officejet_4105_series"
+:status :good
+
+:model "officejet_4110_series"
+:status :good
+
+:model "officejet_4115_series"
+:status :good
+
+:model "officejet_4200_series"
+:status :good
+
+:model "officejet_4255"
+:status :good
+
+:model "officejet_4300_series"
+:status :good
+
+:model "officejet_5100_series"
+:status :good
+
+:model "officejet_5105"
+:status :good
+
+:model "officejet_5110"
+:status :good
+
+:model "officejet_5110v"
+:status :good
+
+:model "officejet_5500_series"
+:status :good
+
+:model "officejet_5600_series"
+:status :good
+
+:model "officejet_6100_series"
+:status :good
+
+:model "officejet_6150_series"
+:status :good
+
+:model "officejet_6200_series"
+:status :good
+
+:model "officejet_6300_series"
+:status :good
+
+:model "officejet_7100_series"
+:status :good
+
+:model "officejet_7200_series"
+:status :good
+
+:model "officejet_7300_series"
+:status :good
+
+:model "officejet_7400_series"
+:status :good
+
+:model "officejet_9100_series"
+:status :good
+
+:model "officejet_pro_1150c"
+:status :good
+
+:model "officejet_pro_1170c_series"
+:status :good
+
+:model "officejet_pro_l7300"
+:status :good
+
+:model "officejet_pro_l7500"
+:status :good
+
+:model "officejet_pro_l7600"
+:status :good
+
+:model "officejet_pro_l7700"
+:status :good
+
+:model "officejet_d_series"
+:status :good
+
+:model "officejet_g55"
+:status :good
+
+:model "officejet_g55xi"
+:status :good
+
+:model "officejet_g85"
+:status :good
+
+:model "officejet_g85xi"
+:status :good
+
+:model "officejet_g95"
+:status :good
+
+:model "officejet_j5700_series"
+:status :good
+
+:model "officejet_k60"
+:status :good
+
+:model "officejet_k60xi"
+:status :good
+
+:model "officejet_k80"
+:status :good
+
+:model "officejet_k80xi"
+:status :good
+
+:model "officejet_r40"
+:status :good
+
+:model "officejet_r40xi"
+:status :good
+
+:model "officejet_r45"
+:status :good
+
+:model "officejet_r60"
+:status :good
+
+:model "officejet_r65"
+:status :good
+
+:model "officejet_r80"
+:status :good
+
+:model "officejet_r80xi"
+:status :good
+
+:model "officejet_series_500"
+:status :good
+
+:model "officejet_series_520"
+:status :good
+
+:model "officejet_series_570"
+:status :good
+
+:model "officejet_series_580"
+:status :good
+
+:model "officejet_series_590"
+:status :good
+
+:model "officejet_series_600"
+:status :good
+
+:model "officejet_series_610"
+:status :good
+
+:model "officejet_series_630"
+:status :good
+
+:model "officejet_series_700"
+:status :good
+
+:model "officejet_series_710"
+:status :good
+
+:model "officejet_series_720"
+:status :good
+
+:model "officejet_series_725"
+:status :good
+
+:model "officejet_t_series"
+:status :good
+
+:model "officejet_v30"
+:status :good
+
+:model "officejet_v40"
+:status :good
+
+:model "officejet_v40xi"
+:status :good
+
+:model "officejet_v45"
+:status :good
+
+:model "psc_1100_series"
+:status :good
+
+:model "psc_1200_series"
+:status :good
+
+:model "psc_1300_series"
+:status :good
+
+:model "psc_1310_series"
+:status :good
+
+:model "psc_1400_series"
+:status :good
+
+:model "psc_1500_series"
+:status :good
+
+:model "psc_1510_series"
+:status :good
+
+:model "psc_1600_series"
+:status :good
+
+:model "psc_2100_series"
+:status :good
+
+:model "psc_2150_series"
+:status :good
+
+:model "psc_2170_series"
+:status :good
+
+:model "psc_2200_series"
+:status :good
+
+:model "psc_2210_series"
+:status :good
+
+:model "psc_2300_series"
+:status :good
+
+:model "psc_2350_series"
+:status :good
+
+:model "psc_2400_series"
+:status :good
+
+:model "psc_2500_series"
+:status :good
+
+:model "psc_500"
+:status :good
+
+:model "psc_720"
+:status :good
+
+:model "psc_750"
+:status :good
+
+:model "psc_750xi"
+:status :good
+
+:model "psc_760"
+:status :good
+
+:model "psc_900_series"
+:status :good
+
+:model "psc_950"
+:status :good
+
+:model "psc_950vr"
+:status :good
+
+:model "psc_950xi"
+:status :good
+
+:model "photosmart_2570_series"
+:status :good
+
+:model "photosmart_2600_series"
+:status :good
+
+:model "photosmart_2700_series"
+:status :good
+
+:model "photosmart_3100_series"
+:status :good
+
+:model "photosmart_3200_series"
+:status :good
+
+:model "photosmart_3300_series"
+:status :good
+
+:model "photosmart_c3100_series"
+:status :good
+
+:model "photosmart_c4100_series"
+:status :good
+
+:model "photosmart_c4200_series"
+:status :good
+
+:model "photosmart_c5100_series"
+:status :good
+
+:model "photosmart_c5200_series"
+:status :good
+
+:model "photosmart_c6100_series"
+:status :good
+
+:model "photosmart_c7100_series"
+:status :good
+
+:model "printer_scanner_copier_300"
+:status :good
+

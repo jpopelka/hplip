@@ -1,0 +1,202 @@
+<!--
+/*
+ (c) Copyright 2001-2007 Hewlett-Packard Development Company, L.P.
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+ Author: Pete Parks
+
+*/
+-->
+<html xmlns="htmlhttp://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta name="generator" content="HTML Tidy for Linux (vers 1 September 2005), see www.w3.org" />
+    <meta http-equiv="PRAGMA" content="NO-CACHE" />
+    <meta http-equiv="EXPIRES" content="Mon, 22 Jul 2002 11:12:01 GMT" />
+    <meta http-equiv="Content-Language" content="en-us" />
+    <meta http-equiv="content-type" content="text/html; charset=us-ascii" />
+    <link rel="stylesheet" type="text/css" href="styles/hplip.css" />
+    <script type="text/javascript" src="scripts/hplip.js"></script>
+    <script type="text/javascript" src="scripts/xml_loader.js"></script>
+    <script type="text/javascript">
+    <!--
+    var statusValue = -1;
+    var responseTextCompiled = "";
+    var operationName = "";
+    var operationNumber = 0;
+
+    function todoOnLoad() {
+        generateHeader();
+        getProgressOperationNumber();
+        setUpCircular();
+        document.getElementById("hiddenDiv").style.dislpay = 'none';
+    };
+
+    function setUpCircular() {
+        document.getElementById("progressText").innerHTML="Installing...";
+        document.getElementById("progressBar").innerHTML="<img src='images/circular.gif' alt='progress'>";
+        loopCircular();
+    };
+
+    function getProgressUpdate(filename) {
+        //var localPath = GetLocalDataFile(filename);
+	var localPath = "http://localhost:8080/" +  filename
+        var http = new XmlLoader(localPath);
+        var responseText = http.submitLoaderRequest("POST", false);
+            responseTextCompiled += responseText;
+        if(responseText) {
+            if(isFireFoxBase() || isSafariBase()) {
+                document.getElementById("scrollTextArea").innerHTML += responseText;
+            } else {
+                document.getElementById("scrollTextDiv").innerHTML = '<textarea cols="62" rows="11" wrap="off" name="scrollTextArea" id="scrollTextArea" >' + responseTextCompiled + '</textarea></div>';
+            }
+        }
+    };
+
+    function toBottom() {
+            self.scrollTo(0, 5)
+    };
+    
+    
+    function retryProgress() {
+	    var localPath = "http://localhost:8080/retry_progress"
+        var http = new XmlLoader(localPath);
+        var serverResponse = http.submitLoaderRequest("POST", false);
+    }
+    
+    
+    function getProgressOperationNumber() {
+	    var localPath = "http://localhost:8080/operation_number"
+        var http = new XmlLoader(localPath);
+        var serverResponse = http.submitLoaderRequest("POST", false);
+        operationNumber = parseInt(serverResponse);
+        if(operationNumber == 2 || operationNumber == 3) {
+            var state = document.getElementById("retry_button").style.display;
+            state.display = state.display? "":"hidden"; 
+        }
+        if(operationNumber  == 0) {
+            operationName = "Profile Software Requirements";
+        } else if(operationNumber  == 1) {
+            operationName = "Required Dependencies";
+        } else if(operationNumber  == 2) {
+            operationName = "Optional Dependencies";
+        } else if(operationNumber  == 3) {
+            operationName = "Preparing Dependencies";
+        } else if(operationNumber  == 4) {
+            operationName = "Finishing Dependencies";
+        } else if(operationNumber  == 5) {
+            operationName = "Building and Installing";
+        } else if(operationNumber  == 6) {
+            operationName = "Remove HPOJ";
+        } else if(operationNumber  == 7) {
+            operationName = "Remove HPLIP";
+        } else if(operationNumber  == 8) {
+            operationName = "Restarting CUPS";
+        } else {
+            operationName = "Unimplemented Operation...";
+        }
+        
+    };
+
+    function getProgressStatus(filename) {
+        //var localPath = GetLocalDataFile(filename);
+	var localPath = "http://localhost:8080/" +  filename
+        var http = new XmlLoader(localPath);
+        var serverResponse = http.submitLoaderRequest("POST", false);
+        statusValue = parseInt(serverResponse);
+    };
+
+    function loopCircular() {
+        getProgressStatus("progress_status");
+        getProgressUpdate("progress_update");
+
+
+        if( -1 == statusValue ) { // Running 
+            document.getElementById("progressText").innerHTML = "Installation Progress: " + operationName;
+            document.getElementById("progressBar").innerHTML = "<img src='images/circular.gif' alt='progress'>";
+        } else if( 0 < statusValue ) { // Done with Error
+            document.getElementById("progressText").innerHTML = "Installation Progress: Error";
+            document.getElementById("progressBar").innerHTML = null;
+            window.location.href = "error_command_failed";
+            // Call the controller code here with the code positive all.
+        } else if( 0 == statusValue ) {  // Done no Error
+            document.getElementById("progressText").innerHTML = "Installation Progress: Operation Completed";
+            document.getElementById("progressBar").innerHTML = null;
+            toggleLayer("hiddenDiv");
+            //setTimeout("window.location.href = 'progress_controller';", 1000)
+            // Call the controller code here with the code zero.
+        } else {
+            document.getElementById("progressText").innerHTML = "Got into a bad state: ";
+            document.getElementById("progressBar").innerHTML = null;
+            toggleLayer("hiddenDiv");
+	}
+
+        if ( -1 == statusValue ) {
+            setTimeout("loopCircular();", 200);
+        }
+    };
+    -->
+    </script>
+
+
+<title>HP Linux Imaging and Printing (HPLIP) Installer</title>
+</head>
+
+<body onload="todoOnLoad();">
+
+<!-- Header Div -->
+<div id="header_box" class="background_box"></div>
+
+
+<!-- Body Div -->
+<div class="body_content">
+    <div class="install_title_replacement"><div id="progressText"></div><div id="progressBar"></div></div> 
+
+    <div id="scrollTextDiv">
+        <textarea cols="62" rows="11" wrap="off" name="scrollTextArea" id="scrollTextArea" onkeyup="sTextArea.innerText=scrollTextArea.innerText"></textarea>
+    </div>
+
+    <div id="message_footer">
+    </div>
+</div>
+
+
+<!-- Button Div -->
+<div class="button_options">
+
+    <div id="quit_button" OnSelectStart='return false;' onClick='todoOnQuit("quit");'> <!-- indexClickActions( "quit_button", "progress_cancel");' -->
+        <img src="../images/button1.png" width="100" height="35" alt="" >
+        <div id="cancel2HiliteText"><a>Cancel</a></div>
+        <div id="cancel2Text"><a>Cancel</a></div>
+    </div>
+
+    <div id="retry_button" OnSelectStart='return false;' onClick='indexClickActions( "retry_button", "retry_progress");'>
+      <img src="../images/button1.png" width="100" height="35">
+      <div id="retryHiliteText"><a>Retry</a></div>
+      <div id="retryText"><a>Retry</a></div>
+    </div>
+
+    <div id="hiddenDiv">
+        <div id="next_button" OnSelectStart='return false;' onClick='indexClickActions( "next_button", "progress_controller");' >
+          <img src="../images/button1.png" width="100" height="35">
+          <div id="nextHiliteText"><a>Next</a></div>
+          <div id="nextText"><a>Next</a></div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

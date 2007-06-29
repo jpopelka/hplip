@@ -1,0 +1,355 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="shortcut icon" href="../../../images/favicon.ico" type="image/x-icon" />
+<title>Configure Linux From Scratch</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="../../../styles/default.css" type="text/css" /> 
+<META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE" />
+<META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 22 Jul 2002 11:12:01 GMT" />
+<META NAME="DESCRIPTION" CONTENT="HP Linux Imaging and Printing - HPLIP is an HP developed solution for printing, scanning, and faxing with HP inkjet and laser based printers in Linux.">
+<META NAME="KEYWORDS" CONTENT="HPLIP, HP, Linux, Printing, HPIJS">
+</head>
+<body>
+<div id="page"><!-- start page -->
+<div id="container"><!-- start main container -->
+<!-- start banner -->
+
+<div id="banner">
+<div id="banner_graphics">
+        <div id="floatleft">
+        <img src="../../../images/hplogo2.png" alt="HP Logo" border="0" />
+        </div>
+        <div id="floatcenter">
+        <a href="../../../index.html">
+        <img src="../../../images/hpliplogo.png" alt="HP Logo" border="0" />
+        </a>
+        </div>
+        <div id="floatright">
+        <img src="../../../images/tuxlogo2.png" alt="Tux" border="0" />
+        </div>
+    </div>
+</div>
+<!-- end banner -->
+
+<div id="navbar">
+<table>
+    <tr>
+        <td valign="top">
+<div id="sidebar-a">
+<ul id="sidebar-a-list">
+    <menu compact="compact">
+        <div class="menuheader"><a href="../../../index.html" title="">Home</a></div>
+    </menu>
+
+<div class="menuheader">About</div>
+    <menu compact="compact">
+        <li><a href="../../../features.html" title="">Features</a></li> 
+        <li><a href="../../../screenshots.html" title="">Screenshots</a></li> 
+        <li><a href="../../../faqs.html" title="FAQs">FAQs</a></li> 
+        <li><a a href="../../../about.html" title="About">About HPLIP</a></li>
+    </menu>
+<div class="menuheader">Setup and Installation</div>
+    <menu compact="compact">
+        <li><a href="../../../downloads.html" title="Downloads">Download HPLIP</a></li>
+        <li><a href="../../../install/index.html" title="Installation Instructions">Installation Instructions</a></li> 
+        <li><a href="../../../system_requirements.html" title="System Requirements">System Requirements</a></li> 
+        <li><a href="../../../supported_devices/index.html" title="Supported Devices">Supported Devices</a></li> 
+    </menu>
+<div class="menuheader">Usage and Support</div>
+    <menu compact="compact">
+        <li><a href="../../../mailing_lists.html" title="Mailing Lists">Mailing Lists</a></li>
+        <li><a href="../../../howtos/index.html" title="How-Tos">How-Tos</a></li> 
+        <li><a href="../../../troubleshooting/index.html" title="Troubleshooting">Troubleshooting</a></li>
+        <li><a href="../../../release_notes.html" title="Release Notes">Release Notes</a></li>
+    </menu>
+<div class="menuheader">Resources</div>
+    <menu compact="compact">
+        <li><a href="../../../tech_docs/index.html" title="">Technical Documentation</a></li> 
+        <li><a href="http://sourceforge.net/projects/hplip/" title="Our project page on Sourceforge.net">Sourceforge Project Page</a></li> 
+        <li><a href="../../../license.html" title="Software License">Software License</a></li>
+        <li><a a href="../../../other_support.html" title="Other Support Information">Other Support Information</a></li>
+        <li><a href="../../../contacts.html" title="Contacts">Contacts</a></li>
+    </menu>
+</ul>
+</div>
+<!-- end sidebar --></td>
+</div>
+<td width=100%>
+<div id="content"><!-- start content -->
+        <a href="../../../index.html">Home</a>
+&gt;
+<a href="../../index.html">Installation</a>
+&gt;
+<a href="../index.html">Manual Install</a>
+&gt;
+<a href="index.html">Linux Distributions</a>
+&gt;
+LFS/BLFS
+
+<hr size="1"/>
+        <div class="document" id="manual-build-and-install-instructions-for-linux-from-scratch">
+<h1 class="title">Manual Build and Install Instructions for Linux From Scratch</h1>
+<div class="section">
+<h1><a id="step-1-installation-prerequisite-steps" name="step-1-installation-prerequisite-steps">Step 1: Installation Prerequisite Steps</a></h1>
+<div class="important">
+<p class="first admonition-title">Important</p>
+<p class="last">This process has not been tested on HPLIP 2.7.X</p>
+</div>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">This process has not been tested by the HPLIP Team and is not supported.</p>
+</div>
+<p><a class="reference" href="../../../release_notes.html">View the current Release Notes</a> for additional information on this release.</p>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">You will need root access to complete many of the steps while installing HPLIP. If you do not have root access contact your system admin for assistance.</p>
+</div>
+<p>Installing hplip-1.7.1 on an LFS/BLFS system</p>
+<p>This document describes the installation of hplip-1.7.1 on a Linux from Scratch (LFS)/Beyond Linux from Scratch (BLFS) setup.</p>
+<p>Some system components of the LFS/BLFS build on which this experience is based are: gcc-4.0.3 ; glibc-2.3.6; udev-088; Linux-2.6.16.5; python-2.4.3; libusb-0.1.12; xfree86-4.5.0; gimp-2.2.10; cups-1.1.23; ESP_Ghostscript-8.15.1; sane-1.0.17; foomatic-3.1.0.</p>
+<p>The procedure installs hplip in a directory different from /usr or /usr/local. If these standard locations are used, some of the configuration steps may be omitted.</p>
+<p>It is assumed that:</p>
+<ol class="arabic simple">
+<li>All the system requirements for the building of hplip are met;</li>
+<li>Hplip-1.7.1.tar.gz has been untarred into a directory we shall call &quot;Build&quot; and that the patch hplip-1.7.1-1.patch has been copied to this directory. The contents of Build should look like this: hplip-1.7.1/hplip-1.7.1-1.patch;</li>
+</ol>
+<p>The various steps are described below.</p>
+<p>First as an unprivileged user:</p>
+<pre class="literal-block">
+$ cd hplip-1.7.1
+$ patch -Np1 -i ../hplip-1.7.1-1.patch
+$ sed -i &quot;s&#64;daemon&#64;pidofproc&#64;g&quot; hplip.sh
+$ ./configure --prefix=/usr/local/Hplip-1.7.1 --disable-network-build --disable-pp-build
+$ make
+</pre>
+<p>Explanations:</p>
+<p>sed -i &quot;s&#64;daemon&#64;pidofproc&#64;g&quot; hplip.sh is done to replace the 'daemon' function in hplip.sh with 'pidofproc'. Lfs does not use 'daemon' at all, but 'pidofproc' in stead.</p>
+<p>--disable-network-build: if you do not have net-snmp installed.</p>
+<dl class="docutils">
+<dt>--disable-pp-build: if your printers do not connect to the parallel</dt>
+<dd>port.</dd>
+</dl>
+<p>Next, as root:</p>
+<pre class="literal-block">
+# export HPLIP_DIR=&quot;/usr/local/Hplip-1.7.1&quot;
+# mkdir -p $HPLIP_DIR/bin
+# make install
+</pre>
+<p>Explanations:</p>
+<p>You need to do the 'mkdir' bit because hplip will not create the 'bin' directory and installation will fail as a result. If you install in /usr/local or /usr this would not be a problem.</p>
+<p>Now you need to configure for hplip (still as root):</p>
+<pre class="literal-block">
+# chmod 0744 $HPLIP_DIR/share/hplip/hplip
+# cd /etc/rc.d/init.d
+# ln -s $HPLIP_DIR/share/hplip/hplip hplip
+# cd ../rc0.d
+# ln -s ../init.d/hplip K01hplip
+# cd ../rc3.d
+# ln -s ../init.d/hplip S24hplip
+# cd ../rc5.d
+# ln -s ../init.d/hplip S24hplip
+# cd ../rc6.d
+# ln -s ../init.d/hplip K01hplip
+# cd /usr/bin
+# ln -s $HPLIP_DIR/bin/hpijs hpijs
+# cd ../lib/sane
+# ln -s $HPLIP_DIR/lib/libsane-hpaio.* .
+</pre>
+<p>Find the path in /dev to the printer. This is done by ls /dev and looking for the usb/ directory, for example. Suppose the path is /dev/usb/lp0</p>
+<p>Edit /etc/profile and add the line</p>
+<pre class="literal-block">
+export SANE_DEFAULT_DEVICE=&quot;hpaio:/dev/usb/lp0&quot;
+</pre>
+<p>Then run the command:</p>
+<pre class="literal-block">
+# . /etc/profile
+</pre>
+<p>To /etc/ld.so.conf add the line</p>
+<pre class="literal-block">
+/usr/local/Hplip-1.7.1/lib
+</pre>
+<p>and run the command</p>
+<pre class="literal-block">
+# ldconfig
+</pre>
+<p>Finally:</p>
+<pre class="literal-block">
+# unset HPLIP_DIR
+</pre>
+<p>Explanations:</p>
+<p>-- The 'hplip' binary as installed is not executable, hence the &quot;chmod&quot; step.</p>
+<p>-- The lfs-setup has 'init.d' in a place different from what the installation procedure expects. We have to make a symlink in ' init.d' to where 'hplip' is.</p>
+<p>-- The symlinks set up in the rc.{0,1,3,5,6} directories will activate the two hplip daemons at boot time and bring them down at shutdown time.  It is important to note that these daemons must be activated before the 'cups' daemon and shut down after the 'cups' daemon. Thus the numbers 'xy' in the 'Sxy' links must preceed those for 'cups'. The 'xy' in 'Kxy' must be larger than those for cups. So have a good look at what goes on in the 'rc.n' directories.</p>
+<p>-- It is important to have a link in /usr/bin to the 'hpijs' binary. Without this link 'cups' will get lost. That is one reason why installation of 'hplip' in /usr is recommended.</p>
+<p>-- Sane will look for the 'libsane-hpaio' libraries in /usr/lib/sane. So we have to establish a link. Without these links scanning at least with 'xscanimage' will not work. The final dot in the command line should not be left out.</p>
+<p>-- The environment variable SANE_DEFAULT_DEVICE will make 'xscanimage' work from wherever it is called. This really is a nice thing to do!</p>
+<p>-- Having 'ldconfig' make the hplip libraries visible to the system may be of importance to software that leans on hplip.</p>
+<p>If you set the variable SANE_DEFAULT_DEVICE do not give a command to
+xscanimage when you configure.</p>
+<p>Hopefully this is of value to users of other Linux distributions as well.</p>
+<p>Documentation provided by Niko Sauer</p>
+<hr></div>
+<div class="section">
+<h1><a id="step-2-install-dependency-packages" name="step-2-install-dependency-packages">Step 2: Install Dependency Packages</a></h1>
+<p>Use the <a class="reference" href="other.html">Other Linux Distros</a> page for a list of required depencency packages.</p>
+<p>Use your distro documentation for installing the packages.</p>
+<hr></div>
+<div class="section">
+<h1><a id="step-3-download-hplip" name="step-3-download-hplip">Step 3: Download HPLIP</a></h1>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">We recommend that you download the HPLIP tarball to your home or desktop directory.</p>
+</div>
+<p><strong>A.</strong> Click here to <a class="reference" href="http://prdownloads.sourceforge.net/hplip/hplip-2.7.6.tar.gz">Download the Regular Tarball</a></p>
+<p><strong>B.</strong> Go to the directory where you downloaded the HPLIP tarball.</p>
+<p>Example:</p>
+<pre class="literal-block">
+cd ~/Desktop
+</pre>
+<p><strong>C.</strong> Uncompress the tarball.</p>
+<p>Enter this command:</p>
+<pre class="literal-block">
+tar xvfz hplip-2.7.6.tar.gz
+</pre>
+<p>This will create a directory with the same name as the tarball file.</p>
+<p><strong>D.</strong> Change your working directory to the hplip-2.7.6 directory.</p>
+<p>Example:</p>
+<pre class="literal-block">
+cd hplip-2.7.6
+</pre>
+<hr></div>
+<div class="section">
+<h1><a id="step-4-configure-hplip-for-installation" name="step-4-configure-hplip-for-installation">Step 4: Configure HPLIP for installation</a></h1>
+<p><strong>A.</strong> This step configures the development environment and checks that your system is ready to install HPLIP.</p>
+For specific information on using ./configure and the different options <a href="#" onClick="MyWindow=window.open('../configure.html','MyWindow','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=900,height=400'); return false;">please go here</a>. Also reference your distro documentation and configuration for additional information on which tags are relevant.<p>Enter this command (select the appropriate command depending on your system configuration):</p>
+<p>32 bit distro users (most users will use this command):</p>
+<pre class="literal-block">
+./configure --prefix=/usr
+</pre>
+<p>64 bit distro users</p>
+<pre class="literal-block">
+./configure --prefix=/usr --libdir=/usr/lib64
+</pre>
+<hr></div>
+<div class="section">
+<h1><a id="step-5-run-make" name="step-5-run-make">Step 5: Run Make</a></h1>
+<p><strong>A.</strong> This step will compile the HPLIP source.</p>
+<div class="important">
+<p class="first admonition-title">Important</p>
+<p class="last">You want to run make as a regular user, NOT as root.</p>
+</div>
+<p>Enter this command:</p>
+<pre class="literal-block">
+make
+</pre>
+<hr></div>
+<div class="section">
+<h1><a id="step-6-run-make-install" name="step-6-run-make-install">Step 6: Run Make Install</a></h1>
+<p><strong>A.</strong> This step will install HPLIP.</p>
+<p>Enter this command:</p>
+<pre class="literal-block">
+su -c &quot;make install&quot;
+</pre>
+<hr></div>
+<div class="section">
+<h1><a id="step-7-post-installation-steps" name="step-7-post-installation-steps">Step 7: Post Installation Steps</a></h1>
+<p><strong>A.</strong> Check USB Port Permissions.</p>
+<p>Run the following script to verify that your USB ports are configured with the correct permissions.</p>
+<p>Enter this command:</p>
+<pre class="literal-block">
+su -c &quot;./installer/permissions.py&quot;
+</pre>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">Alternatively you can manually check your USB port permissions by following the instructions for the Manual Permissions Process link below.</p>
+</div>
+<a href="#" onClick="MyWindow=window.open('../permissions.html','MyWindow','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=900,height=400'); return false;">Manual Permissions Process</a><p><strong>B.</strong> Trigger your USB devices.</p>
+<p>Run the following script to trigger your USB devices.</p>
+<p>Enter this command:</p>
+<pre class="literal-block">
+su -c &quot;./installer/trigger.py&quot;
+</pre>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">Alternatively you can manually trigger your USB devices by unplugging and reconnecting your USB printer's from your computer.</p>
+</div>
+<hr><p><strong>C.</strong> Verify your user is part of the lp group</p>
+<p><strong>a</strong>. Open a terminal shell.</p>
+<p>Enter this command:</p>
+<pre class="literal-block">
+groups
+</pre>
+<p>You should get a result similar to:</p>
+<pre class="literal-block">
+aaron adm dialout cdrom floppy audio dip video plugdev scanner netdev lpadmin powerdev admin
+</pre>
+<p><strong>b.</strong> If you do not see the &quot;lp&quot; group in the list.</p>
+<p>Enter this command:</p>
+<pre class="literal-block">
+su -c &quot;usermod -a -G lp aaron&quot;
+</pre>
+<p>Replace &quot;aaron&quot; with your username.</p>
+<div class="important">
+<p class="first admonition-title">Important</p>
+<p class="last">Logout and back onto your system to apply the changes.</p>
+</div>
+<hr></div>
+<div class="section">
+<h1><a id="step-8-configuring-your-printer-using-hp-setup" name="step-8-configuring-your-printer-using-hp-setup">Step 8: Configuring your printer using hp-setup</a></h1>
+<p><strong>A.</strong> Run hp-check to verify that your system is configure correctly.</p>
+<p>Enter this command:</p>
+<pre class="literal-block">
+hp-check
+</pre>
+<p>If any failures try and resolve them depending on the error.  Contact the mailing list for support as needed.</p>
+<hr></div>
+<div class="section">
+<h1><a id="step-9-configuring-your-printer-using-hp-setup" name="step-9-configuring-your-printer-using-hp-setup">Step 9: Configuring your printer using hp-setup</a></h1>
+<p><a class="reference" href="../hp_setup.html">Continue to hp-setup</a></p>
+</div>
+</div>
+
+<hr size="1"/>
+<center><small>Page last updated: Thu Jun 14 16:07:56 2007; HPLIP Version: 2.7.6</small></center>
+</div>
+</td></tr></table>
+</div>
+<!-- end content -->
+<!-- end container -->
+<div id="footer"><!-- start footer -->
+        <hr size="1"/>
+        <a href="../../../legal.html">Legal Notices</a>
+        Copyright &#169; 2003-2007, Hewlett-Packard Development Company, L.P.
+        <a href="mailto:hplip@hp.com">Contact Site Maintainer</a><br>
+        <a href="http://sourceforge.net/" alt="Hosted by Sourceforge.net"><img src="../../../images/sflogo.png" border="0"></a>
+</div>
+<!-- end footer -->
+</div><!-- end page -->
+
+<!-- google analytics -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1543832-1";
+urchinTracker();
+</script>
+<!-- start google analytics from hplip.marketing -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1543832-7";
+urchinTracker();
+</script>
+<!-- end google analytics -->
+
+
+<!-- START OF ACTIVEMETER CODE -->
+<script type="text/javascript" language="javascript">
+var __pid=30231;
+var __am_invisible=1;
+</script>
+<!-- END OF ACTIVEMETER CODE -->
+
+</body>
+</html>

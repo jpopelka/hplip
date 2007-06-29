@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="shortcut icon" href="../images/favicon.ico" type="image/x-icon" />
+<title>HPLIP Troubleshooting - Printing</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="../styles/default.css" type="text/css" /> 
+<META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE" />
+<META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 22 Jul 2002 11:12:01 GMT" />
+<META NAME="DESCRIPTION" CONTENT="HP Linux Imaging and Printing - HPLIP is an HP developed solution for printing, scanning, and faxing with HP inkjet and laser based printers in Linux.">
+<META NAME="KEYWORDS" CONTENT="HPLIP, HP, Linux, Printing, HPIJS">
+</head>
+<body>
+<div id="page"><!-- start page -->
+<div id="container"><!-- start main container -->
+<!-- start banner -->
+
+<div id="banner">
+<div id="banner_graphics">
+        <div id="floatleft">
+        <img src="../images/hplogo2.png" alt="HP Logo" border="0" />
+        </div>
+        <div id="floatcenter">
+        <a href="../index.html">
+        <img src="../images/hpliplogo.png" alt="HP Logo" border="0" />
+        </a>
+        </div>
+        <div id="floatright">
+        <img src="../images/tuxlogo2.png" alt="Tux" border="0" />
+        </div>
+    </div>
+</div>
+<!-- end banner -->
+
+<div id="navbar">
+<table>
+    <tr>
+        <td valign="top">
+<div id="sidebar-a">
+<ul id="sidebar-a-list">
+    <menu compact="compact">
+        <div class="menuheader"><a href="../index.html" title="">Home</a></div>
+    </menu>
+
+<div class="menuheader">About</div>
+    <menu compact="compact">
+        <li><a href="../features.html" title="">Features</a></li> 
+        <li><a href="../screenshots.html" title="">Screenshots</a></li> 
+        <li><a href="../faqs.html" title="FAQs">FAQs</a></li> 
+        <li><a a href="../about.html" title="About">About HPLIP</a></li>
+    </menu>
+<div class="menuheader">Setup and Installation</div>
+    <menu compact="compact">
+        <li><a href="../downloads.html" title="Downloads">Download HPLIP</a></li>
+        <li><a href="../install/index.html" title="Installation Instructions">Installation Instructions</a></li> 
+        <li><a href="../system_requirements.html" title="System Requirements">System Requirements</a></li> 
+        <li><a href="../supported_devices/index.html" title="Supported Devices">Supported Devices</a></li> 
+    </menu>
+<div class="menuheader">Usage and Support</div>
+    <menu compact="compact">
+        <li><a href="../mailing_lists.html" title="Mailing Lists">Mailing Lists</a></li>
+        <li><a href="../howtos/index.html" title="How-Tos">How-Tos</a></li> 
+        <li><a href="../troubleshooting/index.html" title="Troubleshooting">Troubleshooting</a></li>
+        <li><a href="../release_notes.html" title="Release Notes">Release Notes</a></li>
+    </menu>
+<div class="menuheader">Resources</div>
+    <menu compact="compact">
+        <li><a href="../tech_docs/index.html" title="">Technical Documentation</a></li> 
+        <li><a href="http://sourceforge.net/projects/hplip/" title="Our project page on Sourceforge.net">Sourceforge Project Page</a></li> 
+        <li><a href="../license.html" title="Software License">Software License</a></li>
+        <li><a a href="../other_support.html" title="Other Support Information">Other Support Information</a></li>
+        <li><a href="../contacts.html" title="Contacts">Contacts</a></li>
+    </menu>
+</ul>
+</div>
+<!-- end sidebar --></td>
+</div>
+<td width=100%>
+<div id="content"><!-- start content -->
+        <a href="../index.html">Home</a>
+&gt;
+<a href="index.html">Troubleshooting</a>
+&gt;
+Printing
+
+<hr size="1"/>
+        <div class="document" id="printing-troubleshooting">
+<h1 class="title">Printing Troubleshooting</h1>
+<p><strong>Issue 1: Print jobs are failing on my 4x6 Photosmart printer.</strong></p>
+<p>Solution:</p>
+<p>For printers that only support 4x6 page sizes, make sure the page size setting is correct in the CUPS queue. The default page setting may not be correct and print jobs will fail.</p>
+<p><strong>Issue 2: I'd like to view the CUPS error log for debugging and troubleshooting purposes.</strong></p>
+<p>Solution:</p>
+<p>Edit the /etc/cups/cupsd.conf file, find the section &quot;loglevel&quot; change &quot;info&quot; to &quot;debug&quot; save and exit then restart cups</p>
+<pre class="literal-block">
+# /etc/init.d/cups restart
+</pre>
+<p>or for Ubuntu</p>
+<pre class="literal-block">
+$ sudo /etc/init.d/cupsys restart
+</pre>
+<p>then enter this command to view the log</p>
+<pre class="literal-block">
+tail -f /var/log/cups/error_log
+</pre>
+<p>With the CUPS LogLevel set to debug, the CUPS error_log will show all programs that are executed during the print job. Generally there are two data paths taken during a print job; 1) HPIJS driver path 2) Postscript driver path. Both data paths will use the &quot;hp&quot; backend.</p>
+<p>For the HPIJS path, look for errors near the ghostscript command (gs) command. The gs command will invoke the HPIJS driver.</p>
+<p>For the Postscript path, there will be no gs command. Postscript will be passed directly to the &quot;hp&quot; backend and then to the printer.</p>
+<p><strong>Issue 3: When printing Letter media, the bottom row is printed incompletely.</strong></p>
+<p>Solution:</p>
+<p>Some applications use enscript for printing, make the following changes to /etc/enscript.conf. This tip came from Patricio Paez.</p>
+<p>From:</p>
+<pre class="literal-block">
+DefaultMedia = Letter
+</pre>
+<p>To:</p>
+<pre class="literal-block">
+DefaultMedia = Letterdj
+</pre>
+</div>
+
+<hr size="1"/>
+<center><small>Page last updated: Wed May  2 13:09:44 2007; HPLIP Version: 2.7.6</small></center>
+</div>
+</td></tr></table>
+</div>
+<!-- end content -->
+<!-- end container -->
+<div id="footer"><!-- start footer -->
+        <hr size="1"/>
+        <a href="../legal.html">Legal Notices</a>
+        Copyright &#169; 2003-2007, Hewlett-Packard Development Company, L.P.
+        <a href="mailto:hplip@hp.com">Contact Site Maintainer</a><br>
+        <a href="http://sourceforge.net/" alt="Hosted by Sourceforge.net"><img src="../images/sflogo.png" border="0"></a>
+</div>
+<!-- end footer -->
+</div><!-- end page -->
+
+<!-- google analytics -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1543832-1";
+urchinTracker();
+</script>
+<!-- start google analytics from hplip.marketing -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1543832-7";
+urchinTracker();
+</script>
+<!-- end google analytics -->
+
+
+<!-- START OF ACTIVEMETER CODE -->
+<script type="text/javascript" language="javascript">
+var __pid=30231;
+var __am_invisible=1;
+</script>
+<!-- END OF ACTIVEMETER CODE -->
+
+</body>
+</html>
