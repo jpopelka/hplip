@@ -30,13 +30,13 @@ class CleaningForm(CleaningForm_base):
         CleaningForm_base.__init__(self,parent,name,modal,fl)
         self.dev = dev
 
-        text = str(self.CleaningText.text())
+        text = unicode(self.CleaningText.text())
         self.CleaningText.setText(text % str(cleaning_level + 1))
 
-        text = str(self.Continue.text())
+        text = unicode(self.Continue.text())
         self.Continue.setText(text % str(cleaning_level + 1))
 
-        text = str(self.CleaningTitle.text())
+        text = unicode(self.CleaningTitle.text())
         self.CleaningTitle.setText(text % str(cleaning_level))
 
         self.Icon.setPixmap(QPixmap(os.path.join(prop.image_dir, 'clean.png')))

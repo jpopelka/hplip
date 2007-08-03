@@ -1587,6 +1587,11 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A520</printer>
+      <arg_defval>ev/hpijs-PrintoutMode-Photo-PSP100</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_470</printer>
       <arg_defval>ev/hpijs-PrintoutMode-Photo-PSP470</arg_defval>
      </constraint>
@@ -1597,7 +1602,17 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A620</printer>
+      <arg_defval>ev/hpijs-PrintoutMode-Photo-PSP470</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_A710</printer>
+      <arg_defval>ev/hpijs-PrintoutMode-Photo-PSP470</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A820</printer>
       <arg_defval>ev/hpijs-PrintoutMode-Photo-PSP470</arg_defval>
      </constraint>
      <constraint sense='true'>
@@ -8316,6 +8331,10 @@
       <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_A510</printer>
      </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A520</printer>
+     </constraint>
     </constraints>
    </enum_val>
    <enum_val id="ev/hpijs-PrintoutMode-Photo-PSP100">
@@ -8396,6 +8415,10 @@
       <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_A510</printer>
      </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A520</printer>
+     </constraint>
     </constraints>
    </enum_val>
    <enum_val id="ev/hpijs-PrintoutMode-Normal-PSP100">
@@ -8475,6 +8498,10 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_A510</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A520</printer>
      </constraint>
     </constraints>
    </enum_val>
@@ -9674,7 +9701,15 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A620</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_A710</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A820</printer>
      </constraint>
     </constraints>
    </enum_val>
@@ -9706,7 +9741,15 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A620</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_A710</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A820</printer>
      </constraint>
     </constraints>
    </enum_val>
@@ -9738,7 +9781,15 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A620</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_A710</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A820</printer>
      </constraint>
     </constraints>
    </enum_val>

@@ -49,7 +49,7 @@ class Align10Form(Align10Form_Base):
             if not self.controls[line][0]:
                 ret.append(0)
             else:
-                exec('selected = str(self.comboBox%s.currentText())' % line)
+                exec('selected = unicode(self.comboBox%s.currentText())' % line)
                 try:
                     selected = int(selected[1:])
                 except ValueError:

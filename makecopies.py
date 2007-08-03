@@ -96,7 +96,7 @@ if os.getenv("HPLIP_DEBUG"):
     log.set_level('debug')
 
 for o, a in opts:
-    print o, a
+    #print o, a
     if o in ('-h', '--help'):
         usage()
 

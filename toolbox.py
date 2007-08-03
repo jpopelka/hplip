@@ -135,7 +135,6 @@ elif not utils.checkPyQtImport():
     log.error("PyQt init failed. Exiting.")
     sys.exit(1)
 
-
 from qt import *
 from ui.devmgr4 import DevMgr4
 
@@ -145,7 +144,6 @@ os.umask (0037)
 # create the main application object
 app = QApplication(sys.argv)
 
-###################
 loc = user_cfg.ui.get("loc", "system")
 if loc.lower() == 'system':
     loc = str(QTextCodec.locale())
@@ -161,7 +159,6 @@ if loc.lower() != 'c':
     if loaded:
         app.installTranslator(trans)
     else:
-        #log.error("File failed to load.")
         loc = 'c'
 else:
     loc = 'c'
@@ -170,7 +167,6 @@ if loc == 'c':
     log.debug("Using default 'C' locale")
 else:
     log.debug("Using locale: %s" % loc)
-####################
 
 try:
     hpssd_sock = service.startup()

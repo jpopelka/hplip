@@ -31,7 +31,12 @@ class PhoneNumValidator(QValidator):
         QValidator.__init__(self, parent, name)
 
     def validate(self, input, pos):
-        input = str(input)
+        input = unicode(input)
+        try:
+            input = input.encode('ascii')
+        except UnicodeEncodeError:
+            return QValidator.Invalid, pos
+        
         if not input:
             return QValidator.Acceptable, pos
         elif input[pos-1] not in '0123456789-(+) ':
@@ -47,7 +52,13 @@ class StationNameValidator(QValidator):
         QValidator.__init__(self, parent, name)
 
     def validate(self, input, pos):
-        input = str(input)
+        input = unicode(input)
+        
+        try:
+            input = input.encode('ascii')
+        except UnicodeEncodeError:
+            return QValidator.Invalid, pos
+            
         if not input:
             return QValidator.Acceptable, pos
         # TODO: Find valid chars for this field
@@ -84,19 +95,25 @@ class FaxSettingsForm(FaxSettingsForm_base):
         if toggle is not None:
             self.pushButtonOK.setEnabled(bool(toggle))
         else:
-            name = str(self.nameEdit.text())
-            fax_num = str(self.faxEdit.text())
+            name = unicode(self.nameEdit.text())
+            fax_num = unicode(self.faxEdit.text())
             self.pushButtonOK.setEnabled(bool(name and fax_num))
 
-
     def accept(self):
+        # str() is OK here since the validators removed any non-ascii chars
+        fax = str(self.faxEdit.text())
+        log.debug(fax)
+        name = str(self.nameEdit.text())
+        log.debug(name)
         try:
-            self.dev.setPML(pml.OID_FAX_LOCAL_PHONE_NUM, str(self.faxEdit.text()))
-            self.dev.setPML(pml.OID_FAX_STATION_NAME, str(self.nameEdit.text()))
+            self.dev.setPML(pml.OID_FAX_LOCAL_PHONE_NUM, fax)
+            self.dev.setPML(pml.OID_FAX_STATION_NAME, name)
         except Error:
             log.error("Error setting fax settings to device.")
 
-        user_cfg.fax.voice_phone = str(self.voiceEdit.text())
-        user_cfg.fax.email_address = str(self.emailEdit.text())
+        # TODO: This is a problem - user can enter non-ascii chars...
+        # user config needs to be in utf-8 encoding (but its not right now)
+        user_cfg.fax.voice_phone = unicode(self.voiceEdit.text()).encode('ascii')
+        user_cfg.fax.email_address = unicode(self.emailEdit.text()).encode('ascii')
         FaxSettingsForm_base.accept(self)
 

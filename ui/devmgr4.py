@@ -103,7 +103,7 @@ class PasswordDialog(QDialog):
         self.promptTextLabel.setText(prompt)
 
     def getPassword(self):
-        return str(self.passwordLineEdit.text())
+        return unicode(self.passwordLineEdit.text())
 
     def languageChange(self):
         self.setCaption(self.__tr("HP Device Manager - Enter Password"))
@@ -411,7 +411,7 @@ class DevMgr4(DevMgr4_base):
                 self.UpdateDevice()
 
     def ActivateDevice(self, device_uri):
-        log.debug(utils.bold("Activate: %s %s %s" % ("*"*20, device_uri, "*"*20)))
+        log.debug(log.bold("Activate: %s %s %s" % ("*"*20, device_uri, "*"*20)))
         d = self.DeviceList.firstItem()
         found = False
 
@@ -501,7 +501,7 @@ class DevMgr4(DevMgr4_base):
 
     def UpdateDevice(self, check_state=True):
         if self.cur_device is not None:
-            log.debug(utils.bold("Update: %s %s %s" % ("*"*20, self.cur_device_uri, "*"*20)))
+            log.debug(log.bold("Update: %s %s %s" % ("*"*20, self.cur_device_uri, "*"*20)))
             self.setCaption(self.__tr("HP Device Manager - %1").arg(self.cur_device.model_ui))
 
             self.updatePrinterList()
@@ -714,7 +714,7 @@ class DevMgr4(DevMgr4_base):
                         step_num += 1
                         qApp.processEvents()
 
-                        log.debug(utils.bold("Refresh: %s %s %s" % \
+                        log.debug(log.bold("Refresh: %s %s %s" % \
                             ("*"*20, d, "*"*20)))
 
                         try:
@@ -1015,7 +1015,7 @@ class DevMgr4(DevMgr4_base):
                 self.FailureUI(self.__tr("<p><b>Unable to run command. No command specified.</b><p>Use <pre>Configure...</pre> to specify a command to run."))
                 log.error("No command specified. Use settings to configure commands.")
             else:
-                log.debug(utils.bold("Run: %s %s (%s) %s" % ("*"*20, cmd, self.cur_device_uri, "*"*20)))
+                log.debug("Run: %s %s (%s) %s" % ("*"*20, cmd, self.cur_device_uri, "*"*20))
                 log.debug(cmd)
                 cmd = ''.join([self.cur_device.device_vars.get(x, x) \
                                  for x in cmd.split(macro_char)])
@@ -1090,11 +1090,7 @@ class DevMgr4(DevMgr4_base):
                 cmd = su_sudo % c
 
             log.debug(cmd)
-            #status, output = utils.run(cmd, log_output=True, password_func=None, timeout=1)
             os.system(cmd)
-
-            #self.cur_device_uri = user_cfg.last_used.device_uri
-
             self.RescanDevices()
 
 
@@ -1132,7 +1128,7 @@ class DevMgr4(DevMgr4_base):
 
 
     def FailureUI(self, error_text):
-        log.error(str(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", ""))
+        log.error(unicode(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", ""))
         QMessageBox.critical(self,
                              self.caption(),
                              error_text,

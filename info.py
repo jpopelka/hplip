@@ -154,7 +154,7 @@ if d.device_uri is None and device_uri:
 
 if not devid_mode:
     log.info("")
-    log.info(utils.bold(d.device_uri))
+    log.info(log.bold(d.device_uri))
     log.info("")
 
 user_cfg.last_used.device_uri = d.device_uri
@@ -183,15 +183,15 @@ else:
     dq_keys = d.dq.keys()
     dq_keys.sort()
 
-    log.info(utils.bold("Device Parameters (dynamic data):"))
-    log.info(utils.TextFormatter.bold(formatter.compose(("Parameter", "Value(s)"))))
+    log.info(log.bold("Device Parameters (dynamic data):"))
+    log.info(log.bold(formatter.compose(("Parameter", "Value(s)"))))
     log.info(formatter.compose(('-'*28, '-'*58)))
 
     for key in dq_keys:
         log.info(formatter.compose((key, str(d.dq[key]))))
 
-    log.info(utils.bold("\nModel Parameters (static data):"))
-    log.info(utils.TextFormatter.bold(formatter.compose(("Parameter", "Value(s)"))))
+    log.info(log.bold("\nModel Parameters (static data):"))
+    log.info(log.bold(formatter.compose(("Parameter", "Value(s)"))))
     log.info(formatter.compose(('-'*28, '-'*58)))
 
     mq_keys = d.mq.keys()
@@ -211,8 +211,8 @@ else:
                 )
 
 
-    log.info(utils.bold("\nStatus History (most recent first):"))
-    log.info(utils.TextFormatter.bold(formatter.compose(("Date/Time", "Code", "Status Description", "User", "Job ID"))))
+    log.info(log.bold("\nStatus History (most recent first):"))
+    log.info(log.bold(formatter.compose(("Date/Time", "Code", "Status Description", "User", "Job ID"))))
     log.info(formatter.compose(('-'*20, '-'*5, '-'*40, '-'*8, '-'*8)))
 
     hq = d.queryHistory()

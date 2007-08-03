@@ -20,7 +20,9 @@
 # Author: Don Welch
 #
 
-__version__ = '0.2'
+from __future__ import division
+
+__version__ = '0.5'
 __title__ = 'Scan Utility'
 __doc__ = "SANE-based scan utility for HPLIP." 
 
@@ -29,7 +31,8 @@ import sys, os, os.path, getopt, signal, time, socket
 
 # Local
 from base.g import *
-from base.msg import *
+#from base.msg import *
+from base import tui
 import base.utils as utils
 from base import device, service
 
@@ -98,12 +101,12 @@ USAGE = [(__doc__, "", "name", True),
          ("[SANE-DEVICE-URI]", "", "header", False),
          ("SANE device URI:", "-d<sane_device_uri> or --device=<sane_device_uri>", "option", False),
          ("", "URI format: hpaio:/<bus>/<model>?<identification>", "option", False),
-         
+
          utils.USAGE_SPACE,
          ("[MODE]", "", "header", False),
          ("Enter graphical UI mode:", "-u or --gui (Default)", "option", False),
          ("Run in non-interactive mode:", "-n or --non-interactive", "option", False),
-         
+
          utils.USAGE_SPACE,
          ("[-n OPTIONS] (General) (Not applicable to GUI mode)", "", "header", False),
          ("Scan destinations:", "-s<dest_list> or --dest=<dest_list>", "option", False),
@@ -114,7 +117,7 @@ USAGE = [(__doc__, "", "name", True),
          ("", "where <resolution_in_dpi> is %s (300 is default)." % ', '.join([str(x) for x in valid_res]), "option", False),
          ("Image resize:", "--resize=<scale_in_%> (min=1%, max=400%, default=100%)", "option", False),
          ("Image contrast:", "--contrast=<contrast>", "option", False),
-         
+
          utils.USAGE_SPACE,
          ("[-n OPTIONS] (Scan area) (Not applicable to GUI mode)", "", "header", False),
          ("Specify the units for area/box measurements:", "-t<units> or --units=<units>", "option", False),
@@ -144,10 +147,10 @@ USAGE = [(__doc__, "", "name", True),
          utils.USAGE_SPACE,
          ("[-n OPTIONS] ('file' dest) (Not applicable to GUI mode)", "", "header", False),
          ("Filename for 'file' destination:", "-o<file> or -f<file> or --file=<file> or --output=<file>", "option", False),
-         
+
          utils.USAGE_SPACE,
          ("[-n OPTIONS] ('pdf' dest) (Not applicable to GUI mode)", "", "header", False),
-         
+
          ("PDF viewer application:", "--pdf=<pdf_viewer>", "option", False),
          utils.USAGE_SPACE,
          ("[-n OPTIONS] ('viewer' dest) (Not applicable to GUI mode)", "", "header", False),
@@ -157,16 +160,16 @@ USAGE = [(__doc__, "", "name", True),
          ("[-n OPTIONS] ('editor' dest) (Not applicable to GUI mode)", "", "header", False),
          ("Image editor application:", "-e<editor> or --editor=<editor>", "option", False),
          utils.USAGE_SPACE,
-         
+
          ("[-n OPTIONS] ('email' dest) (Not applicable to GUI mode)", "", "header", False),
          ("From: address for 'email' dest:", "--email-from=<email_from_address> (required for 'email' dest.)", "option", False),
-         
+
          ("To: address for 'email' dest:", "--email-to=<email__to_address> (required for 'email' dest.)", "option", False),
          ("Email subject for 'email' dest:", '--email-subject="<subject>"', "option", False),
          ("", 'Use double quotes (") around the subject if it contains space characters.', "option", False),
          ("Note or message for the 'email' dest:", '--email-msg="<msg>" or --email-note="<note>"', "option", False),
          ("", 'Use double quotes (") around the note/message if it contains space characters.', "option", False),
-         
+
          utils.USAGE_SPACE,
          ("[-n OPTIONS] ('fax' dest) (Not applicable to GUI mode)", "", "header", False),
          ("Fax queue/printer:", "--fax=<fax_printer_name>", "option", False),
@@ -187,7 +190,7 @@ USAGE = [(__doc__, "", "name", True),
          ("4. If an output file is not specified with the 'file' dest, a reasonable default will be used.", "", "note", False),
          ("5. Some options may not be valid on some scanning devices.", "", "note", False),
          ("6. The following features are not yet implemented: GUI mode, ADF scanning, batch scanning, film/negative scanning, contrast adjustment, brightness adjustment, autocrop, resize to axb, resize to xKB, ", "", "note", False),
-         
+
          utils.USAGE_SPACE,
          utils.USAGE_EXAMPLES,
          ("Quickly (low-res) scan entire page in color to file:", "$ hp-scan -n -r75",  "example", False),
@@ -215,7 +218,7 @@ for v in viewer_list:
     if vv:
         viewer = os.path.join(vv, v)
         break
-    
+
 
 editor = ''
 editor_list = ['kolourpaint', 'gimp', 'krita', 'cinepaint', 'mirage',]
@@ -232,7 +235,7 @@ for v in pdf_viewer_list:
     if vv:
         pdf_viewer = os.path.join(vv, v)
         break
-        
+
 try:
     opts, args = getopt.getopt(sys.argv[1:],'l:hd:p:b:gunr:m:t:o:s:f:v:e:c:a:x:', 
         ['device=', 'printer=', 'level=', 
@@ -296,38 +299,38 @@ for o, a in opts:
 
         mode = GUI_MODE
         mode_specified = True
-    
+
     elif o in ('-x', '--compression'):
         a = a.strip().lower()
-        
+
         if a in ('jpeg', 'jpg'):
             scanner_compression = 'JPEG'
-        
+
         elif a in ('raw', 'none'):
             scanner_compression = 'None'
-            
+
         else:
             log.error("Invalid compression value. Valid values are 'jpeg', 'raw', and 'none'.")
             log.error("Using default value of 'jpeg'.")
             scanner_compression = 'JPEG'
-        
+
     elif o in ('-m', '--mode'):
         a = a.strip().lower()
-        
+
         if a in ('color', 'colour'):
             scan_mode = 'color'
-        
+
         elif a in ('lineart', 'bw', 'b&w'):
             scan_mode = 'lineart'
-        
+
         elif a in ('gray', 'grayscale', 'grey', 'greyscale'):
             scan_mode = 'gray'
-        
+
         else:
             log.error("Invalid mode. Using default of 'color'.")
             log.error("Valid modes are 'color', 'lineart', or 'gray'.")
             scan_mode = 'color'
-    
+
     elif o in ('--res', '--resolution', '-r'):
         try:
             r = int(a.strip())
@@ -345,32 +348,32 @@ for o, a in opts:
                     if abs(r-x) < min_dist:
                         min_dist = abs(r-x)
                         res = x
-                
+
                 log.warn("Invalid resolution. Using closest valid resolution of %d dpi" % res)
                 log.error("Valid resolutions are %s dpi." % ', '.join([str(x) for x in valid_res]))
 
     elif o in ('-t', '--units'):
         a = a.strip().lower()
-        
+
         if a in ('in', 'inch', 'inches'):
             units = 'in'
-            
+
         elif a in ('mm', 'milimeter', 'milimeters', 'millimetre', 'millimetres'):
             units = 'mm'
-            
+
         elif a in ('cm', 'centimeter', 'centimeters', 'centimetre', 'centimetres'):
             units = 'cm'
-            
+
         elif a in ('px', 'pixel', 'pixels', 'pel', 'pels'):
             units = 'px'
-            
+
         elif a in ('pt', 'point', 'points'):
             units = 'pt'
-            
+
         else:
             log.error("Invalid units. Using default of mm.")
             units = 'mm'
-            
+
     elif o == '--tlx':
         a = a.strip().lower()
         try:
@@ -379,7 +382,7 @@ for o, a in opts:
             log.error("Invalid value for tlx.")
         else:
             tlx = f
-            
+
     elif o == '--tly':
         a = a.strip().lower()
         try:
@@ -388,7 +391,7 @@ for o, a in opts:
             log.error("Invalid value for tly.")
         else:
             tly = f
-            
+
     elif o == '--brx':
         a = a.strip().lower()
         try:
@@ -397,7 +400,7 @@ for o, a in opts:
             log.error("Invalid value for brx.")
         else:
             brx = f
-            
+
     elif o == '--bry':
         a = a.strip().lower()
         try:
@@ -406,7 +409,7 @@ for o, a in opts:
             log.error("Invalid value for bry.")
         else:
             bry = f
-            
+
     elif o in ('-a', '--area'): # tlx, tly, brx, bry
         a = a.strip().lower()
         try:
@@ -419,19 +422,19 @@ for o, a in opts:
             except ValueError:
                 log.error("Invalid value for tlx. Using defaults.")
                 tlx = None
-            
+
             try:
                 tly = float(tly)
             except ValueError:
                 log.error("Invalid value for tly. Using defaults.")
                 tly = None
-        
+
             try:
                 brx = float(brx)
             except ValueError:
                 log.error("Invalid value for brx. Using defaults.")
                 brx = None
-    
+
             try:
                 bry = float(bry)
             except ValueError:
@@ -450,13 +453,13 @@ for o, a in opts:
             except ValueError:
                 log.error("Invalid value for tlx. Using defaults.")
                 tlx = None
-            
+
             try:
                 tly = float(tly)
             except ValueError:
                 log.error("Invalid value for tly. Using defaults.")
                 tly = None
-        
+
             if tlx is not None:
                 try:
                     brx = float(width) + tlx
@@ -466,7 +469,7 @@ for o, a in opts:
             else:
                 log.error("Cannot calculate brx since tlx is invalid. Using defaults.")
                 brx = None
-    
+
             if tly is not None:
                 try:
                     bry = float(height) + tly
@@ -476,7 +479,7 @@ for o, a in opts:
             else:
                 log.error("Cannot calculate bry since tly is invalid. Using defaults.")
                 bry = None
-                
+
     elif o == '--size':
         size = a.strip().lower()
         if size in PAGE_SIZES:
@@ -486,10 +489,10 @@ for o, a in opts:
         else:
             log.error("Invalid page size. Valid page sizes are: %s" % ', '.join(PAGE_SIZES.keys()))
             log.error("Using defaults.")
-    
+
     elif o in ('-o', '--output', '-f', '--file'):
         output = os.path.abspath(os.path.normpath(os.path.expanduser(a.strip())))
-        
+
         try:
             ext = os.path.splitext(output)[1]
         except IndexError:
@@ -506,17 +509,19 @@ for o, a in opts:
             else:
                 if os.path.exists(output):
                     log.warn("Output file '%s' exists. File will be overwritten." % output)
-                
+
                 if 'file' not in dest:
                     dest.append('file')
-        
+
     elif o in ('-s', '--dest', '--destination'):
         a = a.strip().lower().split(',')
         for aa in a:
             aa = aa.strip()
-            if aa in ('file', 'fax', 'viewer', 'editor', 'printer', 'email', 'pdf') and aa not in dest:
+            if aa in ('file', 'fax', 'viewer', 'editor', 'printer', 'print', 'email', 'pdf') \
+                and aa not in dest:
+                if aa == 'print': aa = 'printer'
                 dest.append(aa)
-                
+
     elif o in ('-v', '--viewer'):
         a = a.strip()
         b = utils.which(a)
@@ -526,7 +531,7 @@ for o, a in opts:
             viewer = os.path.join(b, a)
             if 'viewer' not in dest:
                 dest.append('viewer')
-                
+
     elif o in ('-e', '--editor'):
         a = a.strip()
         b = utils.which(a)
@@ -536,7 +541,7 @@ for o, a in opts:
             editor = os.path.join(b, a)
             if 'editor' not in dest:
                 dest.append('editor')
-                
+
     elif o == '--pdf':
         a = a.strip()
         b = utils.which(a)
@@ -546,7 +551,7 @@ for o, a in opts:
             pdf_viewer = os.path.join(b, a)
             if 'pdf' not in dest:
                 dest.append('pdf')
-                
+
     elif o in ('-p', '--printer'):
         pp = a.strip()
         from prnt import cups
@@ -557,33 +562,33 @@ for o, a in opts:
                 found = True
                 printer = pp
                 break
-        
+
         if found: 
             if 'printer' not in dest:
                 dest.append('printer')
         else:
             log.error("Unknown/invalid printer name: %s" % printer)
-            
+
     elif o == '--email-to':
         email_to = a.split(',')
         if 'email' not in dest:
             dest.append('email')
-    
+
     elif o == '--email-from':
         email_from = a
         if 'email' not in dest:
             dest.append('email')
-            
+
     elif o == '--email-subject':
         email_subject = a
         if 'email' not in dest:
             dest.append('email')
-        
+
     elif o in ('--email-note', '--email-msg'):
         email_note = a
         if 'email' not in dest:
             dest.append('email')
-            
+
     elif o == '--resize':
         a = a.replace("%", "")
         try:
@@ -591,24 +596,24 @@ for o, a in opts:
         except ValueError:
             resize = 100
             log.error("Invalid resize value. Using default of 100%.")
-            
+
     elif o in ('-b', '--brightness'):
         pass
-        
+
     elif o in ('-c', '--contrast'):
         try:
             contrast = int(a.strip())
         except ValueError:
             log.error("Invalid contrast value. Using default of 100.")
             contrast = 100
-            
+
 
 utils.log_title(__title__, __version__)
 
 if 'printer' in dest and not printer:
     from prnt import cups
     printer = cups.getDefaultPrinter()
-    
+
     if printer is not None:
         log.warn("Print destination enabled with no printer specified.")
         log.warn("Using CUPS default printer '%s'." % printer)
@@ -616,19 +621,19 @@ if 'printer' in dest and not printer:
         log.error("Print destination enabled with no printer specified.")
         log.error("No CUPS default printer found. Disabling 'print' destination.")
         dest.remove("printer")
-                
+
 if not dest:
     log.warn("No destinations specified. Adding 'file' destination by default.")
     dest.append('file')
 
 if 'file' in dest and not output:
     log.warn("File destination enabled with no output file specified.")
-    
+
     if scan_mode == 'gray':
         output = utils.createSequencedFilename("hpscan", ".png")
     else:
         output = utils.createSequencedFilename("hpscan", ".jpg")
-    
+
     log.warn("Defaulting to '%s'." % output)
 
 try:
@@ -639,15 +644,15 @@ except IndexError:
 if scan_mode == 'gray' and output_type and output_type != '.png':
     log.error("Grayscale scans must be saved in PNG file format. To save in other formats, set the 'editor' destination and save the image from the editor.")
     sys.exit(1)
-    
+
 if 'email' in dest and (not email_from or not email_to):
     log.error("Email specified, but email to and/or email from address(es) were not specified.")
     log.error("Disabling 'email' destination.")
     dest.remove("email")
-    
+
 if page_size:
     units = 'mm'
-    
+
 if units == 'in':
     if tlx is not None: tlx = tlx * 25.4
     if tly is not None: tly = tly * 25.4
@@ -676,14 +681,14 @@ elif units == 'px':
 if tlx is not None and brx is not None and tlx >= brx:
     log.error("Invalid values for tlx (%d) and brx (%d) (tlx>=brx). Using defaults." % (tlx, brx))
     tlx = brx = None
-    
+
 if tly is not None and bry is not None and tly >= bry:
     log.error("Invalid values for tly (%d) and bry (%d) (tly>=bry). Using defaults." % (tly, bry))
     tly = bry = None
 
 
-        
-        
+
+
 # Security: Do *not* create files that other users can muck around with
 os.umask (0037)
 
@@ -694,11 +699,11 @@ if not prop.scan_build:
 if mode == GUI_MODE:
     log.error("GUI mode is not implemented yet. Please use -n. Refer to 'hp-scan -h' for help.")
     sys.exit(1)
-    
+
     if not prop.gui_build:
         log.warn("GUI mode disabled in build. Reverting to interactive mode.")
         mode = NON_INTERACTIVE_MODE
-    
+
     elif not os.getenv('DISPLAY'):
         log.warn("No display found. Reverting to interactive mode.")
         mode = NON_INTERACTIVE_MODE
@@ -706,7 +711,7 @@ if mode == GUI_MODE:
     elif not utils.checkPyQtImport():
         log.warn("PyQt init failed. Reverting to interactive mode.")
         mode = NON_INTERACTIVE_MODE
-        
+
 if mode == GUI_MODE:
     app = None
     sendfax = None
@@ -721,15 +726,10 @@ if mode == GUI_MODE:
     except Error:
         log.error("Unable to connect to HPLIP I/O (hpssd).")
         sys.exit(1)
-        
-    
 
     # create the main application object
     app = QApplication(sys.argv)
-    
-    #loc = utils.loadTranslators(app, prop.user_config_file)
-    
-    ### Load localized strings...begin
+
     loc = user_cfg.ui.get("loc", "system")
     if loc.lower() == 'system':
         loc = str(QTextCodec.locale())
@@ -745,7 +745,6 @@ if mode == GUI_MODE:
         if loaded:
             app.installTranslator(trans)
         else:
-            #log.error("File failed to load.")
             loc = 'c'
     else:
         loc = 'c'
@@ -754,7 +753,6 @@ if mode == GUI_MODE:
         log.debug("Using default 'C' locale")
     else:
         log.debug("Using locale: %s" % loc)
-    ### Load localized strings...end
 
     scanui = ScanForm(hpssd_sock,
                          device_uri,  
@@ -785,114 +783,98 @@ else: # NON_INTERACTIVE_MODE
     import scanext
     import cStringIO
     import popen2
-    
+
     try:
         import Image
     except ImportError:
         log.error("'hp-scan -n' requires the Python Imaging Library (PIL). Please install it and try again or run 'hp-scan -u' instead.")
         sys.exit(1)
-    
+
     try:
         hpssd_sock = service.startup()
     except Error:
         log.error("Unable to connect to HPLIP I/O (hpssd).")
         sys.exit(1)
-        
+
     sane.init()
     devices = sane.getDevices()
-    
+
     if not device_uri:
         if len(devices) == 0:
             log.error("No scanning devices found.")
             sys.exit(1)
-        
+
         elif len(devices) == 1:
             device_uri = devices[0][0]
-            
+
         else:
-            log.info(utils.bold("\nChoose device:\n"))
-            
+            log.info(log.bold("\nChoose device:\n"))
+
             max_deviceid_size = 0
             for d in devices:
                 max_deviceid_size = max(len(d[0]), max_deviceid_size)
-        
+
             formatter = utils.TextFormatter(
                     (
                         {'width': 4},
                         {'width': max_deviceid_size, 'margin': 2},
                     )
                 )
-        
+
             log.info(formatter.compose(("Num.", "Device URI")))
             log.info(formatter.compose(('-'*4, '-'*(max_deviceid_size))))
-        
+
             i = 0
             for d in devices:
                 log.info(formatter.compose((str(i), d[0])))
                 i += 1
-        
-            while 1:
-                user_input = raw_input(utils.bold("\nEnter number 0...%d for device (q=quit) ?" % (i-1)))
-        
-                if user_input == '':
-                    log.warn("Invalid input - enter a numeric value or 'q' to quit.")
-                    continue
-        
-                if user_input.strip()[0] in ('q', 'Q'):
-                    sys.exit(1)
-        
-                try:
-                    x = int(user_input)
-                except ValueError:
-                    log.warn("Invalid input - enter a numeric value or 'q' to quit.")
-                    continue
-        
-                if x < 0 or x > (i-1):
-                    log.warn("Invalid input - enter a value between 0 and %d or 'q' to quit." % (i-1))
-                    continue
-        
-                break
-    
+
+            ok, x = tui.enter_range("\nEnter number 0...%d for device (q=quit) ?" % (i-1), 0, (i-1))
+            if not ok: sys.exit(0)
             device_uri = devices[x][0]
 
-    
-    log.info(utils.bold("Using device %s" % device_uri))
+
+    log.info(log.bold("Using device %s" % device_uri))
     log.info("Opening connection to device...")
-    
+
     try:
         device = sane.openDevice(device_uri)
     except scanext.error, e:
         log.error(e)
         sys.exit(1)
-    
+
     #print device.options
-    
+
     tlx = device.getOptionObj('tl-x').limitAndSet(tlx)
     tly = device.getOptionObj('tl-y').limitAndSet(tly)
     brx = device.getOptionObj('br-x').limitAndSet(brx)
     bry = device.getOptionObj('br-y').limitAndSet(bry)
-    
+
     scan_area = (brx - tlx) * (bry - tly) # mm^2
     scan_px = scan_area * res * res / 645.16 # res is in DPI
-    
+
     if scan_mode == 'color':
         scan_size = scan_px * 3 # 3 bytes/px
     else:
         scan_size = scan_px # 1 byte/px
-    
-    if res > 600 and scan_size > 52428800: # 50MB
-        log.warn("Using resolutions greater than 600 dpi will cause very large files to be created.")
+
+    if scan_size > 52428800: # 50MB
+        if res > 600:
+            log.warn("Using resolutions greater than 600 dpi will cause very large files to be created.")
+        else:
+            log.warn("The scan current parameters will cause very large files to be created.")
+
         log.warn("This can cause the scan to take a long time to complete and may cause your system to slow down.")
         log.warn("Approx. number of bytes to read from scanner: %s" % utils.format_bytes(scan_size, True))
 
     res = device.getOptionObj('resolution').limitAndSet(res)
-    
+
     device.setOption('compression', scanner_compression)
-    
+
     if brx - tlx <= 0.0 or bry - tly <= 0.0:
         log.error("Invalid scan area.")
         sys.exit(1)
-        
+
     log.info("")
     log.info("Resolution: %ddpi" % res)
     log.info("Mode: %s" % scan_mode)
@@ -902,7 +884,7 @@ else: # NON_INTERACTIVE_MODE
     log.info("  Bottom right (x,y): (%fmm, %fmm)" % (brx, bry))
     log.info("  Width: %fmm" % (brx - tlx))
     log.info("  Height: %fmm" % (bry - tly))
-    
+
     if page_size:
         units = page_units # for display purposes only
         log.info("Page size: %s" % size_desc)
@@ -915,41 +897,41 @@ else: # NON_INTERACTIVE_MODE
         log.info("  Bottom right (x,y): (%fin, %fin)" % (brx/25.4, bry/25.4))
         log.info("  Width: %fin" % ((brx - tlx)/25.4))
         log.info("  Height: %fin" % ((bry - tly)/25.4))
-    
+
     elif units == 'cm':
         log.info("Scan area (cm):")
         log.info("  Top left (x,y): (%fcm, %fcm)" % (tlx/10.0, tly/10.0))
         log.info("  Bottom right (x,y): (%fcm, %fcm)" % (brx/10.0, bry/10.0))
         log.info("  Width: %fcm" % ((brx - tlx)/10.0))
         log.info("  Height: %fcm" % ((bry - tly)/10.0))
-    
+
     elif units == 'px':
         log.info("Scan area (px @ %ddpi):" % res)
         log.info("  Top left (x,y): (%fpx, %fpx)" % (tlx*res/25.4, tly*res/25.4))
         log.info("  Bottom right (x,y): (%fpx, %fpx)" % (brx*res/25.4, bry*res/25.4))
         log.info("  Width: %fpx" % ((brx - tlx)*res/25.4))
         log.info("  Height: %fpx" % ((bry - tly)*res/25.4))
-    
+
     elif units == 'pt':
         log.info("Scan area (pt):")
         log.info("  Top left (x,y): (%fpt, %fpt)" % (tlx/0.3528, tly/0.3528))
         log.info("  Bottom right (x,y): (%fpt, %fpt)" % (brx/0.3528, bry/0.3528))
         log.info("  Width: %fpt" % ((brx - tlx)/0.3528))
         log.info("  Height: %fpt" % ((bry - tly)/0.3528))
-        
+
     log.info("Destination(s): %s" % ', '.join(dest))
-    
+
     if 'file' in dest:
         log.info("Output file: %s" % output)
-    
+
     update_queue = Queue.Queue()
     event_queue = Queue.Queue()
-    
+
     device.setOption("mode", scan_mode)
     device.setOption("resolution", res)
-    
+
     log.info("\nWarming up...")
-    
+    bytes_read = 0
     try:
         try:
             try:
@@ -957,12 +939,15 @@ else: # NON_INTERACTIVE_MODE
             except scanext.error, e:
                 log.error(e)
                 sys.exit(1)
-            
+
             log.info("Scanning...")
-        
+            log.info("Expecting to read %s from scanner." % utils.format_bytes(expected_bytes))
+            cleanup_spinner()
+            log.info("")
+            
+            pm = tui.ProgressMeter("Reading data:")
+
             while device.isScanActive():
-                update_spinner()
-                
                 while update_queue.qsize():
                     try:
                         status, bytes_read = update_queue.get(0)
@@ -970,43 +955,59 @@ else: # NON_INTERACTIVE_MODE
                         if status != scanext.SANE_STATUS_GOOD:
                             log.error("SANE error %d" % status)
                             sys.exit(1)
-                            
-                        #log.debug("Read %s" % utils.format_bytes(bytes_read))
-                            
+
                     except Queue.Empty:
                         break
-                    
-                time.sleep(1)
+
+                pm.update(int(100*bytes_read/expected_bytes), 
+                    utils.format_bytes(bytes_read))
+
+                time.sleep(0.5)
                 
-            cleanup_spinner()
-        
         except KeyboardInterrupt:
             log.error("Aborted.")
             sys.exit(1)
+
+        while update_queue.qsize():
+            status, bytes_read = update_queue.get(0)
             
-        buffer, format, format_name, pixels_per_line, \
-            lines, depth, bytes_per_line, pad_bytes, total_read = device.getScan()
-        
-        if total_read:
+            pm.update(int(100*bytes_read/expected_bytes), 
+                utils.format_bytes(bytes_read))
+
+            if status != scanext.SANE_STATUS_GOOD:
+                log.error("SANE error %d" % status)
+                sys.exit(1)
+            
+            
+        log.info("")
+
+        if bytes_read:
             log.info("Read %s from scanner." % utils.format_bytes(bytes_read))
-            
+
+            buffer, format, format_name, pixels_per_line, \
+                lines, depth, bytes_per_line, pad_bytes, total_read = device.getScan()
+
             if scan_mode == 'color':
-                im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(), 'raw', 'RGBA', 0, 1)
-                
+                im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(), 
+                    'raw', 'RGBA', 0, 1)
+
             elif scan_mode == 'gray':
-                im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(), 'raw', 'RGBA', 0, 1).convert('P')
-            
+                im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(), 
+                    'raw', 'RGBA', 0, 1).convert('P')
+
             elif scan_mode == 'lineart':
-                im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(), 'raw', 'RGBA', 0, 1).convert('L')
+                im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(), 
+                    'raw', 'RGBA', 0, 1).convert('L')
+                    
         else:
             log.error("No data read.")
             sys.exit(1)
-        
+
     finally:
         log.info("Closing device.")
         device.freeScan()
         sane.deInit()
-        
+
     if resize != 100:
         if resize < 1 or resize > 400:
             log.error("Resize parameter is incorrect. Resize must be 0% < resize < 400%.")
@@ -1016,71 +1017,73 @@ else: # NON_INTERACTIVE_MODE
             new_h = lines * resize / 100
             log.info("Resizing from %dx%d to %dx%d..." % (pixels_per_line, lines, new_w, new_h))
             im = im.resize((new_w, new_h), Image.ANTIALIAS)
-            
+
     file_saved = False
     if 'file' in dest:
         log.info("\nOutputting to destination 'file':")
         log.info("Saving to file %s" % output)
-        
+
         try:
             im.save(output)
         except IOError, e:
             log.error("Error saving file: %s" % e)
-            
+
             try:
                 os.remove(output)
             except OSError:
                 pass
-            
+
             sys.exit(1)
-            
+
         file_saved = True
         dest.remove("file")
-        
+
     temp_saved = False
-    if ('editor' in dest or 'viewer' in dest or 'email' in dest) and not file_saved:
+    if ('editor' in dest or 'viewer' in dest or 'email' in dest or 'printer' in dest) \
+        and not file_saved:
+        
         output_fd, output = utils.make_temp_file(suffix='.png')
         try:
             im.save(output)
         except IOError, e:
             log.error("Error saving temporary file: %s" % e)
-            
+
             try:
                 os.remove(output)
             except OSError:
                 pass
-                
+
             sys.exit(1)
-            
+
         os.close(output_fd) 
         temp_saved = True      
-    
+
     for d in dest:
         log.info("\nSending to destination '%s':" % d)
-        
+
         if d == 'fax':
             log.error("fax: Not implemented yet.")
-        
+
         elif d == 'pdf':
             try:
                 from reportlab.pdfgen import canvas
             except ImportError:
                 log.error("PDF output requires ReportLab.")
                 continue
-            
+
             tlx_max = device.getOptionObj('tl-x').constraint[1]
             bry_max = device.getOptionObj('br-y').constraint[1]
-            
+
             pdf_output = utils.createSequencedFilename("hpscan", ".pdf")
             c = canvas.Canvas(pdf_output, (tlx_max/0.3528, bry_max/0.3528))
-            
+
             try:
                 c.drawInlineImage(im, (tlx/0.3528), ((bry_max/0.3528)-(bry/0.3528)), 
                     width=None,height=None)
             except NameError:
                 log.error("A problem has occurred with PDF generation. This is a known bug in ReportLab. Please update your install of ReportLab to version 2.0 or greater.")
                 continue
-            
+
             c.showPage()
             log.info("Saving to file %s" % pdf_output)
             c.save()
@@ -1088,8 +1091,14 @@ else: # NON_INTERACTIVE_MODE
             os.system("%s %s &" % (pdf_viewer, pdf_output))
 
         elif d == 'printer':
-            log.error("print: Not implemented yet.")
-        
+            hp_print = utils.which("hp-print")
+            if hp_print:
+                cmd = 'hp-print %s &' % output
+            else:
+                cmd = "python ./print.py %s &" % output
+                
+            os.system(cmd)
+
         elif d == 'email':
             try:
                 from email.mime.image import MIMEImage
@@ -1098,75 +1107,75 @@ else: # NON_INTERACTIVE_MODE
             except ImportError:
                 log.error("hp-scan email destination requires Python 2.2+.")
                 continue
-            
+
             msg = MIMEMultipart()
             msg['Subject'] = email_subject
             msg['From'] = email_from
             msg['To'] = ','.join(email_to)
             msg.preamble = 'Scanned using hp-scan'
-            
+
             if email_note:
                 txt = MIMEText(email_note)
                 msg.attach(txt)
-                
+
             if file_saved:
                 txt = MIMEText("attached: %s: %dx%d %s PNG image." % 
                     (os.path.basename(output), pixels_per_line, lines, scan_mode))
             else:
                 txt = MIMEText("attached: %dx%d %s PNG image." % (pixels_per_line, lines, scan_mode))
-            
+
             msg.attach(txt) 
-            
+
             fp = open(output, 'r')
             img = MIMEImage(fp.read())
             fp.close()
-            
+
             if file_saved:
                 img.add_header('Content-Disposition', 'attachment', filename=os.path.basename(output))
-                
+
             msg.attach(img)
-            
+
             sendmail = utils.which("sendmail")
-            
+
             if sendmail:
                 sendmail = os.path.join(sendmail, 'sendmail')
                 sendmail += ' -t -r %s' % email_from
-    
+
                 log.debug(sendmail)
                 std_out, std_in, std_err = popen2.popen3(sendmail) 
                 std_in.write(msg.as_string())
                 std_in.close()
-    
+
                 while True:
                     update_spinner()
                     r, w, e = select.select([std_err], [], [], 1.0)
-                    
+
                     if r:
                         break
-                
+
                 cleanup_spinner()
-                
+
                 if r:
                     err = std_err.read()
                     if err:
                         log.error(repr(err))
-    
+
             else:
                 log.error("Mail send failed. 'sendmail' not found.")
-        
+
         elif d == 'viewer':
             if viewer:
                 log.info("Viewing file in %s" % viewer)
                 os.system("%s %s &" % (viewer, output))
             else:
                 log.error("Viewer not found.")
-        
+
         elif d == 'editor':
             if editor:
                 log.info("Editing file in %s" % editor)
                 os.system("%s %s &" % (editor, output))
             else:
                 log.error("Editor not found.")
-    
+
     sys.exit(0)
 

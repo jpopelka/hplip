@@ -19,9 +19,8 @@
  Author: Pete Parks
 */ 
 -->
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 <head>
-  <meta name="generator" content="HTML Tidy for Linux (vers 1 September 2005), see www.w3.org" />
 
     <title>HPLIP Launcher Window</title>
     <meta http-equiv="PRAGMA" content="NO-CACHE" />
@@ -32,9 +31,9 @@
     <script type="text/javascript">
     <!--
     var win = null;
-    
+
     window.reload = todoOnReload();
-    
+
     function todoOnReload() {
         var width = 680;
         var height = 520;
@@ -45,17 +44,57 @@
     };
 
     function todoOnLoad() {
+        //getStringFromDOM();
+
         setLocationRef("welcome");
         setButtonHiliteTime("400");
         setButtonImages("../images/button1.png", "../images/button1d.png");
-        generateHeader();
+        header = '$header_string'; 
+        subheader = '$sub_header_string'; 
+        generateHeader(header, subheader);
         if( isFireFoxBase() || isKonquerorBase() || isGaleonBased()  || isSafariBase() ) {
-            
+            // pass thorugh
         } else {
             window.location.href = "unsupported";
         }
     };
-    
+
+     function getLocalizedString(out_string) {
+      var encodedPath = "";
+      if(isFireFoxBase()) {
+        encodedPath = encode_utf8(out_string);
+      } else {
+        encodedPath = encodeUTF8(out_string);
+      }
+      var localPath = "http://localhost:8080/localized_string?string=" + encodedPath
+      //alert("Path encoded: " + localPath);
+      var http = new XmlLoader(localPath);
+      var responseText = http.submitLoaderRequest("POST", false);
+      //alert("CherryPy Repsonse: " + responseText);
+      if(isFireFoxBase()) {
+        in_string = decode_utf8(responseText);
+      } else {
+        in_string = decodeUTF8(responseText);
+      }
+      //alert("decoded Repsonse: " + in_string);
+      return in_string;
+    };
+
+    function getStringFromDOM() {
+        var html_div_elements = document.getElementsByName("localize");
+        var i=html_div_elements.length;
+        //alert("Length:" + i);
+        tmp = 0;
+        do
+        {
+            //alert("ClassName: " + html_div_elements[tmp].className);
+            var lstring = getLocalizedString(html_div_elements[tmp].className);
+            //alert("localized string: " + lstring);
+            html_div_elements[tmp].innerHTML = lstring
+            tmp++;
+        }
+        while (--i);
+    };
 
     function todoOnClick(url_ref) {
         if(isKonquerorBase()) {
@@ -71,6 +110,7 @@
             }
         }
     };
+
     -->
     </script>
 </head>
@@ -81,9 +121,7 @@
 
 <!-- Body Div --> 
 <div class="body_content">
-    <div id="message_title">
-        <a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To begin the installation process click the 'Start' button.</a>
-    </div>
+    <div id="message_title">HP Device Manager - Alignment</div>
 
     <div id="message_body"></div>
 
@@ -93,11 +131,10 @@
 <!-- Buttons Div -->
 <div id="startButton" OnSelectStart='return false;' onClick='todoOnClick("welcome");'>
     <img src="../images/button1.png" width="100" height="35">
-    <div id="startHiliteText"><a>Start</a></div>
-    <div id="startText"><a>Start</a></div>
+    <div id="startHiliteText">$start_button</div>
+    <div id="startText">$start_button</div>
+
 </div>
 
-
-  
 </body>
 </html>

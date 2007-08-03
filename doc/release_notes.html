@@ -85,6 +85,47 @@ Release Notes
         <div class="document">
 <div class="section">
 <h1><a id="release-notes" name="release-notes">Release Notes</a></h1>
+<p><strong>HPLIP 2.7.7 - This release has the following changes.</strong></p>
+<ol class="arabic simple">
+<li>Fixed issues with ppd_install and ppd_dir in the installer</li>
+<li>Device-id and device-status queries can now be made on more than just the 7/1/2 interface.</li>
+<li>Added pre_install_cmd to installer to fix cups issue in PCLinuxOS and Mandriva</li>
+<li>Added darwin build support to makefile.</li>
+<li>Removed the localOnly conditional in the sane hpaio backend. This was needed for saned usage.</li>
+<li>Fixed defect (Print Settings for fax device is incorrect after switching to other tabs.)</li>
+<li>Fixed defect (The default unload directory path is invalid if user is root.)</li>
+<li>Fixed defect (Wrong release dates for Fedora distros are displayed in terminal.)</li>
+<li>Added Mandriva 2007.1 to distros.dat</li>
+<li>Added Ubuntu 7.10 to distros.dat</li>
+<li>Fixed defect (Entering hp-setup -bnet command in terminal, some error information occurs when network is unreachable.)</li>
+<li>Fixed defect (hp-testpage produces traceback)</li>
+<li>Added some additional error checking to type 3 status (LaserJets)</li>
+<li>Re-designed hp-fab database backend (no longer uses KirbyBase, instead uses pickle)</li>
+<li>Converted hp-fab and hp-sendfax to handle non-ascii characters (Unicode)</li>
+<li>Added a distros.dat flag to handle usermod command with/without -a</li>
+<li>Added a temporary printer destination codepath for hp-scan</li>
+<li>Enhanced hp-setup launch code for the text installer</li>
+<li>Lots of code cleanup in the logging facility</li>
+<li>Fixed the constraints system in hp-scan (can use list based and tuple based constraints)</li>
+<li>Removed '-a' from usermod command in installer</li>
+<li>Converted code to use unicode when dealing with UI strings and user originated strings</li>
+<li>Explicitly convert to utf-8 for file logging output</li>
+<li>Added compile flag conditional compilation in hpmudext.c for parallel and network support</li>
+<li>Fixed the run command in core_install so that exceptions wouldn't pass silently</li>
+<li>Enhanced get_distro() in core_install so that it handles lsb_release output better</li>
+<li>Fixed disable-pp-build and disable-net-build in hpmud.</li>
+<li>Added localization files to tarball.</li>
+<li>Various small bug fixes (esp. in the installer)</li>
+</ol>
+<p><strong>This HPLIP package includes HPIJS 2.7.7 which has the following changes.</strong></p>
+<ol class="arabic simple">
+<li>Added support for the following new printer(s).</li>
+</ol>
+<pre class="literal-block">
+- HP PhotoSmart A620 Series (PSP470)
+- HP PhotoSmart A820 Series (PSP470)
+- HP PhotoSmart A520 Series (DJGenericVIP)
+</pre>
 <p><strong>HPLIP 2.7.6 - This release has the following changes.</strong></p>
 <ol class="arabic simple">
 <li>Major version number change denotes new functionality.</li>
@@ -1890,7 +1931,7 @@ where x equals: DJ630, DJ6xx, DJ6xxP, DJ8xx, DJ9xx or DJ9xxVIP
 </div>
 
 <hr size="1"/>
-<center><small>Page last updated: Tue Jun 12 14:36:34 2007; HPLIP Version: 2.7.6</small></center>
+<center><small>Page last updated: Mon Jul 30 11:45:10 2007; HPLIP Version: 2.7.7</small></center>
 </div>
 </td></tr></table>
 </div>

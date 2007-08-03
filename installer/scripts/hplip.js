@@ -76,8 +76,8 @@ function getContentLine(len, divText, divID) {
     }
 };
 
-function generateHeader() {
-    document.getElementById("header_box").innerHTML='<div class="header_title_class"><div id="hp_blue_logo"><img src="images/hplogo.png" alt=""/></div><div id="header_title">HP Linux Imaging and Printing (HPLIP)</div><div id="header_title2">HP Linux Imaging and Printing (HPLIP)</div><div id="header_subtitle">Installer</div><div id="header_subtitle2">Installer</div><div id="tux_logo"><img src="images/tux.png" alt=""/></div></div>';
+function generateHeader(text, text2) {
+    document.getElementById("header_box").innerHTML='<div class="header_title_class"><div id="hp_blue_logo"><img src="images/hplogo.png" alt=""/></div><div id="header_title">' + text + '</div><div id="header_title2">' + text + '</div><div id="header_subtitle">' + text2 + '</div><div id="header_subtitle2">' + text2 + '</div><div id="tux_logo"><img src="images/tux.png" alt=""/></div></div>';
 };
 
 function resetButton(button_name) {
@@ -391,3 +391,275 @@ var keyStr = "ABCDEFGHIJKLMNOP" +
 
      return output;
    }
+<<<<<<< hplip.js
+   
+   
+function encodeUTF8(source_data) {   
+    
+   var Data = source_data;
+
+   var utf8txt = "";
+
+   for(var n=0; n<Data.length; n++)
+   	{
+   	var c=Data.charCodeAt(n);
+   	// all chars from 0-127 => 1byte
+   	if (c<128)
+   		utf8txt += String.fromCharCode(c);
+   	// all chars from 127 to 2047 => 2byte
+   	else if((c>127) && (c<2048)) {
+   		utf8txt += String.fromCharCode((c>>6)|192);
+   		utf8txt += String.fromCharCode((c&63)|128);
+   	}
+   	// all chars from 2048 to 66536 => 3byte
+   	else {
+   		utf8txt += String.fromCharCode((c>>12)|224);
+   		utf8txt += String.fromCharCode(((c>>6)&63)|128);
+   		utf8txt += String.fromCharCode((c&63)|128);}
+   	}
+   return escape(utf8txt);
+ }
+   
+ 
+function decodeUTF8(source_data) {
+
+   var Data = unescape(source_data);
+
+   var plaintxt = "";
+   var i=0;
+   var c=c1=c2=0;
+
+   while(i<Data.length)	{
+   	c = Data.charCodeAt(i);
+   	// all chars from 0-127 => 1byte
+   	if (c<128) {
+   		plaintxt += String.fromCharCode(c);
+   		i++;
+   	}
+   	// all chars from 127 to 2047 => 2byte
+   	else if((c>191) && (c<224)) {
+   		c2 = Data.charCodeAt(i+1);
+   		plaintxt += String.fromCharCode(((c&31)<<6) | (c2&63));
+   		i+=2;
+   	}
+   	// all chars from 2048 to 66536 => 3byte
+   	else {
+   		c2 = Data.charCodeAt(i+1); c3 = Data.charCodeAt(i+2);
+   		plaintxt += String.fromCharCode(((c&15)<<12) | ((c2&63)<<6) | (c3&63));
+   		i+=3;
+   	}
+   }
+   // Write data back into window above
+   return plaintxt;
+}
+   
+   
+   
+   
+   <!--
+   //PROJECT: Javascript Based Base64 Decoding Engine
+
+   //DATE: 02/10/2004
+
+   //AUTHOR: Adrian Bacon
+
+   //DESCRIPTION:Encode and decode data to and from the Base64 format
+   //in Javascript. This could be used to convert encrypted
+   //data to text for submitting via http gets or posts or
+   //for sending via email or other text only mediums.
+
+   //COPYRIGHT: You are free to use this code as you see fit provided
+   //that you send any changes or modifications back to me.
+   -->
+   
+   //Heres the decode function
+   function decode64(inp)
+   {
+   var out = ""; //This is the output
+   var chr1, chr2, chr3 = ""; //These are the 3 decoded bytes
+   var enc1, enc2, enc3, enc4 = ""; //These are the 4 bytes to be decoded
+   var i = 0; //Position counter
+
+   // remove all characters that are not A-Z, a-z, 0-9, +, /, or =
+   var base64test = /[^A-Za-z0-9\+\/\=]/g;
+
+   if (base64test.exec(inp)) { //Do some error checking
+   alert("There were invalid base64 characters in the input text.\n" +
+   "Valid base64 characters are A-Z, a-z, 0-9, ?+?, ?/?, and ?=?\n" +
+   "Expect errors in decoding.");
+   }
+   inp = inp.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+
+   do { //Here’s the decode loop.
+
+   //Grab 4 bytes of encoded content.
+   enc1 = keyStr.indexOf(inp.charAt(i++));
+   enc2 = keyStr.indexOf(inp.charAt(i++));
+   enc3 = keyStr.indexOf(inp.charAt(i++));
+   enc4 = keyStr.indexOf(inp.charAt(i++));
+
+   //Heres the decode part. There’s really only one way to do it.
+   chr1 = (enc1 << 2) | (enc2 >> 4);
+   chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+   chr3 = ((enc3 & 3) << 6) | enc4;
+
+   //Start to output decoded content
+   out = out + String.fromCharCode(chr1);
+
+   if (enc3 != 64) {
+   out = out + String.fromCharCode(chr2);
+   }
+   if (enc4 != 64) {
+   out = out + String.fromCharCode(chr3);
+   }
+
+   //now clean out the variables used
+   chr1 = chr2 = chr3 = "";
+   enc1 = enc2 = enc3 = enc4 = "";
+
+   } while (i < inp.length); //finish off the loop
+
+   //Now return the decoded values.
+   return out;
+   }
+=======
+   
+   
+function encodeUTF8(source_data) {   
+    
+   var Data = source_data;
+
+   var utf8txt = "";
+
+   for(var n=0; n<Data.length; n++)
+   	{
+   	var c=Data.charCodeAt(n);
+   	// all chars from 0-127 => 1byte
+   	if (c<128)
+   		utf8txt += String.fromCharCode(c);
+   	// all chars from 127 to 2047 => 2byte
+   	else if((c>127) && (c<2048)) {
+   		utf8txt += String.fromCharCode((c>>6)|192);
+   		utf8txt += String.fromCharCode((c&63)|128);
+   	}
+   	// all chars from 2048 to 66536 => 3byte
+   	else {
+   		utf8txt += String.fromCharCode((c>>12)|224);
+   		utf8txt += String.fromCharCode(((c>>6)&63)|128);
+   		utf8txt += String.fromCharCode((c&63)|128);}
+   	}
+   return escape(utf8txt);
+ }
+   
+ 
+function decodeUTF8(source_data) {
+
+   var Data = unescape(source_data);
+   //alert("decodeUTF8;" + Data);
+   var plaintxt = "";
+   var i=0;
+   var c=c1=c2=0;
+
+   while(i<Data.length)	{
+   	c = Data.charCodeAt(i);
+   	// all chars from 0-127 => 1byte
+   	if (c<128) {
+   		plaintxt += String.fromCharCode(c);
+   		i++;
+   	}
+   	// all chars from 127 to 2047 => 2byte
+   	else if((c>191) && (c<224)) {
+   		c2 = Data.charCodeAt(i+1);
+   		plaintxt += String.fromCharCode(((c&31)<<6) | (c2&63));
+   		i+=2;
+   	}
+   	// all chars from 2048 to 66536 => 3byte
+   	else {
+   		c2 = Data.charCodeAt(i+1); c3 = Data.charCodeAt(i+2);
+   		plaintxt += String.fromCharCode(((c&15)<<12) | ((c2&63)<<6) | (c3&63));
+   		i+=3;
+   	}
+   }
+   // Write data back into window above
+   return plaintxt;
+}
+   
+   
+   
+   
+   <!--
+   //PROJECT: Javascript Based Base64 Decoding Engine
+
+   //DATE: 02/10/2004
+
+   //AUTHOR: Adrian Bacon
+
+   //DESCRIPTION:Encode and decode data to and from the Base64 format
+   //in Javascript. This could be used to convert encrypted
+   //data to text for submitting via http gets or posts or
+   //for sending via email or other text only mediums.
+
+   //COPYRIGHT: You are free to use this code as you see fit provided
+   //that you send any changes or modifications back to me.
+   -->
+   
+   //Heres the decode function
+   function decode64(inp)
+   {
+   var out = ""; //This is the output
+   var chr1, chr2, chr3 = ""; //These are the 3 decoded bytes
+   var enc1, enc2, enc3, enc4 = ""; //These are the 4 bytes to be decoded
+   var i = 0; //Position counter
+
+   // remove all characters that are not A-Z, a-z, 0-9, +, /, or =
+   var base64test = /[^A-Za-z0-9\+\/\=]/g;
+
+   if (base64test.exec(inp)) { //Do some error checking
+   alert("There were invalid base64 characters in the input text.\n" +
+   "Valid base64 characters are A-Z, a-z, 0-9, ?+?, ?/?, and ?=?\n" +
+   "Expect errors in decoding.");
+   }
+   inp = inp.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+
+   do { //Here’s the decode loop.
+
+   //Grab 4 bytes of encoded content.
+   enc1 = keyStr.indexOf(inp.charAt(i++));
+   enc2 = keyStr.indexOf(inp.charAt(i++));
+   enc3 = keyStr.indexOf(inp.charAt(i++));
+   enc4 = keyStr.indexOf(inp.charAt(i++));
+
+   //Heres the decode part. There’s really only one way to do it.
+   chr1 = (enc1 << 2) | (enc2 >> 4);
+   chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+   chr3 = ((enc3 & 3) << 6) | enc4;
+
+   //Start to output decoded content
+   out = out + String.fromCharCode(chr1);
+
+   if (enc3 != 64) {
+   out = out + String.fromCharCode(chr2);
+   }
+   if (enc4 != 64) {
+   out = out + String.fromCharCode(chr3);
+   }
+
+   //now clean out the variables used
+   chr1 = chr2 = chr3 = "";
+   enc1 = enc2 = enc3 = enc4 = "";
+
+   } while (i < inp.length); //finish off the loop
+
+   //Now return the decoded values.
+   return out;
+   }
+
+function  encode_utf8(s) {
+    return escape(s); //unescape( encodeURIComponent(s));
+};
+
+function  decode_utf8(s) {
+    return unescape(s); //decodeURIComponent( escape(s));
+};
+
+>>>>>>> 1.34

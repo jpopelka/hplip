@@ -78,7 +78,7 @@ class UnloadForm(QMainWindow):
                 self.init_failed = True
 
             elif x == 1:
-                log.info(utils.bold("Using device: %s" % devices[0][0]))
+                log.info(log.bold("Using device: %s" % devices[0][0]))
                 self.device_uri = devices[0][0]
 
             else:
@@ -123,7 +123,7 @@ class UnloadForm(QMainWindow):
         self.UnloadView.onDeviceChange(self.cur_device)
 
     def FailureUI(self, error_text):
-        log.error(str(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", " "))
+        log.error(unicode(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", " "))
         QMessageBox.critical(self,
                              self.caption(),
                              error_text,

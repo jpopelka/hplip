@@ -250,6 +250,7 @@ static PyObject *make_usb_uri(PyObject *self, PyObject *args)
     return Py_BuildValue("(is#)", result, uri, bytes_read);
 }
 
+#ifdef HAVE_LIBNETSNMP
 static PyObject *make_net_uri(PyObject *self, PyObject *args)
 {
     char * ip;
@@ -265,7 +266,14 @@ static PyObject *make_net_uri(PyObject *self, PyObject *args)
     
     return Py_BuildValue("(is#)", result, uri, bytes_read);
 }
+#else
+static PyObject *make_net_uri(PyObject *self, PyObject *args)
+{
+    return Py_BuildValue("(is#)", HPMUD_R_INVALID_URI, "", 0);
+}
+#endif /* HAVE_LIBSNMP */
 
+#ifdef HAVE_PPORT
 static PyObject *make_par_uri(PyObject *self, PyObject *args)
 {
     char * devnode;
@@ -280,7 +288,12 @@ static PyObject *make_par_uri(PyObject *self, PyObject *args)
     
     return Py_BuildValue("(is#)", result, uri, bytes_read);
 }
-
+#else
+static PyObject *make_par_uri(PyObject *self, PyObject *args)
+{
+    return Py_BuildValue("(is#)", HPMUD_R_INVALID_URI, "", 0);
+}
+#endif /* HAVE_PPORT */
 
 // Unwrapped MUD APIs:
 // int hpmud_get_model(const char *id, char *buf, int buf_size);

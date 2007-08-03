@@ -24,6 +24,8 @@
 
 \*****************************************************************************/
 
+#ifdef HAVE_LIBNETSNMP
+
 #include <signal.h>
 #include "hpmud.h"
 #include "hpmudi.h"
@@ -597,3 +599,5 @@ enum HPMUD_RESULT hpmud_make_net_uri(const char *ip, int port, char *uri, int ur
 bugout:
    return stat;
 }
+
+#endif  /* HAVE_LIBNETSNMP */

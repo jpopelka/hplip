@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '2.5'
+__version__ = '4.0'
 __title__ = 'Printer Cartridge Alignment Utility'
 __doc__ = "Cartridge alignment utility for HPLIP supported inkjet printers."
 
@@ -31,7 +31,7 @@ import getopt
 
 # Local
 from base.g import *
-from base import device, status, utils, maint
+from base import device, status, utils, maint, tui
 from prnt import cups
 
 USAGE = [(__doc__, "", "name", True),
@@ -63,47 +63,23 @@ def usage(typ='text'):
     utils.format_text(USAGE, typ, __title__, 'hp-align', __version__)
     sys.exit(0)
 
-
-def enterNumber(text, minimum, maximum):
-    while True:
-        x = raw_input(utils.bold(text))
-
-        if len(x) > 0 and x[0] in ['q', 'Q']:
-            return False, 0
-
-        try:
-            x = int(x)
-        except ValueError:
-            log.error("You must enter a numeric value.")
-            continue
-        if x < minimum or x > maximum:
-            log.error("You must enter a number between %d and %d." % (minimum, maximum))
-            continue
-        break
-
-    return True, x
-
 def enterAlignmentNumber(letter, hortvert, colors, line_count, maximum):
-    return enterNumber("Enter the best aligned value for line %s (1-%d): " % (letter, maximum),
+    return tui.enter_range("Enter the best aligned value for line %s (1-%d): " % 
+                        (letter, maximum),
                         1,
                         maximum)
 
 def enterPaperEdge(maximum):
-    return enterNumber("Enter numbered arrow that is best aligned with the paper edge (1-%d): " % maximum,
+    return tui.enter_range("Enter numbered arrow that is best aligned with the paper edge (1-%d): " 
+                        % maximum,
                         1,
                         maximum)
 
 def colorAdj(line, maximum):
-    return enterNumber("Enter the numbered box on line %s that is best color matched to the background color (1-%d): " % (line, maximum),
+    return tui.enter_range("Enter the numbered box on line %s that is best color matched to the background color (1-%d): " % 
+                        (line, maximum),
                         1,
                         maximum)
-
-
-def loadPlainPaper():
-    x = raw_input(utils.bold("An alignment page will be printed.\nPlease load plain paper into the printer. Press <Enter> to contine or 'q' to quit."))
-    if len(x) > 0 and x[0].lower() == 'q':
-        return False
-    return True
 
 def bothPensRequired():
     log.error("Cannot perform alignment with 0 or 1 cartridges installed.\nPlease install both cartridges and try again.")
@@ -116,27 +92,12 @@ def invalidPen2():
 
 def aioUI1():
     log.info("To perform alignment, you will need the alignment page that is automatically\nprinted after you install a print cartridge.")
-    log.info("If you would like to cancel, enter 'C' or 'c'")
-    log.info("If you do not have this page (and need it to be printed), enter 'N' or 'n'")
-    log.info("If you already have this page, enter 'Y' or 'y'")
+    log.info("If you would like to cancel, enter or 'c'")
+    log.info("If you do not have this page (and need it to be printed), enter 'n'")
+    log.info("If you already have this page, enter  'y'")
 
-    while 1:
-        x = raw_input(utils.bold("Enter 'C', 'c'; 'Y', 'y'; 'N', or 'n': "))
-        if len(x) > 0:
-            x = x.lower()
-            if x[0] in ['c', 'y', 'n']:
-                break
-
-        log.warning("Please enter 'C', 'c'; 'Y', 'y'; 'N' or 'n'.")
-
-    if x[0] == 'n':
-        return False
-
-    elif x[0] == 'c':
-        sys.exit(0)
-
-    elif x[0] == 'y':
-        return True
+    ok, choice = tui.enter_choice("Enter 'c', 'y', or 'n': ", ['c', 'n', 'y'], 'n')
+    return choice == 'y'
 
 def type10and11Align(pattern, align_type):
     controls = maint.align10and11Controls(pattern, align_type)
@@ -148,11 +109,8 @@ def type10and11Align(pattern, align_type):
         if not controls[line][0]:
             values.append(0)
         else:
-            cont, value = enterNumber( "Enter the numbered box on line %s where the inner lines best line up with the outer lines (1-%d): " % ( line, controls[line][1] ),
-                           1, controls[line][1] )
-            if not cont:
-                sys.exit(0)
-
+            ok, value = tui.enter_range("Enter the numbered box on line %s where the inner lines best line up with the outer lines (1-%d): " 
+                % (line, controls[line][1]),  1, controls[line][1])
             values.append(value)
 
     return values
@@ -160,7 +118,7 @@ def type10and11Align(pattern, align_type):
 
 def aioUI2():
     log.info("")
-    log.info(utils.bold("Follow these steps to complete the alignment:"))
+    log.info(log.bold("Follow these steps to complete the alignment:"))
     log.info("1. Place the alignment page, with the printed side facing down, ")
     log.info("   in the scanner.")
     log.info("2. Press the Enter or Scan button on the printer.")
@@ -287,35 +245,35 @@ try:
             sys.exit(0)
 
         if align_type == ALIGN_TYPE_AUTO:
-            maint.AlignType1(d, loadPlainPaper)
+            maint.AlignType1(d, tui.load_paper_prompt)
 
         elif align_type == ALIGN_TYPE_8XX:
-            maint.AlignType2(d, loadPlainPaper, enterAlignmentNumber,
+            maint.AlignType2(d, ui.load_paper_prompt, enterAlignmentNumber,
                               bothPensRequired)
 
         elif align_type in (ALIGN_TYPE_9XX,ALIGN_TYPE_9XX_NO_EDGE_ALIGN):
-            maint.AlignType3(d, loadPlainPaper, enterAlignmentNumber,
+            maint.AlignType3(d, ui.load_paper_prompt, enterAlignmentNumber,
                               enterPaperEdge, update_spinner)
 
         elif align_type == ALIGN_TYPE_LIDIL_AIO:
-            maint.AlignType6(d, aioUI1, aioUI2, loadPlainPaper)
+            maint.AlignType6(d, aioUI1, aioUI2, ui.load_paper_prompt)
 
         elif align_type == ALIGN_TYPE_DESKJET_450:
-            maint.AlignType8(d, loadPlainPaper, enterAlignmentNumber)
+            maint.AlignType8(d, ui.load_paper_prompt, enterAlignmentNumber)
 
         elif align_type in (ALIGN_TYPE_LIDIL_0_3_8, ALIGN_TYPE_LIDIL_0_4_3, ALIGN_TYPE_LIDIL_VIP):
 
-            maint.AlignxBow(d, align_type, loadPlainPaper, enterAlignmentNumber, enterPaperEdge,
+            maint.AlignxBow(d, align_type, ui.load_paper_prompt, enterAlignmentNumber, enterPaperEdge,
                              invalidPen, colorAdj)
 
         elif align_type  == ALIGN_TYPE_LBOW:
-            maint.AlignType10(d, loadPlainPaper, type10and11Align)
+            maint.AlignType10(d, ui.load_paper_prompt, type10and11Align)
 
         elif align_type == ALIGN_TYPE_LIDIL_0_5_4:
-            maint.AlignType11(d, loadPlainPaper, type10and11Align, invalidPen2)
+            maint.AlignType11(d, ui.load_paper_prompt, type10and11Align, invalidPen2)
             
         elif align_type == ALIGN_TYPE_OJ_PRO:
-            maint.AlignType12(d, loadPlainPaper)
+            maint.AlignType12(d, ui.load_paper_prompt)
             
 
         else:

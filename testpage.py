@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '4.1'
+__version__ = '5.0'
 __title__ = 'Testpage Print Utility'
 __doc__ = "Print a tespage to a printer. Prints a summary of device information and shows the printer's margins."
 
@@ -33,7 +33,7 @@ import time
 
 # Local
 from base.g import *
-from base import device, utils
+from base import device, utils, tui
 from prnt import cups
 
 USAGE = [(__doc__, "", "name", True),
@@ -163,7 +163,7 @@ try:
 
     elif len(d.cups_printers) > 1:
         log.info("\nMultiple printers (queues) found in CUPS for device.")
-        log.info(utils.bold("\nPlease choose the printer (queue) to use for the test page:\n"))
+        log.info(log.bold("\nPlease choose the printer (queue) to use for the test page:\n"))
 
         max_name = 24
         for q in d.cups_printers:
@@ -184,35 +184,19 @@ try:
             log.info(formatter.compose((str(x), d.cups_printers[x])))
             x += 1
 
-        while 1:
-            user_input = raw_input(utils.bold("\nEnter number 0...%d for printer (q=quit) ?" % (x-1)))
-
-            if user_input == '':
-                log.warn("Invalid input - enter a numeric value or 'q' to quit.")
-                continue
-
-            if user_input.strip()[0] in ('q', 'Q'):
-                sys.exit(0)
-
-            try:
-                i = int(user_input)
-            except ValueError:
-                log.warn("Invalid input - enter a numeric value or 'q' to quit.")
-                continue
-
-            if i < 0 or i > (x-1):
-                log.warn("Invalid input - enter a value between 0 and %d or 'q' to quit." % (x-1))
-                continue
-
-            break
-
+        ok, i = tui.enter_range("\nEnter number 0...%d for printer (q=quit) ?" % (x-1), 0, (x-1))
+        if not ok: sys.exit(0)
         printer_name = d.cups_printers[i]
 
     else:
         printer_name = d.cups_printers[0]
 
     log.info("")
-
+    
+    # TODO: Fix the wait for printout stuff... can't get device ID
+    # while hp: backend has device open in printing mode...
+    wait_for_printout = False
+    
     if d.isIdleAndNoError():
         d.close()
         log.info( "Printing test page to printer %s..." % printer_name)

@@ -31,10 +31,6 @@ ld_output = ''
 ps_output = ''
 mod_output = ''
 
-# 
-# Generic fucntions
-#
-
 def update_ld_output():
     # For library checks
     global ld_output
@@ -94,7 +90,7 @@ def check_lib(lib, min_ver=0):
         return False
 
 def check_file(f, dir="/usr/include"):
-    log.debug("Searching for file '%s' under '%s'..." % (f, dir))
+    log.debug("Searching for file '%s' in '%s'..." % (f, dir))
     for w in utils.walkFiles(dir, recurse=True, abs_paths=True, return_folders=False, pattern=f):
         log.debug("File found at '%s'" % w)
         return True
@@ -102,17 +98,33 @@ def check_file(f, dir="/usr/include"):
     log.debug("File not found.")
     return False
 
-def check_lsb():
-    return check_file("install_initd", '/usr/lib/lsb') or \
-           check_file('install_initd', '/usr/sbin') or \
-           check_file('install_initd', '/usr/bin')
 
 def locate_files(f, dir):
-    log.debug("Searching for file(s) '%s' under '%s'..." % (f, dir))
+    log.debug("Searching for file(s) '%s' in '%s'..." % (f, dir))
     found = []
     for w in utils.walkFiles(dir, recurse=True, abs_paths=True, return_folders=False, pattern=f):
         log.debug(w)
         found.append(w)
+
+    if found:
+        log.debug("Found files: %s" % found)
+    else:
+        log.debug("No files not found.")
+
+    return found
+
+def locate_file_contains(f, dir, s):
+    """
+        Find a list of files located in a directory
+        that contain a specified sub-string.
+    """
+    log.debug("Searching for file(s) '%s' in '%s' that contain '%s'..." % (f, dir, s))
+    found = []
+    for w in utils.walkFiles(dir, recurse=True, abs_paths=True, return_folders=False, pattern=f):
+        
+        if check_file_contains(w, s):
+            log.debug(w)
+            found.append(w)
 
     if found:
         log.debug("Found files: %s" % found)
@@ -201,165 +213,3 @@ def check_lsmod(module):
         status, mod_output = utils.run(os.path.join(lsmod, 'lsmod'), log_output=False)
         
     return mod_output.find(module) >= 0
-
-#
-# Specific functions    
-#
-
-def check_python2x():
-    py_ver = sys.version_info
-    py_major_ver, py_minor_ver = py_ver[:2]
-    log.debug("Python ver=%d.%d" % (py_major_ver, py_minor_ver))
-    return py_major_ver >= 2
-
-def check_gcc():
-    return check_tool('gcc --version', 0) and check_tool('g++ --version', 0)
-
-def check_make():
-    return check_tool('make --version', 3.0)
-
-def check_libusb():
-    if not check_lib('libusb'):
-        return False
-
-    for f in locate_files('usb.h', '/usr/include'):
-        if check_file_contains(f, 'usb_init(void)'):
-            return True
-
-    return False
-
-def check_libjpeg():
-    return check_lib("libjpeg") and check_file("jpeglib.h")
-
-def check_libcrypto():
-    return check_lib("libcrypto") and check_file("crypto.h")
-
-def check_libpthread():
-    return check_lib("libpthread") and check_file("pthread.h")
-
-def check_libnetsnmp():
-    return check_lib("libnetsnmp") and check_file("net-snmp-config.h")
-
-def check_reportlab():
-    try:
-        log.debug("Trying to import 'reportlab'...")
-        import reportlab
-        log.debug("Success.")
-        return True
-    except ImportError:
-        log.debug("Failed.")
-        return False
-
-def check_python23():
-    py_ver = sys.version_info
-    py_major_ver, py_minor_ver = py_ver[:2]
-    log.debug("Python ver=%d.%d" % (py_major_ver, py_minor_ver))
-    return py_major_ver >= 2 and py_minor_ver >= 3
-
-def check_sane():
-    return check_lib('libsane')
-    
-def check_sane_devel():
-    return check_file("sane.h")
-
-def check_xsane():
-    if os.getenv('DISPLAY'):
-        return check_tool('xsane --version', 0.9) # will fail if X not running...
-    else:
-        return bool(utils.which("xsane")) # ...so just see if it installed somewhere
-
-def check_scanimage():
-    return check_tool('scanimage --version', 1.0)
-
-def check_ppdev():
-    return check_lsmod('ppdev')
-
-def check_gs():
-    return check_tool('gs -v', 7.05)
-
-def check_pyqt():
-    try:
-        import qt
-        pyqtVersion = None
-        try:
-            pyqtVersion = qt.PYQT_VERSION_STR
-            log.debug("PYQT_VERSION_STR = %s" % pyqtVersion)
-        except:
-            try:
-                pyqtVersion = qt.PYQT_VERSION
-                log.debug("PYQT_VERSION = %s" % pyqtVersion)
-            except:
-                pass
-
-        if pyqtVersion is not None:
-            while pyqtVersion.count('.') < 2:
-                pyqtVersion += '.0'
-
-            (maj_ver, min_ver, pat_ver) = pyqtVersion.split('.')
-
-            if pyqtVersion.find('snapshot') >= 0:
-                log.debug("A non-stable snapshot version of PyQt is installed.")
-                pass
-            else:    
-                try:
-                    maj_ver = int(maj_ver)
-                    min_ver = int(min_ver)
-                    pat_ver = int(pat_ver)
-                except ValueError:
-                    maj_ver, min_ver, pat_ver = 0, 0, 0
-                else:
-                    log.debug("Version %d.%d.%d installed." % (maj_ver, min_ver, pat_ver))
-
-                if maj_ver < MINIMUM_PYQT_MAJOR_VER or \
-                    (maj_ver == MINIMUM_PYQT_MAJOR_VER and min_ver < MINIMUM_PYQT_MINOR_VER):
-                    log.debug("HPLIP may not function properly with the version of PyQt that is installed (%d.%d.%d)." % (maj_ver, min_ver, pat_ver))
-                    log.debug("Incorrect version of PyQt installed. Ver. %d.%d or greater required." % (MINIMUM_PYQT_MAJOR_VER, MINIMUM_PYQT_MINOR_VER))
-                    return True
-                else:
-                    return True
-
-    except ImportError:
-         return False
-
-def check_python_devel():
-    return check_file('Python.h')
-
-def check_cups_devel():
-    return check_file('cups.h') and bool(utils.which('lpr'))
-
-def check_cups():
-    status, output = utils.run('lpstat -r')
-
-    if status > 0:
-        log.debug("CUPS is not running.")
-        return False
-    else:
-        log.debug("CUPS is running.")
-        return True
-
-def check_hpoj():
-    log.debug("Checking for 'HPOJ'...")
-    return check_ps(['ptal-mlcd', 'ptal-printd', 'ptal-photod']) or \
-        bool(utils.which("ptal-init"))
-
-def check_hplip():
-    log.debug("Checking for HPLIP...")
-    return check_ps(['hpiod', 'hpssd']) and locate_files('hplip.conf', '/etc/hp')
-    
-def check_hpssd():
-    log.debug("Checking for hpssd...")
-    return check_ps(['hpssd'])
-
-def check_libtool():
-    log.debug("Checking for libtool...")
-    return check_tool('libtool --version')
-
-def check_pil():
-    log.debug("Checking for PIL...")
-    try:
-        import Image
-        return True
-    except ImportError:
-        return False
-        
-        

@@ -122,7 +122,7 @@ class ScrollView(QScrollView):
                 
                 break
         
-    def onDeviceChange(self, cur_device=None):
+    def onDeviceChange(self, cur_device=None, updating=False):
         if cur_device is not None:
             log.debug("ScrollView.onDeviceChange(%s)" % cur_device.device_uri)
         else:
@@ -131,21 +131,22 @@ class ScrollView(QScrollView):
         self.cur_device = cur_device
 
         if self.cur_device is not None and self.cur_device.supported:
-            try:
-                self.cur_printer = self.cur_device.cups_printers[0]
-            except IndexError:
-                log.error("Printer list empty") # Shouldn't happen!
-            else:
-                self.isFax()
-                
-                QApplication.setOverrideCursor(QApplication.waitCursor)
+            if not updating or not self.cur_printer:
                 try:
-                    try:
-                        self.fillControls()
-                    except Exception, e:
-                        log.exception()
-                finally:
-                    QApplication.restoreOverrideCursor()
+                    self.cur_printer = self.cur_device.cups_printers[0]
+                except IndexError:
+                    log.error("Printer list empty") # Shouldn't happen!
+                else:
+                    self.isFax()
+                
+            QApplication.setOverrideCursor(QApplication.waitCursor)
+            try:
+                try:
+                    self.fillControls()
+                except Exception, e:
+                    log.exception()
+            finally:
+                QApplication.restoreOverrideCursor()
         
         else:
             log.debug("Unsupported device")
@@ -156,7 +157,7 @@ class ScrollView(QScrollView):
             
     def onUpdate(self, cur_device=None):
         log.debug("ScrollView.onUpdate()")
-        return self.onDeviceChange(cur_device)
+        return self.onDeviceChange(cur_device, True)
 
     def fillControls(self):
         log.debug("fillControls(%s)" % str(self.name()))
@@ -374,7 +375,7 @@ class ScrollView(QScrollView):
         
 
     def __tr(self,s,c = None):
-        return qApp.translate("DevMgr4",s,c)
+        return qApp.translate("ScrollView",s,c)
         
         
         

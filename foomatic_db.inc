@@ -306,9 +306,12 @@ foomatic_xml_printers = \
     $(src_dbdir)/printer/HP-PhotoSmart_A310.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_A320.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_A510.xml \
+    $(src_dbdir)/printer/HP-PhotoSmart_A520.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_470.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_A610.xml \
+    $(src_dbdir)/printer/HP-PhotoSmart_A620.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_A710.xml \
+    $(src_dbdir)/printer/HP-PhotoSmart_A820.xml \
     $(src_dbdir)/printer/HP-LaserJet_4.xml \
     $(src_dbdir)/printer/HP-LaserJet_4_Plus.xml \
     $(src_dbdir)/printer/HP-LaserJet_4M.xml \
@@ -738,9 +741,12 @@ foomatic_ppd_printers = \
     ppd/HP-PhotoSmart_A310-hpijs.ppd \
     ppd/HP-PhotoSmart_A320-hpijs.ppd \
     ppd/HP-PhotoSmart_A510-hpijs.ppd \
+    ppd/HP-PhotoSmart_A520-hpijs.ppd \
     ppd/HP-PhotoSmart_470-hpijs.ppd \
     ppd/HP-PhotoSmart_A610-hpijs.ppd \
+    ppd/HP-PhotoSmart_A620-hpijs.ppd \
     ppd/HP-PhotoSmart_A710-hpijs.ppd \
+    ppd/HP-PhotoSmart_A820-hpijs.ppd \
     ppd/HP-LaserJet_4-hpijs.ppd \
     ppd/HP-LaserJet_4_Plus-hpijs.ppd \
     ppd/HP-LaserJet_4M-hpijs.ppd \

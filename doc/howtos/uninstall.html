@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="shortcut icon" href="../images/favicon.ico" type="image/x-icon" />
+<title>HPLIP How-Tos - Uninstall HPLIP</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="../styles/default.css" type="text/css" /> 
+<META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE" />
+<META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 22 Jul 2002 11:12:01 GMT" />
+<META NAME="DESCRIPTION" CONTENT="HP Linux Imaging and Printing - HPLIP is an HP developed solution for printing, scanning, and faxing with HP inkjet and laser based printers in Linux.">
+<META NAME="KEYWORDS" CONTENT="HPLIP, HP, Linux, Printing, HPIJS">
+</head>
+<body>
+<div id="page"><!-- start page -->
+<div id="container"><!-- start main container -->
+<!-- start banner -->
+
+<div id="banner">
+<div id="banner_graphics">
+        <div id="floatleft">
+        <img src="../images/hplogo2.png" alt="HP Logo" border="0" />
+        </div>
+        <div id="floatcenter">
+        <a href="../index.html">
+        <img src="../images/hpliplogo.png" alt="HP Logo" border="0" />
+        </a>
+        </div>
+        <div id="floatright">
+        <img src="../images/tuxlogo2.png" alt="Tux" border="0" />
+        </div>
+    </div>
+</div>
+<!-- end banner -->
+
+<div id="navbar">
+<table>
+    <tr>
+        <td valign="top">
+<div id="sidebar-a">
+<ul id="sidebar-a-list">
+    <menu compact="compact">
+        <div class="menuheader"><a href="../index.html" title="">Home</a></div>
+    </menu>
+
+<div class="menuheader">About</div>
+    <menu compact="compact">
+        <li><a href="../features.html" title="">Features</a></li> 
+        <li><a href="../screenshots.html" title="">Screenshots</a></li> 
+        <li><a href="../faqs.html" title="FAQs">FAQs</a></li> 
+        <li><a a href="../about.html" title="About">About HPLIP</a></li>
+    </menu>
+<div class="menuheader">Setup and Installation</div>
+    <menu compact="compact">
+        <li><a href="../downloads.html" title="Downloads">Download HPLIP</a></li>
+        <li><a href="../install/index.html" title="Installation Instructions">Installation Instructions</a></li> 
+        <li><a href="../system_requirements.html" title="System Requirements">System Requirements</a></li> 
+        <li><a href="../supported_devices/index.html" title="Supported Devices">Supported Devices</a></li> 
+    </menu>
+<div class="menuheader">Usage and Support</div>
+    <menu compact="compact">
+        <li><a href="../mailing_lists.html" title="Mailing Lists">Mailing Lists</a></li>
+        <li><a href="../howtos/index.html" title="How-Tos">How-Tos</a></li> 
+        <li><a href="../troubleshooting/index.html" title="Troubleshooting">Troubleshooting</a></li>
+        <li><a href="../release_notes.html" title="Release Notes">Release Notes</a></li>
+    </menu>
+<div class="menuheader">Resources</div>
+    <menu compact="compact">
+        <li><a href="../tech_docs/index.html" title="">Technical Documentation</a></li> 
+        <li><a href="http://sourceforge.net/projects/hplip/" title="Our project page on Sourceforge.net">Sourceforge Project Page</a></li> 
+        <li><a href="../license.html" title="Software License">Software License</a></li>
+        <li><a a href="../other_support.html" title="Other Support Information">Other Support Information</a></li>
+        <li><a href="../contacts.html" title="Contacts">Contacts</a></li>
+    </menu>
+</ul>
+</div>
+<!-- end sidebar --></td>
+</div>
+<td width=100%>
+<div id="content"><!-- start content -->
+        <a href="../index.html">Home</a>
+&gt;
+<a href="index.html">How-Tos</a>
+&gt;
+Uninstall HPLIP
+
+<hr size="1"/>
+        <div class="document" id="uninstall-hplip-how-to">
+<h1 class="title">Uninstall HPLIP How-To</h1>
+<p><strong>A.</strong> If you still have the source tar ball go into the source directory--for example;</p>
+<pre class="literal-block">
+cd ~/Desktop/hplip-2.7.7
+</pre>
+<p><strong>B.</strong> Execute this command to remove/uninstall HPLIP:</p>
+<pre class="literal-block">
+su -c &quot;make uninstall&quot;
+</pre>
+<p>or if your distro uses sudo;</p>
+<pre class="literal-block">
+sudo make uninstall
+</pre>
+<p><strong>C.</strong> Enter the following command to remove the HPLIP installed directory;</p>
+<div class="warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If you do not enter this command correctly you could damage your system.</p>
+</div>
+<pre class="literal-block">
+su -c &quot;rm -rf /usr/share/hplip&quot;
+</pre>
+<p>or if your distro uses sudo;</p>
+<pre class="literal-block">
+sudo rm -rf /usr/share/hplip
+</pre>
+<p><strong>D.</strong> The uninstall/removal of HPLIP is now complete. Perhaps you now want to <a class="reference" href="../downloads.html">re-install</a>?</p>
+</div>
+
+<hr size="1"/>
+<center><small>Page last updated: Mon Jun 25 15:21:46 2007; HPLIP Version: 2.7.7</small></center>
+</div>
+</td></tr></table>
+</div>
+<!-- end content -->
+<!-- end container -->
+<div id="footer"><!-- start footer -->
+        <hr size="1"/>
+        <a href="../legal.html">Legal Notices</a>
+        Copyright &#169; 2003-2007, Hewlett-Packard Development Company, L.P.
+        <a href="mailto:hplip@hp.com">Contact Site Maintainer</a><br>
+        <a href="http://sourceforge.net/" alt="Hosted by Sourceforge.net"><img src="../images/sflogo.png" border="0"></a>
+</div>
+<!-- end footer -->
+</div><!-- end page -->
+
+<!-- google analytics -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1543832-1";
+urchinTracker();
+</script>
+<!-- start google analytics from hplip.marketing -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1543832-7";
+urchinTracker();
+</script>
+<!-- end google analytics -->
+
+
+<!-- START OF ACTIVEMETER CODE -->
+<script type="text/javascript" language="javascript">
+var __pid=30231;
+var __am_invisible=1;
+</script>
+<!-- END OF ACTIVEMETER CODE -->
+
+</body>
+</html>

@@ -84,11 +84,11 @@ basedir = $(hplipdir)/base
 dist_base_SCRIPTS = base/maint.py base/codes.py base/g.py base/pml.py base/status.py  base/async.py \
     base/__init__.py base/mfpdtf.py base/utils.py base/async_qt.py base/kirbybase.py base/service.py \
     base/device.py base/logger.py base/msg.py base/slp.py base/exif.py base/strings.py base/magic.py \
-    base/imagesize.py base/pexpect.py base/models.py base/mdns.py
+    base/imagesize.py base/pexpect.py base/models.py base/mdns.py base/tui.py
 
 # installer
 installdir = $(hplipdir)/installer
-dist_install_SCRIPTS = installer/__init__.py installer/dcheck.py installer/distros.py installer/core.py
+dist_install_SCRIPTS = installer/__init__.py installer/dcheck.py installer/distros.dat installer/core_install.py
 dist_noinst_SCRIPTS += installer/text_install.py installer/web_install.py installer/trigger.py installer/permissions.py installer/fix_symlink.py installer/mdk_usb_fix.py
 dist_noinst_SCRIPTS += installer/pages/__init__.py installer/pages/install_required.tmpl installer/pages/installation_path.tmpl installer/pages/component.tmpl \
     installer/pages/mode.tmpl installer/pages/confirm_distro.tmpl installer/pages/notes.tmpl installer/pages/error.tmpl installer/pages/options.tmpl \
@@ -128,6 +128,7 @@ pcldir = $(hplipdir)/data/pcl
 ldldir = $(hplipdir)/data/ldl
 postscriptdir = $(hplipdir)/data/ps
 firmdir = $(hplipdir)/data/firmware
+localzdir = $(hplipdir)/data/localization
 dist_postscript_DATA = data/ps/testpage.ps.gz data/ps/clean_page.pdf.gz
 dist_models_DATA = data/models/models.dat
 dist_images_DATA = data/images/*
@@ -138,6 +139,10 @@ dist_pcl_DATA = data/pcl/align1_8xx.pcl.gz data/pcl/align1_9xx.pcl.gz data/pcl/a
 dist_ldl_DATA = data/ldl/cb2pcal.ldl.gz data/ldl/cb2pcal_done.ldl.gz data/ldl/cbbcal.ldl.gz data/ldl/cbccal.ldl.gz data/ldl/cbccal_done.ldl.gz data/ldl/cbcpcal.ldl.gz \
     data/ldl/cbpcal.ldl.gz
 dist_firm_DATA = data/firmware/HP_LaserJet_1018.fw.gz data/firmware/HP_LaserJet_1020.fw.gz
+dist_localz_DATA = data/localization/hplip_de.qm data/localization/hplip_es.qm data/localization/hplip_fr.qm data/localization/hplip_it.qm \
+    data/localization/hplip_pt.qm data/localization/hplip_ru.qm data/localization/hplip_zh.qm
+dist_noinst_DATA += data/localization/hplip_de.ts data/localization/hplip_es.ts data/localization/hplip_fr.ts data/localization/hplip_it.ts \
+    data/localization/hplip_pt.ts data/localization/hplip_ru.ts data/localization/hplip_zh.ts
 
 # unreleased data
 if SHADOW_BUILD
@@ -185,7 +190,11 @@ libsane_hpaio_la_SOURCES = scan/sane/hpaio.c scan/sane/mfpdtf.c scan/sane/pml.c 
       scan/sane/soap_stub.c scan/sane/sanei_init_debug.c
 #      scan/sane/soap.c scan/sane/webScanC.c scan/sane/webScanClient.c scan/sane/stdsoap2.c \
 #      scan/sane/dime.c scan/sane/dime.h scan/sane/webScanStub.h scan/sane/webScanH.h scan/sane/stdsoap2.h scan/sane/webScan.nsmap
+if DARWIN_BUILD
+libsane_hpaio_la_LDFLAGS = -module -framework CoreFoundation -version-info 1:0:0
+else
 libsane_hpaio_la_LDFLAGS = -version-info 1:0:0
+endif
 # The following is a interlibrary dependency that must be compiled first.
 libsane_hpaio_la_LIBADD = libhpip.la libhpmud.la
 #libsane_hpaio_la_CFLAGS = -DWITH_NONAMESPACES -DSOAP_DEBUG

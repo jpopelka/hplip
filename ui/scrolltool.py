@@ -355,7 +355,7 @@ class ScrollToolView(ScrollView):
         d = self.cur_device
         align_type = d.align_type
 
-        log.debug(utils.bold("Align: %s %s (type=%d) %s" % ("*"*20, self.cur_device.device_uri, align_type, "*"*20)))
+        log.debug("Align: %s %s (type=%d) %s" % ("*"*20, self.cur_device.device_uri, align_type, "*"*20))
 
         try:
             QApplication.setOverrideCursor(QApplication.waitCursor)
@@ -436,7 +436,7 @@ class ScrollToolView(ScrollView):
     def ColorCalibrationButton_clicked(self):
         d = self.cur_device
         color_cal_type = d.color_cal_type
-        log.debug(utils.bold("Color-cal: %s %s (type=%d) %s" % ("*"*20, self.cur_device.device_uri, color_cal_type, "*"*20)))
+        log.debug("Color-cal: %s %s (type=%d) %s" % ("*"*20, self.cur_device.device_uri, color_cal_type, "*"*20))
 
         try:
             QApplication.setOverrideCursor(QApplication.waitCursor)
@@ -503,7 +503,7 @@ class ScrollToolView(ScrollView):
     def CleanPensButton_clicked(self):
         d = self.cur_device
         clean_type = d.clean_type
-        log.debug(utils.bold("Clean: %s %s (type=%d) %s" % ("*"*20, self.cur_device.device_uri, clean_type, "*"*20)))
+        log.debug("Clean: %s %s (type=%d) %s" % ("*"*20, self.cur_device.device_uri, clean_type, "*"*20))
 
         try:
             QApplication.setOverrideCursor(QApplication.waitCursor)
@@ -597,7 +597,7 @@ class ScrollToolView(ScrollView):
                 self.form.FailureUI(self.__tr("<p><b>Unable to run command. No command specified.</b><p>Use <pre>Configure...</pre> to specify a command to run."))
                 log.error("No command specified. Use settings to configure commands.")
             else:
-                log.debug(utils.bold("Run: %s %s (%s) %s" % ("*"*20, cmd, self.cur_device.device_uri, "*"*20)))
+                log.debug("Run: %s %s (%s) %s" % ("*"*20, cmd, self.cur_device.device_uri, "*"*20))
                 log.debug(cmd)
                 cmd = ''.join([self.cur_device.device_vars.get(x, x) \
                                  for x in cmd.split(macro_char)])

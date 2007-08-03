@@ -20304,6 +20304,28 @@
    </margins>
   </printer>
   <printer>
+   <id>printer/HP-PhotoSmart_A520</id>
+   <ppdentry>
+     *DefaultResolution: 1200dpi
+    </ppdentry>
+   <margins>
+    <general>
+     <unit>in</unit>
+     <relative />
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0.5</bottom>
+    </general>
+    <exception PageSize="PhotoTearOff">
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="A6TearOff">
+     <bottom>0</bottom>
+    </exception>
+   </margins>
+  </printer>
+  <printer>
    <id>printer/HP-PhotoSmart_470</id>
    <ppdentry>
      *DefaultResolution: 1200dpi
@@ -20348,7 +20370,51 @@
    </margins>
   </printer>
   <printer>
+   <id>printer/HP-PhotoSmart_A620</id>
+   <ppdentry>
+     *DefaultResolution: 1200dpi
+    </ppdentry>
+   <margins>
+    <general>
+     <unit>in</unit>
+     <relative />
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0.5</bottom>
+    </general>
+    <exception PageSize="PhotoTearOff">
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="A6TearOff">
+     <bottom>0</bottom>
+    </exception>
+   </margins>
+  </printer>
+  <printer>
    <id>printer/HP-PhotoSmart_A710</id>
+   <ppdentry>
+     *DefaultResolution: 1200dpi
+    </ppdentry>
+   <margins>
+    <general>
+     <unit>in</unit>
+     <relative />
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0.5</bottom>
+    </general>
+    <exception PageSize="PhotoTearOff">
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="A6TearOff">
+     <bottom>0</bottom>
+    </exception>
+   </margins>
+  </printer>
+  <printer>
+   <id>printer/HP-PhotoSmart_A820</id>
    <ppdentry>
      *DefaultResolution: 1200dpi
     </ppdentry>

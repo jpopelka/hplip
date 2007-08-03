@@ -946,5 +946,5 @@ class ScrollPrintSettingsView(ScrollView):
 
 
     def __tr(self,s,c = None):
-        return qApp.translate("DevMgr4",s,c)
+        return qApp.translate("ScrollPrintSettingsView",s,c)
 

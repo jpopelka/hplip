@@ -145,18 +145,33 @@ isSettable:  %s\n""" % (self.name, curValue,
         return s
         
     def limitAndSet(self, value):
-        if value is not None:
-            if value < self.constraint[0]:
-                value = self.constraint[0]
-                log.warn("Invalid value for %s (%s < min value of %dmm). Using %dmm." % 
-                    (self.name, self.name, value, value))
-            
-            elif value > self.constraint[1]:
-                value = self.constraint[1]
-                log.warn("Invalid value for %s (%s > max value of %dmm). Using %dmm." % 
-                    (self.name, self.name, value, value))
+        if value is not None and self.constraint is not None:
+            if type(self.constraint) == type(()):
+                if value < self.constraint[0]:
+                    value = self.constraint[0]
+                    log.warn("Invalid value for %s (%s < min value of %d). Using %d." % 
+                        (self.name, self.name, value, value))
                 
-            self.cur_device.setOption(self.name, value)
+                elif value > self.constraint[1]:
+                    value = self.constraint[1]
+                    log.warn("Invalid value for %s (%s > max value of %d). Using %d." % 
+                        (self.name, self.name, value, value))
+                    
+                self.cur_device.setOption(self.name, value)
+            
+            elif type(self.constraint) == type([]):
+                if value not in self.constraint:
+                    v = self.constraint[0]
+                    min_dist = sys.maxint
+                    for x in self.constraint: 
+                        if abs(value-x) < min_dist:
+                            min_dist = abs(value-x)
+                            v = x
+                            
+                    log.warn("Invalid value for %s (%s not in constraint list: %s). Using %d." % 
+                        (self.name, self.name, value, ', '.join(self.constraint), v))
+                        
+                    self.cur_device.setOption(self.name, v)
         
         else:
             value = self.cur_device.getOption(self.name)

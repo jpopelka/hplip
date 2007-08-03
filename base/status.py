@@ -564,13 +564,18 @@ def StatusType3( dev, parsedID ): # LaserJet Status (PML/SNMP)
                        'level-trigger' : agent_trigger,})
 
         x += 1
+        
+        if x > 20:
+            break
 
 
-    #log.debug("on_off_line=%d" % on_off_line)
-    #log.debug("sleep_mode=%d" % sleep_mode)
+    printer_status = printer_status or STATUS_PRINTER_IDLE
     log.debug("printer_status=%d" % printer_status)
+    device_status = device_status or pml.DEVICE_STATUS_RUNNING
     log.debug("device_status=%d" % device_status)
+    cover_status = cover_status or pml.COVER_STATUS_CLOSED
     log.debug("cover_status=%d" % cover_status)
+    detected_error_state = detected_error_state or pml.DETECTED_ERROR_STATE_NO_ERROR
     log.debug("detected_error_state=%d (0x%x)" % (detected_error_state, detected_error_state))
 
     stat = LaserJetDeviceStatusToPrinterStatus(device_status, printer_status, detected_error_state)

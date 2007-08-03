@@ -21,7 +21,7 @@
 -->
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta name="generator" content="HTML Tidy for Linux (vers 1 September 2005), see www.w3.org" />
+    
 
     <title>HPLIP Launcher Window</title>
     <meta http-equiv="PRAGMA" content="NO-CACHE" />
@@ -32,7 +32,9 @@
     <script type="text/javascript">
     <!--
     function todoOnLoad() {
-        generateHeader();
+        header = '$header_string'; 
+        subheader = '$sub_header_string'; 
+        generateHeader(header, subheader);
         setTimeout("todoExitApp();", 1000);
     };
 
@@ -49,12 +51,8 @@
 
 <!-- Body Div --> 
 <div class="body_content">
-    <div id="message_title">
-        <a>To finish or exit the installation process, close the browser window.</a>
-    </div>
-
+    <div id="message_title">$quit_message_title</div>
     <div id="message_body"></div>
-
     <div id="message_footer"></div>
 </div>
   

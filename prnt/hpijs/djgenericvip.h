@@ -52,6 +52,7 @@ public:
     virtual PHOTOTRAY_STATE PhotoTrayEngaged (BOOL bQueryPrinter);
     //! Returns TRUE if a hagaki feed is present in printer.
     virtual BOOL HagakiFeedPresent(BOOL bQueryPrinter);
+	virtual DATA_FORMAT GetDataFormat () { return RASTER_STRIP; }
 
 #ifdef APDK_AUTODUPLEX
     //!Returns TRUE if duplexer and hagaki feed (combined) unit is present in printer.
@@ -147,6 +148,7 @@ public:
         "Photosmart 420\0"
         "Photosmart A430\0"
         "Photosmart A510\0"
+        "Photosmart A520\0"
 #ifdef APDK_MLC_PRINTER
 		"PSC 1500\0"
 		"PSC 1600\0"

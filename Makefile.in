@@ -142,10 +142,23 @@ noinst_PROGRAMS = $(am__EXEEXT_1)
 @HPLIP_BUILD_TRUE@	cherrypy/filters/wsgiappfilter.py \
 @HPLIP_BUILD_TRUE@	cherrypy/filters/logdebuginfofilter.py \
 @HPLIP_BUILD_TRUE@	cherrypy/filters/xmlrpcfilter.py
-@HPLIP_BUILD_TRUE@am__append_2 = installer/images/button.png installer/images/favicon.ico installer/images/topbar.png installer/images/view.png \
-@HPLIP_BUILD_TRUE@    installer/images/back.png installer/images/circular.gif installer/images/hplogo.png installer/images/tux.png \
-@HPLIP_BUILD_TRUE@    installer/images/button1.png  installer/images/button1d.png
-
+@HPLIP_BUILD_TRUE@am__append_2 = installer/images/button.png \
+@HPLIP_BUILD_TRUE@	installer/images/favicon.ico \
+@HPLIP_BUILD_TRUE@	installer/images/topbar.png \
+@HPLIP_BUILD_TRUE@	installer/images/view.png \
+@HPLIP_BUILD_TRUE@	installer/images/back.png \
+@HPLIP_BUILD_TRUE@	installer/images/circular.gif \
+@HPLIP_BUILD_TRUE@	installer/images/hplogo.png \
+@HPLIP_BUILD_TRUE@	installer/images/tux.png \
+@HPLIP_BUILD_TRUE@	installer/images/button1.png \
+@HPLIP_BUILD_TRUE@	installer/images/button1d.png \
+@HPLIP_BUILD_TRUE@	data/localization/hplip_de.ts \
+@HPLIP_BUILD_TRUE@	data/localization/hplip_es.ts \
+@HPLIP_BUILD_TRUE@	data/localization/hplip_fr.ts \
+@HPLIP_BUILD_TRUE@	data/localization/hplip_it.ts \
+@HPLIP_BUILD_TRUE@	data/localization/hplip_pt.ts \
+@HPLIP_BUILD_TRUE@	data/localization/hplip_ru.ts \
+@HPLIP_BUILD_TRUE@	data/localization/hplip_zh.ts
 
 # ptest
 
@@ -170,10 +183,10 @@ DIST_COMMON = $(am__configure_deps) $(am__dist_base_SCRIPTS_DIST) \
 	$(am__dist_firm_DATA_DIST) $(am__dist_hpfax_SCRIPTS_DIST) \
 	$(am__dist_hplip_DATA_DIST) $(am__dist_hplip_SCRIPTS_DIST) \
 	$(am__dist_images_DATA_DIST) $(am__dist_install_SCRIPTS_DIST) \
-	$(am__dist_ldl_DATA_DIST) $(am__dist_models_DATA_DIST) \
-	$(am__dist_noinst_DATA_DIST) $(am__dist_noinst_SCRIPTS_DIST) \
-	$(am__dist_pcard_SCRIPTS_DIST) $(am__dist_pcl_DATA_DIST) \
-	$(am__dist_plugins_SCRIPTS_DIST) \
+	$(am__dist_ldl_DATA_DIST) $(am__dist_localz_DATA_DIST) \
+	$(am__dist_models_DATA_DIST) $(am__dist_noinst_DATA_DIST) \
+	$(am__dist_noinst_SCRIPTS_DIST) $(am__dist_pcard_SCRIPTS_DIST) \
+	$(am__dist_pcl_DATA_DIST) $(am__dist_plugins_SCRIPTS_DIST) \
 	$(am__dist_postscript_DATA_DIST) $(am__dist_prnt_SCRIPTS_DIST) \
 	$(am__dist_rules_DATA_DIST) $(am__dist_scan_SCRIPTS_DIST) \
 	$(am__dist_ui_SCRIPTS_DIST) $(am__dist_unrel_DATA_DIST) \
@@ -219,20 +232,21 @@ am__installdirs = "$(DESTDIR)$(cupsextdir)" "$(DESTDIR)$(hpmudextdir)" \
 	"$(DESTDIR)$(scandir)" "$(DESTDIR)$(uidir)" \
 	"$(DESTDIR)$(faxppddir)" "$(DESTDIR)$(firmdir)" \
 	"$(DESTDIR)$(hplipdir)" "$(DESTDIR)$(imagesdir)" \
-	"$(DESTDIR)$(ldldir)" "$(DESTDIR)$(modelsdir)" \
-	"$(DESTDIR)$(pcldir)" "$(DESTDIR)$(postscriptdir)" \
-	"$(DESTDIR)$(rulesdir)" "$(DESTDIR)$(unreldir)" \
-	"$(DESTDIR)$(www0dir)" "$(DESTDIR)$(www1dir)" \
-	"$(DESTDIR)$(www2dir)" "$(DESTDIR)$(www21dir)" \
-	"$(DESTDIR)$(www22dir)" "$(DESTDIR)$(www23dir)" \
-	"$(DESTDIR)$(www24dir)" "$(DESTDIR)$(www241dir)" \
-	"$(DESTDIR)$(www242dir)" "$(DESTDIR)$(www243dir)" \
-	"$(DESTDIR)$(www251dir)" "$(DESTDIR)$(www252dir)" \
-	"$(DESTDIR)$(www261dir)" "$(DESTDIR)$(www3dir)" \
-	"$(DESTDIR)$(www4dir)" "$(DESTDIR)$(www5dir)" \
-	"$(DESTDIR)$(www6dir)" "$(DESTDIR)$(www61dir)" \
-	"$(DESTDIR)$(www7dir)" "$(DESTDIR)$(docdir)" \
-	"$(DESTDIR)$(hplip_confdir)" "$(DESTDIR)$(hplip_desktopdir)"
+	"$(DESTDIR)$(ldldir)" "$(DESTDIR)$(localzdir)" \
+	"$(DESTDIR)$(modelsdir)" "$(DESTDIR)$(pcldir)" \
+	"$(DESTDIR)$(postscriptdir)" "$(DESTDIR)$(rulesdir)" \
+	"$(DESTDIR)$(unreldir)" "$(DESTDIR)$(www0dir)" \
+	"$(DESTDIR)$(www1dir)" "$(DESTDIR)$(www2dir)" \
+	"$(DESTDIR)$(www21dir)" "$(DESTDIR)$(www22dir)" \
+	"$(DESTDIR)$(www23dir)" "$(DESTDIR)$(www24dir)" \
+	"$(DESTDIR)$(www241dir)" "$(DESTDIR)$(www242dir)" \
+	"$(DESTDIR)$(www243dir)" "$(DESTDIR)$(www251dir)" \
+	"$(DESTDIR)$(www252dir)" "$(DESTDIR)$(www261dir)" \
+	"$(DESTDIR)$(www3dir)" "$(DESTDIR)$(www4dir)" \
+	"$(DESTDIR)$(www5dir)" "$(DESTDIR)$(www6dir)" \
+	"$(DESTDIR)$(www61dir)" "$(DESTDIR)$(www7dir)" \
+	"$(DESTDIR)$(docdir)" "$(DESTDIR)$(hplip_confdir)" \
+	"$(DESTDIR)$(hplip_desktopdir)"
 cupsextLTLIBRARIES_INSTALL = $(INSTALL)
 hpmudextLTLIBRARIES_INSTALL = $(INSTALL)
 libLTLIBRARIES_INSTALL = $(INSTALL)
@@ -483,7 +497,7 @@ am__dist_base_SCRIPTS_DIST = base/maint.py base/codes.py base/g.py \
 	base/kirbybase.py base/service.py base/device.py \
 	base/logger.py base/msg.py base/slp.py base/exif.py \
 	base/strings.py base/magic.py base/imagesize.py \
-	base/pexpect.py base/models.py base/mdns.py
+	base/pexpect.py base/models.py base/mdns.py base/tui.py
 dist_baseSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 am__dist_cmd_SCRIPTS_DIST = align.py info.py print.py toolbox.py \
 	clean.py colorcal.py unload.py testpage.py makeuri.py check.py \
@@ -501,7 +515,8 @@ am__dist_hplip_SCRIPTS_DIST = hpssd.py __init__.py install.py \
 	hplip-install
 dist_hplipSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 am__dist_install_SCRIPTS_DIST = installer/__init__.py \
-	installer/dcheck.py installer/distros.py installer/core.py
+	installer/dcheck.py installer/distros.dat \
+	installer/core_install.py
 dist_installSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 am__dist_noinst_SCRIPTS_DIST = installer/text_install.py \
 	installer/web_install.py installer/trigger.py \
@@ -667,6 +682,11 @@ am__dist_ldl_DATA_DIST = data/ldl/cb2pcal.ldl.gz \
 	data/ldl/cbccal.ldl.gz data/ldl/cbccal_done.ldl.gz \
 	data/ldl/cbcpcal.ldl.gz data/ldl/cbpcal.ldl.gz
 dist_ldlDATA_INSTALL = $(INSTALL_DATA)
+am__dist_localz_DATA_DIST = data/localization/hplip_de.qm \
+	data/localization/hplip_es.qm data/localization/hplip_fr.qm \
+	data/localization/hplip_it.qm data/localization/hplip_pt.qm \
+	data/localization/hplip_ru.qm data/localization/hplip_zh.qm
+dist_localzDATA_INSTALL = $(INSTALL_DATA)
 am__dist_models_DATA_DIST = data/models/models.dat
 dist_modelsDATA_INSTALL = $(INSTALL_DATA)
 am__dist_noinst_DATA_DIST = installer/images/button.png \
@@ -674,16 +694,19 @@ am__dist_noinst_DATA_DIST = installer/images/button.png \
 	installer/images/view.png installer/images/back.png \
 	installer/images/circular.gif installer/images/hplogo.png \
 	installer/images/tux.png installer/images/button1.png \
-	installer/images/button1d.png ui/colorcalform2_base.ui \
-	ui/settingsdialog_base.ui ui/aligntype6form1_base.ui \
-	ui/aboutdlg_base.ui ui/imagepropertiesdlg_base.ui \
-	ui/paperedgealignform_base.ui ui/aligntype6form2_base.ui \
-	ui/nodevicesform_base.ui ui/cleaningform_base.ui \
-	ui/colorcalform_base.ui ui/devmgr4_base.ui \
-	ui/loadpaperform_base.ui ui/cleaningform2_base.ui \
-	ui/waitform_base.ui ui/coloradjform_base.ui \
-	ui/faxaddrbookeditform_base.ui ui/faxaddrbookform_base.ui \
-	ui/faxaddrbookgroupeditform_base.ui \
+	installer/images/button1d.png data/localization/hplip_de.ts \
+	data/localization/hplip_es.ts data/localization/hplip_fr.ts \
+	data/localization/hplip_it.ts data/localization/hplip_pt.ts \
+	data/localization/hplip_ru.ts data/localization/hplip_zh.ts \
+	ui/colorcalform2_base.ui ui/settingsdialog_base.ui \
+	ui/aligntype6form1_base.ui ui/aboutdlg_base.ui \
+	ui/imagepropertiesdlg_base.ui ui/paperedgealignform_base.ui \
+	ui/aligntype6form2_base.ui ui/nodevicesform_base.ui \
+	ui/cleaningform_base.ui ui/colorcalform_base.ui \
+	ui/devmgr4_base.ui ui/loadpaperform_base.ui \
+	ui/cleaningform2_base.ui ui/waitform_base.ui \
+	ui/coloradjform_base.ui ui/faxaddrbookeditform_base.ui \
+	ui/faxaddrbookform_base.ui ui/faxaddrbookgroupeditform_base.ui \
 	ui/faxaddrbookgroupsform_base.ui ui/align10form_base.ui \
 	plugins/powersettingsdialog_base.ui ui/faxsettingsform_base.ui \
 	ui/coverpageform_base.ui ui/allowabletypesdlg_base.ui \
@@ -994,9 +1017,12 @@ am__dist_noinst_DATA_DIST = installer/images/button.png \
 	$(src_dbdir)/printer/HP-PhotoSmart_A310.xml \
 	$(src_dbdir)/printer/HP-PhotoSmart_A320.xml \
 	$(src_dbdir)/printer/HP-PhotoSmart_A510.xml \
+	$(src_dbdir)/printer/HP-PhotoSmart_A520.xml \
 	$(src_dbdir)/printer/HP-PhotoSmart_470.xml \
 	$(src_dbdir)/printer/HP-PhotoSmart_A610.xml \
+	$(src_dbdir)/printer/HP-PhotoSmart_A620.xml \
 	$(src_dbdir)/printer/HP-PhotoSmart_A710.xml \
+	$(src_dbdir)/printer/HP-PhotoSmart_A820.xml \
 	$(src_dbdir)/printer/HP-LaserJet_4.xml \
 	$(src_dbdir)/printer/HP-LaserJet_4_Plus.xml \
 	$(src_dbdir)/printer/HP-LaserJet_4M.xml \
@@ -1423,9 +1449,12 @@ am__dist_noinst_DATA_DIST = installer/images/button.png \
 	ppd/HP-PhotoSmart_A310-hpijs.ppd \
 	ppd/HP-PhotoSmart_A320-hpijs.ppd \
 	ppd/HP-PhotoSmart_A510-hpijs.ppd \
+	ppd/HP-PhotoSmart_A520-hpijs.ppd \
 	ppd/HP-PhotoSmart_470-hpijs.ppd \
 	ppd/HP-PhotoSmart_A610-hpijs.ppd \
-	ppd/HP-PhotoSmart_A710-hpijs.ppd ppd/HP-LaserJet_4-hpijs.ppd \
+	ppd/HP-PhotoSmart_A620-hpijs.ppd \
+	ppd/HP-PhotoSmart_A710-hpijs.ppd \
+	ppd/HP-PhotoSmart_A820-hpijs.ppd ppd/HP-LaserJet_4-hpijs.ppd \
 	ppd/HP-LaserJet_4_Plus-hpijs.ppd ppd/HP-LaserJet_4M-hpijs.ppd \
 	ppd/HP-LaserJet_4P-hpijs.ppd ppd/HP-LaserJet_4Si-hpijs.ppd \
 	ppd/HP-LaserJet_4V-hpijs.ppd ppd/HP-LaserJet_5-hpijs.ppd \
@@ -1587,16 +1616,17 @@ docDATA_INSTALL = $(INSTALL_DATA)
 hplip_confDATA_INSTALL = $(INSTALL_DATA)
 hplip_desktopDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(dist_faxppd_DATA) $(dist_firm_DATA) $(dist_hplip_DATA) \
-	$(dist_images_DATA) $(dist_ldl_DATA) $(dist_models_DATA) \
-	$(dist_noinst_DATA) $(dist_pcl_DATA) $(dist_postscript_DATA) \
-	$(dist_rules_DATA) $(dist_unrel_DATA) $(dist_www0_DATA) \
-	$(dist_www1_DATA) $(dist_www2_DATA) $(dist_www21_DATA) \
-	$(dist_www22_DATA) $(dist_www23_DATA) $(dist_www24_DATA) \
-	$(dist_www241_DATA) $(dist_www242_DATA) $(dist_www243_DATA) \
-	$(dist_www251_DATA) $(dist_www252_DATA) $(dist_www261_DATA) \
-	$(dist_www3_DATA) $(dist_www4_DATA) $(dist_www5_DATA) \
-	$(dist_www6_DATA) $(dist_www61_DATA) $(dist_www7_DATA) \
-	$(doc_DATA) $(hplip_conf_DATA) $(hplip_desktop_DATA)
+	$(dist_images_DATA) $(dist_ldl_DATA) $(dist_localz_DATA) \
+	$(dist_models_DATA) $(dist_noinst_DATA) $(dist_pcl_DATA) \
+	$(dist_postscript_DATA) $(dist_rules_DATA) $(dist_unrel_DATA) \
+	$(dist_www0_DATA) $(dist_www1_DATA) $(dist_www2_DATA) \
+	$(dist_www21_DATA) $(dist_www22_DATA) $(dist_www23_DATA) \
+	$(dist_www24_DATA) $(dist_www241_DATA) $(dist_www242_DATA) \
+	$(dist_www243_DATA) $(dist_www251_DATA) $(dist_www252_DATA) \
+	$(dist_www261_DATA) $(dist_www3_DATA) $(dist_www4_DATA) \
+	$(dist_www5_DATA) $(dist_www6_DATA) $(dist_www61_DATA) \
+	$(dist_www7_DATA) $(doc_DATA) $(hplip_conf_DATA) \
+	$(hplip_desktop_DATA)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -1631,6 +1661,8 @@ CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
+DARWIN_BUILD_FALSE = @DARWIN_BUILD_FALSE@
+DARWIN_BUILD_TRUE = @DARWIN_BUILD_TRUE@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DOC_BUILD_FALSE = @DOC_BUILD_FALSE@
@@ -1827,12 +1859,12 @@ lib_LTLIBRARIES = $(am__append_4)
 @HPLIP_BUILD_TRUE@dist_base_SCRIPTS = base/maint.py base/codes.py base/g.py base/pml.py base/status.py  base/async.py \
 @HPLIP_BUILD_TRUE@    base/__init__.py base/mfpdtf.py base/utils.py base/async_qt.py base/kirbybase.py base/service.py \
 @HPLIP_BUILD_TRUE@    base/device.py base/logger.py base/msg.py base/slp.py base/exif.py base/strings.py base/magic.py \
-@HPLIP_BUILD_TRUE@    base/imagesize.py base/pexpect.py base/models.py base/mdns.py
+@HPLIP_BUILD_TRUE@    base/imagesize.py base/pexpect.py base/models.py base/mdns.py base/tui.py
 
 
 # installer
 @HPLIP_BUILD_TRUE@installdir = $(hplipdir)/installer
-@HPLIP_BUILD_TRUE@dist_install_SCRIPTS = installer/__init__.py installer/dcheck.py installer/distros.py installer/core.py
+@HPLIP_BUILD_TRUE@dist_install_SCRIPTS = installer/__init__.py installer/dcheck.py installer/distros.dat installer/core_install.py
 
 # makecopies
 @HPLIP_BUILD_TRUE@copierdir = $(hplipdir)/copier
@@ -1855,6 +1887,7 @@ lib_LTLIBRARIES = $(am__append_4)
 @HPLIP_BUILD_TRUE@ldldir = $(hplipdir)/data/ldl
 @HPLIP_BUILD_TRUE@postscriptdir = $(hplipdir)/data/ps
 @HPLIP_BUILD_TRUE@firmdir = $(hplipdir)/data/firmware
+@HPLIP_BUILD_TRUE@localzdir = $(hplipdir)/data/localization
 @HPLIP_BUILD_TRUE@dist_postscript_DATA = data/ps/testpage.ps.gz data/ps/clean_page.pdf.gz
 @HPLIP_BUILD_TRUE@dist_models_DATA = data/models/models.dat
 @HPLIP_BUILD_TRUE@dist_images_DATA = data/images/*
@@ -1867,6 +1900,9 @@ lib_LTLIBRARIES = $(am__append_4)
 @HPLIP_BUILD_TRUE@    data/ldl/cbpcal.ldl.gz
 
 @HPLIP_BUILD_TRUE@dist_firm_DATA = data/firmware/HP_LaserJet_1018.fw.gz data/firmware/HP_LaserJet_1020.fw.gz
+@HPLIP_BUILD_TRUE@dist_localz_DATA = data/localization/hplip_de.qm data/localization/hplip_es.qm data/localization/hplip_fr.qm data/localization/hplip_it.qm \
+@HPLIP_BUILD_TRUE@    data/localization/hplip_pt.qm data/localization/hplip_ru.qm data/localization/hplip_zh.qm
+
 
 # unreleased data
 @HPLIP_BUILD_TRUE@@SHADOW_BUILD_TRUE@unreldir = $(hplipdir)/data/models/unreleased
@@ -1908,9 +1944,10 @@ lib_LTLIBRARIES = $(am__append_4)
 @HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@      scan/sane/common.c scan/sane/common.h scan/sane/soap.h scan/sane/sanei_debug.h scan/sane/sanei.h \
 @HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@      scan/sane/soap_stub.c scan/sane/sanei_init_debug.c
 
+@DARWIN_BUILD_FALSE@@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@libsane_hpaio_la_LDFLAGS = -version-info 1:0:0
 #      scan/sane/soap.c scan/sane/webScanC.c scan/sane/webScanClient.c scan/sane/stdsoap2.c \
 #      scan/sane/dime.c scan/sane/dime.h scan/sane/webScanStub.h scan/sane/webScanH.h scan/sane/stdsoap2.h scan/sane/webScan.nsmap
-@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@libsane_hpaio_la_LDFLAGS = -version-info 1:0:0
+@DARWIN_BUILD_TRUE@@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@libsane_hpaio_la_LDFLAGS = -module -framework CoreFoundation -version-info 1:0:0
 # The following is a interlibrary dependency that must be compiled first.
 @HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@libsane_hpaio_la_LIBADD = libhpip.la libhpmud.la
 #libsane_hpaio_la_CFLAGS = -DWITH_NONAMESPACES -DSOAP_DEBUG
@@ -2299,9 +2336,12 @@ foomatic_xml_printers = \
     $(src_dbdir)/printer/HP-PhotoSmart_A310.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_A320.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_A510.xml \
+    $(src_dbdir)/printer/HP-PhotoSmart_A520.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_470.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_A610.xml \
+    $(src_dbdir)/printer/HP-PhotoSmart_A620.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_A710.xml \
+    $(src_dbdir)/printer/HP-PhotoSmart_A820.xml \
     $(src_dbdir)/printer/HP-LaserJet_4.xml \
     $(src_dbdir)/printer/HP-LaserJet_4_Plus.xml \
     $(src_dbdir)/printer/HP-LaserJet_4M.xml \
@@ -2731,9 +2771,12 @@ foomatic_ppd_printers = \
     ppd/HP-PhotoSmart_A310-hpijs.ppd \
     ppd/HP-PhotoSmart_A320-hpijs.ppd \
     ppd/HP-PhotoSmart_A510-hpijs.ppd \
+    ppd/HP-PhotoSmart_A520-hpijs.ppd \
     ppd/HP-PhotoSmart_470-hpijs.ppd \
     ppd/HP-PhotoSmart_A610-hpijs.ppd \
+    ppd/HP-PhotoSmart_A620-hpijs.ppd \
     ppd/HP-PhotoSmart_A710-hpijs.ppd \
+    ppd/HP-PhotoSmart_A820-hpijs.ppd \
     ppd/HP-LaserJet_4-hpijs.ppd \
     ppd/HP-LaserJet_4_Plus-hpijs.ppd \
     ppd/HP-LaserJet_4M-hpijs.ppd \
@@ -6251,6 +6294,23 @@ uninstall-dist_ldlDATA:
 	  echo " rm -f '$(DESTDIR)$(ldldir)/$$f'"; \
 	  rm -f "$(DESTDIR)$(ldldir)/$$f"; \
 	done
+install-dist_localzDATA: $(dist_localz_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(localzdir)" || $(mkdir_p) "$(DESTDIR)$(localzdir)"
+	@list='$(dist_localz_DATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(dist_localzDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(localzdir)/$$f'"; \
+	  $(dist_localzDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(localzdir)/$$f"; \
+	done
+
+uninstall-dist_localzDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_localz_DATA)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(localzdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(localzdir)/$$f"; \
+	done
 install-dist_modelsDATA: $(dist_models_DATA)
 	@$(NORMAL_INSTALL)
 	test -z "$(modelsdir)" || $(mkdir_p) "$(DESTDIR)$(modelsdir)"
@@ -6762,7 +6822,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/$(src_dbdir)/PPD/HP $(distdir)/$(src_dbdir)/driver $(distdir)/$(src_dbdir)/opt $(distdir)/$(src_dbdir)/printer $(distdir)/$(src_hpijsdir) $(distdir)/$(src_hpijsdir)/data-generators/hpijs $(distdir)/$(wwwsrc) $(distdir)/$(wwwsrc)/howtos $(distdir)/$(wwwsrc)/images $(distdir)/$(wwwsrc)/install $(distdir)/$(wwwsrc)/install/install $(distdir)/$(wwwsrc)/install/manual $(distdir)/$(wwwsrc)/install/manual/distros $(distdir)/$(wwwsrc)/install/step1 $(distdir)/$(wwwsrc)/install/step2 $(distdir)/$(wwwsrc)/install/step3 $(distdir)/$(wwwsrc)/install/step4 $(distdir)/$(wwwsrc)/install/step4/cups $(distdir)/$(wwwsrc)/install/step4/setup $(distdir)/$(wwwsrc)/install/step4/suse $(distdir)/$(wwwsrc)/styles $(distdir)/$(wwwsrc)/supported_devices $(distdir)/$(wwwsrc)/tech_docs $(distdir)/$(wwwsrc)/tech_docs/man_pages $(distdir)/$(wwwsrc)/troubleshooting $(distdir)/. $(distdir)/Cheetah $(distdir)/Cheetah/Utils $(distdir)/Cheetah/Utils/optik $(distdir)/base $(distdir)/cherrypy $(distdir)/cherrypy/filters $(distdir)/cherrypy/lib $(distdir)/copier $(distdir)/data/firmware $(distdir)/data/images $(distdir)/data/ldl $(distdir)/data/models $(distdir)/data/models/unreleased $(distdir)/data/pcl $(distdir)/data/ps $(distdir)/fax $(distdir)/fax/backend $(distdir)/fax/ppd $(distdir)/installer $(distdir)/installer/images $(distdir)/installer/pages $(distdir)/installer/scripts $(distdir)/installer/styles $(distdir)/pcard $(distdir)/plugins $(distdir)/ppd $(distdir)/prnt $(distdir)/prnt/hpijs $(distdir)/scan $(distdir)/scan/sane $(distdir)/ui
+	$(mkdir_p) $(distdir)/$(src_dbdir)/PPD/HP $(distdir)/$(src_dbdir)/driver $(distdir)/$(src_dbdir)/opt $(distdir)/$(src_dbdir)/printer $(distdir)/$(src_hpijsdir) $(distdir)/$(src_hpijsdir)/data-generators/hpijs $(distdir)/$(wwwsrc) $(distdir)/$(wwwsrc)/howtos $(distdir)/$(wwwsrc)/images $(distdir)/$(wwwsrc)/install $(distdir)/$(wwwsrc)/install/install $(distdir)/$(wwwsrc)/install/manual $(distdir)/$(wwwsrc)/install/manual/distros $(distdir)/$(wwwsrc)/install/step1 $(distdir)/$(wwwsrc)/install/step2 $(distdir)/$(wwwsrc)/install/step3 $(distdir)/$(wwwsrc)/install/step4 $(distdir)/$(wwwsrc)/install/step4/cups $(distdir)/$(wwwsrc)/install/step4/setup $(distdir)/$(wwwsrc)/install/step4/suse $(distdir)/$(wwwsrc)/styles $(distdir)/$(wwwsrc)/supported_devices $(distdir)/$(wwwsrc)/tech_docs $(distdir)/$(wwwsrc)/tech_docs/man_pages $(distdir)/$(wwwsrc)/troubleshooting $(distdir)/. $(distdir)/Cheetah $(distdir)/Cheetah/Utils $(distdir)/Cheetah/Utils/optik $(distdir)/base $(distdir)/cherrypy $(distdir)/cherrypy/filters $(distdir)/cherrypy/lib $(distdir)/copier $(distdir)/data/firmware $(distdir)/data/images $(distdir)/data/ldl $(distdir)/data/localization $(distdir)/data/models $(distdir)/data/models/unreleased $(distdir)/data/pcl $(distdir)/data/ps $(distdir)/fax $(distdir)/fax/backend $(distdir)/fax/ppd $(distdir)/installer $(distdir)/installer/images $(distdir)/installer/pages $(distdir)/installer/scripts $(distdir)/installer/styles $(distdir)/pcard $(distdir)/plugins $(distdir)/ppd $(distdir)/prnt $(distdir)/prnt/hpijs $(distdir)/scan $(distdir)/scan/sane $(distdir)/ui
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -6892,7 +6952,7 @@ all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(SCRIPTS) $(DATA)
 install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs:
-	for dir in "$(DESTDIR)$(cupsextdir)" "$(DESTDIR)$(hpmudextdir)" "$(DESTDIR)$(libdir)" "$(DESTDIR)$(libsane_hpaiodir)" "$(DESTDIR)$(pcardextdir)" "$(DESTDIR)$(scanextdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(hpdir)" "$(DESTDIR)$(basedir)" "$(DESTDIR)$(cmddir)" "$(DESTDIR)$(copierdir)" "$(DESTDIR)$(faxdir)" "$(DESTDIR)$(hpfaxdir)" "$(DESTDIR)$(hplipdir)" "$(DESTDIR)$(installdir)" "$(DESTDIR)$(pcarddir)" "$(DESTDIR)$(pluginsdir)" "$(DESTDIR)$(prntdir)" "$(DESTDIR)$(scandir)" "$(DESTDIR)$(uidir)" "$(DESTDIR)$(faxppddir)" "$(DESTDIR)$(firmdir)" "$(DESTDIR)$(hplipdir)" "$(DESTDIR)$(imagesdir)" "$(DESTDIR)$(ldldir)" "$(DESTDIR)$(modelsdir)" "$(DESTDIR)$(pcldir)" "$(DESTDIR)$(postscriptdir)" "$(DESTDIR)$(rulesdir)" "$(DESTDIR)$(unreldir)" "$(DESTDIR)$(www0dir)" "$(DESTDIR)$(www1dir)" "$(DESTDIR)$(www2dir)" "$(DESTDIR)$(www21dir)" "$(DESTDIR)$(www22dir)" "$(DESTDIR)$(www23dir)" "$(DESTDIR)$(www24dir)" "$(DESTDIR)$(www241dir)" "$(DESTDIR)$(www242dir)" "$(DESTDIR)$(www243dir)" "$(DESTDIR)$(www251dir)" "$(DESTDIR)$(www252dir)" "$(DESTDIR)$(www261dir)" "$(DESTDIR)$(www3dir)" "$(DESTDIR)$(www4dir)" "$(DESTDIR)$(www5dir)" "$(DESTDIR)$(www6dir)" "$(DESTDIR)$(www61dir)" "$(DESTDIR)$(www7dir)" "$(DESTDIR)$(docdir)" "$(DESTDIR)$(hplip_confdir)" "$(DESTDIR)$(hplip_desktopdir)"; do \
+	for dir in "$(DESTDIR)$(cupsextdir)" "$(DESTDIR)$(hpmudextdir)" "$(DESTDIR)$(libdir)" "$(DESTDIR)$(libsane_hpaiodir)" "$(DESTDIR)$(pcardextdir)" "$(DESTDIR)$(scanextdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(hpdir)" "$(DESTDIR)$(basedir)" "$(DESTDIR)$(cmddir)" "$(DESTDIR)$(copierdir)" "$(DESTDIR)$(faxdir)" "$(DESTDIR)$(hpfaxdir)" "$(DESTDIR)$(hplipdir)" "$(DESTDIR)$(installdir)" "$(DESTDIR)$(pcarddir)" "$(DESTDIR)$(pluginsdir)" "$(DESTDIR)$(prntdir)" "$(DESTDIR)$(scandir)" "$(DESTDIR)$(uidir)" "$(DESTDIR)$(faxppddir)" "$(DESTDIR)$(firmdir)" "$(DESTDIR)$(hplipdir)" "$(DESTDIR)$(imagesdir)" "$(DESTDIR)$(ldldir)" "$(DESTDIR)$(localzdir)" "$(DESTDIR)$(modelsdir)" "$(DESTDIR)$(pcldir)" "$(DESTDIR)$(postscriptdir)" "$(DESTDIR)$(rulesdir)" "$(DESTDIR)$(unreldir)" "$(DESTDIR)$(www0dir)" "$(DESTDIR)$(www1dir)" "$(DESTDIR)$(www2dir)" "$(DESTDIR)$(www21dir)" "$(DESTDIR)$(www22dir)" "$(DESTDIR)$(www23dir)" "$(DESTDIR)$(www24dir)" "$(DESTDIR)$(www241dir)" "$(DESTDIR)$(www242dir)" "$(DESTDIR)$(www243dir)" "$(DESTDIR)$(www251dir)" "$(DESTDIR)$(www252dir)" "$(DESTDIR)$(www261dir)" "$(DESTDIR)$(www3dir)" "$(DESTDIR)$(www4dir)" "$(DESTDIR)$(www5dir)" "$(DESTDIR)$(www6dir)" "$(DESTDIR)$(www61dir)" "$(DESTDIR)$(www7dir)" "$(DESTDIR)$(docdir)" "$(DESTDIR)$(hplip_confdir)" "$(DESTDIR)$(hplip_desktopdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -6950,25 +7010,25 @@ install-data-am: install-cupsextLTLIBRARIES install-dist_baseSCRIPTS \
 	install-dist_firmDATA install-dist_hpfaxSCRIPTS \
 	install-dist_hplipDATA install-dist_hplipSCRIPTS \
 	install-dist_imagesDATA install-dist_installSCRIPTS \
-	install-dist_ldlDATA install-dist_modelsDATA \
-	install-dist_pcardSCRIPTS install-dist_pclDATA \
-	install-dist_pluginsSCRIPTS install-dist_postscriptDATA \
-	install-dist_prntSCRIPTS install-dist_rulesDATA \
-	install-dist_scanSCRIPTS install-dist_uiSCRIPTS \
-	install-dist_unrelDATA install-dist_www0DATA \
-	install-dist_www1DATA install-dist_www21DATA \
-	install-dist_www22DATA install-dist_www23DATA \
-	install-dist_www241DATA install-dist_www242DATA \
-	install-dist_www243DATA install-dist_www24DATA \
-	install-dist_www251DATA install-dist_www252DATA \
-	install-dist_www261DATA install-dist_www2DATA \
-	install-dist_www3DATA install-dist_www4DATA \
-	install-dist_www5DATA install-dist_www61DATA \
-	install-dist_www6DATA install-dist_www7DATA install-docDATA \
-	install-hpPROGRAMS install-hplip_confDATA \
-	install-hplip_desktopDATA install-hpmudextLTLIBRARIES \
-	install-libsane_hpaioLTLIBRARIES install-pcardextLTLIBRARIES \
-	install-scanextLTLIBRARIES
+	install-dist_ldlDATA install-dist_localzDATA \
+	install-dist_modelsDATA install-dist_pcardSCRIPTS \
+	install-dist_pclDATA install-dist_pluginsSCRIPTS \
+	install-dist_postscriptDATA install-dist_prntSCRIPTS \
+	install-dist_rulesDATA install-dist_scanSCRIPTS \
+	install-dist_uiSCRIPTS install-dist_unrelDATA \
+	install-dist_www0DATA install-dist_www1DATA \
+	install-dist_www21DATA install-dist_www22DATA \
+	install-dist_www23DATA install-dist_www241DATA \
+	install-dist_www242DATA install-dist_www243DATA \
+	install-dist_www24DATA install-dist_www251DATA \
+	install-dist_www252DATA install-dist_www261DATA \
+	install-dist_www2DATA install-dist_www3DATA \
+	install-dist_www4DATA install-dist_www5DATA \
+	install-dist_www61DATA install-dist_www6DATA \
+	install-dist_www7DATA install-docDATA install-hpPROGRAMS \
+	install-hplip_confDATA install-hplip_desktopDATA \
+	install-hpmudextLTLIBRARIES install-libsane_hpaioLTLIBRARIES \
+	install-pcardextLTLIBRARIES install-scanextLTLIBRARIES
 	@$(NORMAL_INSTALL)
 	$(MAKE) $(AM_MAKEFLAGS) install-data-hook
 
@@ -7007,21 +7067,22 @@ uninstall-am: uninstall-binPROGRAMS uninstall-cupsextLTLIBRARIES \
 	uninstall-dist_hpfaxSCRIPTS uninstall-dist_hplipDATA \
 	uninstall-dist_hplipSCRIPTS uninstall-dist_imagesDATA \
 	uninstall-dist_installSCRIPTS uninstall-dist_ldlDATA \
-	uninstall-dist_modelsDATA uninstall-dist_pcardSCRIPTS \
-	uninstall-dist_pclDATA uninstall-dist_pluginsSCRIPTS \
-	uninstall-dist_postscriptDATA uninstall-dist_prntSCRIPTS \
-	uninstall-dist_rulesDATA uninstall-dist_scanSCRIPTS \
-	uninstall-dist_uiSCRIPTS uninstall-dist_unrelDATA \
-	uninstall-dist_www0DATA uninstall-dist_www1DATA \
-	uninstall-dist_www21DATA uninstall-dist_www22DATA \
-	uninstall-dist_www23DATA uninstall-dist_www241DATA \
-	uninstall-dist_www242DATA uninstall-dist_www243DATA \
-	uninstall-dist_www24DATA uninstall-dist_www251DATA \
-	uninstall-dist_www252DATA uninstall-dist_www261DATA \
-	uninstall-dist_www2DATA uninstall-dist_www3DATA \
-	uninstall-dist_www4DATA uninstall-dist_www5DATA \
-	uninstall-dist_www61DATA uninstall-dist_www6DATA \
-	uninstall-dist_www7DATA uninstall-docDATA uninstall-hpPROGRAMS \
+	uninstall-dist_localzDATA uninstall-dist_modelsDATA \
+	uninstall-dist_pcardSCRIPTS uninstall-dist_pclDATA \
+	uninstall-dist_pluginsSCRIPTS uninstall-dist_postscriptDATA \
+	uninstall-dist_prntSCRIPTS uninstall-dist_rulesDATA \
+	uninstall-dist_scanSCRIPTS uninstall-dist_uiSCRIPTS \
+	uninstall-dist_unrelDATA uninstall-dist_www0DATA \
+	uninstall-dist_www1DATA uninstall-dist_www21DATA \
+	uninstall-dist_www22DATA uninstall-dist_www23DATA \
+	uninstall-dist_www241DATA uninstall-dist_www242DATA \
+	uninstall-dist_www243DATA uninstall-dist_www24DATA \
+	uninstall-dist_www251DATA uninstall-dist_www252DATA \
+	uninstall-dist_www261DATA uninstall-dist_www2DATA \
+	uninstall-dist_www3DATA uninstall-dist_www4DATA \
+	uninstall-dist_www5DATA uninstall-dist_www61DATA \
+	uninstall-dist_www6DATA uninstall-dist_www7DATA \
+	uninstall-docDATA uninstall-hpPROGRAMS \
 	uninstall-hplip_confDATA uninstall-hplip_desktopDATA \
 	uninstall-hpmudextLTLIBRARIES uninstall-info-am \
 	uninstall-libLTLIBRARIES uninstall-libsane_hpaioLTLIBRARIES \
@@ -7046,38 +7107,39 @@ uninstall-am: uninstall-binPROGRAMS uninstall-cupsextLTLIBRARIES \
 	install-dist_firmDATA install-dist_hpfaxSCRIPTS \
 	install-dist_hplipDATA install-dist_hplipSCRIPTS \
 	install-dist_imagesDATA install-dist_installSCRIPTS \
-	install-dist_ldlDATA install-dist_modelsDATA \
-	install-dist_pcardSCRIPTS install-dist_pclDATA \
-	install-dist_pluginsSCRIPTS install-dist_postscriptDATA \
-	install-dist_prntSCRIPTS install-dist_rulesDATA \
-	install-dist_scanSCRIPTS install-dist_uiSCRIPTS \
-	install-dist_unrelDATA install-dist_www0DATA \
-	install-dist_www1DATA install-dist_www21DATA \
-	install-dist_www22DATA install-dist_www23DATA \
-	install-dist_www241DATA install-dist_www242DATA \
-	install-dist_www243DATA install-dist_www24DATA \
-	install-dist_www251DATA install-dist_www252DATA \
-	install-dist_www261DATA install-dist_www2DATA \
-	install-dist_www3DATA install-dist_www4DATA \
-	install-dist_www5DATA install-dist_www61DATA \
-	install-dist_www6DATA install-dist_www7DATA install-docDATA \
-	install-exec install-exec-am install-hpPROGRAMS \
-	install-hplip_confDATA install-hplip_desktopDATA \
-	install-hpmudextLTLIBRARIES install-info install-info-am \
-	install-libLTLIBRARIES install-libsane_hpaioLTLIBRARIES \
-	install-man install-pcardextLTLIBRARIES \
-	install-scanextLTLIBRARIES install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-binPROGRAMS \
-	uninstall-cupsextLTLIBRARIES uninstall-dist_baseSCRIPTS \
-	uninstall-dist_cmdSCRIPTS uninstall-dist_copierSCRIPTS \
-	uninstall-dist_faxSCRIPTS uninstall-dist_faxppdDATA \
-	uninstall-dist_firmDATA uninstall-dist_hpfaxSCRIPTS \
-	uninstall-dist_hplipDATA uninstall-dist_hplipSCRIPTS \
-	uninstall-dist_imagesDATA uninstall-dist_installSCRIPTS \
-	uninstall-dist_ldlDATA uninstall-dist_modelsDATA \
+	install-dist_ldlDATA install-dist_localzDATA \
+	install-dist_modelsDATA install-dist_pcardSCRIPTS \
+	install-dist_pclDATA install-dist_pluginsSCRIPTS \
+	install-dist_postscriptDATA install-dist_prntSCRIPTS \
+	install-dist_rulesDATA install-dist_scanSCRIPTS \
+	install-dist_uiSCRIPTS install-dist_unrelDATA \
+	install-dist_www0DATA install-dist_www1DATA \
+	install-dist_www21DATA install-dist_www22DATA \
+	install-dist_www23DATA install-dist_www241DATA \
+	install-dist_www242DATA install-dist_www243DATA \
+	install-dist_www24DATA install-dist_www251DATA \
+	install-dist_www252DATA install-dist_www261DATA \
+	install-dist_www2DATA install-dist_www3DATA \
+	install-dist_www4DATA install-dist_www5DATA \
+	install-dist_www61DATA install-dist_www6DATA \
+	install-dist_www7DATA install-docDATA install-exec \
+	install-exec-am install-hpPROGRAMS install-hplip_confDATA \
+	install-hplip_desktopDATA install-hpmudextLTLIBRARIES \
+	install-info install-info-am install-libLTLIBRARIES \
+	install-libsane_hpaioLTLIBRARIES install-man \
+	install-pcardextLTLIBRARIES install-scanextLTLIBRARIES \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-binPROGRAMS uninstall-cupsextLTLIBRARIES \
+	uninstall-dist_baseSCRIPTS uninstall-dist_cmdSCRIPTS \
+	uninstall-dist_copierSCRIPTS uninstall-dist_faxSCRIPTS \
+	uninstall-dist_faxppdDATA uninstall-dist_firmDATA \
+	uninstall-dist_hpfaxSCRIPTS uninstall-dist_hplipDATA \
+	uninstall-dist_hplipSCRIPTS uninstall-dist_imagesDATA \
+	uninstall-dist_installSCRIPTS uninstall-dist_ldlDATA \
+	uninstall-dist_localzDATA uninstall-dist_modelsDATA \
 	uninstall-dist_pcardSCRIPTS uninstall-dist_pclDATA \
 	uninstall-dist_pluginsSCRIPTS uninstall-dist_postscriptDATA \
 	uninstall-dist_prntSCRIPTS uninstall-dist_rulesDATA \

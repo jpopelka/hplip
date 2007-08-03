@@ -52,6 +52,7 @@ class ScrollUnloadView(ScrollView):
         self.toolbox_hosted = toolbox_hosted
         self.form = form
         self.progress_dlg = None
+        self.unload_dir = os.path.normpath(os.path.expanduser('~'))
 
         self.image_icon_map = {'tiff' : 'tif.png',
                                 'bmp'  : 'bmp.png',
@@ -63,9 +64,9 @@ class ScrollUnloadView(ScrollView):
         self.video_icon_map = {'unknown' : 'movie.png',
                                 'mpeg'    : 'mpg.png',
                                 }
-                                
+
         QTimer.singleShot(0, self.fillControls)
-        
+
 
     def fillControls(self):
         ScrollView.fillControls(self)
@@ -80,7 +81,7 @@ class ScrollUnloadView(ScrollView):
         self.addFolder()
 
         self.removal_option = 1 # remove files (default)
-        
+
         self.addGroupHeading("options", self.__tr("Unload Options"))
         self.addOptions()
 
@@ -110,7 +111,7 @@ class ScrollUnloadView(ScrollView):
         # TODO: Print a message telling users to use USB mass storage if possible
         QTimer.singleShot(0, self.mountCard)
 
-        
+
     def mountCard(self):
         self.pc = None
 
@@ -136,7 +137,7 @@ class ScrollUnloadView(ScrollView):
                 QApplication.restoreOverrideCursor()
                 self.form.FailureUI("Malformed/invalid device-uri: %s" % self.device_uri)
                 self.cleanup(EVENT_PCARD_JOB_FAIL)
-                
+
                 return False
             else:
                 try:
@@ -168,18 +169,18 @@ class ScrollUnloadView(ScrollView):
                     os.path.exists(user_cfg.last_used.working_dir):
 
                     self.unload_dir = user_cfg.last_used.working_dir
-                else:
-                    self.unload_dir = os.path.normpath(os.path.expanduser('~'))
 
-                os.chdir(self.unload_dir)
+                try:
+                    os.chdir(self.unload_dir)
+                except OSError:
+                    self.unload_dir = ''
+
                 self.UnloadDirectoryEdit.setText(self.unload_dir)
 
                 self.unload_list = self.pc.get_unload_list()
 
                 self.total_number = 0
                 self.total_size = 0
-
-                
 
                 self.updateSelectionStatus()
 
@@ -298,9 +299,9 @@ class ScrollUnloadView(ScrollView):
                 i = i.nextItem()
 
             self.updateSelectionStatus()
-        
+
         self.updateUnloadButton()
-            
+
     def updateUnloadButton(self):
         self.unloadButton.setEnabled(not self.busy and self.total_number and os.path.exists(self.unload_dir))
         #qApp.processEvents()
@@ -359,24 +360,24 @@ class ScrollUnloadView(ScrollView):
         self.busy = True
         self.first_load = first_load
         self.item_num = 0
-        
+
         if first_load:
             self.IconView.clear()
 
         self.num_items = len(self.unload_list)
-        
+
         self.progress_dlg = QProgressDialog(self.__tr("Loading..."), \
             self.__tr("Cancel"), self.num_items, self, "progress", 0)
         self.progress_dlg.setCaption(self.__tr("HP Device Manager"))
-            
+
         self.progress_dlg.setMinimumDuration(0)
         self.progress_dlg.setProgress(0)
 
         self.load_timer = QTimer(self, "LoadTimer")
         self.connect(self.load_timer, SIGNAL('timeout()'), self.continueLoadIconView)
         self.load_timer.start(0)
-    
-    
+
+
     def continueLoadIconView(self):
         if self.item_num == self.num_items:
             self.load_timer.stop()
@@ -391,15 +392,15 @@ class ScrollUnloadView(ScrollView):
             self.busy = False
             QApplication.restoreOverrideCursor()
             return
-            
+
         self.progress_dlg.setProgress(self.item_num)
 
         f = self.unload_list[self.item_num]
         self.item_num += 1
         log.debug(f)
-        
+
         path, size = f[0], f[1]
-        
+
         typ, subtyp = self.pc.classify_file(path).split('/')
 
         if not self.first_load and typ == 'image' and subtyp == 'jpeg':
@@ -482,14 +483,14 @@ class ScrollUnloadView(ScrollView):
         self.UnloadDirectoryBrowseButton.setText(self.__tr("Browse..."))
         self.connect(self.UnloadDirectoryBrowseButton,SIGNAL("clicked()"),self.UnloadDirectoryBrowseButton_clicked)
         self.connect(self.UnloadDirectoryEdit,SIGNAL("textChanged(const QString&)"),self.UnloadDirectoryEdit_textChanged)        
-        
+
         self.bg = self.UnloadDirectoryEdit.paletteBackgroundColor()
 
         self.addWidget(widget, "folder")
-        
+
     def UnloadDirectoryEdit_textChanged(self, dir):
-        self.unload_dir = str(dir)
-        
+        self.unload_dir = unicode(dir)
+
         if not os.path.exists(self.unload_dir):
             self.UnloadDirectoryEdit.setPaletteBackgroundColor(QColor(0xff, 0x99, 0x99))
         else:
@@ -501,16 +502,16 @@ class ScrollUnloadView(ScrollView):
 
         if not len(self.unload_dir):
             return
-        
+
         elif not utils.is_path_writable(self.unload_dir):
             self.form.FailureUI(self.__tr("<p><b>The unload directory path you entered is not valid.</b><p>The directory must exist and you must have write permissions."))
             self.unload_dir = old_dir
-        
+
         else:
             self.UnloadDirectoryEdit.setText(self.unload_dir)
             os.chdir(self.unload_dir)
             user_cfg.last_used.working_dir = self.unload_dir
-  
+
     def addOptions(self):
         widget = self.getWidget()
 
@@ -529,14 +530,14 @@ class ScrollUnloadView(ScrollView):
         self.optionComboBox.insertItem(self.__tr("Leave unloaded files on photo card")) # 0
         self.optionComboBox.insertItem(self.__tr("Remove all unloaded files from photo card")) # 1
         self.optionComboBox.setCurrentItem(self.removal_option)
- 
+
         self.connect(self.optionComboBox, SIGNAL("activated(int)"), self.optionComboBox_activated)
 
         self.addWidget(widget, "option")
 
     def optionComboBox_activated(self, i):
         self.removal_option = i
-        
+
 
     def unloadButton_clicked(self):
         was_cancelled = False
@@ -611,17 +612,17 @@ class ScrollUnloadView(ScrollView):
 
         finally:
             self.busy = False
-            
+
     def updateStatusProgressBar(self, src, trg, size):
         qApp.processEvents()
         self.total_complete += size
         percent = int(100.0 * self.total_complete/self.total_size)
         self.progress_dlg.setProgress(percent)
         qApp.processEvents()
-        
+
         if self.progress_dlg.wasCanceled():
             return True
-            
+
         return False
 
 
@@ -629,7 +630,7 @@ class ScrollUnloadView(ScrollView):
         if self.pc is not None:
             if error > 0:
                 self.pc.device.sendEvent(error, typ='error')
-                
+
             try:
                 self.pc.umount()
                 self.pc.device.close()
@@ -637,12 +638,14 @@ class ScrollUnloadView(ScrollView):
                 pass
 
     def funcButton_clicked(self):
-        self.pc.umount()
-        self.pc.device.close()
+        if self.pc is not None:
+            self.pc.umount()
+            self.pc.device.close()
+        
         if self.toolbox_hosted:
             self.form.SwitchFunctionsTab("funcs")
         else:
             self.form.close()
 
     def __tr(self,s,c = None):
-        return qApp.translate("DevMgr4",s,c)
+        return qApp.translate("ScrollUnloadView",s,c)

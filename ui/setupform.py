@@ -70,12 +70,12 @@ class PrinterNameValidator(QValidator):
         QValidator.__init__(self, parent, name)
 
     def validate(self, input, pos):
-        input = str(input)
+        input = unicode(input)
         
         if not input:
             return QValidator.Acceptable, pos
 
-        elif input[pos-1] in """~`!@#$%^&*()-=+[]{}()\\/,.<>?'\";:|""":     
+        elif input[pos-1] in u"""~`!@#$%^&*()-=+[]{}()\\/,.<>?'\";:|""":     
             return QValidator.Invalid, pos
 
         elif input != utils.printable(input):
@@ -91,12 +91,12 @@ class PhoneNumValidator(QValidator):
         QValidator.__init__(self, parent, name)
 
     def validate(self, input, pos):
-        input = str(input)
+        input = unicode(input)
         
         if not input:
             return QValidator.Acceptable, pos
         
-        elif input[pos-1] not in '0123456789-(+) ':
+        elif input[pos-1] not in u'0123456789-(+) ':
             return QValidator.Invalid, pos
         
         else:
@@ -576,16 +576,16 @@ class SetupForm(SetupForm_base):
             self.setNextEnabled(self.PrinterNamePage, False)
 
     def printerLocationLineEdit_textChanged(self, a0):
-        self.location = str(a0)
+        self.location = unicode(a0)
 
     def printerDescriptionLineEdit_textChanged(self,a0):
-        self.desc = str(a0)
+        self.desc = unicode(a0)
 
     def faxLocationLineEdit_textChanged(self,a0):
-        self.fax_location = str(a0)
+        self.fax_location = unicode(a0)
 
     def faxDescriptionLineEdit_textChanged(self,a0):
-        self.fax_desc = str(a0)
+        self.fax_desc = unicode(a0)
 
     def defaultPrinterNamePushButton_clicked(self):
         self.setDefaultPrinterName()
@@ -620,7 +620,7 @@ class SetupForm(SetupForm_base):
         self.fax_name = fax_name
 
     def faxNameLineEdit_textChanged(self, a0):
-        self.fax_name = str(a0)
+        self.fax_name = unicode(a0)
         self.defaultFaxNamePushButton.setEnabled(True)
 
         if not self.fax_name or (self.fax_uri in self.installed_fax_devices and \
@@ -648,10 +648,10 @@ class SetupForm(SetupForm_base):
             self.setNextEnabled(self.PrinterNamePage, False)
 
     def faxNumberLineEdit_textChanged(self, a0):
-        self.fax_number = str(a0)
+        self.fax_number = unicode(a0)
 
     def faxNameCoLineEdit_textChanged(self, a0):
-        self.fax_name_company = str(a0)
+        self.fax_name_company = unicode(a0)
 
     def faxCheckBox_clicked(self):
         pass
@@ -680,7 +680,7 @@ class SetupForm(SetupForm_base):
                     d.open()
                 except Error:
                     error_text = self.__tr("Unable to communicate with the device. Please check the device and try again.")
-                    log.error(str(error_text))
+                    log.error(unicode(error_text))
                     if QMessageBox.critical(self,
                                            self.caption(),
                                            error_text,
@@ -707,7 +707,7 @@ class SetupForm(SetupForm_base):
 
                             except Error:
                                 error_text = self.__tr("<b>Device I/O Error</b><p>Could not communicate with device. Device may be busy.")
-                                log.error(str(error_text))
+                                log.error(unicode(error_text))
 
                                 if QMessageBox.critical(self,
                                                        self.caption(),
@@ -849,7 +849,7 @@ class SetupForm(SetupForm_base):
         QWizard.reject(self)
 
     def FailureUI(self, error_text):
-        log.error(str(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", ""))
+        log.error(unicode(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", ""))
         QMessageBox.critical(self,
                              self.caption(),
                              error_text,

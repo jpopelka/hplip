@@ -1587,6 +1587,11 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A520</printer>
+      <arg_defval>ev/hpijs-PageSize-PhotoTearOff</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_470</printer>
       <arg_defval>ev/hpijs-PageSize-PhotoTearOff</arg_defval>
      </constraint>
@@ -1597,7 +1602,17 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A620</printer>
+      <arg_defval>ev/hpijs-PageSize-PhotoTearOff</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_A710</printer>
+      <arg_defval>ev/hpijs-PageSize-PhotoTearOff</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A820</printer>
       <arg_defval>ev/hpijs-PageSize-PhotoTearOff</arg_defval>
      </constraint>
      <constraint sense='true'>
@@ -8079,6 +8094,18 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_4V</printer><!-- HP LaserJet 4V -->
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_5Si</printer><!-- HP LaserJet 5Si -->
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_5000</printer><!-- HP LaserJet 5000 -->
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-LaserJet_5100</printer>
      </constraint>
      <constraint sense='true'>
@@ -8132,6 +8159,14 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-LaserJet_9000_MFP</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_M5025_MFP</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_M5035_MFP</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -8644,6 +8679,14 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-Color_LaserJet_9500_MFP</printer><!-- HP Color LaserJet 9500_MFP -->
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-Business_Inkjet_2600</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-Business_Inkjet_2800</printer><!-- HP Business Inkjet 2800 -->
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -11195,6 +11238,18 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_4V</printer><!-- HP LaserJet 4V -->
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_5Si</printer><!-- HP LaserJet 5Si -->
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_5000</printer><!-- HP LaserJet 5000 -->
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-LaserJet_5100</printer>
      </constraint>
      <constraint sense='true'>
@@ -11248,6 +11303,14 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-LaserJet_9000_MFP</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_M5025_MFP</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_M5035_MFP</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -11760,6 +11823,14 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-Color_LaserJet_9500_MFP</printer><!-- HP Color LaserJet 9500_MFP -->
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-Business_Inkjet_2600</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-Business_Inkjet_2800</printer><!-- HP Business Inkjet 2800 -->
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -17887,7 +17958,15 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A620</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_A710</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A820</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -20383,6 +20462,10 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A520</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_470</printer>
      </constraint>
      <constraint sense='true'>
@@ -20391,7 +20474,15 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A620</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_A710</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A820</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -22887,6 +22978,10 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A520</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_470</printer>
      </constraint>
      <constraint sense='true'>
@@ -22895,7 +22990,15 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A620</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_A710</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A820</printer>
      </constraint>
     </constraints>
    </enum_val>
@@ -24175,6 +24278,10 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A520</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_470</printer>
      </constraint>
      <constraint sense='true'>
@@ -24183,7 +24290,15 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A620</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_A710</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A820</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -26679,6 +26794,10 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A520</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_470</printer>
      </constraint>
      <constraint sense='true'>
@@ -26687,7 +26806,15 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A620</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_A710</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A820</printer>
      </constraint>
     </constraints>
    </enum_val>
@@ -26771,6 +26898,18 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_4V</printer><!-- HP LaserJet 4V -->
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_5Si</printer><!-- HP LaserJet 5Si -->
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_5000</printer><!-- HP LaserJet 5000 -->
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-LaserJet_5100</printer>
      </constraint>
      <constraint sense='true'>
@@ -26824,6 +26963,14 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-LaserJet_9000_MFP</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_M5025_MFP</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_M5035_MFP</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -27336,6 +27483,14 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-Color_LaserJet_9500_MFP</printer><!-- HP Color LaserJet 9500_MFP -->
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-Business_Inkjet_2600</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-Business_Inkjet_2800</printer><!-- HP Business Inkjet 2800 -->
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -33515,6 +33670,10 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A520</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_470</printer>
      </constraint>
      <constraint sense='true'>
@@ -33523,7 +33682,15 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A620</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_A710</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A820</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -34828,6 +34995,14 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/Generic-PCL_6_PCL_XL_Printer</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-Business_Inkjet_2600</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-Business_Inkjet_2800</printer><!-- HP Business Inkjet 2800 -->
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -53143,6 +53318,10 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A520</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_470</printer>
      </constraint>
      <constraint sense='true'>
@@ -53151,7 +53330,15 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A620</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_A710</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A820</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -61747,6 +61934,18 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_4V</printer><!-- HP LaserJet 4V -->
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_5Si</printer><!-- HP LaserJet 5Si -->
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_5000</printer><!-- HP LaserJet 5000 -->
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-LaserJet_5100</printer>
      </constraint>
      <constraint sense='true'>
@@ -61800,6 +61999,14 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-LaserJet_9000_MFP</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_M5025_MFP</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_M5035_MFP</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -62312,6 +62519,14 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-Color_LaserJet_9500_MFP</printer><!-- HP Color LaserJet 9500_MFP -->
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-Business_Inkjet_2600</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-Business_Inkjet_2800</printer><!-- HP Business Inkjet 2800 -->
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -63651,6 +63866,10 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A520</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_470</printer>
      </constraint>
      <constraint sense='true'>
@@ -63659,7 +63878,15 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A620</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_A710</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A820</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -66103,7 +66330,15 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A620</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_A710</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_A820</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>

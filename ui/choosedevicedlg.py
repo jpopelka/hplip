@@ -96,7 +96,7 @@ class ChooseDeviceDlg(QDialog):
         return qApp.translate("ChooseDeviceDlg",s,c)
 
     def DevicesButtonGroup_clicked(self,a0):
-        self.device_uri = str(self.radio_buttons[a0].text())
+        self.device_uri = unicode(self.radio_buttons[a0].text())
 
 if __name__ == "__main__":
     a = QApplication(sys.argv)

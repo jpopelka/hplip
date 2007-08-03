@@ -173,6 +173,10 @@ VICEHEIGHTPOINTS=360"
 *FoomaticRIPOptionSetting PageSize=5x8: " -dDEVICEWIDTHPOINTS=360 -dDE&&
 VICEHEIGHTPOINTS=576"
 *End
+*PageSize A3/A3: "%% FoomaticRIPOptionSetting: PageSize=A3"
+*FoomaticRIPOptionSetting PageSize=A3: " -dDEVICEWIDTHPOINTS=842 -dDEV&&
+ICEHEIGHTPOINTS=1190"
+*End
 *PageSize A5/A5: "%% FoomaticRIPOptionSetting: PageSize=A5"
 *FoomaticRIPOptionSetting PageSize=A5: " -dDEVICEWIDTHPOINTS=420 -dDEV&&
 ICEHEIGHTPOINTS=595"
@@ -180,6 +184,10 @@ ICEHEIGHTPOINTS=595"
 *PageSize A6/A6: "%% FoomaticRIPOptionSetting: PageSize=A6"
 *FoomaticRIPOptionSetting PageSize=A6: " -dDEVICEWIDTHPOINTS=297 -dDEV&&
 ICEHEIGHTPOINTS=420"
+*End
+*PageSize B4JIS/B4 (JIS): "%% FoomaticRIPOptionSetting: PageSize=B4JIS"
+*FoomaticRIPOptionSetting PageSize=B4JIS: " -dDEVICEWIDTHPOINTS=729 -d&&
+DEVICEHEIGHTPOINTS=1033"
 *End
 *PageSize B5JIS/B5 (JIS): "%% FoomaticRIPOptionSetting: PageSize=B5JIS"
 *FoomaticRIPOptionSetting PageSize=B5JIS: " -dDEVICEWIDTHPOINTS=516 -d&&
@@ -229,6 +237,10 @@ EVICEHEIGHTPOINTS=936"
 *FoomaticRIPOptionSetting PageSize=Hagaki: " -dDEVICEWIDTHPOINTS=283 -&&
 dDEVICEHEIGHTPOINTS=420"
 *End
+*PageSize Ledger/Ledger: "%% FoomaticRIPOptionSetting: PageSize=Ledger"
+*FoomaticRIPOptionSetting PageSize=Ledger: " -dDEVICEWIDTHPOINTS=792 -&&
+dDEVICEHEIGHTPOINTS=1224"
+*End
 *PageSize Legal/Legal: "%% FoomaticRIPOptionSetting: PageSize=Legal"
 *FoomaticRIPOptionSetting PageSize=Legal: " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
@@ -245,6 +257,10 @@ dDEVICEHEIGHTPOINTS=567"
 *FoomaticRIPOptionSetting PageSize=w612h935: " -dDEVICEWIDTHPOINTS=612&&
  -dDEVICEHEIGHTPOINTS=935"
 *End
+*PageSize w774h1116/8K: "%% FoomaticRIPOptionSetting: PageSize=w774h1116"
+*FoomaticRIPOptionSetting PageSize=w774h1116: " -dDEVICEWIDTHPOINTS=77&&
+4 -dDEVICEHEIGHTPOINTS=1116"
+*End
 *CloseUI: *PageSize
 
 *OpenUI *PageRegion: PickOne
@@ -256,8 +272,10 @@ dDEVICEHEIGHTPOINTS=567"
 *PageRegion Photo5x7/Photo or 5x7 inch index card: "%% FoomaticRIPOptionSetting: PageSize=Photo5x7"
 *PageRegion 3x5/3x5 inch index card: "%% FoomaticRIPOptionSetting: PageSize=3x5"
 *PageRegion 5x8/5x8 inch index card: "%% FoomaticRIPOptionSetting: PageSize=5x8"
+*PageRegion A3/A3: "%% FoomaticRIPOptionSetting: PageSize=A3"
 *PageRegion A5/A5: "%% FoomaticRIPOptionSetting: PageSize=A5"
 *PageRegion A6/A6: "%% FoomaticRIPOptionSetting: PageSize=A6"
+*PageRegion B4JIS/B4 (JIS): "%% FoomaticRIPOptionSetting: PageSize=B4JIS"
 *PageRegion B5JIS/B5 (JIS): "%% FoomaticRIPOptionSetting: PageSize=B5JIS"
 *PageRegion CDDVD80/CD or DVD 80 mm: "%% FoomaticRIPOptionSetting: PageSize=CDDVD80"
 *PageRegion CDDVD120/CD or DVD 120 mm: "%% FoomaticRIPOptionSetting: PageSize=CDDVD120"
@@ -270,10 +288,12 @@ dDEVICEHEIGHTPOINTS=567"
 *PageRegion Executive/Executive: "%% FoomaticRIPOptionSetting: PageSize=Executive"
 *PageRegion FLSA/American Foolscap: "%% FoomaticRIPOptionSetting: PageSize=FLSA"
 *PageRegion Hagaki/Hagaki: "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
+*PageRegion Ledger/Ledger: "%% FoomaticRIPOptionSetting: PageSize=Ledger"
 *PageRegion Legal/Legal: "%% FoomaticRIPOptionSetting: PageSize=Legal"
 *PageRegion Oufuku/Oufuku-Hagaki: "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
 *PageRegion w558h774/16K: "%% FoomaticRIPOptionSetting: PageSize=w558h774"
 *PageRegion w612h935/Executive (JIS): "%% FoomaticRIPOptionSetting: PageSize=w612h935"
+*PageRegion w774h1116/8K: "%% FoomaticRIPOptionSetting: PageSize=w774h1116"
 *CloseUI: *PageRegion
 
 *DefaultImageableArea: Letter
@@ -283,8 +303,10 @@ dDEVICEHEIGHTPOINTS=567"
 *ImageableArea Photo5x7/Photo or 5x7 inch index card: "18 14.40 342 489.60"
 *ImageableArea 3x5/3x5 inch index card: "18 14.40 198 345.60"
 *ImageableArea 5x8/5x8 inch index card: "18 14.40 342 561.60"
+*ImageableArea A3/A3: "18 14.40 824 1175.60"
 *ImageableArea A5/A5: "18 14.40 402 580.60"
 *ImageableArea A6/A6: "18 14.40 279 405.60"
+*ImageableArea B4JIS/B4 (JIS): "18 14.40 711 1018.60"
 *ImageableArea B5JIS/B5 (JIS): "18 14.40 498 714.60"
 *ImageableArea CDDVD80/CD or DVD 80 mm: "18 14.40 219 222.60"
 *ImageableArea CDDVD120/CD or DVD 120 mm: "18 14.40 342 345.60"
@@ -297,10 +319,12 @@ dDEVICEHEIGHTPOINTS=567"
 *ImageableArea Executive/Executive: "18 14.40 504 741.60"
 *ImageableArea FLSA/American Foolscap: "18 14.40 594 921.60"
 *ImageableArea Hagaki/Hagaki: "18 14.40 265 405.60"
+*ImageableArea Ledger/Ledger: "18 14.40 774 1209.60"
 *ImageableArea Legal/Legal: "18 14.40 594 993.60"
 *ImageableArea Oufuku/Oufuku-Hagaki: "18 14.40 402 552.60"
 *ImageableArea w558h774/16K: "18 14.40 540 759.60"
 *ImageableArea w612h935/Executive (JIS): "18 14.40 594 920.60"
+*ImageableArea w774h1116/8K: "18 14.40 756 1101.60"
 
 *DefaultPaperDimension: Letter
 *PaperDimension Letter/Letter: "612 792"
@@ -309,8 +333,10 @@ dDEVICEHEIGHTPOINTS=567"
 *PaperDimension Photo5x7/Photo or 5x7 inch index card: "360 504"
 *PaperDimension 3x5/3x5 inch index card: "216 360"
 *PaperDimension 5x8/5x8 inch index card: "360 576"
+*PaperDimension A3/A3: "842 1190"
 *PaperDimension A5/A5: "420 595"
 *PaperDimension A6/A6: "297 420"
+*PaperDimension B4JIS/B4 (JIS): "729 1033"
 *PaperDimension B5JIS/B5 (JIS): "516 729"
 *PaperDimension CDDVD80/CD or DVD 80 mm: "237 237"
 *PaperDimension CDDVD120/CD or DVD 120 mm: "360 360"
@@ -323,10 +349,12 @@ dDEVICEHEIGHTPOINTS=567"
 *PaperDimension Executive/Executive: "522 756"
 *PaperDimension FLSA/American Foolscap: "612 936"
 *PaperDimension Hagaki/Hagaki: "283 420"
+*PaperDimension Ledger/Ledger: "792 1224"
 *PaperDimension Legal/Legal: "612 1008"
 *PaperDimension Oufuku/Oufuku-Hagaki: "420 567"
 *PaperDimension w558h774/16K: "558 774"
 *PaperDimension w612h935/Executive (JIS): "612 935"
+*PaperDimension w774h1116/8K: "774 1116"
 
 *OpenUI *Duplex/Double-Sided Printing: PickOne
 *FoomaticRIPOption Duplex: enum CmdLine A

@@ -339,22 +339,25 @@ HP-PhotoSmart_A440|HEWLETT-PACKARD|deskjet 5600|PSP100|A6TearOff|
 HP-PhotoSmart_A310|HEWLETT-PACKARD|deskjet 5600|PSP100|A6TearOff|
 HP-PhotoSmart_A320|HEWLETT-PACKARD|deskjet 5600|PSP100|A6TearOff|
 HP-PhotoSmart_A510|HEWLETT-PACKARD|deskjet 5600|PSP100|A6TearOff|
+HP-PhotoSmart_A520|HEWLETT-PACKARD|deskjet 5600|PSP100|A6TearOff|
 HP-PhotoSmart_470|HEWLETT-PACKARD|Photosmart 470|PSP470|Photo5x7|
 HP-PhotoSmart_A610|HEWLETT-PACKARD|Photosmart 470|PSP470|Photo5x7|
+HP-PhotoSmart_A620|HEWLETT-PACKARD|Photosmart 470|PSP470|Photo5x7|
 HP-PhotoSmart_A710|HEWLETT-PACKARD|Photosmart 470|PSP470|Photo5x7|
+HP-PhotoSmart_A820|HEWLETT-PACKARD|Photosmart 470|PSP470|Photo5x7|
 # LJMono
 HP-LaserJet_4|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|HP LaserJet 4
 HP-LaserJet_4_Plus|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|HP LaserJet 4 Plus
 HP-LaserJet_4M|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|HP LaserJet 4M
 HP-LaserJet_4P|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|HP LaserJet 4P
 HP-LaserJet_4Si|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|HP LaserJet 4Si
-HP-LaserJet_4V|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|HP LaserJet 4V
+HP-LaserJet_4V|HEWLETT-PACKARD|HP LaserJet|LJMono|A3|HP LaserJet 4V
 HP-LaserJet_5|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|HP LaserJet 5
 HP-LaserJet_5L|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|HP LaserJet 5L
 HP-LaserJet_5M|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|HP LaserJet 5M
 HP-LaserJet_5MP|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|HP LaserJet 5MP
 HP-LaserJet_5P|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|HP LaserJet 5P
-HP-LaserJet_5Si|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|HP LaserJet 5Si
+HP-LaserJet_5Si|HEWLETT-PACKARD|HP LaserJet|LJMono|A3|HP LaserJet 5Si
 HP-LaserJet_6|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|HP LaserJet 6
 HP-LaserJet_6L|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|HP LaserJet 6L
 HP-LaserJet_6MP|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|HP LaserJet 6MP
@@ -402,7 +405,7 @@ HP-LaserJet_4250|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|
 HP-LaserJet_4300|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|
 HP-LaserJet_4345_MFP|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|
 HP-LaserJet_4350|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|
-HP-LaserJet_5000|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|HP LaserJet 5000
+HP-LaserJet_5000|HEWLETT-PACKARD|HP LaserJet|LJMono|A3|HP LaserJet 5000
 HP-LaserJet_5100|HEWLETT-PACKARD|HP LaserJet|LJMono|A3|
 HP-LaserJet_5200|HEWLETT-PACKARD|HP LaserJet|LJMono|A3|
 HP-LaserJet_5200L|HEWLETT-PACKARD|HP LaserJet|LJMono|A3|
@@ -424,8 +427,8 @@ HP-LaserJet_P3005|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|
 HP-LaserJet_M3027_MFP|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|
 HP-LaserJet_M3035_MFP|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|
 HP-LaserJet_M4345_MFP|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|
-HP-LaserJet_M5025_MFP|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|
-HP-LaserJet_M5035_MFP|HEWLETT-PACKARD|HP LaserJet|LJMono|Legal|
+HP-LaserJet_M5025_MFP|HEWLETT-PACKARD|HP LaserJet|LJMono|A3|
+HP-LaserJet_M5035_MFP|HEWLETT-PACKARD|HP LaserJet|LJMono|A3|
 HP-Mopier_240|HEWLETT-PACKARD|HP LaserJet|LJMono|A3|HP Mopier 240
 HP-Mopier_320|HEWLETT-PACKARD|HP LaserJet|LJMono|A3|HP Mopier 320
 Brother-HL-10h|HEWLETT-PACKARD|HP LaserJet|LJMono|A3|Brother HL-10h
@@ -625,8 +628,8 @@ HP-Color_LaserJet_8550GN|HEWLETT-PACKARD|hp color LaserJet|LJColor|A3|HP Color L
 HP-Color_LaserJet_9500|HEWLETT-PACKARD|hp color LaserJet|LJColor|A3|
 HP-Color_LaserJet_9500_MFP|HEWLETT-PACKARD|hp color LaserJet|LJColor|A3|HP Color LaserJet 9500_MFP
 HP-Business_Inkjet_2300|HEWLETT-PACKARD|hp color LaserJet|LJColor|Legal|
-HP-Business_Inkjet_2600|HEWLETT-PACKARD|hp color LaserJet|LJColor|Legal|
-HP-Business_Inkjet_2800|HEWLETT-PACKARD|hp color LaserJet|LJColor|Legal|HP Business Inkjet 2800
+HP-Business_Inkjet_2600|HEWLETT-PACKARD|hp color LaserJet|LJColor|SuperB|
+HP-Business_Inkjet_2800|HEWLETT-PACKARD|hp color LaserJet|LJColor|SuperB|HP Business Inkjet 2800
 HP-Business_Inkjet_3000|HEWLETT-PACKARD|hp color LaserJet|LJColor|Legal|
 HP-Color_LaserJet_CP4005|HEWLETT-PACKARD|hp color LaserJet|LJColor|Legal|
 HP-Color_LaserJet_CP3505|HEWLETT-PACKARD|hp color LaserJet|LJColor|Legal|

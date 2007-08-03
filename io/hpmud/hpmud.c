@@ -259,14 +259,18 @@ static int new_device(const char *uri, enum HPMUD_IO_MODE mode, int *result)
    {
       msp->device[i].vf = musb_mud_device_vf;
    }
+#ifdef HAVE_LIBNETSNMP
    else if (strcasestr(uri, ":/net") != NULL)
    {
       msp->device[i].vf = jd_mud_device_vf;
    }
+#endif
+#ifdef HAVE_PPORT
    else if (strcasestr(uri, ":/par") != NULL)
    {
       msp->device[i].vf = pp_mud_device_vf;
    }
+#endif
    else
    {
       BUG("invalid uri %s\n", uri);
@@ -524,14 +528,18 @@ enum HPMUD_RESULT hpmud_probe_devices(enum HPMUD_BUS_ID bus, char *buf, int buf_
    {
       len = musb_probe_devices(buf, buf_size, cnt);
    }
+#ifdef HAVE_PPORT
    else if (bus == HPMUD_BUS_PARALLEL)
    {
       len = pp_probe_devices(buf, buf_size, cnt);
    }
+#endif
    else if (bus == HPMUD_BUS_ALL)
    {
       len = musb_probe_devices(buf, buf_size, cnt);
+#ifdef HAVE_PPORT
       len += pp_probe_devices(buf+len, buf_size-len, cnt);
+#endif
    }
 
    *bytes_read = len;

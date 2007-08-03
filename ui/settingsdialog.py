@@ -88,24 +88,24 @@ class SettingsDialog(SettingsDialog_base):
             self.copyButtonGroup.setButton(1)    
 
     def updateData(self):
-        self.user_settings.cmd_print = str(self.PrintCommand.text())
+        self.user_settings.cmd_print = unicode(self.PrintCommand.text())
         self.user_settings.cmd_print_int = (self.printButtonGroup.selectedId() == 0)
 
-        self.user_settings.cmd_scan = str(self.ScanCommand.text())
+        self.user_settings.cmd_scan = unicode(self.ScanCommand.text())
         self.user_settings.cmd_scan_int = (self.scanButtonGroup.selectedId() == 0)
 
-        self.user_settings.cmd_pcard = str(self.AccessPCardCommand.text())
+        self.user_settings.cmd_pcard = unicode(self.AccessPCardCommand.text())
         self.user_settings.cmd_pcard_int = (self.pcardButtonGroup.selectedId() == 0)
 
-        self.user_settings.cmd_fax   = str(self.SendFaxCommand.text())
+        self.user_settings.cmd_fax   = unicode(self.SendFaxCommand.text())
         self.user_settings.cmd_fax_int = (self.faxButtonGroup.selectedId() == 0)
 
-        self.user_settings.cmd_copy  = str(self.MakeCopiesCommand.text())
+        self.user_settings.cmd_copy  = unicode(self.MakeCopiesCommand.text())
         self.user_settings.cmd_copy_int = (self.copyButtonGroup.selectedId() == 0)
 
         self.user_settings.email_alerts = bool(self.EmailCheckBox.isChecked())
-        self.user_settings.email_to_addresses = str(self.EmailAddress.text())
-        self.user_settings.email_from_address = str(self.senderLineEdit.text())
+        self.user_settings.email_to_addresses = unicode(self.EmailAddress.text())
+        self.user_settings.email_from_address = unicode(self.senderLineEdit.text())
 
         self.user_settings.auto_refresh = bool(self.autoRefreshCheckBox.isChecked())
         self.user_settings.auto_refresh_type = self.refreshScopeButtonGroup.selectedId()
@@ -139,8 +139,8 @@ class SettingsDialog(SettingsDialog_base):
             self.DefaultsButton.setEnabled(False)
 
     def EmailTestButton_clicked(self): 
-        email_to_addresses = str(self.EmailAddress.text())
-        email_from_address = str(self.senderLineEdit.text())
+        email_to_addresses = unicode(self.EmailAddress.text())
+        email_from_address = unicode(self.senderLineEdit.text())
 
         if not email_to_addresses or not email_from_address:
             QMessageBox.warning(self,

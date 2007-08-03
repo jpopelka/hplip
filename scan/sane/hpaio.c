@@ -256,7 +256,7 @@ static int DevDiscovery(int localOnly)
    if (stat != HPMUD_R_OK)
       goto bugout;
 
-   /* Look for scanning devices only. */
+   /* Look for local all-in-one scan devices (defined by hpmud). */
    tail = message;
    for (i=0; i<cnt; i++)
    {
@@ -271,23 +271,21 @@ static int DevDiscovery(int localOnly)
       }
    }
 
-   if (!localOnly)
+   /* Ignore localOnly flag (used by saned) and always look for network all-in-one scan devices (defined by cups). */
+   cnt = GetCupsPrinters(&cups_printer);
+   for (i=0; i<cnt; i++)
    {
-      cnt = GetCupsPrinters(&cups_printer);
-      for (i=0; i<cnt; i++)
+      hpmud_query_model(cups_printer[i], &ma);
+      if (ma.scantype > 0)
       {
-         hpmud_query_model(cups_printer[i], &ma);
-         if (ma.scantype > 0)
-         {
-            hpmud_get_uri_model(cups_printer[i], model, sizeof(model));
-            AddDeviceList(cups_printer[i], model, &DeviceList);
-            total++;
-         }
-         free(cups_printer[i]);
+         hpmud_get_uri_model(cups_printer[i], model, sizeof(model));
+         AddDeviceList(cups_printer[i], model, &DeviceList);
+         total++;
       }
-      if (cups_printer)
-         free(cups_printer);
+      free(cups_printer[i]);
    }
+   if (cups_printer)
+      free(cups_printer);
 
 bugout:
    return total;

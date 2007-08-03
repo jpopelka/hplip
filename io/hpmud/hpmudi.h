@@ -42,13 +42,18 @@
 #include <time.h>
 #include <ctype.h>
 #include <pthread.h>
+#include <arpa/inet.h>
 #include "hpmud.h"
 #include "musb.h"
 #include "mlc.h"
 #include "dot4.h"
 #include "pml.h"
+#ifdef HAVE_LIBNETSNMP
 #include "jd.h"
+#endif
+#ifdef HAVE_PPORT
 #include "pp.h"
+#endif
 
 //#define HPMUD_DEBUG
 

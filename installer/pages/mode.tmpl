@@ -19,7 +19,7 @@
  Author: Pete Parks
 */ 
 -->
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html>
 <HEAD>
     <META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE" />
     <META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 22 Jul 2002 11:12:01 GMT" />    
@@ -38,9 +38,11 @@
     };
     -->
     </script>
-<TITLE>HP Linux Imaging and Printing (HPLIP) Installer</TITLE>
+<TITLE>$installer_title</TITLE>
 </HEAD>
-<BODY onload="generateHeader();">
+<BODY onload="header = '$header_string'; 
+        subheader = '$sub_header_string'; 
+        generateHeader(header, subheader);">
     
 <!-- Header Div -->    
 <div id="header_box" class="background_box"></div>
@@ -48,19 +50,17 @@
 <!-- Body Div -->
 <div class="body_content">
     
-    <div id="message_title">
-        <a>Please choose the installation mode:</a>
-    </div>
+    <div id="message_title">$mode_message_title</div>
     
     <div id="message_body">
         <form name="modeForm">
             <div id="radio1">
-                <input type="radio" onclick="changeCheckbox(0)" name="install_type" value="auto_install" checked ><a>&nbsp;&nbsp;&nbsp;Automatic (recommended)
+                <input type="radio" onclick="changeCheckbox(0)" name="install_type" value="auto_install" checked >$mode_radio1
             </div>
             <div id="radio2">
-                <input type="radio" onclick="changeCheckbox(1)" name="install_type" value="custom_install"><a>&nbsp;&nbsp;&nbsp;Custom</a>
+                <input type="radio" onclick="changeCheckbox(1)" name="install_type" value="custom_install">$mode_radio2
             </div>
-        </form>                         
+        </form>
     </div>
     
     <div id="message_footer">
@@ -72,14 +72,14 @@
     
     <div id="quit_button" OnSelectStart='return false;' onClick='todoOnQuit("quit");' >
       <img src="../images/button1.png" width="100" height="35">
-      <div id="quitHiliteText"><a>Quit</a></div>
-      <div id="quitText"><a>Quit</a></div>
+      <div id="quitHiliteText">$quit_button</div>
+      <div id="quitText">$quit_button</div>
     </div>
 
     <div id="next_button" OnSelectStart='return false;' onClick='indexClickActions( "next_button", "mode_controller?auto_mode=1");' >
       <img src="../images/button1.png" width="100" height="35">
-      <div id="nextHiliteText"><a>Next</a></div>
-      <div id="nextText"><a>Next</a></div>
+      <div id="nextHiliteText">$next_button</div>
+      <div id="nextText">$next_button</div>
     </div>
     
 </div>

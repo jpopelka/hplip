@@ -71,36 +71,36 @@ def logBarGraph(agent_level, agent_type, size=DEFAULT_BAR_GRAPH_SIZE, use_colors
 
     if use_colors:
         if agent_type in (AGENT_TYPE_CMY, AGENT_TYPE_KCM, AGENT_TYPE_CYAN, AGENT_TYPE_CYAN_LOW):
-            log.info(utils.codes['teal'])
+            log.info(log.codes['teal'])
         elif agent_type in (AGENT_TYPE_MAGENTA, AGENT_TYPE_MAGENTA_LOW):
-            log.info(utils.codes['fuscia'])
+            log.info(log.codes['fuscia'])
         elif agent_type in (AGENT_TYPE_YELLOW, AGENT_TYPE_YELLOW_LOW):
-            log.info(utils.codes['yellow'])
+            log.info(log.codes['yellow'])
         elif agent_type == AGENT_TYPE_BLUE:
-            log.info(utils.codes['blue'])
+            log.info(log.codes['blue'])
         elif agent_type == AGENT_TYPE_BLACK:
-            log.info(utils.codes['bold'])
+            log.info(log.codes['bold'])
         elif agent_type in (AGENT_TYPE_LG, AGENT_TYPE_G, AGENT_TYPE_PG):
             pass
 
     color = ''
     if use_colors:
         if agent_type in (AGENT_TYPE_CMY, AGENT_TYPE_KCM):
-            color = utils.codes['fuscia']
+            color = log.codes['fuscia']
 
     log.info(("-"*size)+color)
 
     color = ''
     if use_colors:
         if agent_type in (AGENT_TYPE_CMY, AGENT_TYPE_KCM):
-            color = utils.codes['yellow']
+            color = log.codes['yellow']
 
     log.info("%s%s%s%s (approx. %d%%)%s" % ("|", bar_char*bar, 
              " "*(size-bar-2), "|", agent_level, color))
 
     color = ''
     if use_colors:
-        color = utils.codes['reset']
+        color = log.codes['reset']
 
     log.info(("-"*size)+color)
 
@@ -261,14 +261,14 @@ if d.mq['status-type'] != STATUS_TYPE_NONE:
                             AGENT_KIND_INT_BATTERY,
                             AGENT_KIND_DRUM_KIT,):
 
-            log.info(utils.bold(agent_desc))
+            log.info(log.bold(agent_desc))
             log.info("Part No.: %s" % agent_sku)
             log.info("Health: %s" % agent_health_desc)
             logBarGraph(agent_level, agent_type, size, color, bar_char)
             log.info("")
 
         else:
-            log.info(utils.bold(agent_desc))
+            log.info(log.bold(agent_desc))
             log.info("Part No.: %s" % agent_sku)
             log.info("Health: %s" % agent_health_desc)
             log.info("")

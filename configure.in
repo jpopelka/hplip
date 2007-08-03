@@ -23,7 +23,7 @@
 #
 
 AC_PREREQ(2.59)
-AC_INIT([HP Linux Imaging and Printing], [2.7.6], [2.7.6.13], [hplip])
+AC_INIT([HP Linux Imaging and Printing], [2.7.7], [2.7.7.27], [hplip])
 AM_INIT_AUTOMAKE([1.9 foreign])
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
@@ -66,6 +66,7 @@ EOFH
 AC_CHECK_TYPES([uint32_t], [APDK_AUTO_INCLUDE_FLAG="-DAPDK_AUTO_INCLUDE"],, [#include "prnt/hpijs/auto-include.h"])
 
 AC_MSG_CHECKING("for platform-dependencies")
+darwin_build="no"
 case "$host" in
    *-darwin*)
       AC_MSG_RESULT("using Mac OS X platform.h")
@@ -78,6 +79,7 @@ case "$host" in
 #include <stdio.h>
 #include <math.h>
 EOF
+      darwin_build="yes"
       ;;
 
      *)
@@ -91,6 +93,7 @@ EOF
 EOF
       ;;
 esac
+AM_CONDITIONAL(DARWIN_BUILD, test x$darwin_build = xyes)
 
 AC_MSG_CHECKING([for documentation build])
 AC_ARG_ENABLE(doc_build,

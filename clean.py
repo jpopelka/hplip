@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '2.1'
+__version__ = '3.0'
 __title__ = 'Printer Cartridge Cleaning Utility'
 __doc__ = "Cartridge cleaning utility for HPLIP supported inkjet printers."
 
@@ -32,33 +32,14 @@ import time
 
 # Local
 from base.g import *
-from base import device, utils, maint
+from base import device, utils, maint, tui
 from prnt import cups
 
 d = None
 
-def loadPlainPaper():
-    x = raw_input(utils.bold("Please load paper into the printer. Press <enter> to continue or 'q' to quit."))
-    if x.strip().lower() == 'q':
-        return False
-    return True
-
 def CleanUIx(level):
     global d
-    
-    log.info("Ready to perform level %d cleaning (Note: Wait for previous print to finish)." % level)
-    while True:
-        x = raw_input(utils.bold("Press <enter> to continue or 'q' to quit: "))
-        x = x.lower()
-        
-        if not x:
-            break
-            
-        if x == 'q':
-            return  False
-    
-        log.error("Please press <enter> or enter 'q' to quit.")
-        
+    ok = tui.continue_prompt("Ready to perform level %d cleaning (Note: Wait for previous print to finish)." % level)
     timeout = 0
     time.sleep(5)
     
@@ -240,19 +221,19 @@ try:
         try:
             if clean_type == CLEAN_TYPE_PCL:
                 maint.cleaning(d, clean_type, maint.cleanType1, maint.primeType1,
-                                maint.wipeAndSpitType1, loadPlainPaper,
+                                maint.wipeAndSpitType1, tui.load_paper_prompt,
                                 CleanUI1, CleanUI2, CleanUI3,
                                 None)
     
             elif clean_type == CLEAN_TYPE_LIDIL:
                 maint.cleaning(d, clean_type, maint.cleanType2, maint.primeType2,
-                                maint.wipeAndSpitType2, loadPlainPaper,
+                                maint.wipeAndSpitType2, tui.load_paper_prompt,
                                 CleanUI1, CleanUI2, CleanUI3,
                                 None)
     
             elif clean_type == CLEAN_TYPE_PCL_WITH_PRINTOUT:
                 maint.cleaning(d, clean_type, maint.cleanType1, maint.primeType1,
-                                maint.wipeAndSpitType1, loadPlainPaper,
+                                maint.wipeAndSpitType1, tui.load_paper_prompt,
                                 CleanUI1, CleanUI2, CleanUI3,
                                 None)
         

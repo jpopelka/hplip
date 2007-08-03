@@ -32,10 +32,9 @@ import readline, gzip
 
 # Local
 from base.g import *
-from base import device, utils, msg, service
+from base import device, utils, msg, service, tui
 from prnt import cups
 
-#number_pat = re.compile(r""".*?(\d+)""", re.IGNORECASE)
 nickname_pat = re.compile(r'''\*NickName:\s*\"(.*)"''', re.MULTILINE)
 
 USAGE = [ (__doc__, "", "name", True),
@@ -122,7 +121,7 @@ printer_name = None
 fax_name = None
 device_uri = None
 log_level = logger.DEFAULT_LOG_LEVEL
-bus = 'usb' #device.DEFAULT_PROBE_BUS
+bus = 'usb'
 setup_print = True
 setup_fax = True
 makeuri = None
@@ -236,7 +235,6 @@ if mode == GUI_MODE:
         log.warn("PyQt init failed. Reverting to interactive mode.")
         mode = INTERACTIVE_MODE
 
-
 if mode == GUI_MODE:
     from qt import *
     from ui import setupform
@@ -280,7 +278,6 @@ else: # INTERACTIVE_MODE
         sys.exit(1)
 
     # ******************************* MAKEURI
-
     if param:
         device_uri, sane_uri, fax_uri = device.makeURI(param, jd_port)
 
@@ -299,14 +296,12 @@ else: # INTERACTIVE_MODE
             sys.exit(1)
 
     # ******************************* QUERY MODEL AND COLLECT PPDS
-
-    log.info(utils.bold("\nSetting up device: %s\n" % device_uri))
+    log.info(log.bold("\nSetting up device: %s\n" % device_uri))
 
     if not auto:
         log.info("(Note: Defaults for each question are maked with a '*'. Press <enter> to accept the default.)")
 
     log.info("")
-
     print_uri = device_uri.replace("hpfax:", "hp:")
     fax_uri = device_uri.replace("hp:", "hpfax:")
 
@@ -331,36 +326,19 @@ else: # INTERACTIVE_MODE
     stripped_model = default_model.lower().replace('hp-', '').replace('hp_', '')
 
     # ******************************* PRINT QUEUE SETUP
-
     if setup_print:
         installed_print_devices = device.getSupportedCUPSDevices(['hp'])  
         log.debug(installed_print_devices)
 
         if not auto and print_uri in installed_print_devices:
-            log.warning("One or more print queues already exist for this device: %s." % ', '.join(installed_print_devices[print_uri]))
+            log.warning("One or more print queues already exist for this device: %s." % 
+                ', '.join(installed_print_devices[print_uri]))
 
-            while True:
-                user_input = raw_input(utils.bold("\nWould you like to install another print queue for this device? (y=yes, n=no*, q=quit) ?" ))
-                user_input = user_input.lower().strip()
-
-                if not user_input:
-                    user_input = 'n'
-
-                setup_print = (user_input == 'y')
-
-                if user_input in ('q', 'y', 'n'):
-                    break
-
-                log.error("Please enter 'y', 'n' or 'q'")
-
-            if user_input == 'q':
-                log.info("OK, done.")
-                sys.exit(0)
-
-
+            ok, setup_print = tui.enter_yes_no("\nWould you like to install another print queue for this device", 'n')
+            if not ok: sys.exit(0)
 
     if setup_print:
-        log.info(utils.bold("\nPRINT QUEUE SETUP"))
+        log.info(log.bold("\nPRINT QUEUE SETUP"))
 
         if auto:
             printer_name = default_model
@@ -381,7 +359,7 @@ else: # INTERACTIVE_MODE
         if not auto:
             if printer_name is None:
                 while True:
-                    printer_name = raw_input(utils.bold("\nPlease enter a name for this print queue (m=use model name:'%s'*, q=quit) ?" % printer_default_model))
+                    printer_name = raw_input(log.bold("\nPlease enter a name for this print queue (m=use model name:'%s'*, q=quit) ?" % printer_default_model))
 
                     if printer_name.lower().strip() == 'q':
                         log.info("OK, done.")
@@ -428,23 +406,10 @@ else: # INTERACTIVE_MODE
             log.info("Desc: %s" % mins[print_ppd])
 
             if not auto:
-                while True:
-                    log.info("\nNote: The model number may vary slightly from the actual model number on the device.")
-                    user_input = raw_input(utils.bold("\nDoes this PPD file appear to be the correct one (y=yes*, n=no, q=quit) ?"))
-                    user_input = user_input.strip().lower()
-
-                    if user_input == 'q':
-                        log.info("OK, done.")
-                        sys.exit(0)
-
-                    if not user_input or user_input == 'y':
-                        break
-
-                    if user_input == 'n':
-                        enter_ppd = True
-                        break
-
-                    log.error("Please enter 'y' or 'n'")
+                log.info("\nNote: The model number may vary slightly from the actual model number on the device.")
+                ok, ans = tui.enter_yes_no("\nDoes this PPD file appear to be the correct one")
+                if not ok: sys.exit(0)
+                if not ans: enter_ppd = True
 
         else:
             log.info("")
@@ -454,7 +419,7 @@ else: # INTERACTIVE_MODE
             for p in mins:
                 max_ppd_filename_size = max(len(p), max_ppd_filename_size)
 
-            log.info(utils.bold("\nChoose a PPD file that most closely matches your device:"))
+            log.info(log.bold("\nChoose a PPD file that most closely matches your device:"))
             log.info("(Note: The model number may vary slightly from the actual model number on the device.)\n")
 
             formatter = utils.TextFormatter(
@@ -477,60 +442,26 @@ else: # INTERACTIVE_MODE
             none_of_the_above = y+1
             log.info(formatter.compose((str(none_of_the_above), "(None of the above match)", '')))
 
-            while 1:
-                user_input = raw_input(utils.bold("\nEnter number 0...%d for PPD file (q=quit) ?" % (x-1)))
-                user_input = user_input.strip().lower()
-
-                if user_input == '':
-                    log.warn("Invalid input - enter a numeric value or 'q' to quit.")
-                    continue
-
-                if user_input == 'q':
-                    log.info("OK, done.")
-                    sys.exit(0)
-
-                try:
-                    i = int(user_input)
-                except ValueError:
-                    log.warn("Invalid input - enter a numeric value or 'q' to quit.")
-                    continue
-
-                if i == none_of_the_above:
-                    enter_ppd = True
-                    break
-
-                if i < 0 or i > (x-1):
-                    log.warn("Invalid input - enter a value between 0 and %d or 'q' to quit." % (x-1))
-                    continue
-
-                break
-
-            if not enter_ppd:
+            ok, i = tui.enter_range("\nEnter number 0...%d for printer (q=quit) ?" % (x-1), 0, (x-1))
+            if not ok: sys.exit(0)
+            
+            if i == none_of_the_above:
+                enter_ppd = True
+            else:
                 print_ppd = mins_list[i]
 
         if enter_ppd:
             log.error("Unable to find an appropriate PPD file.")
             enter_ppd = False
 
-            while True:
-                user_input = raw_input(utils.bold("\nWould you like to specify the path to the correct PPD file to use (y=yes, n=no*, q=quit) ?"))
-                user_input = user_input.strip().lower()
-
-                if not user_input or user_input in ('q', 'n'):
-                    log.info("OK, done.")
-                    sys.exit(0)
-
-                if user_input == 'y':
-                    enter_ppd = True
-                    break
-
-                log.error("Please enter 'y' or 'n'")
-
+            ok, enter_ppd = tui.enter_yes_no("\nWould you like to specify the path to the correct PPD file to use", 'n')
+            if not ok: sys.exit(0)
+            
             if enter_ppd:
                 ok = False
 
                 while True:
-                    user_input = raw_input(utils.bold("\nPlease enter the full filesystem path to the PPD file to use (q=quit) :"))
+                    user_input = raw_input(log.bold("\nPlease enter the full filesystem path to the PPD file to use (q=quit) :"))
 
                     if user_input.lower().strip() == 'q':
                         log.info("OK, done.")
@@ -555,25 +486,12 @@ else: # INTERACTIVE_MODE
                         else:
                             log.error("No PPD 'NickName' found. This file may not be a valid PPD file.")
 
-                        while True:
-                            user_input = raw_input(utils.bold("\nUse this file (y=yes*, n=no, q=quit) ?"))
-                            user_input = user_input.strip().lower()
-
-                            if not user_input or user_input == 'y':
-                                print_ppd = file_path
-                                ok = True
-                                break
-
-                            elif user_input == 'q':
-                                log.info("OK, done.")
-                                sys.exit(0)
-
-                            elif user_input == 'n':
-                                break
+                        ok, ans = tui.enter_yes_no("\nUse this file")
+                        if not ok: sys.exit(0)
+                        if ans: print_ppd = file_path
 
                     else:
                         log.error("File not found or not an appropriate (PPD) file.")
-
 
                     if ok:
                         break
@@ -582,28 +500,26 @@ else: # INTERACTIVE_MODE
             location, info = '', 'Automatically setup by HPLIP'
         else:
             while True:
-                location = raw_input(utils.bold("Enter a location description for this printer (q=quit) ?"))
+                location = raw_input(log.bold("Enter a location description for this printer (q=quit) ?"))
 
                 if location.strip().lower() == 'q':
                     log.info("OK, done.")
                     sys.exit(0)
 
                 # TODO: Validate chars
-
                 break
 
             while True:
-                info = raw_input(utils.bold("Enter additonal information or notes for this printer (q=quit) ?"))
+                info = raw_input(log.bold("Enter additonal information or notes for this printer (q=quit) ?"))
 
                 if info.strip().lower() == 'q':
                     log.info("OK, done.")
                     sys.exit(0)
 
                 # TODO: Validate chars
-
                 break
 
-        log.info(utils.bold("\nAdding print queue to CUPS:"))
+        log.info(log.bold("\nAdding print queue to CUPS:"))
         log.info("Device URI: %s" % print_uri)
         log.info("Queue name: %s" % printer_name)
         log.info("PPD file: %s" % print_ppd)
@@ -642,9 +558,7 @@ else: # INTERACTIVE_MODE
                 cfg = Config(user_config_file)
                 cfg.last_used.device_uri = print_uri
 
-
     # ******************************* FAX QUEUE SETUP
-
     if setup_fax:
         try:
             from fax import fax
@@ -656,34 +570,17 @@ else: # INTERACTIVE_MODE
     log.info("")
 
     if setup_fax:
-        log.info(utils.bold("\nFAX QUEUE SETUP"))
+        log.info(log.bold("\nFAX QUEUE SETUP"))
         installed_fax_devices = device.getSupportedCUPSDevices(['hpfax'])    
         log.debug(installed_fax_devices)
 
         if not auto and fax_uri in installed_fax_devices:
             log.warning("One or more fax queues already exist for this device: %s." % ', '.join(installed_fax_devices[fax_uri]))
             while True:
-                user_input = raw_input(utils.bold("\nWould you like to install another fax queue for this device? (y=yes, n=no*, q=quit) ?"))
-                user_input = user_input.lower().strip()
-
-                if not user_input:
-                    user_input = 'n'
-
-                setup_fax = (user_input == 'y')
-
-                if user_input in ('q', 'y', 'n'):
-                    break
-
-                log.error("Please enter 'y', 'n' or 'q'")
-
-            if user_input == 'q':
-                log.info("OK, done.")
-                sys.exit(0)
-
+                ok, setup_fax = tui.enter_yes_no("\nWould you like to install another fax queue for this device", 'n')
+                if not ok: sys.exit(0)
 
     if setup_fax:
-        #log.info(utils.bold("\nSetting up fax queue..."))
-
         if auto: # or fax_name is None:
             fax_name = default_model + '_fax'
 
@@ -703,7 +600,7 @@ else: # INTERACTIVE_MODE
         if not auto:
             if fax_name is None:
                 while True:
-                    fax_name = raw_input(utils.bold("\nPlease enter a name for this fax queue (m=use model name:'%s'*, q=quit) ?" % fax_default_model))
+                    fax_name = raw_input(log.bold("\nPlease enter a name for this fax queue (m=use model name:'%s'*, q=quit) ?" % fax_default_model))
 
                     if fax_name.lower().strip() == 'q':
                         log.info("OK, done.")
@@ -743,34 +640,30 @@ else: # INTERACTIVE_MODE
             log.error("Unable to find HP fax PPD file! Please check you HPLIP installation and try again.")
             sys.exit(1)
 
-
         if auto:
             location, info = '', 'Automatically setup by HPLIP'
         else:
             while True:
-                location = raw_input(utils.bold("Enter a location description for this printer (q=quit) ?"))
+                location = raw_input(log.bold("Enter a location description for this printer (q=quit) ?"))
 
                 if location.strip().lower() == 'q':
                     log.info("OK, done.")
                     sys.exit(0)
 
                 # TODO: Validate chars
-
                 break
 
             while True:
-                info = raw_input(utils.bold("Enter additonal information or notes for this printer (q=quit) ?"))
+                info = raw_input(log.bold("Enter additonal information or notes for this printer (q=quit) ?"))
 
                 if info.strip().lower() == 'q':
                     log.info("OK, done.")
                     sys.exit(0)
 
                 # TODO: Validate chars
-
                 break
 
-
-        log.info(utils.bold("\nAdding fax queue to CUPS:"))
+        log.info(log.bold("\nAdding fax queue to CUPS:"))
         log.info("Device URI: %s" % fax_uri)
         log.info("Queue name: %s" % fax_name)
         log.info("PPD file: %s" % fax_ppd)
@@ -793,12 +686,11 @@ else: # INTERACTIVE_MODE
 
 
     # ******************************* FAX HEADER SETUP
-
         if auto:
             setup_fax = False
         else:
             while True:
-                user_input = raw_input(utils.bold("\nWould you like to perform fax header setup (y=yes*, n=no, q=quit) ?"))
+                user_input = raw_input(log.bold("\nWould you like to perform fax header setup (y=yes*, n=no, q=quit) ?"))
                 user_input = user_input.strip().lower()
 
                 if user_input == 'q':
@@ -817,7 +709,6 @@ else: # INTERACTIVE_MODE
 
         if setup_fax:
             d = fax.FaxDevice(fax_uri)
-
             try:
                 d.open()
             except Error:
@@ -848,9 +739,9 @@ else: # INTERACTIVE_MODE
                     if ok:
                         while True:
                             if current_phone_num:
-                                phone_num = raw_input(utils.bold("\nEnter the fax phone number for this device (c=use current:'%s'*, q=quit) ?" % current_phone_num))
+                                phone_num = raw_input(log.bold("\nEnter the fax phone number for this device (c=use current:'%s'*, q=quit) ?" % current_phone_num))
                             else:
-                                phone_num = raw_input(utils.bold("\nEnter the fax phone number for this device (q=quit) ?"))
+                                phone_num = raw_input(log.bold("\nEnter the fax phone number for this device (q=quit) ?"))
 
                             if current_phone_num and (not phone_num or phone_num.strip().lower() == 'c'):
                                 phone_num = current_phone_num
@@ -872,14 +763,14 @@ else: # INTERACTIVE_MODE
 
                             if not ok:
                                 continue
-
+                                
                             break
 
                         while True:
                             if current_station_name:
-                                station_name = raw_input(utils.bold("\nEnter the name and/or company for this device (c=use current:'%s'*, q=quit) ?" % current_station_name))
+                                station_name = raw_input(log.bold("\nEnter the name and/or company for this device (c=use current:'%s'*, q=quit) ?" % current_station_name))
                             else:
-                                station_name = raw_input(utils.bold("\nEnter the name and/or company for this device (q=quit) ?"))
+                                station_name = raw_input(log.bold("\nEnter the name and/or company for this device (q=quit) ?"))
 
                             if current_station_name and (not station_name or station_name.strip().lower() == 'c'):
                                 station_name = current_station_name
@@ -891,9 +782,7 @@ else: # INTERACTIVE_MODE
                             if len(station_name) > 50:
                                 log.error("Name/company length is too long (>50 characters). Please enter a shorter name/company.")
                                 continue
-
                             break
-
 
                         try:
                             d.setStationName(station_name)
@@ -906,9 +795,7 @@ else: # INTERACTIVE_MODE
                 finally:
                     d.close()
 
-
     # ******************************* TEST PAGE
-
     if setup_print:
         print_test_page = False
 
@@ -917,22 +804,8 @@ else: # INTERACTIVE_MODE
                 print_test_page = True
         else:
             while True:
-                user_input = raw_input(utils.bold("\nWould you like to print a test page (y=yes*, n=no, q=quit) ?"))
-                user_input = user_input.strip().lower()
-
-                if not user_input:
-                    user_input = 'y'
-
-                if user_input == 'q':
-                    log.info("OK, done.")
-                    sys.exit(0)
-
-                print_test_page = (user_input == 'y')
-
-                if user_input in ('y', 'n', 'q'):
-                    break
-
-                log.error("Please enter 'y' or 'n'")
+                ok, print_test_page = tui.enter_yes_no("\nWould you like to print a test page")
+                if not ok: sys.exit(0)
 
         if print_test_page:
             path = utils.which('hp-testpage')

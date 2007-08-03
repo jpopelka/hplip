@@ -19,7 +19,7 @@
  Author: Pete Parks
 */ 
 -->
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html>
 <HEAD>
     <META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE" />
     <META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 22 Jul 2002 11:12:01 GMT" />    
@@ -28,31 +28,29 @@
     <link rel="stylesheet" type="text/css" href="styles/hplip.css" />
     <script type="text/javascript" src="scripts/hplip.js"></script>
     <script type="text/javascript" src="scripts/xml_loader.js"></script>
-    <TITLE>HP Linux Imaging and Printing (HPLIP) Installer</TITLE>
+    <TITLE>$installer_title</TITLE>
 </HEAD>
-<BODY onload="generateHeader();">
+<BODY onload="header = '$header_string'; 
+        subheader = '$sub_header_string'; 
+        generateHeader(header, subheader);">
 <!-- Header Div -->    
 <div id="header_box" class="background_box"></div>
 
 <!-- Body Div -->
 <div class="body_content">
     
-    <div id="message_title">
-        <a>Please Choose the installation mode:</a>
-    </div>
+    <div id="message_title">$ready_to_build_message_title</div>
     
     <div id="message_body">
         <div id="radio1">
-            <input type="radio" onclick="clickRadio(0)" name="clickRadio" value="auto_install"><a>&nbsp;&nbsp;&nbsp;Automatic</a>
+            <input type="radio" onclick="clickRadio(0)" name="clickRadio" value="auto_install">$ready_to_build_radio1
         </div>
         <div id="radio2">
-            <input type="radio" onclick="clickRadio(1)" name="clickRadio" value="custom_install"><a>&nbsp;&nbsp;&nbsp;Custom</a>
+            <input type="radio" onclick="clickRadio(1)" name="clickRadio" value="custom_install">$ready_to_build_radio2
         </div>
     </div>
     
-    <div id="message_footer">
-        <a>This installer will install HPLIP version '$version' onto your system.</a>
-    </div>
+    <div id="message_footer">$ready_to_build_message_footer</div>
     
 </div>
 
@@ -61,21 +59,21 @@
     
     <div id="quit_button" OnSelectStart='return false;' onClick='todoOnQuit("quit");' >
       <img src="../images/button1.png" width="100" height="35">
-      <div id="quitHiliteText"><a>Quit</a></div>
-      <div id="quitText"><a>Quit</a></div>
+      <div id="quitHiliteText">$quit_button</div>
+      <div id="quitText">$quit_button</div>
     </div>
     
     
     <div id="previous_button" OnSelectStart='return false;' onClick='indexClickActions( "previous_button", "previous");' >
       <img src="../images/button1.png" width="100" height="35">
-      <div id="previousHiliteText"><a>Previous</a></div>
-      <div id="previousText"><a>Previous</a></div>
+      <div id="previousHiliteText">$previous_button</div>
+      <div id="previousText">$previous_button</div>
     </div>
 
     <div id="next_button" OnSelectStart='return false;' onClick='indexClickActions( "next_button", "quit");' >
       <img src="../images/button1.png" width="100" height="35">
-      <div id="nextHiliteText"><a>Next</a></div>
-      <div id="nextText"><a>Next</a></div>
+      <div id="nextHiliteText">$next_button</div>
+      <div id="nextText">$next_button</div>
 </div>
     
 </BODY>

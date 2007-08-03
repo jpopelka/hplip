@@ -71,7 +71,7 @@ class SetupSettings(SetupSettings_base):
         self.updateFilter(a0)
 
     def searchTermLineEdit_textChanged(self, a0):
-        self.search = str(a0)
+        self.search = unicode(a0)
 
     def ttlSpinBox_valueChanged(self, a0):
         self.ttl = a0

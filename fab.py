@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '2.2'
+__version__ = '3.0'
 __title__ = "Fax Address Book"
 __doc__ = "A simple fax address book for HPLIP."
 
@@ -31,12 +31,6 @@ import getopt
 
 log.set_module("hp-fab")
 
-
-def additional_copyright():
-    log.info("Includes code from KirbyBase 1.8.1")
-    log.info("Copyright (c) Jamey Cribbs (jcribbs@twmi.rr.com)")
-    log.info("Licensed under the Python Software Foundation License.")
-    log.info("")
 
 USAGE = [(__doc__, "", "name", True),
          ("Usage: hp-fab [MODE] [OPTIONS]", "", "summary", True),
@@ -57,27 +51,26 @@ USAGE = [(__doc__, "", "name", True),
 def usage(typ='text'):
     if typ == 'text':
         utils.log_title(__title__, __version__)
-        additional_copyright()
 
     utils.format_text(USAGE, typ, __title__, 'hp-fab', __version__)
     sys.exit(0)
 
 
-## Console class (from ASPN Python Cookbook)
-## Author:   James Thiele
-## Date:     27 April 2004
-## Version:  1.0
-## Location: http://www.eskimo.com/~jet/python/examples/cmd/
-## Copyright (c) 2004, James Thiele
+# Console class (from ASPN Python Cookbook)
+# Author:   James Thiele
+# Date:     27 April 2004
+# Version:  1.0
+# Location: http://www.eskimo.com/~jet/python/examples/cmd/
+# Copyright (c) 2004, James Thiele
 class Console(cmd.Cmd):
 
     def __init__(self):
         cmd.Cmd.__init__(self)
         self.intro  = "Type 'help' for a list of commands. Type 'exit' or 'quit' to quit."
         self.db =  fax.FaxAddressBook() # kirbybase instance
-        self.prompt = utils.bold("hp-fab > ")
+        self.prompt = log.bold("hp-fab > ")
 
-    ## Command definitions ##
+    # Command definitions
     def do_hist(self, args):
         """Print a list of commands that have been entered"""
         print self._hist
@@ -90,7 +83,7 @@ class Console(cmd.Cmd):
         """Exits from the console"""
         return -1
 
-    ## Command definitions to support Cmd object functionality ##
+    # Command definitions to support Cmd object functionality
     def do_EOF(self, args):
         """Exit on system end of file character"""
         return self.do_exit(args)
@@ -100,17 +93,17 @@ class Console(cmd.Cmd):
            'help' or '?' with no arguments prints a list of commands for which help is available
            'help <command>' or '? <command>' gives help on <command>
         """
-        ## The only reason to define this method is for the help text in the doc string
+        # The only reason to define this method is for the help text in the doc string
         cmd.Cmd.do_help(self, args)
 
-    ## Override methods in Cmd object ##
+    # Override methods in Cmd object
     def preloop(self):
         """Initialization before prompting user for commands.
            Despite the claims in the Cmd documentaion, Cmd.preloop() is not a stub.
         """
-        cmd.Cmd.preloop(self)   ## sets up command completion
-        self._hist    = []      ## No history yet
-        self._locals  = {}      ## Initialize execution namespace for user
+        cmd.Cmd.preloop(self)   # sets up command completion
+        self._hist    = []      # No history yet
+        self._locals  = {}      # Initialize execution namespace for user
         self._globals = {}
 
         self.do_list('')
@@ -119,7 +112,7 @@ class Console(cmd.Cmd):
         """Take care of any unfinished business.
            Despite the claims in the Cmd documentaion, Cmd.postloop() is not a stub.
         """
-        cmd.Cmd.postloop(self)   ## Clean up command completion
+        cmd.Cmd.postloop(self)   # Clean up command completion
         print "Exiting..."
 
     def precmd(self, line):
@@ -141,36 +134,36 @@ class Console(cmd.Cmd):
         pass
 
     def default(self, line):
-        print utils.red("error: Unrecognized command. Use 'help' to list commands.")
+        print log.red("error: Unrecognized command. Use 'help' to list commands.")
 
     def get_nickname(self, args, fail_if_match=True, alt_text=False):
         if not args:
             while True:
                 if alt_text:
-                    nickname = raw_input(utils.bold("Enter the entry name (nickname) to add (<enter>=done*, c=cancel) ? ")).strip()
+                    nickname = raw_input(log.bold("Enter the entry name (nickname) to add (<enter>=done*, c=cancel) ? ")).strip()
                 else:
-                    nickname = raw_input(utils.bold("Enter the entry name (nickname) (c=cancel) ? ")).strip()
+                    nickname = raw_input(log.bold("Enter the entry name (nickname) (c=cancel) ? ")).strip()
 
                 if nickname.lower() == 'c':
-                    print utils.red("Canceled")
+                    print log.red("Canceled")
                     return ''
 
                 if not nickname:
                     if alt_text:
                         return ''
                     else:
-                        print utils.red("error: Nickname must not be blank.")
+                        print log.red("error: Nickname must not be blank.")
                         continue
 
 
                 if fail_if_match:
                     if self.db.select(['name'], [nickname]):
-                        print utils.red("error: Entry already exists. Please choose a different name.")
+                        print log.red("error: Entry already exists. Please choose a different name.")
                         continue
 
                 else:
                     if not self.db.select(['name'], [nickname]):
-                        print utils.red("error: Entry not found. Please enter a different name.")
+                        print log.red("error: Entry not found. Please enter a different name.")
                         continue
 
                 break
@@ -180,12 +173,12 @@ class Console(cmd.Cmd):
 
             if fail_if_match:
                 if self.db.select(['name'], [nickname]):
-                    print utils.red("error: Entry already exists. Please choose a different name.")
+                    print log.red("error: Entry already exists. Please choose a different name.")
                     return ''
 
             else:
                 if not self.db.select(['name'], [nickname]):
-                    print utils.red("error: Entry not found. Please enter a different name.")
+                    print log.red("error: Entry not found. Please enter a different name.")
                     return ''
 
         return nickname
@@ -197,30 +190,30 @@ class Console(cmd.Cmd):
         if not args:
             while True:
                 if alt_text:
-                    groupname = raw_input(utils.bold("Enter the group name to join (<enter>=done*, c=cancel) ? ")).strip()
+                    groupname = raw_input(log.bold("Enter the group name to join (<enter>=done*, c=cancel) ? ")).strip()
                 else:
-                    groupname = raw_input(utils.bold("Enter the group name (c=cancel) ? ")).strip()
+                    groupname = raw_input(log.bold("Enter the group name (c=cancel) ? ")).strip()
 
 
                 if groupname.lower() == 'c':
-                    print utils.red("Canceled")
+                    print log.red("Canceled")
                     return ''
 
                 if not groupname:
                     if alt_text:
                         return ''
                     else:
-                        print utils.red("error: The group name must not be blank.")
+                        print log.red("error: The group name must not be blank.")
                         continue
 
                 if fail_if_match: 
                     if groupname in all_groups:
-                        print utils.red("error: Entry already exists. Please choose a different name.")
+                        print log.red("error: Entry already exists. Please choose a different name.")
                         continue
 
                 else:
                     if groupname not in all_groups:
-                        print utils.red("error: Entry not found. Please enter a different name.")
+                        print log.red("error: Entry not found. Please enter a different name.")
                         continue
 
                 break
@@ -230,12 +223,12 @@ class Console(cmd.Cmd):
 
             if fail_if_match: 
                 if groupname in all_groups:
-                    print utils.red("error: Entry already exists. Please choose a different name.")
+                    print log.red("error: Entry already exists. Please choose a different name.")
                     return ''
 
             else:
                 if groupname not in all_groups:
-                    print utils.red("error: Entry not found. Please enter a different name.")
+                    print log.red("error: Entry not found. Please enter a different name.")
                     return ''
 
         return groupname
@@ -270,7 +263,7 @@ class Console(cmd.Cmd):
         all_entries = self.db.AllRecordEntries()
         log.debug(all_entries)
 
-        print utils.bold("\nEntries:\n")
+        print log.bold("\nEntries:\n")
         if len(all_entries) > 0:
 
             formatter = utils.TextFormatter(
@@ -300,7 +293,7 @@ class Console(cmd.Cmd):
         all_groups = self.db.AllGroups()
         log.debug(all_groups)
 
-        print utils.bold("\nGroups:\n")
+        print log.bold("\nGroups:\n")
         if len(all_groups):
 
             formatter = utils.TextFormatter(
@@ -333,33 +326,33 @@ class Console(cmd.Cmd):
         abe = fax.AddressBookEntry(self.db.select(['name'], [nickname])[0])
         log.debug(abe)
 
-        print utils.bold("\nEdit/modify entry information for %s:\n" % abe.name)
+        print log.bold("\nEdit/modify entry information for %s:\n" % abe.name)
 
         save_title = abe.title
-        title = raw_input(utils.bold("Title (<enter>='%s', c=cancel)? " % save_title)).strip()
+        title = raw_input(log.bold("Title (<enter>='%s', c=cancel)? " % save_title)).strip()
 
         if title.lower() == 'c':
-            print utils.red("Canceled")
+            print log.red("Canceled")
             return
 
         if not title:
             title = save_title
 
         save_firstname = abe.firstname
-        firstname = raw_input(utils.bold("First name (<enter>='%s', c=cancel)? " % save_firstname)).strip()
+        firstname = raw_input(log.bold("First name (<enter>='%s', c=cancel)? " % save_firstname)).strip()
 
         if firstname.lower() == 'c':
-            print utils.red("Canceled")
+            print log.red("Canceled")
             return
 
         if not firstname:
             firstname = save_firstname
 
         save_lastname = abe.lastname
-        lastname = raw_input(utils.bold("Last name (<enter>='%s', c=cancel)? " % save_lastname)).strip()
+        lastname = raw_input(log.bold("Last name (<enter>='%s', c=cancel)? " % save_lastname)).strip()
 
         if lastname.lower() == 'c':
-            print utils.red("Canceled")
+            print log.red("Canceled")
             return
 
         if not lastname:
@@ -367,14 +360,14 @@ class Console(cmd.Cmd):
 
         save_faxnum = abe.fax
         while True:
-            faxnum = raw_input(utils.bold("Fax Number (<enter>='%s', c=cancel)? " % save_faxnum)).strip()
+            faxnum = raw_input(log.bold("Fax Number (<enter>='%s', c=cancel)? " % save_faxnum)).strip()
 
             if faxnum.lower() == 'c':
-                print utils.red("Canceled")
+                print log.red("Canceled")
                 return
 
             if not faxnum and not save_faxnum:
-                print utils.red("error: Fax number must not be empty.")
+                print log.red("error: Fax number must not be empty.")
                 continue
 
             if not faxnum:
@@ -383,7 +376,7 @@ class Console(cmd.Cmd):
             ok = True
             for c in faxnum:
                 if c not in '0123456789-(+) *#':
-                    print utils.red("error: Invalid characters in fax number. Fax number may only contain '0123456789-(+) '")
+                    print log.red("error: Invalid characters in fax number. Fax number may only contain '0123456789-(+) '")
                     ok = False
                     break
 
@@ -391,10 +384,10 @@ class Console(cmd.Cmd):
             if ok: break
 
         save_notes = abe.notes
-        notes = raw_input(utils.bold("Notes (<enter>='%s', c=cancel)? " % save_notes)).strip()
+        notes = raw_input(log.bold("Notes (<enter>='%s', c=cancel)? " % save_notes)).strip()
 
         if notes.lower() == 'c':
-            print utils.red("Canceled")
+            print log.red("Canceled")
             return
 
         if not notes:
@@ -405,13 +398,13 @@ class Console(cmd.Cmd):
 
         new_groups = []
         for g in abe.group_list:
-            user_input = raw_input(utils.bold("Stay in group '%s' (y=yes*, n=no (leave), c=cancel) ? " % g)).strip().lower()
+            user_input = raw_input(log.bold("Stay in group '%s' (y=yes*, n=no (leave), c=cancel) ? " % g)).strip().lower()
 
             if not user_input or user_input == 'y':
                 new_groups.append(g)
 
             if user_input == 'c':
-                print utils.red("Canceled")
+                print log.red("Canceled")
                 return
 
 
@@ -421,7 +414,7 @@ class Console(cmd.Cmd):
             add_group = self.get_groupname('', fail_if_match=False, alt_text=True) 
 
             if add_group.lower() == 'c':
-                print utils.red("Canceled")
+                print log.red("Canceled")
                 return
 
             if not add_group.lower():
@@ -431,7 +424,7 @@ class Console(cmd.Cmd):
 
             if add_group not in all_groups:
                 log.warn("Group not found.")
-                user_input = raw_input(utils.bold("Is this a new group (y=yes*, n=no) ?")).strip().lower()
+                user_input = raw_input(log.bold("Is this a new group (y=yes*, n=no) ?")).strip().lower()
 
                 if user_input == 'n':
                     continue
@@ -467,13 +460,13 @@ class Console(cmd.Cmd):
         print "\nLeave or Remove Existing Entries in Group:\n"
 
         for e in old_entries:
-            user_input = raw_input(utils.bold("Leave entry '%s' in this group (y=yes*, n=no (remove), c=cancel) ? " % e)).lower().strip()
+            user_input = raw_input(log.bold("Leave entry '%s' in this group (y=yes*, n=no (remove), c=cancel) ? " % e)).lower().strip()
 
             if not user_input or user_input == 'y':
                 new_entries.append(e)
 
             if user_input == 'c':
-                print utils.red("Canceled")
+                print log.red("Canceled")
                 return
 
         print "\nAdd New Entries in Group:\n"
@@ -482,7 +475,7 @@ class Console(cmd.Cmd):
             nickname = self.get_nickname('', fail_if_match=False, alt_text=True)
 
             if nickname.lower() == 'c':
-                print utils.red("Canceled")
+                print log.red("Canceled")
                 return
 
             if not nickname.lower():
@@ -506,60 +499,60 @@ class Console(cmd.Cmd):
         nickname = self.get_nickname(args, fail_if_match=True)
         if not nickname: return
 
-        print utils.bold("\nEnter entry information for %s:\n" % nickname)
+        print log.bold("\nEnter entry information for %s:\n" % nickname)
 
-        title = raw_input(utils.bold("Title (c=cancel)? ")).strip()
+        title = raw_input(log.bold("Title (c=cancel)? ")).strip()
 
         if title.lower() == 'c':
-            print utils.red("Canceled")
+            print log.red("Canceled")
             return
 
-        firstname = raw_input(utils.bold("First name (c=cancel)? ")).strip()
+        firstname = raw_input(log.bold("First name (c=cancel)? ")).strip()
 
         if firstname.lower() == 'c':
-            print utils.red("Canceled")
+            print log.red("Canceled")
             return
 
-        lastname = raw_input(utils.bold("Last name (c=cancel)? ")).strip()
+        lastname = raw_input(log.bold("Last name (c=cancel)? ")).strip()
 
         if lastname.lower() == 'c':
-            print utils.red("Canceled")
+            print log.red("Canceled")
             return
 
         while True:
-            faxnum = raw_input(utils.bold("Fax Number (c=cancel)? ")).strip()
+            faxnum = raw_input(log.bold("Fax Number (c=cancel)? ")).strip()
 
             if faxnum.lower() == 'c':
-                print utils.red("Canceled")
+                print log.red("Canceled")
                 return
 
             if not faxnum:
-                print utils.red("error: Fax number must not be empty.")
+                print log.red("error: Fax number must not be empty.")
                 continue
 
             ok = True
             for c in faxnum:
                 if c not in '0123456789-(+) *#':
-                    print utils.red("error: Invalid characters in fax number. Fax number may only contain '0123456789-(+) *#'")
+                    print log.red("error: Invalid characters in fax number. Fax number may only contain '0123456789-(+) *#'")
                     ok = False
                     break
 
 
             if ok: break
 
-        notes = raw_input(utils.bold("Notes (c=cancel)? ")).strip()
+        notes = raw_input(log.bold("Notes (c=cancel)? ")).strip()
 
         if notes.strip().lower() == 'c':
-            print utils.red("Canceled")
+            print log.red("Canceled")
             return
 
         groups = []
         all_groups = self.db.AllGroups()
         while True:
-            add_group = raw_input(utils.bold("Member of group (<enter>=done*, c=cancel) ?" )).strip()
+            add_group = raw_input(log.bold("Member of group (<enter>=done*, c=cancel) ?" )).strip()
 
             if add_group.lower() == 'c':
-                print utils.red("Canceled")
+                print log.red("Canceled")
                 return
 
             if not add_group:
@@ -569,7 +562,7 @@ class Console(cmd.Cmd):
                 log.warn("Group not found.")
 
                 while True:
-                    user_input = raw_input(utils.bold("Is this a new group (y=yes*, n=no) ?")).lower().strip()
+                    user_input = raw_input(log.bold("Is this a new group (y=yes*, n=no) ?")).lower().strip()
 
                     if user_input not in ['', 'n', 'y']:
                         log.error("Please enter 'y', 'n' or press <enter> for 'yes'.")
@@ -607,7 +600,7 @@ class Console(cmd.Cmd):
             nickname = self.get_nickname('', fail_if_match=False, alt_text=True)
 
             if nickname.lower() == 'c':
-                print utils.red("Canceled")
+                print log.red("Canceled")
                 return
 
             if not nickname.lower():
@@ -630,7 +623,7 @@ class Console(cmd.Cmd):
         all_entries = self.db.AllRecordEntries()
         log.debug(all_entries)
 
-        print utils.bold("\nView all Data:\n")
+        print log.bold("\nView all Data:\n")
         if len(all_entries) > 0:
 
             formatter = utils.TextFormatter(
@@ -679,7 +672,7 @@ class Console(cmd.Cmd):
                             )
                         )
 
-            print utils.bold("\n%s\n" % name)
+            print log.bold("\n%s\n" % name)
 
             print formatter.compose(("Name:", abe.name))
             print formatter.compose(("Title:", abe.title))
@@ -691,7 +684,7 @@ class Console(cmd.Cmd):
             print formatter.compose(("(recno):", str(abe.recno)))
 
         else:
-            print utils.red("error: Entry name not found. Use 'list entries' to view all entry names.")
+            print log.red("error: Entry name not found. Use 'list entries' to view all entry names.")
 
         print
 
@@ -731,9 +724,6 @@ class Console(cmd.Cmd):
     def do_about(self, args):
         """About fab."""
         utils.log_title(__title__, __version__)
-        additional_copyright()
-
-
 
 
 mode = GUI_MODE
@@ -789,7 +779,6 @@ for o, a in opts:
         mode_specified = True
 
 utils.log_title(__title__, __version__)
-additional_copyright()
 
 # Security: Do *not* create files that other users can muck around with
 os.umask(0037)
@@ -806,15 +795,9 @@ if mode == GUI_MODE:
 
     app = None
     addrbook = None
-    
-    
-
     # create the main application object
     app = QApplication(sys.argv)
     
-    #loc = utils.loadTranslators(app, prop.user_config_file)
-    
-    ### Load localized strings...begin
     loc = user_cfg.ui.get("loc", "system")
     if loc.lower() == 'system':
         loc = str(QTextCodec.locale())
@@ -830,7 +813,6 @@ if mode == GUI_MODE:
         if loaded:
             app.installTranslator(trans)
         else:
-            #log.error("File failed to load.")
             loc = 'c'
     else:
         loc = 'c'
@@ -839,7 +821,6 @@ if mode == GUI_MODE:
         log.debug("Using default 'C' locale")
     else:
         log.debug("Using locale: %s" % loc)
-    ### Load localized strings...end
 
     addrbook = FaxAddrBookForm()
     addrbook.show()

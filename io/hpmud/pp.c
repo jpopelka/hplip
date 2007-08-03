@@ -24,6 +24,8 @@
 
 \*****************************************************************************/
 
+#ifdef HAVE_PPORT
+
 #include "hpmud.h"
 #include "hpmudi.h"
 
@@ -1293,3 +1295,5 @@ bugout:
       close(fd);
    return stat;
 }
+
+#endif /* HAVE_PPORT */

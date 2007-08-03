@@ -70,7 +70,7 @@ class RecipientListViewItem(QListViewItem):
     def __init__(self, parent, order, name, fax, notes):
         QListViewItem.__init__(self, parent, order, name, fax, notes)
         self.name = name
-
+        #self.entry = entry
 
 
 class PhoneNumValidator(QValidator):
@@ -78,10 +78,10 @@ class PhoneNumValidator(QValidator):
         QValidator.__init__(self, parent, name)
 
     def validate(self, input, pos):
-        input = str(input)
+        input = unicode(input)
         if not input:
             return QValidator.Acceptable, pos
-        elif input[pos-1] not in '0123456789-(+) *#':
+        elif input[pos-1] not in u'0123456789-(+) *#':
             return QValidator.Invalid, pos
         elif len(input) > 50:
             return QValidator.Invalid, pos
@@ -112,11 +112,10 @@ class ScrollFaxView(ScrollView):
         self.prev_selected_file_path = ''
         self.prev_selected_recipient = ''
         self.preserve_formatting = False
-        self.progress_dlg = None
-
+        self.waitdlg = None
         log.debug(self.allowable_mime_types)
 
-        self.db =  fax.FaxAddressBook() # kirbybase instance
+        self.db =  fax.FaxAddressBook2()
         self.last_db_modification = self.db.last_modification_time()
 
         self.MIME_TYPES_DESC = \
@@ -612,14 +611,14 @@ class ScrollFaxView(ScrollView):
 
         if dlg.exec_loop() == QDialog.Accepted:
                 results = dlg.selectedFile()
-                workingDirectory = str(dlg.dir().absPath())
+                workingDirectory = unicode(dlg.dir().absPath())
                 log.debug("results: %s" % results)
                 log.debug("workingDirectory: %s" % workingDirectory)
 
                 user_cfg.last_used.working_dir = workingDirectory
 
                 if results:
-                    path = str(results)
+                    path = unicode(results)
                     self.processFile(path)
 
 
@@ -707,8 +706,8 @@ class ScrollFaxView(ScrollView):
         if dlg.exec_loop() == QDialog.Accepted:
 
             self.cover_page_func, cover_page_png = dlg.data
-            self.cover_page_message = str(dlg.messageTextEdit.text())
-            self.cover_page_re = str(dlg.regardingTextEdit.text())
+            self.cover_page_message = unicode(dlg.messageTextEdit.text())
+            self.cover_page_re = unicode(dlg.regardingTextEdit.text())
             self.cover_page_name = dlg.coverpage_name
             self.preserve_formatting = dlg.preserve_formatting
             return True
@@ -818,8 +817,8 @@ class ScrollFaxView(ScrollView):
         order = len(temp)
 
         for name in temp:
-            abe = fax.AddressBookEntry(self.db.select(['name'], [name])[0])
-            i = RecipientListViewItem(self.recipientListView, str(order), name, abe.fax, abe.notes)
+            entry = self.db.get(name)
+            i = RecipientListViewItem(self.recipientListView, str(order), name, entry['fax'], entry['notes'])
 
             if not self.prev_selected_recipient or self.prev_selected_recipient == name:
                 self.recipientListView.setSelected(i, True)
@@ -848,16 +847,16 @@ class ScrollFaxView(ScrollView):
         ind = QPopupMenu(popup)
         grp = QPopupMenu(popup)
 
-        all_entries = self.db.AllRecordEntries()
+        all_entries = self.db.get_all_records()
         if all_entries:
             popup.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir, 'add-user.png'))),
                 self.__tr("Add Individual"), ind)
 
-            for e in all_entries:
+            for e, v in all_entries.items():
                 self.ind_map[ind.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir, 'add-user.png'))), 
-                    e.name, None)] = e.name
+                    e, None)] = e
 
-        all_groups = self.db.AllGroups()
+        all_groups = self.db.get_all_groups()
         if all_groups:
             popup.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir, 'add-users.png'))),
                 self.__tr("Add Group"), grp)
@@ -1022,14 +1021,15 @@ class ScrollFaxView(ScrollView):
         self.addWidget(widget, "recipient_add_from_fab")
 
     def addIndividualPushButton_clicked(self):
-        self.addRecipient(str(self.individualComboBox.currentText()))
+        self.addRecipient(unicode(self.individualComboBox.currentText()))
 
     def addGroupPushButton_clicked(self):
-        self.addRecipient(str(self.groupComboBox.currentText()), True)
+        self.addRecipient(unicode(self.groupComboBox.currentText()), True)
 
     def addRecipient(self, name, is_group=False):
         if is_group:
-            for i in self.db.GroupEntries(name):
+            for i in self.db.group_members(name):
+            #for i in self.db.GroupEntries(name):
                 self.recipient_list.append(i)
                 self.prev_selected_recipient = self.recipient_list[-1]
         else:
@@ -1041,22 +1041,19 @@ class ScrollFaxView(ScrollView):
     def updateRecipientCombos(self):
         # Individuals
         self.individualComboBox.clear()
-        all_entries = self.db.AllRecordEntries()
+        all_entries = self.db.get_all_records()
         self.addIndividualPushButton.setEnabled(len(all_entries))
 
-        for e in all_entries:
-            self.individualComboBox.insertItem(e.name)
+        for e, v in all_entries.items():
+            self.individualComboBox.insertItem(e)
 
         # Groups
         self.groupComboBox.clear()
-        all_groups = self.db.AllGroups()
+        all_groups = self.db.get_all_groups()
         self.addGroupPushButton.setEnabled(len(all_groups))
 
         for g in all_groups:
             self.groupComboBox.insertItem(g)
-
-
-
 
 
     #
@@ -1103,24 +1100,19 @@ class ScrollFaxView(ScrollView):
 
         # TODO: Check for duplicate already in FAB
 
-        name =  str(self.quickAddNameLineEdit.text())
-        self.db.insert(fax.AddressBookEntry((-1, name, '', '', '', 
-            str(self.quickAddFaxLineEdit.text()), '', 'Added with Quick Add')))
-
+        name =  unicode(self.quickAddNameLineEdit.text())
+        self.db.set(name, u'', u'', u'', unicode(self.quickAddFaxLineEdit.text()), [], self.__tr('Added with Quick Add'))
+        self.db.save()
         self.addRecipient(name)
 
         self.quickAddNameLineEdit.setText("")
         self.quickAddFaxLineEdit.setText("")
-
-
 
     def quickAddNameLineEdit_textChanged(self, s):
         self.quickAddPushButton.setEnabled(len(s) and len(self.quickAddFaxLineEdit.text()))
 
     def quickAddFaxLineEdit_textChanged(self, s):
         self.quickAddPushButton.setEnabled(len(self.quickAddNameLineEdit.text()) and len(s))
-
-
 
     def checkSendFaxButton(self):
         self.faxButton.setEnabled(len(self.file_list) and len(self.recipient_list))
@@ -1176,15 +1168,15 @@ class ScrollFaxView(ScrollView):
         log.debug("Recipient list:")
 
         for p in self.recipient_list:
-            a = fax.AddressBookEntry(self.db.select(['name'], [p])[0])
-            phone_num_list.append(a)
-            log.debug("Name=%s Number=%s" % (a.name, a.fax))
+            entry = self.db.get(p)
+            phone_num_list.append(entry)
+            log.debug("Name=%s Number=%s" % (entry["name"], entry["fax"]))
 
         log.debug("File list:")
 
 
         for f in self.file_list:
-            log.debug(str(f))
+            log.debug(unicode(f))
 
         self.busy = True
 
@@ -1261,15 +1253,7 @@ class ScrollFaxView(ScrollView):
                     service.sendEvent(self.sock, EVENT_FAX_JOB_FAIL, device_uri=self.cur_device.device_uri)
 
                 elif status == fax.STATUS_COMPLETED:
-                    #self.SuccessUI()
                     service.sendEvent(self.sock, EVENT_END_FAX_JOB, device_uri=self.cur_device.device_uri)
-
-                    #self.fileListView.clear()
-                    #del self.file_list[:]
-                    #self.updateFileList()
-
-                    #self.addCoverpagePushButton.setEnabled(coverpages_enabled)
-                    #self.editCoverpagePushButton.setEnabled(False)
 
                     self.funcButton_clicked()
 

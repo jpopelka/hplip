@@ -38,8 +38,8 @@ class RangeValidator(QValidator):
         QValidator.__init__(self, parent, name)
 
     def validate(self, input, pos):
-        for x in str(input)[pos-1:]:
-            if x not in '0123456789,- ':
+        for x in unicode(input)[pos-1:]:
+            if x not in u'0123456789,- ':
                 return QValidator.Invalid, pos
 
         return QValidator.Acceptable, pos
@@ -338,14 +338,14 @@ class ScrollPrintView(ScrollView):
 
         if dlg.exec_loop() == QDialog.Accepted:
                 results = dlg.selectedFile()
-                workingDirectory = str(dlg.dir().absPath())
+                workingDirectory = unicode(dlg.dir().absPath())
                 log.debug("results: %s" % results)
                 log.debug("workingDirectory: %s" % workingDirectory)
 
                 user_cfg.last_used.working_dir = workingDirectory
 
                 if results:
-                    self.addFile(str(results))
+                    self.addFile(unicode(results))
 
 
     def removeFile_clicked(self):
@@ -482,7 +482,7 @@ class ScrollPrintView(ScrollView):
     def pageRangeEdit_lostFocus(self):
         x = []
         try:
-            x = utils.expand_range(str(self.pageRangeEdit.text()))
+            x = utils.expand_range(unicode(self.pageRangeEdit.text()))
         except ValueError:
             log.error("Invalid page range entered.")
             self.invalid_page_range = True
@@ -551,7 +551,7 @@ class ScrollPrintView(ScrollView):
             try:
                 self.cur_device.open()
             except Error:
-                self.form.FailureUI(self.__tr("<b>Cannot print: Device is busy or not available.</b><p>Please check device and try again. [1]"))
+                self.form.FailureUI(self.__tr("<b>Cannot print: Device is busy or not available.</b><p>Please check device and try again."))
                 return
 
             if 1: # Go ahead and allow - print will be queued in CUPS if not rejecting
@@ -569,7 +569,7 @@ class ScrollPrintView(ScrollView):
                 
                 copies = int(self.copiesSpinBox.value())
                 all_pages = self.pages_button_group == 0
-                page_range = str(self.pageRangeEdit.text())
+                page_range = unicode(self.pageRangeEdit.text())
                 page_set = int(self.pageSetComboBox.currentItem())
 
                 cups.resetOptions()
@@ -636,4 +636,4 @@ class ScrollPrintView(ScrollView):
             self.form.close()
 
     def __tr(self,s,c = None):
-        return qApp.translate("DevMgr4",s,c)
+        return qApp.translate("ScrollPrintView",s,c)

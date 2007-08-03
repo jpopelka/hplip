@@ -47,7 +47,7 @@ class SetupManualFind(SetupManualFind_base):
             self.findTextLabel.setText(self.__tr("""Device Node:"""))
 
     def findLineEdit_textChanged(self,a0):
-        self.param = str(a0)
+        self.param = unicode(a0)
 
         if self.bus == 'usb':
             bus, dev = self.param.split(':')

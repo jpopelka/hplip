@@ -77,4 +77,4 @@ class NoDevicesForm(NoDevicesForm_base):
                                     QMessageBox.NoButton)
 
     def __tr(self,s,c = None):
-        return qApp.translate("DevMgr4",s,c)
+        return qApp.translate("NoDevicesForm",s,c)

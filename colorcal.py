@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '1.7'
+__version__ = '2.0'
 __title__ = 'Printer Cartridge Color Calibration Utility'
 __doc__ = "Perform color calibration on HPLIP supported inkjet printers. (Note: Not all printers require the use of this utility)."
 
@@ -32,7 +32,7 @@ import getopt
 
 # Local
 from base.g import *
-from base import device, status, utils, maint
+from base import device, status, utils, maint, tui
 from prnt import cups
 
 USAGE = [(__doc__, "", "name", True),
@@ -54,7 +54,6 @@ USAGE = [(__doc__, "", "name", True),
          utils.USAGE_SEEALSO,
          ("hp-clean", "", "seealso", False),
          ("hp-align", "", "seealso", False),
-
          ]
 
 
@@ -65,60 +64,23 @@ def usage(typ='text'):
     utils.format_text(USAGE, typ, __title__, 'hp-colorcal', __version__)
     sys.exit(0)
 
-
-def enterNumber(text, minimum, maximum):
-    while True:
-        x = raw_input(utils.bold(text))
-        if x and x[0].lower() == 'q':
-            sys.exit(0)
-
-        try:
-            x = int(x)
-        except ValueError:
-            log.error("You must enter a numeric value.")
-            continue
-        if x < minimum or x > maximum:
-            log.error("You must enter a number between %d and %d." % (minimum, maximum))
-            continue
-        break
-
-    return True, x
-
-def enterNumberOptions(number, minimum, maximum):
-    while True:
-        try:
-            number = int(number)
-        except ValueError:
-            log.error("You must enter a numeric value.")
-            continue
-        if number < minimum or number > maximum:
-            log.error("You must enter a number between %d and %d." % (minimum, maximum))
-            continue
-        break
-
-    return True, number
-
-
 def enterAlignmentNumber(letter, hortvert, colors, minimum, maximum):
-    return enterNumber("Enter the best aligned value for line %s (%d-%d or q=quit): " % (letter, minimum, maximum), minimum, maximum)
+    return tui.enter_range("Enter the best aligned value for line %s (%d-%d or q=quit): " % 
+        (letter, minimum, maximum), minimum, maximum)
 
 def enterPaperEdge(maximum):
-    return enterNumber("Enter numbered arrow that is best aligned with the paper edge (1-%d or q=quit): " % maximum, 1, maximum)
+    return tui.enter_range("Enter numbered arrow that is best aligned with the paper edge (1-%d or q=quit): " % 
+        maximum, 1, maximum)
 
 def colorAdj(line, maximum):
-    return enterNumber("Enter the numbered box on line %s that is best color matched to the background color (1-%d or q=quit): " % (line, maximum), 1, maximum)
+    return tui.enter_range("Enter the numbered box on line %s that is best color matched to the background color (1-%d or q=quit): " % 
+        (line, maximum), 1, maximum)
 
 def colorCal():
-    return enterNumber("""Enter the numbered image labeled "1" thru "7" that is best color matched to the image labeled "X""", 1, 7)
+    return tui.enter_range("""Enter the numbered image labeled "1" thru "7" that is best color matched to the image labeled "X""", 1, 7)
 
 def colorCal2():
-    return enterNumber("""Select the number between 1 and 81 of the numbered patch that best matches the background.""", 1, 81)
-
-def loadPlainPaper():
-    x = raw_input(utils.bold("An alignment page will be printed.\nPlease load plain paper into the printer. Press <Enter> to contine or 'q' to quit: "))
-    if x and x[0].lower() == 'q':
-        return False
-    return True
+    return tui.enter_range("""Select the number between 1 and 81 of the numbered patch that best matches the background.""", 1, 81)
 
 def invalidPen():
     log.error("Invalid cartridge(s) installed.\nPlease install valid cartridges and try again.")
@@ -137,7 +99,7 @@ def colorCal4():
     values = [0, 0, 0, 0]
     ok = True
     while True:
-        x = raw_input(utils.bold("""Enter the letter ('A' thru 'N') and number (1 thru 14) for the GRAY plot (eg, "C5") or "q" to quit: """))
+        x = raw_input(log.bold("""Enter the letter ('A' thru 'N') and number (1 thru 14) for the GRAY plot (eg, "C5") or "q" to quit: """))
 
         if x.lower().strip() == 'q':
             ok = False
@@ -177,7 +139,7 @@ def colorCal4():
 
     if ok:
         while True:
-            x = raw_input(utils.bold("""Enter the letter ('P' thru 'V') and number (1 thru 7) for the COLOR plot (eg, "R3") or "q" to quit: """))
+            x = raw_input(log.bold("""Enter the letter ('P' thru 'V') and number (1 thru 7) for the COLOR plot (eg, "R3") or "q" to quit: """))
 
             if x.lower().strip() == 'q':
                 ok = False
@@ -331,22 +293,22 @@ try:
             sys.exit(1)
 
         elif color_cal_type == COLOR_CAL_TYPE_DESKJET_450: #1
-            maint.colorCalType1(d, loadPlainPaper, colorCal, photoPenRequired)
+            maint.colorCalType1(d, tui.load_paper_prompt, colorCal, photoPenRequired)
 
         elif color_cal_type == COLOR_CAL_TYPE_MALIBU_CRICK: #2
-            maint.colorCalType2(d, loadPlainPaper, colorCal2, invalidPen)
+            maint.colorCalType2(d, tui.load_paper_prompt, colorCal2, invalidPen)
 
         elif color_cal_type == COLOR_CAL_TYPE_STRINGRAY_LONGBOW_TORNADO: #2
-            maint.colorCalType3(d, loadPlainPaper, colorAdj, photoPenRequired2)
+            maint.colorCalType3(d, tui.load_paper_prompt, colorAdj, photoPenRequired2)
 
         elif color_cal_type == COLOR_CAL_TYPE_CONNERY: # 4
-            maint.colorCalType4(d, loadPlainPaper, colorCal4, None)
+            maint.colorCalType4(d, tui.load_paper_prompt, colorCal4, None)
 
         elif color_cal_type == COLOR_CAL_TYPE_COUSTEAU: # 5
-            maint.colorCalType5(d, loadPlainPaper)
+            maint.colorCalType5(d, tui.load_paper_prompt)
         
         elif color_cal_type == COLOR_CAL_TYPE_CARRIER: # 6
-            maint.colorCalType6(d, loadPlainPaper)
+            maint.colorCalType6(d, tui.load_paper_prompt)
         
         else:
             log.error("Invalid color calibration type.")

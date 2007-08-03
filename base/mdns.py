@@ -230,7 +230,7 @@ def detectNetworkDevices(ttl=4, timeout=10):
             try:
                 for p in create_outgoing_packets(answers):
                     log.debug("Outgoing: (%d)" % len(p))
-                    log.log_data(p, fmt=True, width=16)
+                    log.log_data(p, width=16)
                     s.sendto(p, 0, (mcast_addr, mcast_port))
 
             except socket.error, e:
@@ -254,7 +254,7 @@ def detectNetworkDevices(ttl=4, timeout=10):
                  'status_code': 0, 'device2': '0', 'device3': '0', 'note': ''}
 
             log.debug("Incoming: (%d)" % len(data))
-            log.log_data(data, fmt=True, width=16)
+            log.log_data(data, width=16)
 
             offset = 0
             offset, (id, flags, num_questions, num_answers, num_authorities, num_additionals) = \

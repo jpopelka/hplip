@@ -21,7 +21,7 @@
 -->
 <html xmlns="htmlhttp://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-    <meta name="generator" content="HTML Tidy for Linux (vers 1 September 2005), see www.w3.org" />
+    
     <meta http-equiv="PRAGMA" content="NO-CACHE" />
     <meta http-equiv="EXPIRES" content="Mon, 22 Jul 2002 11:12:01 GMT" />
     <meta http-equiv="Content-Language" content="en-us" />
@@ -30,33 +30,27 @@
     <script type="text/javascript" src="scripts/hplip.js"></script>
     <script type="text/javascript" src="scripts/xml_loader.js"></script>
 
-    <title>HP Linux Imaging and Printing (HPLIP) Installer</title>
+    <title>$installer_title</title>
 </head>
 
-<body onload="generateHeader();">
+<body onload="header = '$header_string'; 
+        subheader = '$sub_header_string'; 
+        generateHeader(header, subheader);">
 <!-- Header Div -->
 <div id="header_box" class="background_box"></div>
 
 <!-- Body Div -->
 <div class="body_content">
-
-    <div id="message_title">
-        <a>An error has occurred!.</a>
-    </div>
-
-    <div id="message_body">
-        $error_text
-    </div>
-    
+    <div id="message_title">$error_message_title</div>
+    <div id="message_body">$error_text</div>
     <div id="message_footer"></div>
-    </div>
 </div>
 
 <!-- Buttons Div -->
 <div id="next_button" OnSelectStart='return false;' onClick='indexClickActions( "next_button", "quit");' >
     <img src="../images/button1.png" width="100" height="35">
-    <div id="nextHiliteText"><a>Next</a></div>
-    <div id="nextText"><a>Next</a></div>
+    <div id="nextHiliteText">$next_button</div>
+    <div id="nextText">$next_button</div>
 </div>
    
 </body>

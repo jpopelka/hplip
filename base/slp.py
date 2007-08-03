@@ -49,7 +49,13 @@ def detectNetworkDevices(ttl=4, timeout=10): #, xid=None, qappobj = None):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 
     x = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    x.connect(('1.2.3.4', 56))
+    
+    try:
+        x.connect(('1.2.3.4', 56))
+    except socket.error:
+        log.error("Network is unreachable. Please check your network connection and try again.")
+        return {}
+        
     intf = x.getsockname()[0]
     x.close()
 
@@ -88,7 +94,7 @@ def detectNetworkDevices(ttl=4, timeout=10): #, xid=None, qappobj = None):
         data, addr = s.recvfrom(2048)
         update_spinner() 
 
-        log.log_data(data, fmt=True, width=32)
+        log.log_data(data, width=32)
 
         try:
             ver, func, length, flags, dialect, lang_code, char_encode, recv_xid, status_code, attr_length = \

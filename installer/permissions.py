@@ -46,7 +46,7 @@ for f1 in utils.walkFiles(udev_dir, recurse=True, abs_paths=True, return_folders
         if state == 1: # Looking for SUBSYSTEM=="usb_device"
             d = subsystem_pat.search(f2)
             if d is not None and not f2.strip().startswith("#"):
-                print "Found 'usb_device' line: %s" % f2.strip()
+                print "Found 'usb_device' on line: %s" % f2.strip()
                 s = mode_pat.search(f2)
                 
                 if s is not None:
@@ -60,9 +60,10 @@ for f1 in utils.walkFiles(udev_dir, recurse=True, abs_paths=True, return_folders
                     state = 1 # Not found on this line, and no continuation, keep looking...
                       
         elif state == 2: # looking for MODE="0xxx" on subsequent lines
+            print "Found usb_device, looking for MODE..."
             s = mode_pat.search(f2)
             if s is not None and not f2.strip().startswith("#"):
-                print "Found 'MODE' line: %s" % f2.strip()
+                print "Found 'MODE' on line: %s" % f2.strip()
                 found = True # Found MODE="0xxx" on a subsequent line to "usb_device"
                 break
             
@@ -77,6 +78,8 @@ for f1 in utils.walkFiles(udev_dir, recurse=True, abs_paths=True, return_folders
         break
     
 if found:
+    print "Found usb_device MODE in file: %s" % f1
+    
     mode = int(s.group(1), 8)
     print "Existing mode=0%o" % mode
     
@@ -87,6 +90,7 @@ if found:
         # Make a backup of the file
         import shutil
         shutil.copyfile(f1, f1 + '.hplip.bak')
+        print "File backed-up to %s" % (f1 + '.hplip.bak')
         
         f4 = file(f1, 'w')
         state = 1

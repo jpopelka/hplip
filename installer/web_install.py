@@ -23,20 +23,20 @@
 import time, thread
 import Queue
 import base64
-import pwd
-import grp
 
 # Local
 import cherrypy
 from base.g import *
 from Cheetah.Template import Template
+from base import utils
+from core_install import *
 from base import utils, pexpect
+from xml.dom.minidom import parse, parseString
 
-import core
-import distros
-import dcheck
+from base import utils, pexpect
+from xml.dom.minidom import parse, parseString
 
-ACTION_INIT = 0 # core.init()
+ACTION_INIT = 0 
 ACTION_INSTALL_REQUIRED = 1
 ACTION_INSTALL_OPTIONAL = 2
 ACTION_PRE_DEPENDENCY = 3
@@ -49,147 +49,111 @@ ACTION_PRE_BUILD = 9
 ACTION_POST_BUILD = 10
 ACTION_MAX = 10
 
+XMLFILE = 'data/localization/hplip_zh.ts'
 
-def sort_vers(x, y):
-    #print("####>>>>sort")
-    try:
-        return cmp(float(x), float(y))
-    except ValueError:
-        return cmp(x, y)
-
-def run(cmd, callback=None, passwd='', timeout=0.5):
-    #print("####>>>>run")
-    try:
-        child = pexpect.spawn(cmd, timeout=timeout)
-    except pexpect.ExceptionPexpect:
-        return 1
-
-    try:
-        while True:
-            update_spinner()
-            i = child.expect(["[pP]assword:", pexpect.EOF, pexpect.TIMEOUT])
-            #print "####>>>> i: ", i
-            
-            if child.before:
-                log.log_to_file(child.before)
-            
-                if callback is not None:
-                    if callback(child.before): # cancel
-                        break
-
-            if i == 0: # Password:
-                child.sendline(passwd)
-
-            elif i == 1: # EOF
-                break
-
-            elif i == 2: # TIMEOUT
-                continue
-
-    except Exception:
-        pass
-
-    cleanup_spinner()
-    
-    try: 
-        child.close()
-    except OSError:
-        pass
-
-    return child.exitstatus
+try:
+    from functools import update_wrapper
+except ImportError: # using Python version < 2.5
+    def trace(f):
+        def newf(*args, **kw):
+           log.debug2("TRACE: func=%s(), args=%s, kwargs=%s" % (f.__name__, args, kw))
+           return f(*args, **kw)
+        newf.__name__ = f.__name__
+        newf.__dict__.update(f.__dict__)
+        newf.__doc__ = f.__doc__
+        newf.__module__ = f.__module__
+        return newf
+else: # using Python 2.5+
+    def trace(f):
+        def newf(*args, **kw):
+            log.debug2("TRACE: func=%s(), args=%s, kwargs=%s" % (f.__name__, args, kw))
+            return f(*args, **kw)
+        return update_wrapper(newf, f)
 
 def cat(package_mgr_cmd, packages_to_install):
-    #print("####>>>>cat")
     return utils.cat(package_mgr_cmd)
 
 
 class Installer(object):
     def __init__(self):
-        #print("####>>>>__init__")
         self.history = []
         self.auto_mode = False # custom_mode = False, auto_mode = True
         self.passwd = ''
         self.next = None
         self.progress_status_code = -1
-        self.action_lock = thread.allocate_lock() # lock to protect self.progress_status_code
+        self.action_lock = thread.allocate_lock() # lock to protect progress_status_code()
         self.queue = Queue.Queue()
         self.pre_has_run = False
         self.post_has_run = False
         self.depends_to_install = []
         self.is_signal_stop = 0
 
-        core.version_description, core.version_public, core.version_internal = \
-            core.getHPLIPVersion()
+        self.core = CoreInstall()
+        self.core.get_hplip_version()
 
+    @trace
     def popHistory(self):
-        #print("####>>>>popHistory")
-        #print "####self.history.pop(): >>>>", self.history.pop()
         return self.history.pop()
 
+    @trace
     def pushHistory(self, pg):
-        #print("####>>>>pushHistory")
-        #print "####>>>>self.history.append(pg): >>>>", self.history.append(pg)
-        #print "####>>>>pg", pg
         self.history.append(pg)
 
+    @trace
     def createTemplate(self, name):
-        #print("####>>>>createTemplate")
-        #print "####>>>>createTemplate: >>>>", name
         template = Template(file="installer/pages/%s.tmpl" % name, \
             compilerSettings={'useStackFrames': False})
 
         template.title = "Title: %s" % name
         template.content = "<em>%s<em>" % name
-        template.version = core.version_public
+        template.version = self.core.version_public
         return template
-
-    def distroKnown(self):
-        #print("####>>>>distroKnown")
-        return core.distro != distros.DISTRO_UNKNOWN and core.distro_version != '0.0'
 
     #
     # INDEX (LAUNCHES MAIN INSTALLER PAGE WELCOME IN NEW WINDOW)
     #
 
-    def quit(self): # No pushing or pop required.. for this screen
-        #print("####>>>>quit")
+    def quit(self): 
         return str(self.createTemplate("quit"))
 
     quit.exposed = True
 
-    def unsupported(self): # No pushing or pop required.. for this screen
-        #print("####>>>>unsupported")
+    def unsupported(self):
         return str(self.createTemplate("unsupported"))
 
     unsupported.exposed = True
-    
-    def unsupported_controller(self): # No pushing or pop required.. for this screen
-        #print("####>>>>unsupported")
+
+    def unsupported_controller(self):
         return str(self.createTemplate("welcome"))
 
     unsupported_controller.exposed = True
 
 
-    def index(self): # No pushing or pop required.. for this screen
-        #print("####>>>>index")
+    def index(self):
         return str(self.createTemplate("index"))
 
     index.exposed = True
 
-    def signal_stop(self): # Called by Quit to signal a stop
-        #print("####>>>>signal_stop")
+    def signal_stop(self): 
+        """
+            Called by Quit to signal a stop
+        """
         self.is_signal_stop = 1
 
     signal_stop.exposed = True
 
-    def signal_stopped(self): # Checked by index.html to see if we are stopping
-        #print("####>>>>signal_stopped")
+    def signal_stopped(self): 
+        """
+            Checked by index.html to see if we are stopping
+        """
         return str(self.is_signal_stop)
 
     signal_stopped.exposed = True
 
-    def stop(self): # Stop the CherryPy browser
-        #print("####>>>>stop")
+    def stop(self): 
+        """
+            Stop the CherryPy browser
+        """
         raise SystemExit
 
     stop.exposed = True
@@ -199,15 +163,18 @@ class Installer(object):
     #
 
     def welcome(self): 
-        #print("####>>>>welcome")
         template = self.createTemplate("welcome")
+        template.installer_title = "HELLO"
+        template.welcome_message_title = "HELLO1"
+        template.welcome_message_body = "HELLO2"
+        template.quit_button = "HELLO3"
+        template.next_button = "HELLO4"
         self.pushHistory(self.welcome)
         return str(template)
 
     welcome.exposed = True
 
     def welcome_controller(self):
-        #print("####>>>>welcome_controller")
         nxt = self.next
         if nxt is not None:
             self.next = None
@@ -218,75 +185,59 @@ class Installer(object):
         else: 
             self.next = self.password
             return self.progress(ACTION_INIT)
-            #<#>return self.password()
 
     welcome_controller.exposed = True
-    
+
 
     #
     # PASSWORD
     #
-    
-    def password_callback(message):
-        #print "####>>>>password_callback: ", message
-        return False
 
-    def set_password(self, passwd): # Collect root password from user - password?passwd=<passwd>
-        #print("####>>>>set_password")
-        rvalue = "Empty"
-
-        if passwd:
-            self.passwd = base64.decodestring(passwd)
-            
-            #print "####Password: ", self.passwd
-
-            cmd = core.su_sudo() % "echo test"
-
-            #print "####Cmd: ", cmd
-
-            status = run(cmd, self.password_callback, self.passwd)
-
-            rvalue = "Failed"
-
-            if status == 0:
-                rvalue = "True"
-
-            #print "####>>>>self.passwd", self.passwd
-            #print "####>>>>rvalue", rvalue
-            #print "####>>>>status", status
-
-        return rvalue
-
-    set_password.exposed = True
-
-
-    def password(self): # Collect root password from user
-        #print("####>>>>password")
+    def password(self): 
+        """
+            Collect root password from user
+        """
         self.pushHistory(self.password)
         return str(self.createTemplate("password"))
 
     password.exposed = True
 
+    def password_callback(self):
+        return self.core.password
+
+    def password_check_callback(self, msg):
+        log.debug(msg)
+
+    @trace
+    def set_password(self, passwd): 
+        """
+            Collect root password from user - password?passwd=<passwd>
+        """
+        if passwd:
+            self.core.password = base64.decodestring(passwd)
+            return str(self.core.check_password(self.password_callback))
+        else:
+            return 'Empty'
+
+    set_password.exposed = True
+
+
     def password_controller(self): 
-        #print("####>>>>password_controller")
         nxt = self.next
-        #print "####password_controller"
         if nxt is not None:
             self.next = None
             return nxt()
 
-        #return self.dependency_controller1()  # CHANGE - this need to reroute to <dependency_controller1>
         return self.mode()
-        #return self.progress(ACTION_INIT)
 
     password_controller.exposed = True
-    
+
     #
     # WARNING
     #
 
+    @trace
     def warning(self): 
-        #print("####>>>>warning")
         template = self.createTemplate("warning")
         self.pushHistory(self.warning)
         return str(template)
@@ -294,32 +245,37 @@ class Installer(object):
     warning.exposed = True
 
     def warning_controller(self):
-        #print("####>>>>warning_controller")
         nxt = self.next
         if nxt is not None:
             self.next = None
             return nxt()
 
         self.next = self.password
-        return self.progress(ACTION_INIT)  # CHANGE - this need to reroute to <progress_init(0)>
+        return self.progress(ACTION_INIT)
 
     warning_controller.exposed = True
-    
+
 
     #
     # MODE SELECTION
     #
 
-    def mode(self): # Install Mode: Custom or Automatic
-        #print("####>>>>mode")
+    @trace
+    def mode(self):
+        """
+            Install Mode: Custom or Automatic
+        """
         template = self.createTemplate("mode")
         self.pushHistory(self.mode)
         return str(template)
 
     mode.exposed = True
 
-    def mode_controller(self, auto_mode): # mode_controller?auto_mode=0|1
-        #print("####>>>>mode_controller")
+    @trace
+    def mode_controller(self, auto_mode): 
+        """
+            mode_controller?auto_mode=0|1
+        """
         self.auto_mode = int(auto_mode)
 
         nxt = self.next
@@ -338,19 +294,23 @@ class Installer(object):
     # COMPONENT SELECTION
     #
 
-    def component(self): # Install Component: HPLIP or HPIJS (not shown in auto mode)
-        #print("####>>>>component")
+    def component(self): 
+        """
+            Install Component: HPLIP or HPIJS (not shown in auto mode)
+        """
         template = self.createTemplate("component")
         self.pushHistory(self.component)
         return str(template)
 
     component.exposed = True
 
-    def component_controller(self, component): # component_controller?component=hplip|hpijs
-        #print("####>>>>component_controller")
-        core.selected_component = component.strip().lower()
-
-        assert core.selected_component in core.components.keys()
+    @trace
+    def component_controller(self, component): 
+        """
+            component_controller?component=hplip|hpijs
+        """
+        self.core.selected_component = component.strip().lower()
+        assert self.core.selected_component in self.core.components.keys()
 
         nxt = self.next
         if nxt is not None:
@@ -365,9 +325,11 @@ class Installer(object):
     # DISTRO AND DISTRO VERSION
     #
 
-    def distro_controller(self): # Determine if distro confirm or select is to be shown
-        #print("####>>>>distro_controller")
-        if self.distroKnown():
+    def distro_controller(self): 
+        """
+            Determine if distro confirm or select is to be shown
+        """
+        if self.core.distro_known():
             if self.auto_mode:
                 return self.notes() # auto mode, skip ahead to notes
             else:
@@ -378,19 +340,23 @@ class Installer(object):
 
     distro_controller.exposed = True
 
-    def confirm_distro(self): # Correct Distro? (NOTE: Only display is distro && distro version is known)
-        #print("####>>>>confirm_distro")
+    def confirm_distro(self):
+        """
+            Correct Distro? (NOTE: Only display is distro && distro version is known)
+        """
         template = self.createTemplate("confirm_distro")
-        template.distro_version = core.distro_version
-        #template.distro_name = core.distros[core.distro_name]['display_name']
-        template.distro_name = core.get_distro_data('display_name')
+        template.distro_version = self.core.distro_version
+        template.distro_name = self.core.get_distro_data('display_name')
         self.pushHistory(self.confirm_distro)
         return str(template)
 
     confirm_distro.exposed = True
 
-    def confirm_distro_controller(self, confirmation): # confirm_distro_controller?confirmation=0|1
-        #print("####>>>>confirm_distro_controller")
+    @trace
+    def confirm_distro_controller(self, confirmation): 
+        """ 
+            confirm_distro_controller?confirmation=0|1
+        """
         confirmation = int(confirmation)
         assert confirmation in (0, 1)
 
@@ -406,17 +372,20 @@ class Installer(object):
 
     confirm_distro_controller.exposed = True
 
-    def select_distro(self): # Choose Distro and Distro Version (only shown if distro and/or version not known || correct distro question answered "no")
-        #print("####>>>>select_distro")
+    def select_distro(self): 
+        """
+            Choose Distro and Distro Version (only shown if distro and/or version not known 
+            || correct distro question answered "no")
+        """
         template = self.createTemplate("select_distro")
         self.pushHistory(self.select_distro)
-        template.distro_version = core.distro_version
-        template.distro_name = core.distro_name
+        template.distro_version = self.core.distro_version
+        template.distro_name = self.core.distro_name
         template.distros = {}
-        template.distro = core.distro
+        template.distro = self.core.distro
 
-        for d in core.distros_index:
-            dd = core.distros[core.distros_index[d]]
+        for d in self.core.distros_index:
+            dd = self.core.distros[self.core.distros_index[d]]
 
             if dd['display']:
                 template.distros[d] = dd['display_name']
@@ -425,27 +394,31 @@ class Installer(object):
 
     select_distro.exposed = True
 
-    def select_distro_update_combo(self, index): # AJAX method to update distro version combo box
-        #print("####>>>>select_distro_update_combo")
-        core.distro = int(index)
-        core.distro_name = core.distros_index[core.distro]
-        versions = core.distros[core.distro_name]['versions'].keys()
+    def select_distro_update_combo(self, index): 
+        """
+            AJAX method to update distro version combo box
+        """
+        self.core.distro = int(index)
+        self.core.distro_name = self.core.distros_index[self.core.distro]
+        versions = self.core.distros[self.core.distro_name]['versions'].keys()
         versions.sort(lambda x, y: sort_vers(x, y))
         return ' '.join(versions)
 
     select_distro_update_combo.exposed = True
 
-    def select_distro_controller(self, distro, version): # select_distro_controller?distro=0&version=0.0
-        #print("####>>>>select_distro_controller")
-        core.distro = int(distro)
-        core.distro_version = version
+    def select_distro_controller(self, distro, version): 
+        """
+            select_distro_controller?distro=0&version=0.0
+        """
+        self.core.distro = int(distro)
+        self.core.distro_version = version
 
         nxt = self.next
         if nxt is not None:
             self.next = None
             return nxt()
 
-        if not  self.distroKnown():
+        if not self.core.distro_known():
             self.check_required()
 
             if self.num_req_missing:
@@ -461,22 +434,15 @@ class Installer(object):
     # NOTES
     #
 
-    def notes(self): # Installation Notes (distro specific)
-        #print("####>>>>notes")
+    def notes(self): 
+        """
+            Installation Notes (distro specific)
+        """
         self.pushHistory(self.notes)
         template = self.createTemplate("notes")
 
-        distro_notes = core.get_distro_data('notes', '')
-        #try:
-        #    distro_notes = core.distros[core.distro_name]['notes']
-        #except KeyError:
-        #    distro_notes = ''
-
-        ver_notes = core.get_ver_data('notes', '')
-        #try:
-        #    ver_notes = core.distros[core.distro_name]['versions'][core.distro_version]['notes']
-        #except KeyError:
-        #    ver_notes = ''
+        distro_notes = self.core.get_distro_data('notes', '')
+        ver_notes = self.core.get_ver_data('notes', '')
 
         if distro_notes and ver_notes:
             template.notes = distro_notes + "<p>" + ver_notes
@@ -492,7 +458,6 @@ class Installer(object):
     notes.exposed = True
 
     def notes_controller(self):
-        #print("####>>>>notes_controller")
         nxt = self.next
         if nxt is not None:
             self.next = None
@@ -501,7 +466,6 @@ class Installer(object):
         if self.auto_mode:
             self.required_components_to_install()
             self.optional_components_to_install()
-            #return self.password()        # CHANGE - this need to reroute to <password()>
             return self.dependency_controller1()
         else:
             return self.options()
@@ -512,30 +476,32 @@ class Installer(object):
     # INSTALLATION OPTIONS
     #
 
-    def options(self): # Build Options (not shown in auto mode)
-        #print("####>>>>options")
+    def options(self): 
+        """
+            Build Options (not shown in auto mode)
+        """
         template = self.createTemplate("options")
-        template.options = core.options
-        template.components = core.components
-        template.selected_component = core.selected_component
+        template.options = self.core.options
+        template.components = self.core.components
+        template.selected_component = self.core.selected_component
         return str(template)
 
     options.exposed = True
 
-    def options_controller(self, **options): # options_controller?opt=0|1&opt=0|1&...
-        #print("####>>>>options_controller")
+    def options_controller(self, **options): 
+        """
+            options_controller?opt=0|1&opt=0|1&...
+        """
         for opt in options:
-            #print("####>>>>options_controller>>>>options: ", opt)
             assert options[opt] in ('0', '1')
-            assert opt in core.selected_options
-            core.selected_options[opt] = int(options[opt])
+            assert opt in self.core.selected_options
+            self.core.selected_options[opt] = int(options[opt])
 
         nxt = self.next
         if nxt is not None:
             self.next = None
             return nxt()
 
-        #return self.password()    # CHANGE - this need to reroute to <password()>
         return self.dependency_controller1()
 
     options_controller.exposed = True
@@ -544,8 +510,11 @@ class Installer(object):
     # PACKAGE MANAGER
     #
 
-    def error_package_manager(self, pkg_mgr=''): # A package manager is running, prompt for closure
-        #print("####>>>>error_package_manager")
+    @trace
+    def error_package_manager(self, pkg_mgr=''): 
+        """
+            A package manager is running, prompt for closure
+        """
         template = self.createTemplate("error_package_manager")
         template.package_manager_name = pkg_mgr
         return str(template)
@@ -553,8 +522,7 @@ class Installer(object):
     error_package_manager.exposed = True
 
     def error_package_manager_controller(self):
-        #print("####>>>>error_package_manager_controller")
-        pkg_mgr = core.check_pkg_mgr()
+        pkg_mgr = self.core.check_pkg_mgr()
         if pkg_mgr:
             return self.error_package_manager(pkg_mgr)
         else:
@@ -562,9 +530,12 @@ class Installer(object):
 
     error_package_manager_controller.exposed = True
 
-    def package_manager_check(self): # AJAX call
-        #print("####>>>>package_manager_check")
-        return str(int(core.check_pkg_mgr()())) # returns '' for no running pkg manager, or '<name>' of running package manager
+    def package_manager_check(self):
+        """ 
+            Note: AJAX call
+        """
+        return str(int(self.core.check_pkg_mgr()())) 
+        # returns '' for no running pkg manager, or '<name>' of running package manager
 
     package_manager_check.exposed = True
 
@@ -574,11 +545,10 @@ class Installer(object):
     #
 
     def dependency_controller1(self):
-        #print("####>>>>dependency_controller1")
         self.check_required()
         self.check_optional()
 
-        if self.distroKnown():
+        if self.core.distro_known():
             if self.num_req_missing:
                 if self.auto_mode: # auto, distro known, req. missing
                     return self.install_required_controller() # ************* Seems Broke this way *********** answer=1)
@@ -594,10 +564,8 @@ class Installer(object):
                 return self.dependency_controller2() # distro unknown, no req. missing (check optional)
 
 
-
     def dependency_controller2(self):
-        #print("####>>>>dependency_controller2")
-        if self.distroKnown():
+        if self.core.distro_known():
             if self.num_opt_missing: 
                 if self.auto_mode: # auto, distro known, opt. missing
                     return self.install_optional_controller()
@@ -613,10 +581,9 @@ class Installer(object):
                 return self.dependency_controller3() # distro unknown, no opt. (continue)
 
     def dependency_controller3(self):
-        #print("####>>>>dependency_controller3")
-        core.hpoj_present = dcheck.check_hpoj()
-        if core.hpoj_present and core.selected_component == 'hplip' and \
-            core.distro_version_supported:
+        self.core.hpoj_present = dcheck.check_hpoj()
+        if self.core.hpoj_present and self.core.selected_component == 'hplip' and \
+            self.core.distro_version_supported:
 
             if self.auto_mode:
                 return self.hpoj_remove_controller()
@@ -626,42 +593,28 @@ class Installer(object):
             return self.dependency_controller9()
 
     def dependency_controller4(self):
-        #print("####>>>>dependency_controller4")
         self.next = self.dependency_controller7
         return self.progress(ACTION_INSTALL_REQUIRED)
 
     def dependency_controller5(self):
-        #print("####>>>>dependency_controller5")
         self.next = self.dependency_controller3
         return self.progress(ACTION_INSTALL_OPTIONAL)
 
     def dependency_controller6(self):
-        #print("####>>>>dependency_controller6")
-        #if self.post_has_run:
-        #    return self.dependency_controller3()
-        #else:
         self.next = self.dependency_controller3
         return self.progress(ACTION_POST_DEPENDENCY)
 
     def dependency_controller7(self):
-        #print("####>>>>dependency_controller7")
-        #self.next = self.dependency_controller2
         return self.dependency_controller2()
-        #return self.progress(ACTION_POST_DEPENDENCY)
 
     def dependency_controller8(self):
-        #print("####>>>>dependency_controller8")
-        #if self.auto_mode:  ## commented out to bpass installation path screen
         self.next = self.finished
         return self.progress(ACTION_BUILD_AND_INSTALL)
-        #else: ## commented out to bpass installation path screen
-        #    return self.installation_path()  ## commented out to bpass installation path screen
 
     def dependency_controller9(self):
-        #print("####>>>>dependency_controller10")
-        core.hplip_present = dcheck.check_hplip()
-        if core.hplip_present and core.selected_component == 'hplip' and \
-            core.distro_version_supported:
+        self.core.hplip_present = dcheck.check_hplip()
+        if self.core.hplip_present and self.core.selected_component == 'hplip' and \
+            self.core.distro_version_supported:
 
             if self.auto_mode:
                 return self.hplip_remove_controller()
@@ -669,24 +622,22 @@ class Installer(object):
                 return self.hplip_remove()
         else:
             return self.dependency_controller8()
-            
-    #       
-    # Network Ping test to verify if network access is available.
+
     #
+    # CHECK FOR ACTIVE NETWORK CONNECTION
+    #
+
     def network_unavailable(self):
-        #print("####>>>>network_unavailable")
         template = self.createTemplate("network_unavailable")
         self.pushHistory(self.network_unavailable)
         return str(template)
-    
+
     network_unavailable.exposed = True
-    
-    
+
     def network_unavailable_controller(self):
-        pkg_mgr = core.check_pkg_mgr()
-        
-        if self.network_ping() != 0:
-            #print "####>>>>network unavailable"
+        pkg_mgr = self.core.check_pkg_mgr()
+
+        if not self.core.check_network_connection():
             return self.network_unavailable()
         else:
             if pkg_mgr:
@@ -695,102 +646,55 @@ class Installer(object):
             else:
                 self.next = self.dependency_controller4
                 return self.progress(ACTION_PRE_DEPENDENCY)
-    
-    network_unavailable_controller.exposed = True
-    
-    #
-    # CHECK FOR ACTIVE NETWORK CONNECTION
-    #
-    def network_ping(self):
-        status = 0
-        ping = utils.which("ping")
 
-        if ping:
-           ping = os.path.join(ping, "ping")
-           status = run(ping + " -c3 sf.net", self.ping_callback, self.passwd, 2.0)
-        #print "####>>>> Status: ", status
-        return status 
-        
-        
-        
-    #
-    # callback for network_ping
-    #
-    def ping_callback(message):
-        #print "####>>>>ping_callback: ", message
-        return False
+    network_unavailable_controller.exposed = True
+
 
     #
     # Various installer checks
     #
+
     def check_required(self):
-        #print("####>>>>check_required")
-        self.num_req_missing = 0
-        # required core.options
-        for opt in core.components[core.selected_component][1]:
-            if core.options[opt][0]: # required core.options
-                for d in core.options[opt][2]: # dependencies for option
-                    if not core.have_dependencies[d]: # missing
-                        self.num_req_missing += 1
+        self.num_req_missing = self.core.count_num_required_missing_dependencies()
 
     def check_optional(self):
-        #print("####>>>>check_optional")
-        self.num_opt_missing = 0
-        # optional core.options
-        for opt in core.components[core.selected_component][1]:
-            if not core.options[opt][0]: # optional core.options
-                for d in core.options[opt][2]: # dependencies for option
-                    if not core.have_dependencies[d]: # missing
-                        self.num_opt_missing += 1
+        self.num_opt_missing = self.core.count_num_optional_missing_dependencies()
 
-
-
-    def install_required(self): # Ask user if they want to try to install required dependencies (not shown in auto mode)
-        #print("####>>>>install_required")
+    def install_required(self): 
+        """
+            Ask user if they want to try to install required dependencies (not shown in auto mode)
+        """
         template = self.createTemplate("install_required")
         template.missing_required_dependencies = {}
-        for opt in core.components[core.selected_component][1]:
-            if core.options[opt][0]: # required options
-                for d in core.options[opt][2]: # dependencies for option
-                    if not core.have_dependencies[d]: # missing
-                        log.error("Missing REQUIRED dependency: %s (%s)" % (d, core.dependencies[d][2]))
-                        template.missing_required_dependencies[d] = core.dependencies[d][2]
-                        self.depends_to_install.append(d)
+
+        for depend, desc, option in self.core.missing_required_dependencies():
+            log.error("Missing REQUIRED dependency: %s (%s)" % (depend, desc))
+            self.depends_to_install.append(depend)
 
         return str(template)
 
     install_required.exposed = True
-    
+
     def required_components_to_install(self):
-        for opt in core.components[core.selected_component][1]:
-            if core.options[opt][0]: # required options
-                for d in core.options[opt][2]: # dependencies for option
-                    if not core.have_dependencies[d]: # missing
-                        log.error("Missing REQUIRED dependency: %s (%s)" % (d, core.dependencies[d][2]))
-                        #template.missing_required_dependencies[d] = core.dependencies[d][2]
-                        self.depends_to_install.append(d)
-                        
+        for depend, desc, option in self.core.missing_required_dependencies():
+            log.error("Missing REQUIRED dependency: %s (%s)" % (depend, desc))
+            self.depends_to_install.append(depend)
+
     def optional_components_to_install(self):
-        for opt in core.components[core.selected_component][1]:
-             if not core.options[opt][0]: # not required
-                 if core.selected_options[opt]: # only for options that are ON
-                     for d in core.options[opt][2]: # dependencies
-                         if not core.have_dependencies[d]: # missing dependency
-                             if core.dependencies[d][0]: # dependency is required for this option
-                                 log.warning("Missing OPTIONAL dependency: %s (%s) [Required for option '%s']" % (d, core.dependencies[d][2], core.options[opt][1]))
-                                 self.depends_to_install.append(d)
-                             else:
-                                 log.warning("Missing OPTIONAL dependency: %s (%s) [Optional for option '%s']" % (d, core.dependencies[d][2], core.options[opt][1]))
-                                 self.depends_to_install.append(d)
+        for depend, desc, required_for_opt, opt in self.core.missing_optional_dependencies():
+            log.warn("Missing OPTIONAL dependency: %s (%s)" % (depend, desc))
+            
+            if required_for_opt:
+                log.warn("(Required for %s option)" % opt)
+            
+            self.depends_to_install.append(depend)
+
 
     def install_required_controller(self): # install_required_controller
-        #print("####>>>>install_required_controller")
-        pkg_mgr = core.check_pkg_mgr()
-        #print "####>>>>install_required_controller:pkg_mgr: ", pkg_mgr
+        pkg_mgr = self.core.check_pkg_mgr()
         if self.network_ping() != 0:
-            #print "####>>>>network unavailable"
             return self.network_unavailable()
-            
+
         if pkg_mgr:
             self.next = self.install_required_controller()
             return self.error_package_manager(pkg_mgr)
@@ -800,33 +704,29 @@ class Installer(object):
 
     install_required_controller.exposed = True
 
-    def install_optional(self): # Ask user if they want to try to install optional dependencies (not shown in auto mode)
-        #print("####>>>>install_optional")
+    def install_optional(self): 
+        """
+            Ask user if they want to try to install optional dependencies (not shown in auto mode)
+        """
         self.depends_to_install = []
         template = self.createTemplate("install_optional")
         template.missing_optional_dependencies = {}
-        #self.optional_components_to_install()
-        for opt in core.components[core.selected_component][1]:
-             if not core.options[opt][0]: # not required
-                 if core.selected_options[opt]: # only for options that are ON
-                     for d in core.options[opt][2]: # dependencies
-                        if not core.have_dependencies[d]: # missing dependency
-                             if core.dependencies[d][0]: # dependency is required for this option
-                                 log.warning("Missing OPTIONAL dependency: %s (%s) [Required for option '%s']" % (d, core.dependencies[d][2], core.options[opt][1]))
-                                 template.missing_optional_dependencies[d] = core.dependencies[d][2]
-                                 self.depends_to_install.append(d)
-                             else:
-                                 log.warning("Missing OPTIONAL dependency: %s (%s) [Optional for option '%s']" % (d, core.dependencies[d][2], core.options[opt][1]))
-                                 template.missing_optional_dependencies[d] = core.dependencies[d][2]
-                                 self.depends_to_install.append(d)
+        
+        for depend, desc, required_for_opt, opt in self.core.missing_optional_dependencies():
+            log.warn("Missing OPTIONAL dependency: %s (%s)" % (depend, desc))
+            
+            if required_for_opt:
+                log.warn("(Required for %s option)" % opt)
+            
+            self.depends_to_install.append(depend)
+            template.missing_optional_dependencies[depend] = desc
+        
         return str(template)
 
     install_optional.exposed = True
 
     def install_optional_controller(self):
-        #print("####>>>>install_optional_controller")
-        pkg_mgr = core.check_pkg_mgr()
-        #print "####>>>>pkg_mgr", pkg_mgr
+        pkg_mgr = self.core.check_pkg_mgr()
         if pkg_mgr:
             self.next = self.install_optional_controller()
             return self.error_package_manager(pkg_mgr)
@@ -841,61 +741,57 @@ class Installer(object):
 
     install_optional_controller.exposed = True
 
-    def turn_off_options(self): # Inform the user that some options have been turned off because of missing optional dependencies
-        #print("####>>>>turn_off_options")
+    def turn_off_options(self): 
+        """
+            Inform the user that some options have been turned off because of missing optional dependencies
+        """
         template = self.createTemplate("turn_off_options")
         template.turned_off_options = {}
 
         self.depends_to_install = []
-        for opt in core.components[core.selected_component][1]:
-            if not core.options[opt][0]: # not required
-                if core.selected_options[opt]: # only for options that are ON
-                    for d in core.options[opt][2]: # dependencies
-                        if not core.have_dependencies[d]: # missing dependency
-                            if core.dependencies[d][0]: # dependency is required for this option
-                                log.warning("Missing OPTIONAL dependency: %s (%s) [Required for option '%s']" % (d, core.dependencies[d][2], core.options[opt][1]))
-                                template.turned_off_options[opt] = core.options[opt][1]
-                                core.selected_options[opt] = False
-                            else:
-                                self.depends_to_install.append(d)
+        for depend, desc, required_for_opt, opt in self.core.missing_optional_dependencies():
+            log.warn("Missing OPTIONAL dependency: %s (%s)" % (depend, desc))
+            
+            if required_for_opt:
+                log.warn("(Required for %s option)" % opt)
+            
+            self.depends_to_install.append(depend)
+            self.core.selected_options[opt] = False
+            template.turned_off_options[opt] = self.core.options[opt][1]
 
         return str(template)
 
     turn_off_options.exposed = True
 
     def turn_off_options_controller(self):
-        #print("####>>>>turn_off_options_controller")
         return self.dependency_controller3()
 
     turn_off_options_controller.exposed = True
 
-    def error_required_missing(self): # A required dependency is missing, can't continue
-        #print("####>>>>error_required_missing")
-        template = self.createTemplate("error_required_missing")
-        template.missing_required_dependencies = {}
-        for opt in core.components[core.selected_component][1]:
-            if core.options[opt][0]: # required options
-                for d in core.options[opt][2]: # dependencies for option
-                    if not core.have_dependencies[d]: # missing
-                        log.error("Missing REQUIRED dependency: %s (%s)" % (d, core.dependencies[d][2]))
-                        template.missing_required_dependencies[d] = core.dependencies[d][2]
+    def error_required_missing(self): 
+        """
+            A required dependency is missing, can't continue
+        """
+        for depend, desc, option in self.core.missing_required_dependencies():
+            log.error("Missing REQUIRED dependency: %s (%s)" % (depend, desc))
+            template.missing_required_dependencies[d] = desc
 
-        return str(template) #self.error("One or more required dependencies are missing and cannot be installed. This installer will exit.")
+        return str(template) 
 
     error_required_missing.exposed = True
 
-    #def error_required_missing_controller(self):
-        # TODO: How to close browser window?
-    #    raise SystemExit
 
     #
     # PROGRESS
     #
 
     # Reusable progress screen
-    
-    def progress(self, action): # progress?action=0|1|2|3|4|5|6|7|8
-        #print("####>>>>progress")
+
+    @trace
+    def progress(self, action): 
+        """
+            progress?action=0|1|2|3|4|5|6|7|8
+        """
         self.action = int(action)
         assert action in range(ACTION_MAX)
         template = self.createTemplate("progress")
@@ -917,85 +813,54 @@ class Installer(object):
                 packages_to_install = []
                 commands_to_run = []
 
-                package_mgr_cmd = core.get_distro_data('package_mgr_cmd', '')
-                #try:
-                #    package_mgr_cmd = core.distros[core.distro_name]['package_mgr_cmd']
-                #except KeyError:
-                #    package_mgr_cmd = ''
+                package_mgr_cmd = self.core.get_distro_data('package_mgr_cmd', '')
 
-                for d in self.depends_to_install:
-                    log.debug("*** Processing dependency: %s" % d)
-                    #package, command = core.distros[core.distro_name]['versions'][core.distro_version]['dependency_cmds'][d]
-                    package, command = core.get_ver_data('dependency_cmds', {}).get(d, ('', ''))
-
-                    if package:
-                        log.debug("Package '%s' will be installed to satisfy dependency '%s'." % (package, d))
-                        packages_to_install.append(package)
-
-                    if command:
-                        log.debug("Command '%s' will be run to satisfy dependency '%s'." % (command, d))
-                        if type(command) == type(""):
-                            commands_to_run.append(command)
+                if package_mgr_cmd:
+                    for d in self.depends_to_install:
+                        log.debug("*** Processing dependency: %s" % d)
+                        packages, commands = core.get_dependency_data(d)
                         
-                        elif type(command) == type([]):
-                            commands_to_run.extend(command)
-                            
-                        else:
-                            pass
+                        log.debug("Packages: %s" % ','.join(packages))
+                        log.debug("Commands: %s" % ','.join(commands))
 
+                        if packages:
+                            log.debug("Packages '%s' will be installed to satisfy dependency '%s'." % 
+                                (','.join(packages), d))
+                            packages_to_install.extend(package)
+    
+                        if commands:
+                            log.debug("Commands '%s' will be run to satisfy dependency '%s'." % 
+                                (','.join(commands), d))
+                            commands_to_run.extend(command)
+    
+    
                 self.cmds.append(cat(package_mgr_cmd, ' '.join(packages_to_install)))
                 self.cmds.extend(commands_to_run)
 
             elif self.action == ACTION_PRE_DEPENDENCY: # 3
                 self.pre_has_run = True
-                #try:
-                    #self.cmds.extend(core.distros[core.distro_name]['versions'][core.distro_version]['pre_depend_cmd'] or core.distros[core.distro_name]['pre_depend_cmd'])
-                #except KeyError:
-                #    pass
-                self.cmds.extend(core.get_distro_ver_data('pre_depend_cmd'))
-
+                self.cmds.extend(self.core.get_distro_ver_data('pre_depend_cmd'))
                 self.fail_ok = True
 
             elif self.action == ACTION_POST_DEPENDENCY: # 4
                 self.post_has_run = True
-                #print "####>>>>Action here: ", self.action
-                #try:
-                    #print "####>>>>Action 4: ", core.distros[core.distro_name]['versions'][core.distro_version]['post_depend_cmd']
-                    #print "####>>>>Sction 4:2: ", core.distros[core.distro_name]['post_depend_cmd']
-                #    self.cmds.extend(core.distros[core.distro_name]['versions'][core.distro_version]['post_depend_cmd'] or core.distros[core.distro_name]['post_depend_cmd'])
-                #except KeyError:
-                    #print "####>>>>Action 4:", KeyError
-                #    pass
-                self.cmds.extend(core.get_distro_ver_data('post_depend_cmd'))
-
+                self.cmds.extend(self.core.get_distro_ver_data('post_depend_cmd'))
                 self.fail_ok = True
 
             elif self.action == ACTION_BUILD_AND_INSTALL: # 5  Do I want to combile pre_build and post_build?
-                self.cmds.extend(self.action_pre_build())
-                enable_ppds = core.ppd_install_flag()
-                log.debug("Enable PPD install: %s" % enable_ppds)
-                ppd_dir = core.get_distro_ver_data('ppd_dir')
-                log.debug("PPD dir=%s" % ppd_dir)
-                self.cmds = core.build_cmds(enable_ppds, core.selected_component == 'hpijs', ppd_dir)
-                self.cmds.extend(self.action_post_build())
-                #print "####core.build_cmds() ", self.cmds
-                #else:
-                    #self.cmds = core.hpijs_build_cmds()
-                    #print "####>>>>core.hpijs_build_cmds() ", self.cmds
+                self.cmds.extend(self.core.run_pre_build)
+                self.cmds.extend(self.core.build_cmds())
+                self.cmds.extend(self.core.run_post_build)
 
             elif self.action == ACTION_REMOVE_HPOJ: # 6
-                #self.cmds.append(core.distros[core.distro_name]['hpoj_remove_cmd'])
-                self.cmds.append(core.get_distro_data('hpoj_remove_cmd', ''))
+                self.cmds.append(self.core.get_distro_data('hpoj_remove_cmd', ''))
                 self.fail_ok = True
 
             elif self.action == ACTION_REMOVE_HPLIP: # 7
-                self.cmds.append(core.stop_hplip())
-                #self.cmds.append(core.distros[core.distro_name]['hplip_remove_cmd'])
-                self.cmds.append(core.get_distro_data('hplip_remove_cmd', ''))
+                self.cmds.append(self.core.stop_hplip())
+                self.cmds.append(self.core.get_distro_data('hplip_remove_cmd', ''))
                 self.fail_ok = True
-            #else:
-                #print "###ACTION_REMOVE_HPLIP: ", self.action
-                
+
             if self.cmds:
                 self.cmds = [c for c in self.cmds if c]
                 log.debug(self.cmds)
@@ -1005,222 +870,131 @@ class Installer(object):
                 return self.next()
 
     progress.exposed = True
-    
-    def action_pre_build(self):
-        cmds = []
-        # Remove the link /usr/share/foomatic/db/source/PPD if the symlink is corrupt (Dapper only?)
-        if core.get_distro_ver_data('fix_ppd_symlink', False):
-          log.debug("Fixing PPD symlink...")
-          cmd = core.su_sudo() % 'python ./installer/fix_symlink.py'
-          log.debug("Running symlink fix utility: %s" % cmd)
-          cmds.append(cmd)
-        return cmds
 
-
-    def action_post_build(self):
-        cmds = []
-        logoff_required = False
-        log.debug("Checking for 'lp' group membership...")
-
-        all_groups = grp.getgrall()
-        for g in all_groups:
-            name, pw, gid, members = g
-            log.debug("group=%s gid=%d" % (name, gid))
-
-        users = {}
-        for p in pwd.getpwall():
-            user, pw, uid, gid, name, home, ci = p
-            log.debug("user=%s uid=%d gid=%d" % (user, uid, gid))
-
-            if 1000 <= uid <= 10000:
-                log.debug("Checking user %s..." % user)
-                grps = []
-
-                for g in all_groups:
-                    grp_name, pw, gid, members = g
-                    if user in members:
-                        grps.append(grp_name)
-
-                log.debug("Member of groups: %s" % ', '.join(grps))
-                users[user] = ('lp' in grps)
-
-        user_list = users.keys()
-        log.debug("User list: %s" % ','.join(user_list))
-
-        if len(user_list) == 1 and users[user_list[0]]:
-            log.debug("1 user (%s) and in 'lp' group. No action needed." % users[user_list[0]])
-            log.info("OK")
-
-        elif len(user_list) == 1 and not users[user_list[0]]:
-            log.debug("1 user (%s) and NOT in 'lp' group. Adding user to 'lp' group..." % user_list[0])
-            log.debug("Adding user '%s' to 'lp' group..." % user_list[0])
-            cmd = "usermod -a -Glp %s" % user_list[0]
-            cmd = core.su_sudo() % cmd
-            log.debug("Running: %s" % cmd)
-            #status, output = run(cmd, True, password_func)
-            cmds.append(cmd)
-            logoff_required = True
-
-        else:
-            #log.info("In order for USB I/O to function, each user that will access the device")
-            #log.info("must be a member of the 'lp' group:" )
-            for u in users:
-                if not users[u]:
-                    #answer = enter_yes_no("\nWould you like to add user '%s' to the 'lp' group (y=yes*, n=no, q=quit)?", default="y")
-                    answer = True
-                    if answer:
-                        log.debug("Adding user '%s' to 'lp' group..." % u)
-                        cmd = "usermod -a -Glp %s" % u
-                        cmd = core.su_sudo() % cmd
-                        log.debug("Running: %s" % cmd)
-                        #status, output = run(cmd, True, password_func)
-                        cmds.append(cmd)
-
-                        #if u == prop.username:
-            logoff_required = True
-
-        # Fix any udev device nodes that aren't 066x
-
-        udev_mode_fix = core.get_distro_ver_data('udev_mode_fix', False)
-        if udev_mode_fix:
-            #log.info("")
-            log.debug("Fixing USB device permissions...")
-            cmd = core.su_sudo() % 'python ./installer/permissions.py'
-            log.debug("Running USB permissions utility: %s" % cmd)
-            #status, output = run(cmd, True, password_func)
-            cmds.append(cmd)
-
-            # Trigger USB devices so that the new mode will take effect 
-
-            log.debug("Triggering USB devices...")
-            cmd = core.su_sudo() % 'python ./installer/trigger.py'
-            log.debug("Running USB trigger utility: %s" % cmd)
-            #status, output = run(cmd, True, password_func)
-            cmds.append(cmd)
-
-        if core.cups11:
-            #log.info("")
-            log.debug("Restarting CUPS...")
-            #status, output = run(core.restart_cups(), True, password_func)
-            cmds.append(core.restart_cups())
-
-            #if status != 0:
-            #    log.warn("CUPS restart failed.")
-            #else:
-            #    log.info("Command completed successfully.")
-
-        # Kill any running hpssd.py instance from a previous install
-        #log.info("")
-        log.debug("Checking for running hpssd...")
-        if dcheck.check_hpssd():
-            pid = dcheck.get_ps_pid('hpssd')
-            try:
-                log.debug("Killing the running 'hpssd' process...")
-                os.kill(pid, 9)
-            except OSError:
-                pass
-            else:
-                log.debug("OK")
-        else:
-            log.debug("Not running (OK).")
-
-        return cmds
-    
-
-    def progress_update(self): # AJAX method to update progress screen. Called periodically...
-        ##print("####>>>>progress_update")
+    #@trace
+    def progress_update(self): 
+        """
+            AJAX method to update progress screen. Called periodically...
+        """
         output = ""
         while not self.queue.empty():
             output = ''.join([output, self.queue.get()])
+        
+        print output.strip()
+        
         return output.lstrip()
 
     progress_update.exposed = True
 
-    def progress_status(self): # AJAX method to update progress screen. Returns an ineteger -1, 0, or >0
-        ##print("####>>>>progress_status")
+    #@trace
+    def progress_status(self): 
+        """
+            AJAX method to update progress screen. Returns an ineteger -1, 0, or >0
+        """
         self.action_lock.acquire()
         t = self.progress_status_code
         self.action_lock.release()
-        #print "####>>>>progress_status code:", t
         t2 = utils.printable(str(t))
         return str(t2)
 
     progress_status.exposed = True
-    
-    
+
+
     def operation_number(self):
-        #print("####>>>>operation_number")
         self.action_lock.acquire()
         t = self.action
         self.action_lock.release()
-        #print "####>>>>operation_number code:", t
         return str(t)
 
     operation_number.exposed = True
-    
+
     def retry_progress(self):
-        #print("####>>>>retry_progress")
         return self.progress(self.action)
 
     retry_progress.exposed = True
-        
 
-    def progress_cancel(self): # AJAX method to cancel current operation.
-        #print("####>>>>progress_cancel")
+
+    def progress_cancel(self): 
+        """
+            AJAX method to cancel current operation.
+        """
         self.cancel_signaled = True
         return '' # TODO: Hook to install canceled page
 
     progress_cancel.exposed = True
 
+    @trace
     def run_action_thread(self, cmds):
-        #print("####>>>>run_action_thread")
-        # 0 : Done, no error
-        # >0 : Done, with error
+        """
+            0 : Done, no error
+            >0 : Done, with error
+        """
         for cmd in cmds:
             self.queue.put(cmd)
-            status = run(cmd, callback=self.progress_callback, passwd=self.passwd, timeout=0.5)
-
-            if status != 0:
-                self.action_lock.acquire()
-                self.progress_status_code = status
-                self.action_lock.release()
-                break
+            
+            try:
+                cmd(self.progress_callback)
+            except TypeError:
+                status, output = run(cmd, self.progress_callback)
+    
+                if status != 0:
+                    self.action_lock.acquire()
+                    self.progress_status_code = status
+                    self.action_lock.release()
+                    break
+                    
 
         self.action_lock.acquire()
         self.progress_status_code = 0
         self.action_lock.release()
 
-    def run_core_init_thread(self): # run core.init() in a thread, report sucess at end
-        #print("####>>>>run_core_init_thread")
-        core.init(self.progress_callback)
+    @trace
+    def run_core_init_thread(self): 
+        """
+            run self.core.init() in a thread, report sucess at end
+        """
+        #self.queue.put("Init...\n")
+        self.core.init(self.progress_callback)
+        
         self.action_lock.acquire()
         self.progress_status_code = 0
         self.action_lock.release()
 
-        if self.distroKnown():
-            log.debug("Distro is %s %s" % (core.get_distro_data('display_name'), core.distro_version))
+        if self.core.distro_known():
+            log.debug("Distro is %s %s" % (self.core.get_distro_data('display_name'), 
+                self.core.distro_version))   
 
-    def progress_callback(self, output): # Called by core.init() in a thread to collect output
-        #print("####>>>>progress_callback")
+    @trace
+    def progress_callback(self, output): 
+        """
+            Called by self.core.init() in a thread to collect output
+        """
+        #print "put: %s" % output
         self.queue.put(output)
         return self.cancel_signaled
 
-    def progress_controller(self): # Called at end if progress_status_code == 0
-        #print("####>>>>progress_controller")
+    @trace
+    def progress_controller(self): 
+        """
+            Called at end if progress_status_code == 0
+        """
         nxt = self.next
-        #print "####Progress_controller: ", nxt
         if nxt is not None:
             self.next = None
             return nxt()
 
     progress_controller.exposed = True
 
-    def error_command_failed(self): # Called at end if progress_status > 0
-        #print("####>>>>error_command_failed")
+    @trace
+    def error_command_failed(self): 
+        """
+            Called at end if progress_status > 0
+        """
         if self.fail_ok:
             return self.next()
         else:
-            return self.error("Command '%s' failed with error code %d." % (self.cmds, self.progress_status_code))
+            return self.error("Command '%s' failed with error code %d." % 
+                (self.cmds, self.progress_status_code))
 
     error_command_failed.exposed = True
 
@@ -1229,43 +1003,26 @@ class Installer(object):
     # INSTALLATION PATH
     #
 
-    def installation_path(self): # Install path (not shown in auto mode)
-        #print("####>>>>installation_path")
+    def installation_path(self): 
+        """
+            Install path (not shown in auto mode)
+        """
         template = self.createTemplate("installation_path")
-        template.install_location = core.install_location
-        #print "####>>>>installation_path::core.install_location: >>>>> ", template.install_location
+        template.install_location = self.core.install_location
         return str(template)
 
     installation_path.exposed = True
 
-    def installation_path_controller(self, path): # installation_path_controller?path=<path>
-        #print("####>>>>installation_path_controller")
-        core.install_location = path
-
-        #assert os.path.exists(path)
-        #print "####>>>>installation_path_controller::core.install_location: >>>>> ", core.install_location
-
+    @trace
+    def installation_path_controller(self, path): 
+        """
+            installation_path_controller?path=<path>
+        """
+        self.core.install_location = path
         nxt = self.next
         if nxt is not None:
             self.next = None
             return nxt()
-
-        #self.next = self.finished
-        #TODO: this determines where I need to 
-        # if sudo is found then self.nxt=self.finished else self.next = self.quit
-
-        #print "####>>>>path: ", path
-        #su_sudo = ""
-        #if utils.which('kdesu'):
-        #    su_sudo = 'kdesu -- "%s"'
-
-        #elif utils.which('gksu'):
-        #    su_sudo = 'gksu "%s"'
-
-        #if su_sudo:
-        #    self.next = self.finished 
-        #else: 
-        #    self.next = self.quit
 
         self.next = self.finished
         return self.progress(ACTION_BUILD_AND_INSTALL)
@@ -1276,29 +1033,31 @@ class Installer(object):
     # PACKAGE CONFLICTS: HPOJ & HPLIP
     #
 
-    def hpoj_remove(self): # Ask user if they want to uninstall HPOJ (not shown in auto mode)
-        #print("####>>>>hpoj_remove")
+    def hpoj_remove(self): 
+        """
+            Ask user if they want to uninstall HPOJ (not shown in auto mode)
+        """
         template = self.createTemplate("hpoj_remove")
         return str(template)
 
     hpoj_remove.exposed = True
 
     def hpoj_remove_controller(self):
-        #print("####>>>>hpoj_remove_controller")
         self.next = self.dependency_controller9
         return self.progress(ACTION_REMOVE_HPOJ)
 
     hpoj_remove_controller.exposed = True
 
-    def hplip_remove(self): # Ask user if they want to uninstall HPLIP (not shown in auto mode)
-        #print("####>>>>hplip_remove")
+    def hplip_remove(self): 
+        """
+            Ask user if they want to uninstall HPLIP (not shown in auto mode)
+        """
         template = self.createTemplate("hplip_remove")
         return str(template)
 
     hplip_remove.exposed = True
 
     def hplip_remove_controller(self):
-        #print("####>>>>hplip_remove_controller")
         self.next = self.dependency_controller8
         return self.progress(ACTION_REMOVE_HPLIP)
 
@@ -1308,15 +1067,16 @@ class Installer(object):
     # BUILD AND INSTALL
     #
 
-    def ready_to_build(self): # Ask user to OK the start of the build (not shown in auto mode)
-        #print("####>>>>ready_to_build")
+    def ready_to_build(self): 
+        """
+            Ask user to OK the start of the build (not shown in auto mode)
+        """
         template = self.createTemplate("ready_to_build")
         return str(template)
 
     ready_to_build.exposed = True
 
     def ready_to_build_controller(self):
-        #print("####>>>>ready_to_build_controller")
         nxt = self.next
         if nxt is not None:
             self.next = None
@@ -1326,45 +1086,23 @@ class Installer(object):
 
     ready_to_build_controller.exposed = True
 
-    def finished(self): # Display summary and results
-        #print("####>>>>finished")
+    def finished(self): 
+        """
+            Display summary and results
+        """
         template = self.createTemplate("finished")
         return str(template)
 
     finished.exposed = True
 
+    @trace
     def finished_controller(self, setup):
-        #print("####>>>>finished_controller")
         nxt = self.next
         if nxt is not None:
             self.next = None
             return nxt()
 
-        #TODO: this determines where I need to
-        setup = int(setup)
-        if setup == 1: 
-            su_sudo = ""
-            if utils.which('kdesu'):
-                su_sudo = 'kdesu -- "%s"'
-
-            elif utils.which('gksu'):
-                su_sudo = 'gksu "%s"'
-
-            if not su_sudo:
-                # What should I do if this is
-                # I think we should go to the return to quit for now...
-                return self.quit()
-            else:
-                if utils.which('hp-setup'):
-                    c = 'hp-setup -u --username=%s' % prop.username
-                    cmd = su_sudo % c
-                else:
-                    c = 'python ./setup.py -u --username=%s' % prop.username
-                    cmd = su_sudo % c
-
-                log.debug(cmd)
-                status, output = utils.run(cmd, log_output=True, password_func=None, timeout=1)
-
+        self.core.run_hp_setup()
         return self.quit()
 
     finished_controller.exposed = True
@@ -1374,8 +1112,11 @@ class Installer(object):
     # VARIOUS ERRORS
     #
 
-    def error(self, error_text): # Generic re-usable error page
-        #print("####>>>>error")
+    @trace
+    def error(self, error_text): 
+        """
+            Generic re-usable error page
+        """
         template = self.createTemplate("error")
         template.error_text = error_text
         return str(template)
@@ -1383,34 +1124,35 @@ class Installer(object):
     error.exposed = True
 
     def error_controller(self):
-        #print("####>>>>error_controller")
         raise SystemExit
 
     error_controller.exposed = True
 
-    def error_unsupported_distro(self): # Can only continue from here if all required dependencies are installed
-        #print("####>>>>error_unsupported_distro")
+    @trace
+    def error_unsupported_distro(self): 
+        """
+            Can only continue from here if all required dependencies are installed
+        """
         template = self.createTemplate("error_unsupported_distro")
-        template.distro_version = core.distro_version
-        template.distro_name = core.get_distro_data('display_name') #core.distro_name
+        template.distro_version = self.core.distro_version
+        template.distro_name = self.core.get_distro_data('display_name')
 
         template.missing_required_dependencies = {}
-        for opt in core.components[core.selected_component][1]:
-            if core.options[opt][0]: # required options
-                for d in core.options[opt][2]: # dependencies for option
-                    if not core.have_dependencies[d]: # missing
-                        log.error("Missing REQUIRED dependency: %s (%s)" % (d, core.dependencies[d][2]))
-                        template.missing_required_dependencies[d] = core.dependencies[d][2]
-                        #self.depends_to_install.append(d)
-
+        for depend, desc, option in core.missing_required_dependencies():
+            template.missing_required_dependencies[depend] = desc
+            log.error("Missing REQUIRED dependency: %s (%s)" % (depend, desc))
+        
         return str(template)
 
     error_unsupported_distro.exposed = True
 
-    def error_unsupported_distro_controller(self, cont): # error_unsupported_distro_controller?cont=0|1
-        #print("####>>>>error_unsupported_distro_controller")
-        # User can chose to continue even if unsupported, but might get tripped up
-        # if any required dependencies are missing.
+    @trace
+    def error_unsupported_distro_controller(self, cont): 
+        """
+            error_unsupported_distro_controller?cont=0|1
+            User can chose to continue even if unsupported, but might get tripped up
+            if any required dependencies are missing.
+        """
         if self.next is not None:
             self.next = None
             return self.next()
@@ -1424,58 +1166,199 @@ class Installer(object):
     # MISC
     #
 
-
+    @trace
     def previous(self):
-        #print("####>>>>previous")
         self.popHistory()
         return (self.popHistory())()
 
     previous.exposed = True
 
     def test(self):
-        #print("####>>>>test")
         # Force reusable screens back to test when done
         self.next = self.test
         template = self.createTemplate("test")
-        template.options = core.options
-        template.components = core.components
-        template.selected_component = core.selected_component
-        template.dependencies = core.dependencies
-        template.have_dependencies = core.have_dependencies
-        template.selected_options = core.selected_options
-        template.version_description = core.version_description
-        template.version_public = core.version_public
-        template.version_internal = core.version_internal
-        template.bitness = core.bitness
-        template.endian = core.endian
-        #template.hpijs_version = core.hpijs_version  # Per Don's new format
-        #template.hpijs_version_description = core.hpijs_version_description
-        template.distro = core.distro
-        template.distro_name = core.distro_name
-        template.distro_version = core.distro_version
-        template.distro_version_supported = core.distro_version_supported
-        template.install_location = core.install_location
-        template.hpoj_present = core.hpoj_present
-        template.hplip_present = core.hplip_present
-        template.distro_known = self.distroKnown()
+        template.options = self.core.options
+        template.components = self.core.components
+        template.selected_component = self.core.selected_component
+        template.dependencies = self.core.dependencies
+        template.have_dependencies = self.core.have_dependencies
+        template.selected_options = self.core.selected_options
+        template.version_description = self.core.version_description
+        template.version_public = self.core.version_public
+        template.version_internal = self.core.version_internal
+        template.bitness = self.core.bitness
+        template.endian = self.core.endian
+        template.distro = self.core.distro
+        template.distro_name = self.core.distro_name
+        template.distro_version = self.core.distro_version
+        template.distro_version_supported = self.core.distro_version_supported
+        template.install_location = self.core.install_location
+        template.hpoj_present = self.core.hpoj_present
+        template.hplip_present = self.core.hplip_present
+        template.distro_known = self.core.distro_known()
         template.passwd = self.passwd
         template.auto_mode = self.auto_mode
         return str(template)
 
     test.exposed = True
+    
+    #
+    # Code for reading the localized .ts files from the /data/localization
+    #
+    
 
+    
 
+    def load_localization_file(self, xmlfile):
+        try:
+            #print "path: ", xmlfile
+            dom = parse(xmlfile.encode('utf-8'))
+            #print dom.toxml()
+        except IOError:
+            print "Location: error.html\n"
+            sys.exit()
+        return dom
+    
+    load_localization_file.exposed = True
+    
+    def get_text(self, nodelist):
+        rc = ""
+        for node in nodelist:
+            if node.nodeType == node.TEXT_NODE:
+                rc = rc + node.data
+        return rc
+            
+    get_text.exposed = False
+
+    def parse_elements(self, dom):
+        messages = dom.getElementsByTagName("message")
+        sources = dom.getElementsByTagName("source")
+        translations = dom.getElementsByTagName("translation")
+        translation_list = []
+        source_list = []
+        self.localized_dict = {}
+
+        for translation in translations:
+            translation_list.append(self.get_text(translation.childNodes))
+            #print 'Translation: ', translation_list
+
+        for source in sources:
+            source_list.append(self.get_text(source.childNodes))
+            #print 'Translation: ', source_list
+
+        self.localized_dict = dict(zip(source_list, translation_list))
+        #for key in self.localized_dict:
+            #print "EN:", key, "ES:", self.localized_dict[key]
+
+    parse_elements.exposed = True
+
+    def localized_string(self, string):  #localized_string?string="Some english string"
+        
+        try:
+            #print "utf8 encoded: ", string 
+            in_string = unicode(string).decode('utf-8')
+        except IOError:
+            print "Decoding Error\n"
+            sys.exit()
+            
+        try:
+            #wstring = cstring.decode()
+            #print "utf8 decoded: ", in_string 
+            rstring = unicode(self.localized_dict.get(in_string, 'Localization load error'))
+            #print "Localized string: ", rstring
+            out_string = rstring.encode('utf-8')
+            #print "Out string: ", out_string
+        except IOError:
+            print "Encoding Error\n"
+            sys.exit()
+            
+        return out_string
+
+    localized_string.exposed = True
+
+    #
+    # Code for reading the localized .ts files from the /data/localization
+    #
+    
+    XMLFILE = 'data/localization/hplip_es.ts'
+
+    def load_localization_file(self, xmlfile):
+        try:
+            #print "path: ", xmlfile
+            dom = parse(xmlfile.encode('utf-8'))
+            #print dom.toxml()
+        except IOError:
+            print "Location: error.html\n"
+            sys.exit()
+        return dom
+    
+    load_localization_file.exposed = True
+    
+    def get_text(self, nodelist):
+        rc = ""
+        for node in nodelist:
+            if node.nodeType == node.TEXT_NODE:
+                rc = rc + node.data
+        return rc
+            
+    get_text.exposed = False
+
+    def parse_elements(self, dom):
+        messages = dom.getElementsByTagName("message")
+        sources = dom.getElementsByTagName("source")
+        translations = dom.getElementsByTagName("translation")
+        translation_list = []
+        source_list = []
+        self.localized_dict = {}
+
+        for translation in translations:
+            translation_list.append(self.get_text(translation.childNodes))
+            #print 'Translation: ', translation_list
+
+        for source in sources:
+            source_list.append(self.get_text(source.childNodes))
+            #print 'Translation: ', source_list
+
+        self.localized_dict = dict(zip(source_list, translation_list))
+        #for key in self.localized_dict:
+            #print "EN:", key, "ES:", self.localized_dict[key]
+
+    parse_elements.exposed = True
+
+    def localized_string(self, string):  #localized_string?string="Some english string"
+        
+        try:
+            #print "utf8 encoded: ", string 
+            in_string = unicode(string).decode('utf-8')
+        except IOError:
+            print "Decoding Error\n"
+            sys.exit()
+            
+        try:
+            #wstring = cstring.decode()
+            #print "utf8 decoded: ", wstring 
+            out_string = unicode(self.localized_dict.get(in_string, 'Localization load error')).encode('utf-8')
+            #print "Localized string: ", rstring
+            #out_string = rstring.encode('utf-8')
+            #print "Out string: ", ostring
+        except IOError:
+            print "Encoding Error\n"
+            sys.exit()
+            
+        return out_string
+
+    localized_string.exposed = True
+    
 
     #========================== End of Class =========================
 
 def init():
-    #print("####>>>>init")
     log.info("Server ready.")
-    utils.openURL("http://localhost:8080")
+    utils.openURL("http://localhost:8888")
 
 def start():
-    #print("####>>>>start")
     cherrypy.root = Installer()
+    #cherrypy.root.parse_elements(cherrypy.root.load_localization_file(XMLFILE))
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     log.debug("The current path: %s" % current_dir)
@@ -1489,7 +1372,7 @@ def start():
         'server.log_file_not_found': False,
         'server.show_tracebacks': False,
         'server.log_request_headers': False,
-        'server.socket_port': 8080,
+        'server.socket_port': 8888,
         'server.socket_queue_size': 5,
         'server.protocol_version': 'HTTP/1.0',
         'server.log_to_screen': False,

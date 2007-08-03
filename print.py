@@ -134,13 +134,9 @@ except Error:
     log.error("Unable to connect to HPLIP I/O (hpssd).")
     sys.exit(1)
     
-
-
 # create the main application object
 app = QApplication(sys.argv)
-#loc = utils.loadTranslators(app, prop.user_config_file)
 
-### Load localized strings...begin
 loc = user_cfg.ui.get("loc", "system")
 if loc.lower() == 'system':
     loc = str(QTextCodec.locale())
@@ -156,7 +152,6 @@ if loc.lower() != 'c':
     if loaded:
         app.installTranslator(trans)
     else:
-        #log.error("File failed to load.")
         loc = 'c'
 else:
     loc = 'c'
@@ -165,7 +160,6 @@ if loc == 'c':
     log.debug("Using default 'C' locale")
 else:
     log.debug("Using locale: %s" % loc)
-### Load localized strings...end
 
 printdlg = PrinterForm(sock, bus, device_uri, printer_name, args)
 printdlg.show()

@@ -178,7 +178,10 @@ class ScrollStatusView(ScrollView):
 
         layout38.addLayout(layout12_2,0,3)
 
+        ess = qApp.translate("StringTable", ess)
         essText.setText(ess)
+        
+        esl = qApp.translate("StringTable", esl)
         eslText.setText(esl)
 
         userTextLabel.setText(self.__tr("User:"))
@@ -191,7 +194,7 @@ class ScrollStatusView(ScrollView):
             jobIDText.setText(str(job_id))
 
         codeTextLabel.setText(self.__tr("Code:"))
-        codeText.setText(str(ec))
+        codeText.setText(unicode(ec))
 
         error_state = STATUS_TO_ERROR_STATE_MAP.get(ec, ERROR_STATE_CLEAR)
         
@@ -245,7 +248,7 @@ class ScrollStatusView(ScrollView):
         try:
             i18n_amount = self.num_repr[amount]
         except KeyError:
-            i18n_amount = str(amount)
+            i18n_amount = unicode(amount)
 
         if amount == 1:
             i18n_unit = self.unit_names[unit_name][0]
@@ -256,5 +259,5 @@ class ScrollStatusView(ScrollView):
 
 
     def __tr(self,s,c = None):
-        return qApp.translate("DevMgr4",s,c)
+        return qApp.translate("ScrollStatusView",s,c)
         

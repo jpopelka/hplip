@@ -21,9 +21,9 @@
  Author: Pete Parks
 */ 
 -->
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html>
 <head>
-    <meta name="generator" content="HTML Tidy for Linux (vers 1 September 2005), see www.w3.org" />
+    
     <meta http-equiv="PRAGMA" content="NO-CACHE" />
     <meta http-equiv="EXPIRES" content="Mon, 22 Jul 2002 11:12:01 GMT" />
     <meta http-equiv="Content-Language" content="en-us" />
@@ -42,13 +42,15 @@
     var divID = 'notes_field';
 
     function todoOnLoad() {
-        generateHeader();
+        header = '$header_string'; 
+        subheader = '$sub_header_string'; 
+        generateHeader(header, subheader);
         getContentText(divText, divID);
     };
     -->
     </script>
 
-  <title>HP Linux Imaging and Printing (HPLIP) Installer</title>
+  <title>$installer_title</title>
 </head>
 
 <body onload="todoOnLoad();">
@@ -58,25 +60,21 @@
 <!-- Body Div -->
 <div class="body_content">
 
-    <div id="message_title">
-        <a>Unsupported distro '$distro_name' verion '$distro_version'. Installer cannot continue.</a>
-    </div>
+    <div id="message_title">$error_unsupported_message_title</div>
 
     <div id="message_body">
         <div id="notes_field"></div>
     </div>
 
-    <div id="message_footer">
-        <a>To exit the installer click the 'Quit' button.</a>
-    </div>
+    <div id="message_footer">$error_unsupported_message_footer</div>
 </div>
 
   <div class="button_options">
   
       <div id="quit_button" OnSelectStart='return false;' onClick='todoOnQuit("quit");' >
         <img src="../images/button1.png" width="100" height="35">
-        <div id="quitHiliteText"><a>Quit</a></div>
-        <div id="quitText"><a>Quit</a></div>
+        <div id="quitHiliteText">$quit_button</div>
+        <div id="quitText">$quit_button</div>
       </div>
   
 </body>

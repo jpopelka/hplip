@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '2.0'
+__version__ = '3.0'
 __title__ = 'HPLIP Installer'
 __doc__ = "Installer for HPLIP tarball."
 
@@ -31,15 +31,14 @@ import getopt, os, os.path, sys, time
 # Local
 from base.g import *
 from base import utils
-from installer import core
 
 
 USAGE = [(__doc__, "", "name", True),
          ("Usage: sh ./hplip-install [MODE] [OPTIONS]", "", "summary", True),
          utils.USAGE_SPACE,
          ("[MODE]", "", "header", False),
-         #("Enter browser (web) UI mode:", "-w or --web or --browser", "option", False),
-         ("Run in interactive mode:", "-i or --interactive (Default)", "option", False),
+         #("Enter browser (web) GUI mode:", "-u or --gui or -w or --web or --browser", "option", False),
+         ("Run in interactive (text) mode:", "-t or --text or -i or  --interactive (Default)", "option", False),
          utils.USAGE_SPACE,
          utils.USAGE_OPTIONS,
          ("Automatic mode (chooses the most common options):", "-a or --auto", "option", False),
@@ -62,11 +61,12 @@ log.set_module("hplip-install")
 log.debug("euid = %d" % os.geteuid())
 mode = INTERACTIVE_MODE
 auto = False
+test = False
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'hl:guiaw', 
-        ['help', 'help-rest', 'help-man', 'help-desc',
-        'logging=', 'interactive', 'auto', 'web', 'browser']) 
+    opts, args = getopt.getopt(sys.argv[1:], 'hl:giawutx', 
+        ['help', 'help-rest', 'help-man', 'help-desc', 'gui',
+        'logging=', 'interactive', 'auto', 'web', 'browser', 'text']) 
 
 except getopt.GetoptError:
     usage()
@@ -97,18 +97,21 @@ for o, a in opts:
     elif o == '-g':
         log.set_level('debug')
 
-    elif o in ('-i', '--interactive'):
+    elif o in ('-i', '--interactive', '--text', '-t'):
         mode = INTERACTIVE_MODE
 
     elif o in ('-a', '--auto'):
         auto = True
 
-    elif o in ('-w', '--browser', '--web'):
+    elif o in ('-u', '-w', '--browser', '--web', '--gui'):
         mode = BROWSER_MODE
+        
+    elif o == '-x':
+        test = True
 
 
 log_file = os.path.normpath('./hplip-install_%s.log' % time.strftime("%a-%d-%b-%Y_%H:%M:%S"))
-#print log_file
+
 if os.path.exists(log_file):
     os.remove(log_file)
 
@@ -117,12 +120,10 @@ log.set_where(log.LOG_TO_CONSOLE_AND_FILE)
 
 log.debug("Log file=%s" % log_file)
 
-version_description, version_public, version_internal = core.getHPLIPVersion()
-log.debug("HPLIP Description=%s Public version=%s Internal version = %s"  % 
-    (version_description, version_public, version_internal))
+utils.log_title(__title__, __version__, True)
 
-prop.version = version_public
-utils.log_title(__title__, __version__)
+log.info("Installer log saved in: %s" % log.bold(log_file))
+log.info("")
 
 if mode == BROWSER_MODE:
     from installer import web_install
@@ -132,9 +133,9 @@ if mode == BROWSER_MODE:
 elif mode == INTERACTIVE_MODE:
     from installer import text_install
     log.debug("Starting text installer...")
-    text_install.start(auto)
+    text_install.start(auto, test)
 
 else:
-    log.error("Invalid mode. Please use '-i' or '-w' to select the mode.")
+    log.error("Invalid mode. Please use '-i', '-t', '-u' or '-w' to select the mode.")
     sys.exit(1)
 

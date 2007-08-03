@@ -333,5 +333,5 @@ class ScrollPrintJobView(ScrollView):
         self.fillControls()
 
     def __tr(self,s,c = None):
-        return qApp.translate("DevMgr4",s,c)
+        return qApp.translate("ScrollPrintJobView",s,c)
         

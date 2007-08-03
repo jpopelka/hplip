@@ -31,7 +31,10 @@ from base import utils
 if not os.geteuid() == 0:
     print "You must be root to run this utility."
     sys.exit(1)
+    
+sys.exit(0)
 
+cycle = 0
 for f1 in utils.walkFiles('/sys', recurse=True, abs_paths=True, return_folders=False, pattern='uevent'):
     if 'usb' in f1:
         try:
@@ -40,5 +43,9 @@ for f1 in utils.walkFiles('/sys', recurse=True, abs_paths=True, return_folders=F
             f0.close()
         except IOError:
             pass
+    
+    cycle += 1
+    if cycle > 5000:
+        break
         
 

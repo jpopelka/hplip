@@ -21,9 +21,9 @@
  Author: Pete Parks
 */ 
 -->
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html>
 <head>
-    <meta name="generator" content="HTML Tidy for Linux (vers 1 September 2005), see www.w3.org" />
+    
     <meta http-equiv="Content-Language" content="en-us" />
     <meta http-equiv="content-type" content="text/html; charset=us-ascii" />
     <link rel="stylesheet" type="text/css" href="styles/hplip.css" />
@@ -40,12 +40,14 @@
     var divID = 'notes_field';
 
     function todoOnLoad() {
-        generateHeader();
+        header = '$header_string'; 
+        subheader = '$sub_header_string'; 
+        generateHeader(header, subheader);
         getContentText(divText, divID);
     };
     -->
     </script>
-<title>HP Linux Imaging and Printing (HPLIP) Installer</title>
+<title>$installer_title</title>
 </head>
 
 <body onload="todoOnLoad();">
@@ -54,17 +56,13 @@
 
 <!-- Body Div --> 
 <div class="body_content">
-    <div id="message_title">
-        <a>The following required dependencies are missing or cannot be installed. Please install them and try again.</a>
-    </div>
+    <div id="message_title">$error_required_message_title</div>
 
     <div id="message_body">
         <div id="notes_field"></div>
     </div>
 
-    <div id="message_footer">
-        To exit the installer click the 'Quit' button.
-    </div>
+    <div id="message_footer">$error_required_message_footer</div>
 </div>
 
 <!-- Buttons Div --> 
@@ -72,14 +70,14 @@
 
     <div id="quit_button" OnSelectStart='return false;' onClick='todoOnQuit("quit");' >
         <img src="../images/button1.png" width="100" height="35">
-        <div id="quitHiliteText"><a>Quit</a></div>
-        <div id="quitText"><a>Quit</a></div>
+        <div id="quitHiliteText">$quit_button</div>
+        <div id="quitText">$quit_button</div>
     </div>
 
     <div id="next_button" OnSelectStart='return false;' onClick='indexClickActions( "next_button", "previous");' >
         <img src="../images/button1.png" width="100" height="35">
-        <div id="previousHiliteText"><a>Previous</a></div>
-        <div id="previousText"><a>Previous</a></div>
+        <div id="previousHiliteText">$previous_button</div>
+        <div id="previousText">$previous_button</div>
     </div>
 </div>
 </body>

@@ -116,7 +116,7 @@ class FaxSendJobForm(QMainWindow):
                 self.init_failed = True
 
             elif x == 1:
-                log.info(utils.bold("Using device: %s" % devices[0][0]))
+                log.info(log.bold("Using device: %s" % devices[0][0]))
                 self.device_uri = devices[0][0]
 
             else:
