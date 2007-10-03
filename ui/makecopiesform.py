@@ -18,13 +18,16 @@
 #
 # Authors: Don Welch
 
-#import os, Queue
+# Std Lib
+import operator
 
+# Local
 from base.g import *
 from prnt import cups
 from base import device, utils, pml, service
 from copier import copier
 
+# Qt
 from qt import *
 from scrollcopy import ScrollCopyView
 
@@ -65,7 +68,7 @@ class MakeCopiesForm(QMainWindow):
         log.debug(self.cups_printers)
 
         if not self.cur_deviceice_uri and not self.printer_name:
-            t = device.probeDevices(bus=bus, filter='copy')
+            t = device.probeDevices(bus=bus, filter={'copy-type': (operator.gt, 0)})
             probed_devices = []
 
             for d in t:

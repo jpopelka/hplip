@@ -259,7 +259,7 @@
                     <cstring>textLabel1_5</cstring>
                 </property>
                 <property name="text">
-                    <string>Please chose the PPD file (by name and description) that most closely matches your printer. &lt;i&gt;Note: The model name of the printer may vary somehwat from the PPD file name, for example, a Deskjet 5550 may have a PPD file with the model name of Deskjet_5500_series.&lt;/i&gt;</string>
+                    <string>Please chose the PPD file (by name and description) that most closely matches your printer. &lt;i&gt;Note: The model name of the printer may vary somewhat from the PPD file name, for example, a Deskjet 5550 may have a PPD file with the model name of Deskjet_5500_series.&lt;/i&gt;</string>
                 </property>
                 <property name="alignment">
                     <set>WordBreak|AlignVCenter</set>

@@ -45,7 +45,6 @@
 # udev_mode_fix=True|False [TYPE_BOOL]
 # ppd_dir=<ppd dir> [TYPE_BOOL]
 # fix_ppd_symlink=True|False [TYPE_BOOL]
-# mdk_usb_fix=True|False [TYPE_BOOL]
 # usermod_params=<params for usermod command, w/o user name(s). e.g. '-Glp' (default)>
 # 
 # # Version data overrides distro data if present.
@@ -59,7 +58,6 @@
 # udev_mode_fix=True|False [TYPE_BOOL]
 # ppd_dir=<ppd dir> [TYPE_STRING]
 # fix_ppd_symlink=True|False [TYPE_BOOL]
-# mdk_usb_fix=True|False [TYPE_BOOL]
 # usermod_params=<params for usermod command, w/o user name(s). e.g. '-Glp' (default)>
 # 
 # # Only include these sections if supported==True for this <distro name>:<version name>.
@@ -70,7 +68,20 @@
 # ****************************************
 
 [distros]
-distros=mepis,debian,suse,mandriva,fedora,redhat,rhel,slackware,gentoo,turbo,redflag,ubuntu,xandros,freebsd,linspire,ark,pclinuxos,asianux,pcbsd,sunwah,miracle,xteam,centos,cocreate,haansoft,neoshine,darwin,openbsd,netbsd,dragonflybsd,igos,freespire
+distros=unknown,mepis,debian,suse,mandriva,fedora,redhat,rhel,slackware,gentoo,turbo,redflag,ubuntu,xandros,freebsd,linspire,ark,pclinuxos,asianux,pcbsd,sunwah,miracle,xteam,centos,cocreate,haansoft,neoshine,darwin,openbsd,netbsd,dragonflybsd,igos,freespire
+
+# ****************************************
+
+[unknown]
+index=0
+display_name=Unknown
+versions=0
+display=False
+package_mgrs=
+su_sudo=
+
+[unknown:0]
+supported=False
 
 # ****************************************
 
@@ -92,7 +103,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=/usr/share/cups/model/manufacturer-PPDs/hp
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=-Glp
 
 
@@ -371,7 +381,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=
 
 
@@ -409,7 +418,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=
 
 
@@ -440,7 +448,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=
 
 
@@ -471,7 +478,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=
 
 
@@ -502,7 +508,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=
 
 
@@ -533,7 +538,6 @@ ppd_install=xml
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=-Glp
 
 
@@ -547,7 +551,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ********************
@@ -560,8 +563,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
-
 
 # ********************
 [fedora:3.0]
@@ -573,7 +574,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [fedora:3.0:cups]
 packages=cups
@@ -654,7 +654,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [fedora:4.0:cups]
 packages=cups
@@ -734,7 +733,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [fedora:5:cups]
 packages=cups
@@ -814,7 +812,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [fedora:5.0:cups]
 packages=cups
@@ -895,7 +892,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [fedora:5.92:cups]
 packages=cups
@@ -975,7 +971,6 @@ notes=
 ppd_install=xml
 udev_mode_fix=True
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [fedora:6:cups]
 packages=cups
@@ -1055,7 +1050,6 @@ notes=
 ppd_install=xml
 udev_mode_fix=True
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [fedora:6.0:cups]
 packages=cups
@@ -1134,7 +1128,6 @@ notes=
 ppd_install=xml
 udev_mode_fix=True
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [fedora:7.0:cups]
 packages=cups
@@ -1224,7 +1217,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=
 
 
@@ -1238,7 +1230,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ****************************************
@@ -1260,7 +1251,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=
 
 
@@ -1274,7 +1264,6 @@ ppd_install=xml
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ********************
@@ -1287,7 +1276,6 @@ ppd_install=xml
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ****************************************
@@ -1309,7 +1297,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=
 
 
@@ -1323,7 +1310,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ********************
@@ -1336,7 +1322,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ********************
@@ -1349,7 +1334,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ********************
@@ -1362,7 +1346,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ********************
@@ -1375,7 +1358,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ****************************************
@@ -1397,7 +1379,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=
 
 
@@ -1411,7 +1392,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ****************************************
@@ -1433,7 +1413,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=
 
 
@@ -1447,7 +1426,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ****************************************
@@ -1470,7 +1448,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=True
 usermod_params=
 
 
@@ -1484,7 +1461,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [pclinuxos:2006.0:cups]
 packages=libcups2
@@ -1565,7 +1541,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [pclinuxos:2007.0:cups]
 packages=libcups2
@@ -1655,7 +1630,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=
 
 # ********************
@@ -1668,7 +1642,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [igos:1.0:cups]
 packages=cups
@@ -1758,7 +1731,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=-a -Glp
 
 
@@ -1772,7 +1744,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [ubuntu:5.04:cups]
 packages=libcupsys
@@ -1853,7 +1824,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=True
-mdk_usb_fix=False
 
 [ubuntu:5.1:cups]
 packages=libcupsys
@@ -1934,7 +1904,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=True
-mdk_usb_fix=False
 
 [ubuntu:6.06:cups]
 packages=libcupsys2
@@ -2015,7 +1984,6 @@ ppd_install=xml
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=True
-mdk_usb_fix=False
 
 [ubuntu:6.10:cups]
 packages=libcupsys2
@@ -2096,7 +2064,6 @@ ppd_install=xml
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=True
-mdk_usb_fix=False
 
 [ubuntu:7.04:cups]
 packages=libcupsys2
@@ -2177,7 +2144,6 @@ ppd_install=xml
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [ubuntu:7.10:cups]
 packages=libcupsys2
@@ -2267,7 +2233,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=-a -Glp
 
 
@@ -2279,7 +2244,6 @@ release_date=2000-8-15
 notes=
 udev_mode_fix=True
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [debian:2.2:cups]
 packages=cupsys,cupsys-client
@@ -2358,7 +2322,6 @@ release_date=2002-7-19
 notes=
 udev_mode_fix=True
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [debian:3.0:cups]
 packages=cupsys,cupsys-client
@@ -2437,7 +2400,6 @@ release_date=2005-6-6
 notes=
 udev_mode_fix=True
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [debian:3.1:cups]
 packages=cupsys,cupsys-client
@@ -2516,7 +2478,6 @@ notes=
 ppd_install=ppd
 udev_mode_fix=True
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [debian:4.0:cups]
 packages=cupsys,cupsys-client
@@ -2596,7 +2557,6 @@ notes=
 ppd_install=ppd
 udev_mode_fix=True
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [debian:4.0r0:cups]
 packages=cupsys,cupsys-client
@@ -2686,7 +2646,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=
 
 
@@ -2700,7 +2659,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ****************************************
@@ -2722,7 +2680,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=
 
 
@@ -2736,7 +2693,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ****************************************
@@ -2758,7 +2714,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=
 
 
@@ -2772,7 +2727,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ****************************************
@@ -2794,7 +2748,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=
 
 
@@ -2808,7 +2761,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ****************************************
@@ -2830,7 +2782,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=
 
 
@@ -2844,7 +2795,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ****************************************
@@ -2866,7 +2816,6 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=False
-mdk_usb_fix=False
 usermod_params=
 
 
@@ -2878,7 +2827,8 @@ release_date=2006-07-22
 notes=Before proceeding please enable the universe/multiverse repositories in Synaptic or Apt.
 udev_mode_fix=True
 fix_ppd_symlink=False
-mdk_usb_fix=False
+ppd_install=ppd
+ppd_dir=/usr/share/ppd/hpijs/HP
 
 [mepis:6.0:cups]
 packages=libcupsys2
@@ -2957,7 +2907,8 @@ release_date=2006-4-4
 notes=Before proceeding please enable the universe/multiverse repositories in Synaptic or Apt.
 udev_mode_fix=True
 fix_ppd_symlink=False
-mdk_usb_fix=False
+ppd_install=ppd
+ppd_dir=/usr/share/cups/model/HP
 
 [mepis:6.5:cups]
 packages=libcupsys2
@@ -3047,7 +2998,6 @@ su_sudo=su
 ppd_install=xml
 udev_mode_fix=True
 fix_ppd_symlink=False
-mdk_usb_fix=True
 usermod_params=
 
 
@@ -3061,7 +3011,6 @@ ppd_install=xml
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ********************
@@ -3074,7 +3023,6 @@ ppd_install=xml
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ********************
@@ -3087,7 +3035,6 @@ ppd_install=xml
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ********************
@@ -3100,7 +3047,6 @@ ppd_install=xml
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ********************
@@ -3113,7 +3059,6 @@ ppd_install=xml
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 
 # ********************
@@ -3125,7 +3070,6 @@ notes=Before proceeding, please add the "contrib", "main", and "updates" install
 ppd_install=xml
 udev_mode_fix=True
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [mandriva:2006.0:cups]
 packages=cups
@@ -3205,7 +3149,6 @@ notes=Before proceeding, please add the "contrib", "main", and "updates" install
 ppd_install=xml
 udev_mode_fix=True
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [mandriva:2007.0:cups]
 packages=cups
@@ -3283,7 +3226,6 @@ notes=Before proceeding, please add the "contrib", "main", and "updates" install
 ppd_install=xml
 udev_mode_fix=True
 fix_ppd_symlink=False
-mdk_usb_fix=False
 
 [mandriva:2007.1:cups]
 packages=cups

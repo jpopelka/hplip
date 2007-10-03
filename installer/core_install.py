@@ -22,6 +22,7 @@
 # Std Lib
 import sys, os, os.path, re, time
 import cStringIO, grp, pwd
+import urllib, sha, tarfile
 
 # Local
 from base.g import *
@@ -41,6 +42,8 @@ TYPE_LIST=2
 TYPE_BOOL=3
 TYPE_INT = 4
 
+PING_TARGET = "www.google.com"
+HTTP_GET_TARGET = "http://www.google.com"
 
 try:
     from functools import update_wrapper
@@ -69,7 +72,6 @@ class CoreInstall(object):
         self.ui_mode = ui_mode
         self.password = ''
         self.version_description, self.version_public, self.version_internal = '', '', ''
-        self.hpijs_version_description, self.hpijs_version = '', ''
         self.bitness = 32
         self.endian = utils.LITTLE_ENDIAN
         self.distro, self.distro_name, self.distro_version = DISTRO_UNKNOWN, '', DISTRO_VER_UNKNOWN
@@ -82,6 +84,9 @@ class CoreInstall(object):
         self.hpijs_build = False
         self.ppd_dir = None
         self.distros = {}
+        self.plugin_path = os.path.join(prop.home_dir, "data", "plugins")
+        self.logoff_required = False
+        self.restart_required = False
 
         self.FIELD_TYPES = {
             'distros' : TYPE_LIST,
@@ -103,7 +108,6 @@ class CoreInstall(object):
             'udev_mode_fix': TYPE_BOOL,
             'ppd_dir': TYPE_STRING,
             'fix_ppd_symlink': TYPE_BOOL,
-            'mdk_usb_fix': TYPE_BOOL,
             'code_name': TYPE_STRING,
             'supported': TYPE_BOOL,
             'release_date': TYPE_STRING,
@@ -210,10 +214,7 @@ class CoreInstall(object):
         for d in self.distros:
             update_spinner()
 
-            if callback is not None:
-                callback("%s\n" % d)
-
-            for a in self.distros[d]['package_mgrs']:
+            for a in self.distros[d].get('package_mgrs', []):
                 if a and a not in self.package_mgrs:
                     self.package_mgrs.append(a)
 
@@ -257,7 +258,7 @@ class CoreInstall(object):
         log.debug("Endian = %d" % self.endian)
 
         update_spinner()
-
+        
         self.distro_name = self.distros_index[self.distro]
         self.distro_version_supported = self.get_distro_ver_data('supported', False)
 
@@ -328,26 +329,25 @@ class CoreInstall(object):
 
     def run(self, cmd, callback=None):
         output = cStringIO.StringIO()
-
+        
         try:
             child = pexpect.spawn(cmd, timeout=1)
         except pexpect.ExceptionPexpect:
             return 1, ''
-
+        
         try:
             while True:
                 update_spinner()
                 i = child.expect(["[pP]assword:|password for", pexpect.EOF, pexpect.TIMEOUT])
-
                 cb = child.before
                 if cb:
                     log.log_to_file(cb)
                     output.write(cb)
 
                     if callback is not None:
-                        if callback(child.before): # cancel
+                        if callback(cb): # cancel
                             break
-
+                
                 if i == 0: # Password:
                     child.sendline(self.password)
 
@@ -356,7 +356,7 @@ class CoreInstall(object):
 
                 elif i == 2: # TIMEOUT
                     continue
-
+                
         except Exception:
             log.exception()
             cleanup_spinner()
@@ -368,7 +368,6 @@ class CoreInstall(object):
             child.close()
         except OSError:
             pass
-
         return child.exitstatus, output.getvalue()
 
 
@@ -407,42 +406,41 @@ class CoreInstall(object):
             except IOError:
                 # Some O/Ss don't have /etc/issue (Mac)
                 self.distro, self.distro_version = DISTRO_UNKNOWN, '0.0'
-
-            found = False
-            for d in self.distros:
-                if name.find(d) > -1:
-                    self.distro = self.distros[d]['index']
-                    found = True
-                else:
-                    for x in self.distros[d].get('alt_names', ''):
-                        if x and name.find(x) > -1:
-                            self.distro = self.distros[d]['index']
-                            found = True
-                            break
-
-                if found:
-                    break
-
-            if found:
-                for n in name.split(): 
-                    if '.' in n:
-                        m = '.'.join(n.split('.')[:2])
+            else:
+                for d in self.distros:
+                    if name.find(d) > -1:
+                        self.distro = self.distros[d]['index']
+                        found = True
                     else:
-                        m = n
-
-                    try:
-                        self.distro_version = str(float(m))
-                    except ValueError:
+                        for x in self.distros[d].get('alt_names', ''):
+                            if x and name.find(x) > -1:
+                                self.distro = self.distros[d]['index']
+                                found = True
+                                break
+    
+                    if found:
+                        break
+    
+                if found:
+                    for n in name.split(): 
+                        if '.' in n:
+                            m = '.'.join(n.split('.')[:2])
+                        else:
+                            m = n
+    
                         try:
-                            self.distro_version = str(int(m))
+                            self.distro_version = str(float(m))
                         except ValueError:
-                            self.distro_version = '0.0'
+                            try:
+                                self.distro_version = str(int(m))
+                            except ValueError:
+                                self.distro_version = '0.0'
+                            else:
+                                break
                         else:
                             break
-                    else:
-                        break
-
-                log.debug("/etc/issue: %s %s" % (name, self.distro_version))
+    
+                    log.debug("/etc/issue: %s %s" % (name, self.distro_version))
 
         log.debug("distro=%d, distro_version=%s" % (self.distro, self.distro_version))
 
@@ -732,9 +730,12 @@ class CoreInstall(object):
 
 
         else: # MODE_CHECK
-            self.version_description, self.version_public, self.version_internal = \
-                '', sys_cfg.configure['internal-tag'], sys_cfg.hplip.version
-
+            try:
+                self.version_description, self.version_public, self.version_internal = \
+                    '', sys_cfg.configure['internal-tag'], sys_cfg.hplip.version
+            except KeyError:
+                self.version_description, self.version_public, self.version_internal = '', '', ''
+                
         return self.version_description, self.version_public, self.version_internal            
 
     def configure(self): 
@@ -807,7 +808,7 @@ class CoreInstall(object):
         self.run(cmd)
 
     def stop_hplip(self):
-        return su_sudo() % "/etc/init.d/hplip stop"
+        return self.su_sudo() % "/etc/init.d/hplip stop"
 
     def su_sudo(self):
         if os.geteuid() == 0:
@@ -914,14 +915,14 @@ class CoreInstall(object):
                         yield d, self.dependencies[d][2], opt
                         # depend, desc, option
 
-    def missing_optional_dependencies(self):                    
+    def missing_optional_dependencies(self):
         for opt in self.components[self.selected_component][1]:
             if not self.options[opt][0]: # not required
                 if self.selected_options[opt]: # only for options that are ON
                     for d in self.options[opt][2]: # dependencies
                         if not self.have_dependencies[d]: # missing dependency
                             log.debug("Missing optional dependency: %s" % d)
-                            yield d, self.dependencies[d][2], self.dependencies[d][0], opt       
+                            yield d, self.dependencies[d][2], self.dependencies[d][0], opt
                             # depend, desc, required_for_opt, opt
 
 
@@ -940,16 +941,42 @@ class CoreInstall(object):
 
         return num_opt_missing
 
+    
     def check_network_connection(self):
-        ping = utils.which("ping")
+        ok = False
 
-        if ping:
-            ping = os.path.join(ping, "ping")
-            status, output = self.run(ping + " -c3 www.google.com")
-
-            return status == 0
-
-        return False
+        wget = utils.which("wget")
+        if wget:
+            wget = os.path.join(wget, "wget")
+            cmd = "%s --timeout=5 %s" % (wget, HTTP_GET_TARGET)
+            log.debug(cmd)
+            status, output = self.run(cmd)
+            log.debug("wget returned: %d" % status)
+            ok = (status == 0)
+                
+        else:
+            curl = utils.which("curl")
+            if curl:
+                curl = os.path.join(curl, "curl")
+                cmd = "%s --connect-timeout 3 --max-time 5 %s" % (curl, HTTP_GET_TARGET)
+                log.debug(cmd)
+                status, output = self.run(cmd)
+                log.debug("curl returned: %d" % status)
+                ok = (status == 0)
+                
+            else:
+                ping = utils.which("ping")
+        
+                if ping:
+                    ping = os.path.join(ping, "ping")
+                    cmd = "%s -c1 -W1 -w5 %s" % (ping, PING_TARGET)
+                    log.debug(cmd)
+                    status, output = self.run(cmd)
+                    log.debug("ping returned: %d" % status)
+                    ok = (status == 0)
+            
+        return ok
+        
 
     def run_pre_install(self, callback=None):
         pre_cmd = self.get_distro_ver_data('pre_install_cmd')
@@ -1005,120 +1032,57 @@ class CoreInstall(object):
                 x += 1
 
 
-    def run_pre_build(self, callback=None):
-        # Remove the link /usr/share/foomatic/db/source/PPD if the symlink is corrupt (Dapper only?)
+    def pre_build(self):
+        cmds = []
         if self.get_distro_ver_data('fix_ppd_symlink', False):
-            cmd = self.su_sudo() % 'python ./installer/fix_symlink.py'
+            cmds.append(self.su_sudo() % 'python ./installer/fix_symlink.py')
+            
+        return cmds
+    
+    def run_pre_build(self, callback=None):
+        x = 1
+        for cmd in self.pre_build():
             status, output = self.run(cmd)
             if callback is not None:
-                callback(cmd, "Fix PPD symlink")
-        else:
-            if callback is not None:
-                callback()
+                callback(cmd, "Pre-build step %d"  % x)
+            
+            x += 1
+             
+            
+        # Remove the link /usr/share/foomatic/db/source/PPD if the symlink is corrupt (Dapper only?)
+##        if self.get_distro_ver_data('fix_ppd_symlink', False):
+##            cmd = self.su_sudo() % 'python ./installer/fix_symlink.py'
+##            status, output = self.run(cmd)
+##            if callback is not None:
+##                callback(cmd, "Fix PPD symlink")
+##        else:
+##            if callback is not None:
+##                callback()
 
 
+        
+    
     def run_post_build(self, callback=None):
+        x = 1
+        for cmd in self.post_build():
+            status, output = self.run(cmd)
+            if callback is not None:
+                callback(cmd, "Post-build step %d"  % x)
+            
+            x += 1
+
+    
+    def post_build(self):
+        cmds = []
         self.logoff_required = False
-        self.restart_required = False
-        trigger_required = False
+        self.restart_required = True
+        trigger_required = True
 
-        if callback is not None:
-            callback("", "Checking for 'lp' group membership...")
-
-        all_groups = grp.getgrall()
-        for g in all_groups:
-            name, pw, gid, members = g
-            log.debug("group=%s gid=%d" % (name, gid))
-
-        usermod_params = self.get_distro_ver_data('usermod_params', '-Glp')
-        if not usermod_params:
-            usermod_params = '-Glp'
-
-        usermod = utils.which('usermod')
-        if usermod:
-            usermod = os.path.join(usermod, 'usermod')
-
-            users = {}
-            for p in pwd.getpwall():
-                user, pw, uid, gid, name, home, ci = p
-                log.debug("user=%s uid=%d gid=%d" % (user, uid, gid))
-
-                if 500 <= uid <= 10000:
-                    log.debug("Checking user %s..." % user)
-                    grps = []
-
-                    for g in all_groups:
-                        grp_name, pw, gid, members = g
-                        if user in members:
-                            grps.append(grp_name)
-
-                    log.debug("Member of groups: %s" % ', '.join(grps))
-                    users[user] = ('lp' in grps)
-
-            user_list = users.keys()
-            log.debug("User list: %s" % ','.join(user_list))
-
-            if len(user_list) == 1 and users[user_list[0]]:
-                log.debug("1 user (%s) and in 'lp' group. No action needed." % users[user_list[0]])
-                if callback is not None:
-                    callback("", "User is already in 'lp' group.")
-
-            elif len(user_list) == 1 and not users[user_list[0]]:
-                log.debug("1 user (%s) and NOT in 'lp' group. Adding user to 'lp' group..." % user_list[0])
-                if callback is not None:
-                    callback("", "Adding user '%s' to 'lp' group..." % user_list[0])
-
-                cmd = "%s %s %s" % (usermod, usermod_params, user_list[0])
-                cmd = self.su_sudo() % cmd
-                log.debug("Running: %s" % cmd)
-                status, output = self.run(cmd)
-                self.logoff_required = True
-
-            else:
-                if callback is not None:
-                    callback("", "In order for USB I/O to function, each user that will access the device must be a member of the 'lp' group")
-
-                for u in users:
-                    if not users[u]:
-                        cmd = "%s %s %s" % (usermod, usermod_params, u)
-                        cmd = self.su_sudo() % cmd
-                        log.debug("Running: %s" % cmd)
-                        status, output = self.run(cmd)
-
-                        if callback is not None:
-                            callback("", "Adding user '%s' to 'lp' group..." % u)
-
-                        if u == prop.username:
-                            self.logoff_required = True
-
-        else:
-            log.error("Could not locate 'usermod' command. Please make sure all printer users are members of the 'lp' group.")
-
-        # Fix any udev device nodes that aren't 066x
-        udev_mode_fix = self.get_distro_ver_data('udev_mode_fix', False)
-        if udev_mode_fix:
-            cmd = self.su_sudo() % 'python ./installer/permissions.py'
-            log.debug("Running USB permissions utility: %s" % cmd)
-            status, output = self.run(cmd)
-            trigger_required = True
-            if callback is not None:
-                callback(cmd, "USB permissions utility")
-
-        # Fix some USB issues on Mandriva and PCLinuxOS
-        mdk_usb_fix = self.get_distro_ver_data('mdk_usb_fix', False)
-        if mdk_usb_fix:
-            cmd = self.su_sudo() % "python ./installer/mdk_usb_fix.py"
-            log.debug("Running mdk usb fix utility: %s" % cmd)
-            status, output = self.run(cmd)
-            trigger_required = True
-            if callback is not None:
-                callback(cmd, "Mandriva USB fix utility")
-
-        # Trigger USB devices so that the new mode will take effect 
-        if trigger_required:
-            #self.logoff_required = True # Temp hack...
-            self.restart_required = True
-            # TODO: Fix trigger utility!
+##        # Trigger USB devices so that the new .rules will take effect 
+##        if trigger_required:
+##            #self.logoff_required = True # Temp hack...
+##            self.restart_required = True
+##            # TODO: Fix trigger utility!
 ##            cmd = self.su_sudo() % 'python ./installer/trigger.py'
 ##            log.debug("Running USB trigger utility: %s" % cmd)
 ##            status, output = self.run(cmd)
@@ -1127,23 +1091,27 @@ class CoreInstall(object):
 
 
         # Restart CUPS if necessary
-        if self.cups11 or mdk_usb_fix:
-            cmd = self.restart_cups()
-            status, output = self.run(cmd)
-            if callback is not None:
-                callback(cmd, "Restart CUPS")
+        if self.cups11: # or mdk_usb_fix:
+            cmds.append(self.restart_cups())
 
         # Kill any running hpssd.py instance from a previous install
         if self.check_hpssd():
             pid = get_ps_pid('hpssd')
-            try:
-                os.kill(pid, 9)
-                status = 0
-            except OSError:
-                status = 1
+            if pid:
+                kill = os.path.join(utils.which("kill"), "kill") + " %d" % pid
+                
+                cmds.append(self.su_sudo() % kill)
+            
+##            try:
+##                os.kill(pid, 9)
+##                status = 0
+##            except OSError:
+##                status = 1
+##
+##            if callback is not None:
+##                callback("", "Stopping hpssd")
 
-            if callback is not None:
-                callback("", "Stopping hpssd")
+        return cmds
 
     def logoff(self):
         ok = False
@@ -1173,15 +1141,8 @@ class CoreInstall(object):
         return os.getenv('DISPLAY') and self.selected_options['gui'] and utils.checkPyQtImport()
 
     def run_hp_setup(self):
-        if self.check_for_gui_support():
-            if utils.which('kdesu'):
-                su_sudo = 'kdesu -- "%s"'
-
-            elif utils.which('gksu'):
-                su_sudo = 'gksu "%s"'
-
-            else:
-                su_sudo = self.su_sudo()
+        if self.selected_options['gui'] and self.check_for_gui_support():
+            su_sudo = self.su_sudo()
 
             if utils.which('hp-setup'):
                 c = 'hp-setup -u --username=%s' % prop.username
@@ -1191,15 +1152,15 @@ class CoreInstall(object):
                 cmd = su_sudo % c
 
             log.debug(cmd)
-            status, output = self.run(cmd)   
+            status, output = self.run(cmd)
 
         else:
             hpsetup = utils.which("hp-setup")
 
             if hpsetup:
-                cmd = "hp-setup %s" % param
+                cmd = "hp-setup -i"
             else:
-                cmd = "python ./setup.py %s" % param
+                cmd = "python ./setup.py -i"
 
             cmd = self.su_sudo() % cmd
             status, output = self.run(cmd)
@@ -1255,12 +1216,13 @@ class CoreInstall(object):
 
     def check_password(self, password_entry_callback, callback=None):
         self.clear_su_sudo_password()
-
         x = 1
         while True:
             self.password = password_entry_callback()
             cmd = self.su_sudo() % "true"
+
             log.debug(cmd)
+
             status, output = self.run(cmd)
 
             log.debug(status)
@@ -1279,9 +1241,164 @@ class CoreInstall(object):
             if x > 3:
                 return False
 
-
     def clear_su_sudo_password(self):
         if self.su_sudo_str() == 'sudo':
             log.debug("Clearing password...")
             self.run("sudo -K")
 
+    # PLUGIN SUPPORT
+    
+    def get_plugin_info(self, model):
+        ok, url, size, checksum, timestamp = False, '', 0, 0, 0.0
+        
+        if self.check_network_connection():
+            filename, headers = urllib.urlretrieve("http://hplip.sf.net/plugins.conf")
+            
+            g, conf = utils.make_temp_file()
+            
+            f = file(filename, 'r')
+            t = f.read()
+            log.debug_block("plugins.conf", t)
+            os.write(g, t)
+            f.close()
+            
+            plugin_cfg = Config(conf, True)
+            
+            try:
+                url = plugin_cfg[model]['url']
+                size = int(plugin_cfg[model]['size'])
+                checksum = plugin_cfg[model]['checksum']
+                timestamp = float(plugin_cfg[model]['timestamp'])
+                ok = True
+            except KeyError:
+                pass
+        else:
+            log.error("No network connection detected. Cannot download required plugin.")
+        
+        return url, size, checksum, timestamp, ok
+        
+    def download_plugin(self, model, url, size, checksum, timestamp):
+        log.debug("Downloading %s.plugin from %s" % (model, url))
+        
+        if not os.path.exists(self.plugin_path):
+            try:
+                log.debug("Creating plugin directory: %s" % self.plugin_path)
+                os.makedirs(self.plugin_path)
+            except (OSError, IOError), e:
+                log.error("Unable to create directory: %s" % e.strerror)
+                return False
+            
+        plugin_file = os.path.join(self.plugin_path, model+".plugin")
+        filename, headers = urllib.urlretrieve(url, plugin_file)
+        calc_checksum = sha.new(file(plugin_file, 'r').read()).hexdigest()
+        log.debug("D/L file checksum=%s" % calc_checksum)
+        
+        #if calc_checksum == checksum:
+        #    log.debug("D/L OK")
+        #    return True, plugin_file
+        
+        #log.error("D/L failed (checksum error).")
+        #return False, ''
+        return True, plugin_file
+        
+        
+    def copy_plugin(self, model, src):
+        plugin_file = os.path.join(self.plugin_path, model+".plugin")
+        
+        if not os.path.exists(self.plugin_path):
+            try:
+                log.debug("Creating plugin directory: %s" % self.plugin_path)
+                os.makedirs(self.plugin_path)
+            except (OSError, IOError), e:
+                log.error("Unable to create directory: %s" % e.strerror)
+                return False
+        
+        import shutil
+        try:
+            log.debug("Copying plugin from %s to %s" % (src, plugin_file))
+            shutil.copyfile(src, plugin_file)
+        except (OSError, IOError), e:
+            log.error("Copy failed: %s" % e.strerror)
+            return False
+    
+        return True
+        
+    def install_plugin(self, model, plugin_lib):
+        log.debug("Installing %s.plugin to %s..." % (model, self.plugin_path))
+        ok = False
+        plugin_file = os.path.join(self.plugin_path, model+".plugin")
+        ppd_path = sys_cfg.dirs.ppd
+        rules_path = '/etc/udev/rules.d'
+        
+        if not os.path.exists(rules_path):
+            log.error("Rules path %s does not exist!" % rules_path)
+        
+        firmware_path = os.path.join(prop.home_dir, "data", "firmware")
+        if not os.path.exists(firmware_path):
+            try:
+                log.debug("Creating plugin directory: %s" % firmware_path)
+                os.makedirs(firmware_path)
+            except (OSError, IOError), e:
+                log.error("Unable to create directory: %s" % e.strerror)
+            
+        lib_path = os.path.join(prop.home_dir, "prnt", "plugins")
+        if not os.path.exists(lib_path):
+            try:
+                log.debug("Creating plugin directory: %s" % lib_path)
+                os.makedirs(lib_path)
+            except (OSError, IOError), e:
+                log.error("Unable to create directory: %s" % e.strerror)
+            
+        tar = tarfile.open(plugin_file, "r:gz")
+        for tarinfo in tar:
+            name = tarinfo.name
+            if name.endswith('.fw') or name.endswith('.fw.gz'):
+                # firmware file
+                log.debug("Extracting fw file %s to %s" % (name, firmware_path))
+                tar.extract(tarinfo, firmware_path)
+            
+            elif name.endswith('.ppd') or name.endswith('.ppd.gz'):
+                # PPD file
+                log.debug("Extracting ppd file %s to %s" % (name, ppd_path))
+                tar.extract(tarinfo, ppd_path,)
+                
+            elif name.endswith('.so'):
+                # Library file(s)
+                log.debug("Extracting library file %s to %s" % (name, lib_path))
+                tar.extract(tarinfo, lib_path)
+                
+            elif name.endswith('.rules'):
+                # .rules file
+                log.debug("Extracting .rules file %s to %s" % (name, rules_path))
+                tar.extract(tarinfo, rules_path)
+                
+            else:
+                log.debug("Skipping file: %s" % name)
+                
+                
+        tar.close()
+        
+        self.bitness = utils.getBitness()
+        self.processor = utils.getProcessor()
+        
+        link_file = os.path.join(lib_path, '%s.so' % plugin_lib)
+        
+        if self.processor == 'power_macintosh':
+            trg_file = os.path.join(lib_path,'%s-ppc.so' % plugin_lib)
+        else:
+            trg_file = os.path.join(lib_path,"%s-x86_%s.so" % (plugin_lib, self.bitness))
+            
+        try:
+            log.debug("Creating link: %s -> %s" % (link_file, trg_file))
+            os.symlink(trg_file, link_file)
+        except (OSError, IOError), e:
+            log.error("Unable to create symlink: %s" % e.strerror)
+        
+        return True
+        
+    def check_for_plugin(self, model): 
+        plugin_file = os.path.join(self.plugin_path, model+".plugin")
+        # TODO: Check for each file of the plugin is installed?
+        return os.path.exists(plugin_file)
+        
+        

@@ -306,7 +306,7 @@ static int write_phoenix_setup(file_descriptor *pfd)
 
    if (pfd->hd == NULL)
    {
-      BUG("invalid wirte_phoenix_setup state\n");
+      BUG("invalid write_phoenix_setup state\n");
       goto bugout;
    }
 

@@ -19,12 +19,16 @@
 # Author: Don Welch
 #
 
+# Std Lib
+import os, os.path
+import operator
+
+# Local
 from base.g import *
 from base import utils, device
 from prnt import cups
 
-import os, os.path
-
+# Qt
 from qt import *
 from scrollunload import ScrollUnloadView
 
@@ -56,7 +60,7 @@ class UnloadForm(QMainWindow):
             self.device_uri, self.printer_name = None, None
 
         if not self.device_uri and not self.printer_name:
-            probed_devices = device.probeDevices(bus=bus, filter='pcard')
+            probed_devices = device.probeDevices(bus=bus, filter={'pcard-type': (operator.eq, 1)})
             cups_printers = cups.getPrinters()
             log.debug(probed_devices)
             log.debug(cups_printers)

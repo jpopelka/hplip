@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '3.0'
+__version__ = '3.1'
 __title__ = 'Photo Card Access Utility'
 __doc__ = "Access inserted photo cards on supported HPLIP printers. This provides an alternative for older devices that do not support USB mass storage or for access to photo cards over a network."
 
@@ -34,6 +34,7 @@ import readline
 import time
 import fnmatch
 import string
+import operator
 
 # Local
 from base.g import *
@@ -609,7 +610,8 @@ try:
                                ['printer=', 'device=', 'help', 'help-rest', 'help-man',
                                 'bus=', 'logging=', 'interactive', 'gui', 'non-interactive',
                                 'output=', 'help-desc'])
-except getopt.GetoptError:
+except getopt.GetoptError, e:
+    log.error(e.msg)
     usage()
 
 printer_name = None
@@ -729,7 +731,7 @@ if mode in (INTERACTIVE_MODE, NON_INTERACTIVE_MODE):
 
     if not device_uri and not printer_name:
         try:
-            device_uri = device.getInteractiveDeviceURI(bus, 'pcard')
+            device_uri = device.getInteractiveDeviceURI(bus, {'pcard-type' : (operator.gt, 0)})
             if device_uri is None:
                 sys.exit(1)
         except Error:

@@ -616,7 +616,8 @@ def main(args):
         opts, args = getopt.getopt(sys.argv[1:], 'l:xhp:g', 
             ['level=', 'help', 'help-man', 'help-rest', 'port=', 'help-desc'])
 
-    except getopt.GetoptError:
+    except getopt.GetoptError, e:
+        log.error(e.msg)
         usage()
 
     if os.getenv("HPLIP_DEBUG"):

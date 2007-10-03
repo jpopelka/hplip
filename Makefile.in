@@ -56,9 +56,7 @@ noinst_PROGRAMS = $(am__EXEEXT_1)
 @HPLIP_BUILD_TRUE@am__append_1 = installer/text_install.py \
 @HPLIP_BUILD_TRUE@	installer/web_install.py \
 @HPLIP_BUILD_TRUE@	installer/trigger.py \
-@HPLIP_BUILD_TRUE@	installer/permissions.py \
 @HPLIP_BUILD_TRUE@	installer/fix_symlink.py \
-@HPLIP_BUILD_TRUE@	installer/mdk_usb_fix.py \
 @HPLIP_BUILD_TRUE@	installer/pages/__init__.py \
 @HPLIP_BUILD_TRUE@	installer/pages/install_required.tmpl \
 @HPLIP_BUILD_TRUE@	installer/pages/installation_path.tmpl \
@@ -86,7 +84,6 @@ noinst_PROGRAMS = $(am__EXEEXT_1)
 @HPLIP_BUILD_TRUE@	installer/pages/quit.tmpl \
 @HPLIP_BUILD_TRUE@	installer/pages/install_required.tmpl \
 @HPLIP_BUILD_TRUE@	installer/scripts/hplip.js \
-@HPLIP_BUILD_TRUE@	installer/scripts/xml_loader.js \
 @HPLIP_BUILD_TRUE@	installer/styles/hplip.css \
 @HPLIP_BUILD_TRUE@	Cheetah/Filters.py \
 @HPLIP_BUILD_TRUE@	Cheetah/SettingsManager.py \
@@ -168,25 +165,25 @@ noinst_PROGRAMS = $(am__EXEEXT_1)
 # ip library
 @HPLIP_BUILD_TRUE@am__append_4 = libhpip.la libhpmud.la
 @GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@am__append_5 = ui/colorcalform2_base.ui ui/settingsdialog_base.ui ui/aligntype6form1_base.ui \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/aboutdlg_base.ui ui/imagepropertiesdlg_base.ui ui/paperedgealignform_base.ui ui/aligntype6form2_base.ui \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/nodevicesform_base.ui ui/cleaningform_base.ui ui/colorcalform_base.ui ui/devmgr4_base.ui ui/loadpaperform_base.ui \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/cleaningform2_base.ui ui/waitform_base.ui ui/coloradjform_base.ui ui/faxaddrbookeditform_base.ui \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/faxaddrbookform_base.ui ui/faxaddrbookgroupeditform_base.ui ui/faxaddrbookgroupsform_base.ui \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/align10form_base.ui  \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    plugins/powersettingsdialog_base.ui ui/faxsettingsform_base.ui ui/coverpageform_base.ui \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/allowabletypesdlg_base.ui ui/setupform_base.ui ui/setupmanualfind_base.ui \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/setupsettings_base.ui
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/aboutdlg_base.ui ui/imagepropertiesdlg_base.ui ui/paperedgealignform_base.ui ui/aligntype6form2_base.ui \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/nodevicesform_base.ui ui/cleaningform_base.ui ui/colorcalform_base.ui ui/devmgr4_base.ui ui/loadpaperform_base.ui \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/cleaningform2_base.ui ui/waitform_base.ui ui/coloradjform_base.ui ui/faxaddrbookeditform_base.ui \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/faxaddrbookform_base.ui ui/faxaddrbookgroupeditform_base.ui ui/faxaddrbookgroupsform_base.ui \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/align10form_base.ui  ui/pluginform_base.ui \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	plugins/powersettingsdialog_base.ui ui/faxsettingsform_base.ui ui/coverpageform_base.ui \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/allowabletypesdlg_base.ui ui/setupform_base.ui ui/setupmanualfind_base.ui \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/setupsettings_base.ui
 
 DIST_COMMON = $(am__configure_deps) $(am__dist_base_SCRIPTS_DIST) \
 	$(am__dist_cmd_SCRIPTS_DIST) $(am__dist_copier_SCRIPTS_DIST) \
 	$(am__dist_fax_SCRIPTS_DIST) $(am__dist_faxppd_DATA_DIST) \
-	$(am__dist_firm_DATA_DIST) $(am__dist_hpfax_SCRIPTS_DIST) \
-	$(am__dist_hplip_DATA_DIST) $(am__dist_hplip_SCRIPTS_DIST) \
-	$(am__dist_images_DATA_DIST) $(am__dist_install_SCRIPTS_DIST) \
-	$(am__dist_ldl_DATA_DIST) $(am__dist_localz_DATA_DIST) \
-	$(am__dist_models_DATA_DIST) $(am__dist_noinst_DATA_DIST) \
-	$(am__dist_noinst_SCRIPTS_DIST) $(am__dist_pcard_SCRIPTS_DIST) \
-	$(am__dist_pcl_DATA_DIST) $(am__dist_plugins_SCRIPTS_DIST) \
+	$(am__dist_hpfax_SCRIPTS_DIST) $(am__dist_hplip_DATA_DIST) \
+	$(am__dist_hplip_SCRIPTS_DIST) $(am__dist_images_DATA_DIST) \
+	$(am__dist_install_SCRIPTS_DIST) $(am__dist_ldl_DATA_DIST) \
+	$(am__dist_localz_DATA_DIST) $(am__dist_models_DATA_DIST) \
+	$(am__dist_noinst_DATA_DIST) $(am__dist_noinst_SCRIPTS_DIST) \
+	$(am__dist_pcard_SCRIPTS_DIST) $(am__dist_pcl_DATA_DIST) \
+	$(am__dist_plugins_SCRIPTS_DIST) \
 	$(am__dist_postscript_DATA_DIST) $(am__dist_prnt_SCRIPTS_DIST) \
 	$(am__dist_rules_DATA_DIST) $(am__dist_scan_SCRIPTS_DIST) \
 	$(am__dist_ui_SCRIPTS_DIST) $(am__dist_unrel_DATA_DIST) \
@@ -230,23 +227,22 @@ am__installdirs = "$(DESTDIR)$(cupsextdir)" "$(DESTDIR)$(hpmudextdir)" \
 	"$(DESTDIR)$(installdir)" "$(DESTDIR)$(pcarddir)" \
 	"$(DESTDIR)$(pluginsdir)" "$(DESTDIR)$(prntdir)" \
 	"$(DESTDIR)$(scandir)" "$(DESTDIR)$(uidir)" \
-	"$(DESTDIR)$(faxppddir)" "$(DESTDIR)$(firmdir)" \
-	"$(DESTDIR)$(hplipdir)" "$(DESTDIR)$(imagesdir)" \
-	"$(DESTDIR)$(ldldir)" "$(DESTDIR)$(localzdir)" \
-	"$(DESTDIR)$(modelsdir)" "$(DESTDIR)$(pcldir)" \
-	"$(DESTDIR)$(postscriptdir)" "$(DESTDIR)$(rulesdir)" \
-	"$(DESTDIR)$(unreldir)" "$(DESTDIR)$(www0dir)" \
-	"$(DESTDIR)$(www1dir)" "$(DESTDIR)$(www2dir)" \
-	"$(DESTDIR)$(www21dir)" "$(DESTDIR)$(www22dir)" \
-	"$(DESTDIR)$(www23dir)" "$(DESTDIR)$(www24dir)" \
-	"$(DESTDIR)$(www241dir)" "$(DESTDIR)$(www242dir)" \
-	"$(DESTDIR)$(www243dir)" "$(DESTDIR)$(www251dir)" \
-	"$(DESTDIR)$(www252dir)" "$(DESTDIR)$(www261dir)" \
-	"$(DESTDIR)$(www3dir)" "$(DESTDIR)$(www4dir)" \
-	"$(DESTDIR)$(www5dir)" "$(DESTDIR)$(www6dir)" \
-	"$(DESTDIR)$(www61dir)" "$(DESTDIR)$(www7dir)" \
-	"$(DESTDIR)$(docdir)" "$(DESTDIR)$(hplip_confdir)" \
-	"$(DESTDIR)$(hplip_desktopdir)"
+	"$(DESTDIR)$(faxppddir)" "$(DESTDIR)$(hplipdir)" \
+	"$(DESTDIR)$(imagesdir)" "$(DESTDIR)$(ldldir)" \
+	"$(DESTDIR)$(localzdir)" "$(DESTDIR)$(modelsdir)" \
+	"$(DESTDIR)$(pcldir)" "$(DESTDIR)$(postscriptdir)" \
+	"$(DESTDIR)$(rulesdir)" "$(DESTDIR)$(unreldir)" \
+	"$(DESTDIR)$(www0dir)" "$(DESTDIR)$(www1dir)" \
+	"$(DESTDIR)$(www2dir)" "$(DESTDIR)$(www21dir)" \
+	"$(DESTDIR)$(www22dir)" "$(DESTDIR)$(www23dir)" \
+	"$(DESTDIR)$(www24dir)" "$(DESTDIR)$(www241dir)" \
+	"$(DESTDIR)$(www242dir)" "$(DESTDIR)$(www243dir)" \
+	"$(DESTDIR)$(www251dir)" "$(DESTDIR)$(www252dir)" \
+	"$(DESTDIR)$(www261dir)" "$(DESTDIR)$(www3dir)" \
+	"$(DESTDIR)$(www4dir)" "$(DESTDIR)$(www5dir)" \
+	"$(DESTDIR)$(www6dir)" "$(DESTDIR)$(www61dir)" \
+	"$(DESTDIR)$(www7dir)" "$(DESTDIR)$(docdir)" \
+	"$(DESTDIR)$(hplip_confdir)" "$(DESTDIR)$(hplip_desktopdir)"
 cupsextLTLIBRARIES_INSTALL = $(INSTALL)
 hpmudextLTLIBRARIES_INSTALL = $(INSTALL)
 libLTLIBRARIES_INSTALL = $(INSTALL)
@@ -377,7 +373,8 @@ am__objects_1 = hpijs-models.$(OBJEXT) hpijs-breaks_open.$(OBJEXT) \
 	hpijs-ljcolor.$(OBJEXT) hpijs-printerproxy.$(OBJEXT) \
 	hpijs-printerfactory.$(OBJEXT) hpijs-ljjetready.$(OBJEXT) \
 	hpijs-jdatadbf.$(OBJEXT) hpijs-jccolor.$(OBJEXT) \
-	hpijs-ljfastraster.$(OBJEXT)
+	hpijs-ljfastraster.$(OBJEXT) hpijs-ljzjs.$(OBJEXT) \
+	hpijs-ljzjsmono.$(OBJEXT)
 am_hpijs_OBJECTS = $(am__objects_1) hpijs-hpijs.$(OBJEXT) \
 	hpijs-ijs_server.$(OBJEXT) hpijs-ijs.$(OBJEXT) \
 	hpijs-hpijsfax.$(OBJEXT) hpijs-services.$(OBJEXT) \
@@ -446,7 +443,9 @@ am__hppgsz_SOURCES_DIST = prnt/hpijs/models.cpp \
 	prnt/hpijs/ljfastraster.cpp prnt/hpijs/ljfastraster.h \
 	prnt/hpijs/jinclude.h prnt/hpijs/jpegint.h prnt/hpijs/dj55xx.h \
 	prnt/hpijs/hpijsfax.h prnt/hpijs/ojprokx50.h \
-	prnt/hpijs/PrinterProperties.cpp \
+	prnt/hpijs/ljzjs.cpp prnt/hpijs/ljzjs.h \
+	prnt/hpijs/ljzjsmono.cpp prnt/hpijs/ljzjsmono.h \
+	prnt/hpijs/hpjbig_wrapper.h prnt/hpijs/PrinterProperties.cpp \
 	prnt/hpijs/PrinterProperties.h
 am__objects_2 = hppgsz-models.$(OBJEXT) hppgsz-breaks_open.$(OBJEXT) \
 	hppgsz-dj9xxvip.$(OBJEXT) hppgsz-dj9xx.$(OBJEXT) \
@@ -481,7 +480,8 @@ am__objects_2 = hppgsz-models.$(OBJEXT) hppgsz-breaks_open.$(OBJEXT) \
 	hppgsz-dj4100_cmap.$(OBJEXT) hppgsz-ljcolor.$(OBJEXT) \
 	hppgsz-printerproxy.$(OBJEXT) hppgsz-printerfactory.$(OBJEXT) \
 	hppgsz-ljjetready.$(OBJEXT) hppgsz-jdatadbf.$(OBJEXT) \
-	hppgsz-jccolor.$(OBJEXT) hppgsz-ljfastraster.$(OBJEXT)
+	hppgsz-jccolor.$(OBJEXT) hppgsz-ljfastraster.$(OBJEXT) \
+	hppgsz-ljzjs.$(OBJEXT) hppgsz-ljzjsmono.$(OBJEXT)
 @HPLIP_BUILD_TRUE@am_hppgsz_OBJECTS = $(am__objects_2) \
 @HPLIP_BUILD_TRUE@	hppgsz-PrinterProperties.$(OBJEXT)
 hppgsz_OBJECTS = $(am_hppgsz_OBJECTS)
@@ -520,8 +520,7 @@ am__dist_install_SCRIPTS_DIST = installer/__init__.py \
 dist_installSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 am__dist_noinst_SCRIPTS_DIST = installer/text_install.py \
 	installer/web_install.py installer/trigger.py \
-	installer/permissions.py installer/fix_symlink.py \
-	installer/mdk_usb_fix.py installer/pages/__init__.py \
+	installer/fix_symlink.py installer/pages/__init__.py \
 	installer/pages/install_required.tmpl \
 	installer/pages/installation_path.tmpl \
 	installer/pages/component.tmpl installer/pages/mode.tmpl \
@@ -542,18 +541,18 @@ am__dist_noinst_SCRIPTS_DIST = installer/text_install.py \
 	installer/pages/index.tmpl installer/pages/welcome.tmpl \
 	installer/pages/install_optional.tmpl \
 	installer/pages/quit.tmpl installer/scripts/hplip.js \
-	installer/scripts/xml_loader.js installer/styles/hplip.css \
-	Cheetah/Filters.py Cheetah/SettingsManager.py \
-	Cheetah/CheetahWrapper.py Cheetah/ImportHooks.py \
-	Cheetah/SourceReader.py Cheetah/Compiler.py \
-	Cheetah/ImportManager.py Cheetah/Template.py \
-	Cheetah/DummyTransaction.py Cheetah/NameMapper.py \
-	Cheetah/TemplateCmdLineIface.py Cheetah/ErrorCatchers.py \
-	Cheetah/Parser.py Cheetah/Version.py Cheetah/FileUtils.py \
-	Cheetah/Servlet.py Cheetah/CacheRegion.py Cheetah/__init__.py \
-	Cheetah/Utils/Indenter.py Cheetah/Utils/Misc.py \
-	Cheetah/Utils/VerifyType.py Cheetah/Utils/WebInputMixin.py \
-	Cheetah/Utils/__init__.py Cheetah/Utils/optik/errors.py \
+	installer/styles/hplip.css Cheetah/Filters.py \
+	Cheetah/SettingsManager.py Cheetah/CheetahWrapper.py \
+	Cheetah/ImportHooks.py Cheetah/SourceReader.py \
+	Cheetah/Compiler.py Cheetah/ImportManager.py \
+	Cheetah/Template.py Cheetah/DummyTransaction.py \
+	Cheetah/NameMapper.py Cheetah/TemplateCmdLineIface.py \
+	Cheetah/ErrorCatchers.py Cheetah/Parser.py Cheetah/Version.py \
+	Cheetah/FileUtils.py Cheetah/Servlet.py Cheetah/CacheRegion.py \
+	Cheetah/__init__.py Cheetah/Utils/Indenter.py \
+	Cheetah/Utils/Misc.py Cheetah/Utils/VerifyType.py \
+	Cheetah/Utils/WebInputMixin.py Cheetah/Utils/__init__.py \
+	Cheetah/Utils/optik/errors.py \
 	Cheetah/Utils/optik/option_parser.py \
 	Cheetah/Utils/optik/option.py Cheetah/Utils/optik/__init__.py \
 	cherrypy/_cphttptools.py cherrypy/_cpwsgi.py \
@@ -629,7 +628,7 @@ am__dist_ui_SCRIPTS_DIST = ui/alignform.py ui/colorcalform_base.py \
 	ui/scrollfunc.py ui/scrollstatus.py ui/scrollprintsettings.py \
 	ui/scrollprintcontrol.py ui/scrolltool.py ui/scrollsupplies.py \
 	ui/scrollprint.py ui/scrollfax.py ui/scrollunload.py \
-	ui/scrollcopy.py
+	ui/scrollcopy.py ui/pluginform.py ui/pluginform_base.py
 dist_uiSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(dist_base_SCRIPTS) $(dist_cmd_SCRIPTS) \
 	$(dist_copier_SCRIPTS) $(dist_fax_SCRIPTS) \
@@ -670,9 +669,6 @@ DIST_SOURCES = $(am__cupsext_la_SOURCES_DIST) \
 	$(am__hppgsz_SOURCES_DIST) $(am__ptest_SOURCES_DIST)
 am__dist_faxppd_DATA_DIST = fax/ppd/HP-Fax-hplip.ppd
 dist_faxppdDATA_INSTALL = $(INSTALL_DATA)
-am__dist_firm_DATA_DIST = data/firmware/HP_LaserJet_1018.fw.gz \
-	data/firmware/HP_LaserJet_1020.fw.gz
-dist_firmDATA_INSTALL = $(INSTALL_DATA)
 am__dist_hplip_DATA_DIST = scan/sane/hpaio.desc
 dist_hplipDATA_INSTALL = $(INSTALL_DATA)
 am__dist_images_DATA_DIST = data/images/*
@@ -708,10 +704,10 @@ am__dist_noinst_DATA_DIST = installer/images/button.png \
 	ui/coloradjform_base.ui ui/faxaddrbookeditform_base.ui \
 	ui/faxaddrbookform_base.ui ui/faxaddrbookgroupeditform_base.ui \
 	ui/faxaddrbookgroupsform_base.ui ui/align10form_base.ui \
-	plugins/powersettingsdialog_base.ui ui/faxsettingsform_base.ui \
-	ui/coverpageform_base.ui ui/allowabletypesdlg_base.ui \
-	ui/setupform_base.ui ui/setupmanualfind_base.ui \
-	ui/setupsettings_base.ui \
+	ui/pluginform_base.ui plugins/powersettingsdialog_base.ui \
+	ui/faxsettingsform_base.ui ui/coverpageform_base.ui \
+	ui/allowabletypesdlg_base.ui ui/setupform_base.ui \
+	ui/setupmanualfind_base.ui ui/setupsettings_base.ui \
 	$(src_dbdir)/printer/HP-DeskJet_350C.xml \
 	$(src_dbdir)/printer/HP-DeskJet_500.xml \
 	$(src_dbdir)/printer/HP-DeskJet_510.xml \
@@ -726,6 +722,8 @@ am__dist_noinst_DATA_DIST = installer/images/button.png \
 	$(src_dbdir)/printer/HP-DeskJet_420C.xml \
 	$(src_dbdir)/printer/HP-DeskJet_500C.xml \
 	$(src_dbdir)/printer/HP-DeskJet_540C.xml \
+	$(src_dbdir)/printer/HP-DeskJet_550C.xml \
+	$(src_dbdir)/printer/HP-DeskJet_560C.xml \
 	$(src_dbdir)/printer/HP-DeskJet_630C.xml \
 	$(src_dbdir)/printer/HP-DeskJet_632C.xml \
 	$(src_dbdir)/printer/HP-DeskJet_656C.xml \
@@ -921,12 +919,18 @@ am__dist_noinst_DATA_DIST = installer/images/button.png \
 	$(src_dbdir)/printer/HP-PhotoSmart_C5100.xml \
 	$(src_dbdir)/printer/HP-PhotoSmart_C5200.xml \
 	$(src_dbdir)/printer/HP-PhotoSmart_C6100.xml \
+	$(src_dbdir)/printer/HP-PhotoSmart_C6200.xml \
 	$(src_dbdir)/printer/HP-PhotoSmart_C7100.xml \
+	$(src_dbdir)/printer/HP-PhotoSmart_C7200.xml \
+	$(src_dbdir)/printer/HP-PhotoSmart_C8100.xml \
 	$(src_dbdir)/printer/HP-PhotoSmart_D7300.xml \
 	$(src_dbdir)/printer/HP-PhotoSmart_D5060.xml \
 	$(src_dbdir)/printer/HP-PhotoSmart_D5100.xml \
+	$(src_dbdir)/printer/HP-PhotoSmart_D5300.xml \
 	$(src_dbdir)/printer/HP-PhotoSmart_D6100.xml \
 	$(src_dbdir)/printer/HP-PhotoSmart_D7100.xml \
+	$(src_dbdir)/printer/HP-PhotoSmart_D7200.xml \
+	$(src_dbdir)/printer/HP-PhotoSmart_D7400.xml \
 	$(src_dbdir)/printer/HP-PhotoSmart_Pro_B8300.xml \
 	$(src_dbdir)/printer/HP-PSC_1510.xml \
 	$(src_dbdir)/printer/HP-PSC_1500.xml \
@@ -946,6 +950,7 @@ am__dist_noinst_DATA_DIST = installer/images/button.png \
 	$(src_dbdir)/printer/HP-OfficeJet_7300.xml \
 	$(src_dbdir)/printer/HP-OfficeJet_7400.xml \
 	$(src_dbdir)/printer/HP-OfficeJet_J5700.xml \
+	$(src_dbdir)/printer/HP-Officejet_K7100.xml \
 	$(src_dbdir)/printer/HP-DeskJet_450.xml \
 	$(src_dbdir)/printer/HP-Business_Inkjet_1000.xml \
 	$(src_dbdir)/printer/HP-Business_Inkjet_1100.xml \
@@ -984,6 +989,7 @@ am__dist_noinst_DATA_DIST = installer/images/button.png \
 	$(src_dbdir)/printer/HP-OfficeJet_4115.xml \
 	$(src_dbdir)/printer/HP-OfficeJet_4200.xml \
 	$(src_dbdir)/printer/HP-OfficeJet_4300.xml \
+	$(src_dbdir)/printer/HP-OfficeJet_J3600.xml \
 	$(src_dbdir)/printer/HP-DeskJet_3650.xml \
 	$(src_dbdir)/printer/HP-DeskJet_3658.xml \
 	$(src_dbdir)/printer/HP-DeskJet_3668.xml \
@@ -1000,6 +1006,7 @@ am__dist_noinst_DATA_DIST = installer/images/button.png \
 	$(src_dbdir)/printer/HP-DeskJet_D2400.xml \
 	$(src_dbdir)/printer/HP-910.xml \
 	$(src_dbdir)/printer/HP-915.xml \
+	$(src_dbdir)/printer/HP-OfficeJet_J5500.xml \
 	$(src_dbdir)/printer/HP-DeskJet_D4100.xml \
 	$(src_dbdir)/printer/HP-DeskJet_D4200.xml \
 	$(src_dbdir)/printer/HP-PhotoSmart_P100.xml \
@@ -1248,6 +1255,7 @@ am__dist_noinst_DATA_DIST = installer/images/button.png \
 	ppd/HP-OfficeJet_330-hpijs.ppd ppd/HP-OfficeJet_350-hpijs.ppd \
 	ppd/HP-DeskJet_400-hpijs.ppd ppd/HP-DeskJet_420C-hpijs.ppd \
 	ppd/HP-DeskJet_500C-hpijs.ppd ppd/HP-DeskJet_540C-hpijs.ppd \
+	ppd/HP-DeskJet_550C-hpijs.ppd ppd/HP-DeskJet_560C-hpijs.ppd \
 	ppd/HP-DeskJet_630C-hpijs.ppd ppd/HP-DeskJet_632C-hpijs.ppd \
 	ppd/HP-DeskJet_656C-hpijs.ppd ppd/HP-DeskJet_600-hpijs.ppd \
 	ppd/HP-DeskJet_660C-hpijs.ppd ppd/HP-DeskJet_670C-hpijs.ppd \
@@ -1377,12 +1385,18 @@ am__dist_noinst_DATA_DIST = installer/images/button.png \
 	ppd/HP-PhotoSmart_C5100-hpijs.ppd \
 	ppd/HP-PhotoSmart_C5200-hpijs.ppd \
 	ppd/HP-PhotoSmart_C6100-hpijs.ppd \
+	ppd/HP-PhotoSmart_C6200-hpijs.ppd \
 	ppd/HP-PhotoSmart_C7100-hpijs.ppd \
+	ppd/HP-PhotoSmart_C7200-hpijs.ppd \
+	ppd/HP-PhotoSmart_C8100-hpijs.ppd \
 	ppd/HP-PhotoSmart_D7300-hpijs.ppd \
 	ppd/HP-PhotoSmart_D5060-hpijs.ppd \
 	ppd/HP-PhotoSmart_D5100-hpijs.ppd \
+	ppd/HP-PhotoSmart_D5300-hpijs.ppd \
 	ppd/HP-PhotoSmart_D6100-hpijs.ppd \
 	ppd/HP-PhotoSmart_D7100-hpijs.ppd \
+	ppd/HP-PhotoSmart_D7200-hpijs.ppd \
+	ppd/HP-PhotoSmart_D7400-hpijs.ppd \
 	ppd/HP-PhotoSmart_Pro_B8300-hpijs.ppd \
 	ppd/HP-PSC_1510-hpijs.ppd ppd/HP-PSC_1500-hpijs.ppd \
 	ppd/HP-PSC_1600-hpijs.ppd ppd/HP-PSC_2210-hpijs.ppd \
@@ -1397,7 +1411,8 @@ am__dist_noinst_DATA_DIST = installer/images/button.png \
 	ppd/HP-OfficeJet_7200-hpijs.ppd \
 	ppd/HP-OfficeJet_7300-hpijs.ppd \
 	ppd/HP-OfficeJet_7400-hpijs.ppd \
-	ppd/HP-OfficeJet_J5700-hpijs.ppd ppd/HP-DeskJet_450-hpijs.ppd \
+	ppd/HP-OfficeJet_J5700-hpijs.ppd \
+	ppd/HP-Officejet_K7100-hpijs.ppd ppd/HP-DeskJet_450-hpijs.ppd \
 	ppd/HP-Business_Inkjet_1000-hpijs.ppd \
 	ppd/HP-Business_Inkjet_1100-hpijs.ppd \
 	ppd/HP-Business_Inkjet_1200-hpijs.ppd \
@@ -1424,7 +1439,8 @@ am__dist_noinst_DATA_DIST = installer/images/button.png \
 	ppd/HP-OfficeJet_4110-hpijs.ppd \
 	ppd/HP-OfficeJet_4115-hpijs.ppd \
 	ppd/HP-OfficeJet_4200-hpijs.ppd \
-	ppd/HP-OfficeJet_4300-hpijs.ppd ppd/HP-DeskJet_3650-hpijs.ppd \
+	ppd/HP-OfficeJet_4300-hpijs.ppd \
+	ppd/HP-OfficeJet_J3600-hpijs.ppd ppd/HP-DeskJet_3650-hpijs.ppd \
 	ppd/HP-DeskJet_3658-hpijs.ppd ppd/HP-DeskJet_3668-hpijs.ppd \
 	ppd/HP-DeskJet_3840-hpijs.ppd ppd/HP-DeskJet_3845-hpijs.ppd \
 	ppd/HP-DeskJet_D2300-hpijs.ppd ppd/HP-OfficeJet_5500-hpijs.ppd \
@@ -1432,8 +1448,8 @@ am__dist_noinst_DATA_DIST = installer/images/button.png \
 	ppd/HP-PSC_1310-hpijs.ppd ppd/HP-PSC_1400-hpijs.ppd \
 	ppd/HP-DeskJet_F300-hpijs.ppd ppd/HP-DeskJet_F4100-hpijs.ppd \
 	ppd/HP-DeskJet_D2400-hpijs.ppd ppd/HP-910-hpijs.ppd \
-	ppd/HP-915-hpijs.ppd ppd/HP-DeskJet_D4100-hpijs.ppd \
-	ppd/HP-DeskJet_D4200-hpijs.ppd \
+	ppd/HP-915-hpijs.ppd ppd/HP-OfficeJet_J5500-hpijs.ppd \
+	ppd/HP-DeskJet_D4100-hpijs.ppd ppd/HP-DeskJet_D4200-hpijs.ppd \
 	ppd/HP-PhotoSmart_P100-hpijs.ppd \
 	ppd/HP-PhotoSmart_P130-hpijs.ppd \
 	ppd/HP-PhotoSmart_140-hpijs.ppd \
@@ -1564,7 +1580,7 @@ dist_pclDATA_INSTALL = $(INSTALL_DATA)
 am__dist_postscript_DATA_DIST = data/ps/testpage.ps.gz \
 	data/ps/clean_page.pdf.gz
 dist_postscriptDATA_INSTALL = $(INSTALL_DATA)
-am__dist_rules_DATA_DIST = 55-hpmud.rules
+am__dist_rules_DATA_DIST = data/rules/55-hpmud.rules
 dist_rulesDATA_INSTALL = $(INSTALL_DATA)
 am__dist_unrel_DATA_DIST = data/models/unreleased/unreleased.dat
 dist_unrelDATA_INSTALL = $(INSTALL_DATA)
@@ -1615,18 +1631,17 @@ dist_www7DATA_INSTALL = $(INSTALL_DATA)
 docDATA_INSTALL = $(INSTALL_DATA)
 hplip_confDATA_INSTALL = $(INSTALL_DATA)
 hplip_desktopDATA_INSTALL = $(INSTALL_DATA)
-DATA = $(dist_faxppd_DATA) $(dist_firm_DATA) $(dist_hplip_DATA) \
-	$(dist_images_DATA) $(dist_ldl_DATA) $(dist_localz_DATA) \
-	$(dist_models_DATA) $(dist_noinst_DATA) $(dist_pcl_DATA) \
-	$(dist_postscript_DATA) $(dist_rules_DATA) $(dist_unrel_DATA) \
-	$(dist_www0_DATA) $(dist_www1_DATA) $(dist_www2_DATA) \
-	$(dist_www21_DATA) $(dist_www22_DATA) $(dist_www23_DATA) \
-	$(dist_www24_DATA) $(dist_www241_DATA) $(dist_www242_DATA) \
-	$(dist_www243_DATA) $(dist_www251_DATA) $(dist_www252_DATA) \
-	$(dist_www261_DATA) $(dist_www3_DATA) $(dist_www4_DATA) \
-	$(dist_www5_DATA) $(dist_www6_DATA) $(dist_www61_DATA) \
-	$(dist_www7_DATA) $(doc_DATA) $(hplip_conf_DATA) \
-	$(hplip_desktop_DATA)
+DATA = $(dist_faxppd_DATA) $(dist_hplip_DATA) $(dist_images_DATA) \
+	$(dist_ldl_DATA) $(dist_localz_DATA) $(dist_models_DATA) \
+	$(dist_noinst_DATA) $(dist_pcl_DATA) $(dist_postscript_DATA) \
+	$(dist_rules_DATA) $(dist_unrel_DATA) $(dist_www0_DATA) \
+	$(dist_www1_DATA) $(dist_www2_DATA) $(dist_www21_DATA) \
+	$(dist_www22_DATA) $(dist_www23_DATA) $(dist_www24_DATA) \
+	$(dist_www241_DATA) $(dist_www242_DATA) $(dist_www243_DATA) \
+	$(dist_www251_DATA) $(dist_www252_DATA) $(dist_www261_DATA) \
+	$(dist_www3_DATA) $(dist_www4_DATA) $(dist_www5_DATA) \
+	$(dist_www6_DATA) $(dist_www61_DATA) $(dist_www7_DATA) \
+	$(doc_DATA) $(hplip_conf_DATA) $(hplip_desktop_DATA)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -1846,7 +1861,7 @@ lib_LTLIBRARIES = $(am__append_4)
 @HPLIP_BUILD_TRUE@dist_hplip_SCRIPTS = hpssd.py __init__.py install.py hplip-install
 @HPLIP_BUILD_TRUE@cmddir = $(hplipdir)
 @HPLIP_BUILD_TRUE@dist_cmd_SCRIPTS = align.py info.py print.py toolbox.py clean.py colorcal.py unload.py testpage.py makeuri.py check.py fab.py levels.py \
-@HPLIP_BUILD_TRUE@    sendfax.py setup.py makecopies.py probe.py timedate.py firmware.py scan.py
+@HPLIP_BUILD_TRUE@	sendfax.py setup.py makecopies.py probe.py timedate.py firmware.py scan.py
 
 
 # hp backend.
@@ -1857,9 +1872,9 @@ lib_LTLIBRARIES = $(am__append_4)
 # base
 @HPLIP_BUILD_TRUE@basedir = $(hplipdir)/base
 @HPLIP_BUILD_TRUE@dist_base_SCRIPTS = base/maint.py base/codes.py base/g.py base/pml.py base/status.py  base/async.py \
-@HPLIP_BUILD_TRUE@    base/__init__.py base/mfpdtf.py base/utils.py base/async_qt.py base/kirbybase.py base/service.py \
-@HPLIP_BUILD_TRUE@    base/device.py base/logger.py base/msg.py base/slp.py base/exif.py base/strings.py base/magic.py \
-@HPLIP_BUILD_TRUE@    base/imagesize.py base/pexpect.py base/models.py base/mdns.py base/tui.py
+@HPLIP_BUILD_TRUE@	base/__init__.py base/mfpdtf.py base/utils.py base/async_qt.py base/kirbybase.py base/service.py \
+@HPLIP_BUILD_TRUE@	base/device.py base/logger.py base/msg.py base/slp.py base/exif.py base/strings.py base/magic.py \
+@HPLIP_BUILD_TRUE@	base/imagesize.py base/pexpect.py base/models.py base/mdns.py base/tui.py
 
 
 # installer
@@ -1886,22 +1901,20 @@ lib_LTLIBRARIES = $(am__append_4)
 @HPLIP_BUILD_TRUE@pcldir = $(hplipdir)/data/pcl
 @HPLIP_BUILD_TRUE@ldldir = $(hplipdir)/data/ldl
 @HPLIP_BUILD_TRUE@postscriptdir = $(hplipdir)/data/ps
-@HPLIP_BUILD_TRUE@firmdir = $(hplipdir)/data/firmware
 @HPLIP_BUILD_TRUE@localzdir = $(hplipdir)/data/localization
 @HPLIP_BUILD_TRUE@dist_postscript_DATA = data/ps/testpage.ps.gz data/ps/clean_page.pdf.gz
 @HPLIP_BUILD_TRUE@dist_models_DATA = data/models/models.dat
-@HPLIP_BUILD_TRUE@dist_images_DATA = data/images/*
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@dist_images_DATA = data/images/*
 @HPLIP_BUILD_TRUE@dist_pcl_DATA = data/pcl/align1_8xx.pcl.gz data/pcl/align1_9xx.pcl.gz data/pcl/align2_8xx.pcl.gz data/pcl/align3_8xx.pcl.gz data/pcl/align4_8xx.pcl.gz \
-@HPLIP_BUILD_TRUE@    data/pcl/align5_8xx.pcl.gz data/pcl/align2_9xx.pcl.gz data/pcl/align3_9xx.pcl.gz data/pcl/align4_450.pcl.gz data/pcl/align6_450.pcl.gz \
-@HPLIP_BUILD_TRUE@    data/pcl/colorcal1_450.pcl.gz data/pcl/colorcal2_450.pcl.gz data/pcl/crbcal.pcl.gz data/pcl/crcaldone.pcl.gz data/pcl/crcbcal.pcl.gz data/pcl/crccal.pcl.gz \
-@HPLIP_BUILD_TRUE@    data/pcl/crcpcal.pcl.gz data/pcl/crpcal.pcl.gz 
+@HPLIP_BUILD_TRUE@	data/pcl/align5_8xx.pcl.gz data/pcl/align2_9xx.pcl.gz data/pcl/align3_9xx.pcl.gz data/pcl/align4_450.pcl.gz data/pcl/align6_450.pcl.gz \
+@HPLIP_BUILD_TRUE@	data/pcl/colorcal1_450.pcl.gz data/pcl/colorcal2_450.pcl.gz data/pcl/crbcal.pcl.gz data/pcl/crcaldone.pcl.gz data/pcl/crcbcal.pcl.gz data/pcl/crccal.pcl.gz \
+@HPLIP_BUILD_TRUE@	data/pcl/crcpcal.pcl.gz data/pcl/crpcal.pcl.gz 
 
 @HPLIP_BUILD_TRUE@dist_ldl_DATA = data/ldl/cb2pcal.ldl.gz data/ldl/cb2pcal_done.ldl.gz data/ldl/cbbcal.ldl.gz data/ldl/cbccal.ldl.gz data/ldl/cbccal_done.ldl.gz data/ldl/cbcpcal.ldl.gz \
-@HPLIP_BUILD_TRUE@    data/ldl/cbpcal.ldl.gz
+@HPLIP_BUILD_TRUE@	data/ldl/cbpcal.ldl.gz
 
-@HPLIP_BUILD_TRUE@dist_firm_DATA = data/firmware/HP_LaserJet_1018.fw.gz data/firmware/HP_LaserJet_1020.fw.gz
 @HPLIP_BUILD_TRUE@dist_localz_DATA = data/localization/hplip_de.qm data/localization/hplip_es.qm data/localization/hplip_fr.qm data/localization/hplip_it.qm \
-@HPLIP_BUILD_TRUE@    data/localization/hplip_pt.qm data/localization/hplip_ru.qm data/localization/hplip_zh.qm
+@HPLIP_BUILD_TRUE@	data/localization/hplip_pt.qm data/localization/hplip_ru.qm data/localization/hplip_zh.qm
 
 
 # unreleased data
@@ -1931,22 +1944,22 @@ lib_LTLIBRARIES = $(am__append_4)
 @HPLIP_BUILD_TRUE@cupsext_la_CFLAGS = -I$(PYTHONINCLUDEDIR)
 @HPLIP_BUILD_TRUE@libhpip_la_LDFLAGS = -version-info 0:1:0
 @HPLIP_BUILD_TRUE@libhpip_la_SOURCES = ip/xconvolve.c ip/xfax.c ip/xgrayout.c ip/xjpg_dct.c ip/xjpg_fix.c ip/xpad.c ip/xrotate.c ip/xskel.c ip/xtiff.c \
-@HPLIP_BUILD_TRUE@    ip/ipmain.c ip/xchgbpp.c ip/xcrop.c ip/xgamma.c ip/xjpg_dec.c ip/xjpg_huf.c ip/xpcx.c ip/xsaturation.c ip/xtable.c ip/xtonemap.c \
-@HPLIP_BUILD_TRUE@    ip/xbi2gray.c ip/xcolrspc.c ip/xfakemono.c ip/xgray2bi.c ip/xinvert.c ip/xjpg_enc.c ip/xmatrix.c ip/xpnm.c ip/xscale.c ip/xthumb.c ip/xyxtract.c \
-@HPLIP_BUILD_TRUE@    ip/hpip.h ip/ipdefs.h ip/xform.h ip/xjpg_dct.h ip/xjpg_huf.h ip/xjpg_mrk.h 
+@HPLIP_BUILD_TRUE@	ip/ipmain.c ip/xchgbpp.c ip/xcrop.c ip/xgamma.c ip/xjpg_dec.c ip/xjpg_huf.c ip/xpcx.c ip/xsaturation.c ip/xtable.c ip/xtonemap.c \
+@HPLIP_BUILD_TRUE@	ip/xbi2gray.c ip/xcolrspc.c ip/xfakemono.c ip/xgray2bi.c ip/xinvert.c ip/xjpg_enc.c ip/xmatrix.c ip/xpnm.c ip/xscale.c ip/xthumb.c ip/xyxtract.c \
+@HPLIP_BUILD_TRUE@	ip/hpip.h ip/ipdefs.h ip/xform.h ip/xjpg_dct.h ip/xjpg_huf.h ip/xjpg_mrk.h 
 
 
 # hpaio sane backend
 @HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@libsane_hpaiodir = $(libdir)/sane
 @HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@libsane_hpaio_LTLIBRARIES = libsane-hpaio.la
 @HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@libsane_hpaio_la_SOURCES = scan/sane/hpaio.c scan/sane/mfpdtf.c scan/sane/pml.c scan/sane/scl.c scan/sane/io.c scan/sane/hpaio.h \
-@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@      scan/sane/pml.h scan/sane/saneopts.h scan/sane/io.h scan/sane/mfpdtf.h scan/sane/sane.h scan/sane/scl.h scan/sane/tables.h \
-@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@      scan/sane/common.c scan/sane/common.h scan/sane/soap.h scan/sane/sanei_debug.h scan/sane/sanei.h \
-@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@      scan/sane/soap_stub.c scan/sane/sanei_init_debug.c
+@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@	  scan/sane/pml.h scan/sane/saneopts.h scan/sane/io.h scan/sane/mfpdtf.h scan/sane/sane.h scan/sane/scl.h scan/sane/tables.h \
+@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@	  scan/sane/common.c scan/sane/common.h scan/sane/soap.h scan/sane/sanei_debug.h scan/sane/sanei.h \
+@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@	  scan/sane/soap_stub.c scan/sane/sanei_init_debug.c
 
 @DARWIN_BUILD_FALSE@@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@libsane_hpaio_la_LDFLAGS = -version-info 1:0:0
-#      scan/sane/soap.c scan/sane/webScanC.c scan/sane/webScanClient.c scan/sane/stdsoap2.c \
-#      scan/sane/dime.c scan/sane/dime.h scan/sane/webScanStub.h scan/sane/webScanH.h scan/sane/stdsoap2.h scan/sane/webScan.nsmap
+#	  scan/sane/soap.c scan/sane/webScanC.c scan/sane/webScanClient.c scan/sane/stdsoap2.c \
+#	  scan/sane/dime.c scan/sane/dime.h scan/sane/webScanStub.h scan/sane/webScanH.h scan/sane/stdsoap2.h scan/sane/webScan.nsmap
 @DARWIN_BUILD_TRUE@@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@libsane_hpaio_la_LDFLAGS = -module -framework CoreFoundation -version-info 1:0:0
 # The following is a interlibrary dependency that must be compiled first.
 @HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@libsane_hpaio_la_LIBADD = libhpip.la libhpmud.la
@@ -1968,8 +1981,8 @@ lib_LTLIBRARIES = $(am__append_4)
 # hpmud library
 @HPLIP_BUILD_TRUE@MUDNAME = hpmud
 @HPLIP_BUILD_TRUE@libhpmud_la_SOURCES = io/hpmud/hpmud.c io/hpmud/mlc.c io/hpmud/model.c io/hpmud/musb.c io/hpmud/pml.c \
-@HPLIP_BUILD_TRUE@      io/hpmud/hpmud.h io/hpmud/hpmudi.h io/hpmud/list.h io/hpmud/mlc.h io/hpmud/musb.h io/hpmud/pml.h io/hpmud/dot4.c \
-@HPLIP_BUILD_TRUE@      io/hpmud/dot4.h io/hpmud/jd.c io/hpmud/jd.h io/hpmud/pp.c io/hpmud/pp.h 
+@HPLIP_BUILD_TRUE@	  io/hpmud/hpmud.h io/hpmud/hpmudi.h io/hpmud/list.h io/hpmud/mlc.h io/hpmud/musb.h io/hpmud/pml.h io/hpmud/dot4.c \
+@HPLIP_BUILD_TRUE@	  io/hpmud/dot4.h io/hpmud/jd.c io/hpmud/jd.h io/hpmud/pp.c io/hpmud/pp.h 
 
 @HPLIP_BUILD_TRUE@libhpmud_la_LDFLAGS = -version-info 0:0:0
 @HPLIP_BUILD_TRUE@libhpmud_la_CFLAGS = -DMUDNAME=\"$(MUDNAME)\" -DCONFDIR=\"$(hplip_confdir)\"
@@ -1984,34 +1997,34 @@ lib_LTLIBRARIES = $(am__append_4)
 
 # hpmud.rules
 @HPLIP_BUILD_TRUE@rulesdir = /etc/udev/rules.d
-@HPLIP_BUILD_TRUE@dist_rules_DATA = 55-hpmud.rules
+@HPLIP_BUILD_TRUE@dist_rules_DATA = data/rules/55-hpmud.rules
 
 # ui
 @GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@uidir = $(hplipdir)/ui
 @GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@dist_ui_SCRIPTS = ui/alignform.py \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/colorcalform_base.py ui/colorcalform.py ui/coloradjform_base.py ui/coloradjform.py ui/devmgr4_base.py ui/devmgr4.py \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/__init__.py ui/loadpaperform_base.py ui/loadpaperform.py \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/paperedgealignform_base.py ui/paperedgealignform.py \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/settingsdialog_base.py ui/settingsdialog.py ui/aligntype6form1.py ui/aligntype6form1_base.py ui/aligntype6form2_base.py \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/aligntype6form2.py ui/nodevicesform_base.py ui/nodevicesform.py ui/unloadform.py \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/imagepropertiesdlg_base.py ui/imagepropertiesdlg.py ui/choosedevicedlg.py ui/chooseprinterdlg.py \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/aboutdlg.py ui/aboutdlg_base.py ui/waitform.py ui/waitform_base.py ui/cleaningform_base.py ui/cleaningform.py \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/cleaningform2_base.py ui/cleaningform2.py ui/colorcalform2_base.py ui/colorcalform2.py ui/colorcal4form.py \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/colorcal4form_base.py ui/colorcal4form_base.ui ui/printerform.py \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/faxaddrbookgroupsform_base.py ui/faxaddrbookgroupeditform_base.py ui/faxaddrbookform_base.py \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/faxaddrbookform.py ui/faxaddrbookeditform_base.py ui/align10form.py ui/align10form_base.py \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/faxsendjobform.py ui/faxsettingsform_base.py ui/faxsettingsform.py \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/coverpageform_base.py ui/coverpageform.py ui/allowabletypesdlg_base.py ui/allowabletypesdlg.py \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/makecopiesform.py ui/setupform_base.py ui/setupform.py ui/setupmanualfind_base.py \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/setupmanualfind.py ui/setupsettings_base.py ui/setupsettings.py ui/scrollview.py ui/scrollfunc.py ui/scrollstatus.py \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/scrollprintsettings.py ui/scrollprintcontrol.py ui/scrolltool.py ui/scrollsupplies.py  ui/scrollprint.py ui/scrollfax.py \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    ui/scrollunload.py ui/scrollcopy.py
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/colorcalform_base.py ui/colorcalform.py ui/coloradjform_base.py ui/coloradjform.py ui/devmgr4_base.py ui/devmgr4.py \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/__init__.py ui/loadpaperform_base.py ui/loadpaperform.py \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/paperedgealignform_base.py ui/paperedgealignform.py \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/settingsdialog_base.py ui/settingsdialog.py ui/aligntype6form1.py ui/aligntype6form1_base.py ui/aligntype6form2_base.py \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/aligntype6form2.py ui/nodevicesform_base.py ui/nodevicesform.py ui/unloadform.py \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/imagepropertiesdlg_base.py ui/imagepropertiesdlg.py ui/choosedevicedlg.py ui/chooseprinterdlg.py \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/aboutdlg.py ui/aboutdlg_base.py ui/waitform.py ui/waitform_base.py ui/cleaningform_base.py ui/cleaningform.py \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/cleaningform2_base.py ui/cleaningform2.py ui/colorcalform2_base.py ui/colorcalform2.py ui/colorcal4form.py \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/colorcal4form_base.py ui/colorcal4form_base.ui ui/printerform.py \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/faxaddrbookgroupsform_base.py ui/faxaddrbookgroupeditform_base.py ui/faxaddrbookform_base.py \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/faxaddrbookform.py ui/faxaddrbookeditform_base.py ui/align10form.py ui/align10form_base.py \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/faxsendjobform.py ui/faxsettingsform_base.py ui/faxsettingsform.py \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/coverpageform_base.py ui/coverpageform.py ui/allowabletypesdlg_base.py ui/allowabletypesdlg.py \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/makecopiesform.py ui/setupform_base.py ui/setupform.py ui/setupmanualfind_base.py \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/setupmanualfind.py ui/setupsettings_base.py ui/setupsettings.py ui/scrollview.py ui/scrollfunc.py ui/scrollstatus.py \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/scrollprintsettings.py ui/scrollprintcontrol.py ui/scrolltool.py ui/scrollsupplies.py  ui/scrollprint.py ui/scrollfax.py \
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	ui/scrollunload.py ui/scrollcopy.py ui/pluginform.py ui/pluginform_base.py
 
 
 # ui plugins
 @GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@pluginsdir = $(hplipdir)/plugins
 @GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@dist_plugins_SCRIPTS = plugins/dj450.py plugins/__init__.py plugins/powersettings.py plugins/powersettingsdialog.py \
-@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@    plugins/powersettingsdialog_base.py plugins/Deskjet_460.py
+@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@	plugins/powersettingsdialog_base.py plugins/Deskjet_460.py
 
 @HPLIP_BUILD_TRUE@hppgsz_SOURCES = $(apdk_SOURCES) prnt/hpijs/PrinterProperties.cpp prnt/hpijs/PrinterProperties.h
 @HPLIP_BUILD_TRUE@hppgsz_CXXFLAGS = $(hpijs_CXXFLAGS)
@@ -2045,6 +2058,8 @@ foomatic_xml_printers = \
     $(src_dbdir)/printer/HP-DeskJet_420C.xml \
     $(src_dbdir)/printer/HP-DeskJet_500C.xml \
     $(src_dbdir)/printer/HP-DeskJet_540C.xml \
+    $(src_dbdir)/printer/HP-DeskJet_550C.xml \
+    $(src_dbdir)/printer/HP-DeskJet_560C.xml \
     $(src_dbdir)/printer/HP-DeskJet_630C.xml \
     $(src_dbdir)/printer/HP-DeskJet_632C.xml \
     $(src_dbdir)/printer/HP-DeskJet_656C.xml \
@@ -2240,12 +2255,18 @@ foomatic_xml_printers = \
     $(src_dbdir)/printer/HP-PhotoSmart_C5100.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_C5200.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_C6100.xml \
+    $(src_dbdir)/printer/HP-PhotoSmart_C6200.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_C7100.xml \
+    $(src_dbdir)/printer/HP-PhotoSmart_C7200.xml \
+    $(src_dbdir)/printer/HP-PhotoSmart_C8100.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_D7300.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_D5060.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_D5100.xml \
+    $(src_dbdir)/printer/HP-PhotoSmart_D5300.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_D6100.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_D7100.xml \
+    $(src_dbdir)/printer/HP-PhotoSmart_D7200.xml \
+    $(src_dbdir)/printer/HP-PhotoSmart_D7400.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_Pro_B8300.xml \
     $(src_dbdir)/printer/HP-PSC_1510.xml \
     $(src_dbdir)/printer/HP-PSC_1500.xml \
@@ -2265,6 +2286,7 @@ foomatic_xml_printers = \
     $(src_dbdir)/printer/HP-OfficeJet_7300.xml \
     $(src_dbdir)/printer/HP-OfficeJet_7400.xml \
     $(src_dbdir)/printer/HP-OfficeJet_J5700.xml \
+    $(src_dbdir)/printer/HP-Officejet_K7100.xml \
     $(src_dbdir)/printer/HP-DeskJet_450.xml \
     $(src_dbdir)/printer/HP-Business_Inkjet_1000.xml \
     $(src_dbdir)/printer/HP-Business_Inkjet_1100.xml \
@@ -2303,6 +2325,7 @@ foomatic_xml_printers = \
     $(src_dbdir)/printer/HP-OfficeJet_4115.xml \
     $(src_dbdir)/printer/HP-OfficeJet_4200.xml \
     $(src_dbdir)/printer/HP-OfficeJet_4300.xml \
+    $(src_dbdir)/printer/HP-OfficeJet_J3600.xml \
     $(src_dbdir)/printer/HP-DeskJet_3650.xml \
     $(src_dbdir)/printer/HP-DeskJet_3658.xml \
     $(src_dbdir)/printer/HP-DeskJet_3668.xml \
@@ -2319,6 +2342,7 @@ foomatic_xml_printers = \
     $(src_dbdir)/printer/HP-DeskJet_D2400.xml \
     $(src_dbdir)/printer/HP-910.xml \
     $(src_dbdir)/printer/HP-915.xml \
+    $(src_dbdir)/printer/HP-OfficeJet_J5500.xml \
     $(src_dbdir)/printer/HP-DeskJet_D4100.xml \
     $(src_dbdir)/printer/HP-DeskJet_D4200.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_P100.xml \
@@ -2480,6 +2504,8 @@ foomatic_ppd_printers = \
     ppd/HP-DeskJet_420C-hpijs.ppd \
     ppd/HP-DeskJet_500C-hpijs.ppd \
     ppd/HP-DeskJet_540C-hpijs.ppd \
+    ppd/HP-DeskJet_550C-hpijs.ppd \
+    ppd/HP-DeskJet_560C-hpijs.ppd \
     ppd/HP-DeskJet_630C-hpijs.ppd \
     ppd/HP-DeskJet_632C-hpijs.ppd \
     ppd/HP-DeskJet_656C-hpijs.ppd \
@@ -2675,12 +2701,18 @@ foomatic_ppd_printers = \
     ppd/HP-PhotoSmart_C5100-hpijs.ppd \
     ppd/HP-PhotoSmart_C5200-hpijs.ppd \
     ppd/HP-PhotoSmart_C6100-hpijs.ppd \
+    ppd/HP-PhotoSmart_C6200-hpijs.ppd \
     ppd/HP-PhotoSmart_C7100-hpijs.ppd \
+    ppd/HP-PhotoSmart_C7200-hpijs.ppd \
+    ppd/HP-PhotoSmart_C8100-hpijs.ppd \
     ppd/HP-PhotoSmart_D7300-hpijs.ppd \
     ppd/HP-PhotoSmart_D5060-hpijs.ppd \
     ppd/HP-PhotoSmart_D5100-hpijs.ppd \
+    ppd/HP-PhotoSmart_D5300-hpijs.ppd \
     ppd/HP-PhotoSmart_D6100-hpijs.ppd \
     ppd/HP-PhotoSmart_D7100-hpijs.ppd \
+    ppd/HP-PhotoSmart_D7200-hpijs.ppd \
+    ppd/HP-PhotoSmart_D7400-hpijs.ppd \
     ppd/HP-PhotoSmart_Pro_B8300-hpijs.ppd \
     ppd/HP-PSC_1510-hpijs.ppd \
     ppd/HP-PSC_1500-hpijs.ppd \
@@ -2700,6 +2732,7 @@ foomatic_ppd_printers = \
     ppd/HP-OfficeJet_7300-hpijs.ppd \
     ppd/HP-OfficeJet_7400-hpijs.ppd \
     ppd/HP-OfficeJet_J5700-hpijs.ppd \
+    ppd/HP-Officejet_K7100-hpijs.ppd \
     ppd/HP-DeskJet_450-hpijs.ppd \
     ppd/HP-Business_Inkjet_1000-hpijs.ppd \
     ppd/HP-Business_Inkjet_1100-hpijs.ppd \
@@ -2738,6 +2771,7 @@ foomatic_ppd_printers = \
     ppd/HP-OfficeJet_4115-hpijs.ppd \
     ppd/HP-OfficeJet_4200-hpijs.ppd \
     ppd/HP-OfficeJet_4300-hpijs.ppd \
+    ppd/HP-OfficeJet_J3600-hpijs.ppd \
     ppd/HP-DeskJet_3650-hpijs.ppd \
     ppd/HP-DeskJet_3658-hpijs.ppd \
     ppd/HP-DeskJet_3668-hpijs.ppd \
@@ -2754,6 +2788,7 @@ foomatic_ppd_printers = \
     ppd/HP-DeskJet_D2400-hpijs.ppd \
     ppd/HP-910-hpijs.ppd \
     ppd/HP-915-hpijs.ppd \
+    ppd/HP-OfficeJet_J5500-hpijs.ppd \
     ppd/HP-DeskJet_D4100-hpijs.ppd \
     ppd/HP-DeskJet_D4200-hpijs.ppd \
     ppd/HP-PhotoSmart_P100-hpijs.ppd \
@@ -2999,66 +3034,67 @@ foomatic_ps_printers = \
     $(src_dbdir)/PPD/HP/hp_LaserJet_1300_series.ppd 
 
 foomatic_hpijs_options = $(src_dbdir)/opt/hpijs-Duplex.xml $(src_dbdir)/opt/hpijs-InputSlot.xml $(src_dbdir)/opt/hpijs-Model.xml \
-    $(src_dbdir)/opt/hpijs-PageSize.xml $(src_dbdir)/opt/hpijs-PrintoutMode.xml $(src_dbdir)/opt/hpijs-Quality.xml
+	$(src_dbdir)/opt/hpijs-PageSize.xml $(src_dbdir)/opt/hpijs-PrintoutMode.xml $(src_dbdir)/opt/hpijs-Quality.xml
 
 foomatic_db_runtime = $(src_db_dir)/db/oldprinterids
 foomatic_db_engine_runtime = $(src_cmddir)/configure.ac $(src_cmddir)/extract_pjl $(src_cmddir)/foomatic-addpjloptions.8.in \
-    $(src_cmddir)/foomatic-addpjloptions.in $(src_cmddir)/foomatic-cleanupdrivers.in $(src_cmddir)/foomatic-combo-xml.1.in \
-    $(src_cmddir)/foomatic-combo-xml.c $(src_cmddir)/foomatic-compiledb.1.in $(src_cmddir)/foomatic-compiledb.in \
-    $(src_cmddir)/foomatic-configure.1.in $(src_cmddir)/foomatic-configure.in $(src_cmddir)/Foomatic-Devel-Ideas.txt \
-    $(src_cmddir)/foomatic-extract-text.in $(src_cmddir)/foomatic-filters-ppds-install $(src_cmddir)/foomatic-fix-xml.in \
-    $(src_cmddir)/foomatic-getpjloptions.8.in $(src_cmddir)/foomatic-getpjloptions.in $(src_cmddir)/foomatic-kitload.8.in \
-    $(src_cmddir)/foomatic-kitload.in $(src_cmddir)/foomatic-nonumericalids.in $(src_cmddir)/foomatic-perl-data.1.in \
-    $(src_cmddir)/foomatic-perl-data.c $(src_cmddir)/foomatic-ppdfile.1.in $(src_cmddir)/foomatic-ppdfile.in \
-    $(src_cmddir)/foomatic-ppd-options.1.in $(src_cmddir)/foomatic-ppd-options.in $(src_cmddir)/foomatic-preferred-driver.8.in \
-    $(src_cmddir)/foomatic-preferred-driver.in $(src_cmddir)/foomatic-printermap-to-gimp-print-xml.in $(src_cmddir)/foomatic-printjob.1.in \
-    $(src_cmddir)/foomatic-printjob.in $(src_cmddir)/foomatic-replaceoldprinterids.in $(src_cmddir)/foomatic-searchprinter.in \
-    $(src_cmddir)/gsPrint $(src_cmddir)/gsQuit $(src_cmddir)/gsTest $(src_cmddir)/make_configure $(src_cmddir)/makeDefaults.in \
-    $(src_cmddir)/Makefile.in $(src_cmddir)/makeMan.in $(src_cmddir)/README $(src_cmddir)/lib/Makefile.PL \
-    $(src_cmddir)/lib/Foomatic/DB.pm $(src_cmddir)/lib/Foomatic/PPD.pm $(src_cmddir)/lib/Foomatic/UIElem.pm \
-    $(src_cmddir)/acinclude.m4
+	$(src_cmddir)/foomatic-addpjloptions.in $(src_cmddir)/foomatic-cleanupdrivers.in $(src_cmddir)/foomatic-combo-xml.1.in \
+	$(src_cmddir)/foomatic-combo-xml.c $(src_cmddir)/foomatic-compiledb.1.in $(src_cmddir)/foomatic-compiledb.in \
+	$(src_cmddir)/foomatic-configure.1.in $(src_cmddir)/foomatic-configure.in $(src_cmddir)/Foomatic-Devel-Ideas.txt \
+	$(src_cmddir)/foomatic-extract-text.in $(src_cmddir)/foomatic-filters-ppds-install $(src_cmddir)/foomatic-fix-xml.in \
+	$(src_cmddir)/foomatic-getpjloptions.8.in $(src_cmddir)/foomatic-getpjloptions.in $(src_cmddir)/foomatic-kitload.8.in \
+	$(src_cmddir)/foomatic-kitload.in $(src_cmddir)/foomatic-nonumericalids.in $(src_cmddir)/foomatic-perl-data.1.in \
+	$(src_cmddir)/foomatic-perl-data.c $(src_cmddir)/foomatic-ppdfile.1.in $(src_cmddir)/foomatic-ppdfile.in \
+	$(src_cmddir)/foomatic-ppd-options.1.in $(src_cmddir)/foomatic-ppd-options.in $(src_cmddir)/foomatic-preferred-driver.8.in \
+	$(src_cmddir)/foomatic-preferred-driver.in $(src_cmddir)/foomatic-printermap-to-gimp-print-xml.in $(src_cmddir)/foomatic-printjob.1.in \
+	$(src_cmddir)/foomatic-printjob.in $(src_cmddir)/foomatic-replaceoldprinterids.in $(src_cmddir)/foomatic-searchprinter.in \
+	$(src_cmddir)/gsPrint $(src_cmddir)/gsQuit $(src_cmddir)/gsTest $(src_cmddir)/make_configure $(src_cmddir)/makeDefaults.in \
+	$(src_cmddir)/Makefile.in $(src_cmddir)/makeMan.in $(src_cmddir)/README $(src_cmddir)/lib/Makefile.PL \
+	$(src_cmddir)/lib/Foomatic/DB.pm $(src_cmddir)/lib/Foomatic/PPD.pm $(src_cmddir)/lib/Foomatic/UIElem.pm \
+	$(src_cmddir)/acinclude.m4
 
 foomatic_db_hpijs_runtime = $(src_hpijsdir)/acinclude.m4 $(src_hpijsdir)/configure.ac $(src_hpijsdir)/install-sh \
-    $(src_hpijsdir)/make_configure $(src_hpijsdir)/Makefile.in $(src_hpijsdir)/README \
-    $(src_hpijsdir)/data-generators/hpijs/hpijs-generator.in $(src_hpijsdir)/data-generators/hpijs/hpijs-printermap \
-    $(src_hpijsdir)/data-generators/hpijs/hpijs-remover.in
+	$(src_hpijsdir)/make_configure $(src_hpijsdir)/Makefile.in $(src_hpijsdir)/README \
+	$(src_hpijsdir)/data-generators/hpijs/hpijs-generator.in $(src_hpijsdir)/data-generators/hpijs/hpijs-printermap \
+	$(src_hpijsdir)/data-generators/hpijs/hpijs-remover.in
 
 apdk_SOURCES = prnt/hpijs/models.cpp prnt/hpijs/breaks_open.cpp \
-    prnt/hpijs/dj9xxvip.cpp prnt/hpijs/dj9xx.cpp prnt/hpijs/capture.cpp prnt/hpijs/colormatch.cpp prnt/hpijs/colormatcher_open.cpp \
-    prnt/hpijs/compression.cpp prnt/hpijs/context.cpp prnt/hpijs/create_so.cpp prnt/hpijs/creator.cpp \
-    prnt/hpijs/dj600.cpp prnt/hpijs/dj630.cpp prnt/hpijs/dj660.cpp prnt/hpijs/dj690.cpp prnt/hpijs/dj6xx.cpp prnt/hpijs/dj8xx.cpp prnt/hpijs/dj600_maps.cpp \
-    prnt/hpijs/dj660_maps.cpp prnt/hpijs/dj690_maps.cpp prnt/hpijs/dj895_maps.cpp prnt/hpijs/dj895_maps2.cpp prnt/hpijs/dj970_maps.cpp \
-    prnt/hpijs/dj970_maps2.cpp prnt/hpijs/dj970_maps3.cpp prnt/hpijs/filterhpa.cpp prnt/hpijs/apollo21xx.cpp prnt/hpijs/apollo2560.cpp prnt/hpijs/apollo2xxx.cpp \
-    prnt/hpijs/dj8x5.cpp prnt/hpijs/psp100.cpp prnt/hpijs/phobos_cmaps.cpp prnt/hpijs/dj350.cpp prnt/hpijs/halftoner.cpp prnt/hpijs/halftoner_open.cpp \
-    prnt/hpijs/globals.cpp prnt/hpijs/header.cpp prnt/hpijs/htmtxhi.cpp prnt/hpijs/pmselect.cpp \
-    prnt/hpijs/job.cpp prnt/hpijs/printer.cpp prnt/hpijs/registry.cpp prnt/hpijs/scaler.cpp \
-    prnt/hpijs/scaler_open.cpp prnt/hpijs/script.cpp prnt/hpijs/systemservices.cpp \
-    prnt/hpijs/translator.cpp prnt/hpijs/version.cpp prnt/hpijs/versioncode.cpp \
-    prnt/hpijs/djgenericvip.cpp prnt/hpijs/dj540.cpp prnt/hpijs/dj850.cpp prnt/hpijs/dj850_maps.cpp prnt/hpijs/dj890.cpp \
-    prnt/hpijs/apollo21xx.h prnt/hpijs/apollo2560.h prnt/hpijs/apollo2xxx.h prnt/hpijs/colormatch.h prnt/hpijs/colormatcher_open.h \
-    prnt/hpijs/compression.h prnt/hpijs/config.h prnt/hpijs/context.h prnt/hpijs/dj350.h prnt/hpijs/dj400.h prnt/hpijs/dj540.h \
-    prnt/hpijs/dj600.h prnt/hpijs/dj630.h prnt/hpijs/dj660.h prnt/hpijs/dj690.h prnt/hpijs/dj6xx.h prnt/hpijs/dj8x5.h prnt/hpijs/dj8xx.h \
-    prnt/hpijs/dj850.h prnt/hpijs/dj890.h prnt/hpijs/dj9xx.h prnt/hpijs/dj9xxvip.h \
-    prnt/hpijs/ernieplatform.h prnt/hpijs/filterhpa.h prnt/hpijs/global_types.h prnt/hpijs/halftoner.h prnt/hpijs/font.h prnt/hpijs/debug.h \
-    prnt/hpijs/halftoner_open.h prnt/hpijs/header.h prnt/hpijs/hpprint_c_api.h \
-    prnt/hpijs/hpprintapi.h prnt/hpijs/hptypes.h prnt/hpijs/htfed.h prnt/hpijs/internal.h \
-    prnt/hpijs/interp.h prnt/hpijs/interp_data_50.h prnt/hpijs/io_defs.h prnt/hpijs/job.h prnt/hpijs/models.h prnt/hpijs/modes.h prnt/hpijs/pmselect.h \
-    prnt/hpijs/printer.h prnt/hpijs/psp100.h prnt/hpijs/psp470.h prnt/hpijs/resources.h prnt/hpijs/scaler_open.h prnt/hpijs/scaler_prop.h prnt/hpijs/script.h \
-    prnt/hpijs/systemservices.h prnt/hpijs/unistd_.h prnt/hpijs/djgenericvip.h prnt/hpijs/ljmono.h prnt/hpijs/ljmono.cpp \
-    prnt/hpijs/dj3320.cpp prnt/hpijs/dj3320.h prnt/hpijs/dj3320_cmap.cpp prnt/hpijs/dj3600.cpp prnt/hpijs/dj3600.h prnt/hpijs/dj3600_cmap.cpp prnt/hpijs/dj4100.h \
-    prnt/hpijs/dj4100_cmap.cpp prnt/hpijs/ldlencap.h prnt/hpijs/ljcolor.cpp prnt/hpijs/ljcolor.h prnt/hpijs/pscript.h \
-    prnt/hpijs/printerproxy.cpp prnt/hpijs/printerfactory.cpp prnt/hpijs/printerproxy.h prnt/hpijs/printerfactory.h \
-    prnt/hpijs/ljjetready.cpp prnt/hpijs/ljjetready.h prnt/hpijs/jdatadbf.c prnt/hpijs/jccolor.c prnt/hpijs/ljfastraster.cpp prnt/hpijs/ljfastraster.h \
-    prnt/hpijs/jinclude.h prnt/hpijs/jpegint.h prnt/hpijs/dj55xx.h prnt/hpijs/hpijsfax.h prnt/hpijs/ojprokx50.h 
+	prnt/hpijs/dj9xxvip.cpp prnt/hpijs/dj9xx.cpp prnt/hpijs/capture.cpp prnt/hpijs/colormatch.cpp prnt/hpijs/colormatcher_open.cpp \
+	prnt/hpijs/compression.cpp prnt/hpijs/context.cpp prnt/hpijs/create_so.cpp prnt/hpijs/creator.cpp \
+	prnt/hpijs/dj600.cpp prnt/hpijs/dj630.cpp prnt/hpijs/dj660.cpp prnt/hpijs/dj690.cpp prnt/hpijs/dj6xx.cpp prnt/hpijs/dj8xx.cpp prnt/hpijs/dj600_maps.cpp \
+	prnt/hpijs/dj660_maps.cpp prnt/hpijs/dj690_maps.cpp prnt/hpijs/dj895_maps.cpp prnt/hpijs/dj895_maps2.cpp prnt/hpijs/dj970_maps.cpp \
+	prnt/hpijs/dj970_maps2.cpp prnt/hpijs/dj970_maps3.cpp prnt/hpijs/filterhpa.cpp prnt/hpijs/apollo21xx.cpp prnt/hpijs/apollo2560.cpp prnt/hpijs/apollo2xxx.cpp \
+	prnt/hpijs/dj8x5.cpp prnt/hpijs/psp100.cpp prnt/hpijs/phobos_cmaps.cpp prnt/hpijs/dj350.cpp prnt/hpijs/halftoner.cpp prnt/hpijs/halftoner_open.cpp \
+	prnt/hpijs/globals.cpp prnt/hpijs/header.cpp prnt/hpijs/htmtxhi.cpp prnt/hpijs/pmselect.cpp \
+	prnt/hpijs/job.cpp prnt/hpijs/printer.cpp prnt/hpijs/registry.cpp prnt/hpijs/scaler.cpp \
+	prnt/hpijs/scaler_open.cpp prnt/hpijs/script.cpp prnt/hpijs/systemservices.cpp \
+	prnt/hpijs/translator.cpp prnt/hpijs/version.cpp prnt/hpijs/versioncode.cpp \
+	prnt/hpijs/djgenericvip.cpp prnt/hpijs/dj540.cpp prnt/hpijs/dj850.cpp prnt/hpijs/dj850_maps.cpp prnt/hpijs/dj890.cpp \
+	prnt/hpijs/apollo21xx.h prnt/hpijs/apollo2560.h prnt/hpijs/apollo2xxx.h prnt/hpijs/colormatch.h prnt/hpijs/colormatcher_open.h \
+	prnt/hpijs/compression.h prnt/hpijs/config.h prnt/hpijs/context.h prnt/hpijs/dj350.h prnt/hpijs/dj400.h prnt/hpijs/dj540.h \
+	prnt/hpijs/dj600.h prnt/hpijs/dj630.h prnt/hpijs/dj660.h prnt/hpijs/dj690.h prnt/hpijs/dj6xx.h prnt/hpijs/dj8x5.h prnt/hpijs/dj8xx.h \
+	prnt/hpijs/dj850.h prnt/hpijs/dj890.h prnt/hpijs/dj9xx.h prnt/hpijs/dj9xxvip.h \
+	prnt/hpijs/ernieplatform.h prnt/hpijs/filterhpa.h prnt/hpijs/global_types.h prnt/hpijs/halftoner.h prnt/hpijs/font.h prnt/hpijs/debug.h \
+	prnt/hpijs/halftoner_open.h prnt/hpijs/header.h prnt/hpijs/hpprint_c_api.h \
+	prnt/hpijs/hpprintapi.h prnt/hpijs/hptypes.h prnt/hpijs/htfed.h prnt/hpijs/internal.h \
+	prnt/hpijs/interp.h prnt/hpijs/interp_data_50.h prnt/hpijs/io_defs.h prnt/hpijs/job.h prnt/hpijs/models.h prnt/hpijs/modes.h prnt/hpijs/pmselect.h \
+	prnt/hpijs/printer.h prnt/hpijs/psp100.h prnt/hpijs/psp470.h prnt/hpijs/resources.h prnt/hpijs/scaler_open.h prnt/hpijs/scaler_prop.h prnt/hpijs/script.h \
+	prnt/hpijs/systemservices.h prnt/hpijs/unistd_.h prnt/hpijs/djgenericvip.h prnt/hpijs/ljmono.h prnt/hpijs/ljmono.cpp \
+	prnt/hpijs/dj3320.cpp prnt/hpijs/dj3320.h prnt/hpijs/dj3320_cmap.cpp prnt/hpijs/dj3600.cpp prnt/hpijs/dj3600.h prnt/hpijs/dj3600_cmap.cpp prnt/hpijs/dj4100.h \
+	prnt/hpijs/dj4100_cmap.cpp prnt/hpijs/ldlencap.h prnt/hpijs/ljcolor.cpp prnt/hpijs/ljcolor.h prnt/hpijs/pscript.h \
+	prnt/hpijs/printerproxy.cpp prnt/hpijs/printerfactory.cpp prnt/hpijs/printerproxy.h prnt/hpijs/printerfactory.h \
+	prnt/hpijs/ljjetready.cpp prnt/hpijs/ljjetready.h prnt/hpijs/jdatadbf.c prnt/hpijs/jccolor.c prnt/hpijs/ljfastraster.cpp prnt/hpijs/ljfastraster.h \
+	prnt/hpijs/jinclude.h prnt/hpijs/jpegint.h prnt/hpijs/dj55xx.h prnt/hpijs/hpijsfax.h prnt/hpijs/ojprokx50.h \
+	prnt/hpijs/ljzjs.cpp prnt/hpijs/ljzjs.h prnt/hpijs/ljzjsmono.cpp prnt/hpijs/ljzjsmono.h prnt/hpijs/hpjbig_wrapper.h
 
 hpijs_SOURCES = $(apdk_SOURCES) prnt/hpijs/hpijs.cpp prnt/hpijs/ijs_server.c prnt/hpijs/ijs.c prnt/hpijs/hpijsfax.cpp prnt/hpijs/services.cpp \
-    prnt/hpijs/hpijs.h prnt/hpijs/ijs.h prnt/hpijs/ijs_server.h prnt/hpijs/services.h prnt/hpijs/ijs_client.h prnt/hpijs/hpiom.c prnt/hpijs/hpiom.h 
+	prnt/hpijs/hpijs.h prnt/hpijs/ijs.h prnt/hpijs/ijs_server.h prnt/hpijs/services.h prnt/hpijs/ijs_client.h prnt/hpijs/hpiom.c prnt/hpijs/hpiom.h 
 
 hpijs_CXXFLAGS = -DAPDK_DJ660 -DAPDK_DJ6xx -DAPDK_DJ6xxPhoto -DAPDK_DJ8xx -DAPDK_DJ9xx -DAPDK_DJ9xxVIP -DAPDK_DJ630 \
-    -DAPDK_APOLLO2XXX -DAPDK_APOLLO21XX -DAPDK_APOLLO2560 -DAPDK_DJ600 -DAPDK_DJ350 -DAPDK_DJ8x5 -DAPDK_PSP100 -DAPDK_AUTODUPLEX \
-    -DAPDK_HIGH_RES_MODES -DAPDK_LJMONO -DAPDK_DJ540 -DAPDK_DJ850 -DAPDK_DJ890 -DAPDK_DJ3320 -DAPDK_LJCOLOR -DAPDK_DJGENERICVIP \
-    -DAPDK_LJJETREADY  -DAPDK_LJFASTRASTER -DAPDK_BUFFER_SEND -DAPDK_LDL_COMPRESS -DAPDK_EXTENDED_MEDIASIZE \
-    -DAPDK_MLC_PRINTER -DAPDK_DJ3600 $(APDK_ENDIAN_FLAG) $(APDK_AUTO_INCLUDE_FLAG) -DAPDK_LINUX -DNDEBUG
+	-DAPDK_APOLLO2XXX -DAPDK_APOLLO21XX -DAPDK_APOLLO2560 -DAPDK_DJ600 -DAPDK_DJ350 -DAPDK_DJ8x5 -DAPDK_PSP100 -DAPDK_AUTODUPLEX \
+	-DAPDK_HIGH_RES_MODES -DAPDK_LJMONO -DAPDK_DJ540 -DAPDK_DJ850 -DAPDK_DJ890 -DAPDK_DJ3320 -DAPDK_LJCOLOR -DAPDK_DJGENERICVIP \
+	-DAPDK_LJJETREADY  -DAPDK_LJFASTRASTER -DAPDK_BUFFER_SEND -DAPDK_LDL_COMPRESS -DAPDK_EXTENDED_MEDIASIZE \
+	-DAPDK_MLC_PRINTER -DAPDK_DJ3600 -DAPDK_LJZJS_MONO $(APDK_ENDIAN_FLAG) $(APDK_AUTO_INCLUDE_FLAG) -DAPDK_LINUX -DNDEBUG
 
 hpijs_CFLAGS = $(hpijs_CXXFLAGS) -Iprnt/hpijs
 @HPLIP_BUILD_TRUE@hpijs_LDADD = libhpip.la libhpmud.la
@@ -3649,6 +3685,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hpijs-ljfastraster.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hpijs-ljjetready.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hpijs-ljmono.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hpijs-ljzjs.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hpijs-ljzjsmono.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hpijs-models.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hpijs-phobos_cmaps.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hpijs-pmselect.Po@am__quote@
@@ -3719,6 +3757,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hppgsz-ljfastraster.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hppgsz-ljjetready.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hppgsz-ljmono.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hppgsz-ljzjs.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hppgsz-ljzjsmono.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hppgsz-models.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hppgsz-phobos_cmaps.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hppgsz-pmselect.Po@am__quote@
@@ -5234,6 +5274,34 @@ hpijs-ljfastraster.obj: prnt/hpijs/ljfastraster.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hpijs_CXXFLAGS) $(CXXFLAGS) -c -o hpijs-ljfastraster.obj `if test -f 'prnt/hpijs/ljfastraster.cpp'; then $(CYGPATH_W) 'prnt/hpijs/ljfastraster.cpp'; else $(CYGPATH_W) '$(srcdir)/prnt/hpijs/ljfastraster.cpp'; fi`
 
+hpijs-ljzjs.o: prnt/hpijs/ljzjs.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hpijs_CXXFLAGS) $(CXXFLAGS) -MT hpijs-ljzjs.o -MD -MP -MF "$(DEPDIR)/hpijs-ljzjs.Tpo" -c -o hpijs-ljzjs.o `test -f 'prnt/hpijs/ljzjs.cpp' || echo '$(srcdir)/'`prnt/hpijs/ljzjs.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/hpijs-ljzjs.Tpo" "$(DEPDIR)/hpijs-ljzjs.Po"; else rm -f "$(DEPDIR)/hpijs-ljzjs.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='prnt/hpijs/ljzjs.cpp' object='hpijs-ljzjs.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hpijs_CXXFLAGS) $(CXXFLAGS) -c -o hpijs-ljzjs.o `test -f 'prnt/hpijs/ljzjs.cpp' || echo '$(srcdir)/'`prnt/hpijs/ljzjs.cpp
+
+hpijs-ljzjs.obj: prnt/hpijs/ljzjs.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hpijs_CXXFLAGS) $(CXXFLAGS) -MT hpijs-ljzjs.obj -MD -MP -MF "$(DEPDIR)/hpijs-ljzjs.Tpo" -c -o hpijs-ljzjs.obj `if test -f 'prnt/hpijs/ljzjs.cpp'; then $(CYGPATH_W) 'prnt/hpijs/ljzjs.cpp'; else $(CYGPATH_W) '$(srcdir)/prnt/hpijs/ljzjs.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/hpijs-ljzjs.Tpo" "$(DEPDIR)/hpijs-ljzjs.Po"; else rm -f "$(DEPDIR)/hpijs-ljzjs.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='prnt/hpijs/ljzjs.cpp' object='hpijs-ljzjs.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hpijs_CXXFLAGS) $(CXXFLAGS) -c -o hpijs-ljzjs.obj `if test -f 'prnt/hpijs/ljzjs.cpp'; then $(CYGPATH_W) 'prnt/hpijs/ljzjs.cpp'; else $(CYGPATH_W) '$(srcdir)/prnt/hpijs/ljzjs.cpp'; fi`
+
+hpijs-ljzjsmono.o: prnt/hpijs/ljzjsmono.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hpijs_CXXFLAGS) $(CXXFLAGS) -MT hpijs-ljzjsmono.o -MD -MP -MF "$(DEPDIR)/hpijs-ljzjsmono.Tpo" -c -o hpijs-ljzjsmono.o `test -f 'prnt/hpijs/ljzjsmono.cpp' || echo '$(srcdir)/'`prnt/hpijs/ljzjsmono.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/hpijs-ljzjsmono.Tpo" "$(DEPDIR)/hpijs-ljzjsmono.Po"; else rm -f "$(DEPDIR)/hpijs-ljzjsmono.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='prnt/hpijs/ljzjsmono.cpp' object='hpijs-ljzjsmono.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hpijs_CXXFLAGS) $(CXXFLAGS) -c -o hpijs-ljzjsmono.o `test -f 'prnt/hpijs/ljzjsmono.cpp' || echo '$(srcdir)/'`prnt/hpijs/ljzjsmono.cpp
+
+hpijs-ljzjsmono.obj: prnt/hpijs/ljzjsmono.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hpijs_CXXFLAGS) $(CXXFLAGS) -MT hpijs-ljzjsmono.obj -MD -MP -MF "$(DEPDIR)/hpijs-ljzjsmono.Tpo" -c -o hpijs-ljzjsmono.obj `if test -f 'prnt/hpijs/ljzjsmono.cpp'; then $(CYGPATH_W) 'prnt/hpijs/ljzjsmono.cpp'; else $(CYGPATH_W) '$(srcdir)/prnt/hpijs/ljzjsmono.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/hpijs-ljzjsmono.Tpo" "$(DEPDIR)/hpijs-ljzjsmono.Po"; else rm -f "$(DEPDIR)/hpijs-ljzjsmono.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='prnt/hpijs/ljzjsmono.cpp' object='hpijs-ljzjsmono.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hpijs_CXXFLAGS) $(CXXFLAGS) -c -o hpijs-ljzjsmono.obj `if test -f 'prnt/hpijs/ljzjsmono.cpp'; then $(CYGPATH_W) 'prnt/hpijs/ljzjsmono.cpp'; else $(CYGPATH_W) '$(srcdir)/prnt/hpijs/ljzjsmono.cpp'; fi`
+
 hpijs-hpijs.o: prnt/hpijs/hpijs.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hpijs_CXXFLAGS) $(CXXFLAGS) -MT hpijs-hpijs.o -MD -MP -MF "$(DEPDIR)/hpijs-hpijs.Tpo" -c -o hpijs-hpijs.o `test -f 'prnt/hpijs/hpijs.cpp' || echo '$(srcdir)/'`prnt/hpijs/hpijs.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/hpijs-hpijs.Tpo" "$(DEPDIR)/hpijs-hpijs.Po"; else rm -f "$(DEPDIR)/hpijs-hpijs.Tpo"; exit 1; fi
@@ -6186,6 +6254,34 @@ hppgsz-ljfastraster.obj: prnt/hpijs/ljfastraster.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hppgsz_CXXFLAGS) $(CXXFLAGS) -c -o hppgsz-ljfastraster.obj `if test -f 'prnt/hpijs/ljfastraster.cpp'; then $(CYGPATH_W) 'prnt/hpijs/ljfastraster.cpp'; else $(CYGPATH_W) '$(srcdir)/prnt/hpijs/ljfastraster.cpp'; fi`
 
+hppgsz-ljzjs.o: prnt/hpijs/ljzjs.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hppgsz_CXXFLAGS) $(CXXFLAGS) -MT hppgsz-ljzjs.o -MD -MP -MF "$(DEPDIR)/hppgsz-ljzjs.Tpo" -c -o hppgsz-ljzjs.o `test -f 'prnt/hpijs/ljzjs.cpp' || echo '$(srcdir)/'`prnt/hpijs/ljzjs.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/hppgsz-ljzjs.Tpo" "$(DEPDIR)/hppgsz-ljzjs.Po"; else rm -f "$(DEPDIR)/hppgsz-ljzjs.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='prnt/hpijs/ljzjs.cpp' object='hppgsz-ljzjs.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hppgsz_CXXFLAGS) $(CXXFLAGS) -c -o hppgsz-ljzjs.o `test -f 'prnt/hpijs/ljzjs.cpp' || echo '$(srcdir)/'`prnt/hpijs/ljzjs.cpp
+
+hppgsz-ljzjs.obj: prnt/hpijs/ljzjs.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hppgsz_CXXFLAGS) $(CXXFLAGS) -MT hppgsz-ljzjs.obj -MD -MP -MF "$(DEPDIR)/hppgsz-ljzjs.Tpo" -c -o hppgsz-ljzjs.obj `if test -f 'prnt/hpijs/ljzjs.cpp'; then $(CYGPATH_W) 'prnt/hpijs/ljzjs.cpp'; else $(CYGPATH_W) '$(srcdir)/prnt/hpijs/ljzjs.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/hppgsz-ljzjs.Tpo" "$(DEPDIR)/hppgsz-ljzjs.Po"; else rm -f "$(DEPDIR)/hppgsz-ljzjs.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='prnt/hpijs/ljzjs.cpp' object='hppgsz-ljzjs.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hppgsz_CXXFLAGS) $(CXXFLAGS) -c -o hppgsz-ljzjs.obj `if test -f 'prnt/hpijs/ljzjs.cpp'; then $(CYGPATH_W) 'prnt/hpijs/ljzjs.cpp'; else $(CYGPATH_W) '$(srcdir)/prnt/hpijs/ljzjs.cpp'; fi`
+
+hppgsz-ljzjsmono.o: prnt/hpijs/ljzjsmono.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hppgsz_CXXFLAGS) $(CXXFLAGS) -MT hppgsz-ljzjsmono.o -MD -MP -MF "$(DEPDIR)/hppgsz-ljzjsmono.Tpo" -c -o hppgsz-ljzjsmono.o `test -f 'prnt/hpijs/ljzjsmono.cpp' || echo '$(srcdir)/'`prnt/hpijs/ljzjsmono.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/hppgsz-ljzjsmono.Tpo" "$(DEPDIR)/hppgsz-ljzjsmono.Po"; else rm -f "$(DEPDIR)/hppgsz-ljzjsmono.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='prnt/hpijs/ljzjsmono.cpp' object='hppgsz-ljzjsmono.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hppgsz_CXXFLAGS) $(CXXFLAGS) -c -o hppgsz-ljzjsmono.o `test -f 'prnt/hpijs/ljzjsmono.cpp' || echo '$(srcdir)/'`prnt/hpijs/ljzjsmono.cpp
+
+hppgsz-ljzjsmono.obj: prnt/hpijs/ljzjsmono.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hppgsz_CXXFLAGS) $(CXXFLAGS) -MT hppgsz-ljzjsmono.obj -MD -MP -MF "$(DEPDIR)/hppgsz-ljzjsmono.Tpo" -c -o hppgsz-ljzjsmono.obj `if test -f 'prnt/hpijs/ljzjsmono.cpp'; then $(CYGPATH_W) 'prnt/hpijs/ljzjsmono.cpp'; else $(CYGPATH_W) '$(srcdir)/prnt/hpijs/ljzjsmono.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/hppgsz-ljzjsmono.Tpo" "$(DEPDIR)/hppgsz-ljzjsmono.Po"; else rm -f "$(DEPDIR)/hppgsz-ljzjsmono.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='prnt/hpijs/ljzjsmono.cpp' object='hppgsz-ljzjsmono.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hppgsz_CXXFLAGS) $(CXXFLAGS) -c -o hppgsz-ljzjsmono.obj `if test -f 'prnt/hpijs/ljzjsmono.cpp'; then $(CYGPATH_W) 'prnt/hpijs/ljzjsmono.cpp'; else $(CYGPATH_W) '$(srcdir)/prnt/hpijs/ljzjsmono.cpp'; fi`
+
 hppgsz-PrinterProperties.o: prnt/hpijs/PrinterProperties.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hppgsz_CXXFLAGS) $(CXXFLAGS) -MT hppgsz-PrinterProperties.o -MD -MP -MF "$(DEPDIR)/hppgsz-PrinterProperties.Tpo" -c -o hppgsz-PrinterProperties.o `test -f 'prnt/hpijs/PrinterProperties.cpp' || echo '$(srcdir)/'`prnt/hpijs/PrinterProperties.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/hppgsz-PrinterProperties.Tpo" "$(DEPDIR)/hppgsz-PrinterProperties.Po"; else rm -f "$(DEPDIR)/hppgsz-PrinterProperties.Tpo"; exit 1; fi
@@ -6225,23 +6321,6 @@ uninstall-dist_faxppdDATA:
 	  f=$(am__strip_dir) \
 	  echo " rm -f '$(DESTDIR)$(faxppddir)/$$f'"; \
 	  rm -f "$(DESTDIR)$(faxppddir)/$$f"; \
-	done
-install-dist_firmDATA: $(dist_firm_DATA)
-	@$(NORMAL_INSTALL)
-	test -z "$(firmdir)" || $(mkdir_p) "$(DESTDIR)$(firmdir)"
-	@list='$(dist_firm_DATA)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f=$(am__strip_dir) \
-	  echo " $(dist_firmDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(firmdir)/$$f'"; \
-	  $(dist_firmDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(firmdir)/$$f"; \
-	done
-
-uninstall-dist_firmDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(dist_firm_DATA)'; for p in $$list; do \
-	  f=$(am__strip_dir) \
-	  echo " rm -f '$(DESTDIR)$(firmdir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(firmdir)/$$f"; \
 	done
 install-dist_hplipDATA: $(dist_hplip_DATA)
 	@$(NORMAL_INSTALL)
@@ -6822,7 +6901,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/$(src_dbdir)/PPD/HP $(distdir)/$(src_dbdir)/driver $(distdir)/$(src_dbdir)/opt $(distdir)/$(src_dbdir)/printer $(distdir)/$(src_hpijsdir) $(distdir)/$(src_hpijsdir)/data-generators/hpijs $(distdir)/$(wwwsrc) $(distdir)/$(wwwsrc)/howtos $(distdir)/$(wwwsrc)/images $(distdir)/$(wwwsrc)/install $(distdir)/$(wwwsrc)/install/install $(distdir)/$(wwwsrc)/install/manual $(distdir)/$(wwwsrc)/install/manual/distros $(distdir)/$(wwwsrc)/install/step1 $(distdir)/$(wwwsrc)/install/step2 $(distdir)/$(wwwsrc)/install/step3 $(distdir)/$(wwwsrc)/install/step4 $(distdir)/$(wwwsrc)/install/step4/cups $(distdir)/$(wwwsrc)/install/step4/setup $(distdir)/$(wwwsrc)/install/step4/suse $(distdir)/$(wwwsrc)/styles $(distdir)/$(wwwsrc)/supported_devices $(distdir)/$(wwwsrc)/tech_docs $(distdir)/$(wwwsrc)/tech_docs/man_pages $(distdir)/$(wwwsrc)/troubleshooting $(distdir)/. $(distdir)/Cheetah $(distdir)/Cheetah/Utils $(distdir)/Cheetah/Utils/optik $(distdir)/base $(distdir)/cherrypy $(distdir)/cherrypy/filters $(distdir)/cherrypy/lib $(distdir)/copier $(distdir)/data/firmware $(distdir)/data/images $(distdir)/data/ldl $(distdir)/data/localization $(distdir)/data/models $(distdir)/data/models/unreleased $(distdir)/data/pcl $(distdir)/data/ps $(distdir)/fax $(distdir)/fax/backend $(distdir)/fax/ppd $(distdir)/installer $(distdir)/installer/images $(distdir)/installer/pages $(distdir)/installer/scripts $(distdir)/installer/styles $(distdir)/pcard $(distdir)/plugins $(distdir)/ppd $(distdir)/prnt $(distdir)/prnt/hpijs $(distdir)/scan $(distdir)/scan/sane $(distdir)/ui
+	$(mkdir_p) $(distdir)/$(src_dbdir)/PPD/HP $(distdir)/$(src_dbdir)/driver $(distdir)/$(src_dbdir)/opt $(distdir)/$(src_dbdir)/printer $(distdir)/$(src_hpijsdir) $(distdir)/$(src_hpijsdir)/data-generators/hpijs $(distdir)/$(wwwsrc) $(distdir)/$(wwwsrc)/howtos $(distdir)/$(wwwsrc)/images $(distdir)/$(wwwsrc)/install $(distdir)/$(wwwsrc)/install/install $(distdir)/$(wwwsrc)/install/manual $(distdir)/$(wwwsrc)/install/manual/distros $(distdir)/$(wwwsrc)/install/step1 $(distdir)/$(wwwsrc)/install/step2 $(distdir)/$(wwwsrc)/install/step3 $(distdir)/$(wwwsrc)/install/step4 $(distdir)/$(wwwsrc)/install/step4/cups $(distdir)/$(wwwsrc)/install/step4/setup $(distdir)/$(wwwsrc)/install/step4/suse $(distdir)/$(wwwsrc)/styles $(distdir)/$(wwwsrc)/supported_devices $(distdir)/$(wwwsrc)/tech_docs $(distdir)/$(wwwsrc)/tech_docs/man_pages $(distdir)/$(wwwsrc)/troubleshooting $(distdir)/. $(distdir)/Cheetah $(distdir)/Cheetah/Utils $(distdir)/Cheetah/Utils/optik $(distdir)/base $(distdir)/cherrypy $(distdir)/cherrypy/filters $(distdir)/cherrypy/lib $(distdir)/copier $(distdir)/data/images $(distdir)/data/ldl $(distdir)/data/localization $(distdir)/data/models $(distdir)/data/models/unreleased $(distdir)/data/pcl $(distdir)/data/ps $(distdir)/data/rules $(distdir)/fax $(distdir)/fax/backend $(distdir)/fax/ppd $(distdir)/installer $(distdir)/installer/images $(distdir)/installer/pages $(distdir)/installer/scripts $(distdir)/installer/styles $(distdir)/pcard $(distdir)/plugins $(distdir)/ppd $(distdir)/prnt $(distdir)/prnt/hpijs $(distdir)/scan $(distdir)/scan/sane $(distdir)/ui
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -6952,7 +7031,7 @@ all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(SCRIPTS) $(DATA)
 install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs:
-	for dir in "$(DESTDIR)$(cupsextdir)" "$(DESTDIR)$(hpmudextdir)" "$(DESTDIR)$(libdir)" "$(DESTDIR)$(libsane_hpaiodir)" "$(DESTDIR)$(pcardextdir)" "$(DESTDIR)$(scanextdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(hpdir)" "$(DESTDIR)$(basedir)" "$(DESTDIR)$(cmddir)" "$(DESTDIR)$(copierdir)" "$(DESTDIR)$(faxdir)" "$(DESTDIR)$(hpfaxdir)" "$(DESTDIR)$(hplipdir)" "$(DESTDIR)$(installdir)" "$(DESTDIR)$(pcarddir)" "$(DESTDIR)$(pluginsdir)" "$(DESTDIR)$(prntdir)" "$(DESTDIR)$(scandir)" "$(DESTDIR)$(uidir)" "$(DESTDIR)$(faxppddir)" "$(DESTDIR)$(firmdir)" "$(DESTDIR)$(hplipdir)" "$(DESTDIR)$(imagesdir)" "$(DESTDIR)$(ldldir)" "$(DESTDIR)$(localzdir)" "$(DESTDIR)$(modelsdir)" "$(DESTDIR)$(pcldir)" "$(DESTDIR)$(postscriptdir)" "$(DESTDIR)$(rulesdir)" "$(DESTDIR)$(unreldir)" "$(DESTDIR)$(www0dir)" "$(DESTDIR)$(www1dir)" "$(DESTDIR)$(www2dir)" "$(DESTDIR)$(www21dir)" "$(DESTDIR)$(www22dir)" "$(DESTDIR)$(www23dir)" "$(DESTDIR)$(www24dir)" "$(DESTDIR)$(www241dir)" "$(DESTDIR)$(www242dir)" "$(DESTDIR)$(www243dir)" "$(DESTDIR)$(www251dir)" "$(DESTDIR)$(www252dir)" "$(DESTDIR)$(www261dir)" "$(DESTDIR)$(www3dir)" "$(DESTDIR)$(www4dir)" "$(DESTDIR)$(www5dir)" "$(DESTDIR)$(www6dir)" "$(DESTDIR)$(www61dir)" "$(DESTDIR)$(www7dir)" "$(DESTDIR)$(docdir)" "$(DESTDIR)$(hplip_confdir)" "$(DESTDIR)$(hplip_desktopdir)"; do \
+	for dir in "$(DESTDIR)$(cupsextdir)" "$(DESTDIR)$(hpmudextdir)" "$(DESTDIR)$(libdir)" "$(DESTDIR)$(libsane_hpaiodir)" "$(DESTDIR)$(pcardextdir)" "$(DESTDIR)$(scanextdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(hpdir)" "$(DESTDIR)$(basedir)" "$(DESTDIR)$(cmddir)" "$(DESTDIR)$(copierdir)" "$(DESTDIR)$(faxdir)" "$(DESTDIR)$(hpfaxdir)" "$(DESTDIR)$(hplipdir)" "$(DESTDIR)$(installdir)" "$(DESTDIR)$(pcarddir)" "$(DESTDIR)$(pluginsdir)" "$(DESTDIR)$(prntdir)" "$(DESTDIR)$(scandir)" "$(DESTDIR)$(uidir)" "$(DESTDIR)$(faxppddir)" "$(DESTDIR)$(hplipdir)" "$(DESTDIR)$(imagesdir)" "$(DESTDIR)$(ldldir)" "$(DESTDIR)$(localzdir)" "$(DESTDIR)$(modelsdir)" "$(DESTDIR)$(pcldir)" "$(DESTDIR)$(postscriptdir)" "$(DESTDIR)$(rulesdir)" "$(DESTDIR)$(unreldir)" "$(DESTDIR)$(www0dir)" "$(DESTDIR)$(www1dir)" "$(DESTDIR)$(www2dir)" "$(DESTDIR)$(www21dir)" "$(DESTDIR)$(www22dir)" "$(DESTDIR)$(www23dir)" "$(DESTDIR)$(www24dir)" "$(DESTDIR)$(www241dir)" "$(DESTDIR)$(www242dir)" "$(DESTDIR)$(www243dir)" "$(DESTDIR)$(www251dir)" "$(DESTDIR)$(www252dir)" "$(DESTDIR)$(www261dir)" "$(DESTDIR)$(www3dir)" "$(DESTDIR)$(www4dir)" "$(DESTDIR)$(www5dir)" "$(DESTDIR)$(www6dir)" "$(DESTDIR)$(www61dir)" "$(DESTDIR)$(www7dir)" "$(DESTDIR)$(docdir)" "$(DESTDIR)$(hplip_confdir)" "$(DESTDIR)$(hplip_desktopdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -7007,28 +7086,28 @@ info-am:
 install-data-am: install-cupsextLTLIBRARIES install-dist_baseSCRIPTS \
 	install-dist_cmdSCRIPTS install-dist_copierSCRIPTS \
 	install-dist_faxSCRIPTS install-dist_faxppdDATA \
-	install-dist_firmDATA install-dist_hpfaxSCRIPTS \
-	install-dist_hplipDATA install-dist_hplipSCRIPTS \
-	install-dist_imagesDATA install-dist_installSCRIPTS \
-	install-dist_ldlDATA install-dist_localzDATA \
-	install-dist_modelsDATA install-dist_pcardSCRIPTS \
-	install-dist_pclDATA install-dist_pluginsSCRIPTS \
-	install-dist_postscriptDATA install-dist_prntSCRIPTS \
-	install-dist_rulesDATA install-dist_scanSCRIPTS \
-	install-dist_uiSCRIPTS install-dist_unrelDATA \
-	install-dist_www0DATA install-dist_www1DATA \
-	install-dist_www21DATA install-dist_www22DATA \
-	install-dist_www23DATA install-dist_www241DATA \
-	install-dist_www242DATA install-dist_www243DATA \
-	install-dist_www24DATA install-dist_www251DATA \
-	install-dist_www252DATA install-dist_www261DATA \
-	install-dist_www2DATA install-dist_www3DATA \
-	install-dist_www4DATA install-dist_www5DATA \
-	install-dist_www61DATA install-dist_www6DATA \
-	install-dist_www7DATA install-docDATA install-hpPROGRAMS \
-	install-hplip_confDATA install-hplip_desktopDATA \
-	install-hpmudextLTLIBRARIES install-libsane_hpaioLTLIBRARIES \
-	install-pcardextLTLIBRARIES install-scanextLTLIBRARIES
+	install-dist_hpfaxSCRIPTS install-dist_hplipDATA \
+	install-dist_hplipSCRIPTS install-dist_imagesDATA \
+	install-dist_installSCRIPTS install-dist_ldlDATA \
+	install-dist_localzDATA install-dist_modelsDATA \
+	install-dist_pcardSCRIPTS install-dist_pclDATA \
+	install-dist_pluginsSCRIPTS install-dist_postscriptDATA \
+	install-dist_prntSCRIPTS install-dist_rulesDATA \
+	install-dist_scanSCRIPTS install-dist_uiSCRIPTS \
+	install-dist_unrelDATA install-dist_www0DATA \
+	install-dist_www1DATA install-dist_www21DATA \
+	install-dist_www22DATA install-dist_www23DATA \
+	install-dist_www241DATA install-dist_www242DATA \
+	install-dist_www243DATA install-dist_www24DATA \
+	install-dist_www251DATA install-dist_www252DATA \
+	install-dist_www261DATA install-dist_www2DATA \
+	install-dist_www3DATA install-dist_www4DATA \
+	install-dist_www5DATA install-dist_www61DATA \
+	install-dist_www6DATA install-dist_www7DATA install-docDATA \
+	install-hpPROGRAMS install-hplip_confDATA \
+	install-hplip_desktopDATA install-hpmudextLTLIBRARIES \
+	install-libsane_hpaioLTLIBRARIES install-pcardextLTLIBRARIES \
+	install-scanextLTLIBRARIES
 	@$(NORMAL_INSTALL)
 	$(MAKE) $(AM_MAKEFLAGS) install-data-hook
 
@@ -7063,26 +7142,25 @@ ps-am:
 uninstall-am: uninstall-binPROGRAMS uninstall-cupsextLTLIBRARIES \
 	uninstall-dist_baseSCRIPTS uninstall-dist_cmdSCRIPTS \
 	uninstall-dist_copierSCRIPTS uninstall-dist_faxSCRIPTS \
-	uninstall-dist_faxppdDATA uninstall-dist_firmDATA \
-	uninstall-dist_hpfaxSCRIPTS uninstall-dist_hplipDATA \
-	uninstall-dist_hplipSCRIPTS uninstall-dist_imagesDATA \
-	uninstall-dist_installSCRIPTS uninstall-dist_ldlDATA \
-	uninstall-dist_localzDATA uninstall-dist_modelsDATA \
-	uninstall-dist_pcardSCRIPTS uninstall-dist_pclDATA \
-	uninstall-dist_pluginsSCRIPTS uninstall-dist_postscriptDATA \
-	uninstall-dist_prntSCRIPTS uninstall-dist_rulesDATA \
-	uninstall-dist_scanSCRIPTS uninstall-dist_uiSCRIPTS \
-	uninstall-dist_unrelDATA uninstall-dist_www0DATA \
-	uninstall-dist_www1DATA uninstall-dist_www21DATA \
-	uninstall-dist_www22DATA uninstall-dist_www23DATA \
-	uninstall-dist_www241DATA uninstall-dist_www242DATA \
-	uninstall-dist_www243DATA uninstall-dist_www24DATA \
-	uninstall-dist_www251DATA uninstall-dist_www252DATA \
-	uninstall-dist_www261DATA uninstall-dist_www2DATA \
-	uninstall-dist_www3DATA uninstall-dist_www4DATA \
-	uninstall-dist_www5DATA uninstall-dist_www61DATA \
-	uninstall-dist_www6DATA uninstall-dist_www7DATA \
-	uninstall-docDATA uninstall-hpPROGRAMS \
+	uninstall-dist_faxppdDATA uninstall-dist_hpfaxSCRIPTS \
+	uninstall-dist_hplipDATA uninstall-dist_hplipSCRIPTS \
+	uninstall-dist_imagesDATA uninstall-dist_installSCRIPTS \
+	uninstall-dist_ldlDATA uninstall-dist_localzDATA \
+	uninstall-dist_modelsDATA uninstall-dist_pcardSCRIPTS \
+	uninstall-dist_pclDATA uninstall-dist_pluginsSCRIPTS \
+	uninstall-dist_postscriptDATA uninstall-dist_prntSCRIPTS \
+	uninstall-dist_rulesDATA uninstall-dist_scanSCRIPTS \
+	uninstall-dist_uiSCRIPTS uninstall-dist_unrelDATA \
+	uninstall-dist_www0DATA uninstall-dist_www1DATA \
+	uninstall-dist_www21DATA uninstall-dist_www22DATA \
+	uninstall-dist_www23DATA uninstall-dist_www241DATA \
+	uninstall-dist_www242DATA uninstall-dist_www243DATA \
+	uninstall-dist_www24DATA uninstall-dist_www251DATA \
+	uninstall-dist_www252DATA uninstall-dist_www261DATA \
+	uninstall-dist_www2DATA uninstall-dist_www3DATA \
+	uninstall-dist_www4DATA uninstall-dist_www5DATA \
+	uninstall-dist_www61DATA uninstall-dist_www6DATA \
+	uninstall-dist_www7DATA uninstall-docDATA uninstall-hpPROGRAMS \
 	uninstall-hplip_confDATA uninstall-hplip_desktopDATA \
 	uninstall-hpmudextLTLIBRARIES uninstall-info-am \
 	uninstall-libLTLIBRARIES uninstall-libsane_hpaioLTLIBRARIES \
@@ -7104,38 +7182,37 @@ uninstall-am: uninstall-binPROGRAMS uninstall-cupsextLTLIBRARIES \
 	install-data-am install-data-hook install-dist_baseSCRIPTS \
 	install-dist_cmdSCRIPTS install-dist_copierSCRIPTS \
 	install-dist_faxSCRIPTS install-dist_faxppdDATA \
-	install-dist_firmDATA install-dist_hpfaxSCRIPTS \
-	install-dist_hplipDATA install-dist_hplipSCRIPTS \
-	install-dist_imagesDATA install-dist_installSCRIPTS \
-	install-dist_ldlDATA install-dist_localzDATA \
-	install-dist_modelsDATA install-dist_pcardSCRIPTS \
-	install-dist_pclDATA install-dist_pluginsSCRIPTS \
-	install-dist_postscriptDATA install-dist_prntSCRIPTS \
-	install-dist_rulesDATA install-dist_scanSCRIPTS \
-	install-dist_uiSCRIPTS install-dist_unrelDATA \
-	install-dist_www0DATA install-dist_www1DATA \
-	install-dist_www21DATA install-dist_www22DATA \
-	install-dist_www23DATA install-dist_www241DATA \
-	install-dist_www242DATA install-dist_www243DATA \
-	install-dist_www24DATA install-dist_www251DATA \
-	install-dist_www252DATA install-dist_www261DATA \
-	install-dist_www2DATA install-dist_www3DATA \
-	install-dist_www4DATA install-dist_www5DATA \
-	install-dist_www61DATA install-dist_www6DATA \
-	install-dist_www7DATA install-docDATA install-exec \
-	install-exec-am install-hpPROGRAMS install-hplip_confDATA \
-	install-hplip_desktopDATA install-hpmudextLTLIBRARIES \
-	install-info install-info-am install-libLTLIBRARIES \
-	install-libsane_hpaioLTLIBRARIES install-man \
-	install-pcardextLTLIBRARIES install-scanextLTLIBRARIES \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-binPROGRAMS uninstall-cupsextLTLIBRARIES \
-	uninstall-dist_baseSCRIPTS uninstall-dist_cmdSCRIPTS \
-	uninstall-dist_copierSCRIPTS uninstall-dist_faxSCRIPTS \
-	uninstall-dist_faxppdDATA uninstall-dist_firmDATA \
+	install-dist_hpfaxSCRIPTS install-dist_hplipDATA \
+	install-dist_hplipSCRIPTS install-dist_imagesDATA \
+	install-dist_installSCRIPTS install-dist_ldlDATA \
+	install-dist_localzDATA install-dist_modelsDATA \
+	install-dist_pcardSCRIPTS install-dist_pclDATA \
+	install-dist_pluginsSCRIPTS install-dist_postscriptDATA \
+	install-dist_prntSCRIPTS install-dist_rulesDATA \
+	install-dist_scanSCRIPTS install-dist_uiSCRIPTS \
+	install-dist_unrelDATA install-dist_www0DATA \
+	install-dist_www1DATA install-dist_www21DATA \
+	install-dist_www22DATA install-dist_www23DATA \
+	install-dist_www241DATA install-dist_www242DATA \
+	install-dist_www243DATA install-dist_www24DATA \
+	install-dist_www251DATA install-dist_www252DATA \
+	install-dist_www261DATA install-dist_www2DATA \
+	install-dist_www3DATA install-dist_www4DATA \
+	install-dist_www5DATA install-dist_www61DATA \
+	install-dist_www6DATA install-dist_www7DATA install-docDATA \
+	install-exec install-exec-am install-hpPROGRAMS \
+	install-hplip_confDATA install-hplip_desktopDATA \
+	install-hpmudextLTLIBRARIES install-info install-info-am \
+	install-libLTLIBRARIES install-libsane_hpaioLTLIBRARIES \
+	install-man install-pcardextLTLIBRARIES \
+	install-scanextLTLIBRARIES install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-binPROGRAMS \
+	uninstall-cupsextLTLIBRARIES uninstall-dist_baseSCRIPTS \
+	uninstall-dist_cmdSCRIPTS uninstall-dist_copierSCRIPTS \
+	uninstall-dist_faxSCRIPTS uninstall-dist_faxppdDATA \
 	uninstall-dist_hpfaxSCRIPTS uninstall-dist_hplipDATA \
 	uninstall-dist_hplipSCRIPTS uninstall-dist_imagesDATA \
 	uninstall-dist_installSCRIPTS uninstall-dist_ldlDATA \
@@ -7162,27 +7239,27 @@ uninstall-am: uninstall-binPROGRAMS uninstall-cupsextLTLIBRARIES \
 
 
 install-data-hook: install-foo 
-#       If scanner build, add hpaio entry to sane dll.conf.
+#	   If scanner build, add hpaio entry to sane dll.conf.
 @HPLIP_BUILD_TRUE@	if [ "$(scan_build)" = "yes" ]; then \
 @HPLIP_BUILD_TRUE@	   $(mkinstalldirs) $(DESTDIR)/etc/sane.d; \
 @HPLIP_BUILD_TRUE@	   if [ ! -f $(DESTDIR)/etc/sane.d/dll.conf ]; then \
-@HPLIP_BUILD_TRUE@	      touch $(DESTDIR)/etc/sane.d/dll.conf; \
+@HPLIP_BUILD_TRUE@		  touch $(DESTDIR)/etc/sane.d/dll.conf; \
 @HPLIP_BUILD_TRUE@	   fi; \
 @HPLIP_BUILD_TRUE@	   if ! grep ^hpaio $(DESTDIR)/etc/sane.d/dll.conf >/dev/null 2>/dev/null ; then \
-@HPLIP_BUILD_TRUE@	      echo "Adding hpaio entry to /etc/sane.d/dll.conf." ; \
-@HPLIP_BUILD_TRUE@	      echo hpaio >>$(DESTDIR)/etc/sane.d/dll.conf ; \
+@HPLIP_BUILD_TRUE@		  echo "Adding hpaio entry to /etc/sane.d/dll.conf." ; \
+@HPLIP_BUILD_TRUE@		  echo hpaio >>$(DESTDIR)/etc/sane.d/dll.conf ; \
 @HPLIP_BUILD_TRUE@	   fi \
 @HPLIP_BUILD_TRUE@	fi
-#       Create hp-xxx commands in bindir.
+#	   Create hp-xxx commands in bindir.
 @HPLIP_BUILD_TRUE@	$(mkinstalldirs) $(DESTDIR)$(bindir)
 @HPLIP_BUILD_TRUE@	for i in $(dist_cmd_SCRIPTS); do \
 @HPLIP_BUILD_TRUE@	   cmd=`basename $$i .py`; \
 @HPLIP_BUILD_TRUE@	   if [ ! \( "$$cmd" = "toolbox" -a "$(gui_build)" = "no" \) ]; then \
-@HPLIP_BUILD_TRUE@	      ln -sf ../share/$(PACKAGE)/$$i $(DESTDIR)$(bindir)/hp-$$cmd; \
+@HPLIP_BUILD_TRUE@		  ln -sf ../share/$(PACKAGE)/$$i $(DESTDIR)$(bindir)/hp-$$cmd; \
 @HPLIP_BUILD_TRUE@	   fi \
 @HPLIP_BUILD_TRUE@	done
 #
-#       Install fax support. 
+#	   Install fax support. 
 @HPLIP_BUILD_TRUE@	if [ "$(fax_build)" = "yes" ]; then \
 @HPLIP_BUILD_TRUE@	   mv $(DESTDIR)$(hpfaxdir)/hpfax.py $(DESTDIR)$(hpfaxdir)/hpfax; \
 @HPLIP_BUILD_TRUE@	   gzip -f $(DESTDIR)$(faxppddir)/HP-Fax-hplip.ppd; \
@@ -7194,12 +7271,12 @@ install-foo:
 	   $(INSTALL_DATA) $(foomatic_ppd_printers) $(DESTDIR)$(hpppddir); \
 	   $(INSTALL_DATA) $(foomatic_ps_printers) $(DESTDIR)$(hpppddir); \
 	   for i in $(foomatic_ppd_printers); do \
-	      id=`basename $$i`; \
-	      gzip -f $(DESTDIR)$(hpppddir)/$$id; \
+		  id=`basename $$i`; \
+		  gzip -f $(DESTDIR)$(hpppddir)/$$id; \
 	   done; \
 	   for i in $(foomatic_ps_printers); do \
-	      id=`basename $$i`; \
-	      gzip -f $(DESTDIR)$(hpppddir)/$$id; \
+		  id=`basename $$i`; \
+		  gzip -f $(DESTDIR)$(hpppddir)/$$id; \
 	   done; \
 	fi
 	if [ "$(foomatic_xml_install)" = "yes" ]; then \
@@ -7212,40 +7289,40 @@ install-foo:
 	   $(mkinstalldirs) $(DESTDIR)$(foomaticdir)/db/source/PPD/HP; \
 	   $(INSTALL_DATA) $(foomatic_ps_printers) $(DESTDIR)$(foomaticdir)/db/source/PPD/HP; \
 	   for i in $(foomatic_ps_printers); do \
-	      id=`basename $$i`; \
-	      gzip -f $(DESTDIR)$(foomaticdir)/db/source/PPD/HP/$$id; \
+		  id=`basename $$i`; \
+		  gzip -f $(DESTDIR)$(foomaticdir)/db/source/PPD/HP/$$id; \
 	   done; \
 	fi
 
 uninstall-foo: 
 	if [ "$(FOOMATIC_PPD_INSTALL)" = "yes" ]; then \
 	   for i in $(foomatic_ppd_printers); do \
-	      id=`basename $$i`; \
-	      rm -f $(DESTDIR)$(hpppddir)/$$id.gz; \
+		  id=`basename $$i`; \
+		  rm -f $(DESTDIR)$(hpppddir)/$$id.gz; \
 	   done; \
 	   for i in $(foomatic_ps_printers); do \
-	      id=`basename $$i`; \
-	      rm -f $(DESTDIR)$(hpppddir)/$$id.gz; \
+		  id=`basename $$i`; \
+		  rm -f $(DESTDIR)$(hpppddir)/$$id.gz; \
 	   done; \
 	fi
 	if [ "$(FOOMATIC_XML_INSTALL)" = "yes" ]; then \
 	   for i in $(foomatic_xml_printers); do \
-	      rm -f $(DESTDIR)$(foomaticdir)/db/source/printer/$$i; \
+		  rm -f $(DESTDIR)$(foomaticdir)/db/source/printer/$$i; \
 	   done; \
 	   for i in $(foomatic_ps_printers); do \
-	      id=`basename $$i`; \
-	      rm -f $(DESTDIR)$(foomaticdir)/db/source/PPD/HP/$$id.gz; \
+		  id=`basename $$i`; \
+		  rm -f $(DESTDIR)$(foomaticdir)/db/source/PPD/HP/$$id.gz; \
 	   done; \
 	fi
 
 uninstall-hook: uninstall-foo
-#       Remove hp-xxx commands.
+#	   Remove hp-xxx commands.
 @HPLIP_BUILD_TRUE@	for i in $(dist_cmd_SCRIPTS); do \
-@HPLIP_BUILD_TRUE@	    cmd=`basename $$i .py`; \
-@HPLIP_BUILD_TRUE@	    rm -f $(DESTDIR)$(bindir)/hp-$$cmd; \
+@HPLIP_BUILD_TRUE@		cmd=`basename $$i .py`; \
+@HPLIP_BUILD_TRUE@		rm -f $(DESTDIR)$(bindir)/hp-$$cmd; \
 @HPLIP_BUILD_TRUE@	done
 #
-#       Remove fax support.
+#	   Remove fax support.
 @HPLIP_BUILD_TRUE@	rm -f $(DESTDIR)$(hpfaxdir)/hpfax 
 @HPLIP_BUILD_TRUE@	rm -f $(DESTDIR)$(faxppddir)/HP-Fax-hplip.ppd.gz
 
@@ -7256,15 +7333,15 @@ get-foo:
 	bzr branch $(BZRSERVER)/foomatic-db foo-tmp/foomatic-db
 	bzr branch $(BZRSERVER)/foomatic-db-hpijs foo-tmp/foomatic-db-hpijs
 	bzr branch $(BZRSERVER)/foomatic-db-engine foo-tmp/foomatic-db-engine
-#       Copy foomatic db runtimes into sandbox.
+#	   Copy foomatic db runtimes into sandbox.
 	for i in $(foomatic_db_runtime) $(foomatic_db_engine_runtime) $(foomatic_db_hpijs_runtime); do \
 	   $(INSTALL_SCRIPT) foo-tmp/$$i $$i; \
 	done;
-#       Copy hp specific printer xml files to sandbox.
+#	   Copy hp specific printer xml files to sandbox.
 	for i in $(foomatic_xml_printers); do \
 	   $(INSTALL_SCRIPT) foo-tmp/$$i $$i; \
 	done;
-#       Copy hp postscript ppd files to sandbox.
+#	   Copy hp postscript ppd files to sandbox.
 	for i in $(foomatic_ps_printers); do \
 	   $(INSTALL_SCRIPT) foo-tmp/$$i $$i; \
 	done;

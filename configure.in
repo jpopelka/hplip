@@ -23,7 +23,7 @@
 #
 
 AC_PREREQ(2.59)
-AC_INIT([HP Linux Imaging and Printing], [2.7.7], [2.7.7.27], [hplip])
+AC_INIT([HP Linux Imaging and Printing], [2.7.9], [2.7.9.13], [hplip])
 AM_INIT_AUTOMAKE([1.9 foreign])
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL

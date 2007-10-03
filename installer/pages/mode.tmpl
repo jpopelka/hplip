@@ -21,10 +21,10 @@
 -->
 <html>
 <HEAD>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE" />
-    <META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 22 Jul 2002 11:12:01 GMT" />    
-    <meta http-equiv="Content-Language" content="en-us" />
-    <META http-equiv="content-type" content="text/html; charset=utf-8">
+       
     <link rel="stylesheet" type="text/css" href="../styles/hplip.css" />
     <script type="text/javascript" src="../scripts/hplip.js"></script>
     <script type="text/javascript">
@@ -40,12 +40,21 @@
     </script>
 <TITLE>$installer_title</TITLE>
 </HEAD>
-<BODY onload="header = '$header_string'; 
-        subheader = '$sub_header_string'; 
-        generateHeader(header, subheader);">
+<BODY onload=" 
+         
+        ">
     
 <!-- Header Div -->    
-<div id="header_box" class="background_box"></div>
+<div id="header_box" class="background_box">
+  <div class='header_title_class'>
+    <div id='hp_blue_logo'><img src='images/hplogo.png' alt=''/></div>
+    <div id='header_title'>$header_string</div>
+    <div id='header_title2'>$header_string</div>
+    <div id='header_subtitle'>$sub_header_string</div>
+    <div id='header_subtitle2'>$sub_header_string</div>
+    <div id='tux_logo'><img src='images/tux.png' alt=''/></div>
+  </div>
+</div>
 
 <!-- Body Div -->
 <div class="body_content">

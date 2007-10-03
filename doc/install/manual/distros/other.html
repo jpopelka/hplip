@@ -144,8 +144,8 @@ Other Linux Versions
 <td>USB library</td>
 <td>Yes</td>
 </tr>
-<tr><td>Python 2.2 or greater</td>
-<td>Python programming language</td>
+<tr><td>python2.2+</td>
+<td>Python programming language version 2.2 or greater</td>
 <td>Yes</td>
 </tr>
 <tr><td>LSB</td>
@@ -184,8 +184,8 @@ Other Linux Versions
 <td>Graphical scanner frontend for SANE</td>
 <td>No, optional for scanning support</td>
 </tr>
-<tr><td>Python 2.3 or greater</td>
-<td>Required for fax functionality</td>
+<tr><td>python2.3+</td>
+<td>Python programming language version 2.3 or greater</td>
 <td>No, optional for fax support</td>
 </tr>
 <tr><td>SANE</td>
@@ -218,12 +218,21 @@ For specific information on using ./configure and the different options <a href=
 </div>
 <div class="section">
 <h1><a id="step-7" name="step-7">Step 7</a></h1>
+<p>If you are going to be setting up a printer with USB and the printer is already plugged in, you will need to do one of the following:</p>
+<ol class="arabic simple">
+<li>Unlpug and re-plug in the USB printer, or</li>
+<li>Restart your PC.</li>
+</ol>
+<p>Failure to do this will cause your USB printer to not be detected by HPLIP.</p>
+</div>
+<div class="section">
+<h1><a id="id1" name="id1">Step 7</a></h1>
 <p><a class="reference" href="../hp_setup.html">Setup your printer</a> (using hp-setup (recommended), CUPS or Yast)</p>
 </div>
 </div>
 
 <hr size="1"/>
-<center><small>Page last updated: Mon Jun 18 16:07:54 2007; HPLIP Version: 2.7.7</small></center>
+<center><small>Page last updated: Thu Sep 13 14:58:19 2007; HPLIP Version: 2.7.9</small></center>
 </div>
 </td></tr></table>
 </div>

@@ -19,30 +19,33 @@
  Author: Pete Parks
 */ 
 -->
-<html xmlns="htmlhttp://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html>
 <head>
-    
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta http-equiv="PRAGMA" content="NO-CACHE" />
-    <meta http-equiv="EXPIRES" content="Mon, 22 Jul 2002 11:12:01 GMT" />
-    <meta http-equiv="Content-Language" content="en-us" />
-    <meta http-equiv="content-type" content="text/html; charset=us-ascii" />
     <link rel="stylesheet" type="text/css" href="styles/hplip.css" />
     <script type="text/javascript" src="scripts/hplip.js"></script>
-    <script type="text/javascript" src="scripts/xml_loader.js"></script>
-
+    <script type="text/javascript" src="scripts/misc_code.js"></script>
     <title>$installer_title</title>
 </head>
 
-<body onload="header = '$header_string'; 
-        subheader = '$sub_header_string'; 
-        generateHeader(header, subheader);">
+<body>
 <!-- Header Div -->
-<div id="header_box" class="background_box"></div>
+<div id="header_box" class="background_box">
+  <div class='header_title_class'>
+    <div id='hp_blue_logo'><img src='images/hplogo.png' alt=''/></div>
+    <div id='header_title'>$header_string</div>
+    <div id='header_title2'>$header_string</div>
+    <div id='header_subtitle'>$sub_header_string</div>
+    <div id='header_subtitle2'>$sub_header_string</div>
+    <div id='tux_logo'><img src='images/tux.png' alt=''/></div>
+  </div>
+</div>
 
 <!-- Body Div -->
 <div class="body_content">
     <div id="message_title">$error_message_title</div>
-    <div id="message_body">$error_text</div>
+    <div id="message_body">$error_message_body</div>
     <div id="message_footer"></div>
 </div>
 

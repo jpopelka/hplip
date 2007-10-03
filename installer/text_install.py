@@ -45,11 +45,16 @@ def option_question_callback(opt, desc):
     if not ok: sys.exit(0)
     return ans
 
-def start(auto=True, test=False):
+def start(auto=True, test_depends=False, test_unknown=False):
     try:
         log.info("Initializing. Please wait...")
         core =  CoreInstall(MODE_INSTALLER)
         core.init()
+        
+        if test_unknown:
+            core.distro_name = 'unknown'
+            core.distro = 0
+            core.distro_version = 0
     
         if core.running_as_root():
             log.error("You are running the installer as root. It is highly recommended that you run the installer as")
@@ -128,7 +133,7 @@ def start(auto=True, test=False):
                     sys.exit(0)
 
         # For testing, mark all dependencies missing
-        if test:
+        if test_depends:
             for d in core.have_dependencies:
                 core.have_dependencies[d] = False
 
@@ -164,7 +169,7 @@ def start(auto=True, test=False):
 
         distro_ok = False
         if core.distro_known():
-            ok, distro_ok = tui.enter_yes_no('\nIs "%s %s" your correct distro/OS and version'
+            ok, distro_ok = tui.enter_yes_no('Is "%s %s" your correct distro/OS and version'
                 % (core.get_distro_data('display_name', '(unknown)'), core.distro_version))
         
         if not ok:
@@ -677,44 +682,37 @@ def start(auto=True, test=False):
         tui.title("POST-BUILD COMMANDS")  
         core.run_post_build(progress_callback)
 
-        # Logoff if necessary
+        # Restart or re-plugin if necessary (always True in 2.7.9+)
         if core.restart_required:
-            tui.title("IMPORTANT! RESTART REQUIRED!")
-            log.note("If you are installing a USB connected printer, you must now restart your PC")
-            log.note("in order to communicate with the printer. After restarting, run:")
-            log.note(core.su_sudo() % "hp-setup")
-            log.note("to setup a printer in HPLIP.")
-
-            log.note("")
-            log.note("IMPORTANT! Make sure to save all work in all open applications before restarting!")
-
-            ok, ans = tui.enter_yes_no(log.bold("Restart now"), 'n')
+            tui.title("RESTART OR RE-PLUG IS REQUIRED")
+            cmd = core.su_sudo() % "hp-setup"
+            paragraph = """If you are installing a USB connected printer, and the printer was plugged in when you started this installer, you will need to either restart your PC or unplug and re-plug in your printer (USB cable only). If you choose to restart, run this command after restarting: %s  (Note: If you are using a parallel connection, you will have to restart your PC).""" % cmd 
+            
+            for p in tui.format_paragraph(paragraph):
+                log.info(p)
+                
+            ok, choice = tui.enter_choice("Restart or re-plug in your printer (r=restart, p=re-plug in*, q=quit) : ", 
+                ['r', 'p'], 'p')
+                
             if not ok: sys.exit(0)
-            if ans:
-                ok = core.restart()
-                if not ok:
-                    log.error("Restart failed. Please restart using the system menu.")
-
-            sys.exit(0)
+            
+            if choice == 'r':
+                log.note("")
+                log.note("IMPORTANT! Make sure to save all work in all open applications before restarting!")
+            
+                ok, ans = tui.enter_yes_no(log.bold("Restart now"), 'n')
+                if not ok: sys.exit(0)
+                if ans:
+                    ok = core.restart()
+                    if not ok:
+                        log.error("Restart failed. Please restart using the system menu.")
+                    
+                sys.exit(0)
+                
+            else: # 'p'
+                if not tui.continue_prompt("Please unplug and re-plugin your printer now. "):
+                    sys.exit(0)
         
-        elif core.logoff_required:
-            tui.title("IMPORTANT! LOGOFF REQUIRED!")
-            log.note("If you are installing a USB connected printer, you must now logoff and re-logon")
-            log.note("in order to communicate with the printer. After logging back on, run:")
-            log.note(core.su_sudo() % "hp-setup")
-            log.note("to setup a printer in HPLIP.")
-
-            log.note("")
-            log.note("IMPORTANT! Make sure to save all work in all open applications before logging off!")
-
-            ok, ans = tui.enter_yes_no(log.bold("Logoff now"), 'n')
-            if not ok: sys.exit(0)
-            if ans:
-                ok = core.logoff()
-                if not ok:
-                    log.error("Logoff failed. Please logoff using the system menu.")
-
-            sys.exit(0)
         #
         # SETUP PRINTER
         #

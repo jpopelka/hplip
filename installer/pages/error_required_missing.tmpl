@@ -23,12 +23,11 @@
 -->
 <html>
 <head>
-    
-    <meta http-equiv="Content-Language" content="en-us" />
-    <meta http-equiv="content-type" content="text/html; charset=us-ascii" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="PRAGMA" content="NO-CACHE" />
     <link rel="stylesheet" type="text/css" href="styles/hplip.css" />
     <script type="text/javascript" src="scripts/hplip.js"></script>
-    <script type="text/javascript" src="scripts/xml_loader.js"></script>
+    <script type="text/javascript" src="scripts/misc_code.js"></script>
     <script type="text/javascript">
     <!--
     var divText = "";
@@ -40,9 +39,6 @@
     var divID = 'notes_field';
 
     function todoOnLoad() {
-        header = '$header_string'; 
-        subheader = '$sub_header_string'; 
-        generateHeader(header, subheader);
         getContentText(divText, divID);
     };
     -->
@@ -52,17 +48,26 @@
 
 <body onload="todoOnLoad();">
 <!-- Header Div -->    
-<div id="header_box" class="background_box"></div>
+<div id="header_box" class="background_box">
+  <div class='header_title_class'>
+    <div id='hp_blue_logo'><img src='images/hplogo.png' alt=''/></div>
+    <div id='header_title'>$header_string</div>
+    <div id='header_title2'>$header_string</div>
+    <div id='header_subtitle'>$sub_header_string</div>
+    <div id='header_subtitle2'>$sub_header_string</div>
+    <div id='tux_logo'><img src='images/tux.png' alt=''/></div>
+  </div>
+</div>
 
 <!-- Body Div --> 
 <div class="body_content">
-    <div id="message_title">$error_required_message_title</div>
+    <div id="message_title">$error_required_missing_message_title</div>
 
     <div id="message_body">
         <div id="notes_field"></div>
     </div>
 
-    <div id="message_footer">$error_required_message_footer</div>
+    <div id="message_footer">$error_required-missing_message_footer</div>
 </div>
 
 <!-- Buttons Div --> 

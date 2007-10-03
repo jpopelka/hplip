@@ -67,7 +67,8 @@ try:
         ['printer=', 'device=', 'help', 'help-rest', 'help-man', 
          'help-desc', 'logging=', 'id', 'bus='])
 
-except getopt.GetoptError:
+except getopt.GetoptError, e:
+    log.error(e.msg)
     usage()
 
 printer_name = None

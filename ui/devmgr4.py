@@ -1098,7 +1098,7 @@ class DevMgr4(DevMgr4_base):
         if self.cur_device is not None:
             x = QMessageBox.critical(self,
                                      self.caption(),
-                                     "<b>Annoying Confirmation: Are you sure you want to remove this device?</b>" ,
+                                     self.__tr("<b>Annoying Confirmation: Are you sure you want to remove this device?</b>"),
                                       QMessageBox.Yes,
                                       QMessageBox.No | QMessageBox.Default,
                                       QMessageBox.NoButton)

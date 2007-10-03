@@ -423,7 +423,22 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C6200</printer>
+      <arg_defval>ev/hpijs-InputSlot-Default</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_C7100</printer>
+      <arg_defval>ev/hpijs-InputSlot-Default</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C7200</printer>
+      <arg_defval>ev/hpijs-InputSlot-Default</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C8100</printer>
       <arg_defval>ev/hpijs-InputSlot-Default</arg_defval>
      </constraint>
      <constraint sense='true'>
@@ -443,12 +458,27 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_D5300</printer>
+      <arg_defval>ev/hpijs-InputSlot-Default</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_D6100</printer>
       <arg_defval>ev/hpijs-InputSlot-Default</arg_defval>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_D7100</printer>
+      <arg_defval>ev/hpijs-InputSlot-Default</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_D7200</printer>
+      <arg_defval>ev/hpijs-InputSlot-Default</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_D7400</printer>
       <arg_defval>ev/hpijs-InputSlot-Default</arg_defval>
      </constraint>
      <constraint sense='true'>
@@ -544,6 +574,11 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-OfficeJet_J5700</printer>
+      <arg_defval>ev/hpijs-InputSlot-Default</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-Officejet_K7100</printer>
       <arg_defval>ev/hpijs-InputSlot-Default</arg_defval>
      </constraint>
      <constraint sense='true'>

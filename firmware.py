@@ -20,12 +20,15 @@
 # Author: Don Welch
 #
 
-__version__ = '0.1'
+__version__ = '0.3'
 __title__ = 'Firmware Download Utility'
 __doc__ = "Download firmware to a device."
 
 # Std Lib
-import sys, getopt, gzip
+import sys
+import getopt
+import gzip
+import operator
 
 # Local
 from base.g import *
@@ -39,12 +42,14 @@ USAGE = [(__doc__, "", "name", True),
          utils.USAGE_PRINTER,
          utils.USAGE_SPACE,
          utils.USAGE_OPTIONS,
+         ("Use USB IDs to specify printer:", "-s xxx:yyy, where xxx is the USB bus ID and yyy is the USB device ID. The ':' and all leading zeroes must be present.", "option", False),
          utils.USAGE_BUS1, utils.USAGE_BUS2,
          utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
          utils.USAGE_HELP,
          utils.USAGE_SPACE,
          utils.USAGE_NOTES,
          utils.USAGE_STD_NOTES1, utils.USAGE_STD_NOTES2, 
+         utils.USAGE_SPACE,
          utils.USAGE_SEEALSO,
          ("hp-toolbox", "", "seealso", False),
 
@@ -62,17 +67,20 @@ log.set_module('hp-info')
 
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'p:d:hl:b:g',
+    opts, args = getopt.getopt(sys.argv[1:], 'p:d:hl:b:gs:',
         ['printer=', 'device=', 'help', 'help-rest', 'help-man', 
          'help-desc', 'logging=', 'bus='])
 
-except getopt.GetoptError:
+except getopt.GetoptError, e:
+    log.error(e.msg)
     usage()
 
 printer_name = None
 device_uri = None
 log_level = logger.DEFAULT_LOG_LEVEL
 bus = "cups,par,usb"
+usb_bus_node = None
+silent = False
 
 if os.getenv("HPLIP_DEBUG"):
     log.set_level('debug')
@@ -114,6 +122,10 @@ for o, a in opts:
 
     elif o == '-g':
         log.set_level('debug')
+        
+    elif o == '-s':
+        silent = True
+        usb_bus_node = a
 
 
 if device_uri and printer_name:
@@ -122,14 +134,26 @@ if device_uri and printer_name:
 
 utils.log_title(__title__, __version__)
 
-if not device_uri and not printer_name:
-    try:
-        device_uri = device.getInteractiveDeviceURI(bus)
-        if device_uri is None:
-            sys.exit(1)
-    except Error:
-        log.error("Error occured during interactive mode. Exiting.")
+if silent:
+    # called by .rules file
+    printer_name = None
+    device_uri, sane_uri, fax_uri = device.makeURI(usb_bus_node, 1)
+    
+    if not device_uri:
+        log.error("Invalid USB IDs: %s" % usb_bus_node)
         sys.exit(1)
+    
+else:
+    if not device_uri and not printer_name:
+        try:
+            device_uri = device.getInteractiveDeviceURI(bus, 
+                filter={'fw-download' : (operator.gt, 0)})
+                
+            if device_uri is None:
+                sys.exit(1)
+        except Error:
+            log.error("Error occured during interactive mode. Exiting.")
+            sys.exit(1)
 
 try:
     d = device.Device(device_uri, printer_name)
@@ -158,7 +182,8 @@ fw_download = d.mq.get('fw-download', 0)
 
 if fw_download:
     if d.downloadFirmware():
-        log.info("Done.")
+        if not silent:
+            log.info("Done.")
 else:
     log.error("Device does not support or require firmware download.")
 

@@ -2200,11 +2200,11 @@ pmlDefaultResRange:
             hpaio->option[OPTION_SCAN_RESOLUTION].constraint_type = SANE_CONSTRAINT_WORD_LIST;
         }
 
-        /* Determine contrast support. */
-        if( PmlRequestGet(hpaio->deviceid, hpaio->cmd_channelid, hpaio->pml.objContrast) != ERROR)
-        {
-            hpaio->option[OPTION_CONTRAST].cap &= ~SANE_CAP_INACTIVE;
-        }
+        /* Determine contrast support. (Removed, no LJ support, des 7/31/07) */
+//        if( PmlRequestGet(hpaio->deviceid, hpaio->cmd_channelid, hpaio->pml.objContrast) != ERROR)
+//        {
+//            hpaio->option[OPTION_CONTRAST].cap &= ~SANE_CAP_INACTIVE;
+//        }
 
         /* Determine supported ADF modes. */
         if(PmlRequestGet(hpaio->deviceid, hpaio->cmd_channelid, hpaio->pml.objModularHardware) != ERROR && 

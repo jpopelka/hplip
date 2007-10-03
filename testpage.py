@@ -66,7 +66,8 @@ try:
     opts, args = getopt.getopt(sys.argv[1:], 'p:d:hl:b:gx',
                                ['printer=', 'device=', 'help', 'help-rest', 
                                 'help-man', 'logging=', 'bus=', 'help-desc'])
-except getopt.GetoptError:
+except getopt.GetoptError, e:
+    log.error(e.msg)
     usage()
 
 printer_name = None
@@ -119,10 +120,6 @@ if device_uri and printer_name:
     log.error("You may not specify both a printer (-p) and a device (-d).")
     usage()
 
-if device_uri and printer_name:
-    log.error("You may not specify both a printer (-p) and a device (-d).")
-    usage()
-
 utils.log_title(__title__, __version__)
 
 if not device_uri and not printer_name:
@@ -157,39 +154,45 @@ try:
         log.error("Unable to print to printer. Please check device and try again.")
         sys.exit(1)
 
-    if len(d.cups_printers) == 0:
-        log.error("No printer queues found for device.")
-        sys.exit(1)
-
-    elif len(d.cups_printers) > 1:
-        log.info("\nMultiple printers (queues) found in CUPS for device.")
-        log.info(log.bold("\nPlease choose the printer (queue) to use for the test page:\n"))
-
-        max_name = 24
-        for q in d.cups_printers:
-            max_name = max(max_name, len(q))
-
-        formatter = utils.TextFormatter(
-            (
-                {'width': 4, 'margin': 2},
-                {'width': max_name, 'margin': 2},
+    if not printer_name:
+        if len(d.cups_printers) == 0:
+            log.error("No printer queues found for device.")
+            sys.exit(1)
+    
+        elif len(d.cups_printers) > 1:
+            log.info("\nMultiple printers (queues) found in CUPS for device.")
+            log.info(log.bold("\nPlease choose the printer (queue) to use for the test page:\n"))
+    
+            max_name = 24
+            for q in d.cups_printers:
+                max_name = max(max_name, len(q))
+    
+            formatter = utils.TextFormatter(
+                (
+                    {'width': 4, 'margin': 2},
+                    {'width': max_name, 'margin': 2},
+                )
             )
-        )
-
-        log.info(formatter.compose(("Num.", "CUPS printer (queue)")))
-        log.info(formatter.compose(('-'*4, '-'*(max_name))))
-
-        x = 0
-        for q in d.cups_printers:
-            log.info(formatter.compose((str(x), d.cups_printers[x])))
-            x += 1
-
-        ok, i = tui.enter_range("\nEnter number 0...%d for printer (q=quit) ?" % (x-1), 0, (x-1))
-        if not ok: sys.exit(0)
-        printer_name = d.cups_printers[i]
-
+    
+            log.info(formatter.compose(("Num.", "CUPS printer (queue)")))
+            log.info(formatter.compose(('-'*4, '-'*(max_name))))
+    
+            x = 0
+            for q in d.cups_printers:
+                log.info(formatter.compose((str(x), d.cups_printers[x])))
+                x += 1
+    
+            ok, i = tui.enter_range("\nEnter number 0...%d for printer (q=quit) ?" % (x-1), 0, (x-1))
+            if not ok: sys.exit(0)
+            printer_name = d.cups_printers[i]
+    
+        else:
+            printer_name = d.cups_printers[0]
+        
     else:
-        printer_name = d.cups_printers[0]
+        if printer_name not in d.cups_printers:
+            log.error("Invalid printer name: %s" % printer_name)
+            sys.exit(1)
 
     log.info("")
     

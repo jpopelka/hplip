@@ -21,7 +21,7 @@
 #
 
 
-__version__ = '4.5'
+__version__ = '7.0'
 __title__ = 'Printer/Fax Setup Utility'
 __doc__ = "Installs HPLIP printers and faxes in the CUPS spooler. Tries to automatically determine the correct PPD file to use. Allows the printing of a testpage. Performs basic fax parameter setup."
 
@@ -114,18 +114,18 @@ try:
         ['printer=', 'fax=', 'device=', 'help', 'help-rest', 'help-man',
          'logging=', 'bus=', 'type=', 'auto', 'port=', 'gui', 'interactive',
          'help-desc', 'username='])
-except getopt.GetoptError:
+except getopt.GetoptError, e:
+    log.error(e.msg)
     usage()
 
 printer_name = None
 fax_name = None
 device_uri = None
 log_level = logger.DEFAULT_LOG_LEVEL
-bus = 'usb'
+bus = None
 setup_print = True
 setup_fax = True
 makeuri = None
-bus = None
 auto = False
 testpage_in_auto_mode = True
 jd_port = 1
@@ -219,6 +219,8 @@ try:
     param = args[0]
 except IndexError:
     param = ''
+    
+log.debug("param=%s" % param)
 
 utils.log_title(__title__, __version__)
 
@@ -276,16 +278,54 @@ else: # INTERACTIVE_MODE
     except Error:
         log.error("Unable to connect to HPLIP I/O (hpssd).")
         sys.exit(1)
-
+    
+    if not auto:
+        log.info("(Note: Defaults for each question are maked with a '*'. Press <enter> to accept the default.)")
+        log.info("")
+        
     # ******************************* MAKEURI
     if param:
         device_uri, sane_uri, fax_uri = device.makeURI(param, jd_port)
 
-    # ******************************* DEVICE CHOOSER
-    if bus is None:
-        bus = 'usb,par'
+    # ******************************* CONNECTION TYPE CHOOSER
+    if not device_uri and bus is None:
+        x = 1
+        ios = {0: ('usb', "Universal Serial Bus (USB)") }
+        if sys_cfg.configure['network-build']: 
+            ios[x] = ('net', "Network/Ethernet/Wireless (direct connection or JetDirect)")
+            x += 1
+        if sys_cfg.configure['pp-build']: 
+            ios[x] = ('par', "Parallel Port (LPT:)")
+            x += 1
+        
+        if len(ios) > 1:
+            tui.header("CHOOSE CONNECTION TYPE")
+            f = tui.Formatter()
+            f.max_widths = (10, 10, 40)
+            f.header = ("Num.", "Connection Type", "Connection Type Description")
+            
+            for x, data in ios.items():
+                if not x:
+                    f.add((str(x) + "*", data[0], data[1]))
+                else:
+                    f.add((str(x), data[0], data[1]))
+                
+            f.output()
+        
+            ok, val = tui.enter_range("\nEnter number 0...%d for connection type (q=quit, enter=usb*) ? " % x, 
+                0, x, 0)
 
+            if not ok: sys.exit(0)
+            
+            bus = ios[val][0]
+        else:
+            bus = ios[0][0]
+            
+        log.info("\nUsing connection type: %s" % bus)
+
+    # ******************************* DEVICE CHOOSER
     if not device_uri: 
+        tui.header("DEVICE DISCOVERY")
         try:
             device_uri = device.getInteractiveDeviceURI(bus)
             if device_uri is None:
@@ -298,8 +338,6 @@ else: # INTERACTIVE_MODE
     # ******************************* QUERY MODEL AND COLLECT PPDS
     log.info(log.bold("\nSetting up device: %s\n" % device_uri))
 
-    if not auto:
-        log.info("(Note: Defaults for each question are maked with a '*'. Press <enter> to accept the default.)")
 
     log.info("")
     print_uri = device_uri.replace("hpfax:", "hp:")
@@ -317,9 +355,144 @@ else: # INTERACTIVE_MODE
         sys.exit(1)
 
     if not mq.get('fax-type', 0) and setup_fax:
-        log.warning("Cannot setup fax - device does not have fax feature.")
+        #log.warning("Cannot setup fax - device does not have fax feature.")
         setup_fax = False
+        
+    # ******************************* PLUGIN
+    
+    from installer import core_install
+    core = core_install.CoreInstall()
+    norm_model = device.normalizeModelName(model).lower()
 
+    if mq.get('plugin', 0) and not core.check_for_plugin(norm_model):
+        tui.header("PLUGIN INSTALLATION")
+        log.debug("Plugin required and not installed for model %s" % norm_model)
+        
+        plugin_lib = mq.get("plugin-library")
+        fw_download = mq.get("fw-download")
+        
+        log.debug("Plugin library=%s" % plugin_lib)
+        log.debug("FW download=%s" % fw_download)
+        
+        log.info(log.bold("A plugin is required for this printer."))
+        
+        for line in tui.format_paragraph("""An additional software plug-in is required to operate this printer. You may download the plug-in directly from HP, or, if you already have a copy, you can specify a path to the file."""):
+            log.info(line)
+            
+        ok, ans = tui.enter_choice("\nDownload plugin from HP (recomended) or specify a path to the plugin (d=download*, p=specify path, q=quit) ? ", ['d', 'p'], 'd')
+        
+        if not ok:
+            sys.exit(0)
+            
+        
+        paragraphs = """LICENSE TERMS FOR HP Linux Imaging and Printing (HPLIP) Driver Plugin
+
+These License Terms govern your Use of the HPLIP Driver Plugin Software (the "Software"). USE OF THE SOFTWARE INCLUDING, WITHOUT LIMITATION, ANY DOCUMENTATION, IS SUBJECT TO THESE LICENSE TERMS AND THE APPLICABLE AS-IS WARRANTY STATEMENT.  BY DOWNLOADING AND INSTALLING THE SOFTWARE, YOU ARE AGREEING TO BE BOUND BY THESE TERMS. IF YOU DO NOT AGREE TO ALL OF THESE TERMS, DO NOT DOWNLOAD AND INSTALL THE SOFTWARE ON YOUR SYSTEM.
+
+1. License Grant.    HP grants you a license to Use one copy of the Software with HP printing products only.  "Use" includes using, storing, loading, installing, executing, and displaying the Software.  You may not modify the Software or disable any licensing or control features of the Software.
+
+2. Ownership.   The Software is owned and copyrighted by HP or its third party suppliers.  Your license confers no title to, or ownership in, the Software and is not a sale of any rights in the Software.  HP's third party suppliers may protect their rights in the Software in the event of any violation of these license terms.
+
+3. Copies and Adaptations.   You may only make copies or adaptations of the Software for archival purposes or when copying or adaptation is an essential step in the authorized Use of the Software. You must reproduce all copyright notices in the original Software on all copies or adaptations.  You may not copy the Software onto any public network.
+
+4. No Disassembly.   You may not Disassemble the Software unless HP's prior written consent is obtained.  "Disassemble" includes disassembling, decompiling, decrypting, and reverse engineering.   In some jurisdictions, HP's consent may not be required for limited Disassembly.  Upon request, you will provide HP with reasonably detailed information regarding any Disassembly.
+
+5. No Transfer.   You may not assign, sublicense or otherwise transfer all or any part of these License Terms or the Software.
+
+6. Termination.   HP may terminate your license, upon notice, for failure to comply with any of these License Terms.  Upon termination, you must immediately destroy the Software, together with all copies, adaptations and merged portions in any form.
+
+7. Export Requirements.   You may not export or re-export the Software or any copy or adaptation in violation of any applicable laws or regulations.
+
+8. U.S. Government Restricted Rights.   The Software has been developed entirely at private expense.  It is delivered and licensed, as defined in any applicable DFARS, FARS, or other equivalent federal agency regulation or contract clause, as either "commercial computer software" or "restricted computer software", whichever is applicable.  You have only those rights provided for such Software by the applicable clause or regulation or by these License Terms.
+
+9. DISCLAIMER OF WARRANTIES.   TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, HP AND ITS SUPPLIERS PROVIDE THE SOFTWARE "AS IS" AND WITH ALL FAULTS, AND HEREBY DISCLAIM ALL OTHER WARRANTIES AND CONDITIONS, EITHER EXPRESS, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, WARRANTIES OF TITLE AND NON-INFRINGEMENT, ANY IMPLIED WARRANTIES, DUTIES OR CONDITIONS OF MERCHANTABILITY, OF FITNESS FOR A PARTICULAR PURPOSE, AND OF LACK OF VIRUSES ALL WITH REGARD TO THE SOFTWARE.  Some states/jurisdictions do not allow exclusion of implied warranties or limitations on the duration of implied warranties, so the above disclaimer may not apply to you in its entirety.
+
+10. LIMITATION OF LIABILITY.  Notwithstanding any damages that you might incur, the entire liability of HP and any of its suppliers under any provision of this agreement and your exclusive remedy for all of the foregoing shall be limited to the greater of the amount actually paid by you separately for the Software or U.S. $5.00.  TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL HP OR ITS SUPPLIERS BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES WHATSOEVER (INCLUDING, BUT NOT LIMITED TO, DAMAGES FOR LOSS OF PROFITS OR CONFIDENTIAL OR OTHER INFORMATION, FOR BUSINESS INTERRUPTION, FOR PERSONAL INJURY, FOR LOSS OF PRIVACY ARISING OUT OF OR IN ANY WAY RELATED TO THE USE OF OR INABILITY TO USE THE SOFTWARE, OR OTHERWISE IN CONNECTION WITH ANY PROVISION OF THIS AGREEMENT, EVEN IF HP OR ANY SUPPLIER HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES AND EVEN IF THE REMEDY FAILS OF ITS ESSENTIAL PURPOSE.  Some states/jurisdictions do not allow the exclusion or limitation of incidental or consequential damages, so the above limitation or exclusion may not apply to you.""".split('\n')
+
+        log.info(log.bold("\nPlease read the following license agreement:"))
+        
+        for para in paragraphs:
+            if para:
+                for line in tui.format_paragraph(para):
+                    log.info(line)
+            else:
+                log.info("")
+            
+        ok, agree = tui.enter_yes_no("\nDo you agree to the terms of this license", 'n')
+        if not ok or not agree: sys.exit(0)
+        
+        if ans == 'd':
+            log.info("\nChecking for network connection...")
+            ok = core.check_network_connection()
+            
+            if ok:
+                log.info("Downloading configuration...")
+                url, size, checksum, timestamp, ok = core.get_plugin_info(norm_model)
+                log.debug("url= %s" % url)
+                log.debug("size=%d" % size)
+                log.debug("checksum=%s" % checksum)
+                log.debug("timestamp=%f" % timestamp)
+                
+                if url and size and checksum and timestamp and ok:
+                    log.info("Downloading plug-in...")
+                    ok, plugin_file = core.download_plugin(norm_model, url, size, checksum, timestamp)
+                    
+                    if not ok:
+                        log.error("Plugin download failed.")
+                        sys.exit(1)
+            
+            else:
+                log.error("Network connection not found.")
+                sys.exit(1)
+                
+        
+        else: # "p": path
+            while True:
+                user_input = raw_input(log.bold("Enter the path to the %s.plugin file (q=quit) : " % norm_model)).strip()
+                if user_input.strip().lower() == 'q':
+                    sys.exit(1)
+                
+                if not user_input.endswith('.plugin'):
+                    log.error("Plug-in filename must end with '.plugin' extension.")
+                    continue
+                
+                if os.path.exists(user_input):
+                    ok = core.copy_plugin(norm_model, user_input)
+                    
+                    if not ok:
+                        log.error("File copy failed.")
+                        
+                    else:
+                        break
+                else:
+                    log.error("File not found.")
+                    
+        if ok:
+            log.info("Installing plug-in...")
+            ok = core.install_plugin(norm_model, plugin_lib)
+            
+            if not ok:
+                log.error("Plug-in install failed.")
+                sys.exit(1)
+                
+            else:
+                log.info("\nPlug-in installation complete.\n")
+                
+                # Download firmware if needed
+                if mq.get('fw-download', 0):
+                    log.info(log.bold("\nDownloading firmware..."))
+                    try:
+                        d = device.Device(print_uri)
+                    except Error:
+                        log.error("Error opening device. Exiting.")
+                        sys.exit(1)
+                    
+                    if d.downloadFirmware():
+                        log.info("Done.\n")
+                        
+                    d.close()
+
+            
     ppds = cups.getSystemPPDs()
 
     default_model = utils.xstrip(model.replace('series', '').replace('Series', ''), '_')
@@ -327,6 +500,8 @@ else: # INTERACTIVE_MODE
 
     # ******************************* PRINT QUEUE SETUP
     if setup_print:
+        tui.header("PRINT QUEUE SETUP")
+        
         installed_print_devices = device.getSupportedCUPSDevices(['hp'])  
         log.debug(installed_print_devices)
 
@@ -338,8 +513,6 @@ else: # INTERACTIVE_MODE
             if not ok: sys.exit(0)
 
     if setup_print:
-        log.info(log.bold("\nPRINT QUEUE SETUP"))
-
         if auto:
             printer_name = default_model
 
@@ -557,6 +730,7 @@ else: # INTERACTIVE_MODE
             if os.path.exists(user_config_file):
                 cfg = Config(user_config_file)
                 cfg.last_used.device_uri = print_uri
+                
 
     # ******************************* FAX QUEUE SETUP
     if setup_fax:
@@ -570,15 +744,14 @@ else: # INTERACTIVE_MODE
     log.info("")
 
     if setup_fax:
-        log.info(log.bold("\nFAX QUEUE SETUP"))
+        tui.header("FAX QUEUE SETUP")
         installed_fax_devices = device.getSupportedCUPSDevices(['hpfax'])    
         log.debug(installed_fax_devices)
 
         if not auto and fax_uri in installed_fax_devices:
             log.warning("One or more fax queues already exist for this device: %s." % ', '.join(installed_fax_devices[fax_uri]))
-            while True:
-                ok, setup_fax = tui.enter_yes_no("\nWould you like to install another fax queue for this device", 'n')
-                if not ok: sys.exit(0)
+            ok, setup_fax = tui.enter_yes_no("\nWould you like to install another fax queue for this device", 'n')
+            if not ok: sys.exit(0)
 
     if setup_fax:
         if auto: # or fax_name is None:
@@ -686,12 +859,14 @@ else: # INTERACTIVE_MODE
 
 
     # ******************************* FAX HEADER SETUP
+        tui.header("FAX HEADER SETUP")
+        
         if auto:
             setup_fax = False
         else:
             while True:
-                user_input = raw_input(log.bold("\nWould you like to perform fax header setup (y=yes*, n=no, q=quit) ?"))
-                user_input = user_input.strip().lower()
+                user_input = raw_input(log.bold("\nWould you like to perform fax header setup (y=yes*, n=no, q=quit) ?")).strip().lower()
+                #user_input = user_input.strip().lower()
 
                 if user_input == 'q':
                     log.info("OK, done.")
@@ -799,22 +974,30 @@ else: # INTERACTIVE_MODE
     if setup_print:
         print_test_page = False
 
+        tui.header("PRINTER TEST PAGE")
+        
         if auto:
             if testpage_in_auto_mode:
                 print_test_page = True
         else:
-            while True:
-                ok, print_test_page = tui.enter_yes_no("\nWould you like to print a test page")
-                if not ok: sys.exit(0)
+            ok, print_test_page = tui.enter_yes_no("\nWould you like to print a test page")
+            if not ok: sys.exit(0)
 
         if print_test_page:
             path = utils.which('hp-testpage')
-
-            if len(path) > 0:
-                cmd = 'hp-testpage -d%s' % print_uri
+            
+            if printer_name:
+                param = "-p%s" % printer_name
             else:
-                cmd = 'python ./testpage.py -d%s' % print_uri
+                param = "-d%s" % print_uri
+                
+            if len(path) > 0:
+                cmd = 'hp-testpage %s' % param
+            else:
+                cmd = 'python ./testpage.py %s' % param
 
+            log.debug(cmd)
+            
             os.system(cmd)
 
 log.info("Done.")

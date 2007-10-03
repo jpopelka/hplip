@@ -443,6 +443,54 @@
    </margins>
   </printer>
   <printer>
+   <id>printer/HP-DeskJet_550C</id><!-- HP DeskJet 550C -->
+   <functionality>
+    <maxresx>300</maxresx>
+    <maxresy>300</maxresy>
+   </functionality>
+   <ppdentry>
+     *DefaultResolution: 300dpi
+    </ppdentry>
+   <margins>
+    <general>
+     <unit>in</unit>
+     <relative />
+     <left>0.25</left>
+     <right>0.25</right>
+     <top>0.125</top>
+     <bottom>0.67</bottom>
+    </general>
+    <exception PageSize="A4">
+     <left>0.135</left>
+     <right>0.135</right>
+    </exception>
+   </margins>
+  </printer>
+  <printer>
+   <id>printer/HP-DeskJet_560C</id><!-- HP DeskJet 560C -->
+   <functionality>
+    <maxresx>300</maxresx>
+    <maxresy>300</maxresy>
+   </functionality>
+   <ppdentry>
+     *DefaultResolution: 300dpi
+    </ppdentry>
+   <margins>
+    <general>
+     <unit>in</unit>
+     <relative />
+     <left>0.25</left>
+     <right>0.25</right>
+     <top>0.125</top>
+     <bottom>0.67</bottom>
+    </general>
+    <exception PageSize="A4">
+     <left>0.135</left>
+     <right>0.135</right>
+    </exception>
+   </margins>
+  </printer>
+  <printer>
    <id>printer/HP-DeskJet_630C</id>
    <functionality>
     <maxresx>600</maxresx>
@@ -13556,7 +13604,310 @@
    </margins>
   </printer>
   <printer>
+   <id>printer/HP-PhotoSmart_C6200</id>
+   <ppdentry>
+     *DefaultResolution: 1200dpi
+    </ppdentry>
+   <margins>
+    <general>
+     <unit>in</unit>
+     <relative />
+     <left>0.25</left>
+     <right>0.25</right>
+     <top>0.125</top>
+     <bottom>0.5</bottom>
+    </general>
+    <exception PageSize="A4">
+     <left>0.135</left>
+     <right>0.135</right>
+    </exception>
+    <exception PageSize="A5">
+     <left>0.125</left>
+     <right>0.125</right>
+    </exception>
+    <exception PageSize="Oufuku">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="5x8">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvDL">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Env10">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvMonarch">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvC6">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Photo5x7">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="CDDVD120">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="A6TearOff">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="A6">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="PhotoTearOff">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="Photo">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Hagaki">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="3x5">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="CDDVD80">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+   </margins>
+  </printer>
+  <printer>
    <id>printer/HP-PhotoSmart_C7100</id>
+   <ppdentry>
+     *DefaultResolution: 1200dpi
+    </ppdentry>
+   <margins>
+    <general>
+     <unit>in</unit>
+     <relative />
+     <left>0.25</left>
+     <right>0.25</right>
+     <top>0.125</top>
+     <bottom>0.5</bottom>
+    </general>
+    <exception PageSize="A4">
+     <left>0.135</left>
+     <right>0.135</right>
+    </exception>
+    <exception PageSize="A5">
+     <left>0.125</left>
+     <right>0.125</right>
+    </exception>
+    <exception PageSize="Oufuku">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="5x8">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvDL">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Env10">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvMonarch">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvC6">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Photo5x7">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="CDDVD120">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="A6TearOff">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="A6">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="PhotoTearOff">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="Photo">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Hagaki">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="3x5">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="CDDVD80">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+   </margins>
+  </printer>
+  <printer>
+   <id>printer/HP-PhotoSmart_C7200</id>
+   <ppdentry>
+     *DefaultResolution: 1200dpi
+    </ppdentry>
+   <margins>
+    <general>
+     <unit>in</unit>
+     <relative />
+     <left>0.25</left>
+     <right>0.25</right>
+     <top>0.125</top>
+     <bottom>0.5</bottom>
+    </general>
+    <exception PageSize="A4">
+     <left>0.135</left>
+     <right>0.135</right>
+    </exception>
+    <exception PageSize="A5">
+     <left>0.125</left>
+     <right>0.125</right>
+    </exception>
+    <exception PageSize="Oufuku">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="5x8">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvDL">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Env10">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvMonarch">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvC6">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Photo5x7">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="CDDVD120">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="A6TearOff">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="A6">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="PhotoTearOff">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="Photo">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Hagaki">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="3x5">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="CDDVD80">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+   </margins>
+  </printer>
+  <printer>
+   <id>printer/HP-PhotoSmart_C8100</id>
    <ppdentry>
      *DefaultResolution: 1200dpi
     </ppdentry>
@@ -13960,6 +14311,107 @@
    </margins>
   </printer>
   <printer>
+   <id>printer/HP-PhotoSmart_D5300</id>
+   <ppdentry>
+     *DefaultResolution: 1200dpi
+    </ppdentry>
+   <margins>
+    <general>
+     <unit>in</unit>
+     <relative />
+     <left>0.25</left>
+     <right>0.25</right>
+     <top>0.125</top>
+     <bottom>0.5</bottom>
+    </general>
+    <exception PageSize="A4">
+     <left>0.135</left>
+     <right>0.135</right>
+    </exception>
+    <exception PageSize="A5">
+     <left>0.125</left>
+     <right>0.125</right>
+    </exception>
+    <exception PageSize="Oufuku">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="5x8">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvDL">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Env10">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvMonarch">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvC6">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Photo5x7">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="CDDVD120">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="A6TearOff">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="A6">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="PhotoTearOff">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="Photo">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Hagaki">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="3x5">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="CDDVD80">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+   </margins>
+  </printer>
+  <printer>
    <id>printer/HP-PhotoSmart_D6100</id>
    <ppdentry>
      *DefaultResolution: 1200dpi
@@ -14062,6 +14514,208 @@
   </printer>
   <printer>
    <id>printer/HP-PhotoSmart_D7100</id>
+   <ppdentry>
+     *DefaultResolution: 1200dpi
+    </ppdentry>
+   <margins>
+    <general>
+     <unit>in</unit>
+     <relative />
+     <left>0.25</left>
+     <right>0.25</right>
+     <top>0.125</top>
+     <bottom>0.5</bottom>
+    </general>
+    <exception PageSize="A4">
+     <left>0.135</left>
+     <right>0.135</right>
+    </exception>
+    <exception PageSize="A5">
+     <left>0.125</left>
+     <right>0.125</right>
+    </exception>
+    <exception PageSize="Oufuku">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="5x8">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvDL">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Env10">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvMonarch">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvC6">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Photo5x7">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="CDDVD120">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="A6TearOff">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="A6">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="PhotoTearOff">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="Photo">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Hagaki">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="3x5">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="CDDVD80">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+   </margins>
+  </printer>
+  <printer>
+   <id>printer/HP-PhotoSmart_D7200</id>
+   <ppdentry>
+     *DefaultResolution: 1200dpi
+    </ppdentry>
+   <margins>
+    <general>
+     <unit>in</unit>
+     <relative />
+     <left>0.25</left>
+     <right>0.25</right>
+     <top>0.125</top>
+     <bottom>0.5</bottom>
+    </general>
+    <exception PageSize="A4">
+     <left>0.135</left>
+     <right>0.135</right>
+    </exception>
+    <exception PageSize="A5">
+     <left>0.125</left>
+     <right>0.125</right>
+    </exception>
+    <exception PageSize="Oufuku">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="5x8">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvDL">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Env10">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvMonarch">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvC6">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Photo5x7">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="CDDVD120">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="A6TearOff">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="A6">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="PhotoTearOff">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="Photo">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Hagaki">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="3x5">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="CDDVD80">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+   </margins>
+  </printer>
+  <printer>
+   <id>printer/HP-PhotoSmart_D7400</id>
    <ppdentry>
      *DefaultResolution: 1200dpi
     </ppdentry>
@@ -16006,6 +16660,120 @@
      <top>0.125</top>
      <bottom>0.5</bottom>
     </general>
+    <exception PageSize="A4">
+     <left>0.135</left>
+     <right>0.135</right>
+    </exception>
+    <exception PageSize="A5">
+     <left>0.125</left>
+     <right>0.125</right>
+    </exception>
+    <exception PageSize="Oufuku">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="5x8">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvDL">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Env10">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvMonarch">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="EnvC6">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Photo5x7">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="CDDVD120">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="A6TearOff">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="A6">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="PhotoTearOff">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="Photo">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="Hagaki">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="3x5">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+    <exception PageSize="CDDVD80">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+    </exception>
+   </margins>
+  </printer>
+  <printer>
+   <id>printer/HP-Officejet_K7100</id>
+   <ppdentry>
+     *DefaultResolution: 1200dpi
+    </ppdentry>
+   <margins>
+    <general>
+     <unit>in</unit>
+     <relative />
+     <left>0.25</left>
+     <right>0.25</right>
+     <top>0.125</top>
+     <bottom>0.5</bottom>
+    </general>
+    <exception PageSize="SuperB">
+     <left>0.2</left>
+     <right>0.2</right>
+    </exception>
+    <exception PageSize="A3">
+     <left>0.2</left>
+     <right>0.2</right>
+     <bottom>0.500000000000002</bottom>
+    </exception>
+    <exception PageSize="Ledger">
+     <left>0.2</left>
+     <right>0.2</right>
+    </exception>
     <exception PageSize="A4">
      <left>0.135</left>
      <right>0.135</right>
@@ -18594,6 +19362,72 @@
    </margins>
   </printer>
   <printer>
+   <id>printer/HP-OfficeJet_J3600</id>
+   <functionality>
+    <maxresx>600</maxresx>
+    <maxresy>600</maxresy>
+   </functionality>
+   <ppdentry>
+     *DefaultResolution: 600dpi
+    </ppdentry>
+   <margins>
+    <general>
+     <unit>in</unit>
+     <relative />
+     <left>0.25</left>
+     <right>0.25</right>
+     <top>0.125</top>
+     <bottom>0.5</bottom>
+    </general>
+    <exception PageSize="A4">
+     <left>0.135</left>
+     <right>0.135</right>
+    </exception>
+    <exception PageSize="A5">
+     <left>0.125</left>
+     <right>0.125</right>
+    </exception>
+    <exception PageSize="Photo5x7">
+     <left>0.125</left>
+     <right>0.125</right>
+    </exception>
+    <exception PageSize="CDDVD120">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="A6TearOff">
+     <left>0.125</left>
+     <right>0.125</right>
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="A6">
+     <left>0.125</left>
+     <right>0.125</right>
+    </exception>
+    <exception PageSize="PhotoTearOff">
+     <left>0.125</left>
+     <right>0.125</right>
+     <bottom>0.125</bottom>
+    </exception>
+    <exception PageSize="Photo">
+     <left>0.125</left>
+     <right>0.125</right>
+    </exception>
+    <exception PageSize="Hagaki">
+     <left>0.125</left>
+     <right>0.125</right>
+    </exception>
+    <exception PageSize="CDDVD80">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0</bottom>
+    </exception>
+   </margins>
+  </printer>
+  <printer>
    <id>printer/HP-DeskJet_3650</id>
    <functionality>
     <maxresx>600</maxresx>
@@ -19585,6 +20419,72 @@
   </printer>
   <printer>
    <id>printer/HP-915</id>
+   <functionality>
+    <maxresx>600</maxresx>
+    <maxresy>600</maxresy>
+   </functionality>
+   <ppdentry>
+     *DefaultResolution: 600dpi
+    </ppdentry>
+   <margins>
+    <general>
+     <unit>in</unit>
+     <relative />
+     <left>0.25</left>
+     <right>0.25</right>
+     <top>0.125</top>
+     <bottom>0.5</bottom>
+    </general>
+    <exception PageSize="A4">
+     <left>0.135</left>
+     <right>0.135</right>
+    </exception>
+    <exception PageSize="A5">
+     <left>0.125</left>
+     <right>0.125</right>
+    </exception>
+    <exception PageSize="Photo5x7">
+     <left>0.125</left>
+     <right>0.125</right>
+    </exception>
+    <exception PageSize="CDDVD120">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="A6TearOff">
+     <left>0.125</left>
+     <right>0.125</right>
+     <bottom>0</bottom>
+    </exception>
+    <exception PageSize="A6">
+     <left>0.125</left>
+     <right>0.125</right>
+    </exception>
+    <exception PageSize="PhotoTearOff">
+     <left>0.125</left>
+     <right>0.125</right>
+     <bottom>0.125</bottom>
+    </exception>
+    <exception PageSize="Photo">
+     <left>0.125</left>
+     <right>0.125</right>
+    </exception>
+    <exception PageSize="Hagaki">
+     <left>0.125</left>
+     <right>0.125</right>
+    </exception>
+    <exception PageSize="CDDVD80">
+     <left>0</left>
+     <right>0</right>
+     <top>0</top>
+     <bottom>0</bottom>
+    </exception>
+   </margins>
+  </printer>
+  <printer>
+   <id>printer/HP-OfficeJet_J5500</id>
    <functionality>
     <maxresx>600</maxresx>
     <maxresy>600</maxresy>

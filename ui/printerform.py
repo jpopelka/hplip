@@ -68,7 +68,7 @@ class PrinterForm(QMainWindow):
         log.debug(self.cups_printers)
 
         if not self.device_uri and not self.printer_name:
-            t = device.probeDevices(bus=bus, filter='none')
+            t = device.probeDevices(bus=bus)
             probed_devices = []
 
             for d in t:

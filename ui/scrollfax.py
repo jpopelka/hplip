@@ -933,6 +933,7 @@ class ScrollFaxView(ScrollView):
         #os.spawnvp(os.P_NOWAIT, path, args) 
         os.system(cmd)
 
+        self.db.load()
         self.updateRecipientList()
         self.updateRecipientCombos()
 

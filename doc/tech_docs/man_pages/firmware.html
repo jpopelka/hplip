@@ -86,15 +86,15 @@
 hp-info
 
 <hr size="1"/>
-        <div class="document" id="hp-info-firmware-download-utility-ver-0-1">
-<h1 class="title">hp-info: Firmware Download Utility (ver. 0.1)</h1>
+        <div class="document" id="hp-info-firmware-download-utility-ver-0-3">
+<h1 class="title">hp-info: Firmware Download Utility (ver. 0.3)</h1>
 <p>Download firmware to a device.</p>
 <p><strong>Usage: hp-firmware [PRINTER|DEVICE-URI] [OPTIONS]</strong></p>
 <p><strong>[PRINTER|DEVICE-URI] (See Notes)</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="53%" />
-<col width="47%" />
+<col width="50%" />
+<col width="50%" />
 </colgroup>
 <tbody valign="top">
 <tr><td><em>To specify a device-URI:</em></td>
@@ -108,10 +108,13 @@ hp-info
 <p><strong>[OPTIONS]</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="53%" />
-<col width="47%" />
+<col width="50%" />
+<col width="50%" />
 </colgroup>
 <tbody valign="top">
+<tr><td><em>Use USB IDs to specify printer:</em></td>
+<td>-s xxx:yyy, where xxx is the USB bus ID and yyy is the USB device ID. The ':' and all leading zeroes must be present.</td>
+</tr>
 <tr><td><em>Bus to probe (if device not specified):</em></td>
 <td>-b&lt;bus&gt; or --bus=&lt;bus&gt;</td>
 </tr>
@@ -135,8 +138,8 @@ hp-info
 <p><strong>Notes:</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="53%" />
-<col width="47%" />
+<col width="50%" />
+<col width="50%" />
 </colgroup>
 <tbody valign="top">
 <tr><td colspan="2"><ol class="first last arabic simple">
@@ -154,8 +157,8 @@ hp-info
 <p><strong>See Also:</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="53%" />
-<col width="47%" />
+<col width="50%" />
+<col width="50%" />
 </colgroup>
 <tbody valign="top">
 <tr><td><a class="reference" href="toolbox.html">hp-toolbox</a></td>
@@ -166,7 +169,7 @@ hp-info
 </div>
 
 <hr size="1"/>
-<center><small>Page last updated: Wed Aug  1 15:17:30 2007; HPLIP Version: 2.7.7</small></center>
+<center><small>Page last updated: Fri Sep 28 16:44:59 2007; HPLIP Version: 2.7.9</small></center>
 </div>
 </td></tr></table>
 </div>

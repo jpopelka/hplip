@@ -85,6 +85,71 @@ Release Notes
         <div class="document">
 <div class="section">
 <h1><a id="release-notes" name="release-notes">Release Notes</a></h1>
+<p><strong>HPLIP 2.7.9 - This release has the following changes.</strong></p>
+<ol class="arabic simple">
+<li>Made the default udev 55-hpmud.rules file more permissive (ie: MODE=0666). Users no longer have to belong to the &quot;lp&quot; group.
+Users or distributions can change this user policy by modify the 55-hpmud.rules file.</li>
+<li>Changed 55-hpmud.rules file to check udev &quot;add&quot; events by product-id. Check is done by wild-card compare instead of individual product-id.</li>
+<li>All known product-ids that HPLIP/HPIJS supports have been added the model.dat file.</li>
+<li>Updated the udev notes in the technical documentation.</li>
+<li>Re-synced foomatic-db-engine with bzr branch at linuxprinting.org.</li>
+<li>Fixed defect (Description of some File Types are not consistent with those in Description of Show Types window when add items to the list to send as a fax.)</li>
+<li>Fixed defect (Hplip installation process hangs up at &quot;PRINTER SETUP&quot; if select no GUIs during custom installation.)</li>
+<li>Fixed defect (Traceback information displays in terminal when click &quot;Unload Photo Card&quot; button in Toolbox.)</li>
+<li>Filtered out foo2* drivers in hp-setup</li>
+<li>Fixed defect (Traceback information displays in terminal when send fax in non-interactive mode in MEPIS 6.5 OS.)</li>
+<li>Fixed installer support for MEPIS 6.5.</li>
+<li>Added DJ550C and DJ560C support to hpijs. These devices are supported with the &quot;DESKJET 540&quot; device class.</li>
+<li>Fixed defect (The default setting of &quot;print a test page&quot; is invalid when executing &quot;hp-setup -i&quot; command in terminal)</li>
+<li>Added a connection type chooser to hp-setup -i</li>
+<li>Enhanced/fixed handling of -p/--printer= in hp-testpage</li>
+<li>Fixed defect (Traceback information displays in terminal when click &quot;Unload Photo Card&quot; button in Toolbox.)</li>
+<li>Fixed defect (Some error information displays in terminal when performing a scan job via command &quot;hp-scan -n&quot;.)</li>
+<li>Fixed defect (&quot;Move Up&quot; and &quot;Move Down&quot; buttons are not grayed when there is no file in the print list. )</li>
+<li>Fixed defect (The same two files are both moved up/down by clicking &quot;Move Up&quot;/ &quot;Move Down&quot; button in Files to print list.)</li>
+<li>Fixed defect (The record of &quot;Fax Address Book&quot; still appears after it is deleted from the record of Recipient tab.)</li>
+<li>Fixed defect (Error occurs when adding a recipient to a group via in interactive mode &quot;hp-fab -i&quot;)</li>
+<li>Fixed defect (Some error information is displayed when entering &quot;hp-scan -n --fax=&quot; in terminal)</li>
+<li>Fixed defect (Adding printer using hp-setup with network is invalid from command line)</li>
+<li>Fixed missing error status when hpmud_make_net_uri() failed.</li>
+<li>Fixed issue where hp-setup would skip the first (Connection) page</li>
+<li>Fixed defect (Some error information displays in terminal when add printer via the command &quot;hp-setup&quot;)</li>
+<li>Removed lp group check in hp-check</li>
+<li>Fixed defect (Error occurs when changing group information via command &quot;editgrp&quot; in interactive mode &quot;hp-fab -i&quot;)</li>
+<li>Fixed defect (Error occurs when adding a recipient to a group via in interactive mode &quot;hp-fab -i&quot;)</li>
+<li>Removed permissions modification from the installer</li>
+<li>Removed lp group add from the installer</li>
+<li>Removed permissions and lp checks from hp-check</li>
+<li>Updated COPYING file.</li>
+<li>Fixed defect (The default setting of &quot;print a test page&quot; is invalid when executing &quot;hp-setup -i&quot; command in terminal)</li>
+<li>Fixed defect (The input &quot;q&quot; of &quot;perform level 2 cleaning&quot; is invalid during the cartridge cleaning process)</li>
+<li>Fixed defect (The default setting of &quot;view the release notes&quot; is invalid during the text installation)</li>
+<li>Fixed hp-fab -i (was still using old Kirbybase database)</li>
+<li>Fixed hp-levels so that it will resize based on the available console width automatically</li>
+<li>Removed lj1018 &amp; lj1020 firmware from distribution. These files should not have been in the tar ball.</li>
+<li>Fixed defect (Some error information is displayed when entering &quot;hp-scan -n --fax=&quot; in terminal)</li>
+<li>Fixed defect (KeyError: 0 during install or check)</li>
+<li>Fixed issue with &quot;KeyError: internal-tag&quot; in check.py reported by a user</li>
+<li>If running --disable-gui-build, the makefile no longer installs hplip/data/images/#. (ie: *.png files).</li>
+<li>Fixed defect (The default setting of &quot;view the release notes&quot; is invalid during the text installation)</li>
+<li>Removed laserjet contrast scan parameter from hpaio sane backend. Laserjets ignore this parameter. Contrast can be adjusted up-stream in xsane.</li>
+<li>Fixed defect (The Printer Name can not be modified during setup UI process)</li>
+</ol>
+<p><strong>This HPLIP package includes HPIJS 2.7.9 which has the following changes.</strong></p>
+<ol class="arabic simple">
+<li>Added support for the following new printer(s).</li>
+</ol>
+<pre class="literal-block">
+- HP Photosmart D7400 series (DJGenericVIP)
+- HP Photosmart D7200 series (DJGenericVIP)
+- HP Officejet K7100 Series (DJGenericVIP)
+- HP Photosmart C6200 series (DJGenericVIP)
+- HP Photosmart C8100 series (DJGenericVIP)
+- HP Photosmart C7200 series (DJGenericVIP)
+- HP Photosmart D5300 series (DJGenericVIP)
+- HP Officejet J3600 Series (DJ3600)
+- HP Officejet J5500 Series (DJ3600)
+</pre>
 <p><strong>HPLIP 2.7.7 - This release has the following changes.</strong></p>
 <ol class="arabic simple">
 <li>Fixed issues with ppd_install and ppd_dir in the installer</li>
@@ -1931,7 +1996,7 @@ where x equals: DJ630, DJ6xx, DJ6xxP, DJ8xx, DJ9xx or DJ9xxVIP
 </div>
 
 <hr size="1"/>
-<center><small>Page last updated: Mon Jul 30 11:45:10 2007; HPLIP Version: 2.7.7</small></center>
+<center><small>Page last updated: Fri Sep 28 10:04:15 2007; HPLIP Version: 2.7.9</small></center>
 </div>
 </td></tr></table>
 </div>

@@ -20,7 +20,20 @@
 # Author: Don Welch
 
 from base.g import *
-import os.path, re, glob
+from base import utils
+
+import os.path
+import re
+import glob
+
+TYPE_UNKNOWN = 0
+TYPE_STRING = 1
+TYPE_STR = 1
+TYPE_LIST = 2
+TYPE_BOOL = 3
+TYPE_INT = 4
+TYPE_HEX = 5
+TYPE_BITFIELD = 6
 
 class ModelData:
     def __init__(self, root_path=None):
@@ -35,6 +48,50 @@ class ModelData:
         self.inc = re.compile(r'^\%include (.*)', re.IGNORECASE)
         self.inc_line = re.compile(r'^\%(.*)\%')
         self.eq = re.compile(r'^([^=]+)=(.*)')
+        
+        self.FIELD_TYPES = {
+            'align-type' : TYPE_INT,
+            'clean-type' : TYPE_INT,
+            'color-cal-type' : TYPE_INT,
+            'copy-type' : TYPE_INT,
+            'embedded-server-type' : TYPE_INT,
+            'fax-type' : TYPE_INT,
+            'fw-download' : TYPE_BOOL,
+            'icon' : TYPE_STR,
+            'io-mfp-mode' : TYPE_INT,
+            'io-mode' : TYPE_INT,
+            'io-support' : TYPE_BITFIELD,
+            'linefeed-cal-type' : TYPE_INT,
+            'panel-check-type' : TYPE_INT,
+            'pcard-type' : TYPE_INT,
+            'plugin' : TYPE_BOOL,
+            'plugin-library' : TYPE_STR,
+            'pq-diag-type' : TYPE_INT,
+            'r-type' : TYPE_INT,
+            'scan-style' : TYPE_INT,
+            'scan-type' : TYPE_INT,
+            'status-battery-check' : TYPE_BOOL,
+            'status-dynamic-counters' : TYPE_BOOL,
+            'status-type' : TYPE_INT,
+            'support-released' : TYPE_BOOL,
+            'support-type' : TYPE_INT,
+            'support-ver' : TYPE_STR,
+            'tech-class' : TYPE_STR,
+            'tech-type' : TYPE_INT,
+            'usb-pid' : TYPE_HEX,
+            'usb-vid' : TYPE_HEX,
+            }
+            
+        self.RE_FIELD_TYPES = {
+            re.compile('r(\d+)-agent(\d+)-kind', re.IGNORECASE) : TYPE_INT,
+            re.compile('r(\d+)-agent(\d+)-type', re.IGNORECASE) : TYPE_INT,
+            re.compile('r(\d+)-agent(\d+)-sku', re.IGNORECASE) : TYPE_STR,
+            re.compile('model(\d+)', re.IGNORECASE) : TYPE_STR,
+            }
+            
+        self.TYPE_CACHE = {}
+            
+          
 
     def read_all_files(self, unreleased=True):
         released_dat = os.path.join(self.root_path, "models.dat")
@@ -133,14 +190,18 @@ class ModelData:
                 match = self.eq.search(line)
 
                 if match is not None:
+                    key = match.group(1)
                     value = match.group(2)
-
-                    try:
+                    typ = self.get_data_type(key)
+                    
+                    if  typ in (TYPE_BITFIELD, TYPE_INT):
                         value = int(value)
-                    except ValueError:
-                        pass
-
-                    cache[read_section][match.group(1)] = value
+                    
+                    elif typ == TYPE_BOOL:
+                        #value = utils.to_bool(value)
+                        value = int(value)
+                        
+                    cache[read_section][key] = value
 
         fd.close()
         return found
@@ -178,4 +239,20 @@ class ModelData:
 
     def all_models(self):
         return self.__cache
+        
+    def get_data_type(self, key):
+        try:
+            return self.FIELD_TYPES[key]
+        except KeyError:
+            try:
+                return self.TYPE_CACHE[key]
+            except KeyError:
+                for pat, typ in self.RE_FIELD_TYPES.items():
+                    match = pat.match(key)
+                    if match is not None:
+                        self.TYPE_CACHE[key] = typ
+                        return typ
+        
+        return TYPE_STR
+    
 

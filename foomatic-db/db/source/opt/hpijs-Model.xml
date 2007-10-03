@@ -87,6 +87,16 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-DeskJet_550C</printer><!-- HP DeskJet 550C -->
+      <arg_defval>ev/hpijs-Model-HP-DeskJet_550C</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-DeskJet_560C</printer><!-- HP DeskJet 560C -->
+      <arg_defval>ev/hpijs-Model-HP-DeskJet_560C</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-DeskJet_630C</printer>
       <arg_defval>ev/hpijs-Model-HP-DeskJet_630C</arg_defval>
      </constraint>
@@ -1067,8 +1077,23 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C6200</printer>
+      <arg_defval>ev/hpijs-Model-HP-PhotoSmart_C6200</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_C7100</printer>
       <arg_defval>ev/hpijs-Model-HP-PhotoSmart_C7100</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C7200</printer>
+      <arg_defval>ev/hpijs-Model-HP-PhotoSmart_C7200</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C8100</printer>
+      <arg_defval>ev/hpijs-Model-HP-PhotoSmart_C8100</arg_defval>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -1087,6 +1112,11 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_D5300</printer>
+      <arg_defval>ev/hpijs-Model-HP-PhotoSmart_D5300</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_D6100</printer>
       <arg_defval>ev/hpijs-Model-HP-PhotoSmart_D6100</arg_defval>
      </constraint>
@@ -1094,6 +1124,16 @@
       <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_D7100</printer>
       <arg_defval>ev/hpijs-Model-HP-PhotoSmart_D7100</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_D7200</printer>
+      <arg_defval>ev/hpijs-Model-HP-PhotoSmart_D7200</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_D7400</printer>
+      <arg_defval>ev/hpijs-Model-HP-PhotoSmart_D7400</arg_defval>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -1189,6 +1229,11 @@
       <driver>hpijs</driver>
       <printer>printer/HP-OfficeJet_J5700</printer>
       <arg_defval>ev/hpijs-Model-HP-OfficeJet_J5700</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-Officejet_K7100</printer>
+      <arg_defval>ev/hpijs-Model-HP-Officejet_K7100</arg_defval>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -1382,6 +1427,11 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-OfficeJet_J3600</printer>
+      <arg_defval>ev/hpijs-Model-HP-OfficeJet_J3600</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-DeskJet_3650</printer>
       <arg_defval>ev/hpijs-Model-HP-DeskJet_3650</arg_defval>
      </constraint>
@@ -1459,6 +1509,11 @@
       <driver>hpijs</driver>
       <printer>printer/HP-915</printer>
       <arg_defval>ev/hpijs-Model-HP-915</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-OfficeJet_J5500</printer>
+      <arg_defval>ev/hpijs-Model-HP-OfficeJet_J5500</arg_defval>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -3470,6 +3525,54 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-DeskJet_540C</printer><!-- HP DeskJet 540C -->
+     </constraint>
+    </constraints>
+   </enum_val>
+   <enum_val id="ev/hpijs-Model-HP-DeskJet_550C">
+    <ev_longname>
+     <en>HP DeskJet 550C</en>
+    </ev_longname>
+    <!-- A multilingual <comments> block can appear here, too;
+         it should be treated as documentation for the user. -->
+    <ev_shortname>
+     <en>HP-DeskJet_550C</en>
+     <!-- Until someone tells me how to learn the user locale in
+          backends, the shortname must be monolingual in <en>! -->
+    </ev_shortname>
+    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;DESKJET 540&quot;</ev_driverval>
+    <constraints>
+     <!-- Assume the choice doesn't apply... -->
+     <constraint sense='false'>
+      <driver>hpijs</driver>
+     </constraint>
+     <!-- ...except to these: -->
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-DeskJet_550C</printer><!-- HP DeskJet 550C -->
+     </constraint>
+    </constraints>
+   </enum_val>
+   <enum_val id="ev/hpijs-Model-HP-DeskJet_560C">
+    <ev_longname>
+     <en>HP DeskJet 560C</en>
+    </ev_longname>
+    <!-- A multilingual <comments> block can appear here, too;
+         it should be treated as documentation for the user. -->
+    <ev_shortname>
+     <en>HP-DeskJet_560C</en>
+     <!-- Until someone tells me how to learn the user locale in
+          backends, the shortname must be monolingual in <en>! -->
+    </ev_shortname>
+    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;DESKJET 540&quot;</ev_driverval>
+    <constraints>
+     <!-- Assume the choice doesn't apply... -->
+     <constraint sense='false'>
+      <driver>hpijs</driver>
+     </constraint>
+     <!-- ...except to these: -->
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-DeskJet_560C</printer><!-- HP DeskJet 560C -->
      </constraint>
     </constraints>
    </enum_val>
@@ -6772,7 +6875,7 @@
      <!-- Until someone tells me how to learn the user locale in
           backends, the shortname must be monolingual in <en>! -->
     </ev_shortname>
-    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5600&quot;</ev_driverval>
+    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5550&quot;</ev_driverval>
     <constraints>
      <!-- Assume the choice doesn't apply... -->
      <constraint sense='false'>
@@ -6796,7 +6899,7 @@
      <!-- Until someone tells me how to learn the user locale in
           backends, the shortname must be monolingual in <en>! -->
     </ev_shortname>
-    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5600&quot;</ev_driverval>
+    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5550&quot;</ev_driverval>
     <constraints>
      <!-- Assume the choice doesn't apply... -->
      <constraint sense='false'>
@@ -6820,7 +6923,7 @@
      <!-- Until someone tells me how to learn the user locale in
           backends, the shortname must be monolingual in <en>! -->
     </ev_shortname>
-    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5600&quot;</ev_driverval>
+    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5550&quot;</ev_driverval>
     <constraints>
      <!-- Assume the choice doesn't apply... -->
      <constraint sense='false'>
@@ -6844,7 +6947,7 @@
      <!-- Until someone tells me how to learn the user locale in
           backends, the shortname must be monolingual in <en>! -->
     </ev_shortname>
-    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5600&quot;</ev_driverval>
+    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5550&quot;</ev_driverval>
     <constraints>
      <!-- Assume the choice doesn't apply... -->
      <constraint sense='false'>
@@ -8177,6 +8280,30 @@
      </constraint>
     </constraints>
    </enum_val>
+   <enum_val id="ev/hpijs-Model-HP-PhotoSmart_C6200">
+    <ev_longname>
+     <en>HP PhotoSmart C6200</en>
+    </ev_longname>
+    <!-- A multilingual <comments> block can appear here, too;
+         it should be treated as documentation for the user. -->
+    <ev_shortname>
+     <en>HP-PhotoSmart_C6200</en>
+     <!-- Until someone tells me how to learn the user locale in
+          backends, the shortname must be monolingual in <en>! -->
+    </ev_shortname>
+    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5600&quot;</ev_driverval>
+    <constraints>
+     <!-- Assume the choice doesn't apply... -->
+     <constraint sense='false'>
+      <driver>hpijs</driver>
+     </constraint>
+     <!-- ...except to these: -->
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C6200</printer>
+     </constraint>
+    </constraints>
+   </enum_val>
    <enum_val id="ev/hpijs-Model-HP-PhotoSmart_C7100">
     <ev_longname>
      <en>HP PhotoSmart C7100</en>
@@ -8198,6 +8325,54 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_C7100</printer>
+     </constraint>
+    </constraints>
+   </enum_val>
+   <enum_val id="ev/hpijs-Model-HP-PhotoSmart_C7200">
+    <ev_longname>
+     <en>HP PhotoSmart C7200</en>
+    </ev_longname>
+    <!-- A multilingual <comments> block can appear here, too;
+         it should be treated as documentation for the user. -->
+    <ev_shortname>
+     <en>HP-PhotoSmart_C7200</en>
+     <!-- Until someone tells me how to learn the user locale in
+          backends, the shortname must be monolingual in <en>! -->
+    </ev_shortname>
+    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5600&quot;</ev_driverval>
+    <constraints>
+     <!-- Assume the choice doesn't apply... -->
+     <constraint sense='false'>
+      <driver>hpijs</driver>
+     </constraint>
+     <!-- ...except to these: -->
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C7200</printer>
+     </constraint>
+    </constraints>
+   </enum_val>
+   <enum_val id="ev/hpijs-Model-HP-PhotoSmart_C8100">
+    <ev_longname>
+     <en>HP PhotoSmart C8100</en>
+    </ev_longname>
+    <!-- A multilingual <comments> block can appear here, too;
+         it should be treated as documentation for the user. -->
+    <ev_shortname>
+     <en>HP-PhotoSmart_C8100</en>
+     <!-- Until someone tells me how to learn the user locale in
+          backends, the shortname must be monolingual in <en>! -->
+    </ev_shortname>
+    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5600&quot;</ev_driverval>
+    <constraints>
+     <!-- Assume the choice doesn't apply... -->
+     <constraint sense='false'>
+      <driver>hpijs</driver>
+     </constraint>
+     <!-- ...except to these: -->
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C8100</printer>
      </constraint>
     </constraints>
    </enum_val>
@@ -8273,6 +8448,30 @@
      </constraint>
     </constraints>
    </enum_val>
+   <enum_val id="ev/hpijs-Model-HP-PhotoSmart_D5300">
+    <ev_longname>
+     <en>HP PhotoSmart D5300</en>
+    </ev_longname>
+    <!-- A multilingual <comments> block can appear here, too;
+         it should be treated as documentation for the user. -->
+    <ev_shortname>
+     <en>HP-PhotoSmart_D5300</en>
+     <!-- Until someone tells me how to learn the user locale in
+          backends, the shortname must be monolingual in <en>! -->
+    </ev_shortname>
+    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5600&quot;</ev_driverval>
+    <constraints>
+     <!-- Assume the choice doesn't apply... -->
+     <constraint sense='false'>
+      <driver>hpijs</driver>
+     </constraint>
+     <!-- ...except to these: -->
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_D5300</printer>
+     </constraint>
+    </constraints>
+   </enum_val>
    <enum_val id="ev/hpijs-Model-HP-PhotoSmart_D6100">
     <ev_longname>
      <en>HP PhotoSmart D6100</en>
@@ -8318,6 +8517,54 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_D7100</printer>
+     </constraint>
+    </constraints>
+   </enum_val>
+   <enum_val id="ev/hpijs-Model-HP-PhotoSmart_D7200">
+    <ev_longname>
+     <en>HP PhotoSmart D7200</en>
+    </ev_longname>
+    <!-- A multilingual <comments> block can appear here, too;
+         it should be treated as documentation for the user. -->
+    <ev_shortname>
+     <en>HP-PhotoSmart_D7200</en>
+     <!-- Until someone tells me how to learn the user locale in
+          backends, the shortname must be monolingual in <en>! -->
+    </ev_shortname>
+    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5600&quot;</ev_driverval>
+    <constraints>
+     <!-- Assume the choice doesn't apply... -->
+     <constraint sense='false'>
+      <driver>hpijs</driver>
+     </constraint>
+     <!-- ...except to these: -->
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_D7200</printer>
+     </constraint>
+    </constraints>
+   </enum_val>
+   <enum_val id="ev/hpijs-Model-HP-PhotoSmart_D7400">
+    <ev_longname>
+     <en>HP PhotoSmart D7400</en>
+    </ev_longname>
+    <!-- A multilingual <comments> block can appear here, too;
+         it should be treated as documentation for the user. -->
+    <ev_shortname>
+     <en>HP-PhotoSmart_D7400</en>
+     <!-- Until someone tells me how to learn the user locale in
+          backends, the shortname must be monolingual in <en>! -->
+    </ev_shortname>
+    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5600&quot;</ev_driverval>
+    <constraints>
+     <!-- Assume the choice doesn't apply... -->
+     <constraint sense='false'>
+      <driver>hpijs</driver>
+     </constraint>
+     <!-- ...except to these: -->
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_D7400</printer>
      </constraint>
     </constraints>
    </enum_val>
@@ -8428,7 +8675,7 @@
      <!-- Until someone tells me how to learn the user locale in
           backends, the shortname must be monolingual in <en>! -->
     </ev_shortname>
-    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5600&quot;</ev_driverval>
+    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5550&quot;</ev_driverval>
     <constraints>
      <!-- Assume the choice doesn't apply... -->
      <constraint sense='false'>
@@ -8774,6 +9021,30 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-OfficeJet_J5700</printer>
+     </constraint>
+    </constraints>
+   </enum_val>
+   <enum_val id="ev/hpijs-Model-HP-Officejet_K7100">
+    <ev_longname>
+     <en>HP Officejet K7100</en>
+    </ev_longname>
+    <!-- A multilingual <comments> block can appear here, too;
+         it should be treated as documentation for the user. -->
+    <ev_shortname>
+     <en>HP-Officejet_K7100</en>
+     <!-- Until someone tells me how to learn the user locale in
+          backends, the shortname must be monolingual in <en>! -->
+    </ev_shortname>
+    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5600&quot;</ev_driverval>
+    <constraints>
+     <!-- Assume the choice doesn't apply... -->
+     <constraint sense='false'>
+      <driver>hpijs</driver>
+     </constraint>
+     <!-- ...except to these: -->
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-Officejet_K7100</printer>
      </constraint>
     </constraints>
    </enum_val>
@@ -9689,6 +9960,30 @@
      </constraint>
     </constraints>
    </enum_val>
+   <enum_val id="ev/hpijs-Model-HP-OfficeJet_J3600">
+    <ev_longname>
+     <en>HP OfficeJet J3600</en>
+    </ev_longname>
+    <!-- A multilingual <comments> block can appear here, too;
+         it should be treated as documentation for the user. -->
+    <ev_shortname>
+     <en>HP-OfficeJet_J3600</en>
+     <!-- Until someone tells me how to learn the user locale in
+          backends, the shortname must be monolingual in <en>! -->
+    </ev_shortname>
+    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 3600&quot;</ev_driverval>
+    <constraints>
+     <!-- Assume the choice doesn't apply... -->
+     <constraint sense='false'>
+      <driver>hpijs</driver>
+     </constraint>
+     <!-- ...except to these: -->
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-OfficeJet_J3600</printer>
+     </constraint>
+    </constraints>
+   </enum_val>
    <enum_val id="ev/hpijs-Model-HP-DeskJet_3650">
     <ev_longname>
      <en>HP DeskJet 3650</en>
@@ -10070,6 +10365,30 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-915</printer>
+     </constraint>
+    </constraints>
+   </enum_val>
+   <enum_val id="ev/hpijs-Model-HP-OfficeJet_J5500">
+    <ev_longname>
+     <en>HP OfficeJet J5500</en>
+    </ev_longname>
+    <!-- A multilingual <comments> block can appear here, too;
+         it should be treated as documentation for the user. -->
+    <ev_shortname>
+     <en>HP-OfficeJet_J5500</en>
+     <!-- Until someone tells me how to learn the user locale in
+          backends, the shortname must be monolingual in <en>! -->
+    </ev_shortname>
+    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 3600&quot;</ev_driverval>
+    <constraints>
+     <!-- Assume the choice doesn't apply... -->
+     <constraint sense='false'>
+      <driver>hpijs</driver>
+     </constraint>
+     <!-- ...except to these: -->
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-OfficeJet_J5500</printer>
      </constraint>
     </constraints>
    </enum_val>

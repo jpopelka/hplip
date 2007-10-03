@@ -46,9 +46,10 @@ class RangeValidator(QValidator):
         
 
 class FileListViewItem(QListViewItem):
-    def __init__(self, parent, order, filename, mime_type_desc, path):
-        QListViewItem.__init__(self, parent, order, filename, mime_type_desc, path)
+    def __init__(self, parent, index, filename, mime_type_desc, path):
+        QListViewItem.__init__(self, parent, str(index+1), filename, mime_type_desc, path)
         self.path = path
+        self.index = index
 
 
 class ScrollPrintView(ScrollView):
@@ -59,8 +60,9 @@ class ScrollPrintView(ScrollView):
         self.form = form
         self.file_list = []
         self.pages_button_group = 0
-        self.prev_selected_file_path = ''
-
+        #self.prev_selected_file_path = ''
+        self.prev_selected_file_index = 0
+        
         self.allowable_mime_types = cups.getAllowableMIMETypes()
         self.allowable_mime_types.append("application/x-python")
 
@@ -119,7 +121,6 @@ class ScrollPrintView(ScrollView):
                                 s, self.funcButton_clicked)
 
         self.printButton.setEnabled(False)
-
         self.maximizeControl()
         
     def onUpdate(self, cur_device=None):
@@ -127,7 +128,6 @@ class ScrollPrintView(ScrollView):
         self.updateFileList()
         
     def onDeviceChange(self, cur_device=None):
-        #print "ScrollPrintView.onDeviceChange()"
         self.file_list = []
         ScrollView.onDeviceChange(self, cur_device)
 
@@ -159,8 +159,6 @@ class ScrollPrintView(ScrollView):
             None, name='addFilePushButton')
 
         layout37.addWidget(self.showTypesPushButton,2,5)
-
-
         self.fileListView = QListView(widget,"fileListView")
         self.fileListView.addColumn(self.__tr("Order"))
         self.fileListView.addColumn(self.__tr("Name"))
@@ -187,6 +185,8 @@ class ScrollPrintView(ScrollView):
         self.moveFileUpPushButton.setText(self.__tr("Move Up"))
 
         self.removeFilePushButton.setEnabled(False)
+        self.moveFileDownPushButton.setEnabled(False)
+        self.moveFileUpPushButton.setEnabled(False)
 
         self.connect(self.addFilePushButton, SIGNAL("clicked()"), self.addFile_clicked)
         self.connect(self.removeFilePushButton, SIGNAL("clicked()"), self.removeFile_clicked)
@@ -202,7 +202,7 @@ class ScrollPrintView(ScrollView):
 
     def fileListView_selectionChanged(self, i):
         try:
-            self.prev_selected_file_path = i.path
+            self.prev_selected_file_index = i.index
         except AttributeError:
             pass
         else:
@@ -215,7 +215,6 @@ class ScrollPrintView(ScrollView):
 
             self.moveFileDownPushButton.setEnabled(file_count > 1 and selected_item is not last_item)
             self.moveFileUpPushButton.setEnabled(file_count > 1 and selected_item is not flv.firstChild())        
-
 
     def fileListView_rightButtonClicked(self, item, pos, col):
         popup = QPopupMenu(self)
@@ -245,31 +244,33 @@ class ScrollPrintView(ScrollView):
 
         popup.popup(pos)
 
-
     def moveFileUp_clicked(self):
+        log.debug("Move file up")
         try:
-            path = self.fileListView.selectedItem().path
+            item = self.fileListView.selectedItem()
+            path, index = item.path, item.index
         except AttributeError:
             return
         else:
-            for i in range(1, len(self.file_list)):
-                if self.file_list[i][0] == path:
-                    self.file_list[i-1],self.file_list[i] = self.file_list[i], self.file_list[i-1]
-
+            new_pos = index-1
+            self.file_list[new_pos], self.file_list[index] = self.file_list[index], self.file_list[new_pos]
+            item.index = new_pos
+            self.prev_selected_file_index = new_pos
             self.updateFileList()
 
     def moveFileDown_clicked(self):
+        log.debug("Move file down")
         try:
-            path = self.fileListView.selectedItem().path
+            item = self.fileListView.selectedItem()
+            path, index = item.path, item.index
         except AttributeError:
             return
         else:
-            for i in range(len(self.file_list) - 2, -1, -1):
-                if self.file_list[i][0] == path:
-                    self.file_list[i], self.file_list[i+1] = self.file_list[i+1], self.file_list[i] 
-
+            new_pos = index+1
+            self.file_list[index], self.file_list[new_pos] = self.file_list[new_pos], self.file_list[index] 
+            item.index = new_pos
+            self.prev_selected_file_index = new_pos
             self.updateFileList()
-
 
     def addFile(self, path):
         path = os.path.realpath(path)
@@ -285,7 +286,6 @@ class ScrollPrintView(ScrollView):
             else:
                 log.debug("Adding file %s (%s,%s)" % (path, mime_type, mime_type_desc))
                 self.file_list.append((path, mime_type, mime_type_desc))
-                self.prev_selected_file_path = path
         else:
             self.form.FailureUI(self.__tr("<b>Unable to add file '%s' to file list (file not found).</b><p>Check the file name and try again." % path))
 
@@ -297,19 +297,19 @@ class ScrollPrintView(ScrollView):
         temp.reverse()
         last_item = None
         selected_item = None
-        order = len(temp)
+        index = len(temp)-1
 
         for path, mime_type, desc in temp:
-            i = FileListViewItem(self.fileListView, str(order), os.path.basename(path), desc, path)
+            log.debug("path=%s, mime_type=%s, desc=%s, index=%d" % (path, mime_type, desc, index))
+            i = FileListViewItem(self.fileListView, index, os.path.basename(path), desc, path)
             
-            if not self.prev_selected_file_path or self.prev_selected_file_path == path:
+            if self.prev_selected_file_index == index:
                 self.fileListView.setSelected(i, True)
-                self.prev_selected_file_path = path
+                self.prev_selected_file_index = index
                 selected_item = i
                 
-            order -= 1
+            index -= 1
 
-        
         last_item = self.fileListView.firstChild()
         while last_item is not None and last_item.nextSibling():
             last_item = last_item.nextSibling()
@@ -319,8 +319,6 @@ class ScrollPrintView(ScrollView):
         self.moveFileUpPushButton.setEnabled(file_count > 1 and selected_item is not self.fileListView.firstChild())
         self.removeFilePushButton.setEnabled(file_count > 0)
         self.printButton.setEnabled(file_count > 0)
-
-
 
     def addFile_clicked(self):
         workingDirectory = user_cfg.last_used.working_dir
@@ -341,12 +339,10 @@ class ScrollPrintView(ScrollView):
                 workingDirectory = unicode(dlg.dir().absPath())
                 log.debug("results: %s" % results)
                 log.debug("workingDirectory: %s" % workingDirectory)
-
                 user_cfg.last_used.working_dir = workingDirectory
 
                 if results:
                     self.addFile(unicode(results))
-
 
     def removeFile_clicked(self):
         try:
@@ -359,7 +355,8 @@ class ScrollPrintView(ScrollView):
             for p, t, d in temp:
                 if p == path:
                     del self.file_list[index]
-                    self.prev_selected_file_path = ''
+                    if index == self.prev_selected_file_index:
+                        self.prev_selected_file_index = 0
                     break
                 index += 1
 

@@ -15,6 +15,8 @@ foomatic_xml_printers = \
     $(src_dbdir)/printer/HP-DeskJet_420C.xml \
     $(src_dbdir)/printer/HP-DeskJet_500C.xml \
     $(src_dbdir)/printer/HP-DeskJet_540C.xml \
+    $(src_dbdir)/printer/HP-DeskJet_550C.xml \
+    $(src_dbdir)/printer/HP-DeskJet_560C.xml \
     $(src_dbdir)/printer/HP-DeskJet_630C.xml \
     $(src_dbdir)/printer/HP-DeskJet_632C.xml \
     $(src_dbdir)/printer/HP-DeskJet_656C.xml \
@@ -210,12 +212,18 @@ foomatic_xml_printers = \
     $(src_dbdir)/printer/HP-PhotoSmart_C5100.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_C5200.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_C6100.xml \
+    $(src_dbdir)/printer/HP-PhotoSmart_C6200.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_C7100.xml \
+    $(src_dbdir)/printer/HP-PhotoSmart_C7200.xml \
+    $(src_dbdir)/printer/HP-PhotoSmart_C8100.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_D7300.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_D5060.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_D5100.xml \
+    $(src_dbdir)/printer/HP-PhotoSmart_D5300.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_D6100.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_D7100.xml \
+    $(src_dbdir)/printer/HP-PhotoSmart_D7200.xml \
+    $(src_dbdir)/printer/HP-PhotoSmart_D7400.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_Pro_B8300.xml \
     $(src_dbdir)/printer/HP-PSC_1510.xml \
     $(src_dbdir)/printer/HP-PSC_1500.xml \
@@ -235,6 +243,7 @@ foomatic_xml_printers = \
     $(src_dbdir)/printer/HP-OfficeJet_7300.xml \
     $(src_dbdir)/printer/HP-OfficeJet_7400.xml \
     $(src_dbdir)/printer/HP-OfficeJet_J5700.xml \
+    $(src_dbdir)/printer/HP-Officejet_K7100.xml \
     $(src_dbdir)/printer/HP-DeskJet_450.xml \
     $(src_dbdir)/printer/HP-Business_Inkjet_1000.xml \
     $(src_dbdir)/printer/HP-Business_Inkjet_1100.xml \
@@ -273,6 +282,7 @@ foomatic_xml_printers = \
     $(src_dbdir)/printer/HP-OfficeJet_4115.xml \
     $(src_dbdir)/printer/HP-OfficeJet_4200.xml \
     $(src_dbdir)/printer/HP-OfficeJet_4300.xml \
+    $(src_dbdir)/printer/HP-OfficeJet_J3600.xml \
     $(src_dbdir)/printer/HP-DeskJet_3650.xml \
     $(src_dbdir)/printer/HP-DeskJet_3658.xml \
     $(src_dbdir)/printer/HP-DeskJet_3668.xml \
@@ -289,6 +299,7 @@ foomatic_xml_printers = \
     $(src_dbdir)/printer/HP-DeskJet_D2400.xml \
     $(src_dbdir)/printer/HP-910.xml \
     $(src_dbdir)/printer/HP-915.xml \
+    $(src_dbdir)/printer/HP-OfficeJet_J5500.xml \
     $(src_dbdir)/printer/HP-DeskJet_D4100.xml \
     $(src_dbdir)/printer/HP-DeskJet_D4200.xml \
     $(src_dbdir)/printer/HP-PhotoSmart_P100.xml \
@@ -450,6 +461,8 @@ foomatic_ppd_printers = \
     ppd/HP-DeskJet_420C-hpijs.ppd \
     ppd/HP-DeskJet_500C-hpijs.ppd \
     ppd/HP-DeskJet_540C-hpijs.ppd \
+    ppd/HP-DeskJet_550C-hpijs.ppd \
+    ppd/HP-DeskJet_560C-hpijs.ppd \
     ppd/HP-DeskJet_630C-hpijs.ppd \
     ppd/HP-DeskJet_632C-hpijs.ppd \
     ppd/HP-DeskJet_656C-hpijs.ppd \
@@ -645,12 +658,18 @@ foomatic_ppd_printers = \
     ppd/HP-PhotoSmart_C5100-hpijs.ppd \
     ppd/HP-PhotoSmart_C5200-hpijs.ppd \
     ppd/HP-PhotoSmart_C6100-hpijs.ppd \
+    ppd/HP-PhotoSmart_C6200-hpijs.ppd \
     ppd/HP-PhotoSmart_C7100-hpijs.ppd \
+    ppd/HP-PhotoSmart_C7200-hpijs.ppd \
+    ppd/HP-PhotoSmart_C8100-hpijs.ppd \
     ppd/HP-PhotoSmart_D7300-hpijs.ppd \
     ppd/HP-PhotoSmart_D5060-hpijs.ppd \
     ppd/HP-PhotoSmart_D5100-hpijs.ppd \
+    ppd/HP-PhotoSmart_D5300-hpijs.ppd \
     ppd/HP-PhotoSmart_D6100-hpijs.ppd \
     ppd/HP-PhotoSmart_D7100-hpijs.ppd \
+    ppd/HP-PhotoSmart_D7200-hpijs.ppd \
+    ppd/HP-PhotoSmart_D7400-hpijs.ppd \
     ppd/HP-PhotoSmart_Pro_B8300-hpijs.ppd \
     ppd/HP-PSC_1510-hpijs.ppd \
     ppd/HP-PSC_1500-hpijs.ppd \
@@ -670,6 +689,7 @@ foomatic_ppd_printers = \
     ppd/HP-OfficeJet_7300-hpijs.ppd \
     ppd/HP-OfficeJet_7400-hpijs.ppd \
     ppd/HP-OfficeJet_J5700-hpijs.ppd \
+    ppd/HP-Officejet_K7100-hpijs.ppd \
     ppd/HP-DeskJet_450-hpijs.ppd \
     ppd/HP-Business_Inkjet_1000-hpijs.ppd \
     ppd/HP-Business_Inkjet_1100-hpijs.ppd \
@@ -708,6 +728,7 @@ foomatic_ppd_printers = \
     ppd/HP-OfficeJet_4115-hpijs.ppd \
     ppd/HP-OfficeJet_4200-hpijs.ppd \
     ppd/HP-OfficeJet_4300-hpijs.ppd \
+    ppd/HP-OfficeJet_J3600-hpijs.ppd \
     ppd/HP-DeskJet_3650-hpijs.ppd \
     ppd/HP-DeskJet_3658-hpijs.ppd \
     ppd/HP-DeskJet_3668-hpijs.ppd \
@@ -724,6 +745,7 @@ foomatic_ppd_printers = \
     ppd/HP-DeskJet_D2400-hpijs.ppd \
     ppd/HP-910-hpijs.ppd \
     ppd/HP-915-hpijs.ppd \
+    ppd/HP-OfficeJet_J5500-hpijs.ppd \
     ppd/HP-DeskJet_D4100-hpijs.ppd \
     ppd/HP-DeskJet_D4200-hpijs.ppd \
     ppd/HP-PhotoSmart_P100-hpijs.ppd \

@@ -29,6 +29,7 @@ import sys
 import re
 import getopt
 import time
+import operator
 
 # Local
 from base.g import *
@@ -40,35 +41,37 @@ d = None
 def CleanUIx(level):
     global d
     ok = tui.continue_prompt("Ready to perform level %d cleaning (Note: Wait for previous print to finish)." % level)
-    timeout = 0
-    time.sleep(5)
     
-    try:
-        while True:
-            update_spinner()
-            try:
-                d.open()
-            except Error:
-                time.sleep(2)
-                timeout += 2
-                continue
-            
-            if d.isIdleAndNoError():
-                break
-            
-            time.sleep(1)
-            timeout += 1
-            
-            if timeout > 45:
-                log.error("Timeout waiting for print to finish.")
-                sys.exit(0)
+    if ok:
+        timeout = 0
+        time.sleep(5)
         
-        
-    finally:
-        cleanup_spinner()
-        d.close()
+        try:
+            while True:
+                update_spinner()
+                try:
+                    d.open()
+                except Error:
+                    time.sleep(2)
+                    timeout += 2
+                    continue
+                
+                if d.isIdleAndNoError():
+                    break
+                
+                time.sleep(1)
+                timeout += 1
+                
+                if timeout > 45:
+                    log.error("Timeout waiting for print to finish.")
+                    sys.exit(0)
+            
+            
+        finally:
+            cleanup_spinner()
+            d.close()
     
-    return True
+    return ok
 
 def CleanUI1():
     log.note("Please wait for page to complete printing before continuing.")
@@ -122,7 +125,8 @@ try:
     opts, args = getopt.getopt(sys.argv[1:], 'p:d:hl:b:g',
                                 ['printer=', 'device=', 'help', 'help-rest', 'help-man', 
                                  'logging=', 'bus=', 'help-desc'])
-except getopt.GetoptError:
+except getopt.GetoptError, e:
+    log.error(e.msg)
     usage()
 
 bus = device.DEFAULT_PROBE_BUS
@@ -179,7 +183,7 @@ utils.log_title(__title__, __version__)
 
 if not device_uri and not printer_name:
     try:
-        device_uri = device.getInteractiveDeviceURI(bus)
+        device_uri = device.getInteractiveDeviceURI(bus, filter={'clean-type': (operator.gt, 0)})
         if device_uri is None:
             sys.exit(0)
     except Error:

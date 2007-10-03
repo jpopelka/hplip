@@ -14,6 +14,7 @@ prnt
 prnt/cupsext
 scan
 ui
+io/mudext
 
 
             GNU GENERAL PUBLIC LICENSE
@@ -301,10 +302,8 @@ POSSIBILITY OF SUCH DAMAGES.
 
 The MIT license applies to the files in these directories:
 
-backend
-backend/hp
-io
-io/hpiod
+prnt/backend
+io/hpmud
 scan/sane
 
 

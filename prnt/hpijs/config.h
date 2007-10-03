@@ -304,6 +304,11 @@ Enables support for the FastRaster host based LaserJets.
 #define APDK_LJFASTRASTER
 
 /*!
+Enables support for LaserJet 1000, 1005, 1018, 1020
+*/
+#define APDK_LJZJS_MONO
+
+/*!
 Enables support for the hp and non-hp Postscript Printers
 */
 #define APDK_PSCRIPT

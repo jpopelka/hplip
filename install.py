@@ -42,6 +42,8 @@ USAGE = [(__doc__, "", "name", True),
          utils.USAGE_SPACE,
          utils.USAGE_OPTIONS,
          ("Automatic mode (chooses the most common options):", "-a or --auto", "option", False),
+         ("Force install of all dependencies (FOR TESTING ONLY):", "-x", "option", False),
+         ("Unknown distro mode (FOR TESTING ONLY):", "-d", "option", False),
          utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
          utils.USAGE_HELP,
          utils.USAGE_SPACE,
@@ -61,14 +63,16 @@ log.set_module("hplip-install")
 log.debug("euid = %d" % os.geteuid())
 mode = INTERACTIVE_MODE
 auto = False
-test = False
+test_depends = False
+test_unknown = False
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'hl:giawutx', 
+    opts, args = getopt.getopt(sys.argv[1:], 'hl:giawutxd', 
         ['help', 'help-rest', 'help-man', 'help-desc', 'gui',
         'logging=', 'interactive', 'auto', 'web', 'browser', 'text']) 
 
-except getopt.GetoptError:
+except getopt.GetoptError, e:
+    log.error(e.msg)
     usage()
     sys.exit(1)
 
@@ -107,8 +111,12 @@ for o, a in opts:
         mode = BROWSER_MODE
         
     elif o == '-x':
-        test = True
+        log.warn("Install all depends (-x) is for TESTING ONLY")
+        test_depends = True
 
+    elif o == '-d':
+        log.warn("Unknown distro (-d) is for TESTING ONLY")
+        test_unknown = True
 
 log_file = os.path.normpath('./hplip-install_%s.log' % time.strftime("%a-%d-%b-%Y_%H:%M:%S"))
 
@@ -126,6 +134,8 @@ log.info("Installer log saved in: %s" % log.bold(log_file))
 log.info("")
 
 if mode == BROWSER_MODE:
+    if test_depends or test_unknown:
+        log.error("Test modes -x and -d are not implemented with GUI mode.")
     from installer import web_install
     log.debug("Starting web browser installer...")
     web_install.start()
@@ -133,7 +143,7 @@ if mode == BROWSER_MODE:
 elif mode == INTERACTIVE_MODE:
     from installer import text_install
     log.debug("Starting text installer...")
-    text_install.start(auto, test)
+    text_install.start(auto, test_depends, test_unknown)
 
 else:
     log.error("Invalid mode. Please use '-i', '-t', '-u' or '-w' to select the mode.")

@@ -20,6 +20,7 @@
 #
 
 # Std Lib
+import operator
 
 # Local
 from base.g import *
@@ -90,7 +91,7 @@ class FaxSendJobForm(QMainWindow):
                 self.init_failed = True
         
         if not self.device_uri and not self.printer_name:
-            t = device.probeDevices(bus=bus, filter='fax')
+            t = device.probeDevices(bus=bus, filter={'fax-type':(operator.gt, 0)})
             probed_devices = []
 
             for d in t:

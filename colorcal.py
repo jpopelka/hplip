@@ -28,6 +28,7 @@ __doc__ = "Perform color calibration on HPLIP supported inkjet printers. (Note: 
 import sys
 import re
 import getopt
+import operator
 
 
 # Local
@@ -196,7 +197,8 @@ try:
                                   'bus='
                                 ]
                               )
-except getopt.GetoptError:
+except getopt.GetoptError, e:
+    log.error(e.msg)
     usage()
 
 printer_name = None
@@ -254,7 +256,7 @@ utils.log_title(__title__, __version__)
 
 if not device_uri and not printer_name:
     try:
-        device_uri = device.getInteractiveDeviceURI(bus)
+        device_uri = device.getInteractiveDeviceURI(bus, filter={'color-cal-type': (operator.gt, 0)})
         if device_uri is None:
             sys.exit(1)
     except Error:

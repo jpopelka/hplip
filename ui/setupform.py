@@ -19,13 +19,19 @@
 # Author: Don Welch
 
 # Std Lib
-import sys, socket, re, gzip, time
+import sys
+import socket
+import re
+import gzip
+import time
 import os.path, os
+import operator
 
 # Local
 from base.g import *
 from base import msg, device, utils, service
 from prnt import cups
+from installer import core_install
 
 try:
     from fax import fax
@@ -78,8 +84,10 @@ class PrinterNameValidator(QValidator):
         elif input[pos-1] in u"""~`!@#$%^&*()-=+[]{}()\\/,.<>?'\";:|""":     
             return QValidator.Invalid, pos
 
-        elif input != utils.printable(input):
-            return QValidator.Invalid, pos
+        # TODO: How to determine if unicode char is "printable" and acceptable
+        # to CUPS?
+        #elif input != utils.printable(input):
+        #    return QValidator.Invalid, pos
 
         else:
             return QValidator.Acceptable, pos
@@ -132,7 +140,15 @@ class SetupForm(SetupForm_base):
         self.jd_port = jd_port
 
         if self.param:
-            self.start_page = self.PPDPage
+            # Validate param...
+            device_uri, sane_uri, fax_uri = device.makeURI(self.param, self.jd_port)
+
+            if device_uri:
+                self.device_uri = device_uri            
+                self.start_page = self.PPDPage
+            
+            else:
+                self.FailureUI(self.__tr("<b>Device not found.</b> <p>Please make sure your printer is properly connected and powered-on."))
 
         icon = QPixmap(os.path.join(prop.image_dir, 'HPmenu.png'))
         self.setIcon(icon)
@@ -208,9 +224,30 @@ class SetupForm(SetupForm_base):
 
                 if device_uri:
                     self.device_uri = device_uri
-                    back_end, is_hp, bus, model, serial, dev_file, host, port = device.parseDeviceURI(self.device_uri)
-                    self.bus = bus
-                    self.mq = device.queryModelByURI(self.device_uri)
+            
+            back_end, is_hp, bus, model, serial, dev_file, host, port = device.parseDeviceURI(self.device_uri)
+            self.bus = bus
+            self.mq = device.queryModelByURI(self.device_uri)
+                    
+            norm_model = device.normalizeModelName(model).lower()
+                    
+            if self.mq.get('plugin', 0):
+                
+                plugin_lib = self.mq.get("plugin-library")
+                fw_download = self.mq.get("fw-download")
+                
+                self.core = core_install.CoreInstall()
+                if not self.core.check_for_plugin(norm_model):
+                    
+                    from pluginform import PluginForm
+                    plugin_form = PluginForm(self.core, norm_model, self.device_uri, plugin_lib, fw_download)
+                    ok = plugin_form.exec_loop()
+                    if not ok:
+                        self.reject()
+                        return
+                    
+                else:
+                    log.debug("Plugin support already installed")
 
             self.updatePPDPage()
 
@@ -366,7 +403,25 @@ class SetupForm(SetupForm_base):
         self.probedDevicesListView.addColumn(self.__tr("Device URI"))
 
         if devices is None:
-            devices = device.probeDevices(self.bus, self.timeout, self.ttl, self.filter, self.search) # net_search='slp'
+            FILTER_MAP = {'print' : None,
+                          'none' : None, 
+                          'scan': 'scan-type', 
+                          'copy': 'copy-type', 
+                          'pcard': 'pcard-type',
+                          'fax': 'fax-type',
+                          }
+            
+            filter_dict = {}
+            for f in self.filter.split(","):
+                if f in FILTER_MAP:
+                    filter_dict[FILTER_MAP[f]] = (operator.gt, 0)
+                else:
+                    filter_dict[f] = (operator.gt, 0)
+                    
+            #print filter_dict
+        
+            devices = device.probeDevices(self.bus, self.timeout, self.ttl, filter_dict, self.search)
+            
             self.probeHeadingTextLabel.setText(self.__tr("%1 device(s) found on the %1:").arg(len(devices)).arg(io_str))
 
         else:

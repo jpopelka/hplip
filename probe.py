@@ -21,17 +21,19 @@
 #
 
 
-__version__ = '3.2'
+__version__ = '4.0'
 __title__ = 'Printer Discovery Utility'
 __doc__ = "Discover USB, parallel, and network printers."
 
 
 # Std Lib
-import sys, getopt
+import sys
+import getopt
+import operator
 
 # Local
 from base.g import *
-from base import device, utils
+from base import device, utils, tui
 
 
 USAGE = [(__doc__, "", "name", True),
@@ -84,11 +86,12 @@ try:
                                   'method=',
                                 ]
                               )
-except getopt.GetoptError:
+except getopt.GetoptError, e:
+    log.error(e.msg)
     usage()
 
 log_level = logger.DEFAULT_LOG_LEVEL
-bus = "usb"
+bus = None
 align_debug = False
 timeout=10
 ttl=4
@@ -172,12 +175,66 @@ for o, a in opts:
 
 utils.log_title(__title__, __version__)
 
+if bus is None:
+    x = 1
+    ios = {0: ('usb', "Universal Serial Bus (USB)") }
+    if sys_cfg.configure['network-build']: 
+        ios[x] = ('net', "Network/Ethernet/Wireless (direct connection or JetDirect)")
+        x += 1
+    if sys_cfg.configure['pp-build']: 
+        ios[x] = ('par', "Parallel Port (LPT:)")
+        x += 1
+    
+    if len(ios) > 1:
+        tui.header("CHOOSE CONNECTION TYPE")
+        f = tui.Formatter()
+        f.max_widths = (10, 10, 40)
+        f.header = ("Num.", "Connection Type", "Connection Type Description")
+        
+        for x, data in ios.items():
+            if not x:
+                f.add((str(x) + "*", data[0], data[1]))
+            else:
+                f.add((str(x), data[0], data[1]))
+            
+        f.output()
+    
+        ok, val = tui.enter_range("\nEnter number 0...%d for connection type (q=quit, enter=usb*) ? " % x, 
+            0, x, 0)
+
+        if not ok: sys.exit(0)
+        
+        bus = ios[val][0]
+    else:
+        bus = ios[0][0]
+        
+    log.info("")
+    
+tui.header("DEVICE DISCOVERY")
+
 buses = bus
 for bus in buses.split(','):
     if bus == 'net':
         log.info(log.bold("Probing network for printers. Please wait, this will take approx. %d seconds...\n" % timeout))
+        
+    FILTER_MAP = {'print' : None,
+                  'none' : None,
+                  'scan': 'scan-type', 
+                  'copy': 'copy-type', 
+                  'pcard': 'pcard-type',
+                  'fax': 'fax-type',
+                  }
+    
+    filter_dict = {}
+    for f in filter.split(','):
+        if f in FILTER_MAP:
+            filter_dict[FILTER_MAP[f]] = (operator.gt, 0)
+        else:
+            filter_dict[f] = (operator.gt, 0)
+            
+    log.debug(filter_dict)
 
-    devices = device.probeDevices(bus, timeout, ttl, filter, search, method)
+    devices = device.probeDevices(bus, timeout, ttl, filter_dict, search, method)
     cleanup_spinner()
 
     max_c1, max_c2, max_c3, max_c4 = 0, 0, 0, 0

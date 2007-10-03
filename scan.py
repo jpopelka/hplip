@@ -68,7 +68,7 @@ page_units = 'mm'
 valid_res = (75, 150, 300, 600, 1200, 2400, 4800)
 default_res = 300
 scanner_compression = 'JPEG'
-
+adf = False
 
 PAGE_SIZES = { # in mm
     '5x7' : (127, 178, "5x7 photo", 'in'),
@@ -117,6 +117,7 @@ USAGE = [(__doc__, "", "name", True),
          ("", "where <resolution_in_dpi> is %s (300 is default)." % ', '.join([str(x) for x in valid_res]), "option", False),
          ("Image resize:", "--resize=<scale_in_%> (min=1%, max=400%, default=100%)", "option", False),
          ("Image contrast:", "--contrast=<contrast>", "option", False),
+         ("ADF mode (EXPERIMENTAL):", "--adf (Note, only PDF output is supported when using the ADF)", "option", False),
 
          utils.USAGE_SPACE,
          ("[-n OPTIONS] (Scan area) (Not applicable to GUI mode)", "", "header", False),
@@ -144,19 +145,20 @@ USAGE = [(__doc__, "", "name", True),
          ("", "Units are specified by -t/--units (default is 'mm').", "option", False),
          ("Specify the scan area based on a paper size:", "--size=<paper size name>", "option", False),
          ("", "where <paper size name> is one of: %s" % ', '.join(PAGE_SIZES.keys()), "option", False), 
+         
          utils.USAGE_SPACE,
          ("[-n OPTIONS] ('file' dest) (Not applicable to GUI mode)", "", "header", False),
          ("Filename for 'file' destination:", "-o<file> or -f<file> or --file=<file> or --output=<file>", "option", False),
 
          utils.USAGE_SPACE,
          ("[-n OPTIONS] ('pdf' dest) (Not applicable to GUI mode)", "", "header", False),
-
          ("PDF viewer application:", "--pdf=<pdf_viewer>", "option", False),
+         
          utils.USAGE_SPACE,
          ("[-n OPTIONS] ('viewer' dest) (Not applicable to GUI mode)", "", "header", False),
-
          ("Image viewer application:", "-v<viewer> or --viewer=<viewer>", "option", False),
          utils.USAGE_SPACE,
+         
          ("[-n OPTIONS] ('editor' dest) (Not applicable to GUI mode)", "", "header", False),
          ("Image editor application:", "-e<editor> or --editor=<editor>", "option", False),
          utils.USAGE_SPACE,
@@ -189,7 +191,7 @@ USAGE = [(__doc__, "", "name", True),
          ("3. If --printer is not specified, the CUPS default will be used if available.", "", "note", False),
          ("4. If an output file is not specified with the 'file' dest, a reasonable default will be used.", "", "note", False),
          ("5. Some options may not be valid on some scanning devices.", "", "note", False),
-         ("6. The following features are not yet implemented: GUI mode, ADF scanning, batch scanning, film/negative scanning, contrast adjustment, brightness adjustment, autocrop, resize to axb, resize to xKB, ", "", "note", False),
+         ("6. The following features are not yet implemented: GUI mode, batch scanning, film/negative scanning, contrast adjustment, brightness adjustment, autocrop, resize to axb, resize to xKB, ", "", "note", False),
 
          utils.USAGE_SPACE,
          utils.USAGE_EXAMPLES,
@@ -206,9 +208,6 @@ def usage(typ='text'):
 
     utils.format_text(USAGE, typ, __title__, 'hp-scan', __version__)
     sys.exit(0)
-
-
-
 
 
 viewer = ''
@@ -248,12 +247,14 @@ try:
           'file=', 'pdf=', 'viewer=', 'editor=',
           'email-from=', 'email-to=', 'resize=',
           'email-subject=', 'email-note=', 'email-msg=',
-          'contrast=', 'brightness=', 'size=', 'compression='])
+          'contrast=', 'brightness=', 'size=', 'compression=',
+          'adf', 'fax='])
 
 
 
 except getopt.GetoptError, e:
-    log.error(e)
+    log.error(e.msg)
+    usage()
     sys.exit(1)
 
 if os.getenv("HPLIP_DEBUG"):
@@ -567,8 +568,26 @@ for o, a in opts:
             if 'printer' not in dest:
                 dest.append('printer')
         else:
-            log.error("Unknown/invalid printer name: %s" % printer)
+            log.error("Unknown/invalid printer name: %s" % pp)
 
+    elif o == '--fax':
+        print "fax"
+        pp = a.strip()
+        from prnt import cups
+        printer_list = cups.getPrinters()
+        found = False
+        for p in printer_list:
+            if p.name == pp:
+                found = True
+                fax = pp
+                break
+
+        if found: 
+            if 'fax' not in dest:
+                dest.append('fax')
+        else:
+            log.error("Unknown/invalid fax name: %s" % pp)
+        
     elif o == '--email-to':
         email_to = a.split(',')
         if 'email' not in dest:
@@ -606,6 +625,10 @@ for o, a in opts:
         except ValueError:
             log.error("Invalid contrast value. Using default of 100.")
             contrast = 100
+            
+    elif o == '--adf':
+        adf = True
+        output_type = 'pdf'
 
 
 utils.log_title(__title__, __version__)
@@ -621,6 +644,10 @@ if 'printer' in dest and not printer:
         log.error("Print destination enabled with no printer specified.")
         log.error("No CUPS default printer found. Disabling 'print' destination.")
         dest.remove("printer")
+        
+if 'fax' in dest and 'file' not in dest:
+    log.error("Fax destination not implemented. Adding 'file' destination. Use output file to fax.")
+    dest.append('file')
 
 if not dest:
     log.warn("No destinations specified. Adding 'file' destination by default.")
@@ -629,20 +656,41 @@ if not dest:
 if 'file' in dest and not output:
     log.warn("File destination enabled with no output file specified.")
 
-    if scan_mode == 'gray':
-        output = utils.createSequencedFilename("hpscan", ".png")
+    if adf:
+        log.info("Setting output format to PDF for ADF mode.")
+        output = utils.createSequencedFilename("hpscan", ".pdf")
+        output_type = 'pdf'
     else:
-        output = utils.createSequencedFilename("hpscan", ".jpg")
-
+        if scan_mode == 'gray':
+            log.info("Setting output format to PNG for greyscale mode.")
+            output = utils.createSequencedFilename("hpscan", ".png")
+            output_type = 'png'
+        else:
+            log.info("Setting output format to JPEG for color/lineart mode.")
+            output = utils.createSequencedFilename("hpscan", ".jpg")
+            output_type = 'jpeg'
+        
     log.warn("Defaulting to '%s'." % output)
 
-try:
-    output_type = os.path.splitext(output)[1].lower()
-except IndexError:
-    output_type = ''
+else:
+    try:
+        output_type = os.path.splitext(output)[1].lower()[1:]
+        if output_type == 'jpg':
+            output_type = 'jpeg'
+    except IndexError:
+        output_type = ''
+        
+if output_type and output_type not in ('jpeg', 'png', 'pdf'):
+    log.error("Invalid output file format. File formats must be 'jpeg', 'png', or 'pdf'.")
+    sys.exit(1)
 
-if scan_mode == 'gray' and output_type and output_type != '.png':
-    log.error("Grayscale scans must be saved in PNG file format. To save in other formats, set the 'editor' destination and save the image from the editor.")
+#sys.exit(0)
+##if scan_mode == 'gray' and output_type and output_type != 'png':
+##    log.error("Grayscale scans must be saved in PNG file format. To save in other formats, set the 'editor' destination and save the image from the editor in the desired format.")
+##    sys.exit(1)
+    
+if adf and output_type and output_type != 'pdf':
+    log.error("ADF scans must be saved in PDF file format.")
     sys.exit(1)
 
 if 'email' in dest and (not email_from or not email_to):
@@ -777,7 +825,6 @@ if mode == GUI_MODE:
         log.exception()
 
 else: # NON_INTERACTIVE_MODE
-    #import struct, Queue
     import Queue
     from scan import sane
     import scanext
@@ -789,7 +836,14 @@ else: # NON_INTERACTIVE_MODE
     except ImportError:
         log.error("'hp-scan -n' requires the Python Imaging Library (PIL). Please install it and try again or run 'hp-scan -u' instead.")
         sys.exit(1)
-
+    
+##    if output_type == 'pdf':
+##        try:
+##            from reportlab.pdfgen import canvas
+##        except ImportError:
+##            log.error("PDF output requires ReportLab.")
+##            sys.exit(1)
+            
     try:
         hpssd_sock = service.startup()
     except Error:
@@ -844,7 +898,8 @@ else: # NON_INTERACTIVE_MODE
         sys.exit(1)
 
     #print device.options
-
+    #sys.exit(0)
+    
     tlx = device.getOptionObj('tl-x').limitAndSet(tlx)
     tly = device.getOptionObj('tl-y').limitAndSet(tly)
     brx = device.getOptionObj('br-x').limitAndSet(brx)
@@ -872,7 +927,7 @@ else: # NON_INTERACTIVE_MODE
     device.setOption('compression', scanner_compression)
 
     if brx - tlx <= 0.0 or bry - tly <= 0.0:
-        log.error("Invalid scan area.")
+        log.error("Invalid scan area (width or height is negative).")
         sys.exit(1)
 
     log.info("")
@@ -929,85 +984,197 @@ else: # NON_INTERACTIVE_MODE
 
     device.setOption("mode", scan_mode)
     device.setOption("resolution", res)
+    
+    if adf:
+        device.setOption("source", "ADF")
+        device.setOption("batch-scan", True)
+    else:
+        try:
+            device.setOption("source", "Auto")
+            device.setOption("batch-scan", False)
+        except scanext.error:
+            log.debug("Error setting source or batch-scan option (this is probably OK).")
 
     log.info("\nWarming up...")
-    bytes_read = 0
+    
+    no_docs = False
+    page = 1
+    adf_page_files = []
+    #adf_pages = []
+    
+    cleanup_spinner()
+    log.info("")
+
     try:
-        try:
-            try:
-                ok, expected_bytes = device.startScan("RGBA", update_queue, event_queue)
-            except scanext.error, e:
-                log.error(e)
-                sys.exit(1)
-
-            log.info("Scanning...")
-            log.info("Expecting to read %s from scanner." % utils.format_bytes(expected_bytes))
-            cleanup_spinner()
-            log.info("")
-            
-            pm = tui.ProgressMeter("Reading data:")
-
-            while device.isScanActive():
-                while update_queue.qsize():
-                    try:
-                        status, bytes_read = update_queue.get(0)
-                        
-                        if status != scanext.SANE_STATUS_GOOD:
-                            log.error("SANE error %d" % status)
-                            sys.exit(1)
-
-                    except Queue.Empty:
-                        break
-
-                pm.update(int(100*bytes_read/expected_bytes), 
-                    utils.format_bytes(bytes_read))
-
-                time.sleep(0.5)
+        while True:
+            if adf:
+                log.info("\nPage %d: Scanning..." % page)
+            else:
+                log.info("\nScanning...")
                 
-        except KeyboardInterrupt:
-            log.error("Aborted.")
-            sys.exit(1)
+            bytes_read = 0
+ 
+            try:
+                try:
+                    ok, expected_bytes, status = device.startScan("RGBA", update_queue, event_queue)
+                except scanext.error, e:
+                    log.error(e)
+                    sys.exit(1)
+                except KeyboardInterrupt:
+                    log.error("Aborted.")
+                    device.cancelScan()
+                    sys.exit(1) 
+             
+                if adf and status == scanext.SANE_STATUS_NO_DOCS:
+                    log.info("Out of documents. Scanned %d pages total." % (page-1))
+                    no_docs = True
+                    break
+                
+                if adf:
+                    log.info("Expecting to read %s from scanner (per page)." % utils.format_bytes(expected_bytes))
+                else:
+                    log.info("Expecting to read %s from scanner." % utils.format_bytes(expected_bytes))
+                
+                device.waitForScanActive()
+                
+                pm = tui.ProgressMeter("Reading data:")
+        
+                while device.isScanActive():
+                    while update_queue.qsize():
+                        try:
+                            status, bytes_read = update_queue.get(0)
+                            
+                            if log.get_level() >= log.LOG_LEVEL_INFO:
+                                pm.update(int(100*bytes_read/expected_bytes), 
+                                    utils.format_bytes(bytes_read))
+                            
+##                            if status == scanext.SANE_STATUS_EOF:
+##                                log.debug("EOF")
+##                            elif status == scanext.SANE_STATUS_NO_DOCS:
+##                                log.debug("NO DOCS")
+##                                no_docs = True
+                            #elif status != scanext.SANE_STATUS_GOOD:
+                            if status != scanext.SANE_STATUS_GOOD:
+                                log.error("SANE error %d" % status)
+                                sys.exit(1)
+        
+                        except Queue.Empty:
+                            break
+        
 
-        while update_queue.qsize():
-            status, bytes_read = update_queue.get(0)
-            
-            pm.update(int(100*bytes_read/expected_bytes), 
-                utils.format_bytes(bytes_read))
-
-            if status != scanext.SANE_STATUS_GOOD:
-                log.error("SANE error %d" % status)
-                sys.exit(1)
-            
-            
-        log.info("")
-
-        if bytes_read:
-            log.info("Read %s from scanner." % utils.format_bytes(bytes_read))
-
-            buffer, format, format_name, pixels_per_line, \
-                lines, depth, bytes_per_line, pad_bytes, total_read = device.getScan()
-
-            if scan_mode == 'color':
-                im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(), 
-                    'raw', 'RGBA', 0, 1)
-
-            elif scan_mode == 'gray':
-                im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(), 
-                    'raw', 'RGBA', 0, 1).convert('P')
-
-            elif scan_mode == 'lineart':
-                im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(), 
-                    'raw', 'RGBA', 0, 1).convert('L')
+                    time.sleep(0.5)
                     
-        else:
-            log.error("No data read.")
-            sys.exit(1)
+            except KeyboardInterrupt:
+                log.error("Aborted.")
+                device.cancelScan()
+                sys.exit(1)
+        
+            # Make sure queue is cleared out...
+            while update_queue.qsize():
+                status, bytes_read = update_queue.get(0)
+                
+                if log.get_level() >= log.LOG_LEVEL_INFO:
+                    pm.update(int(100*bytes_read/expected_bytes), 
+                        utils.format_bytes(bytes_read))
+        
+##                if status == scanext.SANE_STATUS_EOF:
+##                    log.debug("EOF")
+##                elif status == scanext.SANE_STATUS_NO_DOCS:
+##                    log.debug("NO DOCS")
+##                    no_docs = True
+                #elif status != scanext.SANE_STATUS_GOOD:
+                if status != scanext.SANE_STATUS_GOOD:
+                    log.error("SANE error %d" % status)
+                    sys.exit(1)
+                
+            log.info("")
+        
+            if bytes_read:
+                log.info("Read %s from scanner." % utils.format_bytes(bytes_read))
+        
+                buffer, format, format_name, pixels_per_line, \
+                    lines, depth, bytes_per_line, pad_bytes, total_read = device.getScan()
+        
+                if scan_mode in ('color', 'gray'):
+                    im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(), 
+                        'raw', 'RGBA', 0, 1)
+        
+##                elif scan_mode == 'gray':
+##                    im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(), 
+##                        'raw', 'RGBA', 0, 1).convert('P')
+        
+                elif scan_mode == 'lineart':
+                    im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(), 
+                        'raw', 'RGBA', 0, 1).convert('L')
+                        
+                if adf:
+                    temp_output = utils.createSequencedFilename("hpscan_pg%d_" % page, ".png")
+                    adf_page_files.append(temp_output)
+                    im.save(temp_output)  
+                    log.debug("Saved page %d to file %s" % (page, temp_output))
+                    #adf_pages.append(im)
+            else:
+                log.error("No data read.")
+                sys.exit(1)
 
+            if not adf or (adf and no_docs):
+                break
+                
+            page += 1
+        
     finally:
         log.info("Closing device.")
-        device.freeScan()
-        sane.deInit()
+        device.cancelScan()
+        #print "0"
+        #device.freeScan()
+        #sane.deInit()
+            
+    #print "1"
+    if adf:
+        try:
+            from reportlab.pdfgen import canvas
+        except ImportError:
+            log.error("PDF output requires ReportLab.")
+            sys.exit(1)
+        #print "2"
+        #print canvas
+        #print canvas.Canvas
+        
+        tlx_max = device.getOptionObj('tl-x').constraint[1]
+        bry_max = device.getOptionObj('br-y').constraint[1]
 
+        if not output:
+            output = utils.createSequencedFilename("hpscan", ".pdf")
+        
+        c = canvas.Canvas(output, (tlx_max/0.3528, bry_max/0.3528))
+        #print c
+        
+        #for p in adf_page_files:
+        for p in adf_page_files:
+            log.info("Processing page %s..." % p)
+            
+            image = Image.open(p)
+            #print image
+            
+            try:
+                c.drawInlineImage(image, (tlx/0.3528), ((bry_max/0.3528)-(bry/0.3528)), 
+                
+                #c.drawInlineImage(image, 0, bry/0.3528,
+                    width=None,height=None)
+            except NameError:
+                log.error("A problem has occurred with PDF generation. This is a known bug in ReportLab. Please update your install of ReportLab to version 2.0 or greater.")
+                sys.exit(1)
+
+            c.showPage()
+            
+        log.info("Saving to file %s" % output)
+        c.save()
+        log.info("Viewing PDF file in %s" % pdf_viewer)
+        os.system("%s %s &" % (pdf_viewer, output))            
+    
+    
+        sys.exit(0)
+    
     if resize != 100:
         if resize < 1 or resize > 400:
             log.error("Resize parameter is incorrect. Resize must be 0% < resize < 400%.")
@@ -1026,13 +1193,18 @@ else: # NON_INTERACTIVE_MODE
         try:
             im.save(output)
         except IOError, e:
-            log.error("Error saving file: %s" % e)
-
+            log.error("Error saving file: %s (I/O)" % e)
             try:
                 os.remove(output)
             except OSError:
                 pass
-
+            sys.exit(1)
+        except ValueError, e:
+            log.error("Error saving file: %s (PIL)" % e)
+            try:
+                os.remove(output)
+            except OSError:
+                pass
             sys.exit(1)
 
         file_saved = True
@@ -1177,5 +1349,7 @@ else: # NON_INTERACTIVE_MODE
             else:
                 log.error("Editor not found.")
 
+    device.freeScan()
+    sane.deInit()    
     sys.exit(0)
 

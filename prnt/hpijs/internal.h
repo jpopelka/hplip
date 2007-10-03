@@ -380,6 +380,10 @@ class LJJetReadyProxy;
 class LJFastRasterProxy;
 #endif
 
+#ifdef APDK_LJZJS_MONO
+class LJZjsMonoProxy;
+#endif
+
 #if defined(APDK_PSP100) && defined (APDK_DJ9xxVIP)
 class PSP100Proxy;
 class PSP470Proxy;
@@ -520,6 +524,10 @@ public:
 
 #ifdef APDK_LJFASTRASTER
     static LJFastRasterProxy s_LJFastRasterProxy;
+#endif
+
+#ifdef APDK_LJZJS_MONO
+    static LJZjsMonoProxy s_LJZjsMonoProxy;
 #endif
 
 #if defined(APDK_PSP100) && defined (APDK_DJ9xxVIP)
@@ -1117,6 +1125,21 @@ protected:
 	DRIVER_ERROR MapPCLMediaTypeToString (MEDIATYPE eM);
 	int			 FrPaperToMediaSize(PAPER_SIZE ps);
 }; //HeaderLJFastRaster
+
+//ClassName
+/*
+******************************************************************************/
+class HeaderLJZjs : public Header
+{
+    friend class LJZjs;
+public:
+    HeaderLJZjs (Printer *p, PrintContext *pc);
+    virtual DRIVER_ERROR Send ();
+    virtual DRIVER_ERROR FormFeed ();
+protected:
+    DRIVER_ERROR EndJob ();
+    DRIVER_ERROR SendCAPy (unsigned int iAbsY);
+}; // HeaderLJZjs
 
 class RasterSender : public Processor
 {

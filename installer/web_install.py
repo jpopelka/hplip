@@ -23,6 +23,8 @@
 import time, thread
 import Queue
 import base64
+import re
+import locale
 
 # Local
 import cherrypy
@@ -33,10 +35,7 @@ from core_install import *
 from base import utils, pexpect
 from xml.dom.minidom import parse, parseString
 
-from base import utils, pexpect
-from xml.dom.minidom import parse, parseString
-
-ACTION_INIT = 0 
+ACTION_INIT = 0
 ACTION_INSTALL_REQUIRED = 1
 ACTION_INSTALL_OPTIONAL = 2
 ACTION_PRE_DEPENDENCY = 3
@@ -49,7 +48,7 @@ ACTION_PRE_BUILD = 9
 ACTION_POST_BUILD = 10
 ACTION_MAX = 10
 
-XMLFILE = 'data/localization/hplip_zh.ts'
+XMLFILE = 'installer/localization/gui_strings'
 
 try:
     from functools import update_wrapper
@@ -73,6 +72,13 @@ else: # using Python 2.5+
 def cat(package_mgr_cmd, packages_to_install):
     return utils.cat(package_mgr_cmd)
 
+opener = re.escape('$')
+closer = opener
+pattern = re.compile(opener + '([_A-Za-z][_A-Za-z0-9]*)' + closer)
+
+def sub_string_replace(main_string):
+    return re.sub(pattern, r'%(\1)s', main_string.replace('%','%%') )
+
 
 class Installer(object):
     def __init__(self):
@@ -87,6 +93,7 @@ class Installer(object):
         self.post_has_run = False
         self.depends_to_install = []
         self.is_signal_stop = 0
+        self.localized_dict = {}
 
         self.core = CoreInstall()
         self.core.get_hplip_version()
@@ -101,40 +108,86 @@ class Installer(object):
 
     @trace
     def createTemplate(self, name):
-        template = Template(file="installer/pages/%s.tmpl" % name, \
-            compilerSettings={'useStackFrames': False})
+
+        # maybe save as a class member ( self.cur_dir) or save the template path as a member variable (self.template_dir) and then os.join() it to the name.tmpl?
+        #cur_dir = os.path.realpath(os.path.normpath(os.getcwd()))
+        #compilerSettings = {'useStackFrames': False}
+        #template = Template(os.path.join(cur_dir, "installer", "pages", "%s.tmpl" % name))
+
+        template = Template(file="installer/pages/%s.tmpl" % name, compilerSettings={'useStackFrames': False} )
 
         template.title = "Title: %s" % name
         template.content = "<em>%s<em>" % name
         template.version = self.core.version_public
+
+        template.installer_title = self.localized_dict["installer_title"]
+        template.header_string = self.localized_dict["header_string"]
+        template.sub_header_string = self.localized_dict["sub_header_string"]
+       ##template.quit_message_title = self.localized_dict.get(screen + "_message_title", "")
+
+
         return template
 
     #
     # INDEX (LAUNCHES MAIN INSTALLER PAGE WELCOME IN NEW WINDOW)
     #
 
-    def quit(self): 
-        return str(self.createTemplate("quit"))
+    ####################################
+    # QUIT
+    ####################################
+    def quit(self):
+        screen = "quit"
+        template = self.createTemplate(screen)
+
+        # body and message inserts
+        template.quit_message_title = self.localized_dict[screen + "_message_title"]
+
+        return str(template)
 
     quit.exposed = True
 
+    ####################################
+    # UNSUPPORTED
+    ####################################
     def unsupported(self):
-        return str(self.createTemplate("unsupported"))
+        screen = "unsupported"
+        template = self.createTemplate(screen)
+
+        # body and message inserts
+        template.unsupported_message_title = self.localized_dict[screen + "_message_title"]
+        template.unsupported_notes_field = self.localized_dict[screen + "_notes_field"]
+        template.unsupported_notes_field1 = self.localized_dict[screen + "_notes_field1"]
+        template.unsupported_notes_field2 = self.localized_dict[screen + "_notes_field2"]
+        template.unsupported_notes_field3 = self.localized_dict[screen + "_notes_field3"]
+        template.unsupported_notes_field4 = self.localized_dict[screen + "_notes_field4"]
+        # button text inserts
+        template.quit_button = self.localized_dict["quit_button"]
+        template.next_button = self.localized_dict["next_button"]
+        return str(template)
 
     unsupported.exposed = True
 
     def unsupported_controller(self):
-        return str(self.createTemplate("welcome"))
+        return self.welcome()
 
     unsupported_controller.exposed = True
 
-
+    ####################################
+    # INDEX
+    ####################################
     def index(self):
-        return str(self.createTemplate("index"))
+        screen = "index"
+        template = self.createTemplate(screen)
+
+        # body and message inserts
+        template.index_message_title = self.localized_dict[screen + "_message_title"]
+        # button text inserts
+        template.start_button = self.localized_dict["start_button"]
+        return str(template)
 
     index.exposed = True
 
-    def signal_stop(self): 
+    def signal_stop(self):
         """
             Called by Quit to signal a stop
         """
@@ -142,7 +195,7 @@ class Installer(object):
 
     signal_stop.exposed = True
 
-    def signal_stopped(self): 
+    def signal_stopped(self):
         """
             Checked by index.html to see if we are stopping
         """
@@ -150,7 +203,7 @@ class Installer(object):
 
     signal_stopped.exposed = True
 
-    def stop(self): 
+    def stop(self):
         """
             Stop the CherryPy browser
         """
@@ -158,17 +211,24 @@ class Installer(object):
 
     stop.exposed = True
 
-    #
+    ####################################
     # WELCOME
-    #
+    ####################################
 
-    def welcome(self): 
-        template = self.createTemplate("welcome")
-        template.installer_title = "HELLO"
-        template.welcome_message_title = "HELLO1"
-        template.welcome_message_body = "HELLO2"
-        template.quit_button = "HELLO3"
-        template.next_button = "HELLO4"
+    def welcome(self):
+        screen = "welcome"
+        template = self.createTemplate(screen)
+
+        # body and message inserts
+        template.welcome_message_title = self.localized_dict[screen + "_message_title"]
+        template.welcome_message_body = sub_string_replace(self.localized_dict[screen + "_message_body"]) % {"version":self.core.distro_version}
+
+        # button text inserts
+        template.quit_button = self.localized_dict["quit_button"]
+        template.next_button = self.localized_dict["next_button"]
+
+        #template.version = "XXXX"   #TODO: Ask Don why this was removed????
+
         self.pushHistory(self.welcome)
         return str(template)
 
@@ -182,26 +242,40 @@ class Installer(object):
 
         if os.geteuid() == 0:
             return self.warning()
-        else: 
+        else:
             self.next = self.password
             return self.progress(ACTION_INIT)
 
     welcome_controller.exposed = True
 
 
-    #
+    ####################################
     # PASSWORD
-    #
-
-    def password(self): 
+    ####################################
+    def password(self):
         """
             Collect root password from user
         """
+        screen = "password"
+        template = self.createTemplate(screen)
+
+        # body and message inserts
+        template.password_message_title = self.localized_dict[screen + "_message_title"]
+        template.password_message_body = self.localized_dict[screen + "_message_body"]
+        template.password_message_footer = self.localized_dict[screen + "_message_footer"]
+        # button text inserts
+        template.quit_button = self.localized_dict["quit_button"]
+        template.previous_button = self.localized_dict["previous_button"]
+        template.next_button = self.localized_dict["next_button"]
+        template.password_alert = self.localized_dict["password_alert"]
+        
+
         self.pushHistory(self.password)
-        return str(self.createTemplate("password"))
+        return str(template)
 
     password.exposed = True
 
+    # Password callback
     def password_callback(self):
         return self.core.password
 
@@ -209,20 +283,22 @@ class Installer(object):
         log.debug(msg)
 
     @trace
-    def set_password(self, passwd): 
+    # Passwrod set
+    def set_password(self, passwd):
         """
             Collect root password from user - password?passwd=<passwd>
         """
         if passwd:
             self.core.password = base64.decodestring(passwd)
-            return str(self.core.check_password(self.password_callback))
+            pstr = str(self.core.check_password(self.password_callback))
+            return pstr
         else:
             return 'Empty'
 
     set_password.exposed = True
 
-
-    def password_controller(self): 
+    # Password callback
+    def password_controller(self):
         nxt = self.next
         if nxt is not None:
             self.next = None
@@ -232,13 +308,24 @@ class Installer(object):
 
     password_controller.exposed = True
 
-    #
+    ####################################
     # WARNING
-    #
-
+    ####################################
     @trace
-    def warning(self): 
-        template = self.createTemplate("warning")
+    def warning(self):
+
+        screen = "warning"
+        template = self.createTemplate(screen)
+
+        # body and message inserts
+        template.warning_message_title = self.localized_dict[screen + "_message_title"]
+        template.warning_notes_field = self.localized_dict[screen + "_notes_field"]
+        # button text inserts
+        template.quit_button = self.localized_dict["quit_button"]
+        template.previous_button = self.localized_dict["previous_button"]
+        template.next_button = self.localized_dict["next_button"]
+
+
         self.pushHistory(self.warning)
         return str(template)
 
@@ -256,23 +343,32 @@ class Installer(object):
     warning_controller.exposed = True
 
 
-    #
-    # MODE SELECTION
-    #
-
+    ####################################
+    # MODE
+    ####################################
     @trace
     def mode(self):
         """
             Install Mode: Custom or Automatic
         """
-        template = self.createTemplate("mode")
+        screen = "mode"
+        template = self.createTemplate(screen)
+
+        # body and message inserts
+        template.mode_message_title = self.localized_dict[screen + "_message_title"]
+        template.mode_radio1 = self.localized_dict[screen + "_radio1"]
+        template.mode_radio2 = self.localized_dict[screen + "_radio2"]
+        # button text inserts
+        template.quit_button = self.localized_dict["quit_button"]
+        template.next_button = self.localized_dict["next_button"]
+
         self.pushHistory(self.mode)
         return str(template)
 
     mode.exposed = True
 
     @trace
-    def mode_controller(self, auto_mode): 
+    def mode_controller(self, auto_mode):
         """
             mode_controller?auto_mode=0|1
         """
@@ -290,22 +386,32 @@ class Installer(object):
 
     mode_controller.exposed = True
 
-    #
-    # COMPONENT SELECTION
-    #
-
-    def component(self): 
+    ####################################
+    # COMPONENT
+    ####################################
+    def component(self):
         """
             Install Component: HPLIP or HPIJS (not shown in auto mode)
         """
-        template = self.createTemplate("component")
+        screen = "component"
+        template = self.createTemplate(screen)
+
+        # body and message inserts
+        template.component_message_title = self.localized_dict[screen + "_message_title"]
+        template.component_radio1 = self.localized_dict[screen + "_radio1"]
+        template.component_radio2 = self.localized_dict[screen + "_radio2"]
+        # button text inserts
+        template.quit_button = self.localized_dict["quit_button"]
+        template.previous_button = self.localized_dict["previous_button"]
+        template.next_button = self.localized_dict["next_button"]
+
         self.pushHistory(self.component)
         return str(template)
 
     component.exposed = True
 
     @trace
-    def component_controller(self, component): 
+    def component_controller(self, component):
         """
             component_controller?component=hplip|hpijs
         """
@@ -325,7 +431,7 @@ class Installer(object):
     # DISTRO AND DISTRO VERSION
     #
 
-    def distro_controller(self): 
+    def distro_controller(self):
         """
             Determine if distro confirm or select is to be shown
         """
@@ -340,21 +446,34 @@ class Installer(object):
 
     distro_controller.exposed = True
 
+
+    ####################################
+    # CONFIRM_DISTRO
+    ####################################
     def confirm_distro(self):
         """
             Correct Distro? (NOTE: Only display is distro && distro version is known)
         """
-        template = self.createTemplate("confirm_distro")
-        template.distro_version = self.core.distro_version
-        template.distro_name = self.core.get_distro_data('display_name')
+        screen = "confirm_distro"
+        template = self.createTemplate(screen)
+
+        # body and message inserts
+        template.confirm_distro_message_title = self.localized_dict[screen + "_message_title"]
+        template.confirm_distro_message_footer = sub_string_replace(self.localized_dict[screen + "_message_footer"]) % { "distro_version":self.core.distro_version, "distro_name":self.core.get_distro_data('display_name') }
+        # button text inserts
+        template.quit_button = self.localized_dict["quit_button"]
+        template.previous_button = self.localized_dict["previous_button"]
+        template.no_button = self.localized_dict["no_button"]
+        template.yes_button = self.localized_dict["yes_button"]
+
         self.pushHistory(self.confirm_distro)
         return str(template)
 
     confirm_distro.exposed = True
 
     @trace
-    def confirm_distro_controller(self, confirmation): 
-        """ 
+    def confirm_distro_controller(self, confirmation):
+        """
             confirm_distro_controller?confirmation=0|1
         """
         confirmation = int(confirmation)
@@ -372,13 +491,27 @@ class Installer(object):
 
     confirm_distro_controller.exposed = True
 
-    def select_distro(self): 
+    ####################################
+    # SELECT_DISTRO
+    ####################################
+    def select_distro(self):
         """
-            Choose Distro and Distro Version (only shown if distro and/or version not known 
+            Choose Distro and Distro Version (only shown if distro and/or version not known
             || correct distro question answered "no")
         """
-        template = self.createTemplate("select_distro")
+
+        screen = "select_distro"
+        template = self.createTemplate(screen)
+
+        # body and message inserts
+        #select_distro_message_title
+        template.select_distro_message_title = self.localized_dict[screen + "_message_title"]
+        template.select_distro = self.localized_dict[screen]
+
         self.pushHistory(self.select_distro)
+        template.select_distro_version = self.localized_dict["select_distro_version"]
+        template.select_distro_any = self.localized_dict["select_distro_any"]
+
         template.distro_version = self.core.distro_version
         template.distro_name = self.core.distro_name
         template.distros = {}
@@ -390,23 +523,28 @@ class Installer(object):
             if dd['display']:
                 template.distros[d] = dd['display_name']
 
+        # button text inserts
+        template.quit_button = self.localized_dict["quit_button"]
+        template.previous_button = self.localized_dict["previous_button"]
+        template.next_button = self.localized_dict["next_button"]
+
         return str(template)
 
     select_distro.exposed = True
 
-    def select_distro_update_combo(self, index): 
+    def select_distro_update_combo(self, index):
         """
             AJAX method to update distro version combo box
         """
         self.core.distro = int(index)
         self.core.distro_name = self.core.distros_index[self.core.distro]
         versions = self.core.distros[self.core.distro_name]['versions'].keys()
-        versions.sort(lambda x, y: sort_vers(x, y))
+        versions.sort(lambda x, y: self.core.sort_vers(x, y))
         return ' '.join(versions)
 
     select_distro_update_combo.exposed = True
 
-    def select_distro_controller(self, distro, version): 
+    def select_distro_controller(self, distro, version):
         """
             select_distro_controller?distro=0&version=0.0
         """
@@ -430,16 +568,24 @@ class Installer(object):
 
     select_distro_controller.exposed = True
 
-    #
+    ####################################
     # NOTES
-    #
-
-    def notes(self): 
+    ####################################
+    def notes(self):
         """
             Installation Notes (distro specific)
         """
         self.pushHistory(self.notes)
-        template = self.createTemplate("notes")
+
+        screen = "notes"
+        template = self.createTemplate(screen)
+
+        # body and message inserts
+        template.notes_message_title = self.localized_dict[screen + "_message_title"]
+        # button text inserts
+        template.quit_button = self.localized_dict["quit_button"]
+        template.previous_button = self.localized_dict["previous_button"]
+        template.next_button = self.localized_dict["next_button"]
 
         distro_notes = self.core.get_distro_data('notes', '')
         ver_notes = self.core.get_ver_data('notes', '')
@@ -472,23 +618,34 @@ class Installer(object):
 
     notes_controller.exposed = True
 
-    #
-    # INSTALLATION OPTIONS
-    #
-
-    def options(self): 
+    ####################################
+    # OPTIONS
+    ####################################
+    def options(self):
         """
             Build Options (not shown in auto mode)
         """
-        template = self.createTemplate("options")
+        screen = "options"
+        template = self.createTemplate(screen)
+
+        # body and message inserts
+        template.options_message_title = self.localized_dict[screen + "_message_title"]
+        #template.welcome_message_body = sub_string_replace(self.localized_dict[screen + "_message_body"]) % {"version":self.core.distro_version}
+
+        # button text inserts
+        template.quit_button = self.localized_dict["quit_button"]
+        template.previous_button = self.localized_dict["previous_button"]
+        template.next_button = self.localized_dict["next_button"]
+
         template.options = self.core.options
         template.components = self.core.components
         template.selected_component = self.core.selected_component
+
         return str(template)
 
     options.exposed = True
 
-    def options_controller(self, **options): 
+    def options_controller(self, **options):
         """
             options_controller?opt=0|1&opt=0|1&...
         """
@@ -511,12 +668,21 @@ class Installer(object):
     #
 
     @trace
-    def error_package_manager(self, pkg_mgr=''): 
+    def error_package_manager(self, pkg_mgr=''):
         """
             A package manager is running, prompt for closure
         """
-        template = self.createTemplate("error_package_manager")
-        template.package_manager_name = pkg_mgr
+        screen = "error_package_manager"
+        template = self.createTemplate(screen)
+
+        # body and message inserts
+        template.error_package_manager_message_title = self.localized_dict[screen + "_message_title"]
+        template.error_package_manager_message_body = sub_string_replace(self.localized_dict[screen + "_message_body"]) % {"package_manager_name":pkg_mgr}
+        # button text inserts
+        template.quit_button = self.localized_dict["quit_button"]
+        template.previous_button = self.localized_dict["previous_button"]
+        template.next_button = self.localized_dict["next_button"]
+
         return str(template)
 
     error_package_manager.exposed = True
@@ -531,10 +697,10 @@ class Installer(object):
     error_package_manager_controller.exposed = True
 
     def package_manager_check(self):
-        """ 
+        """
             Note: AJAX call
         """
-        return str(int(self.core.check_pkg_mgr()())) 
+        return str(int(self.core.check_pkg_mgr()()))
         # returns '' for no running pkg manager, or '<name>' of running package manager
 
     package_manager_check.exposed = True
@@ -547,6 +713,14 @@ class Installer(object):
     def dependency_controller1(self):
         self.check_required()
         self.check_optional()
+
+        #
+        # PRE-INSTALL COMMANDS
+        #
+        if self.core.run_pre_install(self.progress_callback): # some cmds were run...
+            self.num_req_missing = self.core.count_num_required_missing_dependencies()
+            self.num_opt_missing = self.core.count_num_optional_missing_dependencies()
+
 
         if self.core.distro_known():
             if self.num_req_missing:
@@ -566,7 +740,7 @@ class Installer(object):
 
     def dependency_controller2(self):
         if self.core.distro_known():
-            if self.num_opt_missing: 
+            if self.num_opt_missing:
                 if self.auto_mode: # auto, distro known, opt. missing
                     return self.install_optional_controller()
                 else:
@@ -581,7 +755,7 @@ class Installer(object):
                 return self.dependency_controller3() # distro unknown, no opt. (continue)
 
     def dependency_controller3(self):
-        self.core.hpoj_present = dcheck.check_hpoj()
+        self.core.hpoj_present = self.core.check_hpoj()  #dcheck.check_hpoj()
         if self.core.hpoj_present and self.core.selected_component == 'hplip' and \
             self.core.distro_version_supported:
 
@@ -612,7 +786,7 @@ class Installer(object):
         return self.progress(ACTION_BUILD_AND_INSTALL)
 
     def dependency_controller9(self):
-        self.core.hplip_present = dcheck.check_hplip()
+        self.core.hplip_present = self.core.check_hplip()  #dcheck.check_hplip()
         if self.core.hplip_present and self.core.selected_component == 'hplip' and \
             self.core.distro_version_supported:
 
@@ -628,7 +802,18 @@ class Installer(object):
     #
 
     def network_unavailable(self):
-        template = self.createTemplate("network_unavailable")
+
+        screen = "network_unavailable"
+        template = self.createTemplate(screen)
+
+        # body and message inserts
+        template.network_unavailable_message_title = self.localized_dict[screen + "_message_title"]
+        template.network_unavailable_notes_field = self.localized_dict[screen + "_notes_field"]
+        # button text inserts
+        template.quit_button = self.localized_dict["quit_button"]
+        template.previous_button = self.localized_dict["previous_button"]
+        template.retry_button = self.localized_dict["retry_button"]
+
         self.pushHistory(self.network_unavailable)
         return str(template)
 
@@ -660,16 +845,29 @@ class Installer(object):
     def check_optional(self):
         self.num_opt_missing = self.core.count_num_optional_missing_dependencies()
 
-    def install_required(self): 
+    # =====================================================================
+    # install_required
+    # =====================================================================
+    def install_required(self):
         """
             Ask user if they want to try to install required dependencies (not shown in auto mode)
         """
-        template = self.createTemplate("install_required")
-        template.missing_required_dependencies = {}
+        screen = "install_required"
+        template = self.createTemplate(screen)
 
+        # body and message inserts
+        template.install_required_message_title = self.localized_dict[screen + "_message_title"]
+        template.install_required_message_footer = self.localized_dict[screen + "_message_footer"]
+        # button text inserts
+        template.previous_button = self.localized_dict["previous_button"]
+        template.no_button = self.localized_dict["no_button"]
+        template.yes_button = self.localized_dict["yes_button"]
+
+        template.missing_required_dependencies = {}
         for depend, desc, option in self.core.missing_required_dependencies():
             log.error("Missing REQUIRED dependency: %s (%s)" % (depend, desc))
             self.depends_to_install.append(depend)
+            template.missing_required_dependencies[depend] = desc
 
         return str(template)
 
@@ -683,16 +881,16 @@ class Installer(object):
     def optional_components_to_install(self):
         for depend, desc, required_for_opt, opt in self.core.missing_optional_dependencies():
             log.warn("Missing OPTIONAL dependency: %s (%s)" % (depend, desc))
-            
+
             if required_for_opt:
                 log.warn("(Required for %s option)" % opt)
-            
+
             self.depends_to_install.append(depend)
 
 
     def install_required_controller(self): # install_required_controller
         pkg_mgr = self.core.check_pkg_mgr()
-        if self.network_ping() != 0:
+        if not self.core.check_network_connection():
             return self.network_unavailable()
 
         if pkg_mgr:
@@ -704,23 +902,35 @@ class Installer(object):
 
     install_required_controller.exposed = True
 
-    def install_optional(self): 
+    # =====================================================================
+    # install_optional
+    # =====================================================================
+    def install_optional(self):
         """
             Ask user if they want to try to install optional dependencies (not shown in auto mode)
         """
+        screen = "install_optional"
+        template = self.createTemplate(screen)
+        # body and message inserts
+        template.install_optional_message_title = self.localized_dict[screen + "_message_title"]
+        template.install_optional_message_footer = self.localized_dict[screen + "_message_footer"]
+        # button text inserts
+        template.previous_button = self.localized_dict["previous_button"]
+        template.no_button = self.localized_dict["no_button"]
+        template.quit_button = self.localized_dict["quit_button"]
+
         self.depends_to_install = []
-        template = self.createTemplate("install_optional")
         template.missing_optional_dependencies = {}
-        
+
         for depend, desc, required_for_opt, opt in self.core.missing_optional_dependencies():
             log.warn("Missing OPTIONAL dependency: %s (%s)" % (depend, desc))
-            
+
             if required_for_opt:
                 log.warn("(Required for %s option)" % opt)
-            
+
             self.depends_to_install.append(depend)
             template.missing_optional_dependencies[depend] = desc
-        
+
         return str(template)
 
     install_optional.exposed = True
@@ -741,20 +951,33 @@ class Installer(object):
 
     install_optional_controller.exposed = True
 
-    def turn_off_options(self): 
+    # =====================================================================
+    # turn_off_options
+    # =====================================================================
+    def turn_off_options(self):
         """
             Inform the user that some options have been turned off because of missing optional dependencies
         """
-        template = self.createTemplate("turn_off_options")
+        screen = "turn_off_options"
+        template = self.createTemplate(screen)
+
+
+        # body and message inserts
+        template.turn_off_options_message_title = self.localized_dict[screen + "_message_title"]
+        # button text inserts
+        template.quit_button = self.localized_dict["quit_button"]
+        template.previous_button = self.localized_dict["previous_button"]
+        template.next_button = self.localized_dict["next_button"]
+
         template.turned_off_options = {}
 
         self.depends_to_install = []
         for depend, desc, required_for_opt, opt in self.core.missing_optional_dependencies():
             log.warn("Missing OPTIONAL dependency: %s (%s)" % (depend, desc))
-            
+
             if required_for_opt:
                 log.warn("(Required for %s option)" % opt)
-            
+
             self.depends_to_install.append(depend)
             self.core.selected_options[opt] = False
             template.turned_off_options[opt] = self.core.options[opt][1]
@@ -763,38 +986,74 @@ class Installer(object):
 
     turn_off_options.exposed = True
 
+    # =====================================================================
+    # turn_off_options_controller
+    # =====================================================================
     def turn_off_options_controller(self):
         return self.dependency_controller3()
 
     turn_off_options_controller.exposed = True
 
-    def error_required_missing(self): 
+    # =====================================================================
+    # error_required_missing
+    # =====================================================================
+    def error_required_missing(self):
         """
             A required dependency is missing, can't continue
         """
+        screen = "error_required_missing"
+        template = self.createTemplate(screen)
+
         for depend, desc, option in self.core.missing_required_dependencies():
             log.error("Missing REQUIRED dependency: %s (%s)" % (depend, desc))
             template.missing_required_dependencies[d] = desc
 
-        return str(template) 
+
+        # body and message inserts
+        template.error_required_missing_message_title = self.localized_dict[screen + "_message_title"]
+        template.error_required_missing_message_footer = self.localized_dict[screen + "_notes_footer"]
+        # button text inserts
+        template.quit_button = self.localized_dict["quit_button"]
+        template.previous_button = self.localized_dict["previous_button"]
+
+
+        return str(template)
 
     error_required_missing.exposed = True
 
 
-    #
+    # =====================================================================
     # PROGRESS
-    #
-
+    # =====================================================================
     # Reusable progress screen
-
-    @trace
-    def progress(self, action): 
+    #  @trace
+    def progress(self, action):
         """
             progress?action=0|1|2|3|4|5|6|7|8
         """
         self.action = int(action)
         assert action in range(ACTION_MAX)
-        template = self.createTemplate("progress")
+
+        screen = "progress"
+
+        template = self.createTemplate(screen)
+
+        #template.installer_title = self.localized_dict["installer_title"]
+        #template.header_string = self.localized_dict["header_string"]
+        #template.sub_header_string = self.localized_dict["sub_header_string"]
+        # body and message inserts
+        #template.progress_message_title = self.localized_dict[screen + "_message_title"]
+        #template.progress_message_body = self.localized_dict[screen + "_message_body"]
+        #template.progress_message_footer = self.localized_dict[screen + "_message_footer"]
+        #template.error_package_manager_message_title = self.localized_dict[screen + "_message_title"]
+        #template.error_package_manager_message_body = sub_string_replace(self.localized_dict[screen + "_message_body"]) % {"package_manager_name":pkg_mgr}
+        # button text inserts
+        template.cancel_button = self.localized_dict["cancel_button"]
+        template.retry_button = self.localized_dict["retry_button"]
+        template.next_button = self.localized_dict["next_button"]
+        template.progress_text = self.localized_dict["progress_text"]
+
+
         self.action_lock.acquire()
         self.progress_status_code = -1 # running
         self.action_lock.release()
@@ -818,22 +1077,22 @@ class Installer(object):
                 if package_mgr_cmd:
                     for d in self.depends_to_install:
                         log.debug("*** Processing dependency: %s" % d)
-                        packages, commands = core.get_dependency_data(d)
-                        
+                        packages, commands = self.core.get_dependency_data(d)
+
                         log.debug("Packages: %s" % ','.join(packages))
                         log.debug("Commands: %s" % ','.join(commands))
 
                         if packages:
-                            log.debug("Packages '%s' will be installed to satisfy dependency '%s'." % 
+                            log.debug("Packages '%s' will be installed to satisfy dependency '%s'." %
                                 (','.join(packages), d))
                             packages_to_install.extend(package)
-    
+
                         if commands:
-                            log.debug("Commands '%s' will be run to satisfy dependency '%s'." % 
+                            log.debug("Commands '%s' will be run to satisfy dependency '%s'." %
                                 (','.join(commands), d))
                             commands_to_run.extend(command)
-    
-    
+
+
                 self.cmds.append(cat(package_mgr_cmd, ' '.join(packages_to_install)))
                 self.cmds.extend(commands_to_run)
 
@@ -848,9 +1107,43 @@ class Installer(object):
                 self.fail_ok = True
 
             elif self.action == ACTION_BUILD_AND_INSTALL: # 5  Do I want to combile pre_build and post_build?
-                self.cmds.extend(self.core.run_pre_build)
+                self.cmds.extend(self.core.pre_build())
                 self.cmds.extend(self.core.build_cmds())
-                self.cmds.extend(self.core.run_post_build)
+                self.cmds.extend(self.core.post_build())
+
+                # Logoff if necessary
+                #(*) Todo - I need to finish this...
+            #    if self.core.restart_required:
+                    #tui.title("IMPORTANT! RESTART REQUIRED!")
+                    #log.note("If you are installing a USB connected printer, you must now restart your PC")
+                    #log.note("in order to communicate with the printer. After restarting, run:")
+                    #log.note(self.core.su_sudo() % "hp-setup")
+                    #log.note("to setup a printer in HPLIP.")
+                    #log.note("")
+                    #log.note("IMPORTANT! Make sure to save all work in all open applications before restarting!")
+                #    ok, ans = tui.enter_yes_no(log.bold("Restart now"), 'n')
+                #    if not ok: sys.exit(0)
+                #    if ans:
+                    #    ok = self.core.restart()
+                    #    if not ok:
+                            #log.error("Restart failed. Please restart using the system menu.")
+                #    sys.exit(0)
+
+            #    elif self.core.logoff_required:
+                    #tui.title("IMPORTANT! LOGOFF REQUIRED!")
+                    #log.note("If you are installing a USB connected printer, you must now logoff and re-logon")
+                    #log.note("in order to communicate with the printer. After logging back on, run:")
+                    #log.note(self.core.su_sudo() % "hp-setup")
+                    #log.note("to setup a printer in HPLIP.")
+                    #log.note("")
+                    #log.note("IMPORTANT! Make sure to save all work in all open applications before logging off!")
+                #    ok, ans = tui.enter_yes_no(log.bold("Logoff now"), 'n')
+                #    if not ok: sys.exit(0)
+                #    if ans:
+                    #    ok = self.core.logoff()
+                    #    if not ok:
+                            #log.error("Logoff failed. Please logoff using the system menu.")
+                #    sys.exit(0)
 
             elif self.action == ACTION_REMOVE_HPOJ: # 6
                 self.cmds.append(self.core.get_distro_data('hpoj_remove_cmd', ''))
@@ -868,26 +1161,27 @@ class Installer(object):
                 return str(template)
             else:
                 return self.next()
+            print self.cmds
 
     progress.exposed = True
 
     #@trace
-    def progress_update(self): 
+    def progress_update(self):
         """
             AJAX method to update progress screen. Called periodically...
         """
         output = ""
         while not self.queue.empty():
             output = ''.join([output, self.queue.get()])
-        
-        print output.strip()
-        
+            
+        log.debug(output.strip())
+
         return output.lstrip()
 
     progress_update.exposed = True
 
     #@trace
-    def progress_status(self): 
+    def progress_status(self):
         """
             AJAX method to update progress screen. Returns an ineteger -1, 0, or >0
         """
@@ -914,7 +1208,7 @@ class Installer(object):
     retry_progress.exposed = True
 
 
-    def progress_cancel(self): 
+    def progress_cancel(self):
         """
             AJAX method to cancel current operation.
         """
@@ -931,50 +1225,50 @@ class Installer(object):
         """
         for cmd in cmds:
             self.queue.put(cmd)
-            
+
             try:
                 cmd(self.progress_callback)
             except TypeError:
-                status, output = run(cmd, self.progress_callback)
-    
+                status, output = self.core.run(cmd, self.progress_callback)
+
                 if status != 0:
                     self.action_lock.acquire()
                     self.progress_status_code = status
                     self.action_lock.release()
                     break
-                    
+
 
         self.action_lock.acquire()
         self.progress_status_code = 0
         self.action_lock.release()
 
     @trace
-    def run_core_init_thread(self): 
+    def run_core_init_thread(self):
         """
             run self.core.init() in a thread, report sucess at end
         """
         #self.queue.put("Init...\n")
         self.core.init(self.progress_callback)
-        
+
         self.action_lock.acquire()
         self.progress_status_code = 0
         self.action_lock.release()
 
         if self.core.distro_known():
-            log.debug("Distro is %s %s" % (self.core.get_distro_data('display_name'), 
-                self.core.distro_version))   
+            log.debug("Distro is %s %s" % (self.core.get_distro_data('display_name'),
+                self.core.distro_version))
 
     @trace
-    def progress_callback(self, output): 
+    def progress_callback(self, output):
         """
             Called by self.core.init() in a thread to collect output
         """
-        #print "put: %s" % output
+        log.debug("Progress callback: %s" % output)
         self.queue.put(output)
         return self.cancel_signaled
 
     @trace
-    def progress_controller(self): 
+    def progress_controller(self):
         """
             Called at end if progress_status_code == 0
         """
@@ -986,14 +1280,14 @@ class Installer(object):
     progress_controller.exposed = True
 
     @trace
-    def error_command_failed(self): 
+    def error_command_failed(self):
         """
             Called at end if progress_status > 0
         """
         if self.fail_ok:
             return self.next()
         else:
-            return self.error("Command '%s' failed with error code %d." % 
+            return self.error("Command '%s' failed with error code %d." %
                 (self.cmds, self.progress_status_code))
 
     error_command_failed.exposed = True
@@ -1003,18 +1297,38 @@ class Installer(object):
     # INSTALLATION PATH
     #
 
-    def installation_path(self): 
+    def installation_path(self):
         """
             Install path (not shown in auto mode)
         """
-        template = self.createTemplate("installation_path")
+        screen = "installation_path"
+        template = self.createTemplate(screen)
+
+
+        # body and message inserts
+        template.installation_path_message_title = self.localized_dict[screen + "_message_title"]
+
+        template.installation_path_radio1 = self.localized_dict[screen + "_radio1"]
+        template.installation_path_radio2 = self.localized_dict[screen + "_radio2"]
+
+        template.installation_path_a = self.localized_dict[screen + "_a"]
+        template.installation_path_b = self.localized_dict[screen + "_b"]
+        template.installation_path_c = self.localized_dict[screen + "_c"]
+        template.installation_path_d = self.localized_dict[screen + "_d"]
+        template.installation_path_e = self.localized_dict[screen + "_e"]
+
+        # button text inserts
+        template.quit_button = self.localized_dict["quit_button"]
+        template.previous_button = self.localized_dict["previous_button"]
+        template.next_button = self.localized_dict["next_button"]
+
         template.install_location = self.core.install_location
         return str(template)
 
     installation_path.exposed = True
 
     @trace
-    def installation_path_controller(self, path): 
+    def installation_path_controller(self, path):
         """
             installation_path_controller?path=<path>
         """
@@ -1033,11 +1347,22 @@ class Installer(object):
     # PACKAGE CONFLICTS: HPOJ & HPLIP
     #
 
-    def hpoj_remove(self): 
+    def hpoj_remove(self):
         """
             Ask user if they want to uninstall HPOJ (not shown in auto mode)
         """
-        template = self.createTemplate("hpoj_remove")
+        screen = "hpoj_remove"
+        template = self.createTemplate(screen)
+
+
+        # body and message inserts
+        template.hpoj_remove_message_body = self.localized_dict[screen + "_message_body"]
+
+        # button text inserts
+        template.quit_button = self.localized_dict["quit_button"]
+        template.no_button = self.localized_dict["no_button"]
+        template.yes_button = self.localized_dict["yes_button"]
+
         return str(template)
 
     hpoj_remove.exposed = True
@@ -1048,11 +1373,21 @@ class Installer(object):
 
     hpoj_remove_controller.exposed = True
 
-    def hplip_remove(self): 
+    def hplip_remove(self):
         """
             Ask user if they want to uninstall HPLIP (not shown in auto mode)
         """
-        template = self.createTemplate("hplip_remove")
+        screen = "hplip_remove"
+        template = self.createTemplate(screen)
+
+
+        # body and message inserts
+        template.hplip_remove_message_body = self.localized_dict[screen + "_message_body"]
+
+        # button text inserts
+        template.quit_button = self.localized_dict["quit_button"]
+        template.no_button = self.localized_dict["no_button"]
+        template.yes_button = self.localized_dict["yes_button"]
         return str(template)
 
     hplip_remove.exposed = True
@@ -1067,11 +1402,24 @@ class Installer(object):
     # BUILD AND INSTALL
     #
 
-    def ready_to_build(self): 
+    def ready_to_build(self):
         """
             Ask user to OK the start of the build (not shown in auto mode)
         """
-        template = self.createTemplate("ready_to_build")
+        screen = "ready_to_build"
+        template = self.createTemplate(screen)
+
+
+        # body and message inserts
+        template.ready_to_build_message_title = self.localized_dict[screen + "_message_title"]
+        template.ready_to_build_radio1 = self.localized_dict[screen + "_radio1"]
+        template.ready_to_build_radio2 = self.localized_dict[screen + "_radio2"]
+        template.ready_to_build_message_footer = sub_string_replace(self.localized_dict[screen + "_message_footer"]) % {"version":self.core.distro_version}
+
+        # button text inserts
+        template.quit_button = self.localized_dict["quit_button"]
+        template.previous_button = self.localized_dict["previous_button"]
+        template.next_button = self.localized_dict["next_button"]
         return str(template)
 
     ready_to_build.exposed = True
@@ -1086,11 +1434,19 @@ class Installer(object):
 
     ready_to_build_controller.exposed = True
 
-    def finished(self): 
+    def finished(self):
         """
             Display summary and results
         """
-        template = self.createTemplate("finished")
+        screen = "finished"
+        template = self.createTemplate(screen)
+
+
+        # body and message inserts
+        template.finished_message_title = self.localized_dict[screen + "_message_title"]
+        template.finished_checkbox = self.localized_dict[screen + "_checkbox"]
+        # button text inserts
+        template.quit_button = self.localized_dict["quit_button"]
         return str(template)
 
     finished.exposed = True
@@ -1113,12 +1469,19 @@ class Installer(object):
     #
 
     @trace
-    def error(self, error_text): 
+    def error(self, error_text):
         """
             Generic re-usable error page
         """
-        template = self.createTemplate("error")
-        template.error_text = error_text
+        screen = "error"
+        template = self.createTemplate(screen)
+
+        # body and message inserts
+        template.error_message_title = self.localized_dict[screen + "_message_title"]
+        template.error_message_body = error_text
+        # button text inserts
+        template.next_button = self.localized_dict["next_button"]
+
         return str(template)
 
     error.exposed = True
@@ -1129,25 +1492,34 @@ class Installer(object):
     error_controller.exposed = True
 
     @trace
-    def error_unsupported_distro(self): 
+    def error_unsupported_distro(self):
         """
             Can only continue from here if all required dependencies are installed
         """
-        template = self.createTemplate("error_unsupported_distro")
+
+        screen = "error_unsupported_distro"
+        template = self.createTemplate(screen)
+
+        # body and message inserts
+        template.error_unsupported_distro_message_title = self.localized_dict[screen + "_message_title"]
+        template.error_unsupported_distro_message_footer = self.localized_dict[screen + "_message_footer"]
+        # button text inserts
+        template.quit_button = self.localized_dict["quit_button"]
+
         template.distro_version = self.core.distro_version
         template.distro_name = self.core.get_distro_data('display_name')
 
         template.missing_required_dependencies = {}
-        for depend, desc, option in core.missing_required_dependencies():
+        for depend, desc, option in self.core.missing_required_dependencies():
             template.missing_required_dependencies[depend] = desc
             log.error("Missing REQUIRED dependency: %s (%s)" % (depend, desc))
-        
+
         return str(template)
 
     error_unsupported_distro.exposed = True
 
     @trace
-    def error_unsupported_distro_controller(self, cont): 
+    def error_unsupported_distro_controller(self, cont):
         """
             error_unsupported_distro_controller?cont=0|1
             User can chose to continue even if unsupported, but might get tripped up
@@ -1174,9 +1546,13 @@ class Installer(object):
     previous.exposed = True
 
     def test(self):
+
+        screen = "test"
+        template = self.createTemplate(screen)
+
+
         # Force reusable screens back to test when done
         self.next = self.test
-        template = self.createTemplate("test")
         template.options = self.core.options
         template.components = self.core.components
         template.selected_component = self.core.selected_component
@@ -1186,11 +1562,13 @@ class Installer(object):
         template.version_description = self.core.version_description
         template.version_public = self.core.version_public
         template.version_internal = self.core.version_internal
+        #template.hpijs_version = self.core.hpijs_version
         template.bitness = self.core.bitness
         template.endian = self.core.endian
         template.distro = self.core.distro
         template.distro_name = self.core.distro_name
         template.distro_version = self.core.distro_version
+        #template.hpijs_version = self.hpijs_version
         template.distro_version_supported = self.core.distro_version_supported
         template.install_location = self.core.install_location
         template.hpoj_present = self.core.hpoj_present
@@ -1201,77 +1579,87 @@ class Installer(object):
         return str(template)
 
     test.exposed = True
-    
+
     #
     # Code for reading the localized .ts files from the /data/localization
     #
-    
 
-    
+    def load_localization_file(self, path):
 
-    def load_localization_file(self, xmlfile):
+        # This segment of code loads the proper string based on the Python Locale language.
+        lang, encoder = locale.getdefaultlocale()
+        if lang is not None:
+            supported_countries = ['en_US', 'zh_CN', 'de_DE', 'fr_FR', 'it_IT', 'ru_RU', 'pt_BR', 'es_MX']
+            if lang in supported_countries:
+                xmlfile = path + "_" + lang + ".ts"
+            else:
+                xmlfile = path + "_en_US.ts"
+        else:
+            xmlfile = path + "_en_US.ts"
+
+        xmlfile = path + "_fr_FR.ts"
         try:
-            #print "path: ", xmlfile
-            dom = parse(xmlfile.encode('utf-8'))
-            #print dom.toxml()
+            #log.debug("XML Path: %s" % xmlfile)
+            dom = parse(xmlfile) #.decode('utf-8')
+            #strings = unicode(dom).decode('utf-8')
+            
+            #log.debug("DOM info: %s" % dom.toxml())
+            
         except IOError:
-            print "Location: error.html\n"
+            #log.debug("Location: error.html\n")
             sys.exit()
         return dom
-    
+
     load_localization_file.exposed = True
-    
+
     def get_text(self, nodelist):
         rc = ""
         for node in nodelist:
             if node.nodeType == node.TEXT_NODE:
                 rc = rc + node.data
         return rc
-            
+
     get_text.exposed = False
 
     def parse_elements(self, dom):
         messages = dom.getElementsByTagName("message")
-        sources = dom.getElementsByTagName("source")
+        sources = dom.getElementsByTagName("tag")
         translations = dom.getElementsByTagName("translation")
         translation_list = []
         source_list = []
-        self.localized_dict = {}
 
         for translation in translations:
             translation_list.append(self.get_text(translation.childNodes))
-            #print 'Translation: ', translation_list
+            #log.debug("Translation: %s" % translation_list.encode('ascii', 'replace'))
 
         for source in sources:
             source_list.append(self.get_text(source.childNodes))
-            #print 'Translation: ', source_list
+            #log.debug("Translation Source: %s" % source_list.encode('ascii', 'replace'))
 
         self.localized_dict = dict(zip(source_list, translation_list))
-        #for key in self.localized_dict:
-            #print "EN:", key, "ES:", self.localized_dict[key]
+        for key in self.localized_dict:
+            log.debug( "Translation String Key: %s  Value: %s" % (key, unicode(self.localized_dict[key]).encode('ascii', 'replace') ) )
 
     parse_elements.exposed = True
 
     def localized_string(self, string):  #localized_string?string="Some english string"
-        
+
         try:
-            #print "utf8 encoded: ", string 
+            #log.debug("Utf8 encoded: %s" % string.encode('ascii', 'replace'))
             in_string = unicode(string).decode('utf-8')
         except IOError:
-            print "Decoding Error\n"
+            #log.error("Decoding Error\n")
             sys.exit()
-            
         try:
-            #wstring = cstring.decode()
-            #print "utf8 decoded: ", in_string 
+            #log.debug("Utf8 decoded:  %s" % in_string.encode('ascii', 'replace'))
             rstring = unicode(self.localized_dict.get(in_string, 'Localization load error'))
-            #print "Localized string: ", rstring
+            #log.debug("Localized string:  %s" % rstring.encode('ascii', 'replace'))
             out_string = rstring.encode('utf-8')
-            #print "Out string: ", out_string
+            #log.debug("Out string::  %s" % out_string.encode('ascii', 'replace'))
         except IOError:
-            print "Encoding Error\n"
+            #log.error("Encoding Error\n")
             sys.exit()
-            
+
         return out_string
 
     localized_string.exposed = True
@@ -1279,76 +1667,8 @@ class Installer(object):
     #
     # Code for reading the localized .ts files from the /data/localization
     #
-    
-    XMLFILE = 'data/localization/hplip_es.ts'
 
-    def load_localization_file(self, xmlfile):
-        try:
-            #print "path: ", xmlfile
-            dom = parse(xmlfile.encode('utf-8'))
-            #print dom.toxml()
-        except IOError:
-            print "Location: error.html\n"
-            sys.exit()
-        return dom
-    
-    load_localization_file.exposed = True
-    
-    def get_text(self, nodelist):
-        rc = ""
-        for node in nodelist:
-            if node.nodeType == node.TEXT_NODE:
-                rc = rc + node.data
-        return rc
-            
-    get_text.exposed = False
 
-    def parse_elements(self, dom):
-        messages = dom.getElementsByTagName("message")
-        sources = dom.getElementsByTagName("source")
-        translations = dom.getElementsByTagName("translation")
-        translation_list = []
-        source_list = []
-        self.localized_dict = {}
-
-        for translation in translations:
-            translation_list.append(self.get_text(translation.childNodes))
-            #print 'Translation: ', translation_list
-
-        for source in sources:
-            source_list.append(self.get_text(source.childNodes))
-            #print 'Translation: ', source_list
-
-        self.localized_dict = dict(zip(source_list, translation_list))
-        #for key in self.localized_dict:
-            #print "EN:", key, "ES:", self.localized_dict[key]
-
-    parse_elements.exposed = True
-
-    def localized_string(self, string):  #localized_string?string="Some english string"
-        
-        try:
-            #print "utf8 encoded: ", string 
-            in_string = unicode(string).decode('utf-8')
-        except IOError:
-            print "Decoding Error\n"
-            sys.exit()
-            
-        try:
-            #wstring = cstring.decode()
-            #print "utf8 decoded: ", wstring 
-            out_string = unicode(self.localized_dict.get(in_string, 'Localization load error')).encode('utf-8')
-            #print "Localized string: ", rstring
-            #out_string = rstring.encode('utf-8')
-            #print "Out string: ", ostring
-        except IOError:
-            print "Encoding Error\n"
-            sys.exit()
-            
-        return out_string
-
-    localized_string.exposed = True
-    
 
     #========================== End of Class =========================
 
@@ -1358,10 +1678,12 @@ def init():
 
 def start():
     cherrypy.root = Installer()
-    #cherrypy.root.parse_elements(cherrypy.root.load_localization_file(XMLFILE))
+    cherrypy.root.parse_elements(cherrypy.root.load_localization_file(XMLFILE))
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     log.debug("The current path: %s" % current_dir)
+    
+    #cherrypy.response.headers['Content-Type']="text/html; charset=utf-8"
 
     cherrypy.config.update({
         'server.environment':'production',

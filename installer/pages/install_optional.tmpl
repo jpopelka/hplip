@@ -19,18 +19,15 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
  Author: Pete Parks
-*/ 
+*/
 -->
 <html>
 <head>
-    
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta http-equiv="PRAGMA" content="NO-CACHE" />
-    <meta http-equiv="EXPIRES" content="Mon, 22 Jul 2002 11:12:01 GMT" />
-    <meta http-equiv="Content-Language" content="en-us" />
-    <meta http-equiv="content-type" content="text/html; charset=us-ascii" />
     <link rel="stylesheet" type="text/css" href="styles/hplip.css" />
     <script type="text/javascript" src="scripts/hplip.js"></script>
-    <script type="text/javascript" src="scripts/xml_loader.js"></script>
+    <script type="text/javascript" src="scripts/misc_code.js"></script>
     <script type="text/javascript">
         <!--
         var divText = "";
@@ -40,22 +37,30 @@
             divText += "$missing_optional_dependencies[$d]<br/>";
         #end for
         var divID = 'notes_field';
-       
+
         function todoOnLoad() {
-            header = '$header_string'; 
-        subheader = '$sub_header_string'; 
-        generateHeader(header, subheader);
+            
+            
+            
             getContentText(divText, divID);
         };
         -->
         </script>
-
 <title>$installer_title</title>
 </head>
 
 <body onload="todoOnLoad();">
-<!-- Header Div -->    
-<div id="header_box" class="background_box"></div>
+<!-- Header Div -->
+<div id="header_box" class="background_box">
+  <div class='header_title_class'>
+    <div id='hp_blue_logo'><img src='images/hplogo.png' alt=''/></div>
+    <div id='header_title'>$header_string</div>
+    <div id='header_title2'>$header_string</div>
+    <div id='header_subtitle'>$sub_header_string</div>
+    <div id='header_subtitle2'>$sub_header_string</div>
+    <div id='tux_logo'><img src='images/tux.png' alt=''/></div>
+  </div>
+</div>
 
 <!-- Body Div -->
 <div class="body_content">

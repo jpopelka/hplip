@@ -140,7 +140,7 @@ su -c &quot;apt-get install libcupsys2 libcupsys2-dev build-essential python-dev
 <p class="first admonition-title">Note</p>
 <p class="last">We recommend that you download the HPLIP tarball to your home or desktop directory.</p>
 </div>
-<p><strong>A.</strong> Click here to <a class="reference" href="http://prdownloads.sourceforge.net/hplip/hplip-2.7.7.tar.gz">Download the Regular Tarball</a></p>
+<p><strong>A.</strong> Click here to <a class="reference" href="http://prdownloads.sourceforge.net/hplip/hplip-2.7.9.tar.gz">Download the Regular Tarball</a></p>
 <p><strong>B.</strong> Go to the directory where you downloaded the HPLIP tarball.</p>
 <p>Example:</p>
 <pre class="literal-block">
@@ -149,13 +149,13 @@ cd ~/Desktop
 <p><strong>C.</strong> Uncompress the tarball.</p>
 <p>Enter this command:</p>
 <pre class="literal-block">
-tar xvfz hplip-2.7.7.tar.gz
+tar xvfz hplip-2.7.9.tar.gz
 </pre>
 <p>This will create a directory with the same name as the tarball file.</p>
-<p><strong>D.</strong> Change your working directory to the hplip-2.7.7 directory.</p>
+<p><strong>D.</strong> Change your working directory to the hplip-2.7.9 directory.</p>
 <p>Example:</p>
 <pre class="literal-block">
-cd hplip-2.7.7
+cd hplip-2.7.9
 </pre>
 <hr></div>
 <div class="section">
@@ -192,65 +192,22 @@ su -c &quot;make install&quot;
 </pre>
 <hr></div>
 <div class="section">
-<h1><a id="step-7-post-installation-steps" name="step-7-post-installation-steps">Step 7: Post Installation Steps</a></h1>
-<p><strong>A.</strong> Check USB Port Permissions.</p>
-<p>Run the following script to verify that your USB ports are configured with the correct permissions.</p>
-<p>Enter this command:</p>
-<pre class="literal-block">
-su -c &quot;./installer/permissions.py&quot;
-</pre>
-<div class="note">
-<p class="first admonition-title">Note</p>
-<p class="last">Alternatively you can manually check your USB port permissions by following the instructions for the Manual Permissions Process link below.</p>
-</div>
-<a href="#" onClick="MyWindow=window.open('../permissions.html','MyWindow','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=900,height=400'); return false;">Manual Permissions Process</a><p><strong>B.</strong> Trigger your USB devices.</p>
-<p>Run the following script to trigger your USB devices.</p>
-<p>Enter this command:</p>
-<pre class="literal-block">
-su -c &quot;./installer/trigger.py&quot;
-</pre>
-<div class="note">
-<p class="first admonition-title">Note</p>
-<p class="last">Alternatively you can manually trigger your USB devices by unplugging and reconnecting your USB printer's from your computer.</p>
-</div>
-<hr><p><strong>C.</strong> Verify your user is part of the lp group</p>
-<p><strong>a</strong>. Open a terminal shell.</p>
-<p>Enter this command:</p>
-<pre class="literal-block">
-groups
-</pre>
-<p>You should get a result similar to:</p>
-<pre class="literal-block">
-aaron adm dialout cdrom floppy audio dip video plugdev scanner netdev lpadmin powerdev admin
-</pre>
-<p><strong>b.</strong> If you do not see the &quot;lp&quot; group in the list.</p>
-<p>Enter this command:</p>
-<pre class="literal-block">
-su -c &quot;usermod -a -G lp aaron&quot;
-</pre>
-<p>Replace &quot;aaron&quot; with your username.</p>
-<div class="important">
-<p class="first admonition-title">Important</p>
-<p class="last">Logout and back onto your system to apply the changes.</p>
-</div>
+<h1><a id="step-7-post-installation-step-s" name="step-7-post-installation-step-s">Step 7: Post Installation Step(s)</a></h1>
+<p><strong>A.</strong> If you are going to be setting up a printer with USB and the printer is already plugged in, you will need to do one of the following:</p>
+<ol class="arabic simple">
+<li>Unlpug and re-plug in the USB printer, or</li>
+<li>Restart your PC.</li>
+</ol>
+<p>Failure to do this will cause your USB printer to not be detected by HPLIP.</p>
 <hr></div>
 <div class="section">
 <h1><a id="step-8-configuring-your-printer-using-hp-setup" name="step-8-configuring-your-printer-using-hp-setup">Step 8: Configuring your printer using hp-setup</a></h1>
-<p><strong>A.</strong> Run hp-check to verify that your system is configure correctly.</p>
-<p>Enter this command:</p>
-<pre class="literal-block">
-hp-check
-</pre>
-<p>If any failures try and resolve them depending on the error.  Contact the mailing list for support as needed.</p>
-<hr></div>
-<div class="section">
-<h1><a id="step-9-configuring-your-printer-using-hp-setup" name="step-9-configuring-your-printer-using-hp-setup">Step 9: Configuring your printer using hp-setup</a></h1>
 <p><a class="reference" href="../hp_setup.html">Continue to hp-setup</a></p>
 </div>
 </div>
 
 <hr size="1"/>
-<center><small>Page last updated: Mon Jun 18 16:07:54 2007; HPLIP Version: 2.7.7</small></center>
+<center><small>Page last updated: Thu Sep 13 14:58:19 2007; HPLIP Version: 2.7.9</small></center>
 </div>
 </td></tr></table>
 </div>

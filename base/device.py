@@ -49,8 +49,8 @@ except ImportError:
 DEFAULT_PROBE_BUS = 'usb,par,cups'
 VALID_BUSES = ('par', 'net', 'cups', 'usb') #, 'bt', 'fw')
 VALID_BUSES_WO_CUPS = ('par', 'net', 'usb')
-DEFAULT_FILTER = 'none'
-VALID_FILTERS = ('none', 'print', 'scan', 'fax', 'pcard', 'copy')
+DEFAULT_FILTER = None
+VALID_FILTERS = ('print', 'scan', 'fax', 'pcard', 'copy')
 
 pat_deviceuri = re.compile(r"""(.*):/(.*?)/(\S*?)\?(?:serial=(\S*)|device=(\S*)|ip=(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}[^&]*))(?:&port=(\d))?""", re.IGNORECASE)
 http_pat_url = re.compile(r"""/(.*?)/(\S*?)\?(?:serial=(\S*)|device=(\S*))&loc=(\S*)""", re.IGNORECASE)
@@ -83,9 +83,13 @@ def makeURI(param, port=1):
         log.debug("Trying parallel with %s" % param)
 
         result_code, uri = hpmudext.make_par_uri(param)
-        if result_code == hpmudext.HPMUD_R_OK: 
+        
+        if result_code == hpmudext.HPMUD_R_OK and uri: 
+            log.debug("Found: %s" % uri)
             found = True
             cups_uri = uri
+        else:
+            log.debug("Not found.")
 
     elif usb_pat.search(param) is not None: # USB
         match_obj = usb_pat.search(param)
@@ -95,18 +99,24 @@ def makeURI(param, port=1):
         log.debug("Trying USB with bus=%s dev=%s..." % (usb_bus_id, usb_dev_id))
         result_code, uri = hpmudext.make_usb_uri(usb_bus_id, usb_dev_id)
 
-        if result_code == ERROR_SUCCESS:
+        if result_code == ERROR_SUCCESS and uri:
+            log.debug("Found: %s" % uri)
             found = True
             cups_uri = uri
+        else:
+            log.debug("Not found.")
 
     elif ip_pat.search(param) is not None: # IPv4 dotted quad
         log.debug("Trying IP address %s" % param)
 
         result_code, uri = hpmudext.make_net_uri(param, port)
 
-        if result_code == hpmudext.HPMUD_R_OK:
+        if result_code == hpmudext.HPMUD_R_OK and uri:
+            log.debug("Found: %s" % uri)
             found = True
             cups_uri = uri
+        else:
+            log.debug("Not found.")
 
     else: # serial
         log.debug("Trying serial number %s" % param)
@@ -131,12 +141,13 @@ def makeURI(param, port=1):
                     hpmudext.close_device(device_id)
 
             if serial.lower() == param.lower():
-                log.debug("Match")
+                #log.debug("Match")
+                log.debug("Found: %s" % d)
                 found = True
                 cups_uri = d
                 break
             else:
-                log.debug("No match")
+                log.debug("Not found.")
 
     if found:
         try:
@@ -174,8 +185,17 @@ def queryModelByURI(device_uri):
     else:
         return queryModelByModel(model)
 
+        
+def __checkFilter(filter, mq):
+    for f, p in filter.items():
+        if f is not None:
+            op, val = p
+            if not op(mq[f], val):
+                return False
+     
+    return True   
 
-def getInteractiveDeviceURI(bus='cups,usb,par', filter='none', back_end_filter=('hp',)):
+def getInteractiveDeviceURI(bus='cups,usb,par', filter=DEFAULT_FILTER, back_end_filter=('hp',)):
     probed_devices = probeDevices(bus.lower(), filter=filter)
     cups_printers = cups.getPrinters()
     log.debug(probed_devices)
@@ -249,7 +269,7 @@ def getInteractiveDeviceURI(bus='cups,usb,par', filter='none', back_end_filter=(
 
 
 def probeDevices(bus='cups,usb,par', timeout=10,
-                 ttl=4, filter='none',  search='', net_search='slp', 
+                 ttl=4, filter=DEFAULT_FILTER,  search='', net_search='slp', 
                  back_end_filter=('hp',)):
 
     num_devices, ret_devices = 0, {}
@@ -312,16 +332,10 @@ def probeDevices(bus='cups,usb,par', timeout=10,
                             elif int(mq.get('support-type', SUPPORT_TYPE_NONE)) == SUPPORT_TYPE_NONE:
                                 log.debug("Not supported.")
                                 include = False
-
-                            elif filter not in ('none', 'print'):
-                                for f in filter.split(','):
-                                    filter_type = int(mq.get('%s-type' % f.lower().strip(), 0))
-
-                                    if filter_type == 0:
-                                        log.debug("%s filtered out." % device_uri)
-                                        include = False
-                                        break
-
+                            
+                            elif filter not in (None, 'print', 'print-type'):
+                                include = __checkFilter(filter, mq)
+                                
                             if include:
                                 ret_devices[device_uri] = (model, model, hn)
 
@@ -363,15 +377,8 @@ def probeDevices(bus='cups,usb,par', timeout=10,
                             log.debug("Not supported.")
                             include = False
 
-                        elif filter not in ('none', 'print'):
-
-                            for f in filter.split(','):
-                                filter_type = int(mq.get('%s-type' % f.lower().strip(), 0))
-
-                                if filter_type == 0:
-                                    log.debug("%s filtered out." % uri)
-                                    include = False
-                                    break
+                        elif filter not in (None, 'print', 'print-type'):
+                            include = __checkFilter(filter, mq)
 
                         if include:
                             ret_devices[uri] = (mdl, desc, devid) # model w/ _'s, mdl w/o
@@ -406,14 +413,8 @@ def probeDevices(bus='cups,usb,par', timeout=10,
                         log.debug("Not supported.")
                         include = False
 
-                    elif filter not in ('none', 'print'):
-                        for f in filter.split(','):
-                            filter_type = int(mq.get('%s-type' % f.lower().strip(), 0))
-
-                            if filter_type == 0:
-                                log.debug("%s filtered out." % device_uri)
-                                include = False
-                                break
+                    elif filter not in (None, 'print', 'print-type'):
+                        include = __checkFilter(filter, mq)
 
                     if include:
                         ret_devices[device_uri] = (model, model, '')
@@ -434,6 +435,7 @@ def probeDevices(bus='cups,usb,par', timeout=10,
         if include:
             probed_devices[uri] = ret_devices[uri]
 
+    cleanup_spinner()
     return probed_devices
 
 
@@ -553,6 +555,9 @@ def validateBusList(bus, allow_cups=True):
     return True
 
 def validateFilterList(filter):
+    if filter is None:
+        return True
+        
     for f in filter.split(','):
         if f not in VALID_FILTERS:
             log.error("Invalid term '%s' in filter list" % f)
@@ -1523,10 +1528,12 @@ class Device(object):
         result_code, data, typ, pml_result_code = \
             hpmudext.get_pml(self.device_id, channel_id, pml.PMLToSNMP(oid[0]), oid[1])
 
-        log.debug("Result code = 0x%x" % pml_result_code)
+        log.debug("PML/SNMP get %s (result code = 0x%x)" % (oid[0], pml_result_code))
 
-        if pml_result_code >= pml.ERROR_UNKNOWN_REQUEST:
+        if pml_result_code > pml.ERROR_MAX_OK:
             return pml_result_code, None
+
+        log.log_data(data)
 
         return pml_result_code, pml.ConvertFromPMLDataFormat(data, oid[1], desired_int_size)
 
@@ -1535,11 +1542,13 @@ class Device(object):
         channel_id = self.openPML()
 
         value = pml.ConvertToPMLDataFormat(value, oid[1])
-
+        
         result_code, pml_result_code = \
             hpmudext.set_pml(self.device_id, channel_id, pml.PMLToSNMP(oid[0]), oid[1], value)
 
-        log.debug("Result code = 0x%x" % pml_result_code)
+        log.debug("PML/SNMP set %s (result code = 0x%x)" % (oid[0], pml_result_code))
+        log.log_data(value)
+        
         return pml_result_code
 
 
@@ -1719,6 +1728,8 @@ class Device(object):
                                                     value,
                                                     oid[1])))
 
+        log.log_data(data)
+        
         self.printData(data, direct=direct, raw=True)
 
 
@@ -1813,7 +1824,7 @@ class Device(object):
 
             else:
                 raw_str, rem_str = '', ''
-                if raw: raw_str = '-l'
+                if raw: raw_str = '-o raw'
                 if remove: rem_str = '-r'
 
                 if is_gzip:
@@ -1835,6 +1846,7 @@ class Device(object):
 
     def printData(self, data, printer_name=None, direct=True, raw=True):
         #log.log_data(data)
+        #log.debug("printData(direct=%s, raw=%s)" % (direct, raw))
         if direct:
             self.writePrint(data)
         else:
@@ -1913,7 +1925,7 @@ class Device(object):
 
     def downloadFirmware(self):
         ok = False
-        filename = os.path.join(prop.data_dir, "firmware", self.model + '.fw.gz')
+        filename = os.path.join(prop.data_dir, "firmware", self.model.lower() + '.fw.gz')
         log.debug(filename)
 
         if os.path.exists(filename):
@@ -1924,8 +1936,8 @@ class Device(object):
                 log.debug("%s bytes downloaded." % utils.commafy(bytes_written))
                 self.closePrint()
                 ok = True
-            except:
-                log.error("An error occured.")
+            except Error, e:
+                log.error("An error occured: e.msg")
         else:
             log.error("Firmware file '%s' not found." % filename)
 

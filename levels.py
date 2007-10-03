@@ -25,15 +25,17 @@ __title__ = 'Supply Levels Utility'
 __doc__ = "Display bar graphs of current supply levels for supported HPLIP printers."
 
 # Std Lib
-import sys, getopt, time
+import sys
+import getopt
+import time
+import operator
 
 # Local
 from base.g import *
-from base import device, status, utils
+from base import device, status, utils, tui
 from prnt import cups
 
-DEFAULT_BAR_GRAPH_SIZE = 100
-
+DEFAULT_BAR_GRAPH_SIZE = 8*(tui.ttysize()[1])/10
 
 
 USAGE = [(__doc__, "", "name", True),
@@ -44,7 +46,7 @@ USAGE = [(__doc__, "", "name", True),
          utils.USAGE_SPACE,
          utils.USAGE_OPTIONS,
          utils.USAGE_BUS1, utils.USAGE_BUS2,
-        ("Bar graph size:", "-s<size> or --size=<size> (default=%d)", "option", False),
+        ("Bar graph size:", "-s<size> or --size=<size> (current default=%d)" % DEFAULT_BAR_GRAPH_SIZE, "option", False),
         ("Use colored bar graphs:", "-c or --color (default is colorized)", "option", False),
         ("Bar graph character:", "-a<char> or --char=<char> (default is '/')", "option", False),
          utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
@@ -63,7 +65,6 @@ def usage(typ='text'):
 
 
 def logBarGraph(agent_level, agent_type, size=DEFAULT_BAR_GRAPH_SIZE, use_colors=True, bar_char='/'):
-    if size == 0: size = 100
     adj = 100.0/size
     if adj==0.0: adj=100.0
     bar = int(agent_level/adj)
@@ -115,14 +116,15 @@ try:
         ['printer=', 'device=', 'help', 'help-rest', 'help-man', 
          'help-desc', 'logging=', 'size=', 'color', 'char='])
 
-except getopt.GetoptError:
+except getopt.GetoptError, e:
+    log.error(e.msg)
     usage()
 
 printer_name = None
 device_uri = None
 log_level = logger.DEFAULT_LOG_LEVEL
 bus = device.DEFAULT_PROBE_BUS
-size = 100
+size = DEFAULT_BAR_GRAPH_SIZE
 color = True
 bar_char = '/'
 
@@ -170,7 +172,7 @@ for o, a in opts:
         except:
             size = DEFAULT_BAR_GRAPH_SIZE
 
-        if size < 0 or size > 200:
+        if size < 1 or size > DEFAULT_BAR_GRAPH_SIZE:
             size = DEFAULT_BAR_GRAPH_SIZE
 
     elif o in ('-c', '--color'):
@@ -194,7 +196,7 @@ utils.log_title(__title__, __version__)
 
 if not device_uri and not printer_name:
     try:
-        device_uri = device.getInteractiveDeviceURI(bus)
+        device_uri = device.getInteractiveDeviceURI(bus, filter={'status-type': (operator.gt, 0)})
         if device_uri is None:
             sys.exit(1)
     except Error:

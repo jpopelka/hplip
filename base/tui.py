@@ -29,24 +29,27 @@ from g import *
 import pexpect
 import utils
 
-def enter_yes_no(question, default_value='y'):
-    if type(default_value) == type(True):
-        if default_value:
-            default_value = 'y'
+def enter_yes_no(question, default_value='y', choice_prompt=None):
+    if type(default_value) == type(""):
+        if default_value == 'y':
+            default_value = True
         else:
-            default_value = 'n'
-            
-    assert default_value in ['y', 'n']
+            default_value = False
     
-    if default_value == 'y':
-        question += " (y=yes*, n=no, q=quit) ? "
+    assert default_value in [True, False]
+    
+    if choice_prompt is None:
+        if default_value:
+            question += " (y=yes*, n=no, q=quit) ? "
+        else:
+            question += " (y=yes, n=no*, q=quit) ? "
     else:
-        question += " (y=yes, n=no*, q=quit) ? "
-    
+        question += choice_prompt
+
     while True:
         user_input = raw_input(log.bold(question)).lower().strip()
         
-        if not user_input and default_value:
+        if not user_input:
             return True, default_value
 
         if user_input == 'n':
@@ -55,10 +58,11 @@ def enter_yes_no(question, default_value='y'):
         if user_input == 'y':
             return True, True
 
-        if user_input == 'q':
+        if user_input in ('q', 'c'): # q -> quit, c -> cancel
             return False, default_value
 
         log.error("Please press <enter> or enter 'y', 'n', or 'q'.")
+        
 
 def enter_range(question, min_value, max_value, default_value=None):
     while True:
@@ -84,6 +88,7 @@ def enter_range(question, min_value, max_value, default_value=None):
             continue
 
         return True, value_int
+        
 
 def enter_choice(question, choices, default_value=None):
     if 'q' not in choices:
@@ -167,22 +172,26 @@ def ttysize():
     return int(vals['rows']), int(vals['columns'])
     
     
-class ProgressMeter:
+class ProgressMeter(object):
     def __init__(self, prompt="Progress:"):
         self.progress = 0
         self.prompt = prompt
         self.prev_length = 0
-        self.spinner = "\|/-\|/-"
+        self.spinner = "\|/-\|/-*"
         self.spinner_pos = 0
         self.update(0)
         
     def update(self, progress, msg=''): # progress in %
         self.progress = progress
+        
         if self.progress > 100:
             self.progress = 100
         elif self.progress < 0:
             self.progress = 0
         
+        if self.progress == 100:
+            self.spinner_pos = 8
+            
         sys.stdout.write("\b" * self.prev_length)
         
         x = "%s [%s%s%s] %d%%  %s   " % \
@@ -194,5 +203,134 @@ class ProgressMeter:
         self.prev_length = len(x)
         self.spinner_pos = (self.spinner_pos + 1) % 8
         
+
+
+class Formatter(object):
+    def __init__(self, margin=2, header=None, min_widths=None, max_widths=None):
+        self.margin = margin # int
+        self.header = header # tuple of strings
+        self.rows = [] # list of tuples
+        self.max_widths = max_widths # tuple of ints
+        self.min_widths = min_widths # tuple of ints
+        
+    def add(self, row_data): # tuple of strings
+        self.rows.append(row_data)
+        
+    def output(self):
+        if self.rows:
+            num_cols = len(self.rows[0])
+            for r in self.rows:
+                if len(r) != num_cols:
+                    log.error("Invalid number of items in row: %s" % r)
+                    return
+                    
+            if len(self.header) != num_cols:
+                log.error("Invalid number of items in header.")
+                
+            min_calc_widths = []
+            for c in self.header:
+                header_parts = c.split(' ')
+                max_width = 0
+                for x in header_parts:
+                    max_width = max(max_width, len(x))
+                    
+                min_calc_widths.append(max_width)
+                
+            max_calc_widths = []
+            for x, c in enumerate(self.header):
+                max_width = 0
+                for r in self.rows:
+                    max_width = max(max_width, len(r[x]))
+                
+                max_calc_widths.append(max_width)
+                
+            max_screen_width = None
+            
+            if self.max_widths is None:
+                max_screen_width = ttysize()[1]
+                def_max = 8*(max_screen_width/num_cols)/10
+                self.max_widths = []
+                for c in self.header:
+                    self.max_widths.append(def_max)
+            else:
+                if len(self.max_widths) != num_cols:
+                    log.error("Invalid number of items in max col widths.")
+                    
+            if self.min_widths is None:
+                if max_screen_width is None:
+                    max_screen_width = ttysize()[1]
+                def_min = 4*(max_screen_width/num_cols)/10
+                self.min_widths = []
+                for c in self.header:
+                    self.min_widths.append(def_min)
+            else:
+                if len(self.min_widths) != num_cols:
+                    log.error("Invalid number of items in min col widths.")
+            
+            col_widths = []
+            formats = []
+            for m1, m2, m3, m4 in zip(self.min_widths, min_calc_widths, self.max_widths, max_calc_widths):
+                col_width = max(max(m1, m2), min(m3, m4))
+                col_widths.append(col_width)
+                formats.append({'width': col_width, 'margin': self.margin})
+            
+            formatter = utils.TextFormatter(tuple(formats))
+            
+            print formatter.compose(self.header)
+            
+            sep = []
+            for c in col_widths:
+                sep.append('-'*c)
+                
+            print formatter.compose(tuple(sep))
+            
+            for r in self.rows:
+                print formatter.compose(r)
+                
+        else:
+            log.error("No data rows")
+            
+
+            
+ALIGN_LEFT = 0
+ALIGN_CENTER = 1
+ALIGN_RIGHT = 2
         
         
+def align(line, width=70, alignment=ALIGN_LEFT):
+    space = width - len(line)
+    
+    if alignment == ALIGN_CENTER:
+        return ' '*(space/2) + line + \
+               ' '*(space/2 + space%2)
+    
+    elif alignment == ALIGN_RIGHT:
+        return ' '*space + line
+    
+    else:
+        return line + ' '*space
+
+
+def format_paragraph(paragraph, width=None, alignment=ALIGN_LEFT):
+    if width is None:
+        width = ttysize()[1]
+        
+    result = []
+    #import string
+    words = paragraph.split() #string.split(paragraph)
+    current, words = words[0], words[1:]
+    
+    for word in words:
+        increment = 1 + len(word)
+        
+        if len(current) + increment > width:
+            result.append(align(current, width, alignment))
+            current = word
+        
+        else:
+            current = current+" "+word
+    
+    result.append(align(current, width, alignment))
+    #print result
+    return result
+

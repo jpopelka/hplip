@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '10.0'
+__version__ = '12.0'
 __title__ = 'Dependency/Version Check Utility'
 __doc__ = "Check the existence and versions of HPLIP dependencies."
 
@@ -33,12 +33,12 @@ import re
 
 # Local
 from base.g import *
-from base import utils, tui
+from base import utils, tui, models #, device
 from installer import dcheck
 from installer.core_install import *
 
 USAGE = [(__doc__, "", "name", True),
-         ("Usage: hp-check [OPTIONS]", "", "summary", True),
+         ("Usage: hp-check/check.py [OPTIONS]", "", "summary", True),
          utils.USAGE_OPTIONS,
          ("Pre-install check:", "-p or --pre", "option", False),
          utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
@@ -103,7 +103,8 @@ try:
         opts, args = getopt.getopt(sys.argv[1:], 'hl:gtp', 
             ['help', 'help-rest', 'help-man', 'help-desc', 'logging=', 'pre']) 
 
-    except getopt.GetoptError:
+    except getopt.GetoptError, e:
+        log.error(e.msg)
         usage()
         sys.exit(1)
 
@@ -347,7 +348,7 @@ try:
             log.info("Not found.")  
 
         tui.header("INSTALLED PRINTERS")
-
+        
         lpstat_pat = re.compile(r"""^device for (.*): (.*)""", re.IGNORECASE)
 
         status, output = utils.run('lpstat -v')
@@ -366,15 +367,16 @@ try:
         if cups_printers:
             non_hp = False
             for p in cups_printers:
+                printer_name, device_uri = p
                 try:
                     back_end, is_hp, bus, model, serial, dev_file, host, port = \
-                        parseDeviceURI(p[1])
+                        parseDeviceURI(device_uri)
                 except Error:
                     back_end, is_hp, bus, model, serial, dev_file, host, port = \
                         '', False, '', '', '', '', '', 1
 
-                log.info(log.bold(p[0]))
-                log.info(log.bold('-'*len(p[0])))
+                log.info(log.bold(printer_name))
+                log.info(log.bold('-'*len(printer_name)))
 
                 x = "Unknown"
                 if back_end == 'hpfax':
@@ -391,9 +393,9 @@ try:
                     non_hp = True
 
                 log.info("Installed in HPLIP?: %s" % x)
-                log.info("Device URI: %s" % p[1])
+                log.info("Device URI: %s" % device_uri)
 
-                ppd = os.path.join('/etc/cups/ppd', p[0] + '.ppd')
+                ppd = os.path.join('/etc/cups/ppd', printer_name + '.ppd')
 
                 if os.path.exists(ppd):
                     log.info("PPD: %s" % ppd)
@@ -408,22 +410,42 @@ try:
 
                     log.info("PPD Description: %s" % desc)
 
-                    status, output = utils.run('lpstat -p%s' % p[0])
+                    status, output = utils.run('lpstat -p%s' % printer_name)
                     log.info("Printer status: %s" % output.replace("\n", ""))
 
                     if back_end == 'hpfax' and desc != 'HP Fax':
                         num_errors += 1
-                        log.error("Incorrect PPD file for fax queue '%s'. Fax queues must use 'HP-Fax-hplip.ppd'." % p[0])
+                        log.error("Incorrect PPD file for fax queue '%s'. Fax queues must use 'HP-Fax-hplip.ppd'." % printer_name)
 
                     elif back_end == 'hp' and desc == 'HP Fax':
                         num_errors += 1
-                        log.error("Incorrect PPD file for a print queue '%s'. Print queues must not use 'HP-Fax-hplip.ppd'." % p[0])
+                        log.error("Incorrect PPD file for a print queue '%s'. Print queues must not use 'HP-Fax-hplip.ppd'." % printer_name)
 
                     elif back_end not in ('hp', 'hpfax'):
                         log.warn("Printer is not HPLIP installed. Printers must use the hp: or hpfax: CUPS backend to function in HPLIP.")
                         num_errors += 1
-
-                log.info("")
+                        
+##                if is_hp:
+##                    try:
+##                        d = device.Device(device_uri)
+##                    except Error:
+##                        log.debug("Device() init failed.")
+##                        continue
+##                        
+##                    if d.mq.get('plugin', 0):
+##                        home = sys_cfg.dirs.home
+##                        if not home:
+##                            home = os.path.realpath(os.path.normpath(os.getcwd()))
+##                        
+##                        model = model.lower()
+##                        if os.path.exists(os.path.join(home, "data", "plugins", "%s.plugin" % model)):
+##                            log.info("Plug-in Required: OK, plug-in is installed.")
+##                        else:
+##                            log.info("A plug-in is required for this model:")
+##                            log.error("Plug-in not installed.")
+##                            num_errors += 1
+##                            
+##                log.info("")
 
         else:
             log.warn("No queues found.")
@@ -503,36 +525,7 @@ try:
                 log.info("")
 
         tui.header("USB I/O SETUP")
-
-        log.info(log.bold("Checking proper HPLIP I/O setup (USB I/O only)..."))
-
-        mode_pat = re.compile("""MODE\s*=\s*\"(\d\d\d\d)\"""",  re.IGNORECASE)
-
-        found = False
-        for f1 in utils.walkFiles('/etc/udev/rules.d', recurse=True, abs_paths=True, return_folders=False, pattern='*.rules'):
-            f3 = file(f1, 'r').readlines()
-            for f2 in f3:
-                s = mode_pat.search(f2)
-                if "usb_device" in f2 and s is not None:
-                    log.debug("Found udev usb_device MODE: %s in file %s" % (f2.strip(), os.path.basename(f1)))
-                    found = True
-                    break
-
-            if found:
-                break
-
-        if found:
-            mode = int(s.group(1), 8)
-
-            if mode & 0660 == 0660:
-                log.info('udev "usb_device" access mode: 0%o (OK)' % mode)
-            else:
-                log.error('udev "usb_device" access mode is INCORRECT: 0%o (it must be 066x)' % mode)
-                num_errors += 1
-
-        import pwd
-        import grp
-
+        
         if hpmudext_avail:
             lsusb = utils.which('lsusb')
             if lsusb:
@@ -560,6 +553,9 @@ try:
 
                         devnode = os.path.join("/", "dev", "bus", "usb", bus, device)
 
+                        if not os.path.exists(devnode):
+                            devnode = os.path.join("/", "proc", "bus", "usb", bus, device)
+                        
                         if os.path.exists(devnode):
                             log.info("    Device node: %s" % devnode)
 
@@ -568,58 +564,15 @@ try:
                                 os.stat(devnode)
 
                             log.info("    Mode: 0%o" % (st_mode & 0777))
-
-                            if st_mode & 0660 != 0660:
-                                log.error("INCORRECT mode. Mode must be 066x")
-                                ok = False
-                                num_errors += 1
-
-                            user = pwd.getpwuid(st_uid)[0]
-                            group = grp.getgrgid(st_gid)[0]
-                            log.info("    UID: %d (%s)" % (st_uid, user))
-                            log.info("    GID: %d (%s)" % (st_gid, group))
-
-                            if group != 'lp':
-                                log.error("INCORRECT group. Group must be 'lp'")
-                                ok = False
-                                num_errors += 1
-
-                        else:
-                            log.warn("    Device node NOT FOUND: %s" % devnode) 
-                            ok = False
-                            num_errors += 1
-
-                    if ok:
-                        log.info("    Device group and mode appear correct.")
-                    else:
-                        log.error("    Device group and mode are NOT properly setup.")
-
-        all_groups = grp.getgrall()
-        for g in all_groups:
-            name, pw, gid, members = g
-            log.debug("group=%s gid=%d" % (name, gid))
-
-        log.info("")
-        for p in pwd.getpwall():
-            user, pw, uid, gid, name, home, ci = p
-            log.debug("user=%s uid=%d gid=%d" % (user, uid, gid))
-            if 1000 <= uid <= 10000:
-                log.info(log.bold("Is user '%s' a member of the 'lp' group?" % user))
-                grps = []
-                for g in all_groups:
-                    grp_name, pw, gid, members = g
-                    if user in members:
-                        grps.append(grp_name)
-                log.debug("Member of groups: %s" % ', '.join(grps))
-
-                if 'lp' in grps:
-                    log.info("Yes (OK)")
-                else:
-                    log.warn("NO (HPLIP USB I/O users must be member of 'lp' group)")
-                    log.note("This may not be a problem if this user will not be printing using HPLIP USB I/O.")
-                    num_errors += 1
-
-                log.info("")
+                            
+                            getfacl = utils.which('getfacl')
+                            if getfacl:
+                                getfacl = os.path.join(getfacl, "getfacl")
+                                
+                                status, output = utils.run("%s %s" % (getfacl, devnode))
+                                
+                                log.info(output)
+                                
 
     tui.header("SUMMARY")
 

@@ -75,7 +75,7 @@
 
 
 
-*HWMargins: 18 14.40 18 14.4
+*HWMargins: 18 14.40 18 +14.40
 *VariablePaperSize: True
 *MaxMediaWidth: 100000
 *MaxMediaHeight: 100000

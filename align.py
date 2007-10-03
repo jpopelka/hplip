@@ -28,6 +28,7 @@ __doc__ = "Cartridge alignment utility for HPLIP supported inkjet printers."
 import sys
 import re
 import getopt
+import operator
 
 # Local
 from base.g import *
@@ -138,7 +139,8 @@ try:
                                   'bus='
                                 ]
                               )
-except getopt.GetoptError:
+except getopt.GetoptError, e:
+    log.error(e.msg)
     usage()
 
 log.set_module("hp-align")
@@ -201,7 +203,7 @@ utils.log_title(__title__, __version__)
 
 if not device_uri and not printer_name:
     try:
-        device_uri = device.getInteractiveDeviceURI(bus)
+        device_uri = device.getInteractiveDeviceURI(bus, filter={'align-type': (operator.gt, 0)})
         if device_uri is None:
             sys.exit(0)
     except Error:
@@ -245,7 +247,7 @@ try:
             sys.exit(0)
 
         if align_type == ALIGN_TYPE_AUTO:
-            maint.AlignType1(d, tui.load_paper_prompt)
+            maint.AlignType1PML(d, tui.load_paper_prompt)
 
         elif align_type == ALIGN_TYPE_8XX:
             maint.AlignType2(d, ui.load_paper_prompt, enterAlignmentNumber,
@@ -256,7 +258,7 @@ try:
                               enterPaperEdge, update_spinner)
 
         elif align_type == ALIGN_TYPE_LIDIL_AIO:
-            maint.AlignType6(d, aioUI1, aioUI2, ui.load_paper_prompt)
+            maint.AlignType6(d, aioUI1, aioUI2, tui.load_paper_prompt)
 
         elif align_type == ALIGN_TYPE_DESKJET_450:
             maint.AlignType8(d, ui.load_paper_prompt, enterAlignmentNumber)

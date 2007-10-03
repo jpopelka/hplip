@@ -828,13 +828,13 @@ def getFaxStatus(dev):
 
         result_code, tx_state = dev.getPML(pml.OID_FAXJOB_TX_STATUS)
 
-        if result_code == ERROR_SUCCESS:
+        if result_code == ERROR_SUCCESS and tx_state:
             if tx_state not in (pml.FAXJOB_TX_STATUS_IDLE, pml.FAXJOB_TX_STATUS_DONE):
                 tx_active = True
 
         result_code, rx_state = dev.getPML(pml.OID_FAXJOB_RX_STATUS)
 
-        if result_code == ERROR_SUCCESS:
+        if result_code == ERROR_SUCCESS and rx_state:
             if rx_state not in (pml.FAXJOB_RX_STATUS_IDLE, pml.FAXJOB_RX_STATUS_DONE):
                 rx_active = True
 

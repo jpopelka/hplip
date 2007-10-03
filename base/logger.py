@@ -114,7 +114,7 @@ class Logger(object):
                 return False
 
         elif isinstance(level,int):
-            if Logger.LOG_LEVEL_DEBUG <= level <= Logger.LOG_LEVEL_FATAL:
+            if Logger.LOG_LEVEL_DEBUG3 <= level <= Logger.LOG_LEVEL_FATAL:
                 self._level = level
             else:
                 self.error("Invalid logging level: %d" % level)
@@ -232,16 +232,20 @@ class Logger(object):
 
     def log_data(self, data, width=16): 
         if self._level <= Logger.LOG_LEVEL_DEBUG:
-            index, line = 0, data[0:width]
-            while line:
-                txt = ' '.join(['%04x: ' % index, ' '.join(['%02x' % ord(d) for d in line]), 
-                    ' '*(width*3-3*len(line)), ''.join([('.', i)[i in Logger.printable] for i in line])])
-
-                self.log(self.color("%s[%d]: debug: %s:" % (self.module,  self.pid, txt), 'blue'), 
-                    Logger.LOG_LEVEL_DEBUG)
-
-                index += width
-                line = data[index:index+width]                
+            if data:
+                index, line = 0, data[0:width]
+                while line:
+                    txt = ' '.join(['%04x: ' % index, ' '.join(['%02x' % ord(d) for d in line]), 
+                        ' '*(width*3-3*len(line)), ''.join([('.', i)[i in Logger.printable] for i in line])])
+    
+                    self.log(self.color("%s[%d]: debug: %s" % (self.module,  self.pid, txt), 'blue'), 
+                        Logger.LOG_LEVEL_DEBUG)
+    
+                    index += width
+                    line = data[index:index+width]
+            else:
+                self.log(self.color("%s[%d]: debug: %s" % (self.module,  self.pid, "0000: (no data)"), 'blue'), 
+                        Logger.LOG_LEVEL_DEBUG)
 
     def info(self, message):
         if self._level <= Logger.LOG_LEVEL_INFO:

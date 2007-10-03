@@ -1117,8 +1117,6 @@ def xreverse(s):
 def xstrip(s, chars=' '):
     return xreverse(xlstrip(xreverse(xlstrip(s, chars)), chars))
 
-
-
 def getBitness():
     try:
         import platform
@@ -1126,6 +1124,14 @@ def getBitness():
         return struct.calcsize("P") << 3
     else:
         return int(platform.architecture()[0][:-3])
+        
+def getProcessor():
+    try:
+        import platform
+    except ImportError:
+        return "i686" # TODO: Need a fix here
+    else:
+        return platform.machine().replace(' ', '_').lower() # i386, i686, power_macintosh, etc.
 
 
 BIG_ENDIAN = 0

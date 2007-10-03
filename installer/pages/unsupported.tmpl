@@ -21,34 +21,33 @@
 -->
 <html>
 <HEAD>
-    <META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE" />
-    <META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 22 Jul 2002 11:12:01 GMT" />    
-    <meta http-equiv="Content-Language" content="en-us" />
     <META http-equiv="content-type" content="text/html; charset=utf-8">
+    <META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE" />
     <link rel="stylesheet" type="text/css" href="styles/hplip.css" />    
     <script type="text/javascript" src="scripts/hplip.js"></script>
-    <script type="text/javascript" src="scripts/xml_loader.js"></script>
+    <script type="text/javascript" src="scripts/misc_code.js"></script>
     <script type="text/javascript">
     <!--
-
-    function todoOnLoad() {
-        header = '$header_string'; 
-        subheader = '$sub_header_string'; 
-        generateHeader(header, subheader);
-    };
     -->
     </script>
 <TITLE>$installer_title</TITLE>
 </HEAD>
-<BODY onload="todoOnLoad();">
+<BODY>
  <!-- Header Div -->    
-<div id="header_box" class="background_box"></div>
+<div id="header_box" class="background_box">
+  <div class='header_title_class'>
+    <div id='hp_blue_logo'><img src='images/hplogo.png' alt=''/></div>
+    <div id='header_title'>$header_string</div>
+    <div id='header_title2'>$header_string</div>
+    <div id='header_subtitle'>$sub_header_string</div>
+    <div id='header_subtitle2'>$sub_header_string</div>
+    <div id='tux_logo'><img src='images/tux.png' alt=''/></div>
+  </div>
+</div>
 
 <!-- Body Div -->
 <div class="body_content">
-    <div id="message_title">
-        <a>Installation Notes:</a>
-    </div>
+    <div id="message_title">$unsupported_message_title</div>
     <div id="message_body">
         <div id="notes_field">$unsupported_notes_field<br>
             <br>

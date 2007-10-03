@@ -593,6 +593,12 @@ enum HPMUD_RESULT hpmud_make_net_uri(const char *ip, int port, char *uri, int ur
       else
          *bytes_read = snprintf(uri, uri_size, "hp:/net/%s?ip=%s&port=%d", model, ip, port); 
    }
+   else
+   {
+      BUG("invalid ip %s\n", ip);
+      stat = HPMUD_R_INVALID_IP;
+      goto bugout;
+   }
 
    stat = HPMUD_R_OK;
 

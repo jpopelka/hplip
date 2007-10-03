@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '0.1'
+__version__ = '0.2'
 __title__ = 'Time/Date Utility'
 __doc__ = "Set the time and date on an HP Officejet."
 
@@ -29,6 +29,7 @@ import sys
 import re
 import getopt
 import struct
+import operator
 
 # Local
 from base.g import *
@@ -89,7 +90,8 @@ try:
                                   'bus=',
                                 ]
                               )
-except getopt.GetoptError:
+except getopt.GetoptError, e:
+    log.error(e.msg)
     usage()
 
 printer_name = None
@@ -148,7 +150,7 @@ utils.log_title(__title__, __version__)
 
 if not device_uri and not printer_name:
     try:
-        device_uri = device.getInteractiveDeviceURI(bus)
+        device_uri = device.getInteractiveDeviceURI(bus, filter={'fax-type' : (operator.gt, 0)})
         if device_uri is None:
             sys.exit(1)
     except Error:

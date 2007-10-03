@@ -71,6 +71,10 @@
 #include "pscript.h"
 #include "ljjetready.h"
 #include "ljfastraster.h"
+#ifdef APDK_LJZJS_MONO
+#include "ljzjs.h"
+#include "ljzjsmono.h"
+#endif
 
 APDK_BEGIN_NAMESPACE
 
@@ -92,6 +96,10 @@ LJJetReadyProxy DeviceRegistry::s_LJJetReadyProxy;
 
 #ifdef APDK_LJFASTRASTER
 LJFastRasterProxy DeviceRegistry::s_LJFastRasterProxy;
+#endif
+
+#ifdef APDK_LJZJS_MONO
+LJZjsMonoProxy DeviceRegistry::s_LJZjsMonoProxy;
 #endif
 
 #if defined(APDK_PSP100) && defined (APDK_DJ9xxVIP)

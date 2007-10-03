@@ -20,12 +20,19 @@
 # Author: Don Welch
 #
 
-__version__ = '3.0'
+__version__ = '3.1'
 __title__ = "Make Copies Utility"
 __doc__ = "PC initiated make copies on supported HP AiO and MFP devices."
 
 # Std Lib
-import sys, os, getopt, re, socket, Queue, time
+import sys
+import os
+import getopt
+import re
+import socket
+import Queue
+import time
+import operator
 
 # Local
 from base.g import *
@@ -76,7 +83,8 @@ try:
                                 'reduction=', 'enlargement=', 'fittopage', 
                                 'fit', 'gui', 'help-rest', 'help-man',
                                 'help-desc', 'non-interactive', 'bus='])
-except getopt.GetoptError:
+except getopt.GetoptError, e:
+    log.error(e.msg)
     usage()
 
 printer_name = None
@@ -309,7 +317,9 @@ if mode == GUI_MODE:
 else: # NON_INTERACTIVE_MODE
     if not device_uri and not printer_name:
         try:
-            device_uri = device.getInteractiveDeviceURI(bus, filter='copy')
+            device_uri = device.getInteractiveDeviceURI(bus, 
+                filter={'copy-type': (operator.gt, 0)})
+                
             if device_uri is None:
                 sys.exit(1)
         except Error:

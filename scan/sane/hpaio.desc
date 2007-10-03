@@ -196,6 +196,12 @@
 :model "officejet_g95"
 :status :good
 
+:model "officejet_j3600_series"
+:status :good
+
+:model "officejet_j5500_series"
+:status :good
+
 :model "officejet_j5700_series"
 :status :good
 
@@ -283,6 +289,9 @@
 :model "officejet_v45"
 :status :good
 
+:model "psc_1000_series"
+:status :good
+
 :model "psc_1100_series"
 :status :good
 
@@ -293,6 +302,9 @@
 :status :good
 
 :model "psc_1310_series"
+:status :good
+
+:model "psc_1358_series"
 :status :good
 
 :model "psc_1400_series"
@@ -349,7 +361,16 @@
 :model "psc_760"
 :status :good
 
+:model "psc_780"
+:status :good
+
+:model "psc_780xi"
+:status :good
+
 :model "psc_900_series"
+:status :good
+
+:model "psc_920"
 :status :good
 
 :model "psc_950"
@@ -397,7 +418,19 @@
 :model "photosmart_c6100_series"
 :status :good
 
+:model "photosmart_c6200_series"
+:status :good
+
 :model "photosmart_c7100_series"
+:status :good
+
+:model "photosmart_c7200_series"
+:status :good
+
+:model "photosmart_c8100_series"
+:status :good
+
+:model "photosmart_d5300_series"
 :status :good
 
 :model "printer_scanner_copier_300"

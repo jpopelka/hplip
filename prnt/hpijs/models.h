@@ -65,13 +65,14 @@ typedef enum PRINTER_TYPE               // typedef'ed for C interface
     eDJGenericVIP,
     eDJ55xx,
     eOJProKx50,
-	eLJMono,
-	eLJColor,
-	ePScript,
-	eDJ3600,
+    eLJMono,
+    eLJColor,
+    ePScript,
+    eDJ3600,
     eDJ4100,
-	eLJJetReady,
+    eLJJetReady,
     eLJFastRaster,
+    eLJZjsMono,
     MAX_PRINTER_TYPE
 } PRINTER_TYPE;
 
@@ -103,13 +104,14 @@ const char ModelName[MAX_PRINTER_TYPE][13] =
     "GenericVIP",
     "DJ55xx",
     "OJProKx50",
-	"Mono Laser",
-	"ColorLaser",
-	"PostScript",
-	"DJ3600",
+    "Mono Laser",
+    "ColorLaser",
+    "PostScript",
+    "DJ3600",
     "DJ4100",
-	"LJJetReady",
-    "LJFastRaster"
+    "LJJetReady",
+    "LJFastRaster",
+    "LJZjsMono"
 };
 
 APDK_END_NAMESPACE

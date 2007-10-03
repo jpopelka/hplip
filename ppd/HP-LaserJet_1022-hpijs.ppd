@@ -75,7 +75,7 @@
 
 
 
-*HWMargins: 18 14.40 18 14.4
+*HWMargins: 18 11.34 18 14.4
 *VariablePaperSize: True
 *MaxMediaWidth: 100000
 *MaxMediaHeight: 100000
@@ -277,30 +277,30 @@ dDEVICEHEIGHTPOINTS=567"
 *CloseUI: *PageRegion
 
 *DefaultImageableArea: Letter
-*ImageableArea Letter/Letter: "18 14.40 594 777.60"
-*ImageableArea A4/A4: "18 14.40 577 827.60"
-*ImageableArea Photo/Photo or 4x6 inch index card: "18 14.40 270 417.60"
-*ImageableArea Photo5x7/Photo or 5x7 inch index card: "18 14.40 342 489.60"
-*ImageableArea 3x5/3x5 inch index card: "18 14.40 198 345.60"
-*ImageableArea 5x8/5x8 inch index card: "18 14.40 342 561.60"
-*ImageableArea A5/A5: "18 14.40 402 580.60"
-*ImageableArea A6/A6: "18 14.40 279 405.60"
-*ImageableArea B5JIS/B5 (JIS): "18 14.40 498 714.60"
-*ImageableArea CDDVD80/CD or DVD 80 mm: "18 14.40 219 222.60"
-*ImageableArea CDDVD120/CD or DVD 120 mm: "18 14.40 342 345.60"
-*ImageableArea Env10/Envelope #10: "18 14.40 279 669.60"
-*ImageableArea EnvC5/Envelope C5: "18 14.40 441 634.60"
-*ImageableArea EnvC6/Envelope C6: "18 14.40 305 444.60"
-*ImageableArea EnvDL/Envelope DL: "18 14.40 294 609.60"
-*ImageableArea EnvISOB5/Envelope B5: "18 14.40 481 694.60"
-*ImageableArea EnvMonarch/Envelope Monarch: "18 14.40 261 525.60"
-*ImageableArea Executive/Executive: "18 14.40 504 741.60"
-*ImageableArea FLSA/American Foolscap: "18 14.40 594 921.60"
-*ImageableArea Hagaki/Hagaki: "18 14.40 265 405.60"
-*ImageableArea Legal/Legal: "18 14.40 594 993.60"
-*ImageableArea Oufuku/Oufuku-Hagaki: "18 14.40 402 552.60"
-*ImageableArea w558h774/16K: "18 14.40 540 759.60"
-*ImageableArea w612h935/Executive (JIS): "18 14.40 594 920.60"
+*ImageableArea Letter/Letter: "18 11.34 594 777.60"
+*ImageableArea A4/A4: "18 11.34 577 827.60"
+*ImageableArea Photo/Photo or 4x6 inch index card: "18 11.34 270 417.60"
+*ImageableArea Photo5x7/Photo or 5x7 inch index card: "18 11.34 342 489.60"
+*ImageableArea 3x5/3x5 inch index card: "18 11.34 198 345.60"
+*ImageableArea 5x8/5x8 inch index card: "18 11.34 342 561.60"
+*ImageableArea A5/A5: "18 11.34 402 580.60"
+*ImageableArea A6/A6: "18 11.34 279 405.60"
+*ImageableArea B5JIS/B5 (JIS): "18 11.34 498 714.60"
+*ImageableArea CDDVD80/CD or DVD 80 mm: "18 11.34 219 222.60"
+*ImageableArea CDDVD120/CD or DVD 120 mm: "18 11.34 342 345.60"
+*ImageableArea Env10/Envelope #10: "18 11.34 279 669.60"
+*ImageableArea EnvC5/Envelope C5: "18 11.34 441 634.60"
+*ImageableArea EnvC6/Envelope C6: "18 11.34 305 444.60"
+*ImageableArea EnvDL/Envelope DL: "18 11.34 294 609.60"
+*ImageableArea EnvISOB5/Envelope B5: "18 11.34 481 694.60"
+*ImageableArea EnvMonarch/Envelope Monarch: "18 11.34 261 525.60"
+*ImageableArea Executive/Executive: "18 11.34 504 741.60"
+*ImageableArea FLSA/American Foolscap: "18 11.34 594 921.60"
+*ImageableArea Hagaki/Hagaki: "18 11.34 265 405.60"
+*ImageableArea Legal/Legal: "18 11.34 594 993.60"
+*ImageableArea Oufuku/Oufuku-Hagaki: "18 11.34 402 552.60"
+*ImageableArea w558h774/16K: "18 11.34 540 759.60"
+*ImageableArea w612h935/Executive (JIS): "18 11.34 594 920.60"
 
 *DefaultPaperDimension: Letter
 *PaperDimension Letter/Letter: "612 792"

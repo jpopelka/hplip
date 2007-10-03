@@ -23,7 +23,7 @@ select {width:40%;font-weight:bold;}
     width:463px;
     height:186px;
     background:#FFFFFF;
-    border:1px 
+    border:1px
     solid orange;
 }
 
@@ -35,7 +35,7 @@ select {width:40%;font-weight:bold;}
     width:524px;
     height:226px;
     background:#FFFFFF;
-    border:1px 
+    border:1px
     solid orange;
 }
 
@@ -47,7 +47,7 @@ select {width:40%;font-weight:bold;}
     width:520px;
     height:222px;
     background:#FFFFFF;
-    border:1px 
+    border:1px
     solid orange;
 }
 
@@ -90,6 +90,7 @@ select {width:40%;font-weight:bold;}
     min-width: 638px;
     background:url("../images/topbar.png") repeat-x;
 }
+
 #header_title {
     position: absolute;
     top: 28px;
@@ -102,6 +103,8 @@ select {width:40%;font-weight:bold;}
     padding-right: 1em;
     vertical-align: middle;
 }
+
+
 #header_title2 {
     position: absolute;
     top: 29px;
@@ -127,6 +130,7 @@ select {width:40%;font-weight:bold;}
     text-align: center;
     vertical-align: middle;
 }
+
 #header_subtitle2 {
     position: absolute;
     top: 55px;
@@ -382,7 +386,7 @@ select {width:40%;font-weight:bold;}
     font-size: 1.0em;
     padding: .15ex;
     cursor: pointer;
-} 
+}
 
 #previous_button {
     position: absolute;

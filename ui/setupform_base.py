@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'setupform_base.ui'
+# Form implementation generated from reading ui file 'ui/setupform_base.ui'
 #
-# Created: Mon May 21 13:43:50 2007
+# Created: Thu Sep 20 11:45:16 2007
 #      by: The PyQt User Interface Compiler (pyuic) 3.17
 #
 # WARNING! All changes made in this file will be lost!
@@ -428,7 +428,7 @@ class SetupForm_base(QWizard):
         self.ppdListView.header().setLabel(1,self.__tr("Description"))
         self.otherPPDPushButton.setText(self.__tr("Select Other..."))
         self.ppdDefaultsPushButton.setText(self.__tr("Defaults"))
-        self.textLabel1_5.setText(self.__tr("Please chose the PPD file (by name and description) that most closely matches your printer. <i>Note: The model name of the printer may vary somehwat from the PPD file name, for example, a Deskjet 5550 may have a PPD file with the model name of Deskjet_5500_series.</i>"))
+        self.textLabel1_5.setText(self.__tr("Please chose the PPD file (by name and description) that most closely matches your printer. <i>Note: The model name of the printer may vary somewhat from the PPD file name, for example, a Deskjet 5550 may have a PPD file with the model name of Deskjet_5500_series.</i>"))
         self.setTitle(self.PPDPage,self.__tr("Select/Confirm PPD File"))
         self.groupBox4.setTitle(self.__tr("Printer Information"))
         self.defaultPrinterNamePushButton.setText(self.__tr("Default"))

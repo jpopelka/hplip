@@ -83,6 +83,7 @@ enum HPMUD_SCANTYPE
 #define HPMUD_S_MEMORY_CARD_CHANNEL "HP-CARD-ACCESS"
 #define HPMUD_S_EWS_CHANNEL "HP-EWS"
 #define HPMUD_S_SOAP_SCAN "HP-SOAP-SCAN"
+#define HPMUD_S_DEVMGMT_CHANNEL "HP-DEVMGMT"
 
 typedef int HPMUD_DEVICE;       /* usb, parallel or jetdirect */
 #define HPMUD_DEVICE_MAX 2      /* zero is not used */

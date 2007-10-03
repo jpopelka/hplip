@@ -179,28 +179,28 @@ isSettable:  %s\n""" % (self.name, curValue,
         return value
 
 
-class _SaneIterator:
-    """ intended for ADF scans.
-    """
-
-    def __init__(self, cur_device):
-        self.cur_device = cur_device
-
-    def __iter__(self):
-        return self
-
-    def __del__(self):
-        self.cur_device.cancelScan()
-
-    def next(self):
-        try:
-            self.cur_device.startScan()
-        except error, v:
-            if v == 'Document feeder out of documents':
-                raise StopIteration
-            else:
-                raise
-        return self.cur_device.performScan(1)
+##class _SaneIterator:
+##    """ intended for ADF scans.
+##    """
+##
+##    def __init__(self, cur_device):
+##        self.cur_device = cur_device
+##
+##    def __iter__(self):
+##        return self
+##
+##    def __del__(self):
+##        self.cur_device.cancelScan()
+##
+##    def next(self):
+##        try:
+##            self.cur_device.startScan()
+##        except error, v:
+##            if v == 'Document feeder out of documents':
+##                raise StopIteration
+##            else:
+##                raise
+##        return self.cur_device.performScan(1)
         
 
 
@@ -303,15 +303,15 @@ class ScanDevice:
 
     def getParameters(self):
         """Return a 6-tuple holding all the current device settings:
-   (format, format_name, last_frame, (pixels_per_line, lines), depth, bytes_per_line)
-
-- format is the SANE frame type
-- format is one of 'grey', 'color' (RGB), 'red', 'green', 'blue'.
-- last_frame [bool] indicates if this is the last frame of a multi frame image
-- (pixels_per_line, lines) specifies the size of the scanned image (x,y)
-- lines denotes the number of scanlines per frame
-- depth gives number of pixels per sample
-"""
+           (format, format_name, last_frame, (pixels_per_line, lines), depth, bytes_per_line)
+        
+            - format is the SANE frame type
+            - format is one of 'grey', 'color' (RGB), 'red', 'green', 'blue'.
+            - last_frame [bool] indicates if this is the last frame of a multi frame image
+            - (pixels_per_line, lines) specifies the size of the scanned image (x,y)
+            - lines denotes the number of scanlines per frame
+            - depth gives number of pixels per sample
+        """
         return self.dev.getParameters()
 
     def getOptions(self):
@@ -319,19 +319,22 @@ class ScanDevice:
         return self.dev.getOptions()
         
     def startScan(self, byte_format='BGRA', update_queue=None, event_queue=None):
-        "Perform a scan with the current device."
+        """
+            Perform a scan with the current device.
+            Calls sane_start().
+        """
         if not self.isScanActive():
-            self.dev.startScan()
-
+            status = self.dev.startScan()
             self.format, self.format_name, self.last_frame, self.pixels_per_line, \
-                self.lines, self.depth, self.bytes_per_line = self.dev.getParameters()
-                
+            self.lines, self.depth, self.bytes_per_line = self.dev.getParameters()
+            
             self.scan_thread = ScanThread(self.dev, byte_format, update_queue, event_queue)
             self.scan_thread.scan_active = True
             self.scan_thread.start()
-            return True, self.lines * self.bytes_per_line
+            return True, self.lines * self.bytes_per_line, status
         else:
-            return False, 0
+            # Already active
+            return False, 0, scanext.SANE_STATUS_DEVICE_BUSY
             
     def cancelScan(self):
         "Cancel an in-progress scanning operation."
@@ -362,7 +365,7 @@ class ScanDevice:
         else:
             return False
             
-    def waitForScanThread(self):
+    def waitForScanDone(self):
         if self.scan_thread is not None and \
             self.scan_thread.isAlive() and \
             self.scan_thread.scan_active:
@@ -372,11 +375,22 @@ class ScanDevice:
             except KeyboardInterrupt:
                 pass
                 
-
-    def scanMulti(self):
-        return _SaneIterator(self)
-
-
+    def waitForScanActive(self):
+        time.sleep(0.5)
+        if self.scan_thread is not None:
+            while True:
+                #print self.scan_thread.isAlive()
+                #print self.scan_thread.scan_active
+                if self.scan_thread.isAlive() and \
+                    self.scan_thread.scan_active:
+                    return
+                
+                time.sleep(0.5)
+                #print "Waiting..."
+        
+##    def scanMulti(self):
+##        return _SaneIterator(self)
+        
     def closeScan(self):
         "Close the SANE device after a scan."
         self.dev.closeScan()
@@ -385,6 +399,7 @@ class ScanDevice:
 class ScanThread(threading.Thread):
     def __init__(self, device, byte_format='BGRA', update_queue=None, event_queue=None):
         threading.Thread.__init__(self)
+        self.scan_active = True
         self.dev = device
         self.update_queue = update_queue
         self.event_queue = event_queue
@@ -400,7 +415,7 @@ class ScanThread(threading.Thread):
         self.pad_bytes = -1
         self.total_read = 0
         self.byte_format = byte_format
-        self.scan_active = False
+        
         
     def updateQueue(self, status, bytes_read):
         if self.update_queue is not None:
@@ -408,7 +423,7 @@ class ScanThread(threading.Thread):
             time.sleep(0)
 
     def run(self):
-        self.scan_active = True
+        #self.scan_active = True
         self.format, self.format_name, self.last_frame, self.pixels_per_line, \
             self.lines, self.depth, self.bytes_per_line = self.dev.getParameters()
             
@@ -438,6 +453,7 @@ class ScanThread(threading.Thread):
                 except scanext.error, st:
                     self.updateQueue(st, 0)
                 
+                #print st
                 while st == scanext.SANE_STATUS_GOOD:
                     
                     if t:
@@ -546,6 +562,7 @@ class ScanThread(threading.Thread):
                     if self.checkCancel():
                         break
                     
+        #self.dev.cancelScan()
         self.buffer.seek(0)
         self.scan_active = False
         log.debug("Scan thread exiting...")

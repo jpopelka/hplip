@@ -202,8 +202,10 @@ def getSystemPPDs():
 
         for f in utils.walkFiles(sys_cfg.dirs.ppd, pattern="HP*ppd*;hp*ppd*", abs_paths=True):
             desc = getPPDDescription(f)
-            ppds[f] = desc
-            log.debug("%s: %s" % (f, desc))
+            
+            if 'foo2' not in desc:
+                ppds[f] = desc
+                log.debug("%s: %s" % (f, desc))
 
     else: # 1.2.x
         log.debug("(CUPS 1.2.x) Getting list of PPDs using CUPS_GET_PPDS...")
@@ -218,23 +220,26 @@ def getSystemPPDs():
         log.debug("Foomatic PPD base path = %s" % foomatic_ppd_path)
 
         for ppd in ppd_dict:
-            if 'HP-' in ppd or 'HP_' in ppd and ppd_dict[ppd]['ppd-make'] == 'HP':
-                desc = ppd_dict[ppd]['ppd-make-and-model']
-
-                # PPD files returned by CUPS_GET_PPDS (and by lpinfo -m)
-                # can be relative to /usr/share/ppd/ or to 
-                # /usr/share/cups/model/. Not sure why this is.
-                # Here we will try both and see which one it is...
-                path = os.path.join(foomatic_ppd_path, ppd)
+            if 'hp-' in ppd.lower() or 'hp_' in ppd.lower() and \
+                ppd_dict[ppd]['ppd-make'] == 'HP':
                 
-                if not os.path.exists(path):
-                    path = os.path.join(cups_ppd_path, ppd)
+                desc = ppd_dict[ppd]['ppd-make-and-model']
+                
+                if 'foo2' not in desc:
+                    # PPD files returned by CUPS_GET_PPDS (and by lpinfo -m)
+                    # can be relative to /usr/share/ppd/ or to 
+                    # /usr/share/cups/model/. Not sure why this is.
+                    # Here we will try both and see which one it is...
+                    path = os.path.join(foomatic_ppd_path, ppd)
                     
                     if not os.path.exists(path):
-                        path = ppd # foomatic: or some other driver
-
-                ppds[path] = desc
-                log.debug("%s: %s" % (path, desc))
+                        path = os.path.join(cups_ppd_path, ppd)
+                        
+                        if not os.path.exists(path):
+                            path = ppd # foomatic: or some other driver
+    
+                    ppds[path] = desc
+                    log.debug("%s: %s" % (path, desc))
 
     return ppds
 

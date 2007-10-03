@@ -31,6 +31,7 @@ import os.path, os
 import socket
 import syslog
 import time
+import operator
 
 CUPS_BACKEND_OK = 0 # Job completed successfully
 CUPS_BACKEND_FAILED = 1 # Job failed, use error-policy
@@ -118,7 +119,7 @@ if len( args ) == 0:
     cups11 = utils.to_bool(sys_cfg.configure.cups11, False)
     
     try:
-        probed_devices = device.probeDevices('usb,par', filter='fax')
+        probed_devices = device.probeDevices('usb,par', filter={'fax-type': (operator.gt, 0)})
     except Error:
         log.stderr("hpfax[%d]: error: Unable to contact HPLIP I/O (hpssd)." % pid)
         sys.exit(CUPS_BACKEND_FAILED)

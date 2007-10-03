@@ -111,28 +111,21 @@ cd hplip-2.7.x
 make
 make install
 </pre>
-<p>If HPLIP built and installs correctly you now need to check device access privileges. HPLIP installs a udev rule /etc/udev/rules.d/55-hpmud.rules. This file assigns all HP devices to the &quot;lp&quot; group. This means by default all hotplug USB and parallel port HP devices belong to &quot;lp&quot; group. A user must be a member of the &quot;lp&quot; group in order to access the device.</p>
-<p>You can use the &quot;groups&quot; command along with &quot;cat /etc/group&quot; to see what groups you belong to. If you are not a member of the &quot;lp&quot; group you must add yourself to the &quot;lp&quot; group. Then logoff/login and verify your change by re-running the &quot;groups&quot; command.</p>
-<p>If your HP device was already pluged in and this was the first time 55-hpmud.rules was installed. Your device may not be a memember of the &quot;lp&quot; group yet. If this is the case you must unplug/plug your device so that the hotplug system assigns your device to the &quot;lp&quot; group.</p>
-<p>The following commands can be used to verify a USB device belongs to the &quot;lp&quot; group with proper access privileges.</p>
+<p>If HPLIP built and installs correctly you now need to check device permissions. Most distributions set the default device permissions to root. This means ordinary users do not have access to the device. Usually this is not be a problem for printing, but it is a problem for scanning and the hp-toolbox. These applications will not see the device with-out proper permissions.</p>
+<p>To solve this device permissions problem HPLIP installs the udev rule /etc/udev/rules.d/55-hpmud.rules. In this file there is a rule for every HP product recognized by HPLIP. When a udev event occurs (ie: USB plug-and-play event), this rules file will be invoked. If the HP vendor-id and product-id matches one of the rules, the rule assigns device ownership and permissions for this device.</p>
+<p>For USB devices recognized by the 55-hpmud.rules file, the device file privileges will be set to the following. This example uses the lsusb command to determine the USB bus number and device number. Use these numbers to list the /dev/bus/usb/xxx/xxx device file.</p>
 <pre class="literal-block">
 $ lsusb
-Bus 003 Device 003: ID 03f0:5c11 Hewlett-Packard
-$ ls -l /dev/bus/usb/003/003
-crw-rw---- 1 root lp 189, 258 May 22 17:04 /dev/bus/usb/003/003
+Bus 002 Device 003: ID 03f0:6511 Hewlett-Packard
+$ ls -l /dev/bus/usb/002/003
+crw-rw-rw-- 1 lp lp 189, 258 May 22 17:04 /dev/bus/usb/003/003
 </pre>
-<p>This example can be used to verify a parallel device belongs to the &quot;lp&quot; group with proper access privileges.</p>
+<p>For parallel port devices recognized by the 55-hpmud.rules file, the device file privileges will be set to the following.</p>
 <pre class="literal-block">
 $ ls -l /dev/parport0
-crw-rw-rw- 1 root lp 99, 0 May 22 11:26 /dev/parport0
+crw-rw-rw- 1 lp lp 99, 0 May 22 11:26 /dev/parport0
 </pre>
-<p>Note in the above examples the permissions for the &quot;lp&quot; group must set to &quot;rw&quot; otherwise HPLIP will not find the device. If device permissions are not correct you will have to modify the udev rule that sets the device permissions (ie: MODE=&quot;0660&quot;). For example with Fedora the usb_device rule in /etc/udev/rules.d/50-udev.rules should look like the following.</p>
-<pre class="literal-block">
-ACTION==&quot;add&quot;, SUBSYSTEM==&quot;usb_device&quot;,
-     PROGRAM=&quot;/bin/sh -c 'K=%k; K=$${K#usbdev}; printf bus/usb/%%03i/%%03i $${K%%%%.*} $${K#*.}'&quot;,
-     NAME=&quot;%c&quot;, MODE=&quot;0660&quot;
-</pre>
-<p>Now you should be able to use your HP device with HPLIP.</p>
+<p>If the device permissions are set correctly. You should now be able to use HPLIP.</p>
 <p><strong>Caveats</strong></p>
 <ol class="arabic simple">
 <li>Network support requires libsnmp. HPLIP can be build without network support. At configure time use the following command.</li>
@@ -179,7 +172,17 @@ yum install sip
 <li>In order to run HPLIP with Fedora C4 you must disable SELinux protection. Under &quot;Security Level Configuration&quot;, select SELinux tab, un-click &quot;Enforcing Current:Permissive&quot;. The default SELinux policies will conflict with HPLIP I/O. If you want to run with SELinux enabled install the FC4 HPLIP rpm available at RH.</li>
 <li>HPLIP can be uninstalled with the &quot;make uninstall&quot; command.</li>
 <li>With FC4 64-bit systems use must use &quot;./configure --prefix=/usr --libdir=/usr/lib64&quot; in order to get libsane-hpaio installed correctly.</li>
+<li>The udev 55-hpmud.rules file sets the default Unix permissions to 666 which allow read/write to &quot;owner&quot;, &quot;group&quot; and &quot;other&quot; users. This means anybody can use this HP printer. If you want to change this user policy, then you must modify the 55-hpmud.rules file. For example you can set the Unix permissions to 660 (MODE=&quot;0660&quot;), then only users that are members of the &quot;lp&quot; group can use the device.</li>
+<li>The udev 55-hpmud.rules file wild-cards the USB product-id check based on known HP products. This means the current rules files should work on new future HP products.</li>
+<li>For older distributions (ie: Suse 10.0) the kernel usbfs used /proc/bus/usb/xxx/xxx instead of /dev/bus/usb/xxx/xxx device files. This means the standard udev rules will not work for setting device permissions. You can modify the 55-hpmud.rules file to set device permissions for /proc based systems with the following rule changes.</li>
 </ol>
+<pre class="literal-block">
+SYSFS{idVendor}==&quot;03f0&quot;, SYSFS{idProduct}==&quot;??11&quot;, PROGRAM=&quot;/bin/sh -c 'X=%k X=$${X#usbdev} B=$${X%%%%.*} D=$${X#*.}; printf /proc/bus/usb/%%03i/%%03i $$B $$D'&quot;, RUN+=&quot;/bin/sh -c 'chown lp: %c; chmod 666 %c'&quot;
+SYSFS{idVendor}==&quot;03f0&quot;, SYSFS{idProduct}==&quot;??02&quot;, PROGRAM=&quot;/bin/sh -c 'X=%k X=$${X#usbdev} B=$${X%%%%.*} D=$${X#*.}; printf /proc/bus/usb/%%03i/%%03i $$B $$D'&quot;, RUN+=&quot;/bin/sh -c 'chown lp: %c; chmod 666 %c'&quot;
+SYSFS{idVendor}==&quot;03f0&quot;, SYSFS{idProduct}==&quot;??12&quot;, PROGRAM=&quot;/bin/sh -c 'X=%k X=$${X#usbdev} B=$${X%%%%.*} D=$${X#*.}; printf /proc/bus/usb/%%03i/%%03i $$B $$D'&quot;, RUN+=&quot;/bin/sh -c 'chown lp: %c; chmod 666 %c'&quot;
+SYSFS{idVendor}==&quot;03f0&quot;, SYSFS{idProduct}==&quot;??04&quot;, PROGRAM=&quot;/bin/sh -c 'X=%k X=$${X#usbdev} B=$${X%%%%.*} D=$${X#*.}; printf /proc/bus/usb/%%03i/%%03i $$B $$D'&quot;, RUN+=&quot;/bin/sh -c 'chown lp: %c; chmod 666 %c'&quot;
+SYSFS{idVendor}==&quot;03f0&quot;, SYSFS{idProduct}==&quot;??17&quot;, PROGRAM=&quot;/bin/sh -c 'X=%k X=$${X#usbdev} B=$${X%%%%.*} D=$${X#*.}; printf /proc/bus/usb/%%03i/%%03i $$B $$D'&quot;, RUN+=&quot;/bin/sh -c 'chown lp: %c; chmod 666 %c'&quot;
+</pre>
 </div>
 <div class="section">
 <h1><a id="hpijs-portability-reference" name="hpijs-portability-reference">HPIJS Portability Reference</a></h1>
@@ -227,7 +230,7 @@ ln -s /usr/share/fonts/default/Type1 /usr/share/ghostscript/fonts
 </div>
 
 <hr size="1"/>
-<center><small>Page last updated: Thu May 24 16:32:53 2007; HPLIP Version: 2.7.7</small></center>
+<center><small>Page last updated: Tue Sep 25 13:02:12 2007; HPLIP Version: 2.7.9</small></center>
 </div>
 </td></tr></table>
 </div>

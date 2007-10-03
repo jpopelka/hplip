@@ -27,15 +27,24 @@ from prnt import pcl, ldl, colorcal
 
 # ********************** Align **********************
 
-def AlignType1(dev, loadpaper_ui): # Auto VIP
+def AlignType1(dev, loadpaper_ui): # Auto VIP (using embedded PML)
     ok = loadpaper_ui()
     if ok:
         dev.writeEmbeddedPML(pml.OID_AUTO_ALIGNMENT,
                              pml.AUTO_ALIGNMENT, style=0, 
-                             direct=False)
+                             direct=True)
         dev.closePrint()
 
     return ok
+    
+def AlignType1PML(dev, loadpaper_ui): # Auto VIP (using PML)
+    ok = loadpaper_ui()
+    if ok:
+        dev.setPML(pml.OID_AUTO_ALIGNMENT, pml.AUTO_ALIGNMENT)
+        dev.closePML()
+
+    return ok
+
 
 
 def AlignType2(dev, loadpaper_ui, align_ui, bothpens_ui): # 8xx

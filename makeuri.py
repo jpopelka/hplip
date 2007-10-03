@@ -90,7 +90,8 @@ try:
                                   'port=',
                                 ] 
                               ) 
-except getopt.GetoptError:
+except getopt.GetoptError, e:
+    log.error(e.msg)
     usage()
     sys.exit(1)
 

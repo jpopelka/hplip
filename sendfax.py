@@ -40,8 +40,8 @@ log.set_module('hp-sendfax')
 USAGE = [(__doc__, "", "name", True),
          ("Usage: hp-sendfax [PRINTER|DEVICE-URI] [OPTIONS] [MODE] [FILES]", "", "summary", True),
          utils.USAGE_ARGS,
-         utils.USAGE_DEVICE,
-         utils.USAGE_PRINTER,
+         ("To specify a fax-URI:", "-d<device-uri> or --device=<device-uri>", "option", False),
+         ("To specify a CUPS fax:", "--fax=<fax>", "option", False),
          utils.USAGE_SPACE,
          ("[MODE]", "", "header", False),
          ("Enter graphical UI mode:", "-u or --gui (Default)", "option", False),
@@ -59,7 +59,7 @@ USAGE = [(__doc__, "", "name", True),
          ("A list of files to add to the fax job.", "(Required for -n, optional for -u)", "option", True),
          utils.USAGE_NOTES,
          utils.USAGE_STD_NOTES1,
-         utils.USAGE_STD_NOTES2,
+         ("2. If --fax=\* is specified, the default CUPS fax (printer queue) will be used.", "", "note", False),
          ("3. Coversheets are not supported in non-interactive mode (-n)", "", "note", False),
          ("4. Fax numbers and/or recipients should be listed in comma separated lists (-n only).", "", "note", False),
          utils.USAGE_SPACE,
@@ -90,8 +90,8 @@ bus = device.DEFAULT_PROBE_BUS
 prettyprint = False
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:],'l:hz:d:p:b:g:unf:r:t', 
-        ['device=', 'printer=', 'level=', 
+    opts, args = getopt.getopt(sys.argv[1:],'l:hz:d:b:g:unf:r:t', 
+        ['device=', 'fax=', 'level=', 
          'help', 'help-rest', 
          'help-man', 'logfile=', 'bus=',
          'gui', 'non-interactive', 'logging=',
@@ -135,7 +135,8 @@ for o, a in opts:
     elif o in ('-d', '--device'):
         device_uri = a
 
-    elif o in ('-p', '--printer'):
+    #elif o in ('-p', '--printer'):
+    elif o == '--fax':
         printer_name = a
 
     elif o in ('-b', '--bus'):
@@ -418,9 +419,12 @@ else: # NON_INTERACTIVE_MODE
         max_deviceid_size, max_printer_size = 0, 0
 
         for p in cups_printers:
-            back_end, is_hp, bus, model, serial, dev_file, host, port = \
-                device.parseDeviceURI(p.device_uri)
-
+            try:
+                back_end, is_hp, bus, model, serial, dev_file, host, port = \
+                    device.parseDeviceURI(p.device_uri)
+            except Error:
+                continue
+                
             if back_end == 'hpfax':
                 printers.append((p.name, p.device_uri))
                 max_deviceid_size = max(len(p.device_uri), max_deviceid_size)

@@ -20,16 +20,13 @@
 
 */
 -->
-<html xmlns="htmlhttp://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html>
 <head>
-    
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta http-equiv="PRAGMA" content="NO-CACHE" />
-    <meta http-equiv="EXPIRES" content="Mon, 22 Jul 2002 11:12:01 GMT" />
-    <meta http-equiv="Content-Language" content="en-us" />
-    <meta http-equiv="content-type" content="text/html; charset=us-ascii" />
     <link rel="stylesheet" type="text/css" href="styles/hplip.css" />
     <script type="text/javascript" src="scripts/hplip.js"></script>
-    <script type="text/javascript" src="scripts/xml_loader.js"></script>
+    <script type="text/javascript" src="scripts/misc_code.js"></script>
     <script type="text/javascript">
     <!--
     var statusValue = -1;
@@ -38,23 +35,20 @@
     var operationNumber = 0;
 
     function todoOnLoad() {
-        header = '$header_string'; 
-        subheader = '$sub_header_string'; 
-        generateHeader(header, subheader);
         getProgressOperationNumber();
         setUpCircular();
         document.getElementById("hiddenDiv").style.dislpay = 'none';
     };
 
     function setUpCircular() {
-        document.getElementById("progressText").innerHTML="Installing...";
+        document.getElementById("progressText").innerHTML='$progress_text';
         document.getElementById("progressBar").innerHTML="<img src='images/circular.gif' alt='progress'>";
         loopCircular();
     };
 
     function getProgressUpdate(filename) {
         //var localPath = GetLocalDataFile(filename);
-	var localPath = "http://localhost:8080/" +  filename
+	      var localPath = "http://localhost:8888/" +  filename
         var http = new XmlLoader(localPath);
         var responseText = http.submitLoaderRequest("POST", false);
             responseTextCompiled += responseText;
@@ -73,14 +67,14 @@
     
     
     function retryProgress() {
-	    var localPath = "http://localhost:8080/retry_progress"
+	    var localPath = "http://localhost:8888/retry_progress"
         var http = new XmlLoader(localPath);
         var serverResponse = http.submitLoaderRequest("POST", false);
     }
     
     
     function getProgressOperationNumber() {
-	    var localPath = "http://localhost:8080/operation_number"
+	    var localPath = "http://localhost:8888/operation_number"
         var http = new XmlLoader(localPath);
         var serverResponse = http.submitLoaderRequest("POST", false);
         operationNumber = parseInt(serverResponse);
@@ -114,7 +108,7 @@
 
     function getProgressStatus(filename) {
         //var localPath = GetLocalDataFile(filename);
-	var localPath = "http://localhost:8080/" +  filename
+	      var localPath = "http://localhost:8888/" +  filename
         var http = new XmlLoader(localPath);
         var serverResponse = http.submitLoaderRequest("POST", false);
         statusValue = parseInt(serverResponse);
@@ -134,11 +128,13 @@
             window.location.href = "error_command_failed";
             // Call the controller code here with the code positive all.
         } else if( 0 == statusValue ) {  // Done no Error
-            document.getElementById("progressText").innerHTML = "Installation Progress: Operation Completed";
-            document.getElementById("progressBar").innerHTML = null;
-            toggleLayer("hiddenDiv");
+            //document.getElementById("progressText").innerHTML = "Installation Progress: Operation Completed";
+            //document.getElementById("progressBar").innerHTML = null;
+            //toggleLayer("hiddenDiv");
             //setTimeout("window.location.href = 'progress_controller';", 1000)
             // Call the controller code here with the code zero.
+            indexClickActions( "next_button", "progress_controller");
+            
         } else {
             document.getElementById("progressText").innerHTML = "Got into a bad state: ";
             document.getElementById("progressBar").innerHTML = null;
@@ -151,15 +147,22 @@
     };
     -->
     </script>
-
-
 <title>$installer_title</title>
 </head>
 
 <body onload="todoOnLoad();">
 
 <!-- Header Div -->
-<div id="header_box" class="background_box"></div>
+<div id="header_box" class="background_box">
+  <div class='header_title_class'>
+    <div id='hp_blue_logo'><img src='images/hplogo.png' alt=''/></div>
+    <div id='header_title'>$header_string</div>
+    <div id='header_title2'>$header_string</div>
+    <div id='header_subtitle'>$sub_header_string</div>
+    <div id='header_subtitle2'>$sub_header_string</div>
+    <div id='tux_logo'><img src='images/tux.png' alt=''/></div>
+  </div>
+</div>
 
 
 <!-- Body Div -->
@@ -180,8 +183,8 @@
 
     <div id="quit_button" OnSelectStart='return false;' onClick='todoOnQuit("quit");'> <!-- indexClickActions( "quit_button", "progress_cancel");' -->
         <img src="../images/button1.png" width="100" height="35" alt="" >
-        <div id="cancel2HiliteText">cancel_button</div>
-        <div id="cancel2Text">cancel_button</div>
+        <div id="cancel2HiliteText">$cancel_button</div>
+        <div id="cancel2Text">$cancel_button</div>
     </div>
 
     <div id="retry_button" OnSelectStart='return false;' onClick='indexClickActions( "retry_button", "retry_progress");'>

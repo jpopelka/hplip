@@ -1245,14 +1245,17 @@ DRIVER_ERROR PrintContext::SelectDevice
     {
         return UNSUPPORTED_PRINTER;
     }
-    thePrinter = pPFI->CreatePrinter(pSS, familyHandle);
+    thePrinter = pPFI->CreatePrinter (pSS, familyHandle);
+    if (thePrinter->constructor_error != NO_ERROR)
+    {
+        return thePrinter->constructor_error;
+    }
 
+    const char* model = pPFI->GetFamilyName (familyHandle);
 
-    const char* model = pPFI->GetFamilyName(familyHandle);
+    pSS->AdjustIO (thePrinter->IOMode, model);
 
-    pSS->AdjustIO(thePrinter->IOMode, model);
-
-    PAPER_SIZE ps = thePrinter->MandatoryPaperSize();
+    PAPER_SIZE ps = thePrinter->MandatoryPaperSize ();
     if (ps != UNSUPPORTED_SIZE)
     {
         if ((PSM[ps].fPhysicalPageX < PSM[thePaperSize].fPhysicalPageX))

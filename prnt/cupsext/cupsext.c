@@ -1036,7 +1036,8 @@ PyObject * getPPDList( PyObject * self, PyObject * args )
     ipp_attribute_t * attr;
     //PyObject * ppd_list;
     http_t *http = NULL;     /* HTTP object */
-
+    //char buf[1024];
+    
     result = PyDict_New ();
 
     if ( ( http = httpConnectEncrypt( cupsServer(), ippPort(), cupsEncryption() ) ) == NULL )
@@ -1057,10 +1058,16 @@ PyObject * getPPDList( PyObject * self, PyObject * args )
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
              "attributes-natural-language", NULL, language->language);
 
+    //ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+    //             NULL, "ipp://localhost/printers/");
+    
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-                 NULL, "ipp://localhost/printers/");
+                 NULL, "ipp://localhost/printers/officejet_4100");
 
-   /*
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "requested-attributes",
+                 NULL, "all");
+   
+    /*
     * Do the request and get back a response...
     */
 
@@ -1085,12 +1092,18 @@ PyObject * getPPDList( PyObject * self, PyObject * args )
                 PyObject *val = NULL;
 
                 if (!strcmp (attr->name, "ppd-name") && attr->value_tag == IPP_TAG_NAME)
+                {
                     ppdname = attr->values[0].string.text;
+                
+                    //sprintf( buf, "print '%s'", ppdname);
+                    //PyRun_SimpleString( buf );
+                }
 
-                else if ((!strcmp (attr->name, "ppd-natural-language") && attr->value_tag == IPP_TAG_LANGUAGE) ||
-                    (!strcmp (attr->name, "ppd-make-and-model") && attr->value_tag == IPP_TAG_TEXT) ||
-                    (!strcmp (attr->name, "ppd-make") && attr->value_tag == IPP_TAG_TEXT) ||
-                    (!strcmp (attr->name, "ppd-device-id") && attr->value_tag == IPP_TAG_TEXT))
+                else if (attr->value_tag == IPP_TAG_TEXT || attr->value_tag == IPP_TAG_NAME || attr->value_tag == IPP_TAG_KEYWORD)
+                //else if ((!strcmp (attr->name, "ppd-natural-language") && attr->value_tag == IPP_TAG_LANGUAGE) ||
+                //    (!strcmp (attr->name, "ppd-make-and-model") && attr->value_tag == IPP_TAG_TEXT) ||
+                //    (!strcmp (attr->name, "ppd-make") && attr->value_tag == IPP_TAG_TEXT) ||
+                //    (!strcmp (attr->name, "ppd-device-id") && attr->value_tag == IPP_TAG_TEXT))
                 {
                     val = PyUnicode_DecodeUTF8 (attr->values[0].string.text,
                                                 strlen (attr->values[0].string.text),
@@ -1261,7 +1274,7 @@ PyObject * getPPDOption( PyObject * self, PyObject * args )
 
 PyObject * getPPDPageSize( PyObject * self, PyObject * args )
 {
-    char buf[1024];
+    //char buf[1024];
 
     if ( ppd != NULL )
     {
@@ -1272,8 +1285,8 @@ PyObject * getPPDPageSize( PyObject * self, PyObject * args )
 
         page_size = ppdFindMarkedChoice( ppd, "PageSize" );
 
-        sprintf( buf, "print '%s'", page_size->text );
-        PyRun_SimpleString( buf );
+        //sprintf( buf, "print '%s'", page_size->text );
+        //PyRun_SimpleString( buf );
 
         if ( page_size == NULL )
             goto bailout;
@@ -1283,8 +1296,8 @@ PyObject * getPPDPageSize( PyObject * self, PyObject * args )
         if ( size == NULL )
             goto bailout;
 
-        sprintf( buf, "print '%s'", size->name );
-        PyRun_SimpleString( buf );
+        //sprintf( buf, "print '%s'", size->name );
+        //PyRun_SimpleString( buf );
 
         width = ppdPageWidth( ppd, page_size->text );
         length = ppdPageLength( ppd, page_size->text );
@@ -1715,6 +1728,10 @@ PyObject * getPassword( PyObject * self, PyObject * args )
         return Py_BuildValue( "" );
     }
 }
+
+
+
+
 
 
 // ***************************************************************************************************

@@ -48,11 +48,14 @@
 #include <dlfcn.h>
 #endif
 
+extern "C"
+{
 int (*HPLJJRCompress) (BYTE       *pbOutBuffer, 
                        uint32_t   *outlen, 
                        BYTE       *inmem, 
                        const uint32_t iLogicalImageWidth,
                        const uint32_t iLogicalImageHeight);
+}
 
 APDK_BEGIN_NAMESPACE
 

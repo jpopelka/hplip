@@ -67,7 +67,8 @@ try:
     opts, args = getopt.getopt(sys.argv[1:], 'P:p:d:hl:g',
                                ['printer=', 'device=', 'help', 
                                 'help-rest', 'help-man', 'logging=', 'help-desc'])
-except getopt.GetoptError:
+except getopt.GetoptError, e:
+    log.error(e.msg)
     usage()
 
 printer_name = None

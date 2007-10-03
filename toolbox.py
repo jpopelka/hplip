@@ -89,7 +89,8 @@ try:
     opts, args = getopt.getopt(sys.argv[1:], 'l:hg', 
         ['level=', 'help', 'help-rest', 'help-man', 'help-desc'])
 
-except getopt.GetoptError:
+except getopt.GetoptError, e:
+    log.error(e.msg)
     usage()
 
 if os.getenv("HPLIP_DEBUG"):
@@ -188,7 +189,7 @@ try:
     log.debug("Starting GUI loop...")
     app.exec_loop()
 except KeyboardInterrupt:
-    pass
+    sys.exit(0)
 except:
     log.exception()
 

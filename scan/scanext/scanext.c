@@ -196,11 +196,12 @@ static PyObject *startScan (_ScanDevice * self, PyObject * args)
     st = sane_start (self->h);
     Py_END_ALLOW_THREADS
 
-    if (st != SANE_STATUS_GOOD)
+    if (st != SANE_STATUS_GOOD && 
+        st != SANE_STATUS_EOF && 
+        st != SANE_STATUS_NO_DOCS)
           return raiseSaneError(st);
 
-    Py_INCREF (Py_None);
-    return Py_None;
+    return Py_BuildValue("i", st);
 }
 
 static PyObject *cancelScan (_ScanDevice * self, PyObject * args)
@@ -462,7 +463,9 @@ static PyObject *readScan (_ScanDevice * self, PyObject * args)
     //Py_END_ALLOW_THREADS
     Py_BLOCK_THREADS
 
-    if (st != SANE_STATUS_GOOD && st != SANE_STATUS_EOF)
+    if (st != SANE_STATUS_GOOD && 
+        st != SANE_STATUS_EOF && 
+        st != SANE_STATUS_NO_DOCS)
     {
         sane_cancel(self->h);
         //Py_BLOCK_THREADS

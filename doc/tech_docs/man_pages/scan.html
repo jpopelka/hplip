@@ -93,8 +93,8 @@ hp-scan
 <p><strong>[SANE-DEVICE-URI]</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="50%" />
-<col width="50%" />
+<col width="49%" />
+<col width="51%" />
 </colgroup>
 <tbody valign="top">
 <tr><td><em>SANE device URI:</em></td>
@@ -108,8 +108,8 @@ hp-scan
 <p><strong>[MODE]</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="50%" />
-<col width="50%" />
+<col width="49%" />
+<col width="51%" />
 </colgroup>
 <tbody valign="top">
 <tr><td><em>Enter graphical UI mode:</em></td>
@@ -123,8 +123,8 @@ hp-scan
 <p><strong>[-n OPTIONS] (General) (Not applicable to GUI mode)</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="50%" />
-<col width="50%" />
+<col width="49%" />
+<col width="51%" />
 </colgroup>
 <tbody valign="top">
 <tr><td><em>Scan destinations:</em></td>
@@ -151,13 +151,16 @@ hp-scan
 <tr><td><em>Image contrast:</em></td>
 <td>--contrast=&lt;contrast&gt;</td>
 </tr>
+<tr><td><em>ADF mode (EXPERIMENTAL):</em></td>
+<td>--adf (Note, only PDF output is supported when using the ADF)</td>
+</tr>
 </tbody>
 </table>
 <p><strong>[-n OPTIONS] (Scan area) (Not applicable to GUI mode)</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="50%" />
-<col width="50%" />
+<col width="49%" />
+<col width="51%" />
 </colgroup>
 <tbody valign="top">
 <tr><td><em>Specify the units for area/box measurements:</em></td>
@@ -237,8 +240,8 @@ hp-scan
 <p><strong>[-n OPTIONS] ('file' dest) (Not applicable to GUI mode)</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="50%" />
-<col width="50%" />
+<col width="49%" />
+<col width="51%" />
 </colgroup>
 <tbody valign="top">
 <tr><td><em>Filename for 'file' destination:</em></td>
@@ -249,8 +252,8 @@ hp-scan
 <p><strong>[-n OPTIONS] ('pdf' dest) (Not applicable to GUI mode)</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="50%" />
-<col width="50%" />
+<col width="49%" />
+<col width="51%" />
 </colgroup>
 <tbody valign="top">
 <tr><td><em>PDF viewer application:</em></td>
@@ -261,8 +264,8 @@ hp-scan
 <p><strong>[-n OPTIONS] ('viewer' dest) (Not applicable to GUI mode)</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="50%" />
-<col width="50%" />
+<col width="49%" />
+<col width="51%" />
 </colgroup>
 <tbody valign="top">
 <tr><td><em>Image viewer application:</em></td>
@@ -273,8 +276,8 @@ hp-scan
 <p><strong>[-n OPTIONS] ('editor' dest) (Not applicable to GUI mode)</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="50%" />
-<col width="50%" />
+<col width="49%" />
+<col width="51%" />
 </colgroup>
 <tbody valign="top">
 <tr><td><em>Image editor application:</em></td>
@@ -285,8 +288,8 @@ hp-scan
 <p><strong>[-n OPTIONS] ('email' dest) (Not applicable to GUI mode)</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="50%" />
-<col width="50%" />
+<col width="49%" />
+<col width="51%" />
 </colgroup>
 <tbody valign="top">
 <tr><td><em>From: address for 'email' dest:</em></td>
@@ -312,8 +315,8 @@ hp-scan
 <p><strong>[-n OPTIONS] ('fax' dest) (Not applicable to GUI mode)</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="50%" />
-<col width="50%" />
+<col width="49%" />
+<col width="51%" />
 </colgroup>
 <tbody valign="top">
 <tr><td><em>Fax queue/printer:</em></td>
@@ -324,8 +327,8 @@ hp-scan
 <p><strong>[-n OPTIONS] ('printer' dest) (Not applicable to GUI mode)</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="50%" />
-<col width="50%" />
+<col width="49%" />
+<col width="51%" />
 </colgroup>
 <tbody valign="top">
 <tr><td><em>Printer queue/printer:</em></td>
@@ -336,8 +339,8 @@ hp-scan
 <p><strong>[-n OPTIONS] (advanced) (Not applicable to GUI mode)</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="50%" />
-<col width="50%" />
+<col width="49%" />
+<col width="51%" />
 </colgroup>
 <tbody valign="top">
 <tr><td><em>Set the scanner compression mode:</em></td>
@@ -348,8 +351,8 @@ hp-scan
 <p><strong>[OPTIONS]</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="50%" />
-<col width="50%" />
+<col width="49%" />
+<col width="51%" />
 </colgroup>
 <tbody valign="top">
 <tr><td><em>Set the logging level:</em></td>
@@ -369,8 +372,8 @@ hp-scan
 <p><strong>Notes:</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="50%" />
-<col width="50%" />
+<col width="49%" />
+<col width="51%" />
 </colgroup>
 <tbody valign="top">
 <tr><td colspan="2"><ol class="first last arabic simple">
@@ -399,7 +402,7 @@ hp-scan
 </td>
 </tr>
 <tr><td colspan="2"><ol class="first last arabic simple" start="6">
-<li>The following features are not yet implemented: GUI mode, ADF scanning, batch scanning, film/negative scanning, contrast adjustment, brightness adjustment, autocrop, resize to axb, resize to xKB,</li>
+<li>The following features are not yet implemented: GUI mode, batch scanning, film/negative scanning, contrast adjustment, brightness adjustment, autocrop, resize to axb, resize to xKB,</li>
 </ol>
 </td>
 </tr>
@@ -408,8 +411,8 @@ hp-scan
 <p><strong>Examples:</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="50%" />
-<col width="50%" />
+<col width="49%" />
+<col width="51%" />
 </colgroup>
 <tbody valign="top">
 <tr><td><em>Quickly (low-res) scan entire page in color to file:</em></td>
@@ -432,7 +435,7 @@ hp-scan
 </div>
 
 <hr size="1"/>
-<center><small>Page last updated: Wed Aug  1 15:17:31 2007; HPLIP Version: 2.7.7</small></center>
+<center><small>Page last updated: Fri Sep 28 16:45:00 2007; HPLIP Version: 2.7.9</small></center>
 </div>
 </td></tr></table>
 </div>

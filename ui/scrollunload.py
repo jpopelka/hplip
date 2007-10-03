@@ -123,19 +123,19 @@ class ScrollUnloadView(ScrollView):
                 self.pc = photocard.PhotoCard(None, self.cur_device.device_uri, self.cur_printer)
             except Error, e:
                 QApplication.restoreOverrideCursor()
-                self.form.FailureUI("An error occured: %s" % e[0])
+                self.form.FailureUI(self.__tr("An error occured: %s" % e[0]))
                 self.cleanup(EVENT_PCARD_UNABLE_TO_MOUNT)
                 return False
 
             if self.pc.device.device_uri is None and self.cur_printer:
                 QApplication.restoreOverrideCursor()
-                self.form.FailureUI("Printer '%s' not found." % self.cur_printer)
+                self.form.FailureUI(self.__tr("Printer '%s' not found." % self.cur_printer))
                 self.cleanup(EVENT_PCARD_JOB_FAIL)
                 return False
 
             if self.pc.device.device_uri is None and self.cur_device.device_uri:
                 QApplication.restoreOverrideCursor()
-                self.form.FailureUI("Malformed/invalid device-uri: %s" % self.device_uri)
+                self.form.FailureUI(self.__tr("Malformed/invalid device-uri: %s" % self.device_uri))
                 self.cleanup(EVENT_PCARD_JOB_FAIL)
 
                 return False
@@ -144,7 +144,7 @@ class ScrollUnloadView(ScrollView):
                     self.pc.mount()
                 except Error:
                     QApplication.restoreOverrideCursor()
-                    self.form.FailureUI("<b>Unable to mount photo card on device.</b><p>Check that device is powered on and photo card is correctly inserted.")
+                    self.form.FailureUI(self.__tr("<b>Unable to mount photo card on device.</b><p>Check that device is powered on and photo card is correctly inserted."))
                     #self.pc.umount()
                     self.cleanup(EVENT_PCARD_UNABLE_TO_MOUNT)
                     return
@@ -276,7 +276,7 @@ class ScrollUnloadView(ScrollView):
             self.pc.get_exif_path(item.path) and \
             not item.thumbnail_set:
 
-            popup.insertItem("Show Thumbnail", self.showThumbNail)
+            popup.insertItem(self.__tr("Show Thumbnail", self.showThumbNail))
 
         popup.popup(pos)
 

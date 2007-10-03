@@ -113,8 +113,8 @@ class ScrollStatusView(ScrollView):
                 desc = self.getTimeDeltaDesc(hist[:9])
             else:
                 desc = ''
-        
-        tt = QString("<b>%1 %2</b>").arg(time.strftime("%x %H:%M:%S", hist[:9])).arg(desc).stripWhiteSpace()
+
+        tt = QString("<b>%1 %2</b>").arg(QDateTime (QDate(yr, mt, dy), QTime(hr, mi, sec)).toString()).arg(desc).stripWhiteSpace()
         
         self.addGroupHeading(unicode(tt), tt)
         
@@ -213,7 +213,6 @@ class ScrollStatusView(ScrollView):
 
         self.row += 1
         self.addWidget(widget, str(self.row))
-
 
 
     def getTimeDeltaDesc(self, past):

@@ -504,6 +504,17 @@ static int set_scan_parameters(HPAIO_RECORD *hpaio)
    if (PmlRequestSet(hpaio->deviceid, hpaio->cmd_channelid, hpaio->pml.objCompressionFactor) == ERROR)
       goto bugout;
 
+#if 0  /* Removed, let host side perform contrast adjustments. des */
+   /* Set scan contrast. */
+   if (SANE_OPTION_IS_ACTIVE(hpaio->option[OPTION_CONTRAST].cap))
+   {
+      /* Note although settable, contrast is ignored by LJ3320, CLJ2840, LJ3055, LJ3050. */
+      PmlSetIntegerValue(hpaio->pml.objContrast, PML_TYPE_SIGNED_INTEGER, hpaio->currentContrast);
+      if (PmlRequestSet(hpaio->deviceid, hpaio->cmd_channelid, hpaio->pml.objContrast) == ERROR)
+         goto bugout;
+   }
+#endif
+
    /* Set copier reduction. */
    PmlSetIntegerValue(hpaio->pml.objCopierReduction, PML_TYPE_SIGNED_INTEGER, copierReduction);
    if (PmlRequestSet(hpaio->deviceid, hpaio->cmd_channelid, hpaio->pml.objCopierReduction) == ERROR)

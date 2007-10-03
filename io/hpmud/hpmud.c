@@ -49,7 +49,7 @@ void __attribute__ ((visibility ("hidden"))) sysdump(const void *data, int size)
     for(n=1;n<=size;n++) {
         if (n%16 == 1) {
             /* store address for this line */
-            snprintf(addrstr, sizeof(addrstr), "%.4x", (p-(unsigned char *)data) && 0xffff);
+            snprintf(addrstr, sizeof(addrstr), "%.4d", (int)((p-(unsigned char *)data) & 0xffff));
         }
             
         c = *p;
@@ -221,6 +221,10 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) service_to_channel(mud
    else if (strncasecmp(sn, "hp-configuration-download", 25) == 0)
    {
       *index = HPMUD_CONFIG_DOWNLOAD_CHANNEL;
+   }
+   else if (strncasecmp(sn, "hp-devmgmt", 10) == 0)
+   {
+      *index = HPMUD_DEVMGMT_CHANNEL;
    }
    else
    {
