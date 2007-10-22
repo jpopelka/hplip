@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'ui/aboutdlg_base.ui'
 #
-# Created: Fri Feb 2 13:51:32 2007
-#      by: The PyQt User Interface Compiler (pyuic) 3.15.1
+# Created: Mon Oct 15 16:07:30 2007
+#      by: The PyQt User Interface Compiler (pyuic) 3.17
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -108,9 +108,9 @@ class AboutDlg_base(QDialog):
         self.ToolboxVersionText.setText(self.__tr("0.0.0"))
         self.textLabel2.setText(self.__tr("<b>Authors and Contributors:</b>\n"
 "David Suffield, Don Welch, Shiyun Yie, Raghothama Cauligi, John Oleinik, Cory Meisch, Foster Nuffer, Pete Parks, Jacqueline Pitter, David Paschal, \n"
-"Steve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter"))
+"Steve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter, Linus Araque, Mark Crawford, Charlie Moore"))
         self.textLabel3.setText(self.__tr("<b>License and Copyright:</b>\n"
-"(c) Copyright 2006 Hewlett-Packard Development Company, L.P. This software is licensed under the GNU General Public License (GPL), BSD, and MIT licenses. See the software sources for details."))
+"(c) Copyright 2007 Hewlett-Packard Development Company, L.P. This software is licensed under the GNU General Public License (GPL), BSD, and MIT licenses. See the software sources for details."))
 
 
     def __tr(self,s,c = None):

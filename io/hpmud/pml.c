@@ -395,6 +395,8 @@ enum HPMUD_RESULT hpmud_set_pml(HPMUD_DEVICE device, HPMUD_CHANNEL channel, cons
    *pml_result = status;
    stat = HPMUD_R_OK;
 
+   DBG("set_pml result pmlresult=%x\n", status);
+
 bugout:
    return stat;
 }

@@ -829,7 +829,7 @@ else: # NON_INTERACTIVE_MODE
     from scan import sane
     import scanext
     import cStringIO
-    import popen2
+    import subprocess
 
     try:
         import Image
@@ -1044,7 +1044,8 @@ else: # NON_INTERACTIVE_MODE
                         try:
                             status, bytes_read = update_queue.get(0)
                             
-                            if log.get_level() >= log.LOG_LEVEL_INFO:
+                            #if log.get_level() >= log.LOG_LEVEL_INFO:
+                            if not log.is_debug():
                                 pm.update(int(100*bytes_read/expected_bytes), 
                                     utils.format_bytes(bytes_read))
                             
@@ -1073,7 +1074,7 @@ else: # NON_INTERACTIVE_MODE
             while update_queue.qsize():
                 status, bytes_read = update_queue.get(0)
                 
-                if log.get_level() >= log.LOG_LEVEL_INFO:
+                if not log.is_debug():
                     pm.update(int(100*bytes_read/expected_bytes), 
                         utils.format_bytes(bytes_read))
         
@@ -1082,7 +1083,7 @@ else: # NON_INTERACTIVE_MODE
 ##                elif status == scanext.SANE_STATUS_NO_DOCS:
 ##                    log.debug("NO DOCS")
 ##                    no_docs = True
-                #elif status != scanext.SANE_STATUS_GOOD:
+
                 if status != scanext.SANE_STATUS_GOOD:
                     log.error("SANE error %d" % status)
                     sys.exit(1)
@@ -1311,26 +1312,21 @@ else: # NON_INTERACTIVE_MODE
 
             if sendmail:
                 sendmail = os.path.join(sendmail, 'sendmail')
-                sendmail += ' -t -r %s' % email_from
+                cmd = [sendmail,'-t','-r',email_from]
 
-                log.debug(sendmail)
-                std_out, std_in, std_err = popen2.popen3(sendmail) 
-                std_in.write(msg.as_string())
-                std_in.close()
-
-                while True:
-                    update_spinner()
-                    r, w, e = select.select([std_err], [], [], 1.0)
-
-                    if r:
-                        break
-
+                log.debug(repr(cmd))
+                err = None
+                try:
+                    sp = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    std_out, std_err = sp.communicate(msg.as_string())
+                    if std_err != '':
+                        err = std_err
+                except OSError, e:
+                    err = str(e)
                 cleanup_spinner()
 
-                if r:
-                    err = std_err.read()
-                    if err:
-                        log.error(repr(err))
+                if err:
+                    log.error(repr(err))
 
             else:
                 log.error("Mail send failed. 'sendmail' not found.")

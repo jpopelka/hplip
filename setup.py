@@ -110,10 +110,10 @@ def restart_cups():
 log.set_module('hp-setup')
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'p:n:d:hl:b:t:f:axgui',
+    opts, args = getopt.getopt(sys.argv[1:], 'p:n:d:hl:b:t:f:axguiq:',
         ['printer=', 'fax=', 'device=', 'help', 'help-rest', 'help-man',
          'logging=', 'bus=', 'type=', 'auto', 'port=', 'gui', 'interactive',
-         'help-desc', 'username='])
+         'help-desc', 'username=', 'lang='])
 except getopt.GetoptError, e:
     log.error(e.msg)
     usage()
@@ -132,6 +132,7 @@ jd_port = 1
 mode = GUI_MODE
 mode_specified = False
 username = ''
+loc = None
 
 if os.getenv("HPLIP_DEBUG"):
     log.set_level('debug')
@@ -214,6 +215,13 @@ for o, a in opts:
 
     elif o == '--username':
         username = a
+        
+    elif o in ('-q', '--lang'):
+        if a.strip() == '?':
+            utils.show_languages()
+            sys.exit(0)
+            
+        loc = utils.validate_language(a.lower())
 
 try:
     param = args[0]
@@ -241,8 +249,38 @@ if mode == GUI_MODE:
     from qt import *
     from ui import setupform
 
-    a = QApplication(sys.argv)
-    QObject.connect(a,SIGNAL("lastWindowClosed()"),a,SLOT("quit()"))
+    app = QApplication(sys.argv)
+    QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
+    
+    if loc is None:
+        loc = user_cfg.ui.get("loc", "system")
+        if loc.lower() == 'system':
+            loc = str(QTextCodec.locale())
+            log.debug("Using system locale: %s" % loc)
+    
+    if loc.lower() != 'c':
+        log.debug("Trying to load .qm file for %s locale." % loc)
+        trans = QTranslator(None)
+        qm_file = 'hplip_%s.qm' % loc
+        log.debug("Name of .qm file: %s" % qm_file)
+        loaded = trans.load(qm_file, prop.localization_dir)
+        
+        if loaded:
+            app.installTranslator(trans)
+        else:
+            loc = 'c'
+    
+    if loc == 'c':
+        log.debug("Using default 'C' locale")
+    else:
+        log.debug("Using locale: %s" % loc)
+        QLocale.setDefault(QLocale(loc))
+        try:
+            locale.setlocale(locale.LC_ALL, locale.normalize(loc+".utf8"))
+            prop.locale = loc
+        except locale.Error:
+            log.error("Invalid locale: %s" % (loc+".utf8"))
+    
 
     if not os.geteuid() == 0:
         log.error("You must be root to run this utility.")
@@ -262,10 +300,10 @@ if mode == GUI_MODE:
         log.error("Unable to connect to HPLIP I/O. Please (re)start HPLIP and try again.")
         sys.exit(1)
 
-    a.setMainWidget(w)
+    app.setMainWidget(w)
     w.show()
 
-    a.exec_loop()
+    app.exec_loop()
 
 else: # INTERACTIVE_MODE
 
@@ -291,10 +329,10 @@ else: # INTERACTIVE_MODE
     if not device_uri and bus is None:
         x = 1
         ios = {0: ('usb', "Universal Serial Bus (USB)") }
-        if sys_cfg.configure['network-build']: 
+        if prop.net_build: 
             ios[x] = ('net', "Network/Ethernet/Wireless (direct connection or JetDirect)")
             x += 1
-        if sys_cfg.configure['pp-build']: 
+        if prop.par_build: 
             ios[x] = ('par', "Parallel Port (LPT:)")
             x += 1
         

@@ -114,6 +114,7 @@ class ScrollStatusView(ScrollView):
             else:
                 desc = ''
 
+        # TODO: In Qt4.x, use QLocale.toString(date, format)
         tt = QString("<b>%1 %2</b>").arg(QDateTime (QDate(yr, mt, dy), QTime(hr, mi, sec)).toString()).arg(desc).stripWhiteSpace()
         
         self.addGroupHeading(unicode(tt), tt)

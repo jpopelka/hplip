@@ -49,6 +49,10 @@ class PluginForm(PluginForm_base):
         self.pathLineEdit.setEnabled(False)
         
         self.downloadText = self.__tr("Agree to License, Download and Install Plug-in")
+        self.optionalText = self.__tr("""An optional driver plug-in is available to enhance the operation of this printer. You may skip this installation, download the plug-in directly from an HP authorized server, or, if you already have a copy of the file, you can specify a path to the file.""")
+        self.optionalTitle = self.__tr("Optional Driver Plug-in Available")
+        self.skipText = self.__tr("Skip installation of optional plug-in")
+        
         self.setTitle(self.InstallPage, self.downloadText)
         self.installPushButton.setText(self.downloadText)
         self.bg = self.pathLineEdit.paletteBackgroundColor()

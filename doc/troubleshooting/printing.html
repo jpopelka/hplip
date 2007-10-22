@@ -117,10 +117,15 @@ DefaultMedia = Letter
 <pre class="literal-block">
 DefaultMedia = Letterdj
 </pre>
+<p><strong>Issue 4: The &quot;/dev/usb/lp0&quot; device node is deleted after using HPLIP.</strong></p>
+<p>The &quot;/dev/usb/lp0&quot; device node is created by usblp. HPLIP does not use usblp, instead HPLIP uses libusb. Libusb uses the &quot;/dev/bus/usb/xxx/xxx&quot; device node instead of the &quot;/dev/usb/lp0&quot; device node.</p>
+<p>Since usblp and libusb cannot claim the the same usb device, any HPLIP device I/O usage (ie: scanning, printing or faxing) will remove usblp from the &quot;/dev/usb/lp0&quot; device node. Once usblp has been removed from the device node, the device node is deleted and cannot be restored except by another UDEV plug-n-play event.</p>
+<p>If you are using CUPS this means in general you should always use the HPLIP's &quot;hp&quot; backend (ie: &quot;hp:/usb/...&quot;) instead of the standard CUPS &quot;usb&quot; backend (ie: &quot;usb://...&quot;).</p>
+<p>The &quot;hp&quot; backend will always use the libusb device node. If you try to use the &quot;usb&quot; backend the &quot;/dev/usb/lp0&quot; device node may not be available.</p>
 </div>
 
 <hr size="1"/>
-<center><small>Page last updated: Wed May  2 13:09:44 2007; HPLIP Version: 2.7.9</small></center>
+<center><small>Page last updated: Tue Oct 16 13:02:53 2007; HPLIP Version: 2.7.10</small></center>
 </div>
 </td></tr></table>
 </div>

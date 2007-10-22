@@ -1066,6 +1066,11 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C4380</printer>
+      <arg_defval>ev/hpijs-Quality-600ColorCMYK</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_C5100</printer>
       <arg_defval>ev/hpijs-Quality-600ColorCMYK</arg_defval>
      </constraint>
@@ -1277,6 +1282,11 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-OfficeJet_Pro_K5400</printer>
+      <arg_defval>ev/hpijs-Quality-600ColorCMYK</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-OfficeJet_Pro_K8600</printer>
       <arg_defval>ev/hpijs-Quality-600ColorCMYK</arg_defval>
      </constraint>
      <constraint sense='true'>
@@ -6352,6 +6362,10 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C4380</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_C5100</printer>
      </constraint>
      <constraint sense='true'>
@@ -6521,6 +6535,10 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-OfficeJet_Pro_K5400</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-OfficeJet_Pro_K8600</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -6796,6 +6814,10 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C4380</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_C5100</printer>
      </constraint>
      <constraint sense='true'>
@@ -6961,6 +6983,10 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-OfficeJet_Pro_K5400</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-OfficeJet_Pro_K8600</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -8048,6 +8074,10 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C4380</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_C5100</printer>
      </constraint>
      <constraint sense='true'>
@@ -8217,6 +8247,10 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-OfficeJet_Pro_K5400</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-OfficeJet_Pro_K8600</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -8668,6 +8702,10 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C4380</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_C5100</printer>
      </constraint>
      <constraint sense='true'>
@@ -8833,6 +8871,10 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-OfficeJet_Pro_K5400</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-OfficeJet_Pro_K8600</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -10912,6 +10954,10 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C4380</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_C5100</printer>
      </constraint>
      <constraint sense='true'>
@@ -11081,6 +11127,10 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-OfficeJet_Pro_K5400</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-OfficeJet_Pro_K8600</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -12540,6 +12590,10 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C4380</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_C5100</printer>
      </constraint>
      <constraint sense='true'>
@@ -12709,6 +12763,10 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-OfficeJet_Pro_K5400</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-OfficeJet_Pro_K8600</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -13309,6 +13367,10 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_C4200</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C4380</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -17096,6 +17158,10 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C4380</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_C5100</printer>
      </constraint>
      <constraint sense='true'>
@@ -17265,6 +17331,10 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-OfficeJet_Pro_K5400</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-OfficeJet_Pro_K8600</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -18148,6 +18218,10 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C4380</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_C5100</printer>
      </constraint>
      <constraint sense='true'>
@@ -18317,6 +18391,10 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-OfficeJet_Pro_K5400</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-OfficeJet_Pro_K8600</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -18756,6 +18834,10 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C4380</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_C5100</printer>
      </constraint>
      <constraint sense='true'>
@@ -19021,6 +19103,10 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-OfficeJet_Pro_K5400</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-OfficeJet_Pro_K8600</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -19657,6 +19743,10 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-OfficeJet_Pro_K5400</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-OfficeJet_Pro_K8600</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -21184,6 +21274,10 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C4380</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_C5100</printer>
      </constraint>
      <constraint sense='true'>
@@ -21353,6 +21447,10 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-OfficeJet_Pro_K5400</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-OfficeJet_Pro_K8600</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
@@ -21593,6 +21691,10 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_C4200</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C4380</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>

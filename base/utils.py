@@ -35,6 +35,7 @@ import locale
 from g import *
 from codes import *
 import pexpect
+import tui
 
 xml_basename_pat = re.compile(r"""HPLIP-(\d*)_(\d*)_(\d*).xml""", re.IGNORECASE)
 
@@ -905,6 +906,8 @@ USAGE_NOTES = ("Notes:", "", "heading", False)
 USAGE_STD_NOTES1 = ("1. If device or printer is not specified, the local device bus is probed and the program enters interactive mode.", "", "note", False)
 USAGE_STD_NOTES2 = ("2. If -p\* is specified, the default CUPS printer will be used.", "", "note", False)
 USAGE_SEEALSO = ("See Also:", "", "heading", False)
+USAGE_LANGUAGE = ("Set the language:", "-q <lang> or --lang=<lang>. Use -q? or --lang=? to see a list of available language codes.", "option", False)
+USAGE_LANGUAGE2 = ("Set the language:", "--lang=<lang>. Use --lang=? to see a list of available language codes.", "option", False)
 
 def ttysize():
     ln1 = commands.getoutput('stty -a').splitlines()[0]
@@ -1273,12 +1276,28 @@ def createSequencedFilename(basename, ext, dir=None, digits=3):
                 
     return os.path.join(dir, "%s%0*d%s" % (basename, digits, m+1, ext))
     
+ 
+def validate_language(lang, default='en_US'):
+    if lang is None:
+        loc, encoder = locale.getdefaultlocale()
+    else:
+        lang = lang.lower().strip()
+        for loc, ll in supported_locales.items():
+            if lang in ll:
+                break
+        else:
+            loc = user_cfg.ui.get("loc", "en_US")
+            log.warn("Unknown lang/locale. Using default of %s." % loc)
             
-        
-        
-        
-        
+    return loc
+  
 
+def show_languages():
+    f = tui.Formatter()
+    f.header = ("Language Code", "Alternate Name(s)")
+    for loc, ll in supported_locales.items():
+        f.add((ll[0], ', '.join(ll[1:])))
         
+    f.output()
 
 

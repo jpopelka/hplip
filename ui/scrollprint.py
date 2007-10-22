@@ -102,26 +102,32 @@ class ScrollPrintView(ScrollView):
     def fillControls(self):
         ScrollView.fillControls(self)
 
-        self.addPrinterFaxList()
-        self.addGroupHeading("files_to_print", self.__tr("File(s) to Print"))
-        self.addFileList()
-        self.addGroupHeading("options", self.__tr("Print Options"))
-        self.addCopies()
-        self.addPageRange()
-        self.addPageSet()
-        self.addGroupHeading("space1", "")
-
-        if self.toolbox_hosted:
-            s = self.__tr("<< Functions")
+        if self.addPrinterFaxList():
+            self.addGroupHeading("files_to_print", self.__tr("File(s) to Print"))
+            self.addFileList()
+            self.addGroupHeading("options", self.__tr("Print Options"))
+            self.addCopies()
+            self.addPageRange()
+            self.addPageSet()
+            self.addGroupHeading("space1", "")
+    
+            if self.toolbox_hosted:
+                s = self.__tr("<< Functions")
+            else:
+                s = self.__tr("Close")
+    
+            self.printButton = self.addActionButton("bottom_nav", self.__tr("Print File(s)"), 
+                                    self.printButton_clicked, 'print.png', 'print-disabled.png', 
+                                    s, self.funcButton_clicked)
+    
+            self.printButton.setEnabled(False)
+            self.maximizeControl()
+        
         else:
-            s = self.__tr("Close")
-
-        self.printButton = self.addActionButton("bottom_nav", self.__tr("Print File(s)"), 
-                                self.printButton_clicked, 'print.png', 'print-disabled.png', 
-                                s, self.funcButton_clicked)
-
-        self.printButton.setEnabled(False)
-        self.maximizeControl()
+            QApplication.restoreOverrideCursor()
+            self.form.FailureUI("<b>Print is disabled.</b><p>No CUPS print queue found for this device.")
+            self.funcButton_clicked()
+            
         
     def onUpdate(self, cur_device=None):
         log.debug("ScrollPrintView.onUpdate()")

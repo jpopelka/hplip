@@ -145,7 +145,7 @@ class Logger(object):
         return self._level
 
     def is_debug(self):
-        return self._level <= Logger.LOG_LEVEL_DEBUG
+        return self._level <= Logger.LOG_LEVEL_DEBUG3
 
     level = property(get_level, set_level)
 

@@ -97,12 +97,6 @@
 :model "officejet_4100_series"
 :status :good
 
-:model "officejet_4105_series"
-:status :good
-
-:model "officejet_4110_series"
-:status :good
-
 :model "officejet_4115_series"
 :status :good
 
@@ -409,6 +403,9 @@
 :model "photosmart_c4200_series"
 :status :good
 
+:model "photosmart_c4380_series"
+:status :good
+
 :model "photosmart_c5100_series"
 :status :good
 
@@ -428,9 +425,6 @@
 :status :good
 
 :model "photosmart_c8100_series"
-:status :good
-
-:model "photosmart_d5300_series"
 :status :good
 
 :model "printer_scanner_copier_300"

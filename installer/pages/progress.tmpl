@@ -33,6 +33,8 @@
     var responseTextCompiled = "";
     var operationName = "";
     var operationNumber = 0;
+    var repsonseTextAccumlative = ""
+    var textArea = document.getElementById("scrollTextArea");
 
     function todoOnLoad() {
         getProgressOperationNumber();
@@ -51,12 +53,19 @@
 	      var localPath = "http://localhost:8888/" +  filename
         var http = new XmlLoader(localPath);
         var responseText = http.submitLoaderRequest("POST", false);
-            responseTextCompiled += responseText;
+        repsonseTextAccumlative += responseText;
         if(responseText) {
             if(isFireFoxBase() || isSafariBase()) {
                 document.getElementById("scrollTextArea").innerHTML += responseText;
+                //textArea.innerHTML += responseText;
+                //var textArea = document.getElementById("scrollTextArea");
+                //document.getElementById("scrollTextArea").childNodes[0].nodeValue = responseText;
+                //document.getElementById("scrollTextArea").childNodes[0].data = responseText;
+                //document.getElementById("scrollTextArea").firstChild.nodeValue = responseText;
+                //document.getElementById("scrollTextArea").firstChild.data = responseText;
+                
             } else {
-                document.getElementById("scrollTextDiv").innerHTML = '<textarea cols="62" rows="11" wrap="off" name="scrollTextArea" id="scrollTextArea" >' + responseTextCompiled + '</textarea></div>';
+                document.getElementById("scrollTextDiv").innerHTML = '<textarea cols="62" rows="11" wrap="off" name="scrollTextArea" id="scrollTextArea" >' + repsonseTextAccumlative + '</textarea></div>';
             }
         }
     };
@@ -83,25 +92,25 @@
             state.display = state.display? "":"hidden"; 
         }
         if(operationNumber  == 0) {
-            operationName = "Profile Software Requirements";
+            operationName = "$profile_software_requirements";
         } else if(operationNumber  == 1) {
-            operationName = "Required Dependencies";
+            operationName = "$required_dependencies";
         } else if(operationNumber  == 2) {
-            operationName = "Optional Dependencies";
+            operationName = "$optional_dependencies";
         } else if(operationNumber  == 3) {
-            operationName = "Preparing Dependencies";
+            operationName = "$preparing_dependencies";
         } else if(operationNumber  == 4) {
-            operationName = "Finishing Dependencies";
+            operationName = "$finishing_dependencies";
         } else if(operationNumber  == 5) {
-            operationName = "Building and Installing";
+            operationName = "$building_and_installing";
         } else if(operationNumber  == 6) {
-            operationName = "Remove HPOJ";
+            operationName = "$remove_hpoj";
         } else if(operationNumber  == 7) {
-            operationName = "Remove HPLIP";
+            operationName = "$remove_hplip";
         } else if(operationNumber  == 8) {
-            operationName = "Restarting CUPS";
+            operationName = "$restarting_cups";
         } else {
-            operationName = "Unimplemented Operation...";
+            operationName = "$unimplemented_operation";
         }
         
     };
@@ -120,10 +129,10 @@
 
 
         if( -1 == statusValue ) { // Running 
-            document.getElementById("progressText").innerHTML = "Installation Progress: " + operationName;
+            document.getElementById("progressText").innerHTML = "$installation_progress" + operationName;
             document.getElementById("progressBar").innerHTML = "<img src='images/circular.gif' alt='progress'>";
         } else if( 0 < statusValue ) { // Done with Error
-            document.getElementById("progressText").innerHTML = "Installation Progress: Error";
+            document.getElementById("progressText").innerHTML = "$installation_progress_error";
             document.getElementById("progressBar").innerHTML = null;
             window.location.href = "error_command_failed";
             // Call the controller code here with the code positive all.
@@ -136,7 +145,7 @@
             indexClickActions( "next_button", "progress_controller");
             
         } else {
-            document.getElementById("progressText").innerHTML = "Got into a bad state: ";
+            document.getElementById("progressText").innerHTML = "$got_into_bad_state";
             document.getElementById("progressBar").innerHTML = null;
             toggleLayer("hiddenDiv");
 	}

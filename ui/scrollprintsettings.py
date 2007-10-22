@@ -474,7 +474,7 @@ class ScrollPrintSettingsView(ScrollView):
             self.loading = False
 
     def optionComboBox_activated(self, a):
-        a = str(a)
+        a = unicode(a)
         sender = self.sender()
         choice = None
         
@@ -541,7 +541,7 @@ class ScrollPrintSettingsView(ScrollView):
                         # determine printoutmode option combo enable state
                         c.setEnabled(True)
                         QToolTip.remove(c)
-                        a = str(c.currentText())
+                        a = unicode(c.currentText())
                         
                         # determine printoutmode default button state
                         link_choice = None

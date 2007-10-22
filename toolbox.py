@@ -22,7 +22,7 @@
 # Thanks to Henrique M. Holschuh <hmh@debian.org> for various security patches
 #
 
-__version__ = '10.0'
+__version__ = '11.0'
 __title__ = 'HP Device Manager'
 __doc__ = "The HP Device Manager (aka Toolbox) for HPLIP supported devices. Provides status, tools, and supplies levels."
 
@@ -42,14 +42,14 @@ from base.msg import *
 
 log.set_module('hp-toolbox')
 
-
-
 app = None
 toolbox  = None
+loc = None
 
 USAGE = [(__doc__, "", "name", True),
          ("Usage: hp-toolbox [OPTIONS]", "", "summary", True),
          utils.USAGE_OPTIONS,
+         utils.USAGE_LANGUAGE,
          utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
          utils.USAGE_HELP,
          utils.USAGE_SEEALSO,
@@ -86,8 +86,8 @@ def handleEXIT():
 prop.prog = sys.argv[0]
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'l:hg', 
-        ['level=', 'help', 'help-rest', 'help-man', 'help-desc'])
+    opts, args = getopt.getopt(sys.argv[1:], 'l:hgq:', 
+        ['level=', 'help', 'help-rest', 'help-man', 'help-desc', 'lang='])
 
 except getopt.GetoptError, e:
     log.error(e.msg)
@@ -119,7 +119,12 @@ for o, a in opts:
         print __doc__,
         sys.exit(0)
 
-
+    elif o in ('-q', '--lang'):
+        if a.strip() == '?':
+            utils.show_languages()
+            sys.exit(0)
+            
+        loc = utils.validate_language(a.lower())
 
 utils.log_title(__title__, __version__)
 
@@ -145,10 +150,11 @@ os.umask (0037)
 # create the main application object
 app = QApplication(sys.argv)
 
-loc = user_cfg.ui.get("loc", "system")
-if loc.lower() == 'system':
-    loc = str(QTextCodec.locale())
-    log.debug("Using system locale: %s" % loc)
+if loc is None:
+    loc = user_cfg.ui.get("loc", "system")
+    if loc.lower() == 'system':
+        loc = str(QTextCodec.locale())
+        log.debug("Using system locale: %s" % loc)
 
 if loc.lower() != 'c':
     log.debug("Trying to load .qm file for %s locale." % loc)
@@ -161,13 +167,18 @@ if loc.lower() != 'c':
         app.installTranslator(trans)
     else:
         loc = 'c'
-else:
-    loc = 'c'
 
+        
 if loc == 'c':
     log.debug("Using default 'C' locale")
 else:
     log.debug("Using locale: %s" % loc)
+    QLocale.setDefault(QLocale(loc))
+    try:
+        locale.setlocale(locale.LC_ALL, locale.normalize(loc+".utf8"))
+        prop.locale = loc
+    except locale.Error:
+        log.error("Invalid locale: %s" % (loc+".utf8"))
 
 try:
     hpssd_sock = service.startup()

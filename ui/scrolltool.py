@@ -727,19 +727,18 @@ class ScrollTestpageView(ScrollView):
     def fillControls(self):
         ScrollView.fillControls(self)
 
-        self.addPrinterFaxList()
-
-        self.addTestpageType()
-
-        self.addLoadPaper()
-
-        if self.toolbox_hosted:
-            s = self.__tr("<< Tools")
-        else:
-            s = self.__tr("Close")
-
-        self.printButton = self.addActionButton("bottom_nav", self.__tr("Print Test Page"), 
-                                self.printButton_clicked, 'print.png', None, s, self.navButton_clicked)
+        if self.addPrinterFaxList():
+            self.addTestpageType()
+    
+            self.addLoadPaper()
+    
+            if self.toolbox_hosted:
+                s = self.__tr("<< Tools")
+            else:
+                s = self.__tr("Close")
+    
+            self.printButton = self.addActionButton("bottom_nav", self.__tr("Print Test Page"), 
+                                    self.printButton_clicked, 'print.png', None, s, self.navButton_clicked)
 
 
     def addTestpageType(self):
@@ -808,12 +807,12 @@ class ScrollTestpageView(ScrollView):
             QApplication.restoreOverrideCursor()
 
         if printed:
-                QMessageBox.information(self,
-                                     self.caption(),
-                                     self.__tr("<p><b>A test page should be printing on your printer.</b><p>If the page fails to print, please visit http://hplip.sourceforge.net for troubleshooting and support."),
-                                      QMessageBox.Ok,
-                                      QMessageBox.NoButton,
-                                      QMessageBox.NoButton)
+            QMessageBox.information(self,
+                                 self.caption(),
+                                 self.__tr("<p><b>A test page should be printing on your printer.</b><p>If the page fails to print, please visit http://hplip.sourceforge.net for troubleshooting and support."),
+                                  QMessageBox.Ok,
+                                  QMessageBox.NoButton,
+                                  QMessageBox.NoButton)
 
 
         if self.toolbox_hosted:

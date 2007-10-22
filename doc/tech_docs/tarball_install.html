@@ -177,11 +177,21 @@ yum install sip
 <li>For older distributions (ie: Suse 10.0) the kernel usbfs used /proc/bus/usb/xxx/xxx instead of /dev/bus/usb/xxx/xxx device files. This means the standard udev rules will not work for setting device permissions. You can modify the 55-hpmud.rules file to set device permissions for /proc based systems with the following rule changes.</li>
 </ol>
 <pre class="literal-block">
-SYSFS{idVendor}==&quot;03f0&quot;, SYSFS{idProduct}==&quot;??11&quot;, PROGRAM=&quot;/bin/sh -c 'X=%k X=$${X#usbdev} B=$${X%%%%.*} D=$${X#*.}; printf /proc/bus/usb/%%03i/%%03i $$B $$D'&quot;, RUN+=&quot;/bin/sh -c 'chown lp: %c; chmod 666 %c'&quot;
-SYSFS{idVendor}==&quot;03f0&quot;, SYSFS{idProduct}==&quot;??02&quot;, PROGRAM=&quot;/bin/sh -c 'X=%k X=$${X#usbdev} B=$${X%%%%.*} D=$${X#*.}; printf /proc/bus/usb/%%03i/%%03i $$B $$D'&quot;, RUN+=&quot;/bin/sh -c 'chown lp: %c; chmod 666 %c'&quot;
-SYSFS{idVendor}==&quot;03f0&quot;, SYSFS{idProduct}==&quot;??12&quot;, PROGRAM=&quot;/bin/sh -c 'X=%k X=$${X#usbdev} B=$${X%%%%.*} D=$${X#*.}; printf /proc/bus/usb/%%03i/%%03i $$B $$D'&quot;, RUN+=&quot;/bin/sh -c 'chown lp: %c; chmod 666 %c'&quot;
-SYSFS{idVendor}==&quot;03f0&quot;, SYSFS{idProduct}==&quot;??04&quot;, PROGRAM=&quot;/bin/sh -c 'X=%k X=$${X#usbdev} B=$${X%%%%.*} D=$${X#*.}; printf /proc/bus/usb/%%03i/%%03i $$B $$D'&quot;, RUN+=&quot;/bin/sh -c 'chown lp: %c; chmod 666 %c'&quot;
-SYSFS{idVendor}==&quot;03f0&quot;, SYSFS{idProduct}==&quot;??17&quot;, PROGRAM=&quot;/bin/sh -c 'X=%k X=$${X#usbdev} B=$${X%%%%.*} D=$${X#*.}; printf /proc/bus/usb/%%03i/%%03i $$B $$D'&quot;, RUN+=&quot;/bin/sh -c 'chown lp: %c; chmod 666 %c'&quot;
+SYSFS{idVendor}==&quot;03f0&quot;, SYSFS{idProduct}==&quot;??11&quot;, PROGRAM=&quot;/bin/sh -c 'X=%k; X=$${X#usbdev}; B=$${X%%%%.*}; D=$${X#*.}; printf /proc/bus/usb/%%03i/%%03i $$B $$D'&quot;, RUN+=&quot;/bin/sh -c 'chown lp: %c; chmod 666 %c'&quot;
+SYSFS{idVendor}==&quot;03f0&quot;, SYSFS{idProduct}==&quot;??02&quot;, PROGRAM=&quot;/bin/sh -c 'X=%k; X=$${X#usbdev}; B=$${X%%%%.*}; D=$${X#*.}; printf /proc/bus/usb/%%03i/%%03i $$B $$D'&quot;, RUN+=&quot;/bin/sh -c 'chown lp: %c; chmod 666 %c'&quot;
+SYSFS{idVendor}==&quot;03f0&quot;, SYSFS{idProduct}==&quot;??12&quot;, PROGRAM=&quot;/bin/sh -c 'X=%k; X=$${X#usbdev}; B=$${X%%%%.*}; D=$${X#*.}; printf /proc/bus/usb/%%03i/%%03i $$B $$D'&quot;, RUN+=&quot;/bin/sh -c 'chown lp: %c; chmod 666 %c'&quot;
+SYSFS{idVendor}==&quot;03f0&quot;, SYSFS{idProduct}==&quot;??04&quot;, PROGRAM=&quot;/bin/sh -c 'X=%k; X=$${X#usbdev}; B=$${X%%%%.*}; D=$${X#*.}; printf /proc/bus/usb/%%03i/%%03i $$B $$D'&quot;, RUN+=&quot;/bin/sh -c 'chown lp: %c; chmod 666 %c'&quot;
+SYSFS{idVendor}==&quot;03f0&quot;, SYSFS{idProduct}==&quot;??17&quot;, PROGRAM=&quot;/bin/sh -c 'X=%k; X=$${X#usbdev}; B=$${X%%%%.*}; D=$${X#*.}; printf /proc/bus/usb/%%03i/%%03i $$B $$D'&quot;, RUN+=&quot;/bin/sh -c 'chown lp: %c; chmod 666 %c'&quot;
+</pre>
+<ol class="arabic simple" start="13">
+<li>For Suse 10.3 cups-autoconfig does not work well with the &quot;hp&quot; backend. Cups-autoconfig can be configured to automatically disable print queues. This feature works well with the &quot;usb&quot; backend, but not the &quot;hp&quot; backend. Since both backends do not use libusb you must disable this feature in /etc/cups-autoconfig.conf. Otherwise the printer queue will have to be manually re-started after each udev plug-in-play event.</li>
+</ol>
+<pre class="literal-block">
+from:
+DisablePrintersOnRemoval=yes
+
+to:
+DisablePrintersOnRemoval=no
 </pre>
 </div>
 <div class="section">
@@ -230,7 +240,7 @@ ln -s /usr/share/fonts/default/Type1 /usr/share/ghostscript/fonts
 </div>
 
 <hr size="1"/>
-<center><small>Page last updated: Tue Sep 25 13:02:12 2007; HPLIP Version: 2.7.9</small></center>
+<center><small>Page last updated: Wed Oct 17 15:58:14 2007; HPLIP Version: 2.7.10</small></center>
 </div>
 </td></tr></table>
 </div>

@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '3.1'
+__version__ = '3.2'
 __title__ = 'Photo Card Access Utility'
 __doc__ = "Access inserted photo cards on supported HPLIP printers. This provides an alternative for older devices that do not support USB mass storage or for access to photo cards over a network."
 
@@ -60,6 +60,7 @@ USAGE = [(__doc__, "", "name", True),
          utils.USAGE_OPTIONS,
          ("Output directory:", "-o<dir> or --output=<dir> (Defaults to current directory)(Only used for non-GUI modes)", "option", False),
          utils.USAGE_BUS1, utils.USAGE_BUS2,
+         utils.USAGE_LANGUAGE,
          utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
          utils.USAGE_HELP,
          utils.USAGE_SPACE,
@@ -606,10 +607,10 @@ def status_callback(src, trg, size):
 
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'p:d:hb:l:giuno:',
+    opts, args = getopt.getopt(sys.argv[1:], 'p:d:hb:l:giuno:q:',
                                ['printer=', 'device=', 'help', 'help-rest', 'help-man',
                                 'bus=', 'logging=', 'interactive', 'gui', 'non-interactive',
-                                'output=', 'help-desc'])
+                                'output=', 'help-desc', 'lang='])
 except getopt.GetoptError, e:
     log.error(e.msg)
     usage()
@@ -621,6 +622,7 @@ log_level = logger.DEFAULT_LOG_LEVEL
 mode = GUI_MODE
 mode_specified = False
 output_dir = os.getcwd()
+loc = None
 
 if os.getenv("HPLIP_DEBUG"):
     log.set_level('debug')
@@ -684,6 +686,13 @@ for o, a in opts:
 
     elif o in ('-o', '--output'):
         output_dir = a
+        
+    elif o in ('-q', '--lang'):
+        if a.strip() == '?':
+            utils.show_languages()
+            sys.exit(0)
+            
+        loc = utils.validate_language(a.lower())
 
 
 utils.log_title(__title__, __version__)
@@ -843,8 +852,39 @@ else: # GUI_MODE
     from qt import *
     from ui import unloadform
 
-    a = QApplication(sys.argv)
-    QObject.connect(a,SIGNAL("lastWindowClosed()"),a,SLOT("quit()"))
+    app = QApplication(sys.argv)
+    QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
+    
+    if loc is None:
+        loc = user_cfg.ui.get("loc", "system")
+        if loc.lower() == 'system':
+            loc = str(QTextCodec.locale())
+            log.debug("Using system locale: %s" % loc)
+    
+    if loc.lower() != 'c':
+        log.debug("Trying to load .qm file for %s locale." % loc)
+        trans = QTranslator(None)
+        qm_file = 'hplip_%s.qm' % loc
+        log.debug("Name of .qm file: %s" % qm_file)
+        loaded = trans.load(qm_file, prop.localization_dir)
+        
+        if loaded:
+            app.installTranslator(trans)
+        else:
+            loc = 'c'
+    
+    if loc == 'c':
+        log.debug("Using default 'C' locale")
+    else:
+        log.debug("Using locale: %s" % loc)
+        
+        QLocale.setDefault(QLocale(loc))
+        try:
+            locale.setlocale(locale.LC_ALL, locale.normalize(loc+".utf8"))
+            prop.locale = loc
+        except locale.Error:
+            log.error("Invalid locale: %s" % (loc+".utf8"))        
+
 
     try:
         w = unloadform.UnloadForm(bus, device_uri, printer_name)
@@ -852,10 +892,10 @@ else: # GUI_MODE
         log.error("Unable to connect to HPLIP I/O. Please (re)start HPLIP and try again.")
         sys.exit(1)
 
-    a.setMainWidget(w)
+    app.setMainWidget(w)
     w.show()
 
-    a.exec_loop()
+    app.exec_loop()
 
 log.info("Done.")
 sys.exit(0)

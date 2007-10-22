@@ -29,11 +29,7 @@
     <script type="text/javascript">
     <!--
     function todoOnLoad() {
-        setTimeout("todoExitApp();", 1000);
-    };
-
-    function todoExitApp() {
-        setStoppedStatus("stop");
+        setTimeout('postServerCommand("stop");', 1000);
     };
     -->
     </script>

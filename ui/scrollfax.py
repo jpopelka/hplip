@@ -47,9 +47,23 @@ coverpages_enabled = False
 if fax_enabled:
     try:
         import reportlab
-        coverpages_enabled = True
+        ver = reportlab.Version
+        try:
+            ver_f = float(ver)
+        except ValueError:
+            ver_f = 0.0
+            
+        if ver_f >= 2.0:
+            coverpages_enabled = True
+        else:
+            log.warn("Pre-2.0 version of Reportlab installed. Fax coverpages disabled.")
+            
     except ImportError:
         log.warn("Reportlab not installed. Fax coverpages disabled.")
+        
+        
+if not coverpages_enabled:
+    log.warn("Please install version 2.0+ of Reportlab for coverpage support.")
 
 if fax_enabled and coverpages_enabled:
     from fax import coverpages
@@ -160,47 +174,54 @@ class ScrollFaxView(ScrollView):
         ScrollView.fillControls(self)
 
         if fax_enabled:
-            self.addPrinterFaxList(faxes=True, printers=False)
-
-            self.addGroupHeading("files_to_fax", self.__tr("File(s) to Fax"))
-            self.addFileList()
-
-            if coverpages_enabled:
-                self.addGroupHeading("coverpage", self.__tr("Add/Edit Fax Coverpage"))
-                self.addCoverpage()
-
-            self.addGroupHeading("recipients", self.__tr("Recipient(s)"))
-
-            self.addRecipientList()
-
-            self.addGroupHeading("recipient_add_from_fab", self.__tr("Add Recipients from the Fax Address Book"))
-
-            self.addRecipientAddFromFAB()
-
-            self.addGroupHeading("recipient_quick_add", self.__tr("<i>Quick Add</i> an Individual Recipient"))
-
-            self.addRecipientQuickAdd()
-
-            self.addGroupHeading("space1", "")
-
-            if self.toolbox_hosted:
-                s = self.__tr("<< Functions")
+            if self.addPrinterFaxList(faxes=True, printers=False):
+                self.addGroupHeading("files_to_fax", self.__tr("File(s) to Fax"))
+                self.addFileList()
+    
+                if coverpages_enabled:
+                    self.addGroupHeading("coverpage", self.__tr("Add/Edit Fax Coverpage"))
+                    self.addCoverpage()
+    
+                self.addGroupHeading("recipients", self.__tr("Recipient(s)"))
+    
+                self.addRecipientList()
+    
+                self.addGroupHeading("recipient_add_from_fab", self.__tr("Add Recipients from the Fax Address Book"))
+    
+                self.addRecipientAddFromFAB()
+    
+                self.addGroupHeading("recipient_quick_add", self.__tr("<i>Quick Add</i> an Individual Recipient"))
+    
+                self.addRecipientQuickAdd()
+    
+                self.addGroupHeading("space1", "")
+    
+                if self.toolbox_hosted:
+                    s = self.__tr("<< Functions")
+                else:
+                    s = self.__tr("Close")
+    
+                self.faxButton = self.addActionButton("bottom_nav", self.__tr("Send Fax Now"), 
+                                        self.faxButton_clicked, 'fax.png', 'fax-disabled.png', 
+                                        s, self.funcButton_clicked)
+    
+                self.faxButton.setEnabled(False)
+    
+                self.updateRecipientCombos()
+    
+                self.maximizeControl()
+            
             else:
-                s = self.__tr("Close")
-
-            self.faxButton = self.addActionButton("bottom_nav", self.__tr("Send Fax Now"), 
-                                    self.faxButton_clicked, 'fax.png', 'fax-disabled.png', 
-                                    s, self.funcButton_clicked)
-
-            self.faxButton.setEnabled(False)
-
-            self.updateRecipientCombos()
-
-            self.maximizeControl()
+                QApplication.restoreOverrideCursor()
+                self.form.FailureUI("<b>Fax is disabled.</b><p>No CUPS fax queue found for this device.")
+                self.funcButton_clicked()
 
         else:
+            QApplication.restoreOverrideCursor()
             self.form.FailureUI("<b>Fax is disabled.</b><p>Python version 2.3 or greater required or fax was disabled during build.")
             self.funcButton_clicked()
+            
+            
 
     def onUpdate(self, cur_device=None):
         log.debug("ScrollPrintView.onUpdate()")

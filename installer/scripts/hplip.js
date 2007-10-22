@@ -118,7 +118,7 @@ function getStoppedStatus(filename) {
     return statusValue;
 }
 
-function setStoppedStatus(filename) {
+function postServerCommand(filename) {
     var localPath = GetLocalDataFile(filename);
     //alert("Stop Status - Url Path: " + localPath);
     var http = new XmlLoader(localPath);
@@ -131,7 +131,18 @@ function todoOnQuit(path) {
     indexClickActions( "quit_button", path);
     window.close();
     fixMainWindow();
-    setStoppedStatus("signal_stop");
+    postServerCommand("signal_stop");
+}
+
+
+function todoOnRestart(path) {
+    window.location.href = path;
+    window.opener.location.href = path;
+    //indexClickActions( "set_restart", path);
+    window.close();
+    fixMainWindow();
+    postServerCommand("set_restart");
+    postServerCommand("signal_stop");
 }
 
 

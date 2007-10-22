@@ -32,6 +32,8 @@
 #include "common.h"
 #include "mfpdtf.h"
 #include "hpip.h"
+#include "scl.h"
+#include "pml.h"
 
 /************************************************************************************/
 
@@ -242,6 +244,7 @@ struct  hpaioScanner_s
 };
 
 typedef struct hpaioScanner_s * hpaioScanner_t;
+typedef struct hpaioScanner_s HPAIO_RECORD;
 
 #define UNDEFINED_MODEL(hpaio) (!hpaio->saneDevice.model)
 

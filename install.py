@@ -26,7 +26,12 @@ __doc__ = "Installer for HPLIP tarball."
 
 
 # Std Lib
-import getopt, os, os.path, sys, time
+import getopt
+import os
+import os.path
+import sys
+import time
+import re
 
 # Local
 from base.g import *
@@ -65,10 +70,11 @@ mode = INTERACTIVE_MODE
 auto = False
 test_depends = False
 test_unknown = False
+language = None
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'hl:giawutxd', 
-        ['help', 'help-rest', 'help-man', 'help-desc', 'gui',
+    opts, args = getopt.getopt(sys.argv[1:], 'hl:giawutxdq:', 
+        ['help', 'help-rest', 'help-man', 'help-desc', 'gui', 'lang=',
         'logging=', 'interactive', 'auto', 'web', 'browser', 'text']) 
 
 except getopt.GetoptError, e:
@@ -88,6 +94,9 @@ for o, a in opts:
 
     elif o == '--help-man':
         usage('man')
+        
+    elif o in ('-q', '--lang'):
+        language = a.lower()
 
     elif o == '--help-desc':
         print __doc__,
@@ -128,6 +137,20 @@ log.set_where(log.LOG_TO_CONSOLE_AND_FILE)
 
 log.debug("Log file=%s" % log_file)
 
+ac_init_pat = re.compile(r"""AC_INIT\(\[(.*?)\], *\[(.*?)\], *\[(.*?)\], *\[(.*?)\] *\)""", re.IGNORECASE)
+try:
+    config_in = open('./configure.in', 'r')
+except IOError:
+    prop.version = 'x.x.x'
+else:
+    for c in config_in:
+        if c.startswith("AC_INIT"):
+            match_obj = ac_init_pat.search(c)
+            prop.version = match_obj.group(2)
+            break
+
+    config_in.close()
+
 utils.log_title(__title__, __version__, True)
 
 log.info("Installer log saved in: %s" % log.bold(log_file))
@@ -138,7 +161,7 @@ if mode == BROWSER_MODE:
         log.error("Test modes -x and -d are not implemented with GUI mode.")
     from installer import web_install
     log.debug("Starting web browser installer...")
-    web_install.start()
+    web_install.start(language)
 
 elif mode == INTERACTIVE_MODE:
     from installer import text_install

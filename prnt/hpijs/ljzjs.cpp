@@ -50,45 +50,8 @@ int (*HPLJSoInit) (int iFlag);
 APDK_BEGIN_NAMESPACE
 
 #ifdef HAVE_LIBDL
-void *LoadPlugin (char *szPluginName)
-{
-    FILE    *fp;
-    char    szLine[256];
-    int     i;
-    void    *ptemp = NULL;
-    char    *p = NULL;
-    int     bFound = 0;
-    if ((fp = fopen ("/etc/hp/hplip.conf", "r")) == NULL)
-    {
-        return NULL;
-    }
-    while (!feof (fp))
-    {
-        if (!fgets (szLine, 256, fp))
-        {
-            break;
-        }
-        if (!bFound && strncmp (szLine, "[dirs]", 6))
-            continue;
-        bFound = 1;
-        if (szLine[0] < ' ')
-            break;
-        if (!strncmp (szLine, "home", 4))
-        {
-            i = strlen (szLine);
-            while (i > 0 && szLine[i] < ' ')
-                szLine[i--] = '\0';
-            p = szLine + 4;
-            while (*p && *p != '/')
-                p++;
-            sprintf (p+strlen (p), "/prnt/plugins/%s", szPluginName);
-            ptemp = dlopen (p, RTLD_LAZY);
-        }
-    }
-    fclose (fp);
-    return ptemp;
-}
-#endif // HAVE_LIBDL
+extern void *LoadPlugin (char *szPluginName);
+#endif
 
 LJZjs::LJZjs (SystemServices* pSS, int numfonts, BOOL proto)
     : Printer(pSS, numfonts, proto)

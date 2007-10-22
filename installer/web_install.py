@@ -48,7 +48,7 @@ ACTION_PRE_BUILD = 9
 ACTION_POST_BUILD = 10
 ACTION_MAX = 10
 
-XMLFILE = 'installer/localization/gui_strings'
+XMLPATH = 'installer/localization'
 
 try:
     from functools import update_wrapper
@@ -145,6 +145,59 @@ class Installer(object):
         return str(template)
 
     quit.exposed = True
+    
+
+    ####################################
+    # RESTART
+    ####################################
+    def restart(self):
+        screen = "restart"
+        template = self.createTemplate(screen)
+        
+        template.installer_title = self.localized_dict["installer_title"]
+        template.header_string = self.localized_dict["header_string"]
+        template.sub_header_string = self.localized_dict["sub_header_string"]
+
+        # body and message inserts
+        template.restart_message_body = self.localized_dict[screen + "_message_body"]
+        template.restart_command = self.core.su_sudo() % "hp-setup"
+        template.restart_message_body_bottom = self.localized_dict[screen + "_message_body_bottom"]
+        template.restart_message_footer = self.localized_dict[screen + "_message_footer"]
+        
+        template.restart_button = self.localized_dict["restart_button"]
+        template.quit_button = self.localized_dict["quit_button"]
+        template.replug_button = self.localized_dict["replug_button"]
+
+        return str(template)
+
+    restart.exposed = True
+    
+    
+    ####################################
+    # REPLUG
+    ####################################
+    def replug(self):
+        screen = "replug"
+        template = self.createTemplate(screen)
+        
+        template.installer_title = self.localized_dict["installer_title"]
+        template.header_string = self.localized_dict["header_string"]
+        template.sub_header_string = self.localized_dict["sub_header_string"]
+
+        # body and message inserts
+        template.replug_message_body = self.localized_dict[screen + "_message_body"]
+        template.replug_message_footer = self.localized_dict[screen + "_message_footer"]
+        
+        template.next_button = self.localized_dict["next_button"]
+
+        return str(template)
+
+    replug.exposed = True
+    
+    def replug_controller(self):
+        return self.finished()
+
+    replug_controller.exposed = True
 
     ####################################
     # UNSUPPORTED
@@ -163,6 +216,7 @@ class Installer(object):
         # button text inserts
         template.quit_button = self.localized_dict["quit_button"]
         template.next_button = self.localized_dict["next_button"]
+        
         return str(template)
 
     unsupported.exposed = True
@@ -210,6 +264,10 @@ class Installer(object):
         raise SystemExit
 
     stop.exposed = True
+        
+    def set_restart(self):
+        self.core.restart()
+    set_restart.exposed = True
 
     ####################################
     # WELCOME
@@ -782,7 +840,7 @@ class Installer(object):
         return self.dependency_controller2()
 
     def dependency_controller8(self):
-        self.next = self.finished
+        self.next = self.restart  #finished
         return self.progress(ACTION_BUILD_AND_INSTALL)
 
     def dependency_controller9(self):
@@ -1038,15 +1096,21 @@ class Installer(object):
 
         template = self.createTemplate(screen)
 
-        #template.installer_title = self.localized_dict["installer_title"]
-        #template.header_string = self.localized_dict["header_string"]
-        #template.sub_header_string = self.localized_dict["sub_header_string"]
-        # body and message inserts
-        #template.progress_message_title = self.localized_dict[screen + "_message_title"]
-        #template.progress_message_body = self.localized_dict[screen + "_message_body"]
-        #template.progress_message_footer = self.localized_dict[screen + "_message_footer"]
-        #template.error_package_manager_message_title = self.localized_dict[screen + "_message_title"]
-        #template.error_package_manager_message_body = sub_string_replace(self.localized_dict[screen + "_message_body"]) % {"package_manager_name":pkg_mgr}
+        template.profile_software_requirements = self.localized_dict["profile_software_requirements"]
+        template.required_dependencies = self.localized_dict["required_dependencies"]
+        template.optional_dependencies = self.localized_dict["optional_dependencies"]
+        template.preparing_dependencies = self.localized_dict["preparing_dependencies"]
+        template.finishing_dependencies = self.localized_dict["finishing_dependencies"]
+        template.building_and_installing = self.localized_dict["building_and_installing"]
+        template.remove_hpoj = self.localized_dict["remove_hpoj"]
+        template.remove_hplip = self.localized_dict["remove_hplip"]
+        template.restarting_cups = self.localized_dict["restarting_cups"]
+        template.unimplemented_operation = self.localized_dict["unimplemented_operation"]
+        
+        template.installation_progress = self.localized_dict["installation_progress"]
+        template.installation_progress_error = self.localized_dict["installation_progress_error"]
+        template.got_into_bad_state = self.localized_dict["got_into_bad_state"]
+  
         # button text inserts
         template.cancel_button = self.localized_dict["cancel_button"]
         template.retry_button = self.localized_dict["retry_button"]
@@ -1085,12 +1149,12 @@ class Installer(object):
                         if packages:
                             log.debug("Packages '%s' will be installed to satisfy dependency '%s'." %
                                 (','.join(packages), d))
-                            packages_to_install.extend(package)
+                            packages_to_install.extend(packages)
 
                         if commands:
                             log.debug("Commands '%s' will be run to satisfy dependency '%s'." %
                                 (','.join(commands), d))
-                            commands_to_run.extend(command)
+                            commands_to_run.extend(commands)
 
 
                 self.cmds.append(cat(package_mgr_cmd, ' '.join(packages_to_install)))
@@ -1161,7 +1225,7 @@ class Installer(object):
                 return str(template)
             else:
                 return self.next()
-            print self.cmds
+            #print self.cmds
 
     progress.exposed = True
 
@@ -1189,6 +1253,7 @@ class Installer(object):
         t = self.progress_status_code
         self.action_lock.release()
         t2 = utils.printable(str(t))
+        #print "status: ", str(t2)
         return str(t2)
 
     progress_status.exposed = True
@@ -1338,7 +1403,7 @@ class Installer(object):
             self.next = None
             return nxt()
 
-        self.next = self.finished
+        self.next = self.restart #finished
         return self.progress(ACTION_BUILD_AND_INSTALL)
 
     installation_path_controller.exposed = True
@@ -1579,25 +1644,28 @@ class Installer(object):
         return str(template)
 
     test.exposed = True
-
+    
     #
     # Code for reading the localized .ts files from the /data/localization
     #
+    
+    def user_specified_country(self):
+        lang = None
+        data = parse("installer/localization/gui_info.ts")
+        
+        countrys_code = data.getElementsByTagName("country")
+        for country_code in countrys_code:
+            lang = self.get_text(country_code.childNodes)
+        
+        #print self.core.language
+        return lang
+        
+    user_specified_country.exposed = False
 
-    def load_localization_file(self, path):
 
-        # This segment of code loads the proper string based on the Python Locale language.
-        lang, encoder = locale.getdefaultlocale()
-        if lang is not None:
-            supported_countries = ['en_US', 'zh_CN', 'de_DE', 'fr_FR', 'it_IT', 'ru_RU', 'pt_BR', 'es_MX']
-            if lang in supported_countries:
-                xmlfile = path + "_" + lang + ".ts"
-            else:
-                xmlfile = path + "_en_US.ts"
-        else:
-            xmlfile = path + "_en_US.ts"
-
-        xmlfile = path + "_fr_FR.ts"
+    def load_localization_file(self, path, lang):
+        xmlfile = os.path.join(path, "gui_strings_%s.ts" % utils.validate_language(lang))
+ 
         try:
             #log.debug("XML Path: %s" % xmlfile)
             dom = parse(xmlfile) #.decode('utf-8')
@@ -1676,9 +1744,9 @@ def init():
     log.info("Server ready.")
     utils.openURL("http://localhost:8888")
 
-def start():
+def start(langauge):
     cherrypy.root = Installer()
-    cherrypy.root.parse_elements(cherrypy.root.load_localization_file(XMLFILE))
+    cherrypy.root.parse_elements(cherrypy.root.load_localization_file(XMLPATH, langauge))
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     log.debug("The current path: %s" % current_dir)

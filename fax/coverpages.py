@@ -22,13 +22,24 @@
 from reportlab.platypus.paragraph import Paragraph
 from reportlab.platypus.flowables import Preformatted
 from reportlab.platypus.doctemplate import *
+#from reportlab.rl_config import TTFSearchPath
 from reportlab.platypus import SimpleDocTemplate, Spacer
 from reportlab.platypus.tables import Table, TableStyle
 from reportlab.lib.pagesizes import letter, legal, A4
 from reportlab.lib.units import inch
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib import colors
+#from reportlab.pdfbase import pdfmetrics
+#from reportlab.pdfbase.ttfonts import TTFont
 from time import localtime, strftime
+import warnings
+warnings.simplefilter('ignore', DeprecationWarning)
+
+if __name__ ==  "__main__":
+    import sys
+    sys.path.append("..")
+    
+from base.g import *
 from base import utils
 
 PAGE_SIZE_LETTER = 'letter'
@@ -50,15 +61,22 @@ def createStandardCoverPage(page_size=PAGE_SIZE_LETTER,
                             sender_email='', 
                             regarding='', 
                             message='',
-                            preserve_formatting=False):
+                            preserve_formatting=False,
+                            output=None):
 
     s = getSampleStyleSheet()
 
     story = []
 
+    #print prop.locale
+    #TTFSearchPath.append('/usr/share/fonts/truetype/arphic')
+    #pdfmetrics.registerFont(TTFont('UMing', 'uming.ttf'))
+
     ps = ParagraphStyle(name="title", 
                         parent=None, 
                         fontName='helvetica-bold',
+                        #fontName='STSong-Light',
+                        #fontName = 'UMing',
                         fontSize=36,
                         )
 
@@ -68,6 +86,8 @@ def createStandardCoverPage(page_size=PAGE_SIZE_LETTER,
 
     ps = ParagraphStyle(name='normal',
                         fontName='Times-Roman',
+                        #fontName='STSong-Light',
+                        #fontName='UMing',
                         fontSize=12) 
 
     recipient_name_label = Paragraph("To:", ps)
@@ -146,7 +166,10 @@ def createStandardCoverPage(page_size=PAGE_SIZE_LETTER,
     else:
         pgsz = A4
 
-    f_fd, f = utils.make_temp_file()
+    if output is None:
+        f_fd, f = utils.make_temp_file()
+    else:
+        f = output
 
     doc = SimpleDocTemplate(f, pagesize=pgsz)
     doc.build(story)
@@ -158,4 +181,21 @@ def createStandardCoverPage(page_size=PAGE_SIZE_LETTER,
 #            { "name" : (function, "thumbnail.png"), ... }    
 COVERPAGES = { "basic": (createStandardCoverPage, 'standard_coverpage.png'),
              }
+
+             
+if __name__ ==  "__main__":
+    createStandardCoverPage(page_size=PAGE_SIZE_LETTER,
+                                total_pages=1, 
+                                recipient_name='法国', 
+                                recipient_phone='1234', 
+                                recipient_fax='4321', 
+                                sender_name='Don', 
+                                sender_phone='1234',
+                                sender_fax='5678', 
+                                sender_email='test@hplip.sf.net', 
+                                regarding='Test', 
+                                message='Message',
+                                preserve_formatting=False,
+                                output="output.pdf")
+                                
 

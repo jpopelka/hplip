@@ -1347,7 +1347,7 @@ En cada fila, seleccione la etiqueta que representa el cuadro en el que las lín
     </message>
     <message>
         <source>Contents </source>
-        <translation>Contenido </translation>
+        <translation>Contenido</translation>
     </message>
     <message>
         <source>Properties for</source>
@@ -3655,7 +3655,7 @@ En cada fila, seleccione la etiqueta que representa el cuadro en el que las lín
     </message>
     <message>
         <source>Device(s) to Refresh </source>
-        <translation>Dispositivos que actualizar </translation>
+        <translation>Dispositivos que actualizar</translation>
     </message>
     <message>
         <source>Only currently selected device</source>
@@ -3775,6 +3775,14 @@ En cada fila, seleccione la etiqueta que representa el cuadro en el que las lín
     <message>
         <source>Current: Filter: &quot;%2&quot;  Search: &quot;%3&quot;  TTL: %4  Timeout: %5s</source>
         <translation>Actual: Filtro: Búsqueda de &quot;%2&quot;: TTL de &quot;%3&quot;: Tiempo de espera de %4: %5s</translation>
+    </message>
+    <message>
+        <source>The printer name and fax name must be different. Please choose different names.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Device not found.&lt;/b&gt; &lt;p&gt;Please make sure your printer is properly connected and powered-on.</source>
+        <translation></translation>
     </message>
     <message>
         <source>&lt;b&gt;No devices found.&lt;/b&gt;&lt;p&gt;Please make sure your printer is properly connected and powered-on.</source>
@@ -4068,7 +4076,7 @@ En cada fila, seleccione la etiqueta que representa el cuadro en el que las lín
     </message>
     <message>
         <source> &lt;i&gt;(&quot;/dev/parportX&quot;, X=0,1,2,...)&lt;/i&gt;</source>
-        <translation> &lt;i&gt;(&quot;/dev/parportX&quot;, X=0,1,2,...)&lt;/i&gt;</translation>
+        <translation>&lt;i&gt;(&quot;/dev/parportX&quot;, X=0,1,2,...)&lt;/i&gt;</translation>
     </message>
     <message>
         <source>Device Node:</source>
@@ -4861,7 +4869,7 @@ En cada fila, seleccione la etiqueta que representa el cuadro en el que las lín
     </message>
     <message>
         <source>HPLIP: Error/alert on device: </source>
-<translation>HPLIP: Error/alerta en dispositivo: </translation>
+<translation>HPLIP: Error/alerta en dispositivo:</translation>
     </message>
 </context>
 <context>

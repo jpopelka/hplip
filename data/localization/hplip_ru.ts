@@ -1347,7 +1347,7 @@ For each row, select the label representing the box in which the shorter inner l
     </message>
     <message>
         <source>Contents </source>
-        <translation>Содержание </translation>
+        <translation>Содержание</translation>
     </message>
     <message>
         <source>Properties for</source>
@@ -3655,7 +3655,7 @@ For each row, select the label representing the box in which the shorter inner l
     </message>
     <message>
         <source>Device(s) to Refresh </source>
-        <translation>Обновление устройств </translation>
+        <translation>Обновление устройств</translation>
     </message>
     <message>
         <source>Only currently selected device</source>
@@ -3775,6 +3775,14 @@ For each row, select the label representing the box in which the shorter inner l
     <message>
         <source>Current: Filter: &quot;%2&quot;  Search: &quot;%3&quot;  TTL: %4  Timeout: %5s</source>
         <translation>Текущее: Фильтр: &quot;%2&quot;  Поиск: &quot;%3&quot;  TTL: %4  Время ожидания: %5 сек</translation>
+    </message>
+    <message>
+        <source>The printer name and fax name must be different. Please choose different names.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Device not found.&lt;/b&gt; &lt;p&gt;Please make sure your printer is properly connected and powered-on.</source>
+        <translation></translation>
     </message>
     <message>
         <source>&lt;b&gt;No devices found.&lt;/b&gt;&lt;p&gt;Please make sure your printer is properly connected and powered-on.</source>
@@ -4068,7 +4076,7 @@ For each row, select the label representing the box in which the shorter inner l
     </message>
     <message>
         <source> &lt;i&gt;(&quot;/dev/parportX&quot;, X=0,1,2,...)&lt;/i&gt;</source>
-        <translation> &lt;i&gt;(&quot;/dev/parportX&quot;, X=0,1,2,...)&lt;/i&gt;</translation>
+        <translation>&lt;i&gt;(&quot;/dev/parportX&quot;, X=0,1,2,...)&lt;/i&gt;</translation>
     </message>
     <message>
         <source>Device Node:</source>
@@ -4861,7 +4869,7 @@ For each row, select the label representing the box in which the shorter inner l
     </message>
     <message>
         <source>HPLIP: Error/alert on device: </source>
-<translation>HPLIP: Ошибка/предупреждение на устройстве: </translation>
+<translation>HPLIP: Ошибка/предупреждение на устройстве:</translation>
     </message>
 </context>
 <context>

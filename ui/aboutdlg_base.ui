@@ -166,7 +166,7 @@
             <property name="text">
                 <string>&lt;b&gt;Authors and Contributors:&lt;/b&gt;
 David Suffield, Don Welch, Shiyun Yie, Raghothama Cauligi, John Oleinik, Cory Meisch, Foster Nuffer, Pete Parks, Jacqueline Pitter, David Paschal, 
-Steve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter</string>
+Steve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter, Linus Araque, Mark Crawford, Charlie Moore</string>
             </property>
         </widget>
         <widget class="QLabel" row="4" column="0">
@@ -175,7 +175,7 @@ Steve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wi
             </property>
             <property name="text">
                 <string>&lt;b&gt;License and Copyright:&lt;/b&gt;
-(c) Copyright 2006 Hewlett-Packard Development Company, L.P. This software is licensed under the GNU General Public License (GPL), BSD, and MIT licenses. See the software sources for details.</string>
+(c) Copyright 2007 Hewlett-Packard Development Company, L.P. This software is licensed under the GNU General Public License (GPL), BSD, and MIT licenses. See the software sources for details.</string>
             </property>
         </widget>
         <widget class="QLayoutWidget" row="6" column="0">

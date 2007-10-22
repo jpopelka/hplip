@@ -42,7 +42,7 @@ USAGE = [(__doc__, "", "name", True),
          utils.USAGE_PRINTER,
          utils.USAGE_SPACE,
          utils.USAGE_OPTIONS,
-         ("Use USB IDs to specify printer:", "-s xxx:yyy, where xxx is the USB bus ID and yyy is the USB device ID. The ':' and all leading zeroes must be present.", "option", False),
+         ("Use USB IDs to specify printer:", "-s bbb:ddd, where bbb is the USB bus ID and ddd is the USB device ID. The ':' and all leading zeroes must be present.", "option", False),
          utils.USAGE_BUS1, utils.USAGE_BUS2,
          utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
          utils.USAGE_HELP,
@@ -80,6 +80,8 @@ device_uri = None
 log_level = logger.DEFAULT_LOG_LEVEL
 bus = "cups,par,usb"
 usb_bus_node = None
+usb_bus_id = None
+usb_device_id = None
 silent = False
 
 if os.getenv("HPLIP_DEBUG"):
@@ -125,6 +127,18 @@ for o, a in opts:
         
     elif o == '-s':
         silent = True
+        try:
+            usb_bus_id, usb_device_id = a.split(":", 1)
+            log.debug("USB bus ID: %s" % usb_bus_id)
+            log.debug("USB device ID: %s" % usb_device_id)
+        except ValueError:
+            log.error("Invalid USB IDs: %s" % a)
+            sys.exit(1)
+            
+        if len(usb_bus_id) != 3 or len(usb_device_id) != 3:
+            log.error("Invalid USB IDs: %s" % a)
+            sys.exit(1)
+            
         usb_bus_node = a
 
 
@@ -135,13 +149,16 @@ if device_uri and printer_name:
 utils.log_title(__title__, __version__)
 
 if silent:
-    # called by .rules file
+    # called by .rules file with -s bbb.ddd
     printer_name = None
-    device_uri, sane_uri, fax_uri = device.makeURI(usb_bus_node, 1)
     
-    if not device_uri:
-        log.error("Invalid USB IDs: %s" % usb_bus_node)
-        sys.exit(1)
+    if usb_bus_node is not None:
+        log.debug("USB bus node: %s" % usb_bus_node)
+        device_uri, sane_uri, fax_uri = device.makeURI(usb_bus_node, 1)
+        
+        if not device_uri:
+            log.error("Invalid USB IDs: %s" % usb_bus_node)
+            sys.exit(1)
     
 else:
     if not device_uri and not printer_name:
@@ -181,11 +198,11 @@ except Error, e:
 fw_download = d.mq.get('fw-download', 0)
 
 if fw_download:
-    if d.downloadFirmware():
+    if d.downloadFirmware(usb_bus_id, usb_device_id):
         if not silent:
             log.info("Done.")
 else:
-    log.error("Device does not support or require firmware download.")
+    log.error("Device %s does not support or require firmware download." % device_uri)
 
 
 d.close()

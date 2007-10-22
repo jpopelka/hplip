@@ -32,6 +32,7 @@
 #include "io.h"
 #include "common.h"
 #include "scl.h"
+#include "hpaio.h"
 
 #define DEBUG_DECLARE_ONLY
 #include "sanei_debug.h"
@@ -204,10 +205,6 @@ SANE_Status __attribute__ ((visibility ("hidden"))) SclSendCommand(int deviceid,
         return SANE_STATUS_IO_ERROR;
     }
 
-    DBG(6, "SclSendCommand: len=%d: %s %d\n", datalen, __FILE__, __LINE__);
-    if (DBG_LEVEL >= 6)
-       sysdump(buffer, datalen);
-
     return SANE_STATUS_GOOD;
 }
 
@@ -317,6 +314,66 @@ SANE_Status __attribute__ ((visibility ("hidden"))) SclInquire(int deviceid, int
     return SANE_STATUS_GOOD;
 }
 
+/*
+ * Phase 2 partial rewrite. des 9/26/07
+ */
 
+SANE_Status __attribute__ ((visibility ("hidden"))) scl_send_cmd(HPAIO_RECORD *hpaio, const char *buf, int size)
+{
+    int len;
+    
+    hpmud_write_channel(hpaio->deviceid, hpaio->scan_channelid, buf, size, EXCEPTION_TIMEOUT, &len);
 
+    DBG(6, "scl cmd sent size=%d bytes_wrote=%d: %s %d\n", size, len, __FILE__, __LINE__);
+    if (DBG_LEVEL >= 6)
+       sysdump(buf, size);
+
+    if(len != size)
+    {
+        return SANE_STATUS_IO_ERROR;
+    }
+
+    return SANE_STATUS_GOOD;
+}
+
+SANE_Status __attribute__ ((visibility ("hidden"))) scl_query_int(HPAIO_RECORD *hpaio, const char *buf, int size, int *result)
+{
+    char rbuf[256];
+    int len, stat;
+    char *tail;
+
+    *result=0;
+
+    if ((stat = scl_send_cmd(hpaio, buf, size)) != SANE_STATUS_GOOD)
+    {
+        return stat;
+    }
+
+    if ((stat = hpmud_read_channel(hpaio->deviceid, hpaio->scan_channelid, rbuf, sizeof(rbuf), EXCEPTION_TIMEOUT, &len)) != HPMUD_R_OK)
+    {
+        return SANE_STATUS_IO_ERROR;
+    }
+
+    DBG(6, "scl response size=%d: %s %d\n", len, __FILE__, __LINE__);
+    if (DBG_LEVEL >= 6)
+       sysdump(buf, size);
+
+    /* Null response? */
+    if(rbuf[len-1] == 'N')
+    {
+        DBG(6, "scl null response: %s %d\n", __FILE__, __LINE__);
+        return SANE_STATUS_UNSUPPORTED;
+    }
+        
+    /* Integer response? */
+    if(rbuf[len-1] != 'V' )
+    {
+        bug("invalid scl integer response: %s %d\n", __FILE__, __LINE__);
+        return SANE_STATUS_IO_ERROR;
+    }
+
+    *result = strtol(&rbuf[size], &tail, 10);
+
+    return SANE_STATUS_GOOD;
+}
 

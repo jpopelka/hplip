@@ -261,10 +261,8 @@ int hpijsFaxServer (int argc, char **argv)
 	IP_IMAGE_TRAITS	traits;
 	IP_HANDLE		hJob;
 
-	char					hpFileName[256];
-	FILE					*fpFax = NULL;
-	struct  	timeval		tv;
-	struct		tm			*cur_time;
+	char					hpFileName[] = "/tmp/hplipfaxXXXXXX";
+	int					fdFax = -1;
 	BYTE					szFileHeader[68];
 	BYTE					szPageHeader[64];
 	BYTE					*p;
@@ -293,14 +291,6 @@ int hpijsFaxServer (int argc, char **argv)
 	ijs_server_install_set_cb (ctx, hpijsfax_set_cb, pFaxStruct);
 	ijs_server_install_get_cb (ctx, hpijsfax_get_cb, pFaxStruct);
 
-	memset (&tv, 0, sizeof (tv));
-	gettimeofday (&tv, NULL);
-	cur_time = localtime (&tv.tv_sec);
-    memset (hpFileName, 0, 256);
-	sprintf (hpFileName, "%s/hplipfax%d%d%d%d%d%d.g3", getenv ("TMPDIR"),
-						  cur_time->tm_year+1900, cur_time->tm_mon+1, cur_time->tm_mday,
-						  cur_time->tm_hour, cur_time->tm_min, cur_time->tm_sec);
-
 	while (1)
 	{
 		if ((ret = ijs_server_get_page_header(ctx, &pFaxStruct->ph)) < 0)
@@ -312,10 +302,10 @@ int hpijsFaxServer (int argc, char **argv)
 		if (pFaxStruct->IsFirstRaster ())
 		{
 		    pFaxStruct->SetFirstRaster (0);
-			if (fpFax == NULL)
+			if (fdFax == -1)
 			{
-				fpFax = fopen (hpFileName, "w");
-				if (fpFax == NULL)
+				fdFax = mkstemp (hpFileName);
+				if (fdFax < 0)
 				{
 					bug ("Unable to open Fax output file - %s for writing\n", hpFileName);
 					goto BUGOUT;
@@ -334,7 +324,7 @@ int hpijsFaxServer (int argc, char **argv)
 				*p++ = pFaxStruct->GetFaxEncoding ();	// MH, MMR or JPEG
 				p += 4;									// Reserved 1
 				p += 4;									// Reserved 2
-				fwrite (szFileHeader, 1, p - szFileHeader, fpFax);
+				write (fdFax, szFileHeader, (p - szFileHeader));
 		    }
 		}
 
@@ -488,8 +478,8 @@ int hpijsFaxServer (int argc, char **argv)
 		HPLIPPUTINT32 (p, dwOutputUsed); p += 4;			// Size in bytes of encoded data
 		HPLIPPUTINT32 (p, 0); p += 4;			            // Thumbnail data size
 		HPLIPPUTINT32 (p, 0); p += 4;						// Reserved for future use
-		fwrite (szPageHeader, 1, (p - szPageHeader), fpFax);
-		fwrite (pbOutputBuf, 1, dwOutputUsed, fpFax);
+		write (fdFax, szPageHeader, (p - szPageHeader));
+		write (fdFax, pbOutputBuf, dwOutputUsed);
 /*
  *      Write the thumbnail data here
  */
@@ -505,36 +495,24 @@ int hpijsFaxServer (int argc, char **argv)
 
 	} /* end while (1) */
 
-	fseek (fpFax, 9, SEEK_SET);
+	lseek (fdFax, 9, SEEK_SET);
 	HPLIPPUTINT32 ((szFileHeader + 9), uiPageNum);
-	fwrite (szFileHeader + 9, 1, 4, fpFax);
+	write (fdFax, szFileHeader + 9, 4);
 /*
     chmod (hpFileName, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     hpFileName[strlen (hpFileName)] = '\n';
     write (pFaxStruct->iOutputPath, hpFileName, strlen (hpFileName));
  */
-    fclose (fpFax);
-
-/*
- *  Reopen the fax output file and write the data to fax backend.
- *  Have to do this because the fax header includes number of pages in the
- *  job, so, have to wait until all pages have been received.
- */
 
     BYTE    *pTmp;
     int     iSize;
+    pTmp = NULL;
 
-    fpFax = fopen (hpFileName, "r");
-    if (!fpFax)
-    {
-        goto BUGOUT;
-    }
+    iSize = lseek (fdFax, 0, SEEK_END);
+    lseek (fdFax, 0, SEEK_SET);
 
-    fseek (fpFax, 0, SEEK_END);
-    iSize = ftell (fpFax);
-    fseek (fpFax, 0, SEEK_SET);
-
-    pTmp = new BYTE[iSize];
+    if (iSize > 0)
+        pTmp = new BYTE[iSize];
     if (pTmp == NULL)
     {
         iSize = 1024;
@@ -544,18 +522,16 @@ int hpijsFaxServer (int argc, char **argv)
             goto BUGOUT;
         }
     }
-    while (iSize > 0)
+    while ((i = read (fdFax, pTmp, iSize)) > 0)
     {
-        i = fread (pTmp, 1, iSize, fpFax);
         write (pFaxStruct->iOutputPath, pTmp, i);
-        iSize -= i;
     }
     delete [] pTmp;
 
 BUGOUT:
-	if (fpFax)
+	if (fdFax > 0)
 	{
-		fclose (fpFax);
+		close (fdFax);
 	}
     //unlink (hpFileName);
 	if (pFaxStruct != NULL)

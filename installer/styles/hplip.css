@@ -273,6 +273,25 @@ select {width:40%;font-weight:bold;}
     font-family: "Century Schoolbook";
 }
 
+#restartText {
+    position: absolute;
+    top: 9px;
+    left: 32px;
+    text-align: center;
+    font-family: "Century Schoolbook";
+}
+
+#restartHiliteText {
+    position: absolute;
+    top: 8px;
+    left: 31px;
+    color: white;
+    text-align: center;
+    font-family: "Century Schoolbook";
+}
+
+
+
 #quitText {
     position: absolute;
     top: 9px;
@@ -289,6 +308,7 @@ select {width:40%;font-weight:bold;}
     text-align: center;
     font-family: "Century Schoolbook";
 }
+
 
 #yesText {
     position: absolute;
@@ -380,6 +400,18 @@ select {width:40%;font-weight:bold;}
     position: absolute;
     top: 240px;
     left: 50px;
+    height: 33px;
+    width: 98px;
+    font-weight: bold;
+    font-size: 1.0em;
+    padding: .15ex;
+    cursor: pointer;
+}
+
+#restart_button {
+    position: absolute;
+    top: 240px;
+    left: 380px;
     height: 33px;
     width: 98px;
     font-weight: bold;

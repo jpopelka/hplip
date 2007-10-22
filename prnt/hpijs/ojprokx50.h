@@ -76,6 +76,7 @@ public:
         "OfficeJet Pro K53\0"
         "OfficeJet Pro K54\0"
         "OfficeJet Pro K56\0"
+        "OfficeJet pro K86\0"
         "Officejet Pro L73\0"
         "Officejet Pro L75\0"
         "Officejet Pro L76\0"

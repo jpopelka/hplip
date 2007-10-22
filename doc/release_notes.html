@@ -85,7 +85,43 @@ Release Notes
         <div class="document">
 <div class="section">
 <h1><a id="release-notes" name="release-notes">Release Notes</a></h1>
-<p><strong>HPLIP 2.7.9 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 2.7.10 - This release has the following changes:</strong></p>
+<ol class="arabic simple">
+<li>Made a change to 55-hpmud.rules so that it also works for SUSE 10.3. This rule is still backward compatible with older udev based distros.</li>
+<li>Applied patch for issue CVE-2007-5208 (hpssd command injection)</li>
+<li>Added detection for Reportlab 2.x in hp-check and hp-sendfax</li>
+<li>Fixed defect (Traceback information displays when right-click the picture icon in the &quot;Unload Photo Card&quot; window.)</li>
+<li>Added new icons for Officejet J3600 and Officejet J5500</li>
+<li>Fixed defect (Chinese: The Default button in the print setting tab always invalid when configure the parameter of Page Orientation.)</li>
+<li>Fixed defect (The printer will be replaced by adding another printer with the same name when setting up the printer.)</li>
+<li>Added -q/--lang= to hp-setup</li>
+<li>Fixed defect (Hplip installion process hangs up at &quot;PRINTER SETUP&quot; if select no GUIs during custom installion.)</li>
+<li>Fixed defect (Chinese: Date information in the status tab of toolbox is not localized correctly.)</li>
+<li>Added syslog &quot;loading firmware&quot; message to plugin udev files.</li>
+<li>Some improvements/fixes to LaserJet status</li>
+<li>Added -q/--lang to hp-unload, hp-sendfax, and hp-makecopies</li>
+<li>Cleaned up some code in hpaio.</li>
+<li>Updated APDK label in bootstrap</li>
+<li>Cleaned up lj10xx ppds</li>
+<li>Added support for the following new printer(s):</li>
+</ol>
+<pre class="literal-block">
+- HP Officejet Pro K8600 (DJGenericVP)
+- HP Photosmart C4380 Series (DJGenericVP)
+- HP LaserJet 1018 (LJZjsMono w/plug-in)
+- HP LaserJet 1020 (LJZjsMono w/plug-in)
+- HP LaserJet 1022 (LJZjsMono w/plug-in)
+- HP LaserJet 1022n (LJZjsMono w/plug-in)
+- HP LaserJet 1022nw (LJZjsMono w/plug-in)
+- HP Deskjet 550C (DJ540)
+</pre>
+<p><strong>HPLIP 2.7.10 - Known Issues with Localization (L10N) and Internationalization (I18N):</strong></p>
+<ol class="arabic simple">
+<li>Non-Latin1 characters (Chinese, Russian, etc) cannot be used in the following locations: Coverpage information (hp-sendfax), command paths (hp-toolbox), photocard unload paths (hp-unload), fax header information (hp-toolbox), file print paths (hp-print), and file fax paths (hp-sendfax).</li>
+<li>The date infomation in the status tab of HP Device Manager (hp-toolbox) may not have the correct format for the current locale.</li>
+<li>Non-Latin1 characters (Chinese, Russian, etc) cannot be used for any command line utility as user input or command line argument.</li>
+</ol>
+<p><strong>HPLIP 2.7.9 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Made the default udev 55-hpmud.rules file more permissive (ie: MODE=0666). Users no longer have to belong to the &quot;lp&quot; group.
 Users or distributions can change this user policy by modify the 55-hpmud.rules file.</li>
@@ -135,9 +171,9 @@ Users or distributions can change this user policy by modify the 55-hpmud.rules 
 <li>Removed laserjet contrast scan parameter from hpaio sane backend. Laserjets ignore this parameter. Contrast can be adjusted up-stream in xsane.</li>
 <li>Fixed defect (The Printer Name can not be modified during setup UI process)</li>
 </ol>
-<p><strong>This HPLIP package includes HPIJS 2.7.9 which has the following changes.</strong></p>
+<p><strong>This HPLIP package includes HPIJS 2.7.9 which has the following changes:</strong></p>
 <ol class="arabic simple">
-<li>Added support for the following new printer(s).</li>
+<li>Added support for the following new printer(s):</li>
 </ol>
 <pre class="literal-block">
 - HP Photosmart D7400 series (DJGenericVIP)
@@ -150,7 +186,7 @@ Users or distributions can change this user policy by modify the 55-hpmud.rules 
 - HP Officejet J3600 Series (DJ3600)
 - HP Officejet J5500 Series (DJ3600)
 </pre>
-<p><strong>HPLIP 2.7.7 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 2.7.7 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Fixed issues with ppd_install and ppd_dir in the installer</li>
 <li>Device-id and device-status queries can now be made on more than just the 7/1/2 interface.</li>
@@ -182,16 +218,16 @@ Users or distributions can change this user policy by modify the 55-hpmud.rules 
 <li>Added localization files to tarball.</li>
 <li>Various small bug fixes (esp. in the installer)</li>
 </ol>
-<p><strong>This HPLIP package includes HPIJS 2.7.7 which has the following changes.</strong></p>
+<p><strong>This HPLIP package includes HPIJS 2.7.7 which has the following changes:</strong></p>
 <ol class="arabic simple">
-<li>Added support for the following new printer(s).</li>
+<li>Added support for the following new printer(s):</li>
 </ol>
 <pre class="literal-block">
 - HP PhotoSmart A620 Series (PSP470)
 - HP PhotoSmart A820 Series (PSP470)
 - HP PhotoSmart A520 Series (DJGenericVIP)
 </pre>
-<p><strong>HPLIP 2.7.6 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 2.7.6 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Major version number change denotes new functionality.</li>
 </ol>
@@ -334,10 +370,10 @@ in hplip.conf be used (port 2207). Hpssd does not create any .pid or .port files
 <li>Removed code for screen that shows the optional path installation (defect).</li>
 <li>Merged new hpssd autostart code</li>
 </ol>
-<p><strong>This HPLIP package includes HPIJS 2.7.6 which has the following changes.</strong></p>
+<p><strong>This HPLIP package includes HPIJS 2.7.6 which has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Removed ESC*p command from DJGenericVIP class for each raster send to fix PhotoSmart C4200 assert</li>
-<li>Added support for the following new printer(s).</li>
+<li>Added support for the following new printer(s):</li>
 </ol>
 <pre class="literal-block">
 - HP Photosmart C4200 series (DJGenericVIP)
@@ -350,7 +386,7 @@ in hplip.conf be used (port 2207). Hpssd does not create any .pid or .port files
 - HP 910 (DJ3320)
 - HP 915 (DJ3600)
 </pre>
-<p><strong>HPLIP 1.7.4 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 1.7.4 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Fixed defect (The tip of menu &quot;Contents...&quot; is incorrect.) [added F1 accelerator]</li>
 <li>Fixed defect (The corresponding operation could not work while executing hp-sendfax with &quot;--non-interactive&quot;, &quot;--faxnum&quot;, &quot;--recipient&quot;, &quot;--group&quot;, &quot;--logging&quot; parameters in terminal.)</li>
@@ -381,11 +417,11 @@ in hplip.conf be used (port 2207). Hpssd does not create any .pid or .port files
 <li>Added order column and move up/down to hp-print</li>
 <li>Toolbox internal/built-in send PC fax utility</li>
 </ol>
-<p><strong>This HPLIP package includes HPIJS 2.7.4 which has the following changes.</strong></p>
+<p><strong>This HPLIP package includes HPIJS 2.7.4 which has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Fixed a custom paper size bug that caused unintended scaling in certain cases in services.cpp</li>
 <li>Added supply level low warning message in hpijs.cpp as suggested by Tim Waugh</li>
-<li>Added support for the following new printer(s).</li>
+<li>Added support for the following new printer(s):</li>
 </ol>
 <pre class="literal-block">
 - DeskJet D1400 Series (DJ3320)
@@ -396,7 +432,7 @@ in hplip.conf be used (port 2207). Hpssd does not create any .pid or .port files
 - CM8050MFP with Edgeline (PS)
 - CM8060MFP with Edgeline (PS)
 </pre>
-<p><strong>HPLIP 1.7.3 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 1.7.3 - This release has the following changes:</strong></p>
 <ol class="arabic">
 <li><p class="first">Added the &lt;nopjl /&gt; tag to hpijs-generator.in. This will remove the extra foomatic PJL options from most HP LaserJet PPD files.
 The extra foomatic PJL options caused some HPIJS PCL data issues. This fixes a &quot;PCL XL error&quot; on LJ1010/1012 that can
@@ -464,7 +500,7 @@ This fixes a double-feed ADF issue which occurred when scanning a single page.</
 <li>Changed magic.py to better handle text/plain vs. data detection</li>
 <li>Added last used working directory support to hp-sendfax, hp-print, and hp-unload</li>
 </ol>
-<p><strong>HPLIP 1.7.2 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 1.7.2 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Fixed defect (The fax file is printed out by the sender when use printer name with &quot;-p&quot; parameter to perform a fax job.)</li>
 <li>Added CUPS fax queues to Print Settings and Print Control tabs</li>
@@ -524,11 +560,11 @@ This issue crept back into the hpiod code after the libusb update.</li>
 <li>Set the device list column width in the toolbox splitter to be more narrow by default</li>
 <li>Added the toolbox software version to the Device Manager about dialog</li>
 </ol>
-<p><strong>This HPLIP package includes HPIJS 2.7.2 which has the following changes.</strong></p>
+<p><strong>This HPLIP package includes HPIJS 2.7.2 which has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Fixed media type for maxdpi printmode for vip printers and its derivatives</li>
 <li>Fixed the cause of carriage stall error in C41xx printers</li>
-<li>Added support for the following new printer(s).</li>
+<li>Added support for the following new printer(s):</li>
 </ol>
 <pre class="literal-block">
 - Officejet Pro L7300 series (OJProKx50)
@@ -540,7 +576,7 @@ This issue crept back into the hpiod code after the libusb update.</li>
 - HP Officejet J5700 series (DJGenericVIP)
 </pre>
 <p>OJProKx50 is derived from DJGenericVIP.</p>
-<p><strong>HPLIP 1.7.1 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 1.7.1 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added some new html files to Makefile.am for hplip and hpijs.</li>
 <li>Fixed uninitilized pointer in hplip_api library. As requested by SUSE.</li>
@@ -585,12 +621,12 @@ This issue crept back into the hpiod code after the libusb update.</li>
 <li>Added page range validation to hp-print (disallows ranges like &quot;-2&quot; and &quot;2-&quot;)</li>
 <li>Fixed defect 1291 (The plain-text type file which begins with character &quot;/*&quot; can not be added rendered by the fax driver.) [Pretty printing checkbox added to hp-print and hp-sendfax. Off by default.]</li>
 </ol>
-<p><strong>This HPLIP package includes HPIJS 2.7.1 which has the following changes.</strong></p>
+<p><strong>This HPLIP package includes HPIJS 2.7.1 which has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Moved PSC 21XX from DJ9xxVIP to DJGenericVIP - these printers can do fullbleed printing on 4x6 media</li>
 <li>Added a new printmode, photonormal for DJ9xxVIP to enable printers without media sensors to print to photo media</li>
 </ol>
-<p><strong>HPLIP 1.6.12 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 1.6.12 - This release has the following changes:</strong></p>
 <ol class="arabic">
 <li><dl class="first docutils">
 <dt>Incorporated the following upstream change requests from Red Hat.</dt>
@@ -688,18 +724,18 @@ The hplip_api can be used to get model attributes without running the HPLIP daem
 <li>Applied 'hplip-loop' patch from Tim Waugh [changes hpssd.py async loop timeout from 0.5 to 5.0 sec]</li>
 </ol>
 <p>With SUSE 10.1 if hp-setup fails to create the print queue, and displays the dialog box &quot;failed to create printer queue, please restart CUPS.&quot; and restarting CUPS does not resolve the issue. You can update CUPS to 1.2.7 as a work around for this issue.</p>
-<p><strong>This HPLIP package includes HPIJS 2.6.12 which has the following changes.</strong></p>
+<p><strong>This HPLIP package includes HPIJS 2.6.12 which has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Made hplip_api calls in hpijs conditional at compile time. The hpijs configure flag &quot;hplip-build&quot; will determine if
 hplip_api calls are used.</li>
-<li>Added support for the following new printer(s).</li>
+<li>Added support for the following new printer(s):</li>
 </ol>
 <pre class="literal-block">
 - Color LaserJet CP4005 (LJColor/PS)
 - LaserJet M5025 MFP (LJMono/PS)
 - LaserJet M3027 MFP (LJMono/PS)
 </pre>
-<p><strong>HPLIP 1.6.10 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 1.6.10 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Fixed defect hp-print and hp-sendfax (An error occurs while executing hp-print with invalid device URI or the printer name in terminal).</li>
 <li>Removed batch scanning sane_cancel dependency. This fixes a problem with scanimage version 1.0.18 or higher.</li>
@@ -737,9 +773,9 @@ hplip_api calls are used.</li>
 <li>Changed xsane dependency detection so that it will work if X is not running.</li>
 <li>Changes for setup.py -u.</li>
 </ol>
-<p><strong>This HPLIP package includes HPIJS 2.6.10 which has the following changes.</strong></p>
+<p><strong>This HPLIP package includes HPIJS 2.6.10 which has the following changes:</strong></p>
 <ol class="arabic simple">
-<li>Added support for the following new printer(s).</li>
+<li>Added support for the following new printer(s):</li>
 </ol>
 <pre class="literal-block">
 - LaserJet P2015 (LJMono/PS)
@@ -758,7 +794,7 @@ hplip_api calls are used.</li>
 - Color LaserJet CM1017 (PS)
 </pre>
 <p>Note, current Color LaserJet CM1015/CM1017 support is limited to printing and status. Scanning will be supported in the future.</p>
-<p><strong>HPLIP 1.6.9 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 1.6.9 - This release has the following changes:</strong></p>
 <ol class="arabic">
 <li><p class="first">Add new command hplip-install.</p>
 </li>
@@ -854,10 +890,10 @@ hplip_api calls are used.</li>
 <li><p class="first">Moved Qt import in hp-toolbox and hp-print to after command line processing.</p>
 </li>
 </ol>
-<p><strong>This HPLIP package includes HPIJS 2.6.9 which has the following changes.</strong></p>
+<p><strong>This HPLIP package includes HPIJS 2.6.9 which has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added support CD/DVD label printing (ie: PS D5100).</li>
-<li>Added support for the following new printer(s).</li>
+<li>Added support for the following new printer(s):</li>
 </ol>
 <pre class="literal-block">
 - PhotoSmart A310 series (DJGenericVIP)
@@ -868,7 +904,7 @@ hplip_api calls are used.</li>
 - PhotoSmart D5060 series (DJGenericVIP)
 - PhotoSmart Pro B8300 series (DJGenericVIP)
 </pre>
-<p><strong>HPLIP 1.6.7 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 1.6.7 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Changed from dynamic IP ports to static IANA IP ports for hpiod (2208) and hpssd (2207).</li>
 <li>Changed the &quot;start&quot; return value in hplip startup script.</li>
@@ -895,15 +931,15 @@ hplip_api calls are used.</li>
 <li>Removed some extraneous debugging output in hp-makecopies.</li>
 <li>Fixed defect (CUPS 1.2 does not auto-associate the PPD file to the fax URI) reported by Till.</li>
 </ol>
-<p><strong>This HPLIP package includes HPIJS 2.6.7 which has the following changes.</strong></p>
+<p><strong>This HPLIP package includes HPIJS 2.6.7 which has the following changes:</strong></p>
 <ol class="arabic simple">
-<li>Added support for the following new printer(s).</li>
+<li>Added support for the following new printer(s):</li>
 </ol>
 <pre class="literal-block">
 - Photosmart D6100 series (DJGenericVIP)
 - Photosmart D7100 series (DJGenericVIP)
 </pre>
-<p><strong>HPLIP 1.6.6a - This release has the following changes.</strong></p>
+<p><strong>HPLIP 1.6.6a - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added a check to hp-sendfax, hp-makecopies and hp-unload to disallow GUI mode if X is not available.</li>
 <li>Changed the hpfax: retry to 10sec (from 30sec).</li>
@@ -939,7 +975,7 @@ hplip_api calls are used.</li>
 <li>Fixed bug in hpfax: backend that occured during device autodetection (reported by Till/Henrique).</li>
 <li>Fixed hpfax: autodection string format for CUPS 1.2 (reported by Till).</li>
 </ol>
-<p><strong>HPLIP 1.6.6 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 1.6.6 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>HPLIP has reached 1.0 status. With this release we start using a new date encoded revision number.</li>
 </ol>
@@ -978,12 +1014,12 @@ discovery will no longer cause Inkjets to power-up.</li>
 <li>Added sane hpaio.desc file to documentation.</li>
 <li>Changed library check in hp-check from 'libsnmp' to 'libnetsnmp' (issue reported on mailing list).</li>
 </ol>
-<p><strong>This HPLIP package includes HPIJS 2.6.6 which has the following changes.</strong></p>
+<p><strong>This HPLIP package includes HPIJS 2.6.6 which has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Starting with this release HPIJS will be using the same date encoded revision number as HPLIP. See item one above for details.</li>
 <li>Fixed an auto duplex problem in HPIJS (issue reported by Red Hat).</li>
 <li>Fixed gcc 4.1 compiler issues with HPIJS glue code (issue reported by Debian).</li>
-<li>Added support for the following new printer(s).</li>
+<li>Added support for the following new printer(s):</li>
 </ol>
 <pre class="literal-block">
 - Deskjet D4100 series (DJ4100)
@@ -1014,7 +1050,7 @@ KRGB definition:
  6. K-plane 1-bit definition; 1=black, 0=nothing (ColorSpace=KRGB).
  7. K-plane 8-bit definition; 255=black, 0=nothing (ColorSpace=KxRGB).
 </pre>
-<p><strong>HPLIP 0.9.11 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 0.9.11 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Changed hp-sendfax behavior. Hp-sendfax must be run before print jobs can be printed to a fax queue.</li>
 <li>Completely revamped the email alert system (now uses sendmail rather than a SMTP server).</li>
@@ -1034,12 +1070,12 @@ KRGB definition:
 <li>Moved fax address book file from ~/.hplip.fab to ~/hpfax/fab.db.</li>
 <li>Changed hp-fab so that duplicate entries cannot be created.</li>
 </ol>
-<p><strong>This HPLIP package includes HPIJS 2.1.10 which has the following changes.</strong></p>
+<p><strong>This HPLIP package includes HPIJS 2.1.10 which has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Moved PSC 21xx from DJGenericVIP to DJ9xxVIP device class.</li>
 <li>Forced hpijs and hppgsz to always build with -DNDEBUG.</li>
 <li>Merged hpijs_readme.html into hplip documentation.</li>
-<li>Added support for the following new printer(s).</li>
+<li>Added support for the following new printer(s):</li>
 </ol>
 <pre class="literal-block">
 - LaserJet 5200 (LJMono/PS)
@@ -1048,7 +1084,7 @@ KRGB definition:
 - Officejet 6300 series (DJGenericVIP)
 - Officejet 4300 series (DJ3320)
 </pre>
-<p><strong>HPLIP 0.9.10 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 0.9.10 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Made the &quot;hp&quot; backend more product specific. HP USB keyboards should now be filtered out.</li>
 <li>Fixed gzip 1.2.4 issue with &quot;make install&quot;.</li>
@@ -1063,7 +1099,7 @@ KRGB definition:
 <li>Fixed a hp-toolbox problem displaying cartridge information for Photosmart 8700 when device is connected via network.</li>
 </ol>
 <p>This HPLIP package also includes HPIJS 2.1.9.</p>
-<p><strong>HPLIP 0.9.9 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 0.9.9 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>HPLIP now uses libusb for all USB I/O. Libusb replaces kernel modules printer and usblp. Libusb 0.1.8 or higher is required.</li>
 <li>Removed support for USB URIs based on device files. This means all LaserJets now use USB URIs based on &quot;hp:/hp_model?serial=xxxxxxxx&quot; instead of &quot;hp:/hp_model?device=/dev/usb/lpx&quot;. Old print queues based on the old URI must be updated to the new URI.</li>
@@ -1089,17 +1125,17 @@ KRGB definition:
 <li>HPLIP now installs HP-Fax-hplip.ppd independent of HPIJS. HPLIP installs HP-Fax-hplip.ppd into $(datadir)/HP directory, but</li>
 <li>HPIJS creates the symlink from cups/model/foomatic-ppd to $(datadir)/HP.</li>
 </ol>
-<p><strong>This HPLIP package includes HPIJS 2.1.9 which has the following changes.</strong></p>
+<p><strong>This HPLIP package includes HPIJS 2.1.9 which has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Fixed an array index underflow in ljfastraster.cpp.</li>
 <li>Save paper width and height in UXServices object after a call to SetPaperSize.</li>
 <li>When fullbleed printing is requested, if printer supports it, return actual paper dimensions for PrintableArea.</li>
-<li>Added support for the following new printer(s).</li>
+<li>Added support for the following new printer(s):</li>
 </ol>
 <pre class="literal-block">
 - HP DeskJet F300 Series All-in-one (DJ3600)
 </pre>
-<p><strong>HPLIP 0.9.8 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 0.9.8 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added PC send fax support. This feature is is supported by a send fax UI (hp-sendfax), send fax setup in the hp-toolbox (HP Device Manager), and a fax address book (hp-fab). Files (and an optional coverpage) may be sent by running the send fax UI directly or by printing through the supplied HP Fax CUPS backend from any application or by using lp/lpr. A CUPS queue configured with the HP Fax CUPS backend (hpfax:) must be separately set up for faxing to operate.</li>
 <li>Added HP Setup utility. This new utility (hp-setup) can quickly and automatically setup print and/or fax queues for HPLIP supported devices. It will automatically choose the closest matching PPD file, print a testpage, and set up a fax queue and allow the user to perform basic fax setup (TTI header setup) if appropriate. Using the -m parameter, hp-setup also replaces the functionality of 'hp-makeuri'.</li>
@@ -1117,7 +1153,7 @@ KRGB definition:
 <li>Fixed _GNU_SOURCE define in hpaio.h. (RH patch)</li>
 <li>Fixed GetDeviceStatus overwrite in hpiod. (RH patch)</li>
 </ol>
-<p><strong>This HPLIP package includes HPIJS 2.1.8 which has the following changes.</strong></p>
+<p><strong>This HPLIP package includes HPIJS 2.1.8 which has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Removed a duplicate ; in ljjetready.h.</li>
 <li>Commented out forward declaration of jpeg APIs from ljjetready.cpp - some compilers don't compile otherwise.</li>
@@ -1136,7 +1172,7 @@ KRGB definition:
 <li>Photo Card access is not available via hp-photo. Photo Card access is available via USB mass storage.</li>
 <li>Network scanning is supported, but USB scanning is not. USB scanning requires libusb and should be available in the next HPLIP release.</li>
 </ol>
-<p><strong>HPLIP 0.9.7 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 0.9.7 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added 1284.4 support to hpiod. Previous support was MLC only.</li>
 <li>Added configure option &quot;--disable-pp-build&quot; to disable parallel port build.</li>
@@ -1156,7 +1192,7 @@ KRGB definition:
 <li>Fixed System::GetSnmp sigfault in hpiod. This will fix network scanning/hp-toolbox issues in previous HPLIP releases.</li>
 <li>Fixed an issue where an error occurs while executing hp-photo after the usb cable was disconnected.</li>
 </ol>
-<p><strong>This HPLIP package includes HPIJS 2.1.7 which has the following changes.</strong></p>
+<p><strong>This HPLIP package includes HPIJS 2.1.7 which has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added configure option &quot;--enable-hplip-build&quot;.</li>
 <li>Converted HPIJS to autoconf 2.59.</li>
@@ -1169,7 +1205,7 @@ KRGB definition:
 - HP Color LaserJet 3600 (LJJetReady)
 - HP Color LaserJet 3800 (LJColor/PS)
 </pre>
-<p><strong>HPLIP 0.9.6 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 0.9.6 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>In hp-toolbox (Device Manager) made a small LaserJet status change that makes the CLJ 2550 work OK.</li>
 <li>Fixed a bug with the PSC3310 with low photo supplies (caused a toolbox exception).</li>
@@ -1196,7 +1232,7 @@ KRGB definition:
 - HP Officejet Pro K550 (DJGenericVIP)
 - HP Officejet Pro K850 (DJGenericVIP)
 </pre>
-<p><strong>HPLIP 0.9.5 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 0.9.5 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added parallel port support for printing and scanning. See Product Support table for supported devices and features.</li>
 <li>Fixed most gcc4 warnings.</li>
@@ -1232,7 +1268,7 @@ KRGB definition:
 - HP Deskjet 5440 (DJGenericVIP)
 - HP Color laserJet 4700 (LJColor/PS)
 </pre>
-<p><strong>HPLIP 0.9.4 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 0.9.4 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Fixed a bi-di problem with all LIDIL printers in HPIJS. This fixes a printing problem which occurred in HPLIP 0.9.3.</li>
 <li>Fixed a 64-bit problem with LJJetReady printers in HPIJS.</li>
@@ -1275,7 +1311,7 @@ KRGB definition:
 <li>Network scanning is supported, but USB scanning is not.</li>
 <li>Hp-toolbox status is not complete.</li>
 </ol>
-<p><strong>HPLIP 0.9.3 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 0.9.3 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Modified models.xml Deskjet_1220C panel_check_type to be 0 to solve a forum issue.</li>
 <li>A change was made to fix the Test Email Alert.</li>
@@ -1299,7 +1335,7 @@ KRGB definition:
 <li>Fixed a HPIJS problem printing more than one page with LJ 1010/1012.</li>
 <li>Modified hpijs to ignore bi-di errors so the &quot;hp&quot; backend can handle them. This fixed a problem where hpijs would hang forever.</li>
 </ol>
-<p><strong>HPLIP 0.9.2 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 0.9.2 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Fixed &quot;Invalid color calibration type&quot; error occurs when executing command &quot;colorcal&quot; in terminal.</li>
 <li>Fixed issue reported in forum (AlignType3() number of arguments error in hp-align).</li>
@@ -1315,7 +1351,7 @@ KRGB definition:
 <li>Removed specified gcc options in hpijs configure.in (Debian request).</li>
 <li>Fixed a 64-bit compile issue in ljjetready.cpp.</li>
 </ol>
-<p><strong>HPLIP 0.9.1 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 0.9.1 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Changed configure to check for libnetsnmp instead of libsnmp.</li>
 <li>Made some $DESTDIR changes in configure.in for package maintainers.</li>
@@ -1339,7 +1375,7 @@ KRGB definition:
 - HP LaserJet 1022
 - HP Business Inkjet 1000
 </pre>
-<p><strong>HPLIP 0.9 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 0.9 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added network scanning support.</li>
 <li>Added full status and supply information for most LaserJets. See Product Support table.</li>
@@ -1373,7 +1409,7 @@ KRGB definition:
 - HP Deskjet 6600
 - HP Deskjet 9800 Series
 </pre>
-<p><strong>HPLIP 0.8.8 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 0.8.8 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added low ink infrastructure to device manager.</li>
 <li>Made fixes to cleaning procedure.</li>
@@ -1400,7 +1436,7 @@ KRGB definition:
 - DeskJet 3535
 - HP Business Inkjet 2800
 </pre>
-<p><strong>HPLIP 0.8.7 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 0.8.7 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Changed HPLIP base directory from prefix/hplip to datadir/hplip (ie, /usr/hplip to /usr/share/hplip).</li>
 <li>Changed hpiod install from bindir/hpiod to sbindir/hpiod (ie, /usr/bin to /usr/sbin).</li>
@@ -1420,7 +1456,7 @@ KRGB definition:
 - LaserJet 3015/3020/3030
 </pre>
 <p>Note, if you want to remove any previous HPLIP release you will need to manually remove the old /usr/hplip base directory and the /usr/bin/hpiod executable.</p>
-<p><strong>HPLIP 0.8.4 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 0.8.4 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Updated the device manager.</li>
 <li>Added makefile DESTDIR support to cupsext and pcardext.</li>
@@ -1439,7 +1475,7 @@ KRGB definition:
 <li>Added PPD file for LJ3380.</li>
 <li>Updated Product Support table.</li>
 </ol>
-<p><strong>HPLIP 0.8.2 - This release has the following changes.</strong></p>
+<p><strong>HPLIP 0.8.2 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Startup/Shutdown script now kills all hpguid instances.</li>
 <li>Fixed fat.c warnings.</li>
@@ -1463,7 +1499,7 @@ KRGB definition:
 </div>
 <div class="section">
 <h1><a id="previous-hpijs-release-notes" name="previous-hpijs-release-notes">Previous HPIJS Release Notes</a></h1>
-<p><strong>HPIJS 2.1.6 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 2.1.6 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Moved DJ450 from DJGenericVIP class to DJ9xxVIP class, because mandatory margins are 0.25 inch on left and right sides and it does not support fullbleed on any papersize.</li>
 <li>Added a new printer family, DJ55xx to take care of margin issues for DJ55xx printers.</li>
@@ -1478,7 +1514,7 @@ KRGB definition:
 - HP Officejet Pro K550 (DJGenericVIP)
 - HP Officejet Pro K850 (DJGenericVIP)
 </pre>
-<p><strong>HPIJS 2.1.5 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 2.1.5 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Fixed a 4-sided full bleed printing issue in HPIJS.</li>
 <li>Added support for the following new printers.</li>
@@ -1498,7 +1534,7 @@ KRGB definition:
 - HP Deskjet 5440 (DJGenericVIP)
 - HP Color laserJet 4700 (LJColor/PS)
 </pre>
-<p><strong>HPIJS 2.1.4 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 2.1.4 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Fixed a bi-di problem with all LIDIL printers.</li>
 <li>Fixed a 64-bit problem with LJJetReady printers.</li>
@@ -1518,13 +1554,13 @@ KRGB definition:
 - Deskjet 3040
 - Deskjet 3920
 </pre>
-<p><strong>HPIJS 2.1.3 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 2.1.3 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Increased the printable region for DJGenericVIP. This resolves a left margin issue.</li>
 <li>Fixed a problem printing more than one page with LJ 1010/1012.</li>
 <li>Modified hpijs to ignore bi-di errors so the &quot;hp&quot; backend can handle them. This fixed a problem where hpijs would hang forever.</li>
 </ol>
-<p><strong>HPIJS 2.1.2 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 2.1.2 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added new print mode &quot;FastDraft Grayscale&quot; to DJGenericVIP.</li>
 <li>Rebuilt PPD files with new &quot;FastDraft Grayscale&quot; support.</li>
@@ -1532,7 +1568,7 @@ KRGB definition:
 <li>Removed specified gcc options in hpijs configure.in (Debian request).</li>
 <li>Fixed a 64-bit compile issue in ljjetready.cpp.</li>
 </ol>
-<p><strong>HPIJS 2.1.1 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 2.1.1 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Fixed bi-di support issue for Business Inkjet 1100/1200.</li>
 <li>Added PPD files for the following printers.</li>
@@ -1544,7 +1580,7 @@ KRGB definition:
 - HP LaserJet 1022
 - HP Business Inkjet 1000
 </pre>
-<p><strong>HPIJS 2.1 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 2.1 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added two new device classes - LJFastRaster and LJJetReady. LJFastRaster will replace the pxl1010 driver.</li>
 <li>Fixed some HP-UX compile issues.</li>
@@ -1565,11 +1601,11 @@ KRGB definition:
 - HP Deskjet 6600
 - HP Deskjet 9800 Series
 </pre>
-<p><strong>HPIJS 2.0.2 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 2.0.2 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Fixed a 64 bit compiler issue with ljmono.cpp and ljcolor.cpp.</li>
 </ol>
-<p><strong>HPIJS 2.0.1 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 2.0.1 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Fixed a issue with the max setting for input trays in APDK.</li>
 <li>Added PPD files for the following new printers.</li>
@@ -1579,14 +1615,14 @@ KRGB definition:
 - LaserJet 4345 mfp
 - LaserJet 3015/3020/3030
 </pre>
-<p><strong>HPIJS 2.0 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 2.0 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>HPIJS now supports bi-di and uni-di I/O. Bi-di works only with HP Linux Imaging and Printing (HPLIP) &quot;hp&quot; CUPS backend. Bi-di provides better printer support such as DJGenricVIP four sided full bleed and DJ3320 pen alignment.</li>
 <li>Added a new FastDraft Color mode to DJGenericVIP class</li>
 <li>Moved Business InkJet 1100 and 1200 printers to DJGenericVIP class</li>
 <li>Disabled KRGB path in HighRes mode for DJ9xx class. This fixes a blank page problem when black only data is printed in this printmode.</li>
 </ol>
-<p><strong>HPIJS 1.7.1 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 1.7.1 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added PPD files for the following new printers.</li>
 </ol>
@@ -1598,7 +1634,7 @@ KRGB definition:
 - LaserJet 4250
 - LaserJet 4350
 </pre>
-<p><strong>HPIJS 1.7 - This minor release has the following changes.</strong></p>
+<p><strong>HPIJS 1.7 - This minor release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Changed build package prefix default from /usr to /usr/local in configure. This means &quot;./configure --prefix=/usr&quot; must be used when replacing an existing hpijs installation.</li>
 <li>Added some NULL pointer checks as per Debian request.</li>
@@ -1628,7 +1664,7 @@ KRGB definition:
 - LaserJet 9050 MFP
 - LaserJet 9040 MFP
 </pre>
-<p><strong>HPIJS 1.6.2 - This minor release has the following changes.</strong></p>
+<p><strong>HPIJS 1.6.2 - This minor release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Updated foomatic-rip (3.0.2 SECURITY FIX).</li>
 <li>Regenerated all PPD files with foomatic 3.0.2.</li>
@@ -1644,7 +1680,7 @@ KRGB definition:
 - LJColor:
 - Color LaserJet 9500 MFP
 </pre>
-<p><strong>HPIJS f.1 - This minor release has the following changes.</strong></p>
+<p><strong>HPIJS f.1 - This minor release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added PPD files for the following new printers. There are no HPIJS code changes.</li>
 </ol>
@@ -1659,7 +1695,7 @@ KRGB definition:
 - Photosmart 320
 - Photosmart 370
 </pre>
-<p><strong>HPIJS 1.6 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 1.6 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added support for the following printers.</li>
 </ol>
@@ -1701,7 +1737,7 @@ KRGB definition:
 <pre class="literal-block">
 $ patch -p0 &lt; gdevijs-krgb-1.0.patch
 </pre>
-<p><strong>HPIJS 1.5 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 1.5 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added support for the following printers.</li>
 </ol>
@@ -1736,13 +1772,13 @@ $ patch -p0 &lt; gdevijs-krgb-1.0.patch
 <li>Updated the foomatic PPD files and foomatic-rip.</li>
 <li>Added $(DESTDIR) in Makefile.am to facilitate rpm builds. Special thanks to Robert van den Aker for this suggestion.</li>
 </ol>
-<p><strong>HPIJS 1.4.1 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 1.4.1 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Fixed a GCC 2.95 compile problem with debug.h.</li>
 <li>Fixed a foomatic-install issue with gzip 1.3 in Makefile.am. Removed the gzip -r option.</li>
 <li>Updated the foomatic PPD files for HPIJS.</li>
 </ol>
-<p><strong>HPIJS 1.4 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 1.4 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added the following new printer support.</li>
 </ol>
@@ -1772,7 +1808,7 @@ $ patch -p0 &lt; gdevijs-krgb-1.0.patch
 <pre class="literal-block">
 Special thanks to Till Kamppeter for his support with the Foomatic project at www.linuxprinting.org. His tireless endeavor has consistently improved the printing process.
 </pre>
-<p><strong>HPIJS 1.3.1 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 1.3.1 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added data compression to DJ3320.</li>
 <li>Changed the default black pen vertical alignment value for the DJ3320.</li>
@@ -1781,7 +1817,7 @@ Special thanks to Till Kamppeter for his support with the Foomatic project at ww
 <li>Added Printable Area documentation.</li>
 <li>Fixed a Officejet hang problem (ie: Officejet 500/600/700 and PSC 300). The Officejet would hang after printing a job.</li>
 </ol>
-<p><strong>HPIJS 1.3 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 1.3 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added the following new printer support.</li>
 </ol>
@@ -1811,12 +1847,12 @@ Special thanks to Till Kamppeter for his support with the Foomatic project at ww
 <pre class="literal-block">
 Special credit goes to Matthias Bunte and Richard Spencer-Smith for providing input for the new DJ9xx 600/1200 dpi print modes. The new print modes are based on a patch originated by Matthias Bunte.
 </pre>
-<p><strong>HPIJS 1.2.2 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 1.2.2 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Made support for stdint.h conditional.</li>
 <li>Added a check in configure.in for platforms that don't support stdint.h.</li>
 </ol>
-<p><strong>HPIJS 1.2.1 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 1.2.1 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added PS:MediaPositon parameter for tray selection.</li>
 <li>The LJ1100 too light problem should be fixed.</li>
@@ -1828,7 +1864,7 @@ Special credit goes to Matthias Bunte and Richard Spencer-Smith for providing in
 - Best Grayscale for DJ350, DJ6xx, DJ630 and Apollo is 600x300 not 600x600 dpi.
 - Deskjet 5550/5551 and PhotoSmart 7150/7350 will support full bleed.
 </pre>
-<p><strong>HPIJS 1.2 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 1.2 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added the following new printer support.</li>
 </ol>
@@ -1859,7 +1895,7 @@ Special credit goes to Matthias Bunte and Richard Spencer-Smith for providing in
 <li>Added more support for IJS List and Enumerate commands.</li>
 <li>Updated IJS files to IJS 0.34.</li>
 </ol>
-<p><strong>HPIJS 1.1 - This release has the following changes.</strong></p>
+<p><strong>HPIJS 1.1 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added new printer support for Business Inkjet 2200/2230/2250/2280.</li>
 <li>Added HiRes mode to the PS100 device class.</li>
@@ -1870,7 +1906,7 @@ Special credit goes to Matthias Bunte and Richard Spencer-Smith for providing in
 <pre class="literal-block">
 This release fixes a DJ9xxVIP duplex problem with GNU Ghostscript 7.05 and HPIJS 1.0.4. The problem caused the second page to print incorrectly when duplex was enabled. The problem occurred with 300 dpi input not 600 dpi input.
 </pre>
-<p><strong>HPIJS 1.0.4 - This update has the following changes.</strong></p>
+<p><strong>HPIJS 1.0.4 - This update has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added a new HiRes mode to DJ9xxVIP device class.</li>
 <li>Added support for paper sizes A3 and A5.</li>
@@ -1882,7 +1918,7 @@ This release fixes a DJ9xxVIP duplex problem with GNU Ghostscript 7.05 and HPIJS
 </ol>
 <p>The new HiRes mode supports the maximum resolution for DJ9xxVIP device class. For these devices the box specification for resolution is 2400x1200. In the past no scaling was done to 2400 in the printer.</p>
 <p>Full bleed support is no longer a separate paper size. Full bleed is enabled with a new Ghostscript command called FullBleed. Now you just select your 4x6 paper size and set FullBleed=1.</p>
-<p><strong>HPIJS 1.0.3 - This update has the following changes.</strong></p>
+<p><strong>HPIJS 1.0.3 - This update has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Added support for AFPL Ghostscript 7.04 and GNU Ghostscript 6.53. HPIJS is now compatible with the IJS client that comes with Ghostscript. This means the IJS client (gdevijs.c) included with HPIJS 1.0.2 is no longer needed.</li>
 <li>This release is compatible with IJS 0.33. In order to be compliant with IJS 0.33, some Ghostscript commands have changed from HPIJS 1.0.2.</li>
@@ -1908,7 +1944,7 @@ This release fixes a DJ9xxVIP duplex problem with GNU Ghostscript 7.05 and HPIJS
 -sIjsParams=&quot;Quality=0,ColorMode=2,MediaType=0,PenSet=2&quot;
 </pre>
 <p>The new Ghostscript command -dIjsUseOutputFD is required when using HPIJS.</p>
-<p><strong>HPIJS 1.0.2 - This update has the following changes.</strong></p>
+<p><strong>HPIJS 1.0.2 - This update has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Fixed a problem printing Photo Full Bleed on the Photosmart 100.</li>
 <li>Cleaned up BSD documentation in source files.</li>
@@ -1919,7 +1955,7 @@ This release fixes a DJ9xxVIP duplex problem with GNU Ghostscript 7.05 and HPIJS
 <li>Fixed a off-by-one error in IJS server, gcc -O2 optimization now seems to work.</li>
 <li>Updated the documentation, see the hpijs_readme.html file.</li>
 </ol>
-<p><strong>HPIJS 1.0 - This update has the following changes.</strong></p>
+<p><strong>HPIJS 1.0 - This update has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Updated HPIJS to APDK 3.01 which adds support for the following printers.</li>
 </ol>
@@ -1946,13 +1982,13 @@ Photo, Photo Full Bleed, A6, B4, B5, Oufuku-Hagaki, Hagaki
 <li>Changed top margin from 1/3 to 1/8 inch. Also, changed the bottom margin to 1/2 inch. Note, on the 6xx series the maximum bottom margin is .46 inch for black and .587 for color. This means for the 6xx series, color printing to within 1/2 inch bottom margin is not guaranteed.</li>
 <li>Added a platform-independent automake/autoconf makefile.</li>
 </ol>
-<p><strong>HPIJS 0.97 - This update has the following changes.</strong></p>
+<p><strong>HPIJS 0.97 - This update has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Made some bug fixes to the APDK 2.4 code and changed the top margin settings in gdevhpij.c back to a value that is compatible with existing printer drivers.</li>
 <li>A line of text near the top of the page would not print.</li>
 <li>Top and bottom margins on multiple page jobs was not consistent.</li>
 </ol>
-<p><strong>HPIJS 0.96 - This update has the following changes.</strong></p>
+<p><strong>HPIJS 0.96 - This update has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Updated HPIJS to APDK 2.4 which adds support for the following printers.</li>
 </ol>
@@ -1968,7 +2004,7 @@ Photo, Photo Full Bleed, A6, B4, B5, Oufuku-Hagaki, Hagaki
 <li>Added some query commands to the GS/HPIJS communication interface. These commands can be used to return current printer parameters.</li>
 <li>This release is backward compatible with HPIJS 0.95.</li>
 </ol>
-<p><strong>HPIJS 0.95 - This update has the following changes.</strong></p>
+<p><strong>HPIJS 0.95 - This update has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Fixed a scaling problem with device-dependent postscript using CUPS. This was a problem with DJ630, DJ6xxP and DJ8xx photo mode only. This was not a problem printing device-independent postscript.</li>
 <li>Changed Ghostscript command interface to HPIJS driver. The HPIJS driver is now called with the following Ghostscript commands.</li>
@@ -1987,7 +2023,7 @@ where x equals: DJ630, DJ6xx, DJ6xxP, DJ8xx, DJ9xx or DJ9xxVIP
 <ol class="arabic simple" start="4">
 <li>The old interface is degraded and will eventually be dropped. New printer drivers will not use the old interface.</li>
 </ol>
-<p><strong>HPIJS 0.94 - This update has the following changes.</strong></p>
+<p><strong>HPIJS 0.94 - This update has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Minor changes where made to the add-on files for Ghostscript. No functional changes or bug fixes. Changed gdevhpijs.c to gdevhpij.c (8.3 Ghostscript convention). Moved defines from models.h and hpijs.h to new gdevhpij.h. The gdevhpij.h file is LGPL.</li>
 </ol>
@@ -1996,7 +2032,7 @@ where x equals: DJ630, DJ6xx, DJ6xxP, DJ8xx, DJ9xx or DJ9xxVIP
 </div>
 
 <hr size="1"/>
-<center><small>Page last updated: Fri Sep 28 10:04:15 2007; HPLIP Version: 2.7.9</small></center>
+<center><small>Page last updated: Fri Oct 19 09:14:46 2007; HPLIP Version: 2.7.10</small></center>
 </div>
 </td></tr></table>
 </div>

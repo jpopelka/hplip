@@ -51,7 +51,7 @@ class ScrollView(QScrollView):
         self.orig_height = 0
         self.content_padding = 20
         
-        if log.get_level() == log.LOG_LEVEL_DEBUG:
+        if log.is_debug():
             self.heading_color = qApp.palette().color(QPalette.Active, QColorGroup.Base)
             self.frame_shape = QFrame.Box
         else:
@@ -136,6 +136,7 @@ class ScrollView(QScrollView):
                     self.cur_printer = self.cur_device.cups_printers[0]
                 except IndexError:
                     log.error("Printer list empty") # Shouldn't happen!
+                    self.cur_printer = None
                 else:
                     self.isFax()
                 
@@ -335,10 +336,25 @@ class ScrollView(QScrollView):
                         if self.cur_printer is None:
                             self.cur_printer = p.name
                         
-        #self.cur_printer = 
-        self.connect(self.printerComboBox, SIGNAL("activated(const QString&)"), self.printerComboBox_activated)
+        if self.cur_printer is None:
+            #log.error("No fax queue found")
+            self.y = 0
+            self.clear()
+            
+            if printers and faxes:
+                self.addGroupHeading("error", self.__tr("ERROR: No CUPS queue found for device."))
+            elif printers:
+                self.addGroupHeading("error", self.__tr("ERROR: No CUPS printer queue found for device."))
+            else:
+                self.addGroupHeading("error", self.__tr("ERROR: No CUPS fax queue found for device."))
+                
+            return False
         
-        self.addWidget(widget, "printer_list")
+        else:
+            self.connect(self.printerComboBox, SIGNAL("activated(const QString&)"), self.printerComboBox_activated)
+            
+            self.addWidget(widget, "printer_list")
+            return True
         
         
     def addLoadPaper(self):

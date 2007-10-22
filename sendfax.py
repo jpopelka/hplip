@@ -22,7 +22,7 @@
 # Thanks to Henrique M. Holschuh <hmh@debian.org> for various security patches
 #
 
-__version__ = '7.0'
+__version__ = '7.2'
 __title__ = 'PC Sendfax Utility'
 __doc__ = "Allows for sending faxes from the PC using HPLIP supported multifunction printers." 
 
@@ -54,6 +54,7 @@ USAGE = [(__doc__, "", "name", True),
          utils.USAGE_BUS1, utils.USAGE_BUS2,         
          utils.USAGE_LOGGING1, utils.USAGE_LOGGING2,
          ("Run in debug mode:", "--gg (same as option: -ldebug)", "option", False),
+         utils.USAGE_LANGUAGE,
          utils.USAGE_HELP,
          ("[FILES]", "", "header", False),
          ("A list of files to add to the fax job.", "(Required for -n, optional for -u)", "option", True),
@@ -88,11 +89,12 @@ recipient_list = []
 group_list = []
 bus = device.DEFAULT_PROBE_BUS
 prettyprint = False
+loc = None
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:],'l:hz:d:b:g:unf:r:t', 
+    opts, args = getopt.getopt(sys.argv[1:],'l:hz:d:b:g:unf:r:tq:', 
         ['device=', 'fax=', 'level=', 
-         'help', 'help-rest', 
+         'help', 'help-rest', 'lang=',
          'help-man', 'logfile=', 'bus=',
          'gui', 'non-interactive', 'logging=',
          'faxnum=', 'recipients=',
@@ -168,6 +170,13 @@ for o, a in opts:
 
     elif o in ('-g', '--group'):
         group_list.extend(a.split(','))
+        
+    elif o in ('-q', '--lang'):
+        if a.strip() == '?':
+            utils.show_languages()
+            sys.exit(0)
+            
+        loc = utils.validate_language(a.lower())
 
 
 
@@ -211,29 +220,36 @@ if mode == GUI_MODE:
     # create the main application object
     app = QApplication(sys.argv)
 
-    loc = user_cfg.ui.get("loc", "system")
-    if loc.lower() == 'system':
-        loc = str(QTextCodec.locale())
-        log.debug("Using system locale: %s" % loc)
-
+    if loc is None:
+        loc = user_cfg.ui.get("loc", "system")
+        if loc.lower() == 'system':
+            loc = str(QTextCodec.locale())
+            log.debug("Using system locale: %s" % loc)
+    
     if loc.lower() != 'c':
         log.debug("Trying to load .qm file for %s locale." % loc)
         trans = QTranslator(None)
         qm_file = 'hplip_%s.qm' % loc
         log.debug("Name of .qm file: %s" % qm_file)
         loaded = trans.load(qm_file, prop.localization_dir)
-
+        
         if loaded:
             app.installTranslator(trans)
         else:
             loc = 'c'
-    else:
-        loc = 'c'
-
+    
     if loc == 'c':
         log.debug("Using default 'C' locale")
     else:
         log.debug("Using locale: %s" % loc)
+        
+        QLocale.setDefault(QLocale(loc))
+        try:
+            locale.setlocale(locale.LC_ALL, locale.normalize(loc+".utf8"))
+            prop.locale = loc
+        except locale.Error:
+            log.error("Invalid locale: %s" % (loc+".utf8"))
+
 
     sendfax = FaxSendJobForm(hpssd_sock,
                              device_uri,  

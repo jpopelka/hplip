@@ -276,6 +276,27 @@ try:
         log.error("Version: (Not available. CUPS may not be installed or not running.)")
         num_errors += 1
 
+    log.info("")
+    log.info(log.bold("Checking for Reportlab..."))
+    
+    try:
+        import reportlab
+        ver = reportlab.Version
+        try:
+            ver_f = float(ver)
+        except ValueError:
+            log.warn("Can't determine version.")
+        else:
+            if ver_f >= 2.0:
+                log.info("OK, version >= 2.0")
+            else:
+                log.warn("Version < 2.0 (%.1f). HPLIP fax coverpages requires Reportlab 2.0+." % ver_f)
+                num_errors += 1
+        
+    except ImportError:
+        log.warn("Not installed.")
+        num_errors += 1
+    
     tui.header("DEPENDENCIES")
 
     log.info("")

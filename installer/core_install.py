@@ -50,7 +50,7 @@ try:
 except ImportError: # using Python version < 2.5
     def trace(f):
         def newf(*args, **kw):
-           print "TRACE: func=%s(), args=%s, kwargs=%s" % (f.__name__, args, kw)
+           log.debug("TRACE: func=%s(), args=%s, kwargs=%s" % (f.__name__, args, kw))
            return f(*args, **kw)
         newf.__name__ = f.__name__
         newf.__dict__.update(f.__dict__)
@@ -568,8 +568,21 @@ class CoreInstall(object):
         try:
             log.debug("Trying to import 'reportlab'...")
             import reportlab
-            log.debug("Success.")
-            return True
+            
+            ver = reportlab.Version
+            try:
+                ver_f = float(ver)
+            except ValueError:
+                log.debug("Can't determine version.")
+                return False
+            else:
+                log.debug("Version: %.1f" % ver_f)
+                if ver_f >= 2.0:
+                    log.debug("Success.")
+                    return True
+                else:
+                    return False
+            
         except ImportError:
             log.debug("Failed.")
             return False
@@ -1141,29 +1154,24 @@ class CoreInstall(object):
         return os.getenv('DISPLAY') and self.selected_options['gui'] and utils.checkPyQtImport()
 
     def run_hp_setup(self):
-        if self.selected_options['gui'] and self.check_for_gui_support():
-            su_sudo = self.su_sudo()
-
-            if utils.which('hp-setup'):
+        hpsetup = utils.which("hp-setup")
+        
+        if self.check_for_gui_support():
+            if hpsetup:
                 c = 'hp-setup -u --username=%s' % prop.username
-                cmd = su_sudo % c
             else:
                 c = 'python ./setup.py -u --username=%s' % prop.username
-                cmd = su_sudo % c
-
-            log.debug(cmd)
-            status, output = self.run(cmd)
-
         else:
-            hpsetup = utils.which("hp-setup")
-
             if hpsetup:
-                cmd = "hp-setup -i"
+                c = "hp-setup -i"
             else:
-                cmd = "python ./setup.py -i"
+                c = "python ./setup.py -i"
 
-            cmd = self.su_sudo() % cmd
-            status, output = self.run(cmd)
+        cmd = self.su_sudo() % c
+        log.debug(cmd)
+        status, output = self.run(cmd)
+        #status = os.system(cmd)
+        return status == 0
 
 
     def remove_hplip(self, callback=None):
@@ -1373,7 +1381,9 @@ class CoreInstall(object):
                 tar.extract(tarinfo, rules_path)
                 
             else:
-                log.debug("Skipping file: %s" % name)
+                # other files...
+                log.debug("Extracting file %s to %s" % (name, self.plugin_path))
+                tar.extract(tarinfo, self.plugin_path)
                 
                 
         tar.close()

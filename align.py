@@ -250,32 +250,32 @@ try:
             maint.AlignType1PML(d, tui.load_paper_prompt)
 
         elif align_type == ALIGN_TYPE_8XX:
-            maint.AlignType2(d, ui.load_paper_prompt, enterAlignmentNumber,
+            maint.AlignType2(d, tui.load_paper_prompt, enterAlignmentNumber,
                               bothPensRequired)
 
         elif align_type in (ALIGN_TYPE_9XX,ALIGN_TYPE_9XX_NO_EDGE_ALIGN):
-            maint.AlignType3(d, ui.load_paper_prompt, enterAlignmentNumber,
+            maint.AlignType3(d, tui.load_paper_prompt, enterAlignmentNumber,
                               enterPaperEdge, update_spinner)
 
         elif align_type == ALIGN_TYPE_LIDIL_AIO:
             maint.AlignType6(d, aioUI1, aioUI2, tui.load_paper_prompt)
 
         elif align_type == ALIGN_TYPE_DESKJET_450:
-            maint.AlignType8(d, ui.load_paper_prompt, enterAlignmentNumber)
+            maint.AlignType8(d, tui.load_paper_prompt, enterAlignmentNumber)
 
         elif align_type in (ALIGN_TYPE_LIDIL_0_3_8, ALIGN_TYPE_LIDIL_0_4_3, ALIGN_TYPE_LIDIL_VIP):
 
-            maint.AlignxBow(d, align_type, ui.load_paper_prompt, enterAlignmentNumber, enterPaperEdge,
+            maint.AlignxBow(d, align_type, tui.load_paper_prompt, enterAlignmentNumber, enterPaperEdge,
                              invalidPen, colorAdj)
 
         elif align_type  == ALIGN_TYPE_LBOW:
-            maint.AlignType10(d, ui.load_paper_prompt, type10and11Align)
+            maint.AlignType10(d, tui.load_paper_prompt, type10and11Align)
 
         elif align_type == ALIGN_TYPE_LIDIL_0_5_4:
-            maint.AlignType11(d, ui.load_paper_prompt, type10and11Align, invalidPen2)
+            maint.AlignType11(d, tui.load_paper_prompt, type10and11Align, invalidPen2)
             
         elif align_type == ALIGN_TYPE_OJ_PRO:
-            maint.AlignType12(d, ui.load_paper_prompt)
+            maint.AlignType12(d, tui.load_paper_prompt)
             
 
         else:

@@ -181,6 +181,7 @@ public:
         "Photosmart C31\0"
         "Photosmart C41\0"
         "Photosmart C42\0"
+        "Photosmart C43\0"
         "Photosmart C51\0"
         "Photosmart C52\0"
         "Photosmart C61\0"

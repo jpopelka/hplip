@@ -24,6 +24,7 @@ from __future__ import division
 # Std Lib
 import struct, cStringIO 
 import xml.parsers.expat as expat
+import re
 
 # Local
 from g import *
@@ -1042,7 +1043,6 @@ def StatusType6(dev): #  LaserJet Status (XML)
     return {'revision' :    STATUS_REV_UNKNOWN,
              'agents' :      agents,
              'top-door' :    0,
-             'status-code' : 0,
              'supply-door' : 0,
              'duplexer' :    1,
              'photo-tray' :  0,
@@ -1052,8 +1052,254 @@ def StatusType6(dev): #  LaserJet Status (XML)
              'status-code' : TYPE6_STATUS_CODE_MAP.get(status_code, STATUS_PRINTER_IDLE),
            }     
 
+# PJL status codes
+TYPE8_STATUS_CODE_MAP = {
+    10001: STATUS_PRINTER_IDLE, # online
+    10002: STATUS_PRINTER_OFFLINE, # offline
+    10003: STATUS_PRINTER_WARMING_UP,
+    10004: STATUS_PRINTER_BUSY, # self test
+    10005: STATUS_PRINTER_BUSY, # reset
+    10006: STATUS_PRINTER_LOW_TONER,
+    10007: STATUS_PRINTER_CANCELING,
+    10010: STATUS_PRINTER_SERVICE_REQUEST,
+    10011: STATUS_PRINTER_OFFLINE,
+    10013: STATUS_PRINTER_BUSY,
+    10014: STATUS_PRINTER_REPORT_PRINTING,
+    10015: STATUS_PRINTER_BUSY,
+    10016: STATUS_PRINTER_BUSY,
+    10017: STATUS_PRINTER_REPORT_PRINTING,
+    10018: STATUS_PRINTER_BUSY,
+    10019: STATUS_PRINTER_BUSY,
+    10020: STATUS_PRINTER_BUSY,
+    10021: STATUS_PRINTER_BUSY,
+    10022: STATUS_PRINTER_REPORT_PRINTING,
+    10023: STATUS_PRINTER_PRINTING,
+    10024: STATUS_PRINTER_SERVICE_REQUEST,
+    10025: STATUS_PRINTER_SERVICE_REQUEST,
+    10026: STATUS_PRINTER_BUSY,
+    10027: STATUS_PRINTER_MEDIA_JAM,
+    10028: STATUS_PRINTER_REPORT_PRINTING,
+    10029: STATUS_PRINTER_PRINTING,
+    10030: STATUS_PRINTER_BUSY,
+    10031: STATUS_PRINTER_BUSY,
+    10032: STATUS_PRINTER_BUSY,
+    10033: STATUS_PRINTER_SERVICE_REQUEST,
+    10034: STATUS_PRINTER_CANCELING,
+    10035: STATUS_PRINTER_PRINTING,
+    10036: STATUS_PRINTER_WARMING_UP,
+    10200: STATUS_PRINTER_LOW_BLACK_TONER,
+    10201: STATUS_PRINTER_LOW_CYAN_TONER,
+    10202: STATUS_PRINTER_LOW_MAGENTA_TONER,
+    10203: STATUS_PRINTER_LOW_YELLOW_TONER,
+    10204: STATUS_PRINTER_LOW_TONER, # order image drum
+    10205: STATUS_PRINTER_LOW_BLACK_TONER, # order black drum
+    10206: STATUS_PRINTER_LOW_CYAN_TONER, # order cyan drum
+    10207: STATUS_PRINTER_LOW_MAGENTA_TONER, # order magenta drum
+    10208: STATUS_PRINTER_LOW_YELLOW_TONER, # order yellow drum
+    10209: STATUS_PRINTER_LOW_BLACK_TONER,
+    10210: STATUS_PRINTER_LOW_CYAN_TONER,
+    10211: STATUS_PRINTER_LOW_MAGENTA_TONER,
+    10212: STATUS_PRINTER_LOW_YELLOW_TONER,
+    10213: STATUS_PRINTER_SERVICE_REQUEST, # order transport kit
+    10214: STATUS_PRINTER_SERVICE_REQUEST, # order cleaning kit
+    10215: STATUS_PRINTER_SERVICE_REQUEST, # order transfer kit
+    10216: STATUS_PRINTER_SERVICE_REQUEST, # order fuser kit
+    10217: STATUS_PRINTER_SERVICE_REQUEST, # maintenance
+    10218: STATUS_PRINTER_LOW_TONER,
+    10300: STATUS_PRINTER_LOW_BLACK_TONER, # replace black toner
+    10301: STATUS_PRINTER_LOW_CYAN_TONER, # replace cyan toner
+    10302: STATUS_PRINTER_LOW_MAGENTA_TONER, # replace magenta toner
+    10303: STATUS_PRINTER_LOW_YELLOW_TONER, # replace yellow toner
+    10304: STATUS_PRINTER_SERVICE_REQUEST, # replace image drum
+    10305: STATUS_PRINTER_SERVICE_REQUEST, # replace black drum
+    10306: STATUS_PRINTER_SERVICE_REQUEST, # replace cyan drum
+    10307: STATUS_PRINTER_SERVICE_REQUEST, # replace magenta drum
+    10308: STATUS_PRINTER_SERVICE_REQUEST, # replace yellow drum
+    10309: STATUS_PRINTER_SERVICE_REQUEST, # replace black cart
+    10310: STATUS_PRINTER_SERVICE_REQUEST, # replace cyan cart
+    10311: STATUS_PRINTER_SERVICE_REQUEST, # replace magenta cart
+    10312: STATUS_PRINTER_SERVICE_REQUEST, # replace yellow cart
+    10313: STATUS_PRINTER_SERVICE_REQUEST, # replace transport kit
+    10314: STATUS_PRINTER_SERVICE_REQUEST, # replace cleaning kit
+    10315: STATUS_PRINTER_SERVICE_REQUEST, # replace transfer kit
+    10316: STATUS_PRINTER_SERVICE_REQUEST, # replace fuser kit
+    10317: STATUS_PRINTER_SERVICE_REQUEST,
+    10318: STATUS_PRINTER_SERVICE_REQUEST, # replace supplies
+    10400: STATUS_PRINTER_NON_HP_INK, # [sic]
+    10401: STATUS_PRINTER_IDLE,
+    10402: STATUS_PRINTER_SERVICE_REQUEST,
+    10403: STATUS_PRINTER_IDLE,
+    # 11xyy - Background paper-loading
+    # 12xyy - Background paper-tray status
+    # 15xxy - Output-bin status
+    # 20xxx - PJL parser errors
+    # 25xxx - PJL parser warnings
+    # 27xxx - PJL semantic errors
+    # 30xxx - Auto continuable conditions
+    30119: STATUS_PRINTER_MEDIA_JAM,
+    # 32xxx - PJL file system errors
+    # 35xxx - Potential operator intervention conditions
+    # 40xxx - Operator intervention conditions
+    40021: STATUS_PRINTER_DOOR_OPEN,
+    40022: STATUS_PRINTER_MEDIA_JAM,
+    40038: STATUS_PRINTER_LOW_TONER,
+    40600: STATUS_PRINTER_NO_TONER,
+    # 41xyy - Foreground paper-loading messages
+    # 43xyy - Optional paper handling device messages
+    # 44xyy - LJ 4xxx/5xxx paper jam messages
+    # 50xxx - Hardware errors
+    # 55xxx - Personality errors
+    
+}
 
 
+           
+pjl_code_pat = re.compile("""^CODE\s*=\s*(\d.*)$""", re.IGNORECASE)
+
+def StatusType8(dev): #  LaserJet PJL
+    try:
+        dev.openPrint()
+    except Error, e:
+        log.warn(e.msg)
+        
+    dev.writePrint("\x1b%-12345X@PJL INFO STATUS \r\n\x1b%-12345X")
+    pjl_return = dev.readPrint(1024, timeout=5, allow_short_read=True)
+    dev.close()
+
+    log.debug_block("PJL return:", pjl_return)
+    
+    code = '10001'
+    
+    for line in pjl_return.splitlines():
+        line = line.strip()
+        match = pjl_code_pat.match(line)
+        
+        if match is not None:
+            code = match.group(1)
+            break
+    
+    log.debug("Code = %s" % code)
+    
+    try:
+        error_code = int(code)
+    except ValueError:
+        error_code = 10001
+        
+    log.debug("Error code = %d" % error_code)
+        
+    status_code = TYPE8_STATUS_CODE_MAP.get(error_code, None)
+    
+    if status_code is None:
+        status_code = STATUS_PRINTER_BUSY
+        
+        if 10999 < error_code < 12000: # 11xyy - Background paper-loading
+            # x = tray #
+            # yy = media code
+            tray = int(code[2])
+            media = int(code[3:])
+            log.debug("Background paper loading for tray #%d" % tray)
+            log.debug("Media code = %d" % media)
+            
+        elif 11999 < error_code < 13000: # 12xyy - Background paper-tray status
+            # x = tray #
+            # yy = status code
+            tray = int(code[2])
+            status = int(code[3:])
+            log.debug("Background paper tray status for tray #%d" % tray)
+            log.debug("Status code = %d" % status)
+            
+        elif 14999 < error_code < 16000: # 15xxy - Output-bin status
+            # xx = output bin
+            # y = status code
+            bin = int(code[2:4])
+            status = int(code[4])
+            log.debug("Output bin full for bin #%d" % bin)
+            status_code = STATUS_PRINTER_OUTPUT_BIN_FULL
+            
+        elif 19999 < error_code < 28000: # 20xxx, 25xxx, 27xxx PJL errors
+            status_code = STATUS_PRINTER_SERVICE_REQUEST
+            
+        elif 29999 < error_code < 31000: # 30xxx - Auto continuable conditions
+            log.debug("Auto continuation condition #%d" % error_code)
+            
+        elif 34999 < error_code < 36000: # 35xxx - Potential operator intervention conditions
+            status_code = STATUS_PRINTER_SERVICE_REQUEST
+            
+        elif 39999 < error_code < 41000: # 40xxx - Operator intervention conditions
+            status_code = STATUS_PRINTER_SERVICE_REQUEST
+            
+        elif 40999 < error_code < 42000: # 41xyy - Foreground paper-loading messages
+            # x = tray
+            # yy = media code
+            tray = int(code[2])
+            media = int(code[3:])
+            log.debug("Foreground paper loading for tray #%d" % tray)
+            log.debug("Media code = %d" % media)
+            status_code = STATUS_PRINTER_OUT_OF_PAPER
+            
+        elif 41999 < error_code < 43000:
+            status_code = STATUS_PRINTER_MEDIA_JAM
+        
+        elif 42999 < error_code < 44000: # 43xyy - Optional paper handling device messages
+            status_code = STATUS_PRINTER_SERVICE_REQUEST
+            
+        elif 43999 < error_code < 45000: # 44xyy - LJ 4xxx/5xxx paper jam messages
+            status_code = STATUS_PRINTER_MEDIA_JAM
+            
+        elif 49999 < error_code < 51000: # 50xxx - Hardware errors
+            status_code = STATUS_PRINTER_HARD_ERROR
+            
+        elif 54999 < error_code < 56000 : # 55xxx - Personality errors
+            status_code = STATUS_PRINTER_HARD_ERROR
+            
+        
+    agents = []
+    
+    # TODO: Only handles mono lasers...
+    if status_code in (STATUS_PRINTER_LOW_TONER, STATUS_PRINTER_LOW_BLACK_TONER):
+        health = AGENT_HEALTH_OK
+        level_trigger = AGENT_LEVEL_TRIGGER_ALMOST_DEFINITELY_OUT
+        level = 0
+        
+    elif status_code == STATUS_PRINTER_NO_TONER:
+        health = AGENT_HEALTH_MISINSTALLED
+        level_trigger = AGENT_LEVEL_TRIGGER_ALMOST_DEFINITELY_OUT
+        level = 0
+        
+    else:
+        health = AGENT_HEALTH_OK
+        level_trigger = AGENT_LEVEL_TRIGGER_SUFFICIENT_0
+        level = 100
+        
+    log.debug("Agent: health=%d, level=%d, trigger=%d" % (health, level, level_trigger))
+        
+    
+    agents.append({  'kind' : AGENT_KIND_TONER_CARTRIDGE,
+                     'type' : AGENT_TYPE_BLACK,
+                     'health' : health,
+                     'level' : level,
+                     'level-trigger' : level_trigger,
+                  })
+    
+    if status_code == 40021:
+        top_door = 0
+    else:
+        top_door = 1
+        
+    log.debug("Status code = %d" % status_code)
+    
+    return { 'revision' :    STATUS_REV_UNKNOWN,
+             'agents' :      agents,
+             'top-door' :    top_door,
+             'supply-door' : top_door,
+             'duplexer' :    0,
+             'photo-tray' :  0,
+             'in-tray1' :    1,
+             'in-tray2' :    1,
+             'media-path' :  1,
+             'status-code' : status_code,
+           }     
+    
 
 
 

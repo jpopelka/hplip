@@ -158,22 +158,10 @@ user_cfg = Config(prop.user_config_file)
 
 # Language settings
 try:
-    locale.setlocale(locale.LC_ALL, '') # fails on Ubuntu 5.04
-except locale.Error:
-    # TODO: Is this the right thing to do?
-    log.warn("Unable to set locale.")
-    locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
-
-try:
-    t, prop.encoding = locale.getdefaultlocale()
+    prop.locale, prop.encoding = locale.getdefaultlocale()
 except ValueError:
-    t = 'en_US'
-    prop.encoding = 'ISO8859-1'
-
-try:
-    prop.lang_code = t[:2].lower()
-except TypeError:
-    prop.lang_code = 'en'
+    prop.locale = 'en_US'
+    prop.encoding = 'UTF8'
     
 prop.version = sys_cfg.hplip.version or 'x.x.x'
 prop.home_dir = sys_cfg.dirs.home or os.path.realpath(os.path.normpath(os.getcwd()))
@@ -221,13 +209,13 @@ spinpos = 0
 
 def update_spinner():
     global spinner, spinpos
-    if log.get_level() != log.LOG_LEVEL_DEBUG and sys.stdout.isatty():
+    if not log.is_debug() and sys.stdout.isatty():
         sys.stdout.write("\b" + spinner[spinpos])
         spinpos=(spinpos + 1) % 8
         sys.stdout.flush()
 
 def cleanup_spinner():
-    if log.get_level() != log.LOG_LEVEL_DEBUG and sys.stdout.isatty():
+    if not log.is_debug() and sys.stdout.isatty():
         sys.stdout.write("\b \b")
         sys.stdout.flush()
 
@@ -309,6 +297,15 @@ except NameError:
     True = (1==1)
     False = not True
 
-
-
-
+# as new translations are completed, add them here
+supported_locales =  { 'en_US': ('us', 'en', 'en_us', 'american', 'america', 'usa', 'english'),
+                       'zh_CN': ('zh', 'cn', 'zh_cn' , 'china', 'chinese', 'prc'),
+                       'de_DE': ('de', 'de_de', 'german', 'deutsche'),
+                       'fr_FR': ('fr', 'fr_fr', 'france', 'french', 'français'),
+                       'it_IT': ('it', 'it_it', 'italy', 'italian', 'italiano'),
+                       'ru_RU': ('ru', 'ru_ru', 'russian'),
+                       'pt_BR': ('pt', 'br', 'pt_br', 'brazil', 'brazilian', 'portuguese', 'brasil', 'portuguesa'),
+                       'es_MX': ('es', 'mx', 'es_mx', 'mexico', 'spain', 'spanish', 'espanol', 'español'),
+                     }
+                     
+                     

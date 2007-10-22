@@ -897,7 +897,7 @@ Pour chaque rangée, sélectionnez l&apos;étiquette qui représente le cadre da
     </message>
     <message>
         <source>&amp;About...</source>
-        <translation>À propos de … &amp; </translation>
+        <translation>À propos de … &amp;</translation>
     </message>
     <message>
         <source>About HP Device Manager...</source>
@@ -1017,7 +1017,7 @@ Pour chaque rangée, sélectionnez l&apos;étiquette qui représente le cadre da
     </message>
     <message>
         <source>&amp;Help</source>
-        <translation>&amp; Aide</translation>
+        <translation>&amp;Aide</translation>
     </message>
 </context>
 <context>
@@ -1347,11 +1347,11 @@ Pour chaque rangée, sélectionnez l&apos;étiquette qui représente le cadre da
     </message>
     <message>
         <source>Contents </source>
-        <translation>Sommaire </translation>
+        <translation>Sommaire</translation>
     </message>
     <message>
         <source>Properties for</source>
-        <translation>Propriétés de </translation>
+        <translation>Propriétés de</translation>
     </message>
     <message>
         <source>MIME Type:</source>
@@ -1884,7 +1884,7 @@ Pour chaque rangée, sélectionnez l&apos;étiquette qui représente le cadre da
     </message>
     <message>
         <source>Shell Script</source>
-        <translation>Script Shell </translation>
+        <translation>Script Shell</translation>
     </message>
     <message>
         <source>Plain Text</source>
@@ -2712,7 +2712,7 @@ Pour chaque rangée, sélectionnez l&apos;étiquette qui représente le cadre da
     </message>
     <message>
         <source>Shell Script</source>
-        <translation>Script Shell </translation>
+        <translation>Script Shell</translation>
     </message>
     <message>
         <source>Plain Text</source>
@@ -3655,7 +3655,7 @@ Pour chaque rangée, sélectionnez l&apos;étiquette qui représente le cadre da
     </message>
     <message>
         <source>Device(s) to Refresh </source>
-        <translation>Périphérique(s) à actualiser </translation>
+        <translation>Périphérique(s) à actualiser</translation>
     </message>
     <message>
         <source>Only currently selected device</source>
@@ -3775,6 +3775,14 @@ Pour chaque rangée, sélectionnez l&apos;étiquette qui représente le cadre da
     <message>
         <source>Current: Filter: &quot;%2&quot;  Search: &quot;%3&quot;  TTL: %4  Timeout: %5s</source>
         <translation>Actuelles : Filtre : &quot;%2&quot;  Rechercher : &quot;%3&quot;  TTL : %4  Délai : %5s</translation>
+    </message>
+    <message>
+        <source>The printer name and fax name must be different. Please choose different names.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Device not found.&lt;/b&gt; &lt;p&gt;Please make sure your printer is properly connected and powered-on.</source>
+        <translation></translation>
     </message>
     <message>
         <source>&lt;b&gt;No devices found.&lt;/b&gt;&lt;p&gt;Please make sure your printer is properly connected and powered-on.</source>
@@ -4068,7 +4076,7 @@ Pour chaque rangée, sélectionnez l&apos;étiquette qui représente le cadre da
     </message>
     <message>
         <source> &lt;i&gt;(&quot;/dev/parportX&quot;, X=0,1,2,...)&lt;/i&gt;</source>
-        <translation> &lt;i&gt;(&quot;/dev/parportX&quot;, X=0,1,2,...)&lt;/i&gt;</translation>
+        <translation>&lt;i&gt;(&quot;/dev/parportX&quot;, X=0,1,2,...)&lt;/i&gt;</translation>
     </message>
     <message>
         <source>Device Node:</source>
@@ -4134,7 +4142,7 @@ Pour chaque rangée, sélectionnez l&apos;étiquette qui représente le cadre da
     </message>
     <message>
         <source>PC Send Fax</source>
-        <translation>Envoyer une télécopie via le PC </translation>
+        <translation>Envoyer une télécopie via le PC</translation>
     </message>
     <message>
         <source>OK</source>
@@ -4589,7 +4597,7 @@ Pour chaque rangée, sélectionnez l&apos;étiquette qui représente le cadre da
     </message>
     <message>
         <source>Access photo cards</source>
-<translation>Accès aux cartes photo </translation>
+<translation>Accès aux cartes photo</translation>
     </message>
     <message>
         <source>Invalid/missing</source>
@@ -4861,7 +4869,7 @@ Pour chaque rangée, sélectionnez l&apos;étiquette qui représente le cadre da
     </message>
     <message>
         <source>HPLIP: Error/alert on device: </source>
-<translation>HPLIP : Erreur/alerte sur le périphérique : </translation>
+<translation>HPLIP : Erreur/alerte sur le périphérique :</translation>
     </message>
 </context>
 <context>

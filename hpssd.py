@@ -53,7 +53,7 @@ __doc__ = "Provides persistent data and event services to HPLIP client applicati
 
 # Std Lib
 import sys, socket, os, os.path, signal, getopt, time, select
-import popen2, threading, tempfile
+import subprocess, threading, tempfile
 
 from errno import EALREADY, EINPROGRESS, EWOULDBLOCK, ECONNRESET, \
      ENOTCONN, ESHUTDOWN, EINTR, EISCONN
@@ -560,21 +560,23 @@ class MailThread(threading.Thread):
 
         if sendmail:
             sendmail = os.path.join(sendmail, 'sendmail')
-            sendmail += ' -t -r %s' % self.from_address
+            cmd = [sendmail,'-t','-r',self.from_address]
 
-            log.debug(sendmail)
-            std_out, std_in, std_err = popen2.popen3(sendmail) 
-            log.debug(repr(self.message))
-            std_in.write(self.message)
-            std_in.close()
+            log.debug(repr(cmd))
+            err = None
+            try:
+                sp = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                std_out, std_err = sp.communicate(self.message)
+                log.debug(repr(self.message))
+                if std_err != '':
+                    err = std_err
 
-            r, w, e = select.select([std_err], [], [], 2.0)
+            except OSError, e:
+                err = str(e)
 
-            if r:
-                err = std_err.read()
-                if err:
-                    log.error(repr(err))
-                    self.result = ERROR_TEST_EMAIL_FAILED
+            if err:
+                log.error(repr(err))
+                self.result = ERROR_TEST_EMAIL_FAILED
 
         else:
             log.error("Mail send failed. sendmail not found.")

@@ -1347,7 +1347,7 @@ Per ripristinare i valori predefiniti noti della stampante, fare clic su &lt;i&g
     </message>
     <message>
         <source>Contents </source>
-        <translation>Sommario </translation>
+        <translation>Sommario</translation>
     </message>
     <message>
         <source>Properties for</source>
@@ -3655,7 +3655,7 @@ Per ripristinare i valori predefiniti noti della stampante, fare clic su &lt;i&g
     </message>
     <message>
         <source>Device(s) to Refresh </source>
-        <translation>Dispositivi da aggiornare </translation>
+        <translation>Dispositivi da aggiornare</translation>
     </message>
     <message>
         <source>Only currently selected device</source>
@@ -3775,6 +3775,14 @@ Per ripristinare i valori predefiniti noti della stampante, fare clic su &lt;i&g
     <message>
         <source>Current: Filter: &quot;%2&quot;  Search: &quot;%3&quot;  TTL: %4  Timeout: %5s</source>
         <translation>Corrente: Filtro: &quot;%2&quot;  Ricerca: &quot;%3&quot;  TTL: %4  Timeout: %5s</translation>
+    </message>
+    <message>
+        <source>The printer name and fax name must be different. Please choose different names.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Device not found.&lt;/b&gt; &lt;p&gt;Please make sure your printer is properly connected and powered-on.</source>
+        <translation></translation>
     </message>
     <message>
         <source>&lt;b&gt;No devices found.&lt;/b&gt;&lt;p&gt;Please make sure your printer is properly connected and powered-on.</source>
@@ -4068,7 +4076,7 @@ Per ripristinare i valori predefiniti noti della stampante, fare clic su &lt;i&g
     </message>
     <message>
         <source> &lt;i&gt;(&quot;/dev/parportX&quot;, X=0,1,2,...)&lt;/i&gt;</source>
-        <translation> &lt;i&gt;(&quot;/dev/parportX&quot;, X=0,1,2,...)&lt;/i&gt;</translation>
+        <translation>&lt;i&gt;(&quot;/dev/parportX&quot;, X=0,1,2,...)&lt;/i&gt;</translation>
     </message>
     <message>
         <source>Device Node:</source>
@@ -4861,7 +4869,7 @@ Per ripristinare i valori predefiniti noti della stampante, fare clic su &lt;i&g
     </message>
     <message>
         <source>HPLIP: Error/alert on device: </source>
-<translation>HPLIP: Errore/avviso dispositivo: </translation>
+<translation>HPLIP: Errore/avviso dispositivo:</translation>
     </message>
 </context>
 <context>

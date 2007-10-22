@@ -45,11 +45,9 @@
 #include "common.h"
 #include "io.h"
 #include "mfpdtf.h"
-#include "scl.h"
 #include "tables.h"
 #include "hpip.h"
 #include "hpmud.h"
-#include "pml.h"
 #include "soap.h"
 #include "hpaio.h"
 

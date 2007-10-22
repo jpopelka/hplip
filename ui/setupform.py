@@ -172,9 +172,11 @@ class SetupForm(SetupForm_base):
         self.search = ''
         self.ttl = 4
         self.timeout = 5
-        self.printer_name_ok = False
-        self.fax_name_ok = False
+        self.printer_name_ok = True
+        self.fax_name_ok = True
         self.fax_number = ''
+        self.fax_name = ''
+        self.printer_fax_names_same = False
         self.fax_name_company = ''
         self.fax_location = ''
         self.fax_desc = ''
@@ -576,7 +578,10 @@ class SetupForm(SetupForm_base):
 
     def setDefaultPrinterName(self):
         self.installed_print_devices = device.getSupportedCUPSDevices(['hp'])
+        #self.installed_print_devices = device.getSupportedCUPSDevices('*')
         log.debug(self.installed_print_devices)
+        
+        self.installed_queues = [p.name for p in cups.getPrinters()]
 
         back_end, is_hp, bus, model, serial, dev_file, host, port = device.parseDeviceURI(self.device_uri)
         default_model = utils.xstrip(model.replace('series', '').replace('Series', ''), '_')
@@ -601,23 +606,9 @@ class SetupForm(SetupForm_base):
         self.defaultPrinterNamePushButton.setEnabled(False)
         self.printer_name = printer_name
 
-    def printerNameLineEdit_textChanged(self,a0):
-        self.printer_name = str(a0)
-        self.defaultPrinterNamePushButton.setEnabled(True)
-
-        if not self.printer_name or (self.device_uri in self.installed_print_devices and \
-            self.printer_name in self.installed_print_devices[self.device_uri]):
-                self.setNextEnabled(self.PrinterNamePage, False)
-                self.printer_name_ok = False
-
-                if not self.printer_name:
-                    QToolTip.add(self.printerNameLineEdit, self.__tr('You must enter a name for the printer.'))
-                else:
-                    QToolTip.add(self.printerNameLineEdit, self.__tr('A printer already exists with this name. Please choose a different name.'))
-
-                self.printerNameLineEdit.setPaletteBackgroundColor(QColor(0xff, 0x99, 0x99))
-
-        else:
+        
+    def setEditErrors(self):
+        if self.printer_name_ok:
             self.printerNameLineEdit.setPaletteBackgroundColor(self.bg)
             self.printer_name_ok = True
 
@@ -625,10 +616,58 @@ class SetupForm(SetupForm_base):
                 self.setNextEnabled(self.PrinterNamePage, True)
 
             QToolTip.remove(self.printerNameLineEdit)
-
-        if not self.printer_name:
-            self.printer_name_ok = False
+        
+        else:
+            self.printerNameLineEdit.setPaletteBackgroundColor(QColor(0xff, 0x99, 0x99))
             self.setNextEnabled(self.PrinterNamePage, False)
+            
+        if self.fax_name_ok:
+            self.fax_name_ok = True
+            self.faxNameLineEdit.setPaletteBackgroundColor(self.bg)
+
+            if self.printer_name_ok:
+                self.setNextEnabled(self.PrinterNamePage, True)
+
+            QToolTip.remove(self.faxNameLineEdit)
+        
+        else:
+            self.faxNameLineEdit.setPaletteBackgroundColor(QColor(0xff, 0x99, 0x99))
+            self.setNextEnabled(self.PrinterNamePage, False)
+    
+    
+    def printerNameLineEdit_textChanged(self,a0):
+        self.printer_name = str(a0)
+        self.defaultPrinterNamePushButton.setEnabled(True)
+        
+        self.printer_name_ok = True
+        
+        if not self.printer_name:
+            QToolTip.add(self.printerNameLineEdit, self.__tr('You must enter a name for the printer.'))
+            self.printer_name_ok = False
+        
+        elif self.fax_name == self.printer_name:
+            s = self.__tr('The printer name and fax name must be different. Please choose different names.')
+            QToolTip.add(self.faxNameLineEdit, s)
+            QToolTip.add(self.printerNameLineEdit, s)
+            self.fax_name_ok = False
+            self.printer_name_ok = False
+            self.printer_fax_names_same = True
+        
+        elif self.printer_name in self.installed_queues:
+            QToolTip.add(self.printerNameLineEdit, 
+                self.__tr('A printer already exists with this name. Please choose a different name.'))
+            self.printer_name_ok = False
+            
+        elif self.printer_fax_names_same:
+            if self.fax_name != self.printer_name:
+                self.printer_fax_names_same = False
+                self.printer_name_ok = True
+                
+                self.faxNameLineEdit.emit(SIGNAL("textChanged(const QString&)"), 
+                            (self.faxNameLineEdit.text(),))
+        
+        self.setEditErrors()
+
 
     def printerLocationLineEdit_textChanged(self, a0):
         self.location = unicode(a0)
@@ -660,6 +699,7 @@ class SetupForm(SetupForm_base):
         # Check for duplicate names
         if self.fax_uri in self.installed_fax_devices and \
             fax_name in self.installed_fax_devices[self.fax_uri]:
+        #if fax_name in self.installed_queues or fax_name == self.printer_name:
                 i = 2
                 while True:
                     t = fax_name + "_%d" % i
@@ -673,34 +713,41 @@ class SetupForm(SetupForm_base):
         self.faxNameLineEdit.setPaletteBackgroundColor(self.bg)
         self.defaultFaxNamePushButton.setEnabled(False)
         self.fax_name = fax_name
+        #self.fax_name_error = False
 
     def faxNameLineEdit_textChanged(self, a0):
         self.fax_name = unicode(a0)
         self.defaultFaxNamePushButton.setEnabled(True)
-
-        if not self.fax_name or (self.fax_uri in self.installed_fax_devices and \
-            self.fax_name in self.installed_fax_devices[self.fax_uri]):
-                self.setNextEnabled(self.PrinterNamePage, False)
-                self.fax_name_ok = False
-
-                if not self.fax_name:
-                    QToolTip.add(self.faxNameLineEdit, self.__tr('You must enter a fax name.'))
-                else:
-                    QToolTip.add(self.faxNameLineEdit, self.__tr('A fax already exists with this name. Please choose a different name.'))
-
-                self.faxNameLineEdit.setPaletteBackgroundColor(QColor(0xff, 0x99, 0x99))
-        else:
-            self.fax_name_ok = True
-            self.faxNameLineEdit.setPaletteBackgroundColor(self.bg)
-
-            if self.printer_name_ok:
-                self.setNextEnabled(self.PrinterNamePage, True)
-
-            QToolTip.remove(self.faxNameLineEdit)
-
+        
+        self.fax_name_ok = True
+        
         if not self.fax_name:
+            QToolTip.add(self.faxNameLineEdit, self.__tr('You must enter a fax name.'))
             self.fax_name_ok = False
-            self.setNextEnabled(self.PrinterNamePage, False)
+        
+        elif self.fax_name == self.printer_name:
+            s = self.__tr('The printer name and fax name must be different. Please choose different names.')
+            QToolTip.add(self.faxNameLineEdit, s)
+            QToolTip.add(self.printerNameLineEdit, s)
+            self.printer_name_ok = False
+            self.fax_name_ok = False
+            self.printer_fax_names_same = True
+        
+        elif self.fax_name in self.installed_queues:
+            QToolTip.add(self.faxNameLineEdit, 
+                self.__tr('A fax already exists with this name. Please choose a different name.'))
+            self.fax_name_ok = False
+            
+        elif self.printer_fax_names_same:
+            if self.fax_name != self.printer_name:
+                self.printer_fax_names_same = False
+                self.fax_name_ok = True
+                
+                self.printerNameLineEdit.emit(SIGNAL("textChanged(const QString&)"), 
+                            (self.printerNameLineEdit.text(),))
+                
+        self.setEditErrors() 
+
 
     def faxNumberLineEdit_textChanged(self, a0):
         self.fax_number = unicode(a0)

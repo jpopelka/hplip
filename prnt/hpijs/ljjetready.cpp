@@ -59,6 +59,10 @@ int (*HPLJJRCompress) (BYTE       *pbOutBuffer,
 
 APDK_BEGIN_NAMESPACE
 
+#ifdef HAVE_LIBDL
+extern void *LoadPlugin (char *szPluginName);
+#endif
+
 extern MediaSize PaperToMediaSize(PAPER_SIZE psize);
 
 enum COMPRESS_MODE  {	COMPRESS_MODE0 = 0,
@@ -144,7 +148,7 @@ LJJetReady::LJJetReady (SystemServices* pSS, int numfonts, BOOL proto)
     HPLJJRCompress = NULL;
 
 #ifdef HAVE_LIBDL
-    m_hHPLibHandle = dlopen ("libhpprop.so", RTLD_LAZY);
+    m_hHPLibHandle = LoadPlugin ("lj.so");
     if (m_hHPLibHandle)
     {
         dlerror ();

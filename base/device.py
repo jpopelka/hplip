@@ -65,10 +65,15 @@ MAX_BUFFER = 8192
 # Cache for model data
 model_dat = models.ModelData()
 
+ip_pat = re.compile(r"""\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b""", re.IGNORECASE)
+
+dev_pat = re.compile(r"""/dev/.+""", re.IGNORECASE)
+
+usb_pat = re.compile(r"""(\d+):(\d+)""", re.IGNORECASE)
+    
+    
 def makeURI(param, port=1):  
-    ip_pat = re.compile(r"""\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b""", re.IGNORECASE)
-    dev_pat = re.compile(r"""/dev/.+""", re.IGNORECASE)
-    usb_pat = re.compile(r"""(\d+):(\d+)""", re.IGNORECASE)
+    
 
     cups_uri, sane_uri, fax_uri = '', '', ''
     found = False
@@ -451,7 +456,7 @@ def getSupportedCUPSDevices(back_end_filter=['hp']):
         except Error:
             continue
 
-        if back_end in back_end_filter:
+        if back_end_filter == '*' or back_end in back_end_filter:
             try:
                 devices[p.device_uri]
             except KeyError:
@@ -623,6 +628,7 @@ def queryString(string_id, typ=0):
     if not strings_init:
         initStrings()
 
+    log.debug("queryString(%s)" % string_id)
     s = st.string_table.get(str(string_id), ('', ''))[typ]
 
     if type(s) == type(''):
@@ -671,7 +677,7 @@ AGENT_kinds = {AGENT_KIND_NONE            : 'invalid',
 
 AGENT_healths = {AGENT_HEALTH_OK           : 'ok',
                   AGENT_HEALTH_MISINSTALLED : 'misinstalled', # supply/cart
-                  AGENT_HEALTH_FAIR_MODERATE : '',
+                  #AGENT_HEALTH_FAIR_MODERATE : '',
                   AGENT_HEALTH_INCORRECT    : 'incorrect',
                   AGENT_HEALTH_FAILED       : 'failed',
                   AGENT_HEALTH_OVERTEMP     : 'overtemp', # battery
@@ -1236,6 +1242,10 @@ class Device(object):
             elif status_type == STATUS_TYPE_LJ_XML:
                 log.debug("Type 6: LJ XML")
                 status_block = status.StatusType6(self)
+                
+            elif status_type == STATUS_TYPE_PJL:
+                log.debug("Type 8: LJ XML")
+                status_block = status.StatusType8(self)
 
             else:
                 log.error("Unimplemented status type: %d" % status_type)
@@ -1351,9 +1361,9 @@ class Device(object):
 
                 a = 1
                 while True:
-                    mq_agent_kind = self.mq.get('r%d-agent%d-kind' % (r_value, a), 0)
+                    mq_agent_kind = self.mq.get('r%d-agent%d-kind' % (r_value, a), -1)
 
-                    if mq_agent_kind == 0:
+                    if mq_agent_kind == -1:
                         break
 
                     mq_agent_type = self.mq.get('r%d-agent%d-type' % (r_value, a), 0)
@@ -1371,13 +1381,16 @@ class Device(object):
                            break
 
                     if found:
-                        log.debug("r%d-kind%d-type%d" % (r_value, agent_kind, agent_type))
+                        log.debug("found: r%d-kind%d-type%d" % (r_value, agent_kind, agent_type))
 
-                        log.debug("found")
                         agent_health = agent.get('health', AGENT_HEALTH_OK)
+                        agent_level = agent.get('level', 100)
                         agent_level_trigger = agent.get('level-trigger',
                             AGENT_LEVEL_TRIGGER_SUFFICIENT_0)
 
+                        log.debug("health=%d, level=%d, level_trigger=%d, status_code=%d" % 
+                            (agent_health, agent_level, agent_level_trigger, status_code))
+                        
                         query = 'agent_%s_%s' % (AGENT_types.get(agent_type, 'unknown'), 
                                                  AGENT_kinds.get(agent_kind, 'unknown'))
 
@@ -1388,12 +1401,11 @@ class Device(object):
                         # if agent health is OK, check for low supplies. If low, use
                         # the agent level trigger description for the agent description.
                         # Otherwise, report the agent health.
-                        if status_code == STATUS_PRINTER_IDLE and \
+                        if (status_code == STATUS_PRINTER_IDLE or status_code == STATUS_PRINTER_OUT_OF_INK) and \
                             (agent_health == AGENT_HEALTH_OK or 
                              (agent_health == AGENT_HEALTH_FAIR_MODERATE and agent_kind == AGENT_KIND_HEAD)) and \
                             agent_level_trigger >= AGENT_LEVEL_TRIGGER_MAY_BE_LOW:
 
-                            # Low
                             query = 'agent_level_%s' % AGENT_levels.get(agent_level_trigger, 'unknown')
 
                             if tech_type in (TECH_TYPE_MONO_INK, TECH_TYPE_COLOR_INK):
@@ -1407,105 +1419,101 @@ class Device(object):
                             self.dq['error-state'] = STATUS_TO_ERROR_STATE_MAP.get(code, ERROR_STATE_LOW_SUPPLIES)
                             self.sendEvent(code)
 
-                            if agent_level_trigger in (AGENT_LEVEL_TRIGGER_PROBABLY_OUT, AGENT_LEVEL_TRIGGER_ALMOST_DEFINITELY_OUT):
+                            if agent_level_trigger in \
+                                (AGENT_LEVEL_TRIGGER_PROBABLY_OUT, AGENT_LEVEL_TRIGGER_ALMOST_DEFINITELY_OUT):
+                                
                                 query = 'agent_level_out'
                             else:
                                 query = 'agent_level_low'
 
-                        agent_health_desc = self.queryString(query)
+                            agent_health_desc = self.queryString(query)
+    
+                            self.dq.update(
+                            {
+                                'agent%d-kind' % a :          agent_kind,
+                                'agent%d-type' % a :          agent_type,
+                                'agent%d-known' % a :         agent.get('known', False),
+                                'agent%d-sku' % a :           mq_agent_sku,
+                                'agent%d-level' % a :         agent_level,
+                                'agent%d-level-trigger' % a : agent_level_trigger,
+                                'agent%d-ack' % a :           agent.get('ack', False),
+                                'agent%d-hp-ink' % a :        agent.get('hp-ink', False),
+                                'agent%d-health' % a :        agent_health,
+                                'agent%d-dvc' % a :           agent.get('dvc', 0),
+                                'agent%d-virgin' % a :        agent.get('virgin', False),
+                                'agent%d-desc' % a :          agent_desc,
+                                'agent%d-id' % a :            agent.get('id', 0),
+                                'agent%d-health-desc' % a :   agent_health_desc,
+                            })
 
-                        self.dq.update(
-                        {
-                            'agent%d-kind' % a :          agent_kind,
-                            'agent%d-type' % a :          agent_type,
-                            'agent%d-known' % a :         agent.get('known', False),
-                            'agent%d-sku' % a :           mq_agent_sku,
-                            'agent%d-level' % a :         agent.get('level', 0),
-                            'agent%d-level-trigger' % a : agent_level_trigger,
-                            'agent%d-ack' % a :           agent.get('ack', False),
-                            'agent%d-hp-ink' % a :        agent.get('hp-ink', False),
-                            'agent%d-health' % a :        agent_health,
-                            'agent%d-dvc' % a :           agent.get('dvc', 0),
-                            'agent%d-virgin' % a :        agent.get('virgin', False),
-                            'agent%d-desc' % a :          agent_desc,
-                            'agent%d-id' % a :            agent.get('id', 0),
-                            'agent%d-health-desc' % a :   agent_health_desc,
-                        })
-
-                    else:
-                        agent_health = AGENT_HEALTH_MISINSTALLED
-                        agent_level_trigger = AGENT_LEVEL_TRIGGER_ALMOST_DEFINITELY_OUT
-
-                        query = 'agent_%s_%s' % (AGENT_types.get(mq_agent_type, 'unknown'),
-                                                 AGENT_kinds.get(mq_agent_kind, 'unknown'))
-
-                        agent_desc = self.queryString(query)
-                        agent_health_desc = self.queryString("agent_health_misinstalled")
-
-                        self.dq.update(
-                        {
-                            'agent%d-kind' % a :          mq_agent_kind,
-                            'agent%d-type' % a :          mq_agent_type,
-                            'agent%d-known' % a :         False,
-                            'agent%d-sku' % a :           mq_agent_sku,
-                            'agent%d-level' % a :         0,
-                            'agent%d-level-trigger' % a : agent_level_trigger,
-                            'agent%d-ack' % a :           False,
-                            'agent%d-hp-ink' % a :        False,
-                            'agent%d-health' % a :        agent_health,
-                            'agent%d-dvc' % a :           0,
-                            'agent%d-virgin' % a :        False,
-                            'agent%d-desc' % a :          agent_desc,
-                            'agent%d-id' % a :            0,
-                            'agent%d-health-desc' % a :   agent_health_desc,
-                        })
-
+                        else:
+                            query = 'agent_health_%s' % AGENT_healths.get(agent_health, AGENT_HEALTH_OK)
+                            agent_health_desc = self.queryString(query)
+    
+                            self.dq.update(
+                            {
+                                'agent%d-kind' % a :          agent_kind,
+                                'agent%d-type' % a :          agent_type,
+                                'agent%d-known' % a :         False,
+                                'agent%d-sku' % a :           mq_agent_sku,
+                                'agent%d-level' % a :         agent_level,
+                                'agent%d-level-trigger' % a : agent_level_trigger,
+                                'agent%d-ack' % a :           False,
+                                'agent%d-hp-ink' % a :        False,
+                                'agent%d-health' % a :        agent_health,
+                                'agent%d-dvc' % a :           0,
+                                'agent%d-virgin' % a :        False,
+                                'agent%d-desc' % a :          agent_desc,
+                                'agent%d-id' % a :            0,
+                                'agent%d-health-desc' % a :   agent_health_desc,
+                            })
+    
                     a += 1
 
-                else: # Create agent keys for not-found devices
+        else: # Create agent keys for not-found devices
 
-                    r_value = 0
-                    if r_type > 0 and self.r_values is not None:
-                        r_value = self.r_values[0]
+            r_value = 0
+            if r_type > 0 and self.r_values is not None:
+                r_value = self.r_values[0]
 
-                    # Make sure there is some valid agent data for this r_value
-                    # If not, fall back to r_value == 0
-                    if r_value > 0 and self.mq.get('r%d-agent1-kind', 0) == 0:
-                        r_value = 0
+            # Make sure there is some valid agent data for this r_value
+            # If not, fall back to r_value == 0
+            if r_value > 0 and self.mq.get('r%d-agent1-kind', 0) == 0:
+                r_value = 0
 
-                    a = 1
-                    while True:
-                        mq_agent_kind = self.mq.get('r%d-agent%d-kind' % (r_value, a), 0)
+            a = 1
+            while True:
+                mq_agent_kind = self.mq.get('r%d-agent%d-kind' % (r_value, a), 0)
 
-                        if mq_agent_kind == 0:
-                            break
+                if mq_agent_kind == 0:
+                    break
 
-                        mq_agent_type = self.mq.get('r%d-agent%d-type' % (r_value, a), 0)
-                        mq_agent_sku = self.mq.get('r%d-agent%d-sku' % (r_value, a), '')
-                        query = 'agent_%s_%s' % (AGENT_types.get(mq_agent_type, 'unknown'),
-                                                 AGENT_kinds.get(mq_agent_kind, 'unknown'))
+                mq_agent_type = self.mq.get('r%d-agent%d-type' % (r_value, a), 0)
+                mq_agent_sku = self.mq.get('r%d-agent%d-sku' % (r_value, a), '')
+                query = 'agent_%s_%s' % (AGENT_types.get(mq_agent_type, 'unknown'),
+                                         AGENT_kinds.get(mq_agent_kind, 'unknown'))
 
-                        agent_desc = self.queryString(query)
+                agent_desc = self.queryString(query)
 
-                        self.dq.update(
-                        {
-                            'agent%d-kind' % a :          mq_agent_kind,
-                            'agent%d-type' % a :          mq_agent_type,
-                            'agent%d-known' % a :         False,
-                            'agent%d-sku' % a :           mq_agent_sku,
-                            'agent%d-level' % a :         0,
-                            'agent%d-level-trigger' % a : AGENT_LEVEL_TRIGGER_ALMOST_DEFINITELY_OUT,
-                            'agent%d-ack' % a :           False,
-                            'agent%d-hp-ink' % a :        False,
-                            'agent%d-health' % a :        AGENT_HEALTH_MISINSTALLED,
-                            'agent%d-dvc' % a :           0,
-                            'agent%d-virgin' % a :        False,
-                            'agent%d-health-desc' % a :   self.queryString('agent_health_unknown'),
-                            'agent%d-desc' % a :          agent_desc,
-                            'agent%d-id' % a :            0,
-                        })
+                self.dq.update(
+                {
+                    'agent%d-kind' % a :          mq_agent_kind,
+                    'agent%d-type' % a :          mq_agent_type,
+                    'agent%d-known' % a :         False,
+                    'agent%d-sku' % a :           mq_agent_sku,
+                    'agent%d-level' % a :         0,
+                    'agent%d-level-trigger' % a : AGENT_LEVEL_TRIGGER_ALMOST_DEFINITELY_OUT,
+                    'agent%d-ack' % a :           False,
+                    'agent%d-hp-ink' % a :        False,
+                    'agent%d-health' % a :        AGENT_HEALTH_MISINSTALLED,
+                    'agent%d-dvc' % a :           0,
+                    'agent%d-virgin' % a :        False,
+                    'agent%d-health-desc' % a :   self.queryString('agent_health_unknown'),
+                    'agent%d-desc' % a :          agent_desc,
+                    'agent%d-id' % a :            0,
+                })
 
-                        a += 1
+                a += 1
 
         for d in self.dq:
             self.__dict__[d.replace('-','_')] = self.dq[d]
@@ -1528,14 +1536,23 @@ class Device(object):
         result_code, data, typ, pml_result_code = \
             hpmudext.get_pml(self.device_id, channel_id, pml.PMLToSNMP(oid[0]), oid[1])
 
-        log.debug("PML/SNMP get %s (result code = 0x%x)" % (oid[0], pml_result_code))
-
         if pml_result_code > pml.ERROR_MAX_OK:
+            log.debug("PML/SNMP GET %s failed (result code = 0x%x)" % (oid[0], pml_result_code))
             return pml_result_code, None
 
-        log.log_data(data)
-
-        return pml_result_code, pml.ConvertFromPMLDataFormat(data, oid[1], desired_int_size)
+        converted_data = pml.ConvertFromPMLDataFormat(data, oid[1], desired_int_size)
+        
+        if log.is_debug():
+            if oid[1] in (pml.TYPE_STRING, pml.TYPE_BINARY):
+                
+                log.debug("PML/SNMP GET %s (result code = 0x%x) returned:" % 
+                    (oid[0], pml_result_code))
+                log.log_data(data)
+            else:
+                log.debug("PML/SNMP GET %s (result code = 0x%x) returned: %s" % 
+                    (oid[0], pml_result_code, repr(converted_data)))
+        
+        return pml_result_code, converted_data
 
 
     def setPML(self, oid, value): # oid => ( 'dotted oid value', pml type )
@@ -1545,9 +1562,16 @@ class Device(object):
         
         result_code, pml_result_code = \
             hpmudext.set_pml(self.device_id, channel_id, pml.PMLToSNMP(oid[0]), oid[1], value)
-
-        log.debug("PML/SNMP set %s (result code = 0x%x)" % (oid[0], pml_result_code))
-        log.log_data(value)
+            
+        if log.is_debug():
+            if oid[1] in (pml.TYPE_STRING, pml.TYPE_BINARY): 
+                
+                log.debug("PML/SNMP SET %s (result code = 0x%x) to:" % 
+                    (oid[0], pml_result_code))
+                log.log_data(value)
+            else:
+                log.debug("PML/SNMP SET %s (result code = 0x%x) to: %s" % 
+                    (oid[0], pml_result_code, repr(value)))
         
         return pml_result_code
 
@@ -1607,20 +1631,20 @@ class Device(object):
             raise Error(ERROR_DEVICE_DOES_NOT_SUPPORT_OPERATION)
 
 
-    def readPrint(self, bytes_to_read, stream=None, timeout=prop.read_timeout):
-        return self.__readChannel(self.openPrint, bytes_to_read, stream, timeout)
+    def readPrint(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=False):
+        return self.__readChannel(self.openPrint, bytes_to_read, stream, timeout, allow_short_read)
 
-    def readPCard(self, bytes_to_read, stream=None, timeout=prop.read_timeout):
-        return self.__readChannel(self.openPCard, bytes_to_read, stream, timeout)
+    def readPCard(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=False):
+        return self.__readChannel(self.openPCard, bytes_to_read, stream, timeout, allow_short_read)
 
-    def readFax(self, bytes_to_read, stream=None, timeout=prop.read_timeout):
-        return self.__readChannel(self.openFax, bytes_to_read, stream, timeout)
+    def readFax(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=False):
+        return self.__readChannel(self.openFax, bytes_to_read, stream, timeout, allow_short_read)
 
-    def readCfgUpload(self, bytes_to_read, stream=None, timeout=prop.read_timeout):
-        return self.__readChannel(self.openCfgUpload, bytes_to_read, stream, timeout)
+    def readCfgUpload(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=False):
+        return self.__readChannel(self.openCfgUpload, bytes_to_read, stream, timeout, allow_short_read)
 
-    def readEWS(self, bytes_to_read, stream=None, timeout=prop.read_timeout):
-        return self.__readChannel(self.openEWS, bytes_to_read, stream, timeout, True)
+    def readEWS(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=True):
+        return self.__readChannel(self.openEWS, bytes_to_read, stream, timeout, allow_short_read)
 
 
     def __readChannel(self, opener, bytes_to_read, stream=None, 
@@ -1644,6 +1668,10 @@ class Device(object):
 
             l = len(data)
             #log.log_data(data)
+            
+            if result_code == hpmudext.HPMUD_R_IO_TIMEOUT:
+                log.warn("I/O timeout")
+                break
 
             if result_code != hpmudext.HPMUD_R_OK: 
                 log.error("Channel read error")
@@ -1923,21 +1951,40 @@ class Device(object):
             self.closeEWS()
 
 
-    def downloadFirmware(self):
+    def downloadFirmware(self, usb_bus_id=None, usb_device_id=None):
         ok = False
         filename = os.path.join(prop.data_dir, "firmware", self.model.lower() + '.fw.gz')
         log.debug(filename)
 
         if os.path.exists(filename):
-            try:
-                log.debug("Downloading firmware file '%s'..." % filename)
-                self.openPrint()
-                bytes_written = self.writePrint(gzip.open(filename).read())
-                log.debug("%s bytes downloaded." % utils.commafy(bytes_written))
-                self.closePrint()
-                ok = True
-            except Error, e:
-                log.error("An error occured: e.msg")
+            log.debug("Downloading firmware file '%s'..." % filename)
+            
+            # Write to port directly (no MUD) so that HAL can enumerate the printer
+            if 0: # this currently doesn't work because usblp is loaded...
+            #if usb_bus_id is not None and usb_device_id is not None:
+                try:
+                    p = "/dev/bus/usb/%s/%s" % (usb_bus_id, usb_device_id)
+                    log.debug("Writing to %s..." % p)
+                    #f = file(p, 'w')
+                    f = os.open(p, os.O_RDWR)
+                    x = gzip.open(filename).read()
+                    os.write(f, x)
+                    #f.close()
+                    os.close(f)
+                    ok = True
+                    log.debug("OK")
+                except (OSError, IOError), e:
+                    log.error("An error occured: %s" % e)
+            else:
+                try:
+                    self.openPrint()
+                    bytes_written = self.writePrint(gzip.open(filename).read())
+                    log.debug("%s bytes downloaded." % utils.commafy(bytes_written))
+                    self.closePrint()
+                    ok = True
+                    log.debug("OK")
+                except Error, e:
+                    log.error("An error occured: %s" % e.msg)
         else:
             log.error("Firmware file '%s' not found." % filename)
 

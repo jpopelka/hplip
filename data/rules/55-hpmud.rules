@@ -2,7 +2,10 @@
 
 ACTION!="add", GOTO="hpmud_rules_end"
 SUBSYSTEM=="ppdev", OWNER="lp", GROUP="lp", MODE="0666"
+SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", GOTO="pid_test"
 SUBSYSTEM!="usb_device", GOTO="hpmud_rules_end"
+
+LABEL="pid_test"
 
 # Check for AiO products (0x03f0xx11).
 SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="??11", OWNER="lp", GROUP="lp", MODE="0666"

@@ -154,14 +154,15 @@ def start(auto=True, test_depends=False, test_unknown=False):
         log.debug("Req missing=%d Opt missing=%d HPOJ=%s HPLIP=%s Component=%s" % \
             (num_req_missing, num_opt_missing, core.hpoj_present, core.hplip_present, core.selected_component))
 
-        if core.distro_known():
-            log.info("Distro is %s %s" % (core.get_distro_data('display_name', '(unknown)'), core.distro_version))
-
         #
         # CONFIRM AND SELECT DISTRO NAME AND VERSION
         #
 
         tui.title("DISTRO/OS CONFIRMATION")
+
+
+        if core.distro_known():
+            log.info("Distro appears to be %s %s.\n" % (core.get_distro_data('display_name', '(unknown)'), core.distro_version))
 
         log.debug("Distro = %s Distro Name = %s Display Name= %s Version = %s Supported = %s" % \
             (core.distro, core.distro_name, core.distros[core.distro_name]['display_name'], \
@@ -330,6 +331,8 @@ def start(auto=True, test_depends=False, test_unknown=False):
 
                 if ver_notes:
                     log.info(ver_notes)
+                    
+                log.info("")
 
                 if not tui.continue_prompt("Please read the installation notes."):
                     sys.exit(0)
@@ -690,6 +693,7 @@ def start(auto=True, test_depends=False, test_unknown=False):
             
             for p in tui.format_paragraph(paragraph):
                 log.info(p)
+            log.info("")
                 
             ok, choice = tui.enter_choice("Restart or re-plug in your printer (r=restart, p=re-plug in*, q=quit) : ", 
                 ['r', 'p'], 'p')
@@ -726,7 +730,8 @@ def start(auto=True, test_depends=False, test_unknown=False):
 
         if install_printer:
             log.info("Please make sure your printer is connected and powered on at this time.")
-            core.run_hp_setup()
+            if not core.run_hp_setup():
+                log.error("hp-setup failed. Please run hp-setup manually.")
 
     except KeyboardInterrupt:
         log.info("")

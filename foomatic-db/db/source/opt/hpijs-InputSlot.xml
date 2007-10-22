@@ -408,6 +408,11 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-PhotoSmart_C4380</printer>
+      <arg_defval>ev/hpijs-InputSlot-Default</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-PhotoSmart_C5100</printer>
       <arg_defval>ev/hpijs-InputSlot-Default</arg_defval>
      </constraint>
@@ -614,6 +619,11 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-OfficeJet_Pro_K5400</printer>
+      <arg_defval>ev/hpijs-InputSlot-Default</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-OfficeJet_Pro_K8600</printer>
       <arg_defval>ev/hpijs-InputSlot-Default</arg_defval>
      </constraint>
      <constraint sense='true'>

@@ -87,7 +87,7 @@ supported=False
 
 [suse]
 index=3
-versions=9.0,9.1,9.2,9.3,10.0,10.1,10.2
+versions=9.0,9.1,9.2,9.3,10.0,10.1,10.2,10.3
 display_name=SUSE Linux
 alt_names=
 display=True
@@ -360,6 +360,79 @@ packages=sane
 [suse:10.2:xsane]
 packages=xsane
 
+
+# ********************
+[suse:10.3]
+code_name=
+supported=True
+release_date=2007-10-04
+
+[suse:10.3:cups]
+packages=cups,cups-client
+
+[suse:10.3:cups-devel]
+packages=cups-devel
+
+[suse:10.3:gcc]
+packages=gcc-c++
+
+[suse:10.3:gs]
+packages=ghostscript-library
+
+[suse:10.3:libcrypto]
+packages=openssl
+
+[suse:10.3:libjpeg]
+packages=libjpeg-devel
+
+[suse:10.3:libnetsnmp-devel]
+packages=net-snmp-devel
+
+[suse:10.3:libpthread]
+packages=glibc
+
+[suse:10.3:libtool]
+packages=libtool,libgphoto2-devel
+
+[suse:10.3:libusb]
+packages=libusb,libusb-devel
+
+[suse:10.3:make]
+packages=make
+
+[suse:10.3:pil]
+packages=python-imaging
+
+[suse:10.3:ppdev]
+packages=
+commands=su -c "modprobe ppdev"
+
+[suse:10.3:pyqt]
+packages=python-qt
+
+[suse:10.3:python-devel]
+packages=python-devel,python-xml
+
+[suse:10.3:python23]
+packages=python
+
+[suse:10.3:python2x]
+packages=python
+
+[suse:10.3:reportlab]
+packages=
+
+[suse:10.3:sane]
+packages=sane
+
+[suse:10.3:sane-devel]
+packages=sane-devel
+
+[suse:10.3:scanimage]
+packages=sane
+
+[suse:10.3:xsane]
+packages=xsane
 
 
 # ****************************************
@@ -2139,7 +2212,7 @@ packages=xsane
 code_name=Gutsy Gibbon
 supported=True
 release_date=2007-10-1
-notes=Enable the universe/multiverse repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.
+notes=Enable the universe/multiverse repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubunbtu installation media inserted in the drive.
 ppd_install=xml
 udev_mode_fix=True
 ppd_dir=

@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '3.1'
+__version__ = '3.2'
 __title__ = "Make Copies Utility"
 __doc__ = "PC initiated make copies on supported HP AiO and MFP devices."
 
@@ -59,6 +59,7 @@ USAGE = [(__doc__, "", "name", True),
          ("Quality:", "-q<quality> or --quality=<quality> (where quality is: 'fast', 'draft', 'normal', 'presentation', or 'best')", "option", False),
          ("Contrast:", "-c<contrast> or --contrast=<contrast> (-5 to +5)", "option", False),
          ("Fit to page (flatbed only):", "-f or --fittopage or --fit (overrides reduction/enlargement)", "option", False),
+         utils.USAGE_LANGUAGE2,
          utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
          utils.USAGE_HELP,
          utils.USAGE_SPACE,
@@ -82,7 +83,8 @@ try:
                                 'num=', 'copies=', 'contrast=', 'quality=',
                                 'reduction=', 'enlargement=', 'fittopage', 
                                 'fit', 'gui', 'help-rest', 'help-man',
-                                'help-desc', 'non-interactive', 'bus='])
+                                'help-desc', 'non-interactive', 'bus=', 
+                                'lang='])
 except getopt.GetoptError, e:
     log.error(e.msg)
     usage()
@@ -99,6 +101,7 @@ quality = None
 fit_to_page = None
 mode = GUI_MODE
 mode_specified = False
+loc = None
 
 if os.getenv("HPLIP_DEBUG"):
     log.set_level('debug')
@@ -224,6 +227,13 @@ for o, a in opts:
         bus = a.lower().strip()
         if not device.validateBusList(bus):
             usage()
+            
+    elif o == '--lang':
+        if a.strip() == '?':
+            utils.show_languages()
+            sys.exit(0)
+            
+        loc = utils.validate_language(a.lower())
 
 
 
@@ -269,34 +279,35 @@ if mode == GUI_MODE:
     # create the main application object
     app = QApplication(sys.argv)
     
-    #loc = utils.loadTranslators(app, prop.user_config_file)
-
-    ### Load localized strings...begin
-    loc = user_cfg.ui.get("loc", "system")
-    if loc.lower() == 'system':
-        loc = str(QTextCodec.locale())
-        log.debug("Using system locale: %s" % loc)
-
+    if loc is None:
+        loc = user_cfg.ui.get("loc", "system")
+        if loc.lower() == 'system':
+            loc = str(QTextCodec.locale())
+            log.debug("Using system locale: %s" % loc)
+    
     if loc.lower() != 'c':
         log.debug("Trying to load .qm file for %s locale." % loc)
         trans = QTranslator(None)
         qm_file = 'hplip_%s.qm' % loc
         log.debug("Name of .qm file: %s" % qm_file)
         loaded = trans.load(qm_file, prop.localization_dir)
-
+        
         if loaded:
             app.installTranslator(trans)
         else:
-            #log.error("File failed to load.")
             loc = 'c'
-    else:
-        loc = 'c'
-
+    
     if loc == 'c':
         log.debug("Using default 'C' locale")
     else:
         log.debug("Using locale: %s" % loc)
-    ### Load localized strings...end
+
+        QLocale.setDefault(QLocale(loc))
+        try:
+            locale.setlocale(locale.LC_ALL, locale.normalize(loc+".utf8"))
+            prop.locale = loc
+        except locale.Error:
+            log.error("Invalid locale: %s" % (loc+".utf8"))
     
     makecopiesdlg = MakeCopiesForm(hpssd_sock, bus, device_uri, printer_name, 
                                    num_copies, contrast, quality, reduction, fit_to_page)

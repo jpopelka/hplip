@@ -276,7 +276,7 @@ class ScrollUnloadView(ScrollView):
             self.pc.get_exif_path(item.path) and \
             not item.thumbnail_set:
 
-            popup.insertItem(self.__tr("Show Thumbnail", self.showThumbNail))
+            popup.insertItem(self.__tr("Show Thumbnail"), self.showThumbNail)
 
         popup.popup(pos)
 
@@ -510,7 +510,7 @@ class ScrollUnloadView(ScrollView):
         else:
             self.UnloadDirectoryEdit.setText(self.unload_dir)
             os.chdir(self.unload_dir)
-            user_cfg.last_used.working_dir = self.unload_dir
+            user_cfg.last_used.working_dir = self.unload_dir.encode('utf-8')
 
     def addOptions(self):
         widget = self.getWidget()

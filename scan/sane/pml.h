@@ -69,8 +69,6 @@
 #define PML_ERROR_ACTION_CAN_NOT_BE_PERFORMED_NOW   0x87
 #define PML_ERROR_SYNTAX_ERROR          0x88
 
-typedef struct hpaioScanner_s HPAIO_RECORD;
-
 struct PmlValue_s
 {
         int     type;
@@ -174,9 +172,10 @@ int __attribute__ ((visibility ("hidden"))) PmlRequestGet(int deviceid, int chan
 /*
  * Phase 2 rewrite. des
  */
+struct hpaioScanner_s;
 
-int __attribute__ ((visibility ("hidden"))) pml_start(HPAIO_RECORD *hpaio);
-int __attribute__ ((visibility ("hidden"))) pml_read(HPAIO_RECORD *hpaio, SANE_Byte *data, SANE_Int maxLength, SANE_Int *pLength);
-int __attribute__ ((visibility ("hidden"))) pml_cancel(HPAIO_RECORD *hpaio);
+int __attribute__ ((visibility ("hidden"))) pml_start(struct hpaioScanner_s *hpaio);
+int __attribute__ ((visibility ("hidden"))) pml_read(struct hpaioScanner_s *hpaio, SANE_Byte *data, SANE_Int maxLength, SANE_Int *pLength);
+int __attribute__ ((visibility ("hidden"))) pml_cancel(struct hpaioScanner_s *hpaio);
 
 #endif // _PML_H

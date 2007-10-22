@@ -818,7 +818,7 @@ Para cada fileira, selecione a legenda que representa a caixa na qual as linhas 
     </message>
     <message>
         <source>Refreshing device list...</source>
-        <translation>Atualizando a lista de dispositivos... </translation>
+        <translation>Atualizando a lista de dispositivos...</translation>
     </message>
     <message>
         <source>Press F6 to refresh.</source>
@@ -1347,7 +1347,7 @@ Para cada fileira, selecione a legenda que representa a caixa na qual as linhas 
     </message>
     <message>
         <source>Contents </source>
-        <translation>Conteúdo </translation>
+        <translation>Conteúdo</translation>
     </message>
     <message>
         <source>Properties for</source>
@@ -1550,7 +1550,7 @@ Para cada fileira, selecione a legenda que representa a caixa na qual as linhas 
     </message>
     <message>
         <source>CUPS Web Interface</source>
-        <translation>Interface Web CUPS </translation>
+        <translation>Interface Web CUPS</translation>
     </message>
     <message>
         <source>Close</source>
@@ -2362,7 +2362,7 @@ Para cada fileira, selecione a legenda que representa a caixa na qual as linhas 
     </message>
     <message>
         <source>Accept Jobs</source>
-        <translation>Aceitar trabalhos </translation>
+        <translation>Aceitar trabalhos</translation>
     </message>
     <message>
         <source>Cancel all active print jobs</source>
@@ -2884,7 +2884,7 @@ Para cada fileira, selecione a legenda que representa a caixa na qual as linhas 
     </message>
     <message>
         <source>&lt;b&gt;Cannot print: Printer is stopped.&lt;/b&gt;&lt;p&gt;Please START the printer to continue this print. Job will begin printing once printer is started.</source>
-        <translation>&lt;b&gt;Não é possível imprimir: A impressora está parada.&lt;/b&gt;&lt;p&gt;INICIE a impressora para continuar esta impressão. O trabalho começará a ser impresso assim que a impressora for iniciada. </translation>
+        <translation>&lt;b&gt;Não é possível imprimir: A impressora está parada.&lt;/b&gt;&lt;p&gt;INICIE a impressora para continuar esta impressão. O trabalho começará a ser impresso assim que a impressora for iniciada.</translation>
     </message>
     <message>
         <source>&lt;b&gt;Cannot print: Printer is not accepting jobs.&lt;/b&gt;&lt;p&gt;Please set the printer to ACCEPTING JOBS to continue printing.</source>
@@ -3191,7 +3191,7 @@ Para cada fileira, selecione a legenda que representa a caixa na qual as linhas 
     </message>
     <message>
         <source>Print a test page to test the setup of your printer.</source>
-        <translation>Imprima uma página de teste para testar a instalação da impressora. </translation>
+        <translation>Imprima uma página de teste para testar a instalação da impressora.</translation>
     </message>
     <message>
         <source>Print Test Page &gt;&gt;</source>
@@ -3655,7 +3655,7 @@ Para cada fileira, selecione a legenda que representa a caixa na qual as linhas 
     </message>
     <message>
         <source>Device(s) to Refresh </source>
-        <translation>Dispositivo(s) a atualizar </translation>
+        <translation>Dispositivo(s) a atualizar</translation>
     </message>
     <message>
         <source>Only currently selected device</source>
@@ -3775,6 +3775,14 @@ Para cada fileira, selecione a legenda que representa a caixa na qual as linhas 
     <message>
         <source>Current: Filter: &quot;%2&quot;  Search: &quot;%3&quot;  TTL: %4  Timeout: %5s</source>
         <translation>Atual: Filtro: &quot;%2&quot;  Busca: &quot;%3&quot;  TTL: %4 Tempo limite: %5s</translation>
+    </message>
+    <message>
+        <source>The printer name and fax name must be different. Please choose different names.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Device not found.&lt;/b&gt; &lt;p&gt;Please make sure your printer is properly connected and powered-on.</source>
+        <translation></translation>
     </message>
     <message>
         <source>&lt;b&gt;No devices found.&lt;/b&gt;&lt;p&gt;Please make sure your printer is properly connected and powered-on.</source>
@@ -4056,7 +4064,7 @@ Para cada fileira, selecione a legenda que representa a caixa na qual as linhas 
     </message>
     <message>
         <source>&lt;i&gt;(&quot;xxx:yyy&quot; where xxx is the USB bus ID and yyy is the USB device ID. The &apos;:&apos; and all leading zeroes must be present. Use &apos;lsusb&apos; to determine this information.)&lt;/i&gt;</source>
-        <translation>&lt;i&gt;(&quot;xxx:yyy&quot; onde xxx é o ID do barramento USB e yyy é o ID do dispositivo USB. Os &apos;:&apos; e todos os zeros à esquerda devem estar presentes. Utilize &apos;lsusb&apos; para determinar essas informações).&lt;/i&gt; </translation>
+        <translation>&lt;i&gt;(&quot;xxx:yyy&quot; onde xxx é o ID do barramento USB e yyy é o ID do dispositivo USB. Os &apos;:&apos; e todos os zeros à esquerda devem estar presentes. Utilize &apos;lsusb&apos; para determinar essas informações).&lt;/i&gt;</translation>
     </message>
     <message>
         <source>USB ID:</source>
@@ -4068,7 +4076,7 @@ Para cada fileira, selecione a legenda que representa a caixa na qual as linhas 
     </message>
     <message>
         <source> &lt;i&gt;(&quot;/dev/parportX&quot;, X=0,1,2,...)&lt;/i&gt;</source>
-        <translation> &lt;i&gt;(&quot;/dev/parportX&quot;, X=0,1,2,...)&lt;/i&gt;</translation>
+        <translation>&lt;i&gt;(&quot;/dev/parportX&quot;, X=0,1,2,...)&lt;/i&gt;</translation>
     </message>
     <message>
         <source>Device Node:</source>
@@ -4861,7 +4869,7 @@ Para cada fileira, selecione a legenda que representa a caixa na qual as linhas 
     </message>
     <message>
         <source>HPLIP: Error/alert on device: </source>
-<translation>HPLIP: Erro/alerta no dispositivo: </translation>
+<translation>HPLIP: Erro/alerta no dispositivo:</translation>
     </message>
 </context>
 <context>
