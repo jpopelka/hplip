@@ -33,12 +33,10 @@
         <translation>&lt;b&gt;Versão do software Device Manager: &lt;/b&gt;</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Authors and Contributors:&lt;/b&gt;
-David Suffield, Don Welch, Shiyun Yie, Raghothama Cauligi, John Oleinik, Cory Meisch, Foster Nuffer, Pete Parks, Jacqueline Pitter, David Paschal, 
-Steve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter</source>
+        <source>&lt;b&gt;Authors and Contributors:&lt;/b&gt;\nDavid Suffield, Don Welch, Shiyun Yie, Raghothama Cauligi, John Oleinik, Cory Meisch, Foster Nuffer, Pete Parks, Jacqueline Pitter, David Paschal,\nSteve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter, Linus Araque, Mark Crawford, Charlie Moore</source>
         <translation>&lt;b&gt;Autores e colaboradores:&lt;/b&gt;
 David Suffield, Don Welch, Shiyun Yie, Raghothama Cauligi, John Oleinik, Cory Meisch, Foster Nuffer, Pete Parks, Jacqueline Pitter, David Paschal, 
-Steve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter</translation>
+Steve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter, Linus Araque, Mark Crawford, Charlie Moore</translation>
     </message>
     <message>
         <source>&lt;b&gt;License and Copyright:&lt;/b&gt;
@@ -3778,11 +3776,11 @@ Para cada fileira, selecione a legenda que representa a caixa na qual as linhas 
     </message>
     <message>
         <source>The printer name and fax name must be different. Please choose different names.</source>
-        <translation></translation>
+<translation>O nome da impressora e o nome do fax devem ser diferentes. Escolha nomes diferentes.</translation>
     </message>
     <message>
         <source>&lt;b&gt;Device not found.&lt;/b&gt; &lt;p&gt;Please make sure your printer is properly connected and powered-on.</source>
-        <translation></translation>
+        <translation>&lt;b&gt;Dispositivo não encontrado.&lt;/b&gt; &lt;p&gt;Verifique se a impressora está conectada corretamente e ligada.</translation>
     </message>
     <message>
         <source>&lt;b&gt;No devices found.&lt;/b&gt;&lt;p&gt;Please make sure your printer is properly connected and powered-on.</source>

@@ -33,12 +33,10 @@
         <translation>&lt;b&gt;设备管理器软件版本：&lt;/b&gt;</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Authors and Contributors:&lt;/b&gt;
-David Suffield, Don Welch, Shiyun Yie, Raghothama Cauligi, John Oleinik, Cory Meisch, Foster Nuffer, Pete Parks, Jacqueline Pitter, David Paschal, 
-Steve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter</source>
+        <source>&lt;b&gt;Authors and Contributors:&lt;/b&gt;\nDavid Suffield, Don Welch, Shiyun Yie, Raghothama Cauligi, John Oleinik, Cory Meisch, Foster Nuffer, Pete Parks, Jacqueline Pitter, David Paschal,\nSteve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter, Linus Araque, Mark Crawford, Charlie Moore</source>
         <translation>&lt;b&gt;作者和贡献者：&lt;/b&gt;
 David Suffield、Don Welch、Shiyun Yie、Raghothama Cauligi、John Oleinik、Cory Meisch、Foster Nuffer、Pete Parks、Jacqueline Pitter、David Paschal、
-Steve DeRoos、Mark Overton、Aaron Albright、Smith Kennedy、John Hosszu、Chris Wiesner、Henrique M. Holschuh、Till Kamppeter</translation>
+Steve DeRoos、Mark Overton、Aaron Albright、Smith Kennedy、John Hosszu、Chris Wiesner、Henrique M. Holschuh,、Till Kamppeter, Linus Araque, Mark Crawford, Charlie Moore</translation>
     </message>
     <message>
         <source>&lt;b&gt;License and Copyright:&lt;/b&gt;
@@ -1087,7 +1085,7 @@ For each row, select the label representing the box in which the shorter inner l
     </message>
     <message>
         <source>&lt;b&gt;Name/Nickname:&lt;/b&gt;</source>
-<translation>&lt;b&gt;姓名/昵称：&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;姓名/昵称：&lt;/b&gt;</translation>
     </message>
 </context>
 <context>
@@ -1157,7 +1155,7 @@ For each row, select the label representing the box in which the shorter inner l
     </message>
     <message>
         <source>Edit...</source>
-        <translation>编辑...</translation>
+        <translation>编辑...ui</translation>
     </message>
     <message>
         <source>Delete...</source>
@@ -3778,11 +3776,11 @@ For each row, select the label representing the box in which the shorter inner l
     </message>
     <message>
         <source>The printer name and fax name must be different. Please choose different names.</source>
-        <translation></translation>
+<translation>打印机名称及传真机名称不得同名。请选择其他名称。</translation>
     </message>
     <message>
         <source>&lt;b&gt;Device not found.&lt;/b&gt; &lt;p&gt;Please make sure your printer is properly connected and powered-on.</source>
-        <translation></translation>
+        <translation>未找到设备。请确认打印机连接正确并已开启电源。</translation>
     </message>
     <message>
         <source>&lt;b&gt;No devices found.&lt;/b&gt;&lt;p&gt;Please make sure your printer is properly connected and powered-on.</source>

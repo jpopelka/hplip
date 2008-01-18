@@ -84,23 +84,24 @@ static char *fd_name[MAX_FD] =
    "7/1/3",
    "ff/1/1",
    "ff/2/1",
+   "ff/3/1",
    "ff/ff/ff",
    "ff/d4/0",
 };
 
 static int fd_class[MAX_FD] =
 {
-   0,0x7,0x7,0xff,0xff,0xff,0xff,
+   0,0x7,0x7,0xff,0xff,0xff,0xff,0xff,
 };
 
 static int fd_subclass[MAX_FD] =
 {
-   0,0x1,0x1,0x1,0x2,0xff,0xd4,
+   0,0x1,0x1,0x1,0x2,0x3,0xff,0xd4,
 };
 
 static int fd_protocol[MAX_FD] =
 {
-   0,0x2,0x3,0x1,0x1,0xff,0,
+   0,0x2,0x3,0x1,0x1,0x1,0xff,0,
 };
 
 static const unsigned char venice_power_on[] = {0x1b, '%','P','u','i','f','p','.','p','o','w','e','r',' ','1',';',
@@ -109,6 +110,59 @@ static const unsigned char venice_power_on[] = {0x1b, '%','P','u','i','f','p','.
 static struct usb_device *libusb_device;       /* libusb device referenced by URI */
 //static int open_fd;                            /* 7/1/2 file descriptor, used by deviceid and status */
 static file_descriptor fd_table[MAX_FD];       /* usb file descriptors */
+
+/* This function is similar to usb_get_string_simple, but it handles zero returns. */
+static int get_string_descriptor(usb_dev_handle *dev, int index, char *buf, size_t buflen)
+{
+   char tbuf[255];       /* Some devices choke on size > 255 */
+   int ret, si, di, cnt=5;
+
+   while (cnt--)
+   {
+      ret = usb_control_msg(dev, USB_ENDPOINT_IN, USB_REQ_GET_DESCRIPTOR, (USB_DT_STRING << 8) + index, 
+               0x409, tbuf, sizeof(tbuf), LIBUSB_CONTROL_REQ_TIMEOUT);
+      if (ret==0)
+      {
+         /* This retry is necessary for lj1000 and lj1005. des 12/12/07 */
+         BUG("get_string_descriptor zero result, retrying...");
+         continue;
+      }
+      break;
+   }
+
+   if (ret < 0)
+   {
+      BUG("unable get_string_descriptor %d: %m\n", ret); 
+      return ret;
+   }
+
+   if (tbuf[1] != USB_DT_STRING)
+   {
+      BUG("invalid get_string_descriptor tag act=%d exp=%d\n", tbuf[1], USB_DT_STRING); 
+      return -EIO;
+   }
+
+   if (tbuf[0] > ret)
+   {
+      BUG("invalid get_string_descriptor size act=%d exp=%d\n", tbuf[0], ret); 
+      return -EFBIG;
+   }
+
+   for (di = 0, si = 2; si < tbuf[0]; si += 2)
+   {
+      if (di >= (buflen - 1))
+         break;
+
+      if (tbuf[si + 1])   /* high byte */
+         buf[di++] = '0';
+      else
+         buf[di++] = tbuf[si];
+   }
+
+   buf[di] = 0;
+
+   return di;
+}
 
 /* Check for USB interface descriptor with specified class. */
 static int is_interface(struct usb_device *dev, int dclass)
@@ -533,7 +587,7 @@ static int is_uri(struct usb_device *dev, const char *uri)
    char uriModel[128];
    char uriSerial[128];
    char gen[128];
-   int stat=0;
+   int r, stat=0;
 
    if ((hd = usb_open(dev)) == NULL)
    {
@@ -544,9 +598,9 @@ static int is_uri(struct usb_device *dev, const char *uri)
    if (dev->descriptor.idVendor != 0x3f0)
       goto bugout;
 
-   if (usb_get_string_simple(hd, dev->descriptor.iProduct, sz, sizeof(sz)) < 0)
+   if ((r=get_string_descriptor(hd, dev->descriptor.iProduct, sz, sizeof(sz))) < 0)
    {
-      BUG("invalid product id string: %m\n");
+      BUG("invalid product id string ret=%d\n", r);
       goto bugout;
    }
 
@@ -556,9 +610,9 @@ static int is_uri(struct usb_device *dev, const char *uri)
    if (strcasecmp(uriModel, gen) != 0)
       goto bugout;
 
-   if (usb_get_string_simple(hd, dev->descriptor.iSerialNumber, sz, sizeof(sz)) < 0)
+   if ((r=get_string_descriptor(hd, dev->descriptor.iSerialNumber, sz, sizeof(sz))) < 0)
    {
-      BUG("invalid serial id string: %m\n");
+      BUG("invalid serial id string ret=%d\n", r);
       goto bugout;
    }
 
@@ -788,7 +842,7 @@ static int new_channel(mud_device *pd, int index, const char *sn)
       goto bugout; 
    }
 
-   if (index == HPMUD_EWS_CHANNEL || index == HPMUD_SOAPSCAN_CHANNEL)
+   if (index == HPMUD_EWS_CHANNEL || index == HPMUD_SOAPSCAN_CHANNEL || index == HPMUD_SOAPFAX_CHANNEL)
       pd->channel[index].vf = musb_comp_channel_vf;
    else if (pd->io_mode == HPMUD_RAW_MODE || pd->io_mode == HPMUD_UNI_MODE)
       pd->channel[index].vf = musb_raw_channel_vf;
@@ -1177,11 +1231,14 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_channel_read(mud_
    {
       stat = HPMUD_R_INVALID_STATE;
       BUG("invalid channel_read io_mode=%d\n", pd->io_mode);
+      goto bugout;
    }
  
    pthread_mutex_lock(&pd->mutex);
    stat  = (pc->vf.channel_read)(pc, buf, length, sec_timeout, bytes_read);
    pthread_mutex_unlock(&pd->mutex);
+
+bugout:
    return stat;
 }
 
@@ -1274,7 +1331,7 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_raw_channel_write
          if (len == -ETIMEDOUT)
          {
             stat = HPMUD_R_IO_TIMEOUT;
-            if (sec_timeout >= HPMUD_EXCEPTION_TIMEOUT)
+            if (sec_timeout >= HPMUD_EXCEPTION_SEC_TIMEOUT)
                BUG("unable to write data %s: %d second io timeout\n", msp->device[pc->dindex].uri, sec_timeout);
          }
          else
@@ -1298,18 +1355,23 @@ bugout:
  */
 enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_raw_channel_read(mud_channel *pc, void *buf, int length, int sec_timeout, int *bytes_read)
 {
-   int len=0;
+   int len=0, usec;
    enum HPMUD_RESULT stat = HPMUD_R_IO_ERROR;
 
    *bytes_read = 0;
 
-   len = (msp->device[pc->dindex].vf.read)(pc->fd, buf, length, sec_timeout*1000000);
+   if (sec_timeout==0)
+      usec = 1000;       /* minmum timeout is 1ms for libusb 0.1.12, hangs forever with zero */
+   else
+      usec = sec_timeout*1000000;
+
+   len = (msp->device[pc->dindex].vf.read)(pc->fd, buf, length, usec);
    if (len < 0)
    {
       if (len == -ETIMEDOUT)
       {
          stat = HPMUD_R_IO_TIMEOUT;
-         if (sec_timeout >= HPMUD_EXCEPTION_TIMEOUT)
+         if (sec_timeout >= HPMUD_EXCEPTION_SEC_TIMEOUT)
             BUG("unable to read data %s: %d second io timeout\n", msp->device[pc->dindex].uri, sec_timeout);
       }
       else
@@ -1341,6 +1403,9 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_comp_channel_open
          break;
       case HPMUD_SOAPSCAN_CHANNEL:
          fd = FD_ff_2_1;   
+         break;
+      case HPMUD_SOAPFAX_CHANNEL:
+         fd = FD_ff_3_1;   
          break;
       default:
          stat = HPMUD_R_INVALID_SN;
@@ -1855,7 +1920,7 @@ int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int ls
    char model[128];
    char serial[128];
    char sz[HPMUD_LINE_SIZE];
-   int size=0;
+   int r, size=0;
 
    usb_init();
    usb_find_busses();
@@ -1876,13 +1941,13 @@ int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int ls
          if (dev->descriptor.idVendor == 0x3f0 && is_interface(dev, 7))
          {
             /* Found hp device. */
-            if (usb_get_string_simple(hd, dev->descriptor.iProduct, rmodel, sizeof(rmodel)) < 0)
-               BUG("invalid product id string: %m\n");
+            if ((r=get_string_descriptor(hd, dev->descriptor.iProduct, rmodel, sizeof(rmodel))) < 0)
+               BUG("invalid product id string ret=%d\n", r);
             else
                generalize_model(rmodel, model, sizeof(model));
 
-            if (usb_get_string_simple(hd, dev->descriptor.iSerialNumber, rserial, sizeof(rserial)) < 0)
-               BUG("invalid serial id string: %m\n");
+            if ((r=get_string_descriptor(hd, dev->descriptor.iSerialNumber, rserial, sizeof(rserial))) < 0)
+               BUG("invalid serial id string ret=%d\n", r);
             else
                generalize_serial(rserial, serial, sizeof(serial));
 
@@ -1906,7 +1971,7 @@ int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int ls
 
                *cnt+=1;
             }
-	 }
+         }
          usb_close(hd);
       }
    }
@@ -1922,6 +1987,7 @@ enum HPMUD_RESULT hpmud_make_usb_uri(const char *busnum, const char *devnum, cha
    char model[128];
    char serial[128];
    char sz[256];
+   int r;
    enum HPMUD_RESULT stat = HPMUD_R_INVALID_DEVICE_NODE;
 
    DBG("[%d] hpmud_make_usb_uri() bus=%s dev=%s\n", getpid(), busnum, devnum);
@@ -1935,7 +2001,7 @@ enum HPMUD_RESULT hpmud_make_usb_uri(const char *busnum, const char *devnum, cha
    for (bus=usb_busses; bus && !found_dev; bus=bus->next)
       if (strcmp(bus->dirname, busnum) == 0)
          for (dev=bus->devices; dev && !found_dev; dev=dev->next)
-	    if (strcmp(dev->filename, devnum) == 0)
+            if (strcmp(dev->filename, devnum) == 0)
                 found_dev = dev;  /* found usb device that matches bus:device */
 
    if (found_dev == NULL)
@@ -1956,13 +2022,13 @@ enum HPMUD_RESULT hpmud_make_usb_uri(const char *busnum, const char *devnum, cha
    if (dev->descriptor.idVendor == 0x3f0)
    {
       /* Found hp device. */
-      if (usb_get_string_simple(hd, dev->descriptor.iProduct, sz, sizeof(sz)) < 0)
-         BUG("invalid product id string: %m\n");
+      if ((r=get_string_descriptor(hd, dev->descriptor.iProduct, sz, sizeof(sz))) < 0)
+         BUG("invalid product id string ret=%d\n", r);
       else
          generalize_model(sz, model, sizeof(model));
 
-      if (usb_get_string_simple(hd, dev->descriptor.iSerialNumber, sz, sizeof(sz)) < 0)
-         BUG("invalid serial id string: %m\n");
+      if ((r=get_string_descriptor(hd, dev->descriptor.iSerialNumber, sz, sizeof(sz))) < 0)
+         BUG("invalid serial id string ret=%d\n", r);
       else
          generalize_serial(sz, serial, sizeof(serial));
 

@@ -33,12 +33,10 @@
         <translation>&lt;b&gt;Версия диспетчера устройств:&lt;/b&gt;</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Authors and Contributors:&lt;/b&gt;
-David Suffield, Don Welch, Shiyun Yie, Raghothama Cauligi, John Oleinik, Cory Meisch, Foster Nuffer, Pete Parks, Jacqueline Pitter, David Paschal, 
-Steve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter</source>
+        <source>&lt;b&gt;Authors and Contributors:&lt;/b&gt;\nDavid Suffield, Don Welch, Shiyun Yie, Raghothama Cauligi, John Oleinik, Cory Meisch, Foster Nuffer, Pete Parks, Jacqueline Pitter, David Paschal,\nSteve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter, Linus Araque, Mark Crawford, Charlie Moore</source>
         <translation>&lt;b&gt;Авторы и корреспонденты:&lt;/b&gt;
 Дэвид Саффилд, Дон Уэлч, Шийюн Йи, Раготама Колиджи, Джон Олейник, Кори Мейх, Фостер Наффер, Пит Паркс, Жаклин Питтер, Дэвид Паскаль, 
-Стив Дерус, Марк Овертон, Аарон Олбрайт, Смит Кеннеди, Джон Хошу, Крис Виснер, Генрих М. Хольшух, Тил Кампетер</translation>
+Стив Дерус, Марк Овертон, Аарон Олбрайт, Смит Кеннеди, Джон Хошу, Крис Виснер, Генрих М. Хольшух, Тил Кампетер, Linus Araque, Mark Crawford, Charlie Moore</translation>
     </message>
     <message>
         <source>&lt;b&gt;License and Copyright:&lt;/b&gt;
@@ -1087,7 +1085,7 @@ For each row, select the label representing the box in which the shorter inner l
     </message>
     <message>
         <source>&lt;b&gt;Name/Nickname:&lt;/b&gt;</source>
-<translation>&lt;b&gt;Имя/Псевдоним:&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;Имя/Псевдоним:&lt;/b&gt;</translation>
     </message>
 </context>
 <context>
@@ -1110,7 +1108,7 @@ For each row, select the label representing the box in which the shorter inner l
     </message>
     <message>
         <source>&lt;b&gt;Annoying Confirmation: Are you sure you want to delete this address book entry?&lt;/b&gt;</source>
-<translation>&lt;b&gt;Повторное подтверждение: Удалить данную запись в адресной книге?&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;Повторное подтверждение: Удалить данную запись в адресной книге?&lt;/b&gt;</translation>
     </message>
 </context>
 <context>
@@ -3778,11 +3776,11 @@ For each row, select the label representing the box in which the shorter inner l
     </message>
     <message>
         <source>The printer name and fax name must be different. Please choose different names.</source>
-        <translation></translation>
+<translation>Имя принтера и имя факса должны быть различны. Выберите другое имя.</translation>
     </message>
     <message>
         <source>&lt;b&gt;Device not found.&lt;/b&gt; &lt;p&gt;Please make sure your printer is properly connected and powered-on.</source>
-        <translation></translation>
+        <translation>&lt;b&gt;Устройство не найдено.&lt;/b&gt; &lt;p&gt;Убедитесь в том, что принтер правильно подсоединен и на него подается питание.</translation>
     </message>
     <message>
         <source>&lt;b&gt;No devices found.&lt;/b&gt;&lt;p&gt;Please make sure your printer is properly connected and powered-on.</source>

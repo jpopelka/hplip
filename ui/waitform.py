@@ -55,6 +55,7 @@ class WaitForm(WaitForm_base):
 
     def setMessage(self, message):
         self.textLabel3.setText(message)
+        qApp.processEvents()
 
     def cancelPushButton_clicked(self):
         self.canceled = True

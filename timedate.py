@@ -157,7 +157,8 @@ if not device_uri and not printer_name:
         log.error("Error occured during interactive mode. Exiting.")
         sys.exit(0)
 
-d = fax.FaxDevice(device_uri, printer_name)
+#d = fax.FaxDevice(device_uri, printer_name)
+d = fax.getFaxDevice(device_uri, printer_name)
 
 if d.device_uri is None and printer_name:
     log.error("Printer '%s' not found." % printer_name)

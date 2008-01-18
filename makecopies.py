@@ -107,7 +107,6 @@ if os.getenv("HPLIP_DEBUG"):
     log.set_level('debug')
 
 for o, a in opts:
-    #print o, a
     if o in ('-h', '--help'):
         usage()
 
@@ -247,16 +246,7 @@ utils.log_title(__title__, __version__)
 os.umask (0037)
 
 if mode == GUI_MODE:
-    if not prop.gui_build:
-        log.warn("GUI mode disabled in build. Reverting to non-interactive mode.")
-        mode = NON_INTERACTIVE_MODE
-    
-    elif not os.getenv('DISPLAY'):
-        log.warn("No display found. Reverting to non-interactive mode.")
-        mode = NON_INTERACTIVE_MODE
-
-    elif not utils.checkPyQtImport():
-        log.warn("PyQt init failed. Reverting to non-interactive mode.")
+    if not utils.canEnterGUIMode():
         mode = NON_INTERACTIVE_MODE
         
 if mode == GUI_MODE:
@@ -274,8 +264,6 @@ if mode == GUI_MODE:
 
     log.debug("Connected to hpssd on %s:%d" % (prop.hpssd_host, prop.hpssd_port))
     
-   
-
     # create the main application object
     app = QApplication(sys.argv)
     

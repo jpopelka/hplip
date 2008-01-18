@@ -113,16 +113,8 @@ os.umask (0037)
 
 utils.log_title(__title__, __version__)
 
-if not prop.gui_build:
-    log.error("GUI mode disabled in build. Exiting.")
-    sys.exit(1)
-    
-elif not os.getenv('DISPLAY'):
-    log.error("No display found. Exiting.")
-    sys.exit(1)
-
-elif not utils.checkPyQtImport():
-    log.error("PyQt init failed. Exiting.")
+if not utils.canEnterGUIMode():
+    log.error("hp-print requires GUI support. Exiting.")
     sys.exit(1)
 
 

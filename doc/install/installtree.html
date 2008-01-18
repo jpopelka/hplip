@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="shortcut icon" href="../images/favicon.ico" type="image/x-icon" />
+<title>HPLIP Install Decision Tree</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="../styles/default.css" type="text/css" /> 
+<META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE" />
+<META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 22 Jul 2002 11:12:01 GMT" />
+<META NAME="DESCRIPTION" CONTENT="HP Linux Imaging and Printing - HPLIP is an HP developed solution for printing, scanning, and faxing with HP inkjet and laser based printers in Linux.">
+<META NAME="KEYWORDS" CONTENT="HPLIP, HP, Linux, Printing, HPIJS">
+</head>
+<body>
+<div id="page"><!-- start page -->
+<div id="container"><!-- start main container -->
+<!-- start banner -->
+
+<div id="banner">
+<div id="banner_graphics">
+        <div id="floatleft">
+        <img src="../images/hplogo2.png" alt="HP Logo" border="0" />
+        </div>
+        <div id="floatcenter">
+        <a href="../index.html">
+        <img src="../images/hpliplogo.png" alt="HP Logo" border="0" />
+        </a>
+        </div>
+        <div id="floatright">
+        <img src="../images/tuxlogo2.png" alt="Tux" border="0" />
+        </div>
+    </div>
+</div>
+<!-- end banner -->
+
+<div id="navbar">
+<table>
+    <tr>
+        <td valign="top">
+<div id="sidebar-a">
+<ul id="sidebar-a-list">
+    <menu compact="compact">
+        <div class="menuheader"><a href="../index.html" title="">Home</a></div>
+    </menu>
+
+<div class="menuheader">About</div>
+    <menu compact="compact">
+        <li><a href="../features.html" title="">Features</a></li> 
+        <li><a href="../screenshots.html" title="">Screenshots</a></li> 
+        <li><a href="../faqs.html" title="FAQs">FAQs</a></li> 
+        <li><a a href="../about.html" title="About">About HPLIP</a></li>
+    </menu>
+<div class="menuheader">Setup and Installation</div>
+    <menu compact="compact">
+        <li><a href="../downloads.html" title="Downloads">Download HPLIP</a></li>
+        <li><a href="../install/index.html" title="Installation Instructions">Installation Instructions</a></li> 
+        <li><a href="../system_requirements.html" title="System Requirements">System Requirements</a></li> 
+        <li><a href="../supported_devices/index.html" title="Supported Devices">Supported Devices</a></li> 
+    </menu>
+<div class="menuheader">Usage and Support</div>
+    <menu compact="compact">
+        <li><a href="../mailing_lists.html" title="Mailing Lists">Support</a></li>
+        <li><a href="../howtos/index.html" title="How-Tos">How-Tos</a></li> 
+        <li><a href="../troubleshooting/index.html" title="Troubleshooting">Troubleshooting</a></li>
+        <li><a href="../release_notes.html" title="Release Notes">Release Notes</a></li>
+    </menu>
+<div class="menuheader">Resources</div>
+    <menu compact="compact">
+        <li><a href="../tech_docs/index.html" title="">Technical Documentation</a></li> 
+        <li><a href="http://sourceforge.net/projects/hplip/" title="Our project page on Sourceforge.net">Sourceforge Project Page</a></li> 
+        <li><a href="../license.html" title="Software License">Software License</a></li>
+        <li><a a href="../other_support.html" title="Other Support Information">Other Support Information</a></li>
+        <li><a href="../contacts.html" title="Contacts">Contacts</a></li>
+    </menu>
+</ul>
+</div>
+<!-- end sidebar --></td>
+</div>
+<td width=100%>
+<div id="content"><!-- start content -->
+        <a href="../index.html">Home</a>
+&gt;
+<a href="index.html">Installation</a>
+&gt;
+Install Tree
+
+<hr size="1"/>
+        <div class="document" id="should-you-install-the-latest-hplip">
+<h1 class="title">Should you install the latest HPLIP?</h1>
+<p>Step 1: Is HPLIP currently installed?</p>
+<p><a class="reference" href="#debian">Debian package based distributions (Debian, Ubuntu, Mepis, etc)</a></p>
+<p><a class="reference" href="#rpm">RPM package based distributions (Fedora, SUSE, Mandriva, RHEL, etc)</a></p>
+<p>Step 2: Should you install the latest HPLIP?</p>
+<p><a class="reference" href="#newerprinter">Do you have a newer printer that is not supported by your older version of HPLIP?</a></p>
+<p><a class="reference" href="#newfeatures">Do you want new features or need a version that has a s specific bug fixed?</a></p>
+<p><a class="reference" href="#yestoboth">If you answered &quot;yes&quot; to either of the above questions...</a></p>
+<hr><div class="section">
+<h1><a id="is-hplip-currently-installed" name="is-hplip-currently-installed"><span id="hplipinstalled"></span>Is HPLIP currently installed?</a></h1>
+<p>Most current Linux distributions include HPLIP pre-installed when the operating system was installed. However, some distributions may not have an updated version that you may need to support a newer printer model or one that contains a feature of bug fix that may be important to you.</p>
+<p>To check if HPLIP is already installed you can try one of these commands, however your distribution may have specific package manager commands that are not described here.</p>
+<p><em>Note: You may want to refer to your distribution documentation for the correct way to configure and use HPLIP with your distribution. However, these commands should work in the majority of cases.</em></p>
+<p id="debian"><strong>Debian package based distributions (Debian, Ubuntu, Mepis, etc):</strong></p>
+<p>Run in a terminal window:</p>
+<pre class="literal-block">
+dpkg -l hplip
+</pre>
+<p>You may see something that looks like this:</p>
+<pre class="literal-block">
+Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Installed/Config-files/Unpacked/Failed-config/Half-installed
+|/ Err?=(none)/Hold/Reinst-required/X=both-problems (Status,Err: uppercase=bad)
+||/ Name             Version                  Description
+-----------------------------------------------------------------------------
+ii  hplip            1.7.3-0ubuntu1           HP Linux Printing and Imaging
+</pre>
+<p>If you see &quot;ii&quot; in the first column before &quot;hplip&quot;, then HPLIP is already installed.  If you want to use the currently installed version of HPLIP, try running hp-setup in a terminal shell. See below to deterime if you need to install a newer version.</p>
+<p id="rpm"><strong>RPM package based distributions (Fedora, SUSE, Mandriva, RHEL, etc):</strong></p>
+<p>Run in a terminal window:</p>
+<pre class="literal-block">
+rpm -qa hplip
+</pre>
+<p>You may see something that looks like this:</p>
+<pre class="literal-block">
+hplip-1.6.7-4
+</pre>
+<p>Output that lists &quot;hplip&quot; and a version number indicates that HPLIP is already installed on your system.</p>
+<p>If HPLIP is already installed try running hp-setup to configure your printer. See below to deterime if you need to install a newer version.</p>
+</div>
+<div class="section">
+<h1><a id="how-to-determine-if-you-should-install-a-newer-version-of-hplip" name="how-to-determine-if-you-should-install-a-newer-version-of-hplip"><span id="shouldinstall"></span>How to determine if you should install a newer version of HPLIP</a></h1>
+<p>Note: The current version of HPLIP is 2.7.12.</p>
+<p id="newerprinter"><strong>Do you have a newer printer that is not supported by your older version of HPLIP?</strong></p>
+<p>Check the <a class="reference" href="../supported_devices/index.html">Supported Devices</a> page to see what version of HPLIP is required for your printer.</p>
+<p id="newfeatures"><strong>Do you want new features or need a version that has a s specific bug fixed?</strong></p>
+<p>If your printer is supported by an older version of HPLIP, perhaps you want the newer updated features that the latest verion of HPLIP has to offer.  Check the <a class="reference" href="../release_notes.html">Release Notes</a> page for new features and specific bug fixes.</p>
+<p id="yestoboth"><strong>If you answered &quot;yes&quot; to either of the above questions...</strong></p>
+<p>Determine if a newer pre-packaged version of HPLIP is available. Use your distribution tools (Synaptic, YasT, Red Carpet, etc) to check. It is preferrable to use a pre-packaged version of HPLIP as it is simplier to install and upgrade.</p>
+<p>If a newer version is not available from your distribution or the version they offer doesn't have the printer support you need, <a class="reference" href="index.html#continue">continue with the download and installation of HPLIP.</a></p>
+</div>
+</div>
+
+<hr size="1"/>
+<center><small>Page last updated: Tue Jun 12 15:38:15 2007; HPLIP Version: 2.7.12</small></center>
+</div>
+</td></tr></table>
+</div>
+<!-- end content -->
+<!-- end container -->
+<div id="footer"><!-- start footer -->
+        <hr size="1"/>
+        <a href="../legal.html">Legal Notices</a>
+        Copyright &#169; 2003-2007, Hewlett-Packard Development Company, L.P.
+        <a href="mailto:hplip@hp.com">Contact Site Maintainer</a><br>
+        <a href="http://sourceforge.net/" alt="Hosted by Sourceforge.net"><img src="../images/sflogo.png" border="0"></a>
+</div>
+<!-- end footer -->
+</div><!-- end page -->
+
+<!-- google analytics -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1543832-1";
+urchinTracker();
+</script>
+<!-- start google analytics from hplip.marketing -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1543832-7";
+urchinTracker();
+</script>
+<!-- end google analytics -->
+
+
+<!-- START OF ACTIVEMETER CODE -->
+<script type="text/javascript" language="javascript">
+var __pid=30231;
+var __am_invisible=1;
+</script>
+<!-- END OF ACTIVEMETER CODE -->
+
+</body>
+</html>

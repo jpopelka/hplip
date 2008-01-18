@@ -137,6 +137,9 @@ class Logger(object):
             self._log_file = None
             self._log_file_f = None
             self._where = Logger.LOG_TO_SCREEN
+            
+    def get_logfile(self):
+        return self._log_file
 
     def set_where(self, where):
         self._where = where

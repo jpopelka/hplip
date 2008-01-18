@@ -32,13 +32,15 @@ from waitform import WaitForm
 
 # Std Lib
 import os.path, os
-import struct, Queue
+import struct, Queue, time
 
 fax_enabled = False
-try:
+#try:
+if 1:
     from fax import fax
     fax_enabled = True
-except ImportError:
+#except ImportError:
+if 0:
     # This can fail on Python < 2.3 due to the datetime module
     # or if fax was diabled during the build
     log.warn("Fax send disabled - Python 2.3+ required.")
@@ -228,7 +230,7 @@ class ScrollFaxView(ScrollView):
         self.updateFileList()
         self.updateRecipientList()
 
-    def PeriodicCheck(self):
+    def PeriodicCheck(self): # called by check_timer every 3 sec
         if not self.busy:
             log.debug("Checking for incoming faxes...")
 
@@ -243,8 +245,8 @@ class ScrollFaxView(ScrollView):
                 job_size = fields['job-size']
                 title = fields['title']
 
-                #if self.isMinimized():
-                #    self.showNormal()
+                if self.form.isMinimized():
+                    self.form.showNormal()
 
                 self.check_timer.stop()
                 self.addFileFromJob(0, title, username, job_id, job_size)
@@ -253,7 +255,6 @@ class ScrollFaxView(ScrollView):
 
             elif result_code == ERROR_FAX_PROCESSING:
                 # fax is being processed
-                print "processing..."
 
                 if self.waitdlg is None:
                     self.waitdlg = WaitForm(0, self.__tr("Processing fax..."), None, self, modal=1) # self.add_fax_canceled
@@ -277,7 +278,7 @@ class ScrollFaxView(ScrollView):
 
         try:
             if self.waitdlg is None:
-                self.waitdlg = WaitForm(0, self.__tr("Receiving fax data..."), self.add_fax_canceled, self, modal=1)
+                self.waitdlg = WaitForm(0, self.__tr("Receiving fax data..."), None, self, modal=1)
                 self.waitdlg.show()
 
             log.debug("Transfering job %d (%d bytes)" % (job_id, job_size))
@@ -298,6 +299,7 @@ class ScrollFaxView(ScrollView):
             while True:
                 qApp.processEvents()
                 log.debug("Transfering fax data...")
+                time.sleep(0.5)
 
                 fields, data, result_code = \
                     msg.xmitMessage(self.sock, "FaxGetData", None,
@@ -348,6 +350,12 @@ class ScrollFaxView(ScrollView):
 
         finally:
             self.busy = False
+            
+            if self.waitdlg is not None:
+                self.waitdlg.hide()
+                self.waitdlg.close()
+                self.waitdlg = None
+            
             QApplication.restoreOverrideCursor()                
 
     def add_fax_canceled(self):
@@ -839,14 +847,18 @@ class ScrollFaxView(ScrollView):
 
         for name in temp:
             entry = self.db.get(name)
-            i = RecipientListViewItem(self.recipientListView, str(order), name, entry['fax'], entry['notes'])
-
-            if not self.prev_selected_recipient or self.prev_selected_recipient == name:
-                self.recipientListView.setSelected(i, True)
-                selected_item = i
-                self.prev_selected_recipient = name
-
-            order -= 1
+            # TODO: If entry was in list prior to name change in hp-fab, 
+            # this code will remove it instead of following the name change
+            # Ref: CDP-1675
+            if entry is not None:
+                i = RecipientListViewItem(self.recipientListView, str(order), name, entry['fax'], entry['notes'])
+    
+                if not self.prev_selected_recipient or self.prev_selected_recipient == name:
+                    self.recipientListView.setSelected(i, True)
+                    selected_item = i
+                    self.prev_selected_recipient = name
+    
+                order -= 1
 
         last_item = self.recipientListView.firstChild()
         while last_item is not None and last_item.nextSibling():
@@ -1153,8 +1165,12 @@ class ScrollFaxView(ScrollView):
 
         QApplication.setOverrideCursor(QApplication.waitCursor)
 
-        dev = fax.FaxDevice(device_uri=self.cur_device.device_uri, 
-                            printer_name=self.cur_printer)
+        #dev = fax.FaxDevice(device_uri=self.cur_device.device_uri, 
+        #                    printer_name=self.cur_printer)
+        
+        dev = fax.getFaxDevice(self.cur_device.device_uri,
+                               self.cur_printer, None, None, 
+                               self.cur_device.mq['fax-type'])
 
         try:
             try:

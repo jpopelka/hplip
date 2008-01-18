@@ -36,6 +36,31 @@
         var path = "finished_controller?setup=" + statusValue;
         setLocationRef(path);
     };
+    
+    if(document.addEventListener){ 
+        document.addEventListener("keyup", captureKey,false);
+    }else{
+        document.attachEvent("onkeyup", captureKey);
+    }
+
+    function captureKey(events){
+        if("undefined" != (typeof window.event)){ 
+            events = window.event;
+        }
+        if("keyup" == events.type){
+            checkKey(events.keyCode);
+        }
+    }
+
+    function checkKey(keyID)
+    {
+       switch(keyID)
+       {
+          case 13:
+            indexClickActions( "quit_button", "finished_controller?setup=0");
+            break;
+       }
+    }
     -->
     </script>
 <title>$installer_title</title>

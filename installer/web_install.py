@@ -25,6 +25,8 @@ import Queue
 import base64
 import re
 import locale
+import socket
+
 
 # Local
 import cherrypy
@@ -48,8 +50,12 @@ ACTION_PRE_BUILD = 9
 ACTION_POST_BUILD = 10
 ACTION_MAX = 10
 
+ACTION_TEXT_INSTALL = '33'
+
 XMLPATH = 'installer/localization'
 
+
+    
 try:
     from functools import update_wrapper
 except ImportError: # using Python version < 2.5
@@ -94,6 +100,7 @@ class Installer(object):
         self.depends_to_install = []
         self.is_signal_stop = 0
         self.localized_dict = {}
+        self.failed_cmd = ''
 
         self.core = CoreInstall()
         self.core.get_hplip_version()
@@ -235,8 +242,11 @@ class Installer(object):
 
         # body and message inserts
         template.index_message_title = self.localized_dict[screen + "_message_title"]
+        template.quit_message_title = self.localized_dict["quit_message_title"]
         # button text inserts
         template.start_button = self.localized_dict["start_button"]
+        template.command_button = self.localized_dict["command_button"]
+        template.quit_button = self.localized_dict["quit_button"]
         return str(template)
 
     index.exposed = True
@@ -257,6 +267,12 @@ class Installer(object):
 
     signal_stopped.exposed = True
 
+    def text_installer(self):
+        #print "web_install.py::text_installer"
+        raise SystemExit(ACTION_TEXT_INSTALL)
+        
+    text_installer.exposed = True
+
     def stop(self):
         """
             Stop the CherryPy browser
@@ -266,7 +282,11 @@ class Installer(object):
     stop.exposed = True
         
     def set_restart(self):
-        self.core.restart()
+        #print "set_restart"
+        ok = self.core.restart()
+        if not ok:
+            log.error("Restart failed. Please restart using the system menu.")
+        
     set_restart.exposed = True
 
     ####################################
@@ -279,8 +299,7 @@ class Installer(object):
 
         # body and message inserts
         template.welcome_message_title = self.localized_dict[screen + "_message_title"]
-        template.welcome_message_body = sub_string_replace(self.localized_dict[screen + "_message_body"]) % {"version":self.core.distro_version}
-
+        template.welcome_message_body = sub_string_replace(self.localized_dict[screen + "_message_body"]) % { "version":self.core.version_public }
         # button text inserts
         template.quit_button = self.localized_dict["quit_button"]
         template.next_button = self.localized_dict["next_button"]
@@ -301,7 +320,8 @@ class Installer(object):
         if os.geteuid() == 0:
             return self.warning()
         else:
-            self.next = self.password
+            #self.next = self.password
+            self.next = self.confirm_distro
             return self.progress(ACTION_INIT)
 
     welcome_controller.exposed = True
@@ -395,7 +415,8 @@ class Installer(object):
             self.next = None
             return nxt()
 
-        self.next = self.password
+        #self.next = self.password
+        self.next = self.confirm_distro
         return self.progress(ACTION_INIT)
 
     warning_controller.exposed = True
@@ -543,7 +564,8 @@ class Installer(object):
             return nxt()
 
         if confirmation:
-            return self.notes()
+            #return self.notes()
+            return self.password()
         else:
             return self.select_distro()
 
@@ -580,6 +602,19 @@ class Installer(object):
 
             if dd['display']:
                 template.distros[d] = dd['display_name']
+                
+        template.turned_off_options = {}
+
+        self.depends_to_install = []
+        for depend, desc, required_for_opt, opt in self.core.missing_optional_dependencies():
+            log.warn("Missing OPTIONAL dependency: %s (%s)" % (depend, desc))
+
+            if required_for_opt:
+                log.warn("(Required for %s option)" % opt)
+
+            self.depends_to_install.append(depend)
+            self.core.selected_options[opt] = False
+            template.turned_off_options[opt] = self.core.options[opt][1]
 
         # button text inserts
         template.quit_button = self.localized_dict["quit_button"]
@@ -622,7 +657,9 @@ class Installer(object):
             else:
                 return self.notes() # unsupported, but no required missing, so continue
         else:
-            return self.notes() # ok, move ahead to notes
+            #return self.notes() # ok, move ahead to notes
+            #return self.password()
+            return self.confirm_distro()
 
     select_distro_controller.exposed = True
 
@@ -662,6 +699,7 @@ class Installer(object):
     notes.exposed = True
 
     def notes_controller(self):
+        #print "notes_controller"
         nxt = self.next
         if nxt is not None:
             self.next = None
@@ -704,6 +742,7 @@ class Installer(object):
     options.exposed = True
 
     def options_controller(self, **options):
+        #print "options_controller"
         """
             options_controller?opt=0|1&opt=0|1&...
         """
@@ -758,6 +797,7 @@ class Installer(object):
         """
             Note: AJAX call
         """
+        #print "package_manager_check"
         return str(int(self.core.check_pkg_mgr()()))
         # returns '' for no running pkg manager, or '<name>' of running package manager
 
@@ -783,6 +823,7 @@ class Installer(object):
         if self.core.distro_known():
             if self.num_req_missing:
                 if self.auto_mode: # auto, distro known, req. missing
+                    #print "dependency_controller1 => install_required_controller"
                     return self.install_required_controller() # ************* Seems Broke this way *********** answer=1)
                 else:
                     return self.install_required() # manual, distro known, req. missing
@@ -840,11 +881,15 @@ class Installer(object):
         return self.dependency_controller2()
 
     def dependency_controller8(self):
+        #print "dependency_controller8"
         self.next = self.restart  #finished
         return self.progress(ACTION_BUILD_AND_INSTALL)
 
     def dependency_controller9(self):
         self.core.hplip_present = self.core.check_hplip()  #dcheck.check_hplip()
+        #print "self.core.hplip_present:", self.core.hplip_present
+        #print "self.core.selected_component", self.core.selected_component
+        #print "self.core.distro_version_supported", self.core.distro_version_supported
         if self.core.hplip_present and self.core.selected_component == 'hplip' and \
             self.core.distro_version_supported:
 
@@ -853,6 +898,7 @@ class Installer(object):
             else:
                 return self.hplip_remove()
         else:
+            #print "dependency_controller9"
             return self.dependency_controller8()
 
     #
@@ -860,7 +906,7 @@ class Installer(object):
     #
 
     def network_unavailable(self):
-
+        #print "network_unavailable"
         screen = "network_unavailable"
         template = self.createTemplate(screen)
 
@@ -878,12 +924,14 @@ class Installer(object):
     network_unavailable.exposed = True
 
     def network_unavailable_controller(self):
+        #print "network_unavailable_controller"
         pkg_mgr = self.core.check_pkg_mgr()
-
+        
         if not self.core.check_network_connection():
             return self.network_unavailable()
         else:
             if pkg_mgr:
+                #print "network_unavailable_controller => install_required_controller"
                 self.next = self.install_required_controller()
                 return self.error_package_manager(pkg_mgr)
             else:
@@ -947,12 +995,14 @@ class Installer(object):
 
 
     def install_required_controller(self): # install_required_controller
+        #print "install_required_controller"
         pkg_mgr = self.core.check_pkg_mgr()
         if not self.core.check_network_connection():
+            #print "install_required_controller = > network_unavailable"
             return self.network_unavailable()
 
         if pkg_mgr:
-            self.next = self.install_required_controller()
+            self.next = self.install_required_controller
             return self.error_package_manager(pkg_mgr)
         else:
             self.next = self.dependency_controller4
@@ -973,7 +1023,7 @@ class Installer(object):
         template.install_optional_message_title = self.localized_dict[screen + "_message_title"]
         template.install_optional_message_footer = self.localized_dict[screen + "_message_footer"]
         # button text inserts
-        template.previous_button = self.localized_dict["previous_button"]
+        template.yes_button = self.localized_dict["yes_button"]
         template.no_button = self.localized_dict["no_button"]
         template.quit_button = self.localized_dict["quit_button"]
 
@@ -994,6 +1044,7 @@ class Installer(object):
     install_optional.exposed = True
 
     def install_optional_controller(self):
+        #print "install_optional_controller"
         pkg_mgr = self.core.check_pkg_mgr()
         if pkg_mgr:
             self.next = self.install_optional_controller()
@@ -1162,15 +1213,16 @@ class Installer(object):
 
             elif self.action == ACTION_PRE_DEPENDENCY: # 3
                 self.pre_has_run = True
-                self.cmds.extend(self.core.get_distro_ver_data('pre_depend_cmd'))
+                self.cmds.extend(self.core.get_distro_ver_data('pre_depend_cmd', []))
                 self.fail_ok = True
 
             elif self.action == ACTION_POST_DEPENDENCY: # 4
                 self.post_has_run = True
-                self.cmds.extend(self.core.get_distro_ver_data('post_depend_cmd'))
+                self.cmds.extend(self.core.get_distro_ver_data('post_depend_cmd', []))
                 self.fail_ok = True
 
             elif self.action == ACTION_BUILD_AND_INSTALL: # 5  Do I want to combile pre_build and post_build?
+                #print "ACTION_BUILD_AND_INSTALL"
                 self.cmds.extend(self.core.pre_build())
                 self.cmds.extend(self.core.build_cmds())
                 self.cmds.extend(self.core.post_build())
@@ -1221,7 +1273,7 @@ class Installer(object):
             if self.cmds:
                 self.cmds = [c for c in self.cmds if c]
                 log.debug(self.cmds)
-                self.action_thread = thread.start_new_thread(self.run_action_thread, (self.cmds,))
+                self.action_thread = thread.start_new_thread(self.run_action_thread, (self.cmds, self.fail_ok))
                 return str(template)
             else:
                 return self.next()
@@ -1234,12 +1286,13 @@ class Installer(object):
         """
             AJAX method to update progress screen. Called periodically...
         """
+        #print "progress_update"
         output = ""
         while not self.queue.empty():
             output = ''.join([output, self.queue.get()])
             
         log.debug(output.strip())
-
+        #print "update:", output.lstrip()
         return output.lstrip()
 
     progress_update.exposed = True
@@ -1247,8 +1300,12 @@ class Installer(object):
     #@trace
     def progress_status(self):
         """
-            AJAX method to update progress screen. Returns an ineteger -1, 0, or >0
+            AJAX method to update progress screen. Returns an integer -1, 0, or >0
+            -1 : Running
+             0 : Finished with no error
+             > 0 : Finished with error
         """
+        #print "progress_status"
         self.action_lock.acquire()
         t = self.progress_status_code
         self.action_lock.release()
@@ -1283,7 +1340,7 @@ class Installer(object):
     progress_cancel.exposed = True
 
     @trace
-    def run_action_thread(self, cmds):
+    def run_action_thread(self, cmds, fail_ok=False):
         """
             0 : Done, no error
             >0 : Done, with error
@@ -1298,9 +1355,17 @@ class Installer(object):
 
                 if status != 0:
                     self.action_lock.acquire()
-                    self.progress_status_code = status
+                    
+                    if fail_ok:
+                        log.warn("Command '%s' failed. This is OK." % cmd)
+                        self.progress_status_code = 0
+                    else:
+                        log.error("Command '%s' failed." % cmd)
+                        self.progress_status_code = status
+                        self.failed_cmd  = cmd
+                    
                     self.action_lock.release()
-                    break
+                    return
 
 
         self.action_lock.acquire()
@@ -1324,12 +1389,17 @@ class Installer(object):
                 self.core.distro_version))
 
     @trace
-    def progress_callback(self, output):
+    def progress_callback(self, cmd='', desc=''):
         """
             Called by self.core.init() in a thread to collect output
         """
-        log.debug("Progress callback: %s" % output)
-        self.queue.put(output)
+        log.debug("Progress callback: %s" % cmd)
+        
+        if desc:
+            self.queue.put("%s (%s)" % (cmd, desc))
+        else:
+            self.queue.put(cmd)
+            
         return self.cancel_signaled
 
     @trace
@@ -1353,7 +1423,7 @@ class Installer(object):
             return self.next()
         else:
             return self.error("Command '%s' failed with error code %d." %
-                (self.cmds, self.progress_status_code))
+                (self.failed_cmd, self.progress_status_code))
 
     error_command_failed.exposed = True
 
@@ -1397,6 +1467,7 @@ class Installer(object):
         """
             installation_path_controller?path=<path>
         """
+        #print "installation_path_controller"
         self.core.install_location = path
         nxt = self.next
         if nxt is not None:
@@ -1458,6 +1529,7 @@ class Installer(object):
     hplip_remove.exposed = True
 
     def hplip_remove_controller(self):
+        #print "hplip_remove_controller"
         self.next = self.dependency_controller8
         return self.progress(ACTION_REMOVE_HPLIP)
 
@@ -1522,9 +1594,13 @@ class Installer(object):
         if nxt is not None:
             self.next = None
             return nxt()
-
+        #print "finished_controller"
         self.core.run_hp_setup()
         return self.quit()
+        
+        #cherrypy::engine.stop
+        #self.bus.stop()
+        #self.bus.exit()
 
     finished_controller.exposed = True
 
@@ -1739,14 +1815,33 @@ class Installer(object):
 
 
     #========================== End of Class =========================
+socket_port = 8888
+socket_host = '127.0.0.1'
+socket_file = ''
+socket_queue_size = 5
+socket_timeout = 10
+protocol_version = 'HTTP/1.0'
+reverse_dns = False
+thread_pool = 1
+max_request_header_size = 500 * 1024
+max_request_body_size = 100 * 1024 * 1024
+instance = None
+ssl_certificate = None
+ssl_private_key = None
+
+    
+    
 
 def init():
     log.info("Server ready.")
     utils.openURL("http://localhost:8888")
 
-def start(langauge):
+def start(language):
     cherrypy.root = Installer()
-    cherrypy.root.parse_elements(cherrypy.root.load_localization_file(XMLPATH, langauge))
+    
+    check_port(socket_host, socket_port)
+    
+    cherrypy.root.parse_elements(cherrypy.root.load_localization_file(XMLPATH, language))
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     log.debug("The current path: %s" % current_dir)
@@ -1755,16 +1850,16 @@ def start(langauge):
 
     cherrypy.config.update({
         'server.environment':'production',
-        'server.socketHost':'127.0.0.1',
+        'server.socketHost': socket_host,
         'autoreload.on': False,
-        'server.thread_pool': 1,
+        'server.thread_pool': thread_pool,
         'log_debug_info_filter.on': False,
         'server.log_file_not_found': False,
         'server.show_tracebacks': False,
         'server.log_request_headers': False,
-        'server.socket_port': 8888,
-        'server.socket_queue_size': 5,
-        'server.protocol_version': 'HTTP/1.0',
+        'server.socket_port': socket_port,
+        'server.socket_queue_size': socket_queue_size,
+        'server.protocol_version': protocol_version,
         'server.log_to_screen': False,
         'server.log_file': 'hplip_log',
         'server.reverse_dns': False,
@@ -1789,6 +1884,52 @@ def start(langauge):
             'static_filter.file': os.path.join(current_dir, "images", "favicon.ico")}
         })
 
-    cherrypy.server.start_with_callback(init)
+    try:
+        cherrypy.server.start_with_callback(init)
+    except KeyboardInterrupt, exc:
+        #print "<Ctrl-C> hit: shutting down HTTP servers"
+        self.interrupt = exc
+        self.stop()
+        cherrypy.engine.stop()
+    except SystemExit, exc:
+        #print "SystemExit raised: shutting down HTTP servers"
+        val = exc.args[0]
+        if cmp(val, ACTION_TEXT_INSTALL) == 0:
+            # need to handle the text installer request.
+            import text_install
+            log.debug("Starting terminal text installer...")
+            text_install.start(language)
+            return
+        self.interrupt = exc
+        self.stop()
+        cherrypy.engine.stop()
+        cherrypy.engine.exit()
+        raise
+    
+    
 
+def check_port(host, port):
+    """Raise an error if the given port is not free on the given host."""
+    if not host:
+        host = 'localhost'
+    port = int(port)
 
+    # AF_INET or AF_INET6 socket
+    # Get the correct address family for our host (allows IPv6 addresses)
+    for res in socket.getaddrinfo(host, port, socket.AF_UNSPEC,
+                                  socket.SOCK_STREAM):
+        af, socktype, proto, canonname, sa = res
+        s = None
+        try:
+            s = socket.socket(af, socktype, proto)
+            # See http://groups.google.com/group/cherrypy-users/
+            #        browse_frm/thread/bbfe5eb39c904fe0
+            s.settimeout(1.0)
+            s.connect((host, port))
+            s.close()
+            raise IOError("Port %s is in use on %s; perhaps the previous "
+                          "httpserver did not shut down properly." %
+                          (repr(port), repr(host)))
+        except socket.error:
+            if s:
+                s.close()

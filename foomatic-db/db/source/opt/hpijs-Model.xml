@@ -2097,6 +2097,11 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_M2727</printer>
+      <arg_defval>ev/hpijs-Model-HP-LaserJet_M2727</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-Mopier_240</printer><!-- HP Mopier 240 -->
       <arg_defval>ev/hpijs-Model-HP-Mopier_240</arg_defval>
      </constraint>
@@ -13183,6 +13188,30 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-LaserJet_M5035_MFP</printer>
+     </constraint>
+    </constraints>
+   </enum_val>
+   <enum_val id="ev/hpijs-Model-HP-LaserJet_M2727">
+    <ev_longname>
+     <en>HP LaserJet M2727</en>
+    </ev_longname>
+    <!-- A multilingual <comments> block can appear here, too;
+         it should be treated as documentation for the user. -->
+    <ev_shortname>
+     <en>HP-LaserJet_M2727</en>
+     <!-- Until someone tells me how to learn the user locale in
+          backends, the shortname must be monolingual in <en>! -->
+    </ev_shortname>
+    <ev_driverval>-sDeviceManufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;HP LaserJet&quot;</ev_driverval>
+    <constraints>
+     <!-- Assume the choice doesn't apply... -->
+     <constraint sense='false'>
+      <driver>hpijs</driver>
+     </constraint>
+     <!-- ...except to these: -->
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_M2727</printer>
      </constraint>
     </constraints>
    </enum_val>

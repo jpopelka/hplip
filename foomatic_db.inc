@@ -408,6 +408,7 @@ foomatic_xml_printers = \
     $(src_dbdir)/printer/HP-LaserJet_M4345_MFP.xml \
     $(src_dbdir)/printer/HP-LaserJet_M5025_MFP.xml \
     $(src_dbdir)/printer/HP-LaserJet_M5035_MFP.xml \
+    $(src_dbdir)/printer/HP-LaserJet_M2727.xml \
     $(src_dbdir)/printer/HP-Mopier_240.xml \
     $(src_dbdir)/printer/HP-Mopier_320.xml \
     $(src_dbdir)/printer/HP-LaserJet_4L.xml \
@@ -856,6 +857,7 @@ foomatic_ppd_printers = \
     ppd/HP-LaserJet_M4345_MFP-hpijs.ppd \
     ppd/HP-LaserJet_M5025_MFP-hpijs.ppd \
     ppd/HP-LaserJet_M5035_MFP-hpijs.ppd \
+    ppd/HP-LaserJet_M2727-hpijs.ppd \
     ppd/HP-Mopier_240-hpijs.ppd \
     ppd/HP-Mopier_320-hpijs.ppd \
     ppd/HP-LaserJet_4L-hpijs.ppd \
@@ -964,6 +966,7 @@ foomatic_ps_printers = \
     $(src_dbdir)/PPD/HP/hp_LaserJet_4200_Series.ppd \
     $(src_dbdir)/PPD/HP/HP_LaserJet_5000_Series.ppd \
     $(src_dbdir)/PPD/HP/HP_Color_LaserJet_5M.ppd \
+    $(src_dbdir)/PPD/HP/HP_LaserJet_M2727_MFP.ppd \
     $(src_dbdir)/PPD/HP/HP_Color_LaserJet_4700.ppd \
     $(src_dbdir)/PPD/HP/HP_Color_LaserJet_CP4005.ppd \
     $(src_dbdir)/PPD/HP/HP_Mopier_320.ppd \

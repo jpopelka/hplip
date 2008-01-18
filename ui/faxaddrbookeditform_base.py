@@ -162,7 +162,7 @@ class FaxAddrBookEditForm_base(QDialog):
         self.pushButton34.setText(self.__tr("Cancel"))
         self.OKButton.setText(self.__tr("OK"))
         self.textLabel7.setText(self.__tr("<b>Fax Number:</b>"))
-        self.textLabel3.setText(self.__tr("<b>Name/Nickname:</b>"))
+        self.textLabel3.setText(self.__tr("<b>Name/Nickname:<b>"))
         self.textLabel4.setText(self.__tr("Member of Group(s):"))
         self.groupListView.header().setLabel(0,self.__tr("Group Name"))
         self.textLabel6.setText(self.__tr("Notes/Other Information:"))

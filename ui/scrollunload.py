@@ -268,7 +268,7 @@ class ScrollUnloadView(ScrollView):
 
     def IconView_rightButtonClicked(self, item, pos):
         popup = QPopupMenu(self)
-        popup.insertItem("Properties", self.PopupProperties)
+        popup.insertItem(self.__tr("Properties"), self.PopupProperties)
 
         if item is not None and \
             item.mime_type == 'image' and \

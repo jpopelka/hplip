@@ -74,6 +74,17 @@ enum HPMUD_SCANTYPE
    HPMUD_SCANTYPE_SOAP = 3
 };
 
+enum HPMUD_STATUSTYPE
+{
+   HPMUD_STATUSTYPE_NA = 0,
+   HPMUD_STATUSTYPE_VSTATUS = 1,  /* device-id vstatus */
+   HPMUD_STATUSTYPE_SFIELD = 2,   /* device-id s-field */
+   HPMUD_STATUSTYPE_PML = 3,      /* laserjet pml */
+   HPMUD_STATUSTYPE_EWS = 6,      /* laserjet hp ews */
+   HPMUD_STATUSTYPE_PJL = 8,      /* laserjet pjl */
+   HPMUD_STATUSTYPE_PJLPML = 9,   /* laserjet pjl and pml */
+};
+
 #define HPMUD_S_PRINT_CHANNEL "PRINT"
 #define HPMUD_S_PML_CHANNEL "HP-MESSAGE"
 #define HPMUD_S_SCAN_CHANNEL "HP-SCAN"
@@ -83,6 +94,7 @@ enum HPMUD_SCANTYPE
 #define HPMUD_S_MEMORY_CARD_CHANNEL "HP-CARD-ACCESS"
 #define HPMUD_S_EWS_CHANNEL "HP-EWS"
 #define HPMUD_S_SOAP_SCAN "HP-SOAP-SCAN"
+#define HPMUD_S_SOAP_FAX "HP-SOAP-FAX"
 #define HPMUD_S_DEVMGMT_CHANNEL "HP-DEVMGMT"
 
 typedef int HPMUD_DEVICE;       /* usb, parallel or jetdirect */
@@ -108,6 +120,7 @@ struct hpmud_model_attributes
    enum HPMUD_IO_MODE prt_mode;        /* print only (io_mode) */
    enum HPMUD_IO_MODE mfp_mode;        /* pml | scan | fax (io_mode) */
    enum HPMUD_SCANTYPE scantype;       /* 0=none */
+   enum HPMUD_STATUSTYPE statustype;
 };
 
 #ifdef __cplusplus

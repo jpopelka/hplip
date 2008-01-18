@@ -191,6 +191,10 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) service_to_channel(mud
    {
       *index = HPMUD_SOAPSCAN_CHANNEL;
    }
+   else if (strncasecmp(sn, "hp-soap-fax", 11) == 0)
+   {
+      *index = HPMUD_SOAPFAX_CHANNEL;
+   }
    /* All the following services require MLC/1284.4. */
    else if (pd->io_mode == HPMUD_RAW_MODE || pd->io_mode == HPMUD_UNI_MODE)
    {

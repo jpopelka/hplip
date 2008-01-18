@@ -71,9 +71,14 @@
 #include "pscript.h"
 #include "ljjetready.h"
 #include "ljfastraster.h"
-#ifdef APDK_LJZJS_MONO
+#if defined (APDK_LJZJS_MONO) || defined (APDK_LJZJS_COLOR) || defined (APDK_LJM1005)
 #include "ljzjs.h"
+#endif
+#ifdef APDK_LJZJS_MONO
 #include "ljzjsmono.h"
+#endif
+#ifdef APDK_LJM1005
+#include "ljm1005.h"
 #endif
 
 APDK_BEGIN_NAMESPACE
@@ -100,6 +105,10 @@ LJFastRasterProxy DeviceRegistry::s_LJFastRasterProxy;
 
 #ifdef APDK_LJZJS_MONO
 LJZjsMonoProxy DeviceRegistry::s_LJZjsMonoProxy;
+#endif
+
+#ifdef APDK_LJM1005
+LJM1005Proxy DeviceRegistry::s_LJM1005Proxy;
 #endif
 
 #if defined(APDK_PSP100) && defined (APDK_DJ9xxVIP)

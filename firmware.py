@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '0.3'
+__version__ = '1.0'
 __title__ = 'Firmware Download Utility'
 __doc__ = "Download firmware to a device."
 
@@ -29,6 +29,7 @@ import sys
 import getopt
 import gzip
 import operator
+import time
 
 # Local
 from base.g import *
@@ -43,6 +44,7 @@ USAGE = [(__doc__, "", "name", True),
          utils.USAGE_SPACE,
          utils.USAGE_OPTIONS,
          ("Use USB IDs to specify printer:", "-s bbb:ddd, where bbb is the USB bus ID and ddd is the USB device ID. The ':' and all leading zeroes must be present.", "option", False),
+         ("Seconds to delay before download:", "-y<secs> or --delay=<secs> (float value, e.g. 0.5)", "option", False),
          utils.USAGE_BUS1, utils.USAGE_BUS2,
          utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
          utils.USAGE_HELP,
@@ -63,13 +65,13 @@ def usage(typ='text'):
     sys.exit(0)
 
 
-log.set_module('hp-info')
+log.set_module('hp-firmware')
 
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'p:d:hl:b:gs:',
+    opts, args = getopt.getopt(sys.argv[1:], 'p:d:hl:b:gs:y:',
         ['printer=', 'device=', 'help', 'help-rest', 'help-man', 
-         'help-desc', 'logging=', 'bus='])
+         'help-desc', 'logging=', 'bus=', 'delay='])
 
 except getopt.GetoptError, e:
     log.error(e.msg)
@@ -83,6 +85,7 @@ usb_bus_node = None
 usb_bus_id = None
 usb_device_id = None
 silent = False
+delay = 0.0
 
 if os.getenv("HPLIP_DEBUG"):
     log.set_level('debug')
@@ -140,6 +143,13 @@ for o, a in opts:
             sys.exit(1)
             
         usb_bus_node = a
+        
+    elif o in ('-y', '--delay'):
+        try:
+            delay = float(a)
+        except ValueError:
+            log.error("Invalid delay value. Must be numeric (float) value. Setting delay to 0.0")
+            delay = 0.0
 
 
 if device_uri and printer_name:
@@ -188,6 +198,7 @@ if d.device_uri is None and device_uri:
 
 user_cfg.last_used.device_uri = d.device_uri
     
+   
 try:
     d.open()
     d.queryModel()
@@ -198,6 +209,9 @@ except Error, e:
 fw_download = d.mq.get('fw-download', 0)
 
 if fw_download:
+    if delay:
+        time.sleep(delay)
+        
     if d.downloadFirmware(usb_bus_id, usb_device_id):
         if not silent:
             log.info("Done.")

@@ -83,9 +83,15 @@ noinst_PROGRAMS = $(am__EXEEXT_1)
 @HPLIP_BUILD_TRUE@	installer/pages/install_optional.tmpl \
 @HPLIP_BUILD_TRUE@	installer/pages/quit.tmpl \
 @HPLIP_BUILD_TRUE@	installer/pages/install_required.tmpl \
+@HPLIP_BUILD_TRUE@	installer/pages/replug.tmpl \
+@HPLIP_BUILD_TRUE@	installer/pages/restart.tmpl \
+@HPLIP_BUILD_TRUE@	installer/pages/network_unavailable.tmpl \
+@HPLIP_BUILD_TRUE@	installer/pages/warning.tmpl \
 @HPLIP_BUILD_TRUE@	installer/scripts/hplip.js \
+@HPLIP_BUILD_TRUE@	installer/scripts/encode.js \
+@HPLIP_BUILD_TRUE@	installer/scripts/misc_code.js \
 @HPLIP_BUILD_TRUE@	installer/styles/hplip.css \
-@HPLIP_BUILD_TRUE@	Cheetah/Filters.py \
+@HPLIP_BUILD_TRUE@	installer/styles/misc.css Cheetah/Filters.py \
 @HPLIP_BUILD_TRUE@	Cheetah/SettingsManager.py \
 @HPLIP_BUILD_TRUE@	Cheetah/CheetahWrapper.py \
 @HPLIP_BUILD_TRUE@	Cheetah/ImportHooks.py \
@@ -149,6 +155,18 @@ noinst_PROGRAMS = $(am__EXEEXT_1)
 @HPLIP_BUILD_TRUE@	installer/images/tux.png \
 @HPLIP_BUILD_TRUE@	installer/images/button1.png \
 @HPLIP_BUILD_TRUE@	installer/images/button1d.png \
+@HPLIP_BUILD_TRUE@	installer/images/replug1.png \
+@HPLIP_BUILD_TRUE@	installer/images/replug2.png \
+@HPLIP_BUILD_TRUE@	installer/images/replug3.png \
+@HPLIP_BUILD_TRUE@	installer/images/button2.png \
+@HPLIP_BUILD_TRUE@	installer/localization/gui_strings_de_DE.ts \
+@HPLIP_BUILD_TRUE@	installer/localization/gui_strings_en_US.ts \
+@HPLIP_BUILD_TRUE@	installer/localization/gui_strings_es_MX.ts \
+@HPLIP_BUILD_TRUE@	installer/localization/gui_strings_fr_FR.ts \
+@HPLIP_BUILD_TRUE@	installer/localization/gui_strings_it_IT.ts \
+@HPLIP_BUILD_TRUE@	installer/localization/gui_strings_pt_BR.ts \
+@HPLIP_BUILD_TRUE@	installer/localization/gui_strings_ru_RU.ts \
+@HPLIP_BUILD_TRUE@	installer/localization/gui_strings_zh_CN.ts \
 @HPLIP_BUILD_TRUE@	data/localization/hplip_de.ts \
 @HPLIP_BUILD_TRUE@	data/localization/hplip_es.ts \
 @HPLIP_BUILD_TRUE@	data/localization/hplip_fr.ts \
@@ -374,7 +392,7 @@ am__objects_1 = hpijs-models.$(OBJEXT) hpijs-breaks_open.$(OBJEXT) \
 	hpijs-printerfactory.$(OBJEXT) hpijs-ljjetready.$(OBJEXT) \
 	hpijs-jdatadbf.$(OBJEXT) hpijs-jccolor.$(OBJEXT) \
 	hpijs-ljfastraster.$(OBJEXT) hpijs-ljzjs.$(OBJEXT) \
-	hpijs-ljzjsmono.$(OBJEXT)
+	hpijs-ljzjsmono.$(OBJEXT) hpijs-ljm1005.$(OBJEXT)
 am_hpijs_OBJECTS = $(am__objects_1) hpijs-hpijs.$(OBJEXT) \
 	hpijs-ijs_server.$(OBJEXT) hpijs-ijs.$(OBJEXT) \
 	hpijs-hpijsfax.$(OBJEXT) hpijs-services.$(OBJEXT) \
@@ -444,7 +462,8 @@ am__hppgsz_SOURCES_DIST = prnt/hpijs/models.cpp \
 	prnt/hpijs/jinclude.h prnt/hpijs/jpegint.h prnt/hpijs/dj55xx.h \
 	prnt/hpijs/hpijsfax.h prnt/hpijs/ojprokx50.h \
 	prnt/hpijs/ljzjs.cpp prnt/hpijs/ljzjs.h \
-	prnt/hpijs/ljzjsmono.cpp prnt/hpijs/ljzjsmono.h \
+	prnt/hpijs/ljzjsmono.cpp prnt/hpijs/ljm1005.cpp \
+	prnt/hpijs/ljm1005.h prnt/hpijs/ljzjsmono.h \
 	prnt/hpijs/hpjbig_wrapper.h prnt/hpijs/PrinterProperties.cpp \
 	prnt/hpijs/PrinterProperties.h
 am__objects_2 = hppgsz-models.$(OBJEXT) hppgsz-breaks_open.$(OBJEXT) \
@@ -481,7 +500,8 @@ am__objects_2 = hppgsz-models.$(OBJEXT) hppgsz-breaks_open.$(OBJEXT) \
 	hppgsz-printerproxy.$(OBJEXT) hppgsz-printerfactory.$(OBJEXT) \
 	hppgsz-ljjetready.$(OBJEXT) hppgsz-jdatadbf.$(OBJEXT) \
 	hppgsz-jccolor.$(OBJEXT) hppgsz-ljfastraster.$(OBJEXT) \
-	hppgsz-ljzjs.$(OBJEXT) hppgsz-ljzjsmono.$(OBJEXT)
+	hppgsz-ljzjs.$(OBJEXT) hppgsz-ljzjsmono.$(OBJEXT) \
+	hppgsz-ljm1005.$(OBJEXT)
 @HPLIP_BUILD_TRUE@am_hppgsz_OBJECTS = $(am__objects_2) \
 @HPLIP_BUILD_TRUE@	hppgsz-PrinterProperties.$(OBJEXT)
 hppgsz_OBJECTS = $(am_hppgsz_OBJECTS)
@@ -507,7 +527,7 @@ dist_cmdSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 am__dist_copier_SCRIPTS_DIST = copier/copier.py copier/__init__.py
 dist_copierSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 am__dist_fax_SCRIPTS_DIST = fax/fax.py fax/__init__.py \
-	fax/coverpages.py
+	fax/coverpages.py fax/pmlfax.py
 dist_faxSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 am__dist_hpfax_SCRIPTS_DIST = fax/backend/hpfax.py
 dist_hpfaxSCRIPT_INSTALL = $(INSTALL_SCRIPT)
@@ -540,19 +560,23 @@ am__dist_noinst_SCRIPTS_DIST = installer/text_install.py \
 	installer/pages/turn_off_options.tmpl \
 	installer/pages/index.tmpl installer/pages/welcome.tmpl \
 	installer/pages/install_optional.tmpl \
-	installer/pages/quit.tmpl installer/scripts/hplip.js \
-	installer/styles/hplip.css Cheetah/Filters.py \
-	Cheetah/SettingsManager.py Cheetah/CheetahWrapper.py \
-	Cheetah/ImportHooks.py Cheetah/SourceReader.py \
-	Cheetah/Compiler.py Cheetah/ImportManager.py \
-	Cheetah/Template.py Cheetah/DummyTransaction.py \
-	Cheetah/NameMapper.py Cheetah/TemplateCmdLineIface.py \
-	Cheetah/ErrorCatchers.py Cheetah/Parser.py Cheetah/Version.py \
-	Cheetah/FileUtils.py Cheetah/Servlet.py Cheetah/CacheRegion.py \
-	Cheetah/__init__.py Cheetah/Utils/Indenter.py \
-	Cheetah/Utils/Misc.py Cheetah/Utils/VerifyType.py \
-	Cheetah/Utils/WebInputMixin.py Cheetah/Utils/__init__.py \
-	Cheetah/Utils/optik/errors.py \
+	installer/pages/quit.tmpl installer/pages/replug.tmpl \
+	installer/pages/restart.tmpl \
+	installer/pages/network_unavailable.tmpl \
+	installer/pages/warning.tmpl installer/scripts/hplip.js \
+	installer/scripts/encode.js installer/scripts/misc_code.js \
+	installer/styles/hplip.css installer/styles/misc.css \
+	Cheetah/Filters.py Cheetah/SettingsManager.py \
+	Cheetah/CheetahWrapper.py Cheetah/ImportHooks.py \
+	Cheetah/SourceReader.py Cheetah/Compiler.py \
+	Cheetah/ImportManager.py Cheetah/Template.py \
+	Cheetah/DummyTransaction.py Cheetah/NameMapper.py \
+	Cheetah/TemplateCmdLineIface.py Cheetah/ErrorCatchers.py \
+	Cheetah/Parser.py Cheetah/Version.py Cheetah/FileUtils.py \
+	Cheetah/Servlet.py Cheetah/CacheRegion.py Cheetah/__init__.py \
+	Cheetah/Utils/Indenter.py Cheetah/Utils/Misc.py \
+	Cheetah/Utils/VerifyType.py Cheetah/Utils/WebInputMixin.py \
+	Cheetah/Utils/__init__.py Cheetah/Utils/optik/errors.py \
 	Cheetah/Utils/optik/option_parser.py \
 	Cheetah/Utils/optik/option.py Cheetah/Utils/optik/__init__.py \
 	cherrypy/_cphttptools.py cherrypy/_cpwsgi.py \
@@ -690,19 +714,30 @@ am__dist_noinst_DATA_DIST = installer/images/button.png \
 	installer/images/view.png installer/images/back.png \
 	installer/images/circular.gif installer/images/hplogo.png \
 	installer/images/tux.png installer/images/button1.png \
-	installer/images/button1d.png data/localization/hplip_de.ts \
-	data/localization/hplip_es.ts data/localization/hplip_fr.ts \
-	data/localization/hplip_it.ts data/localization/hplip_pt.ts \
-	data/localization/hplip_ru.ts data/localization/hplip_zh.ts \
-	ui/colorcalform2_base.ui ui/settingsdialog_base.ui \
-	ui/aligntype6form1_base.ui ui/aboutdlg_base.ui \
-	ui/imagepropertiesdlg_base.ui ui/paperedgealignform_base.ui \
-	ui/aligntype6form2_base.ui ui/nodevicesform_base.ui \
-	ui/cleaningform_base.ui ui/colorcalform_base.ui \
-	ui/devmgr4_base.ui ui/loadpaperform_base.ui \
-	ui/cleaningform2_base.ui ui/waitform_base.ui \
-	ui/coloradjform_base.ui ui/faxaddrbookeditform_base.ui \
-	ui/faxaddrbookform_base.ui ui/faxaddrbookgroupeditform_base.ui \
+	installer/images/button1d.png installer/images/replug1.png \
+	installer/images/replug2.png installer/images/replug3.png \
+	installer/images/button2.png \
+	installer/localization/gui_strings_de_DE.ts \
+	installer/localization/gui_strings_en_US.ts \
+	installer/localization/gui_strings_es_MX.ts \
+	installer/localization/gui_strings_fr_FR.ts \
+	installer/localization/gui_strings_it_IT.ts \
+	installer/localization/gui_strings_pt_BR.ts \
+	installer/localization/gui_strings_ru_RU.ts \
+	installer/localization/gui_strings_zh_CN.ts \
+	data/localization/hplip_de.ts data/localization/hplip_es.ts \
+	data/localization/hplip_fr.ts data/localization/hplip_it.ts \
+	data/localization/hplip_pt.ts data/localization/hplip_ru.ts \
+	data/localization/hplip_zh.ts ui/colorcalform2_base.ui \
+	ui/settingsdialog_base.ui ui/aligntype6form1_base.ui \
+	ui/aboutdlg_base.ui ui/imagepropertiesdlg_base.ui \
+	ui/paperedgealignform_base.ui ui/aligntype6form2_base.ui \
+	ui/nodevicesform_base.ui ui/cleaningform_base.ui \
+	ui/colorcalform_base.ui ui/devmgr4_base.ui \
+	ui/loadpaperform_base.ui ui/cleaningform2_base.ui \
+	ui/waitform_base.ui ui/coloradjform_base.ui \
+	ui/faxaddrbookeditform_base.ui ui/faxaddrbookform_base.ui \
+	ui/faxaddrbookgroupeditform_base.ui \
 	ui/faxaddrbookgroupsform_base.ui ui/align10form_base.ui \
 	ui/pluginform_base.ui plugins/powersettingsdialog_base.ui \
 	ui/faxsettingsform_base.ui ui/coverpageform_base.ui \
@@ -1115,6 +1150,7 @@ am__dist_noinst_DATA_DIST = installer/images/button.png \
 	$(src_dbdir)/printer/HP-LaserJet_M4345_MFP.xml \
 	$(src_dbdir)/printer/HP-LaserJet_M5025_MFP.xml \
 	$(src_dbdir)/printer/HP-LaserJet_M5035_MFP.xml \
+	$(src_dbdir)/printer/HP-LaserJet_M2727.xml \
 	$(src_dbdir)/printer/HP-Mopier_240.xml \
 	$(src_dbdir)/printer/HP-Mopier_320.xml \
 	$(src_dbdir)/printer/HP-LaserJet_4L.xml \
@@ -1221,6 +1257,7 @@ am__dist_noinst_DATA_DIST = installer/images/button.png \
 	$(src_dbdir)/PPD/HP/hp_LaserJet_4200_Series.ppd \
 	$(src_dbdir)/PPD/HP/HP_LaserJet_5000_Series.ppd \
 	$(src_dbdir)/PPD/HP/HP_Color_LaserJet_5M.ppd \
+	$(src_dbdir)/PPD/HP/HP_LaserJet_M2727_MFP.ppd \
 	$(src_dbdir)/PPD/HP/HP_Color_LaserJet_4700.ppd \
 	$(src_dbdir)/PPD/HP/HP_Color_LaserJet_CP4005.ppd \
 	$(src_dbdir)/PPD/HP/HP_Mopier_320.ppd \
@@ -1528,8 +1565,8 @@ am__dist_noinst_DATA_DIST = installer/images/button.png \
 	ppd/HP-LaserJet_M4345_MFP-hpijs.ppd \
 	ppd/HP-LaserJet_M5025_MFP-hpijs.ppd \
 	ppd/HP-LaserJet_M5035_MFP-hpijs.ppd \
-	ppd/HP-Mopier_240-hpijs.ppd ppd/HP-Mopier_320-hpijs.ppd \
-	ppd/HP-LaserJet_4L-hpijs.ppd \
+	ppd/HP-LaserJet_M2727-hpijs.ppd ppd/HP-Mopier_240-hpijs.ppd \
+	ppd/HP-Mopier_320-hpijs.ppd ppd/HP-LaserJet_4L-hpijs.ppd \
 	ppd/HP-LaserJet_4V_4LJ_Pro-hpijs.ppd \
 	ppd/HP-LaserJet_4ML-hpijs.ppd \
 	ppd/HP-Color_LaserJet_2500-hpijs.ppd \
@@ -1599,7 +1636,8 @@ am__dist_www0_DATA_DIST = $(wwwsrc)/contacts.html $(wwwsrc)/faqs.html \
 dist_www0DATA_INSTALL = $(INSTALL_DATA)
 am__dist_www1_DATA_DIST = $(wwwsrc)/howtos/*
 dist_www1DATA_INSTALL = $(INSTALL_DATA)
-am__dist_www2_DATA_DIST = $(wwwsrc)/install/index.html
+am__dist_www2_DATA_DIST = $(wwwsrc)/install/index.html \
+	$(wwwsrc)/install/installtree.html
 dist_www2DATA_INSTALL = $(INSTALL_DATA)
 am__dist_www21_DATA_DIST = $(wwwsrc)/install/step1/*
 dist_www21DATA_INSTALL = $(INSTALL_DATA)
@@ -1829,7 +1867,7 @@ lib_LTLIBRARIES = $(am__append_4)
 @DOC_BUILD_TRUE@www1dir = $(docdir)/howtos
 @DOC_BUILD_TRUE@dist_www1_DATA = $(wwwsrc)/howtos/*
 @DOC_BUILD_TRUE@www2dir = $(docdir)/install
-@DOC_BUILD_TRUE@dist_www2_DATA = $(wwwsrc)/install/index.html
+@DOC_BUILD_TRUE@dist_www2_DATA = $(wwwsrc)/install/index.html $(wwwsrc)/install/installtree.html
 @DOC_BUILD_TRUE@www21dir = $(docdir)/install/step1
 @DOC_BUILD_TRUE@dist_www21_DATA = $(wwwsrc)/install/step1/*
 @DOC_BUILD_TRUE@www22dir = $(docdir)/install/step2
@@ -1892,7 +1930,7 @@ lib_LTLIBRARIES = $(am__append_4)
 
 # fax
 @FAX_BUILD_TRUE@@HPLIP_BUILD_TRUE@faxdir = $(hplipdir)/fax
-@FAX_BUILD_TRUE@@HPLIP_BUILD_TRUE@dist_fax_SCRIPTS = fax/fax.py fax/__init__.py fax/coverpages.py
+@FAX_BUILD_TRUE@@HPLIP_BUILD_TRUE@dist_fax_SCRIPTS = fax/fax.py fax/__init__.py fax/coverpages.py fax/pmlfax.py
 @FAX_BUILD_TRUE@@HPLIP_BUILD_TRUE@hpfaxdir = $(cupsbackenddir)
 @FAX_BUILD_TRUE@@HPLIP_BUILD_TRUE@dist_hpfax_SCRIPTS = fax/backend/hpfax.py
 @FAX_BUILD_TRUE@@HPLIP_BUILD_TRUE@faxppddir = $(hpppddir)
@@ -1989,7 +2027,7 @@ lib_LTLIBRARIES = $(am__append_4)
 @HPLIP_BUILD_TRUE@	  io/hpmud/hpmud.h io/hpmud/hpmudi.h io/hpmud/list.h io/hpmud/mlc.h io/hpmud/musb.h io/hpmud/pml.h io/hpmud/dot4.c \
 @HPLIP_BUILD_TRUE@	  io/hpmud/dot4.h io/hpmud/jd.c io/hpmud/jd.h io/hpmud/pp.c io/hpmud/pp.h 
 
-@HPLIP_BUILD_TRUE@libhpmud_la_LDFLAGS = -version-info 0:0:0
+@HPLIP_BUILD_TRUE@libhpmud_la_LDFLAGS = -version-info 0:1:0
 @HPLIP_BUILD_TRUE@libhpmud_la_CFLAGS = -DMUDNAME=\"$(MUDNAME)\" -DCONFDIR=\"$(hplip_confdir)\"
 
 # hpmudext
@@ -2456,6 +2494,7 @@ foomatic_xml_printers = \
     $(src_dbdir)/printer/HP-LaserJet_M4345_MFP.xml \
     $(src_dbdir)/printer/HP-LaserJet_M5025_MFP.xml \
     $(src_dbdir)/printer/HP-LaserJet_M5035_MFP.xml \
+    $(src_dbdir)/printer/HP-LaserJet_M2727.xml \
     $(src_dbdir)/printer/HP-Mopier_240.xml \
     $(src_dbdir)/printer/HP-Mopier_320.xml \
     $(src_dbdir)/printer/HP-LaserJet_4L.xml \
@@ -2904,6 +2943,7 @@ foomatic_ppd_printers = \
     ppd/HP-LaserJet_M4345_MFP-hpijs.ppd \
     ppd/HP-LaserJet_M5025_MFP-hpijs.ppd \
     ppd/HP-LaserJet_M5035_MFP-hpijs.ppd \
+    ppd/HP-LaserJet_M2727-hpijs.ppd \
     ppd/HP-Mopier_240-hpijs.ppd \
     ppd/HP-Mopier_320-hpijs.ppd \
     ppd/HP-LaserJet_4L-hpijs.ppd \
@@ -3012,6 +3052,7 @@ foomatic_ps_printers = \
     $(src_dbdir)/PPD/HP/hp_LaserJet_4200_Series.ppd \
     $(src_dbdir)/PPD/HP/HP_LaserJet_5000_Series.ppd \
     $(src_dbdir)/PPD/HP/HP_Color_LaserJet_5M.ppd \
+    $(src_dbdir)/PPD/HP/HP_LaserJet_M2727_MFP.ppd \
     $(src_dbdir)/PPD/HP/HP_Color_LaserJet_4700.ppd \
     $(src_dbdir)/PPD/HP/HP_Color_LaserJet_CP4005.ppd \
     $(src_dbdir)/PPD/HP/HP_Mopier_320.ppd \
@@ -3095,7 +3136,8 @@ apdk_SOURCES = prnt/hpijs/models.cpp prnt/hpijs/breaks_open.cpp \
 	prnt/hpijs/printerproxy.cpp prnt/hpijs/printerfactory.cpp prnt/hpijs/printerproxy.h prnt/hpijs/printerfactory.h \
 	prnt/hpijs/ljjetready.cpp prnt/hpijs/ljjetready.h prnt/hpijs/jdatadbf.c prnt/hpijs/jccolor.c prnt/hpijs/ljfastraster.cpp prnt/hpijs/ljfastraster.h \
 	prnt/hpijs/jinclude.h prnt/hpijs/jpegint.h prnt/hpijs/dj55xx.h prnt/hpijs/hpijsfax.h prnt/hpijs/ojprokx50.h \
-	prnt/hpijs/ljzjs.cpp prnt/hpijs/ljzjs.h prnt/hpijs/ljzjsmono.cpp prnt/hpijs/ljzjsmono.h prnt/hpijs/hpjbig_wrapper.h
+	prnt/hpijs/ljzjs.cpp prnt/hpijs/ljzjs.h prnt/hpijs/ljzjsmono.cpp prnt/hpijs/ljm1005.cpp prnt/hpijs/ljm1005.h \
+                prnt/hpijs/ljzjsmono.h prnt/hpijs/hpjbig_wrapper.h
 
 hpijs_SOURCES = $(apdk_SOURCES) prnt/hpijs/hpijs.cpp prnt/hpijs/ijs_server.c prnt/hpijs/ijs.c prnt/hpijs/hpijsfax.cpp prnt/hpijs/services.cpp \
 	prnt/hpijs/hpijs.h prnt/hpijs/ijs.h prnt/hpijs/ijs_server.h prnt/hpijs/services.h prnt/hpijs/ijs_client.h prnt/hpijs/hpiom.c prnt/hpijs/hpiom.h 
@@ -3104,7 +3146,8 @@ hpijs_CXXFLAGS = -DAPDK_DJ660 -DAPDK_DJ6xx -DAPDK_DJ6xxPhoto -DAPDK_DJ8xx -DAPDK
 	-DAPDK_APOLLO2XXX -DAPDK_APOLLO21XX -DAPDK_APOLLO2560 -DAPDK_DJ600 -DAPDK_DJ350 -DAPDK_DJ8x5 -DAPDK_PSP100 -DAPDK_AUTODUPLEX \
 	-DAPDK_HIGH_RES_MODES -DAPDK_LJMONO -DAPDK_DJ540 -DAPDK_DJ850 -DAPDK_DJ890 -DAPDK_DJ3320 -DAPDK_LJCOLOR -DAPDK_DJGENERICVIP \
 	-DAPDK_LJJETREADY  -DAPDK_LJFASTRASTER -DAPDK_BUFFER_SEND -DAPDK_LDL_COMPRESS -DAPDK_EXTENDED_MEDIASIZE \
-	-DAPDK_MLC_PRINTER -DAPDK_DJ3600 -DAPDK_LJZJS_MONO $(APDK_ENDIAN_FLAG) $(APDK_AUTO_INCLUDE_FLAG) -DAPDK_LINUX -DNDEBUG
+	-DAPDK_MLC_PRINTER -DAPDK_DJ3600 -DAPDK_LJZJS_MONO -DAPDK_LJM1005 \
+                $(APDK_ENDIAN_FLAG) $(APDK_AUTO_INCLUDE_FLAG) -DAPDK_LINUX -DNDEBUG
 
 hpijs_CFLAGS = $(hpijs_CXXFLAGS) -Iprnt/hpijs
 @HPLIP_BUILD_TRUE@hpijs_LDADD = libhpip.la libhpmud.la
@@ -3694,6 +3737,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hpijs-ljcolor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hpijs-ljfastraster.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hpijs-ljjetready.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hpijs-ljm1005.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hpijs-ljmono.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hpijs-ljzjs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hpijs-ljzjsmono.Po@am__quote@
@@ -3766,6 +3810,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hppgsz-ljcolor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hppgsz-ljfastraster.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hppgsz-ljjetready.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hppgsz-ljm1005.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hppgsz-ljmono.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hppgsz-ljzjs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hppgsz-ljzjsmono.Po@am__quote@
@@ -5312,6 +5357,20 @@ hpijs-ljzjsmono.obj: prnt/hpijs/ljzjsmono.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hpijs_CXXFLAGS) $(CXXFLAGS) -c -o hpijs-ljzjsmono.obj `if test -f 'prnt/hpijs/ljzjsmono.cpp'; then $(CYGPATH_W) 'prnt/hpijs/ljzjsmono.cpp'; else $(CYGPATH_W) '$(srcdir)/prnt/hpijs/ljzjsmono.cpp'; fi`
 
+hpijs-ljm1005.o: prnt/hpijs/ljm1005.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hpijs_CXXFLAGS) $(CXXFLAGS) -MT hpijs-ljm1005.o -MD -MP -MF "$(DEPDIR)/hpijs-ljm1005.Tpo" -c -o hpijs-ljm1005.o `test -f 'prnt/hpijs/ljm1005.cpp' || echo '$(srcdir)/'`prnt/hpijs/ljm1005.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/hpijs-ljm1005.Tpo" "$(DEPDIR)/hpijs-ljm1005.Po"; else rm -f "$(DEPDIR)/hpijs-ljm1005.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='prnt/hpijs/ljm1005.cpp' object='hpijs-ljm1005.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hpijs_CXXFLAGS) $(CXXFLAGS) -c -o hpijs-ljm1005.o `test -f 'prnt/hpijs/ljm1005.cpp' || echo '$(srcdir)/'`prnt/hpijs/ljm1005.cpp
+
+hpijs-ljm1005.obj: prnt/hpijs/ljm1005.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hpijs_CXXFLAGS) $(CXXFLAGS) -MT hpijs-ljm1005.obj -MD -MP -MF "$(DEPDIR)/hpijs-ljm1005.Tpo" -c -o hpijs-ljm1005.obj `if test -f 'prnt/hpijs/ljm1005.cpp'; then $(CYGPATH_W) 'prnt/hpijs/ljm1005.cpp'; else $(CYGPATH_W) '$(srcdir)/prnt/hpijs/ljm1005.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/hpijs-ljm1005.Tpo" "$(DEPDIR)/hpijs-ljm1005.Po"; else rm -f "$(DEPDIR)/hpijs-ljm1005.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='prnt/hpijs/ljm1005.cpp' object='hpijs-ljm1005.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hpijs_CXXFLAGS) $(CXXFLAGS) -c -o hpijs-ljm1005.obj `if test -f 'prnt/hpijs/ljm1005.cpp'; then $(CYGPATH_W) 'prnt/hpijs/ljm1005.cpp'; else $(CYGPATH_W) '$(srcdir)/prnt/hpijs/ljm1005.cpp'; fi`
+
 hpijs-hpijs.o: prnt/hpijs/hpijs.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hpijs_CXXFLAGS) $(CXXFLAGS) -MT hpijs-hpijs.o -MD -MP -MF "$(DEPDIR)/hpijs-hpijs.Tpo" -c -o hpijs-hpijs.o `test -f 'prnt/hpijs/hpijs.cpp' || echo '$(srcdir)/'`prnt/hpijs/hpijs.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/hpijs-hpijs.Tpo" "$(DEPDIR)/hpijs-hpijs.Po"; else rm -f "$(DEPDIR)/hpijs-hpijs.Tpo"; exit 1; fi
@@ -6292,6 +6351,20 @@ hppgsz-ljzjsmono.obj: prnt/hpijs/ljzjsmono.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hppgsz_CXXFLAGS) $(CXXFLAGS) -c -o hppgsz-ljzjsmono.obj `if test -f 'prnt/hpijs/ljzjsmono.cpp'; then $(CYGPATH_W) 'prnt/hpijs/ljzjsmono.cpp'; else $(CYGPATH_W) '$(srcdir)/prnt/hpijs/ljzjsmono.cpp'; fi`
 
+hppgsz-ljm1005.o: prnt/hpijs/ljm1005.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hppgsz_CXXFLAGS) $(CXXFLAGS) -MT hppgsz-ljm1005.o -MD -MP -MF "$(DEPDIR)/hppgsz-ljm1005.Tpo" -c -o hppgsz-ljm1005.o `test -f 'prnt/hpijs/ljm1005.cpp' || echo '$(srcdir)/'`prnt/hpijs/ljm1005.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/hppgsz-ljm1005.Tpo" "$(DEPDIR)/hppgsz-ljm1005.Po"; else rm -f "$(DEPDIR)/hppgsz-ljm1005.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='prnt/hpijs/ljm1005.cpp' object='hppgsz-ljm1005.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hppgsz_CXXFLAGS) $(CXXFLAGS) -c -o hppgsz-ljm1005.o `test -f 'prnt/hpijs/ljm1005.cpp' || echo '$(srcdir)/'`prnt/hpijs/ljm1005.cpp
+
+hppgsz-ljm1005.obj: prnt/hpijs/ljm1005.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hppgsz_CXXFLAGS) $(CXXFLAGS) -MT hppgsz-ljm1005.obj -MD -MP -MF "$(DEPDIR)/hppgsz-ljm1005.Tpo" -c -o hppgsz-ljm1005.obj `if test -f 'prnt/hpijs/ljm1005.cpp'; then $(CYGPATH_W) 'prnt/hpijs/ljm1005.cpp'; else $(CYGPATH_W) '$(srcdir)/prnt/hpijs/ljm1005.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/hppgsz-ljm1005.Tpo" "$(DEPDIR)/hppgsz-ljm1005.Po"; else rm -f "$(DEPDIR)/hppgsz-ljm1005.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='prnt/hpijs/ljm1005.cpp' object='hppgsz-ljm1005.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hppgsz_CXXFLAGS) $(CXXFLAGS) -c -o hppgsz-ljm1005.obj `if test -f 'prnt/hpijs/ljm1005.cpp'; then $(CYGPATH_W) 'prnt/hpijs/ljm1005.cpp'; else $(CYGPATH_W) '$(srcdir)/prnt/hpijs/ljm1005.cpp'; fi`
+
 hppgsz-PrinterProperties.o: prnt/hpijs/PrinterProperties.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hppgsz_CXXFLAGS) $(CXXFLAGS) -MT hppgsz-PrinterProperties.o -MD -MP -MF "$(DEPDIR)/hppgsz-PrinterProperties.Tpo" -c -o hppgsz-PrinterProperties.o `test -f 'prnt/hpijs/PrinterProperties.cpp' || echo '$(srcdir)/'`prnt/hpijs/PrinterProperties.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/hppgsz-PrinterProperties.Tpo" "$(DEPDIR)/hppgsz-PrinterProperties.Po"; else rm -f "$(DEPDIR)/hppgsz-PrinterProperties.Tpo"; exit 1; fi
@@ -6911,7 +6984,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/$(src_dbdir)/PPD/HP $(distdir)/$(src_dbdir)/driver $(distdir)/$(src_dbdir)/opt $(distdir)/$(src_dbdir)/printer $(distdir)/$(src_hpijsdir) $(distdir)/$(src_hpijsdir)/data-generators/hpijs $(distdir)/$(wwwsrc) $(distdir)/$(wwwsrc)/howtos $(distdir)/$(wwwsrc)/images $(distdir)/$(wwwsrc)/install $(distdir)/$(wwwsrc)/install/install $(distdir)/$(wwwsrc)/install/manual $(distdir)/$(wwwsrc)/install/manual/distros $(distdir)/$(wwwsrc)/install/step1 $(distdir)/$(wwwsrc)/install/step2 $(distdir)/$(wwwsrc)/install/step3 $(distdir)/$(wwwsrc)/install/step4 $(distdir)/$(wwwsrc)/install/step4/cups $(distdir)/$(wwwsrc)/install/step4/setup $(distdir)/$(wwwsrc)/install/step4/suse $(distdir)/$(wwwsrc)/styles $(distdir)/$(wwwsrc)/supported_devices $(distdir)/$(wwwsrc)/tech_docs $(distdir)/$(wwwsrc)/tech_docs/man_pages $(distdir)/$(wwwsrc)/troubleshooting $(distdir)/. $(distdir)/Cheetah $(distdir)/Cheetah/Utils $(distdir)/Cheetah/Utils/optik $(distdir)/base $(distdir)/cherrypy $(distdir)/cherrypy/filters $(distdir)/cherrypy/lib $(distdir)/copier $(distdir)/data/images $(distdir)/data/ldl $(distdir)/data/localization $(distdir)/data/models $(distdir)/data/models/unreleased $(distdir)/data/pcl $(distdir)/data/ps $(distdir)/data/rules $(distdir)/fax $(distdir)/fax/backend $(distdir)/fax/ppd $(distdir)/installer $(distdir)/installer/images $(distdir)/installer/pages $(distdir)/installer/scripts $(distdir)/installer/styles $(distdir)/pcard $(distdir)/plugins $(distdir)/ppd $(distdir)/prnt $(distdir)/prnt/hpijs $(distdir)/scan $(distdir)/scan/sane $(distdir)/ui
+	$(mkdir_p) $(distdir)/$(src_dbdir)/PPD/HP $(distdir)/$(src_dbdir)/driver $(distdir)/$(src_dbdir)/opt $(distdir)/$(src_dbdir)/printer $(distdir)/$(src_hpijsdir) $(distdir)/$(src_hpijsdir)/data-generators/hpijs $(distdir)/$(wwwsrc) $(distdir)/$(wwwsrc)/howtos $(distdir)/$(wwwsrc)/images $(distdir)/$(wwwsrc)/install $(distdir)/$(wwwsrc)/install/install $(distdir)/$(wwwsrc)/install/manual $(distdir)/$(wwwsrc)/install/manual/distros $(distdir)/$(wwwsrc)/install/step1 $(distdir)/$(wwwsrc)/install/step2 $(distdir)/$(wwwsrc)/install/step3 $(distdir)/$(wwwsrc)/install/step4 $(distdir)/$(wwwsrc)/install/step4/cups $(distdir)/$(wwwsrc)/install/step4/setup $(distdir)/$(wwwsrc)/install/step4/suse $(distdir)/$(wwwsrc)/styles $(distdir)/$(wwwsrc)/supported_devices $(distdir)/$(wwwsrc)/tech_docs $(distdir)/$(wwwsrc)/tech_docs/man_pages $(distdir)/$(wwwsrc)/troubleshooting $(distdir)/. $(distdir)/Cheetah $(distdir)/Cheetah/Utils $(distdir)/Cheetah/Utils/optik $(distdir)/base $(distdir)/cherrypy $(distdir)/cherrypy/filters $(distdir)/cherrypy/lib $(distdir)/copier $(distdir)/data/images $(distdir)/data/ldl $(distdir)/data/localization $(distdir)/data/models $(distdir)/data/models/unreleased $(distdir)/data/pcl $(distdir)/data/ps $(distdir)/data/rules $(distdir)/fax $(distdir)/fax/backend $(distdir)/fax/ppd $(distdir)/installer $(distdir)/installer/images $(distdir)/installer/localization $(distdir)/installer/pages $(distdir)/installer/scripts $(distdir)/installer/styles $(distdir)/pcard $(distdir)/plugins $(distdir)/ppd $(distdir)/prnt $(distdir)/prnt/hpijs $(distdir)/scan $(distdir)/scan/sane $(distdir)/ui
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

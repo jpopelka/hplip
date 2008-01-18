@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # su/sudo wrapper for HPLIP installer
+#python ./install.py --web $*
 python ./install.py -i $*
 
 

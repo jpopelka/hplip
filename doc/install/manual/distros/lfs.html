@@ -58,7 +58,7 @@
     </menu>
 <div class="menuheader">Usage and Support</div>
     <menu compact="compact">
-        <li><a href="../../../mailing_lists.html" title="Mailing Lists">Mailing Lists</a></li>
+        <li><a href="../../../mailing_lists.html" title="Mailing Lists">Support</a></li>
         <li><a href="../../../howtos/index.html" title="How-Tos">How-Tos</a></li> 
         <li><a href="../../../troubleshooting/index.html" title="Troubleshooting">Troubleshooting</a></li>
         <li><a href="../../../release_notes.html" title="Release Notes">Release Notes</a></li>
@@ -105,90 +105,110 @@ LFS/BLFS
 <p class="first admonition-title">Note</p>
 <p class="last">You will need root access to complete many of the steps while installing HPLIP. If you do not have root access contact your system admin for assistance.</p>
 </div>
-<p><em>Installing hplip-1.7.1 on an LFS/BLFS system</em></p>
-<p>This document describes the installation of hplip-1.7.1 on a Linux from Scratch (LFS)/Beyond Linux from Scratch (BLFS) setup.</p>
-<p>Some system components of the LFS/BLFS build on which this experience is based are: gcc-4.0.3 ; glibc-2.3.6; udev-088; Linux-2.6.16.5; python-2.4.3; libusb-0.1.12; xfree86-4.5.0; gimp-2.2.10; cups-1.1.23; ESP_Ghostscript-8.15.1; sane-1.0.17; foomatic-3.1.0.</p>
-<p>The procedure installs hplip in a directory different from /usr or /usr/local. If these standard locations are used, some of the configuration steps may be omitted.</p>
-<p>It is assumed that:</p>
-<ol class="arabic simple">
-<li>All the system requirements for the building of hplip are met;</li>
-<li>Hplip-1.7.1.tar.gz has been untarred into a directory we shall call &quot;Build&quot; and that the patch hplip-1.7.1-1.patch has been copied to this directory. The contents of Build should look like this: hplip-1.7.1/hplip-1.7.1-1.patch;</li>
+<p><em>Installing hplip-2.7.9 on an LFS system</em></p>
+<p>This document describes the installation of hplip-1.7.1 on a Linux
+from Scratch (LFS)/Beyond Linux from Scratch (BLFS) setup. We have
+OfficeJet usb printers in mind. Printing and scanning was found to
+work well on the HP-OfficeJet 5510 all-in-one.</p>
+<p>Some system components of the LFS/BLFS build on which this experience
+is based are: gcc-4.0.3 ; glibc-2.3.6; udev-088; Linux-2.6.16.5;
+python-2.4.3; libusb-0.1.12; usbutils-0.72; xfree86-4.5.0; gimp-2.2.10;
+cups-1.1.23; ESP_Ghostscript-8.15.1; sane-1.0.18; xsane-0.994;
+foomatic-3.1.0.</p>
+<p>The procedure installs hplip /usr.</p>
+<p>It is assumed that</p>
+<ol class="lowerroman">
+<li><dl class="first docutils">
+<dt>all the system requirements for the building of hplip are</dt>
+<dd><p class="first last">met. In particular, CUPS should be working on its own;</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>hplip-2.7.9.tar.gz has been untarred into a directory we</dt>
+<dd><p class="first last">shall call &quot;Build&quot;;</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">you are now in Build.</p>
+</li>
 </ol>
 <p>The various steps are described below.</p>
 <p>First as an unprivileged user:</p>
 <pre class="literal-block">
-$ cd hplip-1.7.1
-$ patch -Np1 -i ../hplip-1.7.1-1.patch
-$ sed -i &quot;s&#64;daemon&#64;pidofproc&#64;g&quot; hplip.sh
-$ ./configure --prefix=/usr/local/Hplip-1.7.1 --disable-network-build --disable-pp-build
+$ cd hplip-2.7.9
+$ ./configure --prefix=/usr --disable-pp-build --enable-foomatic-ppd-install
 $ make
 </pre>
-<p>Explanations:</p>
-<p>sed -i &quot;s&#64;daemon&#64;pidofproc&#64;g&quot; hplip.sh is done to replace the 'daemon' function in hplip.sh with 'pidofproc'. Lfs does not use 'daemon' at all, but 'pidofproc' in stead.</p>
-<p>--disable-network-build: if you do not have net-snmp installed.</p>
+<p>Configuration notes:</p>
 <dl class="docutils">
 <dt>--disable-pp-build: if your printers do not connect to the parallel</dt>
 <dd>port.</dd>
+<dt>--enable-foomatic-ppd-install: if you wish to use foomatic-ppd-files. At</dt>
+<dd>the moment this database covers a larger variety of HP-printers.</dd>
 </dl>
+<p>You should add: --disable-network-build if you do not have net-snmp installed.</p>
 <p>Next, as root:</p>
 <pre class="literal-block">
-# export HPLIP_DIR=&quot;/usr/local/Hplip-1.7.1&quot;
-# mkdir -p $HPLIP_DIR/bin
 # make install
 </pre>
+<p>Find the foomatic filter script  &quot;foomatic-rip&quot; wherever it was installed.
+If it is not installed, download from</p>
+<a href="http://www.openprinting.org/download/foomatic/foomatic-filters-3.0-20071012.tar.gz">Openprinting.org</a><p>and do</p>
+<pre class="literal-block">
+# cp foomatic-rip /usr/lib/cups/filter/
+</pre>
+<p>Now</p>
+<pre class="literal-block">
+# cd /usr/share/cups/model/
+# ln -s /usr/share/ppd/HP/* foomatic-ppds
+</pre>
+<p>Edit the file /etc/udev/rules.d/25-lfs.rules:</p>
+<ol class="lowerroman simple">
+<li>Add the following rule (from SUSE) as a single line to the very top:</li>
+</ol>
+<p>SUBSYSTEM==&quot;usb_device&quot;, PROGRAM=&quot;/bin/sh -c 'K=%k; K=$${K#usbdev}; printf bus/usb/%%03i/%%03i $${K%%%%.*} $${K#*.}'&quot;, NAME=&quot;%c&quot;, MODE=&quot;0644&quot;</p>
+<ol class="lowerroman simple" start="2">
+<li>Comment out the rules</li>
+</ol>
+<p>KERNEL==&quot;lp[0-9]*&quot;,      GROUP=&quot;lp&quot;
+BUS==&quot;usb&quot;, KERNEL==&quot;lp[0-9]*&quot;, NAME=&quot;usb/%k&quot;, GROUP=&quot;lp&quot;</p>
+<p>by inserting a hash (#) in front of them</p>
+<ol class="lowerroman simple" start="3">
+<li>Make sure that your HP-device is plugged in and turned on. Run the following script to stop the udev-daemon:</li>
+</ol>
+<pre class="literal-block">
+# T=`pidof -x udevd`; kill $T
+</pre>
+<p>Then start the udev-daemon again by running:</p>
+<pre class="literal-block">
+# /etc/rc.d/init.d/udev start
+</pre>
+<p>When udev is started, run:</p>
+<pre class="literal-block">
+# lsusb
+</pre>
+<p>and see if your device has been detected. If &quot;lsusb&quot; is not available (it is part of &quot;usbutils&quot;) you could also do:</p>
+<!-- parsed-literal:
+
+# ls /dev/bus/usb/00* -->
+<p>If there is something, your device is seen correctly for the purposes of hplip.</p>
 <p>Explanations:</p>
-<p>You need to do the 'mkdir' bit because hplip will not create the 'bin' directory and installation will fail as a result. If you install in /usr/local or /usr this would not be a problem.</p>
-<p>Now you need to configure for hplip (still as root):</p>
-<pre class="literal-block">
-# chmod 0744 $HPLIP_DIR/share/hplip/hplip
-# cd /etc/rc.d/init.d
-# ln -s $HPLIP_DIR/share/hplip/hplip hplip
-# cd ../rc0.d
-# ln -s ../init.d/hplip K01hplip
-# cd ../rc3.d
-# ln -s ../init.d/hplip S24hplip
-# cd ../rc5.d
-# ln -s ../init.d/hplip S24hplip
-# cd ../rc6.d
-# ln -s ../init.d/hplip K01hplip
-# cd /usr/bin
-# ln -s $HPLIP_DIR/bin/hpijs hpijs
-# cd ../lib/sane
-# ln -s $HPLIP_DIR/lib/libsane-hpaio.* .
-</pre>
-<p>Find the path in /dev to the printer. This is done by ls /dev and looking for the usb/ directory, for example. Suppose the path is /dev/usb/lp0</p>
-<p>Edit /etc/profile and add the line</p>
-<pre class="literal-block">
-export SANE_DEFAULT_DEVICE=&quot;hpaio:/dev/usb/lp0&quot;
-</pre>
-<p>Then run the command:</p>
-<pre class="literal-block">
-# . /etc/profile
-</pre>
-<p>To /etc/ld.so.conf add the line</p>
-<pre class="literal-block">
-/usr/local/Hplip-1.7.1/lib
-</pre>
-<p>and run the command</p>
-<pre class="literal-block">
-# ldconfig
-</pre>
-<p>Finally:</p>
-<pre class="literal-block">
-# unset HPLIP_DIR
-</pre>
-<p>Explanations:</p>
-<p>-- The 'hplip' binary as installed is not executable, hence the &quot;chmod&quot; step.</p>
-<p>-- The lfs-setup has 'init.d' in a place different from what the installation procedure expects. We have to make a symlink in ' init.d' to where 'hplip' is.</p>
-<p>-- The symlinks set up in the rc.{0,1,3,5,6} directories will activate the two hplip daemons at boot time and bring them down at shutdown time.  It is important to note that these daemons must be activated before the 'cups' daemon and shut down after the 'cups' daemon. Thus the numbers 'xy' in the 'Sxy' links must preceed those for 'cups'. The 'xy' in 'Kxy' must be larger than those for cups. So have a good look at what goes on in the 'rc.n' directories.</p>
-<p>-- It is important to have a link in /usr/bin to the 'hpijs' binary. Without this link 'cups' will get lost. That is one reason why installation of 'hplip' in /usr is recommended.</p>
-<p>-- Sane will look for the 'libsane-hpaio' libraries in /usr/lib/sane. So we have to establish a link. Without these links scanning at least with 'xscanimage' will not work. The final dot in the command line should not be left out.</p>
-<p>-- The environment variable SANE_DEFAULT_DEVICE will make 'xscanimage' work from wherever it is called. This really is a nice thing to do!</p>
-<p>-- Having 'ldconfig' make the hplip libraries visible to the system may be of importance to software that leans on hplip.</p>
-<p>If you set the variable SANE_DEFAULT_DEVICE do not give a command to
-xscanimage when you configure.</p>
-<p>Hopefully this is of value to users of other Linux distributions as well.</p>
-<p>Documentation provided by Niko Sauer</p>
+<p>CUPS has to see the foomatic filter. That is why it has to be
+copied, or symbolically linked, into the file /usr/lib/cups/filter/
+If this is not done, printing with CUPS will not be possible.</p>
+<p>CUPS will look for the Foomatic ppd's in /usr/share/cups/model/
+If the symbolic link is not made you will be unable to configure your
+printer.</p>
+<p>The addition of the SUSE-rule in /ets/udev/rules.d/25-lfs.rules will set
+up your usb devices properly for hplip. It is important for this rule to
+be at the top of the list. The rules you comment out will be redundant.</p>
+<p>Before your system can implement the changes in udev-rules, it is
+necessary to re-start udev by running the scripts as indicated.</p>
+<p>You may         now follow the hplip documentation to set up the program.</p>
+<p>Hopefully some of this is of value to users of other Linux distributions as
+well.</p>
+<p>Documentation provided by Niko Sauer.</p>
 <hr></div>
 <div class="section">
 <h1><a id="step-2-install-dependency-packages" name="step-2-install-dependency-packages">Step 2: Install Dependency Packages</a></h1>
@@ -201,7 +221,7 @@ xscanimage when you configure.</p>
 <p class="first admonition-title">Note</p>
 <p class="last">We recommend that you download the HPLIP tarball to your home or desktop directory.</p>
 </div>
-<p><strong>A.</strong> Click here to <a class="reference" href="http://prdownloads.sourceforge.net/hplip/hplip-2.7.10.tar.gz">Download the Regular Tarball</a></p>
+<p><strong>A.</strong> Click here to <a class="reference" href="http://prdownloads.sourceforge.net/hplip/hplip-2.7.12.tar.gz">Download the Regular Tarball</a></p>
 <p><strong>B.</strong> Go to the directory where you downloaded the HPLIP tarball.</p>
 <p>Example:</p>
 <pre class="literal-block">
@@ -210,13 +230,13 @@ cd ~/Desktop
 <p><strong>C.</strong> Uncompress the tarball.</p>
 <p>Enter this command:</p>
 <pre class="literal-block">
-tar xvfz hplip-2.7.10.tar.gz
+tar xvfz hplip-2.7.12.tar.gz
 </pre>
 <p>This will create a directory with the same name as the tarball file.</p>
-<p><strong>D.</strong> Change your working directory to the hplip-2.7.10 directory.</p>
+<p><strong>D.</strong> Change your working directory to the hplip-2.7.12 directory.</p>
 <p>Example:</p>
 <pre class="literal-block">
-cd hplip-2.7.10
+cd hplip-2.7.12
 </pre>
 <hr></div>
 <div class="section">
@@ -268,7 +288,7 @@ su -c &quot;make install&quot;
 </div>
 
 <hr size="1"/>
-<center><small>Page last updated: Thu Sep 13 14:58:19 2007; HPLIP Version: 2.7.10</small></center>
+<center><small>Page last updated: Thu Nov  8 14:03:55 2007; HPLIP Version: 2.7.12</small></center>
 </div>
 </td></tr></table>
 </div>

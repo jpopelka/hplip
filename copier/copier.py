@@ -347,6 +347,8 @@ class PMLCopyThread(threading.Thread):
                 except Error:
                     log.error("Unable to release copier token.")
 
+                self.dev.close() # Close the device.
+                
                 state = STATE_DONE
 
 

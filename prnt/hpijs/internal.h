@@ -384,6 +384,10 @@ class LJFastRasterProxy;
 class LJZjsMonoProxy;
 #endif
 
+#ifdef APDK_LJM1005
+class LJM1005Proxy;
+#endif
+
 #if defined(APDK_PSP100) && defined (APDK_DJ9xxVIP)
 class PSP100Proxy;
 class PSP470Proxy;
@@ -528,6 +532,10 @@ public:
 
 #ifdef APDK_LJZJS_MONO
     static LJZjsMonoProxy s_LJZjsMonoProxy;
+#endif
+
+#ifdef APDK_LJM1005
+    static LJM1005Proxy s_LJM1005Proxy;
 #endif
 
 #if defined(APDK_PSP100) && defined (APDK_DJ9xxVIP)

@@ -32,7 +32,7 @@
 #ifndef APDK_LJZJS_H
 #define APDK_LJZJS_H
 
-#if defined (APDK_LJZJS_MONO) || defined (APDK_LJZJS_COLOR)
+#if defined (APDK_LJZJS_MONO) || defined (APDK_LJZJS_COLOR) || defined (APDK_LJM1005)
 
 #include "hpjbig_wrapper.h"
 
@@ -59,6 +59,7 @@ public:
     virtual DRIVER_ERROR SkipRasters (int iBlankRasters);
     int SendChunkHeader (BYTE *szStr, DWORD dwSize, DWORD dwChunkType, DWORD dwNumItems);
     int SendItem (BYTE *szStr, BYTE cType, WORD wItem, DWORD dwValue, DWORD dwExtra = 0);
+    int SendIntItem (BYTE *szStr, int iItem, int iItemType, int iItemValue);
     DRIVER_ERROR SendChunkAndItemHeader (BYTE type, void *obj);
 
     virtual BOOL GetMargins (PAPER_SIZE ps, float *fMargins)
@@ -69,6 +70,7 @@ public:
         fMargins[3] = (float) 0.2;
         return TRUE;
     }
+    PRINTER_TYPE    m_iPrinterType;
 
 protected:
 
@@ -80,6 +82,7 @@ protected:
 #endif
 
 //private:
+    int             MapPaperSize ();
     DRIVER_ERROR    JbigCompress ();
     DRIVER_ERROR    SendItemData (BYTE ItemType, WORD Item, DWORD dwValue);
     DRIVER_ERROR    StartPage (DWORD dwWidth, DWORD dwHeight);
@@ -197,5 +200,6 @@ typedef enum
 
 APDK_END_NAMESPACE
 
+#endif // defned (APDK_LJZJS_MONO) || defined (APDK_LJZJS_COLOR) || defined (APDK_LJM1005)
 #endif //APDK_LJZJS_H
-#endif // defined (APDK_LJZJS_MONO) || defined (APDK_LJZJS_COLOR)
+

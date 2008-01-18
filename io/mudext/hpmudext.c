@@ -400,6 +400,8 @@ void inithpmudext(void)
     insstr(d, "HPMUD_S_MEMORY_CARD_CHANNEL", HPMUD_S_MEMORY_CARD_CHANNEL);
     insstr(d, "HPMUD_S_EWS_CHANNEL", HPMUD_S_EWS_CHANNEL);
     insstr(d, "HPMUD_S_SOAP_SCAN", HPMUD_S_SOAP_SCAN);
+    insstr(d, "HPMUD_S_SOAP_FAX", HPMUD_S_SOAP_FAX);
+    insstr(d, "HPMUD_S_DEVMGMT_CHANNEL", HPMUD_S_DEVMGMT_CHANNEL);
 
 }
 

@@ -33,12 +33,10 @@
         <translation>&lt;b&gt;Softwareversion des Geräte-Managers:&lt;/b&gt;</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Authors and Contributors:&lt;/b&gt;
-David Suffield, Don Welch, Shiyun Yie, Raghothama Cauligi, John Oleinik, Cory Meisch, Foster Nuffer, Pete Parks, Jacqueline Pitter, David Paschal, 
-Steve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter</source>
+        <source>&lt;b&gt;Authors and Contributors:&lt;/b&gt;\nDavid Suffield, Don Welch, Shiyun Yie, Raghothama Cauligi, John Oleinik, Cory Meisch, Foster Nuffer, Pete Parks, Jacqueline Pitter, David Paschal,\nSteve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter, Linus Araque, Mark Crawford, Charlie Moore</source>
         <translation>&lt;b&gt;Autoren und Mitwirkende:&lt;/b&gt;
 David Suffield, Don Welch, Shiyun Yie, Raghothama Cauligi, John Oleinik, Cory Meisch, Foster Nuffer, Pete Parks, Jacqueline Pitter, David Paschal, 
-Steve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter</translation>
+Steve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter, Linus Araque, Mark Crawford, Charlie Moore</translation>
     </message>
     <message>
         <source>&lt;b&gt;License and Copyright:&lt;/b&gt;
@@ -1087,7 +1085,7 @@ Wählen Sie für jede Reihe die Beschriftung des Kästchens aus, in dem die kür
     </message>
     <message>
         <source>&lt;b&gt;Name/Nickname:&lt;/b&gt;</source>
-<translation>&lt;b&gt;Name/Spitzname:&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;Name/Spitzname:&lt;/b&gt;</translation>
     </message>
 </context>
 <context>
@@ -1790,7 +1788,7 @@ Wählen Sie für jede Reihe die Beschriftung des Kästchens aus, in dem die kür
     </message>
     <message>
         <source>Best</source>
-<translation>&lt;b&gt;Name/Nickname:&lt;/b&gt;</translation>
+        <translation>Maximal</translation>
     </message>
     <message>
         <source>Enlargement or reduction (percent):</source>
@@ -3778,11 +3776,11 @@ Wählen Sie für jede Reihe die Beschriftung des Kästchens aus, in dem die kür
     </message>
     <message>
         <source>The printer name and fax name must be different. Please choose different names.</source>
-        <translation></translation>
+<translation>Für den Drucker und das Fax müssen verschiedene Namen verwendet werden. Wählen Sie bitte andere Namen.</translation>
     </message>
     <message>
         <source>&lt;b&gt;Device not found.&lt;/b&gt; &lt;p&gt;Please make sure your printer is properly connected and powered-on.</source>
-        <translation></translation>
+<translation>&lt;b&gt;Das Gerät wurde nicht gefunden.&lt;/b&gt; &lt;p&gt;Vergewissern Sie sich, dass der Drucker eingeschaltet und ordnungsgemäß angeschlossen ist.</translation>
     </message>
     <message>
         <source>&lt;b&gt;No devices found.&lt;/b&gt;&lt;p&gt;Please make sure your printer is properly connected and powered-on.</source>

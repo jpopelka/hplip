@@ -1014,6 +1014,21 @@ PyObject * getServer( PyObject * self, PyObject * args )
     return Py_BuildValue( "s", cupsServer() );
 }
 
+PyObject * setServer( PyObject * self, PyObject * args )
+{
+    char * server = NULL;
+
+    if (!PyArg_ParseTuple(args, "z", &server))
+        return Py_BuildValue( "" );
+    
+    if (!strlen(server)) // Pass an empty string to restore default server
+        server = NULL;
+
+    cupsSetServer(server);
+
+    return Py_BuildValue( "" );
+}
+
 
 // ***************************************************************************************************
 
@@ -1755,6 +1770,7 @@ static PyMethodDef cupsext_methods[] =
         { "cancelJob", ( PyCFunction ) cancelJob, METH_VARARGS },
         { "getJobs", ( PyCFunction ) getJobs, METH_VARARGS },
         { "getServer", ( PyCFunction ) getServer, METH_VARARGS },
+        { "setServer", ( PyCFunction ) setServer, METH_VARARGS },
         { "addOption", ( PyCFunction ) addOption, METH_VARARGS },
         { "removeOption", ( PyCFunction ) removeOption, METH_VARARGS },
         { "resetOptions", ( PyCFunction ) resetOptions, METH_VARARGS },

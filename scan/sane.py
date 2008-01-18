@@ -419,6 +419,11 @@ class ScanThread(threading.Thread):
         
     def updateQueue(self, status, bytes_read):
         if self.update_queue is not None:
+            try:
+                status = int(status)
+            except (ValueError, TypeError):
+                status = -1 #scanext.SANE_STATUS_GOOD
+                
             self.update_queue.put((status, bytes_read))
             time.sleep(0)
 

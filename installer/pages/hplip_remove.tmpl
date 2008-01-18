@@ -1,4 +1,4 @@
-<!--
+pr<!--
 /*
  (c) Copyright 2001-2007 Hewlett-Packard Development Company, L.P.
 
@@ -24,6 +24,35 @@
     <meta http-equiv="PRAGMA" content="NO-CACHE" />
     <link rel="stylesheet" type="text/css" href="styles/hplip.css" />
     <script type="text/javascript" src="scripts/hplip.js"></script>
+    <script type="text/javascript">
+    <!--
+
+    if(document.addEventListener){ 
+        document.addEventListener("keyup", captureKey,false);
+    }else{
+        document.attachEvent("onkeyup", captureKey);
+    }
+
+    function captureKey(events){
+        if("undefined" != (typeof window.event)){ 
+            events = window.event;
+        }
+        if("keyup" == events.type){
+            checkKey(events.keyCode);
+        }
+    }
+
+    function checkKey(keyID)
+    {
+       switch(keyID)
+       {
+          case 13:
+            indexClickActions( "next_button", "hplip_remove_controller");
+            break;
+       }
+    }
+    -->
+    </script>
 <title>$installer_title</title>
 </head>
 

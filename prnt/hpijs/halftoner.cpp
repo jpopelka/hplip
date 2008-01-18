@@ -198,13 +198,16 @@ Halftoner::Halftoner
         }
     }
 
-    PlaneSize= (OutputWidth[0] + 7) / 8;
-    originalKData = (BYTE*) pSS->AllocMem(PlaneSize);
-    if (originalKData == NULL)
+    PlaneSize = (OutputWidth[0] + 7) / 8;
+    if (PlaneSize > 0)
     {
-        goto MemoryError;
+        originalKData = (BYTE*) pSS->AllocMem(PlaneSize);
+        if (originalKData == NULL)
+        {
+            goto MemoryError;
+        }
+        memset(originalKData, 0, PlaneSize);
     }
-    memset(originalKData, 0, PlaneSize);
     return;
 
 MemoryError:

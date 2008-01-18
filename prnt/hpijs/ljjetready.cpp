@@ -65,17 +65,6 @@ extern void *LoadPlugin (char *szPluginName);
 
 extern MediaSize PaperToMediaSize(PAPER_SIZE psize);
 
-enum COMPRESS_MODE  {	COMPRESS_MODE0 = 0,
-						COMPRESS_MODE2 = 2, 
-						COMPRESS_MODE9 = 9,
-						COMPRESS_MODE_AUTO = 10,
-						COMPRESS_MODE_JPEG = 11,
-						COMPRESS_MODE_LJ =   12
-					};
-long		dwordAlign(long lN) { return (lN+3)&0xFFFFFFFC;}
-
-short		dwordAlign(short nN) { return (nN+3)&0xFFFC; }
-
 #define MOJAVE_STRIP_HEIGHT	128 // Mojave strip height should always be 128 for compression sake
 
 #define MOJAVE_RESOLUTION	600 // Mojave supports only one resolution- 600 DPI	
@@ -154,7 +143,15 @@ LJJetReady::LJJetReady (SystemServices* pSS, int numfonts, BOOL proto)
         dlerror ();
         *(void **) (&HPLJJRCompress) = dlsym (m_hHPLibHandle, "HPJetReadyCompress");
     }
+    if (HPLJJRCompress)
+    {
+        pMode[ModeCount] = new LJJetReadyBestColorMode ();
+        ModeCount++;
+        pMode[ModeCount] = new LJJetReadyBestGrayMode ();
+        ModeCount++;
+    }
 #endif
+    m_eCompressMode = COMPRESS_MODE_JPEG;
 
     DBG1("LJJetReady created\n");
 }
@@ -207,6 +204,27 @@ LJJetReadyNormalMode::LJJetReadyNormalMode ()
 #endif
 }
 
+LJJetReadyBestColorMode::LJJetReadyBestColorMode () : PrintMode (NULL)
+{
+    ResolutionX[0] =
+    ResolutionY[0] =
+    BaseResX =
+    BaseResY = 600;
+
+    bFontCapable = FALSE;
+
+#if defined(APDK_VIP_COLORFILTERING)
+    Config.bErnie = FALSE; // Raghu
+#endif
+
+    Config.bColorImage = FALSE;
+    theQuality = qualityPresentation;
+    pmQuality = QUALITY_BEST;
+#ifdef APDK_AUTODUPLEX
+    bDuplexCapable = TRUE;
+#endif
+}
+
 LJJetReadyGrayMode::LJJetReadyGrayMode () : PrintMode (NULL)
 {
     ResolutionX[0] =
@@ -222,6 +240,28 @@ LJJetReadyGrayMode::LJJetReadyGrayMode () : PrintMode (NULL)
 
     Config.bColorImage = FALSE;
     pmColor = GREY_K;
+#ifdef APDK_AUTODUPLEX
+    bDuplexCapable = TRUE;
+#endif
+}
+
+LJJetReadyBestGrayMode::LJJetReadyBestGrayMode () : PrintMode (NULL)
+{
+    ResolutionX[0] =
+    ResolutionY[0] =
+    BaseResX =
+    BaseResY = 600;
+
+    bFontCapable = FALSE;
+
+#if defined(APDK_VIP_COLORFILTERING)
+    Config.bErnie = FALSE; // Raghu
+#endif
+
+    Config.bColorImage = FALSE;
+    pmColor = GREY_K;
+    pmQuality = QUALITY_BEST;
+    theQuality = qualityPresentation;
 #ifdef APDK_AUTODUPLEX
     bDuplexCapable = TRUE;
 #endif
@@ -310,25 +350,26 @@ int HeaderLJJetReady::JRPaperToMediaSize(PAPER_SIZE psize)
 {
     switch(psize)
     {
-    case LETTER:        return 0;    break;
-    case LEGAL:         return 1;     break;
-    case A4:            return 2;          break;
-    case B4:            return 10;          break;
-    case B5:            return 11;          break;
-    case OUFUKU:        return 14;      break;
-    case HAGAKI:        return 14;      break;
+        case LETTER:            return 0;
+        case LEGAL:             return 1;
+        case A4:                return 2;
+        case B4:                return 10;
+        case B5:                return 11;
+        case OUFUKU:            return 14;
+        case HAGAKI:            return 14;
+        case A6:                return 17;
 #ifdef APDK_EXTENDED_MEDIASIZE
-    case A3:        return 5;      break;
-    case A5:        return 16;      break;
-    case LEDGER:        return 4;      break;
-    case EXECUTIVE:     return 3;   break;
-    case CUSTOM_SIZE:   return 96;      break;
-	case ENVELOPE_NO_10: return 6;    break;
-	case ENVELOPE_A2:    return 6;       break;
-	case ENVELOPE_C6:    return 8;       break;
-	case ENVELOPE_DL:    return 9;       break;
+        case A3:                return 5;
+        case A5:                return 16;
+        case LEDGER:            return 4;
+        case EXECUTIVE:         return 3;
+        case CUSTOM_SIZE:       return 96;
+        case ENVELOPE_NO_10:    return 6;
+        case ENVELOPE_A2:       return 6;
+        case ENVELOPE_C6:       return 8;
+        case ENVELOPE_DL:       return 9;
 #endif
-    default:            return 0;    break;
+        default:                return 0;
     }
 }
 
@@ -606,7 +647,7 @@ DRIVER_ERROR LJJetReady::Encapsulate (const RASTERDATA* InputRaster, BOOL bLastP
 
     int iJpegHeaderSize = 623;
 #ifdef HAVB_LIBDL
-    if (HPLJJRCompress)
+    if (HPLJJRCompress && m_eCompressMode == COMPRESS_MODE_LJ)
     {
         iJpegHeaderSize = 0;
     }
@@ -663,7 +704,7 @@ DRIVER_ERROR LJJetReady::Encapsulate (const RASTERDATA* InputRaster, BOOL bLastP
     res[6] = 0x46;
     res[7] = 0x21;
 #ifdef HAVE_LIBDL
-    if (HPLJJRCompress)
+    if (HPLJJRCompress && m_eCompressMode == COMPRESS_MODE_LJ)
     {
         res[7] = 0x11;
     }
@@ -694,21 +735,25 @@ Header* LJJetReady::SelectHeader (PrintContext *pc)
  *  Raghu
  */
 
+    COLORMODE       eC = COLOR;
+    MEDIATYPE       eM;
+    QUALITY_MODE    eQ;
+    BOOL            bD;
+
     thePrintContext = pc;
     phLJJetReady = new HeaderLJJetReady (this, pc);
-#ifdef HAVE_LIBDL
-    if (HPLJJRCompress)
+    pc->GetPrintModeSettings (eQ, eM, eC, bD);
+    if (eQ == QUALITY_BEST)
     {
-        COLORMODE       eC = COLOR;
-        MEDIATYPE       eM;
-        QUALITY_MODE    eQ;
-        BOOL            bD;
-        if ((pc->GetPrintModeSettings (eQ, eM, eC, bD)) == NO_ERROR && (eC == GREY_K))
-        {
-            dlclose (m_hHPLibHandle);
-            m_hHPLibHandle = NULL;
-            HPLJJRCompress = NULL;
-        }
+        m_eCompressMode = COMPRESS_MODE_LJ;
+    }
+
+#ifdef HAVE_LIBDL
+    if (HPLJJRCompress && m_eCompressMode != COMPRESS_MODE_LJ)
+    {
+        dlclose (m_hHPLibHandle);
+        m_hHPLibHandle = NULL;
+        HPLJJRCompress = NULL;
     }
 #endif
 	return phLJJetReady;
@@ -757,7 +802,7 @@ Compressor* LJJetReady::CreateCompressor (unsigned int RasterSize)
 
     RasterSize = ((RasterSize + 95) / 96) * 96;
 
-    m_pCompressor = new ModeJPEG (pSS, this, RasterSize);
+    m_pCompressor = new ModeJPEG (pSS, this, RasterSize, m_eCompressMode);
     return m_pCompressor;
 }
 
@@ -864,12 +909,6 @@ DWORD     ModeJPEG::fJPEGBufferPos;            // position of 1'st empty byte in
 void ModeJPEG::jpeg_flush_output_buffer_callback(BYTE* buffer, DWORD size)
 {
     fJPEGBufferPos += size;
-/*
-    while (size-- > 0)
-    {
-        *fpJPEGBuffer++ = *buffer++;
-    }
- */
     memcpy (fpJPEGBuffer, buffer, size);
     fpJPEGBuffer += size;
 }
@@ -901,19 +940,6 @@ BYTE* ModeJPEG::GetBuffer()
 
 extern "C"
 {
-/*
- * These are declared in libjpeg.h, some compilers don't like declaration here as well.
-void jpeg_finish_compress (j_compress_ptr cinfo);
-JDIMENSION jpeg_write_scanlines (j_compress_ptr cinfo, JSAMPARRAY scanlines, JDIMENSION num_lines);
-void jpeg_start_compress(struct jpeg_compress_struct *,unsigned char);
-void jpeg_suppress_tables(struct jpeg_compress_struct *,unsigned char);
-void jpeg_add_quant_table(struct jpeg_compress_struct *,int,unsigned int const *,int,unsigned char);
-void jpeg_default_colorspace(struct jpeg_compress_struct *);
-void jpeg_set_defaults(struct jpeg_compress_struct *);
-void jpeg_CreateCompress(struct jpeg_compress_struct *,int,unsigned int);
-void jpeg_destroy_compress(struct jpeg_compress_struct *);
-struct jpeg_error_mgr * jpeg_std_error(struct jpeg_error_mgr * err);
-*/
 void jpeg_buffer_dest (j_compress_ptr cinfo, JOCTET* outbuff, void* flush_output_buffer_callback);
 }
 
@@ -944,7 +970,8 @@ ModeJPEG::ModeJPEG
 (    
 	SystemServices* pSys,
     Printer* pPrinter,
-    unsigned int PlaneSize
+    unsigned int PlaneSize,
+    COMPRESS_MODE eCompressMode
 ) :
     Compressor(pSys, PlaneSize, TRUE),
     thePrinter(pPrinter)    // needed by Flush                        
@@ -985,6 +1012,7 @@ ModeJPEG::ModeJPEG
 	iRastersReady = 0;
 
 	compressBuf = NULL;
+    m_eCompressMode = eCompressMode;
 
 } // ModeJPEG::ModeJPEG
 
@@ -1079,7 +1107,7 @@ BOOL  ModeJPEG::Compress( HPLJBITMAP *pSrcBitmap,
 {
 
 #ifdef HAVE_LIBDL
-    if (HPLJJRCompress)
+    if (HPLJJRCompress && m_eCompressMode == COMPRESS_MODE_LJ)
     {
         int     iRet;
         memcpy (pTrgBitmap, pSrcBitmap, sizeof (HPLJBITMAP));
@@ -1518,7 +1546,7 @@ BOOL ModeJPEG::Process
 				//  0x46       - vendor unique  
 				BYTE JrDataLengthSeq[] = {0xC2,0x38,0x03,0x00,0x00,0xF8,0x92,0x46};
 #ifdef HAVE_LIBDL
-                if (HPLJJRCompress)
+                if (HPLJJRCompress && m_eCompressMode == COMPRESS_MODE_LJ)
                 {
                     JrDataLengthSeq[1] = 0;
                     JrDataLengthSeq[2] = 0;
@@ -1532,7 +1560,7 @@ BOOL ModeJPEG::Process
 								 &qTableInfo,
 								 FALSE	// We are only worried about the qTables not about the colorspace.
 							    );
-                if (!HPLJJRCompress)
+                if (!HPLJJRCompress || (HPLJJRCompress && m_eCompressMode != COMPRESS_MODE_LJ))
                 {
 
 				    //VWritePrinter("\x00\x80\x00\x03\x00\x00", 0x6);

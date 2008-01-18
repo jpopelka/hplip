@@ -164,4 +164,9 @@ void __attribute__ ((visibility ("hidden"))) StrListClear( const char ** list );
 int __attribute__ ((visibility ("hidden"))) StrListIsInList( const char ** list, char * s );
 int __attribute__ ((visibility ("hidden"))) StrListAdd( const char ** list, char * s );
 
+#define _STRINGIZE(x) #x
+#define STRINGIZE(x) _STRINGIZE(x)
+
+#define BUG(args...) bug(__FILE__ " " STRINGIZE(__LINE__) ": " args)
+
 #endif

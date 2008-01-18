@@ -30,6 +30,7 @@ import cStringIO, re
 import xml.parsers.expat as expat
 import getpass
 import locale
+import platform
 
 # Local
 from g import *
@@ -141,7 +142,7 @@ def walkFiles(root, recurse=True, abs_paths=False, return_folders=False, pattern
         names = os.listdir(root)
     except os.error:
         raise StopIteration
-        
+
     pattern = pattern or '*'
     pat_list = pattern.split(';')
 
@@ -282,19 +283,19 @@ class RingBuffer:
     def __init__(self,size_max=50):
         self.max = size_max
         self.data = []
-    
+
     def append(self,x):
         """append an element at the end of the buffer"""
         self.data.append(x)
-        
+
         if len(self.data) == self.max:
             self.cur = 0
             self.__class__ = RingBufferFull
-            
+
     def replace(self, x):
         """replace the last element instead off appending"""
         self.data[-1] = x
-    
+
     def get(self):
         """ return a list of elements from the oldest to the newest"""
         return self.data
@@ -304,18 +305,18 @@ class RingBufferFull:
     def __init__(self,n):
         #raise "you should use RingBuffer"
         pass
-    
+
     def append(self,x):
         self.data[self.cur] = x
         self.cur = (self.cur+1) % self.max
-        
+
     def replace(self, x):
         # back up 1 position to previous location
         self.cur = (self.cur-1) % self.max
         self.data[self.cur] = x
         # setup for next item
         self.cur = (self.cur+1) % self.max
-    
+
     def get(self):
         return self.data[self.cur:] + self.data[:self.cur]
 
@@ -348,7 +349,7 @@ def format_bytes(s, show_bytes=False):
             return ''.join([unicode(round(s/1073741824.0, 1)), u' GB (',  commafy(s), ')'])
         else:
             return ''.join([unicode(round(s/1073741824.0, 1)), u' GB'])
-        
+
 
 
 try:
@@ -361,12 +362,12 @@ except AttributeError:
 
 def log_title(program_name, version, show_ver=True):
     log.info("")
-    
+
     if show_ver:
         log.info(log.bold("HP Linux Imaging and Printing System (ver. %s)" % prop.version))
     else:    
         log.info(log.bold("HP Linux Imaging and Printing System"))
-        
+
     log.info(log.bold("%s ver. %s" % (program_name, version)))
     log.info("")
     log.info("Copyright (c) 2001-7 Hewlett-Packard Development Company, LP")
@@ -407,90 +408,90 @@ def which(command, return_full_path=False):
 class UserSettings(object):
     def __init__(self):
         self.load()
-    
+
     def loadDefaults(self):
         # Print
         self.cmd_print = ''
         path = which('hp-print')
-    
+
         if len(path) > 0:
             self.cmd_print = 'hp-print -p%PRINTER%'
         else:
             path = which('kprinter')
-    
+
             if len(path) > 0:
                 self.cmd_print = 'kprinter -P%PRINTER% --system cups'
             else:
                 path = which('gtklp')
-    
+
                 if len(path) > 0:
                     self.cmd_print = 'gtklp -P%PRINTER%'
-    
+
                 else:
                     path = which('xpp')
-    
+
                     if len(path) > 0:
                         self.cmd_print = 'xpp -P%PRINTER%'
-    
+
         # Scan
         self.cmd_scan = ''
         path = which('xsane')
-    
+
         if len(path) > 0:
             self.cmd_scan = 'xsane -V %SANE_URI%'
         else:
             path = which('kooka')
-    
+
             if len(path) > 0:
                 self.cmd_scan = 'kooka'
-    
+
             else:
                 path = which('xscanimage')
-    
+
                 if len(path) > 0:
                     self.cmd_scan = 'xscanimage'
-    
+
         # Photo Card
         path = which('hp-unload')
-    
+
         if len(path):
             self.cmd_pcard = 'hp-unload -d %DEVICE_URI%'
-    
+
         else:
             self.cmd_pcard = 'python %HOME%/unload.py -d %DEVICE_URI%'
-    
+
         # Copy
         path = which('hp-makecopies')
-    
+
         if len(path):
             self.cmd_copy = 'hp-makecopies -d %DEVICE_URI%'
-    
+
         else:
             self.cmd_copy = 'python %HOME%/makecopies.py -d %DEVICE_URI%'
-    
+
         # Fax
         path = which('hp-sendfax')
-    
+
         if len(path):
             self.cmd_fax = 'hp-sendfax -d %FAX_URI%'
-    
+
         else:
             self.cmd_fax = 'python %HOME%/sendfax.py -d %FAX_URI%'
-    
+
         # Fax Address Book
         path = which('hp-fab')
-    
+
         if len(path):
             self.cmd_fab = 'hp-fab'
-    
+
         else:
             self.cmd_fab = 'python %HOME%/fab.py'    
-    
+
     def load(self):
         self.loadDefaults()
-        
+
         log.debug("Loading user settings...")
-        
+
         self.email_alerts = to_bool(user_cfg.alerts.email_alerts, False)
         self.email_to_addresses = user_cfg.alerts.email_to_addresses
         self.email_from_address = user_cfg.alerts.email_from_address
@@ -508,80 +509,80 @@ class UserSettings(object):
 
         self.cmd_print = user_cfg.commands.prnt or self.cmd_print
         self.cmd_print_int = to_bool(user_cfg.commands.prnt_int, True)
-        
+
         self.cmd_scan = user_cfg.commands.scan or self.cmd_scan
         self.cmd_scan_int = to_bool(user_cfg.commands.scan_int, False)
-        
+
         self.cmd_pcard = user_cfg.commands.pcard or self.cmd_pcard
         self.cmd_pcard_int = to_bool(user_cfg.commands.pcard_int, True)
-        
+
         self.cmd_copy = user_cfg.commands.cpy or self.cmd_copy
         self.cmd_copy_int = to_bool(user_cfg.commands.cpy_int, True)
-        
+
         self.cmd_fax = user_cfg.commands.fax or self.cmd_fax
         self.cmd_fax_int = to_bool(user_cfg.commands.fax_int, True)
-        
+
         self.cmd_fab = user_cfg.commands.fab or self.cmd_fab
         self.cmd_fab_int = to_bool(user_cfg.commands.fab_int, False)
-        
+
         self.debug()
-    
+
     def debug(self):
         log.debug("Print command: %s" % self.cmd_print)
         log.debug("Use Internal print command: %s" % self.cmd_print_int)
-        
+
         log.debug("PCard command: %s" % self.cmd_pcard)
         log.debug("Use internal PCard command: %s" % self.cmd_pcard_int)
-        
+
         log.debug("Fax command: %s" % self.cmd_fax)
         log.debug("Use internal fax command: %s" % self.cmd_fax_int)
-        
+
         log.debug("FAB command: %s" % self.cmd_fab)
         log.debug("Use internal FAB command: %s" % self.cmd_fab_int)
-        
+
         log.debug("Copy command: %s " % self.cmd_copy)
         log.debug("Use internal copy command: %s " % self.cmd_copy_int)
-        
+
         log.debug("Scan command: %s" % self.cmd_scan)
         log.debug("Use internal scan command: %s" % self.cmd_scan_int)
-        
+
         log.debug("Email alerts: %s" % self.email_alerts)
         log.debug("Email to address(es): %s" % self.email_to_addresses)
         log.debug("Email from address: %s" % self.email_from_address)
         log.debug("Auto refresh: %s" % self.auto_refresh)
         log.debug("Auto refresh rate: %s" % self.auto_refresh_rate)
         log.debug("Auto refresh type: %s" % self.auto_refresh_type)        
-    
+
     def save(self):
         log.debug("Saving user settings...")
-        
+
         user_cfg.commands.prnt = self.cmd_print
         user_cfg.commands.prnt_int = self.cmd_print_int
-        
+
         user_cfg.commands.pcard = self.cmd_pcard
         user_cfg.commands.pcard_int = self.cmd_pcard_int
-        
+
         user_cfg.commands.fax = self.cmd_fax
         user_cfg.commands.fax_int = self.cmd_fax_int
-        
+
         user_cfg.commands.scan = self.cmd_scan
         user_cfg.commands.scan_int = self.cmd_scan_int
-        
+
         user_cfg.commands.cpy = self.cmd_copy
         user_cfg.commands.cpy_int = self.cmd_copy_int
-        
+
         user_cfg.alerts.email_to_addresses = self.email_to_addresses
         user_cfg.alerts.email_from_address = self.email_from_address
         user_cfg.alerts.email_alerts = self.email_alerts
-        
+
         user_cfg.refresh.enable = self.auto_refresh
         user_cfg.refresh.rate = self.auto_refresh_rate
         user_cfg.refresh.type = self.auto_refresh_type
-        
-        self.debug()
-        
 
-          
+        self.debug()
+
+
+
 def no_qt_message_gtk():
     try:
         import gtk
@@ -593,7 +594,23 @@ def no_qt_message_gtk():
         dialog.destroy()
 
     except ImportError:
-        pass
+        log.error("PyQt not installed. GUI not available. Please check that the PyQt package is installed. Exiting.")
+
+
+def canEnterGUIMode():
+    if not prop.gui_build:
+        log.warn("GUI mode disabled in build.")
+        return False
+
+    elif not os.getenv('DISPLAY'):
+        log.warn("No display found.")
+        return False
+
+    elif not checkPyQtImport():
+        log.warn("Qt/PyQt initialization failed.")
+        return False
+
+    return True
 
 def checkPyQtImport():
     # PyQt
@@ -791,18 +808,35 @@ def all(S,f=lambda x:x):
         if not f(x): return False
     return True
 
-def openURL(url):
-    browsers = ['firefox', 'mozilla', 'konqueror', 'galeon', 'skipstone'] # in preferred order
-    browser_opt = {'firefox': '-new-window', 'mozilla' : '', 'konqueror': '', 'galeon': '-w', 'skipstone': ''}
+BROWSERS = ['firefox', 'mozilla', 'konqueror', 'galeon', 'skipstone'] # in preferred order
+BROWSER_OPTS = {'firefox': '-new-window', 'mozilla' : '', 'konqueror': '', 'galeon': '-w', 'skipstone': ''}
 
-    for b in browsers:
-        if which(b):
-            cmd = """%s %s "%s" &""" % (b, browser_opt[b], url)
-            log.debug(cmd)
-            os.system(cmd)
-            break
+def find_browser():
+    if platform.system() == 'Darwin':
+        return "open"
     else:
-        log.warn("Unable to open URL: %s" % url)
+        for b in BROWSERS:
+            if which(b):
+                return b
+        else:
+            return None
+    
+def openURL(url):
+    if platform.system() == 'Darwin':
+        cmd = 'open "%s"' % url
+        log.debug(cmd)
+        os.system(cmd)
+    else:
+        for b in BROWSERS:
+            bb = which(b)
+            if bb:
+                bb = os.path.join(bb, b)
+                cmd = """%s %s "%s" &""" % (bb, BROWSER_OPTS[b], url)
+                log.debug(cmd)
+                os.system(cmd)
+                break
+        else:
+            log.warn("Unable to open URL: %s" % url)
 
 
 def uniqueList(input):
@@ -1127,7 +1161,7 @@ def getBitness():
         return struct.calcsize("P") << 3
     else:
         return int(platform.architecture()[0][:-3])
-        
+
 def getProcessor():
     try:
         import platform
@@ -1257,15 +1291,15 @@ def collapse_range(x): # x --> sorted list of ints
         s.append('-%s' % i)
 
     return ''.join(s)
-    
+
 def createSequencedFilename(basename, ext, dir=None, digits=3):
     if dir is None:
         dir = os.getcwd()
-        
+
     m = 0
     for f in walkFiles(dir, recurse=False, abs_paths=False, return_folders=False, pattern='*', path=None):
         r, e = os.path.splitext(f)
-        
+
         if r.startswith(basename) and ext == e:
             try:
                 i = int(r[len(basename):])
@@ -1273,10 +1307,10 @@ def createSequencedFilename(basename, ext, dir=None, digits=3):
                 continue
             else:
                 m = max(m, i)
-                
+
     return os.path.join(dir, "%s%0*d%s" % (basename, digits, m+1, ext))
-    
- 
+
+
 def validate_language(lang, default='en_US'):
     if lang is None:
         loc, encoder = locale.getdefaultlocale()
@@ -1288,16 +1322,16 @@ def validate_language(lang, default='en_US'):
         else:
             loc = user_cfg.ui.get("loc", "en_US")
             log.warn("Unknown lang/locale. Using default of %s." % loc)
-            
+
     return loc
-  
+
 
 def show_languages():
     f = tui.Formatter()
     f.header = ("Language Code", "Alternate Name(s)")
     for loc, ll in supported_locales.items():
         f.add((ll[0], ', '.join(ll[1:])))
-        
+
     f.output()
 
 

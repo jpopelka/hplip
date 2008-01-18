@@ -96,6 +96,7 @@ class Engine(object):
                 #cherrypy.log("<Ctrl-C> hit: shutting down autoreloader", "ENGINE")
                 log.error("<Ctrl-C> hit: shutting down autoreloader")
                 self.stop()
+                raise
             except SystemExit:
                 #cherrypy.log("SystemExit raised: shutting down autoreloader", "ENGINE")
                 log.error("SystemExit raised: shutting down autoreloader")
@@ -124,6 +125,7 @@ class Engine(object):
             #cherrypy.log("<Ctrl-C> hit: shutting down app server", "ENGINE")
             log.error("<Ctrl-C> hit: shutting down app server")
             self.stop()
+            raise
         except SystemExit:
             #cherrypy.log("SystemExit raised: shutting down app server", "ENGINE")
             log.error("SystemExit raised: shutting down app server")

@@ -50,7 +50,7 @@
 *1284DeviceID: "MFG:HP;MDL:Fax;DES:HP Fax;"
 *FoomaticIDs: HPLIPFax hpijs
 *FoomaticRIPCommandLine: "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPAUSE &&
--sDEVICE=ijs -sIjsServer=hpijs %A%B%D -dIjsUseOutputFD%Z -sOutputFile=- -"
+-sDEVICE=ijs -sIjsServer=hpijs %A%B%D -dIjsUseOutputFD%Z -sOutputFile=-  -sDeviceModel=HPFax -"
 *End
 
 *DefaultImageableArea: Letter

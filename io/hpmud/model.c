@@ -446,6 +446,7 @@ static int parse_key_value_pair(char *buf, int len, struct hpmud_model_attribute
    ma->prt_mode = HPMUD_RAW_MODE;
    ma->mfp_mode = HPMUD_DOT4_MODE;
    ma->scantype = 0;
+   ma->statustype = HPMUD_STATUSTYPE_SFIELD;
 
    if (buf == NULL)
       return HPMUD_R_OK;    /* initialize ma */
@@ -464,9 +465,13 @@ static int parse_key_value_pair(char *buf, int len, struct hpmud_model_attribute
       {
          ma->mfp_mode = strtol(value, &tail2, 10);      /* mfc | dot4 */
       }
-      else if( strcasecmp( key, "scan-type" ) == 0 )
+      else if(strcasecmp(key, "scan-type") == 0)
       {
-         ma->scantype = strtol( value, &tail2, 10 );
+         ma->scantype = strtol(value, &tail2, 10);
+      }
+      else if(strcasecmp(key, "status-type") == 0)
+      {
+         ma->statustype = strtol(value, &tail2, 10);
       }
       else
       {

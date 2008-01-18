@@ -112,8 +112,16 @@ public:
 		iFaxEncoding = RASTER_MH;
 		fPaperWidth = 8.5;
 		fPaperHeight = 11.0;
+        strcpy (m_szDeviceName, "HPFax");
 	}
-	char	*PrinterModel ();
+	char    *GetDeviceName ()
+    {
+        return m_szDeviceName;
+    }
+    void    SetDeviceName (char *szDeviceName)
+    {
+        strcpy (m_szDeviceName, szDeviceName);
+    }
 	void	SetOutputPath (int fd)
 	{
 		iOutputPath = fd;
@@ -275,7 +283,7 @@ private:
 	float	fPaperWidth;
 	float	fPaperHeight;
 	int		iFirstRaster;
-	char	szPrinterModelName[64];
+	char	m_szDeviceName[64];
 };
 
 void RGB2Gray (BYTE *pRGBData, int iNumPixels, BYTE *pBWData);

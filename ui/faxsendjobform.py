@@ -27,9 +27,11 @@ from base.g import *
 from base import utils, device
 from prnt import cups
 
-try:
+if 1:
+#try:
     from fax import fax
-except ImportError:
+#except ImportError:
+if 0:
     # This can fail on Python < 2.3 due to the datetime module
     log.error("Fax send disabled - Python 2.3+ required.")
     sys.exit(1)

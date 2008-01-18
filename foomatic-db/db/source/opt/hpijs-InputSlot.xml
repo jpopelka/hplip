@@ -1063,6 +1063,11 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_M2727</printer>
+      <arg_defval>ev/hpijs-InputSlot-Default</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-Mopier_240</printer><!-- HP Mopier 240 -->
       <arg_defval>ev/hpijs-InputSlot-Default</arg_defval>
      </constraint>

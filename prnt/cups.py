@@ -203,7 +203,10 @@ def getSystemPPDs():
         for f in utils.walkFiles(sys_cfg.dirs.ppd, pattern="HP*ppd*;hp*ppd*", abs_paths=True):
             desc = getPPDDescription(f)
             
-            if 'foo2' not in desc:
+            if not ('foo2' in desc or 
+                    'gutenprint' in desc.lower() or 
+                    'gutenprint' in f):
+                    
                 ppds[f] = desc
                 log.debug("%s: %s" % (f, desc))
 
@@ -224,8 +227,12 @@ def getSystemPPDs():
                 ppd_dict[ppd]['ppd-make'] == 'HP':
                 
                 desc = ppd_dict[ppd]['ppd-make-and-model']
+                #print ppd, desc
                 
-                if 'foo2' not in desc:
+                if not ('foo2' in desc.lower() or 
+                        'gutenprint' in desc.lower() or 
+                        'gutenprint' in ppd):
+                        
                     # PPD files returned by CUPS_GET_PPDS (and by lpinfo -m)
                     # can be relative to /usr/share/ppd/ or to 
                     # /usr/share/cups/model/. Not sure why this is.
@@ -243,7 +250,8 @@ def getSystemPPDs():
 
     return ppds
 
-
+    
+# TODO: Move this to CUPSEXT for better performance
 def levenshtein_distance(a,b):
     """
     Calculates the Levenshtein distance between a and b.
@@ -399,6 +407,18 @@ def getPPDPageSize():
     return cupsext.getPPDPageSize()
 
 def getPrinters():
+##    p2 = []
+##    p = cupsext.getPrinters()
+##    for pp in p:
+##        print pp
+##        try:
+##            pn = pp.name.decode('utf-8')
+##        except UnicodeError:
+##            pass
+##            
+##        p2.append(pp)
+##        
+##    return p2
     return cupsext.getPrinters()
 
 def getJobs(my_job=0, completed=0):

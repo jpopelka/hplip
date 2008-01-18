@@ -64,7 +64,7 @@ class ModelData:
             'linefeed-cal-type' : TYPE_INT,
             'panel-check-type' : TYPE_INT,
             'pcard-type' : TYPE_INT,
-            'plugin' : TYPE_BOOL,
+            'plugin' : TYPE_INT,
             'plugin-library' : TYPE_STR,
             'pq-diag-type' : TYPE_INT,
             'r-type' : TYPE_INT,

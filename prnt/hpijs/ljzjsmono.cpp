@@ -28,7 +28,6 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 \*****************************************************************************/
 
-
 #ifdef APDK_LJZJS_MONO
 
 #include "header.h"
@@ -70,6 +69,7 @@ LJZjsMono::LJZjsMono (SystemServices* pSS, int numfonts, BOOL proto)
     }
     m_iP[0] = 0;
     m_bIamColor = FALSE;
+    m_iPrinterType = eLJZjsMono;
 }
 
 LJZjsMono::~LJZjsMono ()
@@ -92,6 +92,7 @@ LJZjsMonoDraftGrayMode::LJZjsMonoDraftGrayMode ()
     bDuplexCapable = TRUE;
 #endif
     Config.bCompress = FALSE;
+    medium = mediaAuto;    // compatible with any media type
 }
 
 LJZjsMonoNormalGrayMode::LJZjsMonoNormalGrayMode ()
@@ -109,6 +110,7 @@ LJZjsMonoNormalGrayMode::LJZjsMonoNormalGrayMode ()
     bDuplexCapable = TRUE;
 #endif
     Config.bCompress = FALSE;
+    medium = mediaAuto;    // compatible with any media type
 }
 
 DRIVER_ERROR LJZjsMono::Encapsulate (const RASTERDATA *pRasterData, BOOL bLastPlane)
@@ -206,4 +208,4 @@ DRIVER_ERROR LJZjsMono::ParsePenInfo (PEN_TYPE& ePen, BOOL QueryPrinter)
 
 APDK_END_NAMESPACE
 
-#endif  // defined APDK_LJZJS_MONO
+#endif  // APDK_LJZJS_MONO

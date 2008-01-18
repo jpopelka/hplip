@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '12.0'
+__version__ = '12.2'
 __title__ = 'Dependency/Version Check Utility'
 __doc__ = "Check the existence and versions of HPLIP dependencies."
 
@@ -33,9 +33,18 @@ import re
 
 # Local
 from base.g import *
-from base import utils, tui, models #, device
+from base import utils, tui, models
 from installer import dcheck
 from installer.core_install import *
+
+device_avail = False
+try:
+    from base import device, pml
+except ImportError:
+    log.debug("Device library is not avail.")
+else:
+    device_avail = True
+
 
 USAGE = [(__doc__, "", "name", True),
          ("Usage: hp-check/check.py [OPTIONS]", "", "summary", True),
@@ -142,7 +151,7 @@ try:
 
     if not log.set_level(log_level):
         usage()
-        
+
     if not fmt:
         log.no_formatting()
 
@@ -278,7 +287,7 @@ try:
 
     log.info("")
     log.info(log.bold("Checking for Reportlab..."))
-    
+
     try:
         import reportlab
         ver = reportlab.Version
@@ -292,11 +301,11 @@ try:
             else:
                 log.warn("Version < 2.0 (%.1f). HPLIP fax coverpages requires Reportlab 2.0+." % ver_f)
                 num_errors += 1
-        
+
     except ImportError:
         log.warn("Not installed.")
         num_errors += 1
-    
+
     tui.header("DEPENDENCIES")
 
     log.info("")
@@ -305,7 +314,7 @@ try:
     dd.sort()
     for d in dd:
         log.debug("***")
-        
+
         log.info(log.bold("Checking for dependency: %s..." % core.dependencies[d][2]))
 
         if core.have_dependencies[d]:
@@ -320,7 +329,7 @@ try:
 
             if core.distro_supported():
                 packages_to_install, commands = core.get_dependency_data(d)
-                
+
                 commands_to_run = []
 
                 if packages_to_install:
@@ -334,7 +343,7 @@ try:
                     commands_to_run.extend(commands)
 
                 overall_commands_to_run.extend(commands_to_run)
-                
+
                 if len(commands_to_run) == 1:
                     log.info("To install this dependency, execute this command:")
                     log.info(commands_to_run[0])
@@ -368,8 +377,48 @@ try:
         else:
             log.info("Not found.")  
 
-        tui.header("INSTALLED PRINTERS")
         
+        if device_avail:
+            if prop.par_build:
+                tui.header("DISCOVERED PARALLEL DEVICES")
+                
+                devices = device.probeDevices('par')
+                
+                if devices:
+                    f = tui.Formatter()
+                    f.header = ("Device URI", "Model")
+                    
+                    for d, dd in devices.items():
+                        f.add((d, dd[0]))
+
+                    f.output()
+                
+                else:
+                    log.info("No devices found.")
+                    
+                    if not core.have_dependencies['ppdev']:
+                        log.error("'ppdev' kernel module not loaded.")
+            
+            if prop.usb_build:
+                tui.header("DISCOVERED USB DEVICES")                
+                
+                devices = device.probeDevices('usb')
+                
+                if devices:
+                    f = tui.Formatter()
+                    f.header = ("Device URI", "Model")
+                    
+                    for d, dd in devices.items():
+                        f.add((d, dd[0]))
+
+                    f.output()
+                    
+                else:
+                    log.info("No devices found.")
+        
+        
+        tui.header("INSTALLED CUPS PRINTER QUEUES")
+
         lpstat_pat = re.compile(r"""^device for (.*): (.*)""", re.IGNORECASE)
 
         status, output = utils.run('lpstat -v')
@@ -384,6 +433,8 @@ try:
                 cups_printers.append((printer_name, device_uri))
             except AttributeError:
                 pass
+
+        log.debug(cups_printers)
 
         if cups_printers:
             non_hp = False
@@ -445,28 +496,70 @@ try:
                     elif back_end not in ('hp', 'hpfax'):
                         log.warn("Printer is not HPLIP installed. Printers must use the hp: or hpfax: CUPS backend to function in HPLIP.")
                         num_errors += 1
-                        
-##                if is_hp:
-##                    try:
-##                        d = device.Device(device_uri)
-##                    except Error:
-##                        log.debug("Device() init failed.")
-##                        continue
-##                        
-##                    if d.mq.get('plugin', 0):
-##                        home = sys_cfg.dirs.home
-##                        if not home:
-##                            home = os.path.realpath(os.path.normpath(os.getcwd()))
-##                        
-##                        model = model.lower()
-##                        if os.path.exists(os.path.join(home, "data", "plugins", "%s.plugin" % model)):
-##                            log.info("Plug-in Required: OK, plug-in is installed.")
-##                        else:
-##                            log.info("A plug-in is required for this model:")
-##                            log.error("Plug-in not installed.")
-##                            num_errors += 1
-##                            
-##                log.info("")
+
+                if device_avail and is_hp:
+                    d = None
+                    try:
+                        try:
+                            d = device.Device(device_uri)
+                        except Error:
+                            log.error("Device initialization failed.")
+                            continue
+
+                        plugin = d.mq.get('plugin', PLUGIN_NONE)
+                        if plugin in (PLUGIN_REQUIRED, PLUGIN_OPTIONAL):
+                            home = sys_cfg.dirs.home or os.path.realpath(os.path.normpath(os.getcwd()))
+                            
+                            log.debug("home=%s" % home)
+
+                            model = model.lower()
+
+                            if os.path.exists(os.path.join(home, "data", "plugins", "%s.plugin" % model)):
+                                if plugin == PLUGIN_REQUIRED:
+                                    log.info("Required plug-in status: Installed")
+                                else:
+                                    log.info("Optional plug-in status: Installed")
+                            else:
+                                num_errors += 1
+                                
+                                if plugin == PLUGIN_REQUIRED:
+                                    log.error("Required plug-in status: Not installed")
+                                else:
+                                    log.warn("Optional plug-in status: Not installed") 
+                                
+
+                        if bus in ('par', 'usb'):
+                            try:
+                                d.open()
+                            except Error, e:
+                                log.error(e.msg)
+                                deviceid = ''
+                            else:
+                                deviceid = d.getDeviceID()
+                                log.debug(deviceid)
+
+                            if not deviceid:
+                                log.error("Communication status: Failed")
+                                num_errors += 1
+                            else:
+                                log.info("Communication status: Good")
+
+                        elif bus == 'net':
+                            error_code, deviceid = d.getPML(pml.OID_DEVICE_ID)
+                            
+                            if error_code > pml.ERROR_MAX_OK:
+                                log.error("Communication status: Failed")
+                                num_errors += 1
+                            else:
+                                log.info("Communication status: Good")
+
+                    finally:
+                        if d is not None:
+                            d.close()
+
+                    log.info("")
+
+
 
         else:
             log.warn("No queues found.")
@@ -546,7 +639,7 @@ try:
                 log.info("")
 
         tui.header("USB I/O SETUP")
-        
+
         if hpmudext_avail:
             lsusb = utils.which('lsusb')
             if lsusb:
@@ -564,7 +657,7 @@ try:
 
                     if match is not None:
                         bus, device, vid, pid, mfg = match.groups()
-                        log.info("HP Device 0x%x at %s:%s: " % (int(pid, 16), bus, device))
+                        log.info("\nHP Device 0x%x at %s:%s: " % (int(pid, 16), bus, device))
                         result_code, deviceuri = hpmudext.make_usb_uri(bus, device)
 
                         if result_code == hpmudext.HPMUD_R_OK:
@@ -576,7 +669,7 @@ try:
 
                         if not os.path.exists(devnode):
                             devnode = os.path.join("/", "proc", "bus", "usb", bus, device)
-                        
+
                         if os.path.exists(devnode):
                             log.info("    Device node: %s" % devnode)
 
@@ -585,15 +678,15 @@ try:
                                 os.stat(devnode)
 
                             log.info("    Mode: 0%o" % (st_mode & 0777))
-                            
+
                             getfacl = utils.which('getfacl')
                             if getfacl:
                                 getfacl = os.path.join(getfacl, "getfacl")
-                                
+
                                 status, output = utils.run("%s %s" % (getfacl, devnode))
-                                
+
                                 log.info(output)
-                                
+
 
     tui.header("SUMMARY")
 
@@ -602,7 +695,7 @@ try:
             log.error("1 error or warning.")
         else:
             log.error("%d errors and/or warnings." % num_errors)
-            
+
         if overall_commands_to_run:
             log.info("")
             log.info(log.bold("Summary of needed commands to run to satisfy missing dependencies:"))

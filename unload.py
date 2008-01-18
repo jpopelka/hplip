@@ -701,23 +701,7 @@ utils.log_title(__title__, __version__)
 os.umask (0037)
 
 if mode == GUI_MODE:
-    if not prop.gui_build:
-        log.error("GUI mode disabled in build. Exiting.")
-        sys.exit(1)
-        
-    elif not os.getenv('DISPLAY'):
-        log.error("No display found. Exiting.")
-        sys.exit(1)
-    
-    elif not utils.checkPyQtImport():
-        log.error("PyQt init failed. Exiting.")
-        sys.exit(1)
-
-
-if mode == GUI_MODE:
-    if not os.getenv('DISPLAY'):
-        mode = INTERACTIVE_MODE
-    elif not utils.checkPyQtImport():
+    if not utils.canEnterGUIMode():
         mode = INTERACTIVE_MODE
 
 if mode in (INTERACTIVE_MODE, NON_INTERACTIVE_MODE):

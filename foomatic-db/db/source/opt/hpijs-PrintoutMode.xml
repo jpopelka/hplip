@@ -2097,6 +2097,11 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_M2727</printer>
+      <arg_defval>ev/hpijs-PrintoutMode-Normal-LJMono</arg_defval>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-Mopier_240</printer><!-- HP Mopier 240 -->
       <arg_defval>ev/hpijs-PrintoutMode-Normal-LJMono</arg_defval>
      </constraint>
@@ -16874,6 +16879,10 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_M2727</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-Mopier_240</printer><!-- HP Mopier 240 -->
      </constraint>
      <constraint sense='true'>
@@ -17902,6 +17911,10 @@
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_M2727</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
       <printer>printer/HP-Mopier_240</printer><!-- HP Mopier 240 -->
      </constraint>
      <constraint sense='true'>
@@ -18927,6 +18940,10 @@
      <constraint sense='true'>
       <driver>hpijs</driver>
       <printer>printer/HP-LaserJet_M5035_MFP</printer>
+     </constraint>
+     <constraint sense='true'>
+      <driver>hpijs</driver>
+      <printer>printer/HP-LaserJet_M2727</printer>
      </constraint>
      <constraint sense='true'>
       <driver>hpijs</driver>

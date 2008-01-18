@@ -40,6 +40,7 @@ enum FD_ID
    FD_7_1_3,         /* 1284.4 interface */
    FD_ff_1_1,        /* HP EWS interface */
    FD_ff_2_1,        /* HP Soap Scan interface */
+   FD_ff_3_1,        /* HP Soap Fax interface */
    FD_ff_ff_ff,        /* HP dot4 interface */
    FD_ff_d4_0,        /* HP dot4 interface */
    MAX_FD

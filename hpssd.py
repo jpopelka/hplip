@@ -46,7 +46,7 @@
 #
 
 
-__version__ = '9.2'
+__version__ = '9.3'
 __title__ = "Services and Status Daemon"
 __doc__ = "Provides persistent data and event services to HPLIP client applications."
 
@@ -62,7 +62,7 @@ from errno import EALREADY, EINPROGRESS, EWOULDBLOCK, ECONNRESET, \
 from base.g import *
 from base.codes import *
 from base.msg import *
-from base import utils, device
+from base import utils, device, status
 from base.async import dispatcher, loop
 
 # CUPS support
@@ -442,7 +442,13 @@ class hpssd_handler(dispatcher):
     def handle_event(self):
         gui_port, gui_host = None, None
         event_type = self.fields.get('event-type', 'event')
-        event_code = self.fields.get('event-code', 0)
+        
+        event_code = self.fields.get('event-code', STATUS_PRINTER_IDLE)
+        
+        # If event-code > 10001, its a PJL error code, so convert it
+        if event_code > EVENT_MAX_EVENT:
+            event_code = status.MapPJLErrorCode(event_code)
+            
         device_uri = self.fields.get('device-uri', '').replace('hpfax:', 'hp:')
         log.debug("Device URI: %s" % device_uri)
 

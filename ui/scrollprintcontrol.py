@@ -83,7 +83,7 @@ class ScrollPrintJobView(ScrollView):
 
         num_jobs = 0
         for j in jobs:
-            if j.dest == self.cur_printer: 
+            if j.dest.decode('utf-8') == self.cur_printer: 
                 num_jobs += 1
 
         if num_jobs > 1:
@@ -162,7 +162,7 @@ class ScrollPrintJobView(ScrollView):
 
         cups_printers = cups.getPrinters()
         for p in cups_printers:
-            if p.name == self.cur_printer:
+            if p.name.decode('utf-8') == self.cur_printer:
                 self.printer_state = p.state
                 self.printer_accepting = p.accepting
                 break

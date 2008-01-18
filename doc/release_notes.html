@@ -58,7 +58,7 @@
     </menu>
 <div class="menuheader">Usage and Support</div>
     <menu compact="compact">
-        <li><a href="mailing_lists.html" title="Mailing Lists">Mailing Lists</a></li>
+        <li><a href="mailing_lists.html" title="Mailing Lists">Support</a></li>
         <li><a href="howtos/index.html" title="How-Tos">How-Tos</a></li> 
         <li><a href="troubleshooting/index.html" title="Troubleshooting">Troubleshooting</a></li>
         <li><a href="release_notes.html" title="Release Notes">Release Notes</a></li>
@@ -85,6 +85,42 @@ Release Notes
         <div class="document">
 <div class="section">
 <h1><a id="release-notes" name="release-notes">Release Notes</a></h1>
+<p><strong>HPLIP 2.7.12 - This release has the following changes:</strong></p>
+<ol class="arabic simple">
+<li>Enabled SendScanEvent in &quot;hp&quot; backend and libsane-hpaio.</li>
+<li>Added laserjet pjl support to &quot;hp&quot; backend. Pjl support in the &quot;hp&quot; backend provides in-band printer status. Pjl support is enabled/disabled via the models.dat file.</li>
+<li>Added pjl_read_thread to hp.c.</li>
+<li>Added 1ms read timeout support to hpmud.</li>
+<li>Added new printmodes to LJJetReady</li>
+<li>Added custom papersize command</li>
+<li>Added installtree.html to makefile.</li>
+<li>Turned fax off for Photosmart 3200 series (device has no fax)</li>
+<li>Added Officejet 4105 All-in-one to models.dat</li>
+<li>Fixed defect (German: There are some truncated characters display on panel when disconnect one device.)</li>
+<li>Refactored fax send objects</li>
+<li>Fixed defect (&quot;0.0&quot; verses current version number.)</li>
+<li>Fixed defect (Usability issues in plug-in download reported by Till Kamppetter)</li>
+<li>Fixed defect (Traceback information displays when enter &quot;hp-fab&quot; command in terminal after GUI mod is disable in installation process.)</li>
+<li>Changed OWNER from lp to root in 55-hpmud.rules as suggested by Suse.</li>
+<li>Added more gui install files.</li>
+<li>Bumped libhpmud from 0.0.0 to 0.1.0 for statustype support in hpmud_query_model().</li>
+<li>Fixed defect (There is not help documents of -q parameter when input hp-setup -h in terminal.)</li>
+<li>Fixed defect (Traceback information displays when edit or delete the nickname in fax address book which is added in Recipient(s).)</li>
+<li>Added support for the following new printer(s):</li>
+</ol>
+<pre class="literal-block">
+- HP LaserJet M2727 MFP (Postscript) (printing only, no scanning or PC send fax)
+- HP LaserJet M1005 MFP (LJm1005 w/plugin) (printing only, no scanning)
+- HP LaserJet 1000/1005 (LJZjsMono w/plugin)
+- HP LaserJet 3600/3500/3550 (LJJetReady optional plugin)
+- HP LaserJet 9040 (Postscript)
+</pre>
+<p><strong>HPLIP 2.7.12 - Known Issues with Localization (L10N) and Internationalization (I18N):</strong></p>
+<ol class="arabic simple">
+<li>Non-Latin1 characters (Chinese, Russian, etc) cannot be used in the following locations: Coverpage information (hp-sendfax), command paths (hp-toolbox), photocard unload paths (hp-unload), fax header information (hp-toolbox), file print paths (hp-print), and file fax paths (hp-sendfax).</li>
+<li>The date infomation in the status tab of HP Device Manager (hp-toolbox) may not have the correct format for the current locale.</li>
+<li>Non-Latin1 characters (Chinese, Russian, etc) cannot be used for any command line utility as user input or command line argument.</li>
+</ol>
 <p><strong>HPLIP 2.7.10 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Made a change to 55-hpmud.rules so that it also works for SUSE 10.3. This rule is still backward compatible with older udev based distros.</li>
@@ -2032,7 +2068,7 @@ where x equals: DJ630, DJ6xx, DJ6xxP, DJ8xx, DJ9xx or DJ9xxVIP
 </div>
 
 <hr size="1"/>
-<center><small>Page last updated: Fri Oct 19 09:14:46 2007; HPLIP Version: 2.7.10</small></center>
+<center><small>Page last updated: Wed Dec  5 16:40:32 2007; HPLIP Version: 2.7.12</small></center>
 </div>
 </td></tr></table>
 </div>

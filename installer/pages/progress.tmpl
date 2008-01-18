@@ -29,131 +29,115 @@
     <script type="text/javascript" src="scripts/misc_code.js"></script>
     <script type="text/javascript">
     <!--
-    var statusValue = -1;
-    var responseTextCompiled = "";
     var operationName = "";
     var operationNumber = 0;
-    var repsonseTextAccumlative = ""
-    var textArea = document.getElementById("scrollTextArea");
-
+    var lineCount = 0;
+    var statusAjaxObj = createXmlLoader();
+    var statusTextAjaxObj = createXmlLoader();
+    var repsonseTextAccumlative = "";
+    
     function todoOnLoad() {
         getProgressOperationNumber();
-        setUpCircular();
+        setupLoopingGraphic();
         document.getElementById("hiddenDiv").style.dislpay = 'none';
     };
-
-    function setUpCircular() {
+    
+    
+    function setupLoopingGraphic() {
         document.getElementById("progressText").innerHTML='$progress_text';
         document.getElementById("progressBar").innerHTML="<img src='images/circular.gif' alt='progress'>";
-        loopCircular();
-    };
-
-    function getProgressUpdate(filename) {
-        //var localPath = GetLocalDataFile(filename);
-	      var localPath = "http://localhost:8888/" +  filename
-        var http = new XmlLoader(localPath);
-        var responseText = http.submitLoaderRequest("POST", false);
-        repsonseTextAccumlative += responseText;
-        if(responseText) {
-            if(isFireFoxBase() || isSafariBase()) {
-                document.getElementById("scrollTextArea").innerHTML += responseText;
-                //textArea.innerHTML += responseText;
-                //var textArea = document.getElementById("scrollTextArea");
-                //document.getElementById("scrollTextArea").childNodes[0].nodeValue = responseText;
-                //document.getElementById("scrollTextArea").childNodes[0].data = responseText;
-                //document.getElementById("scrollTextArea").firstChild.nodeValue = responseText;
-                //document.getElementById("scrollTextArea").firstChild.data = responseText;
-                
-            } else {
-                document.getElementById("scrollTextDiv").innerHTML = '<textarea cols="62" rows="11" wrap="off" name="scrollTextArea" id="scrollTextArea" >' + repsonseTextAccumlative + '</textarea></div>';
-            }
-        }
-    };
-
-    function toBottom() {
-            self.scrollTo(0, 5)
+        getProgressStatus();
     };
     
     
-    function retryProgress() {
-	    var localPath = "http://localhost:8888/retry_progress"
-        var http = new XmlLoader(localPath);
-        var serverResponse = http.submitLoaderRequest("POST", false);
+    function setOperationTitleString(serverResponse) {
+      operationNumber = parseInt(serverResponse);
+      if(operationNumber == 2 || operationNumber == 3) {
+          var state = document.getElementById("retry_button").style.display;
+          state.display = state.display? "":"hidden"; 
+      }
+      if(operationNumber  == 0) {
+          operationName = "$profile_software_requirements";
+      } else if(operationNumber  == 1) {
+          operationName = "$required_dependencies";
+      } else if(operationNumber  == 2) {
+          operationName = "$optional_dependencies";
+      } else if(operationNumber  == 3) {
+          operationName = "$preparing_dependencies";
+      } else if(operationNumber  == 4) {
+          operationName = "$finishing_dependencies";
+      } else if(operationNumber  == 5) {
+          operationName = "$building_and_installing";
+      } else if(operationNumber  == 6) {
+          operationName = "$remove_hpoj";
+      } else if(operationNumber  == 7) {
+          operationName = "$remove_hplip";
+      } else if(operationNumber  == 8) {
+          operationName = "$restarting_cups";
+      } else {
+          operationName = "$unimplemented_operation";
+      }
+    };
+    
+    function getServerResponse(ajaxObj, httpOpt, filename, sync) {
+      if(ajaxObj == null) {
+        ajaxObj = createXmlLoader();
+      }
+      var localPath = "http://localhost:8888/" +  filename
+      return submitXmlLoaderRequest(ajaxObj, httpOpt, localPath, sync);
     }
+    
+    function getProgressTextUpdate() {
+      getServerResponse(statusTextAjaxObj, "POST", "progress_update", false);
+    };
     
     
     function getProgressOperationNumber() {
-	    var localPath = "http://localhost:8888/operation_number"
-        var http = new XmlLoader(localPath);
-        var serverResponse = http.submitLoaderRequest("POST", false);
-        operationNumber = parseInt(serverResponse);
-        if(operationNumber == 2 || operationNumber == 3) {
-            var state = document.getElementById("retry_button").style.display;
-            state.display = state.display? "":"hidden"; 
-        }
-        if(operationNumber  == 0) {
-            operationName = "$profile_software_requirements";
-        } else if(operationNumber  == 1) {
-            operationName = "$required_dependencies";
-        } else if(operationNumber  == 2) {
-            operationName = "$optional_dependencies";
-        } else if(operationNumber  == 3) {
-            operationName = "$preparing_dependencies";
-        } else if(operationNumber  == 4) {
-            operationName = "$finishing_dependencies";
-        } else if(operationNumber  == 5) {
-            operationName = "$building_and_installing";
-        } else if(operationNumber  == 6) {
-            operationName = "$remove_hpoj";
-        } else if(operationNumber  == 7) {
-            operationName = "$remove_hplip";
-        } else if(operationNumber  == 8) {
-            operationName = "$restarting_cups";
-        } else {
-            operationName = "$unimplemented_operation";
-        }
-        
+      setOperationTitleString(getServerResponse(null, "POST", "operation_number", false));
     };
 
-    function getProgressStatus(filename) {
-        //var localPath = GetLocalDataFile(filename);
-	      var localPath = "http://localhost:8888/" +  filename
-        var http = new XmlLoader(localPath);
-        var serverResponse = http.submitLoaderRequest("POST", false);
-        statusValue = parseInt(serverResponse);
+    function getProgressStatus() {
+      statusResponseFromServer(parseInt(getServerResponse(statusAjaxObj, "POST", "progress_status", false)));
     };
-
-    function loopCircular() {
-        getProgressStatus("progress_status");
-        getProgressUpdate("progress_update");
-
-
-        if( -1 == statusValue ) { // Running 
-            document.getElementById("progressText").innerHTML = "$installation_progress" + operationName;
-            document.getElementById("progressBar").innerHTML = "<img src='images/circular.gif' alt='progress'>";
-        } else if( 0 < statusValue ) { // Done with Error
-            document.getElementById("progressText").innerHTML = "$installation_progress_error";
-            document.getElementById("progressBar").innerHTML = null;
-            window.location.href = "error_command_failed";
-            // Call the controller code here with the code positive all.
-        } else if( 0 == statusValue ) {  // Done no Error
-            //document.getElementById("progressText").innerHTML = "Installation Progress: Operation Completed";
-            //document.getElementById("progressBar").innerHTML = null;
-            //toggleLayer("hiddenDiv");
-            //setTimeout("window.location.href = 'progress_controller';", 1000)
-            // Call the controller code here with the code zero.
-            indexClickActions( "next_button", "progress_controller");
-            
-        } else {
-            document.getElementById("progressText").innerHTML = "$got_into_bad_state";
-            document.getElementById("progressBar").innerHTML = null;
-            toggleLayer("hiddenDiv");
-	}
-
-        if ( -1 == statusValue ) {
-            setTimeout("loopCircular();", 200);
+    
+    function statusResponseFromServer(status) {
+      
+      //getProgressTextUpdate();
+      
+      if( -1 == status ) { // Running 
+          document.getElementById("progressText").innerHTML = "$installation_progress" + operationName;
+          document.getElementById("progressBar").innerHTML = "<img src='images/circular.gif' alt='progress'>";
+          setTimeout("getProgressStatus();", 200);
+      } else if( 0 < status ) { // Done with Error
+          document.getElementById("progressText").innerHTML = "$installation_progress_error";
+          document.getElementById("progressBar").innerHTML = null;
+          window.location.href = "error_command_failed";
+      } else if( 0 == status ) {  // Done no Error
+          indexClickActions( "next_button", "progress_controller");
+      } else {
+          document.getElementById("progressText").innerHTML = "$got_into_bad_state";
+          document.getElementById("progressBar").innerHTML = null;
+          toggleLayer("hiddenDiv");
+      }
+    }
+    
+    function setProgressElementText(responseText) {
+      if(responseText) {
+        lineCount = lineCount + 1;
+        if(lineCount >= 200) {
+          document.getElementById("scrollTextArea").innerHTML = "";
+          repsonseTextAccumlative = ""
+          lineCount = 0; 
         }
+        if(isFireFoxBase() || isSafariBase()) {
+            document.getElementById("scrollTextArea").innerHTML += responseText;
+        } else { 
+          repsonseTextAccumlative += responseText;
+          document.getElementById("scrollTextDiv").innerHTML = '<textarea cols="62" rows="11" wrap="off" name="scrollTextArea" id="scrollTextArea" >' + repsonseTextAccumlative + '</textarea></div>';
+        }
+      }
     };
+
     -->
     </script>
 <title>$installer_title</title>
@@ -176,10 +160,11 @@
 
 <!-- Body Div -->
 <div class="body_content">
-    <div class="install_title_replacement"><div id="progressText"></div><div id="progressBar"></div></div> 
+     
 
-    <div id="scrollTextDiv">
-        <textarea cols="62" rows="11" wrap="off" name="scrollTextArea" id="scrollTextArea" onkeyup="sTextArea.innerText=scrollTextArea.innerText"></textarea>
+    <div id="message_body">
+      <div class="install_title_replacement"><div id="progressText"></div></div>
+      <div id="progressBar"></div>
     </div>
 
     <div id="message_footer">

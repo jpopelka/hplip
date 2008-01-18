@@ -43,6 +43,15 @@ APDK_BEGIN_NAMESPACE
 /*!
 \internal
 */
+
+enum COMPRESS_MODE  {	COMPRESS_MODE0 = 0,
+						COMPRESS_MODE2 = 2, 
+						COMPRESS_MODE9 = 9,
+						COMPRESS_MODE_AUTO = 10,
+						COMPRESS_MODE_JPEG = 11,
+						COMPRESS_MODE_LJ =   12
+					};
+
 class LJJetReady : public Printer
 {
 public:
@@ -108,6 +117,7 @@ protected:
 #ifdef HAVE_LIBDL
     void    *m_hHPLibHandle;
 #endif
+    COMPRESS_MODE    m_eCompressMode;
 
 }; // LJJetReady
 
@@ -117,11 +127,23 @@ public:
     LJJetReadyNormalMode ();
 };   // LJJetReadyNormalMode
 
+class LJJetReadyBestColorMode : public PrintMode
+{
+public:
+    LJJetReadyBestColorMode ();
+};   // LJJetReadyBestColorMode
+
 class LJJetReadyGrayMode : public PrintMode
 {
 public:
     LJJetReadyGrayMode ();
-};   // LJJetReadyNormalMode
+};   // LJJetReadyGrayMode
+
+class LJJetReadyBestGrayMode : public PrintMode
+{
+public:
+    LJJetReadyBestGrayMode ();
+};   // LJJetReadyBestGrayMode
 
 /*!
 \internal
@@ -144,7 +166,7 @@ class ModeJPEG : public Compressor
 	friend class HeaderLJJetReady;
 
 public:
-    ModeJPEG(SystemServices* pSys, Printer* pPrinter, unsigned int RasterSize);
+    ModeJPEG(SystemServices* pSys, Printer* pPrinter, unsigned int RasterSize, COMPRESS_MODE eCompressMode);
     virtual ~ModeJPEG();
     BOOL Process(RASTERDATA* input);
 	BYTE* NextOutputRaster(COLORTYPE color);
@@ -195,7 +217,8 @@ private:
 	long                m_lCurrCDRasterRow;			// Current  raster index. in PrintNextBand
     long                m_lPrinterRasterRow;		// Current printer raster row.
     int                 m_iRasterWidth;             // Input image width
-}; //ModeJR
+    COMPRESS_MODE       m_eCompressMode;
+}; //ModeJPEG
 
 
 #ifdef APDK_LJJETREADY

@@ -68,8 +68,8 @@ select {width:40%;font-weight:bold;}
 #progressBar
 {
     position:absolute;
-    top: -15px;
-    left: 488px;
+    top: 100px;
+    left: 175px;
 }
 
 
@@ -78,6 +78,10 @@ select {width:40%;font-weight:bold;}
     display: none;
 }
 
+#buttonDiv
+{
+    display: block;
+}
 
 .header_title_class
 {
@@ -173,6 +177,14 @@ select {width:40%;font-weight:bold;}
     left: 70px;
     width:  440px;
 }
+
+#message_options_title {
+    position: relative;
+    top: 10px;
+    left: 40px;
+    width:  520px;
+}
+
 
 #error_message_title {
     position: relative;
@@ -276,7 +288,7 @@ select {width:40%;font-weight:bold;}
 #restartText {
     position: absolute;
     top: 9px;
-    left: 32px;
+    left: 18px;
     text-align: center;
     font-family: "Century Schoolbook";
 }
@@ -284,13 +296,45 @@ select {width:40%;font-weight:bold;}
 #restartHiliteText {
     position: absolute;
     top: 8px;
-    left: 31px;
+    left: 17px;
     color: white;
     text-align: center;
     font-family: "Century Schoolbook";
 }
 
+#replugText {
+    position: absolute;
+    top: 9px;
+    left: 18px;
+    text-align: center;
+    font-family: "Century Schoolbook";
+}
 
+#replugHiliteText {
+    position: absolute;
+    top: 8px;
+    left: 17px;
+    color: white;
+    text-align: center;
+    font-family: "Century Schoolbook";
+}
+
+#startText {
+    position: absolute;
+    top: 9px;
+    left: 32px;
+    text-align: center;
+    font-family: "Century Schoolbook";
+}
+
+#startHiliteText {
+    position: absolute;
+    top: 8px;
+    left: 31px;
+    color: white;
+    text-align: center;
+    font-family: "Century Schoolbook";
+}
 
 #quitText {
     position: absolute;
@@ -304,6 +348,23 @@ select {width:40%;font-weight:bold;}
     position: absolute;
     top: 8px;
     left: 31px;
+    color: white;
+    text-align: center;
+    font-family: "Century Schoolbook";
+}
+
+#commandText {
+    position: absolute;
+    top: 4px;
+    left: 9px;
+    text-align: center;
+    font-family: "Century Schoolbook";
+}
+
+#commandHiliteText {
+    position: absolute;
+    top: 3px;
+    left: 8px;
     color: white;
     text-align: center;
     font-family: "Century Schoolbook";
@@ -379,23 +440,6 @@ select {width:40%;font-weight:bold;}
     font-family: "Century Schoolbook";
 }
 
-#startText {
-    position: absolute;
-    top: 7px;
-    left: 29px;
-    text-align: center;
-    font-family: "Century Schoolbook";
-}
-
-#startHiliteText {
-    position: absolute;
-    top: 6px;
-    left: 28px;
-    color: white;
-    text-align: center;
-    font-family: "Century Schoolbook";
-}
-
 #quit_button {
     position: absolute;
     top: 240px;
@@ -404,6 +448,31 @@ select {width:40%;font-weight:bold;}
     width: 98px;
     font-weight: bold;
     font-size: 1.0em;
+    padding: .15ex;
+    cursor: pointer;
+}
+
+
+#command_button {
+    position: absolute;
+    top: 240px;
+    left: 160px;
+    height: 33px;
+    width: 100px;
+    font-weight: bold;
+    font-size: .70em;
+    padding: .15ex;
+    cursor: pointer;
+}
+
+#start_button {
+    position: absolute;
+    top: 240px;
+    left: 512px;
+    height: 33px;
+    width: 98px;
+    font-weight: bold;
+    font-size: 1.1em;
     padding: .15ex;
     cursor: pointer;
 }
@@ -464,18 +533,6 @@ select {width:40%;font-weight:bold;}
     width: 98px;
     font-weight: bold;
     font-size: 1.0em;
-    padding: .15ex;
-    cursor: pointer;
-}
-
-#startButton {
-    position: absolute;
-    top: 250px;
-    left: 280px;
-    height: 33px;
-    width: 98px;
-    font-weight: bold;
-    font-size: 1.1em;
     padding: .15ex;
     cursor: pointer;
 }

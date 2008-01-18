@@ -59,8 +59,34 @@
         var path = "installation_path_controller?path=" + escape(str);
         setLocationRef(path);
     };
+
+    if(document.addEventListener){ 
+        document.addEventListener("keyup", captureKey,false);
+    }else{ 
+        document.attachEvent("onkeyup", captureKey);
+    }
+
+    function captureKey(events){
+        if("undefined" != (typeof window.event)){ 
+            events = window.event;
+        }
+        if("keyup" == events.type){
+            checkKey(events.keyCode);
+        }
+    }
+
+    function checkKey(keyID)
+    {
+       switch(keyID)
+       {
+          case 13:
+            indexClickActions( "next_button", "installation_path_controller?path=/usr");
+            break;
+       }
+    }
     -->
     </script>
+    
 <title>$installer_title</title>
 </head>
 

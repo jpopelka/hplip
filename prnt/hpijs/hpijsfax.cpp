@@ -127,6 +127,10 @@ int hpijsfax_set_cb (void *set_cb_data, IjsServerCtx *ctx, IjsJobId job_id,
 		fd = strtol (svalue, &tail, 10);
 		pFaxStruct->iOutputPath = fd;   /* set prn_stream as output of SS::ToDevice */
 	}
+    else if (!strcmp (key, "DeviceModel"))
+    {
+        pFaxStruct->SetDeviceName (svalue);
+    }
 	else if (!strcmp (key, "PaperSize"))
 	{
 		w = (float) strtod (svalue, &tail);
@@ -192,6 +196,10 @@ int hpijsfax_get_cb (void *get_cb_data, IjsServerCtx *ctx, IjsJobId job_id,
 		                 pFaxStruct->PrintableWidth (),
 						 pFaxStruct->PrintableHeight ());
 	}
+    else if (!strcmp (key, "DeviceModel"))
+    {
+        return snprintf (value_buf, value_size, "%s", pFaxStruct->GetDeviceName ());
+    }
 	else if (!strcmp (key, "PrintableTopLeft"))
 	{
 		return snprintf (value_buf, value_size, "%.4fx%.4f",
@@ -335,11 +343,23 @@ int hpijsFaxServer (int argc, char **argv)
 		}
 
 		width = (((pFaxStruct->ph.width + 7) >> 3)) << 3;
+
+/*
+ *      Devices in the HPFax2 category require fixed width of 2528 pixels.
+ *      Example: LaserJet 2727 MFP
+ */
+
+        if (!strcmp (pFaxStruct->GetDeviceName (), "HPFax2"))
+        {
+            width = 2528;
+        }
+
 		if ((pThisScanLine = (LPBYTE) malloc (width * 3)) == NULL)
 		{
 			bug ("unable to allocate pThisScanLine buffer size = %d: %m\n", width * 3);
 			goto BUGOUT;
 		}
+
 		memset (pThisScanLine, 0xFF, width * 3);
 
 		iInputBufSize = width * pFaxStruct->ph.height;

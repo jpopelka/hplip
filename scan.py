@@ -571,7 +571,7 @@ for o, a in opts:
             log.error("Unknown/invalid printer name: %s" % pp)
 
     elif o == '--fax':
-        print "fax"
+        #print "fax"
         pp = a.strip()
         from prnt import cups
         printer_list = cups.getPrinters()
@@ -1097,16 +1097,24 @@ else: # NON_INTERACTIVE_MODE
                     lines, depth, bytes_per_line, pad_bytes, total_read = device.getScan()
         
                 if scan_mode in ('color', 'gray'):
-                    im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(), 
-                        'raw', 'RGBA', 0, 1)
-        
+                    try:
+                        im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(), 
+                            'raw', 'RGBA', 0, 1)
+                    except ValueError:
+                        log.error("Did not read enough data from scanner (I/O Error?)")
+                        sys.exit(1)
+                        
 ##                elif scan_mode == 'gray':
 ##                    im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(), 
 ##                        'raw', 'RGBA', 0, 1).convert('P')
         
                 elif scan_mode == 'lineart':
-                    im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(), 
-                        'raw', 'RGBA', 0, 1).convert('L')
+                    try:
+                        im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(), 
+                            'raw', 'RGBA', 0, 1).convert('L')
+                    except ValueError:
+                        log.error("Did not read enough data from scanner (I/O Error?)")
+                        sys.exit(1)
                         
                 if adf:
                     temp_output = utils.createSequencedFilename("hpscan_pg%d_" % page, ".png")

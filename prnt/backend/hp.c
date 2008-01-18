@@ -2,7 +2,7 @@
 
   hp.c - hp cups backend 
  
-  (c) 2004 Copyright Hewlett-Packard Development Company, LP
+  (c) 2004-2007 Copyright Hewlett-Packard Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy 
   of this software and associated documentation files (the "Software"), to deal 
@@ -23,6 +23,10 @@
 
 \*****************************************************************************/
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
@@ -35,7 +39,40 @@
 #include <unistd.h>
 #include <stdarg.h>
 #include <syslog.h>
+#include <ctype.h>
+#include <pthread.h>
 #include "hpmud.h"
+
+//#define HP_DEBUG
+
+struct pjl_attributes
+{
+   int pjl_device;   /* 0=disabled, 1=enabled */
+   int current_status;
+   int eoj_pages;        /* end-of-job pages */
+   int abort;         /* 0=no, 1=yes */
+   int done;          /* 0=no, 1=yes */
+   HPMUD_DEVICE dd;
+   HPMUD_CHANNEL cd;
+   pthread_t tid;
+   pthread_mutex_t mutex;
+   pthread_cond_t done_cond;
+};
+
+#define _STRINGIZE(x) #x
+#define STRINGIZE(x) _STRINGIZE(x)
+
+#define BUG(args...) bug(__FILE__ " " STRINGIZE(__LINE__) ": " args)
+
+#ifdef HP_DEBUG
+   #define DBG(args...) syslog(LOG_INFO, __FILE__ " " STRINGIZE(__LINE__) ": " args)
+   #define DBG_DUMP(data, size) sysdump((data), (size))
+   #define DBG_SZ(args...) syslog(LOG_INFO, args)
+#else
+   #define DBG(args...)
+   #define DBG_DUMP(data, size)
+   #define DBG_SZ(args...)
+#endif
 
 #define RETRY_TIMEOUT 30  /* seconds */
 #define EXCEPTION_TIMEOUT 45 /* seconds */
@@ -84,9 +121,13 @@ typedef enum
    VSTATUS_CLNO       /* clean out tray missing */
 } VSTATUS;
 
-
 #define EVENT_START_JOB 500
 #define EVENT_END_JOB 501
+
+//const char pjl_status_cmd[] = "\e%-12345X@PJL INFO STATUS \r\n\e%-12345X";
+static const char pjl_ustatus_cmd[] = "\e%-12345X@PJL USTATUS DEVICE = ON \r\n@PJL USTATUS JOB = ON \r\n@PJL JOB \r\n\e%-12345X";
+static const char pjl_job_end_cmd[] = "\e%-12345X@PJL EOJ \r\n\e%-12345X";
+static const char pjl_ustatus_off_cmd[] = "\e%-12345X@PJL USTATUSOFF \r\n\e%-12345X";
 
 static int bug(const char *fmt, ...)
 {
@@ -100,168 +141,313 @@ static int bug(const char *fmt, ...)
       buf[255] = 0;     /* output was truncated */
 
    fprintf(stderr, buf);
-   syslog(LOG_WARNING, buf);
+   syslog(LOG_ERR, buf);
 
    fflush(stderr);
    va_end(args);
    return n;
 }
 
-static const char *GetVStatusMessage(VSTATUS status)
+#ifdef HP_DEBUG
+static void sysdump(const void *data, int size)
 {
-   char *p;
+    /* Dump size bytes of *data. Output looks like:
+     * [0000] 75 6E 6B 6E 6F 77 6E 20 30 FF 00 00 00 00 39 00 unknown 0.....9.
+     */
 
-   /* Map VStatus to text message. TODO: text needs to be localized. */
-   switch(status)
-   {
-      case(VSTATUS_IDLE):
-         p = "ready to print";
-         break;
-      case(VSTATUS_BUSY):
-         p = "busy";
-         break;
-      case(VSTATUS_PRNT):
-         p = "i/o printing";
-         break;
-      case(VSTATUS_OFFF):
-         p = "turning off";
-         break;
-      case(VSTATUS_RPRT):
-         p = "report printing";
-         break;
-      case(VSTATUS_CNCL):
-         p = "canceling";
-         break;
-      case(VSTATUS_IOST):
-         p = "incomplete job";
-         break;
-      case(VSTATUS_DRYW):
-         p = "dry time wait";
-         break;
-      case(VSTATUS_PENC):
-         p = "pen change";
-         break;
-      case(VSTATUS_OOPA):
-         p = "out of paper";
-         break;
-      case(VSTATUS_BNEJ):
-         p = "banner eject needed";
-         break;
-      case(VSTATUS_BNMZ):
-         p = "banner mismatch";
-         break;
-      case(VSTATUS_DPMZ):
-         p = "duplex mismatch";
-         break;
-      case(VSTATUS_PAJM):
-         p = "media jam";
-         break;
-      case(VSTATUS_CARS):
-         p = "carriage stall";
-         break;
-      case(VSTATUS_PAPS):
-         p = "paper stall";
-         break;
-      case(VSTATUS_PENF):
-         p = "pen failure";
-         break;
-      case(VSTATUS_ERRO):
-         p = "hard error";
-         break;
-      case(VSTATUS_PWDN):
-         p = "power down";
-         break;
-      case(VSTATUS_FPTS):
-         p = "front panel test";
-         break;
-      case(VSTATUS_CLNO):
-         p = "clean out tray missing";
-         break;
-      case(5000+HPMUD_R_IO_ERROR):
-         p = "check device";
-         break;
-      default:
-         p = "unknown state";
-         bug("INFO: printer state=%d\n", status);
-         break;
-   }
-   return p;
+    unsigned char *p = (unsigned char *)data;
+    unsigned char c;
+    int n;
+    char bytestr[4] = {0};
+    char addrstr[10] = {0};
+    char hexstr[16*3 + 5] = {0};
+    char charstr[16*1 + 5] = {0};
+    for(n=1;n<=size;n++) {
+        if (n%16 == 1) {
+            /* store address for this line */
+            snprintf(addrstr, sizeof(addrstr), "%.4d", (int)((p-(unsigned char *)data) & 0xffff));
+        }
+            
+        c = *p;
+        if (isprint(c) == 0) {
+            c = '.';
+        }
+
+        /* store hex str (for left side) */
+        snprintf(bytestr, sizeof(bytestr), "%02X ", *p);
+        strncat(hexstr, bytestr, sizeof(hexstr)-strlen(hexstr)-1);
+
+        /* store char str (for right side) */
+        snprintf(bytestr, sizeof(bytestr), "%c", c);
+        strncat(charstr, bytestr, sizeof(charstr)-strlen(charstr)-1);
+
+        if(n%16 == 0) { 
+            /* line completed */
+            DBG_SZ("[%4.4s]   %-50.50s  %s\n", addrstr, hexstr, charstr);
+            hexstr[0] = 0;
+            charstr[0] = 0;
+        }
+        p++; /* next byte */
+    }
+
+    if (strlen(hexstr) > 0) {
+        /* print rest of buffer if not empty */
+        DBG_SZ("[%4.4s]   %-50.50s  %s\n", addrstr, hexstr, charstr);
+    }
 }
+#endif
 
-static int GetVStatus(HPMUD_DEVICE dd)
+/* Map printer status to IPP printer-state-reasons (see RFC-2911). */
+static int map_ipp_printer_state_reason(int status, const char **state_msg)
 {
-   char id[1024];
-   char *pSf;
-   int vstatus=VSTATUS_IDLE, ver, len;
-   enum HPMUD_RESULT r;
-
-   r = hpmud_get_device_id(dd,  id, sizeof(id), &len);
-   if (!(r == HPMUD_R_OK || r == HPMUD_R_DEVICE_BUSY))
-   {
-      vstatus = 5000+HPMUD_R_IO_ERROR;      /* no deviceid, return some error */
-      goto bugout;
-   }
    
-   /* Check for valid S-field in device id string. */
-   if ((pSf = strstr(id, ";S:")) == NULL)
+   if (status >= 1000 && status <= 1999)
    {
-      /* No S-field, use status register instead of device id. */ 
-      unsigned int status;
-      hpmud_get_device_status(dd, &status);      
-      if (DEVICE_IS_OOP(status))
-         vstatus = VSTATUS_OOPA;
-      else if (DEVICE_PAPER_JAMMED(status))
-         vstatus = VSTATUS_PAJM;
-      else if (DEVICE_IO_TRAP(status))
-         vstatus = VSTATUS_CARS;
+      /* inkjet vstatus */
+      switch (status)
+      {
+         case VSTATUS_IDLE:
+         case VSTATUS_PRNT:
+            *state_msg = "none";
+            break;
+         case VSTATUS_OOPA:
+            *state_msg = "media-empty-error";
+            break;
+         case(VSTATUS_PAJM):
+            *state_msg = "media-jam-error";
+            break;
+         default:
+            *state_msg = "other";
+            break;
+      }
+   }
+   else if (status >= 10000 && status <= 55999)
+   {
+      /* laserjet pjl status */
+      if (status >= 10000 && status <= 10999)
+         *state_msg = "none";
+      else if (status >= 41000 && status <= 41999)
+         *state_msg = "media-empty-error";
+      else if ((status >= 42000 && status <= 42999) || (status >= 44000 && status <= 44999) || (status == 40022))
+         *state_msg = "media-jam-error";
+      else if (status == 40021)
+         *state_msg = "cover-open-error";
+      else if (status == 40600)
+         *state_msg = "toner-empty-error";
       else
-         vstatus = 5000+HPMUD_R_IO_ERROR;      /* nothing in status, return some error */
+         *state_msg = "other";      
    }
    else
    {
-      /* Valid S-field, get version number. */
-      pSf+=3;
-      ver = 0; 
-      HEX2INT(*pSf, ver);
-      pSf++;
-      ver = ver << 4;
-      HEX2INT(*pSf, ver);
-      pSf++;
+      /* Assume hpmud error */
+      *state_msg = "other";
+   }
 
-      /* Position pointer to printer state subfield. */
-      switch (ver)
-      {
-         case 0:
-         case 1:
-         case 2:
-            pSf+=12;
-            break;
-         case 3:
-            pSf+=14;
-            break;
-         case 4:
-            pSf+=18;
-            break;
-         default:
-            bug("WARNING: unknown S-field version=%d\n", ver);
-            pSf+=12;
-            break;            
+   return 0;
+}
+
+static enum HPMUD_RESULT get_pjl_input(HPMUD_DEVICE dd, HPMUD_CHANNEL cd, char *buf, int buf_size, int sec_timeout, int *bytes_read)
+{
+   enum HPMUD_RESULT stat;
+   int len;
+
+   *bytes_read = 0;
+
+   /* Read unsolicited status from device. */   
+   stat = hpmud_read_channel(dd, cd, buf, buf_size, sec_timeout, &len);
+   if (stat != HPMUD_R_OK)
+      goto bugout;
+
+   buf[len]=0;
+
+   DBG("pjl result len=%d\n", len);
+   DBG_DUMP(buf, len);
+
+   *bytes_read = len;
+
+   stat = HPMUD_R_OK;
+
+bugout:
+   return stat;
+}
+
+static int parse_pjl_job_end(char *buf, int *pages)
+{
+   char *p, *tail;
+   int stat=0;
+
+   if (buf[0] == 0)
+      goto bugout;
+
+   if ((p = strcasestr(buf, "ustatus job")) != NULL)
+   {
+      if (strncasecmp(p+13, "end", 3) == 0)
+      { 
+         stat = 1;   
+         if ((p = strcasestr(p+13+5, "pages=")) != NULL)
+            *pages = strtol(p+6, &tail, 10);
       }
-
-      /* Extract VStatus.*/
-      vstatus = 0; 
-      HEX2INT(*pSf, vstatus);
-      pSf++;
-      vstatus = vstatus << 4;
-      HEX2INT(*pSf, vstatus);
-      vstatus += 1000;
    }
 
 bugout:
-   return vstatus;
+   return stat;
 }
 
-static int DevDiscovery()
+static int parse_pjl_device_status(char *buf, int *status)
+{
+   char *p, *tail;
+   int stat=0;
+
+   if (buf[0] == 0)
+      goto bugout;
+
+   if ((p = strcasestr(buf, "code=")) != NULL)
+   {
+      *status = strtol(p+5, &tail, 10);
+      stat = 1;   
+   }
+
+bugout:
+   return stat;
+}
+
+static void pjl_read_thread(struct pjl_attributes *pa)
+{
+   enum HPMUD_RESULT stat;
+   int len;
+   char buf[1024];
+   
+   pthread_detach(pthread_self());
+
+   DBG("starting thread %d\n", (int)pa->tid);
+
+   pa->current_status = 10001;       /* default is ready */
+   pa->eoj_pages = pa->abort = pa->done = 0;
+
+   while (!pa->abort)
+   {
+      stat = get_pjl_input(pa->dd, pa->cd, buf, sizeof(buf), 0, &len);
+      if (!(stat == HPMUD_R_OK || stat == HPMUD_R_IO_TIMEOUT))
+         break;
+
+      if (stat == HPMUD_R_OK)
+      {
+         pthread_mutex_lock(&pa->mutex);
+         parse_pjl_device_status(buf, &pa->current_status);
+         parse_pjl_job_end(buf, &pa->eoj_pages);
+         pthread_mutex_unlock(&pa->mutex);
+      }
+      else
+         sleep(1);
+   }
+
+   DBG("exiting thread %d abort=%d stat=%d\n", (int)pa->tid, pa->abort, stat);
+
+   pa->done=1;
+   pthread_cond_signal(&pa->done_cond);
+
+   return;
+}
+
+/* 
+ * get_printer_status
+ *
+ * inputs:
+ *   dd - device descriptor
+ *   pa - see pjl_attributes definition
+ *
+ * outputs:
+ *   return - printer status, 1000 to 1999 = inkjet vstatus, 5000 to 5999 = hpmud error, 10000 to 55999 = pjl status code
+ *    
+ */
+static int get_printer_status(HPMUD_DEVICE dd, HPMUD_CHANNEL cd, struct pjl_attributes *pa)
+{
+   char id[1024];
+   char *pSf;
+   int status, ver, len;
+   enum HPMUD_RESULT r;
+
+   if (pa->pjl_device)
+   {
+      pthread_mutex_lock(&pa->mutex);
+      status = pa->current_status;
+      pthread_mutex_unlock(&pa->mutex);
+   }
+   else
+   {
+      status = VSTATUS_IDLE; /* set default */
+      r = hpmud_get_device_id(dd, id, sizeof(id), &len);
+      if (!(r == HPMUD_R_OK || r == HPMUD_R_DEVICE_BUSY))
+      {
+         status = 5000+r;      /* no deviceid, return some error */
+         goto bugout;
+      }
+   
+      /* Check for valid S-field in device id string. */
+      if ((pSf = strstr(id, ";S:")) == NULL)
+      {
+         /* No S-field, use status register instead of device id. */ 
+         unsigned int bit_status;
+         r = hpmud_get_device_status(dd, &bit_status);      
+         if (!(r == HPMUD_R_OK || r == HPMUD_R_DEVICE_BUSY))
+         {
+            status = 5000+r;      /* no 8-bit status, return some error */
+            goto bugout;
+         }
+
+         if (DEVICE_IS_OOP(bit_status))
+            status = VSTATUS_OOPA;
+         else if (DEVICE_PAPER_JAMMED(bit_status))
+            status = VSTATUS_PAJM;
+         else if (DEVICE_IO_TRAP(bit_status))
+            status = VSTATUS_CARS;
+      }
+      else
+      {
+         /* Valid S-field, get version number. */
+         pSf+=3;
+         ver = 0; 
+         HEX2INT(*pSf, ver);
+         pSf++;
+         ver = ver << 4;
+         HEX2INT(*pSf, ver);
+         pSf++;
+
+         /* Position pointer to printer state subfield. */
+         switch (ver)
+         {
+            case 0:
+            case 1:
+            case 2:
+               pSf+=12;
+               break;
+            case 3:
+               pSf+=14;
+               break;
+            case 4:
+               pSf+=18;
+               break;
+            default:
+               BUG("WARNING: unknown S-field version=%d\n", ver);
+               pSf+=12;
+               break;            
+         }
+
+         /* Extract VStatus.*/
+         status = 0; 
+         HEX2INT(*pSf, status);
+         pSf++;
+         status = status << 4;
+         HEX2INT(*pSf, status);
+         status += 1000;
+      }
+   }
+
+bugout:
+   return status;
+}
+
+static int device_discovery()
 {
    char buf[HPMUD_LINE_SIZE*64];
    int cnt=0, bytes_read, r=1;  
@@ -287,14 +473,29 @@ bugout:
    return r;
 }
 
-#if 0
-static int DeviceEvent(char *dev, char *jobid, int code, char *type, int timeout)
+static int device_event(const char *dev, const char *jobid, int code, char *type, int timeout)
 {
+   struct sockaddr_in pin;  
    char message[512];  
    int len=0;
- 
-   if (hplip_session->hpssd_socket < 0)
-      goto mordor;  
+   int hpssd_socket=-1, hpssd_port_num=2207;
+
+   bzero(&pin, sizeof(pin));  
+   pin.sin_family = AF_INET;  
+   pin.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+   pin.sin_port = htons(hpssd_port_num);  
+    
+   if ((hpssd_socket = socket(AF_INET, SOCK_STREAM, 0)) == -1) 
+   {  
+      BUG("unable to create hpssd socket %d: %m\n", hpssd_port_num);
+      goto bugout;  
+   }  
+
+   if (connect(hpssd_socket, (void *)&pin, sizeof(pin)) == -1)  
+   {  
+      BUG("unable to connect hpssd socket %d: %m\n", hpssd_port_num);
+      goto bugout;  
+   }  
 
    if (timeout == 0)
       len = sprintf(message, "msg=Event\ndevice-uri=%s\njob-id=%s\nevent-code=%d\nevent-type=%s\n", dev, jobid, code, type);
@@ -303,19 +504,54 @@ static int DeviceEvent(char *dev, char *jobid, int code, char *type, int timeout
                      dev, jobid, code, type, timeout);
  
    /* Send message with no response. */
-   if (send(hplip_session->hpssd_socket, message, len, 0) == -1) 
+   if (send(hpssd_socket, message, len, 0) == -1) 
    {  
-      bug("unable to send Event %s %s %d: %m\n", dev, jobid, code);
+      BUG("unable to send Event %s %s %d: %m\n", dev, jobid, code);
    }  
 
-mordor:
+bugout:
+   if (hpssd_socket >= 0)
+      close(hpssd_socket);
 
    return 0;
 }
-#endif
 
-static int DeviceEvent(char *dev, char *jobid, int code, char *type, int timeout)
+/* Check printer status, if in an error state, loop until error condition is cleared. */
+static int loop_test(HPMUD_DEVICE dd, HPMUD_CHANNEL cd, struct pjl_attributes *pa, const char *uri, const char *job)
 {
+   int retry=0, status;
+   const char *pstate;
+
+   while (1)
+   {
+      status = get_printer_status(dd, cd, pa);
+      map_ipp_printer_state_reason(status, &pstate);
+
+      if (strcmp(pstate, "none")==0)
+      {
+         if (retry)
+         {
+            /* Clear error. */
+            device_event(uri, job, VSTATUS_PRNT, "event", 0);
+            fputs("INFO: Printing...\n", stderr);
+            fprintf(stderr, "STATE: -%s\n", pstate);
+            retry=0;
+         }
+         break;   /* no error, done */
+      }
+
+      if (!retry)
+      {
+         /* Display error. */
+         device_event(uri, job, status, "error", RETRY_TIMEOUT);
+         fprintf(stderr, "STATE: +%s\n", pstate);
+      }
+
+      BUG("ERROR: %d %s; will retry in %d seconds...\n", status, pstate, RETRY_TIMEOUT);
+      sleep(RETRY_TIMEOUT);
+      retry = 1;
+   }
+
    return 0;
 }
 
@@ -323,13 +559,13 @@ int main(int argc, char *argv[])
 {
    int fd;
    int copies;
-   int len, vstatus, cnt;
+   int len, status, cnt;
    char buf[HPMUD_BUFFER_SIZE];
    struct hpmud_model_attributes ma;
-   int paperout=0, offline=0;
+   struct pjl_attributes pa;
    HPMUD_DEVICE hd=-1;
    HPMUD_CHANNEL cd=-1;
-   int n, total, retry=0, size;
+   int n, total, retry=0, size, pages;
    enum HPMUD_RESULT stat;
 
    if (argc > 1)
@@ -344,11 +580,11 @@ int main(int argc, char *argv[])
    }
 
    if (argc == 1)
-      exit (DevDiscovery());
+      exit (device_discovery());
 
    if (argc < 6 || argc > 7)
    {
-      bug("ERROR: invalid usage: device_uri job-id user title copies options [file]\n");
+      BUG("ERROR: invalid usage: device_uri job-id user title copies options [file]\n");
       exit (1);
    }
 
@@ -361,24 +597,32 @@ int main(int argc, char *argv[])
    {
       if ((fd = open(argv[6], O_RDONLY)) < 0)  /* use specified file */ 
       {
-         bug("ERROR: unable to open print file %s: %m\n", argv[6]);
+         BUG("ERROR: unable to open print file %s: %m\n", argv[6]);
          exit (1);
       }
       copies = atoi(argv[4]);
    }
 
+   fputs("STATE: +connecting-to-device\n", stderr);
+
    /* Get any parameters needed for DeviceOpen. */
    hpmud_query_model(argv[0], &ma);  
 
-   DeviceEvent(argv[0], argv[1], EVENT_START_JOB, "event", 0);
+   DBG("job start %s prt_mode=%d statustype=%d\n", argv[0], ma.prt_mode, ma.statustype); 
+
+   pa.pjl_device = 0;
+   if (strcasestr(argv[0], ":/net") == NULL && (ma.statustype==HPMUD_STATUSTYPE_PJL || ma.statustype==HPMUD_STATUSTYPE_PJLPML))
+      pa.pjl_device = 1;
+
+   device_event(argv[0], argv[1], EVENT_START_JOB, "event", 0);
 
    /* Open hp device. */
    while ((stat = hpmud_open_device(argv[0], ma.prt_mode, &hd)) != HPMUD_R_OK)
    {
        /* Display user error. */
-       DeviceEvent(argv[0], argv[1], 5000+stat, "error", RETRY_TIMEOUT);
+       device_event(argv[0], argv[1], 5000+stat, "error", RETRY_TIMEOUT);
 
-       bug("INFO: open device failed; will retry in %d seconds...\n", RETRY_TIMEOUT);
+       BUG("INFO: open device failed; will retry in %d seconds...\n", RETRY_TIMEOUT);
        sleep(RETRY_TIMEOUT);
        retry = 1;
    }
@@ -386,7 +630,7 @@ int main(int argc, char *argv[])
    if (retry)
    {
       /* Clear user error. */
-      DeviceEvent(argv[0], argv[1], VSTATUS_PRNT, "event", 0);
+      device_event(argv[0], argv[1], VSTATUS_PRNT, "event", 0);
       retry=0;
    }
 
@@ -413,8 +657,8 @@ int main(int argc, char *argv[])
             {
                while ((stat = hpmud_open_channel(hd, HPMUD_S_PRINT_CHANNEL, &cd)) != HPMUD_R_OK)
                {
-                  DeviceEvent(argv[0], argv[1], 5000+stat, "error", RETRY_TIMEOUT);
-                  bug("INFO: open print channel failed; will retry in %d seconds...\n", RETRY_TIMEOUT);
+                  device_event(argv[0], argv[1], 5000+stat, "error", RETRY_TIMEOUT);
+                  BUG("INFO: open print channel failed; will retry in %d seconds...\n", RETRY_TIMEOUT);
                   sleep(RETRY_TIMEOUT);
                   retry = 1;
                }
@@ -422,8 +666,21 @@ int main(int argc, char *argv[])
                if (retry)
                {
                   /* Clear user error. */
-                  DeviceEvent(argv[0], argv[1], VSTATUS_PRNT, "event", 0);
+                  device_event(argv[0], argv[1], VSTATUS_PRNT, "event", 0);
                   retry=0;
+               }          
+
+               fputs("STATE: -connecting-to-device\n", stderr);
+
+               if (pa.pjl_device)
+               {
+                  /* Enable unsolicited status. */
+                  hpmud_write_channel(hd, cd, pjl_ustatus_cmd, sizeof(pjl_ustatus_cmd)-1, 5, &len);
+                  pa.dd = hd;
+                  pa.cd = cd;
+                  pthread_mutex_init(&pa.mutex, NULL);
+                  pthread_cond_init(&pa.done_cond, NULL);
+                  pthread_create(&pa.tid, NULL, (void *(*)(void*))pjl_read_thread, (void *)&pa);
                }
             }
 
@@ -432,94 +689,83 @@ int main(int argc, char *argv[])
             if (n != size)
             {
                /* IO error, get printer status. */
-               vstatus = GetVStatus(hd);
-
-               /* Display user error. */
-               DeviceEvent(argv[0], argv[1], vstatus, "error", RETRY_TIMEOUT);
-
-               switch (vstatus)
-               {
-                  case VSTATUS_OOPA:
-                     if (!paperout)
-                     {
-                        fputs("STATE: +media-empty-error\n", stderr);
-                        paperout=1;
-                     }
-                     break;
-                  default:
-                     if (!offline)
-                     {
-                        fputs("STATE: +other\n", stderr);
-                        offline=1;
-                     }
-                     break;
-               }
-
-               bug("ERROR: %s; will retry in %d seconds...\n", GetVStatusMessage(vstatus), RETRY_TIMEOUT);
-               sleep(RETRY_TIMEOUT);
-               retry = 1;
-
+               loop_test(hd, cd, &pa, argv[0], argv[1]);
             }
             else
             {
-               if (paperout || offline)
-                  bug("INFO: Printing...\n");
-
-               if (paperout)
+               /* Data was sent to device successfully. */ 
+               if (pa.pjl_device)
                {
-                  paperout = 0;
-                  fputs("STATE: -media-empty-error\n", stderr);
-               }
-               if (offline)
-               {
-                  offline = 0;
-                  fputs("STATE: -other\n", stderr);
+                  /* Laserjets have a large data buffer, so manually check for operator intervention condition. */
+                  loop_test(hd, cd, &pa, argv[0], argv[1]);
                }
             }
             total+=n;
             size-=n;
          }   /* while (size > 0) */
-
-         if (retry)
-         {
-            /* Clear user error. */
-            DeviceEvent(argv[0], argv[1], VSTATUS_PRNT, "event", 0);
-            retry=0;
-         }
       }   /* while ((len = read(fd, buf, HPLIP_BUFFER_SIZE)) > 0) */
    }   /* while (copies > 0) */
 
-   /* Wait for I/O to complete over the wire. */
-   sleep(2);
+   DBG("job end %s prt_mode=%d statustype=%d\n", argv[0], ma.prt_mode, ma.statustype); 
 
-   /* If not uni-di mode, monitor printer status and wait for I/O to finish. */
-   if (ma.prt_mode != HPMUD_UNI_MODE)
+   if (pa.pjl_device)
    {
-      /*
-       * Since hpiod uses non-blocking i/o (bi-di) we must make sure the printer has received all data
-       * before closing the print channel. Otherwise data will be lost.
-       */
-      vstatus = GetVStatus(hd);
-      if (vstatus < 5000)
+      pthread_mutex_lock(&pa.mutex);
+      pa.eoj_pages=0;
+      pthread_mutex_unlock(&pa.mutex);
+      hpmud_write_channel(hd, cd, pjl_job_end_cmd, sizeof(pjl_job_end_cmd)-1, 5, &len);
+
+      /* Look for job end status. */
+      for (cnt=0; cnt<10; cnt++)
+      {
+         loop_test(hd, cd, &pa, argv[0], argv[1]);         
+         pthread_mutex_lock(&pa.mutex);
+         pages = pa.eoj_pages;
+         pthread_mutex_unlock(&pa.mutex);
+         if (pages > 0)
+         {
+            DBG("job end pages=%d\n", pages);
+            break;
+         }
+         sleep(2);
+      }
+
+      hpmud_write_channel(hd, cd, pjl_ustatus_off_cmd, sizeof(pjl_ustatus_off_cmd)-1, 5, &len);
+
+      /* Gracefully kill the pjl_read_thread. */
+      pthread_mutex_lock(&pa.mutex);
+      pa.abort=1;
+      while (!pa.done)
+         pthread_cond_wait(&pa.done_cond, &pa.mutex);
+      pthread_mutex_unlock(&pa.mutex);
+      pthread_cancel(pa.tid);   
+      pthread_mutex_destroy(&pa.mutex);
+      pthread_cond_destroy(&pa.done_cond);
+   }
+   else if ((ma.prt_mode != HPMUD_UNI_MODE) && (ma.statustype == HPMUD_STATUSTYPE_VSTATUS || ma.statustype == HPMUD_STATUSTYPE_SFIELD))
+   {
+      /* Wait for printer to receive all data before closing print channel. Otherwise data can be truncated. */
+      status = get_printer_status(hd, cd, &pa);
+      if (status < 5000)
       {
          /* Got valid status, wait for idle. */
          cnt=0;
-         while ((vstatus != VSTATUS_IDLE) && (vstatus < 5000) && (cnt < 5))
+         while ((status != VSTATUS_IDLE) && (status < 5000) && (cnt < 5))
          {
            sleep(2);
-           vstatus = GetVStatus(hd);
+           status = get_printer_status(hd, cd, &pa);
            cnt++;
          } 
       }
-      else
-      {
-         /* No valid status, use fixed delay. */
-         sleep(8);
-      }
    }
-   
-   DeviceEvent(argv[0], argv[1], EVENT_END_JOB, "event", 0);
-   fprintf(stderr, "INFO: %s\n", GetVStatusMessage(VSTATUS_IDLE));
+   else
+   {
+      /* Just use fixed delay for uni-di and laserjets without pjl. */
+      sleep(8);
+   }
+      
+   device_event(argv[0], argv[1], EVENT_END_JOB, "event", 0);
+   fputs("INFO: ready to print\n", stderr);
 
    if (cd >= 0)
       hpmud_close_channel(hd, cd);

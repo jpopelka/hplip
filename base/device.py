@@ -516,6 +516,8 @@ def parseDynamicCounter(ctr_field, convert_to_int=True):
 
 
 def parseDeviceURI(device_uri):
+    #print repr(pat_deviceuri)
+    #print repr(device_uri)
     m = pat_deviceuri.match(device_uri)
 
     if m is None:
@@ -1023,7 +1025,12 @@ class Device(object):
     def closeCfgDownload(self):
         return self.__closeChannel(hpmudext.HPMUD_S_CONFIG_DOWNLOAD_CHANNEL)
 
-
+    def openSoapFax(self):
+        return self.__openChannel(hpmudext.HPMUD_S_SOAP_FAX)
+        
+    def closeSoapFax(self):
+        return self.__closeChannel(hpmudext.HPMUD_S_SOAP_FAX)
+        
     def __closeChannel(self, service_name):
         #if not self.mq['io-mode'] == IO_MODE_UNI and \
         if self.io_state == IO_STATE_HP_OPEN:
@@ -1235,8 +1242,8 @@ class Device(object):
                 log.debug("Type 1/2 (S: or VSTATUS:) status")
                 status_block = status.parseStatus(self.deviceID)
 
-            elif status_type == STATUS_TYPE_LJ:
-                log.debug("Type 3 LaserJet status")
+            elif status_type in (STATUS_TYPE_LJ, STATUS_TYPE_PML_AND_PJL):
+                log.debug("Type 3/9 LaserJet PML(+PJL) status")
                 status_block = status.StatusType3(self, self.deviceID)
 
             elif status_type == STATUS_TYPE_LJ_XML:
@@ -1244,7 +1251,7 @@ class Device(object):
                 status_block = status.StatusType6(self)
                 
             elif status_type == STATUS_TYPE_PJL:
-                log.debug("Type 8: LJ XML")
+                log.debug("Type 8: LJ PJL")
                 status_block = status.StatusType8(self)
 
             else:
@@ -1646,6 +1653,8 @@ class Device(object):
     def readEWS(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=True):
         return self.__readChannel(self.openEWS, bytes_to_read, stream, timeout, allow_short_read)
 
+    def readSoapFax(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=True):
+        return self.__readChannel(self.openSoapFax, bytes_to_read, stream, timeout, allow_short_read)
 
     def __readChannel(self, opener, bytes_to_read, stream=None, 
                       timeout=prop.read_timeout, allow_short_read=False):
@@ -1717,6 +1726,10 @@ class Device(object):
 
     def writeCfgDownload(self, data):
         return self.__writeChannel(self.openCfgDownload, data)
+        
+    def writeSoapFax(self, data):
+        return self.__writeChannel(self.openSoapFax, data)
+    
 
     def __writeChannel(self, opener, data):
         channel_id = opener()

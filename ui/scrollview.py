@@ -62,10 +62,10 @@ class ScrollView(QScrollView):
         widget = Widget(self.viewport(),"widget")
         #widget.setPaletteBackgroundColor(qApp.palette().color(QPalette.Active, QColorGroup.Base))
         widget.setPaletteBackgroundColor(qApp.palette().color(QPalette.Active, QColorGroup.Background))
-        widget.setSizePolicy(QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum))
-        widget.resize(self.visibleWidth(), self.size().height())
-        widget.setMinimumWidth(self.visibleWidth())
-        widget.resize(self.viewport().size().width(), self.size().height())
+        #widget.setSizePolicy(QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum))
+        #widget.resize(self.visibleWidth(), self.size().height())
+        #widget.setMinimumWidth(self.visibleWidth())
+        #widget.resize(self.viewport().size().width(), self.size().height())
         return widget
 
     def viewportResizeEvent(self, e):
@@ -115,8 +115,10 @@ class ScrollView(QScrollView):
     def isFax(self):
         self.is_fax = False
         self.printers = cups.getPrinters()
+        #print self.printers
         for p in self.printers:
-            if p.name == self.cur_printer:
+            #print repr(p.name)
+            if p.name.decode('utf-8') == self.cur_printer:
                 if p.device_uri.startswith("hpfax:"):
                     self.is_fax = True
                 
@@ -169,7 +171,8 @@ class ScrollView(QScrollView):
         if printer_name == self.cur_printer:
             return
         
-        self.cur_printer = str(printer_name)
+        #self.cur_printer = str(printer_name)
+        self.cur_printer = unicode(printer_name)
         
         if self.cur_device is not None and self.cur_device.supported:
             self.isFax()
@@ -200,7 +203,10 @@ class ScrollView(QScrollView):
                 widget.resize(widget.size().width(), 150)
                 self.orig_height = widget.size().height()
                 
-            widget.setControl(control)
+            try:
+                widget.setControl(control)
+            except AttributeError:
+                pass
             self.items[key] = widget
             widget.setMinimumWidth(self.visibleWidth())
             widget.adjustSize()
@@ -222,29 +228,35 @@ class ScrollView(QScrollView):
     def addGroupHeading(self, group, heading, read_only=False):
         widget = self.getWidget()
         widget.setMinimumHeight(30)
-        widget.setMaximumHeight(30)
         
-        if heading:
-            widget.setPaletteBackgroundColor(self.heading_color)
-        
-        layout = QGridLayout(widget, 1, 1, 5, 10, "layout")
+        layout = QGridLayout(widget, 0, 0, 5, 0, "layout")
         textLabel2 = QLabel(widget, "textLabel2")
         
-        if heading:
-            textLabel2.setFrameShape(QFrame.TabWidgetPanel)
-        
         textLabel2.setSizePolicy(QSizePolicy(QSizePolicy.Preferred, 
-            QSizePolicy.Minimum, 0, 0,
+            QSizePolicy.Maximum, 0, 0,
             textLabel2.sizePolicy().hasHeightForWidth()))
         
-        textLabel2.setAlignment( QLabel.AlignLeft | QLabel.AlignVCenter)
-        layout.addWidget(textLabel2, 0, 0)
-
+        if log.is_debug():
+            textLabel2.setFrameShape(self.frame_shape)
+        
+        elif heading:
+            textLabel2.setFrameShape(QFrame.TabWidgetPanel)
+            textLabel2.setPaletteBackgroundColor(self.heading_color)
+    
         if read_only:
-            textLabel2.setText(self.__tr("<b>%1 (read only)</b>").arg(heading))
-        else:
-            textLabel2.setText(QString("<b>%1</b>").arg(heading))
-
+            s = self.__tr("<b>%1 (read only)</b>").arg(heading) # <nobr>
+        else:  
+            s = QString("<b>%1</b>").arg(heading)
+            
+        # If label is kinda long, provide a tooltip to allow reading the whole thing
+        if s.length() > 32:
+            QToolTip.add(textLabel2, s)
+            
+        textLabel2.setText(s)
+        textLabel2.setAlignment(QLabel.AlignLeft | QLabel.AlignVCenter | Qt.SingleLine)
+        
+        layout.addWidget(textLabel2, 0, 0)
+        
         self.addWidget(widget, "g:"+unicode(group))
         
         

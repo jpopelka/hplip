@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui/pluginform_base.ui'
 #
-# Created: Fri Sep 21 09:24:18 2007
+# Created: Mon Oct 22 16:21:53 2007
 #      by: The PyQt User Interface Compiler (pyuic) 3.17
 #
 # WARNING! All changes made in this file will be lost!
@@ -27,7 +27,9 @@ class PluginForm_base(QWizard):
         self.textLabel1.setAlignment(QLabel.WordBreak | QLabel.AlignVCenter)
 
         SourcePageLayout.addWidget(self.textLabel1,0,0)
-        spacer9 = QSpacerItem(20,60,QSizePolicy.Minimum,QSizePolicy.Expanding)
+        spacer2 = QSpacerItem(20,21,QSizePolicy.Minimum,QSizePolicy.Expanding)
+        SourcePageLayout.addItem(spacer2,1,0)
+        spacer9 = QSpacerItem(20,30,QSizePolicy.Minimum,QSizePolicy.Expanding)
         SourcePageLayout.addItem(spacer9,3,0)
 
         self.sourceGroup = QButtonGroup(self.SourcePage,"sourceGroup")
@@ -42,11 +44,6 @@ class PluginForm_base(QWizard):
 
         sourceGroupLayout.addWidget(self.radioButton5,1,0)
 
-        self.pathLineEdit = QLineEdit(self.sourceGroup,"pathLineEdit")
-        self.pathLineEdit.setEnabled(0)
-
-        sourceGroupLayout.addWidget(self.pathLineEdit,2,0)
-
         self.browsePushButton = QPushButton(self.sourceGroup,"browsePushButton")
         self.browsePushButton.setEnabled(0)
 
@@ -58,9 +55,18 @@ class PluginForm_base(QWizard):
 
         sourceGroupLayout.addWidget(self.radioButton4,0,0)
 
+        self.pathLineEdit = QLineEdit(self.sourceGroup,"pathLineEdit")
+        self.pathLineEdit.setEnabled(0)
+
+        sourceGroupLayout.addWidget(self.pathLineEdit,2,0)
+
+        self.skipRadioButton = QRadioButton(self.sourceGroup,"skipRadioButton")
+        self.skipRadioButton.setEnabled(0)
+        self.sourceGroup.insert( self.skipRadioButton,2)
+
+        sourceGroupLayout.addMultiCellWidget(self.skipRadioButton,3,3,0,1)
+
         SourcePageLayout.addWidget(self.sourceGroup,2,0)
-        spacer2 = QSpacerItem(20,21,QSizePolicy.Minimum,QSizePolicy.Expanding)
-        SourcePageLayout.addItem(spacer2,1,0)
         self.addPage(self.SourcePage,QString(""))
 
         self.InstallPage = QWidget(self,"InstallPage")
@@ -99,6 +105,7 @@ class PluginForm_base(QWizard):
         self.radioButton5.setText(self.__tr("Use an exisiting copy of the plug-in file (advanced):"))
         self.browsePushButton.setText(self.__tr("Browse..."))
         self.radioButton4.setText(self.__tr("Download the plug-in from an HP authorized server (recommended)"))
+        self.skipRadioButton.setText(self.__tr("Skip installation of plug-in (not recommended)"))
         self.setTitle(self.SourcePage,self.__tr("Driver Plug-in Required"))
         self.installPushButton.setText(QString.null)
         self.textLabel2.setText(self.__tr("By installing the driver plug-in, you are agreeing to this license agreement."))

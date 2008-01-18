@@ -20,7 +20,7 @@
 
 # Local
 from base.g import *
-from base import device
+from base import device, utils
 
 # Std Lib
 import sys
@@ -34,7 +34,7 @@ from waitform import WaitForm
 
 
 class PluginForm(PluginForm_base):
-    def __init__(self, core, norm_model, device_uri, plugin_lib, fw_download, 
+    def __init__(self, core, norm_model, plugin, device_uri, plugin_lib, fw_download, 
                  parent = None, name = None, modal = 0, fl = 0):
         
         PluginForm_base.__init__(self,parent,name,modal,fl)
@@ -49,16 +49,13 @@ class PluginForm(PluginForm_base):
         self.pathLineEdit.setEnabled(False)
         
         self.downloadText = self.__tr("Agree to License, Download and Install Plug-in")
-        self.optionalText = self.__tr("""An optional driver plug-in is available to enhance the operation of this printer. You may skip this installation, download the plug-in directly from an HP authorized server, or, if you already have a copy of the file, you can specify a path to the file.""")
-        self.optionalTitle = self.__tr("Optional Driver Plug-in Available")
-        self.skipText = self.__tr("Skip installation of optional plug-in")
-        
         self.setTitle(self.InstallPage, self.downloadText)
         self.installPushButton.setText(self.downloadText)
         self.bg = self.pathLineEdit.paletteBackgroundColor()
         self.download = True
         self.path = u''
         self.norm_model = norm_model
+        self.plugin = plugin
         self.waitdlg = None
         self.device_uri = device_uri
         self.plugin_lib = plugin_lib
@@ -70,34 +67,46 @@ class PluginForm(PluginForm_base):
         if page is self.SourcePage:
             self.setFinishEnabled(self.SourcePage, False)
             self.setHelpEnabled(self.SourcePage, False)
-            #print "Source Page"
+            
+            if self.plugin == PLUGIN_OPTIONAL:
+                self.textLabel1.setText(self.__tr("""An optional driver plug-in is available to enhance the operation of this printer. You may skip this installation, download the plug-in directly from an HP authorized server, or, if you already have a copy of the file, you can specify a path to the file."""))
+                self.setTitle(self.SourcePage, self.__tr("Optional Driver Plug-in Available"))
+                self.skipRadioButton.setEnabled(True)
         
         elif page is self.InstallPage:
             self.setBackEnabled(self.InstallPage, False)
             self.setFinishEnabled(self.SourcePage, False)
             self.setHelpEnabled(self.InstallPage, False)
-            #print "Download Page"
         
         QWizard.showPage(self, page)
     
-    def sourceGroup_clicked(self,a0):
-        print a0
-        if a0 == 0: # download
+    def sourceGroup_clicked(self, opt):
+        if opt == 0: # download
             self.browsePushButton.setEnabled(False)
+            self.setFinishEnabled(self.SourcePage, False)
             self.pathLineEdit.setEnabled(False)
             self.setTitle(self.InstallPage, self.downloadText)
             self.installPushButton.setText(self.downloadText)
             self.download = True
             self.setNextEnabled(self.SourcePage, True)
             
-        else: # local file
+        elif opt == 1: # local file
             self.browsePushButton.setEnabled(True)
+            self.setFinishEnabled(self.SourcePage, False)
             self.pathLineEdit.setEnabled(True)
             s = self.__tr("Agree to License and Install Plug-in")
             self.setTitle(self.InstallPage, s)
             self.installPushButton.setText(s)
             self.download = False
             self.checkPath()
+            
+        else: # skip
+            self.browsePushButton.setEnabled(False)
+            self.pathLineEdit.setEnabled(False)
+            self.download = False
+            self.setNextEnabled(self.SourcePage, False)
+            self.setFinishEnabled(self.SourcePage, True)
+        
         
     def browsePushButton_clicked(self):
         workingDirectory = user_cfg.last_used.working_dir
@@ -143,10 +152,24 @@ class PluginForm(PluginForm_base):
 
     def cancelled(self):
         print "Cancel!"
+        # TODO: How to cancel urllib.urlretrieve? (use urlopen())
+        
+    def download_callback(self, c, s, t):
+        if c:
+            h1 = utils.format_bytes(c*s)
+            h2 = utils.format_bytes(t)
+            self.waitdlg.setMessage(self.__tr("Downloaded %1 of %2").arg(h1).arg(h2))
+            log.debug("Downloaded %s of %s" % (h1, h2))
+        
+        
+    def download_callback(self, blocks_xfered, block_size, total_size):
+        #print blocks_xfered, block_size, total_size
+        pass
         
     def installPushButton_clicked(self):
-        self.waitdlg = WaitForm(0, self.__tr("Initializing..."), self.cancelled, self, modal=1)
+        self.waitdlg = WaitForm(0, self.__tr("Initializing..."), None, self, modal=0)
         self.waitdlg.show()
+        qApp.processEvents()
         
         try:
             core = self.core
@@ -158,7 +181,9 @@ class PluginForm(PluginForm_base):
                 if ok:
                     self.waitdlg.setMessage(self.__tr("Downloading configuration..."))
                     log.debug("Downloading configuration...")
-                    url, size, checksum, timestamp, ok = core.get_plugin_info(self.norm_model)
+                    url, size, checksum, timestamp, ok = core.get_plugin_info(self.norm_model, 
+                        self.download_callback)
+                        
                     log.debug("url= %s" % url)
                     log.debug("size=%d" % size)
                     log.debug("checksum=%s" % checksum)
@@ -167,7 +192,9 @@ class PluginForm(PluginForm_base):
                     if url and size and checksum and timestamp and ok:
                         log.debug("Downloading plug-in...")
                         self.waitdlg.setMessage(self.__tr("Downloading plug-in..."))
-                        ok, plugin_file = core.download_plugin(self.norm_model, url, size, checksum, timestamp)
+                        
+                        ok, plugin_file = core.download_plugin(self.norm_model, url, size, 
+                            checksum, timestamp, self.download_callback)
                         
                         if not ok:
                             self.FailureUI(self.__tr("<b>An error occured downloading plugin file.</b><p>Please check your network connection try again."))

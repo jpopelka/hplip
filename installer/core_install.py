@@ -44,6 +44,7 @@ TYPE_INT = 4
 
 PING_TARGET = "www.google.com"
 HTTP_GET_TARGET = "http://www.google.com"
+PLUGIN_CONF_URL = "http://hplip.sf.net/plugins.conf"
 
 try:
     from functools import update_wrapper
@@ -87,6 +88,7 @@ class CoreInstall(object):
         self.plugin_path = os.path.join(prop.home_dir, "data", "plugins")
         self.logoff_required = False
         self.restart_required = False
+        self.network_connected = False
 
         self.FIELD_TYPES = {
             'distros' : TYPE_LIST,
@@ -258,7 +260,7 @@ class CoreInstall(object):
         log.debug("Endian = %d" % self.endian)
 
         update_spinner()
-        
+
         self.distro_name = self.distros_index[self.distro]
         self.distro_version_supported = self.get_distro_ver_data('supported', False)
 
@@ -329,12 +331,12 @@ class CoreInstall(object):
 
     def run(self, cmd, callback=None):
         output = cStringIO.StringIO()
-        
+
         try:
             child = pexpect.spawn(cmd, timeout=1)
         except pexpect.ExceptionPexpect:
             return 1, ''
-        
+
         try:
             while True:
                 update_spinner()
@@ -347,7 +349,7 @@ class CoreInstall(object):
                     if callback is not None:
                         if callback(cb): # cancel
                             break
-                
+
                 if i == 0: # Password:
                     child.sendline(self.password)
 
@@ -356,7 +358,7 @@ class CoreInstall(object):
 
                 elif i == 2: # TIMEOUT
                     continue
-                
+
         except Exception:
             log.exception()
             cleanup_spinner()
@@ -417,17 +419,17 @@ class CoreInstall(object):
                                 self.distro = self.distros[d]['index']
                                 found = True
                                 break
-    
+
                     if found:
                         break
-    
+
                 if found:
                     for n in name.split(): 
                         if '.' in n:
                             m = '.'.join(n.split('.')[:2])
                         else:
                             m = n
-    
+
                         try:
                             self.distro_version = str(float(m))
                         except ValueError:
@@ -439,7 +441,7 @@ class CoreInstall(object):
                                 break
                         else:
                             break
-    
+
                     log.debug("/etc/issue: %s %s" % (name, self.distro_version))
 
         log.debug("distro=%d, distro_version=%s" % (self.distro, self.distro_version))
@@ -550,7 +552,7 @@ class CoreInstall(object):
             return False
 
         return len(locate_file_contains("usb.h", '/usr/include', 'usb_init(void)')) > 0
-        
+
 
     def check_libjpeg(self):
         return check_lib("libjpeg") and check_file("jpeglib.h")
@@ -568,7 +570,7 @@ class CoreInstall(object):
         try:
             log.debug("Trying to import 'reportlab'...")
             import reportlab
-            
+
             ver = reportlab.Version
             try:
                 ver_f = float(ver)
@@ -582,7 +584,7 @@ class CoreInstall(object):
                     return True
                 else:
                     return False
-            
+
         except ImportError:
             log.debug("Failed.")
             return False
@@ -748,7 +750,7 @@ class CoreInstall(object):
                     '', sys_cfg.configure['internal-tag'], sys_cfg.hplip.version
             except KeyError:
                 self.version_description, self.version_public, self.version_internal = '', '', ''
-                
+
         return self.version_description, self.version_public, self.version_internal            
 
     def configure(self): 
@@ -954,42 +956,42 @@ class CoreInstall(object):
 
         return num_opt_missing
 
-    
+
     def check_network_connection(self):
-        ok = False
+        self.network_connected = False
 
         wget = utils.which("wget")
         if wget:
             wget = os.path.join(wget, "wget")
-            cmd = "%s --timeout=5 %s" % (wget, HTTP_GET_TARGET)
+            cmd = "%s --timeout=10 %s" % (wget, HTTP_GET_TARGET)
             log.debug(cmd)
             status, output = self.run(cmd)
             log.debug("wget returned: %d" % status)
-            ok = (status == 0)
-                
+            self.network_connected = (status == 0)
+
         else:
             curl = utils.which("curl")
             if curl:
                 curl = os.path.join(curl, "curl")
-                cmd = "%s --connect-timeout 3 --max-time 5 %s" % (curl, HTTP_GET_TARGET)
+                cmd = "%s --connect-timeout 5 --max-time 10 %s" % (curl, HTTP_GET_TARGET)
                 log.debug(cmd)
                 status, output = self.run(cmd)
                 log.debug("curl returned: %d" % status)
-                ok = (status == 0)
-                
+                self.network_connected = (status == 0)
+
             else:
                 ping = utils.which("ping")
-        
+
                 if ping:
                     ping = os.path.join(ping, "ping")
-                    cmd = "%s -c1 -W1 -w5 %s" % (ping, PING_TARGET)
+                    cmd = "%s -c1 -W1 -w10 %s" % (ping, PING_TARGET)
                     log.debug(cmd)
                     status, output = self.run(cmd)
                     log.debug("ping returned: %d" % status)
-                    ok = (status == 0)
-            
-        return ok
-        
+                    self.network_connected = (status == 0)
+
+        return self.network_connected
+
 
     def run_pre_install(self, callback=None):
         pre_cmd = self.get_distro_ver_data('pre_install_cmd')
@@ -1049,19 +1051,19 @@ class CoreInstall(object):
         cmds = []
         if self.get_distro_ver_data('fix_ppd_symlink', False):
             cmds.append(self.su_sudo() % 'python ./installer/fix_symlink.py')
-            
+
         return cmds
-    
+
     def run_pre_build(self, callback=None):
         x = 1
         for cmd in self.pre_build():
             status, output = self.run(cmd)
             if callback is not None:
                 callback(cmd, "Pre-build step %d"  % x)
-            
+
             x += 1
-             
-            
+
+
         # Remove the link /usr/share/foomatic/db/source/PPD if the symlink is corrupt (Dapper only?)
 ##        if self.get_distro_ver_data('fix_ppd_symlink', False):
 ##            cmd = self.su_sudo() % 'python ./installer/fix_symlink.py'
@@ -1073,18 +1075,18 @@ class CoreInstall(object):
 ##                callback()
 
 
-        
-    
+
+
     def run_post_build(self, callback=None):
         x = 1
         for cmd in self.post_build():
             status, output = self.run(cmd)
             if callback is not None:
                 callback(cmd, "Post-build step %d"  % x)
-            
+
             x += 1
 
-    
+
     def post_build(self):
         cmds = []
         self.logoff_required = False
@@ -1112,9 +1114,9 @@ class CoreInstall(object):
             pid = get_ps_pid('hpssd')
             if pid:
                 kill = os.path.join(utils.which("kill"), "kill") + " %d" % pid
-                
+
                 cmds.append(self.su_sudo() % kill)
-            
+
 ##            try:
 ##                os.kill(pid, 9)
 ##                status = 0
@@ -1140,11 +1142,14 @@ class CoreInstall(object):
 
     def restart(self):
         ok = False
+        #print "Shutdown"
         shutdown = utils.which('shutdown')
         if shutdown:
             cmd = "%s -r now" % (os.path.join(shutdown, "shutdown"))
             cmd = self.su_sudo() % cmd
             status, output = self.run(cmd)
+            #print "status: ", status
+            #print "output: ", output 
 
             ok = (status == 0)
 
@@ -1155,7 +1160,7 @@ class CoreInstall(object):
 
     def run_hp_setup(self):
         hpsetup = utils.which("hp-setup")
-        
+
         if self.check_for_gui_support():
             if hpsetup:
                 c = 'hp-setup -u --username=%s' % prop.username
@@ -1255,23 +1260,40 @@ class CoreInstall(object):
             self.run("sudo -K")
 
     # PLUGIN SUPPORT
-    
-    def get_plugin_info(self, model):
+
+    def create_plugin_dir(self):
+        if not os.path.exists(self.plugin_path):
+            try:
+                log.debug("Creating plugin directory: %s" % self.plugin_path)
+                os.makedirs(self.plugin_path)
+                return True
+            except (OSError, IOError), e:
+                log.error("Unable to create directory: %s" % e.strerror)
+                return False
+
+        return True
+
+
+    def get_plugin_info(self, model, callback):
         ok, url, size, checksum, timestamp = False, '', 0, 0, 0.0
-        
-        if self.check_network_connection():
-            filename, headers = urllib.urlretrieve("http://hplip.sf.net/plugins.conf")
-            
-            g, conf = utils.make_temp_file()
-            
-            f = file(filename, 'r')
+
+        if self.network_connected:
+            if not self.create_plugin_dir():
+                return '', 0, 0, 0, False
+
+            conf = os.path.join(self.plugin_path, "plugins.conf")
+            ## XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+            filename, headers = urllib.urlretrieve(PLUGIN_CONF_URL, conf, callback)
+            ##filename, headers = urllib.urlretrieve("http://localhost:8001/plugins.conf", 
+            ##    conf, callback)
+
+            f = file(conf, 'r')
             t = f.read()
             log.debug_block("plugins.conf", t)
-            os.write(g, t)
             f.close()
-            
+
             plugin_cfg = Config(conf, True)
-            
+
             try:
                 url = plugin_cfg[model]['url']
                 size = int(plugin_cfg[model]['size'])
@@ -1282,45 +1304,36 @@ class CoreInstall(object):
                 pass
         else:
             log.error("No network connection detected. Cannot download required plugin.")
-        
+
         return url, size, checksum, timestamp, ok
-        
-    def download_plugin(self, model, url, size, checksum, timestamp):
-        log.debug("Downloading %s.plugin from %s" % (model, url))
-        
-        if not os.path.exists(self.plugin_path):
-            try:
-                log.debug("Creating plugin directory: %s" % self.plugin_path)
-                os.makedirs(self.plugin_path)
-            except (OSError, IOError), e:
-                log.error("Unable to create directory: %s" % e.strerror)
-                return False
-            
+
+
+    def download_plugin(self, model, url, size, checksum, timestamp, callback=None):
+        log.debug("Downloading %s.plugin from %s to %s" % (model, url, self.plugin_path))
+
+        if not self.create_plugin_dir():
+            return False, ''
+
         plugin_file = os.path.join(self.plugin_path, model+".plugin")
-        filename, headers = urllib.urlretrieve(url, plugin_file)
+        filename, headers = urllib.urlretrieve(url, plugin_file, callback)
         calc_checksum = sha.new(file(plugin_file, 'r').read()).hexdigest()
         log.debug("D/L file checksum=%s" % calc_checksum)
-        
-        #if calc_checksum == checksum:
-        #    log.debug("D/L OK")
-        #    return True, plugin_file
-        
-        #log.error("D/L failed (checksum error).")
-        #return False, ''
+
+        ##if calc_checksum == checksum:
+        ##    log.debug("D/L OK")
+        ##    return True, plugin_file
+
+        ##log.error("D/L failed (checksum error).")
+        ##return False, ''
         return True, plugin_file
-        
-        
+
+
     def copy_plugin(self, model, src):
         plugin_file = os.path.join(self.plugin_path, model+".plugin")
-        
-        if not os.path.exists(self.plugin_path):
-            try:
-                log.debug("Creating plugin directory: %s" % self.plugin_path)
-                os.makedirs(self.plugin_path)
-            except (OSError, IOError), e:
-                log.error("Unable to create directory: %s" % e.strerror)
-                return False
-        
+
+        if not self.create_plugin_dir():
+            return False
+
         import shutil
         try:
             log.debug("Copying plugin from %s to %s" % (src, plugin_file))
@@ -1328,19 +1341,19 @@ class CoreInstall(object):
         except (OSError, IOError), e:
             log.error("Copy failed: %s" % e.strerror)
             return False
-    
+
         return True
-        
+
     def install_plugin(self, model, plugin_lib):
         log.debug("Installing %s.plugin to %s..." % (model, self.plugin_path))
         ok = False
         plugin_file = os.path.join(self.plugin_path, model+".plugin")
         ppd_path = sys_cfg.dirs.ppd
         rules_path = '/etc/udev/rules.d'
-        
+
         if not os.path.exists(rules_path):
             log.error("Rules path %s does not exist!" % rules_path)
-        
+
         firmware_path = os.path.join(prop.home_dir, "data", "firmware")
         if not os.path.exists(firmware_path):
             try:
@@ -1348,7 +1361,7 @@ class CoreInstall(object):
                 os.makedirs(firmware_path)
             except (OSError, IOError), e:
                 log.error("Unable to create directory: %s" % e.strerror)
-            
+
         lib_path = os.path.join(prop.home_dir, "prnt", "plugins")
         if not os.path.exists(lib_path):
             try:
@@ -1356,7 +1369,7 @@ class CoreInstall(object):
                 os.makedirs(lib_path)
             except (OSError, IOError), e:
                 log.error("Unable to create directory: %s" % e.strerror)
-            
+
         tar = tarfile.open(plugin_file, "r:gz")
         for tarinfo in tar:
             name = tarinfo.name
@@ -1364,51 +1377,51 @@ class CoreInstall(object):
                 # firmware file
                 log.debug("Extracting fw file %s to %s" % (name, firmware_path))
                 tar.extract(tarinfo, firmware_path)
-            
+
             elif name.endswith('.ppd') or name.endswith('.ppd.gz'):
                 # PPD file
                 log.debug("Extracting ppd file %s to %s" % (name, ppd_path))
                 tar.extract(tarinfo, ppd_path,)
-                
+
             elif name.endswith('.so'):
                 # Library file(s)
                 log.debug("Extracting library file %s to %s" % (name, lib_path))
                 tar.extract(tarinfo, lib_path)
-                
+
             elif name.endswith('.rules'):
                 # .rules file
                 log.debug("Extracting .rules file %s to %s" % (name, rules_path))
                 tar.extract(tarinfo, rules_path)
-                
+
             else:
                 # other files...
                 log.debug("Extracting file %s to %s" % (name, self.plugin_path))
                 tar.extract(tarinfo, self.plugin_path)
-                
-                
+
+
         tar.close()
-        
+
         self.bitness = utils.getBitness()
         self.processor = utils.getProcessor()
-        
+
         link_file = os.path.join(lib_path, '%s.so' % plugin_lib)
-        
+
         if self.processor == 'power_macintosh':
             trg_file = os.path.join(lib_path,'%s-ppc.so' % plugin_lib)
         else:
             trg_file = os.path.join(lib_path,"%s-x86_%s.so" % (plugin_lib, self.bitness))
-            
+
         try:
             log.debug("Creating link: %s -> %s" % (link_file, trg_file))
             os.symlink(trg_file, link_file)
         except (OSError, IOError), e:
-            log.error("Unable to create symlink: %s" % e.strerror)
-        
+            log.warn("Unable to create symlink: %s" % e.strerror)
+
         return True
-        
+
     def check_for_plugin(self, model): 
         plugin_file = os.path.join(self.plugin_path, model+".plugin")
         # TODO: Check for each file of the plugin is installed?
         return os.path.exists(plugin_file)
-        
-        
+
+

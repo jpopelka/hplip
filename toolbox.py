@@ -129,16 +129,8 @@ for o, a in opts:
 utils.log_title(__title__, __version__)
 
 # UI Forms and PyQt
-if not prop.gui_build:
-    log.error("GUI mode disabled in build. Exiting.")
-    sys.exit(1)
-    
-elif not os.getenv('DISPLAY'):
-    log.error("No display found. Exiting.")
-    sys.exit(1)
-
-elif not utils.checkPyQtImport():
-    log.error("PyQt init failed. Exiting.")
+if not utils.canEnterGUIMode():
+    log.error("hp-toolbox requires GUI support. Exiting.")
     sys.exit(1)
 
 from qt import *
@@ -201,8 +193,8 @@ try:
     app.exec_loop()
 except KeyboardInterrupt:
     sys.exit(0)
-except:
-    log.exception()
+#except:
+#    log.exception()
 
 handleEXIT()
 

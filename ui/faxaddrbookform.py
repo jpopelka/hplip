@@ -160,6 +160,10 @@ class FaxAddrBookGroupEditForm(FaxAddrBookGroupEditForm_base):
             return
 
         self.okButton.setEnabled(True)
+    
+    def __tr(self,s,c = None):
+        return qApp.translate("FaxAddrBookGroupEditForm",s,c)
+    
 
 # **************************************************************************** #
 
@@ -248,7 +252,7 @@ class FaxAddrBookGroupsForm(FaxAddrBookGroupsForm_base):
         popup.popup(pos)
 
     def __tr(self,s,c = None):
-        return qApp.translate("FAB",s,c)
+        return qApp.translate("FaxAddrBookGroupsForm",s,c)
 
 
 # **************************************************************************** #
@@ -328,7 +332,7 @@ class FaxAddrBookEditForm(FaxAddrBookEditForm_base):
         self.OKButton.setEnabled(ok)
 
     def __tr(self,s,c = None):
-        return qApp.translate("FAB",s,c)
+        return qApp.translate("FaxAddrBookEditForm",s,c)
 
 # **************************************************************************** #
 
@@ -455,7 +459,7 @@ class FaxAddrBookForm(FaxAddrBookForm_base):
                               QMessageBox.NoButton)
 
     def __tr(self,s,c = None):
-        return qApp.translate("FAB",s,c)
+        return qApp.translate("FaxAddrBookForm",s,c)
 
     def accept(self):
         self.sendUpdateEvent()

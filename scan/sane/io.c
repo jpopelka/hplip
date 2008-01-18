@@ -28,24 +28,48 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
 #include "hpmud.h"
 #include "common.h"
 #include "pml.h"
 #include "io.h"
 
-int __attribute__ ((visibility ("hidden"))) SendScanEvent( char * device_uri, int event, char * type )
+int __attribute__ ((visibility ("hidden"))) SendScanEvent(char *device_uri, int event, char *type)
 {
-#if 0
-    char message[HPMUD_BUFFER_SIZE];
+   struct sockaddr_in pin;  
+   char message[512];  
+   int len=0;
+   int hpssd_socket=-1, hpssd_port_num=2207;
 
-    int len = sprintf( message, "msg=Event\ndevice-uri=%s\nevent-code=%d\nevent-type=%s\n", 
-        device_uri, event, type );
+   bzero(&pin, sizeof(pin));  
+   pin.sin_family = AF_INET;  
+   pin.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+   pin.sin_port = htons(hpssd_port_num);  
+    
+   if ((hpssd_socket = socket(AF_INET, SOCK_STREAM, 0)) == -1) 
+   {  
+      BUG("unable to create hpssd socket %d: %m\n", hpssd_port_num);
+      goto bugout;  
+   }  
 
-    if (send(hplip_session->hpssd_socket, message, len, 0) == -1) 
-    {
-       bug("SendScanEvent(): unable to send message: %m\n" );  
-    }
-#endif
+   if (connect(hpssd_socket, (void *)&pin, sizeof(pin)) == -1)  
+   {  
+      BUG("unable to connect hpssd socket %d: %m\n", hpssd_port_num);
+      goto bugout;  
+   }  
+
+   len = sprintf(message, "msg=Event\ndevice-uri=%s\nevent-code=%d\nevent-type=%s\n", device_uri, event, type);
+ 
+   /* Send message with no response. */
+   if (send(hpssd_socket, message, len, 0) == -1) 
+   {  
+      BUG("unable to send Event %s %d: %m\n", device_uri, event);
+   }  
+
+bugout:
+   if (hpssd_socket >= 0)
+      close(hpssd_socket);
+
     return 0;    
 }
 

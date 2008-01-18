@@ -22,105 +22,27 @@
 from __future__ import generators
 
 # Std Lib
-import sys, os, os.path, mmap, struct, time, threading, Queue, socket
-from cStringIO import StringIO
+import sys
+import os
+import threading
 import cPickle
+import time
+from cStringIO import StringIO
+import struct
 
 # Local
 from base.g import *
 from base.codes import *
-from base import device, utils, status, pml, msg, service
+from base import device, utils, msg, service, msg
 from base.kirbybase import KirbyBase
 from prnt import cups
+
 
 try:
     import coverpages
 except ImportError:
     pass
-
-# **************************************************************************** #
-
-# Page flags 
-PAGE_FLAG_NONE = 0x00
-PAGE_FLAG_NEW_PAGE = 0x01
-PAGE_FLAG_END_PAGE = 0x02
-PAGE_FLAG_NEW_DOC = 0x04
-PAGE_FLAG_END_DOC = 0x08
-PAGE_FLAG_END_STREAM = 0x10
-
-MAJOR_VER = 2
-MINOR_VER = 0
-
-MFPDTF_RASTER_BITMAP  = 0 # Not used
-MFPDTF_RASTER_GRAYMAP = 1 # Not used
-MFPDTF_RASTER_MH      = 2 # OfficeJets B&W Fax
-MFPDTF_RASTER_MR      = 3 # Not used
-MFPDTF_RASTER_MMR     = 4 # LaserJets B&W Fax
-MFPDTF_RASTER_RGB     = 5 # Not used
-MFPDTF_RASTER_YCC411  = 6 # Not used
-MFPDTF_RASTER_JPEG    = 7 # Color Fax
-MFPDTF_RASTER_PCL     = 8 # Not used
-MFPDTF_RASTER_NOT     = 9 # Not used
-
-# Data types for FH
-DT_UNKNOWN       = 0
-DT_FAX_IMAGES    = 1
-DT_SCANNED_IMAGES= 2
-DT_DIAL_STRINGS  = 3
-DT_DEMO_PAGES    = 4
-DT_SPEED_DIALS   = 5
-DT_FAX_LOGS      = 6
-DT_CFG_PARMS     = 7
-DT_LANG_STRS     = 8
-DT_JUNK_FAX_CSIDS= 9  
-DT_REPORT_STRS   = 10  
-DT_FONTS         = 11
-DT_TTI_BITMAP    = 12
-DT_COUNTERS      = 13
-DT_DEF_PARMS     = 14  
-DT_SCAN_OPTIONS  = 15
-DT_FW_JOB_TABLE  = 17
-
-# Raster data record types
-RT_START_PAGE = 0
-RT_RASTER = 1
-RT_END_PAGE = 2
-
-# FH
-FIXED_HEADER_SIZE = 8
-
-# Variants
-IMAGE_VARIANT_HEADER_SIZE = 10
-DIAL_STRINGS_VARIANT_HEADER_SIZE = 6
-FAX_IMAGE_VARIANT_HEADER_SIZE = 74
-
-# Data records
-SOP_RECORD_SIZE = 36
-RASTER_RECORD_SIZE = 4
-EOP_RECORD_SIZE = 12
-DIAL_STRING_RECORD_SIZE = 51
-
-# Page flags 
-PAGE_FLAG_NEW_PAGE = 0x01
-PAGE_FLAG_END_PAGE = 0x02
-PAGE_FLAG_NEW_DOC = 0x04
-PAGE_FLAG_END_DOC = 0x08
-PAGE_FLAG_END_STREAM = 0x10
-
-# Fax data variant header data source
-SRC_UNKNOWN = 0
-SRC_HOST = 2
-SRC_SCANNER = 5
-SRC_HOST_THEN_SCANNER = 6
-SRC_SCANNER_THEN_HOST = 7
-
-# Fax data variant header TTI header control
-TTI_NONE = 0
-TTI_PREPENDED_TO_IMAGE = 1
-TTI_OVERLAYED_ON_IMAGE = 2
-
-RASTER_DATA_SIZE = 504
-
+    
 # Update queue values (Send thread ==> UI)
 STATUS_IDLE = 0
 STATUS_PROCESSING_FILES = 1
@@ -195,9 +117,9 @@ EVENT_FAX_SEND_CANCELED = 1
 
 FILE_HEADER_SIZE = 28
 PAGE_HEADER_SIZE = 24
+    
 
 # **************************************************************************** #
-
 class FaxAddressBook2(object): # Pickle based address book
     def __init__(self):
         self._data = {}
@@ -240,10 +162,10 @@ class FaxAddressBook2(object): # Pickle based address book
                              e.group_list, 
                              e.notes.decode('utf-8'))
             self.save()
-            
+
         else:
             self.save() # save the empty file to create the file
-            
+
 
     def set(self, name, title, firstname, lastname, fax, groups, notes):
         try:
@@ -449,6 +371,7 @@ class FaxAddressBook(KirbyBase): # KirbyBase based address book
                 entry.group_list.remove(group_name)
                 self.update(['recno'], [entry.recno], [','.join(entry.group_list)], ['groups'])
 
+
 # **************************************************************************** #
 # DEPRECATED: TO BE REMOVED
 class AddressBookEntry(object):
@@ -471,77 +394,68 @@ class AddressBookEntry(object):
 
 
 # **************************************************************************** #
-
-
-# **************************************************************************** #
 class FaxDevice(device.Device):
 
     def __init__(self, device_uri=None, printer_name=None,
-                 hpssd_sock=None, callback=None):
+                 hpssd_sock=None, callback=None, 
+                 fax_type=FAX_TYPE_NONE):
 
         device.Device.__init__(self, device_uri, printer_name,
                                hpssd_sock, callback)
 
         self.send_fax_thread = None
         self.upload_log_thread = None
+        self.fax_type = fax_type
+        #self.fax_type = self.mq['fax-type']
 
     def setPhoneNum(self, num):
-        return self.setPML(pml.OID_FAX_LOCAL_PHONE_NUM, str(num))
+        raise AttributeError
+        #return self.setPML(pml.OID_FAX_LOCAL_PHONE_NUM, str(num))
 
     def getPhoneNum(self):
-        return utils.printable(str(self.getPML(pml.OID_FAX_LOCAL_PHONE_NUM)[1]))
+        raise AttributeError
+        #return utils.printable(str(self.getPML(pml.OID_FAX_LOCAL_PHONE_NUM)[1]))
 
-    phone_num = property(getPhoneNum, setPhoneNum, doc="OID_FAX_LOCAL_PHONE_NUM")
+    phone_num = property(getPhoneNum, setPhoneNum)
 
 
     def setStationName(self, name):
-        return self.setPML(pml.OID_FAX_STATION_NAME, str(name))
+        raise AttributeError
+        #return self.setPML(pml.OID_FAX_STATION_NAME, str(name))
 
     def getStationName(self):
-        return utils.printable(str(self.getPML(pml.OID_FAX_STATION_NAME)[1]))
+        raise AttributeError
+        #return utils.printable(str(self.getPML(pml.OID_FAX_STATION_NAME)[1]))
 
-    station_name = property(getStationName, setStationName, doc="OID_FAX_STATION_NAME")
+    station_name = property(getStationName, setStationName)
 
     def setDateAndTime(self):
-        t = time.localtime()
-        p = struct.pack("BBBBBBB", t[0]-2000, t[1], t[2], t[6]+1, t[3], t[4], t[5])
-        log.debug(repr(p))
-        return self.setPML(pml.OID_DATE_AND_TIME, p)
+        raise AttributeError
+##        t = time.localtime()
+##        p = struct.pack("BBBBBBB", t[0]-2000, t[1], t[2], t[6]+1, t[3], t[4], t[5])
+##        log.debug(repr(p))
+##        return self.setPML(pml.OID_DATE_AND_TIME, p)
 
     def uploadLog(self):
-        if not self.isUloadLogActive():
-            self.upload_log_thread = UploadLogThread(self)
-            self.upload_log_thread.start()
-            return True
-        else:
-            return False
+        raise AttributeError
+##        if not self.isUloadLogActive():
+##            self.upload_log_thread = UploadLogThread(self)
+##            self.upload_log_thread.start()
+##            return True
+##        else:
+##            return False
 
     def isUploadLogActive(self):
-        if self.upload_log_thread is not None:
-            return self.upload_log_thread.isAlive()
-        else:
-            return False
+        raise AttributeError
 
     def waitForUploadLogThread(self):
-        if self.upload_log_thread is not None and \
-            self.upload_log_thread.isAlive():
-
-            self.upload_log_thread.join()
-
+        raise AttributeError
 
     def sendFaxes(self, phone_num_list, fax_file_list, cover_message='', cover_re='', 
                   cover_func=None, preserve_formatting=False, printer_name='', 
                   update_queue=None, event_queue=None):
 
-        if not self.isSendFaxActive():
-            self.send_fax_thread = FaxSendThread(self, phone_num_list, fax_file_list, 
-                                                 cover_message, cover_re, cover_func, preserve_formatting, 
-                                                 printer_name, update_queue, event_queue)
-            self.send_fax_thread.start()
-            return True
-        else:
-            return False
-
+        raise AttributeError
 
     def isSendFaxActive(self):
         if self.send_fax_thread is not None:
@@ -559,99 +473,64 @@ class FaxDevice(device.Device):
                 pass
 
 
-class UploadLogThread(threading.Thread):
-    def __init__(self, dev):
-        threading.Thread.__init__(self)
-        self.dev = dev
+# **************************************************************************** #
 
+def getFaxDevice(device_uri=None, printer_name=None,
+                 hpssd_sock=None, callback=None, 
+                 fax_type=FAX_TYPE_NONE):
+                 
+    if fax_type == FAX_TYPE_NONE:
+        if device_uri is None and printer_name is not None:
+            printers = cups.getPrinters()
+    
+            for p in printers:
+                if p.name.lower() == printer_name.lower():
+                    device_uri = p.device_uri
+                    break
+            else:
+                raise Error(ERROR_DEVICE_NOT_FOUND)
+                
+        if device_uri is not None:
+            mq = device.queryModelByURI(device_uri)
+            fax_type = mq['fax-type']
+            
+    log.debug("fax-type=%d" % fax_type)
+                    
+    if fax_type in (FAX_TYPE_BLACK_SEND_EARLY_OPEN, FAX_TYPE_BLACK_SEND_LATE_OPEN):
+        from pmlfax import PMLFaxDevice
+        return PMLFaxDevice(device_uri, printer_name, hpssd_sock, callback, fax_type)
 
-    def run(self):
-        STATE_DONE = 0
-        STATE_ABORT = 10
-        STATE_SUCCESS = 20
-        STATE_BUSY = 25
-        STATE_DEVICE_OPEN = 28
-        STATE_CHECK_IDLE = 30
-        STATE_REQUEST_START = 40
-        STATE_WAIT_FOR_ACTIVE = 50
-        STATE_UPLOAD_DATA = 60
-        STATE_DEVICE_CLOSE = 70
-
-        state = STATE_CHECK_IDLE
-
-        while state != STATE_DONE: # --------------------------------- Log upload state machine
-            if state == STATE_ABORT: 
-                pass
-            elif state == STATE_SUCCESS:
-                pass
-            elif state == STATE_BUSY:
-                pass
-
-            elif state == STATE_DEVICE_OPEN: # --------------------------------- Open device (28)
-                state = STATE_REQUEST_START
-                try:
-                    self.dev.open()
-                except Error, e:
-                    log.error("Unable to open device (%s)." % e.msg)
-                    state = STATE_ERROR
-                else:
-                    try:
-                        dev.setPML(pml.OID_UPLOAD_TIMEOUT, pml.DEFAULT_UPLOAD_TIMEOUT)
-                    except Error:
-                        state = STATE_ERROR
-
-            elif state == STATE_CHECK_IDLE: # --------------------------------- Check idle (30)
-                state = STATE_REQUEST_START
-                ul_state = self.getCfgUploadState()
-
-                if ul_state != pml.UPDN_STATE_IDLE:
-                    state = STATE_BUSY
-
-
-            elif state == STATE_REQUEST_START: # --------------------------------- Request start (40)
-                state = STATE_WAIT_FOR_ACTIVE
-                self.dev.setPML(pml.OID_FAX_CFG_UPLOAD_DATA_TYPE, pml.FAX_CFG_UPLOAD_DATA_TYPE_FAXLOGS)
-                self.dev.setPML(pml.OID_DEVICE_CFG_UPLOAD, pml.UPDN_STATE_REQSTART)
-
-            elif state == STATE_WAIT_FOR_ACTIVE: # --------------------------------- Wait for active state (50)
-                state = STATE_UPLOAD_DATA
-
-                tries = 0
-                while True:
-                    tries += 1
-                    ul_state = self.getCfgUploadState()
-
-                    if ul_state == pml.UPDN_STATE_XFERACTIVE:
-                        break
-
-                    if ul_state in (pml.UPDN_STATE_ERRORABORT, pml.UPDN_STATE_XFERDONE):
-                        log.error("Cfg upload aborted!")
-                        state = STATE_ERROR
-                        break
-
-                    if tries > 10:
-                        state = STATE_ERROR
-                        log.error("Unable to get into active state!")
-                        break
-
-                    time.sleep(0.5)
-
-            elif state == STATE_UPLOAD_DATA: # --------------------------------- Upload log data (60)
-                pass
-
-            elif state == STATE_DEVICE_CLOSE: # --------------------------------- Close device (70)
-                self.dev.close()
+    else:
+        raise Error(ERROR_DEVICE_DOES_NOT_SUPPORT_OPERATION)
 
 
 
+# **************************************************************************** #
 
+# TODO: Define these in only 1 place!
+STATE_DONE = 0
+STATE_ABORTED = 10
+STATE_SUCCESS = 20
+STATE_BUSY = 25
+STATE_READ_SENDER_INFO = 30
+STATE_PRERENDER = 40
+STATE_COUNT_PAGES = 50
+STATE_NEXT_RECIPIENT = 60
+STATE_COVER_PAGE = 70
+STATE_SINGLE_FILE = 80
+STATE_MERGE_FILES = 90
+STATE_SINGLE_FILE = 100
+STATE_SEND_FAX = 110
+STATE_CLEANUP = 120
+STATE_ERROR = 130 
+    
 class FaxSendThread(threading.Thread):
     def __init__(self, dev, phone_num_list, fax_file_list, 
                  cover_message='', cover_re='', cover_func=None, preserve_formatting=False,
                  printer_name='', update_queue=None, event_queue=None):
 
         threading.Thread.__init__(self)
-        self.dev = dev
+        self.dev = dev # device.Device
         self.phone_num_list = phone_num_list
         self.fax_file_list = fax_file_list
         self.update_queue = update_queue
@@ -664,819 +543,257 @@ class FaxSendThread(threading.Thread):
         self.prev_update = ''
         self.remove_temp_file = False
         self.preserve_formatting = preserve_formatting
+        self.results = {} # {'file' : error_code,...}
+        self.cover_page_present = False
+        self.recipient_file_list = []
+        self.f = None # final file of fax data to send (pages merged)
+        self.job_hort_dpi = 0
+        self.job_hort_dpi = 0
+        self.job_vert_dpi = 0
+        self.job_page_size = 0
+        self.job_resolution = 0
+        self.job_encoding = 0
 
 
-    def run(self):
-        results = {} # {'file' : error_code,...}
+    def pre_render(self, state):
+        # pre-render each page that needs rendering
+        # except for the cover page
+        self.cover_page_present = False
+        log.debug(self.fax_file_list)
 
-        STATE_DONE = 0
-        STATE_ABORTED = 10
-        STATE_SUCCESS = 20
-        STATE_BUSY = 25
-        STATE_READ_SENDER_INFO = 30
-        STATE_PRERENDER = 40
-        STATE_COUNT_PAGES = 50
-        STATE_NEXT_RECIPIENT = 60
-        STATE_COVER_PAGE = 70
-        STATE_SINGLE_FILE = 80
-        STATE_MERGE_FILES = 90
-        STATE_SINGLE_FILE = 100
-        STATE_SEND_FAX = 110
-        STATE_CLEANUP = 120
-        STATE_ERROR = 130
+        for fax_file in self.fax_file_list: # (file, type, desc, title)
+            fax_file_name, fax_file_type, fax_file_desc, \
+                fax_file_title, fax_file_pages = fax_file
 
-        next_recipient = self.next_recipient_gen()
+            if fax_file_type == "application/hplip-fax-coverpage": # render later
+                self.cover_page_present = True
+                log.debug("Skipping coverpage")
 
-        state = STATE_READ_SENDER_INFO
-        self.rendered_file_list = []
+            #if fax_file_type == "application/hplip-fax": # already rendered
+            else:
+                self.rendered_file_list.append((fax_file_name, "application/hplip-fax",
+                    "HP Fax", fax_file_title))
 
-        while state != STATE_DONE: # --------------------------------- Fax state machine
+                log.debug("Processing pre-rendered file: %s (%d pages)" % 
+                    (fax_file_name, fax_file_pages))
+
             if self.check_for_cancel():
                 state = STATE_ABORTED
 
-            log.debug("STATE=(%d, 0, 0)" % state)
+        log.debug(self.rendered_file_list)  
 
-            if state == STATE_ABORTED: # --------------------------------- Aborted (10, 0, 0)
-                log.error("Aborted by user.")
-                self.write_queue((STATUS_IDLE, 0, ''))
-                state = STATE_CLEANUP
+        if self.check_for_cancel():
+            state = STATE_ABORTED
 
-
-            elif state == STATE_SUCCESS: # --------------------------------- Success (20, 0, 0)
-                log.debug("Success.")
-                self.write_queue((STATUS_COMPLETED, 0, ''))
-                state = STATE_CLEANUP
+        return state
 
 
-            elif state == STATE_ERROR: # --------------------------------- Error (130, 0, 0)
-                log.error("Error, aborting.")
-                self.write_queue((STATUS_ERROR, 0, ''))
-                state = STATE_CLEANUP
+    def count_pages(self, state):
+        self.recipient_file_list = self.rendered_file_list[:]
+        log.debug("Counting total pages...")
+        self.job_total_pages = 0
+        log.debug(self.recipient_file_list)
 
+        i = 0
+        for fax_file in self.recipient_file_list: # (file, type, desc, title)
+            fax_file_name = fax_file[0]
+            log.debug("Processing file (counting pages): %s..." % fax_file_name)
 
-            elif state == STATE_BUSY: # --------------------------------- Busy (25, 0, 0)
-                log.error("Device busy, aborting.")
-                self.write_queue((STATUS_BUSY, 0, ''))
-                state = STATE_CLEANUP
+            #self.write_queue((STATUS_PROCESSING_FILES, self.job_total_pages, ''))
 
+            if os.path.exists(fax_file_name):
+                self.results[fax_file_name] = ERROR_SUCCESS
+                fax_file_fd = file(fax_file_name, 'r')
+                header = fax_file_fd.read(FILE_HEADER_SIZE)
 
-            elif state == STATE_READ_SENDER_INFO: # --------------------------------- Get sender info (30, 0, 0)
-                log.debug("%s State: Get sender info" % ("*"*20))
-                state = STATE_PRERENDER
-                try:
-                    try:
-                        self.dev.open()
-                    except Error, e:
-                        log.error("Unable to open device (%s)." % e.msg)
-                        state = STATE_ERROR
-                    else:
-                        try:
-                            self.sender_name = self.dev.station_name
-                            log.debug("Sender name=%s" % self.sender_name)
-                            self.sender_fax = self.dev.phone_num
-                            log.debug("Sender fax=%s" % self.sender_fax)
-                        except Error:
-                            log.error("PML get failed!")
-                            state = STATE_ERROR
+                magic, version, total_pages, hort_dpi, vert_dpi, page_size, \
+                    resolution, encoding, reserved1, reserved2 = \
+                        self.decode_fax_header(header)
 
-                finally:
-                    self.dev.close()
-
-
-            elif state == STATE_PRERENDER: # --------------------------------- Pre-render non-G3 files (40, 0, 0)
-                log.debug("%s State: Pre-render non-G3 files" % ("*"*20))
-                # pre-render each page that needs rendering
-                # except for the cover page
-                state = STATE_COUNT_PAGES
-                cover_page_present = False
-                log.debug(self.fax_file_list)
-
-                for fax_file in self.fax_file_list: # (file, type, desc, title)
-                    fax_file_name, fax_file_type, fax_file_desc, fax_file_title, fax_file_pages = fax_file
-
-                    if fax_file_type == "application/hplip-fax-coverpage": # render later
-                        cover_page_present = True
-                        log.debug("Skipping coverpage")
-
-                    #if fax_file_type == "application/hplip-fax": # already rendered
-                    else:
-                        self.rendered_file_list.append((fax_file_name, "application/hplip-fax", "HP Fax", fax_file_title))
-                        log.debug("Processing pre-rendered file: %s (%d pages)" % (fax_file_name, fax_file_pages))
-
-                    if self.check_for_cancel():
-                        state = STATE_ABORTED
-
-                log.debug(self.rendered_file_list)
-
-
-            elif state == STATE_COUNT_PAGES: # --------------------------------- Get total page count (50, 0, 0)
-                log.debug("%s State: Get total page count" % ("*"*20))
-                state = STATE_NEXT_RECIPIENT
-                recipient_file_list = self.rendered_file_list[:]
-                log.debug("Counting total pages...")
-                self.job_total_pages = 0
-                log.debug(recipient_file_list)
-
-                i = 0
-                for fax_file in recipient_file_list: # (file, type, desc, title)
-                    fax_file_name = fax_file[0]
-                    log.debug("Processing file (counting pages): %s..." % fax_file_name)
-
-                    #self.write_queue((STATUS_PROCESSING_FILES, self.job_total_pages, ''))
-
-                    if os.path.exists(fax_file_name):
-                        results[fax_file_name] = ERROR_SUCCESS
-                        fax_file_fd = file(fax_file_name, 'r')
-                        header = fax_file_fd.read(FILE_HEADER_SIZE)
-
-                        magic, version, total_pages, hort_dpi, vert_dpi, page_size, \
-                            resolution, encoding, reserved1, reserved2 = self.decode_fax_header(header)
-
-                        if magic != 'hplip_g3':
-                            log.error("Invalid file header. Bad magic.")
-                            results[fax_file_name] = ERROR_FAX_INVALID_FAX_FILE
-                            state = STATE_ERROR
-                            continue
-
-                        if not i:
-                            job_hort_dpi, job_vert_dpi, job_page_size, job_resolution, job_encoding = \
-                                hort_dpi, vert_dpi, page_size, resolution, encoding
-                            i += 1
-                        else:
-                            if job_hort_dpi != hort_dpi or \
-                                job_vert_dpi != vert_dpi or \
-                                job_page_size != page_size or \
-                                job_resolution != resolution or \
-                                job_encoding != encoding:
-
-                                log.error("Incompatible options for file: %s" % fax_file_name)
-                                results[fax_file_name] = ERROR_FAX_INCOMPATIBLE_OPTIONS
-                                state = STATE_ERROR
-
-
-                        log.debug("Magic=%s Ver=%d Pages=%d hDPI=%d vDPI=%d Size=%d Res=%d Enc=%d" %
-                                  (magic, version, total_pages, hort_dpi, vert_dpi, page_size, resolution, encoding))
-
-                        self.job_total_pages += total_pages
-
-                        fax_file_fd.close()
-
-                    else:
-                        log.error("Unable to find HP Fax file: %s" % fax_file_name)
-                        results[fax_file_name] = ERROR_FAX_FILE_NOT_FOUND
-                        state = STATE_ERROR
-                        break
-
-                    if self.check_for_cancel():
-                        state = STATE_ABORTED
-                        break
-
-
-                if cover_page_present:
-                    self.job_total_pages += 1 # Cover pages are truncated to 1 page
-
-                log.debug("Total fax pages=%d" % self.job_total_pages)                        
-
-
-            elif state == STATE_NEXT_RECIPIENT: # --------------------------------- Loop for multiple recipients (60, 0, 0)
-                log.debug("%s State: Next recipient" % ("*"*20))
-                state = STATE_COVER_PAGE
-
-                try:
-                    recipient = next_recipient.next()
-                    #print recipient
-                    log.debug("Processing for recipient %s" % recipient['name'])
-                except StopIteration:
-                    state = STATE_SUCCESS
-                    log.debug("Last recipient.")
+                if magic != 'hplip_g3':
+                    log.error("Invalid file header. Bad magic.")
+                    self.results[fax_file_name] = ERROR_FAX_INVALID_FAX_FILE
+                    state = STATE_ERROR
                     continue
 
-                recipient_file_list = self.rendered_file_list[:]
+                if not i:
+                    self.job_hort_dpi, self.job_vert_dpi, self.job_page_size, \
+                        self.job_resolution, self.job_encoding = \
+                        hort_dpi, vert_dpi, page_size, resolution, encoding
 
-
-            elif state == STATE_COVER_PAGE: # --------------------------------- Create cover page (70, 0, 0)
-                log.debug("%s State: Render cover page" % ("*"*20))
-
-                if self.job_total_pages > 1:
-                    state = STATE_MERGE_FILES
+                    i += 1
                 else:
-                    state = STATE_SINGLE_FILE
+                    if self.job_hort_dpi != hort_dpi or \
+                        self.job_vert_dpi != vert_dpi or \
+                        self.job_page_size != page_size or \
+                        self.job_resolution != resolution or \
+                        self.job_encoding != encoding:
 
-                if cover_page_present:
-                    log.debug("Creating cover page for recipient: %s" % recipient['name'])
-                    fax_file, canceled = self.render_cover_page(recipient)
-
-                    if canceled:
-                        state = STATE_ABORTED
-                    elif not fax_file:
-                        state = STATE_ERROR # timeout
-                    else:
-                        recipient_file_list.insert(0, (fax_file, "application/hplip-fax", 
-                            "HP Fax", 'Cover Page'))
-                            
-                        log.debug("Cover page G3 file: %s" % fax_file)
-
-                        results[fax_file] = ERROR_SUCCESS
+                        log.error("Incompatible options for file: %s" % fax_file_name)
+                        self.results[fax_file_name] = ERROR_FAX_INCOMPATIBLE_OPTIONS
+                        state = STATE_ERROR
 
 
-            elif state == STATE_SINGLE_FILE: # --------------------------------- Special case for single file (no merge) (80, 0, 0)
-                log.debug("%s State: Handle single file" % ("*"*20))
-                state = STATE_SEND_FAX
+                log.debug("Magic=%s Ver=%d Pages=%d hDPI=%d vDPI=%d Size=%d Res=%d Enc=%d" %
+                          (magic, version, total_pages, hort_dpi, 
+                           vert_dpi, page_size, resolution, encoding))
 
-                log.debug("Processing single file...")
+                self.job_total_pages += total_pages
 
-                f = recipient_file_list[0][0]
+                fax_file_fd.close()
 
-                try:
-                    f_fd = file(f, 'r')
-                except IOError:
-                    log.error("Unable to open fax file: %s" % f)
-                    state = STATE_ERROR
-                else:
-                    header = f_fd.read(FILE_HEADER_SIZE)
+            else:
+                log.error("Unable to find HP Fax file: %s" % fax_file_name)
+                self.results[fax_file_name] = ERROR_FAX_FILE_NOT_FOUND
+                state = STATE_ERROR
+                break
+
+            if self.check_for_cancel():
+                state = STATE_ABORTED
+                break
+
+
+        if self.cover_page_present:
+            self.job_total_pages += 1 # Cover pages are truncated to 1 page
+
+        log.debug("Total fax pages=%d" % self.job_total_pages)
+
+        return state
+
+
+    def cover_page(self,  recipient):
+        if self.job_total_pages > 1:
+            state = STATE_MERGE_FILES
+        else:
+            state = STATE_SINGLE_FILE
+
+        if self.cover_page_present:
+            log.debug("Creating cover page for recipient: %s" % recipient['name'])
+            fax_file, canceled = self.render_cover_page(recipient)
+
+            if canceled:
+                state = STATE_ABORTED
+            elif not fax_file:
+                state = STATE_ERROR # timeout
+            else:
+                self.recipient_file_list.insert(0, (fax_file, "application/hplip-fax", 
+                                                    "HP Fax", 'Cover Page'))
+
+                log.debug("Cover page G3 file: %s" % fax_file)
+
+                self.results[fax_file] = ERROR_SUCCESS
+
+        return state
+
+    def single_file(self, state):
+        state = STATE_SEND_FAX
+
+        log.debug("Processing single file...")
+
+        self.f = self.recipient_file_list[0][0]
+
+        try:
+            f_fd = file(self.f, 'r')
+        except IOError:
+            log.error("Unable to open fax file: %s" % self.f)
+            state = STATE_ERROR
+        else:
+            header = f_fd.read(FILE_HEADER_SIZE)
+
+            magic, version, total_pages, hort_dpi, vert_dpi, page_size, \
+                resolution, encoding, reserved1, reserved2 = self.decode_fax_header(header)
+
+            self.results[self.f] = ERROR_SUCCESS
+
+            if magic != 'hplip_g3':
+                log.error("Invalid file header. Bad magic.")
+                self.results[self.f] = ERROR_FAX_INVALID_FAX_FILE
+                state = STATE_ERROR
+
+            log.debug("Magic=%s Ver=%d Pages=%d hDPI=%d vDPI=%d Size=%d Res=%d Enc=%d" %
+                      (magic, version, total_pages, hort_dpi, vert_dpi, 
+                       page_size, resolution, encoding))
+
+            f_fd.close()
+
+        return state
+
+
+    def merge_files(self, state):
+        log.debug("%s State: Merge multiple files" % ("*"*20))
+        log.debug(self.recipient_file_list)
+        log.debug("Merging g3 files...")
+        self.remove_temp_file = True
+
+        if self.job_total_pages:
+            f_fd, self.f = utils.make_temp_file()
+            log.debug("Temp file=%s" % self.f)
+
+            data = struct.pack(">8sBIHHBBBII", "hplip_g3", 1L, self.job_total_pages,  
+                self.job_hort_dpi, self.job_vert_dpi, self.job_page_size, 
+                self.job_resolution, self.job_encoding, 
+                0L, 0L)
+
+            os.write(f_fd, data)
+
+            job_page_num = 1
+
+            for fax_file in self.recipient_file_list:
+                fax_file_name = fax_file[0]
+                log.debug("Processing file: %s..." % fax_file_name)
+
+                if self.results[fax_file_name] == ERROR_SUCCESS:
+                    fax_file_fd = file(fax_file_name, 'r')
+                    header = fax_file_fd.read(FILE_HEADER_SIZE)
 
                     magic, version, total_pages, hort_dpi, vert_dpi, page_size, \
                         resolution, encoding, reserved1, reserved2 = self.decode_fax_header(header)
 
-                    results[f] = ERROR_SUCCESS
-
                     if magic != 'hplip_g3':
                         log.error("Invalid file header. Bad magic.")
-                        results[f] = ERROR_FAX_INVALID_FAX_FILE
                         state = STATE_ERROR
+                        break
 
                     log.debug("Magic=%s Ver=%d Pages=%d hDPI=%d vDPI=%d Size=%d Res=%d Enc=%d" %
                               (magic, version, total_pages, hort_dpi, vert_dpi, page_size, resolution, encoding))
 
-                    f_fd.close()
+                    for p in range(total_pages):
+                        header = fax_file_fd.read(PAGE_HEADER_SIZE)
 
+                        page_num, ppr, rpp, bytes_to_read, thumbnail_bytes, reserved2 = \
+                            self.decode_page_header(header)
 
-            elif state == STATE_MERGE_FILES: # --------------------------------- Merge multiple G3 files (90, 0, 0)
-                log.debug("%s State: Merge multiple files" % ("*"*20))
-                log.debug(recipient_file_list)
-                log.debug("Merging g3 files...")
-                state = STATE_SEND_FAX
-                self.remove_temp_file = True
+                        if page_num == -1:
+                            log.error("Page header error")
+                            state - STATE_ERROR
+                            break
 
-                if self.job_total_pages:
-                    f_fd, f = utils.make_temp_file()
-                    log.debug("Temp file=%s" % f)
+                        header = struct.pack(">IIIIII", job_page_num, ppr, rpp, bytes_to_read, thumbnail_bytes, 0L)
+                        os.write(f_fd, header)
 
-                    data = struct.pack(">8sBIHHBBBII", "hplip_g3", 1L, self.job_total_pages,  
-                        job_hort_dpi, job_vert_dpi, job_page_size, job_resolution, job_encoding, 
-                        0L, 0L)
+                        self.write_queue((STATUS_PROCESSING_FILES, job_page_num, ''))
 
-                    os.write(f_fd, data)
+                        log.debug("Page=%d PPR=%d RPP=%d BPP=%d Thumb=%s" %
+                                  (page_num, ppr, rpp, bytes_to_read, thumbnail_bytes))                    
 
-                    job_page_num = 1
+                        os.write(f_fd, fax_file_fd.read(bytes_to_read))
+                        job_page_num += 1
 
-                    for fax_file in recipient_file_list:
-                        fax_file_name = fax_file[0]
-                        log.debug("Processing file: %s..." % fax_file_name)
-
-                        if results[fax_file_name] == ERROR_SUCCESS:
-                            fax_file_fd = file(fax_file_name, 'r')
-                            header = fax_file_fd.read(FILE_HEADER_SIZE)
-
-                            magic, version, total_pages, hort_dpi, vert_dpi, page_size, \
-                                resolution, encoding, reserved1, reserved2 = self.decode_fax_header(header)
-
-                            if magic != 'hplip_g3':
-                                log.error("Invalid file header. Bad magic.")
-                                state = STATE_ERROR
-                                break
-
-                            log.debug("Magic=%s Ver=%d Pages=%d hDPI=%d vDPI=%d Size=%d Res=%d Enc=%d" %
-                                      (magic, version, total_pages, hort_dpi, vert_dpi, page_size, resolution, encoding))
-
-                            for p in range(total_pages):
-                                header = fax_file_fd.read(PAGE_HEADER_SIZE)
-
-                                page_num, ppr, rpp, bytes_to_read, thumbnail_bytes, reserved2 = \
-                                    self.decode_page_header(header)
-
-                                if page_num == -1:
-                                    log.error("Page header error")
-                                    state - STATE_ERROR
-                                    break
-
-                                header = struct.pack(">IIIIII", job_page_num, ppr, rpp, bytes_to_read, thumbnail_bytes, 0L)
-                                os.write(f_fd, header)
-
-                                self.write_queue((STATUS_PROCESSING_FILES, job_page_num, ''))
-
-                                log.debug("Page=%d PPR=%d RPP=%d BPP=%d Thumb=%s" %
-                                          (page_num, ppr, rpp, bytes_to_read, thumbnail_bytes))                    
-
-                                os.write(f_fd, fax_file_fd.read(bytes_to_read))
-                                job_page_num += 1
-
-                            fax_file_fd.close()
-
-                            if self.check_for_cancel():
-                                state = STATE_ABORTED
-                                break
-
-                        else:
-                            log.error("Skipping file: %s" % fax_file_name)
-                            continue
-
-                    os.close(f_fd)
-                    log.debug("Total pages=%d" % self.job_total_pages)
-
-
-            elif state == STATE_SEND_FAX: # --------------------------------- Send fax state machine (110, 0, 0)
-                log.debug("%s State: Send fax" % ("*"*20))
-                state = STATE_NEXT_RECIPIENT
-
-                FAX_SEND_STATE_DONE = 0
-                FAX_SEND_STATE_ABORT = 10
-                FAX_SEND_STATE_ERROR = 20
-                FAX_SEND_STATE_BUSY = 25
-                FAX_SEND_STATE_SUCCESS = 30
-                FAX_SEND_STATE_DEVICE_OPEN = 40
-                FAX_SEND_STATE_SET_TOKEN = 50
-                FAX_SEND_STATE_EARLY_OPEN = 60
-                FAX_SEND_STATE_SET_PARAMS = 70
-                FAX_SEND_STATE_CHECK_IDLE = 80
-                FAX_SEND_STATE_START_REQUEST = 90
-                FAX_SEND_STATE_LATE_OPEN = 100
-                FAX_SEND_STATE_SEND_DIAL_STRINGS = 110
-                FAX_SEND_STATE_SEND_FAX_HEADER = 120
-                FAX_SEND_STATE_SEND_PAGES = 130
-                FAX_SEND_STATE_SEND_END_OF_STREAM = 140
-                FAX_SEND_STATE_WAIT_FOR_COMPLETE = 150
-                FAX_SEND_STATE_RESET_TOKEN = 160
-                FAX_SEND_STATE_CLOSE_SESSION = 170
-
-                monitor_state = False
-                fax_send_state = FAX_SEND_STATE_DEVICE_OPEN
-
-                while fax_send_state != FAX_SEND_STATE_DONE:
+                    fax_file_fd.close()
 
                     if self.check_for_cancel():
-                        log.error("Fax send aborted.")
-                        fax_send_state = FAX_SEND_STATE_ABORT
-
-                    if monitor_state:
-                        fax_state = self.getFaxDownloadState() 
-                        if not fax_state in (pml.UPDN_STATE_XFERACTIVE, pml.UPDN_STATE_XFERDONE):
-                            log.error("D/L error state=%d" % fax_state)
-                            fax_send_state = FAX_SEND_STATE_ERROR
-                            state = STATE_ERROR
-
-                    log.debug("STATE=(%d, %d, 0)" % (STATE_SEND_FAX, fax_send_state))
-
-                    if fax_send_state == FAX_SEND_STATE_ABORT: # -------------- Abort (110, 10, 0)
-                        # TODO: Set D/L state to ???
-                        monitor_state = False
-                        fax_send_state = FAX_SEND_STATE_RESET_TOKEN
                         state = STATE_ABORTED
+                        break
 
-                    elif fax_send_state == FAX_SEND_STATE_ERROR: # -------------- Error (110, 20, 0)
-                        log.error("Fax send error.")
-                        monitor_state = False
+                else:
+                    log.error("Skipping file: %s" % fax_file_name)
+                    continue
 
-                        fax_send_state = FAX_SEND_STATE_RESET_TOKEN
-                        state = STATE_ERROR
+            os.close(f_fd)
+            log.debug("Total pages=%d" % self.job_total_pages)
 
-                        #fax_send_state = FAX_SEND_STATE_DONE
-                        #state = STATE_NEXT_RECIPIENT
+        return state
 
-
-                    elif fax_send_state == FAX_SEND_STATE_BUSY: # -------------- Busy (110, 25, 0)
-                        log.error("Fax device busy.")
-                        monitor_state = False
-                        fax_send_state = FAX_SEND_STATE_RESET_TOKEN
-                        state = STATE_BUSY
-
-                    elif fax_send_state == FAX_SEND_STATE_SUCCESS: # -------------- Success (110, 30, 0)
-                        log.debug("Fax send success.")
-                        monitor_state = False
-                        fax_send_state = FAX_SEND_STATE_RESET_TOKEN
-                        state = STATE_NEXT_RECIPIENT
-
-                    elif fax_send_state == FAX_SEND_STATE_DEVICE_OPEN: # -------------- Device open (110, 40, 0)
-                        log.debug("%s State: Open device" % ("*"*20))
-                        fax_send_state = FAX_SEND_STATE_SET_TOKEN
-                        try:
-                            self.dev.open()
-                        except Error, e:
-                            log.error("Unable to open device (%s)." % e.msg)
-                            fax_send_state = FAX_SEND_STATE_ERROR
-                        else:
-                            if self.dev.device_state == DEVICE_STATE_NOT_FOUND:
-                                fax_send_state = FAX_SEND_STATE_ERROR
-
-                    elif fax_send_state == FAX_SEND_STATE_SET_TOKEN: # -------------- Acquire fax token (110, 50, 0)
-                        log.debug("%s State: Acquire fax token" % ("*"*20))
-                        try:
-                            result_code, token = self.dev.getPML(pml.OID_FAX_TOKEN)
-                        except Error:
-                            log.debug("Unable to acquire fax token (1).")
-                            fax_send_state = FAX_SEND_STATE_EARLY_OPEN
-                        else:
-                            if result_code > pml.ERROR_MAX_OK:
-                                fax_send_state = FAX_SEND_STATE_EARLY_OPEN
-                                log.debug("Skipping token acquisition.")
-                            else:
-                                token = time.strftime("%d%m%Y%H:%M:%S", time.gmtime())
-                                log.debug("Setting token: %s" % token)
-                                try:
-                                    self.dev.setPML(pml.OID_FAX_TOKEN, token)
-                                except Error:
-                                    log.error("Unable to acquire fax token (2).")
-                                    fax_send_state = FAX_SEND_STATE_ERROR
-                                else:
-                                    result_code, check_token = self.dev.getPML(pml.OID_FAX_TOKEN)
-
-                                    if check_token == token:
-                                        fax_send_state = FAX_SEND_STATE_EARLY_OPEN
-                                    else:
-                                        log.error("Unable to acquire fax token (3).")
-                                        fax_send_state = FAX_SEND_STATE_ERROR
-
-
-                    elif fax_send_state == FAX_SEND_STATE_EARLY_OPEN: # -------------- Early open (newer models) (110, 60, 0)
-                        log.debug("%s State: Early open" % ("*"*20))
-                        fax_send_state = FAX_SEND_STATE_CHECK_IDLE
-
-                        if self.dev.fax_type == FAX_TYPE_BLACK_SEND_EARLY_OPEN: # newer
-                            log.debug("Opening fax channel.")
-                            try:
-                                self.dev.openFax()
-                            except Error, e:
-                                log.error("Unable to open channel (%s)." % e.msg)
-                                fax_send_state = FAX_SEND_STATE_ERROR
-                        else:
-                            log.debug("Skipped.")
-
-
-                    elif fax_send_state == FAX_SEND_STATE_CHECK_IDLE: # -------------- Check for initial idle (110, 80, 0)
-                        log.debug("%s State: Check idle" % ("*"*20))
-                        fax_send_state = FAX_SEND_STATE_START_REQUEST
-
-                        dl_state = self.getFaxDownloadState()
-                        tx_status = self.getFaxJobTxStatus()
-                        rx_status = self.getFaxJobRxStatus()
-
-                        if ((dl_state == pml.UPDN_STATE_IDLE or \
-                            dl_state == pml.UPDN_STATE_ERRORABORT or \
-                            dl_state == pml.UPDN_STATE_XFERDONE) and \
-                            (tx_status == pml.FAXJOB_TX_STATUS_IDLE or tx_status == pml.FAXJOB_TX_STATUS_DONE) and \
-                            (rx_status == pml.FAXJOB_RX_STATUS_IDLE or rx_status == pml.FAXJOB_RX_STATUS_DONE)):
-
-                            if state == pml.UPDN_STATE_IDLE:
-                                log.debug("Starting in idle state")
-                            else:
-                                log.debug("Reseting to idle...")
-                                self.dev.setPML(pml.OID_FAX_DOWNLOAD, pml.UPDN_STATE_IDLE)
-                                time.sleep(0.5)
-                        else:
-                            fax_send_state = FAX_SEND_STATE_BUSY
-
-                    elif fax_send_state == FAX_SEND_STATE_START_REQUEST: # -------------- Request fax start (110, 90, 0) 
-                        log.debug("%s State: Request start" % ("*"*20))
-                        fax_send_state = FAX_SEND_STATE_SET_PARAMS
-
-                        dl_state = self.getFaxDownloadState()
-
-                        if dl_state == pml.UPDN_STATE_IDLE:
-                            self.dev.setPML(pml.OID_FAX_DOWNLOAD, pml.UPDN_STATE_REQSTART)
-                            time.sleep(1)
-
-                            log.debug("Waiting for active state...")
-                            i = 0
-
-                            while i < 10:
-                                log.debug("Try: %d" % i)
-                                try:
-                                    dl_state = self.getFaxDownloadState()
-                                except Error:
-                                    log.error("PML/SNMP error")
-                                    fax_send_state = FAX_SEND_STATE_ERROR
-                                    break
-
-                                if dl_state == pml.UPDN_STATE_XFERACTIVE:
-                                    break
-
-                                time.sleep(1)
-                                self.dev.setPML(pml.OID_FAX_DOWNLOAD, pml.UPDN_STATE_REQSTART)
-
-                                i += 1
-
-                            else:  
-                                log.error("Could not get into active state!")
-                                fax_send_state = FAX_SEND_STATE_BUSY
-
-                            monitor_state = True
-
-                        else:
-                            log.error("Could not get into idle state!")
-                            fax_send_state = FAX_SEND_STATE_BUSY
-
-
-                    elif fax_send_state == FAX_SEND_STATE_SET_PARAMS: # -------------- Set fax send params (110, 70, 0)
-                        log.debug("%s State: Set params" % ("*"*20))
-                        fax_send_state = FAX_SEND_STATE_LATE_OPEN
-
-                        try:
-                            self.dev.setPML(pml.OID_DEV_DOWNLOAD_TIMEOUT, pml.DEFAULT_DOWNLOAD_TIMEOUT)
-                            self.dev.setPML(pml.OID_FAXJOB_TX_TYPE, pml.FAXJOB_TX_TYPE_HOST_ONLY)
-                            log.debug("Setting date and time on device.")                            
-                            self.dev.setDateAndTime() 
-                        except Error, e:
-                            log.error("PML/SNMP error (%s)" % e.msg)
-                            fax_send_state = FAX_SEND_STATE_ERROR
-
-
-                    elif fax_send_state == FAX_SEND_STATE_LATE_OPEN: # -------------- Late open (older models) (110, 100, 0)
-                        log.debug("%s State: Late open" % ("*"*20))
-                        fax_send_state = FAX_SEND_STATE_SEND_DIAL_STRINGS
-
-                        if self.dev.fax_type == FAX_TYPE_BLACK_SEND_LATE_OPEN: # older
-                            log.debug("Opening fax channel.")
-                            try:
-                                self.dev.openFax()
-                            except Error:
-                                log.error("Unable to open channel.")
-                                fax_send_state = FAX_SEND_STATE_ERROR
-                        else:
-                            log.debug("Skipped.")
-
-
-                    elif fax_send_state == FAX_SEND_STATE_SEND_DIAL_STRINGS: # -------------- Dial strings (110, 110, 0)
-                        log.debug("%s State: Send dial strings" % ("*"*20))
-                        fax_send_state = FAX_SEND_STATE_SEND_FAX_HEADER
-
-                        log.debug("Dialing: %s" % recipient['fax'])
-
-                        log.debug("Sending dial strings...")
-                        self.create_mfpdtf_fixed_header(DT_DIAL_STRINGS, True, 
-                            PAGE_FLAG_NEW_DOC | PAGE_FLAG_END_DOC | PAGE_FLAG_END_STREAM) # 0x1c on Windows, we were sending 0x0c
-                        #print recipient
-                        self.create_mfpdtf_dial_strings(recipient['fax'].encode('ascii'))
-
-                        try:
-                            self.write_stream()
-                        except Error:
-                            log.error("Channel write error.")
-                            fax_send_state = FAX_SEND_STATE_ERROR
-
-
-                    elif fax_send_state == FAX_SEND_STATE_SEND_FAX_HEADER: # -------------- Fax header (110, 120, 0)
-                        log.debug("%s State: Send fax header" % ("*"*20))
-                        fax_send_state = FAX_SEND_STATE_SEND_PAGES
-
-                        try:
-                            ff = file(f, 'r')
-                        except IOError:
-                            log.error("Unable to read fax file.")
-                            fax_send_state = FAX_SEND_STATE_ERROR
-                            continue
-
-                        try:
-                            header = ff.read(FILE_HEADER_SIZE)
-                        except IOError:
-                            log.error("Unable to read fax file.")
-                            fax_send_state = FAX_SEND_STATE_ERROR
-                            continue
-
-                        magic, version, total_pages, hort_dpi, vert_dpi, page_size, \
-                            resolution, encoding, reserved1, reserved2 = self.decode_fax_header(header)
-
-
-                        if magic != 'hplip_g3':
-                            log.error("Invalid file header. Bad magic.")
-                            fax_send_state = FAX_SEND_STATE_ERROR
-                        else:
-                            log.debug("Magic=%s Ver=%d Pages=%d hDPI=%d vDPI=%d Size=%d Res=%d Enc=%d" %
-                                      (magic, version, total_pages, hort_dpi, vert_dpi, page_size, resolution, encoding))
-
-                            log.debug("Sending fax header...")
-                            self.create_mfpdtf_fixed_header(DT_FAX_IMAGES, True, PAGE_FLAG_NEW_DOC)
-                            self.create_mfpdtf_fax_header(total_pages)
-
-                            try:
-                                self.write_stream()
-                            except Error:
-                                log.error("Unable to write to channel.")
-                                fax_send_state = FAX_SEND_STATE_ERROR
-
-
-                    elif fax_send_state == FAX_SEND_STATE_SEND_PAGES:  # --------------------------------- Send fax pages state machine (110, 130, 0)
-                        log.debug("%s State: Send pages" % ("*"*20))
-                        fax_send_state = FAX_SEND_STATE_SEND_END_OF_STREAM
-                        page = StringIO()
-
-                        for p in range(total_pages):
-
-                            if self.check_for_cancel():
-                                fax_send_state = FAX_SEND_STATE_ABORT
-
-                            if fax_send_state == FAX_SEND_STATE_ABORT:
-                                break
-
-                            try:
-                                header = ff.read(PAGE_HEADER_SIZE)
-                            except IOError:
-                                log.error("Unable to read fax file.")
-                                fax_send_state = FAX_SEND_STATE_ERROR
-                                continue
-
-                            page_num, ppr, rpp, bytes_to_read, thumbnail_bytes, reserved2 = \
-                                self.decode_page_header(header)
-
-                            log.debug("Page=%d PPR=%d RPP=%d BPP=%d Thumb=%d" %
-                                      (page_num, ppr, rpp, bytes_to_read, thumbnail_bytes))
-
-                            page.write(ff.read(bytes_to_read))
-                            thumbnail = ff.read(thumbnail_bytes) # thrown away for now (should be 0 read)
-                            page.seek(0)
-
-                            self.create_mfpdtf_fixed_header(DT_FAX_IMAGES, page_flags=PAGE_FLAG_NEW_PAGE)
-                            self.create_sop_record(page_num, hort_dpi, vert_dpi, ppr, rpp, encoding)
-
-                            try:
-                                data = page.read(RASTER_DATA_SIZE)
-                            except IOError:
-                                log.error("Unable to read fax file.")
-                                fax_send_state = FAX_SEND_STATE_ERROR
-                                continue
-
-                            if data == '':
-                                log.error("No data!")
-                                fax_send_state = FAX_SEND_STATE_ERROR
-                                continue
-
-                            self.create_raster_data_record(data)
-                            total_read = RASTER_DATA_SIZE
-
-                            while True:
-                                data = page.read(RASTER_DATA_SIZE)
-                                total_read += RASTER_DATA_SIZE
-
-                                self.getFaxDownloadState()
-
-                                if data == '':
-                                    self.create_eop_record(rpp)
-
-                                    try:
-                                        self.write_stream()
-                                    except Error:
-                                        log.error("Channel write error.")
-                                        fax_send_state = FAX_SEND_STATE_ERROR
-                                    break
-
-                                else:
-                                    try:
-                                        self.write_stream()
-                                    except Error:
-                                        log.error("Channel write error.")
-                                        fax_send_state = FAX_SEND_STATE_ERROR
-                                        break
-
-                                status = self.getFaxJobTxStatus()
-                                while status  == pml.FAXJOB_TX_STATUS_DIALING:
-                                    self.write_queue((STATUS_DIALING, 0, recipient['fax']))
-                                    time.sleep(1.0)
-
-                                    if self.check_for_cancel():
-                                        fax_send_state = FAX_SEND_STATE_ABORT
-                                        break
-
-                                    dl_state = self.getFaxDownloadState()
-                                    if dl_state == pml.UPDN_STATE_ERRORABORT:
-                                        fax_send_state = FAX_SEND_STATE_ERROR
-                                        break
-
-                                    status = self.getFaxJobTxStatus()
-
-                                if fax_send_state not in (FAX_SEND_STATE_ABORT, FAX_SEND_STATE_ERROR):
-
-                                    while status  == pml.FAXJOB_TX_STATUS_CONNECTING: 
-                                        self.write_queue((STATUS_CONNECTING, 0, recipient['fax']))
-                                        time.sleep(1.0)
-
-                                        if self.check_for_cancel():
-                                            fax_send_state = FAX_SEND_STATE_ABORT
-                                            break
-
-                                        dl_state = self.getFaxDownloadState()
-                                        if dl_state == pml.UPDN_STATE_ERRORABORT:
-                                            fax_send_state = FAX_SEND_STATE_ERROR
-                                            break
-
-                                        status = self.getFaxJobTxStatus()
-
-                                if status == pml.FAXJOB_TX_STATUS_TRANSMITTING:    
-                                    self.write_queue((STATUS_SENDING, page_num, recipient['fax']))
-
-                                self.create_mfpdtf_fixed_header(DT_FAX_IMAGES, page_flags=0)
-                                self.create_raster_data_record(data)
-
-                                if fax_send_state in (FAX_SEND_STATE_ABORT, FAX_SEND_STATE_ERROR):
-                                    break
-
-                            page.truncate(0)
-                            page.seek(0)                
-
-
-                    elif fax_send_state == FAX_SEND_STATE_SEND_END_OF_STREAM: # -------------- EOS (110, 140, 0)
-                        log.debug("%s State: Send EOS" % ("*"*20))
-                        fax_send_state = FAX_SEND_STATE_WAIT_FOR_COMPLETE
-                        log.debug("End of stream...")
-                        self.create_mfpdtf_fixed_header(DT_FAX_IMAGES, False, PAGE_FLAG_END_STREAM)
-
-                        try:
-                            self.write_stream()
-                        except Error:
-                            log.error("Channel write error.")
-                            fax_send_state = FAX_SEND_STATE_ERROR
-
-                        monitor_state = False
-
-
-                    elif fax_send_state == FAX_SEND_STATE_WAIT_FOR_COMPLETE: # -------------- Wait for complete (110, 150, 0)
-                        log.debug("%s State: Wait for completion" % ("*"*20))
-
-                        fax_send_state = FAX_SEND_STATE_WAIT_FOR_COMPLETE
-
-                        time.sleep(1.0)
-                        status = self.getFaxJobTxStatus()
-
-                        if status == pml.FAXJOB_TX_STATUS_DIALING:
-                                self.write_queue((STATUS_DIALING, 0, recipient['fax']))
-
-                        elif status == pml.FAXJOB_TX_STATUS_TRANSMITTING:    
-                            self.write_queue((STATUS_SENDING, page_num, recipient['fax']))
-
-                        elif status in (pml.FAXJOB_TX_STATUS_DONE, pml.FAXJOB_RX_STATUS_IDLE):
-                            fax_send_state = FAX_SEND_STATE_RESET_TOKEN
-                            state = STATE_NEXT_RECIPIENT
-
-                        else:
-                            self.write_queue((STATUS_SENDING, page_num, recipient['fax']))
-
-
-                    elif fax_send_state == FAX_SEND_STATE_RESET_TOKEN: # -------------- Release fax token (110, 160, 0)
-                        self.write_queue((STATUS_CLEANUP, 0, ''))
-                        log.debug("%s State: Release fax token" % ("*"*20))
-
-                        try:
-                            self.dev.setPML(pml.OID_FAX_TOKEN, '\x00'*16)
-                        except Error:
-                            log.error("Unable to release fax token.")
-
-                        fax_send_state = FAX_SEND_STATE_CLOSE_SESSION
-
-
-                    elif fax_send_state == FAX_SEND_STATE_CLOSE_SESSION: # -------------- Close session (110, 170, 0)
-                        log.debug("%s State: Close session" % ("*"*20))
-                        fax_send_state = FAX_SEND_STATE_DONE
-                        log.debug("Closing session...")
-
-                        try:
-                            mm.close()
-                        except NameError:
-                            pass
-
-                        try:
-                            ff.close()
-                        except NameError:
-                            pass
-
-                        if self.dev.fax_type == FAX_TYPE_BLACK_SEND_LATE_OPEN:
-                            log.debug("Closing fax channel.")
-                            self.dev.closeFax()
-
-                        self.dev.setPML(pml.OID_FAX_DOWNLOAD, pml.UPDN_STATE_IDLE)
-
-                        time.sleep(1)
-
-                        if self.dev.fax_type == FAX_TYPE_BLACK_SEND_EARLY_OPEN:
-                            log.debug("Closing fax channel.")
-                            self.dev.closeFax()
-
-                        self.dev.close()
-
-
-            elif state == STATE_CLEANUP: # --------------------------------- Cleanup (120, 0, 0)
-                log.debug("%s State: Cleanup" % ("*"*20))
-
-                if self.remove_temp_file:
-                    log.debug("Removing merged file: %s" % f)
-                    try:
-                        os.remove(f)
-                        log.debug("Removed")
-                    except OSError:
-                        log.debug("Not found")
-
-                state = STATE_DONE
-
-
-
-# --------------------------------- Support functions
 
     def next_recipient_gen(self):
         for a in self.phone_num_list:
@@ -1629,107 +946,3 @@ class FaxSendThread(threading.Thread):
             time.sleep(0)
             self.prev_update = message
 
-    def getFaxDownloadState(self):
-        result_code, state = self.dev.getPML(pml.OID_FAX_DOWNLOAD)
-        if state:
-            log.debug("D/L State=%d (%s)" % (state, pml.UPDN_STATE_STR.get(state, 'Unknown')))
-            return state
-        else:
-            return pml.UPDN_STATE_ERRORABORT
-
-    def getFaxJobTxStatus(self):
-        result_code, status = self.dev.getPML(pml.OID_FAXJOB_TX_STATUS)
-        if status:
-            log.debug("Tx Status=%d (%s)" % (status, pml.FAXJOB_TX_STATUS_STR.get(status, 'Unknown')))
-            return status
-        else:
-            return pml.FAXJOB_TX_STATUS_IDLE
-
-    def getFaxJobRxStatus(self):
-        result_code, status = self.dev.getPML(pml.OID_FAXJOB_RX_STATUS)
-        if status:
-            log.debug("Rx Status=%d (%s)" % (status, pml.FAXJOB_RX_STATUS_STR.get(status, 'Unknown')))
-            return status
-        else:
-            return pml.FAXJOB_RX_STATUS_IDLE
-
-    def getCfgUploadState(self):
-        result_code, state = self.dev.getPML(pml.OID_DEVICE_CFG_UPLOAD)
-        if state:
-            log.debug("Cfg Upload State = %d (%s)" % (state, pml.UPDN_STATE_STR.get(state, 'Unknown')))
-            return state
-        else:
-            return pml.UPDN_STATE_ERRORABORT
-
-    def create_mfpdtf_fixed_header(self, data_type, send_variant=False, page_flags=0):
-        header_len = FIXED_HEADER_SIZE
-
-        if send_variant:
-            if data_type == DT_DIAL_STRINGS:
-                    header_len += DIAL_STRINGS_VARIANT_HEADER_SIZE
-
-            elif data_type == DT_FAX_IMAGES:
-                header_len += FAX_IMAGE_VARIANT_HEADER_SIZE
-
-        self.stream.write(struct.pack("<IHBB", 
-                          0, header_len, data_type, page_flags))
-
-
-    def create_mfpdtf_dial_strings(self, number):
-        self.stream.write(struct.pack("<BBHH51s", 
-                          MAJOR_VER, MINOR_VER,
-                          1, 51, number[:51]))
-
-
-    def adjust_fixed_header_block_size(self):
-        size = self.stream.tell()
-        self.stream.seek(0)
-        self.stream.write(struct.pack("<I", size))
-
-
-    def create_sop_record(self, page_num, hort_dpi, vert_dpi, ppr, rpp, encoding, bpp=1):
-        self.stream.write(struct.pack("<BBHHHIHHHHHHIHHHH",
-                            RT_START_PAGE, encoding, page_num,
-                            ppr, bpp,
-                            rpp, 0x00, hort_dpi, 0x00, vert_dpi,
-                            ppr, bpp,
-                            rpp, 0x00, hort_dpi, 0x00, vert_dpi))
-
-
-    def create_eop_record(self, rpp):
-        self.stream.write(struct.pack("<BBBBII",
-                            RT_END_PAGE, 0, 0, 0, 
-                            rpp, 0,))
-
-
-    def create_raster_data_record(self, data):
-        assert len(data) <= RASTER_DATA_SIZE
-        self.stream.write(struct.pack("<BBH",
-                        RT_RASTER, 0, len(data),))
-        self.stream.write(data)
-
-
-    def create_mfpdtf_fax_header(self, total_pages):
-        self.stream.write(struct.pack("<BBBHBI20s20s20sI", 
-                            MAJOR_VER, MINOR_VER, SRC_HOST, total_pages, 
-                            TTI_PREPENDED_TO_IMAGE, 0, '', '', '', 0))
-
-
-    def write_stream(self):
-        self.adjust_fixed_header_block_size() 
-        self.dev.writeFax(self.stream.getvalue())
-        self.stream.truncate(0)
-        self.stream.seek(0)    
-
-
-    def decode_fax_header(self, header):
-        try:
-            return struct.unpack(">8sBIHHBBBII", header)
-        except struct.error:
-            return -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
-
-    def decode_page_header(self, header):
-        try:
-            return struct.unpack(">IIIIII", header)
-        except struct.error:
-            return -1, -1, -1, -1, -1, -1

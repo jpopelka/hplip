@@ -32,6 +32,8 @@
 #ifndef APDK_LJZJS_MONO_H
 #define APDK_LJZJS_MONO_H
 
+#ifdef APDK_LJZJS_MONO
+
 APDK_BEGIN_NAMESPACE
 
 /*!
@@ -82,6 +84,8 @@ class LJZjsMonoProxy : public PrinterProxy
 public:
     LJZjsMonoProxy() : PrinterProxy(
         "LJZjsMono",
+        "HP LaserJet 1000\0"
+        "HP LaserJet 1005\0"
         "HP LaserJet 1018\0"
         "HP LaserJet 1020\0"
         "HP LaserJet 1022\0"
@@ -93,4 +97,6 @@ public:
 
 APDK_END_NAMESPACE
 
+#endif // APDK_LJZJS_MONO
 #endif //APDK_LJZJS_MONO_H
+

@@ -29,7 +29,7 @@
 \*****************************************************************************/
 
 
-#if defined (APDK_LJZJS_MONO) || defined (APDK_LJZJS_COLOR)
+#if defined (APDK_LJZJS_MONO) || defined (APDK_LJZJS_COLOR) || defined (APDK_LJM1005)
 
 #include "header.h"
 #include "io_defs.h"
@@ -66,6 +66,7 @@ LJZjs::LJZjs (SystemServices* pSS, int numfonts, BOOL proto)
     m_bStartPageSent = FALSE;
     HPLJJBGCompress = NULL;
     m_hHPLibHandle = NULL;
+    m_iPrinterType = UNSUPPORTED;
 #ifdef HAVE_LIBDL
     m_hHPLibHandle = LoadPlugin ("lj.so");
     if (m_hHPLibHandle)
@@ -107,21 +108,67 @@ HeaderLJZjs::HeaderLJZjs (Printer* p,PrintContext* pc)
 DRIVER_ERROR HeaderLJZjs::Send ()
 {
     DRIVER_ERROR err = NO_ERROR;
-    char        szStr[64];
+    char        szStr[256];
     WORD        wItems[3] = {ZJI_DMCOLLATE, ZJI_PAGECOUNT, ZJI_DMDUPLEX};
-    int            i = 4;
+    int         i = 4;
 
-    memset (szStr, 0, 64);
+    QUALITY_MODE    eQuality;
+    MEDIATYPE       cmt;
+    BOOL            cdt;
+    COLORMODE       ccm;
+    thePrintContext->GetPrintModeSettings (eQuality, cmt, ccm, cdt);
+
+    if (((LJZjs *) thePrinter)->m_iPrinterType == eLJM1005)
+    {
+        strcpy (szStr, "\x1B\x25-12345X@PJL JOB\x0D\x0A");
+        strcpy (szStr+strlen (szStr), "@PJL SET JAMRECOVERY=OFF\x0D\x0A");
+        strcpy (szStr+strlen (szStr), "@PJL SET DENSITY=3\x0D\x0A");
+        strcpy (szStr+strlen (szStr), "@PJL SET RET=MEDIUM\x0D\x0A");
+        strcpy (szStr+strlen (szStr), "@PJL SET ECONOMODE=");
+        if (eQuality == QUALITY_DRAFT)
+        {
+            strcpy (szStr+strlen (szStr), "ON\x0D\x0A");
+        }
+        else
+        {
+            strcpy (szStr+strlen (szStr), "OFF\x0D\x0A");
+        }
+        err = thePrinter->Send ((const BYTE *) szStr, strlen (szStr));
+        ERRCHECK;
+
+        strcpy (szStr, "\x1B\x25-12345X,XQX");
+        err = thePrinter->Send ((const BYTE *) szStr, strlen (szStr));
+        memset (szStr, 0x0, 92);
+        szStr[3] = 0x01;
+        szStr[7] = 0x07;
+        i = 8;
+        i += ((LJZjs *) thePrinter)->SendIntItem ((BYTE *) szStr+i, 0x80000000, 0x04, 0x54);
+        i += ((LJZjs *) thePrinter)->SendIntItem ((BYTE *) szStr+i, 0x10000005, 0x04, 0x01);
+        i += ((LJZjs *) thePrinter)->SendIntItem ((BYTE *) szStr+i, 0x10000001, 0x04, 0x00);
+        i += ((LJZjs *) thePrinter)->SendIntItem ((BYTE *) szStr+i, 0x10000002, 0x04, 0x00);
+        i += ((LJZjs *) thePrinter)->SendIntItem ((BYTE *) szStr+i, 0x10000000, 0x04, 0x00);
+        i += ((LJZjs *) thePrinter)->SendIntItem ((BYTE *) szStr+i, 0x10000003, 0x04, 0x01);
+        i += ((LJZjs *) thePrinter)->SendIntItem ((BYTE *) szStr+i, 0x80000001, 0x04, 0xDEADBEEF);
+        err = thePrinter->Send ((const BYTE *) szStr, i);
+        return err;
+    }
+    
+    strcpy (szStr, "\x1B\x25-12345X@PJL ENTER LANGUAGE=ZJS\x0A");
+    err = thePrinter->Send ((const BYTE *) szStr, strlen (szStr));
+    ERRCHECK;
+
+    memset (szStr, 0, 256);
+
     strcpy (szStr, "JZJZ");
+    i = 0;
+    szStr[i+7]  = 52;
+    szStr[i+11] = ZJT_START_DOC;
+    szStr[i+15] = 3;
+    szStr[i+17] = 36;
+    szStr[i+18] = 'Z';
+    szStr[i+19] = 'Z';
 
-    szStr[7]  = 52;
-    szStr[11] = ZJT_START_DOC;
-    szStr[15] = 3;
-    szStr[17] = 36;
-    szStr[18] = 'Z';
-    szStr[19] = 'Z';
-
-    i = 20;
+    i += 20;
     for (int j = 0; j < 3; j++)
     {
         szStr[i+3] = 12;
@@ -130,8 +177,33 @@ DRIVER_ERROR HeaderLJZjs::Send ()
         szStr[i+11] = j / 2;
         i += 12;
     }
-    err = thePrinter->Send ((const BYTE *) szStr, 56);
+    err = thePrinter->Send ((const BYTE *) szStr, i);
     return err;
+}
+
+int LJZjs::MapPaperSize ()
+{
+    switch (thePrintContext->GetPaperSize ())
+    {
+        case LETTER:         return 1;
+        case LEGAL:          return 5;
+        case A4:             return 9;
+        case B4:             return 12;
+        case B5:             return 357;
+        case OUFUKU:         return 43;
+        case HAGAKI:         return 43;
+#ifdef APDK_EXTENDED_MEDIASIZE
+        case A3:             return 8;
+        case A5:             return 11;
+//        case LEDGER:         return 4;
+        case EXECUTIVE:      return 7;
+//        case CUSTOM_SIZE:    return 96;
+	case ENVELOPE_NO_10: return 20;
+	case ENVELOPE_DL:    return 27;
+        case FLSA:           return 258;
+#endif
+        default:             return 1;
+    }
 }
 
 DRIVER_ERROR LJZjs::StartPage (DWORD dwWidth, DWORD dwHeight)
@@ -144,6 +216,7 @@ DRIVER_ERROR LJZjs::StartPage (DWORD dwWidth, DWORD dwHeight)
     BYTE                szStr[16 + 15 * 12];
     int                 iPlanes = 1;
     int                 i;
+    int                 iMediaType = 1; // Plain paper
 
     if (m_bStartPageSent)
     {
@@ -151,6 +224,41 @@ DRIVER_ERROR LJZjs::StartPage (DWORD dwWidth, DWORD dwHeight)
     }
     m_bStartPageSent = TRUE;
     err = thePrintContext->GetPrintModeSettings (cqm, cmt, m_cmColorMode, cdt);
+    if (cmt == MEDIA_TRANSPARENCY)
+    {
+        iMediaType = 2;
+    }
+    else if (cmt == MEDIA_PHOTO)
+    {
+        iMediaType = 3;
+    }
+
+    if (m_iPrinterType == eLJM1005)
+    {
+        memset (szStr, 0x0, sizeof (szStr));
+        szStr[3] = 0x03;
+        szStr[7] = 0x0F;
+        err = Send ((const BYTE *) szStr, 8);
+        i = 0;
+        i += SendIntItem (szStr+i, 0x80000000, 0x04, 0xB4);
+        i += SendIntItem (szStr+i, 0x20000005, 0x04, 0x01);
+        i += SendIntItem (szStr+i, 0x20000006, 0x04, 0x07);
+        i += SendIntItem (szStr+i, 0x20000000, 0x04, 0x01);
+        i += SendIntItem (szStr+i, 0x20000007, 0x04, 0x01);
+        i += SendIntItem (szStr+i, 0x20000008, 0x04, (int) thePrintContext->EffectiveResolutionX ());
+        i += SendIntItem (szStr+i, 0x20000009, 0x04, (int) thePrintContext->EffectiveResolutionY ());
+        i += SendIntItem (szStr+i, 0x2000000D, 0x04, (int) dwWidth);
+        i += SendIntItem (szStr+i, 0x2000000E, 0x04, (int) m_dwLastRaster);
+        i += SendIntItem (szStr+i, 0x2000000A, 0x04, 0x01);
+        i += SendIntItem (szStr+i, 0x2000000F, 0x04, (int) dwWidth);
+        i += SendIntItem (szStr+i, 0x20000010, 0x04, (int) m_dwLastRaster);
+        i += SendIntItem (szStr+i, 0x20000011, 0x04, 0x01);
+        i += SendIntItem (szStr+i, 0x20000001, 0x04, MapPaperSize ());
+        i += SendIntItem (szStr+i, 0x80000001, 0x04, 0xDEADBEEF);
+        err = Send ((const BYTE *) szStr, i);
+        return err;
+    }
+
     if (m_cmColorMode == COLOR && m_bIamColor)
     {
         iPlanes = 4;
@@ -163,10 +271,10 @@ DRIVER_ERROR LJZjs::StartPage (DWORD dwWidth, DWORD dwHeight)
     {
         i += SendItem (szStr+i, ZJIT_UINT32, ZJI_PLANE, iPlanes);
     }
-    i += SendItem (szStr+i, ZJIT_UINT32, ZJI_DMPAPER, 1);
+    i += SendItem (szStr+i, ZJIT_UINT32, ZJI_DMPAPER, MapPaperSize ());
     i += SendItem (szStr+i, ZJIT_UINT32, ZJI_DMCOPIES, thePrintContext->GetCopyCount ());
     i += SendItem (szStr+i, ZJIT_UINT32, ZJI_DMDEFAULTSOURCE, thePrintContext->GetMediaSource ());
-    i += SendItem (szStr+i, ZJIT_UINT32, ZJI_DMMEDIATYPE, 1);
+    i += SendItem (szStr+i, ZJIT_UINT32, ZJI_DMMEDIATYPE, iMediaType);
     i += SendItem (szStr+i, ZJIT_UINT32, ZJI_NBIE, iPlanes);
     i += SendItem (szStr+i, ZJIT_UINT32, ZJI_RESOLUTION_X, thePrintContext->EffectiveResolutionX ());
     i += SendItem (szStr+i, ZJIT_UINT32, ZJI_RESOLUTION_Y, thePrintContext->EffectiveResolutionY ());
@@ -215,6 +323,25 @@ int LJZjs::SendItem (BYTE *szStr, BYTE cType, WORD wItem, DWORD dwValue, DWORD d
     for (j = 3; j >= 0; j--)
     {
         szStr[i++] = (BYTE) ((dwValue >> (8 * (j))) & 0xFF);
+    }
+    return i;
+}
+
+int LJZjs::SendIntItem (BYTE *szStr, int iItem, int iItemType, int iItemValue)
+{
+    int        i = 0;
+    int        j;
+    for (j = 3; j >= 0; j--)
+    {
+        szStr[i++] = (BYTE) ((iItem >> (8 * (j))) & 0xFF);
+    }
+    for (j = 3; j >= 0; j--)
+    {
+        szStr[i++] = (BYTE) ((iItemType >> (8 * (j))) & 0xFF);
+    }
+    for (j = 3; j >= 0; j--)
+    {
+        szStr[i++] = (BYTE) ((iItemValue >> (8 * (j))) & 0xFF);
     }
     return i;
 }
@@ -316,9 +443,20 @@ DRIVER_ERROR LJZjs::JbigCompress ()
 DRIVER_ERROR HeaderLJZjs::EndJob ()
 {
     DRIVER_ERROR    err = NO_ERROR;
-    BYTE            szStr[16];
+    char            szStr[64];
 
-    memset (szStr, 0, 16);
+    if (((LJZjs *) thePrinter)->m_iPrinterType == eLJM1005)
+    {
+        memset (szStr, 0, 8);
+        szStr[3] = 2;
+        strcpy ((char *) szStr+8, "\x1B\x25-12345X@PJL EOJ\x0D\x0A\x1B\x25-12345X");
+        err = thePrinter->Send ((const BYTE *) szStr, 8 + strlen ((char *) (szStr+8)));
+        return err;
+    }
+
+
+    memset (szStr, 0, 64);
+
     szStr[3] = 16;
     szStr[7] = ZJT_END_DOC;
     szStr[14] = 'Z';
@@ -343,9 +481,9 @@ Header *LJZjs::SelectHeader (PrintContext* pc)
         m_iP[0] = 3;
     }
     m_dwWidth = pc->OutputPixelsPerRow () / 8;
-    if ((pc->OutputPixelsPerRow () / 16 * 16) != pc->OutputPixelsPerRow ())
+    if (m_dwWidth % 8)
     {
-        m_dwWidth = (((pc->OutputPixelsPerRow () / 16) + 1) * 16) / 8;
+        m_dwWidth = (m_dwWidth / 8 + 1) * 8;
     }
     m_dwLastRaster = (int) (pc->PrintableHeight () * pc->EffectiveResolutionY ());
     dwSize = m_dwWidth * m_dwLastRaster * iPlanes * m_iBPP;
@@ -377,4 +515,4 @@ DRIVER_ERROR LJZjs::ParsePenInfo (PEN_TYPE& ePen, BOOL QueryPrinter)
 
 APDK_END_NAMESPACE
 
-#endif  // defined APDK_LJZJS_MONO || defined APDK_LJZPJ_COLOR
+#endif  // defined APDK_LJZJS_MONO || defined APDK_LJZJS_COLOR || defined APDK_LJM1005

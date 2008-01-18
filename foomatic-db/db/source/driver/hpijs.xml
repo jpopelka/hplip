@@ -23255,6 +23255,27 @@
    </margins>
   </printer>
   <printer>
+   <id>printer/HP-LaserJet_M2727</id>
+   <functionality>
+    <maxresx>600</maxresx>
+    <maxresy>600</maxresy>
+    <monochrome />
+   </functionality>
+   <ppdentry>
+     *DefaultResolution: 600dpi
+    </ppdentry>
+   <margins>
+    <general>
+     <unit>in</unit>
+     <relative />
+     <left>0.25</left>
+     <right>0.25</right>
+     <top>0.2</top>
+     <bottom>0.2</bottom>
+    </general>
+   </margins>
+  </printer>
+  <printer>
    <id>printer/HP-Mopier_240</id><!-- HP Mopier 240 -->
    <functionality>
     <maxresx>600</maxresx>

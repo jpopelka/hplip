@@ -97,6 +97,9 @@
 :model "officejet_4100_series"
 :status :good
 
+:model "officejet_4105"
+:status :good
+
 :model "officejet_4115_series"
 :status :good
 

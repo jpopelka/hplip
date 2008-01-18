@@ -56,8 +56,10 @@
         var distro_name = document.getElementById("distros").options[index1].text;
         var filename = "select_distro_update_combo?index=" + distro_menu[distro_name];
         var localPath = GetLocalDataFile(filename);
-        var http = new XmlLoader(localPath);
-        var serverResponse = http.submitLoaderRequest("POST", false);
+        //var http = new XmlLoader(localPath);
+        //var serverResponse = http.submitLoaderRequest("POST", false, null);
+        var ajaxObj = createXmlLoader();
+        var serverResponse = submitXmlLoaderRequest(ajaxObj, "POST", localPath, false);
         var strarray = serverResponse.split(" ");
         changeCombo('versions', strarray);
         onClickedNext();
@@ -83,6 +85,39 @@
 
         }
         domForm.options[index_version].selected = true;
+    };
+
+    function todoOnLoad() {
+        var divText = "";
+        #for $d in $turned_off_options
+            divText += "$turned_off_options[$d]<br/>";
+        #end for
+        document.getElementById("scrollTextArea").innerHTML = divText;
+    };
+
+    if(document.addEventListener){ 
+        document.addEventListener("keyup", captureKey,false);
+    }else{ 
+        document.attachEvent("onkeyup", captureKey);
+    };
+
+    function captureKey(events){
+        if("undefined" != (typeof window.event)){ 
+            events = window.event;
+        }
+        if("keyup" == events.type){
+            checkKey(events.keyCode);
+        }
+    };
+
+    function checkKey(keyID)
+    {
+       switch(keyID)
+       {
+          case 13:
+            indexClickActions( "next_button", "select_distro_controller?distro=0&version=0.0");
+            break;
+       }
     };
     -->
     </script>

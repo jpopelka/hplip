@@ -190,18 +190,9 @@ if not prop.fax_build:
     sys.exit(1)
 
 if mode == GUI_MODE:
-    if not prop.gui_build:
-        log.warn("GUI mode disabled in build. Reverting to non-interactive mode.")
+    if not utils.canEnterGUIMode():
         mode = NON_INTERACTIVE_MODE
-
-    elif not os.getenv('DISPLAY'):
-        log.warn("No display found. Reverting to non-interactive mode.")
-        mode = NON_INTERACTIVE_MODE
-
-    elif not utils.checkPyQtImport():
-        log.warn("PyQt init failed. Reverting to non-interactive mode.")
-        mode = NON_INTERACTIVE_MODE
-
+    
 if mode == GUI_MODE:
     app = None
     sendfax = None
@@ -649,8 +640,10 @@ else: # NON_INTERACTIVE_MODE
 
     log.debug("\nChecking device state...")
     try:
-        dev = fax.FaxDevice(device_uri=device_uri, 
-                            printer_name=printer_name)
+        #dev = fax.FaxDevice(device_uri=device_uri, 
+        #                    printer_name=printer_name)
+        
+        dev = fax.getFaxDevice(device_uri, printer_name)
 
         try:
             dev.open()

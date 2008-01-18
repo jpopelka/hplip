@@ -29,7 +29,7 @@ dist_www0_DATA = $(wwwsrc)/contacts.html $(wwwsrc)/faqs.html $(wwwsrc)/features.
 www1dir = $(docdir)/howtos
 dist_www1_DATA = $(wwwsrc)/howtos/*
 www2dir = $(docdir)/install
-dist_www2_DATA = $(wwwsrc)/install/index.html
+dist_www2_DATA = $(wwwsrc)/install/index.html $(wwwsrc)/install/installtree.html
 www21dir = $(docdir)/install/step1
 dist_www21_DATA = $(wwwsrc)/install/step1/*
 www22dir = $(docdir)/install/step2
@@ -95,12 +95,19 @@ dist_noinst_SCRIPTS += installer/pages/__init__.py installer/pages/install_requi
 	installer/pages/error_package_manager.tmpl installer/pages/password.tmpl installer/pages/error_required_missing.tmpl installer/pages/progress.tmpl \
 	installer/pages/error_unsupported_distro.tmpl installer/pages/ready_to_build.tmpl installer/pages/finished.tmpl installer/pages/select_distro.tmpl \
 	installer/pages/hplip_remove.tmpl installer/pages/hpoj_remove.tmpl installer/pages/unsupported.tmpl installer/pages/turn_off_options.tmpl \
-	installer/pages/index.tmpl installer/pages/welcome.tmpl installer/pages/install_optional.tmpl installer/pages/quit.tmpl installer/pages/install_required.tmpl
-dist_noinst_SCRIPTS += installer/scripts/hplip.js 
+	installer/pages/index.tmpl installer/pages/welcome.tmpl installer/pages/install_optional.tmpl installer/pages/quit.tmpl \
+	installer/pages/install_required.tmpl installer/pages/replug.tmpl installer/pages/restart.tmpl installer/pages/network_unavailable.tmpl \
+	installer/pages/warning.tmpl
+dist_noinst_SCRIPTS += installer/scripts/hplip.js installer/scripts/encode.js installer/scripts/misc_code.js
 dist_noinst_DATA += installer/images/button.png installer/images/favicon.ico installer/images/topbar.png installer/images/view.png \
 	installer/images/back.png installer/images/circular.gif installer/images/hplogo.png installer/images/tux.png \
-	installer/images/button1.png  installer/images/button1d.png
-dist_noinst_SCRIPTS += installer/styles/hplip.css
+	installer/images/button1.png installer/images/button1d.png installer/images/replug1.png installer/images/replug2.png \
+	installer/images/replug3.png installer/images/button2.png
+dist_noinst_DATA += installer/localization/gui_strings_de_DE.ts installer/localization/gui_strings_en_US.ts installer/localization/gui_strings_es_MX.ts \
+	installer/localization/gui_strings_fr_FR.ts installer/localization/gui_strings_it_IT.ts installer/localization/gui_strings_pt_BR.ts \
+	installer/localization/gui_strings_ru_RU.ts installer/localization/gui_strings_zh_CN.ts
+
+dist_noinst_SCRIPTS += installer/styles/hplip.css installer/styles/misc.css
 
 # makecopies
 copierdir = $(hplipdir)/copier
@@ -109,7 +116,7 @@ dist_copier_SCRIPTS = copier/copier.py copier/__init__.py
 # fax
 if FAX_BUILD
 faxdir = $(hplipdir)/fax
-dist_fax_SCRIPTS = fax/fax.py fax/__init__.py fax/coverpages.py
+dist_fax_SCRIPTS = fax/fax.py fax/__init__.py fax/coverpages.py fax/pmlfax.py
 hpfaxdir = $(cupsbackenddir)
 dist_hpfax_SCRIPTS = fax/backend/hpfax.py
 faxppddir = $(hpppddir)
@@ -219,7 +226,7 @@ lib_LTLIBRARIES += libhpmud.la
 libhpmud_la_SOURCES = io/hpmud/hpmud.c io/hpmud/mlc.c io/hpmud/model.c io/hpmud/musb.c io/hpmud/pml.c \
 	  io/hpmud/hpmud.h io/hpmud/hpmudi.h io/hpmud/list.h io/hpmud/mlc.h io/hpmud/musb.h io/hpmud/pml.h io/hpmud/dot4.c \
 	  io/hpmud/dot4.h io/hpmud/jd.c io/hpmud/jd.h io/hpmud/pp.c io/hpmud/pp.h 
-libhpmud_la_LDFLAGS = -version-info 0:0:0
+libhpmud_la_LDFLAGS = -version-info 0:1:0
 libhpmud_la_CFLAGS = -DMUDNAME=\"$(MUDNAME)\" -DCONFDIR=\"$(hplip_confdir)\"
 
 # hpmudext
@@ -373,14 +380,16 @@ apdk_SOURCES = prnt/hpijs/models.cpp prnt/hpijs/breaks_open.cpp \
 	prnt/hpijs/printerproxy.cpp prnt/hpijs/printerfactory.cpp prnt/hpijs/printerproxy.h prnt/hpijs/printerfactory.h \
 	prnt/hpijs/ljjetready.cpp prnt/hpijs/ljjetready.h prnt/hpijs/jdatadbf.c prnt/hpijs/jccolor.c prnt/hpijs/ljfastraster.cpp prnt/hpijs/ljfastraster.h \
 	prnt/hpijs/jinclude.h prnt/hpijs/jpegint.h prnt/hpijs/dj55xx.h prnt/hpijs/hpijsfax.h prnt/hpijs/ojprokx50.h \
-	prnt/hpijs/ljzjs.cpp prnt/hpijs/ljzjs.h prnt/hpijs/ljzjsmono.cpp prnt/hpijs/ljzjsmono.h prnt/hpijs/hpjbig_wrapper.h
+	prnt/hpijs/ljzjs.cpp prnt/hpijs/ljzjs.h prnt/hpijs/ljzjsmono.cpp prnt/hpijs/ljm1005.cpp prnt/hpijs/ljm1005.h \
+                prnt/hpijs/ljzjsmono.h prnt/hpijs/hpjbig_wrapper.h
 hpijs_SOURCES = $(apdk_SOURCES) prnt/hpijs/hpijs.cpp prnt/hpijs/ijs_server.c prnt/hpijs/ijs.c prnt/hpijs/hpijsfax.cpp prnt/hpijs/services.cpp \
 	prnt/hpijs/hpijs.h prnt/hpijs/ijs.h prnt/hpijs/ijs_server.h prnt/hpijs/services.h prnt/hpijs/ijs_client.h prnt/hpijs/hpiom.c prnt/hpijs/hpiom.h 
 hpijs_CXXFLAGS = -DAPDK_DJ660 -DAPDK_DJ6xx -DAPDK_DJ6xxPhoto -DAPDK_DJ8xx -DAPDK_DJ9xx -DAPDK_DJ9xxVIP -DAPDK_DJ630 \
 	-DAPDK_APOLLO2XXX -DAPDK_APOLLO21XX -DAPDK_APOLLO2560 -DAPDK_DJ600 -DAPDK_DJ350 -DAPDK_DJ8x5 -DAPDK_PSP100 -DAPDK_AUTODUPLEX \
 	-DAPDK_HIGH_RES_MODES -DAPDK_LJMONO -DAPDK_DJ540 -DAPDK_DJ850 -DAPDK_DJ890 -DAPDK_DJ3320 -DAPDK_LJCOLOR -DAPDK_DJGENERICVIP \
 	-DAPDK_LJJETREADY  -DAPDK_LJFASTRASTER -DAPDK_BUFFER_SEND -DAPDK_LDL_COMPRESS -DAPDK_EXTENDED_MEDIASIZE \
-	-DAPDK_MLC_PRINTER -DAPDK_DJ3600 -DAPDK_LJZJS_MONO $(APDK_ENDIAN_FLAG) $(APDK_AUTO_INCLUDE_FLAG) -DAPDK_LINUX -DNDEBUG
+	-DAPDK_MLC_PRINTER -DAPDK_DJ3600 -DAPDK_LJZJS_MONO -DAPDK_LJM1005 \
+                $(APDK_ENDIAN_FLAG) $(APDK_AUTO_INCLUDE_FLAG) -DAPDK_LINUX -DNDEBUG
 hpijs_CFLAGS = $(hpijs_CXXFLAGS) -Iprnt/hpijs
 if HPLIP_BUILD
 hpijs_LDADD = libhpip.la libhpmud.la

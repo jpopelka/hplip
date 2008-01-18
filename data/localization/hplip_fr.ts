@@ -33,12 +33,10 @@
         <translation>&lt;b&gt;Version du logiciel Gestionnaire de périphériques&lt;/b&gt;</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Authors and Contributors:&lt;/b&gt;
-David Suffield, Don Welch, Shiyun Yie, Raghothama Cauligi, John Oleinik, Cory Meisch, Foster Nuffer, Pete Parks, Jacqueline Pitter, David Paschal, 
-Steve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter</source>
+        <source>&lt;b&gt;Authors and Contributors:&lt;/b&gt;\nDavid Suffield, Don Welch, Shiyun Yie, Raghothama Cauligi, John Oleinik, Cory Meisch, Foster Nuffer, Pete Parks, Jacqueline Pitter, David Paschal,\nSteve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter, Linus Araque, Mark Crawford, Charlie Moore</source>
         <translation>&lt;b&gt;Auteurs et contributeurs :&lt;/b&gt;
 David Suffield, Don Welch, Shiyun Yie, Raghothama Cauligi, John Oleinik, Cory Meisch, Foster Nuffer, Pete Parks, Jacqueline Pitter, David Paschal, 
-Steve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter</translation>
+Steve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter, Linus Araque, Mark Crawford, Charlie Moore</translation>
     </message>
     <message>
         <source>&lt;b&gt;License and Copyright:&lt;/b&gt;
@@ -1016,8 +1014,8 @@ Pour chaque rangée, sélectionnez l&apos;étiquette qui représente le cadre da
         <translation>Configurer</translation>
     </message>
     <message>
-        <source>&amp;Help</source>
-        <translation>&amp;Aide</translation>
+        <source>Help</source>
+        <translation>Aide</translation>
     </message>
 </context>
 <context>
@@ -3778,11 +3776,11 @@ Pour chaque rangée, sélectionnez l&apos;étiquette qui représente le cadre da
     </message>
     <message>
         <source>The printer name and fax name must be different. Please choose different names.</source>
-        <translation></translation>
+<translation>Les noms de l’imprimante et du télécopieur doivent être différents. Veuillez choisir des noms différents.</translation>
     </message>
     <message>
         <source>&lt;b&gt;Device not found.&lt;/b&gt; &lt;p&gt;Please make sure your printer is properly connected and powered-on.</source>
-        <translation></translation>
+<translation>&lt;b&gt;Impossible de trouver le périphérique.&lt;/b&gt; &lt;p&gt;Vérifiez que votre imprimante est correctement connectée et en marche.</translation>
     </message>
     <message>
         <source>&lt;b&gt;No devices found.&lt;/b&gt;&lt;p&gt;Please make sure your printer is properly connected and powered-on.</source>

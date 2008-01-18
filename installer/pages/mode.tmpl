@@ -36,8 +36,34 @@
         //document.getElementById("next_button").value = path;
         setLocationRef(path);
     };
+
+    if(document.addEventListener){ 
+        document.addEventListener("keyup", captureKey,false);
+    }else{ 
+        document.attachEvent("onkeyup", captureKey);
+    }
+
+    function captureKey(events){
+        if("undefined" != (typeof window.event)){ 
+            events = window.event;
+        }
+        if("keyup" == events.type){
+            checkKey(events.keyCode);
+        }
+    }
+
+    function checkKey(keyID)
+    {
+       switch(keyID)
+       {
+          case 13:  //mode_controller?auto_mode=1
+            indexClickActions( "next_button", "mode_controller?auto_mode=1");
+            break;
+       }
+    }
     -->
     </script>
+    
 <TITLE>$installer_title</TITLE>
 </HEAD>
 <BODY onload=" 

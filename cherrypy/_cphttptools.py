@@ -255,6 +255,7 @@ class Request(object):
         try:
             body = page_handler(*virtual_path, **self.params)
         except Exception, x:
+            print "Exception x", x
             if hasattr(x, "args"):
                 x.args = x.args + (page_handler,)
             raise

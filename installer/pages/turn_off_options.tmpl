@@ -31,10 +31,35 @@
     function todoOnLoad() {
         var divText = "";
         #for $d in $turned_off_options
-            divText += "$turned_off_options[$d]<br/>";
+            divText += "$turned_off_options[$d]" + "\n";
         #end for
         document.getElementById("scrollTextArea").innerHTML = divText;
     };
+
+    if(document.addEventListener){ 
+        document.addEventListener("keyup", captureKey,false);
+    }else{ 
+        document.attachEvent("onkeyup", captureKey);
+    }
+
+    function captureKey(events){
+        if("undefined" != (typeof window.event)){ 
+            events = window.event;
+        }
+        if("keyup" == events.type){
+            checkKey(events.keyCode);
+        }
+    }
+
+    function checkKey(keyID)
+    {
+       switch(keyID)
+       {
+          case 13:
+            indexClickActions( "previous_button", "previous");
+            break;
+       }
+    }
     -->
     </script>
 <title>$installer_title</title>
@@ -56,7 +81,7 @@
 <!-- Body Div --> 
 <div class="body_content">
     
-    <div id="message_title">$turn_off_options_message_title</div>
+    <div id="message_options_title">$turn_off_options_message_title</div>
     
     <div id="scrollTextDiv">
         <textarea cols="62" rows="11" wrap="off" name="scrollTextArea" id="scrollTextArea" onkeyup="sTextArea.innerText=scrollTextArea.innerText"></textarea>

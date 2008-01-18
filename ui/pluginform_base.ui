@@ -37,6 +37,23 @@
                     <set>WordBreak|AlignVCenter</set>
                 </property>
             </widget>
+            <spacer row="1" column="0">
+                <property name="name">
+                    <cstring>spacer2</cstring>
+                </property>
+                <property name="orientation">
+                    <enum>Vertical</enum>
+                </property>
+                <property name="sizeType">
+                    <enum>Expanding</enum>
+                </property>
+                <property name="sizeHint">
+                    <size>
+                        <width>20</width>
+                        <height>21</height>
+                    </size>
+                </property>
+            </spacer>
             <spacer row="3" column="0">
                 <property name="name">
                     <cstring>spacer9</cstring>
@@ -50,7 +67,7 @@
                 <property name="sizeHint">
                     <size>
                         <width>20</width>
-                        <height>60</height>
+                        <height>30</height>
                     </size>
                 </property>
             </spacer>
@@ -74,14 +91,6 @@
                         </property>
                         <property name="buttonGroupId">
                             <number>1</number>
-                        </property>
-                    </widget>
-                    <widget class="QLineEdit" row="2" column="0">
-                        <property name="name">
-                            <cstring>pathLineEdit</cstring>
-                        </property>
-                        <property name="enabled">
-                            <bool>false</bool>
                         </property>
                     </widget>
                     <widget class="QPushButton" row="2" column="1">
@@ -109,25 +118,30 @@
                             <number>0</number>
                         </property>
                     </widget>
+                    <widget class="QLineEdit" row="2" column="0">
+                        <property name="name">
+                            <cstring>pathLineEdit</cstring>
+                        </property>
+                        <property name="enabled">
+                            <bool>false</bool>
+                        </property>
+                    </widget>
+                    <widget class="QRadioButton" row="3" column="0" rowspan="1" colspan="2">
+                        <property name="name">
+                            <cstring>skipRadioButton</cstring>
+                        </property>
+                        <property name="enabled">
+                            <bool>false</bool>
+                        </property>
+                        <property name="text">
+                            <string>Skip installation of plug-in (not recommended)</string>
+                        </property>
+                        <property name="buttonGroupId">
+                            <number>2</number>
+                        </property>
+                    </widget>
                 </grid>
             </widget>
-            <spacer row="1" column="0">
-                <property name="name">
-                    <cstring>spacer2</cstring>
-                </property>
-                <property name="orientation">
-                    <enum>Vertical</enum>
-                </property>
-                <property name="sizeType">
-                    <enum>Expanding</enum>
-                </property>
-                <property name="sizeHint">
-                    <size>
-                        <width>20</width>
-                        <height>21</height>
-                    </size>
-                </property>
-            </spacer>
         </grid>
     </widget>
     <widget class="QWidget">
@@ -223,9 +237,6 @@ These License Terms govern your Use of the HPLIP Driver Plug-in Software (the "S
         <slot>installPushButton_clicked()</slot>
     </connection>
 </connections>
-<includes>
-    <include location="local" impldecl="in implementation">pluginform_base.ui.h</include>
-</includes>
 <slots>
     <slot>sourceGroup_clicked( int )</slot>
     <slot>browsePushButton_clicked()</slot>

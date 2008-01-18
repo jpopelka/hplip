@@ -95,7 +95,6 @@ function hiliteButton(button_name) {
 
 
 function indexClickActions(button_name, default_path) {
-    //alert("location_ref - Url Path: " + default_path);
     if(default_path == "????") {
         alert("An unimplement path has occured!");
         location_ref = "test";
@@ -105,24 +104,19 @@ function indexClickActions(button_name, default_path) {
     if(getLocationRef() != "#") {
         location_ref = getLocationRef();
     }
-    //alert("location_ref - Url Path: " + location_ref);
     hiliteButton(button_name);
 }
 
 function getStoppedStatus(filename) {
     var localPath = GetLocalDataFile(filename);
-    //alert("Get Status - Url Path: " + localPath);
-    var http = new XmlLoader(localPath);
-    var serverResponse = http.submitLoaderRequest("POST", false);
-    statusValue = parseInt(serverResponse);
+    statusValue = parseInt(submitXmlLoaderRequest(null, "POST", localPath, false));
     return statusValue;
 }
 
 function postServerCommand(filename) {
     var localPath = GetLocalDataFile(filename);
-    //alert("Stop Status - Url Path: " + localPath);
-    var http = new XmlLoader(localPath);
-    http.submitLoaderRequest("POST", false);
+    var ajaxObj = createXmlLoader();
+    return submitXmlLoaderRequest(ajaxObj, "POST", localPath, false);
 }
 
 function todoOnQuit(path) {
@@ -136,13 +130,15 @@ function todoOnQuit(path) {
 
 
 function todoOnRestart(path) {
-    window.location.href = path;
-    window.opener.location.href = path;
-    //indexClickActions( "set_restart", path);
-    window.close();
-    fixMainWindow();
+    //window.location.href = path;
+    //window.opener.location.href = path;
+    //indexClickActions( "quit_button", path);
     postServerCommand("set_restart");
-    postServerCommand("signal_stop");
+    //window.close();
+    indexClickActions( "quit_button", path);
+    setTimeout("postServerCommand('signal_stop');", 500);
+    
+    //fixMainWindow();
 }
 
 

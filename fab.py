@@ -39,6 +39,7 @@ USAGE = [(__doc__, "", "name", True),
          ("Enter graphical UI mode:", "-u or --gui (Default)", "option", False),
          utils.USAGE_SPACE,
          utils.USAGE_OPTIONS,
+         utils.USAGE_LANGUAGE,
          utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
          utils.USAGE_HELP,
          utils.USAGE_NOTES,
@@ -703,11 +704,12 @@ class Console(cmd.Cmd):
 
 mode = GUI_MODE
 mode_specified = False
+loc = None
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'l:hgiu', 
+    opts, args = getopt.getopt(sys.argv[1:], 'l:hgiuq:', 
         ['level=', 'help', 'help-rest', 'help-man',
-         'help-desc', 'gui', 'interactive'])
+         'help-desc', 'gui', 'interactive', 'lang='])
 
 except getopt.GetoptError, e:
     log.error(e.msg)
@@ -753,6 +755,13 @@ for o, a in opts:
 
         mode = GUI_MODE
         mode_specified = True
+        
+    elif o in ('-q', '--lang'):
+        if a.strip() == '?':
+            utils.show_languages()
+            sys.exit(0)
+            
+        loc = utils.validate_language(a.lower())        
 
 utils.log_title(__title__, __version__)
 
@@ -760,9 +769,7 @@ utils.log_title(__title__, __version__)
 os.umask(0037)
 
 if mode == GUI_MODE:
-    if not os.getenv('DISPLAY'):
-        mode = NON_INTERACTIVE_MODE
-    elif not utils.checkPyQtImport():
+    if not utils.canEnterGUIMode():
         mode = NON_INTERACTIVE_MODE
 
 if mode == GUI_MODE:
@@ -774,29 +781,34 @@ if mode == GUI_MODE:
     # create the main application object
     app = QApplication(sys.argv)
     
-    loc = user_cfg.ui.get("loc", "system")
-    if loc.lower() == 'system':
-        loc = str(QTextCodec.locale())
-        log.debug("Using system locale: %s" % loc)
-
+    if loc is None:
+        loc = user_cfg.ui.get("loc", "system")
+        if loc.lower() == 'system':
+            loc = str(QTextCodec.locale())
+            log.debug("Using system locale: %s" % loc)
+    
     if loc.lower() != 'c':
         log.debug("Trying to load .qm file for %s locale." % loc)
         trans = QTranslator(None)
         qm_file = 'hplip_%s.qm' % loc
         log.debug("Name of .qm file: %s" % qm_file)
         loaded = trans.load(qm_file, prop.localization_dir)
-
+        
         if loaded:
             app.installTranslator(trans)
         else:
             loc = 'c'
-    else:
-        loc = 'c'
-
+    
     if loc == 'c':
         log.debug("Using default 'C' locale")
     else:
         log.debug("Using locale: %s" % loc)
+        QLocale.setDefault(QLocale(loc))
+        try:
+            locale.setlocale(locale.LC_ALL, locale.normalize(loc+".utf8"))
+            prop.locale = loc
+        except locale.Error:
+            log.error("Invalid locale: %s" % (loc+".utf8"))
 
     addrbook = FaxAddrBookForm()
     addrbook.show()

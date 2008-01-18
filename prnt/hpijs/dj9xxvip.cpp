@@ -554,6 +554,30 @@ DRIVER_ERROR HeaderDJ990::Send()
     ERRCHECK;
 
     ////////////////////////////////////////////////////////////////////////////////////
+
+/*
+ *  Custom papersize command
+ */
+
+    if (thePrintContext->thePaperSize == CUSTOM_SIZE)
+    {
+        BYTE    szStr[32];
+        short   sWidth, sHeight;
+        BYTE    b1, b2;
+        sWidth  = (short) (thePrintContext->PhysicalPageSizeX () * thePrintContext->EffectiveResolutionX ());
+        sHeight = (short) (thePrintContext->PhysicalPageSizeY () * thePrintContext->EffectiveResolutionY ());
+        memcpy (szStr, "\x1B*o5W\x0E\x05\x00\x00\x00\x1B*o5W\x0E\x06\x00\x00\x00", 20);
+        b1 = (BYTE) ((sWidth & 0xFF00) >> 8);
+        b2 = (BYTE) (sWidth & 0xFF);
+        szStr[8] = b1;
+        szStr[9] = b2;
+        b1 = (BYTE) ((sHeight & 0xFF00) >> 8);
+        b2 = (BYTE) (sHeight & 0xFF);
+        szStr[18] = b1;
+        szStr[19] = b2;
+        err = thePrinter->Send ((const BYTE *) szStr, 20);
+    }
+
     float   fXOverSpray = 0.0;
     float   fYOverSpray = 0.0;
     float   fLeftOverSpray = 0.0;

@@ -116,7 +116,7 @@ static int wait_status(int fd, unsigned char mask, unsigned char val, int usec)
       gettimeofday(&now, NULL);
       if ((now.tv_sec > tmo.tv_sec) || (now.tv_sec == tmo.tv_sec && now.tv_usec > tmo.tv_usec))
       {
-         BUG("wait_status timeout status=%x mask=%x val=%x us=%d\n", status, mask, val, usec);
+         DBG("wait_status timeout status=%x mask=%x val=%x us=%d\n", status, mask, val, usec);
          return -1;   /* timeout */
       }
    }
@@ -359,7 +359,7 @@ bugout:
    return len;
 }
 
-static int ecp_read(int fd, void *buffer, int size, int sec)
+static int ecp_read(int fd, void *buffer, int size, int usec)
 {
    int i=0;
    unsigned char *p = (unsigned char *)buffer;
@@ -370,12 +370,12 @@ static int ecp_read(int fd, void *buffer, int size, int sec)
    {
       if (ecp_read_data(fd, p+i) != 1)
       {
-         if (sec > 0)
-         {
-            sec--;
+         usec-=PP_SIGNAL_TIMEOUT;
+         if (usec > 0)
             continue;
-	 }
-         return -1;
+
+//         return -1;
+         return -ETIMEDOUT;   /* timeout */
       }
       i++;
    }
@@ -464,7 +464,7 @@ bugout:
    return len;
 }
 
-static int nibble_read(int fd, int flag, void *buffer, int size, int sec)
+static int nibble_read(int fd, int flag, void *buffer, int size, int usec)
 {
    int i=0;
    unsigned char *p = (unsigned char *)buffer;
@@ -475,20 +475,20 @@ static int nibble_read(int fd, int flag, void *buffer, int size, int sec)
    ioctl (fd, PPNEGOT, &mc);
    if (ioctl (fd, PPNEGOT, &m))
    {
-     //      syslog(LOG_ERR, "ParDevice::nibble_read failed: %m\n");
-      goto bugout;
+      DBG("nibble_read negotiation failed: %m\n");
+      return -1;
    }
 
    while (i < size)
    {
       if (nibble_read_data(fd, p+i) != 1)
       {
-         if (sec > 0)
-         {
-            sec--;
+         usec-=PP_SIGNAL_TIMEOUT;
+         if (usec > 0)
             continue;
-	 }
-         return -1;
+
+//         return -1;
+         return -ETIMEDOUT;   /* timeout */
       }
 
       i++;
@@ -504,7 +504,6 @@ static int nibble_read(int fd, int flag, void *buffer, int size, int sec)
       }
    }
 
-bugout:
    return i;
 }
 
@@ -749,17 +748,17 @@ int __attribute__ ((visibility ("hidden"))) pp_write(int fd, const void *buf, in
 int __attribute__ ((visibility ("hidden"))) pp_read(int fd, void *buf, int size, int usec)
 {
    int len=0, m;
-   int sec = usec/1000000;
+//   int sec = usec/1000000;
 
    ioctl(fd, PPGETMODE, &m);
 
    if (m & (IEEE1284_MODE_ECPSWE | IEEE1284_MODE_ECP))
    {  
-      len = ecp_read(fd, buf, size, sec);
+      len = ecp_read(fd, buf, size, usec);
    }
    else
    {
-      len = nibble_read(fd, 0, buf, size, sec);
+      len = nibble_read(fd, 0, buf, size, usec);
    }
 
    DBG("read fd=%d len=%d size=%d usec=%d\n", fd, len, size, usec);

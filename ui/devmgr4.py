@@ -577,19 +577,23 @@ class DevMgr4(DevMgr4_base):
             self.cur_device.supported:
 
             for c in self.cur_device.cups_printers:
-                self.PrintSettingsPrinterCombo.insertItem(c)
-                self.PrintJobPrinterCombo.insertItem(c)
+                #print repr(c), type(c)
+                #print c.encode('latin1')
+                self.PrintSettingsPrinterCombo.insertItem(c.decode("utf-8"))
+                self.PrintJobPrinterCombo.insertItem(c.decode("utf-8"))
 
-            self.current_printer = str(self.PrintSettingsPrinterCombo.currentText())
+            self.current_printer = unicode(self.PrintSettingsPrinterCombo.currentText())
 
     def SettingsPrinterCombo_activated(self, s):
-        self.current_printer = str(s)
-        self.PrintJobPrinterCombo.setCurrentText(self.current_printer)
+        #self.current_printer = str(s)
+        self.current_printer = unicode(s)
+        self.PrintJobPrinterCombo.setCurrentText(self.current_printer.encode("latin1"))
         return self.PrinterCombo_activated(self.current_printer)
 
     def JobsPrinterCombo_activated(self, s):
-        self.current_printer = str(s)
-        self.PrintSettingsPrinterCombo.setCurrentText(s)
+        #self.current_printer = str(s)
+        self.current_printer = unicode(s)
+        self.PrintSettingsPrinterCombo.setCurrentText(self.current_printer.encode("latin1"))
         return self.PrinterCombo_activated(self.current_printer)
 
     def PrinterCombo_activated(self, printer):
