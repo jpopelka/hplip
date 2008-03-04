@@ -61,10 +61,12 @@ public:
     DJ55xxProxy() : PrinterProxy(
         "DJ55xx",                // family name
         "Deskjet 460\0"
+        "Deskjet 470\0"
         "deskjet 5550\0"
         "deskjet 5551\0"
 		"OfficeJet 6100\0"
 		"OfficeJet 6150\0"
+        "Officejet H470\0"
         "PSC 21\0"              
         "PSC 2200\0"
 

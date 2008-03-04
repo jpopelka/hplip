@@ -37,14 +37,36 @@ MODE_INSTALLER = 0 # hplip-install
 MODE_CHECK = 1 # hp-check
 MODE_CREATE_DOCS = 2 # create_docs
 
-TYPE_STRING=1
-TYPE_LIST=2
-TYPE_BOOL=3
+TYPE_STRING = 1
+TYPE_LIST = 2
+TYPE_BOOL = 3
 TYPE_INT = 4
+
+DEPENDENCY_RUN_TIME = 1
+DEPENDENCY_COMPILE_TIME = 2
+DEPENDENCY_RUN_AND_COMPILE_TIME = 3
 
 PING_TARGET = "www.google.com"
 HTTP_GET_TARGET = "http://www.google.com"
 PLUGIN_CONF_URL = "http://hplip.sf.net/plugins.conf"
+
+PASSWORD_LIST = [
+pexpect.EOF, # 0
+pexpect.TIMEOUT, # 1
+"passwor[dt]", # en/de
+"password for", # en
+"mot de passe", # fr
+]
+
+PASSWORD_EXPECT_LIST = []
+for s in PASSWORD_LIST:
+    try:
+        p = re.compile(s, re.I)
+    except TypeError:
+        PASSWORD_EXPECT_LIST.append(s)
+    else:
+        PASSWORD_EXPECT_LIST.append(p)
+
 
 try:
     from functools import update_wrapper
@@ -66,6 +88,7 @@ else: # using Python 2.5+
         return update_wrapper(newf, f)
 
 
+
 class CoreInstall(object):
     def __init__(self, mode=MODE_INSTALLER, ui_mode=INTERACTIVE_MODE):
         os.umask(0022)
@@ -84,6 +107,7 @@ class CoreInstall(object):
         self.cups11 = False
         self.hpijs_build = False
         self.ppd_dir = None
+        self.drv_dir = None
         self.distros = {}
         self.plugin_path = os.path.join(prop.home_dir, "data", "plugins")
         self.logoff_required = False
@@ -109,12 +133,14 @@ class CoreInstall(object):
             'ppd_install': TYPE_STRING,
             'udev_mode_fix': TYPE_BOOL,
             'ppd_dir': TYPE_STRING,
+            'drv_dir' : TYPE_STRING,
             'fix_ppd_symlink': TYPE_BOOL,
             'code_name': TYPE_STRING,
             'supported': TYPE_BOOL,
             'release_date': TYPE_STRING,
             'packages': TYPE_LIST,
             'commands': TYPE_LIST,
+            'same_as_version' : TYPE_STRING,
         }
 
         # components
@@ -132,8 +158,8 @@ class CoreInstall(object):
             'base':     (True,  'Required HPLIP base components', []), # HPLIP
             'network' : (False, 'Network/JetDirect I/O', []),
             'gui' :     (False, 'Graphical User Interfaces (GUIs)', []),
-            'fax' :     (False, 'PC Send Fax', []),
-            'scan':     (False, 'Scanning', []),
+            'fax' :     (False, 'PC Send Fax support', []),
+            'scan':     (False, 'Scanning support', []),
             'parallel': (False, 'Parallel I/O (LPT)', []),
             'docs':     (False, 'HPLIP documentation (HTML)', []),
 
@@ -160,36 +186,47 @@ class CoreInstall(object):
         }
 
         # dependencies
-        # 'name': (<required for option>, [<option list>], <display_name>, <check_func>), ...
+        # 'name': (<required for option>, [<option list>], <display_name>, <check_func>, <runtime/compiletime>), ...
         # Note: any change to the list of dependencies must be reflected in base/distros.py
         self.dependencies = {
-            'libjpeg':          (True,  ['base', 'hpijs'], "libjpeg - JPEG library", self.check_libjpeg),
-            'libtool':          (True,  ['base'], "libtool - Library building support services", self.check_libtool),
-            'cups' :            (True,  ['base', 'hpijs-cups'], 'cups - Common Unix Printing System', self.check_cups), 
-            'cups-devel':       (True,  ['base'], 'cups-devel- Common Unix Printing System development files', self.check_cups_devel),
-            'gcc' :             (True,  ['base', 'hpijs'], 'gcc - GNU Project C and C++ Compiler', self.check_gcc),
-            'make' :            (True,  ['base', 'hpijs'], "make - GNU make utility to maintain groups of programs", self.check_make),
-            'python-devel' :    (True,  ['base'], "python-devel - Python development files", self.check_python_devel),
-            'libpthread' :      (True,  ['base'], "libpthread - POSIX threads library", self.check_libpthread),
-            'python2x':         (True,  ['base'], "Python 2.2 or greater - Python programming language", self.check_python2x),
-            'gs':               (True,  ['base', 'hpijs'], "GhostScript - PostScript and PDF language interpreter and previewer", self.check_gs),
-            'libusb':           (True,  ['base'], "libusb - USB library", self.check_libusb),
+            # Required base packages
+            'libjpeg':          (True,  ['base', 'hpijs'], "libjpeg - JPEG library", self.check_libjpeg, DEPENDENCY_RUN_AND_COMPILE_TIME),
+            'libtool':          (True,  ['base'], "libtool - Library building support services", self.check_libtool, DEPENDENCY_COMPILE_TIME),
+            'cups' :            (True,  ['base', 'hpijs-cups'], 'cups - Common Unix Printing System', self.check_cups, DEPENDENCY_RUN_TIME), 
+            'cups-devel':       (True,  ['base'], 'cups-devel- Common Unix Printing System development files', self.check_cups_devel, DEPENDENCY_COMPILE_TIME),
+            'gcc' :             (True,  ['base', 'hpijs'], 'gcc - GNU Project C and C++ Compiler', self.check_gcc, DEPENDENCY_COMPILE_TIME),
+            'make' :            (True,  ['base', 'hpijs'], "make - GNU make utility to maintain groups of programs", self.check_make, DEPENDENCY_COMPILE_TIME),
+            'python-devel' :    (True,  ['base'], "python-devel - Python development files", self.check_python_devel, DEPENDENCY_COMPILE_TIME),
+            'libpthread' :      (True,  ['base'], "libpthread - POSIX threads library", self.check_libpthread, DEPENDENCY_RUN_AND_COMPILE_TIME),
+            'python2x':         (True,  ['base'], "Python 2.2 or greater - Python programming language", self.check_python2x, DEPENDENCY_RUN_AND_COMPILE_TIME),
+            'gs':               (True,  ['base', 'hpijs'], "GhostScript - PostScript and PDF language interpreter and previewer", self.check_gs, DEPENDENCY_RUN_TIME),
+            'libusb':           (True,  ['base'], "libusb - USB library", self.check_libusb, DEPENDENCY_RUN_AND_COMPILE_TIME),
 
-            'sane':             (True,  ['scan'], "SANE - Scanning library", self.check_sane),
-            'sane-devel' :      (True,  ['scan'], "SANE - Scanning library development files", self.check_sane_devel),
-            'xsane':            (False, ['scan'], "xsane - Graphical scanner frontend for SANE", self.check_xsane),
-            'scanimage':        (False, ['scan'], "scanimage - Shell scanning program", self.check_scanimage),
-            'pil':              (False, ['scan'], "PIL - Python Imaging Library (required for commandline scanning with hp-scan)", self.check_pil), 
+            # Optional base packages
+            'cups-ddk':          (False, ['base'], "cups-ddk - CUPS driver development kit", self.check_cupsddk, DEPENDENCY_RUN_TIME), # req. for .drv PPD installs
 
-            'reportlab':        (False, ['fax'], "Reportlab - PDF library for Python", self.check_reportlab), 
-            'python23':         (True,  ['fax'], "Python 2.3 or greater - Required for fax functionality", self.check_python23),
+            # Required scan packages
+            'sane':             (True,  ['scan'], "SANE - Scanning library", self.check_sane, DEPENDENCY_RUN_TIME),
+            'sane-devel' :      (True,  ['scan'], "SANE - Scanning library development files", self.check_sane_devel, DEPENDENCY_COMPILE_TIME),
 
-            'ppdev':            (True,  ['parallel'], "ppdev - Parallel port support kernel module.", self.check_ppdev),
+            # Optional scan packages
+            'xsane':            (False, ['scan'], "xsane - Graphical scanner frontend for SANE", self.check_xsane, DEPENDENCY_RUN_TIME),
+            'scanimage':        (False, ['scan'], "scanimage - Shell scanning program", self.check_scanimage, DEPENDENCY_RUN_TIME),
+            'pil':              (False, ['scan'], "PIL - Python Imaging Library (required for commandline scanning with hp-scan)", self.check_pil, DEPENDENCY_RUN_TIME), 
 
-            'pyqt':             (True,  ['gui'], "PyQt - Qt interface for Python", self.check_pyqt),
+            # Required fax packages
+            'python23':         (True,  ['fax'], "Python 2.3 or greater - Required for fax functionality", self.check_python23, DEPENDENCY_RUN_TIME),
+            'reportlab':        (False, ['fax'], "Reportlab - PDF library for Python", self.check_reportlab, DEPENDENCY_RUN_TIME), 
 
-            'libnetsnmp-devel': (True,  ['network'], "libnetsnmp-devel - SNMP networking library development files", self.check_libnetsnmp),
-            'libcrypto':        (True,  ['network'], "libcrypto - OpenSSL cryptographic library", self.check_libcrypto),
+            # Required parallel I/O packages
+            'ppdev':            (True,  ['parallel'], "ppdev - Parallel port support kernel module.", self.check_ppdev, DEPENDENCY_RUN_TIME),
+
+            # Required gui packages
+            'pyqt':             (True,  ['gui'], "PyQt - Qt interface for Python", self.check_pyqt, DEPENDENCY_RUN_TIME),
+
+            # Required network I/O packages
+            'libnetsnmp-devel': (True,  ['network'], "libnetsnmp-devel - SNMP networking library development files", self.check_libnetsnmp, DEPENDENCY_RUN_AND_COMPILE_TIME),
+            'libcrypto':        (True,  ['network'], "libcrypto - OpenSSL cryptographic library", self.check_libcrypto, DEPENDENCY_RUN_AND_COMPILE_TIME),
         }
 
         for opt in self.options:
@@ -238,7 +275,6 @@ class CoreInstall(object):
 
         self.check_dependencies(callback)
 
-        log.debug("******")
         for d in self.dependencies:
             update_spinner()
 
@@ -246,8 +282,6 @@ class CoreInstall(object):
 
             if callback is not None:
                 callback("Result: %s = %d\n" % (d, self.have_dependencies[d]))
-
-        log.debug("******")
 
         log.debug("Running package manager: %s" % self.check_pkg_mgr())
 
@@ -287,8 +321,7 @@ class CoreInstall(object):
         self.sys_uname_info = self.sys_uname_info.replace('\n', '')
         log.debug(self.sys_uname_info)
 
-        self.ppd_install_flag()
-        self.ppd_dir = self.get_distro_ver_data('ppd_dir')
+        self.distro_changed()
 
         # Record the installation time/date and version.
         # Also has the effect of making the .hplip.conf file user r/w
@@ -300,13 +333,33 @@ class CoreInstall(object):
         if callback is not None:
             callback("Done")
 
+    def init_for_docs(self, distro_name, version, bitness=32):
+        self.distro_name = distro_name
+        self.distro_version = version
+
+        try:
+            self.distro = self.distros[distro_name]['index']
+        except KeyError:
+            log.error("Invalid distro name: %s" % distro_name)
+            sys.exit(1)
+
+        self.bitness = bitness
+
+
+        for d in self.dependencies:
+            self.have_dependencies[d] = True
+
+        self.enable_ppds = self.get_distro_ver_data('ppd_install', 'ppd') == 'ppd'
+        self.ppd_dir = self.get_distro_ver_data('ppd_dir')
+        self.drv_dir = self.get_distro_ver_data('drv_dir')
+
+        self.distro_version_supported = True # for manual installs    
+
 
     def check_dependencies(self, callback=None):
         update_ld_output()
 
         for d in self.dependencies:
-            log.debug("***")
-
             update_spinner()
 
             log.debug("Checking for dependency '%s'...\n" % d)
@@ -329,48 +382,79 @@ class CoreInstall(object):
         else:
             return ''
 
-    def run(self, cmd, callback=None):
-        output = cStringIO.StringIO()
 
+    def run(self, cmd, callback=None, timeout=300):
+        if cmd is None: 
+            return 1, ''
+        output = cStringIO.StringIO()
+        ok, ret = False, ''
+        # Hack! TODO: Fix!
+        check_timeout = not (cmd.startswith('xterm') or cmd.startswith('gnome-terminal'))
+        
         try:
             child = pexpect.spawn(cmd, timeout=1)
         except pexpect.ExceptionPexpect:
             return 1, ''
 
         try:
-            while True:
-                update_spinner()
-                i = child.expect(["[pP]assword:|password for", pexpect.EOF, pexpect.TIMEOUT])
-                cb = child.before
-                if cb:
-                    log.log_to_file(cb)
-                    output.write(cb)
+            try:
+                start = time.time()
 
-                    if callback is not None:
-                        if callback(cb): # cancel
-                            break
+                while True:
+                    update_spinner()
 
-                if i == 0: # Password:
-                    child.sendline(self.password)
+                    i = child.expect_list(PASSWORD_EXPECT_LIST)
 
-                elif i == 1: # EOF
-                    break
+                    cb = child.before
+                    if cb:
+                        # output
+                        start = time.time()
+                        log.log_to_file(cb)
+                        output.write(cb)
 
-                elif i == 2: # TIMEOUT
-                    continue
+                        if callback is not None:
+                            if callback(cb): # cancel
+                                break
+                    
+                    elif check_timeout:
+                        # no output
+                        span = int(time.time()-start)
 
-        except Exception:
-            log.exception()
+                        if span:
+                            if span % 5 == 0:
+                                log.debug("No output seen in %d secs" % span)
+
+                            if span > timeout:
+                                log.error("No output seen in over %d sec... (Is the CD-ROM/DVD source repository enabled? It shouldn't be!)" % timeout)
+                                child.close()
+                                child.terminate(force=True)
+                                break
+
+                    if i == 0: # EOF
+                        ok, ret = True, output.getvalue()
+                        break
+
+                    elif i == 1: # TIMEOUT
+                        continue
+
+                    else: # password
+                        child.sendline(self.password)
+
+            except (Exception, pexpect.ExceptionPexpect):
+                log.exception()
+
+        finally:
             cleanup_spinner()
+
+            try:
+                child.close()
+            except OSError:
+                pass
+
+        if ok:        
+            return child.exitstatus, ret
+        else:
             return 1, ''
-
-        cleanup_spinner()
-
-        try: 
-            child.close()
-        except OSError:
-            pass
-        return child.exitstatus, output.getvalue()
 
 
     def get_distro(self):
@@ -382,24 +466,23 @@ class CoreInstall(object):
         lsb_release = utils.which("lsb_release")
 
         if lsb_release:
-            log.debug("Using 'lsb_release -i/-r'")
+            log.debug("Using 'lsb_release -is/-rs'")
             cmd = os.path.join(lsb_release, "lsb_release")
+            status, name = self.run(cmd + ' -is')
+            name = name.lower().strip()
+            log.debug("Distro name=%s" % name)
 
-            status, name = self.run(cmd + ' -i')
+            if not status and name:
+                status, ver = self.run(cmd + ' -rs')
+                ver = ver.lower().strip()
+                log.debug("Distro version=%s" % ver)
 
-            if name and ':' in name:
-                name = name.split(':')[1].strip().lower()
-                status, ver = self.run(cmd + ' -r')
-
-                if ver and ':' in ver:
-                    self.distro_version = ver.split(':')[1].strip()
-
-                    log.debug("LSB: %s %s" % (name, self.distro_version))
-
+                if not status and ver:
                     for d in self.distros:
                         if name.find(d) > -1:
                             self.distro = self.distros[d]['index']
                             found = True
+                            self.distro_version = ver
                             break
 
         if not found:
@@ -425,21 +508,22 @@ class CoreInstall(object):
 
                 if found:
                     for n in name.split(): 
+                        m= n
                         if '.' in n:
                             m = '.'.join(n.split('.')[:2])
-                        else:
-                            m = n
 
                         try:
-                            self.distro_version = str(float(m))
+                            float(m)
                         except ValueError:
                             try:
-                                self.distro_version = str(int(m))
+                                int(m)
                             except ValueError:
                                 self.distro_version = '0.0'
                             else:
+                                self.distro_version = m
                                 break
                         else:
+                            self.distro_version = m
                             break
 
                     log.debug("/etc/issue: %s %s" % (name, self.distro_version))
@@ -448,9 +532,29 @@ class CoreInstall(object):
 
 
     def distro_changed(self):
-        self.ppd_install_flag()
+        ppd_install = self.get_distro_ver_data('ppd_install', 'ppd')
+
+        if ppd_install not in ('ppd', 'drv'):
+            log.warning("Invalid ppd_install value: %s" % ppd_install)
+
+        if self.cups11:
+            self.enable_ppds = True
+        else:
+            self.enable_ppds = (ppd_install == 'ppd')
+
+        log.debug("Enable PPD install: %s (False=drv)" % self.enable_ppds)
+
         self.ppd_dir = self.get_distro_ver_data('ppd_dir')
+
+        if not self.ppd_dir or not os.path.exists(self.ppd_dir):
+            log.warning("Invalid ppd_dir value: %s" % self.ppd_dir)
+
+        self.drv_dir = self.get_distro_ver_data('drv_dir')
+        if not self.enable_ppds and (not self.drv_dir or not os.path.exists(self.drv_dir)):
+            log.warning("Invalid drv_dir value: %s" % self.drv_dir)
+
         self.distro_version_supported = self.get_distro_ver_data('supported', False)
+
 
     def __fixup_data(self, key, data):
         field_type = self.FIELD_TYPES.get(key, TYPE_STRING)
@@ -458,7 +562,10 @@ class CoreInstall(object):
             return utils.to_bool(data)
 
         elif field_type == TYPE_STRING:
-            return data.strip()
+            if type('') == type(data):
+                return data.strip()
+            else:
+                return data
 
         elif field_type == TYPE_INT:
             try:
@@ -468,6 +575,7 @@ class CoreInstall(object):
 
         elif field_type == TYPE_LIST:
             return [x for x in data.split(',') if x]
+
 
     def load_distros(self):
         if self.mode  == MODE_INSTALLER:
@@ -493,6 +601,7 @@ class CoreInstall(object):
             try:
                 distro_section = distros_dat[distro]
             except KeyError:
+                log.debug("Missing distro section in distros.dat: [%s]" % distro)
                 continue
 
             for key in distro_section:
@@ -507,33 +616,52 @@ class CoreInstall(object):
             self.distros[distro]['versions'] = {}
 
             for ver in temp_versions:
+                v = ver
                 try:
-                    ver_section = distros_dat["%s:%s" % (distro, ver)]
+                    ver_section = distros_dat["%s:%s" % (distro, v)].copy()
                 except KeyError:
+                    log.debug("Missing version section in distros.dat: [%s:%s]" % (distro, v))
                     continue
 
                 for key in ver_section:
                     ver_section[key] = self.__fixup_data(key, ver_section[key])
 
+                if 'same_as_version' in ver_section:
+                    v = ver_section['same_as_version']
+
+                    try:
+                        ver_section = distros_dat["%s:%s" % (distro, v)].copy()
+                        ver_section['same_as_version'] = v
+                    except KeyError:
+                        log.debug("Missing 'same_as_version=' version in distros.dat for section [%s:%s]." % (distro, v))
+                        continue
+
                 self.distros[distro]['versions'][ver] = ver_section
                 self.distros[distro]['versions'][ver]['dependency_cmds'] = {}
 
-                for dep in self.dependencies:
-                    try:
-                        dep_section = distros_dat["%s:%s:%s" % (distro, ver, dep)]
-                    except KeyError:
-                        continue
+                #if utils.to_bool(ver_section['supported']):
+                if 1:
+                    for dep in self.dependencies:
+                        try:
+                            dep_section = distros_dat["%s:%s:%s" % (distro, v, dep)].copy()
+                        except KeyError:
+                            log.debug("Missing dependency section in distros.dat: [%s:%s:%s]" % (distro, v, dep))
+                            continue
 
-                    for key in dep_section:
-                        dep_section[key] = self.__fixup_data(key, dep_section[key])
-                        self.distros[distro]['versions'][ver]['dependency_cmds'][dep] = dep_section
+
+                        for key in dep_section:
+                            dep_section[key] = self.__fixup_data(key, dep_section[key])
+                            self.distros[distro]['versions'][ver]['dependency_cmds'][dep] = dep_section
+
 
 
     def pre_install(self):
         pass
 
+
     def pre_depend(self):
         pass
+
 
     def check_python2x(self):
         py_ver = sys.version_info
@@ -541,11 +669,14 @@ class CoreInstall(object):
         log.debug("Python ver=%d.%d" % (py_major_ver, py_minor_ver))
         return py_major_ver >= 2
 
+
     def check_gcc(self):
         return check_tool('gcc --version', 0) and check_tool('g++ --version', 0)
 
+
     def check_make(self):
         return check_tool('make --version', 3.0)
+
 
     def check_libusb(self):
         if not check_lib('libusb'):
@@ -557,14 +688,18 @@ class CoreInstall(object):
     def check_libjpeg(self):
         return check_lib("libjpeg") and check_file("jpeglib.h")
 
+
     def check_libcrypto(self):
         return check_lib("libcrypto") and check_file("crypto.h")
+
 
     def check_libpthread(self):
         return check_lib("libpthread") and check_file("pthread.h")
 
+
     def check_libnetsnmp(self):
         return check_lib("libnetsnmp") and check_file("net-snmp-config.h")
+
 
     def check_reportlab(self):
         try:
@@ -589,17 +724,21 @@ class CoreInstall(object):
             log.debug("Failed.")
             return False
 
+
     def check_python23(self):
         py_ver = sys.version_info
         py_major_ver, py_minor_ver = py_ver[:2]
         log.debug("Python ver=%d.%d" % (py_major_ver, py_minor_ver))
         return py_major_ver >= 2 and py_minor_ver >= 3
 
+
     def check_sane(self):
         return check_lib('libsane')
 
+
     def check_sane_devel(self):
         return len(locate_file_contains("sane.h", '/usr/include', 'extern SANE_Status sane_init')) > 0
+
 
     def check_xsane(self):
         if os.getenv('DISPLAY'):
@@ -607,14 +746,18 @@ class CoreInstall(object):
         else:
             return bool(utils.which("xsane")) # ...so just see if it installed somewhere
 
+
     def check_scanimage(self):
         return check_tool('scanimage --version', 1.0)
+
 
     def check_ppdev(self):
         return check_lsmod('ppdev')
 
+
     def check_gs(self):
         return check_tool('gs -v', 7.05)
+
 
     def check_pyqt(self):
         try:
@@ -660,14 +803,18 @@ class CoreInstall(object):
         except ImportError:
              return False
 
+
     def check_python_devel(self):
         return check_file('Python.h')
+
 
     def check_cups_devel(self):
         return check_file('cups.h') and bool(utils.which('lpr'))
 
+
     def check_cups(self):
         status, output = self.run('lpstat -r')
+
 
         if status > 0:
             log.debug("CUPS is not running.")
@@ -676,22 +823,27 @@ class CoreInstall(object):
             log.debug("CUPS is running.")
             return True
 
+
     def check_hpoj(self):
         log.debug("Checking for 'HPOJ'...")
         return check_ps(['ptal-mlcd', 'ptal-printd', 'ptal-photod']) or \
             bool(utils.which("ptal-init"))
 
+
     def check_hplip(self):
         log.debug("Checking for HPLIP...")
         return check_ps(['hpiod', 'hpssd']) and locate_files('hplip.conf', '/etc/hp')
+
 
     def check_hpssd(self):
         log.debug("Checking for hpssd...")
         return check_ps(['hpssd'])
 
+
     def check_libtool(self):
         log.debug("Checking for libtool...")
         return check_tool('libtool --version')
+
 
     def check_pil(self):
         log.debug("Checking for PIL...")
@@ -700,6 +852,13 @@ class CoreInstall(object):
             return True
         except ImportError:
             return False
+
+
+    def check_cupsddk(self):
+        log.debug("Checking for cups-ddk...")
+        # TODO: Compute these paths some way or another...
+        #return check_tool("/usr/lib/cups/driver/drv list") and os.path.exists("/usr/share/cupsddk/include/media.defs")
+        return check_file('drv', "/usr/lib/cups/driver") and check_file('media.defs', "/usr/share/cupsddk/include")        
 
     def check_pkg_mgr(self): # modified from EasyUbuntu
         """
@@ -716,6 +875,7 @@ class CoreInstall(object):
                 if p in process:
                     return p
         return ''
+
 
     def get_hplip_version(self):
         self.version_description, self.version_public, self.version_internal = '', '', ''
@@ -753,6 +913,7 @@ class CoreInstall(object):
 
         return self.version_description, self.version_public, self.version_internal            
 
+
     def configure(self): 
         configure_cmd = './configure'
 
@@ -786,13 +947,22 @@ class CoreInstall(object):
         else:
             configure_cmd += ' --disable-doc-build'
 
-        if self.enable_ppds:
-            configure_cmd += ' --enable-foomatic-ppd-install --disable-foomatic-xml-install'
+        if self.enable_ppds: # Use ppd install if cups 1.1 or ppd_install=ppd
+            configure_cmd += ' --enable-foomatic-ppd-install --disable-foomatic-drv-install'
 
-            if self.ppd_dir is not None:
-                configure_cmd += ' --with-hpppddir=%s' % self.ppd_dir
-        else:
-            configure_cmd += ' --disable-foomatic-ppd-install --enable-foomatic-xml-install'
+        else: # otherwise, use drv if cups ddk is avail, otherwise fall back to .ppds
+
+            if self.have_dependencies['cups-ddk']:
+                configure_cmd += ' --disable-foomatic-ppd-install --enable-foomatic-drv-install'
+
+                if self.drv_dir is not None:
+                    configure_cmd += ' --with-drvdir=%s' % self.drv_dir
+
+            else:
+                configure_cmd += ' --enable-foomatic-ppd-install --disable-foomatic-drv-install'
+
+        if self.ppd_dir is not None:
+            configure_cmd += ' --with-hpppddir=%s' % self.ppd_dir
 
         if self.hpijs_build:
             configure_cmd += ' --enable-hpijs-only-build'
@@ -822,8 +992,10 @@ class CoreInstall(object):
 
         self.run(cmd)
 
+
     def stop_hplip(self):
         return self.su_sudo() % "/etc/init.d/hplip stop"
+
 
     def su_sudo(self):
         if os.geteuid() == 0:
@@ -849,13 +1021,6 @@ class CoreInstall(object):
                 'make', 
                 self.su_sudo() % 'make install']
 
-    def ppd_install_flag(self): 
-        if self.cups11:
-            self.enable_ppds = True
-        else:
-            self.enable_ppds = (self.get_distro_ver_data('ppd_install', 'ppd') == 'ppd')
-
-        log.debug("Enable PPD install: %s" % self.enable_ppds)
 
     def get_distro_ver_data(self, key, default=None):
         try:
@@ -866,11 +1031,13 @@ class CoreInstall(object):
 
         return value
 
+
     def get_distro_data(self, key, default=None):
         try:
             return self.distros[self.distro_name].get(key, None) or default
         except KeyError:
             return default
+
 
     def get_ver_data(self, key, default=None):
         try:
@@ -880,6 +1047,7 @@ class CoreInstall(object):
 
         return value
 
+
     def get_dependency_data(self, dependency):
         dependency_cmds = self.get_ver_data("dependency_cmds", {})
         dependency_data = dependency_cmds.get(dependency, {})
@@ -888,11 +1056,50 @@ class CoreInstall(object):
         return packages, commands
 
 
+    def get_dependency_commands(self):
+        dd = self.dependencies.keys()
+        dd.sort()
+        commands_to_run = []
+        packages_to_install = []
+        overall_commands_to_run = []
+        for d in dd:
+            include = False
+            for opt in self.dependencies[d][1]:
+                if self.selected_options[opt]:
+                    include = True
+            if include:
+                pkgs, cmds = self.get_dependency_data(d)
+
+                if pkgs:
+                    packages_to_install.extend(pkgs)
+
+                if cmds:
+                    commands_to_run.extend(cmds)
+
+        package_mgr_cmd = self.get_distro_data('package_mgr_cmd')
+
+        overall_commands_to_run.extend(commands_to_run)
+
+        if package_mgr_cmd:
+            packages_to_install = ' '.join(packages_to_install)
+            overall_commands_to_run.append(utils.cat(package_mgr_cmd))
+
+        if not overall_commands_to_run:
+            log.error("No cmds/pkgs")
+
+        return overall_commands_to_run
+
+
     def distro_known(self):
         return self.distro != DISTRO_UNKNOWN and self.distro_version != DISTRO_VER_UNKNOWN
 
+
     def distro_supported(self):
-        return self.distro != DISTRO_UNKNOWN and self.distro_version != DISTRO_VER_UNKNOWN and self.get_ver_data('supported', False)
+        if self.mode == MODE_INSTALLER:
+            return self.distro != DISTRO_UNKNOWN and self.distro_version != DISTRO_VER_UNKNOWN and self.get_ver_data('supported', False)
+        else:
+            return True # For docs (manual install)
+
 
     def sort_vers(self, x, y):
         try:
@@ -900,8 +1107,10 @@ class CoreInstall(object):
         except ValueError:
             return cmp(x, y)
 
+
     def running_as_root(self):
         return os.geteuid() == 0
+
 
     def show_release_notes_in_browser(self):
         url = "file://%s" % os.path.join(os.getcwd(), 'doc', 'release_notes.html')
@@ -909,11 +1118,13 @@ class CoreInstall(object):
         status, output = self.run("xhost +")
         utils.openURL(url)
 
+
     def count_num_required_missing_dependencies(self):
         num_req_missing = 0
         for d, desc, opt in self.missing_required_dependencies():
             num_req_missing += 1
         return num_req_missing
+
 
     def count_num_optional_missing_dependencies(self):
         num_opt_missing = 0
@@ -921,24 +1132,39 @@ class CoreInstall(object):
             num_opt_missing += 1
         return num_opt_missing
 
-    def missing_required_dependencies(self):
+
+    def missing_required_dependencies(self): # missing req. deps in req. options
         for opt in self.components[self.selected_component][1]:
             if self.options[opt][0]: # required options
                 for d in self.options[opt][2]: # dependencies for option
-                    if not self.have_dependencies[d]: # missing
-                        log.debug("Missing required dependency: %s" % d)
-                        yield d, self.dependencies[d][2], opt
-                        # depend, desc, option
+                    if self.dependencies[d][0]: # required option
+                        if not self.have_dependencies[d]: # missing
+                            log.debug("Missing required dependency: %s" % d)
+                            yield d, self.dependencies[d][2], opt
+                            # depend, desc, option
+
 
     def missing_optional_dependencies(self):
+        # missing deps in opt. options
+
         for opt in self.components[self.selected_component][1]:
-            if not self.options[opt][0]: # not required
+            if not self.options[opt][0]: # not required option
                 if self.selected_options[opt]: # only for options that are ON
                     for d in self.options[opt][2]: # dependencies
                         if not self.have_dependencies[d]: # missing dependency
                             log.debug("Missing optional dependency: %s" % d)
                             yield d, self.dependencies[d][2], self.dependencies[d][0], opt
                             # depend, desc, required_for_opt, opt
+
+        # opt. deps in req. options
+        for opt in self.components[self.selected_component][1]:
+              if self.options[opt][0]: # required options
+                  for d in self.options[opt][2]: # dependencies for option
+                      if not self.dependencies[d][0]: # optional dep
+                          if not self.have_dependencies[d]: # missing
+                              log.debug("Missing optional dependency: %s" % d)
+                              yield d, self.dependencies[d][2], self.dependencies[d][0], opt
+                              # depend, desc, option  
 
 
     def select_options(self, answer_callback):
@@ -1064,19 +1290,6 @@ class CoreInstall(object):
             x += 1
 
 
-        # Remove the link /usr/share/foomatic/db/source/PPD if the symlink is corrupt (Dapper only?)
-##        if self.get_distro_ver_data('fix_ppd_symlink', False):
-##            cmd = self.su_sudo() % 'python ./installer/fix_symlink.py'
-##            status, output = self.run(cmd)
-##            if callback is not None:
-##                callback(cmd, "Fix PPD symlink")
-##        else:
-##            if callback is not None:
-##                callback()
-
-
-
-
     def run_post_build(self, callback=None):
         x = 1
         for cmd in self.post_build():
@@ -1093,20 +1306,8 @@ class CoreInstall(object):
         self.restart_required = True
         trigger_required = True
 
-##        # Trigger USB devices so that the new .rules will take effect 
-##        if trigger_required:
-##            #self.logoff_required = True # Temp hack...
-##            self.restart_required = True
-##            # TODO: Fix trigger utility!
-##            cmd = self.su_sudo() % 'python ./installer/trigger.py'
-##            log.debug("Running USB trigger utility: %s" % cmd)
-##            status, output = self.run(cmd)
-##            if callback is not None:
-##                callback(cmd, "USB triggering utility")
-
-
         # Restart CUPS if necessary
-        if self.cups11: # or mdk_usb_fix:
+        if self.cups11:
             cmds.append(self.restart_cups())
 
         # Kill any running hpssd.py instance from a previous install
@@ -1117,16 +1318,8 @@ class CoreInstall(object):
 
                 cmds.append(self.su_sudo() % kill)
 
-##            try:
-##                os.kill(pid, 9)
-##                status = 0
-##            except OSError:
-##                status = 1
-##
-##            if callback is not None:
-##                callback("", "Stopping hpssd")
-
         return cmds
+
 
     def logoff(self):
         ok = False
@@ -1140,25 +1333,26 @@ class CoreInstall(object):
 
         return ok
 
+
     def restart(self):
         ok = False
-        #print "Shutdown"
         shutdown = utils.which('shutdown')
         if shutdown:
             cmd = "%s -r now" % (os.path.join(shutdown, "shutdown"))
             cmd = self.su_sudo() % cmd
             status, output = self.run(cmd)
-            #print "status: ", status
-            #print "output: ", output 
 
             ok = (status == 0)
 
         return ok
 
+
     def check_for_gui_support(self):
         return os.getenv('DISPLAY') and self.selected_options['gui'] and utils.checkPyQtImport()
 
+
     def run_hp_setup(self):
+        status = 0
         hpsetup = utils.which("hp-setup")
 
         if self.check_for_gui_support():
@@ -1166,16 +1360,22 @@ class CoreInstall(object):
                 c = 'hp-setup -u --username=%s' % prop.username
             else:
                 c = 'python ./setup.py -u --username=%s' % prop.username
+
+            cmd = self.su_sudo() % c
+            log.debug(cmd)
+
+            status, output = self.run(cmd)
         else:
             if hpsetup:
                 c = "hp-setup -i"
             else:
                 c = "python ./setup.py -i"
 
-        cmd = self.su_sudo() % c
-        log.debug(cmd)
-        status, output = self.run(cmd)
-        #status = os.system(cmd)
+            cmd = self.su_sudo() % c
+            log.debug(cmd)
+            os.system(cmd)
+
+
         return status == 0
 
 
@@ -1227,6 +1427,7 @@ class CoreInstall(object):
 
         return failed
 
+
     def check_password(self, password_entry_callback, callback=None):
         self.clear_su_sudo_password()
         x = 1
@@ -1253,6 +1454,7 @@ class CoreInstall(object):
 
             if x > 3:
                 return False
+
 
     def clear_su_sudo_password(self):
         if self.su_sudo_str() == 'sudo':
@@ -1282,11 +1484,7 @@ class CoreInstall(object):
                 return '', 0, 0, 0, False
 
             conf = os.path.join(self.plugin_path, "plugins.conf")
-            ## XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
             filename, headers = urllib.urlretrieve(PLUGIN_CONF_URL, conf, callback)
-            ##filename, headers = urllib.urlretrieve("http://localhost:8001/plugins.conf", 
-            ##    conf, callback)
-
             f = file(conf, 'r')
             t = f.read()
             log.debug_block("plugins.conf", t)
@@ -1319,12 +1517,6 @@ class CoreInstall(object):
         calc_checksum = sha.new(file(plugin_file, 'r').read()).hexdigest()
         log.debug("D/L file checksum=%s" % calc_checksum)
 
-        ##if calc_checksum == checksum:
-        ##    log.debug("D/L OK")
-        ##    return True, plugin_file
-
-        ##log.error("D/L failed (checksum error).")
-        ##return False, ''
         return True, plugin_file
 
 
@@ -1343,6 +1535,7 @@ class CoreInstall(object):
             return False
 
         return True
+
 
     def install_plugin(self, model, plugin_lib):
         log.debug("Installing %s.plugin to %s..." % (model, self.plugin_path))
@@ -1418,6 +1611,7 @@ class CoreInstall(object):
             log.warn("Unable to create symlink: %s" % e.strerror)
 
         return True
+
 
     def check_for_plugin(self, model): 
         plugin_file = os.path.join(self.plugin_path, model+".plugin")

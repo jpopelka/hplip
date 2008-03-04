@@ -86,19 +86,25 @@
 hp-check
 
 <hr size="1"/>
-        <div class="document" id="hp-check-dependency-version-check-utility-ver-12-2">
-<h1 class="title">hp-check: Dependency/Version Check Utility (ver. 12.2)</h1>
+        <div class="document" id="hp-check-dependency-version-check-utility-ver-13-0">
+<h1 class="title">hp-check: Dependency/Version Check Utility (ver. 13.0)</h1>
 <p>Check the existence and versions of HPLIP dependencies.</p>
 <p><strong>Usage: hp-check/check.py [OPTIONS]</strong></p>
 <p><strong>[OPTIONS]</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="72%" />
-<col width="28%" />
+<col width="66%" />
+<col width="34%" />
 </colgroup>
 <tbody valign="top">
-<tr><td><em>Pre-install check:</em></td>
-<td>-p or --pre</td>
+<tr><td><em>Compile-time check:</em></td>
+<td>-c or --compile</td>
+</tr>
+<tr><td><em>Run-time check:</em></td>
+<td>-r or --run</td>
+</tr>
+<tr><td><em>Compile and run-time checks:</em></td>
+<td>-b or --both (default)</td>
 </tr>
 <tr><td><em>Set the logging level:</em></td>
 <td>-l&lt;level&gt; or --logging=&lt;level&gt;</td>
@@ -120,31 +126,30 @@ hp-check
 <p><strong>Notes:</strong></p>
 <table border="1" class="borderless docutils">
 <colgroup>
-<col width="72%" />
-<col width="28%" />
+<col width="66%" />
+<col width="34%" />
 </colgroup>
 <tbody valign="top">
 <tr><td colspan="2"><ol class="first last arabic simple">
-<li>For posting to the mailing list, use the -t parameter and then copy/paste the onscreen output or use the generated hp-check.log file.</li>
+<li>For checking for the proper build environment for the HPLIP supplied tarball (.tar.gz or .run),</li>
 </ol>
 </td>
+</tr>
+<tr><td colspan="2">use the --compile or --both switches.</td>
 </tr>
 <tr><td colspan="2"><ol class="first last arabic simple" start="2">
-<li>Use with the '-p' switch prior to installation to check for dependencies and system requirements (skips some checks).</li>
+<li>For checking for the proper runtime environment for a distro supplied package (.deb, .rpm, etc),</li>
 </ol>
 </td>
 </tr>
-<tr><td colspan="2"><ol class="first last arabic simple" start="3">
-<li>Run without the '-p' switch after installation to check for proper install (runs all checks).</li>
-</ol>
-</td>
+<tr><td colspan="2">use the --runtime switch.</td>
 </tr>
 </tbody>
 </table>
 </div>
 
 <hr size="1"/>
-<center><small>Page last updated: Fri Dec 14 14:42:39 2007; HPLIP Version: 2.7.12</small></center>
+<center><small>Page last updated: Fri Feb  8 18:07:19 2008; HPLIP Version: 2.8.2</small></center>
 </div>
 </td></tr></table>
 </div>

@@ -109,7 +109,7 @@ su -c &quot;apt-get update&quot;
 <p><strong>C.</strong> Install the required dependency packages.</p>
 <p>Enter this command:</p>
 <pre class="literal-block">
-su -c &quot;apt-get install libcupsys2 libcupsys2-dev build-essential python-dev python gs-esp libusb-dev sane xsane sane-utils python-reportlab python-qt3 libsnmp9-dev openssl libjpeg62-dev libsane libsane-dev python-imaging&quot;
+su -c &quot;apt-get install --yes libcupsys2 libcupsys2-dev build-essential gs-esp openssl libjpeg62-dev libsnmp9-dev build-essential libtool libusb-dev build-essential python-imaging python-qt3 python-dev python python python-reportlab sane libsane-dev libsane-dev sane-utils xsane&quot;
 </pre>
 <hr></div>
 <div class="section">
@@ -118,7 +118,7 @@ su -c &quot;apt-get install libcupsys2 libcupsys2-dev build-essential python-dev
 <p class="first admonition-title">Note</p>
 <p class="last">We recommend that you download the HPLIP tarball to your home or desktop directory.</p>
 </div>
-<p><strong>A.</strong> Click here to <a class="reference" href="http://prdownloads.sourceforge.net/hplip/hplip-2.7.12.tar.gz">Download the Regular Tarball</a></p>
+<p><strong>A.</strong> Click here to <a class="reference" href="http://prdownloads.sourceforge.net/hplip/hplip-2.8.2.tar.gz">Download the Regular Tarball</a></p>
 <p><strong>B.</strong> Go to the directory where you downloaded the HPLIP tarball.</p>
 <p>Example:</p>
 <pre class="literal-block">
@@ -127,13 +127,13 @@ cd ~/Desktop
 <p><strong>C.</strong> Uncompress the tarball.</p>
 <p>Enter this command:</p>
 <pre class="literal-block">
-tar xvfz hplip-2.7.12.tar.gz
+tar xvfz hplip-2.8.2.tar.gz
 </pre>
 <p>This will create a directory with the same name as the tarball file.</p>
-<p><strong>D.</strong> Change your working directory to the hplip-2.7.12 directory.</p>
+<p><strong>D.</strong> Change your working directory to the hplip-2.8.2 directory.</p>
 <p>Example:</p>
 <pre class="literal-block">
-cd hplip-2.7.12
+cd hplip-2.8.2
 </pre>
 <hr></div>
 <div class="section">
@@ -142,11 +142,11 @@ cd hplip-2.7.12
 For specific information on using ./configure and the different options <a href="#" onClick="MyWindow=window.open('../configure.html','MyWindow','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=900,height=400'); return false;">please go here</a>. Also reference your distro documentation and configuration for additional information on which tags are relevant.<p>Enter this command (select the appropriate command depending on your system configuration):</p>
 <p>32 bit distro users (most users will use this command):</p>
 <pre class="literal-block">
-./configure --prefix=/usr --disable-xml-install --enable-foomatic-ppd-install --with-hpppddir=/usr/share/ppd/hpijs/HP
+./configure --enable-network-build --disable-pp-build --enable-fax-build --enable-gui-build --enable-scan-build --enable-doc-build --enable-foomatic-ppd-install --disable-foomatic-drv-install --with-hpppddir=/usr/share/ppd/hpijs/HP --disable-hpijs-only-build --prefix=/usr
 </pre>
-<p>64 bit distro users</p>
+<p>64 bit distro users:</p>
 <pre class="literal-block">
-./configure --prefix=/usr --libdir=/usr/lib64 --disable-xml-install --enable-foomatic-ppd-install --with-hpppddir=/usr/share/ppd/hpijs/HP
+./configure --enable-network-build --disable-pp-build --enable-fax-build --enable-gui-build --enable-scan-build --enable-doc-build --enable-foomatic-ppd-install --disable-foomatic-drv-install --with-hpppddir=/usr/share/ppd/hpijs/HP --disable-hpijs-only-build --libdir=/usr/lib64 --prefix=/usr
 </pre>
 <hr></div>
 <div class="section">
@@ -185,7 +185,7 @@ su -c &quot;make install&quot;
 </div>
 
 <hr size="1"/>
-<center><small>Page last updated: Thu Sep 13 14:58:19 2007; HPLIP Version: 2.7.12</small></center>
+<center><small>Page last updated: Tue Feb  5 18:12:20 2008; HPLIP Version: 2.8.2</small></center>
 </div>
 </td></tr></table>
 </div>

@@ -28,7 +28,12 @@ __doc__ = "Installs HPLIP printers and faxes in the CUPS spooler. Tries to autom
 # Std Lib
 import sys, getopt, time
 import socket, os.path, re
-import readline, gzip
+import gzip
+
+try:
+    import readline
+except ImportError:
+    pass
 
 # Local
 from base.g import *
@@ -290,11 +295,18 @@ if mode == GUI_MODE:
         if loc.lower() == 'system':
             loc = str(QTextCodec.locale())
             log.debug("Using system locale: %s" % loc)
-    
+
     if loc.lower() != 'c':
         log.debug("Trying to load .qm file for %s locale." % loc)
         trans = QTranslator(None)
-        qm_file = 'hplip_%s.qm' % loc
+        
+        try:
+            l, e = loc.split('.')
+        except ValueError:
+            l = loc
+            e = 'utf8'
+        
+        qm_file = 'hplip_%s.qm' % l
         log.debug("Name of .qm file: %s" % qm_file)
         loaded = trans.load(qm_file, prop.localization_dir)
         
@@ -302,18 +314,17 @@ if mode == GUI_MODE:
             app.installTranslator(trans)
         else:
             loc = 'c'
-    
+
     if loc == 'c':
         log.debug("Using default 'C' locale")
     else:
         log.debug("Using locale: %s" % loc)
         QLocale.setDefault(QLocale(loc))
+        prop.locale = loc
         try:
-            locale.setlocale(locale.LC_ALL, locale.normalize(loc+".utf8"))
-            prop.locale = loc
+            locale.setlocale(locale.LC_ALL, locale.normalize(loc))
         except locale.Error:
-            log.error("Invalid locale: %s" % (loc+".utf8"))
-    
+            pass
 
     if not os.geteuid() == 0:
         log.error("You must be root to run this utility.")
@@ -428,7 +439,7 @@ else: # INTERACTIVE_MODE
         log.error("Unsupported printer model.")
         sys.exit(1)
 
-    if not mq.get('fax-type', 0) and setup_fax:
+    if not mq.get('fax-type', FAX_TYPE_NONE) and setup_fax:
         #log.warning("Cannot setup fax - device does not have fax feature.")
         setup_fax = False
         
@@ -813,7 +824,7 @@ else: # INTERACTIVE_MODE
     # ******************************* FAX QUEUE SETUP
     if setup_fax:
         try:
-            from fax import fax
+            from fax import fax, faxdevice
         except ImportError:
             # This can fail on Python < 2.3 due to the datetime module
             setup_fax = False
@@ -882,8 +893,15 @@ else: # INTERACTIVE_MODE
 
         log.info("Using queue name: %s" % fax_name)
 
+        fax_type = mq.get('fax-type', FAX_TYPE_NONE)
+        
+        if fax_type == FAX_TYPE_SOAP:
+            fax_ppd_name = 'HP-Fax2-hplip'
+        else:
+            fax_ppd_name = 'HP-Fax-hplip'
+        
         for f in ppds:
-            if f.find('HP-Fax') >= 0:
+            if f.find(fax_ppd_name) >= 0:
                 fax_ppd = f
                 log.debug("Found PDD file: %s" % fax_ppd)
                 break
@@ -961,8 +979,7 @@ else: # INTERACTIVE_MODE
                 log.error("Please enter 'y' or 'n'")
 
         if setup_fax:
-            #d = fax.FaxDevice(fax_uri)
-            d = fax.getFaxDevice(fax_uri)
+            d = faxdevice.FaxDevice(fax_uri)
             
             try:
                 d.open()

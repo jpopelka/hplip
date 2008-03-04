@@ -31,8 +31,11 @@ class StringTable:
 
         self.string_table = {
         
+            '0' :      (self.__tr('Unknown'),
+                        ''),
+            
             'unknown'   :       (self.__tr('Unknown'),
-                                 self.__tr('Unknown')),
+                                 ''),
             
             'try_again' :       ('',
                                  self.__tr('Please correct the problem and try again.')),

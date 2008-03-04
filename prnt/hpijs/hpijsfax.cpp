@@ -261,6 +261,7 @@ int hpijsFaxServer (int argc, char **argv)
 	int				n;
 	int				i;
 	int				width;
+    int             widthMMR;
 	int				iInputBufSize;
 	LPBYTE 			pbOutputBuf = NULL;
 	LPBYTE 			pThisScanLine = NULL;
@@ -343,6 +344,7 @@ int hpijsFaxServer (int argc, char **argv)
 		}
 
 		width = (((pFaxStruct->ph.width + 7) >> 3)) << 3;
+        int widthMMR = width;
 
 /*
  *      Devices in the HPFax2 category require fixed width of 2528 pixels.
@@ -351,7 +353,7 @@ int hpijsFaxServer (int argc, char **argv)
 
         if (!strcmp (pFaxStruct->GetDeviceName (), "HPFax2"))
         {
-            width = 2528;
+            widthMMR = 2528;
         }
 
 		if ((pThisScanLine = (LPBYTE) malloc (width * 3)) == NULL)
@@ -362,7 +364,7 @@ int hpijsFaxServer (int argc, char **argv)
 
 		memset (pThisScanLine, 0xFF, width * 3);
 
-		iInputBufSize = width * pFaxStruct->ph.height;
+		iInputBufSize = widthMMR * pFaxStruct->ph.height;
 		if (pFaxStruct->GetColorMode () == HPLIPFAX_COLOR)
 		{
 			iInputBufSize *= 3;
@@ -385,11 +387,11 @@ int hpijsFaxServer (int argc, char **argv)
 			}
 			if (pFaxStruct->GetColorMode () == HPLIPFAX_MONO)
 			{
-				RGB2Gray (pThisScanLine, width, pInputBuf + i * width);
+				RGB2Gray (pThisScanLine, width, pInputBuf + i * widthMMR);
 			}
 			else
 			{
-			    memcpy (pInputBuf + (i * width * 3), pThisScanLine, n);
+			    memcpy (pInputBuf + (i * widthMMR * 3), pThisScanLine, n);
 			}
 		}
 		WORD		wResult;
@@ -456,7 +458,7 @@ int hpijsFaxServer (int argc, char **argv)
 			goto BUGOUT;
 		}
 		traits.iBitsPerPixel = 8;
-		traits.iPixelsPerRow = width;
+		traits.iPixelsPerRow = widthMMR;
 		traits.lHorizDPI = pFaxStruct->EffectiveResolutionX ();
 		traits.lVertDPI = pFaxStruct->EffectiveResolutionY ();
 		traits.lNumRows = pFaxStruct->ph.height;
@@ -493,7 +495,7 @@ int hpijsFaxServer (int argc, char **argv)
 
 		p = szPageHeader;
 		HPLIPPUTINT32 (p, uiPageNum); p += 4;				// Current page number
-		HPLIPPUTINT32 (p, width); p += 4;					// Num of pixels per row
+		HPLIPPUTINT32 (p, widthMMR); p += 4;				// Num of pixels per row
 		HPLIPPUTINT32 (p, pFaxStruct->ph.height); p += 4;	// Num of rows in this page
 		HPLIPPUTINT32 (p, dwOutputUsed); p += 4;			// Size in bytes of encoded data
 		HPLIPPUTINT32 (p, 0); p += 4;			            // Thumbnail data size

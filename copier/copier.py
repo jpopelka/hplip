@@ -115,12 +115,15 @@ class PMLCopyThread(threading.Thread):
         state = STATE_SET_TOKEN
 
         while state != STATE_DONE: # ------------------------- Copier Thread
-            if self.check_for_cancel():
-                state = STATE_ABORTED
+            # revisit - Checking cancel and setting state here means
+            # every state can unconditionally transition to STATE_ABORTED.
+            # This has not been verified.
+            # if self.check_for_cancel():
+                # state = STATE_ABORTED
 
             if state == STATE_ABORTED:
                 log.debug("%s State: Aborted" % ("*"*20))
-                self.write_queue(STATUS_ERROR)
+                self.write_queue(STATUS_DONE) # This was STATUS_ERROR.
                 state = STATE_RESET_TOKEN
 
             if state == STATE_ERROR:

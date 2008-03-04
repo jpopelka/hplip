@@ -90,12 +90,41 @@ Portablity Reference
 <p>HPLIP uses GNU Autotools for building and installing. GNU Autotools simplify most portability issues automatically, but some customization may be desirable. This section documents different configuration options that are available and some caveats for building HPLIP on different distributions and platforms.</p>
 <p>This information is useful for package maintainers and users who want to build and install HPLIP from the source tar ball. Most users don't not need to build from source code and should get the latest HPLIP package from their distribution.</p>
 <p>This section assumes all System Requirements have been met and any pre-existing HPLIP install uses the same &quot;./configure --prefix=/usr&quot; parameters. For more detailed install instructions see <a class="reference" href="../install/index.html">Installation Instructions</a> .</p>
-<p>There are two major install configurations - foomatic-xml-install and foomatic-ppd-install. The default is the foomatic-xml-install. The foomatic-xml-install will install all necessary files for dynamic PPD file creation at runtime. Since the foomatic db builds HPIJS PPD files, only HPIJS PPD files are built-on-the-fly. HP postscript PPD files are always pre-built. The foomatic-ppd-install will install pre-built HPIJS PPD files and HP postscript PPD files.</p>
-<p>The foomatic-xml-install works with CUPS systems that use dynamic PPD file creation. Generally CUPS 1.2 uses dynamic PPD file creation. Use foomatic-ppd-install with CUPS 1.1.x. The following command displays the CUPS version.</p>
+<p>PPD files are used to specifiy driver and driver parameters. Each print job has an associated PPD file and each HP printer has a unique PPD file. There are HPIJS PPD files, postscript PPD files and fax PPD files. All HPIJS PPD files are generated from a CUPS drv file called hpijs.drv.</p>
+<p>CUPS drv support is part of the CUPS DDK at <a class="reference" href="http://www.cups.org/ddk">http://www.cups.org/ddk</a>. The CUPS DDK allows us to support the hpijs/ghostscript/foomatic-rip driver. CUPS drv support provides dynamic and static PPD file support similar to the foomatic database. CUPS drv support provides more PPD options, faster PPD file generation, and a smaller foot-print than the foomatic database. See <a class="reference" href="http://linuxprinting.org">http://linuxprinting.org</a> for foomatic database information.</p>
+<p>There are two major install configurations - <em>dynamic PPD install</em> and <em>static PPD install</em>. The default is the <em>dynamic PPD install</em>. The <em>dynamic PPD install</em> will install all necessary files for dynamic PPD file creation at runtime. Currently only HPIJS PPD files are built-on-the-fly. Postscript PPD files and fax PPD files are pre-built.</p>
+<p>The <em>dynamic PPD install</em> works with CUPS systems that use dynamic PPD file creation. Generally CUPS 1.2 uses dynamic PPD file creation. Use <em>static PPD install</em> with CUPS 1.1.x. The following command displays the CUPS version.</p>
 <pre class="literal-block">
 cups-config --version
 </pre>
-<p>The following example is a foomatic-xml-install which is the default.</p>
+<p>The following configure time options are valid for <em>dynamic PPD install</em> and <em>static PPD install</em>.</p>
+<ol class="arabic simple">
+<li><strong>Static PPD install with foomatic-rip-hplip</strong> - Intended for individual customers using the tar ball install on distros that do not support CUPS dynamic PPD files. Installs precompiled HPIJS PPD files included in the tar ball. All HPIJS ppd files call foomatic-rip-hplip.</li>
+</ol>
+<pre class="literal-block">
+--enable-foomatic-ppd-install   [enable foomatic static ppd install, uses hpppdir]
+--with-hpppddir  [destination for *-hpijs.ppd, *-ps.ppd and HP-Fax-hplip.ppd]
+--enable-foomatic-rip-hplip-install
+</pre>
+<ol class="arabic simple" start="2">
+<li><strong>Dynamic PPD install with foomatic-rip-hplip</strong> - Intended for individual customers using the tar ball install on distros that support CUPS dynamic PPD files. No static hpijs PPD files are installed. Dynamic PPD files will call foomatic-rip-hplip.</li>
+</ol>
+<pre class="literal-block">
+--enable-foomatic-drv-install   [enable foomatic dynamic ppd install, uses drvdir and hpppddir]
+--with-drvdir  [destination for hpijs.drv]
+--with-hpppddir  [destination for *-ps.ppd and HP-Fax-hplip.ppd]
+--enable-foomatic-rip-hplip-install
+</pre>
+<ol class="arabic simple" start="3">
+<li><strong>Dynamic PPD install with no foomatic-rip-hplip</strong> - Intended for distro package managers that will use the latest foomatic-rip. Dynamic PPD files will call foomatic-rip.</li>
+</ol>
+<pre class="literal-block">
+--enable-foomatic-drv-install   [enable foomatic dynamic ppd install, uses drvdir and hpppddir]
+--with-drvdir  [destination for *.drv]
+--with-hpppddir  [destination for *-ps.ppd and HP-Fax-hplip.ppd]
+--disable-foomatic-rip-hplip-install
+</pre>
+<p>The following example is a <em>dynamic PPD install</em> which is the default.</p>
 <pre class="literal-block">
 tar xzvf hplip-2.7.x.tar.gz
 cd hplip-2.7.x
@@ -103,11 +132,11 @@ cd hplip-2.7.x
 make
 make install
 </pre>
-<p>Use this example for a foomatic-ppd-install.</p>
+<p>Use this example for a <em>static PPD install</em>.</p>
 <pre class="literal-block">
 tar xzvf hplip-2.7.x.tar.gz
 cd hplip-2.7.x
-./configure --prefix=/usr --disable-xml-install --enable-foomatic-ppd-install --with-hpppddir=/usr/share/cups/model
+./configure --prefix=/usr --disable-drv-install --enable-foomatic-ppd-install --with-hpppddir=/usr/share/cups/model
 make
 make install
 </pre>
@@ -153,11 +182,13 @@ ln -s /usr/lib/libcrypto.so.0.9.7 /usr/lib/libcrypto.so
 --enable-cups11-build           enable cups 1.1.x build (default=no)
 --enable-shadow-build           enable shadow build (default=no)
 --enable-foomatic-ppd-install   enable foomatic ppd install, uses hpppddir (default=no)
---enable-foomatic-xml-install   enable foomatic xml install, uses foomaticdir (default=yes)
+--enable-foomatic-drv-install   enable foomatic drv install, uses foomaticdir (default=yes)
+--enable-foomatic-rip-hplip-install    enable foomatic-rip-hplip install (default=yes), uses cupsfilterdir
 --with-cupsbackenddir=DIR       set cups backend install directory (default=/usr/lib/cups/backend)
 --with-icondir=DIR              set icon install directory (default=/usr/share/applications)
 --with-hpppddir=DIR             set hp ppd install directory (default=datadir/ppd/HP)
---with-foomaticdir=DIR          set foomatic db install directory (default=datadir/foomatic)
+--with-drvdir=DIR               set cups drv install directory (default=datadir/cups/drv/hp)
+--with-cupsfilterdir=DIR        set cups filter install directory (default=/usr/lib/cups/filter)
 </pre>
 <ol class="arabic simple" start="4">
 <li>For Mandrake be sure to include the net-snmp-mibs package for network support.</li>
@@ -193,6 +224,13 @@ DisablePrintersOnRemoval=yes
 to:
 DisablePrintersOnRemoval=no
 </pre>
+<ol class="arabic simple" start="14">
+<li>If the distro package manager wants a <em>static PPD install</em> that supports foomatic-rip instead of foomatic-rip-hplip, they can do one of the following.</li>
+</ol>
+<pre class="literal-block">
+A. Modify all the static hpijs ppd files in the tar ball to call foomatic-rip.
+B. Perform a <strong>Dynamic PPD install with no foomatic-rip-hplip</strong> then run &quot;ppdc hpijs.drv&quot; in order to create ppd files that call foomatic-rip.
+</pre>
 </div>
 <div class="section">
 <h1><a id="hpijs-portability-reference" name="hpijs-portability-reference">HPIJS Portability Reference</a></h1>
@@ -221,14 +259,11 @@ Copyright (c) 2001-2006, Hewlett-Packard Co.
 </ol>
 <pre class="literal-block">
 --enable-foomatic-ppd-install   enable foomatic ppd install, uses hpppddir (default=no)
---enable-foomatic-xml-install   enable foomatic xml install, uses foomaticdir (default=yes)
+--enable-foomatic-drv-install   enable foomatic drv install, uses drvdir (default=yes)
+--enable-foomatic-rip-hplip-install    enable foomatic-rip-hplip install (default=yes), uses cupsfilterdir
 --with-hpppddir=DIR             set hp ppd install directory (default=datadir/ppd/HP)
---with-foomaticdir=DIR          set foomatic db install directory (default=datadir/foomatic)
-
-Foomatic-ppd-install will (1) copy HPIJS PPD files to $(hpppddir) (2) copy HP postscript PPD files to $(hpppddir) (3) gzip all PPD files.
-
-Foomatic-xml-install will (1) copy HPIJS xml files to $(foomaticdir)/... (2) copy HP postscript PPD files to $(foomaticdir)/db/source/PPD/HP
-(3) gzip all postscript PPD files.
+--with-drvdir=DIR               set cups drv install directory (default=datadir/cups/drv/hp)
+--with-cupsfilterdir=DIR        set cups filter install directory (default=/usr/lib/cups/filter)
 </pre>
 <ol class="arabic simple" start="2">
 <li>If you are building Ghostscript from scratch and gs gets a missing font error message, try the following symbolic link. Ghostscript looks for fonts in hardcoded directories, see GS_LIB_DEFAULT in the Ghostscript Makefile. For Red Hat the following symbolic link will allow Ghostscript to find fonts with out modifying the makefile. Other distributions may have different font directories.</li>
@@ -240,7 +275,7 @@ ln -s /usr/share/fonts/default/Type1 /usr/share/ghostscript/fonts
 </div>
 
 <hr size="1"/>
-<center><small>Page last updated: Wed Oct 17 15:58:14 2007; HPLIP Version: 2.7.12</small></center>
+<center><small>Page last updated: Thu Feb  7 11:28:56 2008; HPLIP Version: 2.8.2</small></center>
 </div>
 </td></tr></table>
 </div>

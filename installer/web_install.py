@@ -102,7 +102,7 @@ class Installer(object):
         self.localized_dict = {}
         self.failed_cmd = ''
 
-        self.core = CoreInstall()
+        self.core = CoreInstall(MODE_INSTALLER, GUI_MODE)
         self.core.get_hplip_version()
 
     @trace

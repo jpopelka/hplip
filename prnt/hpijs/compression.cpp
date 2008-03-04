@@ -104,12 +104,12 @@ Mode9::Mode9 (SystemServices* pSys,unsigned int RasterSize, BOOL bVIPPrinter)
     if (constructor_error != NO_ERROR)  // if error in base constructor
         return;
 
-	// In the worst case, compression expands data by 50%
-	compressBuf = (BYTE*)pSS->AllocMem(RasterSize + RasterSize/2);
+	// Allocate double the RasterSize to accommodate worst case
+	compressBuf = (BYTE*)pSS->AllocMem(RasterSize * 2);
 	if (compressBuf == NULL)
 		constructor_error=ALLOCMEM_ERROR;
 
-	memset(compressBuf, 0, RasterSize + RasterSize/2);
+	memset(compressBuf, 0, RasterSize * 2);
     memset(SeedRow,0,RasterSize);
 
 	ResetSeedRow = FALSE;
@@ -199,7 +199,7 @@ BOOL Mode9::Process(RASTERDATA* input)
 		return TRUE;
 	}
 
-	memset(compressBuf, 0, inputsize + inputsize/2);
+	memset(compressBuf, 0, inputsize * 2);
 
     unsigned int originalsize=input->rastersize[myplane];
 	unsigned int size=input->rastersize[myplane];

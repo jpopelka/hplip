@@ -90,7 +90,7 @@ Overview
 <p>HPLIP is comprised of several major components; applications, driver, backend, daemons, and PPD files. HPLIP is designed to work with the CUPS spooler system. A CUPS/HPLIP system provides bi-di communication which is necessary for full HPLIP support. HPLIP provides a new CUPS backend called &quot;hp&quot; which supports bi-di printing connectivity.</p>
 <p>HPLIP uses HPIJS for generating printer-ready-data for non-postscript print jobs. HPIJS has been available since 2001 as a uni-di solution. HPIJS has been modified to support HPLIP, but HPIJS is still backward compatible with existing spoolers. HPIJS is included with the HPLIP solution.</p>
 <p>HPLIP supports connectivity over USB, parallel and network (JetDirect). The following figure is an overview of the CUPS/HPLIP system with major components highlighted.</p>
-<div align="center" class="align-center"><img src="../images/hplip_overview.png" alt="HPLIP Architecture Diagram"/></div><p>Each print job has an associated PPD file. Print job properties are set with the PPD file. Each HP printer has a unique PPD file and is generated from the foomatic database and distributed with the HPLIP tar ball. The foomatic system is available at <a class="reference" href="http://www.linuxprinting.org">http://www.linuxprinting.org</a>.</p>
+<div align="center" class="align-center"><img src="../images/hplip_overview.png" alt="HPLIP Architecture Diagram"/></div><p>Each print job has an associated PPD file. Print job properties are set with the PPD file and each HP printer has a unique PPD file. PPD files can be static or dynamically created at runtime. Static PPD files are distributed with the HPLIP tar ball.</p>
 <p>The &quot;hp&quot; CUPS backend supports printing via USB, parallel, and JetDirect connectivity. The &quot;hp&quot; backend can be used in place of the normal &quot;usb&quot; and &quot;parallel&quot; backends provided by CUPS.</p>
 <p>The &quot;hp&quot; backend provides in-bound print job status. Job status is sent to CUPS via stderr &quot;ERROR:&quot; and &quot;INFO:&quot; messages and to the HP Device Manager.</p>
 <p>Out-of-bound printer status is available in the HP Device Manager. For example, ink levels for most inkjets can be viewed in the device manager. Also pen alignment can be performed from the device manager.</p>
@@ -98,7 +98,7 @@ Overview
 <p>A photo-card application allows the user to download and delete pictures from printers that support photo-cards.</p>
 <p>PC fax send is supported, no PC fax receive. PC fax send will look like a CUPS printer spool queue.</p>
 <p>A distribution can mix and match the HPLIP package in order to support a bi-di or uni-di solution. HPIJS is part of the HPLIP package, but HPIJS can still be installed separately. The HPLIP package includes one makefile for both HPLIP and HPIJS.</p>
-<p>HPLIP is intended to replace HPOJ. They both support USB, parallel and JetDirect connectivity. HPLIP is similar to HPOJ, but different. HPLIP has no persistent daemons like HPOJ, this make HPLIP more friendly and easy to install. HPLIP does not require a &quot;ptal-init setup&quot; or boot time start/stop script. The &quot;hp&quot; backend will look like any other CUPS backend that can install printers as needed.</p>
+<p>HPLIP is intended to replace HPOJ. They both support USB, parallel and JetDirect connectivity. HPLIP is similar to HPOJ, but different. HPLIP has no persistent daemons like HPOJ, this makes HPLIP more friendly and easy to install. HPLIP does not require a &quot;ptal-init setup&quot; or boot time start/stop script. The &quot;hp&quot; backend will look like any other CUPS backend that can install printers as needed.</p>
 <p>HPLIP provides a MLC/1284.4 transport for talking to Multi-Function Peripherals (MFPs), but HPLIP does not dedicate the port to MLC/1284.4 like HPOJ does. HPLIP brings MLC/1284.4 up and down as needed. This means a MFP can use raw I/O for printing and MLC/1284.4 for scanning.</p>
 <p>HPOJ performs all parallel I/O directly to the hardware port in User Mode. This is problematic with other Linux/Unix platforms. Many kernels do not allow direct communication to the parallel port from User Mode. HPLIP also performs parallel I/O in User Mode, but HPLIP uses the ppdev/parport kernel modules. Which provides kernel management and a better sharing mechanism for other applications.</p>
 <p>All parallel IEEE 1284 functions needed for HPLIP are performed with low-level ppdev ioctl(s). This includes data reads and writes. For MLC/1284.4, hardware ECP Mode is not always available so only software ECP Mode is supported.</p>
@@ -110,7 +110,7 @@ Overview
 </div>
 
 <hr size="1"/>
-<center><small>Page last updated: Tue Jun 12 11:22:44 2007; HPLIP Version: 2.7.12</small></center>
+<center><small>Page last updated: Mon Jan 28 11:39:20 2008; HPLIP Version: 2.8.2</small></center>
 </div>
 </td></tr></table>
 </div>

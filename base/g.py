@@ -201,7 +201,6 @@ prop.fax_build = to_bool(sys_cfg.configure.get('fax-build', '0'))
 prop.doc_build = to_bool(sys_cfg.configure.get('doc-build', '0'))
 prop.foomatic_xml_install = to_bool(sys_cfg.configure.get('foomatic-xml-install', '0'))
 prop.foomatic_ppd_install = to_bool(sys_cfg.configure.get('foomatic-ppd-install', '0'))
-prop.shadow_build = to_bool(sys_cfg.configure.get('shadow-build', '0'))
 
 # Spinner, ala Gentoo Portage
 spinner = "\|/-\|/-"

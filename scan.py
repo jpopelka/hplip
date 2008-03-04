@@ -778,29 +778,41 @@ if mode == GUI_MODE:
     # create the main application object
     app = QApplication(sys.argv)
 
-    loc = user_cfg.ui.get("loc", "system")
-    if loc.lower() == 'system':
-        loc = str(QTextCodec.locale())
-        log.debug("Using system locale: %s" % loc)
+    if loc is None:
+        loc = user_cfg.ui.get("loc", "system")
+        if loc.lower() == 'system':
+            loc = str(QTextCodec.locale())
+            log.debug("Using system locale: %s" % loc)
 
     if loc.lower() != 'c':
         log.debug("Trying to load .qm file for %s locale." % loc)
         trans = QTranslator(None)
-        qm_file = 'hplip_%s.qm' % loc
+        
+        try:
+            l, e = loc.split('.')
+        except ValueError:
+            l = loc
+            e = 'utf8'
+        
+        qm_file = 'hplip_%s.qm' % l
         log.debug("Name of .qm file: %s" % qm_file)
         loaded = trans.load(qm_file, prop.localization_dir)
-
+        
         if loaded:
             app.installTranslator(trans)
         else:
             loc = 'c'
-    else:
-        loc = 'c'
 
     if loc == 'c':
         log.debug("Using default 'C' locale")
     else:
         log.debug("Using locale: %s" % loc)
+        QLocale.setDefault(QLocale(loc))
+        prop.locale = loc
+        try:
+            locale.setlocale(locale.LC_ALL, locale.normalize(loc))
+        except locale.Error:
+            pass
 
     scanui = ScanForm(hpssd_sock,
                          device_uri,  

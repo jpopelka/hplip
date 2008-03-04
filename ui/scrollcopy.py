@@ -441,7 +441,8 @@ class ScrollCopyView(ScrollView):
 
     def copy_canceled(self):
         self.event_queue.put(copier.COPY_CANCELED)
-        service.sendEvent(self.sock, EVENT_COPY_JOB_CANCELED, device_uri=self.device_uri)
+        # was service.sendEvent(self.sock, EVENT_COPY_JOB_CANCELED, device_uri=self.device_uri)
+        service.sendEvent(self.sock, EVENT_COPY_JOB_CANCELED, device_uri=self.cur_device.device_uri)
 
 
     def copy_timer_timeout(self):
@@ -469,6 +470,13 @@ class ScrollCopyView(ScrollView):
                 self.copy_timer.stop()
                 #self.pb.hide()
                 #self.form.statusBar().removeWidget(self.pb)
+
+                # Close the dialog box.
+                #
+                if self.waitdlg is not None:
+                    self.waitdlg.hide()
+                    self.waitdlg.close()
+                    self.waitdlg = None
 
                 if status == copier.STATUS_ERROR:
                     self.form.FailureUI(self.__tr("<b>Copier error.</b><p>"))
@@ -527,6 +535,11 @@ class ScrollCopyView(ScrollView):
 
             log.debug("Fit to page: %s (%s)" % (self.fit_to_page, s))
             log.debug("Scan style: %d" % self.scan_style)
+
+            # Open the dialog box.
+            #
+            self.waitdlg = WaitForm(0, self.__tr("Copying..."), self.copy_canceled, self, modal=1)
+            self.waitdlg.show()
 
             self.copy_timer = QTimer(self, "CopyTimer")
             self.connect(self.copy_timer, SIGNAL('timeout()'), self.copy_timer_timeout)

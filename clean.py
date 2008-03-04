@@ -153,7 +153,7 @@ for o, a in opts:
 
     elif o in ('-p', '--printer'):
         if a.startswith('*'):
-            printer_name = cups.getDefault()
+            printer_name = cups.getDefaultPrinter()
         else:
             printer_name = a
 

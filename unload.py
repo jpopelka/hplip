@@ -30,11 +30,15 @@ import os, os.path
 import getopt
 import re
 import cmd
-import readline
 import time
 import fnmatch
 import string
 import operator
+
+try:
+    import readline
+except ImportError:
+    pass
 
 # Local
 from base.g import *
@@ -844,11 +848,18 @@ else: # GUI_MODE
         if loc.lower() == 'system':
             loc = str(QTextCodec.locale())
             log.debug("Using system locale: %s" % loc)
-    
+
     if loc.lower() != 'c':
         log.debug("Trying to load .qm file for %s locale." % loc)
         trans = QTranslator(None)
-        qm_file = 'hplip_%s.qm' % loc
+        
+        try:
+            l, e = loc.split('.')
+        except ValueError:
+            l = loc
+            e = 'utf8'
+        
+        qm_file = 'hplip_%s.qm' % l
         log.debug("Name of .qm file: %s" % qm_file)
         loaded = trans.load(qm_file, prop.localization_dir)
         
@@ -856,18 +867,17 @@ else: # GUI_MODE
             app.installTranslator(trans)
         else:
             loc = 'c'
-    
+
     if loc == 'c':
         log.debug("Using default 'C' locale")
     else:
         log.debug("Using locale: %s" % loc)
-        
         QLocale.setDefault(QLocale(loc))
+        prop.locale = loc
         try:
-            locale.setlocale(locale.LC_ALL, locale.normalize(loc+".utf8"))
-            prop.locale = loc
+            locale.setlocale(locale.LC_ALL, locale.normalize(loc))
         except locale.Error:
-            log.error("Invalid locale: %s" % (loc+".utf8"))        
+            pass 
 
 
     try:

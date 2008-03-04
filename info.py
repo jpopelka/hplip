@@ -96,7 +96,7 @@ for o, a in opts:
 
     elif o in ('-p', '--printer'):
         if a.startswith('*'):
-            printer_name = cups.getDefault()
+            printer_name = cups.getDefaultPrinter()
             log.info("Using CUPS default printer: %s" % printer_name)
             log.debug(printer_name)
         else:

@@ -98,10 +98,14 @@ def enter_choice(question, choices, default_value=None):
         user_input = raw_input(log.bold(question)).lower().strip()
 
         if (not user_input and default_value) or user_input == default_value:
-            return True, default_value
+            if default_value == 'q':
+                return False, default_value
+            else:
+                return True, default_value
 
+        print user_input
         if user_input == 'q':
-            return False, default_value
+            return False, user_input
 
         if user_input in choices:
             return True, user_input

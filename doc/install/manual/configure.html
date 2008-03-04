@@ -22,123 +22,51 @@
 <p class="first admonition-title">Note</p>
 <p class="last">You can also run ./configure --help from the hplip source directory for this information.</p>
 </div>
-<p>Usage: ./configure [OPTION]... [VAR=VALUE]...</p>
-<p>To assign environment variables (e.g., CC, CFLAGS...), specify them as
-VAR=VALUE.  See below for descriptions of some of the useful variables.</p>
-<p>Defaults for the options are specified in brackets.</p>
-<p>Configuration:</p>
+<p>Usage: ./configure [OPTION] [VAR=VALUE]</p>
+<p>Static PPD install with foomatic-rip-hplip - Intended for individual customers using the tar ball install on distros that do not support CUPS dynamic PPD files. Installs precompiled HPIJS PPD files included in the tar ball. All HPIJS ppd files call foomatic-rip-hplip.</p>
 <pre class="literal-block">
--h, --help              display this help and exit
-    --help=short        display options specific to this package
-    --help=recursive    display the short help of all the included packages
--V, --version           display version information and exit
--q, --quiet, --silent   do not print checking... messages
-    --cache-file=FILE   cache test results in FILE [disabled]
--C, --config-cache      alias for --cache-file=config.cache
--n, --no-create         do not create output files
-    --srcdir=DIR        find the sources in DIR [configure dir or ..]
+--enable-foomatic-ppd-install   [enable foomatic static ppd install (default=no), uses hpppdir]
+--with-hpppddir  [destination for -hpijs.ppd, -ps.ppd and HP-Fax-hplip.ppd]
+--enable-foomatic-rip-hplip  [(default=yes)]
 </pre>
-<p>Installation directories:</p>
+<p>Dynamic PPD install with foomatic-rip-hplip - Intended for individual customers using the tar ball install on distros that support CUPS dynamic PPD files. No static hpijs PPD files are installed. Dynamic PPD files will call foomatic-rip-hplip.</p>
 <pre class="literal-block">
---prefix=PREFIX         install architecture-independent files in PREFIX
-                        [/usr/local]
---exec-prefix=EPREFIX   install architecture-dependent files in EPREFIX
-                        [PREFIX]
+--enable-foomatic-drv-install   [enable foomatic dynamic ppd install (default=yes), uses drvdir and hpppddir]
+--with-drvdir  [destination for hpijs.drv]
+--with-hpppddir  [destination for -ps.ppd and HP-Fax-hplip.ppd]
+--enable-foomatic-rip-hplip  (default=yes)
 </pre>
-<p>By default, make install will install all the files in
-/usr/local/bin, /usr/local/lib etc.  You can specify
-an installation prefix other than /usr/local using --prefix,
-for instance --prefix=$HOME.</p>
-<p>For better control, use the options below.</p>
-<p>Fine tuning of the installation directories:</p>
+<p>Dynamic PPD install with no foomatic-rip-hplip - Intended for distro package managers that will use the latest foomatic-rip. Dynamic PPD files will call foomatic-rip.</p>
 <pre class="literal-block">
---bindir=DIR           user executables [EPREFIX/bin]
---sbindir=DIR          system admin executables [EPREFIX/sbin]
---libexecdir=DIR       program executables [EPREFIX/libexec]
---sysconfdir=DIR       read-only single-machine data [PREFIX/etc]
---sharedstatedir=DIR   modifiable architecture-independent data [PREFIX/com]
---localstatedir=DIR    modifiable single-machine data [PREFIX/var]
---libdir=DIR           object code libraries [EPREFIX/lib]
---includedir=DIR       C header files [PREFIX/include]
---oldincludedir=DIR    C header files for non-gcc [/usr/include]
---datarootdir=DIR      read-only arch.-independent data root [PREFIX/share]
---datadir=DIR          read-only architecture-independent data [DATAROOTDIR]
---infodir=DIR          info documentation [DATAROOTDIR/info]
---localedir=DIR        locale-dependent data [DATAROOTDIR/locale]
---mandir=DIR           man documentation [DATAROOTDIR/man]
---docdir=DIR           documentation root [DATAROOTDIR/doc/hplip]
---htmldir=DIR          html documentation [DOCDIR]
---dvidir=DIR           dvi documentation [DOCDIR]
---pdfdir=DIR           pdf documentation [DOCDIR]
---psdir=DIR            ps documentation [DOCDIR]
+--enable-foomatic-drv-install   [enable foomatic dynamic ppd install (default=yes), uses drvdir and hpppddir]
+--with-drvdir  [destination for .drv]
+--with-hpppddir  [destination for -ps.ppd and HP-Fax-hplip.ppd]
+--disable-foomatic-rip-hplip  (default=yes)
 </pre>
-<p>Program names:</p>
+<p>Options:</p>
 <pre class="literal-block">
---program-prefix=PREFIX            prepend PREFIX to installed program names
---program-suffix=SUFFIX            append SUFFIX to installed program names
---program-transform-name=PROGRAM   run sed PROGRAM on installed program names
+--enable-doc-build              enable documentation build (default=yes)
+--enable-hpijs-only-build       enable hpijs only build (default=no)
+--enable-network-build          enable network build (default=yes)
+--enable-pp-build               enable parallel port build (default=yes)
+--enable-scan-build             enable scanner build (default=yes)
+--enable-gui-build              enable gui build (default=yes)
+--enable-fax-build              enable fax build (default=yes)
+--enable-cups11-build           enable cups 1.1.x build (default=no)
+--enable-shadow-build           enable shadow build (default=no)
+--enable-foomatic-ppd-install   enable foomatic ppd install, uses hpppddir (default=no)
+--enable-foomatic-drv-install   enable foomatic drv install, uses foomaticdir (default=yes)
+--enable-foomatic-rip-hplip-install    enable foomatic-rip-hplip install (default=yes), uses cupsfilterdir
+--with-cupsbackenddir=DIR       set cups backend install directory (default=/usr/lib/cups/backend)
+--with-icondir=DIR              set icon install directory (default=/usr/share/applications)
+--with-hpppddir=DIR             set hp ppd install directory (default=datadir/ppd/HP)
+--with-drvdir=DIR               set cups drv install directory (default=datadir/cups/drv/hp)
+--with-cupsfilterdir=DIR        set cups filter install directory (default=/usr/lib/cups/filter)
 </pre>
-<p>System types:</p>
-<pre class="literal-block">
---build=BUILD     configure for building on BUILD [guessed]
---host=HOST       cross-compile to build programs to run on HOST [BUILD]
-</pre>
-<p>Optional Features:</p>
-<pre class="literal-block">
---disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
---enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
---enable-static[=PKGS]  build static libraries [default=no]
---enable-shared[=PKGS]  build shared libraries [default=yes]
---enable-fast-install[=PKGS] optimize for fast installation [default=yes]
---disable-dependency-tracking  speeds up one-time build
---enable-dependency-tracking   do not reject slow dependency extractors
---disable-libtool-lock  avoid locking (might break parallel builds)
---enable-doc-build     enable documentation build (default=yes)
---enable-hpijs-only-build     enable hpijs only build (default=no)
---enable-network-build    enable network build (default=yes)
---enable-pp-build    enable parallel port build (default=yes)
---enable-scan-build    enable scanner build (default=yes)
---enable-gui-build    enable gui build (default=yes)
---enable-fax-build    enable fax build (default=yes)
---enable-cups11-build    enable cups 1.1.x build (default=no)
---enable-shadow-build    enable shadow build (default=no)
---enable-foomatic-ppd-install         enable foomatic ppd install, uses hpppddir default=no
---enable-foomatic-xml-install         enable foomatic xml install, uses foomaticdir default=yes
-</pre>
-<p>Optional Packages:</p>
-<pre class="literal-block">
---with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
---without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
---with-gnu-ld           assume the C compiler uses GNU ld [default=no]
---with-pic              try to use only PIC/non-PIC objects [default=use both]
---with-tags[=TAGS]      include additional configurations [automatic]
---with-cupsbackenddir=DIR set cups backend install directory default=/usr/lib/cups/backend
---with-icondir=DIR      set icon install directory default=/usr/share/applications
---with-hpppddir=DIR     set hp ppd install directory default=datadir/ppd/HP
---with-foomaticdir=DIR  set foomatic db install directory default=datadir/foomatic
-</pre>
-<p>Some influential environment variables:</p>
-<pre class="literal-block">
-CC          C compiler command
-CFLAGS      C compiler flags
-LDFLAGS     linker flags, e.g. -L&lt;lib dir&gt; if you have libraries in a nonstandard directory &lt;lib dir&gt;
-LIBS        libraries to pass to the linker, e.g. -l&lt;library&gt;
-CPPFLAGS    C/C++/Objective C preprocessor flags, e.g. -I&lt;include dir&gt; if you have headers in a nonstandard directory &lt;include dir&gt;
-CPP         C preprocessor
-CXX         C++ compiler command
-CXXFLAGS    C++ compiler flags
-CXXCPP      C++ preprocessor
-F77         Fortran 77 compiler command
-FFLAGS      Fortran 77 compiler flags
-PYTHON      Python interpreter/compiler command
-PYTHONINCLUDEDIR path to Python.h C header file
-</pre>
-<p>Use these variables to override the choices made by configure or to help
-it to find libraries and programs with nonstandard names/locations.</p>
 <center><a href="JavaScript:window.close()">Close</a> this window to continue.</center></div>
 
 <hr size="1"/>
-<center><small>Page last updated: Thu Jun 14 16:07:55 2007; HPLIP Version: 2.7.12</small></center>
+<center><small>Page last updated: Wed Jan 30 14:56:16 2008; HPLIP Version: 2.8.2</small></center>
 </div>
 </td></tr></table>
 </div>

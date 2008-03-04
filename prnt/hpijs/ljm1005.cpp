@@ -62,7 +62,7 @@ LJM1005::LJM1005 (SystemServices* pSS, int numfonts, BOOL proto)
     m_cmColorMode = GREY_K;
     m_bStartPageSent = FALSE;
 	m_iPlaneNumber = 0;
-	m_iBPP = 1;
+	m_iBPP = 2;
 	for (int i = 1; i < 4; i++)
 	{
 		m_iP[i] = i - 1; //{3, 0, 1, 2};
@@ -109,12 +109,17 @@ DRIVER_ERROR LJM1005::Encapsulate (const RASTERDATA *pRasterData, BOOL bLastPlan
 {
 	if (pRasterData != NULL)
 	{
-	    memcpy (m_pszCurPtr, pRasterData->rasterdata[COLORTYPE_COLOR],
-		        pRasterData->rastersize[COLORTYPE_COLOR]);
+        for (int i = 0; i < pRasterData->rastersize[COLORTYPE_COLOR]; i++)
+        {
+            m_pszCurPtr[i*m_iBPP]   = szByte1[pRasterData->rasterdata[COLORTYPE_COLOR][i]];
+            m_pszCurPtr[i*m_iBPP+1] = szByte2[pRasterData->rasterdata[COLORTYPE_COLOR][i]];
+            m_pszCurPtr[i*m_iBPP]   |= (m_pszCurPtr[i*m_iBPP] >> 1);
+            m_pszCurPtr[i*m_iBPP+1] |= (m_pszCurPtr[i*m_iBPP+1] >> 1);
+        }
 	}
 
 	m_dwCurrentRaster++;
-	m_pszCurPtr += m_dwWidth;
+	m_pszCurPtr += (m_iBPP * m_dwWidth);
     if (m_dwCurrentRaster == m_dwLastRaster)
     {
         JbigCompress ();

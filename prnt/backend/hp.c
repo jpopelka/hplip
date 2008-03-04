@@ -521,6 +521,7 @@ static int loop_test(HPMUD_DEVICE dd, HPMUD_CHANNEL cd, struct pjl_attributes *p
 {
    int retry=0, status;
    const char *pstate;
+   const char *error_state=NULL;
 
    while (1)
    {
@@ -534,7 +535,7 @@ static int loop_test(HPMUD_DEVICE dd, HPMUD_CHANNEL cd, struct pjl_attributes *p
             /* Clear error. */
             device_event(uri, job, VSTATUS_PRNT, "event", 0);
             fputs("INFO: Printing...\n", stderr);
-            fprintf(stderr, "STATE: -%s\n", pstate);
+            fprintf(stderr, "STATE: -%s\n", error_state);
             retry=0;
          }
          break;   /* no error, done */
@@ -543,9 +544,19 @@ static int loop_test(HPMUD_DEVICE dd, HPMUD_CHANNEL cd, struct pjl_attributes *p
       if (!retry)
       {
          /* Display error. */
+         error_state = pstate;
          device_event(uri, job, status, "error", RETRY_TIMEOUT);
-         fprintf(stderr, "STATE: +%s\n", pstate);
+         fprintf(stderr, "STATE: +%s\n", error_state);
       }
+      
+      if (strcmp(pstate, error_state) != 0)
+      {
+         /* Clear old error and display new error. */
+         device_event(uri, job, status, "error", RETRY_TIMEOUT);
+         fprintf(stderr, "STATE: -%s\n", error_state);
+         error_state = pstate;
+         fprintf(stderr, "STATE: +%s\n", error_state);
+      }        
 
       BUG("ERROR: %d %s; will retry in %d seconds...\n", status, pstate, RETRY_TIMEOUT);
       sleep(RETRY_TIMEOUT);

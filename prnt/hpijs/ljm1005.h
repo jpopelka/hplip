@@ -48,6 +48,14 @@ public:
     virtual DRIVER_ERROR Encapsulate (const RASTERDATA *pRasterData, BOOL bLastPlane);
     virtual DRIVER_ERROR VerifyPenInfo ();
     virtual DRIVER_ERROR ParsePenInfo (PEN_TYPE& ePen, BOOL QueryPrinter = TRUE);
+    virtual BOOL GetMargins (PAPER_SIZE ps, float *fMargins)
+    {
+        fMargins[0] = (float) 0.156;
+        fMargins[1] = (float) 0.156;
+        fMargins[2] = (float) 0.156;
+        fMargins[3] = (float) 0.2;
+        return TRUE;
+    }
 
 protected:
 
@@ -86,6 +94,10 @@ public:
         "LJM1005",
         "LaserJet M1005\0"
         "HP LaserJet M1005\0"
+        "HP LaserJet P1005\0"
+        "HP LaserJet P1006\0"
+        "HP LaserJet P1505\0"
+        "HP LaserJet P201\0"
         "M1005\0"
     ) {m_iPrinterType = eLJM1005;}
     inline Printer* CreatePrinter(SystemServices* pSS) const { return new LJM1005(pSS); }

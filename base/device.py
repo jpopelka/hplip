@@ -401,7 +401,7 @@ def probeDevices(bus='cups,usb,par', timeout=10,
                         back_end, is_hp, bs, model, serial, dev_file, host, port = \
                             parseDeviceURI(device_uri)
                     except Error:
-                        log.warning("Inrecognized URI: %s" % device_uri)
+                        log.debug("Unrecognized URI: %s" % device_uri)
                         continue
 
                     if not is_hp:
@@ -630,7 +630,7 @@ def queryString(string_id, typ=0):
     if not strings_init:
         initStrings()
 
-    log.debug("queryString(%s)" % string_id)
+    #log.debug("queryString(%s)" % string_id)
     s = st.string_table.get(str(string_id), ('', ''))[typ]
 
     if type(s) == type(''):
@@ -1200,8 +1200,8 @@ class Device(object):
         status_type = self.mq.get('status-type', STATUS_TYPE_NONE)
         battery_check = self.mq.get('status-battery-check', STATUS_BATTERY_CHECK_NONE)
         dynamic_counters = self.mq.get('status-dynamic-counters', STATUS_DYNAMIC_COUNTERS_NONE)
-        #io_mode = self.mq.get('io-mode', IO_MODE_UNI)
-        #io_mfp_mode = self.mq.get('io-mfp-mode', IO_MODE_UNI)
+        io_mode = self.mq.get('io-mode', IO_MODE_UNI)
+        io_mfp_mode = self.mq.get('io-mfp-mode', IO_MODE_UNI)
 
         # Turn off status if local connection and bi-di not avail.
         #if io_mode  == IO_MODE_UNI and self.back_end != 'net':
@@ -1257,9 +1257,11 @@ class Device(object):
             else:
                 log.error("Unimplemented status type: %d" % status_type)
 
-            if battery_check:
+            if battery_check and \
+                io_mode != IO_MODE_UNI:
+                
                 log.debug("Battery check...")
-                status.BatteryCheck(self, status_block)
+                status.BatteryCheck(self, status_block, battery_check)
 
             if status_block:
                 log.debug(status_block)
@@ -1277,7 +1279,8 @@ class Device(object):
 
             if not quick and \
                 self.mq.get('fax-type', FAX_TYPE_NONE) and \
-                status_code == STATUS_PRINTER_IDLE:
+                status_code == STATUS_PRINTER_IDLE and \
+                io_mode != IO_MODE_UNI:
 
                 log.debug("Fax activity check...")
 
@@ -1313,7 +1316,10 @@ class Device(object):
                 if self.panel_check:
                     self.panel_check = bool(self.mq.get('panel-check-type', 0))
 
-                if self.panel_check and status_type in (STATUS_TYPE_LJ, STATUS_TYPE_S, STATUS_TYPE_VSTATUS):
+                if self.panel_check and \
+                    status_type in (STATUS_TYPE_LJ, STATUS_TYPE_S, STATUS_TYPE_VSTATUS) and \
+                    io_mode != IO_MODE_UNI:
+                    
                     log.debug("Panel check...")
                     try:
                         self.panel_check, line1, line2 = status.PanelCheck(self)
@@ -1325,7 +1331,9 @@ class Device(object):
                                       'panel-line2': line2,})
 
 
-                if dynamic_counters != STATUS_DYNAMIC_COUNTERS_NONE:
+                if dynamic_counters != STATUS_DYNAMIC_COUNTERS_NONE and \
+                    io_mode != IO_MODE_UNI:
+                    
                     r_value, r_value_str, rg, rr = self.getRValues(r_type, status_type, dynamic_counters)
                 else:
                     r_value, r_value_str, rg, rr = 0, '000000000', '000', '000000'
@@ -1585,6 +1593,7 @@ class Device(object):
 
     def getDynamicCounter(self, counter, convert_to_int=True):
         dynamic_counters = self.mq.get('status-dynamic-counters', STATUS_DYNAMIC_COUNTERS_NONE)
+        log.debug("Dynamic counters: %d" % dynamic_counters)
         if dynamic_counters != STATUS_DYNAMIC_COUNTERS_NONE:
 
             if dynamic_counters == STATUS_DYNAMIC_COUNTERS_LIDIL_0_5_4:
@@ -1669,17 +1678,13 @@ class Device(object):
             buffer = ''
 
         while True:
-            #print self.device_id, channel_id, bytes_to_read, timeout
             result_code, data = \
                 hpmudext.read_channel(self.device_id, channel_id, bytes_to_read, timeout)
 
-            #result_code, data = read_channel(dd, cd, bytes_to_read, [timeout])
-
             l = len(data)
-            #log.log_data(data)
             
             if result_code == hpmudext.HPMUD_R_IO_TIMEOUT:
-                log.warn("I/O timeout")
+                log.debug("I/O timeout")
                 break
 
             if result_code != hpmudext.HPMUD_R_OK: 
@@ -1700,15 +1705,19 @@ class Device(object):
             if self.callback is not None:
                 self.callback()
 
-            if num_bytes == bytes_to_read or allow_short_read:
-                log.debug("Read complete")
+            if num_bytes == bytes_to_read:
+                log.debug("Full read complete.")
+                break
+                
+            if allow_short_read and num_bytes < bytes_to_read:
+                log.debug("Allowed short read of %d of %d bytes complete." % (num_bytes, bytes_to_read))
                 break
 
         if stream is None:
             log.debug("Returned %d total bytes in buffer." % num_bytes)
             return buffer
         else:
-            log.debug("Wrote %d total bytes to stream." % num_bytes)
+            log.debug("Saved %d total bytes to stream." % num_bytes)
             return num_bytes
 
 
@@ -1940,7 +1949,7 @@ class Device(object):
     def getEWSUrl(self, url, stream):
         try:
             if self.is_local:
-                url2 = "%s&loc=%s" % (self.device_uri, url)
+                url2 = "%s&loc=%s" % (self.device_uri.replace('hpfax:', 'hp:'), url)
                 data = self
             else:
                 url2 = "http://%s%s" % (self.host, url)
@@ -2027,9 +2036,12 @@ class LocalOpener(urllib.URLopener):
         dev.writeEWS("""GET %s HTTP/1.0\nContent-Length:0\nHost:localhost\nUser-Agent:hplip\n\n""" % loc)
 
         reply = xStringIO()
-        dev.readEWS(MAX_BUFFER, reply)
-
+        
+        while dev.readEWS(8192, reply, timeout=1):
+            pass
+            
         reply.seek(0)
+        log.log_data(reply.getvalue())
 
         response = httplib.HTTPResponse(reply)
         response.begin()

@@ -790,7 +790,19 @@ except ImportError:
 
 
 
-cat = lambda _ : Template(_).substitute(sys._getframe(1).f_globals, **sys._getframe(1).f_locals)
+#cat = lambda _ : Template(_).substitute(sys._getframe(1).f_globals, **sys._getframe(1).f_locals)
+
+def cat(s):
+    globals = sys._getframe(1).f_globals.copy()
+    if 'self' in globals:
+        del globals['self']
+    
+    locals = sys._getframe(1).f_locals.copy()
+    if 'self' in locals:
+        del locals['self']
+        
+    return Template(s).substitute(sys._getframe(1).f_globals, **locals)
+    
 identity = string.maketrans('','')
 unprintable = identity.translate(identity, string.printable)
 
@@ -1268,10 +1280,10 @@ def expand_range(ns): # ns -> string repr. of numeric range, e.g. "1-4, 7, 9-12"
 def collapse_range(x): # x --> sorted list of ints
     """ Convert a list of integers into a string
         range representation: 
-        [1,2,3,4,7,9,10,11,12] --> "1-4, 7, 9-12"
+        [1,2,3,4,7,9,10,11,12] --> "1-4,7,9-12"
     """
     if not x:
-        return ""
+        return ''
 
     s, c, r = [str(x[0])], x[0], False
 
@@ -1280,10 +1292,10 @@ def collapse_range(x): # x --> sorted list of ints
             r = True
         else:
             if r:
-                s.append('-%s, %s' % (c,i))
+                s.append('-%s,%s' % (c,i))
                 r = False
             else:
-                s.append(', %s' % i)
+                s.append(',%s' % i)
 
         c = i
 
@@ -1334,4 +1346,17 @@ def show_languages():
 
     f.output()
 
-
+   
+def gen_random_uuid():
+    try:
+        import uuid # requires Python 2.5+
+        return str(uuid.uuid4())
+        
+    except ImportError:
+        uuidgen = which("uuidgen")
+        if uuidgen:
+            uuidgen = os.path.join(uuidgen, "uuidgen")
+            return commands.getoutput(uuidgen)
+        else:
+            return ''
+    

@@ -563,11 +563,12 @@ class PMLFaxSendThread(FaxSendThread):
                         dl_state = self.getFaxDownloadState()
 
                         if dl_state == pml.UPDN_STATE_IDLE:
+                            log.debug("Try: 0")
                             self.dev.setPML(pml.OID_FAX_DOWNLOAD, pml.UPDN_STATE_REQSTART)
                             time.sleep(1)
 
                             log.debug("Waiting for active state...")
-                            i = 0
+                            i = 1
 
                             while i < 10:
                                 log.debug("Try: %d" % i)
@@ -667,7 +668,6 @@ class PMLFaxSendThread(FaxSendThread):
 
                         magic, version, total_pages, hort_dpi, vert_dpi, page_size, \
                             resolution, encoding, reserved1, reserved2 = self.decode_fax_header(header)
-
 
                         if magic != 'hplip_g3':
                             log.error("Invalid file header. Bad magic.")
@@ -997,17 +997,6 @@ class PMLFaxSendThread(FaxSendThread):
         self.stream.seek(0)    
 
 
-    def decode_fax_header(self, header):
-        try:
-            return struct.unpack(">8sBIHHBBBII", header)
-        except struct.error:
-            return -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
-
-    def decode_page_header(self, header):
-        try:
-            return struct.unpack(">IIIIII", header)
-        except struct.error:
-            return -1, -1, -1, -1, -1, -1
 
             
             

@@ -64,9 +64,10 @@ def usage(typ='text'):
 
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'P:p:d:hl:g',
+    opts, args = getopt.getopt(sys.argv[1:], 'P:p:d:hl:gq:',
                                ['printer=', 'device=', 'help', 
-                                'help-rest', 'help-man', 'logging=', 'help-desc'])
+                                'help-rest', 'help-man', 'logging=', 
+                                'lang=', 'help-desc'])
 except getopt.GetoptError, e:
     log.error(e.msg)
     usage()
@@ -75,6 +76,8 @@ printer_name = None
 device_uri = None
 log_level = logger.DEFAULT_LOG_LEVEL
 bus = 'cups'
+loc = None
+
 
 if os.getenv("HPLIP_DEBUG"):
     log.set_level('debug')
@@ -107,6 +110,14 @@ for o, a in opts:
     elif o == '-g':
         log.set_level('debug')
 
+    elif o in ('-q', '--lang'):
+        if a.strip() == '?':
+            utils.show_languages()
+            sys.exit(0)
+
+        loc = utils.validate_language(a.lower())
+
+
 
 # Security: Do *not* create files that other users can muck around with
 os.umask (0037)
@@ -130,29 +141,41 @@ except Error:
 # create the main application object
 app = QApplication(sys.argv)
 
-loc = user_cfg.ui.get("loc", "system")
-if loc.lower() == 'system':
-    loc = str(QTextCodec.locale())
-    log.debug("Using system locale: %s" % loc)
+if loc is None:
+    loc = user_cfg.ui.get("loc", "system")
+    if loc.lower() == 'system':
+        loc = str(QTextCodec.locale())
+        log.debug("Using system locale: %s" % loc)
 
 if loc.lower() != 'c':
     log.debug("Trying to load .qm file for %s locale." % loc)
     trans = QTranslator(None)
-    qm_file = 'hplip_%s.qm' % loc
+    
+    try:
+        l, e = loc.split('.')
+    except ValueError:
+        l = loc
+        e = 'utf8'
+    
+    qm_file = 'hplip_%s.qm' % l
     log.debug("Name of .qm file: %s" % qm_file)
     loaded = trans.load(qm_file, prop.localization_dir)
-
+    
     if loaded:
         app.installTranslator(trans)
     else:
         loc = 'c'
-else:
-    loc = 'c'
 
 if loc == 'c':
     log.debug("Using default 'C' locale")
 else:
     log.debug("Using locale: %s" % loc)
+    QLocale.setDefault(QLocale(loc))
+    prop.locale = loc
+    try:
+        locale.setlocale(locale.LC_ALL, locale.normalize(loc))
+    except locale.Error:
+        pass
 
 printdlg = PrinterForm(sock, bus, device_uri, printer_name, args)
 printdlg.show()

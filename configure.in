@@ -23,7 +23,7 @@
 #
 
 AC_PREREQ(2.59)
-AC_INIT([HP Linux Imaging and Printing], [2.7.12], [2.7.12.10], [hplip])
+AC_INIT([HP Linux Imaging and Printing], [2.8.2], [2.8.2.10], [hplip])
 AM_INIT_AUTOMAKE([1.9 foreign])
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
@@ -197,6 +197,9 @@ AM_CONDITIONAL(SHADOW_BUILD, test x$shadow_build = xyes)
 AC_ARG_WITH(cupsbackenddir, AC_HELP_STRING([--with-cupsbackenddir=DIR], [set cups backend install directory [default=/usr/lib/cups/backend]]),
    cupsbackenddir=$withval, cupsbackenddir="/usr/lib/cups/backend")
 
+AC_ARG_WITH(cupsfilterdir, AC_HELP_STRING([--with-cupsfilterdir=DIR], [set cups filter install directory [default=/usr/lib/cups/filter]]),
+   cupsfilterdir=$withval, cupsfilterdir="/usr/lib/cups/filter")
+
 AC_ARG_WITH(icondir, AC_HELP_STRING([--with-icondir=DIR], [set icon install directory [default=/usr/share/applications]]),
    icondir=$withval, icondir="/usr/share/applications")
 
@@ -206,9 +209,9 @@ AC_ARG_WITH(hpppddir, AC_HELP_STRING([--with-hpppddir=DIR], [set hp ppd install 
 AC_ARG_WITH(docdir, AC_HELP_STRING([--with-docdir=DIR], [set hplip documentation directory [default=datadir/doc]]),
    hpdocdir=$withval, hpdocdir="$datadir/doc/hplip-$VERSION")
 
-AC_MSG_CHECKING("for foomatic ppd install")
+AC_MSG_CHECKING([for foomatic ppd install])
 AC_ARG_ENABLE(foomatic_ppd_install,
-  [  --enable-foomatic-ppd-install         enable foomatic ppd install, uses hpppddir [default=no]],
+  [  --enable-foomatic-ppd-install    enable foomatic static ppd install (default=no), uses hpppddir],
   foomatic_ppd_install=$enableval, foomatic_ppd_install=no)
 if test $foomatic_ppd_install = yes; then
    AC_MSG_RESULT(yes)
@@ -216,18 +219,31 @@ else
    AC_MSG_RESULT(no)
 fi
 
-AC_ARG_WITH(foomaticdir, AC_HELP_STRING([--with-foomaticdir=DIR], [set foomatic db install directory [default=datadir/foomatic]]),
-   foomaticdir=$withval, foomaticdir="$datadir/foomatic")
+AC_ARG_WITH(drvdir, AC_HELP_STRING([--with-drvdir=DIR], [set cups drv install directory [default=datadir/cups/drv/hp]]),
+   drvdir=$withval, drvdir="$datadir/cups/drv/hp")
 
-AC_MSG_CHECKING("for foomatic xml install")
-AC_ARG_ENABLE(foomatic_xml_install,
-  [  --enable-foomatic-xml-install         enable foomatic xml install, uses foomaticdir [default=yes]],
-  foomatic_xml_install=$enableval, foomatic_xml_install=yes)
-if test $foomatic_xml_install = yes; then
+AC_MSG_CHECKING([for foomatic drv install])
+AC_ARG_ENABLE(foomatic_drv_install,
+  [  --enable-foomatic-drv-install    enable foomatic dynamic ppd install (default=yes), uses drvdir and hpppddir],
+  foomatic_drv_install=$enableval, foomatic_drv_install=yes)
+if test $foomatic_drv_install = yes; then
    AC_MSG_RESULT(yes)
 else
    AC_MSG_RESULT(no)
 fi
+
+AC_MSG_CHECKING([for foomatic-rip-hplip install])
+AC_ARG_ENABLE(foomatic_rip_hplip_install,
+  [  --enable-foomatic-rip-hplip-install    enable foomatic-rip-hplip install (default=yes), uses cupsfilterdir],
+  foomatic_rip_hplip_install=$enableval, foomatic_rip_hplip_install=yes)
+if test "$foomatic_rip_hplip_install" = "yes"; then
+   AC_MSG_RESULT(yes)
+   foomatic_filter="foomatic-rip-hplip"
+else
+   AC_MSG_RESULT(no)
+   foomatic_filter="foomatic-rip"
+fi
+AM_CONDITIONAL(RIP_INSTALL, test x$foomatic_rip_hplip_install = xyes)
 
 # Check conditional packages.
 
@@ -285,31 +301,34 @@ AC_DEFINE_DIR([abs_sbindir], [sbindir])
 AC_DEFINE_DIR([abs_hpppddir], [hpppddir])
 AC_DEFINE_DIR([abs_docdir], [hpdocdir])
 abs_ppddir=${abs_hpppddir%/*}
-AC_DEFINE_DIR([abs_foomaticdir], [foomaticdir])
+AC_DEFINE_DIR([abs_drvdir], [drvdir])
 
 AC_SUBST(abs_datadir) 
 AC_SUBST(abs_sbindir) 
 AC_SUBST(abs_hpppddir) 
 AC_SUBST(abs_docdir) 
 AC_SUBST(abs_ppddir) 
-AC_SUBST(abs_foomaticdir) 
+AC_SUBST(abs_drvdir) 
 AC_SUBST(icondir)
 AC_SUBST(cupsbackenddir)
+AC_SUBST(cupsfilterdir)
 AC_SUBST(hpppddir)
 AC_SUBST(hpdocdir)
-AC_SUBST(foomaticdir)
+AC_SUBST(drvdir)
 AC_SUBST(network_build)
 AC_SUBST(pp_build)
 AC_SUBST(gui_build)
 AC_SUBST(scan_build)
 AC_SUBST(fax_build)
 AC_SUBST(cups11_build)
-AC_SUBST(foomatic_xml_install)
+AC_SUBST(foomatic_drv_install)
 AC_SUBST(foomatic_ppd_install)
+AC_SUBST(foomatic_rip_hplip_install)
+AC_SUBST(foomatic_filter)
 AC_SUBST(doc_build)
 AC_SUBST(shadow_build)
 AC_SUBST(APDK_ENDIAN_FLAG)
 AC_SUBST(APDK_AUTO_INCLUDE_FLAG)
 
-AC_CONFIG_FILES(Makefile hplip.conf hplip.desktop)
+AC_CONFIG_FILES(Makefile hplip.conf hplip.desktop prnt/drv/hpijs.drv)
 AC_OUTPUT

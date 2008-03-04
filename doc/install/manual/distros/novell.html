@@ -135,14 +135,24 @@ installation_sources -a <a class="reference" href="http://download.opensuse.org/
 <pre class="literal-block">
 installation_sources -a <a class="reference" href="http://download.opensuse.org/distribution/10.2/repo/debug/">http://download.opensuse.org/distribution/10.2/repo/debug/</a>
 </pre>
-<p><strong>D.</strong> Install the required dependency packages, run:</p>
-<p><strong>For SUSE 10.0/10.1</strong></p>
+<p><strong>For SUSE 10.3</strong></p>
 <pre class="literal-block">
-yast --install cups-devel python-devel xsane python-xml kdebindings3-python net-snmp-devel openssl libjpeg-devel gcc-c++ libusb libtool
+installation_sources -a <a class="reference" href="http://download.opensuse.org/distribution/10.3/repo/oss/">http://download.opensuse.org/distribution/10.3/repo/oss/</a>
 </pre>
-<p><strong>For SUSE 10.2</strong></p>
 <pre class="literal-block">
-yast --install cups-devel python-devel xsane python-xml kdebindings3-python net-snmp-devel openssl libjpeg-devel gcc-c++ libusb libgphoto2-devel libtool python-imaging
+installation_sources -a <a class="reference" href="http://download.opensuse.org/distribution/10.3/repo/non-oss/">http://download.opensuse.org/distribution/10.3/repo/non-oss/</a>
+</pre>
+<pre class="literal-block">
+installation_sources -a <a class="reference" href="http://download.opensuse.org/distribution/10.3/repo/debug/">http://download.opensuse.org/distribution/10.3/repo/debug/</a>
+</pre>
+<p><strong>D.</strong> Install the required dependency packages, run:</p>
+<p>SUSE 10.0 / 10.1</p>
+<pre class="literal-block">
+xterm -e su -c &quot;yast --install cups cups-client cups-devel gcc-c++ ghostscript-library openssl libjpeg-devel net-snmp-devel glibc libtool libusb libusb-devel make python-imaging python-qt python-devel python-xml python python sane sane-devel sane xsane&quot;
+</pre>
+<p>SUSE 10.2 / 10.3</p>
+<pre class="literal-block">
+xterm -e su -c &quot;yast --install cups cups-client cupsddk cups-devel gcc-c++ ghostscript-library openssl libjpeg-devel net-snmp-devel glibc libtool libgphoto2-devel libusb libusb-devel make python-imaging python-qt python-devel python-xml python python sane sane-devel sane xsane&quot;
 </pre>
 <p><strong>E.</strong> Logout of root.</p>
 <pre class="literal-block">
@@ -155,7 +165,7 @@ exit
 <p class="first admonition-title">Note</p>
 <p class="last">We recommend that you download the HPLIP tarball to your home or desktop directory.</p>
 </div>
-<p><strong>A.</strong> Click here to <a class="reference" href="http://prdownloads.sourceforge.net/hplip/hplip-2.7.12.tar.gz">Download the Regular Tarball</a></p>
+<p><strong>A.</strong> Click here to <a class="reference" href="http://prdownloads.sourceforge.net/hplip/hplip-2.8.2.tar.gz">Download the Regular Tarball</a></p>
 <p><strong>B.</strong> Go to the directory where you downloaded the HPLIP tarball.</p>
 <p>Example:</p>
 <pre class="literal-block">
@@ -164,13 +174,13 @@ cd ~/Desktop
 <p><strong>C.</strong> Uncompress the tarball.</p>
 <p>Enter this command:</p>
 <pre class="literal-block">
-tar xvfz hplip-2.7.12.tar.gz
+tar xvfz hplip-2.8.2.tar.gz
 </pre>
 <p>This will create a directory with the same name as the tarball file.</p>
-<p><strong>D.</strong> Change your working directory to the hplip-2.7.12 directory.</p>
+<p><strong>D.</strong> Change your working directory to the hplip-2.8.2 directory.</p>
 <p>Example:</p>
 <pre class="literal-block">
-cd hplip-2.7.12
+cd hplip-2.8.2
 </pre>
 <hr></div>
 <div class="section">
@@ -179,11 +189,11 @@ cd hplip-2.7.12
 For specific information on using ./configure and the different options <a href="#" onClick="MyWindow=window.open('../configure.html','MyWindow','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=900,height=400'); return false;">please go here</a>. Also reference your distro documentation and configuration for additional information on which tags are relevant.<p>Enter this command (select the appropriate command depending on your system configuration):</p>
 <p>32 bit distro users (most users will use this command):</p>
 <pre class="literal-block">
-./configure --prefix=/usr --disable-xml-install --enable-foomatic-ppd-install --with-hpppddir=/usr/share/cups/model/manufacturer-PPDs/hp
+./configure --enable-network-build --disable-pp-build --enable-fax-build --enable-gui-build --enable-scan-build --enable-doc-build --disable-foomatic-ppd-install --enable-foomatic-drv-install --with-drvdir=/usr/share/cups/drv/hp/ --with-hpppddir=/usr/share/cups/model/HP --disable-hpijs-only-build --prefix=/usr
 </pre>
-<p>64 bit distro users</p>
+<p>64 bit distro users:</p>
 <pre class="literal-block">
-./configure --prefix=/usr --libdir=/usr/lib64 ---disable-xml-install --enable-foomatic-ppd-install --with-hpppddir=/usr/share/cups/model/manufacturer-PPDs/hp
+./configure --enable-network-build --disable-pp-build --enable-fax-build --enable-gui-build --enable-scan-build --enable-doc-build --disable-foomatic-ppd-install --enable-foomatic-drv-install --with-drvdir=/usr/share/cups/drv/hp/ --with-hpppddir=/usr/share/cups/model/HP --disable-hpijs-only-build --libdir=/usr/lib64 --prefix=/usr
 </pre>
 <hr></div>
 <div class="section">
@@ -225,7 +235,7 @@ If your distro uses the /proc/dev/bus files system you'll need to reference step
 </div>
 
 <hr size="1"/>
-<center><small>Page last updated: Fri Sep 28 16:33:09 2007; HPLIP Version: 2.7.12</small></center>
+<center><small>Page last updated: Tue Feb  5 18:12:20 2008; HPLIP Version: 2.8.2</small></center>
 </div>
 </td></tr></table>
 </div>

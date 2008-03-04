@@ -1,4 +1,3 @@
-#
 # (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -40,10 +39,11 @@
 # post_depend_cmd=<commands to run after packages are installed (comma sep. list)> [TYPE_LIST]
 # hpoj_remove_cmd=<command to remove/disable hpoj> [TYPE_LIST]
 # hplip_remove_cmd=<command to remove package version of hplip> [TYPE_LIST]
-# su_sudo=su|sudo # su is default [TYPE_STRING]
-# ppd_install=ppd|xml # ppd is default [TYPE_STRING]
+# su_sudo=su|sudo  [TYPE_STRING] # su is default
+# ppd_install=ppd|drv  [TYPE_STRING] # ppd is default
 # udev_mode_fix=True|False [TYPE_BOOL]
-# ppd_dir=<ppd dir> [TYPE_BOOL]
+# ppd_dir=<ppd dir> [TYPE_STRING] # Used for BOTH ppd and drv install types
+# drv_dir=<drv dir> [TYPE_STRING] # Used for only drv installs
 # fix_ppd_symlink=True|False [TYPE_BOOL]
 # usermod_params=<params for usermod command, w/o user name(s). e.g. '-Glp' (default)>
 # 
@@ -54,9 +54,10 @@
 # supported=True|False [TYPE_BOOL]
 # release_date=<human readable date YYYY-MM-DD> [TYPE_STRING]
 # notes=<version notes> [TYPE_STRING]
-# ppd_install=ppd|xml # ppd is default [TYPE_STRING]
+# ppd_install=ppd|drv [TYPE_STRING] # ppd is default 
 # udev_mode_fix=True|False [TYPE_BOOL]
-# ppd_dir=<ppd dir> [TYPE_STRING]
+# ppd_dir=<ppd dir> [TYPE_STRING] # Used for BOTH ppd and drv install types
+# drv_dir=<drv dir> [TYPE_STRING] # Used for only drv installs
 # fix_ppd_symlink=True|False [TYPE_BOOL]
 # usermod_params=<params for usermod command, w/o user name(s). e.g. '-Glp' (default)>
 # 
@@ -79,6 +80,7 @@ versions=0
 display=False
 package_mgrs=
 su_sudo=
+drv_dir=
 
 [unknown:0]
 supported=False
@@ -104,6 +106,7 @@ udev_mode_fix=True
 ppd_dir=/usr/share/cups/model/manufacturer-PPDs/hp
 fix_ppd_symlink=False
 usermod_params=-Glp
+drv_dir=/usr/share/cups/drv/hp/
 
 
 # ********************
@@ -112,6 +115,7 @@ code_name=
 supported=False
 release_date=2003-11-15
 notes=
+drv_dir=/usr/share/cups/drv/hp/
 
 
 # ********************
@@ -120,6 +124,7 @@ code_name=
 supported=False
 release_date=2004-4-23
 notes=
+drv_dir=/usr/share/cups/drv/hp/
 
 
 # ********************
@@ -128,6 +133,7 @@ code_name=
 supported=False
 release_date=2004-10-25
 notes=
+drv_dir=/usr/share/cups/drv/hp/
 
 
 # ********************
@@ -136,6 +142,7 @@ code_name=
 supported=False
 release_date=2005-4-16
 notes=
+drv_dir=/usr/share/cups/drv/hp/
 
 
 # ********************
@@ -143,6 +150,12 @@ notes=
 code_name=
 supported=True
 release_date=2005-5-10
+notes=
+ppd_install=ppd
+udev_mode_fix=True
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [suse:10.0:cups]
 packages=cups,cups-client
@@ -211,12 +224,21 @@ packages=sane
 [suse:10.0:xsane]
 packages=xsane
 
+[suse:10.0:cups-ddk]
+# packages=cupsddk
+
 
 # ********************
 [suse:10.1]
 code_name=
 supported=True
 release_date=2006-5-11
+notes=
+ppd_install=ppd
+udev_mode_fix=True
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [suse:10.1:cups]
 packages=cups,cups-client
@@ -285,13 +307,20 @@ packages=sane
 [suse:10.1:xsane]
 packages=xsane
 
-
+[suse:10.1:cups-ddk]
+# packages=cupsddk
 
 # ********************
 [suse:10.2]
 code_name=
 supported=True
 release_date=2006-7-12
+notes=
+ppd_install=ppd
+udev_mode_fix=True
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [suse:10.2:cups]
 packages=cups,cups-client
@@ -360,6 +389,9 @@ packages=sane
 [suse:10.2:xsane]
 packages=xsane
 
+[suse:10.2:cups-ddk]
+# packages=cupsddk
+
 
 # ********************
 [suse:10.3]
@@ -367,6 +399,11 @@ code_name=
 supported=True
 release_date=2007-10-04
 notes=Please be sure to disable the CD repositories in YaST.
+ppd_install=drv
+udev_mode_fix=True
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [suse:10.3:cups]
 packages=cups,cups-client
@@ -435,6 +472,10 @@ packages=sane
 [suse:10.3:xsane]
 packages=xsane
 
+[suse:10.3:cups-ddk]
+packages=cupsddk
+
+
 
 # ****************************************
 [redhat]
@@ -456,25 +497,24 @@ udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
 usermod_params=
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [redhat:8.0]
 code_name=Psyche
 supported=False
 release_date=2002-9-1
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [redhat:9.0]
 code_name=Shrike
 supported=False
 release_date=2003-3-1
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ****************************************
 [turbolinux]
-
 index=10
 versions=any
 display_name=Turbolinux
@@ -493,7 +533,7 @@ udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
 usermod_params=
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [turbolinux:any]
@@ -501,7 +541,7 @@ code_name=
 supported=False
 release_date=
 notes=
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ****************************************
 [redflag]
@@ -523,7 +563,7 @@ udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
 usermod_params=
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [redflag:any]
@@ -531,7 +571,7 @@ code_name=
 supported=False
 release_date=
 notes=
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ****************************************
 [ark]
@@ -553,14 +593,14 @@ udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
 usermod_params=
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [ark:any]
 code_name=
 supported=False
 release_date=
-
+drv_dir=/usr/share/cups/drv/hp/
 
 
 # ****************************************
@@ -583,20 +623,20 @@ udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
 usermod_params=
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [sunwah:any]
 code_name=
 supported=False
 release_date=
-
+drv_dir=/usr/share/cups/drv/hp/
 
 
 # ****************************************
 [fedora]
 index=5
-versions=1.0,2.0,3.0,4.0,5,5.0,5.92,6,6.0,7.0,8.0
+versions=1.0,2.0,3.0,4.0,5,5.0,5.92,6,6.0,7,7.0,8,8.0
 display_name=Fedora
 alt_names=Fedora Core
 display=True
@@ -608,12 +648,12 @@ post_depend_cmd=
 hpoj_remove_cmd=su -c "yum -y -d 10 -e 1 remove hplip hpijs"
 hplip_remove_cmd=su -c "yum -y -d 10 -e 1 remove hplip hpijs"
 su_sudo=su
-ppd_install=xml
+ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=False
 usermod_params=-Glp
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [fedora:1.0]
@@ -625,7 +665,7 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [fedora:2.0]
@@ -637,6 +677,7 @@ ppd_install=ppd
 udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [fedora:3.0]
@@ -646,8 +687,9 @@ release_date=2004-11-8
 notes=
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [fedora:3.0:cups]
 packages=cups
@@ -716,6 +758,9 @@ packages=sane-frontends
 [fedora:3.0:xsane]
 packages=xsane
 
+[fedora:3.0:cups-ddk]
+# packages=cupsddk,cupsddk-drivers,cupsddk-devel
+
 
 
 # ********************
@@ -726,8 +771,9 @@ release_date=2005-6-13
 notes=
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [fedora:4.0:cups]
 packages=cups
@@ -796,6 +842,9 @@ packages=sane-frontends
 [fedora:4.0:xsane]
 packages=xsane
 
+[fedora:4.0:cups-ddk]
+# packages=cupsddk,cupsddk-drivers,cupsddk-devel
+
 
 # ********************
 [fedora:5]
@@ -805,8 +854,9 @@ release_date=2006-3-20
 notes=
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [fedora:5:cups]
 packages=cups
@@ -875,86 +925,13 @@ packages=sane-frontends
 [fedora:5:xsane]
 packages=xsane
 
+[fedora:5:cups-ddk]
+# packages=cupsddk,cupsddk-drivers,cupsddk-devel
+
 
 # ********************
 [fedora:5.0]
-code_name=Bordeaux
-supported=True
-release_date=2006-3-20
-notes=
-ppd_install=ppd
-udev_mode_fix=True
-ppd_dir=
-fix_ppd_symlink=False
-
-[fedora:5.0:cups]
-packages=cups
-
-[fedora:5.0:cups-devel]
-packages=cups-devel
-
-[fedora:5.0:gcc]
-packages=gcc-c++
-
-[fedora:5.0:gs]
-packages=ghostscript
-
-[fedora:5.0:libcrypto]
-packages=net-snmp-devel,openssl-devel
-
-[fedora:5.0:libjpeg]
-packages=libjpeg-devel
-
-[fedora:5.0:libnetsnmp-devel]
-packages=net-snmp-devel
-
-[fedora:5.0:libpthread]
-packages=glibc-headers
-
-[fedora:5.0:libtool]
-packages=libtool
-
-[fedora:5.0:libusb]
-packages=libusb-devel
-
-[fedora:5.0:make]
-packages=make
-
-[fedora:5.0:pil]
-packages=python-imaging
-
-[fedora:5.0:ppdev]
-packages=
-commands=su -c "/sbin/modprobe ppdev"
-
-[fedora:5.0:pyqt]
-packages=PyQt
-
-[fedora:5.0:python-devel]
-packages=python-devel
-
-[fedora:5.0:python23]
-packages=python
-
-[fedora:5.0:python2x]
-packages=python
-
-[fedora:5.0:reportlab]
-packages=python-reportlab
-
-[fedora:5.0:sane]
-packages=sane-backends
-
-[fedora:5.0:sane-devel]
-packages=sane-devel
-
-[fedora:5.0:scanimage]
-packages=sane-frontends
-
-[fedora:5.0:xsane]
-packages=xsane
-
-
+same_as_version=5
 
 # ********************
 [fedora:5.92]
@@ -964,8 +941,9 @@ release_date=2006-10-24
 notes=
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [fedora:5.92:cups]
 packages=cups
@@ -1034,6 +1012,9 @@ packages=sane-frontends
 [fedora:5.92:xsane]
 packages=xsane
 
+[fedora:5.92:cups-ddk]
+# packages=cupsddk,cupsddk-drivers,cupsddk-devel
+
 
 
 # ********************
@@ -1042,9 +1023,11 @@ code_name=
 supported=True
 release_date=2006-10-24
 notes=
-ppd_install=xml
+ppd_install=drv
 udev_mode_fix=True
+ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [fedora:6:cups]
 packages=cups
@@ -1113,241 +1096,188 @@ packages=sane-frontends
 [fedora:6:xsane]
 packages=xsane
 
+[fedora:6:cups-ddk]
+packages=cupsddk,cupsddk-drivers,cupsddk-devel
+
 
 
 # ********************
 [fedora:6.0]
-code_name=
-supported=True
-release_date=2006-10-24
-notes=
-ppd_install=xml
-udev_mode_fix=True
-fix_ppd_symlink=False
-
-[fedora:6.0:cups]
-packages=cups
-
-[fedora:6.0:cups-devel]
-packages=cups-devel
-
-[fedora:6.0:gcc]
-packages=gcc-c++
-
-[fedora:6.0:gs]
-packages=ghostscript
-
-[fedora:6.0:libcrypto]
-packages=net-snmp-devel,openssl-devel
-
-[fedora:6.0:libjpeg]
-packages=libjpeg-devel
-
-[fedora:6.0:libnetsnmp-devel]
-packages=net-snmp-devel
-
-[fedora:6.0:libpthread]
-packages=glibc-headers
-
-[fedora:6.0:libtool]
-packages=libtool
-
-[fedora:6.0:libusb]
-packages=libusb-devel
-
-[fedora:6.0:make]
-packages=make
-
-[fedora:6.0:pil]
-packages=python-imaging
-
-[fedora:6.0:ppdev]
-packages=
-commands=su -c "/sbin/modprobe ppdev"
-
-[fedora:6.0:pyqt]
-packages=PyQt
-
-[fedora:6.0:python-devel]
-packages=python-devel
-
-[fedora:6.0:python23]
-packages=python
-
-[fedora:6.0:python2x]
-packages=python
-
-[fedora:6.0:reportlab]
-packages=python-reportlab
-
-[fedora:6.0:sane]
-packages=sane-backends
-
-[fedora:6.0:sane-devel]
-packages=sane-backends-devel,sane-backends-devel
-
-[fedora:6.0:scanimage]
-packages=sane-frontends
-
-[fedora:6.0:xsane]
-packages=xsane
-
+same_as_version= 6
 
 # ********************
-[fedora:7.0]
+[fedora:7]
 code_name=
 supported=True
 release_date=2007-5-31
 notes=
-ppd_install=xml
+ppd_install=drv
 udev_mode_fix=True
+ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
-[fedora:7.0:cups]
+[fedora:7:cups]
 packages=cups
 
-[fedora:7.0:cups-devel]
+[fedora:7:cups-devel]
 packages=cups-devel
 
-[fedora:7.0:gcc]
+[fedora:7:gcc]
 packages=gcc-c++
 
-[fedora:7.0:gs]
+[fedora:7:gs]
 packages=ghostscript
 
-[fedora:7.0:libcrypto]
+[fedora:7:libcrypto]
 packages=openssl-devel
 
-[fedora:7.0:libjpeg]
+[fedora:7:libjpeg]
 packages=libjpeg-devel
 
-[fedora:7.0:libnetsnmp-devel]
+[fedora:7:libnetsnmp-devel]
 packages=net-snmp-devel
 
-[fedora:7.0:libpthread]
+[fedora:7:libpthread]
 packages=glibc-headers
 
-[fedora:7.0:libtool]
+[fedora:7:libtool]
 packages=libtool
 
-[fedora:7.0:libusb]
+[fedora:7:libusb]
 packages=libusb-devel
 
-[fedora:7.0:make]
+[fedora:7:make]
 packages=make
 
-[fedora:7.0:pil]
+[fedora:7:pil]
 packages=python-imaging
 
-[fedora:7.0:ppdev]
+[fedora:7:ppdev]
 packages=
 commands=su -c "/sbin/modprobe ppdev"
 
-[fedora:7.0:pyqt]
+[fedora:7:pyqt]
 packages=PyQt
 
-[fedora:7.0:python-devel]
+[fedora:7:python-devel]
 packages=python-devel
 
-[fedora:7.0:python23]
+[fedora:7:python23]
 packages=python
 
-[fedora:7.0:python2x]
+[fedora:7:python2x]
 packages=python
 
-[fedora:7.0:reportlab]
+[fedora:7:reportlab]
 packages=python-reportlab
 
-[fedora:7.0:sane]
+[fedora:7:sane]
 packages=sane-backends
 
-[fedora:7.0:sane-devel]
+[fedora:7:sane-devel]
 packages=sane-backends-devel
 
-[fedora:7.0:scanimage]
+[fedora:7:scanimage]
 packages=sane-frontends
 
-[fedora:7.0:xsane]
+[fedora:7:xsane]
 packages=xsane
 
+[fedora:7:cups-ddk]
+packages=cupsddk,cupsddk-drivers,cupsddk-devel
 
 # ********************
-[fedora:8.0]
+[fedora:7.0]
+same_as_version= 7
+
+# ********************
+[fedora:8]
 code_name=
 supported=True
 release_date=2007-11-8
 notes=
-ppd_install=xml
+ppd_install=drv
 udev_mode_fix=True
+ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
-[fedora:8.0:cups]
+[fedora:8:cups]
 packages=cups
 
-[fedora:8.0:cups-devel]
+[fedora:8:cups-devel]
 packages=cups-devel
 
-[fedora:8.0:gcc]
+[fedora:8:gcc]
 packages=gcc-c++
 
-[fedora:8.0:gs]
+[fedora:8:gs]
 packages=ghostscript
 
-[fedora:8.0:libcrypto]
+[fedora:8:libcrypto]
 packages=openssl-devel
 
-[fedora:8.0:libjpeg]
+[fedora:8:libjpeg]
 packages=libjpeg-devel
 
-[fedora:8.0:libnetsnmp-devel]
+[fedora:8:libnetsnmp-devel]
 packages=net-snmp-devel
 
-[fedora:8.0:libpthread]
+[fedora:8:libpthread]
 packages=glibc-headers
 
-[fedora:8.0:libtool]
+[fedora:8:libtool]
 packages=libtool
 
-[fedora:8.0:libusb]
+[fedora:8:libusb]
 packages=libusb-devel
 
-[fedora:8.0:make]
+[fedora:8:make]
 packages=make
 
-[fedora:8.0:pil]
+[fedora:8:pil]
 packages=python-imaging
 
-[fedora:8.0:ppdev]
+[fedora:8:ppdev]
 packages=
 commands=su -c "/sbin/modprobe ppdev"
 
-[fedora:8.0:pyqt]
+[fedora:8:pyqt]
 packages=PyQt
 
-[fedora:8.0:python-devel]
+[fedora:8:python-devel]
 packages=python-devel
 
-[fedora:8.0:python23]
+[fedora:8:python23]
 packages=python
 
-[fedora:8.0:python2x]
+[fedora:8:python2x]
 packages=python
 
-[fedora:8.0:reportlab]
+[fedora:8:reportlab]
 packages=python-reportlab
 
-[fedora:8.0:sane]
+[fedora:8:sane]
 packages=sane-backends
 
-[fedora:8.0:sane-devel]
+[fedora:8:sane-devel]
 packages=sane-backends-devel
 
-[fedora:8.0:scanimage]
+[fedora:8:scanimage]
 packages=sane-frontends
 
-[fedora:8.0:xsane]
+[fedora:8:xsane]
 packages=xsane
 
+[fedora:8:cups-ddk]
+packages=cupsddk,cupsddk-drivers,cupsddk-devel
+
+
+
+# ********************
+[fedora:8.0]
+same_as_version= 8
 
 # ****************************************
 [linspire]
@@ -1366,9 +1296,10 @@ hplip_remove_cmd=su -c "apt-get remove hplip hpijs"
 su_sudo=su
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=False
 usermod_params=
+drv_dir=/usr/share/cups/drv/hp/
 
 
 # ********************
@@ -1379,14 +1310,14 @@ release_date=
 notes=
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=False
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ****************************************
 [rhel]
 index=7
-versions=3.0,4.0
+versions=3.0,4.0,5.0
 display_name=Red Hat Enterprise Linux
 alt_names=red hat enterprise linux
 display=True
@@ -1400,10 +1331,10 @@ hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=False
 usermod_params=
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [rhel:3.0]
@@ -1411,11 +1342,11 @@ code_name=Taroon
 supported=False
 release_date=2003-10-22
 notes=
-ppd_install=xml
+ppd_install=
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=False
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [rhel:4.0]
@@ -1423,11 +1354,23 @@ code_name=Nahant
 supported=False
 release_date=2005-2-15
 notes=
-ppd_install=xml
+ppd_install=
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
+# ********************
+[rhel:5.0]
+code_name=
+supported=False
+release_date=
+notes=
+ppd_install=
+udev_mode_fix=True
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 # ****************************************
 [slackware]
@@ -1446,10 +1389,10 @@ hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
 usermod_params=
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [slackware:9.0]
@@ -1459,9 +1402,9 @@ release_date=2003-3-19
 notes=
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [slackware:9.1]
@@ -1471,9 +1414,9 @@ release_date=2003-9-26
 notes=
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [slackware:10.0]
@@ -1483,9 +1426,9 @@ release_date=2004-6-23
 notes=
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [slackware:10.1]
@@ -1495,9 +1438,9 @@ release_date=2005-2-2
 notes=
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [slackware:10.2]
@@ -1507,9 +1450,9 @@ release_date=2005-9-14
 notes=
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ****************************************
 [centos]
@@ -1528,10 +1471,10 @@ hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
 usermod_params=
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [centos:any]
@@ -1541,9 +1484,79 @@ release_date=
 notes=
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
+[centos:any:cups]
+packages=
+
+[centos:any:cups-devel]
+packages=cups-devel
+
+[centos:any:gcc]
+packages=
+
+[centos:any:gs]
+packages=
+
+[centos:any:libcrypto]
+packages=
+
+[centos:any:libjpeg]
+packages=libjpeg-devel
+
+[centos:any:libnetsnmp-devel]
+packages=net-snmp-devel
+
+[centos:any:libpthread]
+packages=
+
+[centos:any:libtool]
+packages=
+
+[centos:any:libusb]
+packages=
+
+[centos:any:make]
+packages=
+
+[centos:any:pil]
+packages=
+
+[centos:any:ppdev]
+packages=
+commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
+
+[centos:any:pyqt]
+packages=pyqt, pyqt-devel
+
+[centos:any:python-devel]
+packages=
+
+[centos:any:python23]
+packages=
+
+[centos:any:python2x]
+packages=
+
+[centos:any:reportlab]
+packages=
+
+[centos:any:sane]
+packages=
+
+[centos:any:sane-devel]
+packages=
+
+[centos:any:scanimage]
+packages=
+
+[centos:any:xsane]
+packages=xsane
+
+[centos:any:cups-ddk]
+packages=
 
 # ****************************************
 [gentoo]
@@ -1565,7 +1578,7 @@ udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
 usermod_params=
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [gentoo:any]
@@ -1575,21 +1588,21 @@ release_date=
 notes=
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ****************************************
 [pclinuxos]
 index=17
-versions=2006.0,2007.0
+versions=2006.0,2006,2007.0,2007,2008.0,2008
 display_name=PCLinuxOS
 alt_names=
 display=True
 notes=Please enable all the available repositories before continuing or the install will fail.
 package_mgrs=apt-get,synaptic
 package_mgr_cmd=su -c "apt-get install --yes $packages_to_install"
-pre_install_cmd=su - -c "/etc/init.d/cups restart"
+pre_install_cmd=su - -c "/etc/init.d/cups restart",su -c "touch /etc/security/console.perms.d/60-hplip.perms && echo '<usb>=/dev/usb/dabusb* /dev/usb/mdc800* /dev/usb/rio500 /dev/ttyUSB*' | tee /etc/security/console.perms.d/60-hplip.perms"
 pre_depend_cmd=su -c "apt-get update"
 post_depend_cmd=
 hpoj_remove_cmd=su -c "apt-get remove --yes hpoj"
@@ -1597,10 +1610,10 @@ hplip_remove_cmd=su -c "apt-get remove --yes hplip hpijs"
 su_sudo=su
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
 usermod_params=
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [pclinuxos:2006.0]
@@ -1610,8 +1623,9 @@ release_date=
 notes=
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [pclinuxos:2006.0:cups]
 packages=libcups2
@@ -1680,7 +1694,12 @@ packages=sane-frontends
 [pclinuxos:2006.0:xsane]
 packages=xsane
 
+[pclinuxos:2006.0:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
 
+# ********************
+[pclinuxos:2006]
+same_as_version=2006.0
 
 # ********************
 [pclinuxos:2007.0]
@@ -1690,8 +1709,9 @@ release_date=
 notes=
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [pclinuxos:2007.0:cups]
 packages=libcups2
@@ -1760,7 +1780,98 @@ packages=sane-frontends
 [pclinuxos:2007.0:xsane]
 packages=xsane
 
+[pclinuxos:2007.0:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
 
+# ********************
+[pclinuxos:2007]
+same_as_version=2007.0
+
+# ********************
+[pclinuxos:2008.0]
+code_name=
+supported=False
+release_date=
+notes=
+ppd_install=ppd
+udev_mode_fix=True
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
+
+[pclinuxos:2008.0:cups]
+packages=libcups2
+
+[pclinuxos:2008.0:cups-devel]
+packages=libcups2-devel
+
+[pclinuxos:2008.0:gcc]
+packages=gcc-c++
+
+[pclinuxos:2008.0:gs]
+packages=ghostscript
+
+[pclinuxos:2008.0:libcrypto]
+packages=openssl
+
+[pclinuxos:2008.0:libjpeg]
+packages=libjpeg62-devel
+
+[pclinuxos:2008.0:libnetsnmp-devel]
+packages=libnet-snmp10-devel
+
+[pclinuxos:2008.0:libpthread]
+packages=glibc
+
+[pclinuxos:2008.0:libtool]
+packages=libtool
+
+[pclinuxos:2008.0:libusb]
+packages=libusb-devel
+
+[pclinuxos:2008.0:make]
+packages=make
+
+[pclinuxos:2008.0:pil]
+packages=python-imaging
+
+[pclinuxos:2008.0:ppdev]
+packages=
+commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
+
+[pclinuxos:2008.0:pyqt]
+packages=pyqt
+
+[pclinuxos:2008.0:python-devel]
+packages=libpython2.4-devel
+
+[pclinuxos:2008.0:python23]
+packages=python
+
+[pclinuxos:2008.0:python2x]
+packages=python
+
+[pclinuxos:2008.0:reportlab]
+packages=python-reportlab
+
+[pclinuxos:2008.0:sane]
+packages=sane-frontends
+
+[pclinuxos:2008.0:sane-devel]
+packages=libsane1-devel
+
+[pclinuxos:2008.0:scanimage]
+packages=sane-frontends
+
+[pclinuxos:2008.0:xsane]
+packages=xsane
+
+[pclinuxos:2008.0:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
+
+# ********************
+[pclinuxos:2008]
+same_as_version=2008.0
 
 # ****************************************
 [igos]
@@ -1782,6 +1893,7 @@ udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
 usermod_params=
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [igos:1.0]
@@ -1791,8 +1903,9 @@ release_date=
 notes=
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [igos:1.0:cups]
 packages=cups
@@ -1861,12 +1974,15 @@ packages=sane-frontends
 [igos:1.0:xsane]
 packages=xsane
 
+[igos:1.0:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
+
 
 
 # ****************************************
 [ubuntu]
 index=12
-versions=5.04,5.1,6.06,6.10,7.04,7.10
+versions=5.04,5.1,6.06,6.10,7.04,7.10,8.04
 display_name=Ubuntu
 alt_names=kubunbu,edubuntu,xubuntu
 display=True
@@ -1883,18 +1999,20 @@ udev_mode_fix=True
 ppd_dir=
 fix_ppd_symlink=False
 usermod_params=-a -Glp
+drv_dir=/usr/share/cups/drv/hp/
 
 
 # ********************
 [ubuntu:5.04]
 code_name=Hoary Hedgehog
-supported=True
+supported=False
 release_date=2004-5-1
 notes=Enable the universe/multiverse repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [ubuntu:5.04:cups]
 packages=libcupsys
@@ -1963,18 +2081,22 @@ packages=sane-utils,
 [ubuntu:5.04:xsane]
 packages=xsane
 
+[ubuntu:5.04:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
+
 
 
 # ********************
 [ubuntu:5.1]
 code_name=Breezy Badger
-supported=True
+supported=False
 release_date=2005-10-1
 notes=Enable the universe/multiverse repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=True
+drv_dir=/usr/share/cups/drv/hp/
 
 [ubuntu:5.1:cups]
 packages=libcupsys
@@ -2043,6 +2165,9 @@ packages=sane-utils,
 [ubuntu:5.1:xsane]
 packages=xsane
 
+[ubuntu:5.1:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
+
 
 
 # ********************
@@ -2053,8 +2178,9 @@ release_date=2006-6-1
 notes=Enable the universe/multiverse repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=True
+drv_dir=/usr/share/cups/drv/hp/
 
 [ubuntu:6.06:cups]
 packages=libcupsys2
@@ -2123,7 +2249,8 @@ packages=libsane
 [ubuntu:6.06:xsane]
 packages=xsane
 
-
+[ubuntu:6.06:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
 
 # ********************
 [ubuntu:6.10]
@@ -2131,10 +2258,11 @@ code_name=Edgy Eft
 supported=True
 release_date=2006-10-1
 notes=Enable the universe/multiverse repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.
-ppd_install=xml
+ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=True
+drv_dir=/usr/share/cups/drv/hp/
 
 [ubuntu:6.10:cups]
 packages=libcupsys2
@@ -2203,7 +2331,8 @@ packages=libsane
 [ubuntu:6.10:xsane]
 packages=xsane
 
-
+[ubuntu:6.10:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
 
 # ********************
 [ubuntu:7.04]
@@ -2211,10 +2340,11 @@ code_name=Feisty Fawn
 supported=True
 release_date=2007-4-1
 notes=Enable the universe/multiverse repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.
-ppd_install=xml
+ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=True
+drv_dir=/usr/share/cups/drv/hp/
 
 [ubuntu:7.04:cups]
 packages=libcupsys2
@@ -2283,7 +2413,8 @@ packages=libsane
 [ubuntu:7.04:xsane]
 packages=xsane
 
-
+[ubuntu:7.04:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
 
 # ********************
 [ubuntu:7.10]
@@ -2291,10 +2422,11 @@ code_name=Gutsy Gibbon
 supported=True
 release_date=2007-10-1
 notes=Enable the universe/multiverse repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubunbtu installation media inserted in the drive.
-ppd_install=xml
+ppd_install=drv
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [ubuntu:7.10:cups]
 packages=libcupsys2
@@ -2315,7 +2447,7 @@ packages=openssl
 packages=libjpeg62-dev
 
 [ubuntu:7.10:libnetsnmp-devel]
-packages=libsnmp9-dev
+packages=libsnmp-dev
 
 [ubuntu:7.10:libpthread]
 packages=build-essential
@@ -2363,7 +2495,90 @@ packages=libsane
 [ubuntu:7.10:xsane]
 packages=xsane
 
+[ubuntu:7.10:cups-ddk]
+packages=cupsddk,cupsddk-drivers
 
+# ********************
+[ubuntu:8.04]
+code_name=Hardy Heron
+supported=True
+release_date=2008
+notes=Enable the universe/multiverse repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubunbtu installation media inserted in the drive.
+ppd_install=drv
+udev_mode_fix=True
+ppd_dir=/usr/share/ppd/hpijs/HP
+fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
+
+[ubuntu:8.04:cups]
+packages=libcupsys2
+
+[ubuntu:8.04:cups-devel]
+packages=libcupsys2-dev,cupsys-bsd
+
+[ubuntu:8.04:gcc]
+packages=build-essential
+
+[ubuntu:8.04:gs]
+packages=gs-esp
+
+[ubuntu:8.04:libcrypto]
+packages=openssl
+
+[ubuntu:8.04:libjpeg]
+packages=libjpeg62-dev
+
+[ubuntu:8.04:libnetsnmp-devel]
+packages=libsnmp-dev
+
+[ubuntu:8.04:libpthread]
+packages=build-essential
+
+[ubuntu:8.04:libtool]
+packages=libtool
+
+[ubuntu:8.04:libusb]
+packages=libusb-dev
+
+[ubuntu:8.04:make]
+packages=build-essential
+
+[ubuntu:8.04:pil]
+packages=python-imaging
+
+[ubuntu:8.04:ppdev]
+packages=
+commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppdev | sudo tee -a /etc/modules
+
+[ubuntu:8.04:pyqt]
+packages=python-qt3
+
+[ubuntu:8.04:python-devel]
+packages=python2.5-dev
+
+[ubuntu:8.04:python23]
+packages=python
+
+[ubuntu:8.04:python2x]
+packages=python
+
+[ubuntu:8.04:reportlab]
+packages=python-reportlab
+
+[ubuntu:8.04:sane]
+packages=libsane
+
+[ubuntu:8.04:sane-devel]
+packages=libsane-dev
+
+[ubuntu:8.04:scanimage]
+packages=sane-utils
+
+[ubuntu:8.04:xsane]
+packages=xsane
+
+[ubuntu:8.04:cups-ddk]
+packages=cupsddk,cupsddk-drivers
 
 # ****************************************
 [debian]
@@ -2385,6 +2600,7 @@ udev_mode_fix=True
 ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=False
 usermod_params=-a -Glp
+drv_dir=/usr/share/cups/drv/hp/
 
 
 # ********************
@@ -2393,8 +2609,11 @@ code_name=Potato
 supported=True
 release_date=2000-8-15
 notes=
+ppd_install=ppd
 udev_mode_fix=True
+ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [debian:2.2:cups]
 packages=cupsys,cupsys-client
@@ -2463,7 +2682,8 @@ packages=sane-utils
 [debian:2.2:xsane]
 packages=sane
 
-
+[debian:2.2:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
 
 # ********************
 [debian:3.0]
@@ -2471,8 +2691,11 @@ code_name=Woody
 supported=True
 release_date=2002-7-19
 notes=
+ppd_install=ppd
 udev_mode_fix=True
+ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [debian:3.0:cups]
 packages=cupsys,cupsys-client
@@ -2541,7 +2764,8 @@ packages=sane-utils
 [debian:3.0:xsane]
 packages=sane
 
-
+[debian:3.0:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
 
 # ********************
 [debian:3.1]
@@ -2549,8 +2773,11 @@ code_name=Sarge
 supported=True
 release_date=2005-6-6
 notes=
+ppd_install=ppd
 udev_mode_fix=True
+ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [debian:3.1:cups]
 packages=cupsys,cupsys-client
@@ -2619,6 +2846,9 @@ packages=sane-utils
 [debian:3.1:xsane]
 packages=sane
 
+[debian:3.1:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
+
 # ********************
 [debian:4.0]
 code_name=Etch
@@ -2627,7 +2857,9 @@ release_date=2007-4-8
 notes=Be sure to disable the CD-ROM repositories and also ensure that the main/security repositories are enabled.
 ppd_install=ppd
 udev_mode_fix=True
+ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [debian:4.0:cups]
 packages=cupsys,cupsys-client
@@ -2696,6 +2928,9 @@ packages=sane-utils
 [debian:4.0:xsane]
 packages=xsane
 
+[debian:4.0:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
+
 # ********************
 [debian:4.0r0]
 code_name=Etch
@@ -2704,7 +2939,9 @@ release_date=2007-4-8
 notes=Be sure to disable the CD-ROM repositories and also ensure that the main/security repositories are enabled.
 ppd_install=ppd
 udev_mode_fix=True
+ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [debian:4.0r0:cups]
 packages=cupsys,cupsys-client
@@ -2773,6 +3010,9 @@ packages=sane-utils
 [debian:4.0r0:xsane]
 packages=xsane
 
+[debian:4.0r0:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
+
 # ********************
 [debian:4.0r1]
 code_name=Etch
@@ -2781,7 +3021,9 @@ release_date=2007-4-8
 notes=Be sure to disable the CD-ROM repositories and also ensure that the main/security repositories are enabled.
 ppd_install=ppd
 udev_mode_fix=True
+ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [debian:4.0r1:cups]
 packages=cupsys,cupsys-client
@@ -2850,6 +3092,9 @@ packages=sane-utils
 [debian:4.0r1:xsane]
 packages=xsane
 
+[debian:4.0r1:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
+
 # ********************
 [debian:5.0]
 code_name=Lenny
@@ -2858,7 +3103,9 @@ release_date=
 notes=NOTE: Disable the CD Sources in your apt sources.list or the install will fail and hang.
 ppd_install=ppd
 udev_mode_fix=True
+ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [debian:5.0:cups]
 packages=cupsys,cupsys-client
@@ -2921,11 +3168,14 @@ packages=libsane
 [debian:5.0:sane-devel]
 packages=libsane-dev
 
-[ddebian:5.0:scanimage]
+[debian:5.0:scanimage]
 packages=sane-utils
 
 [debian:5.0:xsane]
 packages=sane
+
+[debian:5.0:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
 
 # ********************
 [debian:stable]
@@ -2935,7 +3185,9 @@ release_date=2007-4-8
 notes=Be sure to disable the CD-ROM repositories and also ensure that the main/security repositories are enabled.
 ppd_install=ppd
 udev_mode_fix=True
+ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [debian:stable:cups]
 packages=cupsys,cupsys-client
@@ -3004,6 +3256,9 @@ packages=sane-utils
 [debian:stable:xsane]
 packages=xsane
 
+[debian:stable:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
+
 # ********************
 [debian:testing]
 code_name=sid
@@ -3012,7 +3267,9 @@ release_date=
 notes=NOTE: Disable the CD Sources in your apt sources.list or the install will fail and hang. Also make sure all the lenny repositories are enabled or the install will fail.
 ppd_install=ppd
 udev_mode_fix=True
+ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [debian:testing:cups]
 packages=cupsys,cupsys-client
@@ -3075,11 +3332,16 @@ packages=libsane
 [debian:testing:sane-devel]
 packages=libsane-dev
 
-[ddebian:testing:scanimage]
+[debian:testing:scanimage]
 packages=sane-utils
 
 [debian:testing:xsane]
 packages=sane
+
+[debian:testing:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
+
+
 
 # ********************
 [debian:lenny/sid]
@@ -3089,7 +3351,9 @@ release_date=
 notes=NOTE: Disable the CD Sources in your apt sources.list or the install will fail and hang. Also make sure all the lenny repositories are enabled or the install will fail.
 ppd_install=ppd
 udev_mode_fix=True
+ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [debian:lenny/sid:cups]
 packages=cupsys,cupsys-client
@@ -3152,11 +3416,15 @@ packages=libsane
 [debian:lenny/sid:sane-devel]
 packages=libsane-dev
 
-[ddebian:lenny/sid:scanimage]
+[debian:lenny/sid:scanimage]
 packages=sane-utils
 
 [debian:lenny/sid:xsane]
 packages=sane
+
+[debian:lenny/sid:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
+
 
 
 # ********************
@@ -3167,7 +3435,9 @@ release_date=
 notes=NOTE: Disable the CD Sources in your apt sources.list or the install will fail and hang. Also make sure all the lenny repositories are enabled or the install will fail.
 ppd_install=ppd
 udev_mode_fix=True
+ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [debian:lenny:cups]
 packages=cupsys,cupsys-client
@@ -3230,11 +3500,15 @@ packages=libsane
 [debian:lenny:sane-devel]
 packages=libsane-dev
 
-[ddebian:lenny:scanimage]
+[debian:lenny:scanimage]
 packages=sane-utils
 
 [debian:lenny:xsane]
 packages=sane
+
+[debian:lenny:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
+
 
 # ****************************************
 [xandros]
@@ -3253,9 +3527,10 @@ hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
 usermod_params=
+drv_dir=/usr/share/cups/drv/hp/
 
 
 # ********************
@@ -3266,9 +3541,9 @@ release_date=
 notes=
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ****************************************
 [pcbsd]
@@ -3287,10 +3562,10 @@ hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
 usermod_params=
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [pcbsd:any]
@@ -3300,9 +3575,9 @@ release_date=
 notes=
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ****************************************
 [miracle]
@@ -3321,10 +3596,10 @@ hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
 usermod_params=
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [miracle:any]
@@ -3334,9 +3609,9 @@ release_date=
 notes=
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ****************************************
 [asianux]
@@ -3355,10 +3630,10 @@ hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
 usermod_params=
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [asianux:any]
@@ -3368,9 +3643,9 @@ release_date=
 notes=
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ****************************************
 [freebsd]
@@ -3389,10 +3664,10 @@ hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
 usermod_params=
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [freebsd:any]
@@ -3402,14 +3677,14 @@ release_date=
 notes=
 ppd_install=ppd
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=False
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ****************************************
 [mepis]
 index=1
-versions=6.0,6.5
+versions=6.0,6.5,7.0
 display_name=Mepis
 alt_names=
 display=True
@@ -3426,7 +3701,7 @@ udev_mode_fix=True
 ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=False
 usermod_params=
-
+drv_dir=/usr/share/cups/drv/hp/
 
 # ********************
 [mepis:6.0]
@@ -3438,6 +3713,7 @@ udev_mode_fix=True
 fix_ppd_symlink=False
 ppd_install=ppd
 ppd_dir=/usr/share/ppd/hpijs/HP
+drv_dir=/usr/share/cups/drv/hp/
 
 [mepis:6.0:cups]
 packages=libcupsys2
@@ -3506,7 +3782,8 @@ packages=sane-utils
 [mepis:6.0:xsane]
 packages=xsane
 
-
+[mepis:6.0:cups-ddk]
+packages=
 
 # ********************
 [mepis:6.5]
@@ -3517,7 +3794,8 @@ notes=Before proceeding please enable the universe/multiverse repositories in Sy
 udev_mode_fix=True
 fix_ppd_symlink=False
 ppd_install=ppd
-ppd_dir=/usr/share/cups/model/HP
+ppd_dir=/usr/share/ppd/hpijs/HP
+drv_dir=/usr/share/cups/drv/hp/
 
 [mepis:6.5:cups]
 packages=libcupsys2
@@ -3586,7 +3864,90 @@ packages=sane-utils
 [mepis:6.5:xsane]
 packages=xsane
 
+[mepis:6.5:cups-ddk]
+packages=
 
+# ********************
+[mepis:7.0]
+code_name=
+supported=True
+release_date=
+notes=Before proceeding please enable the universe/multiverse repositories in Synaptic or Apt.
+udev_mode_fix=True
+fix_ppd_symlink=False
+ppd_install=ppd
+ppd_dir=/usr/share/ppd/hpijs/HP
+drv_dir=/usr/share/cups/drv/hp/
+
+[mepis:7.0:cups]
+packages=libcupsys2
+
+[mepis:7.0:cups-devel]
+packages=libcupsys2-dev
+
+[mepis:7.0:gcc]
+packages=build-essential
+
+[mepis:7.0:gs]
+packages=gs-esp
+
+[mepis:7.0:libcrypto]
+packages=openssl
+
+[mepis:7.0:libjpeg]
+packages=libjpeg62-dev
+
+[mepis:7.0:libnetsnmp-devel]
+packages=libsnmp9-dev
+
+[mepis:7.0:libpthread]
+packages=build-essential
+
+[mepis:7.0:libtool]
+packages=libtool
+
+[mepis:7.0:libusb]
+packages=libusb-dev
+
+[mepis:7.0:make]
+packages=build-essential
+
+[mepis:7.0:pil]
+packages=python-imaging
+
+[mepis:7.0:ppdev]
+packages=
+commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
+
+[mepis:7.0:pyqt]
+packages=python-qt3
+
+[mepis:7.0:python-devel]
+packages=python-dev
+
+[mepis:7.0:python23]
+packages=python
+
+[mepis:7.0:python2x]
+packages=python
+
+[mepis:7.0:reportlab]
+packages=python-reportlab
+
+[mepis:7.0:sane]
+packages=sane,libsane-dev
+
+[mepis:7.0:sane-devel]
+packages=libsane-dev
+
+[mepis:7.0:scanimage]
+packages=sane-utils
+
+[mepis:7.0:xsane]
+packages=xsane
+
+[mepis:7.0:cups-ddk]
+packages=
 
 # ****************************************
 [mandriva]
@@ -3595,19 +3956,21 @@ versions=9.1,9.2,10.0,10.1,10.2,2006.0,2007.0,2007.1,2008.0
 display_name=Mandriva Linux
 alt_names=Mandrakelinux, Mandrake Linux
 display=True
-notes=If you are going to be connecting a USB printer, you will need to follow the post-installation steps described here: http://hplip.sourceforge.net/install/manual/distros/mandriva.html (Step 7)
+notes=
 package_mgrs=urpmi
 package_mgr_cmd=su - -c "urpmi --auto $packages_to_install"
-pre_install_cmd=su - -c "/etc/init.d/cups restart"
+pre_install_cmd=su - -c "/etc/init.d/cups restart",su - -c "touch /etc/security/console.perms.d/60-hplip.perms && echo '<usb>=/dev/usb/dabusb* /dev/usb/mdc800* /dev/usb/rio500 /dev/ttyUSB*' | tee /etc/security/console.perms.d/60-hplip.perms"
 pre_depend_cmd=su - -c "rm /etc/hp/hplip.conf"
 post_depend_cmd=su - -c "/etc/init.d/cups restart"
 hpoj_remove_cmd=
-hplip_remove_cmd=
+hplip_remove_cmd=su - -c "urpme hplip task-printing-hp"
 su_sudo=su
-ppd_install=xml
+ppd_install=drv
 udev_mode_fix=True
+ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=False
 usermod_params=
+drv_dir=/usr/share/cups/drv/hp/
 
 
 # ********************
@@ -3616,10 +3979,11 @@ code_name=Bamboo
 supported=False
 release_date=2003-3-25
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration.  Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
-ppd_install=xml
+ppd_install=drv
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 
 # ********************
@@ -3628,10 +3992,11 @@ code_name=Fivestar
 supported=False
 release_date=2003-10-14
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration.  Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
-ppd_install=xml
+ppd_install=drv
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 
 # ********************
@@ -3640,10 +4005,11 @@ code_name=Community and official
 supported=False
 release_date=2004-3-4
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
-ppd_install=xml
+ppd_install=drv
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 
 # ********************
@@ -3652,10 +4018,11 @@ code_name=Official
 supported=False
 release_date=2004-9-16
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
-ppd_install=xml
+ppd_install=drv
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 
 # ********************
@@ -3664,10 +4031,11 @@ code_name=Limited edition 2005
 supported=False
 release_date=2005-4-14
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
-ppd_install=xml
+ppd_install=drv
 udev_mode_fix=True
-ppd_dir=
+ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 
 # ********************
@@ -3676,9 +4044,11 @@ code_name=2k6
 supported=True
 release_date=2005-4-14
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
-ppd_install=xml
+ppd_install=drv
 udev_mode_fix=True
+ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [mandriva:2006.0:cups]
 packages=cups
@@ -3747,6 +4117,9 @@ packages=sane-utils
 [mandriva:2006.0:xsane]
 packages=xsane
 
+[mandriva:2006.0:cups-ddk]
+packages=cupsddk,cupsddk-drivers
+
 
 
 # ********************
@@ -3755,15 +4128,17 @@ code_name=2k7
 supported=True
 release_date=2006-10-3
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
-ppd_install=xml
+ppd_install=drv
 udev_mode_fix=True
+ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [mandriva:2007.0:cups]
 packages=cups
 
 [mandriva:2007.0:cups-devel]
-packages=cups-devel
+packages=libcups2-devel
 
 [mandriva:2007.0:gcc]
 packages=gcc-c++
@@ -3781,7 +4156,7 @@ packages=libjpeg62-dev
 packages=libsnmp0-devel
 
 [mandriva:2007.0:libpthread]
-packages=glibc-i18ndata-2.4-4mdk,glibc_lsb-2.3.6-1mdk
+packages=glibc
 
 [mandriva:2007.0:libtool]
 packages=libtool
@@ -3803,7 +4178,7 @@ commands=su -c "modprobe ppdev"
 packages=PyQt
 
 [mandriva:2007.0:python-devel]
-packages=python-devel
+packages=libpython2.4-devel
 
 [mandriva:2007.0:python23]
 packages=python
@@ -3826,15 +4201,22 @@ packages=sane-utils
 [mandriva:2007.0:xsane]
 packages=xsane
 
+[mandriva:2007.0:cups-ddk]
+packages=cupsddk,cupsddk-drivers
+
+
+
 # ********************
 [mandriva:2007.1]
 code_name=2k7
 supported=True
 release_date=2007-4-17
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
-ppd_install=xml
+ppd_install=drv
 udev_mode_fix=True
+ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [mandriva:2007.1:cups]
 packages=cups
@@ -3903,15 +4285,22 @@ packages=sane-utils
 [mandriva:2007.1:xsane]
 packages=xsane
 
+[mandriva:2007.1:cups-ddk]
+packages=cupsddk,cupsddk-drivers
+
+
+
 # ********************
 [mandriva:2008.0]
 code_name=2k7
 supported=True
 release_date=2007-4-17
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
-ppd_install=ppd
+ppd_install=drv
 udev_mode_fix=True
+ppd_dir=/usr/share/ppd/hpijs/HP
 fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
 
 [mandriva:2008.0:cups]
 packages=cups
@@ -3979,3 +4368,7 @@ packages=sane-utils
 
 [mandriva:2008.0:xsane]
 packages=xsane
+
+[mandriva:2008.0:cups-ddk]
+packages=cupsddk,cupsddk-drivers
+

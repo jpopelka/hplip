@@ -359,7 +359,10 @@ def getPPDFile(stripped_model, ppds):
 #
 
 def getDefaultPrinter():
-    return cupsext.getDefaultPrinter()
+    r = cupsext.getDefaultPrinter()
+    if r is None:
+        log.warning("The CUPS default printer is not set.")
+    return r
 
 def setDefaultPrinter(printer_name):
     return cupsext.setDefaultPrinter(printer_name)

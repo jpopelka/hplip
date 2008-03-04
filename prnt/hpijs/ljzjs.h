@@ -95,6 +95,8 @@ protected:
         return SYSTEM_ERROR;
     }
 
+    static const unsigned char szByte1[256];
+    static const unsigned char szByte2[256];
     void            *m_hHPLibHandle;
 
     DWORD           m_dwWidth;

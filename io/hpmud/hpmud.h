@@ -85,6 +85,13 @@ enum HPMUD_STATUSTYPE
    HPMUD_STATUSTYPE_PJLPML = 9,   /* laserjet pjl and pml */
 };
 
+enum HPMUD_SUPPORT_TYPE
+{
+   HPMUD_SUPPORT_TYPE_NONE = 0,   /* not supported */
+   HPMUD_SUPPORT_TYPE_HPIJS = 1,  /* supported by hpijs only */
+   HPMUD_SUPPORT_TYPE_HPLIP = 2,   /* supported by hpijs and "hp" backend */
+};
+
 #define HPMUD_S_PRINT_CHANNEL "PRINT"
 #define HPMUD_S_PML_CHANNEL "HP-MESSAGE"
 #define HPMUD_S_SCAN_CHANNEL "HP-SCAN"
@@ -121,6 +128,7 @@ struct hpmud_model_attributes
    enum HPMUD_IO_MODE mfp_mode;        /* pml | scan | fax (io_mode) */
    enum HPMUD_SCANTYPE scantype;       /* 0=none */
    enum HPMUD_STATUSTYPE statustype;
+   enum HPMUD_SUPPORT_TYPE support;
 };
 
 #ifdef __cplusplus

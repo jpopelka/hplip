@@ -34,8 +34,8 @@ from prnt import cups
 from installer import core_install
 
 try:
-    #from fax import fax, faxdevice
-    from fax import fax
+    from fax import fax, faxdevice
+    #from fax import fax
     fax_import_ok = True
 except ImportError:
     # This can fail on Python < 2.3 due to the datetime module
@@ -260,6 +260,7 @@ class SetupForm(SetupForm_base):
         elif page is self.PrinterNamePage:
             self.setDefaultPrinterName()
 
+            #print self.mq.get('fax-type', FAX_TYPE_NONE)
             if fax_import_ok and self.mq.get('fax-type', FAX_TYPE_NONE) != FAX_TYPE_NONE:
                 self.faxCheckBox.setEnabled(True)
                 self.faxCheckBox.setEnabled(True)
@@ -783,8 +784,8 @@ class SetupForm(SetupForm_base):
         try:
             QApplication.setOverrideCursor(QApplication.waitCursor)
             
-            #d = faxdevice.FaxDevice(self.fax_uri)
-            d = fax.getFaxDevice(self.fax_uri)
+            d = faxdevice.FaxDevice(self.fax_uri)
+            #d = fax.getFaxDevice(self.fax_uri)
 
             while True:
                 try:
@@ -810,8 +811,8 @@ class SetupForm(SetupForm_base):
 
                             try:
                                 if read:
-                                    self.fax_number = d.getPhoneNum()
-                                    self.fax_name_company = d.getStationName()
+                                    self.fax_number = unicode(d.getPhoneNum())
+                                    self.fax_name_company = unicode(d.getStationName())
                                 else:
                                     d.setStationName(self.fax_name_company)
                                     d.setPhoneNum(self.fax_number)
@@ -884,28 +885,31 @@ class SetupForm(SetupForm_base):
         QApplication.setOverrideCursor(QApplication.waitCursor)
         
         if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_SOAP:
-            nick = "HP Fax 2" # Fixed width (2528 pixels) and 300dpi rendering
+            fax_ppd_name = "HP-Fax2-hplip" # Fixed width (2528 pixels) and 300dpi rendering
+            nick = "HP Fax 2"
         else:
-            nick = "HP Fax" # Standard
+            fax_ppd_name = "HP-Fax-hplip" # Standard
+            nick = "HP Fax"
         
         ppds = []
 
-        log.debug("Searching for fax file (%s) in %s..." % (nick, sys_cfg.dirs.ppd))
+        log.debug("Searching for fax file %s..." % fax_ppd_name)
         
         for f in utils.walkFiles(sys_cfg.dirs.ppd, pattern="HP-Fax*.ppd*", abs_paths=True):
             ppds.append(f)
 
         for f in ppds:
-            if cups.getPPDDescription(f) == nick:
+            if f.find(fax_ppd_name) >= 0:
                 fax_ppd = f
-                log.debug("Found PDD file: %s (%s)" % (fax_ppd, nick))
+                log.debug("Found PDD file: %s" % fax_ppd)
+                log.debug("Nickname: %s" % cups.getPPDDescription(fax_ppd))
                 break
         else:
             QApplication.restoreOverrideCursor()
             log.error("Fax PPD file not found.")
             
             if QMessageBox.warning(self, self.__tr("Unable to find HP fax PPD file."),
-                self.__tr("The PPD file (%1) needed to setup the fax queue was not found.").arg(nick),
+                self.__tr("The PPD file (%1.ppd) needed to setup the fax queue was not found.").arg(fax_ppd_name),
                 self.__tr("Browse to file..."), # button 0
                 self.__tr("Quit") # button 1
                 ) == 0: # Browse

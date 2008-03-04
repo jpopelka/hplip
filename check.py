@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '12.2'
+__version__ = '13.0'
 __title__ = 'Dependency/Version Check Utility'
 __doc__ = "Check the existence and versions of HPLIP dependencies."
 
@@ -49,14 +49,21 @@ else:
 USAGE = [(__doc__, "", "name", True),
          ("Usage: hp-check/check.py [OPTIONS]", "", "summary", True),
          utils.USAGE_OPTIONS,
-         ("Pre-install check:", "-p or --pre", "option", False),
+         #("Pre-install check:", "-p or --pre", "option", False),
+         ("Compile-time check:", "-c or --compile", "option", False),
+         ("Run-time check:", "-r or --run", "option", False),
+         ("Compile and run-time checks:", "-b or --both (default)", "option", False),
          utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
          utils.USAGE_LOGGING_PLAIN,
          utils.USAGE_HELP,
          utils.USAGE_NOTES,
-         ("1. For posting to the mailing list, use the -t parameter and then copy/paste the onscreen output or use the generated hp-check.log file.", "", "note", False),
-         ("2. Use with the '-p' switch prior to installation to check for dependencies and system requirements (skips some checks).", "", "note", False),
-         ("3. Run without the '-p' switch after installation to check for proper install (runs all checks). ", "", "note", False),
+         #("1. For posting to the mailing list, use the -t parameter and then copy/paste the onscreen output or use the generated hp-check.log file.", "", "note", False),
+         #("2. Use with the '-p' switch prior to installation to check for dependencies and system requirements (skips some checks).", "", "note", False),
+         #("3. Run without the '-p' switch after installation to check for proper install (runs all checks). ", "", "note", False),
+         ("1. For checking for the proper build environment for the HPLIP supplied tarball (.tar.gz or .run),", "", "note", False), 
+         ("use the --compile or --both switches.", "", "note", False),
+         ("2. For checking for the proper runtime environment for a distro supplied package (.deb, .rpm, etc),", "", "note", False), 
+         ("use the --runtime switch.", "", "note", False),
         ]
 
 def usage(typ='text'):
@@ -102,15 +109,16 @@ def parseDeviceURI(device_uri):
 
 num_errors = 0
 fmt = True
-pre = False
 overall_commands_to_run = []
+time_flag = DEPENDENCY_RUN_AND_COMPILE_TIME
 
 try:
     log.set_module("hp-check")
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hl:gtp', 
-            ['help', 'help-rest', 'help-man', 'help-desc', 'logging=', 'pre']) 
+        opts, args = getopt.getopt(sys.argv[1:], 'hl:gtcrb', 
+            ['help', 'help-rest', 'help-man', 'help-desc', 'logging=', 
+             'run', 'compile', 'both']) 
 
     except getopt.GetoptError, e:
         log.error(e.msg)
@@ -144,10 +152,15 @@ try:
 
         elif o == '-t':
             fmt = False
-
-        elif o in ('-p', '--pre'):
-            pre = True
-
+            
+        elif o in ('-c', '--compile'):
+            time_flag = DEPENDENCY_COMPILE_TIME
+            
+        elif o in ('-r', '--runtime'):
+            time_flag = DEPENDENCY_RUN_TIME
+            
+        elif o in ('-b', '--both'):
+            time_flag = DEPENDENCY_RUN_AND_COMPILE_TIME
 
     if not log.set_level(log_level):
         usage()
@@ -157,8 +170,22 @@ try:
 
     utils.log_title(__title__, __version__)
 
+    log.info(log.bold("Note: hp-check can be run in three modes:"))
+    
+    for l in tui.format_paragraph("1. Compile-time check mode (-c or --compile): Use this mode before compiling the HPLIP supplied tarball (.tar.gz or .run) to determine if the proper dependencies are installed to successfully compile HPLIP."):
+        log.info(l)
+        
+    for l in tui.format_paragraph("2. Run-time check mode (-r or --run): Use this mode to determine if a distro supplied package (.deb, .rpm, etc) or an already built HPLIP supplied tarball has the proper dependencies installed to successfully run."):
+        log.info(l)
+    
+    for l in tui.format_paragraph("3. Both compile- and run-time check mode (-b or --both) (Default): This mode will check both of the above cases (both compile- and run-time dependencies)."):
+        log.info(l)
+    
+    log.info("")
+    
+    
     log_file = os.path.normpath('./hp-check.log')
-    print "Saving output in log file: %s" % log_file
+    log.info(log.bold("Saving output in log file: %s" % log_file))
     log.debug("Log file=%s" % log_file)
     if os.path.exists(log_file):
         os.remove(log_file)
@@ -286,27 +313,36 @@ try:
         num_errors += 1
 
     log.info("")
-    log.info(log.bold("Checking for Reportlab..."))
+##    log.info(log.bold("Checking for Reportlab..."))
+##
+##    try:
+##        import reportlab
+##        ver = reportlab.Version
+##        try:
+##            ver_f = float(ver)
+##        except ValueError:
+##            log.warn("Can't determine version.")
+##        else:
+##            if ver_f >= 2.0:
+##                log.info("OK, version >= 2.0")
+##            else:
+##                log.warn("Version < 2.0 (%.1f). HPLIP fax coverpages requires Reportlab 2.0+." % ver_f)
+##                num_errors += 1
+##
+##    except ImportError:
+##        log.warn("Not installed.")
+##        num_errors += 1
 
-    try:
-        import reportlab
-        ver = reportlab.Version
-        try:
-            ver_f = float(ver)
-        except ValueError:
-            log.warn("Can't determine version.")
-        else:
-            if ver_f >= 2.0:
-                log.info("OK, version >= 2.0")
-            else:
-                log.warn("Version < 2.0 (%.1f). HPLIP fax coverpages requires Reportlab 2.0+." % ver_f)
-                num_errors += 1
-
-    except ImportError:
-        log.warn("Not installed.")
-        num_errors += 1
-
-    tui.header("DEPENDENCIES")
+    if time_flag == DEPENDENCY_RUN_AND_COMPILE_TIME:
+        tui.header("COMPILE AND RUNTIME DEPENDENCIES")
+        log.note("To check for compile-time only dependencies, re-run hp-check with the -c parameter (ie, hp-check -c).")
+        log.note("To check for run-time only dependencies, re-run hp-check with the -r parameter (ie, hp-check -r).")
+    
+    elif time_flag == DEPENDENCY_COMPILE_TIME:
+        tui.header("COMPILE TIME DEPENDENCIES")
+    
+    elif time_flag == DEPENDENCY_RUN_TIME:
+        tui.header("RUNTIME DEPENDENCIES")
 
     log.info("")
 
@@ -315,48 +351,58 @@ try:
     for d in dd:
         log.debug("***")
 
-        log.info(log.bold("Checking for dependency: %s..." % core.dependencies[d][2]))
+        if time_flag == DEPENDENCY_RUN_AND_COMPILE_TIME or time_flag == core.dependencies[d][4]:
+                
+            log.info(log.bold("Checking for dependency: %s..." % core.dependencies[d][2]))
 
-        if core.have_dependencies[d]:
-            log.info("OK, found.")
-        else:
-            num_errors += 1
-
-            if core.dependencies[d][0]:
-                log.error("NOT FOUND! This is a REQUIRED dependency. Please make sure that this dependency is installed before installing or running HPLIP.")
+            if core.have_dependencies[d]:
+                log.info("OK, found.")
             else:
-                log.warn("NOT FOUND! This is an OPTIONAL dependency. Some HPLIP functionality may not function properly.")
+                num_errors += 1
 
-            if core.distro_supported():
-                packages_to_install, commands = core.get_dependency_data(d)
+                if core.dependencies[d][4] == DEPENDENCY_RUN_AND_COMPILE_TIME:
+                    s = ''
+                elif core.dependencies[d][4] == DEPENDENCY_COMPILE_TIME:
+                    s = '/COMPILE TIME ONLY'
+                    
+                elif core.dependencies[d][4] == DEPENDENCY_RUN_TIME:
+                    s = '/RUNTIME ONLY'
+                
+                if core.dependencies[d][0]:
+                    log.error("NOT FOUND! This is a REQUIRED%s dependency. Please make sure that this dependency is installed before installing or running HPLIP." % s)
+                else:
+                    log.warn("NOT FOUND! This is an OPTIONAL%s dependency. Some HPLIP functionality may not function properly." %s)
 
-                commands_to_run = []
+                if core.distro_supported():
+                    packages_to_install, commands = core.get_dependency_data(d)
 
-                if packages_to_install:
-                    package_mgr_cmd = core.get_distro_data('package_mgr_cmd')
+                    commands_to_run = []
 
-                    if package_mgr_cmd:
-                        packages_to_install = ' '.join(packages_to_install)
-                        commands_to_run.append(utils.cat(package_mgr_cmd))
+                    if packages_to_install:
+                        package_mgr_cmd = core.get_distro_data('package_mgr_cmd')
 
-                if commands:
-                    commands_to_run.extend(commands)
+                        if package_mgr_cmd:
+                            packages_to_install = ' '.join(packages_to_install)
+                            commands_to_run.append(utils.cat(package_mgr_cmd))
 
-                overall_commands_to_run.extend(commands_to_run)
+                    if commands:
+                        commands_to_run.extend(commands)
 
-                if len(commands_to_run) == 1:
-                    log.info("To install this dependency, execute this command:")
-                    log.info(commands_to_run[0])
+                    overall_commands_to_run.extend(commands_to_run)
 
-                elif len(commands_to_run) > 1:
-                    log.info("To install this dependency, execute these commands:")
-                    for c in commands_to_run:
-                        log.info(c)
+                    if len(commands_to_run) == 1:
+                        log.info("To install this dependency, execute this command:")
+                        log.info(commands_to_run[0])
+
+                    elif len(commands_to_run) > 1:
+                        log.info("To install this dependency, execute these commands:")
+                        for c in commands_to_run:
+                            log.info(c)
 
 
-        log.info("")
-
-    if not pre:
+            log.info("")
+    
+    if time_flag in (DEPENDENCY_RUN_TIME, DEPENDENCY_RUN_AND_COMPILE_TIME):
         tui.header("HPLIP INSTALLATION")
 
         scanning_enabled = utils.to_bool(sys_cfg.configure.get("scanner-build", False))
@@ -539,16 +585,20 @@ try:
                                 log.debug(deviceid)
 
                             if not deviceid:
-                                log.error("Communication status: Failed")
+                                #log.error("Communication status: Failed")
                                 num_errors += 1
                             else:
                                 log.info("Communication status: Good")
 
                         elif bus == 'net':
-                            error_code, deviceid = d.getPML(pml.OID_DEVICE_ID)
+                            try:
+                                error_code, deviceid = d.getPML(pml.OID_DEVICE_ID)
+                            except Error:
+                                #log.error("Communication with device failed.")
+                                error_code = pml.ERROR_COMMAND_EXECUTION
                             
                             if error_code > pml.ERROR_MAX_OK:
-                                log.error("Communication status: Failed")
+                                #log.error("Communication status: Failed")
                                 num_errors += 1
                             else:
                                 log.info("Communication status: Good")

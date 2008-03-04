@@ -36,7 +36,7 @@ from base.g import *
 from base.codes import *
 from base import device, status, utils, pml
 from prnt import cups
-from fax import fax
+from fax import faxdevice
 
 USAGE = [(__doc__, "", "name", True),
          ("Usage: timedate.py [PRINTER|DEVICE-URI] [OPTIONS]", "", "summary", True),
@@ -118,7 +118,7 @@ for o, a in opts:
 
     elif o in ('-p', '--printer'):
         if a.startswith('*'):
-            printer_name = cups.getDefault()
+            printer_name = cups.getDefaultPrinter()
         else:
             printer_name = a
 
@@ -157,8 +157,15 @@ if not device_uri and not printer_name:
         log.error("Error occured during interactive mode. Exiting.")
         sys.exit(0)
 
-#d = fax.FaxDevice(device_uri, printer_name)
-d = fax.getFaxDevice(device_uri, printer_name)
+try:
+    d = faxdevice.FaxDevice(device_uri, printer_name)
+except Error, e:
+    if e.opt == ERROR_DEVICE_DOES_NOT_SUPPORT_OPERATION:
+        log.error("Device does not support setting time/date.")
+        sys.exit(1)
+    else:
+        log.error(e.msg)
+        sys.exit(1)
 
 if d.device_uri is None and printer_name:
     log.error("Printer '%s' not found." % printer_name)

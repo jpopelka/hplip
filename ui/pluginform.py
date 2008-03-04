@@ -260,7 +260,7 @@ class PluginForm(PluginForm_base):
         QWizard.accept(self)
         
     def FailureUI(self, error_text):
-        log.error(unicode(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", ""))
+        log.error(unicode(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", " "))
         QMessageBox.critical(self,
                              self.caption(),
                              error_text,

@@ -37,7 +37,6 @@ from base import device, utils, msg, service, msg
 from base.kirbybase import KirbyBase
 from prnt import cups
 
-
 try:
     import coverpages
 except ImportError:
@@ -114,6 +113,10 @@ EVENT_FAX_SEND_CANCELED = 1
 # # Thumbnail data (if present)                  #
 # #==============================================#
 #
+
+RESOLUTION_STD = 1
+RESOLUTION_FINE = 2
+RESOLUTION_300DPI = 3
 
 FILE_HEADER_SIZE = 28
 PAGE_HEADER_SIZE = 24
@@ -406,44 +409,29 @@ class FaxDevice(device.Device):
         self.send_fax_thread = None
         self.upload_log_thread = None
         self.fax_type = fax_type
-        #self.fax_type = self.mq['fax-type']
 
     def setPhoneNum(self, num):
         raise AttributeError
-        #return self.setPML(pml.OID_FAX_LOCAL_PHONE_NUM, str(num))
 
     def getPhoneNum(self):
         raise AttributeError
-        #return utils.printable(str(self.getPML(pml.OID_FAX_LOCAL_PHONE_NUM)[1]))
 
     phone_num = property(getPhoneNum, setPhoneNum)
 
 
     def setStationName(self, name):
         raise AttributeError
-        #return self.setPML(pml.OID_FAX_STATION_NAME, str(name))
 
     def getStationName(self):
         raise AttributeError
-        #return utils.printable(str(self.getPML(pml.OID_FAX_STATION_NAME)[1]))
 
     station_name = property(getStationName, setStationName)
 
     def setDateAndTime(self):
         raise AttributeError
-##        t = time.localtime()
-##        p = struct.pack("BBBBBBB", t[0]-2000, t[1], t[2], t[6]+1, t[3], t[4], t[5])
-##        log.debug(repr(p))
-##        return self.setPML(pml.OID_DATE_AND_TIME, p)
 
     def uploadLog(self):
         raise AttributeError
-##        if not self.isUloadLogActive():
-##            self.upload_log_thread = UploadLogThread(self)
-##            self.upload_log_thread.start()
-##            return True
-##        else:
-##            return False
 
     def isUploadLogActive(self):
         raise AttributeError
@@ -659,7 +647,18 @@ class FaxSendThread(threading.Thread):
         log.debug("Total fax pages=%d" % self.job_total_pages)
 
         return state
+        
+    def decode_fax_header(self, header):
+        try:
+            return struct.unpack(">8sBIHHBBBII", header)
+        except struct.error:
+            return -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 
+    def decode_page_header(self, header):
+        try:
+            return struct.unpack(">IIIIII", header)
+        except struct.error:
+            return -1, -1, -1, -1, -1, -1
 
     def cover_page(self,  recipient):
         if self.job_total_pages > 1:
@@ -838,7 +837,7 @@ class FaxSendThread(threading.Thread):
         except Error:
             return '', True   
 
-        end_time = time.time() + 120.0 
+        end_time = time.time() + 300.0 # wait for 5 min. max 
         while time.time() < end_time:
             log.debug("Waiting for fax...")
             fields, data, result_code = \
@@ -945,4 +944,10 @@ class FaxSendThread(threading.Thread):
             self.update_queue.put(message)
             time.sleep(0)
             self.prev_update = message
+            
+    
+    def run(self):
+        pass
+        
+        
 

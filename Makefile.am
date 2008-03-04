@@ -13,7 +13,7 @@ hplipdir = $(datadir)/hplip
 
 docdir = $(hpdocdir)
 doc_DATA = COPYING prnt/hpijs/README_LIBJPG
-EXTRA_DIST = prnt/hpijs/gdevijs-krgb-1.3-gs8.54.patch prnt/hpijs/README_LIBJPG
+EXTRA_DIST = prnt/hpijs/gdevijs-krgb-1.5-gs8.61.patch prnt/hpijs/README_LIBJPG
 
 dist_noinst_SCRIPTS = 
 dist_noinst_DATA =
@@ -84,7 +84,7 @@ basedir = $(hplipdir)/base
 dist_base_SCRIPTS = base/maint.py base/codes.py base/g.py base/pml.py base/status.py  base/async.py \
 	base/__init__.py base/mfpdtf.py base/utils.py base/async_qt.py base/kirbybase.py base/service.py \
 	base/device.py base/logger.py base/msg.py base/slp.py base/exif.py base/strings.py base/magic.py \
-	base/imagesize.py base/pexpect.py base/models.py base/mdns.py base/tui.py
+	base/imagesize.py base/pexpect.py base/models.py base/mdns.py base/tui.py base/dime.py
 
 # installer
 installdir = $(hplipdir)/installer
@@ -116,11 +116,11 @@ dist_copier_SCRIPTS = copier/copier.py copier/__init__.py
 # fax
 if FAX_BUILD
 faxdir = $(hplipdir)/fax
-dist_fax_SCRIPTS = fax/fax.py fax/__init__.py fax/coverpages.py fax/pmlfax.py
+dist_fax_SCRIPTS = fax/fax.py fax/__init__.py fax/coverpages.py fax/pmlfax.py fax/soapfax.py fax/faxdevice.py
 hpfaxdir = $(cupsbackenddir)
 dist_hpfax_SCRIPTS = fax/backend/hpfax.py
 faxppddir = $(hpppddir)
-dist_faxppd_DATA = fax/ppd/HP-Fax-hplip.ppd
+dist_faxppd_DATA = fax/ppd/HP-Fax-hplip.ppd fax/ppd/HP-Fax2-hplip.ppd
 endif
 
 # ptest
@@ -152,10 +152,7 @@ dist_noinst_DATA += data/localization/hplip_de.ts data/localization/hplip_es.ts 
 	data/localization/hplip_pt.ts data/localization/hplip_ru.ts data/localization/hplip_zh.ts
 
 # unreleased data
-if SHADOW_BUILD
-unreldir = $(hplipdir)/data/models/unreleased
-dist_unrel_DATA = data/models/unreleased/unreleased.dat
-endif
+include unreleased.inc
 
 # pcard 
 pcarddir = $(hplipdir)/pcard
@@ -226,7 +223,7 @@ lib_LTLIBRARIES += libhpmud.la
 libhpmud_la_SOURCES = io/hpmud/hpmud.c io/hpmud/mlc.c io/hpmud/model.c io/hpmud/musb.c io/hpmud/pml.c \
 	  io/hpmud/hpmud.h io/hpmud/hpmudi.h io/hpmud/list.h io/hpmud/mlc.h io/hpmud/musb.h io/hpmud/pml.h io/hpmud/dot4.c \
 	  io/hpmud/dot4.h io/hpmud/jd.c io/hpmud/jd.h io/hpmud/pp.c io/hpmud/pp.h 
-libhpmud_la_LDFLAGS = -version-info 0:1:0
+libhpmud_la_LDFLAGS = -version-info 0:2:0
 libhpmud_la_CFLAGS = -DMUDNAME=\"$(MUDNAME)\" -DCONFDIR=\"$(hplip_confdir)\"
 
 # hpmudext
@@ -277,7 +274,7 @@ endif
 if GUI_BUILD
 pluginsdir = $(hplipdir)/plugins
 dist_plugins_SCRIPTS = plugins/dj450.py plugins/__init__.py plugins/powersettings.py plugins/powersettingsdialog.py \
-	plugins/powersettingsdialog_base.py plugins/Deskjet_460.py
+	plugins/powersettingsdialog_base.py plugins/Deskjet_460.py plugins/Officejet_H470.py plugins/powersettings2.py
 endif
 
 # cheetah
@@ -320,36 +317,15 @@ hplip_conf_DATA = hplip.conf
 
 endif	# if HPLIP_BUILD
 
-# foomatic db
-src_db_dir = foomatic-db
-src_dbdir = foomatic-db/db/source
-src_cmddir = foomatic-db-engine
-src_hpijsdir = foomatic-db-hpijs
-include foomatic_db.inc
-foomatic_hpijs_options =  $(src_dbdir)/opt/hpijs-Duplex.xml $(src_dbdir)/opt/hpijs-InputSlot.xml $(src_dbdir)/opt/hpijs-Model.xml \
-	$(src_dbdir)/opt/hpijs-PageSize.xml $(src_dbdir)/opt/hpijs-PrintoutMode.xml $(src_dbdir)/opt/hpijs-Quality.xml
-foomatic_db_runtime = $(src_db_dir)/db/oldprinterids
-foomatic_db_engine_runtime =  $(src_cmddir)/configure.ac $(src_cmddir)/extract_pjl $(src_cmddir)/foomatic-addpjloptions.8.in \
-	$(src_cmddir)/foomatic-addpjloptions.in $(src_cmddir)/foomatic-cleanupdrivers.in $(src_cmddir)/foomatic-combo-xml.1.in \
-	$(src_cmddir)/foomatic-combo-xml.c $(src_cmddir)/foomatic-compiledb.1.in $(src_cmddir)/foomatic-compiledb.in \
-	$(src_cmddir)/foomatic-configure.1.in $(src_cmddir)/foomatic-configure.in $(src_cmddir)/Foomatic-Devel-Ideas.txt \
-	$(src_cmddir)/foomatic-extract-text.in $(src_cmddir)/foomatic-filters-ppds-install $(src_cmddir)/foomatic-fix-xml.in \
-	$(src_cmddir)/foomatic-getpjloptions.8.in $(src_cmddir)/foomatic-getpjloptions.in $(src_cmddir)/foomatic-kitload.8.in \
-	$(src_cmddir)/foomatic-kitload.in $(src_cmddir)/foomatic-nonumericalids.in $(src_cmddir)/foomatic-perl-data.1.in \
-	$(src_cmddir)/foomatic-perl-data.c $(src_cmddir)/foomatic-ppdfile.1.in $(src_cmddir)/foomatic-ppdfile.in \
-	$(src_cmddir)/foomatic-ppd-options.1.in $(src_cmddir)/foomatic-ppd-options.in $(src_cmddir)/foomatic-preferred-driver.8.in \
-	$(src_cmddir)/foomatic-preferred-driver.in $(src_cmddir)/foomatic-printermap-to-gimp-print-xml.in $(src_cmddir)/foomatic-printjob.1.in \
-	$(src_cmddir)/foomatic-printjob.in $(src_cmddir)/foomatic-replaceoldprinterids.in $(src_cmddir)/foomatic-searchprinter.in \
-	$(src_cmddir)/gsPrint $(src_cmddir)/gsQuit $(src_cmddir)/gsTest $(src_cmddir)/make_configure $(src_cmddir)/makeDefaults.in \
-	$(src_cmddir)/Makefile.in $(src_cmddir)/makeMan.in $(src_cmddir)/README $(src_cmddir)/lib/Makefile.PL \
-	$(src_cmddir)/lib/Foomatic/DB.pm $(src_cmddir)/lib/Foomatic/PPD.pm $(src_cmddir)/lib/Foomatic/UIElem.pm \
-	$(src_cmddir)/acinclude.m4
-foomatic_db_hpijs_runtime = $(src_hpijsdir)/acinclude.m4 $(src_hpijsdir)/configure.ac $(src_hpijsdir)/install-sh \
-	$(src_hpijsdir)/make_configure $(src_hpijsdir)/Makefile.in $(src_hpijsdir)/README \
-	$(src_hpijsdir)/data-generators/hpijs/hpijs-generator.in $(src_hpijsdir)/data-generators/hpijs/hpijs-printermap \
-	$(src_hpijsdir)/data-generators/hpijs/hpijs-remover.in
-dist_noinst_DATA += $(foomatic_xml_printers) $(foomatic_ps_printers) $(foomatic_ppd_printers) $(foomatic_hpijs_options) $(src_dbdir)/driver/hpijs.xml
-dist_noinst_SCRIPTS += $(foomatic_db_hpijs_runtime)
+# drv
+include foomatic_drv.inc
+dist_noinst_DATA += $(foomatic_ps_printers) $(foomatic_ppd_printers)
+
+# foomatic-rip-hplip
+if RIP_INSTALL
+ripdir = $(cupsfilterdir)
+dist_rip_SCRIPTS = prnt/hpijs/foomatic-rip-hplip
+endif
 
 # hpijs
 bin_PROGRAMS = hpijs
@@ -395,7 +371,7 @@ if HPLIP_BUILD
 hpijs_LDADD = libhpip.la libhpmud.la
 endif
 
-install-data-hook: install-foo 
+install-data-hook: install-foo
 if HPLIP_BUILD
 #	   If scanner build, add hpaio entry to sane dll.conf.
 	if [ "$(scan_build)" = "yes" ]; then \
@@ -438,23 +414,19 @@ install-foo:
 		  gzip -f $(DESTDIR)$(hpppddir)/$$id; \
 	   done; \
 	fi
-	if [ "$(foomatic_xml_install)" = "yes" ]; then \
-	   $(mkinstalldirs) $(DESTDIR)$(foomaticdir)/db/source/printer; \
-	   $(INSTALL_DATA) $(foomatic_xml_printers) $(DESTDIR)$(foomaticdir)/db/source/printer; \
-	   $(mkinstalldirs) $(DESTDIR)$(foomaticdir)/db/source/opt; \
-	   $(INSTALL_DATA) $(foomatic_hpijs_options) $(DESTDIR)$(foomaticdir)/db/source/opt; \
-	   $(mkinstalldirs) $(DESTDIR)$(foomaticdir)/db/source/driver; \
-	   $(INSTALL_DATA) $(src_dbdir)/driver/hpijs.xml $(DESTDIR)$(foomaticdir)/db/source/driver; \
-	   $(mkinstalldirs) $(DESTDIR)$(foomaticdir)/db/source/PPD/HP; \
-	   $(INSTALL_DATA) $(foomatic_ps_printers) $(DESTDIR)$(foomaticdir)/db/source/PPD/HP; \
+	if [ "$(foomatic_drv_install)" = "yes" ]; then \
+	   $(mkinstalldirs) $(DESTDIR)$(drvdir); \
+	   $(INSTALL_DATA) $(foomatic_drv) $(DESTDIR)$(drvdir); \
+	   $(mkinstalldirs) $(DESTDIR)$(hpppddir); \
+	   $(INSTALL_DATA) $(foomatic_ps_printers) $(DESTDIR)$(hpppddir); \
 	   for i in $(foomatic_ps_printers); do \
 		  id=`basename $$i`; \
-		  gzip -f $(DESTDIR)$(foomaticdir)/db/source/PPD/HP/$$id; \
+		  gzip -f $(DESTDIR)$(hpppddir)/$$id; \
 	   done; \
 	fi
 
 uninstall-foo: 
-	if [ "$(FOOMATIC_PPD_INSTALL)" = "yes" ]; then \
+	if [ "$(foomatic_ppd_install)" = "yes" ]; then \
 	   for i in $(foomatic_ppd_printers); do \
 		  id=`basename $$i`; \
 		  rm -f $(DESTDIR)$(hpppddir)/$$id.gz; \
@@ -464,13 +436,11 @@ uninstall-foo:
 		  rm -f $(DESTDIR)$(hpppddir)/$$id.gz; \
 	   done; \
 	fi
-	if [ "$(FOOMATIC_XML_INSTALL)" = "yes" ]; then \
-	   for i in $(foomatic_xml_printers); do \
-		  rm -f $(DESTDIR)$(foomaticdir)/db/source/printer/$$i; \
-	   done; \
+	if [ "$(foomatic_drv_install)" = "yes" ]; then \
+	   rm -f $(DESTDIR)$(drvdir)/$(foomatic_drv); \
 	   for i in $(foomatic_ps_printers); do \
 		  id=`basename $$i`; \
-		  rm -f $(DESTDIR)$(foomaticdir)/db/source/PPD/HP/$$id.gz; \
+		  rm -f $(DESTDIR)$(hpppddir)/$$id.gz; \
 	   done; \
 	fi
 
@@ -487,36 +457,3 @@ if HPLIP_BUILD
 	rm -f $(DESTDIR)$(faxppddir)/HP-Fax-hplip.ppd.gz
 endif
 
-# [WARNING SANDBOX OVERWRITE] Get latest hp specific foomatic db from linuxprinting.org
-get-foo:
-	rm -fr foo-tmp
-	install -d foo-tmp
-	bzr branch $(BZRSERVER)/foomatic-db foo-tmp/foomatic-db
-	bzr branch $(BZRSERVER)/foomatic-db-hpijs foo-tmp/foomatic-db-hpijs
-	bzr branch $(BZRSERVER)/foomatic-db-engine foo-tmp/foomatic-db-engine
-#	   Copy foomatic db runtimes into sandbox.
-	for i in $(foomatic_db_runtime) $(foomatic_db_engine_runtime) $(foomatic_db_hpijs_runtime); do \
-	   $(INSTALL_SCRIPT) foo-tmp/$$i $$i; \
-	done;
-#	   Copy hp specific printer xml files to sandbox.
-	for i in $(foomatic_xml_printers); do \
-	   $(INSTALL_SCRIPT) foo-tmp/$$i $$i; \
-	done;
-#	   Copy hp postscript ppd files to sandbox.
-	for i in $(foomatic_ps_printers); do \
-	   $(INSTALL_SCRIPT) foo-tmp/$$i $$i; \
-	done;
-
-# Remove all foomatic build files.
-clean-foo:
-	cd foomatic-db-hpijs; \
-	./make_configure; \
-	./configure; \
-	make distclean; \
-	rm -f aclocal.m4 configure Makefile
-	rm -f foo/foomatic-db/db/source/driver/*
-	rm -f foo/foomatic-db/db/source/opt/*
-	cd foomatic-db-engine; \
-	./make_configure; \
-	./configure; \
-	make distclean

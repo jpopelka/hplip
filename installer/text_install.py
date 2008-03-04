@@ -47,7 +47,7 @@ def option_question_callback(opt, desc):
 
 def start(language, auto=True, test_depends=False, test_unknown=False):
     try:
-        core =  CoreInstall(MODE_INSTALLER)
+        core =  CoreInstall(MODE_INSTALLER, INTERACTIVE_MODE)
     
         if core.running_as_root():
             log.error("You are running the installer as root. It is highly recommended that you run the installer as")
@@ -410,6 +410,7 @@ def start(language, auto=True, test_depends=False, test_unknown=False):
             log.notice("Installation of dependencies requires an active internet connection.")
 
             for depend, desc, required_for_opt, opt in core.missing_optional_dependencies():
+                
                 if required_for_opt:
                     log.warning("Missing REQUIRED dependency for option '%s': %s (%s)" % (opt, depend, desc))
 
@@ -465,7 +466,8 @@ def start(language, auto=True, test_depends=False, test_unknown=False):
             p = core.check_pkg_mgr()
             while p:
                 ok, user_input = tui.enter_choice("A package manager '%s' appears to be running. Please quit the package manager and press enter to continue (i=ignore, q=quit*) :" 
-                    % p, ['i'], 'q')
+                    % p, ['i', 'q'], 'q')
+                
                 if not ok: sys.exit(0)
                 
                 if user_input == 'i':
@@ -705,19 +707,19 @@ def start(language, auto=True, test_depends=False, test_unknown=False):
 
         tui.title("POST-BUILD COMMANDS")  
         core.run_post_build(progress_callback)
-
+        
         # Restart or re-plugin if necessary (always True in 2.7.9+)
         if core.restart_required:
             tui.title("RESTART OR RE-PLUG IS REQUIRED")
             cmd = core.su_sudo() % "hp-setup"
-            paragraph = """If you are installing a USB connected printer, and the printer was plugged in when you started this installer, you will need to either restart your PC or unplug and re-plug in your printer (USB cable only). If you choose to restart, run this command after restarting: %s  (Note: If you are using a parallel connection, you will have to restart your PC).""" % cmd 
+            paragraph = """If you are installing a USB connected printer, and the printer was plugged in when you started this installer, you will need to either restart your PC or unplug and re-plug in your printer (USB cable only). If you choose to restart, run this command after restarting: %s  (Note: If you are using a parallel connection, you will have to restart your PC. If you are using network/wireless, you can ignore and continue).""" % cmd 
             
             for p in tui.format_paragraph(paragraph):
                 log.info(p)
             log.info("")
                 
-            ok, choice = tui.enter_choice("Restart or re-plug in your printer (r=restart, p=re-plug in*, q=quit) : ", 
-                ['r', 'p'], 'p')
+            ok, choice = tui.enter_choice("Restart or re-plug in your printer (r=restart, p=re-plug in*, i=ignore/continue, q=quit) : ", 
+                ['r', 'p', 'i'], 'p')
                 
             if not ok: sys.exit(0)
             
@@ -734,10 +736,10 @@ def start(language, auto=True, test_depends=False, test_unknown=False):
                     
                 sys.exit(0)
                 
-            else: # 'p'
+            elif choice == 'p': # 'p'
                 if not tui.continue_prompt("Please unplug and re-plugin your printer now. "):
                     sys.exit(0)
-        
+                    
         #
         # SETUP PRINTER
         #

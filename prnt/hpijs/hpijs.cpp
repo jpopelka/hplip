@@ -458,7 +458,7 @@ int hpijs_get_client_raster(IjsServerCtx *ctx, char *buf, int size, char white)
    return size;
 }
 
-int main(int argc, char *argv[], char *evenp[])
+int main (int argc, char *argv[], char *evenp[])
 {
    UXServices *pSS = NULL;
    IjsServerCtx *ctx = NULL;
@@ -505,7 +505,7 @@ int main(int argc, char *argv[], char *evenp[])
       bug("unable to init capture");
 #endif
 
-   pSS->pPC = new PrintContext(pSS, 0, 0);
+   pSS->pPC = new PrintContext (pSS, 0, 0);
 
    /* Ignore JOB_CANCELED. This a bi-di hack that allows the job to continue even if bi-di communication failed. */
    if (pSS->pPC->constructor_error > 0 && pSS->DisplayStatus != DISPLAY_PRINTING_CANCELED)
@@ -513,9 +513,16 @@ int main(int argc, char *argv[], char *evenp[])
       bug("unable to open PrintContext object err=%d\n", pSS->pPC->constructor_error);
       goto BUGOUT;
    }
-    if (pSS->pPC->constructor_error < 0)
+
+/*
+ *  Ignore the WARN_MODE_MISMATCH warning. This will happen if we are talking to a monochrome printer.
+ *  We will select the correct printmode later.
+ */
+
+    if (pSS->pPC->constructor_error < 0 &&
+        pSS->pPC->constructor_error != WARN_MODE_MISMATCH)
     {
-        bug ("WARNING: %s\n", pSS->GetDriverMessage(pSS->pPC->constructor_error));
+        bug ("WARNING: %s\n", pSS->GetDriverMessage (pSS->pPC->constructor_error));
 		switch (pSS->pPC->constructor_error)
 		{
 			case WARN_LOW_INK_BOTH_PENS:
@@ -533,12 +540,12 @@ int main(int argc, char *argv[], char *evenp[])
 			case WARN_LOW_INK_MAGENTA:
 			case WARN_LOW_INK_YELLOW:
 			case WARN_LOW_INK_MULTIPLE_PENS:
-            {
-				bug ("STATE: marker-supply-low\n");
-                break;
-            }
+                        {
+			   bug ("STATE: marker-supply-low-warning\n");
+                           break;
+                        }
 			default:
-				bug ("STATE: -marker-supply-low");
+			   bug ("STATE: -marker-supply-low-warning");
 		}
     }
 

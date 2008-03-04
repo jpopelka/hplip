@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '2.6'
+__version__ = '2.7'
 __title__ = 'CUPS Fax Backend (hpfax:)'
 __doc__ = "CUPS backend for PC send fax. Generally this backend is run by CUPS, not directly by a user. To send a fax as a user, run hp-sendfax."
 
@@ -51,14 +51,14 @@ if os.path.exists(config_file):
     try:
         home_dir = config.get('dirs', 'home')
     except:
-        syslog.syslog(syslog.LOG_CRIT, "hpfax[%d]: error: Error setting home directory: home= under [dirs] not found." % pid)
+        syslog.syslog("hpfax[%d]: error: Error setting home directory: home= under [dirs] not found." % pid)
         sys.exit(1)
 else:
-    syslog.syslog(syslog.LOG_CRIT, "hpfax[%d]: error: Error setting home directory: /etc/hp/hplip.conf not found." % pid)
+    syslog.syslog("hpfax[%d]: error: Error setting home directory: /etc/hp/hplip.conf not found." % pid)
     sys.exit(1)
 
 if not home_dir or not os.path.exists(home_dir):
-    syslog.syslog(syslog.LOG_CRIT, "hpfax[%d]: error: Error setting home directory: Home directory %s not found." % (pid, home_dir))
+    syslog.syslog("hpfax[%d]: error: Error setting home directory: Home directory %s not found." % (pid, home_dir))
     sys.exit(1)
 
 sys.path.insert( 0, home_dir )
@@ -70,7 +70,7 @@ try:
     from base.service import sendEvent
     from prnt import cups
 except ImportError:
-    syslog.syslog(syslog.LOG_CRIT, "hpfax[%d]: error: Error importing HPLIP modules." % pid)
+    syslog.syslog("hpfax[%d]: error: Error importing HPLIP modules." % pid)
     sys.exit(1)
 
 log.set_module("hpfax")

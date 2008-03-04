@@ -1207,6 +1207,7 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) pp_dot4_channel_close(
 
 int __attribute__ ((visibility ("hidden"))) pp_probe_devices(char *lst, int lst_size, int *cnt)
 {
+   struct hpmud_model_attributes ma;
    char dev[HPMUD_LINE_SIZE];
    char rmodel[128];
    char model[128];
@@ -1230,6 +1231,14 @@ int __attribute__ ((visibility ("hidden"))) pp_probe_devices(char *lst, int lst_
                hpmud_get_model(id, model, sizeof(model));
                hpmud_get_raw_model(id, rmodel, sizeof(rmodel));
                snprintf(dev, sizeof(dev), "hp:/par/%s?device=/dev/parport%d", model, i);
+
+               /* See if device is supported by hplip. */
+               hpmud_query_model(dev, &ma); 
+               if (ma.support != HPMUD_SUPPORT_TYPE_HPLIP)
+               {
+                  BUG("ignoring %s support=%d\n", dev, ma.support);
+                  continue;           /* ignor, not supported */
+               }
 
                if (strncasecmp(rmodel, "hp ", 3) == 0)
                   size += sprintf(lst+size,"direct %s \"HP %s\" \"HP %s LPT parport%d HPLIP\" \"%s\"\n", dev, &rmodel[3], &rmodel[3], i, id);

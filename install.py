@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '3.0'
+__version__ = '3.1'
 __title__ = 'HPLIP Installer'
 __doc__ = "Installer for HPLIP tarball."
 
@@ -47,9 +47,9 @@ USAGE = [(__doc__, "", "name", True),
          ("Run in interactive (text) mode:", "-t or --text or -i or  --interactive (Default)", "option", False),
          utils.USAGE_SPACE,
          utils.USAGE_OPTIONS,
-         ("Automatic mode (chooses the most common options):", "-a or --auto", "option", False),
-         ("Force install of all dependencies (FOR TESTING ONLY):", "-x", "option", False),
-         ("Unknown distro mode (FOR TESTING ONLY):", "-d", "option", False),
+         ("Automatic mode (chooses the most common options):", "-a or --auto (text mode only)", "option", False),
+         ("Force install of all dependencies (FOR TESTING ONLY):", "-x (text mode only)", "option", False),
+         ("Unknown distro mode (FOR TESTING ONLY):", "-d (text mode only)", "option", False),
          utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
          utils.USAGE_HELP,
          utils.USAGE_SPACE,
@@ -127,7 +127,9 @@ for o, a in opts:
     elif o == '-d':
         log.warn("Unknown distro (-d) is for TESTING ONLY")
         test_unknown = True
-
+        
+        
+    
 log_file = os.path.normpath('./hplip-install_%s.log' % time.strftime("%a-%d-%b-%Y_%H:%M:%S"))
 
 if os.path.exists(log_file):
@@ -177,7 +179,7 @@ if mode == BROWSER_MODE:
 elif mode == INTERACTIVE_MODE:
     from installer import text_install
     log.debug("Starting text installer...")
-    text_install.start(language, auto, test_depends, test_unknown) # This is the -x and -d options 
+    text_install.start(language, auto, test_depends, test_unknown)
 
 else:
     log.error("Invalid mode. Please use '-i', '-t', '-u' or '-w' to select the mode.")

@@ -106,7 +106,7 @@ for o, a in opts:
 
     elif o in ('-p', '--printer'):
         if a.startswith('*'):
-            printer_name = cups.getDefault()
+            printer_name = cups.getDefaultPrinter()
             log.info("Using CUPS default printer: %s" % printer_name)
             log.debug(printer_name)
         else:
@@ -181,6 +181,9 @@ else:
         except Error:
             log.error("Error occured during interactive mode. Exiting.")
             sys.exit(1)
+    
+if delay:
+    time.sleep(delay)
 
 try:
     d = device.Device(device_uri, printer_name)
@@ -209,9 +212,6 @@ except Error, e:
 fw_download = d.mq.get('fw-download', 0)
 
 if fw_download:
-    if delay:
-        time.sleep(delay)
-        
     if d.downloadFirmware(usb_bus_id, usb_device_id):
         if not silent:
             log.info("Done.")

@@ -1915,6 +1915,7 @@ int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int ls
    struct usb_bus *bus;
    struct usb_device *dev;
    usb_dev_handle *hd;
+   struct hpmud_model_attributes ma;
    char rmodel[128];
    char rserial[128];
    char model[128];
@@ -1957,6 +1958,14 @@ int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int ls
             if (model[0])
             {
                snprintf(sz, sizeof(sz), "hp:/usb/%s?serial=%s", model, serial);
+
+               /* See if device is supported by hplip. */
+               hpmud_query_model(sz, &ma); 
+               if (ma.support != HPMUD_SUPPORT_TYPE_HPLIP)
+               {
+                  BUG("ignoring %s support=%d\n", sz, ma.support);
+                  continue;           /* ignor, not supported */
+               }
 
                /*
                 * For Cups 1.2 we append a dummy deviceid. A valid deviceid would require us to claim the USB interface, thus removing usblp. 

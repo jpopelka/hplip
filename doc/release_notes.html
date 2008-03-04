@@ -85,6 +85,83 @@ Release Notes
         <div class="document">
 <div class="section">
 <h1><a id="release-notes" name="release-notes">Release Notes</a></h1>
+<p><strong>HPLIP 2.8.2 - This release has the following changes:</strong></p>
+<ol class="arabic simple">
+<li>Corrected the IPP printer-state error messages in hp.c as requested by Tim Waugh.</li>
+<li>Fixed printmode mismatch warning for mono lasers.</li>
+<li>Fixed segmentation fault resulting from buffer overflow in compression.cpp</li>
+<li>HPIJS PPD files are now created with the CUPS DDK instead of the foomatic database. Dynamic PPD files are now supported via the hpijs.drv file. See the technical documentation for more information about drv support.</li>
+<li>Added foomatic-rip-hplip support. Foomatic-rip-hplip is for distros that do not have the latest foomatic-rip which is required for drv support.</li>
+<li>Added a new configure option for foomatic-rip-hplip. The following configure options are valid for the different types of PPD installs.</li>
+</ol>
+<pre class="literal-block">
+static ppd install with foomatic-rip-hplip
+  --enable-foomatic-ppd-install   [enable foomatic static ppd install, uses hpppdir]
+  --with-hpppddir  [destination for *-hpijs.ppd, *-ps.ppd and HP-Fax-hplip.ppd]
+  --enable-foomatic-rip-hplip-install
+dynamic ppd install with foomatic-rip-hplip
+  --enable-foomatic-drv-install   [enable foomatic dynamic ppd install, uses drvdir and hpppddir]
+  --with-drvdir  [destination for *.drv]
+  --with-hpppddir  [destination for *-ps.ppd and HP-Fax-hplip.ppd]
+  --enable-foomatic-rip-hplip-install
+dynamic ppd install with foomatic-rip
+  --enable-foomatic-drv-install   [enable foomatic dynamic ppd install, uses drvdir and hpppddir]
+  --with-drvdir  [destination for *.drv]
+  --with-hpppddir  [destination for *-ps.ppd and HP-Fax-hplip.ppd]
+  --disable-foomatic-rip-hplip-install
+</pre>
+<ol class="arabic simple" start="7">
+<li>Updated the krgb patch for gpl ghostscript 8.61. This patch added checks for null forward device in the graphic procedures. Corrected the &quot;force banding&quot; code in gsijs_open which was needed for small images (IE: hagaki in landscape).</li>
+<li>Fixed defect (Error message &quot;Print command fail with error 256&quot; pops up when assign page range using comma.)</li>
+<li>Fixed defect (Error message pops up when setup new device from toolbox by pressing the key &quot;INSERT&quot;.)</li>
+<li>Fixed defect (Running toolbox generates error: error: Invalid locale: de_DE.UTF-8.utf8)</li>
+<li>Fixed defect (Traceback information appears if delete the printer with root account in the &quot;Functions &gt; print &quot; tab of toolbox .)</li>
+<li>Fixed defect (The refresh function will be invalid if refresh the information of &quot;DeskJet 656c&quot; several times.)</li>
+<li>Fixed defect (The error &quot;Unable to mount photo card on device&quot; appears if delete device in &quot;Function-&gt;Unload Photo Card&quot; page on Officejet 7400.)</li>
+<li>Added a &quot;ignore/continue&quot; choice in the text installer in the RESTART OR RE-PLUG IS REQUIRED section for network installs.</li>
+<li>Fixed defect (Hplip installion process hangs up at &quot;PRINTER SETUP&quot; if select no GUIs during custom installion.)</li>
+<li>Updated the &quot;hp&quot; backend to return hplip supported devices only during device discovery. If the device is not in the models.dat file the &quot;hp&quot; backend will exclude this device from the discovery list.</li>
+<li>Added -c and -r params to hp-check, removed -p param</li>
+<li>Added new CUPS DDK dependencies to installers</li>
+<li>Added drv_dir to installers</li>
+<li>Added ppd_install=, ppd_dir=, and drv_dir= checks in installers</li>
+<li>Changed margins to .125 inch from 0</li>
+<li>Added power settings plugin support for the Officejet H470</li>
+<li>Added SOAP fax support (LJ M2727)</li>
+<li>Enhanced distro detection in the installer (properly handles Ubuntu 7.10)</li>
+<li>Fixed defect ([2.7.12] [Toolbox] installed w/o fax support causes traceback)</li>
+<li>Added support for non-English &quot;Password:&quot; prompts in the installer</li>
+<li>Added 'same_as_version' key to distros.dat</li>
+<li>Fixed an issue in the text installer that would not allow a 'quit' if a running package manager was detected</li>
+<li>Bumped libhpmud from 0.0.0 to 0.0.2 for support_type in hpmud_query_model().</li>
+<li>Added support for the following new printer(s):</li>
+</ol>
+<pre class="literal-block">
+- HP LaserJet P1006 (LJZjsMono w/plug-in)
+- HP LaserJet P1005 (LJZjsMono w/plug-in)
+- HP LaserJet P1505 (LJZjsMono w/Optional plug-in)
+- HP LaserJet P1505n (LJMono)
+- HP Officejet H470 (DJGenericVIP)
+- HP LaserJet P2014 (LJZjsMono w/Optional plug-in)
+</pre>
+<p><strong>HPLIP 2.8.2 - Known Issues</strong></p>
+<ol class="arabic simple">
+<li>User initiated printer status in the hp-toolbox is not available during the print job. Only the following printers are affected:</li>
+</ol>
+<pre class="literal-block">
+- HP Laserjet 1000
+- HP Laserjet 1005_series
+- HP Laserjet 1018
+- HP Laserjet 1020
+- HP Laserjet m1005
+- HP Laserjet p1005
+- HP Laserjet p1006
+- HP Laserjet p1007
+- HP Laserjet p1008
+- HP Laserjet p1505
+- HP Laserjet p1505n
+- HP Laserjet 1000
+</pre>
 <p><strong>HPLIP 2.7.12 - This release has the following changes:</strong></p>
 <ol class="arabic simple">
 <li>Enabled SendScanEvent in &quot;hp&quot; backend and libsane-hpaio.</li>
@@ -103,7 +180,7 @@ Release Notes
 <li>Fixed defect (Traceback information displays when enter &quot;hp-fab&quot; command in terminal after GUI mod is disable in installation process.)</li>
 <li>Changed OWNER from lp to root in 55-hpmud.rules as suggested by Suse.</li>
 <li>Added more gui install files.</li>
-<li>Bumped libhpmud from 0.0.0 to 0.1.0 for statustype support in hpmud_query_model().</li>
+<li>Bumped libhpmud from 0.0.0 to 0.0.1 for statustype support in hpmud_query_model().</li>
 <li>Fixed defect (There is not help documents of -q parameter when input hp-setup -h in terminal.)</li>
 <li>Fixed defect (Traceback information displays when edit or delete the nickname in fax address book which is added in Recipient(s).)</li>
 <li>Added support for the following new printer(s):</li>
@@ -2068,7 +2145,7 @@ where x equals: DJ630, DJ6xx, DJ6xxP, DJ8xx, DJ9xx or DJ9xxVIP
 </div>
 
 <hr size="1"/>
-<center><small>Page last updated: Wed Dec  5 16:40:32 2007; HPLIP Version: 2.7.12</small></center>
+<center><small>Page last updated: Fri Feb  8 18:05:14 2008; HPLIP Version: 2.8.2</small></center>
 </div>
 </td></tr></table>
 </div>

@@ -229,19 +229,19 @@ public:
 	float	PrintableStartX ()
 	{
 		//return (float) 0.25;
-		return (float) 0.0;
+		return (float) 0.125;
 	}
 	float	PrintableStartY ()
 	{
-		return (float) 0.0;
+		return (float) 0.125;
 	}
 	float	PrintableWidth ()
 	{
-		return fPaperWidth;
+		return fPaperWidth - (2.0 * 0.125);
 	}
 	float	PrintableHeight ()
 	{
-		return fPaperHeight;
+		return fPaperHeight - (2.0 * 0.125);
 	}
 	float	PhysicalPageSizeX ()
 	{

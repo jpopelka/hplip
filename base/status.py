@@ -236,6 +236,7 @@ def parseSStatus(s, z=''):
 def parseVStatus(s):
     pens, pen, c = [], {}, 0
     fields = s.split(',')
+    log.debug(fields)
     f0 = fields[0]
 
     if len(f0) == 20:
@@ -284,12 +285,20 @@ def parseVStatus(s):
     else:
         pass
 
-    if fields[2] == 'DN':
-        top_lid = 1
+    try:
+        fields[2]
+    except IndexError: 
+        top_lid = 1 # something went wrong!
     else:
-        top_lid = 2
+        if fields[2] == 'DN':
+            top_lid = 1
+        else:
+            top_lid = 2
 
-    stat = vstatus_xlate.get(fields[3].lower(), STATUS_PRINTER_IDLE)
+    try:
+        stat = vstatus_xlate.get(fields[3].lower(), STATUS_PRINTER_IDLE)
+    except IndexError:
+        stat = STATUS_PRINTER_IDLE # something went wrong!
 
     return {'revision' :   STATUS_REV_V,
              'agents' :     pens,
@@ -302,6 +311,7 @@ def parseVStatus(s):
              'in-tray2' :   IN_TRAY_NOT_PRESENT,
              'media-path' : MEDIA_PATH_CUT_SHEET, # ?
            }
+           
 
 def parseStatus(DeviceID):
     if 'VSTATUS' in DeviceID:
@@ -642,32 +652,33 @@ setup_panel_translator()
 
 def PanelCheck(dev):
     line1, line2 = '', ''
-    try:
-        dev.openPML()
-    except Error:
-        pass
-    else:
+    
+    if dev.io_mode not in (IO_MODE_RAW, IO_MODE_UNI):
+    
+        try:
+            dev.openPML()
+        except Error:
+            pass
+        else:
 
-        oids = [(pml.OID_HP_LINE1, pml.OID_HP_LINE2),
-                 (pml.OID_SPM_LINE1, pml.OID_SPM_LINE2)]
+            oids = [(pml.OID_HP_LINE1, pml.OID_HP_LINE2),
+                     (pml.OID_SPM_LINE1, pml.OID_SPM_LINE2)]
 
-        for oid1, oid2 in oids:
-            result, line1 = dev.getPML(oid1)
-
-            if result < pml.ERROR_MAX_OK:
-                line1 = PANEL_TRANSLATOR_FUNC(line1).rstrip()
-
-                if '\x0a' in line1:
-                    line1, line2 = line1.split('\x0a', 1)
-                    break
-
-                result, line2 = dev.getPML(oid2)
+            for oid1, oid2 in oids:
+                result, line1 = dev.getPML(oid1)
 
                 if result < pml.ERROR_MAX_OK:
-                    line2 = PANEL_TRANSLATOR_FUNC(line2).rstrip()
-                    break
+                    line1 = PANEL_TRANSLATOR_FUNC(line1).rstrip()
 
-        #dev.closePML()
+                    if '\x0a' in line1:
+                        line1, line2 = line1.split('\x0a', 1)
+                        break
+
+                    result, line2 = dev.getPML(oid2)
+
+                    if result < pml.ERROR_MAX_OK:
+                        line2 = PANEL_TRANSLATOR_FUNC(line2).rstrip()
+                        break
 
     return bool(line1 or line2), line1 or '', line2 or ''
 
@@ -700,7 +711,7 @@ BATTERY_PML_TRIGGER_MAP = {
         }
 
 
-def BatteryCheck(dev, status_block):
+def BatteryCheck(dev, status_block, battery_check):
     try_dynamic_counters = False
 
     try:
@@ -734,20 +745,23 @@ def BatteryCheck(dev, status_block):
                         agent_health = AGENT_HEALTH_OK
 
                     status_block['agents'].append({
-                                                    'kind'   : AGENT_KIND_INT_BATTERY,
-                                                    'type'   : AGENT_TYPE_UNSPECIFIED,
-                                                    'health' : agent_health,
-                                                    'level'  : battery_level,
-                                                    'level-trigger' : battery_trigger_level,
-                                                    })
+                        'kind'   : AGENT_KIND_INT_BATTERY,
+                        'type'   : AGENT_TYPE_UNSPECIFIED,
+                        'health' : agent_health,
+                        'level'  : battery_level,
+                        'level-trigger' : battery_trigger_level,
+                        })
+                    return
+                    
                 else:
                     status_block['agents'].append({
-                                                    'kind'   : AGENT_KIND_INT_BATTERY,
-                                                    'type'   : AGENT_TYPE_UNSPECIFIED,
-                                                    'health' : AGENT_HEALTH_UNKNOWN,
-                                                    'level'  : 0,
-                                                    'level-trigger' : AGENT_LEVEL_TRIGGER_SUFFICIENT_0,
-                                                    })
+                        'kind'   : AGENT_KIND_INT_BATTERY,
+                        'type'   : AGENT_TYPE_UNSPECIFIED,
+                        'health' : AGENT_HEALTH_UNKNOWN,
+                        'level'  : 0,
+                        'level-trigger' : AGENT_LEVEL_TRIGGER_SUFFICIENT_0,
+                        })
+                    return
 
             else:
                 try_dynamic_counters = True
@@ -755,7 +769,9 @@ def BatteryCheck(dev, status_block):
     finally:
         dev.closePML()
 
-    if try_dynamic_counters:
+    
+    if battery_check == STATUS_BATTERY_CHECK_STD and \
+        try_dynamic_counters:
 
         try:
             try:
@@ -764,22 +780,32 @@ def BatteryCheck(dev, status_block):
                 battery_level = dev.getDynamicCounter(202)
 
                 status_block['agents'].append({
-                                                'kind'   : AGENT_KIND_INT_BATTERY,
-                                                'type'   : AGENT_TYPE_UNSPECIFIED,
-                                                'health' : BATTERY_HEALTH_MAP[battery_health],
-                                                'level'  : battery_level,
-                                                'level-trigger' : BATTERY_TRIGGER_MAP[battery_trigger_level],
-                                                })
+                    'kind'   : AGENT_KIND_INT_BATTERY,
+                    'type'   : AGENT_TYPE_UNSPECIFIED,
+                    'health' : BATTERY_HEALTH_MAP[battery_health],
+                    'level'  : battery_level,
+                    'level-trigger' : BATTERY_TRIGGER_MAP[battery_trigger_level],
+                    })
             except Error:
                 status_block['agents'].append({
-                                                'kind'   : AGENT_KIND_INT_BATTERY,
-                                                'type'   : AGENT_TYPE_UNSPECIFIED,
-                                                'health' : AGENT_HEALTH_UNKNOWN,
-                                                'level'  : 0,
-                                                'level-trigger' : AGENT_LEVEL_TRIGGER_SUFFICIENT_0,
-                                                })
+                    'kind'   : AGENT_KIND_INT_BATTERY,
+                    'type'   : AGENT_TYPE_UNSPECIFIED,
+                    'health' : AGENT_HEALTH_UNKNOWN,
+                    'level'  : 0,
+                    'level-trigger' : AGENT_LEVEL_TRIGGER_SUFFICIENT_0,
+                    })
         finally:
             dev.closePrint()
+            
+    else:
+        status_block['agents'].append({
+            'kind'   : AGENT_KIND_INT_BATTERY,
+            'type'   : AGENT_TYPE_UNSPECIFIED,
+            'health' : AGENT_HEALTH_UNKNOWN,
+            'level'  : 0,
+            'level-trigger' : AGENT_LEVEL_TRIGGER_SUFFICIENT_0,
+            })
+        
 
 
 # this works for 2 pen products that allow 1 or 2 pens inserted
@@ -823,26 +849,29 @@ def getPenConfiguration(s): # s=status dict from parsed device ID
 
 def getFaxStatus(dev):
     tx_active, rx_active = False, False
+    
+    if dev.io_mode not in (IO_MODE_UNI, IO_MODE_RAW):
+        try:
+            dev.openPML()
 
-    try:
-        dev.openPML()
+            result_code, tx_state = dev.getPML(pml.OID_FAXJOB_TX_STATUS)
 
-        result_code, tx_state = dev.getPML(pml.OID_FAXJOB_TX_STATUS)
+            if result_code == ERROR_SUCCESS and tx_state:
+                if tx_state not in (pml.FAXJOB_TX_STATUS_IDLE, pml.FAXJOB_TX_STATUS_DONE):
+                    tx_active = True
 
-        if result_code == ERROR_SUCCESS and tx_state:
-            if tx_state not in (pml.FAXJOB_TX_STATUS_IDLE, pml.FAXJOB_TX_STATUS_DONE):
-                tx_active = True
+            result_code, rx_state = dev.getPML(pml.OID_FAXJOB_RX_STATUS)
 
-        result_code, rx_state = dev.getPML(pml.OID_FAXJOB_RX_STATUS)
+            if result_code == ERROR_SUCCESS and rx_state:
+                if rx_state not in (pml.FAXJOB_RX_STATUS_IDLE, pml.FAXJOB_RX_STATUS_DONE):
+                    rx_active = True
 
-        if result_code == ERROR_SUCCESS and rx_state:
-            if rx_state not in (pml.FAXJOB_RX_STATUS_IDLE, pml.FAXJOB_RX_STATUS_DONE):
-                rx_active = True
-
-    finally:
-        dev.closePML()
+        finally:
+            dev.closePML()
 
     return tx_active, rx_active
+    
+  
 
 
 TYPE6_STATUS_CODE_MAP = {

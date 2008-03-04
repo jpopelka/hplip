@@ -35,12 +35,10 @@ import os.path, os
 import struct, Queue, time
 
 fax_enabled = False
-#try:
-if 1:
-    from fax import fax
+try:
+    from fax import fax, faxdevice
     fax_enabled = True
-#except ImportError:
-if 0:
+except ImportError:
     # This can fail on Python < 2.3 due to the datetime module
     # or if fax was diabled during the build
     log.warn("Fax send disabled - Python 2.3+ required.")
@@ -1165,12 +1163,9 @@ class ScrollFaxView(ScrollView):
 
         QApplication.setOverrideCursor(QApplication.waitCursor)
 
-        #dev = fax.FaxDevice(device_uri=self.cur_device.device_uri, 
-        #                    printer_name=self.cur_printer)
-        
-        dev = fax.getFaxDevice(self.cur_device.device_uri,
-                               self.cur_printer, None, None, 
-                               self.cur_device.mq['fax-type'])
+        dev = faxdevice.FaxDevice(self.cur_device.device_uri,
+                                  self.cur_printer, None, None, 
+                                  self.cur_device.mq['fax-type'])
 
         try:
             try:

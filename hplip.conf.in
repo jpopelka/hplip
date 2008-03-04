@@ -16,7 +16,8 @@ ppdbase=@abs_ppddir@
 doc=@abs_docdir@
 icon=@icondir@
 cupsbackend=@cupsbackenddir@
-foomatic=@abs_foomaticdir@
+cupsfilter=@cupsfilterdir@
+drv=@abs_drvdir@
 
 # Following values are determined at configure time and cannot be changed.
 [configure]
@@ -28,6 +29,7 @@ fax-build=@fax_build@
 cups11-build=@cups11_build@
 doc-build=@doc_build@
 shadow-build=@shadow_build@
-foomatic-xml-install=@foomatic_xml_install@
+foomatic-drv-install=@foomatic_drv_install@
 foomatic-ppd-install=@foomatic_ppd_install@
+foomatic-rip-hplip-install=@foomatic_rip_hplip_install@
 internal-tag=@PACKAGE_BUGREPORT@

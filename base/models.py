@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -66,12 +66,13 @@ class ModelData:
             'pcard-type' : TYPE_INT,
             'plugin' : TYPE_INT,
             'plugin-library' : TYPE_STR,
+            'power-settings': TYPE_INT,
             'pq-diag-type' : TYPE_INT,
             'r-type' : TYPE_INT,
             'scan-style' : TYPE_INT,
             'scan-type' : TYPE_INT,
-            'status-battery-check' : TYPE_BOOL,
-            'status-dynamic-counters' : TYPE_BOOL,
+            'status-battery-check' : TYPE_INT,
+            'status-dynamic-counters' : TYPE_INT,
             'status-type' : TYPE_INT,
             'support-released' : TYPE_BOOL,
             'support-type' : TYPE_INT,

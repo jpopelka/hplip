@@ -214,8 +214,8 @@ class ScrollView(QScrollView):
             self.y += (widget.size().height() + self.item_margin)
             self.resizeContents(self.visibleWidth(), self.y + self.content_padding)
             widget.show()
-        else:
-            log.debug("ERROR: Duplicate control name: %s" % key)
+        #else:
+        #    log.debug("ERROR: Duplicate control name: %s" % key)
 
     def clear(self):
         if len(self.items):
