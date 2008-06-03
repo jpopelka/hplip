@@ -338,24 +338,18 @@ public:
 
 #endif
 
-#ifdef APDK_LINUX
     virtual DRIVER_ERROR    SendPerPageHeader (BOOL bLastPage)
     {
         return NO_ERROR;
     }
-    DRIVER_ERROR            SetHint (int iHint, int iValue)
+    virtual DRIVER_ERROR    SetHint (int iHint, int iValue)
     {
-        if (iHint & 0x1)
-        {
-            m_iNumPages = iValue;
-        }
-        else if (iHint & 0x2)
-        {
-            return SendPerPageHeader (iValue);
-        }
         return NO_ERROR;
     }
-#endif  // ifdef APDK_LINUX
+    virtual int GetHint (int iHint)
+    {
+        return 0;
+    }
 
 protected:
     SystemServices* pSS;

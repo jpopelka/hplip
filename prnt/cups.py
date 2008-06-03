@@ -20,8 +20,14 @@
 #
 
 # Std Lib
-import os, os.path, gzip
-import re, time, urllib, tempfile, glob
+import os
+import os.path
+import gzip
+import re
+import time
+import urllib
+import tempfile
+import glob
 
 # Local
 from base.g import *
@@ -39,6 +45,7 @@ except ImportError:
         sys.exit(1)
 
 nickname_pat = re.compile(r'''\*NickName:\s*\"(.*)"''', re.MULTILINE)
+pat_cups_error_log = re.compile("""^loglevel\s?(debug|debug2|warn|info|error|none)""", re.I)
 
 IPP_PRINTER_STATE_IDLE = 3
 IPP_PRINTER_STATE_PROCESSING = 4
@@ -132,8 +139,8 @@ CUPS_ERROR_BAD_PARAMETERS = 0x0f01
 
 
 
-def restartCUPS(): # must be root. How do you check for this?
-    os.system('killall -HUP cupsd')
+##def restartCUPS(): # must be root. How do you check for this?
+##    os.system('killall -HUP cupsd')
 
 def getPPDPath(addtional_paths=None):
     """
@@ -178,18 +185,18 @@ def getAllowableMIMETypes():
     allowable_mime_types.append("text/cpp")
 
     return allowable_mime_types
-    
+
 def getPPDDescription(f):
     if f.endswith('.gz'):
         nickname = gzip.GzipFile(f, 'r').read(4096)
     else:
         nickname = file(f, 'r').read(4096)
-    
+
     try:
         desc = nickname_pat.search(nickname).group(1)
     except AttributeError:
         desc = ''
-        
+
     return desc
 
 
@@ -202,11 +209,11 @@ def getSystemPPDs():
 
         for f in utils.walkFiles(sys_cfg.dirs.ppd, pattern="HP*ppd*;hp*ppd*", abs_paths=True):
             desc = getPPDDescription(f)
-            
+
             if not ('foo2' in desc or 
                     'gutenprint' in desc.lower() or 
                     'gutenprint' in f):
-                    
+
                 ppds[f] = desc
                 log.debug("%s: %s" % (f, desc))
 
@@ -223,34 +230,47 @@ def getSystemPPDs():
         log.debug("Foomatic PPD base path = %s" % foomatic_ppd_path)
 
         for ppd in ppd_dict:
+            if not ppd:
+                continue
+
             if 'hp-' in ppd.lower() or 'hp_' in ppd.lower() and \
                 ppd_dict[ppd]['ppd-make'] == 'HP':
-                
+
                 desc = ppd_dict[ppd]['ppd-make-and-model']
                 #print ppd, desc
-                
+
                 if not ('foo2' in desc.lower() or 
                         'gutenprint' in desc.lower() or 
                         'gutenprint' in ppd):
-                        
+
                     # PPD files returned by CUPS_GET_PPDS (and by lpinfo -m)
                     # can be relative to /usr/share/ppd/ or to 
                     # /usr/share/cups/model/. Not sure why this is.
                     # Here we will try both and see which one it is...
-                    path = os.path.join(foomatic_ppd_path, ppd)
                     
-                    if not os.path.exists(path):
-                        path = os.path.join(cups_ppd_path, ppd)
-                        
-                        if not os.path.exists(path):
-                            path = ppd # foomatic: or some other driver
-    
+                    if os.path.exists(ppd):
+                        path = ppd
+                    else:
+                        try:
+                            path = os.path.join(foomatic_ppd_path, ppd)
+                        except AttributeError: # happens on some boxes with provider: style ppds (foomatic: etc)
+                            path = ppd
+                        else:
+                            if not os.path.exists(path):
+                                try:
+                                    path = os.path.join(cups_ppd_path, ppd)
+                                except AttributeError:
+                                    path = ppd
+                                else:
+                                    if not os.path.exists(path):
+                                        path = ppd # foomatic: or some other driver
+
                     ppds[path] = desc
                     log.debug("%s: %s" % (path, desc))
 
     return ppds
 
-    
+
 # TODO: Move this to CUPSEXT for better performance
 def levenshtein_distance(a,b):
     """
@@ -265,16 +285,34 @@ def levenshtein_distance(a,b):
     current = range(n+1)
     for i in range(1,m+1):
         previous, current = current, [i]+[0]*m
+
         for j in range(1,n+1):
             add, delete = previous[j]+1, current[j-1]+1
             change = previous[j-1]
+
             if a[j-1] != b[i-1]:
                 change = change + 1
+
             current[j] = min(add, delete, change)
 
     return current[n]
 
+
 number_pat = re.compile(r""".*?(\d+)""", re.IGNORECASE)
+
+STRIP_STRINGS = ['-ps', '-pcl', 'foomatic:', '-hpijs', 'hp-', 'hp_', 
+                 '_series', '-hpijs', '.gz', '.ppd', '-series',
+                 '-zjs', '-lidil']
+
+def stripModel(model):
+    model = model.lower()
+
+    for x in STRIP_STRINGS:
+        model = model.replace(x, '')
+
+    return model
+
+
 
 def getPPDFile(stripped_model, ppds):
     """
@@ -286,10 +324,7 @@ def getPPDFile(stripped_model, ppds):
     min_edit_distance = sys.maxint
 
     for f in ppds:
-        t = os.path.basename(f).lower().replace('hp-', '').replace('-hpijs', '').\
-            replace('.gz', '').replace('.ppd', '').replace('hp_', '').replace('_series', '').\
-            replace('foomatic:', '').lower()
-
+        t = stripModel(os.path.basename(f))
         eds[f] = levenshtein_distance(stripped_model, t)
         log.debug("dist('%s', '%s') = %d" % (stripped_model, t, eds[f]))
         min_edit_distance = min(min_edit_distance, eds[f])
@@ -354,6 +389,69 @@ def getPPDFile(stripped_model, ppds):
     return mins
 
 
+def getErrorLogLevel():
+    cups_conf = '/etc/cups/cupsd.conf'
+    try:
+        f = file(cups_conf, 'r')
+    except OSError:
+        log.error("%s not found." % cups_conf)
+    except IOError:
+        log.error("%s: I/O error." % cups_conf)
+    else:
+        for l in f:
+            m = pat_cups_error_log.match(l)
+            if m is not None:
+                level = m.group(1).lower()
+                log.debug("CUPS error_log LogLevel: %s" % level)
+                return level
+
+    log.debug("CUPS error_log LogLevel: unknown")
+    return 'unknown'
+
+
+def getPrintJobErrorLog(job_id, max_lines=1000, cont_interval=5):
+    ret = []
+    s = '[Job %d]' % job_id
+    #level = getErrorLogLevel()
+    cups_conf = '/var/log/cups/error_log'
+
+    #if level in ('debug', 'debug2'):
+    if 1:
+        try:
+            f = file(cups_conf, 'r')
+        except (IOError, OSError):
+            log.error("Could not open the CUPS error_log file: %s" % cups_conf)
+            return ''
+
+        else:
+            if s in file(cups_conf, 'r').read():
+                queue = utils.Queue()
+                job_found = False
+
+                while True:
+                    line = f.readline()
+
+                    if s in line:
+                        job_found = True
+
+                        while len(queue):
+                            ret.append(queue.get())
+
+                        ret.append(line.strip())
+
+                        if len(ret) > max_lines:
+                            break
+
+                    else:
+                        if job_found:
+                            queue.put(line.strip())
+
+                            if len(queue) > cont_interval:
+                                break
+
+            return '\n'.join(ret)
+
+
 #
 # cupsext wrappers
 #
@@ -361,7 +459,7 @@ def getPPDFile(stripped_model, ppds):
 def getDefaultPrinter():
     r = cupsext.getDefaultPrinter()
     if r is None:
-        log.warning("The CUPS default printer is not set.")
+        log.debug("The CUPS default printer is not set.")
     return r
 
 def setDefaultPrinter(printer_name):
@@ -504,4 +602,4 @@ def removeOption(option):
 
 def setPasswordCallback(func):
     return cupsext.setPasswordCallback(func)
-    
+

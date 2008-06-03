@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui/devmgr4_base.ui'
+# Form implementation generated from reading ui file 'devmgr4_base.ui'
 #
-# Created: Mon May 21 16:06:42 2007
-#      by: The PyQt User Interface Compiler (pyuic) 3.17
+# Created: Mon Apr 28 10:56:51 2008
+#      by: The PyQt User Interface Compiler (pyuic) 3.17.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -25,33 +25,158 @@ class DevMgr4_base(QMainWindow):
 
         self.splitter2 = QSplitter(self.centralWidget(),"splitter2")
         self.splitter2.setOrientation(QSplitter.Horizontal)
-        self.splitter2.setOpaqueResize(1)
 
-        self.DeviceList = QIconView(self.splitter2,"DeviceList")
-        self.DeviceList.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Preferred,0,0,self.DeviceList.sizePolicy().hasHeightForWidth()))
+        LayoutWidget = QWidget(self.splitter2,"layout8")
+        layout8 = QVBoxLayout(LayoutWidget,11,6,"layout8")
+
+        self.DeviceList = QIconView(LayoutWidget,"DeviceList")
+        self.DeviceList.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Preferred,0,0,self.DeviceList.sizePolicy().hasHeightForWidth()))
+        self.DeviceList.setMinimumSize(QSize(0,0))
         self.DeviceList.setMaximumSize(QSize(32767,32767))
         self.DeviceList.setResizePolicy(QIconView.Manual)
         self.DeviceList.setArrangement(QIconView.TopToBottom)
         self.DeviceList.setResizeMode(QIconView.Adjust)
+        layout8.addWidget(self.DeviceList)
 
         self.Tabs = QTabWidget(self.splitter2,"Tabs")
 
         self.FunctionsTab = QWidget(self.Tabs,"FunctionsTab")
+        FunctionsTabLayout = QGridLayout(self.FunctionsTab,1,1,11,6,"FunctionsTabLayout")
+
+        self.iconList = QIconView(self.FunctionsTab,"iconList")
+        self.iconList.setFrameShape(QIconView.StyledPanel)
+        self.iconList.setFrameShadow(QIconView.Sunken)
+        self.iconList.setSelectionMode(QIconView.Single)
+        self.iconList.setGridX(100)
+        self.iconList.setGridY(100)
+        self.iconList.setResizeMode(QIconView.Adjust)
+        self.iconList.setShowToolTips(0)
+
+        FunctionsTabLayout.addWidget(self.iconList,0,0)
         self.Tabs.insertTab(self.FunctionsTab,QString.fromLatin1(""))
 
         self.StatusTab = QWidget(self.Tabs,"StatusTab")
+        StatusTabLayout = QGridLayout(self.StatusTab,1,1,11,6,"StatusTabLayout")
+
+        self.statusListView = QListView(self.StatusTab,"statusListView")
+        self.statusListView.addColumn(QString.null)
+        self.statusListView.addColumn(self.__tr("Description"))
+        self.statusListView.addColumn(self.__tr("Date and Time"))
+        self.statusListView.addColumn(self.__tr("Code"))
+        self.statusListView.addColumn(self.__tr("Job ID"))
+        self.statusListView.addColumn(self.__tr("User"))
+        self.statusListView.setSelectionMode(QListView.NoSelection)
+        self.statusListView.setAllColumnsShowFocus(1)
+        self.statusListView.setResizeMode(QListView.NoColumn)
+
+        StatusTabLayout.addWidget(self.statusListView,1,0)
+
+        layout11 = QHBoxLayout(None,0,6,"layout11")
+        spacer3 = QSpacerItem(20,20,QSizePolicy.Expanding,QSizePolicy.Minimum)
+        layout11.addItem(spacer3)
+
+        self.panel = QLabel(self.StatusTab,"panel")
+        self.panel.setSizePolicy(QSizePolicy(QSizePolicy.Fixed,QSizePolicy.Fixed,0,0,self.panel.sizePolicy().hasHeightForWidth()))
+        self.panel.setMinimumSize(QSize(254,40))
+        self.panel.setScaledContents(1)
+        layout11.addWidget(self.panel)
+        spacer4 = QSpacerItem(21,20,QSizePolicy.Expanding,QSizePolicy.Minimum)
+        layout11.addItem(spacer4)
+
+        StatusTabLayout.addLayout(layout11,0,0)
         self.Tabs.insertTab(self.StatusTab,QString.fromLatin1(""))
 
         self.SuppliesTab = QWidget(self.Tabs,"SuppliesTab")
-        self.Tabs.insertTab(self.SuppliesTab,QString.fromLatin1(""))
+        SuppliesTabLayout = QGridLayout(self.SuppliesTab,1,1,11,6,"SuppliesTabLayout")
 
-        self.MaintTab = QWidget(self.Tabs,"MaintTab")
-        self.Tabs.insertTab(self.MaintTab,QString.fromLatin1(""))
+        self.suppliesList = QListView(self.SuppliesTab,"suppliesList")
+        self.suppliesList.addColumn(QString.null)
+        self.suppliesList.addColumn(self.__tr("Description"))
+        self.suppliesList.addColumn(self.__tr("HP Part No."))
+        self.suppliesList.addColumn(self.__tr("Approx. Level"))
+        self.suppliesList.addColumn(self.__tr("Status"))
+        self.suppliesList.setSelectionMode(QListView.NoSelection)
+        self.suppliesList.setAllColumnsShowFocus(1)
+        self.suppliesList.setResizeMode(QListView.NoColumn)
+
+        SuppliesTabLayout.addWidget(self.suppliesList,0,0)
+        self.Tabs.insertTab(self.SuppliesTab,QString.fromLatin1(""))
 
         self.PrintSettingsTab = QWidget(self.Tabs,"PrintSettingsTab")
         self.Tabs.insertTab(self.PrintSettingsTab,QString.fromLatin1(""))
 
         self.PrintJobsTab = QWidget(self.Tabs,"PrintJobsTab")
+        PrintJobsTabLayout = QGridLayout(self.PrintJobsTab,1,1,11,6,"PrintJobsTabLayout")
+
+        self.groupBox2 = QGroupBox(self.PrintJobsTab,"groupBox2")
+        self.groupBox2.setColumnLayout(0,Qt.Vertical)
+        self.groupBox2.layout().setSpacing(6)
+        self.groupBox2.layout().setMargin(11)
+        groupBox2Layout = QGridLayout(self.groupBox2.layout())
+        groupBox2Layout.setAlignment(Qt.AlignTop)
+
+        self.jobList = QListView(self.groupBox2,"jobList")
+        self.jobList.addColumn(QString.null)
+        self.jobList.addColumn(QString.null)
+        self.jobList.addColumn(self.__tr("Title/Description"))
+        self.jobList.addColumn(self.__tr("Status"))
+        self.jobList.addColumn(self.__tr("Job ID"))
+        self.jobList.setSelectionMode(QListView.NoSelection)
+        self.jobList.setAllColumnsShowFocus(1)
+        self.jobList.setResizeMode(QListView.NoColumn)
+
+        groupBox2Layout.addMultiCellWidget(self.jobList,0,0,0,2)
+
+        self.cancelToolButton = QToolButton(self.groupBox2,"cancelToolButton")
+        self.cancelToolButton.setSizePolicy(QSizePolicy(QSizePolicy.Fixed,QSizePolicy.Fixed,0,0,self.cancelToolButton.sizePolicy().hasHeightForWidth()))
+        self.cancelToolButton.setMinimumSize(QSize(32,32))
+
+        groupBox2Layout.addWidget(self.cancelToolButton,1,0)
+
+        self.infoToolButton = QToolButton(self.groupBox2,"infoToolButton")
+        self.infoToolButton.setSizePolicy(QSizePolicy(QSizePolicy.Fixed,QSizePolicy.Fixed,0,0,self.infoToolButton.sizePolicy().hasHeightForWidth()))
+        self.infoToolButton.setMinimumSize(QSize(32,32))
+
+        groupBox2Layout.addWidget(self.infoToolButton,1,1)
+        spacer5 = QSpacerItem(360,20,QSizePolicy.Expanding,QSizePolicy.Minimum)
+        groupBox2Layout.addItem(spacer5,1,2)
+
+        PrintJobsTabLayout.addMultiCellWidget(self.groupBox2,2,2,0,3)
+
+        self.groupBox1 = QGroupBox(self.PrintJobsTab,"groupBox1")
+        self.groupBox1.setColumnLayout(0,Qt.Vertical)
+        self.groupBox1.layout().setSpacing(6)
+        self.groupBox1.layout().setMargin(11)
+        groupBox1Layout = QGridLayout(self.groupBox1.layout())
+        groupBox1Layout.setAlignment(Qt.AlignTop)
+
+        self.defaultPushButton = QPushButton(self.groupBox1,"defaultPushButton")
+
+        groupBox1Layout.addWidget(self.defaultPushButton,0,2)
+
+        self.rejectacceptPushButton = QPushButton(self.groupBox1,"rejectacceptPushButton")
+
+        groupBox1Layout.addWidget(self.rejectacceptPushButton,0,1)
+
+        self.stopstartPushButton = QPushButton(self.groupBox1,"stopstartPushButton")
+
+        groupBox1Layout.addWidget(self.stopstartPushButton,0,0)
+
+        PrintJobsTabLayout.addMultiCellWidget(self.groupBox1,1,1,0,3)
+        spacer6 = QSpacerItem(20,20,QSizePolicy.Preferred,QSizePolicy.Minimum)
+        PrintJobsTabLayout.addItem(spacer6,0,0)
+        spacer7 = QSpacerItem(20,20,QSizePolicy.Preferred,QSizePolicy.Minimum)
+        PrintJobsTabLayout.addItem(spacer7,0,3)
+
+        self.PrintJobPrinterCombo = QComboBox(0,self.PrintJobsTab,"PrintJobPrinterCombo")
+        self.PrintJobPrinterCombo.setSizePolicy(QSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed,0,0,self.PrintJobPrinterCombo.sizePolicy().hasHeightForWidth()))
+        self.PrintJobPrinterCombo.setMinimumSize(QSize(0,0))
+
+        PrintJobsTabLayout.addWidget(self.PrintJobPrinterCombo,0,2)
+
+        self.printerTextLabel = QLabel(self.PrintJobsTab,"printerTextLabel")
+
+        PrintJobsTabLayout.addWidget(self.printerTextLabel,0,1)
         self.Tabs.insertTab(self.PrintJobsTab,QString.fromLatin1(""))
 
         DevMgr4_baseLayout.addWidget(self.splitter2,0,0)
@@ -75,6 +200,8 @@ class DevMgr4_base(QMainWindow):
         self.deviceInstallAction = QAction(self,"deviceInstallAction")
         self.deviceRemoveAction = QAction(self,"deviceRemoveAction")
 
+
+        self.Toolbar = QToolBar(QString(""),self,Qt.DockTop)
 
 
 
@@ -109,7 +236,7 @@ class DevMgr4_base(QMainWindow):
 
         self.languageChange()
 
-        self.resize(QSize(812,518).expandedTo(self.minimumSizeHint()))
+        self.resize(QSize(778,505).expandedTo(self.minimumSizeHint()))
         self.clearWState(Qt.WState_Polished)
 
         self.connect(self.helpIndexAction,SIGNAL("activated()"),self.helpIndex)
@@ -117,28 +244,60 @@ class DevMgr4_base(QMainWindow):
         self.connect(self.helpAboutAction,SIGNAL("activated()"),self.helpAbout)
         self.connect(self.deviceExitAction,SIGNAL("activated()"),self.close)
         self.connect(self.deviceRescanAction,SIGNAL("activated()"),self.deviceRescanAction_activated)
-        self.connect(self.settingsEmailAlertsAction,SIGNAL("activated()"),self.settingsEmailAlertsAction_activated)
         self.connect(self.settingsConfigure,SIGNAL("activated()"),self.settingsConfigure_activated)
         self.connect(self.DeviceList,SIGNAL("currentChanged(QIconViewItem*)"),self.DeviceList_currentChanged)
         self.connect(self.deviceRefreshAll,SIGNAL("activated()"),self.deviceRefreshAll_activated)
         self.connect(self.DeviceList,SIGNAL("clicked(QIconViewItem*)"),self.DeviceList_clicked)
-        self.connect(self.autoRefresh,SIGNAL("toggled(bool)"),self.autoRefresh_toggled)
         self.connect(self.DeviceList,SIGNAL("rightButtonClicked(QIconViewItem*,const QPoint&)"),self.DeviceList_rightButtonClicked)
         self.connect(self.setupDevice,SIGNAL("activated()"),self.setupDevice_activated)
         self.connect(self.viewSupportAction,SIGNAL("activated()"),self.viewSupportAction_activated)
         self.connect(self.deviceInstallAction,SIGNAL("activated()"),self.deviceInstallAction_activated)
         self.connect(self.deviceRemoveAction,SIGNAL("activated()"),self.deviceRemoveAction_activated)
-        self.connect(self.Tabs,SIGNAL("currentChanged(QWidget*)"),self.Tabs_currentChanged)
         self.connect(self.DeviceList,SIGNAL("onItem(QIconViewItem*)"),self.DeviceList_onItem)
+        self.connect(self.Tabs,SIGNAL("currentChanged(QWidget*)"),self.Tabs_currentChanged)
+        self.connect(self.PrintJobPrinterCombo,SIGNAL("activated(const QString&)"),self.PrintJobPrinterCombo_activated)
+        self.connect(self.stopstartPushButton,SIGNAL("clicked()"),self.stopstartPushButton_clicked)
+        self.connect(self.rejectacceptPushButton,SIGNAL("clicked()"),self.rejectacceptPushButton_clicked)
+        self.connect(self.defaultPushButton,SIGNAL("clicked()"),self.defaultPushButton_clicked)
+        self.connect(self.iconList,SIGNAL("clicked(QIconViewItem*)"),self.iconList_clicked)
+        self.connect(self.iconList,SIGNAL("contextMenuRequested(QIconViewItem*,const QPoint&)"),self.iconList_contextMenuRequested)
+        self.connect(self.iconList,SIGNAL("returnPressed(QIconViewItem*)"),self.iconList_returnPressed)
+        self.connect(self.jobList,SIGNAL("clicked(QListViewItem*)"),self.jobList_clicked)
+        self.connect(self.infoToolButton,SIGNAL("clicked()"),self.infoToolButton_clicked)
+        self.connect(self.cancelToolButton,SIGNAL("clicked()"),self.cancelToolButton_clicked)
+        self.connect(self.jobList,SIGNAL("contextMenuRequested(QListViewItem*,const QPoint&,int)"),self.jobList_contextMenuRequested)
 
 
     def languageChange(self):
         self.setCaption(self.__tr("HP Device Manager"))
-        self.Tabs.changeTab(self.FunctionsTab,self.__tr("Functions"))
+        self.Tabs.changeTab(self.FunctionsTab,self.__tr("Actions"))
+        self.statusListView.header().setLabel(0,QString.null)
+        self.statusListView.header().setLabel(1,self.__tr("Description"))
+        self.statusListView.header().setLabel(2,self.__tr("Date and Time"))
+        self.statusListView.header().setLabel(3,self.__tr("Code"))
+        self.statusListView.header().setLabel(4,self.__tr("Job ID"))
+        self.statusListView.header().setLabel(5,self.__tr("User"))
         self.Tabs.changeTab(self.StatusTab,self.__tr("Status"))
+        self.suppliesList.header().setLabel(0,QString.null)
+        self.suppliesList.header().setLabel(1,self.__tr("Description"))
+        self.suppliesList.header().setLabel(2,self.__tr("HP Part No."))
+        self.suppliesList.header().setLabel(3,self.__tr("Approx. Level"))
+        self.suppliesList.header().setLabel(4,self.__tr("Status"))
         self.Tabs.changeTab(self.SuppliesTab,self.__tr("Supplies"))
-        self.Tabs.changeTab(self.MaintTab,self.__tr("Tools"))
         self.Tabs.changeTab(self.PrintSettingsTab,self.__tr("Print Settings"))
+        self.groupBox2.setTitle(self.__tr("Active Jobs"))
+        self.jobList.header().setLabel(0,QString.null)
+        self.jobList.header().setLabel(1,QString.null)
+        self.jobList.header().setLabel(2,self.__tr("Title/Description"))
+        self.jobList.header().setLabel(3,self.__tr("Status"))
+        self.jobList.header().setLabel(4,self.__tr("Job ID"))
+        self.cancelToolButton.setText(QString.null)
+        self.infoToolButton.setText(QString.null)
+        self.groupBox1.setTitle(self.__tr("Printer (Queue) Control"))
+        self.defaultPushButton.setText(self.__tr("Set As Default"))
+        self.rejectacceptPushButton.setText(self.__tr("Reject Jobs"))
+        self.stopstartPushButton.setText(self.__tr("Stop Printer"))
+        self.printerTextLabel.setText(self.__tr("Printer Name:"))
         self.Tabs.changeTab(self.PrintJobsTab,self.__tr("Print Control"))
         self.helpContentsAction.setText(self.__tr("Contents"))
         self.helpContentsAction.setMenuText(self.__tr("&Contents..."))
@@ -182,6 +341,7 @@ class DevMgr4_base(QMainWindow):
         self.deviceRemoveAction.setText(self.__tr("Remove Device..."))
         self.deviceRemoveAction.setMenuText(self.__tr("Remove Device..."))
         self.deviceRemoveAction.setAccel(self.__tr("Del"))
+        self.Toolbar.setLabel(self.__tr("Toolbar"))
         if self.MenuBar.findItem(2):
             self.MenuBar.findItem(2).setText(self.__tr("Device"))
         if self.MenuBar.findItem(3):
@@ -336,6 +496,51 @@ class DevMgr4_base(QMainWindow):
 
     def DeviceList_onItem(self,a0):
         print "DevMgr4_base.DeviceList_onItem(QIconViewItem*): Not implemented yet"
+
+    def iconList_doubleClicked(self,a0):
+        print "DevMgr4_base.iconList_doubleClicked(QIconViewItem*): Not implemented yet"
+
+    def iconList_rightButtonClicked(self,a0,a1):
+        print "DevMgr4_base.iconList_rightButtonClicked(QIconViewItem*,const QPoint&): Not implemented yet"
+
+    def iconList_clicked(self,a0):
+        print "DevMgr4_base.iconList_clicked(QIconViewItem*): Not implemented yet"
+
+    def iconList_contextMenuRequested(self,a0,a1):
+        print "DevMgr4_base.iconList_contextMenuRequested(QIconViewItem*,const QPoint&): Not implemented yet"
+
+    def iconList_returnPressed(self,a0):
+        print "DevMgr4_base.iconList_returnPressed(QIconViewItem*): Not implemented yet"
+
+    def stopstartPushButton_clicked(self):
+        print "DevMgr4_base.stopstartPushButton_clicked(): Not implemented yet"
+
+    def rejectacceptPushButton_clicked(self):
+        print "DevMgr4_base.rejectacceptPushButton_clicked(): Not implemented yet"
+
+    def defaultPushButton_clicked(self):
+        print "DevMgr4_base.defaultPushButton_clicked(): Not implemented yet"
+
+    def PrintJobPrinterCombo_activated(self,a0):
+        print "DevMgr4_base.PrintJobPrinterCombo_activated(const QString&): Not implemented yet"
+
+    def PrintSettingsPrinterCombo_activated(self,a0):
+        print "DevMgr4_base.PrintSettingsPrinterCombo_activated(const QString&): Not implemented yet"
+
+    def jobList_rightButtonClicked(self,a0,a1,a2):
+        print "DevMgr4_base.jobList_rightButtonClicked(QListViewItem*,const QPoint&,int): Not implemented yet"
+
+    def jobList_clicked(self,a0):
+        print "DevMgr4_base.jobList_clicked(QListViewItem*): Not implemented yet"
+
+    def infoToolButton_clicked(self):
+        print "DevMgr4_base.infoToolButton_clicked(): Not implemented yet"
+
+    def cancelToolButton_clicked(self):
+        print "DevMgr4_base.cancelToolButton_clicked(): Not implemented yet"
+
+    def jobList_contextMenuRequested(self,a0,a1,a2):
+        print "DevMgr4_base.jobList_contextMenuRequested(QListViewItem*,const QPoint&,int): Not implemented yet"
 
     def __tr(self,s,c = None):
         return qApp.translate("DevMgr4_base",s,c)

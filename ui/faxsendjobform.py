@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import operator
 from base.g import *
 from base import utils, device
 from prnt import cups
+from ui_utils import load_pixmap
 
 if 1:
 #try:
@@ -41,24 +42,30 @@ if 0:
 from qt import *
 from scrollfax import ScrollFaxView
 
-
+# dBus
+dbus_avail = False
+try:
+    import dbus
+except ImportError:
+    dbus_avail = False
+    
+    
+    
 class FaxSendJobForm(QMainWindow):
 
-    def __init__(self, sock, device_uri, printer_name, args, 
+    def __init__(self, device_uri, printer_name, args, 
                  parent=None, name=None, 
                  modal=0, fl=0):
 
         QMainWindow.__init__(self,parent,name,fl)
-        
-        icon = QPixmap(os.path.join(prop.image_dir, 'HPmenu.png'))
-        self.setIcon(icon)
-        
-        self.sock = sock
+
+        self.setIcon(load_pixmap('prog', '48x48'))
+
         self.init_failed = False
         self.device_uri = device_uri
         self.dev = None
         self.printer_name = printer_name
-        bus = 'cups'
+        bus = ['cups']
         self.filename = ''
         self.username = prop.username
         self.args = args
@@ -84,14 +91,14 @@ class FaxSendJobForm(QMainWindow):
                     self.device_uri = p.device_uri
                     found = True
                     break
-    
+
             if not found:
                 self.FailureUI(self.__tr("<b>Unknown printer name: %1</b><p>Please check the printer name and try again.").arg(self.printer_name))
-    
+
             if found and not p.device_uri.startswith('hpfax:/'):
                 self.FailureUI(self.__tr("You must specify a printer that has a device URI in the form 'hpfax:/...'"))
                 self.init_failed = True
-        
+
         if not self.device_uri and not self.printer_name:
             t = device.probeDevices(bus=bus, filter={'fax-type':(operator.gt, 0)})
             probed_devices = []
@@ -109,10 +116,13 @@ class FaxSendJobForm(QMainWindow):
                 for p in self.cups_printers:
                     if p.device_uri == d:
                         printers.append(p.name)
+                
                 devices[x] = (d, printers)
-                x += 1
+                #x += 1
                 max_deviceid_size = max(len(d), max_deviceid_size)
 
+            x = len(devices)
+            
             if x == 0:
                 from nodevicesform import NoDevicesForm
                 self.FailureUI(self.__tr("<p><b>No devices found.</b><p>Please make sure your device is properly installed and try again."))
@@ -129,28 +139,29 @@ class FaxSendJobForm(QMainWindow):
                     self.device_uri = dlg.device_uri
                 else:
                     self.init_failed = True
+                    
+        self.dbus_avail, self.service = device.init_dbus()
 
-        self.FaxView = ScrollFaxView(self.sock, False, self.centralWidget(), self)
+        self.FaxView = ScrollFaxView(self.service, self.centralWidget(), self)
         self.FormLayout.addWidget(self.FaxView,0,0)
-        
+
         if not self.init_failed:
             try:
                 self.cur_device = device.Device(device_uri=self.device_uri, 
-                                                 printer_name=self.printer_name, 
-                                                 hpssd_sock=self.sock)
+                                                 printer_name=self.printer_name)
             except Error, e:
                 log.error("Invalid device URI or printer name.")
                 self.FailureUI("<b>Invalid device URI or printer name.</b><p>Please check the parameters to hp-print and try again.")
                 self.init_failed = True
-    
+
             else:
                 self.device_uri = self.cur_device.device_uri
                 user_cfg.last_used.device_uri = self.device_uri
-    
+
                 log.debug(self.device_uri)
-            
+
                 self.statusBar().message(self.device_uri)        
-        
+
         QTimer.singleShot(0, self.InitialUpdate)
 
 
@@ -160,17 +171,23 @@ class FaxSendJobForm(QMainWindow):
             return      
 
         self.FaxView.onDeviceChange(self.cur_device)
-        
+
         if self.args is not None:
             for f in self.args:
                 self.FaxView.processFile(f)
-                
+
         if self.printer_name is not None:
             self.FaxView.onPrinterChange(self.printer_name)
 
 
     def languageChange(self):
         self.setCaption(self.__tr("HP Device Manager - Send Fax"))
+        
+    def closeEvent(self, event):
+        #print "close"
+        print self.FaxView.lock_file
+        utils.unlock(self.FaxView.lock_file)
+        event.accept()
 
     def SuccessUI(self):
         QMessageBox.information(self,
@@ -181,6 +198,7 @@ class FaxSendJobForm(QMainWindow):
                               QMessageBox.NoButton)
 
     def FailureUI(self, error_text):
+        log.error(unicode(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", " "))
         QMessageBox.critical(self,
                              self.caption(),
                              error_text,
@@ -189,6 +207,7 @@ class FaxSendJobForm(QMainWindow):
                               QMessageBox.NoButton)
 
     def WarningUI(self, msg):
+        log.warn(unicode(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", " "))   
         QMessageBox.warning(self,
                              self.caption(),
                              msg,

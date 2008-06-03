@@ -8,8 +8,9 @@
 <META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE" />
 <META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 22 Jul 2002 11:12:01 GMT" />
 <META NAME="DESCRIPTION" CONTENT="HP Linux Imaging and Printing - HPLIP is an HP developed solution for printing, scanning, and faxing with HP inkjet and laser based printers in Linux.">
-<META NAME="KEYWORDS" CONTENT="HPLIP, HP, Linux, Printing, HPIJS">
+<META NAME="KEYWORDS" CONTENT="HPLIP, HP, Linux, Printing, HPIJS, Linux Printing, OfficeJet, LaserJet, DeskJet, Photosmart, PSC, Color Laserjet, Business InkJet">
 </head>
+
 <body>
 <div id="page"><!-- start page -->
 <div id="container"><!-- start main container -->
@@ -17,6 +18,10 @@
 
 <div id="banner">
 <div id="banner_graphics">
+<center>
+<img src="../../../images/hpliplogo2.png" alt="HP Logo" border="0" />
+</center>
+<!--
         <div id="floatleft">
         <img src="../../../images/hplogo2.png" alt="HP Logo" border="0" />
         </div>
@@ -27,21 +32,21 @@
         </div>
         <div id="floatright">
         <img src="../../../images/tuxlogo2.png" alt="Tux" border="0" />
-        </div>
+        </div> 
+-->
     </div>
 </div>
 <!-- end banner -->
 
-<div id="navbar">
+<!-- <div id="navbar"> -->
 <table>
     <tr>
         <td valign="top">
 <div id="sidebar-a">
 <ul id="sidebar-a-list">
-    <menu compact="compact">
-        <div class="menuheader"><a href="../../../index.html" title="">Home</a></div>
-    </menu>
-
+<div class="menuheader">
+	<a href="../../../index.html" title="">Home</a></div>
+<br />
 <div class="menuheader">About</div>
     <menu compact="compact">
         <li><a href="../../../features.html" title="">Features</a></li> 
@@ -49,20 +54,23 @@
         <li><a href="../../../faqs.html" title="FAQs">FAQs</a></li> 
         <li><a a href="../../../about.html" title="About">About HPLIP</a></li>
     </menu>
+<br />
 <div class="menuheader">Setup and Installation</div>
     <menu compact="compact">
-        <li><a href="../../../downloads.html" title="Downloads">Download HPLIP</a></li>
-        <li><a href="../../../install/index.html" title="Installation Instructions">Installation Instructions</a></li> 
+        <li><a href="../../../downloads.html" title="Downloads">Download and Install</a></li>
+        <!-- <li><a href="../../../install/index.html" title="Installation Instructions">Installation Instructions</a></li> -->
         <li><a href="../../../system_requirements.html" title="System Requirements">System Requirements</a></li> 
-        <li><a href="../../../supported_devices/index.html" title="Supported Devices">Supported Devices</a></li> 
+        <li><a href="../../../supported_devices/index.html" title="Supported Devices">Supported Printers</a></li> 
     </menu>
+<br />
 <div class="menuheader">Usage and Support</div>
     <menu compact="compact">
-        <li><a href="../../../mailing_lists.html" title="Mailing Lists">Support</a></li>
+        <li><a href="../../../mailing_lists.html" title="Mailing Lists">Contact Support</a></li>
         <li><a href="../../../howtos/index.html" title="How-Tos">How-Tos</a></li> 
         <li><a href="../../../troubleshooting/index.html" title="Troubleshooting">Troubleshooting</a></li>
         <li><a href="../../../release_notes.html" title="Release Notes">Release Notes</a></li>
     </menu>
+<br />
 <div class="menuheader">Resources</div>
     <menu compact="compact">
         <li><a href="../../../tech_docs/index.html" title="">Technical Documentation</a></li> 
@@ -71,6 +79,7 @@
         <li><a a href="../../../other_support.html" title="Other Support Information">Other Support Information</a></li>
         <li><a href="../../../contacts.html" title="Contacts">Contacts</a></li>
     </menu>
+<br />
 </ul>
 </div>
 <!-- end sidebar --></td>
@@ -79,7 +88,7 @@
 <div id="content"><!-- start content -->
         <a href="../../../index.html">Home</a>
 &gt;
-<a href="../../index.html">Installation</a>
+<a href="../../index.html">Download and Install</a>
 &gt;
 <a href="../index.html">Manual Install</a>
 &gt;
@@ -98,12 +107,11 @@ Other Linux Versions
 <h1><a id="step-2" name="step-2">Step 2</a></h1>
 <p>Install these HPLIP dependencies using your distribution's package management tool:</p>
 <p>(<em>Note</em>: Your package names will vary depending on your Linux distribution. please refer to your Linux distribution documentation and/or support resources.)</p>
-<blockquote>
 <table border="1" class="docutils">
 <colgroup>
-<col width="20%" />
-<col width="49%" />
-<col width="31%" />
+<col width="14%" />
+<col width="58%" />
+<col width="27%" />
 </colgroup>
 <thead valign="bottom">
 <tr><th class="head">Dependency</th>
@@ -112,93 +120,112 @@ Other Linux Versions
 </tr>
 </thead>
 <tbody valign="top">
-<tr><td>libcrypto</td>
-<td>OpenSSL cryptographic library</td>
+<tr><td>cups</td>
+<td>cups - Common Unix Printing System</td>
 <td>Yes</td>
 </tr>
-<tr><td>gcc</td>
-<td>GNU Project C and C++ Compiler</td>
-<td>Yes</td>
-</tr>
-<tr><td>GhostScript</td>
-<td>PostScript and PDF language interpreter and previewer.</td>
-<td>Yes</td>
-</tr>
-<tr><td>libjpeg</td>
-<td>JPEG library</td>
-<td>Yes</td>
-</tr>
-<tr><td>libpthread</td>
-<td>POSIX threads library</td>
-<td>Yes</td>
-</tr>
-<tr><td>make</td>
-<td>GNU make utility to maintain groups of programs</td>
-<td>Yes</td>
+<tr><td>cups-ddk</td>
+<td>cups-ddk - CUPS driver development kit</td>
+<td>No</td>
 </tr>
 <tr><td>cups-devel</td>
-<td>Common Unix Printing System development files</td>
+<td>cups-devel- Common Unix Printing System development files</td>
+<td>Yes</td>
+</tr>
+<tr><td>dbus</td>
+<td>dbus - Message bus system</td>
+<td>No, optional for fax support.</td>
+</tr>
+<tr><td>gcc</td>
+<td>gcc - GNU Project C and C++ Compiler</td>
+<td>Yes</td>
+</tr>
+<tr><td>gs</td>
+<td>GhostScript - PostScript and PDF language interpreter and previewer</td>
+<td>Yes</td>
+</tr>
+<tr><td>libcrypto</td>
+<td>libcrypto - OpenSSL cryptographic library</td>
+<td>No, optional for network support.</td>
+</tr>
+<tr><td>libjpeg</td>
+<td>libjpeg - JPEG library</td>
+<td>Yes</td>
+</tr>
+<tr><td>libnetsnmp-devel</td>
+<td>libnetsnmp-devel - SNMP networking library development files</td>
+<td>No, optional for network support.</td>
+</tr>
+<tr><td>libpthread</td>
+<td>libpthread - POSIX threads library</td>
+<td>Yes</td>
+</tr>
+<tr><td>libtool</td>
+<td>libtool - Library building support services</td>
 <td>Yes</td>
 </tr>
 <tr><td>libusb</td>
-<td>USB library</td>
+<td>libusb - USB library</td>
 <td>Yes</td>
 </tr>
-<tr><td>python2.2+</td>
-<td>Python programming language version 2.2 or greater</td>
+<tr><td>make</td>
+<td>make - GNU make utility to maintain groups of programs</td>
 <td>Yes</td>
 </tr>
-<tr><td>LSB</td>
-<td>Linux Standard Base support</td>
-<td>Yes</td>
-</tr>
-<tr><td>cups</td>
-<td>Common Unix Printing System</td>
-<td>Yes</td>
-</tr>
-<tr><td>python-devel</td>
-<td>Python development files</td>
-<td>Yes</td>
-</tr>
-<tr><td>Reportlab</td>
-<td>PDF library for Python</td>
-<td>No, optional for fax cover pages</td>
-</tr>
-<tr><td>PyQt</td>
-<td>Qt interface for Python</td>
-<td>No, optional for GUI</td>
+<tr><td>pil</td>
+<td>PIL - Python Imaging Library (required for commandline scanning with hp-scan)</td>
+<td>No, optional for scan support.</td>
 </tr>
 <tr><td>ppdev</td>
-<td>Parallel port support kernel module</td>
-<td>No, optional for parallel port I/O</td>
+<td>ppdev - Parallel port support kernel module.</td>
+<td>No, optional for parallel support.</td>
+</tr>
+<tr><td>pyqt</td>
+<td>PyQt - Qt interface for Python</td>
+<td>No, optional for gui support.</td>
+</tr>
+<tr><td>python-ctypes</td>
+<td>python-ctypes - A foreign function library for Python</td>
+<td>No, optional for fax support.</td>
+</tr>
+<tr><td>python-dbus</td>
+<td>python-dbus - Python bindings for dbus</td>
+<td>No, optional for fax support.</td>
+</tr>
+<tr><td>python-devel</td>
+<td>python-devel - Python development files</td>
+<td>Yes</td>
+</tr>
+<tr><td>python23</td>
+<td>Python 2.3 or greater - Required for fax functionality</td>
+<td>No, optional for fax support.</td>
+</tr>
+<tr><td>python2x</td>
+<td>Python 2.2 or greater - Python programming language</td>
+<td>Yes</td>
+</tr>
+<tr><td>reportlab</td>
+<td>Reportlab - PDF library for Python</td>
+<td>No, optional for fax support.</td>
+</tr>
+<tr><td>sane</td>
+<td>SANE - Scanning library</td>
+<td>No, optional for scan support.</td>
+</tr>
+<tr><td>sane-devel</td>
+<td>SANE - Scanning library development files</td>
+<td>No, optional for scan support.</td>
 </tr>
 <tr><td>scanimage</td>
-<td>Shell scanning program</td>
-<td>No, optional for scanning support</td>
-</tr>
-<tr><td>libnetsnmp-devel</td>
-<td>SNMP networking library development files</td>
-<td>No, optional for networking support</td>
+<td>scanimage - Shell scanning program</td>
+<td>No, optional for scan support.</td>
 </tr>
 <tr><td>xsane</td>
-<td>Graphical scanner frontend for SANE</td>
-<td>No, optional for scanning support</td>
-</tr>
-<tr><td>python2.3+</td>
-<td>Python programming language version 2.3 or greater</td>
-<td>No, optional for fax support</td>
-</tr>
-<tr><td>SANE</td>
-<td>SANE scanning library</td>
-<td>No, optional for scanning support</td>
-</tr>
-<tr><td>python-imaging</td>
-<td>Scanning library</td>
-<td>No, optional for scanning support</td>
+<td>xsane - Graphical scanner frontend for SANE</td>
+<td>No, optional for scan support.</td>
 </tr>
 </tbody>
 </table>
-</blockquote>
 </div>
 <div class="section">
 <h1><a id="step-3" name="step-3">Step 3</a></h1>
@@ -231,24 +258,24 @@ For specific information on using ./configure and the different options <a href=
 </div>
 </div>
 
-<hr size="1"/>
-<center><small>Page last updated: Thu Sep 13 14:58:19 2007; HPLIP Version: 2.8.2</small></center>
 </div>
 </td></tr></table>
-</div>
+<hr>
 <!-- end content -->
 <!-- end container -->
+<div id="pageupdate">
+<center>Page last updated: Thu May  8 09:25:32 2008; HPLIP Version: 2.8.5</center>
+</div>
 <div id="footer"><!-- start footer -->
-        <hr size="1"/>
-        <a href="../../../legal.html">Legal Notices</a>
-        Copyright &#169; 2003-2007, Hewlett-Packard Development Company, L.P.
-        <a href="mailto:hplip@hp.com">Contact Site Maintainer</a><br>
+        <a href="http://welcome.hp.com/country/us/en/privacy.html">Privacy Statement</a> |
+        <a href="http://welcome.hp.com/country/us/en/termsofuse.html">Using this site means you accept its terms</a> |
+        &#169; 2008 Hewlett-Packard Development Company, L.P. <br />
         <a href="http://sourceforge.net/" alt="Hosted by Sourceforge.net"><img src="../../../images/sflogo.png" border="0"></a>
 </div>
 <!-- end footer -->
 </div><!-- end page -->
-
-<!-- google analytics -->
+</div> 
+<!-- google analytics from aaron's account-->
 <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
 </script>
 <script type="text/javascript">
@@ -264,13 +291,27 @@ urchinTracker();
 </script>
 <!-- end google analytics -->
 
+<!-- end google analytics from hplip.marketing@gmail.com-->
 
-<!-- START OF ACTIVEMETER CODE -->
-<script type="text/javascript" language="javascript">
-var __pid=30231;
-var __am_invisible=1;
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
 </script>
-<!-- END OF ACTIVEMETER CODE -->
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-1543832-10");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+
+<!-- end google analytics from hplip.marketing@gmail.com -->
+
+
+<!-- Begin METRICS Javascript -->
+
+<script language="JavaScript" type="text/javascript"
+src="http://welcome.hp-ww.com/cma/region/na/metricsNAgeneric.js"></script>
+
+<!-- End METRICS Javascript --> 
 
 </body>
 </html>

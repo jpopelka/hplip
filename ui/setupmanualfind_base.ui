@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>561</width>
-            <height>184</height>
+            <width>646</width>
+            <height>226</height>
         </rect>
     </property>
     <property name="caption">
@@ -147,9 +147,6 @@
     <tabstop>pushButton12</tabstop>
     <tabstop>pushButton11</tabstop>
 </tabstops>
-<includes>
-    <include location="local" impldecl="in implementation">setupmanualfind_base.ui.h</include>
-</includes>
 <slots>
     <slot>findLineEdit_textChanged( const QString &amp; )</slot>
 </slots>

@@ -20,14 +20,19 @@
 # Author: Don Welch
 #
 
-__version__ = '4.0'
+__version__ = '4.1'
 __title__ = "Fax Address Book"
 __doc__ = "A simple fax address book for HPLIP."
 
+# Std Lib
 import cmd
+import getopt
+import os
+
+# Local
 from base.g import *
 from base import utils, tui
-import getopt
+
 
 log.set_module("hp-fab")
 
@@ -68,7 +73,7 @@ class Console(cmd.Cmd):
     def __init__(self):
         cmd.Cmd.__init__(self)
         self.intro  = "Type 'help' for a list of commands. Type 'exit' or 'quit' to quit."
-        self.db =  fax.FaxAddressBook2() # database instance
+        self.db =  fax.FaxAddressBook() # database instance
         self.prompt = log.bold("hp-fab > ")
 
     # Command definitions
@@ -135,7 +140,7 @@ class Console(cmd.Cmd):
         pass
 
     def default(self, line):
-        print log.red("error: Unrecognized command. Use 'help' to list commands.")
+        log.error("Unrecognized command. Use 'help' to list commands.")
 
     def get_nickname(self, args, fail_if_match=True, alt_text=False):
         if not args:
@@ -153,18 +158,18 @@ class Console(cmd.Cmd):
                     if alt_text:
                         return ''
                     else:
-                        print log.red("error: Nickname must not be blank.")
+                        log.error("Nickname must not be blank.")
                         continue
 
 
                 if fail_if_match:
                     if self.db.get(nickname) is not None:
-                        print log.red("error: Name already exists. Please choose a different name.")
+                        log.error("Name already exists. Please choose a different name.")
                         continue
 
                 else:
                     if self.db.get(nickname) is None:
-                        print log.red("error: Name not found. Please enter a different name.")
+                        log.error("Name not found. Please enter a different name.")
                         continue
 
                 break
@@ -174,12 +179,12 @@ class Console(cmd.Cmd):
 
             if fail_if_match:
                 if self.db.get(nickname) is not None:
-                    print log.red("error: Name already exists. Please choose a different name.")
+                    log.error("Name already exists. Please choose a different name.")
                     return ''
 
             else:
                 if self.db.get(nickname) is None:
-                    print log.red("error: Name not found. Please enter a different name.")
+                    log.error("Name not found. Please enter a different name.")
                     return ''
 
         return nickname
@@ -187,7 +192,7 @@ class Console(cmd.Cmd):
 
     def get_groupname(self, args, fail_if_match=True, alt_text=False):
         all_groups = self.db.get_all_groups()
-        
+
         if not args:
             while True:
                 if alt_text:
@@ -204,17 +209,17 @@ class Console(cmd.Cmd):
                     if alt_text:
                         return ''
                     else:
-                        print log.red("error: The group name must not be blank.")
+                        log.error("The group name must not be blank.")
                         continue
 
                 if fail_if_match: 
                     if groupname in all_groups:
-                        print log.red("error: Name already exists. Please choose a different name.")
+                        log.error("Name already exists. Please choose a different name.")
                         continue
 
                 else:
                     if groupname not in all_groups:
-                        print log.red("error: Name not found. Please enter a different name.")
+                        log.error("Name not found. Please enter a different name.")
                         continue
 
                 break
@@ -224,12 +229,12 @@ class Console(cmd.Cmd):
 
             if fail_if_match: 
                 if groupname in all_groups:
-                    print log.red("error: Name already exists. Please choose a different name.")
+                    log.error("Name already exists. Please choose a different name.")
                     return ''
 
             else:
                 if groupname not in all_groups:
-                    print log.red("error: Name not found. Please enter a different name.")
+                    log.error("Name not found. Please enter a different name.")
                     return ''
 
         return groupname
@@ -247,7 +252,7 @@ class Console(cmd.Cmd):
             if args.startswith('nam'):
                 self.do_names('')
                 return
-                
+
             elif args.startswith('gro'):
                 self.do_groups('')
                 return
@@ -267,12 +272,12 @@ class Console(cmd.Cmd):
 
         print log.bold("\nNames:\n")
         if len(all_entries) > 0:
-        
+
             f = tui.Formatter()
             f.header = ("Name", "Fax Number", "Member of Group(s)")
             for name, e in all_entries.items():
                 f.add((name, e['fax'], ', '.join(e['groups'])))
-                
+
             f.output()
 
         else:
@@ -297,7 +302,7 @@ class Console(cmd.Cmd):
             for group in all_groups:
                 f.add((group, ', '.join(self.db.group_members(group))))
             f.output()
-            
+
         else:
             print "(None)"
 
@@ -357,7 +362,7 @@ class Console(cmd.Cmd):
                 return
 
             if not faxnum and not save_faxnum:
-                print log.red("error: Fax number must not be empty.")
+                log.error("Fax number must not be empty.")
                 continue
 
             if not faxnum:
@@ -366,7 +371,7 @@ class Console(cmd.Cmd):
             ok = True
             for c in faxnum:
                 if c not in '0123456789-(+) *#':
-                    print log.red("error: Invalid characters in fax number. Fax number may only contain '0123456789-(+) '")
+                    log.error("Invalid characters in fax number. Fax number may only contain '0123456789-(+) '")
                     ok = False
                     break
 
@@ -394,7 +399,7 @@ class Console(cmd.Cmd):
             if not ok:
                 print log.red("Canceled")
                 return
-            
+
             if ans:
                 new_groups.append(g)
 
@@ -420,17 +425,17 @@ class Console(cmd.Cmd):
                 if not ok:
                     print log.red("Canceled")
                     return
-                
+
                 if not ans:
                     continue
 
             if add_group in e['groups']:
-                log.error("error: Group already specified. Choose a different group name or press <enter> to continue.")
+                log.error("Group already specified. Choose a different group name or press <enter> to continue.")
                 continue
 
             new_groups.append(add_group)
-        
-        
+
+
         self.db.set(nickname, title, firstname, lastname, faxnum, new_groups, notes)
         self.do_show(nickname)
 
@@ -455,14 +460,14 @@ class Console(cmd.Cmd):
         print "\nLeave or Remove Existing Names in Group:\n"
 
         for e in old_entries:
-            
+
             ok, ans = tui.enter_yes_no("Leave name '%s' in this group" % e, 
                 choice_prompt="(y=yes* (leave), n=no (remove), c=cancel)")
-                
+
             if not ok:
                 print log.red("Canceled")
                 return
-            
+
             if ans:
                 new_entries.append(e)
 
@@ -479,7 +484,7 @@ class Console(cmd.Cmd):
                 break
 
             new_entries.append(nickname)
-            
+
         self.db.update_groups(group, new_entries)
 
         print
@@ -524,13 +529,13 @@ class Console(cmd.Cmd):
                 return
 
             if not faxnum:
-                print log.red("error: Fax number must not be empty.")
+                log.error("Fax number must not be empty.")
                 continue
 
             ok = True
             for c in faxnum:
                 if c not in '0123456789-(+) *#':
-                    print log.red("error: Invalid characters in fax number. Fax number may only contain '0123456789-(+) *#'")
+                    log.error("Invalid characters in fax number. Fax number may only contain '0123456789-(+) *#'")
                     ok = False
                     break
 
@@ -625,11 +630,11 @@ class Console(cmd.Cmd):
 
             f = tui.Formatter()
             f.header = ("Name", "Title", "First Name", "Last Name", "Fax", "Notes", "Member of Group(s)")
-            
+
             for name, e in all_entries.items():
                 f.add((name, e['title'], e['firstname'], e['lastname'], e['fax'], 
                        e['notes'], ', '.join(e['groups'])))
-                          
+
             f.output()
 
         print
@@ -656,11 +661,11 @@ class Console(cmd.Cmd):
             f.add(("Fax Number:", e['fax']))
             f.add(("Notes:", e['notes']))
             f.add(("Member of Group(s):", ', '.join(e['groups'])))
-            
+
             f.output()
-            
+
         else:
-            print log.red("error: Name not found. Use the 'names' command to view all names.")
+            log.error("Name not found. Use the 'names' command to view all names.")
 
         print
 
@@ -700,6 +705,63 @@ class Console(cmd.Cmd):
     def do_about(self, args):
         """About fab."""
         utils.log_title(__title__, __version__)
+
+    def do_import(self, args):
+        """ 
+        Import LDIF
+        import <filename> [type]
+        [type] = vcf|ldif|auto
+        """
+        args = args.strip().split()
+
+        if not args:
+            log.error("You must specify a filename to import from.")
+            return
+
+        filename = args[0]
+
+        if len(args) > 1:
+            typ = args[1].lower()
+        else:
+            typ = 'auto'
+
+        if typ not in ('auto', 'ldif', 'vcf', 'vcard'):
+            log.error("Invalid type: %s" % typ)
+            return
+
+        if not os.path.exists(filename):
+            log.error("File %s not found." % filename)
+            return
+
+        if typ == 'auto':
+            ext = os.path.splitext(filename)[1].lower()
+            if ext == '.vcf':
+                typ = 'vcf'
+            elif ext == '.ldif':
+                typ = 'ldif'
+            else:
+                head = file(filename, 'r').read(1024).lower()
+                if 'begin:vcard' in head:
+                    typ = 'vcf'
+                else:
+                    typ = 'ldif'
+
+        if typ == 'ldif':
+            print "Importing from LDIF file %s..." % filename
+            ok, error_str = self.db.import_ldif(filename)
+
+        elif typ in ('vcard', 'vcf'):
+            print "Importing from VCF file %s..." % filename
+            ok, error_str = self.db.import_vcard(filename)
+
+        if not ok:
+            log.error(error_str)
+        else:
+            self.db.save()
+            self.do_list('')
+
+        print
+
 
 
 mode = GUI_MODE
@@ -755,15 +817,18 @@ for o, a in opts:
 
         mode = GUI_MODE
         mode_specified = True
-        
+
     elif o in ('-q', '--lang'):
         if a.strip() == '?':
-            utils.show_languages()
+            tui.show_languages()
             sys.exit(0)
-            
+
         loc = utils.validate_language(a.lower())        
 
 utils.log_title(__title__, __version__)
+
+if os.getuid() == 0:
+    log.error("hp-fab should not be run as root.")
 
 # Security: Do *not* create files that other users can muck around with
 os.umask(0037)
@@ -780,7 +845,7 @@ if mode == GUI_MODE:
     addrbook = None
     # create the main application object
     app = QApplication(sys.argv)
-    
+
     if loc is None:
         loc = user_cfg.ui.get("loc", "system")
         if loc.lower() == 'system':
@@ -788,19 +853,21 @@ if mode == GUI_MODE:
             log.debug("Using system locale: %s" % loc)
 
     if loc.lower() != 'c':
-        log.debug("Trying to load .qm file for %s locale." % loc)
-        trans = QTranslator(None)
-        
+        e = 'utf8'
         try:
-            l, e = loc.split('.')
+            l, x = loc.split('.')
+            loc = '.'.join([l, e])
         except ValueError:
             l = loc
-            e = 'utf8'
-        
+            loc = '.'.join([loc, e])
+
+        log.debug("Trying to load .qm file for %s locale." % loc)
+        trans = QTranslator(None)
+
         qm_file = 'hplip_%s.qm' % l
         log.debug("Name of .qm file: %s" % qm_file)
         loaded = trans.load(qm_file, prop.localization_dir)
-        
+
         if loaded:
             app.installTranslator(trans)
         else:
@@ -839,9 +906,10 @@ else: # INTERACTIVE_MODE
 
     console = Console()
     try:
-        try:
-            console.cmdloop()
-        except KeyboardInterrupt:
-            log.error("Aborted.")
-    finally:
-        pass
+        console.cmdloop()
+    except KeyboardInterrupt:
+        log.error("User exit.")
+
+    log.info("")
+    log.info("Done.")
+

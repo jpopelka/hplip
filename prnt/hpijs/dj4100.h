@@ -95,7 +95,7 @@ public:
         "DJ4100",                               // family name
 		"Deskjet D4100\0"                        // DeskJet 4100
         "Deskjet D4160\0"
-        "Deskjet d42\0"
+        "Deskjet D42\0"
     ) {m_iPrinterType = eDJ4100;}
     inline Printer* CreatePrinter(SystemServices* pSS) const { return new DJ4100(pSS); }
 	inline PRINTER_TYPE GetPrinterType() const { return eDJ4100;}

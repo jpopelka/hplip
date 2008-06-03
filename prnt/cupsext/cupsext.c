@@ -102,27 +102,10 @@ const char * g_ppd_file = NULL;
  * 'validate_name()' - Make sure the printer name only contains valid chars.
  */
 
-static int                      /* O - 0 if name is no good, 1 if name is good */
+static int                                /* O - 0 if name is no good, 1 if name is good */
 validate_name( const char *name )         /* I - Name to check */
 {
-    const char * ptr;                /* Pointer into name */
-
-
-    /*
-     * Scan the whole name...
-     */
-
-    for ( ptr = name; *ptr; ptr ++ )
-        if ( *ptr == '@' )
-            break;
-        else if ( ( *ptr < '!' ) || ( *ptr > '~' ) || ( *ptr == '/' ) )
-            return ( 0 );
-
-    /*
-     * All the characters are good; validate the length, too...
-     */
-
-    return ( ( ptr - name ) < 128 );
+    return 1; // TODO: Make it work with utf-8 encoding
 }
 
 
@@ -277,6 +260,8 @@ static PyObject * newPrinter( PyObject * self, PyObject * args, PyObject * kwarg
 
     return _newPrinter( device_uri, printer_uri, name, location, makemodel, info, state, accepting);
 }
+
+
 
 PyObject * getPrinters( PyObject * self, PyObject * args )
 {
@@ -660,11 +645,16 @@ PyObject * setDefaultPrinter( PyObject * self, PyObject * args )
     {
         goto abort;
     }
+                
+    //char buf[1024];
+    //sprintf( buf, "print '%s'", name);
+    //PyRun_SimpleString( buf );
 
     if ( !validate_name( name ) )
     {
         goto abort;
     }
+    
     /* Connect to the HTTP server */
     if ( ( http = httpConnectEncrypt( cupsServer(), ippPort(), cupsEncryption() ) ) == NULL )
     {
@@ -690,10 +680,12 @@ PyObject * setDefaultPrinter( PyObject * self, PyObject * args )
     language = cupsLangDefault();
 
     ippAddString( request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                  "attributes-charset", NULL, cupsLangEncoding( language ) );
+                  "attributes-charset", NULL, "utf-8" ); //cupsLangEncoding( language ) );
 
     ippAddString( request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                  "attributes-natural-language", NULL, language->language );
+                  "attributes-natural-language",
+                  //NULL, language != NULL ? language->language : "en");
+                  NULL, language->language );
 
     ippAddString( request, IPP_TAG_OPERATION, IPP_TAG_URI,
                   "printer-uri", NULL, uri );

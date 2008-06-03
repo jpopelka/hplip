@@ -28,8 +28,28 @@
 #ifndef _COMMON_H
 #define _COMMON_H
 
+#include <syslog.h>
+
 // Uncomment the following line to get verbose debugging output
 //#define HPAIO_DEBUG
+
+#define _STRINGIZE(x) #x
+#define STRINGIZE(x) _STRINGIZE(x)
+
+#define BUG(args...) {syslog(LOG_ERR, __FILE__ " " STRINGIZE(__LINE__) ": " args); DBG(2, __FILE__ " " STRINGIZE(__LINE__) ": " args);}
+#define BUG_DUMP(data, size) bugdump((data), (size))
+#define BUG_SZ(args...) {syslog(LOG_ERR, args); DBG(2, args);}
+
+#define DBG_DUMP(data, size) sysdump((data), (size))
+#if 1
+   #define DBG6(args...) DBG(6, __FILE__ " " STRINGIZE(__LINE__) ": " args)
+   #define DBG8(args...) DBG(8, __FILE__ " " STRINGIZE(__LINE__) ": " args)
+   #define DBG_SZ(args...) DBG(6, args)
+#else
+   #define DBG6(args...) syslog(LOG_INFO, __FILE__ " " STRINGIZE(__LINE__) ": " args)
+   #define DBG8(args...) syslog(LOG_INFO, __FILE__ " " STRINGIZE(__LINE__) ": " args)
+   #define DBG_SZ(args...) syslog(LOG_INFO, args)
+#endif
 
 #define BACKEND_NAME hpaio
 
@@ -163,10 +183,5 @@ int __attribute__ ((visibility ("hidden"))) NumListGetFirst( int * list );
 void __attribute__ ((visibility ("hidden"))) StrListClear( const char ** list );
 int __attribute__ ((visibility ("hidden"))) StrListIsInList( const char ** list, char * s );
 int __attribute__ ((visibility ("hidden"))) StrListAdd( const char ** list, char * s );
-
-#define _STRINGIZE(x) #x
-#define STRINGIZE(x) _STRINGIZE(x)
-
-#define BUG(args...) bug(__FILE__ " " STRINGIZE(__LINE__) ": " args)
 
 #endif

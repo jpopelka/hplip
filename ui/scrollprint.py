@@ -23,15 +23,18 @@
 from base.g import *
 from base import utils, magic
 from prnt import cups
+from ui_utils import load_pixmap
 
 # Qt
 from qt import *
 from scrollview import ScrollView, PixmapLabelButton
 from allowabletypesdlg import AllowableTypesDlg
+from jobstoragemixin import JobStorageMixin
 
 # Std Lib
-import os.path, os
-
+import os.path
+import os
+import time
 
 class RangeValidator(QValidator):
     def __init__(self, parent=None, name=None):
@@ -45,6 +48,7 @@ class RangeValidator(QValidator):
         return QValidator.Acceptable, pos
         
 
+
 class FileListViewItem(QListViewItem):
     def __init__(self, parent, index, filename, mime_type_desc, path):
         QListViewItem.__init__(self, parent, str(index+1), filename, mime_type_desc, path)
@@ -53,14 +57,16 @@ class FileListViewItem(QListViewItem):
 
 
 class ScrollPrintView(ScrollView):
-    def __init__(self, toolbox_hosted=True, parent = None, form=None, name = None,fl = 0):
-        ScrollView.__init__(self,parent,name,fl)
-
-        self.toolbox_hosted = toolbox_hosted
+    utils.mixin(JobStorageMixin)
+    
+    def __init__(self, service, parent=None, form=None, name=None, fl=0):
+        ScrollView.__init__(self, service, parent, name, fl)
+        
+        self.initJobStorage()
+        
         self.form = form
         self.file_list = []
         self.pages_button_group = 0
-        #self.prev_selected_file_path = ''
         self.prev_selected_file_index = 0
         
         self.allowable_mime_types = cups.getAllowableMIMETypes()
@@ -109,16 +115,18 @@ class ScrollPrintView(ScrollView):
             self.addCopies()
             self.addPageRange()
             self.addPageSet()
+            
+            self.job_storage_avail = self.cur_device.mq['job-storage'] == JOB_STORAGE_ENABLE
+            
+            if self.job_storage_avail:
+                self.addGroupHeading("jobstorage", self.__tr("Job Storage and Secure Printing"))
+                self.addJobStorage()
+            
             self.addGroupHeading("space1", "")
-    
-            if self.toolbox_hosted:
-                s = self.__tr("<< Functions")
-            else:
-                s = self.__tr("Close")
     
             self.printButton = self.addActionButton("bottom_nav", self.__tr("Print File(s)"), 
                                     self.printButton_clicked, 'print.png', 'print-disabled.png', 
-                                    s, self.funcButton_clicked)
+                                    self.__tr("Close"), self.funcButton_clicked)
     
             self.printButton.setEnabled(False)
             self.maximizeControl()
@@ -142,12 +150,12 @@ class ScrollPrintView(ScrollView):
         layout37 = QGridLayout(widget,1,1,5,10,"layout37")
 
         self.addFilePushButton = PixmapLabelButton(widget, 
-            "list-add.png", "list-add-disabled.png")
+            "list_add.png", "list_add-disabled.png")
 
         layout37.addWidget(self.addFilePushButton,2,0)
 
         self.removeFilePushButton = PixmapLabelButton(widget, 
-            "list-remove.png", "list-remove-disabled.png")
+            "list_remove.png", "list_remove-disabled.png")
 
         layout37.addWidget(self.removeFilePushButton,2,1)
 
@@ -224,12 +232,12 @@ class ScrollPrintView(ScrollView):
 
     def fileListView_rightButtonClicked(self, item, pos, col):
         popup = QPopupMenu(self)
-        popup.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir, 'list-add.png'))),
+        popup.insertItem(QIconSet(load_pixmap('list_add', '16x16')),
             self.__tr("Add File..."), self.addFile_clicked)
 
         if item is not None:
-            popup.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir,
-                'list-remove.png'))), self.__tr("Remove File"), self.removeFile_clicked)
+            popup.insertItem(QIconSet(load_pixmap('list_remove', '16x16')),
+                self.__tr("Remove File"), self.removeFile_clicked)
                 
             if self.fileListView.childCount() > 1:
                 last_item = self.fileListView.firstChild()
@@ -237,16 +245,16 @@ class ScrollPrintView(ScrollView):
                     last_item = last_item.nextSibling()
                     
                 if item is not self.fileListView.firstChild():
-                    popup.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir,
-                        'up.png'))), self.__tr("Move Up"), self.moveFileUp_clicked)
+                    popup.insertItem(QIconSet(load_pixmap('up', '16x16')),
+                        self.__tr("Move Up"), self.moveFileUp_clicked)
     
                 if item is not last_item:
-                    popup.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir,
-                        'down.png'))), self.__tr("Move Down"), self.moveFileDown_clicked)
+                    popup.insertItem(QIconSet(load_pixmap('down', '16x16')),
+                        self.__tr("Move Down"), self.moveFileDown_clicked)
 
         popup.insertSeparator(-1)
-        popup.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir,
-                'mimetypes.png'))), self.__tr("Show File Types..."), self.showFileTypes_clicked)
+        popup.insertItem(QIconSet(load_pixmap('mimetypes', '16x16')),
+            self.__tr("Show File Types..."), self.showFileTypes_clicked)
 
         popup.popup(pos)
 
@@ -280,7 +288,7 @@ class ScrollPrintView(ScrollView):
 
     def addFile(self, path):
         path = os.path.realpath(path)
-        if os.path.exists(path):
+        if os.path.exists(path) and os.access(path, os.R_OK):
             mime_type = magic.mime_type(path)
             mime_type_desc = mime_type
             log.debug(mime_type)
@@ -293,7 +301,7 @@ class ScrollPrintView(ScrollView):
                 log.debug("Adding file %s (%s,%s)" % (path, mime_type, mime_type_desc))
                 self.file_list.append((path, mime_type, mime_type_desc))
         else:
-            self.form.FailureUI(self.__tr("<b>Unable to add file '%s' to file list (file not found).</b><p>Check the file name and try again." % path))
+            self.form.FailureUI(self.__tr("<b>Unable to add file '%1' to file list (file not found or insufficient permissions).</b><p>Check the file name and try again.").arg(path))
 
         self.updateFileList()
 
@@ -544,6 +552,405 @@ class ScrollPrintView(ScrollView):
 
     def pageSetComboBox_activated(self, i):
         self.pagesetDefaultPushButton.setEnabled(i != 0)
+        
+##    # 
+##    # JOB STORAGE
+##    #
+##    
+##    def addJobStorage(self):
+##        self.addJobStorageMode()
+##        self.addJobStoragePIN()
+##        self.addJobStorageUsername()
+##        self.addJobStorageID()
+##        self.addJobStorageIDExists()
+##        self.jobStorageDisable()
+##        
+##        
+##    def addJobStorageMode(self):
+##        widget = self.getWidget()
+##
+##        layout34 = QHBoxLayout(widget,5,10,"layout34")
+##
+##        self.jobStorageModeLabel = QLabel(widget,"jobStorageModeLabel")
+##        layout34.addWidget(self.jobStorageModeLabel)
+##        spacer20_4 = QSpacerItem(20,20,QSizePolicy.Expanding,QSizePolicy.Minimum)
+##        layout34.addItem(spacer20_4)
+##
+##        self.jobStorageModeComboBox = QComboBox(0,widget,"jobStorageModeComboBox")
+##        layout34.addWidget(self.jobStorageModeComboBox)
+##
+##        self.jobStorageModeDefaultPushButton = QPushButton(widget,"pagesetDefaultPushButton")
+##        layout34.addWidget(self.jobStorageModeDefaultPushButton)
+##
+##        self.jobStorageModeLabel.setText(self.__tr("Job Storage Mode:"))
+##        self.jobStorageModeComboBox.clear()
+##        self.jobStorageModeComboBox.insertItem(self.__tr("Off"))
+##        self.jobStorageModeComboBox.insertItem(self.__tr("Proof and Hold"))
+##        self.jobStorageModeComboBox.insertItem(self.__tr("Personal/Private Job"))
+##        self.jobStorageModeComboBox.insertItem(self.__tr("Quick Copy"))
+##        self.jobStorageModeComboBox.insertItem(self.__tr("Stored Job"))
+##        
+##        self.jobStorageModeDefaultPushButton.setText(self.__tr("Default"))
+##        self.jobStorageModeDefaultPushButton.setEnabled(False)
+##
+##        self.connect(self.jobStorageModeComboBox, SIGNAL("activated(int)"), self.jobStorageModeComboBox_activated)
+##        self.connect(self.jobStorageModeDefaultPushButton, SIGNAL("clicked()"), self.jobStorageModeDefaultPushButton_clicked)
+##
+##        self.addWidget(widget, "job_storage_mode")
+##        
+##    def jobStorageModeComboBox_activated(self, a):
+##        self.job_storage_mode = a
+##        
+##        if a == 0: # Off
+##            self.jobStorageDisable()
+##        
+##        elif a == 1: # Proof and Hold
+##            self.jobStorageModeDefaultPushButton.setEnabled(True)
+##            self.jobStorageUserJobEnable(True)
+##            self.jobStoragePINEnable(False)
+##
+##        elif a == 2: # Private Job
+##            self.jobStorageModeDefaultPushButton.setEnabled(True)
+##            self.jobStoragePINEnable(True)
+##            self.jobStorageUserJobEnable(True)
+##        
+##        elif a == 3: # Quick Copy
+##            self.jobStorageModeDefaultPushButton.setEnabled(True)
+##            self.jobStoragePINEnable(False)
+##            self.jobStorageUserJobEnable(True)
+##        
+##        elif a == 4: # Stored Job
+##            self.jobStorageModeDefaultPushButton.setEnabled(True)
+##            self.jobStoragePINEnable(True) # ???
+##            self.jobStorageUserJobEnable(True)
+##        
+##    def jobStorageModeDefaultPushButton_clicked(self):
+##        self.jobStorageModeComboBox.setCurrentItem(0)
+##        self.job_storage_mode = 0
+##    
+##    def jobStorageDisable(self): # Turn all Off
+##        self.jobStorageModeDefaultPushButton.setEnabled(False)
+##        self.jobStoragePINEnable(False)
+##        self.jobStorageUserJobEnable(False)
+##        
+##    def jobStoragePINEnable(self, e=True): # PIN On/Off
+##        t = e and self.jobStoragePINButtonGroup.selectedId() == 1
+##        self.jobStoragePINButtonGroup.setEnabled(e)
+##        self.jobStoragePINEdit.setEnabled(t)
+##        self.jobStoragePINDefaultPushButton.setEnabled(t)
+##        
+##    def jobStorageUserJobEnable(self, e=True): # Username/Job ID/Job ID Exists On/Off
+##        t = e and self.jobStorageUsernameButtonGroup.selectedId() == 1
+##        self.jobStorageUsernameButtonGroup.setEnabled(e)
+##        self.jobStorageUsernameDefaultPushButton.setEnabled(t)
+##        self.jobStorageUsernameEdit.setEnabled(t)
+##            
+##        t = e and self.jobStorageIDButtonGroup.selectedId() == 1
+##        self.jobStorageIDButtonGroup.setEnabled(e)
+##        self.jobStorageIDDefaultPushButton.setEnabled(t)
+##        self.jobStorageIDEdit.setEnabled(t)
+##        
+##        t = e and self.jobStorageIDExistsComboBox.currentItem() == 1
+##        self.jobStorageIDExistsComboBox.setEnabled(e)
+##        self.jobStorageIDExistsDefaultPushButton.setEnabled(t)
+##        
+##    
+##        
+##    # PIN
+##    
+##        
+##    def addJobStoragePIN(self):
+##        widget = self.getWidget()
+##
+##        layout39 = QGridLayout(widget,1,1,5,10,"layout39")
+##
+##        self.jobStoragePINEdit = QLineEdit(widget,"self.jobStoragePINEdit")
+##        self.jobStoragePINEdit.setMaxLength(4)
+##        self.jobStoragePINEdit.setText(self.job_storage_pin)
+##        layout39.addWidget(self.jobStoragePINEdit,0,3)
+##
+##        spacer20_2 = QSpacerItem(20,20,QSizePolicy.Expanding,QSizePolicy.Minimum)
+##        layout39.addItem(spacer20_2,0,1)
+##
+##        textLabel5_2 = QLabel(widget,"textLabel5_2")
+##        layout39.addWidget(textLabel5_2,0,0)
+##
+##        self.jobStoragePINDefaultPushButton = QPushButton(widget,"jobStoragePINDefaultPushButton")
+##        layout39.addWidget(self.jobStoragePINDefaultPushButton,0,4)
+##
+##        self.jobStoragePINButtonGroup = QButtonGroup(widget,"self.jobStoragePINButtonGroup")
+##        self.jobStoragePINButtonGroup.setLineWidth(0)
+##        self.jobStoragePINButtonGroup.setColumnLayout(0,Qt.Vertical)
+##        self.jobStoragePINButtonGroup.layout().setSpacing(0)
+##        self.jobStoragePINButtonGroup.layout().setMargin(0)
+##        self.jobStoragePINButtonGroupLayout = QGridLayout(self.jobStoragePINButtonGroup.layout())
+##        self.jobStoragePINButtonGroupLayout.setAlignment(Qt.AlignTop)
+##
+##        radioButton3_2 = QRadioButton(self.jobStoragePINButtonGroup,"radioButton3_2")
+##        radioButton3_2.setChecked(1)
+##        self.jobStoragePINButtonGroup.insert( radioButton3_2,0)
+##        self.jobStoragePINButtonGroupLayout.addWidget(radioButton3_2,0,0)
+##
+##        radioButton4_2 = QRadioButton(self.jobStoragePINButtonGroup,"radioButton4_2")
+##        self.jobStoragePINButtonGroup.insert( radioButton4_2,1)
+##        self.jobStoragePINButtonGroupLayout.addWidget(radioButton4_2,0,1)
+##
+##        layout39.addWidget(self.jobStoragePINButtonGroup,0,2)
+##
+##        self.bg = self.jobStoragePINEdit.paletteBackgroundColor()
+##        self.invalid_page_range = False
+##
+##        self.jobStoragePINEdit.setValidator(PINValidator(self.jobStoragePINEdit))
+##
+##        textLabel5_2.setText(self.__tr("Make Job Private (use PIN to print):"))
+##        radioButton3_2.setText(self.__tr("Public/Off"))
+##        radioButton4_2.setText(self.__tr("Private/Use PIN to Print:"))
+##
+##        self.jobStoragePINDefaultPushButton.setText(self.__tr("Default"))
+##
+##        self.connect(self.jobStoragePINButtonGroup, SIGNAL("clicked(int)"), self.jobStoragePINButtonGroup_clicked)
+##        self.connect(self.jobStoragePINEdit,SIGNAL("lostFocus()"),self.jobStoragePINEdit_lostFocus)
+##        self.connect(self.jobStoragePINEdit,SIGNAL("textChanged(const QString&)"),self.jobStoragePINEdit_textChanged)
+##        self.connect(self.jobStoragePINDefaultPushButton, SIGNAL("clicked()"), self.jobStoragePINDefaultPushButton_clicked)
+##
+##        self.addWidget(widget, "job_storage_pin")
+##        
+##    def jobStoragePINButtonGroup_clicked(self, a):
+##        if a == 0: # Public/Off
+##            self.jobStoragePINDefaultPushButton.setEnabled(False)
+##            self.jobStoragePINEdit.setEnabled(False)
+##            self.job_storage_use_pin = False
+##            self.job_storage_pin = u"0000"
+##            
+##        else: # On/Private/Use PIN
+##            self.jobStoragePINDefaultPushButton.setEnabled(True)
+##            self.jobStoragePINEdit.setEnabled(True)
+##            self.job_storage_use_pin = True
+##            self.job_storage_pin = unicode(self.jobStoragePINEdit.text())
+##        
+##    def jobStoragePINEdit_lostFocus(self):
+##        pafss
+##        
+##    def jobStoragePINEdit_textChanged(self, a):
+##        self.job_storage_pin = unicode(a)
+##        
+##    def jobStoragePINDefaultPushButton_clicked(self):
+##        self.jobStoragePINButtonGroup.setButton(0)
+##        self.jobStoragePINDefaultPushButton.setEnabled(False)
+##        self.jobStoragePINEdit.setEnabled(False)
+##        self.job_storage_use_pin = False
+##
+##    # Username    
+##
+##    def addJobStorageUsername(self):
+##        widget = self.getWidget()
+##
+##        layout39 = QGridLayout(widget,1,1,5,10,"layout39")
+##
+##        self.jobStorageUsernameEdit = QLineEdit(widget,"self.jobStorageUsernameEdit")
+##        self.jobStorageUsernameEdit.setMaxLength(16)
+##        self.jobStorageUsernameEdit.setText(self.job_storage_username)
+##        layout39.addWidget(self.jobStorageUsernameEdit,0,3)
+##        
+##        spacer20_2 = QSpacerItem(20,20,QSizePolicy.Expanding,QSizePolicy.Minimum)
+##        layout39.addItem(spacer20_2,0,1)
+##
+##        textLabel5_2 = QLabel(widget,"textLabel5_2")
+##        layout39.addWidget(textLabel5_2,0,0)
+##
+##        self.jobStorageUsernameDefaultPushButton = QPushButton(widget,"jobStorageUsernameDefaultPushButton")
+##        layout39.addWidget(self.jobStorageUsernameDefaultPushButton,0,4)
+##
+##        self.jobStorageUsernameButtonGroup = QButtonGroup(widget,"self.jobStorageUsernameButtonGroup")
+##        self.jobStorageUsernameButtonGroup.setLineWidth(0)
+##        self.jobStorageUsernameButtonGroup.setColumnLayout(0,Qt.Vertical)
+##        self.jobStorageUsernameButtonGroup.layout().setSpacing(0)
+##        self.jobStorageUsernameButtonGroup.layout().setMargin(0)
+##        self.jobStorageUsernameButtonGroupLayout = QGridLayout(self.jobStorageUsernameButtonGroup.layout())
+##        self.jobStorageUsernameButtonGroupLayout.setAlignment(Qt.AlignTop)
+##
+##        radioButton3_2 = QRadioButton(self.jobStorageUsernameButtonGroup,"radioButton3_2")
+##        radioButton3_2.setChecked(1)
+##        self.jobStorageUsernameButtonGroup.insert( radioButton3_2,0)
+##        self.jobStorageUsernameButtonGroupLayout.addWidget(radioButton3_2,0,0)
+##
+##        radioButton4_2 = QRadioButton(self.jobStorageUsernameButtonGroup,"radioButton4_2")
+##        self.jobStorageUsernameButtonGroup.insert( radioButton4_2,1)
+##        self.jobStorageUsernameButtonGroupLayout.addWidget(radioButton4_2,0,1)
+##
+##        layout39.addWidget(self.jobStorageUsernameButtonGroup,0,2)
+##
+##        self.bg = self.jobStorageUsernameEdit.paletteBackgroundColor()
+##        self.invalid_page_range = False
+##
+##        self.jobStorageUsernameEdit.setValidator(TextValidator(self.jobStorageUsernameEdit))
+##
+##        textLabel5_2.setText(self.__tr("User name (for job identification):"))
+##        radioButton3_2.setText(self.__tr("Automatic"))
+##        radioButton4_2.setText(self.__tr("Custom:"))
+##
+##        self.jobStorageUsernameDefaultPushButton.setText(self.__tr("Default"))
+##
+##        self.connect(self.jobStorageUsernameButtonGroup, SIGNAL("clicked(int)"), self.jobStorageUsernameButtonGroup_clicked)
+##        self.connect(self.jobStorageUsernameEdit,SIGNAL("lostFocus()"),self.jobStorageUsernameEdit_lostFocus)
+##        self.connect(self.jobStorageUsernameEdit,SIGNAL("textChanged(const QString&)"),self.jobStorageUsernameEdit_textChanged)
+##        self.connect(self.jobStorageUsernameDefaultPushButton, SIGNAL("clicked()"), self.jobStorageUsernameDefaultPushButton_clicked)
+##
+##        self.addWidget(widget, "job_storage_username")
+##        
+##    def jobStorageUsernameButtonGroup_clicked(self, a):
+##        if a == 0: # Automatic
+##            self.jobStorageUsernameDefaultPushButton.setEnabled(False)
+##            self.jobStorageUsernameEdit.setEnabled(False)
+##            self.job_storage_auto_username = True
+##            self.job_storage_username = unicode(prop.username[:16])
+##        
+##        else: # Custom
+##            self.jobStorageUsernameDefaultPushButton.setEnabled(True)
+##            self.jobStorageUsernameEdit.setEnabled(True)
+##            self.job_storage_auto_username = False
+##            self.job_storage_username = unicode(self.jobStorageUsernameEdit.text())
+##            
+##    def jobStorageUsernameEdit_lostFocus(saddJobStorageIDelf):
+##        pass
+##        
+##    def jobStorageUsernameEdit_textChanged(self, a):
+##        self.job_storage_username = unicode(a)
+##        
+##    def jobStorageUsernameDefaultPushButton_clicked(self):
+##        self.jobStorageUsernameButtonGroup.setButton(0)
+##        self.jobStorageUsernameDefaultPushButton.setEnabled(False)
+##        self.jobStorageUsernameEdit.setEnabled(False)
+##        self.job_storage_auto_username = True
+##        self.job_storage_username = unicode(prop.username[:16])
+##
+##    # Job ID    
+##
+##    def addJobStorageID(self):
+##        widget = self.getWidget()
+##
+##        layout39 = QGridLayout(widget,1,1,5,10,"layout39")
+##
+##        self.jobStorageIDEdit = QLineEdit(widget,"self.jobStorageIDEdit")
+##        self.jobStorageIDEdit.setMaxLength(16)
+##        self.jobStorageIDEdit.setText(self.job_storage_jobname)
+##        layout39.addWidget(self.jobStorageIDEdit,0,3)
+##
+##        spacer20_2 = QSpacerItem(20,20,QSizePolicy.Expanding,QSizePolicy.Minimum)
+##        layout39.addItem(spacer20_2,0,1)
+##
+##        textLabel5_2 = QLabel(widget,"textLabel5_2")
+##        layout39.addWidget(textLabel5_2,0,0)
+##
+##        self.jobStorageIDDefaultPushButton = QPushButton(widget,"jobStorageIDDefaultPushButton")
+##        layout39.addWidget(self.jobStorageIDDefaultPushButton,0,4)
+##
+##        self.jobStorageIDButtonGroup = QButtonGroup(widget,"self.jobStorageIDButtonGroup")
+##        self.jobStorageIDButtonGroup.setLineWidth(0)
+##        self.jobStorageIDButtonGroup.setColumnLayout(0,Qt.Vertical)
+##        self.jobStorageIDButtonGroup.layout().setSpacing(0)
+##        self.jobStorageIDButtonGroup.layout().setMargin(0)
+##        self.jobStorageIDButtonGroupLayout = QGridLayout(self.jobStorageIDButtonGroup.layout())
+##        self.jobStorageIDButtonGroupLayout.setAlignment(Qt.AlignTop)
+##
+##        radioButton3_2 = QRadioButton(self.jobStorageIDButtonGroup,"radioButton3_2")
+##        radioButton3_2.setChecked(1)
+##        self.jobStorageIDButtonGroup.insert( radioButton3_2,0)
+##        self.jobStorageIDButtonGroupLayout.addWidget(radioButton3_2,0,0)
+##
+##        radioButton4_2 = QRadioButton(self.jobStorageIDButtonGroup,"radioButton4_2")
+##        self.jobStorageIDButtonGroup.insert( radioButton4_2,1)
+##        self.jobStorageIDButtonGroupLayout.addWidget(radioButton4_2,0,1)
+##
+##        layout39.addWidget(self.jobStorageIDButtonGroup,0,2)
+##
+##        self.bg = self.jobStorageIDEdit.paletteBackgroundColor()
+##        self.invalid_page_range = False
+##
+##        self.jobStorageIDEdit.setValidator(TextValidator(self.jobStorageIDEdit))
+##
+##        textLabel5_2.setText(self.__tr("Job name (for job identification):"))
+##        radioButton3_2.setText(self.__tr("Automatic"))
+##        radioButton4_2.setText(self.__tr("Custom:"))
+##
+##        self.jobStorageIDDefaultPushButton.setText(self.__tr("Default"))
+##
+##        self.connect(self.jobStorageIDButtonGroup, SIGNAL("clicked(int)"), self.jobStorageIDButtonGroup_clicked)
+##        self.connect(self.jobStorageIDEdit,SIGNAL("lostFocus()"),self.jobStorageIDEdit_lostFocus)
+##        self.connect(self.jobStorageIDEdit,SIGNAL("textChanged(const QString&)"),self.jobStorageIDEdit_textChanged)
+##        self.connect(self.jobStorageIDDefaultPushButton, SIGNAL("clicked()"), self.jobStorageIDDefaultPushButton_clicked)
+##
+##        self.addWidget(widget, "job_storage_ID")
+##        
+##    def jobStorageIDButtonGroup_clicked(self, a):
+##        if a == 0: # Automatic
+##            self.jobStorageIDDefaultPushButton.setEnabled(False)
+##            self.jobStorageIDEdit.setEnabled(False)
+##            self.job_storage_auto_jobname = True
+##            self.job_storage_jobname = unicode(time.strftime("%a, %d %b %Y %H:%M:%S"))
+##            
+##        else: # Custom
+##            self.jobStorageIDDefaultPushButton.setEnabled(True)
+##            self.jobStorageIDEdit.setEnabled(True)
+##            self.job_storage_auto_jobname = False
+##            self.job_storage_jobname = unicode(self.jobStorageIDEdit.text())
+##        
+##    def jobStorageIDEdit_lostFocus(self):
+##        pass
+##        
+##    def jobStorageIDEdit_textChanged(self, a):
+##        self.job_storage_jobname = unicode(a)
+##                
+##    def jobStorageIDDefaultPushButton_clicked(self):
+##        self.jobStorageIDButtonGroup.setButton(0)
+##        self.jobStorageIDDefaultPushButton.setEnabled(False)
+##        self.jobStorageIDEdit.setEnabled(False)
+##        self.job_storage_auto_jobname = True
+##        self.job_storage_jobname = unicode(time.strftime("%a, %d %b %Y %H:%M:%S"))
+##
+##    # Job ID Exists
+##
+##    def addJobStorageIDExists(self):
+##        widget = self.getWidget()
+##
+##        layout34 = QHBoxLayout(widget,5,10,"layout34")
+##
+##        self.jobStorageIDExistsLabel = QLabel(widget,"jobStorageIDExistsLabel")
+##        layout34.addWidget(self.jobStorageIDExistsLabel)
+##        spacer20_4 = QSpacerItem(20,20,QSizePolicy.Expanding,QSizePolicy.Minimum)
+##        layout34.addItem(spacer20_4)
+##
+##        self.jobStorageIDExistsComboBox = QComboBox(0,widget,"jobStorageIDExistsComboBox")
+##        layout34.addWidget(self.jobStorageIDExistsComboBox)
+##
+##        self.jobStorageIDExistsDefaultPushButton = QPushButton(widget,"pagesetDefaultPushButton")
+##        layout34.addWidget(self.jobStorageIDExistsDefaultPushButton)
+##
+##        self.jobStorageIDExistsLabel.setText(self.__tr("If Job Name already exists:"))
+##        self.jobStorageIDExistsComboBox.clear()
+##        self.jobStorageIDExistsComboBox.insertItem(self.__tr("Replace existing job"))
+##        self.jobStorageIDExistsComboBox.insertItem(self.__tr("Use Job Name + (1-99)"))
+##        
+##        self.jobStorageIDExistsDefaultPushButton.setText(self.__tr("Default"))
+##
+##        self.connect(self.jobStorageIDExistsComboBox, SIGNAL("activated(int)"), self.jobStorageIDExistsComboBox_activated)
+##        self.connect(self.jobStorageIDExistsDefaultPushButton, SIGNAL("clicked()"), self.jobStorageIDExistsDefaultPushButton_clicked)
+##
+##        self.addWidget(widget, "job_storage_id_exists")
+##        
+##    def jobStorageIDExistsComboBox_activated(self, a):
+##        self.jobStorageIDExistsDefaultPushButton.setEnabled(a==1)
+##        self.job_storage_job_exist = a
+##        
+##    def jobStorageIDExistsDefaultPushButton_clicked(self):
+##        self.jobStorageIDExistsComboBox.setCurrentItem(0)
+##        self.jobStorageIDExistsDefaultPushButton.setEnabled(False)
+##        self.job_storage_job_exist = 0
+##
+##        
+##    #
+##    #    
+##    #    
 
     def printButton_clicked(self):
         if self.invalid_page_range:
@@ -614,6 +1021,59 @@ class ScrollPrintView(ScrollView):
                         else:
                             cmd = ' '.join([cmd, '-o page-set=odd'])
 
+                    
+                    # Job Storage
+                    # self.job_storage_mode = (0=Off, 1=P&H, 2=PJ, 3=QC, 4=SJ)
+                    # self.job_storage_pin = u"" (dddd)
+                    # self.job_storage_use_pin = True|False
+                    # self.job_storage_username = u""
+                    # self.job_storage_auto_username = True|False
+                    # self.job_storage_jobname = u""
+                    # self.job_storage_auto_jobname = True|False
+                    # self.job_storage_job_exist = (0=replace, 1=job name+(1-99))
+                    
+                    if self.job_storage_avail: 
+                        if self.job_storage_mode: # On
+                            
+                            if self.job_storage_mode == 1: # Proof and Hold
+                                cmd = ' '.join([cmd, '-o HOLD=PROOF'])
+                                
+                            elif self.job_storage_mode == 2: # Private Job
+                                if self.job_storage_use_pin:
+                                    cmd = ' '.join([cmd, '-o HOLD=ON'])
+                                    cmd = ' '.join([cmd, '-o HOLDTYPE=PRIVATE'])
+                                    cmd = ' '.join([cmd, '-o HOLDKEY=%s' % self.job_storage_pin.encode('ascii')])
+                                else:
+                                    cmd = ' '.join([cmd, '-o HOLD=PROOF'])
+                                    cmd = ' '.join([cmd, '-o HOLDTYPE=PRIVATE'])
+                                
+                            elif self.job_storage_mode == 3: # Quick Copy
+                                cmd = ' '.join([cmd, '-o HOLD=ON'])
+                                cmd = ' '.join([cmd, '-o HOLDTYPE=PUBLIC'])
+
+                            elif self.job_storage_mode == 4: # Store Job
+                                if self.job_storage_use_pin:
+                                    cmd = ' '.join([cmd, '-o HOLD=STORE'])
+                                    cmd = ' '.join([cmd, '-o HOLDTYPE=PRIVATE'])
+                                    cmd = ' '.join([cmd, '-o HOLDKEY=%s' % self.job_storage_pin.encode('ascii')])
+                                else:
+                                    cmd = ' '.join([cmd, '-o HOLD=STORE'])
+                                
+                            cmd = ' '.join([cmd, '-o USERNAME=%s' % self.job_storage_username.encode('ascii')\
+                                .replace(" ", "_")])
+                            
+                            cmd = ' '.join([cmd, '-o JOBNAME=%s' % self.job_storage_jobname.encode('ascii')\
+                                .replace(" ", "_")])
+                            
+                            if self.job_storage_job_exist == 1:
+                                cmd = ' '.join([cmd, '-o DUPLICATEJOB=APPEND']) 
+                            else:
+                                cmd = ' '.join([cmd, '-o DUPLICATEJOB=REPLACE'])
+                        
+                        else: # Off
+                            cmd = ' '.join([cmd, '-o HOLD=OFF'])
+                    
+                    
                     if not alt_nup:
                         cmd = ''.join([cmd, ' "', p, '"'])
 
@@ -624,19 +1084,13 @@ class ScrollPrintView(ScrollView):
                         log.error("Print command failed.")
                         self.form.FailureUI(self.__tr("Print command failed with error code %1").arg(code))
 
-                if self.toolbox_hosted:
-                    self.form.SwitchFunctionsTab("funcs")
-                else:
-                    self.form.close()
+                self.form.close()
 
         finally:
             self.cur_device.close()
 
     def funcButton_clicked(self):
-        if self.toolbox_hosted:
-            self.form.SwitchFunctionsTab("funcs")
-        else:
-            self.form.close()
+        self.form.close()
 
     def __tr(self,s,c = None):
         return qApp.translate("ScrollPrintView",s,c)

@@ -21,6 +21,7 @@
 # Local
 from base.g import *
 from base import device, utils
+from ui_utils import load_pixmap
 
 # Std Lib
 import sys
@@ -39,8 +40,7 @@ class PluginForm(PluginForm_base):
         
         PluginForm_base.__init__(self,parent,name,modal,fl)
         
-        icon = QPixmap(os.path.join(prop.image_dir, 'HPmenu.png'))
-        self.setIcon(icon)
+        self.setIcon(load_pixmap('prog', '48x48'))
         
         self.setTitleFont(QFont("Helvetica", 16))
         
@@ -151,7 +151,8 @@ class PluginForm(PluginForm_base):
         
 
     def cancelled(self):
-        print "Cancel!"
+        #print "Cancel!"
+        pass
         # TODO: How to cancel urllib.urlretrieve? (use urlopen())
         
     def download_callback(self, c, s, t):

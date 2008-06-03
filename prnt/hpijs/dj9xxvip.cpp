@@ -45,6 +45,9 @@ APDK_BEGIN_NAMESPACE
 extern uint32_t ulMapDJ600_CCM_K[ 9 * 9 * 9 ];
 
 const char GrayscaleSeq[]= {ESC, '*', 'o', '5', 'W', 0x0B, 0x01, 0x00, 0x00, 0x02};
+
+const BYTE ExtraDryTime[] = "\033&b16WPML \004\000\006\001\004\001\004\001\006\010\001";
+
 extern BYTE EscAmplCopy(BYTE *dest, int num, char end);
 extern void AsciiHexToBinary(BYTE* dest, char* src, int count);
 
@@ -92,6 +95,7 @@ DJ9xxVIP::DJ9xxVIP
     pMode[ModeCount++] = new DJ990BestMode ();         // Photo Best
     pMode[ModeCount++] = new DJ990PhotoNormalMode ();  // Photo Normal
 
+    m_cExtraDryTime = 0;
 }
 
 GrayModeDJ990::GrayModeDJ990
@@ -508,6 +512,14 @@ DRIVER_ERROR HeaderDJ990::Send()
     if (thePrintContext->QueryDuplexMode () != DUPLEXMODE_NONE)
     {
         err = thePrinter->Send ((const BYTE *) EnableDuplex, sizeof (EnableDuplex));
+        BYTE    cDryTime;
+        cDryTime = (BYTE) ((thePrinter->GetHint (0x4)) & 0xFF);
+        if (cDryTime != 0)
+        {
+            err = thePrinter->Send (ExtraDryTime, sizeof (ExtraDryTime));
+            err = thePrinter->Send ((const BYTE *) &cDryTime, 1);
+            ERRCHECK;
+        }
     }
 #endif
 
@@ -831,6 +843,10 @@ DRIVER_ERROR DJ9xxVIP::ParsePenInfo(PEN_TYPE& ePen, BOOL QueryPrinter)
     else if ((str[0] >= 'A') && (str[0] <= 'F'))
     {
         num_pens = 10 + (str[0] - 'A');
+    }
+    else if ((str[0] >= 'a') && (str[0] <= 'f'))
+    {
+        num_pens = 10 + (str[0] - 'a');
     }
     else
     {

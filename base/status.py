@@ -22,7 +22,8 @@
 from __future__ import division
 
 # Std Lib
-import struct, cStringIO 
+import struct
+import cStringIO 
 import xml.parsers.expat as expat
 import re
 
@@ -718,42 +719,14 @@ def BatteryCheck(dev, status_block, battery_check):
         try:
             dev.openPML()
         except Error:
-            log.debug("PML channel open failed. Trying dynamic counters...")
-            try_dynamic_counters = True
+            if battery_check == STATUS_BATTERY_CHECK_STD:
+                log.debug("PML channel open failed. Trying dynamic counters...")
+                try_dynamic_counters = True
         else:
-            result, battery_level = dev.getPML(pml.OID_BATTERY_LEVEL)
-            result, power_mode =  dev.getPML(pml.OID_POWER_MODE)
-
-            if battery_level is not None and \
-                power_mode is not None:
-
-                if power_mode & pml.POWER_MODE_BATTERY_LEVEL_KNOWN and \
-                    battery_level >= 0:
-
-                    for x in BATTERY_PML_TRIGGER_MAP:
-                        if x[0] >= battery_level > x[1]:
-                            battery_trigger_level = BATTERY_PML_TRIGGER_MAP[x]
-                            break
-
-                    if power_mode & pml.POWER_MODE_CHARGING:
-                        agent_health = AGENT_HEALTH_CHARGING
-
-                    elif power_mode & pml.POWER_MODE_DISCHARGING:
-                        agent_health = AGENT_HEALTH_DISCHARGING
-
-                    else:
-                        agent_health = AGENT_HEALTH_OK
-
-                    status_block['agents'].append({
-                        'kind'   : AGENT_KIND_INT_BATTERY,
-                        'type'   : AGENT_TYPE_UNSPECIFIED,
-                        'health' : agent_health,
-                        'level'  : battery_level,
-                        'level-trigger' : battery_trigger_level,
-                        })
-                    return
-                    
-                else:
+            if battery_check == STATUS_BATTERY_CHECK_PML:
+                result, battery_level = dev.getPML(pml.OID_BATTERY_LEVEL_2)
+                
+                if result > pml.ERROR_MAX_OK:
                     status_block['agents'].append({
                         'kind'   : AGENT_KIND_INT_BATTERY,
                         'type'   : AGENT_TYPE_UNSPECIFIED,
@@ -762,9 +735,62 @@ def BatteryCheck(dev, status_block, battery_check):
                         'level-trigger' : AGENT_LEVEL_TRIGGER_SUFFICIENT_0,
                         })
                     return
+                
+                else:
+                    status_block['agents'].append({
+                        'kind'   : AGENT_KIND_INT_BATTERY,
+                        'type'   : AGENT_TYPE_UNSPECIFIED,
+                        'health' : AGENT_HEALTH_UNKNOWN,
+                        'level'  : battery_level,
+                        'level-trigger' : AGENT_LEVEL_TRIGGER_SUFFICIENT_0,
+                        })
+                    return
+            
+            else: # STATUS_BATTERY_CHECK_STD
+                result, battery_level = dev.getPML(pml.OID_BATTERY_LEVEL)
+                result, power_mode =  dev.getPML(pml.OID_POWER_MODE)
 
-            else:
-                try_dynamic_counters = True
+                if battery_level is not None and \
+                    power_mode is not None:
+
+                    if power_mode & pml.POWER_MODE_BATTERY_LEVEL_KNOWN and \
+                        battery_level >= 0:
+
+                        for x in BATTERY_PML_TRIGGER_MAP:
+                            if x[0] >= battery_level > x[1]:
+                                battery_trigger_level = BATTERY_PML_TRIGGER_MAP[x]
+                                break
+
+                        if power_mode & pml.POWER_MODE_CHARGING:
+                            agent_health = AGENT_HEALTH_CHARGING
+
+                        elif power_mode & pml.POWER_MODE_DISCHARGING:
+                            agent_health = AGENT_HEALTH_DISCHARGING
+
+                        else:
+                            agent_health = AGENT_HEALTH_OK
+
+                        status_block['agents'].append({
+                            'kind'   : AGENT_KIND_INT_BATTERY,
+                            'type'   : AGENT_TYPE_UNSPECIFIED,
+                            'health' : agent_health,
+                            'level'  : battery_level,
+                            'level-trigger' : battery_trigger_level,
+                            })
+                        return
+                        
+                    else:
+                        status_block['agents'].append({
+                            'kind'   : AGENT_KIND_INT_BATTERY,
+                            'type'   : AGENT_TYPE_UNSPECIFIED,
+                            'health' : AGENT_HEALTH_UNKNOWN,
+                            'level'  : 0,
+                            'level-trigger' : AGENT_LEVEL_TRIGGER_SUFFICIENT_0,
+                            })
+                        return
+
+                else:
+                    try_dynamic_counters = True
 
     finally:
         dev.closePML()
@@ -1266,39 +1292,50 @@ def MapPJLErrorCode(error_code, str_code=None):
 
 pjl_code_pat = re.compile("""^CODE\s*=\s*(\d.*)$""", re.IGNORECASE)
 
-def StatusType8(dev): #  LaserJet PJL
+
+
+def StatusType8(dev): #  LaserJet PJL (B&W only)
     try:
+        # Will error if printer is busy printing...
         dev.openPrint()
     except Error, e:
         log.warn(e.msg)
+        status_code = STATUS_PRINTER_BUSY
+    else:
+        try:
+            dev.writePrint("\x1b%-12345X@PJL INFO STATUS \r\n\x1b%-12345X")
+            pjl_return = dev.readPrint(1024, timeout=5, allow_short_read=True)
+            dev.close()
 
-    dev.writePrint("\x1b%-12345X@PJL INFO STATUS \r\n\x1b%-12345X")
-    pjl_return = dev.readPrint(1024, timeout=5, allow_short_read=True)
-    dev.close()
+            log.debug_block("PJL return:", pjl_return)
 
-    log.debug_block("PJL return:", pjl_return)
+            str_code = '10001'
 
-    str_code = '10001'
+            for line in pjl_return.splitlines():
+                line = line.strip()
+                match = pjl_code_pat.match(line)
 
-    for line in pjl_return.splitlines():
-        line = line.strip()
-        match = pjl_code_pat.match(line)
+                if match is not None:
+                    str_code = match.group(1)
+                    break
 
-        if match is not None:
-            str_code = match.group(1)
-            break
+            log.debug("Code = %s" % str_code)
 
-    log.debug("Code = %s" % str_code)
+            try:
+                error_code = int(str_code)
+            except ValueError:
+                error_code = DEFAULT_PJL_ERROR_CODE
 
-    try:
-        error_code = int(str_code)
-    except ValueError:
-        error_code = DEFAULT_PJL_ERROR_CODE
+            log.debug("Error code = %d" % error_code)
 
-    log.debug("Error code = %d" % error_code)
-
-    status_code = MapPJLErrorCode(error_code, str_code)
-
+            status_code = MapPJLErrorCode(error_code, str_code)
+        
+        finally:
+            try:
+                dev.closePrint()
+            except Error:
+                pass
+    
     agents = []
 
     # TODO: Only handles mono lasers...

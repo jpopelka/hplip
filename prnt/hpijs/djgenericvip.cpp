@@ -54,7 +54,11 @@ DJGenericVIP::DJGenericVIP (SystemServices* pSS, BOOL proto)
     {
         bCheckForCancelButton = TRUE;
         constructor_error = VerifyPenInfo ();
-        CERRCHECK;
+        if (constructor_error != NO_ERROR)
+        {
+            constructor_error = NO_ERROR;
+            ePen = BOTH_PENS;
+        }
     }
     else
         ePen = BOTH_PENS;
@@ -451,7 +455,7 @@ BOOL DJGenericVIP::HagakiFeedDuplexerPresent(BOOL bQueryPrinter)
         bQueryPrinter = FALSE;
     }
 
-    err = pSS->GetDeviceID(bDevIDBuff, DevIDBuffSize, bQueryPrinter);
+    err = pSS->GetDeviceID (bDevIDBuff, DevIDBuffSize, bQueryPrinter);
     if (err!=NO_ERROR)
     {
         return 0;

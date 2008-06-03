@@ -82,28 +82,26 @@ class SetupSettings(SetupSettings_base):
         log.debug(self.timeout)
 
     def updateFilter(self, id=-1):
+        self.filter = []
+        
         if id == 0:
-            self.filter = 'none'
+            return 
 
         else:
-            filters = []
-
             if self.faxCheckBox.isChecked():
-                filters.append('fax')
+                self.filter.append('fax')
 
             if self.scanCheckBox.isChecked():
-                filters.append('scan')
+                self.filter.append('scan')
 
             if self.pcardCheckBox.isChecked():
-                filters.append('pcard')
+                self.filter.append('pcard')
 
             if self.copyCheckBox.isChecked():
-                filters.append('copy')
+                self.filter.append('copy')
 
-            if not filters:
-                filters.append('none')
-
-            self.filter = ','.join(filters)
+            #if not filter:
+            #    filter.append('none')
 
         log.debug(self.filter)
 

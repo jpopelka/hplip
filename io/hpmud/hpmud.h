@@ -2,7 +2,7 @@
 
   hpmud.h - public definitions for multi-point transport driver 
  
-  (c) 2004-2007 Copyright Hewlett-Packard Development Company, LP
+  (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy 
   of this software and associated documentation files (the "Software"), to deal 
@@ -71,7 +71,9 @@ enum HPMUD_SCANTYPE
    HPMUD_SCANTYPE_NA = 0,
    HPMUD_SCANTYPE_SCL = 1,
    HPMUD_SCANTYPE_PML = 2,
-   HPMUD_SCANTYPE_SOAP = 3
+   HPMUD_SCANTYPE_SOAP = 3,    /* Wookie (ie:ljcm1017) */
+   HPMUD_SCANTYPE_MARVELL = 4,     /* (ie: ljm1005) */
+   HPMUD_SCANTYPE_SOAPHT = 5,   /* HorseThief (ie: ljm1522) */
 };
 
 enum HPMUD_STATUSTYPE
@@ -103,6 +105,7 @@ enum HPMUD_SUPPORT_TYPE
 #define HPMUD_S_SOAP_SCAN "HP-SOAP-SCAN"
 #define HPMUD_S_SOAP_FAX "HP-SOAP-FAX"
 #define HPMUD_S_DEVMGMT_CHANNEL "HP-DEVMGMT"
+#define HPMUD_S_MARVELL_SCAN_CHANNEL "HP-MARVELL-SCAN"
 
 typedef int HPMUD_DEVICE;       /* usb, parallel or jetdirect */
 #define HPMUD_DEVICE_MAX 2      /* zero is not used */

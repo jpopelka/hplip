@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,10 +19,15 @@
 # Author: Don Welch
 #
 
+# Std Lib
+
+# Local
 from base.g import *
-import os.path
+from ui_utils import load_pixmap
+
+# Qt
 from qt import *
-#from alignform_base import AlignForm_base
+
 
 class AlignForm(QDialog):
     def __init__(self, parent, line_id, orientation, colors, line_count, 
@@ -96,7 +101,7 @@ class AlignForm(QDialog):
         self.connect(self.ContinueButton,SIGNAL("clicked()"),self,SLOT("accept()"))
         self.connect(self.buttonGroup,SIGNAL("clicked(int)"),self.buttonGroup_clicked)
 
-        self.Icon.setPixmap(QPixmap(os.path.join(prop.image_dir, '%s-%s-%d.png' % (orientation, colors, line_count))))
+        self.Icon.setPixmap(load_pixmap('%s-%s-%d.png' % (orientation, colors, line_count), 'other'))
 
         self.buttonGroup.setTitle(line_id)
 

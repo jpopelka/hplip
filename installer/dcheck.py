@@ -20,16 +20,25 @@
 # Author: Don Welch
 #
 
-import os, os.path, re, sys
+# Std Lib
+import os
+import os.path
+import re
+import sys
 
+# Local
 from base.g import *
 from base import utils
 
+
 ver_pat = re.compile("""(\d+.\d+)""", re.IGNORECASE)
+proc_pat = re.compile(r"""(\d+)""", re.I)
 
 ld_output = ''
-ps_output = ''
+#ps_output = ''
 mod_output = ''
+
+
 
 def update_ld_output():
     # For library checks
@@ -121,7 +130,7 @@ def locate_file_contains(f, dir, s):
     log.debug("Searching for file(s) '%s' in '%s' that contain '%s'..." % (f, dir, s))
     found = []
     for w in utils.walkFiles(dir, recurse=True, abs_paths=True, return_folders=False, pattern=f):
-        
+
         if check_file_contains(w, s):
             log.debug(w)
             found.append(w)
@@ -150,66 +159,65 @@ def check_file_contains(f, s):
     finally:
         cleanup_spinner()
 
+
+def get_process_list():
+    processes = [] # (pid, cmdline), ...
+    for x in utils.walkFiles("/proc", False, True, True):
+        s = proc_pat.search(x) 
+        if s is not None:
+            try:
+                cmdline = file(os.path.join(x, 'cmdline'), 'r').read().replace('\x00', '').replace('\n', '').strip()
+            except IOError:
+                cmdline = None
+                
+            if cmdline:
+                processes.append((int(s.group(1)), cmdline))
+
+    return processes
+
+
 def check_ps(process_list):
-    global ps_output
-    
-    log.debug("Searching any process(es) '%s' in 'ps' output..." % process_list)
-    
-    if not ps_output:
-        status, ps_output = utils.run('ps -e -a -o pid,cmd', log_output=False)
+    log.debug("Searching any process(es) '%s' in running processes..." % process_list)
+    processes = get_process_list()
 
     try:
-        for a in ps_output.splitlines():
+        for pid, cmdline in processes:
             update_spinner()
-
             for p in process_list:
-                if p in a:
-                    log.debug("'%s' found." % a.replace('\n', ''))
+                if p in cmdline:
+                    log.debug("'%s' found." % cmdline)
                     return True
 
-        log.debug("Process not found.")
+        log.debug("Not found")
         return False
 
     finally:
         cleanup_spinner()
-        
+
+
 def get_ps_pid(process):
-    global ps_output
-    
-    log.debug("Searching for the PID for process '%s' in 'ps' output..." % process)
-    
-    if not ps_output:
-        status, ps_output = utils.run('ps -e -a -o pid,cmd', log_output=False)
-    
+    log.debug("Searching for the PID for process '%s' in running processes..." % process)
+    processes = get_process_list()
+
     try:
-        for a in ps_output.splitlines():
+        for pid, cmdline in processes:
             update_spinner()
-            try:
-                pid, command = a.strip().split(' ', 1)
-            except ValueError:
-                continue
-            
-            if process in command:
-                try:
-                    pid = int(pid)
-                except ValueError:
-                    continue
-                    
-                log.debug("'%s' found (pid=%d)." % (command, pid))
+            if process in cmdline:
+                log.debug("'%s' found." % cmdline)
                 return pid
 
-        log.debug("Process not found.")
+        log.debug("Not found")
         return 0
 
     finally:
-        cleanup_spinner()        
-        
-        
+        cleanup_spinner()
+
+
 def check_lsmod(module):
     global mod_output
-    
+
     if not mod_output:
         lsmod = utils.which('lsmod')
         status, mod_output = utils.run(os.path.join(lsmod, 'lsmod'), log_output=False)
-        
+
     return mod_output.find(module) >= 0

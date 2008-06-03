@@ -2,7 +2,7 @@
 
   io.c - HP SANE backend for multi-function peripherals (libsane-hpaio)
 
-  (c) 2001-2007 Copyright Hewlett-Packard Development Company, LP
+  (c) 2001-2008 Copyright Hewlett-Packard Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy 
   of this software and associated documentation files (the "Software"), to deal 
@@ -27,52 +27,93 @@
 
 #include <stdio.h>
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
+#include <unistd.h>
+#include <pwd.h>
 #include "hpmud.h"
 #include "common.h"
 #include "pml.h"
 #include "io.h"
+#ifdef HAVE_DBUS
+#include <dbus/dbus.h>
+#endif
+#define DEBUG_DECLARE_ONLY
+#include "sanei_debug.h"
 
-int __attribute__ ((visibility ("hidden"))) SendScanEvent(char *device_uri, int event, char *type)
+#ifdef HAVE_DBUS
+DBusError dbus_err;
+DBusConnection * dbus_conn;
+
+int __attribute__ ((visibility ("hidden"))) InitDbus(void)
 {
-   struct sockaddr_in pin;  
-   char message[512];  
-   int len=0;
-   int hpssd_socket=-1, hpssd_port_num=2207;
-
-   bzero(&pin, sizeof(pin));  
-   pin.sin_family = AF_INET;  
-   pin.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-   pin.sin_port = htons(hpssd_port_num);  
+   dbus_error_init(&dbus_err);
+   dbus_conn = dbus_bus_get(DBUS_BUS_SYSTEM, &dbus_err);
     
-   if ((hpssd_socket = socket(AF_INET, SOCK_STREAM, 0)) == -1) 
-   {  
-      BUG("unable to create hpssd socket %d: %m\n", hpssd_port_num);
-      goto bugout;  
-   }  
+   if (dbus_error_is_set(&dbus_err))
+   { 
+      BUG("dBus Connection Error (%s)!\n", dbus_err.message); 
+      dbus_error_free(&dbus_err); 
+   }
 
-   if (connect(hpssd_socket, (void *)&pin, sizeof(pin)) == -1)  
-   {  
-      BUG("unable to connect hpssd socket %d: %m\n", hpssd_port_num);
-      goto bugout;  
-   }  
+   if (NULL == dbus_conn) 
+   { 
+      return 0; 
+   }
 
-   len = sprintf(message, "msg=Event\ndevice-uri=%s\nevent-code=%d\nevent-type=%s\n", device_uri, event, type);
- 
-   /* Send message with no response. */
-   if (send(hpssd_socket, message, len, 0) == -1) 
-   {  
-      BUG("unable to send Event %s %d: %m\n", device_uri, event);
-   }  
-
-bugout:
-   if (hpssd_socket >= 0)
-      close(hpssd_socket);
-
-    return 0;    
+   return 1;
 }
 
+int __attribute__ ((visibility ("hidden"))) SendScanEvent(char *device_uri, int event)
+{
+    DBusMessage * msg = dbus_message_new_signal(DBUS_PATH, DBUS_INTERFACE, "Event");
+    char * printer = "";
+    char * title = "";
+    int jobid = 0; 
+    char * username = "";
+
+    uid_t uid = getuid();
+    struct passwd *p = getpwuid (uid);
+    username = p->pw_name;
+
+    if (NULL == username)
+        username = "";
+
+    if (NULL == msg)
+    {
+        BUG("dbus message is NULL!\n");
+        return 0;
+    }
+
+    dbus_message_append_args(msg, 
+        DBUS_TYPE_STRING, &device_uri,
+        DBUS_TYPE_STRING, &printer,
+        DBUS_TYPE_UINT32, &event, 
+        DBUS_TYPE_STRING, &username, 
+        DBUS_TYPE_UINT32, &jobid,
+        DBUS_TYPE_STRING, &title, 
+        DBUS_TYPE_INVALID);
+
+    if (!dbus_connection_send(dbus_conn, msg, NULL))
+    {
+        BUG("dbus message send failed!\n");
+        return 0;
+    }
+
+    dbus_connection_flush(dbus_conn);
+    dbus_message_unref(msg);
+
+    return 1;
+}
+#else
+int __attribute__ ((visibility ("hidden"))) InitDbus(void)
+{
+   return 1;
+}
+int __attribute__ ((visibility ("hidden"))) SendScanEvent(char *device_uri, int event)
+{
+    return 1;
+}
+#endif  /* HAVE_DBUS */
+ 
 /* Read full requested data length in BUFFER_SIZE chunks. Return number of bytes read. */
 int __attribute__ ((visibility ("hidden"))) ReadChannelEx(int deviceid, int channelid, unsigned char * buffer, int length, int timeout)
 {

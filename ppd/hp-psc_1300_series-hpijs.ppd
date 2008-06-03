@@ -3,7 +3,7 @@
 *% Created by the CUPS PPD Compiler v1.2.0.
 *% (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 *FormatVersion: "4.3"
-*FileVersion: "hpijs 2.8.2.10"
+*FileVersion: "hpijs 2.8.5.23"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "hp-psc_1300_series-hpijs.ppd"
@@ -13,7 +13,7 @@
 *Manufacturer: "HP"
 *ModelName: "HP PSC 1300 Foomatic/hpijs"
 *ShortNickName: "HP PSC 1300 Foomatic/hpijs"
-*NickName: "HP PSC 1300 Foomatic/hpijs, hpijs 2.8.2.10"
+*NickName: "HP PSC 1300 Foomatic/hpijs, hpijs 2.8.5.23"
 *PSVersion: "(3010.000) 705"
 *PSVersion: "(3010.000) 707"
 *PSVersion: "(3010.000) 815"

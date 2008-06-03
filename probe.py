@@ -21,7 +21,7 @@
 #
 
 
-__version__ = '4.0'
+__version__ = '4.1'
 __title__ = 'Printer Discovery Utility'
 __doc__ = "Discover USB, parallel, and network printers."
 
@@ -30,6 +30,7 @@ __doc__ = "Discover USB, parallel, and network printers."
 import sys
 import getopt
 import operator
+import os
 
 # Local
 from base.g import *
@@ -69,221 +70,227 @@ def usage(typ='text'):
 
 log.set_module('hp-probe')
 
-
-
 try:
-    opts, args = getopt.getopt(sys.argv[1:],
-                                'hl:b:t:o:e:s:gm:',
-                                ['help', 'help-rest', 'help-man',
-                                  'help-desc',
-                                  'logging=',
-                                  'bus=',
-                                  'event=',
-                                  'ttl=',
-                                  'timeout=',
-                                  'filter=',
-                                  'search=',
-                                  'method=',
-                                ]
-                              )
-except getopt.GetoptError, e:
-    log.error(e.msg)
-    usage()
 
-log_level = logger.DEFAULT_LOG_LEVEL
-bus = None
-align_debug = False
-timeout=10
-ttl=4
-filter = 'none'
-search = ''
-method = 'slp'
-
-if os.getenv("HPLIP_DEBUG"):
-    log.set_level('debug')
-
-for o, a in opts:
-
-    if o in ('-h', '--help'):
+    try:
+        opts, args = getopt.getopt(sys.argv[1:],
+                                    'hl:b:t:o:e:s:gm:',
+                                    ['help', 'help-rest', 'help-man',
+                                      'help-desc',
+                                      'logging=',
+                                      'bus=',
+                                      'event=',
+                                      'ttl=',
+                                      'timeout=',
+                                      'filter=',
+                                      'search=',
+                                      'method=',
+                                    ]
+                                  )
+    except getopt.GetoptError, e:
+        log.error(e.msg)
         usage()
 
-    elif o == '--help-rest':
-        usage('rest')
+    log_level = logger.DEFAULT_LOG_LEVEL
+    bus = None
+    align_debug = False
+    timeout=10
+    ttl=4
+    filter = []
+    search = ''
+    method = 'slp'
 
-    elif o == '--help-man':
-        usage('man')
-
-    elif o == '--help-desc':
-        print __doc__,
-        sys.exit(0)
-
-    elif o == '-g':
+    if os.getenv("HPLIP_DEBUG"):
         log.set_level('debug')
 
-    elif o in ('-b', '--bus'):
-        try:
-            bus = a.lower().strip()
-        except:
-            bus = 'usb'
+    for o, a in opts:
 
-        if not device.validateBusList(bus):
+        if o in ('-h', '--help'):
             usage()
 
-    elif o in ('-l', '--logging'):
-        log_level = a.lower().strip()
-        if not log.set_level(log_level):
-            usage()
+        elif o == '--help-rest':
+            usage('rest')
 
-    elif o in ('-m', '--method'):
-        method = a.lower().strip()
+        elif o == '--help-man':
+            usage('man')
 
-        if method not in ('slp', 'mdns', 'bonjour'):
-            log.error("Invalid network search protocol: %s (must be 'slp' or 'mdns')" % method)
-            method = 'slp'
+        elif o == '--help-desc':
+            print __doc__,
+            sys.exit(0)
 
-        else:
-            bus = 'net'
+        elif o == '-g':
+            log.set_level('debug')
 
-    elif o in ('-t', '--ttl'):
-        try:
-            ttl = int(a)
-        except ValueError:
-            ttl = 4
-            log.note("TTL value error. TTL set to default of 4 hops.")
+        elif o in ('-b', '--bus'):
+            try:
+                bus = [x.lower().strip() for x in a.split(',')]
+            except TypeError:
+                bus = ['usb']
 
-    elif o in ('-o', '--timeout'):
-        try:
-            timeout = int(a)
-            if timeout > 45:
-                log.note("Timeout > 45secs. Setting to 45secs.")
-                timeout = 45
-        except ValueError:
-            timeout = 5
-            log.note("Timeout value error. Timeout set to default of 5secs.")
+            if not device.validateBusList(bus):
+                usage()
 
-        if timeout < 0:
-            log.error("You must specify a positive timeout in seconds.")
-            usage()
+        elif o in ('-l', '--logging'):
+            log_level = a.lower().strip()
+            if not log.set_level(log_level):
+                usage()
 
-    elif o in ('-e', '--filter'):
-        filter = a.lower().strip()
-        if not device.validateFilterList(filter):
-            usage()
+        elif o in ('-m', '--method'):
+            method = a.lower().strip()
 
-    elif o in ('-s', '--search'):
-        search = a.lower().strip()
+            if method not in ('slp', 'mdns', 'bonjour'):
+                log.error("Invalid network search protocol: %s (must be 'slp' or 'mdns')" % method)
+                method = 'slp'
 
-utils.log_title(__title__, __version__)
-
-if bus is None:
-    x = 1
-    ios = {0: ('usb', "Universal Serial Bus (USB)") }
-    if sys_cfg.configure['network-build']: 
-        ios[x] = ('net', "Network/Ethernet/Wireless (direct connection or JetDirect)")
-        x += 1
-    if sys_cfg.configure['pp-build']: 
-        ios[x] = ('par', "Parallel Port (LPT:)")
-        x += 1
-    
-    if len(ios) > 1:
-        tui.header("CHOOSE CONNECTION TYPE")
-        f = tui.Formatter()
-        f.max_widths = (10, 10, 40)
-        f.header = ("Num.", "Connection Type", "Connection Type Description")
-        
-        for x, data in ios.items():
-            if not x:
-                f.add((str(x) + "*", data[0], data[1]))
             else:
-                f.add((str(x), data[0], data[1]))
+                bus = ['net']
+
+        elif o in ('-t', '--ttl'):
+            try:
+                ttl = int(a)
+            except ValueError:
+                ttl = 4
+                log.note("TTL value error. TTL set to default of 4 hops.")
+
+        elif o in ('-o', '--timeout'):
+            try:
+                timeout = int(a)
+                if timeout > 45:
+                    log.note("Timeout > 45secs. Setting to 45secs.")
+                    timeout = 45
+            except ValueError:
+                timeout = 5
+                log.note("Timeout value error. Timeout set to default of 5secs.")
+
+            if timeout < 0:
+                log.error("You must specify a positive timeout in seconds.")
+                usage()
+
+        elif o in ('-e', '--filter'):
+            filter = [x.strip().lower() for x in a.split(',')]
+            if not device.validateFilterList(filter):
+                usage()
+
+        elif o in ('-s', '--search'):
+            search = a.lower().strip()
+
+    utils.log_title(__title__, __version__)
+    
+    if os.getuid() == 0:
+        log.warn("hp-probe should not be run as root.")
+
+    if bus is None:
+        x = 1
+        ios = {0: ('usb', "Universal Serial Bus (USB)") }
+        if sys_cfg.configure['network-build']: 
+            ios[x] = ('net', "Network/Ethernet/Wireless (direct connection or JetDirect)")
+            x += 1
+        if sys_cfg.configure['pp-build']: 
+            ios[x] = ('par', "Parallel Port (LPT:)")
+            x += 1
+        
+        if len(ios) > 1:
+            tui.header("CHOOSE CONNECTION TYPE")
+            f = tui.Formatter()
+            f.max_widths = (10, 10, 40)
+            f.header = ("Num.", "Connection Type", "Connection Type Description")
             
-        f.output()
-    
-        ok, val = tui.enter_range("\nEnter number 0...%d for connection type (q=quit, enter=usb*) ? " % x, 
-            0, x, 0)
+            for x, data in ios.items():
+                if not x:
+                    f.add((str(x) + "*", data[0], data[1]))
+                else:
+                    f.add((str(x), data[0], data[1]))
+                
+            f.output()
+        
+            ok, val = tui.enter_range("\nEnter number 0...%d for connection type (q=quit, enter=usb*) ? " % x, 
+                0, x, 0)
 
-        if not ok: sys.exit(0)
-        
-        bus = ios[val][0]
-    else:
-        bus = ios[0][0]
-        
-    log.info("")
-    
-tui.header("DEVICE DISCOVERY")
-
-buses = bus
-for bus in buses.split(','):
-    if bus == 'net':
-        log.info(log.bold("Probing network for printers. Please wait, this will take approx. %d seconds...\n" % timeout))
-        
-    FILTER_MAP = {'print' : None,
-                  'none' : None,
-                  'scan': 'scan-type', 
-                  'copy': 'copy-type', 
-                  'pcard': 'pcard-type',
-                  'fax': 'fax-type',
-                  }
-    
-    filter_dict = {}
-    for f in filter.split(','):
-        if f in FILTER_MAP:
-            filter_dict[FILTER_MAP[f]] = (operator.gt, 0)
-        else:
-            filter_dict[f] = (operator.gt, 0)
+            if not ok: sys.exit(0)
             
-    log.debug(filter_dict)
+            bus = [ios[val][0]]
+        else:
+            bus = [ios[0][0]]
+            
+        log.info("")
+        
+    tui.header("DEVICE DISCOVERY")
 
-    devices = device.probeDevices(bus, timeout, ttl, filter_dict, search, method)
-    cleanup_spinner()
+    for b in bus:
+        if b == 'net':
+            log.info(log.bold("Probing network for printers. Please wait, this will take approx. %d seconds...\n" % timeout))
+            
+        FILTER_MAP = {'print' : None,
+                      'none' : None,
+                      'scan': 'scan-type', 
+                      'copy': 'copy-type', 
+                      'pcard': 'pcard-type',
+                      'fax': 'fax-type',
+                      }
+        
+        filter_dict = {}
+        for f in filter:
+            if f in FILTER_MAP:
+                filter_dict[FILTER_MAP[f]] = (operator.gt, 0)
+            else:
+                filter_dict[f] = (operator.gt, 0)
+                
+        log.debug(filter_dict)
 
-    max_c1, max_c2, max_c3, max_c4 = 0, 0, 0, 0
+        devices = device.probeDevices([b], timeout, ttl, filter_dict, search, method)
+        cleanup_spinner()
 
-    if devices:
-        for d in devices:
-            max_c1 = max(len(d), max_c1)
-            max_c3 = max(len(devices[d][0]), max_c3)
-            max_c4 = max(len(devices[d][2]), max_c4)
+        max_c1, max_c2, max_c3, max_c4 = 0, 0, 0, 0
 
-        if bus == 'net':
-            formatter = utils.TextFormatter(
-                        (
-                            {'width': max_c1, 'margin' : 2},
-                            {'width': max_c3, 'margin' : 2},
-                            {'width': max_c4, 'margin' : 2},
-                        )
-                    )
-
-            log.info(formatter.compose(("Device URI", "Model", "Name")))
-            log.info(formatter.compose(('-'*max_c1, '-'*max_c3, '-'*max_c4)))
+        if devices:
             for d in devices:
-                log.info(formatter.compose((d, devices[d][0], devices[d][2])))
+                max_c1 = max(len(d), max_c1)
+                max_c3 = max(len(devices[d][0]), max_c3)
+                max_c4 = max(len(devices[d][2]), max_c4)
 
-        elif bus in ('usb', 'par', 'cups'):
-            formatter = utils.TextFormatter(
-                        (
-                            {'width': max_c1, 'margin' : 2},
-                            {'width': max_c3, 'margin' : 2},
+            if b == 'net':
+                formatter = utils.TextFormatter(
+                            (
+                                {'width': max_c1, 'margin' : 2},
+                                {'width': max_c3, 'margin' : 2},
+                                {'width': max_c4, 'margin' : 2},
+                            )
                         )
-                    )
 
-            log.info(formatter.compose(("Device URI", "Model")))
-            log.info(formatter.compose(('-'*max_c1, '-'*max_c3)))
-            for d in devices:
-                log.info(formatter.compose((d, devices[d][0])))
+                log.info(formatter.compose(("Device URI", "Model", "Name")))
+                log.info(formatter.compose(('-'*max_c1, '-'*max_c3, '-'*max_c4)))
+                for d in devices:
+                    log.info(formatter.compose((d, devices[d][0], devices[d][2])))
+
+            elif b in ('usb', 'par', 'cups'):
+                formatter = utils.TextFormatter(
+                            (
+                                {'width': max_c1, 'margin' : 2},
+                                {'width': max_c3, 'margin' : 2},
+                            )
+                        )
+
+                log.info(formatter.compose(("Device URI", "Model")))
+                log.info(formatter.compose(('-'*max_c1, '-'*max_c3)))
+                for d in devices:
+                    log.info(formatter.compose((d, devices[d][0])))
+
+            else:
+                log.error("Invalid bus: %s" % b)
+
+            log.info("\nFound %d printer(s) on the '%s' bus.\n" % (len(devices), b))
 
         else:
-            log.error("Invalid bus: %s" % bus)
+            log.warn("No devices found on the '%s' bus. If this isn't the result you are expecting," % b)
 
-        log.info("\nFound %d printer(s) on the '%s' bus.\n" % (len(devices), bus))
+            if b == 'net':
+                log.warn("check your network connections and make sure your internet")
+                log.warn("firewall software is disabled.")
+            else:
+                log.warn("check to make sure your devices are properly connected and powered on.")
 
-    else:
-        log.warn("No devices found on the '%s' bus. If this isn't the result you are expecting," % bus)
+except KeyboardInterrupt:
+    log.error("User exit")
 
-        if bus == 'net':
-            log.warn("check your network connections and make sure your internet")
-            log.warn("firewall software is disabled.")
-        else:
-            log.warn("check to make sure your devices are properly connected and powered on.")
-
-
+log.info("")
+log.info("Done.")

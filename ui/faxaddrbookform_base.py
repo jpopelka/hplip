@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/dwelch/linux-imaging-and-printing/src/ui/faxaddrbookform_base.ui'
+# Form implementation generated from reading ui file 'faxaddrbookform_base.ui'
 #
-# Created: Mon May 9 13:35:55 2005
-#      by: The PyQt User Interface Compiler (pyuic) 3.14.1
+# Created: Thu Feb 7 16:26:14 2008
+#      by: The PyQt User Interface Compiler (pyuic) 3.17.3
 #
 # WARNING! All changes made in this file will be lost!
 
 
-import sys
 from qt import *
 
 
@@ -24,7 +23,7 @@ class FaxAddrBookForm_base(QDialog):
 
         self.OKButton = QPushButton(self,"OKButton")
 
-        FaxAddrBookForm_baseLayout.addWidget(self.OKButton,2,6)
+        FaxAddrBookForm_baseLayout.addWidget(self.OKButton,2,8)
 
         self.newButton = QPushButton(self,"newButton")
 
@@ -37,19 +36,6 @@ class FaxAddrBookForm_base(QDialog):
         self.deleteButton = QPushButton(self,"deleteButton")
 
         FaxAddrBookForm_baseLayout.addWidget(self.deleteButton,2,2)
-        spacer29 = QSpacerItem(270,20,QSizePolicy.Expanding,QSizePolicy.Minimum)
-        FaxAddrBookForm_baseLayout.addItem(spacer29,2,5)
-
-        self.line8 = QFrame(self,"line8")
-        self.line8.setFrameShape(QFrame.VLine)
-        self.line8.setFrameShadow(QFrame.Sunken)
-        self.line8.setFrameShape(QFrame.VLine)
-
-        FaxAddrBookForm_baseLayout.addWidget(self.line8,2,3)
-
-        self.groupButton = QPushButton(self,"groupButton")
-
-        FaxAddrBookForm_baseLayout.addWidget(self.groupButton,2,4)
 
         self.addressListView = QListView(self,"addressListView")
         self.addressListView.addColumn(self.__tr("Nickname"))
@@ -64,11 +50,35 @@ class FaxAddrBookForm_base(QDialog):
         self.addressListView.setAllColumnsShowFocus(1)
         self.addressListView.setShowSortIndicator(0)
 
-        FaxAddrBookForm_baseLayout.addMultiCellWidget(self.addressListView,1,1,0,6)
+        FaxAddrBookForm_baseLayout.addMultiCellWidget(self.addressListView,1,1,0,8)
 
         self.textLabel11 = QLabel(self,"textLabel11")
 
         FaxAddrBookForm_baseLayout.addMultiCellWidget(self.textLabel11,0,0,0,2)
+
+        self.groupButton = QPushButton(self,"groupButton")
+
+        FaxAddrBookForm_baseLayout.addWidget(self.groupButton,2,4)
+
+        self.line8 = QFrame(self,"line8")
+        self.line8.setFrameShape(QFrame.VLine)
+        self.line8.setFrameShadow(QFrame.Sunken)
+        self.line8.setFrameShape(QFrame.VLine)
+
+        FaxAddrBookForm_baseLayout.addWidget(self.line8,2,3)
+
+        self.line8_2 = QFrame(self,"line8_2")
+        self.line8_2.setFrameShape(QFrame.VLine)
+        self.line8_2.setFrameShadow(QFrame.Sunken)
+        self.line8_2.setFrameShape(QFrame.VLine)
+
+        FaxAddrBookForm_baseLayout.addWidget(self.line8_2,2,5)
+
+        self.importPushButton = QPushButton(self,"importPushButton")
+
+        FaxAddrBookForm_baseLayout.addWidget(self.importPushButton,2,6)
+        spacer29 = QSpacerItem(300,20,QSizePolicy.Expanding,QSizePolicy.Minimum)
+        FaxAddrBookForm_baseLayout.addItem(spacer29,2,7)
 
         self.languageChange()
 
@@ -83,6 +93,7 @@ class FaxAddrBookForm_base(QDialog):
         self.connect(self.addressListView,SIGNAL("currentChanged(QListViewItem*)"),self.addressListView_currentChanged)
         self.connect(self.addressListView,SIGNAL("doubleClicked(QListViewItem*)"),self.addressListView_doubleClicked)
         self.connect(self.groupButton,SIGNAL("clicked()"),self.groupButton_clicked)
+        self.connect(self.importPushButton,SIGNAL("clicked()"),self.importPushButton_clicked)
 
         self.setTabOrder(self.addressListView,self.newButton)
         self.setTabOrder(self.newButton,self.editButton)
@@ -97,7 +108,6 @@ class FaxAddrBookForm_base(QDialog):
         self.newButton.setText(self.__tr("New..."))
         self.editButton.setText(self.__tr("Edit..."))
         self.deleteButton.setText(self.__tr("Delete..."))
-        self.groupButton.setText(self.__tr("Groups..."))
         self.addressListView.header().setLabel(0,self.__tr("Nickname"))
         self.addressListView.header().setLabel(1,self.__tr("Title"))
         self.addressListView.header().setLabel(2,self.__tr("First Name"))
@@ -106,6 +116,8 @@ class FaxAddrBookForm_base(QDialog):
         self.addressListView.header().setLabel(5,self.__tr("Member of Group(s)"))
         self.addressListView.header().setLabel(6,self.__tr("Notes/Other Information"))
         self.textLabel11.setText(self.__tr("<b>Fax Addresses:</b>"))
+        self.groupButton.setText(self.__tr("Groups..."))
+        self.importPushButton.setText(self.__tr("Import..."))
 
 
     def newButton_clicked(self):
@@ -129,13 +141,8 @@ class FaxAddrBookForm_base(QDialog):
     def groupButton_clicked(self):
         print "FaxAddrBookForm_base.groupButton_clicked(): Not implemented yet"
 
+    def importPushButton_clicked(self):
+        print "FaxAddrBookForm_base.importPushButton_clicked(): Not implemented yet"
+
     def __tr(self,s,c = None):
         return qApp.translate("FaxAddrBookForm_base",s,c)
-
-if __name__ == "__main__":
-    a = QApplication(sys.argv)
-    QObject.connect(a,SIGNAL("lastWindowClosed()"),a,SLOT("quit()"))
-    w = FaxAddrBookForm_base()
-    a.setMainWidget(w)
-    w.show()
-    a.exec_loop()

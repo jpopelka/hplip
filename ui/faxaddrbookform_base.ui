@@ -19,7 +19,7 @@
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
-        <widget class="QPushButton" row="2" column="6">
+        <widget class="QPushButton" row="2" column="8">
             <property name="name">
                 <cstring>OKButton</cstring>
             </property>
@@ -51,46 +51,7 @@
                 <string>Delete...</string>
             </property>
         </widget>
-        <spacer row="2" column="5">
-            <property name="name">
-                <cstring>spacer29</cstring>
-            </property>
-            <property name="orientation">
-                <enum>Horizontal</enum>
-            </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>270</width>
-                    <height>20</height>
-                </size>
-            </property>
-        </spacer>
-        <widget class="Line" row="2" column="3">
-            <property name="name">
-                <cstring>line8</cstring>
-            </property>
-            <property name="frameShape">
-                <enum>VLine</enum>
-            </property>
-            <property name="frameShadow">
-                <enum>Sunken</enum>
-            </property>
-            <property name="orientation">
-                <enum>Vertical</enum>
-            </property>
-        </widget>
-        <widget class="QPushButton" row="2" column="4">
-            <property name="name">
-                <cstring>groupButton</cstring>
-            </property>
-            <property name="text">
-                <string>Groups...</string>
-            </property>
-        </widget>
-        <widget class="QListView" row="1" column="0" rowspan="1" colspan="7">
+        <widget class="QListView" row="1" column="0" rowspan="1" colspan="9">
             <column>
                 <property name="text">
                     <string>Nickname</string>
@@ -192,6 +153,67 @@
                 <string>&lt;b&gt;Fax Addresses:&lt;/b&gt;</string>
             </property>
         </widget>
+        <widget class="QPushButton" row="2" column="4">
+            <property name="name">
+                <cstring>groupButton</cstring>
+            </property>
+            <property name="text">
+                <string>Groups...</string>
+            </property>
+        </widget>
+        <widget class="Line" row="2" column="3">
+            <property name="name">
+                <cstring>line8</cstring>
+            </property>
+            <property name="frameShape">
+                <enum>VLine</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>Sunken</enum>
+            </property>
+            <property name="orientation">
+                <enum>Vertical</enum>
+            </property>
+        </widget>
+        <widget class="Line" row="2" column="5">
+            <property name="name">
+                <cstring>line8_2</cstring>
+            </property>
+            <property name="frameShape">
+                <enum>VLine</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>Sunken</enum>
+            </property>
+            <property name="orientation">
+                <enum>Vertical</enum>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="2" column="6">
+            <property name="name">
+                <cstring>importPushButton</cstring>
+            </property>
+            <property name="text">
+                <string>Import...</string>
+            </property>
+        </widget>
+        <spacer row="2" column="7">
+            <property name="name">
+                <cstring>spacer29</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>300</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
     </grid>
 </widget>
 <connections>
@@ -243,6 +265,12 @@
         <receiver>FaxAddrBookForm_base</receiver>
         <slot>groupButton_clicked()</slot>
     </connection>
+    <connection>
+        <sender>importPushButton</sender>
+        <signal>clicked()</signal>
+        <receiver>FaxAddrBookForm_base</receiver>
+        <slot>importPushButton_clicked()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>addressListView</tabstop>
@@ -263,6 +291,7 @@
     <slot>addressListView_currentChanged( QListViewItem * )</slot>
     <slot>addressListView_doubleClicked( QListViewItem * )</slot>
     <slot>groupButton_clicked()</slot>
+    <slot>importPushButton_clicked()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

@@ -2,7 +2,7 @@
 
   hp.c - hp cups backend 
  
-  (c) 2004-2007 Copyright Hewlett-Packard Development Company, LP
+  (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy 
   of this software and associated documentation files (the "Software"), to deal 
@@ -29,7 +29,6 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <stdio.h>
@@ -41,6 +40,9 @@
 #include <syslog.h>
 #include <ctype.h>
 #include <pthread.h>
+#ifdef HAVE_DBUS
+#include <dbus/dbus.h>
+#endif
 #include "hpmud.h"
 
 //#define HP_DEBUG
@@ -128,6 +130,13 @@ typedef enum
 static const char pjl_ustatus_cmd[] = "\e%-12345X@PJL USTATUS DEVICE = ON \r\n@PJL USTATUS JOB = ON \r\n@PJL JOB \r\n\e%-12345X";
 static const char pjl_job_end_cmd[] = "\e%-12345X@PJL EOJ \r\n\e%-12345X";
 static const char pjl_ustatus_off_cmd[] = "\e%-12345X@PJL USTATUSOFF \r\n\e%-12345X";
+
+#ifdef HAVE_DBUS
+#define DBUS_INTERFACE "com.hplip.Service"
+#define DBUS_PATH "/"
+static DBusError dbus_err;
+static DBusConnection *dbus_conn;
+#endif
 
 static int bug(const char *fmt, ...)
 {
@@ -473,51 +482,75 @@ bugout:
    return r;
 }
 
-static int device_event(const char *dev, const char *jobid, int code, char *type, int timeout)
+#ifdef HAVE_DBUS
+static int device_event(const char *dev, const char *printer, int code, 
+    const char *username, const char *jobid, const char *title)
 {
-   struct sockaddr_in pin;  
-   char message[512];  
-   int len=0;
-   int hpssd_socket=-1, hpssd_port_num=2207;
+    DBusMessage * msg = NULL;
+    int id = atoi(jobid);
 
-   bzero(&pin, sizeof(pin));  
-   pin.sin_family = AF_INET;  
-   pin.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-   pin.sin_port = htons(hpssd_port_num);  
-    
-   if ((hpssd_socket = socket(AF_INET, SOCK_STREAM, 0)) == -1) 
-   {  
-      BUG("unable to create hpssd socket %d: %m\n", hpssd_port_num);
-      goto bugout;  
-   }  
+    msg = dbus_message_new_signal(DBUS_PATH, DBUS_INTERFACE, "Event");
 
-   if (connect(hpssd_socket, (void *)&pin, sizeof(pin)) == -1)  
-   {  
-      BUG("unable to connect hpssd socket %d: %m\n", hpssd_port_num);
-      goto bugout;  
-   }  
+    if (NULL == msg)
+    {
+        BUG("dbus message is NULL!\n");
+        return 0;
+    }
 
-   if (timeout == 0)
-      len = sprintf(message, "msg=Event\ndevice-uri=%s\njob-id=%s\nevent-code=%d\nevent-type=%s\n", dev, jobid, code, type);
-   else
-      len = sprintf(message, "msg=Event\ndevice-uri=%s\njob-id=%s\nevent-code=%d\nevent-type=%s\nretry-timeout=%d\n", 
-                     dev, jobid, code, type, timeout);
- 
-   /* Send message with no response. */
-   if (send(hpssd_socket, message, len, 0) == -1) 
-   {  
-      BUG("unable to send Event %s %s %d: %m\n", dev, jobid, code);
-   }  
+    dbus_message_append_args(msg, 
+        DBUS_TYPE_STRING, &dev,
+        DBUS_TYPE_STRING, &printer,
+        DBUS_TYPE_UINT32, &code, 
+        DBUS_TYPE_STRING, &username, 
+        DBUS_TYPE_UINT32, &id,
+        DBUS_TYPE_STRING, &title, 
+        DBUS_TYPE_INVALID);
 
-bugout:
-   if (hpssd_socket >= 0)
-      close(hpssd_socket);
+    if (!dbus_connection_send(dbus_conn, msg, NULL))
+    {
+        BUG("dbus message send failed!\n");
+        return 0;
+    }
 
-   return 0;
+    dbus_connection_flush(dbus_conn);
+    dbus_message_unref(msg);
+
+    return 1;
 }
 
+int init_dbus(void)
+{
+   dbus_error_init(&dbus_err);
+   dbus_conn = dbus_bus_get(DBUS_BUS_SYSTEM, &dbus_err);
+    
+   if (dbus_error_is_set(&dbus_err))
+   { 
+      BUG("dBus Connection Error (%s)!\n", dbus_err.message); 
+      dbus_error_free(&dbus_err); 
+   }
+
+   if (dbus_conn == NULL) 
+   { 
+      return 0; 
+   }
+
+   return 1;
+}
+#else
+static int device_event(const char *dev, const char *printer, int code, 
+    const char *username, const char *jobid, const char *title)
+{
+    return 1;
+}
+int init_dbus(void)
+{
+   return 1;
+}
+#endif  /* HAVE_DBUS */
+
 /* Check printer status, if in an error state, loop until error condition is cleared. */
-static int loop_test(HPMUD_DEVICE dd, HPMUD_CHANNEL cd, struct pjl_attributes *pa, const char *uri, const char *job)
+static int loop_test(HPMUD_DEVICE dd, HPMUD_CHANNEL cd, struct pjl_attributes *pa, 
+        const char *dev, const char *printer, const char *username, const char *jobid, const char *title)
 {
    int retry=0, status;
    const char *pstate;
@@ -533,7 +566,7 @@ static int loop_test(HPMUD_DEVICE dd, HPMUD_CHANNEL cd, struct pjl_attributes *p
          if (retry)
          {
             /* Clear error. */
-            device_event(uri, job, VSTATUS_PRNT, "event", 0);
+            device_event(dev, printer, VSTATUS_PRNT, username, jobid, title);
             fputs("INFO: Printing...\n", stderr);
             fprintf(stderr, "STATE: -%s\n", error_state);
             retry=0;
@@ -545,14 +578,14 @@ static int loop_test(HPMUD_DEVICE dd, HPMUD_CHANNEL cd, struct pjl_attributes *p
       {
          /* Display error. */
          error_state = pstate;
-         device_event(uri, job, status, "error", RETRY_TIMEOUT);
+         device_event(dev, printer, status, username, jobid, title);
          fprintf(stderr, "STATE: +%s\n", error_state);
       }
       
       if (strcmp(pstate, error_state) != 0)
       {
          /* Clear old error and display new error. */
-         device_event(uri, job, status, "error", RETRY_TIMEOUT);
+         device_event(dev, printer, status, username, jobid, title);
          fprintf(stderr, "STATE: -%s\n", error_state);
          error_state = pstate;
          fprintf(stderr, "STATE: +%s\n", error_state);
@@ -578,14 +611,18 @@ int main(int argc, char *argv[])
    HPMUD_CHANNEL cd=-1;
    int n, total, retry=0, size, pages;
    enum HPMUD_RESULT stat;
-
+   char *printer = getenv("PRINTER"); 
+   
+   //     0        1     2     3     4      5
+   // device_uri job-id user title copies options
+   
    if (argc > 1)
    {
       const char *arg = argv[1];
       if ((arg[0] == '-') && (arg[1] == 'h'))
       {
          fprintf(stdout, "HP Linux Imaging and Printing System\nCUPS Backend %s\n", VERSION);
-         fprintf(stdout, "(c) 2003-2007 Copyright Hewlett-Packard Development Company, LP\n");
+         fprintf(stdout, "(c) 2003-2008 Copyright Hewlett-Packard Development Company, LP\n");
          exit(0);
       }
    }
@@ -614,6 +651,8 @@ int main(int argc, char *argv[])
       copies = atoi(argv[4]);
    }
 
+   init_dbus();
+
    fputs("STATE: +connecting-to-device\n", stderr);
 
    /* Get any parameters needed for DeviceOpen. */
@@ -625,13 +664,13 @@ int main(int argc, char *argv[])
    if (strcasestr(argv[0], ":/net") == NULL && (ma.statustype==HPMUD_STATUSTYPE_PJL || ma.statustype==HPMUD_STATUSTYPE_PJLPML))
       pa.pjl_device = 1;
 
-   device_event(argv[0], argv[1], EVENT_START_JOB, "event", 0);
+   device_event(argv[0], printer, EVENT_START_JOB, argv[2], argv[1], argv[3]);
 
    /* Open hp device. */
    while ((stat = hpmud_open_device(argv[0], ma.prt_mode, &hd)) != HPMUD_R_OK)
    {
        /* Display user error. */
-       device_event(argv[0], argv[1], 5000+stat, "error", RETRY_TIMEOUT);
+        device_event(argv[0], printer, 5000+stat, argv[2], argv[1], argv[3]);
 
        BUG("INFO: open device failed; will retry in %d seconds...\n", RETRY_TIMEOUT);
        sleep(RETRY_TIMEOUT);
@@ -641,7 +680,7 @@ int main(int argc, char *argv[])
    if (retry)
    {
       /* Clear user error. */
-      device_event(argv[0], argv[1], VSTATUS_PRNT, "event", 0);
+      device_event(argv[0], printer, VSTATUS_PRNT, argv[2], argv[1], argv[3]);
       retry=0;
    }
 
@@ -668,7 +707,7 @@ int main(int argc, char *argv[])
             {
                while ((stat = hpmud_open_channel(hd, HPMUD_S_PRINT_CHANNEL, &cd)) != HPMUD_R_OK)
                {
-                  device_event(argv[0], argv[1], 5000+stat, "error", RETRY_TIMEOUT);
+                  device_event(argv[0], printer, 5000+stat, argv[2], argv[1], argv[3]);
                   BUG("INFO: open print channel failed; will retry in %d seconds...\n", RETRY_TIMEOUT);
                   sleep(RETRY_TIMEOUT);
                   retry = 1;
@@ -677,7 +716,7 @@ int main(int argc, char *argv[])
                if (retry)
                {
                   /* Clear user error. */
-                  device_event(argv[0], argv[1], VSTATUS_PRNT, "event", 0);
+                  device_event(argv[0], printer, VSTATUS_PRNT, argv[2], argv[1], argv[3]);
                   retry=0;
                }          
 
@@ -700,7 +739,7 @@ int main(int argc, char *argv[])
             if (n != size)
             {
                /* IO error, get printer status. */
-               loop_test(hd, cd, &pa, argv[0], argv[1]);
+               loop_test(hd, cd, &pa, argv[0], printer, argv[2], argv[1], argv[3]);
             }
             else
             {
@@ -708,7 +747,7 @@ int main(int argc, char *argv[])
                if (pa.pjl_device)
                {
                   /* Laserjets have a large data buffer, so manually check for operator intervention condition. */
-                  loop_test(hd, cd, &pa, argv[0], argv[1]);
+                  loop_test(hd, cd, &pa, argv[0], printer, argv[2], argv[1], argv[3]);
                }
             }
             total+=n;
@@ -729,7 +768,7 @@ int main(int argc, char *argv[])
       /* Look for job end status. */
       for (cnt=0; cnt<10; cnt++)
       {
-         loop_test(hd, cd, &pa, argv[0], argv[1]);         
+         loop_test(hd, cd, &pa, argv[0], printer, argv[2], argv[1], argv[3]);         
          pthread_mutex_lock(&pa.mutex);
          pages = pa.eoj_pages;
          pthread_mutex_unlock(&pa.mutex);
@@ -775,7 +814,7 @@ int main(int argc, char *argv[])
       sleep(8);
    }
       
-   device_event(argv[0], argv[1], EVENT_END_JOB, "event", 0);
+   device_event(argv[0], printer, EVENT_END_JOB, argv[2], argv[1], argv[3]);
    fputs("INFO: ready to print\n", stderr);
 
    if (cd >= 0)

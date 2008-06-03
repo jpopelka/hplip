@@ -620,7 +620,7 @@ int __attribute__ ((visibility ("hidden"))) pml_start(HPAIO_RECORD *hpaio)
          bug("failed to open pml channel: %s %d\n", __FILE__, __LINE__);
          goto bugout;
       }
-      SendScanEvent(hpaio->deviceuri, 2000, "event");  /* hpssd message scan started */
+      SendScanEvent(hpaio->deviceuri, EVENT_START_SCAN_JOB); 
    }
    if (!oldStuff)
    {
@@ -1049,7 +1049,7 @@ int __attribute__ ((visibility ("hidden"))) pml_cancel(HPAIO_RECORD *hpaio)
    {
       hpmud_close_channel(hpaio->deviceid, hpaio->cmd_channelid);
       hpaio->cmd_channelid = -1;
-      SendScanEvent(hpaio->deviceuri, 2001, "event");  /* hpssd message scan done */
+      SendScanEvent(hpaio->deviceuri, EVENT_END_SCAN_JOB);
    }
 
    return OK;

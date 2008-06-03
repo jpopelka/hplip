@@ -33,14 +33,20 @@ import struct
 # Local
 from base.g import *
 from base.codes import *
-from base import device, utils, msg, service, msg
-from base.kirbybase import KirbyBase
+from base.ldif import LDIFParser
+from base import device, utils, vcard
 from prnt import cups
 
 try:
     import coverpages
 except ImportError:
     pass
+    
+try:
+    import dbus
+except ImportError:
+    log.error("dbus is required for PC send fax.")
+    
     
 # Update queue values (Send thread ==> UI)
 STATUS_IDLE = 0
@@ -120,10 +126,65 @@ RESOLUTION_300DPI = 3
 
 FILE_HEADER_SIZE = 28
 PAGE_HEADER_SIZE = 24
+
+# **************************************************************************** #
+
+##skip_dn = ["uid=foo,ou=People,dc=example,dc=com",
+##    "uid=bar,ou=People,dc=example,dc=com", "dc=example,dc=com"]
+
+class FaxLDIFParser(LDIFParser):
+    def __init__(self, input, db):
+        LDIFParser.__init__(self, input)
+        self.db = db
+    
+    def handle(self, dn, entry):
+        ##for i in skip_dn:
+        ##    if i == dn: return
+        if dn:
+            try:
+                firstname = entry['givenName'][0]
+            except KeyError:
+                try:
+                    firstname = entry['givenname'][0]
+                except KeyError:
+                    firstname = ''
+                
+            try:
+                lastname = entry['sn'][0]
+            except KeyError:
+                lastname = ''
+            
+            try:
+                nickname = entry['cn'][0]
+            except KeyError:
+                nickname = firstname + ' ' + lastname
+            
+            try:
+                fax = entry['facsimiletelephonenumber'][0] # fax
+            except KeyError:
+                try:
+                    fax = entry['fax'][0]
+                except KeyError:
+                    fax  = ''
+                
+            grps = []
+            try:
+                grps = entry['ou']
+            except KeyError:
+                pass
+                
+            try:
+                title = entry['title'][0]
+            except KeyError:
+                title = ''
+             
+            if nickname:
+                log.debug("%s, %s, %s, %s, %s, %s, %s" % ( nickname, title, firstname, lastname, fax, grps, dn))
+                self.db.set(nickname, title, firstname, lastname, fax, grps, dn)
     
 
 # **************************************************************************** #
-class FaxAddressBook2(object): # Pickle based address book
+class FaxAddressBook(object): # Pickle based address book
     def __init__(self):
         self._data = {}
         #
@@ -147,24 +208,6 @@ class FaxAddressBook2(object): # Pickle based address book
             pickle_file = open(self._fab, "r")
             self._data = cPickle.load(pickle_file)
             pickle_file.close()
-
-        elif os.path.exists(old_fab): # convert old KirbyBase file
-            db = FaxAddressBook()
-            all_entries = db.AllRecordEntries()
-
-            for e in all_entries:
-                try:
-                    self.set(e.name, e.title, e.firstname, e.lastname,
-                             e.fax, e.group_list, e.notes)
-                except UnicodeDecodeError:
-                    self.set(e.name.decode('utf-8'), 
-                             e.title.decode('utf-8'),
-                             e.firstname.decode('utf-8'),
-                             e.lastname.decode('utf-8'),
-                             e.fax.decode('utf-8'),
-                             e.group_list, 
-                             e.notes.decode('utf-8'))
-            self.save()
 
         else:
             self.save() # save the empty file to create the file
@@ -251,164 +294,71 @@ class FaxAddressBook2(object): # Pickle based address book
             if group in v['groups']:
                 members.append(e)
         return members
-
-
-# **************************************************************************** #
-
-# DEPRECATED: TO BE REMOVED
-class FaxAddressBook(KirbyBase): # KirbyBase based address book
-    def __init__(self):
-        KirbyBase.__init__(self)
-        # Transitional code to handle moving of db file
-        t1 = os.path.expanduser('~/.hplip.fab') # old location #1
-        t2 = os.path.expanduser('~/hpfax/hplip.fab') # old location #2
-        self._fab = os.path.join(prop.user_dir, 'fab.db') # new location
-        log.debug("fab.db: %s" % self._fab)
-
-        if os.path.exists(t1) and not os.path.exists(self._fab):
-            import shutil
-            log.debug("Copying %s to %s..." % (t1, self._fab))
-            shutil.move(t1, self._fab)
-
-        elif os.path.exists(t2) and not os.path.exists(self._fab):
-            import shutil
-            log.debug("Copying %s to %s..." % (t2, self._fab))
-            shutil.move(t2, self._fab)
-
-        if not os.path.exists(self._fab):
-            log.debug("Creating new fax address book: %s" % self._fab)
-            self.create()
-
-    def create(self):
-        return KirbyBase.create(self, self._fab,
-            ['name:str',
-             'title:str',
-             'firstname:str',
-             'lastname:str',
-             'fax:str',
-             'groups:str', # comma sep list of group names
-             'notes:str'])
-
-    def filename(self):
-        return self._fab
-
-    def last_modification_time(self):
-        return os.stat(self._fab).st_mtime
-
-    def close(self):
-        return KirbyBase.close(self)
-
-    def insert(self, values):
-        return KirbyBase.insert(self, self._fab, values)
-
-    def insertBatch(self, batchRecords):
-        return KirbyBase.insertBatch(self, self._fab, batchRecords)
-
-    def update(self, fields, searchData, updates, filter=None, useRegExp=False):
-        return KirbyBase.update(self, self._fab, fields, searchData, updates, filter, useRegExp)
-
-    def delete(self, fields, searchData, useRegExp=False):
-        return KirbyBase.delete(self, self._fab, fields, searchData, useRegExp)
-
-    def select(self, fields, searchData, filter=None, useRegExp=False, sortFields=[],
-        sortDesc=[], returnType='list', rptSettings=[0,False]):
-        return KirbyBase.select(self, self._fab, fields, searchData, filter,
-            useRegExp, sortFields, sortDesc, returnType, rptSettings)
-
-    def pack(self):
-        return KirbyBase.pack(self, self._fab)
-
-    def validate(self):
-        return KirbyBase.validate(self, self._fab)
-
-    def drop(self):
-        return KirbyBase.drop(self, self._fab)
-
-    def getFieldNames(self):
-        return KirbyBase.getFieldNames(self, self._fab)
-
-    def getFieldTypes(self):
-        return KirbyBase.getFieldTypes(self, self._fab)
-
-    def len(self):
-        return KirbyBase.len(self, self._fab)
-
-    def GetEntryByRecno(self, recno):
-        return AddressBookEntry(self.select(['recno'], [recno])[0])
-
-    def AllRecords(self):
-        return self.select(['recno'], ['*'])
-
-    def AllRecordEntries(self):
-        return [AddressBookEntry(rec) for rec in self.select(['recno'], ['*'])]
-
-    def GroupEntries(self, group):
-        return [abe.name for abe in self.AllRecordEntries() if group in abe.group_list]
-
-    def AllGroups(self):
-        temp = {}
-        for abe in self.AllRecordEntries():
-            for g in abe.group_list:
-                temp.setdefault(g)
-
-        return temp.keys()
-
-    def UpdateGroupEntries(self, group_name, member_entries):
-        for entry in self.AllRecordEntries():
-
-            if entry.name in member_entries: # membership indicated
-
-                if not group_name in entry.group_list: # entry already member of group
-                    # add it
-                    entry.group_list.append(group_name)
-                    self.update(['recno'], [entry.recno], [','.join(entry.group_list)], ['groups'])
-            else:
-
-                if group_name in entry.group_list: # remove from entry
-                    entry.group_list.remove(group_name)
-                    self.update(['recno'], [entry.recno], [','.join(entry.group_list)], ['groups'])
-
-    def DeleteGroup(self, group_name):
-        for entry in self.AllRecordEntries():
-            if group_name in entry.group_list:
-                entry.group_list.remove(group_name)
-                self.update(['recno'], [entry.recno], [','.join(entry.group_list)], ['groups'])
-
-
-# **************************************************************************** #
-# DEPRECATED: TO BE REMOVED
-class AddressBookEntry(object):
-    def __init__(self, rec=None):
-        if rec is not None:
-            rec = [x or '' for x in rec]
-            self.recno, self.name, \
-            self.title, self.firstname, self.lastname, \
-            self.fax, self.groups, self.notes = rec
-            self.group_list = []
-
-            if len(self.groups):
-                for g in self.groups.split(','):
-                    self.group_list.append(g.strip())
-
-    def __str__(self):
-        return "Recno=%d, Name=%s, Title=%s, First=%s, Last=%s, Fax=%s, Groups=%s, Notes=%s\n" % \
-            (self.recno, self.name, self.title, self.firstname,
-              self.lastname, self.fax, self.group_list, self.notes)
+        
+    def import_ldif(self, filename):
+        try:
+            parser = FaxLDIFParser(open(filename, 'r'), self)
+            parser.parse()
+            return True, ''
+        except ValueError, e:
+            return False, e.message
+            
+    def import_vcard(self, filename):
+        for card in vcard.VCards(vcard.VFile(vcard.opentextfile(filename))):
+            log.debug(card)
+            
+            if card['name']:
+                fax = ''
+                for x in range(1,9999):
+                    if x == 1:
+                        s = 'phone'
+                    else:
+                        s = 'phone%d' % x
+                        
+                    try:
+                        card[s]
+                    except KeyError:
+                        break
+                    else:
+                        if 'fax' in card[s]['type']:
+                            fax = card[s]['number']
+                            break
+                
+                org = card.get('organisation', '')
+                if org:
+                    org = [org]
+                else:
+                    org = card.get('categories', '').split(';')
+                    if not org:
+                        org = []
+                
+                self.set(card['name'], '', card.get('first name', ''), card.get('last name', ''), 
+                    fax, org, card.get('notes', ''))
+        
+        return True, ''
 
 
 # **************************************************************************** #
 class FaxDevice(device.Device):
 
     def __init__(self, device_uri=None, printer_name=None,
-                 hpssd_sock=None, callback=None, 
-                 fax_type=FAX_TYPE_NONE):
+                 callback=None, 
+                 fax_type=FAX_TYPE_NONE,
+                 disable_dbus=False):
 
         device.Device.__init__(self, device_uri, printer_name,
-                               hpssd_sock, callback)
+                               None, callback, disable_dbus)
 
         self.send_fax_thread = None
         self.upload_log_thread = None
         self.fax_type = fax_type
+        
+        if not disable_dbus:
+            session_bus = dbus.SessionBus()
+            self.service = session_bus.get_object('com.hplip.StatusService', "/com/hplip/StatusService")
+        else:
+            self.service = None
+
 
     def setPhoneNum(self, num):
         raise AttributeError
@@ -463,9 +413,11 @@ class FaxDevice(device.Device):
 
 # **************************************************************************** #
 
+
 def getFaxDevice(device_uri=None, printer_name=None,
-                 hpssd_sock=None, callback=None, 
-                 fax_type=FAX_TYPE_NONE):
+                 callback=None, 
+                 fax_type=FAX_TYPE_NONE,
+                 disable_dbus=False):
                  
     if fax_type == FAX_TYPE_NONE:
         if device_uri is None and printer_name is not None:
@@ -486,14 +438,17 @@ def getFaxDevice(device_uri=None, printer_name=None,
                     
     if fax_type in (FAX_TYPE_BLACK_SEND_EARLY_OPEN, FAX_TYPE_BLACK_SEND_LATE_OPEN):
         from pmlfax import PMLFaxDevice
-        return PMLFaxDevice(device_uri, printer_name, hpssd_sock, callback, fax_type)
-
+        return PMLFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
+    
+    elif fax_type == FAX_TYPE_SOAP:
+        from soapfax import SOAPFaxDevice
+        return SOAPFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
+    
     else:
         raise Error(ERROR_DEVICE_DOES_NOT_SUPPORT_OPERATION)
 
-
-
 # **************************************************************************** #
+
 
 # TODO: Define these in only 1 place!
 STATE_DONE = 0
@@ -513,12 +468,14 @@ STATE_CLEANUP = 120
 STATE_ERROR = 130 
     
 class FaxSendThread(threading.Thread):
-    def __init__(self, dev, phone_num_list, fax_file_list, 
+    def __init__(self, dev, service, phone_num_list, fax_file_list, 
                  cover_message='', cover_re='', cover_func=None, preserve_formatting=False,
                  printer_name='', update_queue=None, event_queue=None):
 
         threading.Thread.__init__(self)
+        
         self.dev = dev # device.Device
+        self.service = service # dbus proxy to status server object
         self.phone_num_list = phone_num_list
         self.fax_file_list = fax_file_list
         self.update_queue = update_queue
@@ -688,7 +645,6 @@ class FaxSendThread(threading.Thread):
         state = STATE_SEND_FAX
 
         log.debug("Processing single file...")
-
         self.f = self.recipient_file_list[0][0]
 
         try:
@@ -832,29 +788,21 @@ class FaxSendThread(threading.Thread):
         fax_file = ''
         complete = False
 
-        try:
-            sock = service.startup()
-        except Error:
-            return '', True   
-
         end_time = time.time() + 300.0 # wait for 5 min. max 
         while time.time() < end_time:
             log.debug("Waiting for fax...")
-            fields, data, result_code = \
-                msg.xmitMessage(sock, "FaxCheck", None,
-                                     {"username": prop.username,
-                                     })
+            
+            result = list(self.service.CheckForWaitingFax(self.dev.device_uri, prop.username, sent_job_id))
 
-            if result_code == ERROR_FAX_PROCESSING:
-                log.debug("Fax is being rendered...")
-
-            elif result_code == ERROR_FAX_READY:
+            fax_file = str(result[7])
+            log.debug("Fax file=%s" % fax_file)
+            
+            if fax_file:
                 break
-
+            
             if self.check_for_cancel():
                 log.error("Render canceled. Canceling job #%d..." % sent_job_id)
                 cups.cancelJob(sent_job_id)
-                sock.close()
                 return '', True
 
             time.sleep(1)
@@ -863,34 +811,6 @@ class FaxSendThread(threading.Thread):
             log.error("Timeout waiting for rendering. Canceling job #%d..." % sent_job_id)
             cups.cancelJob(sent_job_id)
             return '', False
-
-        fd, fax_file = utils.make_temp_file()
-
-        while True:
-            log.debug("Transfering fax data...")
-            fields, data, result_code = \
-                msg.xmitMessage(sock, "FaxGetData", None,
-                                     {"username": prop.username,
-                                      "job-id": sent_job_id,
-                                     })
-
-            if data and result_code == ERROR_SUCCESS:
-                os.write(fd, data)
-
-            else:
-                complete = True
-                break
-
-            if self.check_for_cancel():
-                log.error("Render canceled. Canceling job #%d..." % sent_job_id)
-                cups.cancelJob(sent_job_id)
-                os.close(fd)
-                sock.close()
-                return '', True
-
-
-        os.close(fd)
-        sock.close()
 
         return fax_file, False
 

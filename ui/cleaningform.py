@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,15 +19,20 @@
 # Author: Don Welch
 #
 
-#import sys
+# Std Lib
+
+# Local
+from base.g import *
+from ui_utils import load_pixmap
+
+# Qt
 from qt import *
 from cleaningform_base import CleaningForm_base
-from base.g import *
-import os.path
+
 
 class CleaningForm(CleaningForm_base):
-    def __init__(self, parent, dev, cleaning_level, name = None, modal = 0, fl = 0):
-        CleaningForm_base.__init__(self,parent,name,modal,fl)
+    def __init__(self, parent, dev, cleaning_level, name=None, modal=0, fl=0):
+        CleaningForm_base.__init__(self, parent, name, modal, fl)
         self.dev = dev
 
         text = unicode(self.CleaningText.text())
@@ -39,7 +44,7 @@ class CleaningForm(CleaningForm_base):
         text = unicode(self.CleaningTitle.text())
         self.CleaningTitle.setText(text % str(cleaning_level))
 
-        self.Icon.setPixmap(QPixmap(os.path.join(prop.image_dir, 'clean.png')))
+        self.Icon.setPixmap(load_pixmap('clean.png', 'other'))
 
         self.check_timer = QTimer(self, "CheckTimer")
         self.connect(self.check_timer, SIGNAL('timeout()'), self.CheckTimerTimeout)

@@ -20,7 +20,8 @@
 #
 
 # Std Lib
-import time, thread
+import time
+import thread # TODO: Use threading instead
 import Queue
 import base64
 import re

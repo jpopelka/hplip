@@ -8,8 +8,9 @@
 <META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE" />
 <META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 22 Jul 2002 11:12:01 GMT" />
 <META NAME="DESCRIPTION" CONTENT="HP Linux Imaging and Printing - HPLIP is an HP developed solution for printing, scanning, and faxing with HP inkjet and laser based printers in Linux.">
-<META NAME="KEYWORDS" CONTENT="HPLIP, HP, Linux, Printing, HPIJS">
+<META NAME="KEYWORDS" CONTENT="HPLIP, HP, Linux, Printing, HPIJS, Linux Printing, OfficeJet, LaserJet, DeskJet, Photosmart, PSC, Color Laserjet, Business InkJet">
 </head>
+
 <body>
 <div id="page"><!-- start page -->
 <div id="container"><!-- start main container -->
@@ -17,6 +18,10 @@
 
 <div id="banner">
 <div id="banner_graphics">
+<center>
+<img src="../images/hpliplogo2.png" alt="HP Logo" border="0" />
+</center>
+<!--
         <div id="floatleft">
         <img src="../images/hplogo2.png" alt="HP Logo" border="0" />
         </div>
@@ -27,21 +32,21 @@
         </div>
         <div id="floatright">
         <img src="../images/tuxlogo2.png" alt="Tux" border="0" />
-        </div>
+        </div> 
+-->
     </div>
 </div>
 <!-- end banner -->
 
-<div id="navbar">
+<!-- <div id="navbar"> -->
 <table>
     <tr>
         <td valign="top">
 <div id="sidebar-a">
 <ul id="sidebar-a-list">
-    <menu compact="compact">
-        <div class="menuheader"><a href="../index.html" title="">Home</a></div>
-    </menu>
-
+<div class="menuheader">
+	<a href="../index.html" title="">Home</a></div>
+<br />
 <div class="menuheader">About</div>
     <menu compact="compact">
         <li><a href="../features.html" title="">Features</a></li> 
@@ -49,20 +54,23 @@
         <li><a href="../faqs.html" title="FAQs">FAQs</a></li> 
         <li><a a href="../about.html" title="About">About HPLIP</a></li>
     </menu>
+<br />
 <div class="menuheader">Setup and Installation</div>
     <menu compact="compact">
-        <li><a href="../downloads.html" title="Downloads">Download HPLIP</a></li>
-        <li><a href="../install/index.html" title="Installation Instructions">Installation Instructions</a></li> 
+        <li><a href="../downloads.html" title="Downloads">Download and Install</a></li>
+        <!-- <li><a href="../install/index.html" title="Installation Instructions">Installation Instructions</a></li> -->
         <li><a href="../system_requirements.html" title="System Requirements">System Requirements</a></li> 
-        <li><a href="../supported_devices/index.html" title="Supported Devices">Supported Devices</a></li> 
+        <li><a href="../supported_devices/index.html" title="Supported Devices">Supported Printers</a></li> 
     </menu>
+<br />
 <div class="menuheader">Usage and Support</div>
     <menu compact="compact">
-        <li><a href="../mailing_lists.html" title="Mailing Lists">Support</a></li>
+        <li><a href="../mailing_lists.html" title="Mailing Lists">Contact Support</a></li>
         <li><a href="../howtos/index.html" title="How-Tos">How-Tos</a></li> 
         <li><a href="../troubleshooting/index.html" title="Troubleshooting">Troubleshooting</a></li>
         <li><a href="../release_notes.html" title="Release Notes">Release Notes</a></li>
     </menu>
+<br />
 <div class="menuheader">Resources</div>
     <menu compact="compact">
         <li><a href="../tech_docs/index.html" title="">Technical Documentation</a></li> 
@@ -71,6 +79,7 @@
         <li><a a href="../other_support.html" title="Other Support Information">Other Support Information</a></li>
         <li><a href="../contacts.html" title="Contacts">Contacts</a></li>
     </menu>
+<br />
 </ul>
 </div>
 <!-- end sidebar --></td>
@@ -92,34 +101,54 @@ Portablity Reference
 <p>This section assumes all System Requirements have been met and any pre-existing HPLIP install uses the same &quot;./configure --prefix=/usr&quot; parameters. For more detailed install instructions see <a class="reference" href="../install/index.html">Installation Instructions</a> .</p>
 <p>PPD files are used to specifiy driver and driver parameters. Each print job has an associated PPD file and each HP printer has a unique PPD file. There are HPIJS PPD files, postscript PPD files and fax PPD files. All HPIJS PPD files are generated from a CUPS drv file called hpijs.drv.</p>
 <p>CUPS drv support is part of the CUPS DDK at <a class="reference" href="http://www.cups.org/ddk">http://www.cups.org/ddk</a>. The CUPS DDK allows us to support the hpijs/ghostscript/foomatic-rip driver. CUPS drv support provides dynamic and static PPD file support similar to the foomatic database. CUPS drv support provides more PPD options, faster PPD file generation, and a smaller foot-print than the foomatic database. See <a class="reference" href="http://linuxprinting.org">http://linuxprinting.org</a> for foomatic database information.</p>
-<p>There are two major install configurations - <em>dynamic PPD install</em> and <em>static PPD install</em>. The default is the <em>dynamic PPD install</em>. The <em>dynamic PPD install</em> will install all necessary files for dynamic PPD file creation at runtime. Currently only HPIJS PPD files are built-on-the-fly. Postscript PPD files and fax PPD files are pre-built.</p>
+<p>Unfortunately drv generated PPDs are only compatible with the latest foomatic-rip. Since the static PPDs included in the tar ball are not compatible with older versions of foomatic-rip, we included a copy of the latest foomatic-rip called foomatic-rip-hplip. The foomatic-rip-hplip was built from foomatic-filters-3.0-current.tar.gz dated 1/23/2008.</p>
+<p>There are two major install configurations - <em>dynamic PPD install</em> and <em>static PPD install</em>. The default is the <em>dynamic PPD install</em>. The <em>dynamic PPD install</em> will install all necessary files for dynamic PPD file creation at runtime. Currently only HPIJS PPDs are built-on-the-fly. Postscript PPDs and fax PPDs are pre-built.</p>
 <p>The <em>dynamic PPD install</em> works with CUPS systems that use dynamic PPD file creation. Generally CUPS 1.2 uses dynamic PPD file creation. Use <em>static PPD install</em> with CUPS 1.1.x. The following command displays the CUPS version.</p>
 <pre class="literal-block">
 cups-config --version
 </pre>
 <p>The following configure time options are valid for <em>dynamic PPD install</em> and <em>static PPD install</em>.</p>
 <ol class="arabic simple">
-<li><strong>Static PPD install with foomatic-rip-hplip</strong> - Intended for individual customers using the tar ball install on distros that do not support CUPS dynamic PPD files. Installs precompiled HPIJS PPD files included in the tar ball. All HPIJS ppd files call foomatic-rip-hplip.</li>
+<li><strong>Static PPD install with foomatic-rip-hplip</strong> - Intended for distros that do not have the latest foomatic-rip. Installs precompiled HPIJS PPDs included in the tar ball. All HPIJS PPDs call foomatic-rip-hplip.</li>
 </ol>
 <pre class="literal-block">
---enable-foomatic-ppd-install   [enable foomatic static ppd install, uses hpppdir]
+--disable-foomatic-drv-install
+--enable-foomatic-ppd-install
 --with-hpppddir  [destination for *-hpijs.ppd, *-ps.ppd and HP-Fax-hplip.ppd]
 --enable-foomatic-rip-hplip-install
 </pre>
 <ol class="arabic simple" start="2">
-<li><strong>Dynamic PPD install with foomatic-rip-hplip</strong> - Intended for individual customers using the tar ball install on distros that support CUPS dynamic PPD files. No static hpijs PPD files are installed. Dynamic PPD files will call foomatic-rip-hplip.</li>
+<li><strong>Static PPD install with no foomatic-rip-hplip and HPIJS PPDs must be modified</strong> - Intended for distros that have the latest foomatic-rip. The user must manually change the *cupsFilter line from foomatic-rip-hpijs to foomatic-rip for all HPIJS PPDs before &quot;make install&quot;.</li>
 </ol>
 <pre class="literal-block">
---enable-foomatic-drv-install   [enable foomatic dynamic ppd install, uses drvdir and hpppddir]
+--disable-foomatic-drv-install
+--enable-foomatic-ppd-install
+--with-hpppddir  [destination for *-hpijs.ppd, *-ps.ppd and HP-Fax-hplip.ppd]
+--disable-foomatic-rip-hplip-install
+</pre>
+<ol class="arabic simple" start="3">
+<li><strong>Static PPD install with no foomatic-rip-hplip and new HPIJS PPDs must be created</strong> - Intended for distros that have the latest foomatic-rip. The user must manually create new HPIJS PPDs with the CUPS DDK by running &quot;ppdc prnt/drv/hpijs.drv&quot; before &quot;make install&quot;.</li>
+</ol>
+<pre class="literal-block">
+--disable-foomatic-drv-install
+--enable-foomatic-ppd-install
+--with-hpppddir  [destination for *-hpijs.ppd, *-ps.ppd and HP-Fax-hplip.ppd]
+--disable-foomatic-rip-hplip-install
+</pre>
+<ol class="arabic simple" start="4">
+<li><strong>Dynamic PPD install with foomatic-rip-hplip</strong> - Intended for distros that do not have the latest foomatic-rip. No static HPIJS PPD files are installed. Dynamic PPD files will call foomatic-rip-hplip.</li>
+</ol>
+<pre class="literal-block">
+--enable-foomatic-drv-install
 --with-drvdir  [destination for hpijs.drv]
 --with-hpppddir  [destination for *-ps.ppd and HP-Fax-hplip.ppd]
 --enable-foomatic-rip-hplip-install
 </pre>
-<ol class="arabic simple" start="3">
-<li><strong>Dynamic PPD install with no foomatic-rip-hplip</strong> - Intended for distro package managers that will use the latest foomatic-rip. Dynamic PPD files will call foomatic-rip.</li>
+<ol class="arabic simple" start="5">
+<li><strong>Dynamic PPD install with no foomatic-rip-hplip</strong> - Intended for distros that have the latest foomatic-rip. Dynamic PPD files will call foomatic-rip.</li>
 </ol>
 <pre class="literal-block">
---enable-foomatic-drv-install   [enable foomatic dynamic ppd install, uses drvdir and hpppddir]
+--enable-foomatic-drv-install
 --with-drvdir  [destination for *.drv]
 --with-hpppddir  [destination for *-ps.ppd and HP-Fax-hplip.ppd]
 --disable-foomatic-rip-hplip-install
@@ -136,7 +165,7 @@ make install
 <pre class="literal-block">
 tar xzvf hplip-2.7.x.tar.gz
 cd hplip-2.7.x
-./configure --prefix=/usr --disable-drv-install --enable-foomatic-ppd-install --with-hpppddir=/usr/share/cups/model
+./configure --prefix=/usr --disable-foomatic-drv-install --enable-foomatic-ppd-install --with-hpppddir=/usr/share/cups/model
 make
 make install
 </pre>
@@ -224,13 +253,6 @@ DisablePrintersOnRemoval=yes
 to:
 DisablePrintersOnRemoval=no
 </pre>
-<ol class="arabic simple" start="14">
-<li>If the distro package manager wants a <em>static PPD install</em> that supports foomatic-rip instead of foomatic-rip-hplip, they can do one of the following.</li>
-</ol>
-<pre class="literal-block">
-A. Modify all the static hpijs ppd files in the tar ball to call foomatic-rip.
-B. Perform a <strong>Dynamic PPD install with no foomatic-rip-hplip</strong> then run &quot;ppdc hpijs.drv&quot; in order to create ppd files that call foomatic-rip.
-</pre>
 </div>
 <div class="section">
 <h1><a id="hpijs-portability-reference" name="hpijs-portability-reference">HPIJS Portability Reference</a></h1>
@@ -274,24 +296,24 @@ ln -s /usr/share/fonts/default/Type1 /usr/share/ghostscript/fonts
 </div>
 </div>
 
-<hr size="1"/>
-<center><small>Page last updated: Thu Feb  7 11:28:56 2008; HPLIP Version: 2.8.2</small></center>
 </div>
 </td></tr></table>
-</div>
+<hr>
 <!-- end content -->
 <!-- end container -->
+<div id="pageupdate">
+<center>Page last updated: Thu May  8 09:25:31 2008; HPLIP Version: 2.8.5</center>
+</div>
 <div id="footer"><!-- start footer -->
-        <hr size="1"/>
-        <a href="../legal.html">Legal Notices</a>
-        Copyright &#169; 2003-2007, Hewlett-Packard Development Company, L.P.
-        <a href="mailto:hplip@hp.com">Contact Site Maintainer</a><br>
+        <a href="http://welcome.hp.com/country/us/en/privacy.html">Privacy Statement</a> |
+        <a href="http://welcome.hp.com/country/us/en/termsofuse.html">Using this site means you accept its terms</a> |
+        &#169; 2008 Hewlett-Packard Development Company, L.P. <br />
         <a href="http://sourceforge.net/" alt="Hosted by Sourceforge.net"><img src="../images/sflogo.png" border="0"></a>
 </div>
 <!-- end footer -->
 </div><!-- end page -->
-
-<!-- google analytics -->
+</div> 
+<!-- google analytics from aaron's account-->
 <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
 </script>
 <script type="text/javascript">
@@ -307,13 +329,27 @@ urchinTracker();
 </script>
 <!-- end google analytics -->
 
+<!-- end google analytics from hplip.marketing@gmail.com-->
 
-<!-- START OF ACTIVEMETER CODE -->
-<script type="text/javascript" language="javascript">
-var __pid=30231;
-var __am_invisible=1;
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
 </script>
-<!-- END OF ACTIVEMETER CODE -->
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-1543832-10");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+
+<!-- end google analytics from hplip.marketing@gmail.com -->
+
+
+<!-- Begin METRICS Javascript -->
+
+<script language="JavaScript" type="text/javascript"
+src="http://welcome.hp-ww.com/cma/region/na/metricsNAgeneric.js"></script>
+
+<!-- End METRICS Javascript --> 
 
 </body>
 </html>

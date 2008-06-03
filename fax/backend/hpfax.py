@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,18 +20,20 @@
 # Author: Don Welch
 #
 
-__version__ = '2.7'
+__version__ = '4.0'
 __title__ = 'CUPS Fax Backend (hpfax:)'
-__doc__ = "CUPS backend for PC send fax. Generally this backend is run by CUPS, not directly by a user. To send a fax as a user, run hp-sendfax."
+__doc__ = "CUPS backend for PC send fax. Generally this backend is run by CUPS, not directly by a user. To send a fax as a user, run hp-sendfax or print to the device's CUPS fax queue."
 
+# StdLib
 import sys
 import getopt
 import ConfigParser
 import os.path, os
-import socket
 import syslog
 import time
 import operator
+import tempfile
+
 
 CUPS_BACKEND_OK = 0 # Job completed successfully
 CUPS_BACKEND_FAILED = 1 # Job failed, use error-policy
@@ -40,10 +42,19 @@ CUPS_BACKEND_HOLD = 3 # Job failed, hold job
 CUPS_BACKEND_STOP = 4 #  Job failed, stop queue
 CUPS_BACKEND_CANCEL = 5 # Job failed, cancel job
 
+PIPE_BUF = 4096
+
+job_id = 0
 pid = os.getpid()
 config_file = '/etc/hp/hplip.conf'
 home_dir = ''
 
+
+def bug(msg):
+    syslog.syslog("hpfax[%d]: error: %s\n" % (pid, msg))
+    log.stderr("ERROR: %s\n" % msg)
+    
+    
 if os.path.exists(config_file):
     config = ConfigParser.ConfigParser()
     config.read(config_file)
@@ -51,32 +62,36 @@ if os.path.exists(config_file):
     try:
         home_dir = config.get('dirs', 'home')
     except:
-        syslog.syslog("hpfax[%d]: error: Error setting home directory: home= under [dirs] not found." % pid)
+        bug("Error setting home directory: home= under [dirs] not found.")
         sys.exit(1)
 else:
-    syslog.syslog("hpfax[%d]: error: Error setting home directory: /etc/hp/hplip.conf not found." % pid)
+    bug("Error setting home directory: /etc/hp/hplip.conf not found")
     sys.exit(1)
 
 if not home_dir or not os.path.exists(home_dir):
-    syslog.syslog("hpfax[%d]: error: Error setting home directory: Home directory %s not found." % (pid, home_dir))
+    bug("Error setting home directory: Home directory %s not found." % home_dir)
     sys.exit(1)
 
-sys.path.insert( 0, home_dir )
+sys.path.insert(0, home_dir)
+os.chdir(home_dir)
 
+# HPLIP
 try:
     from base.g import *
     from base.codes import *
-    from base import device, utils, msg, service
-    from base.service import sendEvent
+    from base import device
+    from base import utils
     from prnt import cups
-except ImportError:
-    syslog.syslog("hpfax[%d]: error: Error importing HPLIP modules." % pid)
+except ImportError, e:
+    bug("Error importing HPLIP modules: %s\n" % (pid, e))
     sys.exit(1)
 
-log.set_module("hpfax")
+def handle_sigpipe():
+    syslog.syslog("SIGPIPE!")
+    
 
 USAGE = [(__doc__, "", "para", True),
-         ("Usage: hpfax [OPTIONS] [job_id] [username] [title] [copies] [options]", "", "summary", True),
+         ("Usage: hpfax [job_id] [username] [title] [copies] [options]", "", "summary", True),
          utils.USAGE_OPTIONS,
          utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
          utils.USAGE_HELP,
@@ -87,8 +102,16 @@ def usage(typ='text'):
         utils.log_title(__title__, __version__)
 
     utils.format_text(USAGE, typ, title=__title__, crumb='hpfax:')
-    sys.exit(CUPS_BACKEND_OK)        
+    sys.exit(CUPS_BACKEND_OK)   
 
+# Send dbus event to hpssd on dbus system bus
+def send_message(device_uri, printer_name, event_code, username, job_id, title, pipe_name=''):
+    args = [device_uri, printer_name, event_code, username, job_id, title, pipe_name]
+    msg = lowlevel.SignalMessage('/', 'com.hplip.Service', 'Event')
+    msg.append(signature='ssisiss', *args)
+    
+    SystemBus().send_message(msg) 
+ 
 
 try:
     opts, args = getopt.getopt(sys.argv[1:], 'l:hg', ['level=', 'help', 'help-rest', 'help-man'])
@@ -119,9 +142,8 @@ if len( args ) == 0:
     cups11 = utils.to_bool(sys_cfg.configure.cups11, False)
     
     try:
-        probed_devices = device.probeDevices('usb,par', filter={'fax-type': (operator.gt, 0)})
+        probed_devices = device.probeDevices(['usb', 'par'], filter={'fax-type': (operator.gt, 0)})
     except Error:
-        log.stderr("hpfax[%d]: error: Unable to contact HPLIP I/O (hpssd)." % pid)
         sys.exit(CUPS_BACKEND_FAILED)
 
     good_devices = 0
@@ -132,8 +154,17 @@ if len( args ) == 0:
         except Error:
             continue
 
-        print 'direct %s "HP Fax" "%s HP Fax HPLIP" "MFG:HP;MDL:Fax;DES:HP Fax;"' % \
-            (uri.replace("hp:", "hpfax:"), model.replace("_", " "))
+        mq = device.queryModelByModel(model)
+        
+        if mq.get('fax-type', FAX_TYPE_NONE) in (FAX_TYPE_SOAP,):
+            # HP Fax 2
+            print 'direct %s "HP Fax 2" "%s HP Fax HPLIP" "MFG:HP;MDL:Fax 2;DES:HP Fax 2;"' % \
+                (uri.replace("hp:", "hpfax:"), model.replace('_', ' '))
+        
+        else:
+            # HP Fax
+            print 'direct %s "HP Fax" "%s HP Fax HPLIP" "MFG:HP;MDL:Fax;DES:HP Fax;"' % \
+                (uri.replace("hp:", "hpfax:"),  model.replace('_', ' '))
             
         good_devices += 1
 
@@ -146,108 +177,76 @@ if len( args ) == 0:
     sys.exit(CUPS_BACKEND_OK)
 
 else:
+    try:
+        # dBus
+        import dbus
+        from dbus import SystemBus, lowlevel
+    except ImportError:
+        bug("HPLIP pc send fax requires dbus and python-dbus")
+        sys.exit(CUPS_BACKEND_FAILED)
+
     # CUPS provided environment
     try:
         device_uri = os.environ['DEVICE_URI']
         printer_name = os.environ['PRINTER']
     except KeyError:
-        log.stderr("hpfax[%d]: error: Improper environment: Must be run by CUPS." % pid)
+        bug("Improper environment: Must be run by CUPS.")
         sys.exit(CUPS_BACKEND_FAILED)
 
     log.debug(args)
 
     try:
         job_id, username, title, copies, options = args[0:5]
+        job_id = int(job_id)
     except IndexError:
-        log.stderr("hpfax[%d]: error: Invalid command line: Invalid arguments." % pid)
+        bug("Invalid command line: invalid arguments.")
         sys.exit(CUPS_BACKEND_FAILED)
 
+    send_message(device_uri, printer_name, EVENT_START_FAX_PRINT_JOB, username, job_id, title)
+    
     try:
         input_fd = file(args[5], 'r')
     except IndexError:
         input_fd = 0
-
+ 
+    # REVISIT:
+    tmp_dir = '/tmp'
+    pipe_name = os.path.join(tmp_dir, "hpfax-pipe-%d" % job_id)
+    
+    # Create the named pipe. Make sure it exists before sending
+    # message to hppsd.
+    os.umask(0111)
     try:
-        sock = service.startup()
-    except Error:
-        log.stderr("hpfax[%d]: error: Unable to start hpssd." % pid)
-        sys.exit(CUPS_BACKEND_FAILED)
+        os.mkfifo(pipe_name)
+    except OSError:
+        os.unlink(pipe_name)
+        os.mkfifo(pipe_name)
 
-    fax_data = os.read(input_fd, prop.max_message_len)
+    # Send dbus event to hpssd
+    send_message(device_uri, printer_name, EVENT_FAX_RENDER_COMPLETE, username, job_id, title, pipe_name)
 
-    if not len(fax_data):
-        log.stderr("hpfax[%d]: error: No data!" % pid)
-
-        sendEvent(sock, EVENT_ERROR_NO_DATA_AVAILABLE, 'error',
-                  job_id, username, device_uri)
-
-        sock.close()
-        sys.exit(CUPS_BACKEND_FAILED)
-
-
-    sendEvent(sock, EVENT_START_FAX_PRINT_JOB, 'event',
-              job_id, username, device_uri)
-
-    while True:
-        try:
-            fields, data, result_code = \
-                msg.xmitMessage(sock, "HPFaxBegin", 
-                                     None,
-                                     {"username": username,
-                                      "job-id": job_id,
-                                      "device-uri": device_uri,
-                                      "printer": printer_name,
-                                      "title": title,
-                                     })
-
-        except Error:
-            log.stderr("hpfax[%d]: error: Unable to send event to HPLIP I/O (hpssd)." % pid)
-            sys.exit(CUPS_BACKEND_FAILED) 
-
-        if result_code == ERROR_GUI_NOT_AVAILABLE:
-            # New behavior in 1.6.6a (10sec retry)
-            log.stderr("hpfax[%d]: error: You must run hp-sendfax first. Run hp-sendfax now to continue. Fax will resume within 10 seconds." % pid)
-
-            sendEvent(sock, EVENT_ERROR_FAX_MUST_RUN_SENDFAX_FIRST, 'event',
-                      job_id, username, device_uri)
-
-        else: # ERROR_SUCCESS
-            break
-
-        time.sleep(10)
-
-
+    # REVISIT:
+    pipe = os.open(pipe_name, os.O_WRONLY)
+            
     bytes_read = 0
     while True:
-        if not len(fax_data):
-            fields, data, result_code = \
-                msg.xmitMessage(sock, "HPFaxEnd", 
-                                     None,
-                                     {"username": username,
-                                      "job-id": job_id,
-                                      "printer": printer_name,
-                                      "title": title,
-                                      "options": options,
-                                      "device-uri": device_uri,
-                                      "job-size": bytes_read,
-                                     })
-
+        data = os.read(input_fd, PIPE_BUF)
+        
+        if not data:
             break
-
-
-        bytes_read += len(fax_data) 
-
-        fields, data, result_code = \
-            msg.xmitMessage(sock, "HPFaxData", 
-                                 fax_data,
-                                 {"username": username,
-                                  "job-id": job_id,
-                                 })
-
-        fax_data = os.read(input_fd, prop.max_message_len)
-
+        
+        os.write(pipe, data)
+        #syslog.syslog("Writing %d to pipe..." % len(data))
+        bytes_read += len(data)
+            
+    if not bytes_read:
+        bug("No data on input file descriptor.")
+        sys.exit(CUPS_BACKEND_FAILED)
+    
     os.close(input_fd)
-    sock.close()
+    os.close(pipe)
+    os.unlink(pipe_name)
+    
+    send_message(device_uri, printer_name, EVENT_END_FAX_PRINT_JOB, username, job_id, title)
+    
     sys.exit(CUPS_BACKEND_OK)
-
-

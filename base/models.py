@@ -81,6 +81,7 @@ class ModelData:
             'tech-type' : TYPE_INT,
             'usb-pid' : TYPE_HEX,
             'usb-vid' : TYPE_HEX,
+            'job-storage' : TYPE_INT,
             }
             
         self.RE_FIELD_TYPES = {

@@ -375,6 +375,17 @@ dDEVICEHEIGHTPOINTS=567"
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
  -dDEVICEHEIGHTPOINTS=935"
+  ////////// Large format paper support
+  Attribute "FoomaticRIPOptionSetting" "PageSize=B4JIS" " -dDEVICEWIDTHPOINTS=729 -d&&
+DEVICEHEIGHTPOINTS=1033"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Ledger" " -dDEVICEWIDTHPOINTS=792 -&&
+dDEVICEHEIGHTPOINTS=1224"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=SuperB" " -dDEVICEWIDTHPOINTS=936 -&&
+dDEVICEHEIGHTPOINTS=1368"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w774h1116" " -dDEVICEWIDTHPOINTS=77&&
+4 -dDEVICEHEIGHTPOINTS=1116"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A3" " -dDEVICEWIDTHPOINTS=842 -dDEV&&
+ICEHEIGHTPOINTS=1190"
   Attribute "FoomaticRIPOption" "Duplex" "enum CmdLine A"
   Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexNoTumble" " -dDuplex=true -dTum&&
 ble=false"
@@ -772,6 +783,17 @@ dDEVICEHEIGHTPOINTS=567"
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
  -dDEVICEHEIGHTPOINTS=935"
+  ///////// Large format paper support
+  Attribute "FoomaticRIPOptionSetting" "PageSize=B4JIS" " -dDEVICEWIDTHPOINTS=729 -d&&
+DEVICEHEIGHTPOINTS=1033"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Ledger" " -dDEVICEWIDTHPOINTS=792 -&&
+dDEVICEHEIGHTPOINTS=1224"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=SuperB" " -dDEVICEWIDTHPOINTS=936 -&&
+dDEVICEHEIGHTPOINTS=1368"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w774h1116" " -dDEVICEWIDTHPOINTS=77&&
+4 -dDEVICEHEIGHTPOINTS=1116"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A3" " -dDEVICEWIDTHPOINTS=842 -dDEV&&
+ICEHEIGHTPOINTS=1190"
   Attribute "FoomaticRIPOption" "Duplex" "enum CmdLine A"
   Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexNoTumble" " -dDuplex=true -dTum&&
 ble=false"
@@ -964,6 +986,17 @@ dDEVICEHEIGHTPOINTS=567"
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
  -dDEVICEHEIGHTPOINTS=935"
+  /////////// Large format paper support
+  Attribute "FoomaticRIPOptionSetting" "PageSize=B4JIS" " -dDEVICEWIDTHPOINTS=729 -d&&
+DEVICEHEIGHTPOINTS=1033"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Ledger" " -dDEVICEWIDTHPOINTS=792 -&&
+dDEVICEHEIGHTPOINTS=1224"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=SuperB" " -dDEVICEWIDTHPOINTS=936 -&&
+dDEVICEHEIGHTPOINTS=1368"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w774h1116" " -dDEVICEWIDTHPOINTS=77&&
+4 -dDEVICEHEIGHTPOINTS=1116"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A3" " -dDEVICEWIDTHPOINTS=842 -dDEV&&
+ICEHEIGHTPOINTS=1190"
   Attribute "FoomaticRIPOption" "Duplex" "enum CmdLine A"
   Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexNoTumble" " -dDuplex=true -dTum&&
 ble=false"
@@ -1160,6 +1193,17 @@ dDEVICEHEIGHTPOINTS=567"
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
  -dDEVICEHEIGHTPOINTS=935"
+  /////////// Large format paper support
+  Attribute "FoomaticRIPOptionSetting" "PageSize=B4JIS" " -dDEVICEWIDTHPOINTS=729 -d&&
+DEVICEHEIGHTPOINTS=1033"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Ledger" " -dDEVICEWIDTHPOINTS=792 -&&
+dDEVICEHEIGHTPOINTS=1224"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=SuperB" " -dDEVICEWIDTHPOINTS=936 -&&
+dDEVICEHEIGHTPOINTS=1368"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w774h1116" " -dDEVICEWIDTHPOINTS=77&&
+4 -dDEVICEHEIGHTPOINTS=1116"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A3" " -dDEVICEWIDTHPOINTS=842 -dDEV&&
+ICEHEIGHTPOINTS=1190"
   Attribute "FoomaticRIPOption" "Duplex" "enum CmdLine A"
   Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexNoTumble" " -dDuplex=true -dTum&&
 ble=false"
@@ -1862,6 +1906,17 @@ dDEVICEHEIGHTPOINTS=567"
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
  -dDEVICEHEIGHTPOINTS=935"
+  /////////// Large format paper support
+  Attribute "FoomaticRIPOptionSetting" "PageSize=B4JIS" " -dDEVICEWIDTHPOINTS=729 -d&&
+DEVICEHEIGHTPOINTS=1033"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Ledger" " -dDEVICEWIDTHPOINTS=792 -&&
+dDEVICEHEIGHTPOINTS=1224"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=SuperB" " -dDEVICEWIDTHPOINTS=936 -&&
+dDEVICEHEIGHTPOINTS=1368"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w774h1116" " -dDEVICEWIDTHPOINTS=77&&
+4 -dDEVICEHEIGHTPOINTS=1116"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A3" " -dDEVICEWIDTHPOINTS=842 -dDEV&&
+ICEHEIGHTPOINTS=1190"
   Attribute "FoomaticRIPOption" "Duplex" "enum CmdLine A"
   Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexNoTumble" " -dDuplex=true -dTum&&
 ble=false"
@@ -2146,9 +2201,19 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart c4200 series;DES:photosmart c4200 series;"
   }
   {
+    ModelName "HP PhotoSmart C4340 Foomatic/hpijs"
+    PCFileName "hp-photosmart_c4340_series-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart c4340 series;DES:photosmart c4340 series;"
+  }
+  {
     ModelName "HP PhotoSmart C4380 Foomatic/hpijs"
     PCFileName "hp-photosmart_c4380_series-hpijs.ppd"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart c4380 series;DES:photosmart c4380 series;"
+  }
+  {
+    ModelName "HP PhotoSmart C4400 Foomatic/hpijs"
+    PCFileName "hp-photosmart_c4400_series-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart c4400 series;DES:photosmart c4400 series;"
   }
   {
     ModelName "HP PhotoSmart C5100 Foomatic/hpijs"
@@ -2186,6 +2251,11 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart d5100;DES:photosmart d5100;"
   }
   {
+    ModelName "HP PhotoSmart D5300 Foomatic/hpijs"
+    PCFileName "hp-photosmart_d5300-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart d5300;DES:photosmart d5300;"
+  }
+  {
     ModelName "HP PhotoSmart D6100 Foomatic/hpijs"
     PCFileName "hp-photosmart_d6100-hpijs.ppd"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart d6100;DES:photosmart d6100;"
@@ -2194,6 +2264,16 @@ lity:PenSet=2,Quality:FullBleed=1"
     ModelName "HP PhotoSmart D7100 Foomatic/hpijs"
     PCFileName "hp-photosmart_d7100-hpijs.ppd"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart d7100;DES:photosmart d7100;"
+  }
+  {
+    ModelName "HP PhotoSmart D2500 Foomatic/hpijs"
+    PCFileName "hp-deskjet_d2500-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet d2500;DES:deskjet d2500;"
+  }
+  {
+    ModelName "HP PhotoSmart F4200 Foomatic/hpijs"
+    PCFileName "hp-deskjet_f4200-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet f4200;DES:deskjet f4200;"
   }
   {
     ModelName "HP PSC 1500 Foomatic/hpijs"
@@ -2270,6 +2350,11 @@ lity:PenSet=2,Quality:FullBleed=1"
     PCFileName "hp-officejet_j5700-hpijs.ppd"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet j5700;DES:officejet j5700;"
   }
+  {
+    ModelName "HP OfficeJet J6400 Foomatic/hpijs"
+    PCFileName "hp-officejet_j6400_-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet j6400;DES:officejet j6400;"
+  }
   { 
     // Large format SuperB paper support
     CustomMedia "B4JIS/B4 (JIS)" 729.00 1033.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=B4JIS" "%% FoomaticRIPOptionSetting: PageSize=B4JIS"
@@ -2295,6 +2380,11 @@ lity:PenSet=2,Quality:FullBleed=1"
       ModelName "HP PhotoSmart Pro B8300 Foomatic/hpijs"
       PCFileName "hp-photosmart_pro_b8300_series-hpijs.ppd"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart pro b8300 series;DES:photosmart pro b8300 series;"
+    }
+    {
+      ModelName "HP PhotoSmart Pro B8800 Foomatic/hpijs"
+      PCFileName "hp-photosmart_pro_b8800_series-hpijs.ppd"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart pro b8800 series;DES:photosmart pro b8800 series;"
     }
   }
 }  // end DJGenericVIP
@@ -2392,6 +2482,17 @@ dDEVICEHEIGHTPOINTS=567"
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
  -dDEVICEHEIGHTPOINTS=935"
+  //////////// Large format paper support
+  Attribute "FoomaticRIPOptionSetting" "PageSize=B4JIS" " -dDEVICEWIDTHPOINTS=729 -d&&
+DEVICEHEIGHTPOINTS=1033"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Ledger" " -dDEVICEWIDTHPOINTS=792 -&&
+dDEVICEHEIGHTPOINTS=1224"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=SuperB" " -dDEVICEWIDTHPOINTS=936 -&&
+dDEVICEHEIGHTPOINTS=1368"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w774h1116" " -dDEVICEWIDTHPOINTS=77&&
+4 -dDEVICEHEIGHTPOINTS=1116"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A3" " -dDEVICEWIDTHPOINTS=842 -dDEV&&
+ICEHEIGHTPOINTS=1190"
   Attribute "FoomaticRIPOption" "Duplex" "enum CmdLine A"
   Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexNoTumble" " -dDuplex=true -dTum&&
 ble=false"
@@ -2532,6 +2633,11 @@ et=2"
     ModelName "HP OfficeJet Pro L7300 Foomatic/hpijs"
     PCFileName "hp-officejet_pro_l7300-hpijs.ppd"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet pro l7300;DES:officejet pro l7300;"
+  }
+  {
+    ModelName "HP OfficeJet Pro L7400 Foomatic/hpijs"
+    PCFileName "hp-officejet_pro_l7400-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet pro l7400;DES:officejet pro l7400;"
   }
   {
     ModelName "HP OfficeJet Pro L7500 Foomatic/hpijs"
@@ -2800,6 +2906,11 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
     ModelName "HP DeskJet D1400 Foomatic/hpijs"
     PCFileName "hp-deskjet_d1400_series-hpijs.ppd"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet d1400 series;DES:deskjet d1400 series;"
+  }
+  {
+    ModelName "HP DeskJet D1500 Foomatic/hpijs"
+    PCFileName "hp-deskjet_d1500_series-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet d1500 series;DES:deskjet d1500 series;"
   }
   {
     ModelName "HP PSC 1100 Foomatic/hpijs"
@@ -3711,6 +3822,17 @@ dDEVICEHEIGHTPOINTS=567"
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
  -dDEVICEHEIGHTPOINTS=935"
+  ////////// Large format paper support
+  Attribute "FoomaticRIPOptionSetting" "PageSize=B4JIS" " -dDEVICEWIDTHPOINTS=729 -d&&
+DEVICEHEIGHTPOINTS=1033"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Ledger" " -dDEVICEWIDTHPOINTS=792 -&&
+dDEVICEHEIGHTPOINTS=1224"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=SuperB" " -dDEVICEWIDTHPOINTS=936 -&&
+dDEVICEHEIGHTPOINTS=1368"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w774h1116" " -dDEVICEWIDTHPOINTS=77&&
+4 -dDEVICEHEIGHTPOINTS=1116"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A3" " -dDEVICEWIDTHPOINTS=842 -dDEV&&
+ICEHEIGHTPOINTS=1190"
   Attribute "FoomaticRIPOption" "Duplex" "enum CmdLine A"
   Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexNoTumble" " -dDuplex=true -dTum&&
 ble=false"
@@ -4042,6 +4164,21 @@ t=0"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:laserjet p3005;DES:laserjet p3005;"
   }
   {
+    ModelName "HP LaserJet P4015 Foomatic/hpijs"
+    PCFileName "hp-laserjet_p4015-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:laserjet p4015;DES:laserjet p4015;"
+  }
+  {
+    ModelName "HP LaserJet P4014 Foomatic/hpijs"
+    PCFileName "hp-laserjet_p4014-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:laserjet p4014;DES:laserjet p4014;"
+  }
+  {
+    ModelName "HP LaserJet P4515 Foomatic/hpijs"
+    PCFileName "hp-laserjet_p4515-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:laserjet p4515;DES:laserjet p4515;"
+  }
+  {
     ModelName "HP LaserJet M3027 MFP Foomatic/hpijs"
     PCFileName "hp-laserjet_m3027_mfp-hpijs.ppd"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:laserjet m3027 mfp;DES:laserjet m3027 mfp;"
@@ -4057,14 +4194,24 @@ t=0"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:laserjet m4345 mfp;DES:laserjet m4345 mfp;"
   }
   {
+    ModelName "HP LaserJet M9050 MFP Foomatic/hpijs"
+    PCFileName "hp-laserjet_m9050_mfp-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:laserjet m9050 mfp;DES:laserjet m9050 mfp;"
+  }
+  {
+    ModelName "HP LaserJet M9040 MFP Foomatic/hpijs"
+    PCFileName "hp-laserjet_m9040_mfp-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:laserjet m9040 mfp;DES:laserjet m9040 mfp;"
+  }
+  {
     ModelName "HP LaserJet M2727 MFP Foomatic/hpijs"
     PCFileName "hp-laserjet_m2727_mfp-hpijs.ppd"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:laserjet m2727 mfp;DES:laserjet m2727 mfp;"
   }
   {
-    ModelName "HP LaserJet P1505 Foomatic/hpijs/pcl"
-    PCFileName "hp-laserjet_p1505-hpijs-pcl.ppd"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:laserjet p1505;DES:laserjet p1505;"
+    ModelName "HP LaserJet P1505n Foomatic/hpijs/pcl"
+    PCFileName "hp-laserjet_p1505n-hpijs-pcl.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:laserjet p1505n;DES:laserjet p1505n;"
   }
   {
     ModelName "LaserJet M1522 MFP"
@@ -4405,6 +4552,17 @@ dDEVICEHEIGHTPOINTS=567"
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
  -dDEVICEHEIGHTPOINTS=935"
+  ///////// Large format paper support
+  Attribute "FoomaticRIPOptionSetting" "PageSize=B4JIS" " -dDEVICEWIDTHPOINTS=729 -d&&
+DEVICEHEIGHTPOINTS=1033"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Ledger" " -dDEVICEWIDTHPOINTS=792 -&&
+dDEVICEHEIGHTPOINTS=1224"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=SuperB" " -dDEVICEWIDTHPOINTS=936 -&&
+dDEVICEHEIGHTPOINTS=1368"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w774h1116" " -dDEVICEWIDTHPOINTS=77&&
+4 -dDEVICEHEIGHTPOINTS=1116"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A3" " -dDEVICEWIDTHPOINTS=842 -dDEV&&
+ICEHEIGHTPOINTS=1190"
   Attribute "FoomaticRIPOption" "Duplex" "enum CmdLine A"
   Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexNoTumble" " -dDuplex=true -dTum&&
 ble=false"
@@ -4592,6 +4750,16 @@ nSet=2"
     ModelName "HP Color LaserJet CP3505 Foomatic/hpijs"
     PCFileName "hp-color_laserjet_cp3505-hpijs.ppd"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:color laserjet cp3505;DES:color laserjet cp3505;"
+  }
+  {
+    ModelName "HP Color LaserJet CP6015 Foomatic/hpijs"
+    PCFileName "hp-color_laserjet_cp6015-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:color laserjet cp6014;DES:color laserjet cp6015;"
+  }
+  {
+    ModelName "HP Color LaserJet CM6040 MFP Foomatic/hpijs"
+    PCFileName "hp-color_laserjet_cm6040_mfp-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:color laserjet cm6040 mfp;DES:color laserjet cm6040 mfp;"
   }
   {
     // Large format A3 paper support
@@ -5157,6 +5325,41 @@ nSet=2"
     ModelName "HP Color LaserJet 3600 Foomatic/hpijs"
     PCFileName "hp-color_laserjet_3600-hpijs.ppd"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:color laserjet 3600;DES:color laserjet 3600;"
+  }
+  {
+    ModelName "HP Color LaserJet CP1513n Foomatic/hpijs"
+    PCFileName "hp-color_laserjet_cp1513n-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:color laserjet cp1513n;DES:color laserjet cp1513n;"
+  }
+  {
+    ModelName "HP Color LaserJet CP1514n Foomatic/hpijs"
+    PCFileName "hp-color_laserjet_cp1514n-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:color laserjet cp1514n;DES:color laserjet cp1514n;"
+  }
+  {
+    ModelName "HP Color LaserJet CP1515n Foomatic/hpijs"
+    PCFileName "hp-color_laserjet_cp1515n-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:color laserjet cp1515n;DES:color laserjet cp1515n;"
+  }
+  {
+    ModelName "HP Color LaserJet CP1516n Foomatic/hpijs"
+    PCFileName "hp-color_laserjet_cp1516n-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:color laserjet cp1516n;DES:color laserjet cp1516n;"
+  }
+  {
+    ModelName "HP Color LaserJet CP1517ni Foomatic/hpijs"
+    PCFileName "hp-color_laserjet_cp1517ni-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:color laserjet cp1517ni;DES:color laserjet cp1517ni;"
+  }
+  {
+    ModelName "HP Color LaserJet CP1518ni Foomatic/hpijs"
+    PCFileName "hp-color_laserjet_cp1518ni-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:color laserjet cp1518ni;DES:color laserjet cp1518ni;"
+  }
+  {
+    ModelName "HP Color LaserJet CP1519ni Foomatic/hpijs"
+    PCFileName "hp-color_laserjet_cp1519ni-hpijs.ppd"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:color laserjet cp1519ni;DES:color laserjet cp1519ni;"
   }
 }  // end LJJetReady
 

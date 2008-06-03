@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,8 +21,9 @@
 
 # Local
 from base.g import *
-from base import utils, magic, msg, service
+from base import utils, magic
 from prnt import cups
+from ui_utils import load_pixmap
 
 # Qt
 from qt import *
@@ -34,15 +35,19 @@ from waitform import WaitForm
 import os.path, os
 import struct, Queue, time
 
-fax_enabled = False
-try:
-    from fax import fax, faxdevice
-    fax_enabled = True
-except ImportError:
-    # This can fail on Python < 2.3 due to the datetime module
-    # or if fax was diabled during the build
-    log.warn("Fax send disabled - Python 2.3+ required.")
 
+fax_enabled = prop.fax_build
+
+if fax_enabled:
+    try:
+        from fax import fax
+    except ImportError:
+        # This can fail on Python < 2.3 due to the datetime module
+        # or if fax was diabled during the build
+        log.warn("Fax send disabled - Python 2.3+ required.")
+        fax_enabled = False
+    
+    
 coverpages_enabled = False
 if fax_enabled:
     try:
@@ -103,15 +108,18 @@ class PhoneNumValidator(QValidator):
             return QValidator.Acceptable, pos
 
 
+            
 class ScrollFaxView(ScrollView):
-    def __init__(self, hpssd_sock, toolbox_hosted=True, parent = None, form=None, name = None,fl = 0):
-        ScrollView.__init__(self,parent,name,fl)
-
-        self.toolbox_hosted = toolbox_hosted
+    def __init__(self, service, parent = None, form=None, name = None,fl = 0):
+        ScrollView.__init__(self, service, parent, name, fl)
+        
+        global fax_enabled
+        if service is None:
+            fax_enabled = False
+            
         self.form = form
         self.file_list = []
         self.pages_button_group = 0
-        self.sock = hpssd_sock
         self.recipient_list = []
         self.username = prop.username
         self.busy = False
@@ -128,8 +136,12 @@ class ScrollFaxView(ScrollView):
         self.preserve_formatting = False
         self.waitdlg = None
         log.debug(self.allowable_mime_types)
+        self.last_job_id = 0
+        self.dev = None
+        self.lock_file = None
+        
 
-        self.db =  fax.FaxAddressBook2()
+        self.db =  fax.FaxAddressBook()
         self.last_db_modification = self.db.last_modification_time()
 
         self.MIME_TYPES_DESC = \
@@ -161,20 +173,24 @@ class ScrollFaxView(ScrollView):
             "image/x-xpixmap" : (self.__tr("X11 Pixmap (XPM)"), '.xpm'),
             "image/x-sun-raster" : (self.__tr("Sun Raster Format"), '.ras'),
         }
-
+        
+        
         user_settings = utils.UserSettings()
         self.cmd_fab = user_settings.cmd_fab
         log.debug("FAB command: %s" % self.cmd_fab)
 
-        self.check_timer = QTimer(self, "CheckTimer")
-        self.connect(self.check_timer, SIGNAL('timeout()'), self.PeriodicCheck)
-        self.check_timer.start(3000)
+        if fax_enabled:
+            self.check_timer = QTimer(self, "CheckTimer")
+            self.connect(self.check_timer, SIGNAL('timeout()'), self.PeriodicCheck)
+            self.check_timer.start(3000)
+        
 
     def fillControls(self):
         ScrollView.fillControls(self)
 
         if fax_enabled:
-            if self.addPrinterFaxList(faxes=True, printers=False):
+            if self.addPrinterFaxList(): #faxes=True, printers=False):
+                
                 self.addGroupHeading("files_to_fax", self.__tr("File(s) to Fax"))
                 self.addFileList()
     
@@ -196,14 +212,9 @@ class ScrollFaxView(ScrollView):
     
                 self.addGroupHeading("space1", "")
     
-                if self.toolbox_hosted:
-                    s = self.__tr("<< Functions")
-                else:
-                    s = self.__tr("Close")
-    
                 self.faxButton = self.addActionButton("bottom_nav", self.__tr("Send Fax Now"), 
                                         self.faxButton_clicked, 'fax.png', 'fax-disabled.png', 
-                                        s, self.funcButton_clicked)
+                                        self.__tr("Close"), self.funcButton_clicked)
     
                 self.faxButton.setEnabled(False)
     
@@ -227,37 +238,34 @@ class ScrollFaxView(ScrollView):
         log.debug("ScrollPrintView.onUpdate()")
         self.updateFileList()
         self.updateRecipientList()
+        
 
     def PeriodicCheck(self): # called by check_timer every 3 sec
+        #print self
         if not self.busy:
             log.debug("Checking for incoming faxes...")
-
-            fields, data, result_code = \
-                msg.xmitMessage(self.sock, "FaxCheck", None,
-                                {"username": self.username})
-
-            if result_code == ERROR_FAX_READY:
-                # fax is waiting
-                username = fields['username']
-                job_id = fields['job-id']
-                job_size = fields['job-size']
-                title = fields['title']
+            
+            result = list(self.service.CheckForWaitingFax(self.cur_device.device_uri,
+                          prop.username, self.last_job_id))
+                
+            fax_file = str(result[7])
+            
+            if fax_file:
+                self.last_job_id = 0
+                log.debug("A new fax has arrived: %s" % fax_file)
+                job_id = int(result[4])
+                title = str(result[5])
 
                 if self.form.isMinimized():
                     self.form.showNormal()
 
                 self.check_timer.stop()
-                self.addFileFromJob(0, title, username, job_id, job_size)
+                self.addFileFromJob(0, title, prop.username, job_id, fax_file)
                 self.check_timer.start(3000)
                 return
 
-            elif result_code == ERROR_FAX_PROCESSING:
-                # fax is being processed
-
-                if self.waitdlg is None:
-                    self.waitdlg = WaitForm(0, self.__tr("Processing fax..."), None, self, modal=1) # self.add_fax_canceled
-                    self.waitdlg.show()
-
+            log.debug("Not found.")
+            
             # Check for updated FAB
             last_db_modification = self.db.last_modification_time()
 
@@ -267,74 +275,48 @@ class ScrollFaxView(ScrollView):
                 self.last_db_modification = last_db_modification
                 self.updateRecipientCombos()
                 QApplication.restoreOverrideCursor()
+                
+    
+    def onPrinterChange(self, printer_name):
+        if printer_name != self.cur_printer:
+            self.unlock()
+            self.lock(printer_name)
+            #utils.unlock(self.lock_file)
+            #ok, self.lock_file = utils.lock_app('hp-sendfax-%s' % printer_name, True)
+            
+        ScrollView.onPrinterChange(self, printer_name)
+        
+    def unlock(self):
+        utils.unlock(self.lock_file)
+        
+    def lock(self, printer_name=None):
+        if printer_name is None:
+            printer_name = self.cur_printer
+            
+        ok, self.lock_file = utils.lock_app('hp-sendfax-%s' % printer_name, True)
+        
 
 
     # Event handler for adding files from a external print job (not during fax send thread)
-    def addFileFromJob(self, event, title, username, job_id=0, job_size=0):
+    def addFileFromJob(self, event, title, username, job_id, fax_file):
         QApplication.setOverrideCursor(QApplication.waitCursor)
         self.busy = True
 
         try:
-            if self.waitdlg is None:
-                self.waitdlg = WaitForm(0, self.__tr("Receiving fax data..."), None, self, modal=1)
-                self.waitdlg.show()
+            f = file(fax_file, 'r')
+            header = f.read(fax.FILE_HEADER_SIZE)
 
-            log.debug("Transfering job %d (%d bytes)" % (job_id, job_size))
-            fax_dir = prop.user_dir
+            if len(header) != fax.FILE_HEADER_SIZE:
+                log.error("Invalid fax file! (truncated header or no data)")
+                sys.exit(1)
+                
+            mg, version, total_pages, hort_dpi, vert_dpi, page_size, \
+                resolution, encoding, reserved1, reserved2 = \
+                struct.unpack(">8sBIHHBBBII", header[:fax.FILE_HEADER_SIZE])
 
-            if not os.path.exists(fax_dir):
-                os.mkdir(fax_dir)
-
-            fax_file = os.path.expanduser(os.path.join(fax_dir, "hpfax-%d.g3" % job_id))
-            fd = file(fax_file, 'w')
-            bytes_read = 0
-            header_read = False
-            total_pages = 0
-
-            #if self.waitdlg is not None:
-            #    self.waitdlg.setMessage(self.__tr("Receiving fax data..."))
-
-            while True:
-                qApp.processEvents()
-                log.debug("Transfering fax data...")
-                time.sleep(0.5)
-
-                fields, data, result_code = \
-                    msg.xmitMessage(self.sock, "FaxGetData", None,
-                                         {"username": username,
-                                          "job-id": job_id,
-                                         })
-
-                log.debug(repr(data)), len(data)
-
-                if data and result_code == ERROR_SUCCESS:
-                    fd.write(data)
-                    bytes_read += len(data)
-
-                    self.waitdlg.setMessage(self.__tr("Read %1 of fax data...").arg(utils.format_bytes(bytes_read)))
-
-                    if not header_read and len(data) >= fax.FILE_HEADER_SIZE:
-                        mg, version, total_pages, hort_dpi, vert_dpi, page_size, \
-                            resolution, encoding, reserved1, reserved2 = \
-                            struct.unpack(">8sBIHHBBBII", data[:fax.FILE_HEADER_SIZE])
-
-                        log.debug("Magic=%s Ver=%d Pages=%d hDPI=%d vDPI=%d Size=%d Res=%d Enc=%d" %
-                                  (mg, version, total_pages, hort_dpi, vert_dpi, page_size, resolution, encoding))
-
-                        header_read = True
-
-                else:
-                    break # Done
-
-            fd.close()
-
-            if self.waitdlg is not None:
-                self.waitdlg.hide()
-                self.waitdlg.close()
-                self.waitdlg = None
-
-            log.debug("Transfered %d bytes" % bytes_read)
-
+            log.debug("Magic=%s Ver=%d Pages=%d hDPI=%d vDPI=%d Size=%d Res=%d Enc=%d" %
+                      (mg, version, total_pages, hort_dpi, vert_dpi, page_size, resolution, encoding))
+            
             if total_pages > 0:
                 mime_type = job_types.get(job_id, "application/hplip-fax")
                 mime_type_desc = self.MIME_TYPES_DESC.get(mime_type, ('Unknown', 'n/a'))[0]
@@ -352,10 +334,11 @@ class ScrollFaxView(ScrollView):
             if self.waitdlg is not None:
                 self.waitdlg.hide()
                 self.waitdlg.close()
-                self.waitdlg = None
+                self.waitdlg = None            
             
             QApplication.restoreOverrideCursor()                
 
+            
     def add_fax_canceled(self):
             pass
 
@@ -368,13 +351,13 @@ class ScrollFaxView(ScrollView):
 
         layout37 = QGridLayout(widget,1,1,5,10,"layout37")
 
-        self.addFilePushButton = PixmapLabelButton(widget, "list-add.png", 
-            "list-add-disabled.png", name='addFilePushButton')
+        self.addFilePushButton = PixmapLabelButton(widget, "list_add.png", 
+            "list_add-disabled.png", name='addFilePushButton')
 
         layout37.addWidget(self.addFilePushButton,2,0)
 
         self.removeFilePushButton = PixmapLabelButton(widget, 
-            "list-remove.png", "list-remove-disabled.png", name='removeFilePushButton')
+            "list_remove.png", "list_remove-disabled.png", name='removeFilePushButton')
 
         layout37.addWidget(self.removeFilePushButton,2,1)
 
@@ -482,12 +465,12 @@ class ScrollFaxView(ScrollView):
     def fileListView_rightButtonClicked(self, item, pos, col):
         popup = QPopupMenu(self)
 
-        popup.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir, 'list-add.png'))),
+        popup.insertItem(QIconSet(load_pixmap('list_add', '16x16')),
             self.__tr("Add File..."), self.addFile_clicked)
 
         if item is not None:
-            popup.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir,
-                'list-remove.png'))), self.__tr("Remove File"), self.removeFile_clicked)
+            popup.insertItem(QIconSet(load_pixmap('list_remove', '16x16')), 
+                self.__tr("Remove File"), self.removeFile_clicked)
 
             if self.fileListView.childCount() > 1:
                 last_item = self.fileListView.firstChild()
@@ -495,17 +478,18 @@ class ScrollFaxView(ScrollView):
                     last_item = last_item.nextSibling()
 
                 if item is not self.fileListView.firstChild():
-                    popup.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir,
-                        'up.png'))), self.__tr("Move Up"), self.moveFileUp_clicked)
+                    popup.insertItem(QIconSet(load_pixmap('up', '16x16')), 
+                        self.__tr("Move Up"), self.moveFileUp_clicked)
 
                 if item is not last_item:
-                    popup.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir,
-                        'down.png'))), self.__tr("Move Down"), self.moveFileDown_clicked)
+                    popup.insertItem(QIconSet(load_pixmap('down', '16x16')),
+                        self.__tr("Move Down"), self.moveFileDown_clicked)
 
 
         popup.insertSeparator(-1)
-        popup.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir,
-                'mimetypes.png'))), self.__tr("Show File Types..."), self.showFileTypes_clicked)
+        popup.insertItem(QIconSet(load_pixmap('mimetypes', '16x16')), 
+            self.__tr("Show File Types..."), self.showFileTypes_clicked)
+        
         popup.popup(pos)
 
 
@@ -520,16 +504,12 @@ class ScrollFaxView(ScrollView):
         if not title:
             title = os.path.basename(path)
 
-        if os.path.exists(path):
+        if os.path.exists(path) and os.access(path, os.R_OK):
             mime_type = magic.mime_type(path)
-            log.debug(mime_type)
             mime_type_desc = mime_type
-
-            log.debug(mime_type)
 
             if mime_type == 'application/hplip-fax':
                 mime_type_desc = self.MIME_TYPES_DESC[mime_type][0]
-
 
                 fax_file_fd = file(path, 'r')
                 header = fax_file_fd.read(fax.FILE_HEADER_SIZE)
@@ -543,6 +523,7 @@ class ScrollFaxView(ScrollView):
                     return
 
                 self.addFile(path, title, mime_type, mime_type_desc, pages)
+            
             else:
                 log.debug(repr(mime_type))
                 try:
@@ -570,7 +551,9 @@ class ScrollFaxView(ScrollView):
                     log.debug("Printer state = %d" % printer_state)
 
                     if printer_state == cups.IPP_PRINTER_STATE_IDLE:
+                        log.debug("Printing: %s on %s" % (path, self.cur_printer))
                         sent_job_id = cups.printFile(self.cur_printer, path, os.path.basename(path))
+                        self.last_job_id = sent_job_id
                         job_types[sent_job_id] = mime_type # save for later
                         log.debug("Job ID=%d" % sent_job_id)  
 
@@ -588,7 +571,7 @@ class ScrollFaxView(ScrollView):
                     QApplication.restoreOverrideCursor()
 
         else:
-            self.form.FailureUI(self.__tr("<b>Unable to add file '%1' to file list.</b><p>Check the file name and try again.".arg(path)))
+            self.form.FailureUI(self.__tr("<b>Unable to add file '%1' to file list (file not found or insufficient permissions).</b><p>Check the file name and try again.").arg(path))
 
 
 
@@ -697,7 +680,7 @@ class ScrollFaxView(ScrollView):
         layout14.addWidget(self.editCoverpagePushButton,0,1)
 
         self.addCoverpagePushButton = PixmapLabelButton(widget, 
-            "list-add.png", "list-add-disabled.png", name='')
+            "list_add.png", "list_add-disabled.png", name='')
 
         layout14.addWidget(self.addCoverpagePushButton,0,2)
         spacer12_2 = QSpacerItem(20,20,QSizePolicy.Expanding,QSizePolicy.Minimum)
@@ -753,7 +736,7 @@ class ScrollFaxView(ScrollView):
         layout9 = QGridLayout(widget,1,1,5,10,"layout9")
 
         self.moveDownPushButton = PixmapLabelButton(widget, 
-            "down-user.png", "down-user-disabled.png", name='')
+            "down_user.png", "down_user-disabled.png", name='')
 
         layout9.addWidget(self.moveDownPushButton,1,2)
 
@@ -777,12 +760,12 @@ class ScrollFaxView(ScrollView):
         layout9.addMultiCellWidget(self.recipientListView,0,0,0,4)
 
         self.fabPushButton = PixmapLabelButton(widget, 
-                    "fab.png", None, name='')        
+                    "fab", None, name='') 
 
         layout9.addWidget(self.fabPushButton,1,4)
 
         self.removeRecipientPushButton = PixmapLabelButton(widget, 
-            "remove-user.png", "remove-user-disabled.png", name='')
+            "remove_user.png", "remove_user-disabled.png", name='')
 
         self.removeRecipientPushButton.setEnabled(1)
 
@@ -791,7 +774,7 @@ class ScrollFaxView(ScrollView):
         layout9.addItem(spacer10,1,3)
 
         self.moveUpPushButton = PixmapLabelButton(widget, 
-            "up-user.png", "up-user-disabled.png", name='')
+            "up_user.png", "up_user-disabled.png", name='')
 
         layout9.addWidget(self.moveUpPushButton,1,1)
 
@@ -880,27 +863,26 @@ class ScrollFaxView(ScrollView):
 
         all_entries = self.db.get_all_records()
         if all_entries:
-            popup.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir, 'add-user.png'))),
+            popup.insertItem(QIconSet(load_pixmap('add_user', '16x16')),
                 self.__tr("Add Individual"), ind)
 
             for e, v in all_entries.items():
-                self.ind_map[ind.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir, 'add-user.png'))), 
-                    e, None)] = e
+                self.ind_map[ind.insertItem(QIconSet(load_pixmap('add_user', '16x16')), e, None)] = e
 
         all_groups = self.db.get_all_groups()
         if all_groups:
-            popup.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir, 'add-users.png'))),
+            popup.insertItem(QIconSet(load_pixmap('add_users', '16x16')),
                 self.__tr("Add Group"), grp)
 
             for g in all_groups:
-                self.grp_map[grp.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir, 'add-users.png'))), 
+                self.grp_map[grp.insertItem(QIconSet(load_pixmap('add_users', '16x16')), 
                     g, None)] = g
 
         if item is not None:
             popup.insertSeparator(-1)
 
-            popup.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir,
-                'remove-user.png'))), self.__tr("Remove"), self.removeRecipientPushButton_clicked)
+            popup.insertItem(QIconSet(load_pixmap('remove_user', '16x16')), 
+                self.__tr("Remove"), self.removeRecipientPushButton_clicked)
 
             if self.recipientListView.childCount() > 1:
                 last_item = self.recipientListView.firstChild()
@@ -908,16 +890,16 @@ class ScrollFaxView(ScrollView):
                     last_item = last_item.nextSibling()
 
                 if item is not self.recipientListView.firstChild():
-                    popup.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir,
-                        'up-user.png'))), self.__tr("Move Up"), self.moveUpPushButton_clicked)
+                    popup.insertItem(QIconSet(load_pixmap('up_user', '16x16')), 
+                        self.__tr("Move Up"), self.moveUpPushButton_clicked)
 
                 if item is not last_item:
-                    popup.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir,
-                        'down-user.png'))), self.__tr("Move Down"), self.moveDownPushButton_clicked)
+                    popup.insertItem(QIconSet(load_pixmap('down_user', '16x16')), 
+                        self.__tr("Move Down"), self.moveDownPushButton_clicked)
 
         popup.insertSeparator(-1)
-        popup.insertItem(QIconSet(QPixmap(os.path.join(prop.image_dir,
-                'fab.png'))), self.__tr("Fax Address Book..."), self.fabPushButton_clicked)
+        popup.insertItem(QIconSet(load_pixmap('fab', '16x16')), 
+            self.__tr("Fax Address Book..."), self.fabPushButton_clicked)
 
         self.connect(ind, SIGNAL("activated(int)"), self.ind_popup_activated)
         self.connect(grp, SIGNAL("activated(int)"), self.grp_popup_activated)
@@ -1031,12 +1013,12 @@ class ScrollFaxView(ScrollView):
         layout13.addItem(spacer11,0,1)
 
         self.addGroupPushButton = PixmapLabelButton(widget, 
-                    "add-users.png", "add-users-disabled.png", name='addGroupPushButton')
+                    "add_users.png", "add_users-disabled.png", name='addGroupPushButton')
 
         layout13.addWidget(self.addGroupPushButton,1,3)
 
         self.addIndividualPushButton = PixmapLabelButton(widget, 
-                    "add-user.png", "add-user-disabled.png", name='addIndividualPushButton')
+                    "add_user.png", "add_user-disabled.png", name='addIndividualPushButton')
 
 
         layout13.addWidget(self.addIndividualPushButton,0,3)
@@ -1108,7 +1090,7 @@ class ScrollFaxView(ScrollView):
         layout12.addWidget(self.textLabel4,0,0)
 
         self.quickAddPushButton = PixmapLabelButton(widget, 
-                    "add-user-quick.png", "add-user-quick-disabled.png", name='quickAddPushButton')
+                    "add_user_quick.png", "add_user_quick-disabled.png", name='quickAddPushButton')
 
         layout12.addWidget(self.quickAddPushButton,0,4)
 
@@ -1163,28 +1145,28 @@ class ScrollFaxView(ScrollView):
 
         QApplication.setOverrideCursor(QApplication.waitCursor)
 
-        dev = faxdevice.FaxDevice(self.cur_device.device_uri,
-                                  self.cur_printer, None, None, 
-                                  self.cur_device.mq['fax-type'])
+        self.dev = fax.getFaxDevice(self.cur_device.device_uri, 
+                                   self.cur_printer, None,
+                                   self.cur_device.mq['fax-type'])
 
         try:
             try:
-                dev.open()
+                self.dev.open()
             except Error, e:
                 log.warn(e.msg)
 
             try:
-                dev.queryDevice(quick=True)
+                self.dev.queryDevice(quick=True)
             except Error, e:
                 log.error("Query device error (%s)." % e.msg)
-                dev.error_state = ERROR_STATE_ERROR
+                self.dev.error_state = ERROR_STATE_ERROR
 
         finally:
-            dev.close()
+            self.dev.close()
             QApplication.restoreOverrideCursor()
 
-        if dev.error_state > ERROR_STATE_MAX_OK and \
-            dev.error_state not in (ERROR_STATE_LOW_SUPPLIES, ERROR_STATE_LOW_PAPER):
+        if self.dev.error_state > ERROR_STATE_MAX_OK and \
+            self.dev.error_state not in (ERROR_STATE_LOW_SUPPLIES, ERROR_STATE_LOW_PAPER):
             
             self.form.FailureUI(self.__tr("<b>Device is busy or in an error state (code=%1)</b><p>Please wait for the device to become idle or clear the error and try again.").arg(self.cur_device.status_code))
             return
@@ -1213,14 +1195,14 @@ class ScrollFaxView(ScrollView):
 
         self.busy = True
 
-        service.sendEvent(self.sock, EVENT_START_FAX_JOB, device_uri=dev.device_uri)
-
-        if not dev.sendFaxes(phone_num_list, self.file_list, self.cover_page_message, 
-                              self.cover_page_re, self.cover_page_func, self.preserve_formatting,
-                              self.cur_printer, self.update_queue, self.event_queue):
+        self.dev.sendEvent(EVENT_START_FAX_JOB, self.cur_printer, 0, '') 
+    
+        if not self.dev.sendFaxes(phone_num_list, self.file_list, self.cover_page_message, 
+                                  self.cover_page_re, self.cover_page_func, self.preserve_formatting,
+                                  self.cur_printer, self.update_queue, self.event_queue):
 
             self.form.FailureUI(self.__tr("<b>Send fax is active.</b><p>Please wait for operation to complete."))
-            service.sendEvent(self.sock, EVENT_FAX_JOB_FAIL, device_uri=dev.device_uri)
+            self.dev.sendEvent(EVENT_FAX_JOB_FAIL, self.cur_printer, 0, '')
             self.busy = False
             return
 
@@ -1234,8 +1216,7 @@ class ScrollFaxView(ScrollView):
 
     def send_fax_canceled(self):
         self.event_queue.put((fax.EVENT_FAX_SEND_CANCELED, '', '', ''))
-        service.sendEvent(self.sock, EVENT_FAX_JOB_CANCELED, device_uri=self.cur_device.device_uri)
-
+        self.dev.sendEvent(EVENT_FAX_JOB_CANCELED, self.cur_printer, 0, '')
 
     def send_fax_timer_timeout(self):
         while self.update_queue.qsize():
@@ -1279,26 +1260,27 @@ class ScrollFaxView(ScrollView):
 
                 if status  == fax.STATUS_ERROR:
                     self.form.FailureUI(self.__tr("<b>Fax send error.</b><p>"))
-                    service.sendEvent(self.sock, EVENT_FAX_JOB_FAIL, device_uri=self.cur_device.device_uri)
+                    self.dev.sendEvent(EVENT_FAX_JOB_FAIL, self.cur_printer, 0, '')
 
                 elif status == fax.STATUS_BUSY:
                     self.form.FailureUI(self.__tr("<b>Fax device is busy.</b><p>Please try again later."))
-                    service.sendEvent(self.sock, EVENT_FAX_JOB_FAIL, device_uri=self.cur_device.device_uri)
+                    self.dev.sendEvent(EVENT_FAX_JOB_FAIL, self.cur_printer, 0, '')
 
                 elif status == fax.STATUS_COMPLETED:
-                    service.sendEvent(self.sock, EVENT_END_FAX_JOB, device_uri=self.cur_device.device_uri)
+                    self.dev.sendEvent(EVENT_END_FAX_JOB, self.cur_printer, 0, '')
 
                     self.funcButton_clicked()
 
 
+    def cleanup(self):
+        self.unlock()
+        
+        if fax_enabled:
+            self.check_timer.stop()
 
     def funcButton_clicked(self):
-        self.check_timer.stop()
-
-        if self.toolbox_hosted:
-            self.form.SwitchFunctionsTab("funcs")
-        else:
-            self.form.close()
+        self.cleanup()
+        self.form.close()
 
     def __tr(self,s,c = None):
         return qApp.translate("ScrollFaxView",s,c)

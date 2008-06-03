@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '3.1'
+__version__ = '3.3'
 __title__ = 'HPLIP Installer'
 __doc__ = "Installer for HPLIP tarball."
 
@@ -48,6 +48,8 @@ USAGE = [(__doc__, "", "name", True),
          utils.USAGE_SPACE,
          utils.USAGE_OPTIONS,
          ("Automatic mode (chooses the most common options):", "-a or --auto (text mode only)", "option", False),
+         ("Dependency installation retries:", "-r <retries> or --retries=<retries> (default is 3)", "option", False),
+         ("Assume network connection present:", "-n or --network", "option", False),
          ("Force install of all dependencies (FOR TESTING ONLY):", "-x (text mode only)", "option", False),
          ("Unknown distro mode (FOR TESTING ONLY):", "-d (text mode only)", "option", False),
          utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
@@ -72,11 +74,14 @@ auto = False
 test_depends = False
 test_unknown = False
 language = None
+assume_network = False
+max_retries = 3
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'hl:giawutxdq:', 
+    opts, args = getopt.getopt(sys.argv[1:], 'hl:giawutxdq:nr:', 
         ['help', 'help-rest', 'help-man', 'help-desc', 'gui', 'lang=',
-        'logging=', 'interactive', 'auto', 'web', 'browser', 'text']) 
+        'logging=', 'interactive', 'auto', 'web', 'browser', 'text', 
+        'network', 'retries=']) 
 
 except getopt.GetoptError, e:
     log.error(e.msg)
@@ -128,8 +133,20 @@ for o, a in opts:
         log.warn("Unknown distro (-d) is for TESTING ONLY")
         test_unknown = True
         
+    elif o in ('-n', '--network'):
+        assume_network = True
         
-    
+    elif o in ('-r', '--retries'):
+        try:
+            max_retries = int(a)
+        except ValueError:
+            log.error("Invalid value for retries. Set to default of 3.")
+            max_retries = 3
+        
+        
+if os.getuid() == 0:
+    log.error("hplip-install should not be run as root.")
+
 log_file = os.path.normpath('./hplip-install_%s.log' % time.strftime("%a-%d-%b-%Y_%H:%M:%S"))
 
 if os.path.exists(log_file):
@@ -177,9 +194,13 @@ if mode == BROWSER_MODE:
     web_install.start(language)
 
 elif mode == INTERACTIVE_MODE:
-    from installer import text_install
-    log.debug("Starting text installer...")
-    text_install.start(language, auto, test_depends, test_unknown)
+
+    try:
+        from installer import text_install
+        log.debug("Starting text installer...")
+        text_install.start(language, auto, test_depends, test_unknown, assume_network, max_retries)
+    except KeyboardInterrupt:
+        log.error("User exit")
 
 else:
     log.error("Invalid mode. Please use '-i', '-t', '-u' or '-w' to select the mode.")

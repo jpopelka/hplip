@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,16 +22,19 @@
 # Ported from Perl's Image::Size module by Randy J. Ray
 #
 
-import os, os.path, re, struct
+# Std Lib
+import os
+import os.path
+import re
+import struct
 
-
+# Re patterns
 xbm_pat = re.compile(r'^\#define\s*\S*\s*(\d+)\s*\n\#define\s*\S*\s*(\d+)', re.IGNORECASE)
 xpm_pat = re.compile(r'"\s*(\d+)\s+(\d+)(\s+\d+\s+\d+){1,2}\s*"', re.IGNORECASE)
 ppm_pat1 = re.compile(r'^\#.*', re.IGNORECASE | re.MULTILINE)
 ppm_pat2 = re.compile(r'^(P[1-6])\s+(\d+)\s+(\d+)', re.IGNORECASE)
 ppm_pat3 = re.compile(r'IMGINFO:(\d+)x(\d+)', re.IGNORECASE)
 tiff_endian_pat = re.compile(r'II\x2a\x00')
-
 
 
 def readin(stream, length, offset=0):

@@ -124,12 +124,14 @@ RASTER_DATA_SIZE = 504
 class PMLFaxDevice(FaxDevice):
 
     def __init__(self, device_uri=None, printer_name=None,
-                 hpssd_sock=None, callback=None, 
-                 fax_type=FAX_TYPE_NONE):
+                 callback=None, 
+                 fax_type=FAX_TYPE_NONE,
+                 disable_dbus=False):
 
         FaxDevice.__init__(self, device_uri, 
-                           printer_name, hpssd_sock, 
-                           callback, fax_type)
+                           printer_name, 
+                           callback, fax_type,
+                           disable_dbus)
 
         self.send_fax_thread = None
         self.upload_log_thread = None
@@ -184,7 +186,7 @@ class PMLFaxDevice(FaxDevice):
 
         if not self.isSendFaxActive():
     
-            self.send_fax_thread = PMLFaxSendThread(self, phone_num_list, fax_file_list, 
+            self.send_fax_thread = PMLFaxSendThread(self, self.service, phone_num_list, fax_file_list, 
                                                     cover_message, cover_re, cover_func, 
                                                     preserve_formatting, 
                                                     printer_name, update_queue, 
@@ -285,11 +287,11 @@ class PMLUploadLogThread(threading.Thread):
         
 # **************************************************************************** #
 class PMLFaxSendThread(FaxSendThread):
-    def __init__(self, dev, phone_num_list, fax_file_list, 
+    def __init__(self, dev, service, phone_num_list, fax_file_list, 
                  cover_message='', cover_re='', cover_func=None, preserve_formatting=False,
                  printer_name='', update_queue=None, event_queue=None):
                  
-        FaxSendThread.__init__(self, dev, phone_num_list, fax_file_list, 
+        FaxSendThread.__init__(self, dev, service, phone_num_list, fax_file_list, 
              cover_message, cover_re, cover_func, preserve_formatting,
              printer_name, update_queue, event_queue)
 
@@ -547,10 +549,11 @@ class PMLFaxSendThread(FaxSendThread):
                             (tx_status == pml.FAXJOB_TX_STATUS_IDLE or tx_status == pml.FAXJOB_TX_STATUS_DONE) and \
                             (rx_status == pml.FAXJOB_RX_STATUS_IDLE or rx_status == pml.FAXJOB_RX_STATUS_DONE)):
 
-                            if state == pml.UPDN_STATE_IDLE:
+                            # xwas if state == pml.UPDN_STATE_IDLE:
+                            if dl_state == pml.UPDN_STATE_IDLE:
                                 log.debug("Starting in idle state")
                             else:
-                                log.debug("Reseting to idle...")
+                                log.debug("Resetting to idle...")
                                 self.dev.setPML(pml.OID_FAX_DOWNLOAD, pml.UPDN_STATE_IDLE)
                                 time.sleep(0.5)
                         else:
@@ -564,6 +567,7 @@ class PMLFaxSendThread(FaxSendThread):
 
                         if dl_state == pml.UPDN_STATE_IDLE:
                             log.debug("Try: 0")
+                            log.debug("Setting to up/down state request start...")
                             self.dev.setPML(pml.OID_FAX_DOWNLOAD, pml.UPDN_STATE_REQSTART)
                             time.sleep(1)
 
@@ -583,6 +587,7 @@ class PMLFaxSendThread(FaxSendThread):
                                     break
 
                                 time.sleep(1)
+                                log.debug("Setting to up/down state request start...")
                                 self.dev.setPML(pml.OID_FAX_DOWNLOAD, pml.UPDN_STATE_REQSTART)
 
                                 i += 1
@@ -830,16 +835,20 @@ class PMLFaxSendThread(FaxSendThread):
 
                         if status == pml.FAXJOB_TX_STATUS_DIALING:
                                 self.write_queue((STATUS_DIALING, 0, recipient['fax']))
+                                log.debug("Dialing ...")
 
                         elif status == pml.FAXJOB_TX_STATUS_TRANSMITTING:    
                             self.write_queue((STATUS_SENDING, page_num, recipient['fax']))
+                            log.debug("Transmitting ...")
 
                         elif status in (pml.FAXJOB_TX_STATUS_DONE, pml.FAXJOB_RX_STATUS_IDLE):
                             fax_send_state = FAX_SEND_STATE_RESET_TOKEN
                             state = STATE_NEXT_RECIPIENT
+                            log.debug("Transmitting done or idle ...")
 
                         else:
                             self.write_queue((STATUS_SENDING, page_num, recipient['fax']))
+                            log.debug("Pending ...")
 
 
                     elif fax_send_state == FAX_SEND_STATE_RESET_TOKEN: # -------------- Release fax token (110, 160, 0)

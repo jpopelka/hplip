@@ -20,7 +20,7 @@
 # Authors: Don Welch, Smith Kennedy
 #
 
-__version__ = '4.3'
+__version__ = '4.4'
 __title__ = 'Device URI Creation Utility'
 __doc__ = "Creates device URIs for local and network connected printers for use with CUPS."
 
@@ -28,7 +28,7 @@ __doc__ = "Creates device URIs for local and network connected printers for use 
 import sys
 import re
 import getopt
-import socket
+import os
 
 # Local
 from base.g import *
@@ -78,114 +78,128 @@ def usage(typ='text'):
 
 
 log.set_module('hp-makeuri')
-
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 
-                                'hl:csfp:g', 
-                                ['help', 'help-rest', 'help-man', 'help-desc',
-                                  'logging=',
-                                  'cups',
-                                  'sane',
-                                  'fax',
-                                  'port=',
-                                ] 
-                              ) 
-except getopt.GetoptError, e:
-    log.error(e.msg)
-    usage()
-    sys.exit(1)
-
-if os.getenv("HPLIP_DEBUG"):
-    log.set_level('debug')
-
-log_level = 'info'
-cups_quiet_mode = False
-sane_quiet_mode = False
-fax_quiet_mode = False
-jd_port = 1
-
-for o, a in opts:
-
-    if o in ('-h', '--help'):
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 
+                                    'hl:csfp:g', 
+                                    ['help', 'help-rest', 'help-man', 'help-desc',
+                                      'logging=',
+                                      'cups',
+                                      'sane',
+                                      'fax',
+                                      'port=',
+                                    ] 
+                                  ) 
+    except getopt.GetoptError, e:
+        log.error(e.msg)
         usage()
+        sys.exit(1)
 
-    elif o == '--help-rest':
-        usage('rest')
-
-    elif o == '--help-man':
-        usage('man')
-
-    elif o == '--help-desc':
-        print __doc__,
-        sys.exit(0)
-
-    elif o in ('-l', '--logging'):
-        log_level = a.lower().strip()
-        if not log.set_level(log_level):
-            usage()
-
-    elif o in ('-c', '--cups'):
-        cups_quiet_mode = True
-
-    elif o in ('-s', '--sane'):
-        sane_quiet_mode = True
-
-    elif o in ('-f', '--fax'):
-        fax_quiet_mode = True
-
-    elif o in ('-p', '--port'):
-        try:
-            jd_port = int(a)
-        except ValueError:
-            log.error("Invalid port number. Must be between 1 and 3 inclusive.")
-            usage()
-
-    elif o == '-g':
+    if os.getenv("HPLIP_DEBUG"):
         log.set_level('debug')
 
+    log_level = 'info'
+    cups_quiet_mode = False
+    sane_quiet_mode = False
+    fax_quiet_mode = False
+    jd_port = 1
 
-quiet_mode = cups_quiet_mode or sane_quiet_mode or fax_quiet_mode
+    for o, a in opts:
 
-if quiet_mode:
-    log.set_level('warn')
+        if o in ('-h', '--help'):
+            usage()
 
-utils.log_title(__title__, __version__)    
+        elif o == '--help-rest':
+            usage('rest')
 
-if len(args) != 1:
-    log.error("You must specify one SERIAL NO., IP, USB ID or DEVNODE on the command line.")
-    usage()
+        elif o == '--help-man':
+            usage('man')
 
-param = args[0]
+        elif o == '--help-desc':
+            print __doc__,
+            sys.exit(0)
 
-if 'localhost' in param.lower():
-    log.error("Invalid hostname")
-    usage()
+        elif o in ('-l', '--logging'):
+            log_level = a.lower().strip()
+            if not log.set_level(log_level):
+                usage()
 
-cups_uri, sane_uri, fax_uri = device.makeURI(param, jd_port)
+        elif o in ('-c', '--cups'):
+            cups_quiet_mode = True
 
-if not cups_uri:
-    log.error("Device not found")
-    sys.exit(1)
+        elif o in ('-s', '--sane'):
+            sane_quiet_mode = True
 
-if cups_quiet_mode:
-    print cups_uri
-elif not quiet_mode:    
-    print "CUPS URI:", cups_uri
+        elif o in ('-f', '--fax'):
+            fax_quiet_mode = True
 
-if sane_uri:
-    if sane_quiet_mode:
-        print sane_uri
-    elif not quiet_mode:
-        print "SANE URI:", sane_uri
-elif not sane_uri and sane_quiet_mode:
-    log.error("Device does not support scan.")
+        elif o in ('-p', '--port'):
+            try:
+                jd_port = int(a)
+            except ValueError:
+                log.error("Invalid port number. Must be between 1 and 3 inclusive.")
+                usage()
 
-if fax_uri:
-    if fax_quiet_mode:
-        print fax_uri
-    elif not quiet_mode:
-        print "HP Fax URI:", fax_uri
-elif not fax_uri and fax_quiet_mode:
-    log.error("Device does not support fax.")
+        elif o == '-g':
+            log.set_level('debug')
 
-sys.exit(0)
+
+    quiet_mode = cups_quiet_mode or sane_quiet_mode or fax_quiet_mode
+
+    if quiet_mode:
+        log.set_level('warn')
+
+    utils.log_title(__title__, __version__)   
+   
+    if os.getuid() == 0:
+        log.error("hp-makeuri should not be run as root.")
+
+    if len(args) != 1:
+        log.error("You must specify one SERIAL NO., IP, USB ID or DEVNODE on the command line.")
+        usage()
+
+    param = args[0]
+
+    if 'localhost' in param.lower():
+        log.error("Invalid hostname")
+        usage()
+
+    cups_uri, sane_uri, fax_uri = device.makeURI(param, jd_port)
+
+    if not cups_uri:
+        log.error("Device not found")
+        sys.exit(1)
+
+    if cups_quiet_mode:
+        print cups_uri
+
+    elif not quiet_mode:    
+        print "CUPS URI:", cups_uri
+
+    if sane_uri:
+        if sane_quiet_mode:
+            print sane_uri
+        
+        elif not quiet_mode:
+            print "SANE URI:", sane_uri
+    
+    elif not sane_uri and sane_quiet_mode:
+        log.error("Device does not support scan.")
+
+    if fax_uri:
+        if fax_quiet_mode:
+            print fax_uri
+        
+        elif not quiet_mode:
+            print "HP Fax URI:", fax_uri
+            
+    elif not fax_uri and fax_quiet_mode:
+        log.error("Device does not support fax.")
+
+except KeyboardInterrupt:
+    log.error("User exit")
+
+if not quiet_mode:
+    log.info("")
+    log.info("Done.")
+

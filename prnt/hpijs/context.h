@@ -254,9 +254,7 @@ public:
     {
         m_iCopyCount = iNumCopies;
     }
-#ifdef APDK_LINUX
     DRIVER_ERROR    SetPrinterHint (int iHint, int iValue);
-#endif
 
 private:
 

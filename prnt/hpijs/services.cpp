@@ -516,9 +516,6 @@ int UXServices::MapPaperSize (float width, float height)
     if (size == CUSTOM_SIZE)
         pPC->SetCustomSize (width, height);
 
-    PaperWidth  = pPC->PhysicalPageSizeX ();
-    PaperHeight = pPC->PhysicalPageSizeY ();
-
     if ((r = pPC->SetPaperSize ((PAPER_SIZE)size, FullBleed)) != NO_ERROR)
     {
         if (r > 0)
@@ -535,6 +532,9 @@ int UXServices::MapPaperSize (float width, float height)
         PaperHeight = pPC->PhysicalPageSizeY ();
         return -1;
     }
+
+    PaperWidth  = pPC->PhysicalPageSizeX ();
+    PaperHeight = pPC->PhysicalPageSizeY ();
 
     return 0; 
 }

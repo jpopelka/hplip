@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '1.1'
+__version__ = '1.3'
 __title__ = 'Supply Levels Utility'
 __doc__ = "Display bar graphs of current supply levels for supported HPLIP printers."
 
@@ -29,6 +29,7 @@ import sys
 import getopt
 import time
 import operator
+import os
 
 # Local
 from base.g import *
@@ -110,176 +111,187 @@ def logBarGraph(agent_level, agent_type, size=DEFAULT_BAR_GRAPH_SIZE, use_colors
 
 log.set_module('hp-levels')
 
-
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'p:d:hl:b:s:ca:g',
-        ['printer=', 'device=', 'help', 'help-rest', 'help-man', 
-         'help-desc', 'logging=', 'size=', 'color', 'char='])
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 'p:d:hl:b:s:ca:g',
+            ['printer=', 'device=', 'help', 'help-rest', 'help-man', 
+             'help-desc', 'logging=', 'size=', 'color', 'char=', 'bus='])
 
-except getopt.GetoptError, e:
-    log.error(e.msg)
-    usage()
-
-printer_name = None
-device_uri = None
-log_level = logger.DEFAULT_LOG_LEVEL
-bus = device.DEFAULT_PROBE_BUS
-size = DEFAULT_BAR_GRAPH_SIZE
-color = True
-bar_char = '/'
-
-if os.getenv("HPLIP_DEBUG"):
-    log.set_level('debug')
-
-for o, a in opts:
-    if o in ('-h', '--help'):
+    except getopt.GetoptError, e:
+        log.error(e.msg)
         usage()
 
-    elif o == '--help-rest':
-        usage('rest')
+    printer_name = None
+    device_uri = None
+    log_level = logger.DEFAULT_LOG_LEVEL
+    bus = device.DEFAULT_PROBE_BUS
+    size = DEFAULT_BAR_GRAPH_SIZE
+    color = True
+    bar_char = '/'
 
-    elif o == '--help-man':
-        usage('man')
-
-    elif o == '--help-desc':
-        print __doc__,
-        sys.exit(0)
-
-    elif o in ('-p', '--printer'):
-        if a.startswith('*'):
-            printer_name = cups.getDefaultPrinter()
-            log.info("Using CUPS default printer: %s" % printer_name)
-            log.debug(printer_name)
-        else:
-            printer_name = a
-
-    elif o in ('-d', '--device'):
-        device_uri = a
-
-    elif o in ('-b', '--bus'):
-        bus = a.lower().strip()
-        if not device.validateBusList(bus):
-            usage()
-
-    elif o in ('-l', '--logging'):
-        log_level = a.lower().strip()
-        if not log.set_level(log_level):
-            usage()
-
-    elif o in ('-s', '--size'):
-        try:
-            size = int(a.strip())
-        except:
-            size = DEFAULT_BAR_GRAPH_SIZE
-
-        if size < 1 or size > DEFAULT_BAR_GRAPH_SIZE:
-            size = DEFAULT_BAR_GRAPH_SIZE
-
-    elif o in ('-c', '--color'):
-        color = True
-
-    elif o in ('-a', '--char'):
-        try:
-            bar_char = a[0]
-        except:
-            bar_char = '/'
-
-    elif o == '-g':
+    if os.getenv("HPLIP_DEBUG"):
         log.set_level('debug')
 
+    for o, a in opts:
+        if o in ('-h', '--help'):
+            usage()
 
-if device_uri and printer_name:
-    log.error("You may not specify both a printer (-p) and a device (-d).")
-    usage()
+        elif o == '--help-rest':
+            usage('rest')
 
-utils.log_title(__title__, __version__)
+        elif o == '--help-man':
+            usage('man')
 
-if not device_uri and not printer_name:
-    try:
-        device_uri = device.getInteractiveDeviceURI(bus, filter={'status-type': (operator.gt, 0)})
-        if device_uri is None:
+        elif o == '--help-desc':
+            print __doc__,
+            sys.exit(0)
+
+        elif o in ('-p', '--printer'):
+            if a.startswith('*'):
+                printer_name = cups.getDefault()
+                log.info("Using CUPS default printer: %s" % printer_name)
+                log.debug(printer_name)
+            else:
+                printer_name = a
+
+        elif o in ('-d', '--device'):
+            device_uri = a
+
+        elif o in ('-b', '--bus'):
+            bus = [x.lower().strip() for x in a.split(',')]
+            if not device.validateBusList(bus):
+                usage()
+
+        elif o in ('-l', '--logging'):
+            log_level = a.lower().strip()
+            if not log.set_level(log_level):
+                usage()
+
+        elif o in ('-s', '--size'):
+            try:
+                size = int(a.strip())
+            except TypeError:
+                size = DEFAULT_BAR_GRAPH_SIZE
+
+            if size < 1 or size > DEFAULT_BAR_GRAPH_SIZE:
+                size = DEFAULT_BAR_GRAPH_SIZE
+
+        elif o in ('-c', '--color'):
+            color = True
+
+        elif o in ('-a', '--char'):
+            try:
+                bar_char = a[0]
+            except KeyError:
+                bar_char = '/'
+
+        elif o == '-g':
+            log.set_level('debug')
+
+
+    if device_uri and printer_name:
+        log.error("You may not specify both a printer (-p) and a device (-d).")
+        usage()
+
+    utils.log_title(__title__, __version__)
+    
+    if os.getuid() == 0:
+        log.error("hp-levels should not be run as root.")
+
+    if not device_uri and not printer_name:
+        try:
+            device_uri = device.getInteractiveDeviceURI(bus, filter={'status-type': (operator.gt, 0)})
+            if device_uri is None:
+                sys.exit(1)
+        except Error:
+            log.error("Error occured during interactive mode. Exiting.")
             sys.exit(1)
+
+
+    try:
+        d = device.Device(device_uri, printer_name)
     except Error:
-        log.error("Error occured during interactive mode. Exiting.")
+        log.error("Error opening device. Exiting.")
         sys.exit(1)
 
+    if d.device_uri is None and printer_name:
+        log.error("Printer '%s' not found." % printer_name)
+        sys.exit(1)
 
-try:
-    d = device.Device(device_uri, printer_name)
-except Error:
-    log.error("Error opening device. Exiting.")
-    sys.exit(1)
+    if d.device_uri is None and device_uri:
+        log.error("Malformed/invalid device-uri: %s" % device_uri)
+        sys.exit(1)
 
-if d.device_uri is None and printer_name:
-    log.error("Printer '%s' not found." % printer_name)
-    sys.exit(1)
+    user_cfg.last_used.device_uri = d.device_uri
 
-if d.device_uri is None and device_uri:
-    log.error("Malformed/invalid device-uri: %s" % device_uri)
-    sys.exit(1)
-
-user_cfg.last_used.device_uri = d.device_uri
-
-try:
-    d.open()
-    d.queryDevice()
-except Error, e:
-    log.error("Error opening device (%s). Exiting." % e.msg)
-    sys.exit(1)
-
-if d.mq['status-type'] != STATUS_TYPE_NONE:
-
-    log.info("")
-
-    sorted_supplies = []
-    a = 1
-    while True:
+    try:
         try:
-            agent_type = int(d.dq['agent%d-type' % a])
-            agent_kind = int(d.dq['agent%d-kind' % a])
-        except KeyError:
-            break
-        else:
-            sorted_supplies.append((a, agent_kind, agent_type))
+            d.open()
+            d.queryDevice()
+        except Error, e:
+            log.error("Error opening device (%s). Exiting." % e.msg)
+            sys.exit(1)
 
-        a += 1
+        if d.mq['status-type'] != STATUS_TYPE_NONE:
 
-    sorted_supplies.sort(lambda x, y: cmp(x[2], y[2]) or cmp(x[1], y[1]))
-
-    for x in sorted_supplies:
-        a, agent_kind, agent_type = x
-        agent_health = d.dq['agent%d-health' % a]
-        agent_level = d.dq['agent%d-level' % a]
-        agent_sku = str(d.dq['agent%d-sku' % a])
-        agent_desc = d.dq['agent%d-desc' % a]
-        agent_health_desc = d.dq['agent%d-health-desc' % a]
-
-        if agent_health == AGENT_HEALTH_OK and \
-            agent_kind in (AGENT_KIND_SUPPLY,
-                            AGENT_KIND_HEAD_AND_SUPPLY,
-                            AGENT_KIND_TONER_CARTRIDGE,
-                            AGENT_KIND_MAINT_KIT,
-                            AGENT_KIND_ADF_KIT,
-                            AGENT_KIND_INT_BATTERY,
-                            AGENT_KIND_DRUM_KIT,):
-
-            log.info(log.bold(agent_desc))
-            log.info("Part No.: %s" % agent_sku)
-            log.info("Health: %s" % agent_health_desc)
-            logBarGraph(agent_level, agent_type, size, color, bar_char)
             log.info("")
 
+            sorted_supplies = []
+            a = 1
+            while True:
+                try:
+                    agent_type = int(d.dq['agent%d-type' % a])
+                    agent_kind = int(d.dq['agent%d-kind' % a])
+                except KeyError:
+                    break
+                else:
+                    sorted_supplies.append((a, agent_kind, agent_type))
+
+                a += 1
+
+            sorted_supplies.sort(lambda x, y: cmp(x[2], y[2]) or cmp(x[1], y[1]))
+
+            for x in sorted_supplies:
+                a, agent_kind, agent_type = x
+                agent_health = d.dq['agent%d-health' % a]
+                agent_level = d.dq['agent%d-level' % a]
+                agent_sku = str(d.dq['agent%d-sku' % a])
+                agent_desc = d.dq['agent%d-desc' % a]
+                agent_health_desc = d.dq['agent%d-health-desc' % a]
+
+                if agent_health == AGENT_HEALTH_OK and \
+                    agent_kind in (AGENT_KIND_SUPPLY,
+                                    AGENT_KIND_HEAD_AND_SUPPLY,
+                                    AGENT_KIND_TONER_CARTRIDGE,
+                                    AGENT_KIND_MAINT_KIT,
+                                    AGENT_KIND_ADF_KIT,
+                                    AGENT_KIND_INT_BATTERY,
+                                    AGENT_KIND_DRUM_KIT,):
+
+                    log.info(log.bold(agent_desc))
+                    log.info("Part No.: %s" % agent_sku)
+                    log.info("Health: %s" % agent_health_desc)
+                    logBarGraph(agent_level, agent_type, size, color, bar_char)
+                    log.info("")
+
+                else:
+                    log.info(log.bold(agent_desc))
+                    log.info("Part No.: %s" % agent_sku)
+                    log.info("Health: %s" % agent_health_desc)
+                    log.info("")
+
+
         else:
-            log.info(log.bold(agent_desc))
-            log.info("Part No.: %s" % agent_sku)
-            log.info("Health: %s" % agent_health_desc)
-            log.info("")
+            log.error("Status not supported for selected device.")
+            sys.exit(1)
+    finally:
+        d.close()
+        
+except KeyboardInterrupt:
+    log.error("User exit")
+    
+log.info("")
+log.info("Done.")
 
 
-else:
-    log.error("Status not supported for selected device.")
-    sys.exit(1)
-
-d.close()
-sys.exit(0)
 

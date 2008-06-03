@@ -24,25 +24,24 @@ import operator
 # Local
 from base.g import *
 from prnt import cups
-from base import device, utils, pml, service
+from base import device, utils, pml
 from copier import copier
+from ui_utils import load_pixmap
 
 # Qt
 from qt import *
 from scrollcopy import ScrollCopyView
 
 class MakeCopiesForm(QMainWindow):
-    def __init__(self, sock, bus='cups', device_uri=None, printer_name=None, 
+    def __init__(self, bus='cups', device_uri=None, printer_name=None, 
                 num_copies=None, contrast=None, quality=None, 
                 reduction=None, fit_to_page=None, 
                 parent=None, name=None, modal=0, fl=0):
 
         QMainWindow.__init__(self,parent,name,fl)
-        
-        icon = QPixmap(os.path.join(prop.image_dir, 'HPmenu.png'))
-        self.setIcon(icon)
 
-        self.sock = sock
+        self.setIcon(load_pixmap('prog', '48x48'))
+
         self.cur_deviceice_uri = device_uri
         self.printer_name = printer_name
         self.init_failed = False
@@ -106,53 +105,53 @@ class MakeCopiesForm(QMainWindow):
                     self.cur_deviceice_uri = dlg.device_uri
                 else:
                     self.init_failed = True
+                    
 
-        self.CopyView = ScrollCopyView(self.sock, False, num_copies=num_copies, 
+        self.CopyView = ScrollCopyView(None, num_copies=num_copies, 
                                         contrast=contrast, quality=quality, 
                                         reduction=reduction, fit_to_page=fit_to_page, 
                                         parent=self.centralWidget(), form=self)
-            
+
         self.FormLayout.addWidget(self.CopyView,0,0)
-        
+
         self.cur_device = self.cur_deviceice_uri
-        
+
         if not self.init_failed:
             try:
                 self.cur_device = copier.PMLCopyDevice(device_uri=self.cur_deviceice_uri, 
-                                            printer_name=self.printer_name, 
-                                            hpssd_sock=self.sock)
+                                            printer_name=self.printer_name)
             except Error:
                 log.error("Invalid device URI or printer name.")
                 self.FailureUI("<b>Invalid device URI or printer name.</b><p>Please check the parameters to hp-print and try again.")
                 self.init_failed = True
-            
+
             else:
-    
+
                 if self.cur_device.copy_type == COPY_TYPE_NONE:
                     self.FailureUI(self.__tr("<b>Sorry, make copies functionality is not implemented for this device.</b>"))
                     self.close()
                     return
-                
+
                 self.cur_deviceice_uri = self.cur_device.device_uri
                 user_cfg.last_used.device_uri = self.cur_deviceice_uri
-    
+
                 log.debug(self.cur_deviceice_uri)
-            
+
                 self.statusBar().message(self.cur_device.device_uri)        
-        
-        
+
+
         QTimer.singleShot(0, self.InitialUpdate)
 
     def InitialUpdate(self):
         if self.init_failed:
             self.close()
             return    
-        
+
         self.CopyView.onDeviceChange(self.cur_device)
 
     def languageChange(self):
         self.setCaption(self.__tr("HP Device Manager - Make Copies"))
-        
+
     def FailureUI(self, error_text):
         QMessageBox.critical(self,
                              self.caption(),
@@ -168,7 +167,7 @@ class MakeCopiesForm(QMainWindow):
                               QMessageBox.Ok,
                               QMessageBox.NoButton,
                               QMessageBox.NoButton)        
-        
-        
+
+
     def __tr(self,s,c = None):
         return qApp.translate("MakeCopiesForm",s,c)

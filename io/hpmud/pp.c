@@ -972,10 +972,9 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) pp_channel_open(mud_de
    else
    {
       if ((stat = (pd->channel[index].vf.open)(&pd->channel[index])) != HPMUD_R_OK)  /* call transport specific open */
-      {
          del_channel(pd, &pd->channel[index]);   /* open failed, cleanup */
-      }
-      *cd = index;
+      else
+         *cd = index;
    }
 
    pthread_mutex_unlock(&pd->mutex);

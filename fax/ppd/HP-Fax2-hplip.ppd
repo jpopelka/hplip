@@ -47,7 +47,7 @@
 *VariablePaperSize: True
 *TTRasterizer:	Type42
 *HWMargins: 18 36 18 18
-*1284DeviceID: "MFG:HP;MDL:Fax;DES:HP Fax 2;"
+*1284DeviceID: "MFG:HP;MDL:Fax 2;DES:HP Fax 2;"
 *FoomaticIDs: HPLIPFax hpijs
 *FoomaticRIPCommandLine: "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPAUSE &&
 -sDEVICE=ijs -sIjsServer=hpijs %A%B%D -dIjsUseOutputFD%Z -sOutputFile=-  -sDeviceModel=HPFax2 -"

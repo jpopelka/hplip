@@ -17,13 +17,16 @@
 #   10 = no libm
 #   11 = no libusb-devel
 #   12 = no sane-backends-devel
+#   13 = no libdbus-1 support
+#   14 = no dbus-devel support
+#   15 = fax requries dbus support
+#
 #   102 = no libjpeg
 #   103 = no jpeg-devel
 #   104 = no libdl
-#
 
 AC_PREREQ(2.59)
-AC_INIT([HP Linux Imaging and Printing], [2.8.2], [2.8.2.10], [hplip])
+AC_INIT([HP Linux Imaging and Printing], [2.8.5], [2.8.5.23], [hplip])
 AM_INIT_AUTOMAKE([1.9 foreign])
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
@@ -38,6 +41,7 @@ AC_CHECK_LIB([pthread], [pthread_create])
 AC_CHECK_LIB([m], [pow],, [AC_MSG_ERROR([cannot find libm math support], 10)])
 AC_CHECK_LIB([jpeg], [jpeg_set_defaults],, [AC_MSG_ERROR(["cannot find libjpeg support"], 102)])
 AC_CHECK_LIB([dl], [dlopen],, [AC_MSG_ERROR(["cannot find libdl support"], 104)])
+
 
 # Checks for required header files.
 AC_HEADER_STDC
@@ -172,6 +176,17 @@ else
 fi
 AM_CONDITIONAL(FAX_BUILD, test x$fax_build = xyes)
 
+AC_MSG_CHECKING([for dbus build])
+AC_ARG_ENABLE(dbus_build,
+  [  --enable-dbus-build    enable dbus build (default=yes)],
+  dbus_build=$enableval, dbus_build=yes)
+if test "$dbus_build" = "yes"; then
+   AC_MSG_RESULT(yes)
+   AC_DEFINE(HAVE_DBUS) 
+else
+   AC_MSG_RESULT(no)
+fi
+
 AC_MSG_CHECKING([for cups 1.1.x build])
 AC_ARG_ENABLE(cups11_build,
   [  --enable-cups11-build    enable cups 1.1.x build (default=no)],
@@ -200,8 +215,11 @@ AC_ARG_WITH(cupsbackenddir, AC_HELP_STRING([--with-cupsbackenddir=DIR], [set cup
 AC_ARG_WITH(cupsfilterdir, AC_HELP_STRING([--with-cupsfilterdir=DIR], [set cups filter install directory [default=/usr/lib/cups/filter]]),
    cupsfilterdir=$withval, cupsfilterdir="/usr/lib/cups/filter")
 
-AC_ARG_WITH(icondir, AC_HELP_STRING([--with-icondir=DIR], [set icon install directory [default=/usr/share/applications]]),
+AC_ARG_WITH(icondir, AC_HELP_STRING([--with-icondir=DIR], [set hplip.desktop install directory [default=/usr/share/applications]]),
    icondir=$withval, icondir="/usr/share/applications")
+
+AC_ARG_WITH(systraydir, AC_HELP_STRING([--with-systraydir=DIR], [set hplip-systray.desktop install directory [default=/etc/xdg/autostart]]),
+   systraydir=$withval, systraydir="/etc/xdg/autostart")
 
 AC_ARG_WITH(hpppddir, AC_HELP_STRING([--with-hpppddir=DIR], [set hp ppd install directory [default=datadir/ppd/HP]]),
    hpppddir=$withval, hpppddir="$datadir/ppd/HP")
@@ -275,6 +293,16 @@ if test "$hpijs_only_build" = "no" && test "$scan_build" = "yes"; then
    AC_CHECK_LIB([sane], [sane_open],, [AC_MSG_ERROR([cannot find sane-backends-devel support (or --disable-scan-build)], 12)])
 fi
 
+if test "$hpijs_only_build" = "no" && test "$dbus_build" = "yes"; then
+#   PKG_CHECK_MODULES(DBUS, [dbus-1 >= 1.0.0, dbus-glib-1 >= 0.61],,[AC_MSG_ERROR([cannot find dbus-devel support: $DBUS_PKG_ERRORS], 14)])
+   PKG_CHECK_MODULES(DBUS, [dbus-1 >= 1.0.0],,[AC_MSG_ERROR([cannot find dbus-devel support: $DBUS_PKG_ERRORS], 14)])
+   AC_CHECK_LIB([dbus-1], [dbus_connection_open],,[AC_MSG_ERROR([cannot find libdbus support], 13)])
+fi
+
+if test "$hpijs_only_build" = "no" && test "$fax_build" = "yes" && test "$dbus_build" = "no"; then
+   AC_MSG_ERROR([fax requires dbus support], 15)
+fi
+
 # AC_DEFINE_DIR([DATADIR], [datadir])
 # Copyright © 2006 Stepan Kasal  <kasal@ucw.cz>
 # Copyright © 2006 Andreas Schwab <schwab@suse.de>
@@ -310,6 +338,7 @@ AC_SUBST(abs_docdir)
 AC_SUBST(abs_ppddir) 
 AC_SUBST(abs_drvdir) 
 AC_SUBST(icondir)
+AC_SUBST(systraydir)
 AC_SUBST(cupsbackenddir)
 AC_SUBST(cupsfilterdir)
 AC_SUBST(hpppddir)
@@ -320,6 +349,7 @@ AC_SUBST(pp_build)
 AC_SUBST(gui_build)
 AC_SUBST(scan_build)
 AC_SUBST(fax_build)
+AC_SUBST(dbus_build)
 AC_SUBST(cups11_build)
 AC_SUBST(foomatic_drv_install)
 AC_SUBST(foomatic_ppd_install)
@@ -330,5 +360,5 @@ AC_SUBST(shadow_build)
 AC_SUBST(APDK_ENDIAN_FLAG)
 AC_SUBST(APDK_AUTO_INCLUDE_FLAG)
 
-AC_CONFIG_FILES(Makefile hplip.conf hplip.desktop prnt/drv/hpijs.drv)
+AC_CONFIG_FILES(Makefile hplip.conf hplip.desktop hplip-systray.desktop prnt/drv/hpijs.drv)
 AC_OUTPUT

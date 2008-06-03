@@ -8,7 +8,7 @@
 # All Rights Reserved
 #
 # Modifications by Don Welch
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
 #
 # Redistribution and use in source and binary forms, with or without modification,
 # are permitted provided that the following conditions are met:

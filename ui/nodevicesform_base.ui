@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>768</width>
-            <height>273</height>
+            <height>343</height>
         </rect>
     </property>
     <property name="caption">
@@ -19,50 +19,6 @@
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
-        <widget class="QPushButton" row="3" column="2">
-            <property name="name">
-                <cstring>setupPushButton</cstring>
-            </property>
-            <property name="text">
-                <string>Setup Device...</string>
-            </property>
-        </widget>
-        <widget class="QPushButton" row="3" column="3">
-            <property name="name">
-                <cstring>CUPSButton</cstring>
-            </property>
-            <property name="text">
-                <string>CUPS Web Interface</string>
-            </property>
-        </widget>
-        <widget class="QPushButton" row="3" column="4">
-            <property name="name">
-                <cstring>ExitButton</cstring>
-            </property>
-            <property name="text">
-                <string>Close</string>
-            </property>
-            <property name="default">
-                <bool>true</bool>
-            </property>
-        </widget>
-        <spacer row="3" column="0" rowspan="1" colspan="2">
-            <property name="name">
-                <cstring>spacer43</cstring>
-            </property>
-            <property name="orientation">
-                <enum>Horizontal</enum>
-            </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>400</width>
-                    <height>20</height>
-                </size>
-            </property>
-        </spacer>
         <widget class="QLabel" row="0" column="0">
             <property name="name">
                 <cstring>Icon</cstring>
@@ -82,7 +38,7 @@
                 <bool>true</bool>
             </property>
         </widget>
-        <spacer row="1" column="0" rowspan="2" colspan="1">
+        <spacer row="1" column="0">
             <property name="name">
                 <cstring>spacer3</cstring>
             </property>
@@ -132,6 +88,50 @@
                 <set>WordBreak|AlignVCenter</set>
             </property>
         </widget>
+        <spacer row="3" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>spacer43</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>400</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
+        <widget class="QPushButton" row="3" column="2">
+            <property name="name">
+                <cstring>setupPushButton</cstring>
+            </property>
+            <property name="text">
+                <string>Setup Device...</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="3" column="3">
+            <property name="name">
+                <cstring>CUPSButton</cstring>
+            </property>
+            <property name="text">
+                <string>CUPS Web Interface</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="3" column="4">
+            <property name="name">
+                <cstring>ExitButton</cstring>
+            </property>
+            <property name="text">
+                <string>Close</string>
+            </property>
+            <property name="default">
+                <bool>true</bool>
+            </property>
+        </widget>
     </grid>
 </widget>
 <connections>
@@ -154,9 +154,6 @@
         <slot>setupPushButton_clicked()</slot>
     </connection>
 </connections>
-<includes>
-    <include location="local" impldecl="in implementation">nodevicesform_base.ui.h</include>
-</includes>
 <slots>
     <slot>CUPSButton_clicked()</slot>
     <slot>ExitButton_clicked()</slot>

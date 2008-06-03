@@ -74,6 +74,30 @@ public:
         return FALSE;
     }
 
+    virtual DRIVER_ERROR SetHint (int iHint, int iValue)
+    {
+        if (iHint & 0x1)
+        {
+            m_iNumPages = iValue;
+        }
+        else if (iHint & 0x2)
+        {
+            return SendPerPageHeader (iValue);
+        }
+        else if (iHint & 0x4)
+        {
+            m_cExtraDryTime = (BYTE) (iValue & 0xFF);
+        }
+        return NO_ERROR;
+    }
+    virtual int GetHint (int iHint)
+    {
+        if (iHint & 0x4)
+        {
+            return (int) m_cExtraDryTime;
+        }
+        return 0;
+    }
 protected:
 
 #ifdef APDK_HP_UX
@@ -89,6 +113,7 @@ protected:
 
 private:
     BOOL IsPCL3DriverwareAvailable();
+    BYTE    m_cExtraDryTime;
 }; //DJ9xxVIP
 
 

@@ -20,13 +20,14 @@
 # Author: Don Welch
 #
 
-__version__ = '3.2'
+__version__ = '3.3'
 __title__ = 'Photo Card Access Utility'
 __doc__ = "Access inserted photo cards on supported HPLIP printers. This provides an alternative for older devices that do not support USB mass storage or for access to photo cards over a network."
 
 # Std Lib
 import sys
-import os, os.path
+import os
+import os.path
 import getopt
 import re
 import cmd
@@ -42,7 +43,7 @@ except ImportError:
 
 # Local
 from base.g import *
-from base import device, service, utils #, exif
+from base import device, utils, tui
 from prnt import cups
 from pcard import photocard
 
@@ -652,7 +653,7 @@ for o, a in opts:
         device_uri = a
 
     elif o in ('-b', '--bus'):
-        bus = a.lower().strip()
+        bus = [x.lower().strip() for x in a.split(',')]
         if not device.validateBusList(bus):
             usage()
 
@@ -690,16 +691,19 @@ for o, a in opts:
 
     elif o in ('-o', '--output'):
         output_dir = a
-        
+
     elif o in ('-q', '--lang'):
         if a.strip() == '?':
-            utils.show_languages()
+            tui.show_languages()
             sys.exit(0)
-            
+
         loc = utils.validate_language(a.lower())
 
 
 utils.log_title(__title__, __version__)
+
+if os.getuid() == 0:
+    log.error("hp-unload should not be run as root.")
 
 # Security: Do *not* create files that other users can muck around with
 os.umask (0037)
@@ -709,92 +713,95 @@ if mode == GUI_MODE:
         mode = INTERACTIVE_MODE
 
 if mode in (INTERACTIVE_MODE, NON_INTERACTIVE_MODE):
-    if device_uri and printer_name:
-        log.error("You may not specify both a printer (-p) and a device (-d).")
-        usage()
+    try:
+        if device_uri and printer_name:
+            log.error("You may not specify both a printer (-p) and a device (-d).")
+            usage()
 
 
-    if printer_name:
-        printer_list = cups.getPrinters()
-        found = False
-        for p in printer_list:
-            if p.name == printer_name:
-                found = True
+        if printer_name:
+            printer_list = cups.getPrinters()
+            found = False
+            for p in printer_list:
+                if p.name == printer_name:
+                    found = True
 
-        if not found:
-            log.error("Unknown printer name: %s" % printer_name)
-            sys.exit(1)
-
-
-    if not device_uri and not printer_name:
-        try:
-            device_uri = device.getInteractiveDeviceURI(bus, {'pcard-type' : (operator.gt, 0)})
-            if device_uri is None:
+            if not found:
+                log.error("Unknown printer name: %s" % printer_name)
                 sys.exit(1)
-        except Error:
-            log.error("Error occured during interactive mode. Exiting.")
+
+
+        if not device_uri and not printer_name:
+            try:
+                device_uri = device.getInteractiveDeviceURI(bus, {'pcard-type' : (operator.gt, 0)})
+                if device_uri is None:
+                    sys.exit(1)
+            except Error:
+                log.error("Error occured during interactive mode. Exiting.")
+                sys.exit(1)
+
+        try:
+            pc = photocard.PhotoCard( None, device_uri, printer_name )
+        except Error, e:
+            log.error("Unable to start photocard session: %s" % e.msg)
             sys.exit(1)
 
-    try:
-        pc = photocard.PhotoCard( None, device_uri, printer_name )
-    except Error, e:
-        log.error("Unable to start photocard session: %s" % e.msg)
-        sys.exit(1)
+        pc.set_callback(update_spinner)
 
-    pc.set_callback(update_spinner)
+        if pc.device.device_uri is None and printer_name:
+            log.error("Printer '%s' not found." % printer_name)
+            sys.exit(1)
 
-    if pc.device.device_uri is None and printer_name:
-        log.error("Printer '%s' not found." % printer_name)
-        sys.exit(1)
+        if pc.device.device_uri is None and device_uri:
+            log.error("Malformed/invalid device-uri: %s" % device_uri)
+            sys.exit(1)
 
-    if pc.device.device_uri is None and device_uri:
-        log.error("Malformed/invalid device-uri: %s" % device_uri)
-        sys.exit(1)
-        
-    user_cfg.last_used.device_uri = pc.device.device_uri
+        user_cfg.last_used.device_uri = pc.device.device_uri
 
-    pc.device.sendEvent(EVENT_START_PCARD_JOB)
+        # TODO: 
+        #pc.device.sendEvent(EVENT_START_PCARD_JOB)
 
-    try:
-        pc.mount()
-    except Error:
-        log.error("Unable to mount photo card on device. Check that device is powered on and photo card is correctly inserted.")
-        pc.umount()
-        pc.device.sendEvent(EVENT_PCARD_UNABLE_TO_MOUNT, typ='error')
-        sys.exit(1)
-
-    log.info(log.bold("\nPhotocard on device %s mounted" % pc.device.device_uri))
-    log.info(log.bold("DO NOT REMOVE PHOTO CARD UNTIL YOU EXIT THIS PROGRAM"))
-
-    output_dir = os.path.realpath(os.path.normpath(os.path.expanduser(output_dir)))
-
-    try:
-        os.chdir(output_dir)
-    except OSError:
-        print log.bold("ERROR: Output directory %s not found." % output_dir)
-        sys.exit(1)
-
-
-
-    if mode == INTERACTIVE_MODE: # INTERACTIVE_MODE
-
-        console = Console(pc)
         try:
-            try:
-                console . cmdloop()
-            except KeyboardInterrupt:
-                log.error("Aborted.")
-            except Exception, e:
-                log.error("An error occured: %s" % e)
-        finally:
+            pc.mount()
+        except Error:
+            log.error("Unable to mount photo card on device. Check that device is powered on and photo card is correctly inserted.")
             pc.umount()
+            # TODO:
+            #pc.device.sendEvent(EVENT_PCARD_UNABLE_TO_MOUNT, typ='error')
+            sys.exit(1)
 
-        pc.device.sendEvent(EVENT_END_PCARD_JOB)
+        log.info(log.bold("\nPhotocard on device %s mounted" % pc.device.device_uri))
+        log.info(log.bold("DO NOT REMOVE PHOTO CARD UNTIL YOU EXIT THIS PROGRAM"))
 
+        output_dir = os.path.realpath(os.path.normpath(os.path.expanduser(output_dir)))
 
-    else: # NON_INTERACTIVE_MODE
-        print "Output directory is %s" % os.getcwd()
         try:
+            os.chdir(output_dir)
+        except OSError:
+            print log.bold("ERROR: Output directory %s not found." % output_dir)
+            sys.exit(1)
+
+
+
+        if mode == INTERACTIVE_MODE: # INTERACTIVE_MODE
+
+            console = Console(pc)
+            try:
+                try:
+                    console . cmdloop()
+                except KeyboardInterrupt:
+                    log.error("Aborted.")
+                except Exception, e:
+                    log.error("An error occured: %s" % e)
+            finally:
+                pc.umount()
+
+            # TODO:
+            #pc.device.sendEvent(EVENT_END_PCARD_JOB)
+
+
+        else: # NON_INTERACTIVE_MODE
+            print "Output directory is %s" % os.getcwd()
             try:
                 unload_list = pc.get_unload_list()
                 print
@@ -827,12 +834,12 @@ if mode in (INTERACTIVE_MODE, NON_INTERACTIVE_MODE):
                     total, delta, was_cancelled = pc.unload(unload_list, status_callback, None, True)
                     print log.bold("\n%s unloaded in %d sec (%d KB/sec)" % (utils.format_bytes(total), delta, (total/1024)/delta))
 
-            except KeyboardInterrupt:
-                log.error("Aborted.")
-                pass
 
-        finally:
-            pc.umount()
+            finally:
+                pc.umount()
+
+    except KeyboardInterrupt:
+        log.error("User exit")
 
 
 else: # GUI_MODE
@@ -842,7 +849,7 @@ else: # GUI_MODE
 
     app = QApplication(sys.argv)
     QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
-    
+
     if loc is None:
         loc = user_cfg.ui.get("loc", "system")
         if loc.lower() == 'system':
@@ -850,19 +857,21 @@ else: # GUI_MODE
             log.debug("Using system locale: %s" % loc)
 
     if loc.lower() != 'c':
-        log.debug("Trying to load .qm file for %s locale." % loc)
-        trans = QTranslator(None)
-        
+        e = 'utf8'
         try:
-            l, e = loc.split('.')
+            l, x = loc.split('.')
+            loc = '.'.join([l, e])
         except ValueError:
             l = loc
-            e = 'utf8'
-        
+            loc = '.'.join([loc, e])
+
+        log.debug("Trying to load .qm file for %s locale." % loc)
+        trans = QTranslator(None)
+
         qm_file = 'hplip_%s.qm' % l
         log.debug("Name of .qm file: %s" % qm_file)
         loaded = trans.load(qm_file, prop.localization_dir)
-        
+
         if loaded:
             app.installTranslator(trans)
         else:
@@ -891,6 +900,7 @@ else: # GUI_MODE
 
     app.exec_loop()
 
+log.info("")
 log.info("Done.")
-sys.exit(0)
+
 

@@ -1,19 +1,23 @@
+body { 
+background-color: #000000;
+}
+
 #page {
-position: relative;
-width: 96%;
-\width: 96%;
-w\idth: 96%;
-margin-left: auto;
-margin-right: auto;
-margin-top: auto;
-margin-bottom: auto;
-padding: 0px;
 }
 
 #container {
 position: relative;
 background-color: rgb(239,244,244);
-border: solid 1px orange;
+border: solid 1px black;
+width: 98%;
+\width: 98%;
+w\idth: 98%;
+margin-left: auto;
+margin-right: auto;
+margin-top: auto;
+margin-bottom: auto;
+padding: 0px;
+overflow: auto;
 }
 
 /* ******************* divs ******************* */
@@ -21,12 +25,17 @@ border: solid 1px orange;
 #content {
 position: relative; 
 padding: 0px;
-font-size: 12pt;
-border: solid 0px red;
+font-size: 10pt;
 white-space: pre-line;
+min-height: 660px;
+max-width: 900px;
+/* border: solid 3px red; */
+overflow: hidden;
 }
 
 #navbar {
+position: relative;
+border: solid 1px blue;
 }
 
 #sidebar-a {
@@ -40,6 +49,7 @@ padding-left: 0px;
 padding-top: 0px;
 padding-bottom: 0px;
 background-color: #99CCFF;
+border: solid 1px black;
 }
 
 #footer {
@@ -51,23 +61,30 @@ margin-right: 0px;
 text-align: center;
 vertical-align: middle;
 font-size: 10pt;
+/* border: solid 1px green; */
+}
+
+#pageupdate {
+font-size: 10pt;
+/* border: solid 1px green; */
 }
 
 /* ******************* banner graphics ******************* */
 #banner {
 position: relative;
-background: url("../images/topbar.png") repeat-x;
+/* background: url("../images/topbar.png") repeat-x; */
+background-color: #fdce17;
 height: 100%;
 border: solid 0px red;
 }
 
 #banner_graphics {
 height: 80px;
-border: solid 0px blue;
 top: 0px;
-
+border-bottom: solid 1px black;
 }
 
+/* 
 #floatleft { 
 position: relative;
 float: left;
@@ -89,6 +106,7 @@ top: -25px;
 right: 10px;
 
 }
+*/
 
 /* ******************* header title ******************* */
 
@@ -97,7 +115,7 @@ position: absolute;
 left: 1px; 
 top: 1px; 
 color: rgb(26,77,143);
-font-size: 12pt;
+font-size: 10pt;
 }
 
 .header_title_text1 { 
@@ -105,7 +123,7 @@ position: absolute;
 left: -1px; 
 top: -1px; 
 color: #fff;
-font-size: 12pt;
+font-size: 10pt;
 } 
 
 #header_title a:link {
@@ -156,7 +174,7 @@ color: #fff;
 #sidebar-a li {
 list-style: none;
 width: ;
-margin: 0px;
+margin: auto;
 }
 
 menu {
@@ -173,7 +191,7 @@ color: black;
 .menuheader {
 padding-left: .5em;
 font-weight: bold;
-font-size: 12pt;
+font-size: 10pt;
 }
 
 a:link {
@@ -210,8 +228,8 @@ color: #fff;
 /*
 :Author: David Goodger
 :Contact: goodger@users.sourceforge.net
-:Date: $Date: 2007/05/02 20:33:29 $
-:Version: $Revision: 1.13 $
+:Date: $Date: 2008/03/10 20:20:01 $
+:Version: $Revision: 1.16 $
 :Copyright: This stylesheet has been placed in the public domain.
 
 Default cascading style sheet for the HTML output of Docutils.
@@ -380,19 +398,19 @@ ol.upperroman {
 
 
 p {
-font-size: 12pt;
+font-size: 10pt;
 }
 
 a {
-font-size: 12pt;
+font-size: 10pt;
 }
 
 h1 {
-font-size: 12pt;
+font-size: 10pt;
 }
 
 li {
-font-size: 12pt;
+font-size: 10pt;
 }
 
 p.attribution {
@@ -685,3 +703,15 @@ background-color: rgb(239,244,244);
 tr {
 background-color: rgb(239,244,244);
 }
+
+img { 
+border: none; 
+}
+
+pre.literal-block {
+width: 80%;
+background-color: #ffffff;
+padding: 3px;
+overflow: auto;
+}
+

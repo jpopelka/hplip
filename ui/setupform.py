@@ -29,12 +29,13 @@ import operator
 
 # Local
 from base.g import *
-from base import msg, device, utils, service
+from base import device, utils
 from prnt import cups
 from installer import core_install
+from ui_utils import load_pixmap
 
 try:
-    from fax import fax, faxdevice
+    from fax import fax
     #from fax import fax
     fax_import_ok = True
 except ImportError:
@@ -82,7 +83,7 @@ class PrinterNameValidator(QValidator):
         if not input:
             return QValidator.Acceptable, pos
 
-        elif input[pos-1] in u"""~`!@#$%^&*()-=+[]{}()\\/,.<>?'\";:|""":     
+        elif input[pos-1] in u"""~`!@#$%^&*()-=+[]{}()\\/,.<>?'\";:| """:
             return QValidator.Invalid, pos
 
         # TODO: How to determine if unicode char is "printable" and acceptable
@@ -124,7 +125,7 @@ class SetupForm(SetupForm_base):
         if bus is None:
             self.bus = 'usb'
         else:
-            self.bus = bus
+            self.bus = bus[0]
             self.start_page = self.ProbedDevicesPage
             
         if not prop.par_build:
@@ -151,14 +152,7 @@ class SetupForm(SetupForm_base):
             else:
                 self.FailureUI(self.__tr("<b>Device not found.</b> <p>Please make sure your printer is properly connected and powered-on."))
 
-        icon = QPixmap(os.path.join(prop.image_dir, 'HPmenu.png'))
-        self.setIcon(icon)
-
-        try:
-            self.hpssd_sock = service.startup()
-        except Error:
-            log.error("Unable to connect to HPLIP I/O (hpssd).")
-            raise Error(ERROR_UNABLE_TO_CONTACT_SERVICE)
+        self.setIcon(load_pixmap('prog', '48x48'))
 
         self.connectionTypeButtonGroup.setButton(0)
         self.device_uri = ''
@@ -169,7 +163,7 @@ class SetupForm(SetupForm_base):
         self.ppd_list = []
         self.location = ''
         self.desc = ''
-        self.filter = 'none'
+        self.filter = []
         self.search = ''
         self.ttl = 4
         self.timeout = 5
@@ -198,7 +192,7 @@ class SetupForm(SetupForm_base):
         self.printerNameLineEdit.setMaxLength(50)
 
         QToolTip.add(self.searchFiltersPushButton2,
-            self.__tr('Current: Filter: "%2"  Search: "%3"  TTL: %4  Timeout: %5s').arg(self.filter).arg(self.search or '').arg(self.ttl).arg(self.timeout))
+            self.__tr('Current: Filter: [%2]  Search: "%3"  TTL: %4  Timeout: %5s').arg(','.join(self.filter)).arg(self.search or '').arg(self.ttl).arg(self.timeout))
 
 
     def showPage(self, page):
@@ -260,8 +254,7 @@ class SetupForm(SetupForm_base):
         elif page is self.PrinterNamePage:
             self.setDefaultPrinterName()
 
-            #print self.mq.get('fax-type', FAX_TYPE_NONE)
-            if fax_import_ok and self.mq.get('fax-type', FAX_TYPE_NONE) != FAX_TYPE_NONE:
+            if fax_import_ok and prop.fax_build and self.mq.get('fax-type', FAX_TYPE_NONE) != FAX_TYPE_NONE:
                 self.faxCheckBox.setEnabled(True)
                 self.faxCheckBox.setEnabled(True)
                 self.faxNameLineEdit.setEnabled(True)
@@ -356,12 +349,13 @@ class SetupForm(SetupForm_base):
     def settingsDlg(self):
         dlg = SetupSettings(self.bus, self.filter, self.search, self.ttl, self.timeout, self)
         if dlg.exec_loop() == QDialog.Accepted:
+            #self.filter = [x.lower().strip() for x in dlg.filter.split(',')]
             self.filter = dlg.filter
             self.search = dlg.search
             self.ttl = dlg.ttl
             self.timeout = dlg.timeout
 
-            t = self.__tr('Current Settings: Filter: "%2"  Search: "%3"  TTL: %4  Timeout: %5s').arg(self.filter).arg(self.search or '').arg(self.ttl).arg(self.timeout)
+            t = self.__tr('Current Settings: Filter: [%2]  Search: "%3"  TTL: %4  Timeout: %5s').arg(','.join(self.filter)).arg(self.search or '').arg(self.ttl).arg(self.timeout)
 
             QToolTip.add(self.searchFiltersPushButton2, t)
             QToolTip.add(self.searchFiltersPushButton, t)
@@ -385,7 +379,7 @@ class SetupForm(SetupForm_base):
         elif self.bus == 'par':
             io_str = self.__tr("parallel port")
 
-        QToolTip.add(self.searchFiltersPushButton, self.__tr('Current Settings: Filter: "%2"  Search: "%3"  TTL: %4  Timeout: %5s').arg(self.filter).arg(self.search or '').arg(self.ttl).arg(self.timeout))
+        QToolTip.add(self.searchFiltersPushButton, self.__tr('Current Settings: Filter: [%2]  Search: "%3"  TTL: %4  Timeout: %5s').arg(','.join(self.filter)).arg(self.search or '').arg(self.ttl).arg(self.timeout))
 
         log.debug("Updating probed devices list...")
         log.debug(self.bus)
@@ -419,17 +413,13 @@ class SetupForm(SetupForm_base):
                           }
             
             filter_dict = {}
-            for f in self.filter.split(","):
+            for f in self.filter:
                 if f in FILTER_MAP:
                     filter_dict[FILTER_MAP[f]] = (operator.gt, 0)
                 else:
                     filter_dict[f] = (operator.gt, 0)
                     
-            ##print filter_dict
-        
-            devices = device.probeDevices(self.bus, self.timeout, self.ttl, filter_dict, self.search)
-            ## XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-            ##devices = ['hp:/usb/hp_laserjet_1020?serial=12345678']
+            devices = device.probeDevices([self.bus], self.timeout, self.ttl, filter_dict, self.search)
             
             self.probeHeadingTextLabel.setText(self.__tr("%1 device(s) found on the %1:").arg(len(devices)).arg(io_str))
 
@@ -543,7 +533,7 @@ class SetupForm(SetupForm_base):
         #print ppds
 
         default_model = utils.xstrip(model.replace('series', '').replace('Series', ''), '_')
-        stripped_model = default_model.lower().replace('hp-', '').replace('hp_', '')
+        stripped_model = cups.stripModel(default_model)
 
         self.ppd_dict = cups.getPPDFile(stripped_model, ppds)
         log.debug(self.ppd_dict)
@@ -784,8 +774,7 @@ class SetupForm(SetupForm_base):
         try:
             QApplication.setOverrideCursor(QApplication.waitCursor)
             
-            d = faxdevice.FaxDevice(self.fax_uri)
-            #d = fax.getFaxDevice(self.fax_uri)
+            d = fax.getFaxDevice(self.fax_uri, disable_dbus=True)
 
             while True:
                 try:
@@ -861,7 +850,7 @@ class SetupForm(SetupForm_base):
 
         #if self.ppd_file.startswith("foomatic:"):
         if not os.path.exists(self.ppd_file): # assume foomatic: or some such
-            status, status_str = cups.addPrinter(self.printer_name, self.device_uri,
+            status, status_str = cups.addPrinter(self.printer_name.encode('utf8'), self.device_uri,
                 self.location, '', self.ppd_file, self.desc)
         else:
             status, status_str = cups.addPrinter(self.printer_name.encode('utf8'), self.device_uri,
@@ -877,8 +866,10 @@ class SetupForm(SetupForm_base):
 
             self.FailureUI(self.__tr("<b>Printer queue setup failed.</b><p>Please restart CUPS and try again."))
         else:
-            service.sendEvent(self.hpssd_sock, EVENT_CUPS_QUEUES_CHANGED, device_uri=self.device_uri)
-
+            # TODO:
+            #service.sendEvent(self.hpssd_sock, EVENT_CUPS_QUEUES_CHANGED, device_uri=self.device_uri)
+            pass
+            
         QApplication.restoreOverrideCursor()
 
     def setupFax(self):
@@ -934,8 +925,12 @@ class SetupForm(SetupForm_base):
             else: # Quit
                 return
 
-        status, status_str = cups.addPrinter(self.fax_name.encode('utf8'), 
-            self.fax_uri, self.fax_location, fax_ppd, '', self.fax_desc)
+        if not os.path.exists(fax_ppd):
+            status, status_str = cups.addPrinter(self.fax_name.encode('utf8'), 
+                self.fax_uri, self.fax_location, '', fax_ppd,  self.fax_desc)
+        else:        
+            status, status_str = cups.addPrinter(self.fax_name.encode('utf8'), 
+                self.fax_uri, self.fax_location, fax_ppd, '', self.fax_desc)
             
         log.debug("addPrinter() returned (%d, %s)" % (status, status_str))
         self.installed_fax_devices = device.getSupportedCUPSDevices(['hpfax'])
@@ -947,7 +942,9 @@ class SetupForm(SetupForm_base):
 
             self.FailureUI(self.__tr("<b>Fax queue setup failed.</b><p>Please restart CUPS and try again."))
         else:
-            service.sendEvent(self.hpssd_sock, EVENT_CUPS_QUEUES_CHANGED, device_uri=self.fax_uri)
+            pass
+            # TODO:
+            #service.sendEvent(self.hpssd_sock, EVENT_CUPS_QUEUES_CHANGED, device_uri=self.fax_uri)
 
         QApplication.restoreOverrideCursor()
 
@@ -978,7 +975,6 @@ class SetupForm(SetupForm_base):
                         self.FailureUI(self.__tr("<b>Printer Error.</b><p>Printer is busy, offline, or in an error state. Please check the device and try again."))
                         d.close()
 
-        self.hpssd_sock.close()
 
         if self.username:
             import pwd
@@ -993,8 +989,6 @@ class SetupForm(SetupForm_base):
 
 
     def reject(self):
-        self.hpssd_sock.close()
-
         QWizard.reject(self)
 
     def FailureUI(self, error_text):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,19 +19,24 @@
 # Author: Don Welch
 #
 
-from base.g import *
-import os.path
+# Std Lib
 
+# Local
+from base.g import *
+from ui_utils import load_pixmap
+
+# Qt
 from qt import *
 from colorcal4form_base import ColorCal4Form_base
 
 
 class ColorCal4Form(ColorCal4Form_base):
 
-    def __init__(self,parent = None,name = None,modal = 0,fl = 0):
-        ColorCal4Form_base.__init__(self,parent,name,modal,fl)
-        self.gray_plot_png.setPixmap(QPixmap(os.path.join(prop.image_dir, 'type4_gray_patch.png')))
-        self.color_plot_png.setPixmap(QPixmap(os.path.join(prop.image_dir, 'type4_color_patch.png')))
+    def __init__(self, parent=None, name=None, modal=0, fl=0):
+        ColorCal4Form_base.__init__(self, parent, name, modal, fl)
+        
+        self.gray_plot_png.setPixmap(load_pixmap('type4_gray_patch', 'other'))
+        self.color_plot_png.setPixmap(load_pixmap('type4_color_patch', 'other'))
         self.values = [0, 0, 0, 0]
 
     def GrayLetterComboBox_highlighted(self,a0):

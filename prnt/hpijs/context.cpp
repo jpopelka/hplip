@@ -2034,7 +2034,6 @@ void PrintContext::ResetIOMode (BOOL bDevID, BOOL bStatus)
     }
 }
 
-#ifdef APDK_LINUX
 DRIVER_ERROR PrintContext::SetPrinterHint (int iHint, int iValue)
 {
     if (thePrinter)
@@ -2043,6 +2042,5 @@ DRIVER_ERROR PrintContext::SetPrinterHint (int iHint, int iValue)
     }
     return NO_ERROR;
 }
-#endif // APDK_LINUX
 
 APDK_END_NAMESPACE

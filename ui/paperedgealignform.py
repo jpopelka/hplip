@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,18 +19,24 @@
 # Author: Don Welch
 #
 
-
+# Std Lib
 from base.g import *
+
+# Local
+from ui_utils import load_pixmap
+
+# Qt
 from qt import *
 from paperedgealignform_base import PaperEdgeAlignForm_base
-import os.path
+
+
 
 class PaperEdgeAlignForm(PaperEdgeAlignForm_base):
     def __init__(self,parent = None,name = None,modal = 0,fl = 0):
         PaperEdgeAlignForm_base.__init__(self,parent,name,modal,fl)
-        self.Icon.setPixmap(QPixmap(os.path.join(prop.image_dir, "zca.png")))
+        self.Icon.setPixmap(load_pixmap("zca.png", 'other'))
         self.value = 1
+
 
     def buttonGroup_clicked(self,a0):
         self.value = a0 + 1
-

@@ -63,7 +63,9 @@ $Revision: 1.2 $
 $Date: 2007/01/11 20:51:46 $
 """
 try:
-    import os, sys, time
+    import os
+    import sys
+    import time
     import select
     import string
     import re

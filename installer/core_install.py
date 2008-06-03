@@ -20,9 +20,17 @@
 #
 
 # Std Lib
-import sys, os, os.path, re, time
-import cStringIO, grp, pwd
-import urllib, sha, tarfile
+import sys
+import os
+import os.path
+import re
+import time
+import cStringIO
+import grp
+import pwd
+import urllib # TODO: Replace with urllib2 (urllib is deprecated in Python 3.0)
+import sha # TODO: Replace with hashlib (sha is deprecated in Python 3.0)
+import tarfile
 
 # Local
 from base.g import *
@@ -51,11 +59,17 @@ HTTP_GET_TARGET = "http://www.google.com"
 PLUGIN_CONF_URL = "http://hplip.sf.net/plugins.conf"
 
 PASSWORD_LIST = [
-pexpect.EOF, # 0
-pexpect.TIMEOUT, # 1
-"passwor[dt]", # en/de
-"password for", # en
-"mot de passe", # fr
+    pexpect.EOF, # 0
+    pexpect.TIMEOUT, # 1
+    "passwor[dt]", # en/de/it/ru
+    "kennwort", # de?
+    "password for", # en
+    "mot de passe", # fr
+    "contraseña", # es
+    "palavra passe", # pt
+    "口令", # zh
+    "wachtwoord", # nl
+    "heslo", # czech
 ]
 
 PASSWORD_EXPECT_LIST = []
@@ -66,6 +80,30 @@ for s in PASSWORD_LIST:
         PASSWORD_EXPECT_LIST.append(s)
     else:
         PASSWORD_EXPECT_LIST.append(p)
+
+OK_PROCESS_LIST = ['adpept-notifier', 
+                   'yum-updatesd',
+                   ]
+                   
+CONFIGURE_ERRORS = { 1 : "General/unknown error",
+                     2 : "libusb not found",
+                     3 : "cups-devel not found",
+                     4 : "libnetsnmp not found",
+                     5 : "netsnmp-devel not found",
+                     6 : "python-devel not found",
+                     7 : "pthread-devel not found",
+                     8 : "ppdev-devel not found",
+                     9 : "libcups not found",
+                     10 : "libm not found",
+                     11 : "libusb-devel not found",
+                     12 : "sane-backends-devel not found",
+                     13 : "libdbus not found",
+                     14 : "dbus-devel not found",
+                     15 : "fax requires dbus support",
+                     102 : "libjpeg not found",
+                     103 : "jpeg-devel not found",
+                     104 : "libdi not found",
+                   }
 
 
 try:
@@ -136,11 +174,20 @@ class CoreInstall(object):
             'drv_dir' : TYPE_STRING,
             'fix_ppd_symlink': TYPE_BOOL,
             'code_name': TYPE_STRING,
-            'supported': TYPE_BOOL,
+            'supported': TYPE_BOOL, # Supported by installer 
             'release_date': TYPE_STRING,
             'packages': TYPE_LIST,
             'commands': TYPE_LIST,
             'same_as_version' : TYPE_STRING,
+            'gui_supported' : TYPE_BOOL,
+            'scan_supported' : TYPE_BOOL,
+            'fax_supported' : TYPE_BOOL,
+            'pcard_supported' : TYPE_BOOL,
+            'network_supported' : TYPE_BOOL,
+            'parallel_supported' : TYPE_BOOL,
+            'usb_supported' : TYPE_BOOL,
+            'packaged_version': TYPE_STRING, # Version of HPLIP pre-packaged in distro
+            'cups_path_with_bitness' : TYPE_BOOL,
         }
 
         # components
@@ -201,6 +248,8 @@ class CoreInstall(object):
             'python2x':         (True,  ['base'], "Python 2.2 or greater - Python programming language", self.check_python2x, DEPENDENCY_RUN_AND_COMPILE_TIME),
             'gs':               (True,  ['base', 'hpijs'], "GhostScript - PostScript and PDF language interpreter and previewer", self.check_gs, DEPENDENCY_RUN_TIME),
             'libusb':           (True,  ['base'], "libusb - USB library", self.check_libusb, DEPENDENCY_RUN_AND_COMPILE_TIME),
+            
+
 
             # Optional base packages
             'cups-ddk':          (False, ['base'], "cups-ddk - CUPS driver development kit", self.check_cupsddk, DEPENDENCY_RUN_TIME), # req. for .drv PPD installs
@@ -216,13 +265,18 @@ class CoreInstall(object):
 
             # Required fax packages
             'python23':         (True,  ['fax'], "Python 2.3 or greater - Required for fax functionality", self.check_python23, DEPENDENCY_RUN_TIME),
+            'dbus':             (True,  ['fax'], "dbus - Message bus system", self.check_dbus, DEPENDENCY_RUN_AND_COMPILE_TIME),
+            'python-dbus':      (True,  ['fax'], "python-dbus - Python bindings for dbus", self.check_python_dbus, DEPENDENCY_RUN_TIME),
+            'python-ctypes':    (True,  ['fax'], "python-ctypes - A foreign function library for Python", self.check_python_ctypes, DEPENDENCY_RUN_TIME),
+
+            # Optional fax packages
             'reportlab':        (False, ['fax'], "Reportlab - PDF library for Python", self.check_reportlab, DEPENDENCY_RUN_TIME), 
 
             # Required parallel I/O packages
             'ppdev':            (True,  ['parallel'], "ppdev - Parallel port support kernel module.", self.check_ppdev, DEPENDENCY_RUN_TIME),
 
             # Required gui packages
-            'pyqt':             (True,  ['gui'], "PyQt - Qt interface for Python", self.check_pyqt, DEPENDENCY_RUN_TIME),
+            'pyqt':             (True,  ['gui'], "PyQt - Qt interface for Python", self.check_pyqt, DEPENDENCY_RUN_TIME), # PyQt 3.x
 
             # Required network I/O packages
             'libnetsnmp-devel': (True,  ['network'], "libnetsnmp-devel - SNMP networking library development files", self.check_libnetsnmp, DEPENDENCY_RUN_AND_COMPILE_TIME),
@@ -236,6 +290,14 @@ class CoreInstall(object):
                     self.options[opt][2].append(d)
 
         self.load_distros()
+        
+        #for d in self.distros:
+        #    print
+##        import pprint
+##        print "6: ", pprint.pprint(self.distros['fedora']['versions']['6'])
+##        print
+##        print "6.0: ", pprint.pprint(self.distros['fedora']['versions']['6.0'])
+##        sys.exit(1)
 
         self.distros_index = {}
         for d in self.distros:
@@ -283,7 +345,9 @@ class CoreInstall(object):
             if callback is not None:
                 callback("Result: %s = %d\n" % (d, self.have_dependencies[d]))
 
-        log.debug("Running package manager: %s" % self.check_pkg_mgr())
+        pid, cmdline = self.check_pkg_mgr()
+        if pid:
+            log.debug("Running package manager: %s (%d)" % (cmdline, pid) )
 
         self.bitness = utils.getBitness()
         log.debug("Bitness = %d" % self.bitness)
@@ -333,6 +397,7 @@ class CoreInstall(object):
         if callback is not None:
             callback("Done")
 
+
     def init_for_docs(self, distro_name, version, bitness=32):
         self.distro_name = distro_name
         self.distro_version = version
@@ -344,7 +409,6 @@ class CoreInstall(object):
             sys.exit(1)
 
         self.bitness = bitness
-
 
         for d in self.dependencies:
             self.have_dependencies[d] = True
@@ -390,7 +454,7 @@ class CoreInstall(object):
         ok, ret = False, ''
         # Hack! TODO: Fix!
         check_timeout = not (cmd.startswith('xterm') or cmd.startswith('gnome-terminal'))
-        
+
         try:
             child = pexpect.spawn(cmd, timeout=1)
         except pexpect.ExceptionPexpect:
@@ -410,12 +474,13 @@ class CoreInstall(object):
                         # output
                         start = time.time()
                         log.log_to_file(cb)
+                        log.debug(cb)
                         output.write(cb)
 
                         if callback is not None:
                             if callback(cb): # cancel
                                 break
-                    
+
                     elif check_timeout:
                         # no output
                         span = int(time.time()-start)
@@ -546,18 +611,25 @@ class CoreInstall(object):
 
         self.ppd_dir = self.get_distro_ver_data('ppd_dir')
 
-        if not self.ppd_dir or not os.path.exists(self.ppd_dir):
+        if not self.ppd_dir: 
             log.warning("Invalid ppd_dir value: %s" % self.ppd_dir)
 
         self.drv_dir = self.get_distro_ver_data('drv_dir')
-        if not self.enable_ppds and (not self.drv_dir or not os.path.exists(self.drv_dir)):
+        if not self.enable_ppds and not self.drv_dir: 
             log.warning("Invalid drv_dir value: %s" % self.drv_dir)
 
         self.distro_version_supported = self.get_distro_ver_data('supported', False)
-
+        self.selected_options['fax'] = self.get_distro_ver_data('fax-supported', True)
+        self.selected_options['gui'] = self.get_distro_ver_data('gui-supported', True)
+        self.selected_options['network'] = self.get_distro_ver_data('network-supported', True)
+        self.selected_options['scan'] = self.get_distro_ver_data('scan-supported', True)
+        self.selected_options['parallel'] = self.get_distro_ver_data('parallel-supported', False)
+                
 
     def __fixup_data(self, key, data):
         field_type = self.FIELD_TYPES.get(key, TYPE_STRING)
+        #log.debug("%s (%s) %d" % (key, data, field_type))
+        
         if field_type == TYPE_BOOL:
             return utils.to_bool(data)
 
@@ -592,12 +664,12 @@ class CoreInstall(object):
                 distros_dat_file = os.path.join('installer', 'distros.dat')
 
         distros_dat = Config(distros_dat_file, True)
-
-        distros_list = distros_dat.distros.distros.split(',')
+        distros_list = self.__fixup_data('distros', distros_dat.distros.distros)
         log.debug(distros_list)
 
         for distro in distros_list:
             update_spinner()
+            d = {}
             try:
                 distro_section = distros_dat[distro]
             except KeyError:
@@ -605,56 +677,57 @@ class CoreInstall(object):
                 continue
 
             for key in distro_section:
-                distro_section[key] = self.__fixup_data(key, distro_section[key])
+                d[key] = self.__fixup_data(key, distro_section[key])
 
-            self.distros[distro] = distro_section
-
-            if type(self.distros[distro]['versions']) == type(''):
-                self.distros[distro]['versions'] = [self.distros[distro]['versions']]
-
-            temp_versions = self.distros[distro]['versions']
+            self.distros[distro] = d
+            versions = self.__fixup_data("versions", distros_dat[distro]['versions'])
             self.distros[distro]['versions'] = {}
 
-            for ver in temp_versions:
-                v = ver
+            for ver in versions:
+                v = {}
                 try:
-                    ver_section = distros_dat["%s:%s" % (distro, v)].copy()
+                    ver_section = distros_dat["%s:%s" % (distro, ver)]
                 except KeyError:
-                    log.debug("Missing version section in distros.dat: [%s:%s]" % (distro, v))
+                    log.debug("Missing version section in distros.dat: [%s:%s]" % (distro, ver))
                     continue
 
                 for key in ver_section:
-                    ver_section[key] = self.__fixup_data(key, ver_section[key])
+                    v[key] = self.__fixup_data(key, ver_section[key])
+                
+                self.distros[distro]['versions'][ver] = v
+                self.distros[distro]['versions'][ver]['dependency_cmds'] = {}
 
+                for dep in self.dependencies:
+                    dd = {}
+                    try:
+                        dep_section = distros_dat["%s:%s:%s" % (distro, ver, dep)].copy()
+                    except KeyError:
+                        log.debug("Missing dependency section in distros.dat: [%s:%s:%s]" % (distro, ver, dep))
+                        continue
+
+
+                    for key in dep_section:
+                        dd[key] = self.__fixup_data(key, dep_section[key])
+                    
+                    self.distros[distro]['versions'][ver]['dependency_cmds'][dep] = dd
+            
+            versions = self.distros[distro]['versions']
+            for ver in versions:
+                ver_section = distros_dat["%s:%s" % (distro, ver)]
+                
                 if 'same_as_version' in ver_section:
-                    v = ver_section['same_as_version']
+                    v = self.__fixup_data("same_as_version", ver_section['same_as_version'])
+                    log.debug("Setting %s:%s to %s:%s" % (distro, ver, distro, v))
 
                     try:
-                        ver_section = distros_dat["%s:%s" % (distro, v)].copy()
-                        ver_section['same_as_version'] = v
+                        vv = self.distros[distro]['versions'][v].copy()
+                        vv['same_as_version'] = v
+                        self.distros[distro]['versions'][ver] = vv
                     except KeyError:
                         log.debug("Missing 'same_as_version=' version in distros.dat for section [%s:%s]." % (distro, v))
                         continue
-
-                self.distros[distro]['versions'][ver] = ver_section
-                self.distros[distro]['versions'][ver]['dependency_cmds'] = {}
-
-                #if utils.to_bool(ver_section['supported']):
-                if 1:
-                    for dep in self.dependencies:
-                        try:
-                            dep_section = distros_dat["%s:%s:%s" % (distro, v, dep)].copy()
-                        except KeyError:
-                            log.debug("Missing dependency section in distros.dat: [%s:%s:%s]" % (distro, v, dep))
-                            continue
-
-
-                        for key in dep_section:
-                            dep_section[key] = self.__fixup_data(key, dep_section[key])
-                            self.distros[distro]['versions'][ver]['dependency_cmds'][dep] = dep_section
-
-
-
+                
+            
     def pre_install(self):
         pass
 
@@ -682,7 +755,7 @@ class CoreInstall(object):
         if not check_lib('libusb'):
             return False
 
-        return len(locate_file_contains("usb.h", '/usr/include', 'usb_init(void)')) > 0
+        return len(locate_file_contains("usb.h", '/usr/include', 'usb_init(void)'))
 
 
     def check_libjpeg(self):
@@ -737,7 +810,7 @@ class CoreInstall(object):
 
 
     def check_sane_devel(self):
-        return len(locate_file_contains("sane.h", '/usr/include', 'extern SANE_Status sane_init')) > 0
+        return len(locate_file_contains("sane.h", '/usr/include', 'extern SANE_Status sane_init'))
 
 
     def check_xsane(self):
@@ -766,11 +839,11 @@ class CoreInstall(object):
             try:
                 pyqtVersion = qt.PYQT_VERSION_STR
                 log.debug("PYQT_VERSION_STR = %s" % pyqtVersion)
-            except:
+            except AttributeError:
                 try:
                     pyqtVersion = qt.PYQT_VERSION
                     log.debug("PYQT_VERSION = %s" % pyqtVersion)
-                except:
+                except AttributeError:
                     pass
 
             if pyqtVersion is not None:
@@ -808,14 +881,50 @@ class CoreInstall(object):
         return check_file('Python.h')
 
 
+    def check_python_dbus(self):
+        log.debug("Checking for python-dbus (>= 0.80)...")
+        try:
+            import dbus
+            try:
+                ver = dbus.version
+                log.debug("Version: %s" % '.'.join([str(x) for x in dbus.version]))
+                return ver >= (0,80,0)
+            
+            except AttributeError:
+                try:
+                    ver = dbus.__version__
+                    log.debug("Version: %s" % dbus.__version__)
+                    log.debug("HPLIP requires dbus version > 0.80.")
+                    return False
+                
+                except AttributeError:
+                    log.debug("Unknown version. HPLIP requires dbus version > 0.80.")
+                    return False
+        
+        except ImportError:
+            return False
+            
+    
+    def check_python_ctypes(self):
+        try:
+            import ctypes
+            return True
+        except ImportError:
+            return False
+
+
+    def check_dbus(self):
+        log.debug("Checking for dbus running...")
+        return check_ps(['dbus-daemon']) and \
+            len(locate_file_contains("dbus-message.h", '/usr/include', 'dbus_message_new_signal'))
+
+
     def check_cups_devel(self):
         return check_file('cups.h') and bool(utils.which('lpr'))
 
 
     def check_cups(self):
         status, output = self.run('lpstat -r')
-
-
         if status > 0:
             log.debug("CUPS is not running.")
             return False
@@ -831,7 +940,7 @@ class CoreInstall(object):
 
 
     def check_hplip(self):
-        log.debug("Checking for HPLIP...")
+        log.debug("Checking for HPLIP (pre-2.x)...")
         return check_ps(['hpiod', 'hpssd']) and locate_files('hplip.conf', '/etc/hp')
 
 
@@ -860,22 +969,25 @@ class CoreInstall(object):
         #return check_tool("/usr/lib/cups/driver/drv list") and os.path.exists("/usr/share/cupsddk/include/media.defs")
         return check_file('drv', "/usr/lib/cups/driver") and check_file('media.defs', "/usr/share/cupsddk/include")        
 
-    def check_pkg_mgr(self): # modified from EasyUbuntu
+    def check_pkg_mgr(self):
         """
             Check if any pkg mgr processes are running
         """
-        log.debug("Searching for '%s' in 'ps' output..." % self.package_mgrs)
+        log.debug("Searching for '%s' in running processes..." % self.package_mgrs)
 
-        p = os.popen("ps -U root -o comm") # TODO: Doesn't work on Mac OS X
-        pslist = p.readlines()
-        p.close()
-
-        for process in pslist:
+        processes = get_process_list()
+        
+        for pid, cmdline in processes:
             for p in self.package_mgrs:
-                if p in process:
-                    return p
-        return ''
-
+                if p in cmdline:
+                    for k in OK_PROCESS_LIST:
+                        if k not in cmdline:
+                            log.debug("Found: %s (%d)" % (cmdline, pid))
+                            return (pid, cmdline)
+        
+        log.debug("Not found")
+        return (0, '')
+        
 
     def get_hplip_version(self):
         self.version_description, self.version_public, self.version_internal = '', '', ''
@@ -916,6 +1028,8 @@ class CoreInstall(object):
 
     def configure(self): 
         configure_cmd = './configure'
+        
+        dbus_avail = self.have_dependencies['dbus'] and self.have_dependencies['python-dbus']
 
         if self.selected_options['network']:
             configure_cmd += ' --enable-network-build'
@@ -927,10 +1041,15 @@ class CoreInstall(object):
         else:
             configure_cmd += ' --disable-pp-build'
 
-        if self.selected_options['fax']:
+        if self.selected_options['fax'] and dbus_avail:
             configure_cmd += ' --enable-fax-build'
         else:
             configure_cmd += ' --disable-fax-build'
+            
+        if dbus_avail:
+            configure_cmd += ' --enable-dbus-build'
+        else:
+            configure_cmd += ' --disable-dbus-build'
 
         if self.selected_options['gui']:
             configure_cmd += ' --enable-gui-build'
@@ -976,6 +1095,9 @@ class CoreInstall(object):
 
         if self.cups11:
             configure_cmd += ' --enable-cups11-build'
+            
+        if self.get_distro_ver_data('cups_path_with_bitness', False) and self.bitness == 64:
+            configure_cmd += ' --with-cupsbackenddir=/usr/lib64/cups/backend --with-cupsfilterdir=/usr/lib64/cups/filter'
 
         return configure_cmd
 
@@ -1086,7 +1208,7 @@ class CoreInstall(object):
 
         if not overall_commands_to_run:
             log.error("No cmds/pkgs")
-
+            
         return overall_commands_to_run
 
 

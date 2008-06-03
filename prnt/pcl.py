@@ -19,9 +19,12 @@
 # Author: Don Welch
 #
 
-
+# Std Lib
 import struct
+
+# Local
 from base import pml
+
 
 ESC = '\x1b'
 RESET = '\x1bE'

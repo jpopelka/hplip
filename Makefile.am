@@ -4,7 +4,7 @@
 #  (c) 2004-2007 Copyright Hewlett-Packard Development Company, LP
 #
 
-INCLUDES = -Iip -Iio/hpmud -Iscan/sane
+INCLUDES = -Iip -Iio/hpmud -Iscan/sane 
 
 BZRSERVER=http://bzr.linuxprinting.org/devel
 #BZRSERVER=http://dsufflnx/bzr
@@ -62,6 +62,30 @@ www61dir = $(docdir)/tech_docs/man_pages
 dist_www61_DATA = $(wwwsrc)/tech_docs/man_pages/*
 www7dir = $(docdir)/troubleshooting
 dist_www7_DATA = $(wwwsrc)/troubleshooting/*
+www8dir = $(docdir)/models
+dist_www8_DATA = $(wwwsrc)/models/index.html
+www82dir = $(docdir)/models/deskjet
+dist_www82_DATA = $(wwwsrc)/models/deskjet/*
+www83dir = $(docdir)/models/deskjet_aio
+dist_www83_DATA = $(wwwsrc)/models/deskjet_aio/*
+www84dir = $(docdir)/models/photosmart
+dist_www84_DATA = $(wwwsrc)/models/photosmart/*
+www85dir = $(docdir)/models/officejet
+dist_www85_DATA = $(wwwsrc)/models/officejet/*
+www86dir = $(docdir)/models/psc
+dist_www86_DATA = $(wwwsrc)/models/psc/*
+www87dir = $(docdir)/models/laserjet
+dist_www87_DATA = $(wwwsrc)/models/laserjet/*
+www88dir = $(docdir)/models/color_laserjet
+dist_www88_DATA = $(wwwsrc)/models/color_laserjet/*
+www89dir = $(docdir)/models/bij
+dist_www89_DATA = $(wwwsrc)/models/bij/*
+www810dir = $(docdir)/models/edgeline
+dist_www810_DATA = $(wwwsrc)/models/edgeline/*
+www811dir = $(docdir)/models/apollo
+dist_www811_DATA = $(wwwsrc)/models/apollo/*
+www812dir = $(docdir)/models/other
+dist_www812_DATA = $(wwwsrc)/models/other/*
 endif
 
 if HPLIP_BUILD
@@ -71,20 +95,23 @@ dist_hplip_SCRIPTS = hpssd.py __init__.py install.py hplip-install
 
 cmddir = $(hplipdir)
 dist_cmd_SCRIPTS = align.py info.py print.py toolbox.py clean.py colorcal.py unload.py testpage.py makeuri.py check.py fab.py levels.py \
-	sendfax.py setup.py makecopies.py probe.py timedate.py firmware.py scan.py
+	sendfax.py setup.py makecopies.py probe.py timedate.py firmware.py scan.py systray.py
 
 # hp backend.
 hpdir = $(cupsbackenddir)
 hp_PROGRAMS = hp
 hp_SOURCES = prnt/backend/hp.c
 hp_LDADD = libhpmud.la
+hp_CFLAGS = $(DBUS_CFLAGS)
 
 # base
 basedir = $(hplipdir)/base
-dist_base_SCRIPTS = base/maint.py base/codes.py base/g.py base/pml.py base/status.py  base/async.py \
-	base/__init__.py base/mfpdtf.py base/utils.py base/async_qt.py base/kirbybase.py base/service.py \
-	base/device.py base/logger.py base/msg.py base/slp.py base/exif.py base/strings.py base/magic.py \
-	base/imagesize.py base/pexpect.py base/models.py base/mdns.py base/tui.py base/dime.py
+
+dist_base_SCRIPTS = base/maint.py base/codes.py base/g.py base/pml.py base/status.py  \
+	base/__init__.py base/mfpdtf.py base/utils.py \
+	base/device.py base/logger.py base/slp.py base/exif.py base/strings.py base/magic.py \
+	base/imagesize.py base/pexpect.py base/models.py base/mdns.py base/tui.py base/dime.py \
+	base/ldif.py base/vcard.py
 
 # installer
 installdir = $(hplipdir)/installer
@@ -130,16 +157,28 @@ ptest_LDADD = libhpmud.la
 
 # data
 modelsdir = $(hplipdir)/data/models
-imagesdir = $(hplipdir)/data/images
+images_16x16dir = $(hplipdir)/data/images/16x16
+images_32x32dir = $(hplipdir)/data/images/32x32
+images_48x48dir = $(hplipdir)/data/images/48x48
+images_128x128dir = $(hplipdir)/data/images/128x128
+images_devicesdir = $(hplipdir)/data/images/devices
+images_otherdir = $(hplipdir)/data/images/other
 pcldir = $(hplipdir)/data/pcl
 ldldir = $(hplipdir)/data/ldl
 postscriptdir = $(hplipdir)/data/ps
 localzdir = $(hplipdir)/data/localization
 dist_postscript_DATA = data/ps/testpage.ps.gz data/ps/clean_page.pdf.gz
 dist_models_DATA = data/models/models.dat
+
 if GUI_BUILD
-dist_images_DATA = data/images/*
+dist_images_16x16_DATA = data/images/16x16/*
+dist_images_32x32_DATA = data/images/32x32/*
+dist_images_48x48_DATA = data/images/48x48/*
+dist_images_128x128_DATA = data/images/128x128/*
+dist_images_devices_DATA = data/images/devices/*
+dist_images_other_DATA = data/images/other/*
 endif
+
 dist_pcl_DATA = data/pcl/align1_8xx.pcl.gz data/pcl/align1_9xx.pcl.gz data/pcl/align2_8xx.pcl.gz data/pcl/align3_8xx.pcl.gz data/pcl/align4_8xx.pcl.gz \
 	data/pcl/align5_8xx.pcl.gz data/pcl/align2_9xx.pcl.gz data/pcl/align3_9xx.pcl.gz data/pcl/align4_450.pcl.gz data/pcl/align6_450.pcl.gz \
 	data/pcl/colorcal1_450.pcl.gz data/pcl/colorcal2_450.pcl.gz data/pcl/crbcal.pcl.gz data/pcl/crcaldone.pcl.gz data/pcl/crcbcal.pcl.gz data/pcl/crccal.pcl.gz \
@@ -186,14 +225,13 @@ libhpip_la_SOURCES = ip/xconvolve.c ip/xfax.c ip/xgrayout.c ip/xjpg_dct.c ip/xjp
 
 # hpaio sane backend
 if SCAN_BUILD
+include bb_scan.inc
 libsane_hpaiodir = $(libdir)/sane
 libsane_hpaio_LTLIBRARIES = libsane-hpaio.la
 libsane_hpaio_la_SOURCES = scan/sane/hpaio.c scan/sane/mfpdtf.c scan/sane/pml.c scan/sane/scl.c scan/sane/io.c scan/sane/hpaio.h \
 	  scan/sane/pml.h scan/sane/saneopts.h scan/sane/io.h scan/sane/mfpdtf.h scan/sane/sane.h scan/sane/scl.h scan/sane/tables.h \
-	  scan/sane/common.c scan/sane/common.h scan/sane/soap.h scan/sane/sanei_debug.h scan/sane/sanei.h \
-	  scan/sane/soap_stub.c scan/sane/sanei_init_debug.c
-#	  scan/sane/soap.c scan/sane/webScanC.c scan/sane/webScanClient.c scan/sane/stdsoap2.c \
-#	  scan/sane/dime.c scan/sane/dime.h scan/sane/webScanStub.h scan/sane/webScanH.h scan/sane/stdsoap2.h scan/sane/webScan.nsmap
+	  scan/sane/common.c scan/sane/common.h scan/sane/soap.h scan/sane/soapht.h scan/sane/sanei_debug.h scan/sane/sanei.h \
+	  scan/sane/sanei_init_debug.c scan/sane/marvell.h $(BB_SCAN_SOURCES)
 if DARWIN_BUILD
 libsane_hpaio_la_LDFLAGS = -module -framework CoreFoundation -version-info 1:0:0
 else
@@ -202,7 +240,7 @@ endif
 # The following is a interlibrary dependency that must be compiled first.
 libsane_hpaio_la_LIBADD = libhpip.la libhpmud.la
 #libsane_hpaio_la_CFLAGS = -DWITH_NONAMESPACES -DSOAP_DEBUG
-libsane_hpaio_la_CFLAGS = -DWITH_NONAMESPACES -DWITH_LEAN
+libsane_hpaio_la_CFLAGS = $(DBUS_CFLAGS) $(BB_SCAN_CFLAGS)
 
 # scan
 scandir = $(hplipdir)/scan
@@ -244,7 +282,7 @@ uidir = $(hplipdir)/ui
 dist_ui_SCRIPTS = ui/alignform.py \
 	ui/colorcalform_base.py ui/colorcalform.py ui/coloradjform_base.py ui/coloradjform.py ui/devmgr4_base.py ui/devmgr4.py \
 	ui/__init__.py ui/loadpaperform_base.py ui/loadpaperform.py \
-	ui/paperedgealignform_base.py ui/paperedgealignform.py \
+	ui/paperedgealignform_base.py ui/paperedgealignform.py ui/ui_utils.py \
 	ui/settingsdialog_base.py ui/settingsdialog.py ui/aligntype6form1.py ui/aligntype6form1_base.py ui/aligntype6form2_base.py \
 	ui/aligntype6form2.py ui/nodevicesform_base.py ui/nodevicesform.py ui/unloadform.py \
 	ui/imagepropertiesdlg_base.py ui/imagepropertiesdlg.py ui/choosedevicedlg.py ui/chooseprinterdlg.py \
@@ -256,9 +294,10 @@ dist_ui_SCRIPTS = ui/alignform.py \
 	ui/faxsendjobform.py ui/faxsettingsform_base.py ui/faxsettingsform.py \
 	ui/coverpageform_base.py ui/coverpageform.py ui/allowabletypesdlg_base.py ui/allowabletypesdlg.py \
 	ui/makecopiesform.py ui/setupform_base.py ui/setupform.py ui/setupmanualfind_base.py \
-	ui/setupmanualfind.py ui/setupsettings_base.py ui/setupsettings.py ui/scrollview.py ui/scrollfunc.py ui/scrollstatus.py \
-	ui/scrollprintsettings.py ui/scrollprintcontrol.py ui/scrolltool.py ui/scrollsupplies.py  ui/scrollprint.py ui/scrollfax.py \
-	ui/scrollunload.py ui/scrollcopy.py ui/pluginform.py ui/pluginform_base.py
+	ui/setupmanualfind.py ui/setupsettings_base.py ui/setupsettings.py ui/scrollview.py \
+	ui/scrollprintsettings.py ui/scrollprint.py ui/scrollfax.py \
+	ui/scrollunload.py ui/scrollcopy.py ui/pluginform.py ui/pluginform_base.py ui/systemtray_qt3.py \
+	ui/systemtray_qt4.py ui/ui_utils.py ui/jobstoragemixin.py
 dist_noinst_DATA += ui/colorcalform2_base.ui ui/settingsdialog_base.ui ui/aligntype6form1_base.ui \
 	ui/aboutdlg_base.ui ui/imagepropertiesdlg_base.ui ui/paperedgealignform_base.ui ui/aligntype6form2_base.ui \
 	ui/nodevicesform_base.ui ui/cleaningform_base.ui ui/colorcalform_base.ui ui/devmgr4_base.ui ui/loadpaperform_base.ui \
@@ -307,13 +346,17 @@ hppgsz_SOURCES = $(apdk_SOURCES) prnt/hpijs/PrinterProperties.cpp prnt/hpijs/Pri
 hppgsz_CXXFLAGS = $(hpijs_CXXFLAGS)
 hppgsz_CFLAGS = $(hpijs_CXXFLAGS) -Iprnt/hpijs
 
-# icon file
+# hplip.desktop
 hplip_desktopdir = $(icondir)
 hplip_desktop_DATA = hplip.desktop
 
 # hplip.conf
 hplip_confdir = /etc/hp
 hplip_conf_DATA = hplip.conf
+
+# hplip-systray.desktop
+hplip_systraydir = $(systraydir)
+hplip_systray_DATA = hplip-systray.desktop
 
 endif	# if HPLIP_BUILD
 
@@ -326,6 +369,11 @@ if RIP_INSTALL
 ripdir = $(cupsfilterdir)
 dist_rip_SCRIPTS = prnt/hpijs/foomatic-rip-hplip
 endif
+
+# hpipjs
+hplipjsdir = $(cupsfilterdir)
+hplipjs_PROGRAMS = hplipjs
+hplipjs_SOURCES = prnt/filters/hplipjs.c
 
 # hpijs
 bin_PROGRAMS = hpijs

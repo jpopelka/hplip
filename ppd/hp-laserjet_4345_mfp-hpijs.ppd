@@ -3,7 +3,7 @@
 *% Created by the CUPS PPD Compiler v1.2.0.
 *% (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 *FormatVersion: "4.3"
-*FileVersion: "hpijs 2.8.2.10"
+*FileVersion: "hpijs 2.8.5.23"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "hp-laserjet_4345_mfp-hpijs.ppd"
@@ -13,7 +13,7 @@
 *Manufacturer: "HP"
 *ModelName: "HP LaserJet 4345 MFP Foomatic/hpijs"
 *ShortNickName: "HP LaserJet 4345 MFP Foomatic/hpijs"
-*NickName: "HP LaserJet 4345 MFP Foomatic/hpijs, hpijs 2.8.2.10"
+*NickName: "HP LaserJet 4345 MFP Foomatic/hpijs, hpijs 2.8.5.23"
 *PSVersion: "(3010.000) 705"
 *PSVersion: "(3010.000) 707"
 *PSVersion: "(3010.000) 815"
@@ -127,6 +127,21 @@ dDEVICEHEIGHTPOINTS=567"
 *End
 *FoomaticRIPOptionSetting PageSize=w612h935: " -dDEVICEWIDTHPOINTS=612&&
  -dDEVICEHEIGHTPOINTS=935"
+*End
+*FoomaticRIPOptionSetting PageSize=B4JIS: " -dDEVICEWIDTHPOINTS=729 -d&&
+DEVICEHEIGHTPOINTS=1033"
+*End
+*FoomaticRIPOptionSetting PageSize=Ledger: " -dDEVICEWIDTHPOINTS=792 -&&
+dDEVICEHEIGHTPOINTS=1224"
+*End
+*FoomaticRIPOptionSetting PageSize=SuperB: " -dDEVICEWIDTHPOINTS=936 -&&
+dDEVICEHEIGHTPOINTS=1368"
+*End
+*FoomaticRIPOptionSetting PageSize=w774h1116: " -dDEVICEWIDTHPOINTS=77&&
+4 -dDEVICEHEIGHTPOINTS=1116"
+*End
+*FoomaticRIPOptionSetting PageSize=A3: " -dDEVICEWIDTHPOINTS=842 -dDEV&&
+ICEHEIGHTPOINTS=1190"
 *End
 *FoomaticRIPOption Duplex: "enum CmdLine A"
 *FoomaticRIPOptionSetting Duplex=DuplexNoTumble: " -dDuplex=true -dTum&&
@@ -333,4 +348,4 @@ t=0"
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of hp-laserjet_4345_mfp-hpijs.ppd, 17054 bytes.
+*% End of hp-laserjet_4345_mfp-hpijs.ppd, 17572 bytes.

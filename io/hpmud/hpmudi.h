@@ -98,6 +98,7 @@ enum HPMUD_CHANNEL_ID
    HPMUD_EWS_CHANNEL = 0x12,          /* Embeded Web Server interface ff/1/1, any unused socket id */
    HPMUD_SOAPSCAN_CHANNEL = 0x13,          /* Soap Scan interface ff/2/1, any unused socket id */
    HPMUD_SOAPFAX_CHANNEL = 0x14,          /* Soap Fax interface ff/3/1, any unused socket id */
+   HPMUD_MARVELL_SCAN_CHANNEL = 0x15,    /* Marvell scan interface ff/ff/ff, any unused socket id */
    HPMUD_DEVMGMT_CHANNEL = 0x2c,      /* decimal 44 */
    HPMUD_MAX_CHANNEL_ID
 };

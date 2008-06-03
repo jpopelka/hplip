@@ -27,6 +27,7 @@ import operator
 from base.g import *
 from base import utils, device
 from prnt import cups
+from ui_utils import load_pixmap
 
 # Qt
 from qt import *
@@ -34,7 +35,7 @@ from scrollunload import ScrollUnloadView
 
 
 class UnloadForm(QMainWindow):
-    def __init__(self, bus='usb,par', device_uri=None, printer_name=None,
+    def __init__(self, bus=['usb', 'par'], device_uri=None, printer_name=None,
                  parent=None, name=None, fl=0):
 
         QMainWindow.__init__(self,parent,name,fl)
@@ -44,8 +45,7 @@ class UnloadForm(QMainWindow):
         self.printer_name = printer_name
         self.init_failed = False
 
-        icon = QPixmap(os.path.join(prop.image_dir, 'HPmenu.png'))
-        self.setIcon(icon)
+        self.setIcon(load_pixmap('prog', '48x48'))
 
         self.setCentralWidget(QWidget(self,"qt_central_widget"))
         self.FormLayout = QGridLayout(self.centralWidget(),1,1,11,6,"FormLayout")
@@ -93,15 +93,18 @@ class UnloadForm(QMainWindow):
                 else:
                     self.init_failed = True
 
-        self.UnloadView = ScrollUnloadView(False, self.centralWidget(), self, "UnloadView")
+        self.dbus_avail, self.service = device.init_dbus()
+        
+        self.UnloadView = ScrollUnloadView(self.service, 
+            self.centralWidget(), self, "UnloadView")
+            
         self.FormLayout.addWidget(self.UnloadView,0,0)
 
 
         if not self.init_failed:
             try:
                 self.cur_device = device.Device(device_uri=self.device_uri, 
-                                                 printer_name=self.printer_name, 
-                                                 hpssd_sock=None)
+                                                 printer_name=self.printer_name)
             except Error, e:
                 log.error("Invalid device URI or printer name.")
                 self.FailureUI("<b>Invalid device URI or printer name.</b><p>Please check the parameters to hp-print and try again.")

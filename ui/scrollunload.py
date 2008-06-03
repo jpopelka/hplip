@@ -23,6 +23,7 @@
 from base.g import *
 from base import utils, magic
 from pcard import photocard
+from ui_utils import load_pixmap
 
 # Qt
 from qt import *
@@ -47,22 +48,22 @@ class IconViewItem(QIconViewItem):
 
 
 class ScrollUnloadView(ScrollView):
-    def __init__(self, toolbox_hosted=True, parent = None, form=None, name = None,fl = 0):
-        ScrollView.__init__(self, parent, name, fl)
-        self.toolbox_hosted = toolbox_hosted
+    def __init__(self, service, parent=None, form=None, name=None, fl=0):
+        ScrollView.__init__(self, service, parent, name, fl)
+        
         self.form = form
         self.progress_dlg = None
         self.unload_dir = os.path.normpath(os.path.expanduser('~'))
 
-        self.image_icon_map = {'tiff' : 'tif.png',
-                                'bmp'  : 'bmp.png',
-                                'jpeg' : 'jpg.png',
-                                'gif'  : 'gif.png',
-                                'unknown' : 'unknown.png',
+        self.image_icon_map = {'tiff' : 'tif',
+                               'bmp'  : 'bmp',
+                               'jpeg' : 'jpg',
+                               'gif'  : 'gif',
+                               'unknown' : 'unknown',
                                 }
 
-        self.video_icon_map = {'unknown' : 'movie.png',
-                                'mpeg'    : 'mpg.png',
+        self.video_icon_map = {'unknown' : 'movie',
+                                'mpeg'    : 'mpg',
                                 }
 
         QTimer.singleShot(0, self.fillControls)
@@ -87,14 +88,9 @@ class ScrollUnloadView(ScrollView):
 
         self.addGroupHeading("space1", "")
 
-        if self.toolbox_hosted:
-            s = self.__tr("<< Functions")
-        else:
-            s = self.__tr("Close")
-
         self.unloadButton = self.addActionButton("bottom_nav", self.__tr("Unload File(s)"), 
-                                self.unloadButton_clicked, 'download-small.png', 'download-small-disabled.png', 
-                                s, self.funcButton_clicked)
+                                self.unloadButton_clicked, 'download.png', 'download-disabled.png', 
+                                self.__tr("Close"), self.funcButton_clicked)
 
         self.unloadButton.setEnabled(False)
 
@@ -152,7 +148,8 @@ class ScrollUnloadView(ScrollView):
                 self.device_uri = self.pc.device.device_uri
                 user_cfg.last_used.device_uri = self.device_uri
 
-                self.pc.device.sendEvent(EVENT_START_PCARD_JOB)
+                # TODO:
+                #self.pc.device.sendEvent(EVENT_START_PCARD_JOB)
 
                 disk_info = self.pc.info()
                 self.pc.write_protect = disk_info[8]
@@ -220,7 +217,7 @@ class ScrollUnloadView(ScrollView):
         spacer34 = QSpacerItem(20,20,QSizePolicy.Expanding,QSizePolicy.Minimum)
         layout32.addItem(spacer34,2,2)
 
-        self.selectAllPushButton = PixmapLabelButton(widget, 'ok_small.png', None)
+        self.selectAllPushButton = PixmapLabelButton(widget, 'ok.png', None)
 
         layout32.addWidget(self.selectAllPushButton,2,0)
 
@@ -435,13 +432,16 @@ class ScrollUnloadView(ScrollView):
 
         elif self.first_load:
             if typ == 'image':
-                f = os.path.join(prop.image_dir, self.image_icon_map.get(subtyp, 'unknown.png'))
+                f = self.image_icon_map.get(subtyp, 'unknown')
+            
             elif typ == 'video':
-                f = os.path.join(prop.image_dir, self.video_icon_map.get(subtyp, 'movie.png'))
+                f = self.video_icon_map.get(subtyp, 'movie')
+            
             elif typ == 'audio':
-                f = os.path.join(prop.image_dir, 'sound.png')
+                f = 'sound'
+            
             else:
-                f = os.path.join(prop.image_dir, 'unknown.png')
+                f = 'unknown'
 
             dirname, fname=os.path.split(path)
             num = 1
@@ -454,11 +454,11 @@ class ScrollUnloadView(ScrollView):
                 num = len(self.item_map[fname])
 
             if num == 1:
-                IconViewItem(self.IconView, dirname, fname, path, QPixmap(f),
-                              typ, subtyp, size)
+                IconViewItem(self.IconView, dirname, fname, path, 
+                    load_pixmap(f, '128x128'), typ, subtyp, size)
             else:
                 IconViewItem(self.IconView, dirname, fname + " (%d)" % num,
-                              path, QPixmap(f), typ, subtyp, size)
+                              path,load_pixmap(f, '128x128'), typ, subtyp, size)
 
     def resizePixmap(self, pixmap):
         w, h = pixmap.width(), pixmap.height()
@@ -595,7 +595,8 @@ class ScrollUnloadView(ScrollView):
             self.progress_dlg.close()
             self.progress_dlg = None
 
-            self.pc.device.sendEvent(EVENT_PCARD_FILES_TRANSFERED)
+            # TODO:
+            #self.pc.device.sendEvent(EVENT_PCARD_FILES_TRANSFERED)
 
             if self.removal_option != 0: # remove selected or remove all
                 self.unload_list = self.pc.get_unload_list()
@@ -629,7 +630,9 @@ class ScrollUnloadView(ScrollView):
     def cleanup(self, error=0):
         if self.pc is not None:
             if error > 0:
-                self.pc.device.sendEvent(error, typ='error')
+                # TODO:
+                #self.pc.device.sendEvent(error, typ='error')
+                pass
 
             try:
                 self.pc.umount()
@@ -642,10 +645,7 @@ class ScrollUnloadView(ScrollView):
             self.pc.umount()
             self.pc.device.close()
         
-        if self.toolbox_hosted:
-            self.form.SwitchFunctionsTab("funcs")
-        else:
-            self.form.close()
+        self.form.close()
 
     def __tr(self,s,c = None):
         return qApp.translate("ScrollUnloadView",s,c)

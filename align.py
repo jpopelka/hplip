@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '4.0'
+__version__ = '4.1'
 __title__ = 'Printer Cartridge Alignment Utility'
 __doc__ = "Cartridge alignment utility for HPLIP supported inkjet printers."
 
@@ -29,11 +29,14 @@ import sys
 import re
 import getopt
 import operator
+import os
 
 # Local
 from base.g import *
 from base import device, status, utils, maint, tui
 from prnt import cups
+
+
 
 USAGE = [(__doc__, "", "name", True),
          ("""Usage: hp-align [PRINTER|DEVICE-URI] [OPTIONS]""", "", "summary", True),
@@ -126,166 +129,176 @@ def aioUI2():
     log.info('3. "Alignment Complete" will be displayed when the process is finished (on some models).')
 
 
-try:
-    opts, args = getopt.getopt(sys.argv[1:],
-                                'p:d:hl:b:ag',
-                                ['printer=',
-                                  'device=',
-                                  'help',
-                                  'help-rest',
-                                  'help-man',
-                                  'help-desc',
-                                  'logging=',
-                                  'bus='
-                                ]
-                              )
-except getopt.GetoptError, e:
-    log.error(e.msg)
-    usage()
-
-log.set_module("hp-align")
-
-printer_name = None
-device_uri = None
-bus = device.DEFAULT_PROBE_BUS
-log_level = logger.DEFAULT_LOG_LEVEL
-align_debug = False
-
-if os.getenv("HPLIP_DEBUG"):
-    log.set_level('debug')
-
-for o, a in opts:
-    if o in ('-h', '--help'):
+    
+    
+try:    
+    try:
+        opts, args = getopt.getopt(sys.argv[1:],
+                                    'p:d:hl:b:ag',
+                                    ['printer=',
+                                      'device=',
+                                      'help',
+                                      'help-rest',
+                                      'help-man',
+                                      'help-desc',
+                                      'logging=',
+                                      'bus='
+                                    ]
+                                  )
+    except getopt.GetoptError, e:
+        log.error(e.msg)
         usage()
 
-    elif o == '--help-rest':
-        usage('rest')
+    log.set_module("hp-align")
 
-    elif o == '--help-man':
-        usage('man')
+    printer_name = None
+    device_uri = None
+    bus = device.DEFAULT_PROBE_BUS
+    log_level = logger.DEFAULT_LOG_LEVEL
+    align_debug = False
 
-    elif o == '--help-desc':
-        print __doc__,
-        sys.exit(0)
-
-    elif o in ('-p', '--printer'):
-        if a.startswith('*'):
-            printer_name = cups.getDefaultPrinter()
-        else:
-            printer_name = a
-
-    elif o in ('-d', '--device'):
-        device_uri = a
-
-    elif o in ('-b', '--bus'):
-        bus = a.lower().strip()
-        if not device.validateBusList(bus):
-            usage()
-
-    elif o in ('-l', '--logging'):
-        log_level = a.lower().strip()
-        if not log.set_level(log_level):
-            usage()
-
-    elif o == '-g':
+    if os.getenv("HPLIP_DEBUG"):
         log.set_level('debug')
 
-    elif o == '-a':
-        align_debug = True
+    for o, a in opts:
+        if o in ('-h', '--help'):
+            usage()
 
+        elif o == '--help-rest':
+            usage('rest')
 
+        elif o == '--help-man':
+            usage('man')
 
-if device_uri and printer_name:
-    log.error("You may not specify both a printer (-p) and a device (-d).")
-    usage()
-
-utils.log_title(__title__, __version__)
-
-if not device_uri and not printer_name:
-    try:
-        device_uri = device.getInteractiveDeviceURI(bus, filter={'align-type': (operator.gt, 0)})
-        if device_uri is None:
+        elif o == '--help-desc':
+            print __doc__,
             sys.exit(0)
-    except Error:
-        log.error("Error occured during interactive mode. Exiting.")
+
+        elif o in ('-p', '--printer'):
+            if a.startswith('*'):
+                printer_name = cups.getDefault()
+            else:
+                printer_name = a
+
+        elif o in ('-d', '--device'):
+            device_uri = a
+
+        elif o in ('-b', '--bus'):
+            bus = [x.lower().strip() for x in a.split(',')]
+            if not device.validateBusList(bus):
+                usage()
+
+        elif o in ('-l', '--logging'):
+            log_level = a.lower().strip()
+            if not log.set_level(log_level):
+                usage()
+
+        elif o == '-g':
+            log.set_level('debug')
+
+        elif o == '-a':
+            align_debug = True
+
+
+
+    if device_uri and printer_name:
+        log.error("You may not specify both a printer (-p) and a device (-d).")
+        usage()
+
+    utils.log_title(__title__, __version__)
+    
+    if os.getuid() == 0:
+        log.error("hp-align should not be run as root.")
+
+    if not device_uri and not printer_name:
+        try:
+            device_uri = device.getInteractiveDeviceURI(bus, filter={'align-type': (operator.gt, 0)})
+            if device_uri is None:
+                sys.exit(0)
+        except Error:
+            log.error("Error occured during interactive mode. Exiting.")
+            sys.exit(0)
+
+    try:
+        d = device.Device( device_uri, printer_name )
+    except Error, e:
+        log.error("Unable to open device: %s" % e.msg)
         sys.exit(0)
 
-try:
-    d = device.Device( device_uri, printer_name )
-except Error, e:
-    log.error("Unable to open device: %s" % e.msg)
-    sys.exit(0)
+    if d.device_uri is None and printer_name:
+        log.error("Printer '%s' not found." % printer_name)
+        sys.exit(0)
 
-if d.device_uri is None and printer_name:
-    log.error("Printer '%s' not found." % printer_name)
-    sys.exit(0)
+    if d.device_uri is None and device_uri:
+        log.error("Malformed/invalid device-uri: %s" % device_uri)
+        sys.exit(0)
+        
+    user_cfg.last_used.device_uri = d.device_uri
 
-if d.device_uri is None and device_uri:
-    log.error("Malformed/invalid device-uri: %s" % device_uri)
-    sys.exit(0)
-    
-user_cfg.last_used.device_uri = d.device_uri
-
-if not d.cups_printers:
-    log.error("No appropriate printer queue found for device. Please setup printer with hp-setup and try again.")
-    sys.exit(1)
-
-try:
-    try:
-        d.open()
-    except Error:
-        log.error("Device is busy or in an error state. Please check device and try again.")
+    if not d.cups_printers:
+        log.error("No appropriate printer queue found for device. Please setup printer with hp-setup and try again.")
         sys.exit(1)
 
-    if d.isIdleAndNoError():
-        align_type = d.mq.get('align-type', 0)
-        log.debug("Alignment type=%d" % align_type)
-        d.close()
+    try:
+        try:
+            d.open()
+        except Error:
+            log.error("Device is busy or in an error state. Please check device and try again.")
+            sys.exit(1)
 
-        if align_type == ALIGN_TYPE_NONE:
-            log.error("Alignment not supported or required by device.")
-            sys.exit(0)
+        if d.isIdleAndNoError():
+            align_type = d.mq.get('align-type', 0)
+            log.debug("Alignment type=%d" % align_type)
+            d.close()
 
-        if align_type == ALIGN_TYPE_AUTO:
-            maint.AlignType1PML(d, tui.load_paper_prompt)
+            if align_type == ALIGN_TYPE_NONE:
+                log.error("Alignment not supported or required by device.")
+                sys.exit(0)
 
-        elif align_type == ALIGN_TYPE_8XX:
-            maint.AlignType2(d, tui.load_paper_prompt, enterAlignmentNumber,
-                              bothPensRequired)
+            if align_type == ALIGN_TYPE_AUTO:
+                maint.AlignType1PML(d, tui.load_paper_prompt)
 
-        elif align_type in (ALIGN_TYPE_9XX,ALIGN_TYPE_9XX_NO_EDGE_ALIGN):
-            maint.AlignType3(d, tui.load_paper_prompt, enterAlignmentNumber,
-                              enterPaperEdge, update_spinner)
+            elif align_type == ALIGN_TYPE_8XX:
+                maint.AlignType2(d, tui.load_paper_prompt, enterAlignmentNumber,
+                                  bothPensRequired)
 
-        elif align_type == ALIGN_TYPE_LIDIL_AIO:
-            maint.AlignType6(d, aioUI1, aioUI2, tui.load_paper_prompt)
+            elif align_type in (ALIGN_TYPE_9XX,ALIGN_TYPE_9XX_NO_EDGE_ALIGN):
+                maint.AlignType3(d, tui.load_paper_prompt, enterAlignmentNumber,
+                                  enterPaperEdge, update_spinner)
 
-        elif align_type == ALIGN_TYPE_DESKJET_450:
-            maint.AlignType8(d, tui.load_paper_prompt, enterAlignmentNumber)
+            elif align_type == ALIGN_TYPE_LIDIL_AIO:
+                maint.AlignType6(d, aioUI1, aioUI2, tui.load_paper_prompt)
 
-        elif align_type in (ALIGN_TYPE_LIDIL_0_3_8, ALIGN_TYPE_LIDIL_0_4_3, ALIGN_TYPE_LIDIL_VIP):
+            elif align_type == ALIGN_TYPE_DESKJET_450:
+                maint.AlignType8(d, tui.load_paper_prompt, enterAlignmentNumber)
 
-            maint.AlignxBow(d, align_type, tui.load_paper_prompt, enterAlignmentNumber, enterPaperEdge,
-                             invalidPen, colorAdj)
+            elif align_type in (ALIGN_TYPE_LIDIL_0_3_8, ALIGN_TYPE_LIDIL_0_4_3, ALIGN_TYPE_LIDIL_VIP):
 
-        elif align_type  == ALIGN_TYPE_LBOW:
-            maint.AlignType10(d, tui.load_paper_prompt, type10and11Align)
+                maint.AlignxBow(d, align_type, tui.load_paper_prompt, enterAlignmentNumber, enterPaperEdge,
+                                 invalidPen, colorAdj)
 
-        elif align_type == ALIGN_TYPE_LIDIL_0_5_4:
-            maint.AlignType11(d, tui.load_paper_prompt, type10and11Align, invalidPen2)
-            
-        elif align_type == ALIGN_TYPE_OJ_PRO:
-            maint.AlignType12(d, tui.load_paper_prompt)
-            
+            elif align_type  == ALIGN_TYPE_LBOW:
+                maint.AlignType10(d, tui.load_paper_prompt, type10and11Align)
+
+            elif align_type == ALIGN_TYPE_LIDIL_0_5_4:
+                maint.AlignType11(d, tui.load_paper_prompt, type10and11Align, invalidPen2)
+                
+            elif align_type == ALIGN_TYPE_OJ_PRO:
+                maint.AlignType12(d, tui.load_paper_prompt)
+                
+
+            else:
+                log.error("Invalid alignment type.")
 
         else:
-            log.error("Invalid alignment type.")
+            log.error("Device is busy or in an error state. Please check device and try again.")
 
-    else:
-        log.error("Device is busy or in an error state. Please check device and try again.")
+    finally:
+        d.close()
 
-finally:
-    d.close()
+except KeyboardInterrupt:
+    log.error("User exit")
+
 
 log.info("")
 log.info('Done.')

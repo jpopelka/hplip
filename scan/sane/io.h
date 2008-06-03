@@ -31,8 +31,16 @@
 #include "sane.h"
 #include "hpmud.h"
 
-int __attribute__ ((visibility ("hidden"))) SendScanEvent(char * device_uri, int event, char * type);
+int __attribute__ ((visibility ("hidden"))) InitDbus(void);
+int __attribute__ ((visibility ("hidden"))) SendScanEvent(char * device_uri, int event);
 int __attribute__ ((visibility ("hidden"))) ReadChannelEx(int deviceid, int channelid, unsigned char * buffer, int length, int timeout);
+
+#define EVENT_START_SCAN_JOB 2000
+#define EVENT_END_SCAN_JOB 2001
+#define EVENT_SCANNER_FAIL 2002
+
+#define DBUS_INTERFACE "com.hplip.Service"
+#define DBUS_PATH "/"
 
 #endif
 

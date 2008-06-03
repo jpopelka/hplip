@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,12 +20,15 @@
 # Author: Don Welch
 #
 
-__version__ = '3.4'
+__version__ = '4.1'
 __title__ = 'Device Information Utility'
 __doc__ = "Query a printer for both static model information and dynamic status."
 
 # Std Lib
-import sys, getopt, time
+import sys
+import getopt
+import time
+import os
 
 # Local
 from base.g import *
@@ -61,171 +64,182 @@ def usage(typ='text'):
 
 log.set_module('hp-info')
 
-
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'p:d:hl:b:ig',
-        ['printer=', 'device=', 'help', 'help-rest', 'help-man', 
-         'help-desc', 'logging=', 'id', 'bus='])
 
-except getopt.GetoptError, e:
-    log.error(e.msg)
-    usage()
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 'p:d:hl:b:ig',
+            ['printer=', 'device=', 'help', 'help-rest', 'help-man', 
+             'help-desc', 'logging=', 'id', 'bus='])
 
-printer_name = None
-device_uri = None
-log_level = logger.DEFAULT_LOG_LEVEL
-bus = "cups,par,usb"
-devid_mode = False
-
-if os.getenv("HPLIP_DEBUG"):
-    log.set_level('debug')
-
-for o, a in opts:
-    if o in ('-h', '--help'):
+    except getopt.GetoptError, e:
+        log.error(e.msg)
         usage()
 
-    elif o == '--help-rest':
-        usage('rest')
+    printer_name = None
+    device_uri = None
+    log_level = logger.DEFAULT_LOG_LEVEL
+    bus = device.DEFAULT_PROBE_BUS
+    devid_mode = False
 
-    elif o == '--help-man':
-        usage('man')
-
-    elif o == '--help-desc':
-        print __doc__,
-        sys.exit(0)
-
-    elif o in ('-p', '--printer'):
-        if a.startswith('*'):
-            printer_name = cups.getDefaultPrinter()
-            log.info("Using CUPS default printer: %s" % printer_name)
-            log.debug(printer_name)
-        else:
-            printer_name = a
-
-    elif o in ('-d', '--device'):
-        device_uri = a
-
-    elif o in ('-b', '--bus'):
-        bus = a.lower().strip()
-        if not device.validateBusList(bus):
-            usage()
-
-    elif o in ('-l', '--logging'):
-        log_level = a.lower().strip()
-        if not log.set_level(log_level):
-            usage()
-
-    elif o == '-g':
+    if os.getenv("HPLIP_DEBUG"):
         log.set_level('debug')
 
-    elif o in ('-i', '--id'):
-        devid_mode = True
+
+    for o, a in opts:
+        if o in ('-h', '--help'):
+            usage()
+
+        elif o == '--help-rest':
+            usage('rest')
+
+        elif o == '--help-man':
+            usage('man')
+
+        elif o == '--help-desc':
+            print __doc__,
+            sys.exit(0)
+
+        elif o in ('-p', '--printer'):
+            if a.startswith('*'):
+                printer_name = cups.getDefault()
+                log.info("Using CUPS default printer: %s" % printer_name)
+                log.debug(printer_name)
+            else:
+                printer_name = a
+
+        elif o in ('-d', '--device'):
+            device_uri = a
+
+        elif o in ('-b', '--bus'):
+            bus = [x.lower().strip() for x in a.split(',')]
+            if not device.validateBusList(bus):
+                usage()
+
+        elif o in ('-l', '--logging'):
+            log_level = a.lower().strip()
+            if not log.set_level(log_level):
+                usage()
+
+        elif o == '-g':
+            log.set_level('debug')
+
+        elif o in ('-i', '--id'):
+            devid_mode = True
 
 
-if device_uri and printer_name:
-    log.error("You may not specify both a printer (-p) and a device (-d).")
-    usage()
+    if device_uri and printer_name:
+        log.error("You may not specify both a printer (-p) and a device (-d).")
+        usage()
 
-if not devid_mode:
-    utils.log_title(__title__, __version__)
-
-if not device_uri and not printer_name:
-    try:
-        device_uri = device.getInteractiveDeviceURI(bus)
-        if device_uri is None:
-            sys.exit(1)
-    except Error:
-        log.error("Error occured during interactive mode. Exiting.")
-        sys.exit(1)
+    if not devid_mode:
+        utils.log_title(__title__, __version__)
         
+    if os.getuid() == 0:
+        log.warn("hp-info should not be run as root.")
 
-try:
-    d = device.Device(device_uri, printer_name)
-except Error:
-    log.error("Error opening device. Exiting.")
-    sys.exit(1)
-
-if d.device_uri is None and printer_name:
-    log.error("Printer '%s' not found." % printer_name)
-    sys.exit(1)
-
-if d.device_uri is None and device_uri:
-    log.error("Malformed/invalid device-uri: %s" % device_uri)
-    sys.exit(1)
-
-if not devid_mode:
-    log.info("")
-    log.info(log.bold(d.device_uri))
-    log.info("")
-
-user_cfg.last_used.device_uri = d.device_uri
-
-try:
-    d.open()
-    d.queryDevice()
-except Error, e:
-    log.error("Error opening device (%s). Exiting." % e.msg)
-    sys.exit(1)
-
-if not devid_mode:
-    formatter = utils.TextFormatter(
-                    (
-                        {'width': 28, 'margin' : 2},
-                        {'width': 58, 'margin' : 2},
-                    )
-                )
-
-if devid_mode:
+    if not device_uri and not printer_name:
+        try:
+            device_uri = device.getInteractiveDeviceURI(bus)
+            if device_uri is None:
+                sys.exit(1)
+        except Error:
+            log.error("Error occured during interactive mode. Exiting.")
+            sys.exit(1)
+            
     try:
-        print d.dq['deviceid']
-    except KeyError:
-        log.error("Device ID not available.")
-else:
-    dq_keys = d.dq.keys()
-    dq_keys.sort()
+        d = device.Device(device_uri, printer_name)
+    except Error:
+        log.error("Unexpected error. Exiting.")
+        sys.exit(1)
 
-    log.info(log.bold("Device Parameters (dynamic data):"))
-    log.info(log.bold(formatter.compose(("Parameter", "Value(s)"))))
-    log.info(formatter.compose(('-'*28, '-'*58)))
+    if d.device_uri is None and printer_name:
+        log.error("Printer '%s' not found." % printer_name)
+        sys.exit(1)
 
-    for key in dq_keys:
-        log.info(formatter.compose((key, str(d.dq[key]))))
+    if d.device_uri is None and device_uri:
+        log.error("Malformed/invalid device-uri: %s" % device_uri)
+        sys.exit(1)
 
-    log.info(log.bold("\nModel Parameters (static data):"))
-    log.info(log.bold(formatter.compose(("Parameter", "Value(s)"))))
-    log.info(formatter.compose(('-'*28, '-'*58)))
+    if not devid_mode:
+        log.info("")
+        log.info(log.bold(d.device_uri))
+        log.info("")
 
-    mq_keys = d.mq.keys()
-    mq_keys.sort()
+    user_cfg.last_used.device_uri = d.device_uri
 
-    for key in mq_keys:
-        log.info(formatter.compose((key, str(d.mq[key]))))
+    try:
+        try:
+            d.open()
+            d.queryDevice()
+        except Error, e:
+            log.error("Error opening device (%s)." % e.msg)
+            #sys.exit(1)
 
-    formatter = utils.TextFormatter(
-                    (
-                        {'width': 20, 'margin' : 2}, # date/time
-                        {'width': 5, 'margin' : 2}, # code
-                        {'width': 40, 'margin' : 2}, # desc
-                        {'width': 8, 'margin' : 2}, # user
-                        {'width': 8, 'margin' : 2}, # job id
-                    )
-                )
+        if not devid_mode:
+            formatter = utils.TextFormatter(
+                            (
+                                {'width': 28, 'margin' : 2},
+                                {'width': 58, 'margin' : 2},
+                            )
+                        )
 
-
-    log.info(log.bold("\nStatus History (most recent first):"))
-    log.info(log.bold(formatter.compose(("Date/Time", "Code", "Status Description", "User", "Job ID"))))
-    log.info(formatter.compose(('-'*20, '-'*5, '-'*40, '-'*8, '-'*8)))
-
-    hq = d.queryHistory()
-
-    for h in hq:
-        if h[9]:
-            j = str(h[9])
+        if devid_mode:
+            try:
+                print d.dq['deviceid']
+                sys.exit(0)
+            except KeyError:
+                log.error("Device ID not available.")
         else:
-            j = ''
-        log.info(formatter.compose((time.strftime("%x %H:%M:%S", h[:9]),  str(h[11]), h[12], h[10], j)))
+            dq_keys = d.dq.keys()
+            dq_keys.sort()
 
-    log.info("")
+            log.info(log.bold("Device Parameters (dynamic data):"))
+            log.info(log.bold(formatter.compose(("Parameter", "Value(s)"))))
+            log.info(formatter.compose(('-'*28, '-'*58)))
 
-d.close()
-sys.exit(0)
+            for key in dq_keys:
+                log.info(formatter.compose((key, str(d.dq[key]))))
+
+            log.info(log.bold("\nModel Parameters (static data):"))
+            log.info(log.bold(formatter.compose(("Parameter", "Value(s)"))))
+            log.info(formatter.compose(('-'*28, '-'*58)))
+
+            mq_keys = d.mq.keys()
+            mq_keys.sort()
+
+            for key in mq_keys:
+                log.info(formatter.compose((key, str(d.mq[key]))))
+
+            if d.dbus_avail:
+                formatter = utils.TextFormatter(
+                                (
+                                    {'width': 20, 'margin' : 2}, # date/time
+                                    {'width': 5, 'margin' : 2}, # code
+                                    {'width': 40, 'margin' : 2}, # desc
+                                    {'width': 8, 'margin' : 2}, # user
+                                    {'width': 8, 'margin' : 2}, # job id
+                                )
+                            )
+
+                log.info(log.bold("\nStatus History (most recent first):"))
+                log.info(log.bold(formatter.compose(("Date/Time", "Code", "Status Description", "User", "Job ID"))))
+                log.info(formatter.compose(('-'*20, '-'*5, '-'*40, '-'*8, '-'*8)))
+
+                hq = d.queryHistory()
+
+                for h in hq:
+                    desc = device.queryString(h.event_code)
+                    log.info(formatter.compose((time.strftime("%x %H:%M:%S", time.localtime(h.timedate)),  
+                        str(h.event_code), desc, h.username, str(h.job_id))))
+                
+
+                log.info("")
+    finally:
+        d.close()
+        
+except KeyboardInterrupt:
+    log.error("User exit")
+    
+log.info("")
+log.info("Done.")
+

@@ -121,7 +121,7 @@ int hpijs_status_cb(void *status_cb_data, IjsServerCtx *ctx, IjsJobId job_id)
 int hpijs_list_cb(void *list_cb_data, IjsServerCtx *ctx, IjsJobId job_id,
         char *val_buf, int val_size)
 {
-   return snprintf(val_buf, val_size, "OutputFD,DeviceManufacturer,DeviceModel,PageImageFormat,Dpi,Width,Height,BitsPerSample,ColorSpace,PaperSize,PrintableArea,PrintableTopLeft,PS:Duplex,PS:Tumble,Quality:Quality,Quality:MediaType,Quality:ColorMode,Quality:PenSet,Quality:FullBleed,PS:MediaPosition");
+   return snprintf(val_buf, val_size, "OutputFD,DeviceManufacturer,DeviceModel,PageImageFormat,Dpi,Width,Height,BitsPerSample,ColorSpace,PaperSize,PrintableArea,PrintableTopLeft,DryTime,PS:Duplex,PS:Tumble,Quality:Quality,Quality:MediaType,Quality:ColorMode,Quality:PenSet,Quality:FullBleed,PS:MediaPosition");
 }
 
 int hpijs_enum_cb(void *enum_cb_data, IjsServerCtx *ctx, IjsJobId job_id,
@@ -296,6 +296,11 @@ int hpijs_set_cb (void *set_cb_data, IjsServerCtx *ctx, IjsJobId job_id,
    {
       pSS->MediaPosition = strtol(svalue, &tail, 10);
    }
+    else if (!strcmp (key, "DryTime"))
+    {
+        int    iDryTime = strtol (svalue, &tail, 10);
+        pSS->pPC->SetPrinterHint (0x4, iDryTime);
+    }
    else
       bug("unable to set key=%s, value=%s\n", key, svalue);    
 

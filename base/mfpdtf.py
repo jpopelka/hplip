@@ -20,7 +20,8 @@
 #
 
 # Std Lib
-import struct, cStringIO
+import struct
+import cStringIO
 
 # Local
 from g import *

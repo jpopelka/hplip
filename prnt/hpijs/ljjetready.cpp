@@ -646,7 +646,7 @@ DRIVER_ERROR LJJetReady::Encapsulate (const RASTERDATA* InputRaster, BOOL bLastP
 	// For color JPEG, you need to skip the header information of 623 bytes
 
     int iJpegHeaderSize = 623;
-#ifdef HAVB_LIBDL
+#ifdef HAVE_LIBDL
     if (HPLJJRCompress && m_eCompressMode == COMPRESS_MODE_LJ)
     {
         iJpegHeaderSize = 0;
@@ -1105,7 +1105,6 @@ BOOL  ModeJPEG::Compress( HPLJBITMAP *pSrcBitmap,
                         ) 
 
 {
-
 #ifdef HAVE_LIBDL
     if (HPLJJRCompress && m_eCompressMode == COMPRESS_MODE_LJ)
     {
@@ -1115,6 +1114,19 @@ BOOL  ModeJPEG::Compress( HPLJBITMAP *pSrcBitmap,
         if (pTrgBitmap->pvBits == NULL)
         {
             return FALSE;
+        }
+        if (bGrayscaleSet)
+        {
+            BYTE    *p = pSrcBitmap->pvBits;
+            for (int j = 0; j < pSrcBitmap->bitmapInfo.bmiHeader.biHeight; j++)
+            {
+                for (int i = 0; i < pSrcBitmap->bitmapInfo.bmiHeader.biWidth; i++)
+                {
+                    p[0] = ConvertToGrayMacro (p[0], p[1], p[2]);
+                    p[1] = p[2] = 0;
+                    p += 3;
+                }
+            }
         }
         iRet = HPLJJRCompress (pTrgBitmap->pvBits, (uint32_t *) &pTrgBitmap->cjBits, pSrcBitmap->pvBits,
                                pSrcBitmap->bitmapInfo.bmiHeader.biWidth, pSrcBitmap->bitmapInfo.bmiHeader.biHeight);
@@ -1725,7 +1737,7 @@ BOOL ModeJPEG::Process
 			// Convert 24bpp Gray to 8bpp Gray.
 			// JPEG takes K 8bpp gray data. We are using two different buffers for these.
 			//
-			if(bGrayScaleSet)
+			if(bGrayScaleSet && m_eCompressMode == COMPRESS_MODE_JPEG)
 			{
 				pbTemp = (BYTE*)m_SourceBitmap.pvBits;
         
@@ -1750,7 +1762,7 @@ BOOL ModeJPEG::Process
 			//
 			// JPEG grayscale specific operations are done here.
 			//
-			if(bGrayScaleSet)
+			if(bGrayScaleSet && m_eCompressMode == COMPRESS_MODE_JPEG)
 			{
 				jpegGrayBitmap.cjBits = m_SourceBitmap.cjBits / 3;
 				jpegGrayBitmap.bitmapInfo.bmiHeader.biSizeImage = m_SourceBitmap.bitmapInfo.bmiHeader.biSizeImage / 3;
@@ -1758,7 +1770,7 @@ BOOL ModeJPEG::Process
 				jpegGrayBitmap.bitmapInfo.bmiHeader.biWidth = m_SourceBitmap.bitmapInfo.bmiHeader.biWidth;
 				jpegGrayBitmap.bitmapInfo.bmiHeader.biHeight = m_SourceBitmap.bitmapInfo.bmiHeader.biHeight;
 			}
-			if (bGrayScaleSet)
+			if (bGrayScaleSet && m_eCompressMode == COMPRESS_MODE_JPEG)
 			{
 				bRet = Compress (&jpegGrayBitmap, &m_DestBitmap, &qTableInfo,bGrayScaleSet);
 			}

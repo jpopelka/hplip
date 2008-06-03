@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '13.0'
+__version__ = '14.0'
 __title__ = 'Dependency/Version Check Utility'
 __doc__ = "Check the existence and versions of HPLIP dependencies."
 
@@ -49,7 +49,6 @@ else:
 USAGE = [(__doc__, "", "name", True),
          ("Usage: hp-check/check.py [OPTIONS]", "", "summary", True),
          utils.USAGE_OPTIONS,
-         #("Pre-install check:", "-p or --pre", "option", False),
          ("Compile-time check:", "-c or --compile", "option", False),
          ("Run-time check:", "-r or --run", "option", False),
          ("Compile and run-time checks:", "-b or --both (default)", "option", False),
@@ -57,9 +56,6 @@ USAGE = [(__doc__, "", "name", True),
          utils.USAGE_LOGGING_PLAIN,
          utils.USAGE_HELP,
          utils.USAGE_NOTES,
-         #("1. For posting to the mailing list, use the -t parameter and then copy/paste the onscreen output or use the generated hp-check.log file.", "", "note", False),
-         #("2. Use with the '-p' switch prior to installation to check for dependencies and system requirements (skips some checks).", "", "note", False),
-         #("3. Run without the '-p' switch after installation to check for proper install (runs all checks). ", "", "note", False),
          ("1. For checking for the proper build environment for the HPLIP supplied tarball (.tar.gz or .run),", "", "note", False), 
          ("use the --compile or --both switches.", "", "note", False),
          ("2. For checking for the proper runtime environment for a distro supplied package (.deb, .rpm, etc),", "", "note", False), 
@@ -73,9 +69,13 @@ def usage(typ='text'):
     utils.format_text(USAGE, typ, __title__, 'hp-check', __version__)
     sys.exit(0)        
 
+
 build_str = "HPLIP will not build, install, and/or function properly without this dependency."
 
-pat_deviceuri = re.compile(r"""(.*):/(.*?)/(\S*?)\?(?:serial=(\S*)|device=(\S*)|ip=(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}[^&]*))(?:&port=(\d))?""", re.IGNORECASE)
+pat_deviceuri = re.compile(r"""(.*):/(.*?)/(\S*?)\?(?:serial=(\S*)|device=(\S*)|ip=(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}[^&]*))(?:&port=(\d))?""", re.I)
+
+pat_cups_error_log = re.compile("""^loglevel\s?(debug|debug2|warn|info|error|none)""", re.I)
+
 
 def parseDeviceURI(device_uri):
     m = pat_deviceuri.match(device_uri)
@@ -118,7 +118,7 @@ try:
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'hl:gtcrb', 
             ['help', 'help-rest', 'help-man', 'help-desc', 'logging=', 
-             'run', 'compile', 'both']) 
+             'run', 'runtime', 'compile', 'both']) 
 
     except getopt.GetoptError, e:
         log.error(e.msg)
@@ -156,7 +156,7 @@ try:
         elif o in ('-c', '--compile'):
             time_flag = DEPENDENCY_COMPILE_TIME
             
-        elif o in ('-r', '--runtime'):
+        elif o in ('-r', '--runtime', '--run'):
             time_flag = DEPENDENCY_RUN_TIME
             
         elif o in ('-b', '--both'):
@@ -181,7 +181,7 @@ try:
     for l in tui.format_paragraph("3. Both compile- and run-time check mode (-b or --both) (Default): This mode will check both of the above cases (both compile- and run-time dependencies)."):
         log.info(l)
     
-    log.info("")
+    log.info()
     
     
     log_file = os.path.normpath('./hp-check.log')
@@ -202,7 +202,7 @@ try:
     log.info(log.bold("Basic system information:"))
     log.info(core.sys_uname_info)
 
-    log.info("")
+    log.info()
     log.info(log.bold("Distribution:"))
     log.info("%s %s" % (core.distro_name, core.distro_version))
 
@@ -215,7 +215,7 @@ try:
         log.info("No, HPOJ is not running (OK).")
 
 
-    log.info("")
+    log.info()
     log.info(log.bold("Checking Python version..."))
     ver = sys.version_info
     log.debug("sys.version_info = %s" % repr(ver))
@@ -231,7 +231,7 @@ try:
             sys.exit(1)
 
 
-    log.info("")
+    log.info()
     log.info(log.bold("Checking PyQt version..."))
 
     # PyQt
@@ -250,7 +250,7 @@ try:
             #check version of PyQt
             try:
                 pyqtVersion = qt.PYQT_VERSION_STR
-            except:
+            except AttributeError:
                 pyqtVersion = qt.PYQT_VERSION
 
             while pyqtVersion.count('.') < 2:
@@ -278,7 +278,7 @@ try:
                     log.info("OK, version %d.%d installed." % (maj_ver, min_ver))
 
 
-    log.info("")
+    log.info()
     log.info(log.bold("Checking SIP version..."))
 
     sip_ver = None
@@ -295,43 +295,78 @@ try:
         num_errors += 1
         log.error("SIP not installed or version not found.")
 
-    log.info("")
+    log.info()
     log.info(log.bold("Checking for CUPS..."))
+    cups_ok = True
 
     status, output = utils.run('lpstat -r')
     if status == 0:
         log.info("Status: %s" % output.strip())
     else:
         log.error("Status: (Not available. CUPS may not be installed or not running.)")
+        cups_ok = False
         num_errors += 1
 
-    status, output = utils.run('cups-config --version')
-    if status == 0:
-        log.info("Version: %s" % output.strip())
+    if cups_ok:
+        status, output = utils.run('cups-config --version')
+        if status == 0:
+            log.info("Version: %s" % output.strip())
+        else:
+            log.error("Version: (Not available. CUPS may not be installed or not running.)")
+            cups_ok = False
+            num_errors += 1
+        
+    if cups_ok:
+        cups_conf = '/etc/cups/cupsd.conf'
+        
+        try:
+            f = file(cups_conf, 'r')
+        except (IOError, OSError):
+            log.warn("%s file not found or not accessible." % cups_conf)
+        else:
+            for l in f:
+                m = pat_cups_error_log.match(l)
+                if m is not None:
+                    level = m.group(1).lower()
+                    log.info("error_log is set to level: %s" % level)
+                    
+                    if level not in ('debug', 'debug2'):
+                        log.note("For troubleshooting printing issues, it is best to have the CUPS 'LogLevel'")
+                        log.note("set to 'debug'. To set the LogLevel to debug, edit the file %s (as root)," % cups_conf)
+                        log.note("and change the line near the top of the file that begins with 'LogLevel' to read:")
+                        log.note("LogLevel debug")
+                        log.note("Save the file and then restart CUPS (see your OS/distro docs on how to restart CUPS).")
+                        log.note("Now, when you print, helpful debug information will be saved to the file:")
+                        log.note("/var/log/cups/error_log")
+                        log.note("You can monitor this file by running this command in a console/shell:")
+                        log.note("tail -f /var/log/cups/error_log")
+                    
+                    break
+                    
+
+    log.info()
+
+    log.info(log.bold("Checking for dbus/python-dbus..."))
+    
+    if dcheck.check_ps(['dbus-daemon']):
+        log.info("dbus daemon is running.")
     else:
-        log.error("Version: (Not available. CUPS may not be installed or not running.)")
-        num_errors += 1
-
-    log.info("")
-##    log.info(log.bold("Checking for Reportlab..."))
-##
-##    try:
-##        import reportlab
-##        ver = reportlab.Version
-##        try:
-##            ver_f = float(ver)
-##        except ValueError:
-##            log.warn("Can't determine version.")
-##        else:
-##            if ver_f >= 2.0:
-##                log.info("OK, version >= 2.0")
-##            else:
-##                log.warn("Version < 2.0 (%.1f). HPLIP fax coverpages requires Reportlab 2.0+." % ver_f)
-##                num_errors += 1
-##
-##    except ImportError:
-##        log.warn("Not installed.")
-##        num_errors += 1
+        log.warn("dbus daemon is not running.")
+        
+    try:
+        import dbus
+        try:
+            log.info("python-dbus version: %s" % dbus.__version__)
+        except AttributeError:
+            try:
+                log.info("python-dbus version: %s" % '.'.join([str(x) for x in dbus.version]))
+            except AttributeError:
+                log.warn("python-dbus imported OK, but unknown version.")
+    except ImportError:
+        log.warn("python-dbus not installed.")
+    
+    log.info()
+    
 
     if time_flag == DEPENDENCY_RUN_AND_COMPILE_TIME:
         tui.header("COMPILE AND RUNTIME DEPENDENCIES")
@@ -344,7 +379,7 @@ try:
     elif time_flag == DEPENDENCY_RUN_TIME:
         tui.header("RUNTIME DEPENDENCIES")
 
-    log.info("")
+    log.info()
 
     dd = core.dependencies.keys()
     dd.sort()
@@ -400,14 +435,14 @@ try:
                             log.info(c)
 
 
-            log.info("")
+            log.info()
     
     if time_flag in (DEPENDENCY_RUN_TIME, DEPENDENCY_RUN_AND_COMPILE_TIME):
         tui.header("HPLIP INSTALLATION")
 
         scanning_enabled = utils.to_bool(sys_cfg.configure.get("scanner-build", False))
 
-        log.info("")
+        log.info()
         log.info(log.bold("Currently installed HPLIP version..."))
         v = sys_cfg.hplip.version
         home = sys_cfg.dirs.home
@@ -415,7 +450,7 @@ try:
         if v:
             log.info("HPLIP %s currently installed in '%s'." % (v, home))
 
-            log.info("")
+            log.info()
             log.info(log.bold("Current contents of '/etc/hp/hplip.conf' file:"))
             output = file('/etc/hp/hplip.conf', 'r').read()
             log.info(output)
@@ -428,7 +463,7 @@ try:
             if prop.par_build:
                 tui.header("DISCOVERED PARALLEL DEVICES")
                 
-                devices = device.probeDevices('par')
+                devices = device.probeDevices(['par'])
                 
                 if devices:
                     f = tui.Formatter()
@@ -448,7 +483,7 @@ try:
             if prop.usb_build:
                 tui.header("DISCOVERED USB DEVICES")                
                 
-                devices = device.probeDevices('usb')
+                devices = device.probeDevices(['usb'])
                 
                 if devices:
                     f = tui.Formatter()
@@ -468,7 +503,7 @@ try:
         lpstat_pat = re.compile(r"""^device for (.*): (.*)""", re.IGNORECASE)
 
         status, output = utils.run('lpstat -v')
-        log.info("")
+        log.info()
 
         cups_printers = []
         for p in output.splitlines():
@@ -607,7 +642,7 @@ try:
                         if d is not None:
                             d.close()
 
-                    log.info("")
+                    log.info()
 
 
 
@@ -634,7 +669,7 @@ try:
                     num_errors += 1
                     log.error("Not found. SANE backend 'hpaio' NOT properly setup (needs to be added to /etc/sane.d/dll.conf).")
 
-                log.info("")
+                log.info()
                 log.info(log.bold("Checking output of 'scanimage -L'..."))
                 if utils.which('scanimage'):
                     status, output = utils.run("scanimage -L")
@@ -653,7 +688,7 @@ try:
         else:
             log.info("OK, found.")
 
-        log.info("")
+        log.info()
         log.info(log.bold("Checking 'pcardext' Photocard extension..."))
         try:
             import pcardext
@@ -663,7 +698,7 @@ try:
         else:
             log.info("OK, found.")
 
-        log.info("")
+        log.info()
         log.info(log.bold("Checking 'hpmudext' I/O extension..."))
         try:
             import hpmudext
@@ -676,7 +711,7 @@ try:
             log.info("OK, found.")        
 
         if scanning_enabled:
-            log.info("")
+            log.info()
             log.info(log.bold("Checking 'scanext' SANE scanning extension..."))
             try:
                 import scanext
@@ -686,14 +721,14 @@ try:
             else:
                 log.info("OK, found.")        
 
-                log.info("")
+                log.info()
 
         tui.header("USB I/O SETUP")
 
         if hpmudext_avail:
             lsusb = utils.which('lsusb')
             if lsusb:
-                log.info("")
+                log.info()
                 log.info(log.bold("Checking for permissions of USB attached printers..."))
                 lsusb = os.path.join(lsusb, 'lsusb')
                 status, output = utils.run("%s -d03f0:" % lsusb)
@@ -747,12 +782,12 @@ try:
             log.error("%d errors and/or warnings." % num_errors)
 
         if overall_commands_to_run:
-            log.info("")
+            log.info()
             log.info(log.bold("Summary of needed commands to run to satisfy missing dependencies:"))
             for c in overall_commands_to_run:
                 log.info(c)
 
-        log.info("")
+        log.info()
         log.info("Please refer to the installation instructions at:")
         log.info("http://hplip.sourceforge.net/install/index.html\n")
 
@@ -760,4 +795,8 @@ try:
         log.info(log.green("No errors or warnings."))
 
 except KeyboardInterrupt:
-    log.warn("Aborted")
+    log.error("User exit")
+    
+log.info()
+log.info("Done.")
+

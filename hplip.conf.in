@@ -26,6 +26,7 @@ pp-build=@pp_build@
 gui-build=@gui_build@
 scanner-build=@scan_build@
 fax-build=@fax_build@
+dbus-build=@dbus_build@
 cups11-build=@cups11_build@
 doc-build=@doc_build@
 shadow-build=@shadow_build@

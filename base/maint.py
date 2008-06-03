@@ -1388,6 +1388,11 @@ def colorCalType6(dev, loadpaper_ui):
     if loadpaper_ui():
         dev.setPML(pml.OID_PRINT_INTERNAL_PAGE, pml.PRINT_INTERNAL_PAGE_COLOR_CAL)
         dev.closePML()
+        
+def colorCalType7(dev, loadpaper_ui):
+    if loadpaper_ui():
+        dev.setPML(pml.OID_PRINT_INTERNAL_PAGE, pml.PRINT_INTERNAL_PAGE_AUTOMATIC_COLOR_CALIBRATION)
+        dev.closePML()
 
 # ********************** LF Cal **********************        
         

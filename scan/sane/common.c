@@ -66,7 +66,7 @@ void __attribute__ ((visibility ("hidden"))) sysdump(const void *data, int size)
     for(n=1;n<=size;n++) {
         if (n%16 == 1) {
             /* store address for this line */
-            snprintf(addrstr, sizeof(addrstr), "%.4x", (p-(unsigned char *)data) && 0xffff);
+            snprintf(addrstr, sizeof(addrstr), "%.4d", (int)((p-(unsigned char *)data) & 0xffff));
         }
             
         c = *p;
@@ -84,7 +84,7 @@ void __attribute__ ((visibility ("hidden"))) sysdump(const void *data, int size)
 
         if(n%16 == 0) { 
             /* line completed */
-            DBG(6, "[%4.4s]   %-50.50s  %s\n", addrstr, hexstr, charstr);
+            DBG_SZ("[%4.4s]   %-50.50s  %s\n", addrstr, hexstr, charstr);
             hexstr[0] = 0;
             charstr[0] = 0;
         }
@@ -93,7 +93,7 @@ void __attribute__ ((visibility ("hidden"))) sysdump(const void *data, int size)
 
     if (strlen(hexstr) > 0) {
         /* print rest of buffer if not empty */
-        DBG(6, "[%4.4s]   %-50.50s  %s\n", addrstr, hexstr, charstr);
+        DBG_SZ("[%4.4s]   %-50.50s  %s\n", addrstr, hexstr, charstr);
     }
 }
 
@@ -113,7 +113,7 @@ void __attribute__ ((visibility ("hidden"))) bugdump(const void *data, int size)
     for(n=1;n<=size;n++) {
         if (n%16 == 1) {
             /* store address for this line */
-            snprintf(addrstr, sizeof(addrstr), "%.4x", (p-(unsigned char *)data) && 0xffff);
+            snprintf(addrstr, sizeof(addrstr), "%.4d", (int)((p-(unsigned char *)data) & 0xffff));
         }
             
         c = *p;
@@ -131,7 +131,7 @@ void __attribute__ ((visibility ("hidden"))) bugdump(const void *data, int size)
 
         if(n%16 == 0) { 
             /* line completed */
-            bug("[%4.4s]   %-50.50s  %s\n", addrstr, hexstr, charstr);
+            BUG_SZ("[%4.4s]   %-50.50s  %s\n", addrstr, hexstr, charstr);
             hexstr[0] = 0;
             charstr[0] = 0;
         }
@@ -140,7 +140,7 @@ void __attribute__ ((visibility ("hidden"))) bugdump(const void *data, int size)
 
     if (strlen(hexstr) > 0) {
         /* print rest of buffer if not empty */
-        bug("[%4.4s]   %-50.50s  %s\n", addrstr, hexstr, charstr);
+        BUG_SZ("[%4.4s]   %-50.50s  %s\n", addrstr, hexstr, charstr);
     }
 }
 

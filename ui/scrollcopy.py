@@ -21,7 +21,7 @@
 
 # Local
 from base.g import *
-from base import utils, pml, service
+from base import utils, pml
 from copier import copier
 
 # Qt
@@ -35,13 +35,11 @@ import Queue
 
 
 class ScrollCopyView(ScrollView):
-    def __init__(self, hpssd_sock, toolbox_hosted=True, num_copies=None, contrast=None, quality=None, 
-                reduction=None, fit_to_page=None, parent = None, form=None, name = None,fl = 0):
-        ScrollView.__init__(self,parent,name,fl)
+    def __init__(self, service, num_copies=None, contrast=None, quality=None, 
+                reduction=None, fit_to_page=None, parent=None, form=None, name=None, fl=0):
+        ScrollView.__init__(self, service, parent, name, fl)
 
-        self.toolbox_hosted = toolbox_hosted
         self.form = form
-        self.sock = hpssd_sock
 
         self.num_copies = num_copies
         self.contrast = contrast
@@ -187,14 +185,9 @@ class ScrollCopyView(ScrollView):
 
         self.addGroupHeading("space1", "")
 
-        if self.toolbox_hosted:
-            s = self.__tr("<< Functions")
-        else:
-            s = self.__tr("Close")
-
         self.copyButton = self.addActionButton("bottom_nav", self.__tr("Make Copies(s)"), 
                                 self.copyButton_clicked, 'print.png', 'print-disabled.png', 
-                                s, self.funcButton_clicked)
+                                self.__tr("Close"), self.funcButton_clicked)
 
 
 
@@ -205,8 +198,7 @@ class ScrollCopyView(ScrollView):
         ScrollView.onDeviceChange(self, cur_device)
 
         self.dev = copier.PMLCopyDevice(device_uri=self.cur_device.device_uri, 
-                                        printer_name=self.cur_printer, 
-                                        hpssd_sock=self.sock)
+                                        printer_name=self.cur_printer)
 
         self.scan_style = self.dev.mq.get('scan-style', SCAN_STYLE_FLATBED)
         self.copy_type = self.dev.mq.get('copy-type', COPY_TYPE_DEVICE)
@@ -441,8 +433,8 @@ class ScrollCopyView(ScrollView):
 
     def copy_canceled(self):
         self.event_queue.put(copier.COPY_CANCELED)
-        # was service.sendEvent(self.sock, EVENT_COPY_JOB_CANCELED, device_uri=self.device_uri)
-        service.sendEvent(self.sock, EVENT_COPY_JOB_CANCELED, device_uri=self.cur_device.device_uri)
+        # TODO:
+        #service.sendEvent(self.sock, EVENT_COPY_JOB_CANCELED, device_uri=self.device_uri)
 
 
     def copy_timer_timeout(self):
@@ -480,18 +472,18 @@ class ScrollCopyView(ScrollView):
 
                 if status == copier.STATUS_ERROR:
                     self.form.FailureUI(self.__tr("<b>Copier error.</b><p>"))
-                    service.sendEvent(self.sock, EVENT_COPY_JOB_FAIL, device_uri=self.cur_device.device_uri)
+                    # TODO:
+                    #service.sendEvent(self.sock, EVENT_COPY_JOB_FAIL, device_uri=self.cur_device.device_uri)
 
                 elif status == copier.STATUS_DONE:
-                    service.sendEvent(self.sock, EVENT_END_COPY_JOB, device_uri=self.cur_device.device_uri)
+                    pass
+                    # TODO:
+                    #service.sendEvent(self.sock, EVENT_END_COPY_JOB, device_uri=self.cur_device.device_uri)
 
                 self.cur_device.close()
                 self.copyButton.setEnabled(True)
 
-                if self.toolbox_hosted:
-                    self.form.SwitchFunctionsTab("funcs")
-                else:
-                    self.form.close()
+                self.form.close()
 
 
     def copyButton_clicked(self):
@@ -503,7 +495,8 @@ class ScrollCopyView(ScrollView):
                 self.form.FailureUI(self.__tr("<b>Cannot copy: Device is busy or not available.</b><p>Please check device and try again. [1]"))
                 return
 
-            service.sendEvent(self.sock, EVENT_START_COPY_JOB, device_uri=self.cur_device.device_uri)
+            # TODO:
+            #service.sendEvent(self.sock, EVENT_START_COPY_JOB, device_uri=self.cur_device.device_uri)
 
             #self.pb = QProgressBar()
             #self.pb.setTotalSteps(2)
@@ -556,10 +549,7 @@ class ScrollCopyView(ScrollView):
 
     def funcButton_clicked(self):
         self.dev.close()
-        if self.toolbox_hosted:
-            self.form.SwitchFunctionsTab("funcs")
-        else:
-            self.form.close()
+        self.form.close()
 
     def __tr(self,s,c = None):
         return qApp.translate("ScrollCopy",s,c)

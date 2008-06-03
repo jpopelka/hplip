@@ -22,13 +22,18 @@
 from __future__ import generators
 
 # Std Lib
-import sys, os, os.path, mmap, struct, time, threading, Queue, socket
+import sys
+import os
+import os.path
+import time
+import threading
+import Queue
 from cStringIO import StringIO
 
 # Local
 from base.g import *
 from base.codes import *
-from base import device, utils, status, pml, msg
+from base import device, utils, status, pml
 
 # Event queue values (UI ==> Copy thread)
 COPY_CANCELED = 1
@@ -44,11 +49,11 @@ STATUS_ERROR = 5
 
 # PML Copier Only
 class PMLCopyDevice(device.Device):
-    def __init__(self, device_uri=None, printer_name=None,
-                 hpssd_sock=None, callback=None):
+    def __init__(self, device_uri=None, printer_name=None, 
+                 service=None, callback=None):
 
         device.Device.__init__(self, device_uri, printer_name,
-                               hpssd_sock, callback)
+                               service, callback)
 
         self.copy_thread = None
 

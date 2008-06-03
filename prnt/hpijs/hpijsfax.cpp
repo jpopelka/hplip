@@ -344,7 +344,7 @@ int hpijsFaxServer (int argc, char **argv)
 		}
 
 		width = (((pFaxStruct->ph.width + 7) >> 3)) << 3;
-        int widthMMR = width;
+        widthMMR = width;
 
 /*
  *      Devices in the HPFax2 category require fixed width of 2528 pixels.

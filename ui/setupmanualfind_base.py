@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'ui/setupmanualfind_base.ui'
 #
-# Created: Wed Sep 27 09:51:56 2006
-#      by: The PyQt User Interface Compiler (pyuic) 3.15.1
+# Created: Fri Apr 25 15:08:10 2008
+#      by: The PyQt User Interface Compiler (pyuic) 3.17.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -59,7 +59,7 @@ class SetupManualFind_base(QDialog):
 
         self.languageChange()
 
-        self.resize(QSize(561,184).expandedTo(self.minimumSizeHint()))
+        self.resize(QSize(646,226).expandedTo(self.minimumSizeHint()))
         self.clearWState(Qt.WState_Polished)
 
         self.connect(self.pushButton12,SIGNAL("clicked()"),self.reject)

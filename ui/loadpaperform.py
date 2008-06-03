@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,13 +19,19 @@
 # Author: Don Welch
 #
 
+# Std Lib
+
+# Local
 from base.g import *
+from ui_utils import load_pixmap
+
+# Qt
 from qt import *
 from loadpaperform_base import LoadPaperForm_base
-import os.path
+
 
 class LoadPaperForm(LoadPaperForm_base):
-    def __init__(self,parent = None,name = None,modal = 0,fl = 0):
-        LoadPaperForm_base.__init__(self,parent,name,modal,fl)
+    def __init__(self, parent=None, name=None, modal=0, fl=0):
+        LoadPaperForm_base.__init__(self, parent, name, modal, fl)
 
-        self.Icon.setPixmap(QPixmap(os.path.join(prop.image_dir, "load_paper.png")))
+        self.Icon.setPixmap(load_pixmap('load_paper', 'other'))

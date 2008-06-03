@@ -26,7 +26,7 @@ import sys
 import os
 import time
 import cStringIO
-import urllib
+import urllib # TODO: Replace with urllib2 (urllib is deprecated in Python 3.0)
 import re
 
 # Local
@@ -63,12 +63,14 @@ PIXELS_PER_LINE = 2528
 class SOAPFaxDevice(FaxDevice):
 
     def __init__(self, device_uri=None, printer_name=None,
-                 hpssd_sock=None, callback=None, 
-                fax_type=FAX_TYPE_NONE):
+                 callback=None, 
+                 fax_type=FAX_TYPE_NONE,
+                 disable_dbus=False):
 
         FaxDevice.__init__(self, device_uri, 
-                           printer_name, hpssd_sock, 
-                           callback, fax_type)
+                           printer_name, 
+                           callback, fax_type,
+                           disable_dbus)
 
         self.send_fax_thread = None
         self.upload_log_thread = None
@@ -194,7 +196,7 @@ Cache-control: No-cache
 
         if not self.isSendFaxActive():
 
-            self.send_fax_thread = SOAPFaxSendThread(self, phone_num_list, fax_file_list, 
+            self.send_fax_thread = SOAPFaxSendThread(self, self.service, phone_num_list, fax_file_list, 
                                                      cover_message, cover_re, cover_func, 
                                                      preserve_formatting, 
                                                      printer_name, update_queue, 
@@ -208,11 +210,11 @@ Cache-control: No-cache
 
 # **************************************************************************** #
 class SOAPFaxSendThread(FaxSendThread):
-    def __init__(self, dev, phone_num_list, fax_file_list, 
+    def __init__(self, dev, service, phone_num_list, fax_file_list, 
                  cover_message='', cover_re='', cover_func=None, preserve_formatting=False,
                  printer_name='', update_queue=None, event_queue=None):
 
-        FaxSendThread.__init__(self, dev, phone_num_list, fax_file_list, 
+        FaxSendThread.__init__(self, dev, service, phone_num_list, fax_file_list, 
              cover_message, cover_re, cover_func, preserve_formatting,
              printer_name, update_queue, event_queue)
              

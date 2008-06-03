@@ -36,7 +36,7 @@ class ImagePropertiesDlg(ImagePropertiesDlg_base):
             for k in exif_info:
                 kk = k.lower()
                 if kk != "jpegthumbnail":
-                    print repr(k), repr(exif_info[k])
+                    #print repr(k), repr(exif_info[k])
                     QListViewItem(self.EXifDataListView, k, str(exif_info[k]))
 
 

@@ -19,15 +19,20 @@
 # Author: Don Welch
 #
 
+# Std Lib
+
+# Local
 from base.g import *
-import os.path
+from ui_utils import load_pixmap
+
+# Qt
 from qt import *
 from coloradjform_base import ColorAdjForm_base
 
 class ColorAdjForm(ColorAdjForm_base):
     def __init__(self, parent, line, name = None, modal = 0, fl = 0):
         ColorAdjForm_base.__init__(self,parent,name,modal,fl)
-        self.Icon.setPixmap(QPixmap(os.path.join(prop.image_dir,  'color-adj.png')))
+        self.Icon.setPixmap(load_pixmap('color_adj'))
         self.LineLabel.setText("""<b><font size="+1">%s</font></b>""" % line)
         self.value = 11
 

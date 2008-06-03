@@ -25,12 +25,13 @@ __title__ = 'Print Utility'
 __doc__ = "A simple front end to 'lp'. Provides a print UI from the Device Manager if kprinter, gtklp, or xpp are not installed."
 
 # Std Lib
-import sys, os, getopt, re, socket
+import sys
+import os
+import getopt
 
 # Local
 from base.g import *
-from base.msg import *
-from base import utils, device, service
+from base import utils, device, tui
 from prnt import cups
 
 log.set_module('hp-print')
@@ -75,9 +76,8 @@ except getopt.GetoptError, e:
 printer_name = None
 device_uri = None
 log_level = logger.DEFAULT_LOG_LEVEL
-bus = 'cups'
 loc = None
-
+bus = ['cups']
 
 if os.getenv("HPLIP_DEBUG"):
     log.set_level('debug')
@@ -112,7 +112,7 @@ for o, a in opts:
 
     elif o in ('-q', '--lang'):
         if a.strip() == '?':
-            utils.show_languages()
+            tui.show_languages()
             sys.exit(0)
 
         loc = utils.validate_language(a.lower())
@@ -124,6 +124,9 @@ os.umask (0037)
 
 utils.log_title(__title__, __version__)
 
+if os.getuid() == 0:
+    log.error("hp-print should not be run as root.")
+
 if not utils.canEnterGUIMode():
     log.error("hp-print requires GUI support. Exiting.")
     sys.exit(1)
@@ -132,12 +135,7 @@ if not utils.canEnterGUIMode():
 from qt import *
 from ui.printerform import PrinterForm
 
-try:
-    sock = service.startup()
-except Error:
-    log.error("Unable to connect to HPLIP I/O (hpssd).")
-    sys.exit(1)
-    
+
 # create the main application object
 app = QApplication(sys.argv)
 
@@ -148,19 +146,21 @@ if loc is None:
         log.debug("Using system locale: %s" % loc)
 
 if loc.lower() != 'c':
-    log.debug("Trying to load .qm file for %s locale." % loc)
-    trans = QTranslator(None)
-    
+    e = 'utf8'
     try:
-        l, e = loc.split('.')
+        l, x = loc.split('.')
+        loc = '.'.join([l, e])
     except ValueError:
         l = loc
-        e = 'utf8'
-    
+        loc = '.'.join([loc, e])
+
+    log.debug("Trying to load .qm file for %s locale." % loc)
+    trans = QTranslator(None)
+
     qm_file = 'hplip_%s.qm' % l
     log.debug("Name of .qm file: %s" % qm_file)
     loaded = trans.load(qm_file, prop.localization_dir)
-    
+
     if loaded:
         app.installTranslator(trans)
     else:
@@ -177,7 +177,8 @@ else:
     except locale.Error:
         pass
 
-printdlg = PrinterForm(sock, bus, device_uri, printer_name, args)
+
+printdlg = PrinterForm(bus, device_uri, printer_name, args)
 printdlg.show()
 app.setMainWidget(printdlg)
 
@@ -186,10 +187,10 @@ try:
     app.exec_loop()
 except KeyboardInterrupt:
     pass
-except:
-    log.exception()
+#except:
+#    log.exception()
 
-sock.close()
+#sock.close()
 sys.exit(0)
 
 
