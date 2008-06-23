@@ -81,6 +81,10 @@
 #include "ljm1005.h"
 #endif
 
+#ifdef APDK_QUICKCONNECT
+#include "quickconnect.h"
+#endif
+
 APDK_BEGIN_NAMESPACE
 
 #ifdef APDK_PSCRIPT
@@ -195,6 +199,10 @@ Apollo21xxProxy DeviceRegistry::s_Apollo21xxProxy;
 
 #ifdef APDK_APOLLO2XXX
 Apollo2xxxProxy DeviceRegistry::s_Apollo2xxxProxy;
+#endif
+
+#ifdef APDK_QUICKCONNECT
+QuickConnectProxy DeviceRegistry::s_QuickConnectProxy;
 #endif
 
 DeviceRegistry::DeviceRegistry()

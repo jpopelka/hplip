@@ -1,19 +1,21 @@
 *PPD-Adobe: "4.3"
-*% PPD file for HP DeskJet D2400 Foomatic/hpijs with CUPS.
+*% PPD file for HP Deskjet d2400 series Foomatic/hpijs with CUPS.
 *% Created by the CUPS PPD Compiler v1.2.0.
 *% (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 *FormatVersion: "4.3"
-*FileVersion: "hpijs 2.8.5.23"
+*FileVersion: "hpijs 2.8.6.20"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "hp-deskjet_d2400_series-hpijs.ppd"
-*Product: "(ESP Ghostscript)"
-*Product: "(GPL Ghostscript)"
-*Product: "(GNU Ghostscript)"
+*Product: "HP Deskjet d2430 Printer"
+*Product: "HP Deskjet d2445 Printer"
+*Product: "HP Deskjet d2460 Printer"
+*Product: "HP Deskjet d2466 Printer"
+*Product: "HP Deskjet d2468 Printer"
 *Manufacturer: "HP"
-*ModelName: "HP DeskJet D2400 Foomatic/hpijs"
-*ShortNickName: "HP DeskJet D2400 Foomatic/hpijs"
-*NickName: "HP DeskJet D2400 Foomatic/hpijs, hpijs 2.8.5.23"
+*ModelName: "HP Deskjet d2400 series Foomatic/hpijs"
+*ShortNickName: "HP Deskjet d2400 series Foomatic/hpijs"
+*NickName: "HP Deskjet d2400 series Foomatic/hpijs, hpijs 2.8.6.20"
 *PSVersion: "(3010.000) 705"
 *PSVersion: "(3010.000) 707"
 *PSVersion: "(3010.000) 815"
@@ -203,7 +205,12 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
 Params=Quality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quali&&
 ty:PenSet=2,Quality:FullBleed=1"
 *End
-*1284DeviceID: "MFG:HP;MDL:deskjet d2400 series;DES:deskjet d2400 series;"
+*1284DeviceID: "MFG:HP;MDL:deskjet_d2400_series;DES:deskjet_d2400_series;"
+*Product: "HP Deskjet d2430 Printer"
+*Product: "HP Deskjet d2445 Printer"
+*Product: "HP Deskjet d2460 Printer"
+*Product: "HP Deskjet d2466 Printer"
+*Product: "HP Deskjet d2468 Printer"
 *cupsVersion: 1.3
 *cupsModelNumber: 0
 *cupsManualCopies: True
@@ -393,4 +400,4 @@ ty:PenSet=2,Quality:FullBleed=1"
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of hp-deskjet_d2400_series-hpijs.ppd, 20591 bytes.
+*% End of hp-deskjet_d2400_series-hpijs.ppd, 20899 bytes.

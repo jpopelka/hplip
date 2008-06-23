@@ -1,7 +1,7 @@
 /*****************************************************************************\
   ljjetready.cpp : Implimentation for the LJJetReady class
 
-  Copyright (c) 1996 - 2006, Hewlett-Packard Co.
+  Copyright (c) 1996 - 2008, Hewlett-Packard Co.
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -906,7 +906,7 @@ DISPLAY_STATUS LJJetReady::ParseError(BYTE status_reg)
 BYTE *    ModeJPEG::fpJPEGBuffer = NULL;       // image buffer
 DWORD     ModeJPEG::fJPEGBufferPos;            // position of 1'st empty byte in image buffer
 
-void ModeJPEG::jpeg_flush_output_buffer_callback(BYTE* buffer, DWORD size)
+void ModeJPEG::jpeg_flush_output_buffer_callback(JOCTET *outbuf, BYTE* buffer, DWORD size)
 {
     fJPEGBufferPos += size;
     memcpy (fpJPEGBuffer, buffer, size);
@@ -941,6 +941,7 @@ BYTE* ModeJPEG::GetBuffer()
 extern "C"
 {
 void jpeg_buffer_dest (j_compress_ptr cinfo, JOCTET* outbuff, void* flush_output_buffer_callback);
+void hp_rgb_ycc_setup (int iFlag);
 }
 
 #define ConvertToGrayMacro(red, green, blue) ((unsigned char)( ( (red * 30) + (green * 59) + (blue * 11) ) / 100 ))
@@ -1145,6 +1146,8 @@ BOOL  ModeJPEG::Compress( HPLJBITMAP *pSrcBitmap,
 #endif
 
 	fJPEGBufferPos = 0;
+
+    hp_rgb_ycc_setup (1);   // Use modified Mojave CSC table
 
     int iColorsUsed = bGrayscaleSet ? 1 : 3;
 

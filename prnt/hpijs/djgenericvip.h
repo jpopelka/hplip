@@ -197,6 +197,7 @@ public:
         "Photosmart D5060\0"
         "Photosmart D51\0"
         "Photosmart D53\0"
+        "Photosmart D54\0"
         "Photosmart D61\0"
         "Photosmart D71\0"
         "Photosmart D72\0"

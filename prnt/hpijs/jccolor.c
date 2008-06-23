@@ -1,4 +1,4 @@
-#ifdef APDK_LJJETREADY
+#if defined (APDK_LJJETREADY) || defined (APDK_QUICKCONNECT)
 /*
  * jccolor.c
  *
@@ -13,7 +13,7 @@
 #include "jinclude.h"
 #include "jpeglib.h"
 
-#define USE_MOJAVE_CSC
+//#define USE_MOJAVE_CSC
 
 /* Private subobject */
 
@@ -78,30 +78,49 @@ typedef my_color_converter * my_cconvert_ptr;
  * machines (more than can hold all eight addresses, anyway).
  */
 
-#ifdef USE_MOJAVE_CSC
-#	define R_Y_OFF		0							/* offset to R => Y section */
-#	define G_Y_OFF		(1*(MAXJSAMPLE+1))	/* offset to G => Y section */
-#	define B_Y_OFF		(2*(MAXJSAMPLE+1))	/* offset to B => Y section */
-#	define R_CB_OFF	R_Y_OFF					/* R=>Y, R=>Cb are the same */
-#	define G_CB_OFF	(3*(MAXJSAMPLE+1))	/* offset to G => Cb section */
-#	define B_CB_OFF	G_Y_OFF					/* G=>Y, B=>Cb are the same */
-#	define R_CR_OFF	R_Y_OFF					/* R=>Y, R=>Cr are the same */
-#	define G_CR_OFF	G_Y_OFF					/* G=>Y, G=>Cr are the same */
-#	define B_CR_OFF	G_CB_OFF					/* G=>Cb, B=>Cr are the same */
-#	define TABLE_SIZE	(4*(MAXJSAMPLE+1))
-#else
-#	define R_Y_OFF		0			/* offset to R => Y section */
-#	define G_Y_OFF		(1*(MAXJSAMPLE+1))	/* offset to G => Y section */
-#	define B_Y_OFF		(2*(MAXJSAMPLE+1))	/* etc. */
-#	define R_CB_OFF	(3*(MAXJSAMPLE+1))
-#	define G_CB_OFF	(4*(MAXJSAMPLE+1))
-#	define B_CB_OFF	(5*(MAXJSAMPLE+1))
-#	define R_CR_OFF	B_CB_OFF		/* B=>Cb, R=>Cr are the same */
-#	define G_CR_OFF	(6*(MAXJSAMPLE+1))
-#	define B_CR_OFF	(7*(MAXJSAMPLE+1))
-#	define TABLE_SIZE	(8*(MAXJSAMPLE+1))
-#endif
+int    iUseMojaveCsc = 1;
 
+int R_Y_OFF;							/* offset to R => Y section */
+int G_Y_OFF;	/* offset to G => Y section */
+int B_Y_OFF;	/* offset to B => Y section */
+int R_CB_OFF;					/* R=>Y, R=>Cb are the same */
+int G_CB_OFF;	/* offset to G => Cb section */
+int B_CB_OFF;					/* G=>Y, B=>Cb are the same */
+int R_CR_OFF;					/* R=>Y, R=>Cr are the same */
+int G_CR_OFF;					/* G=>Y, G=>Cr are the same */
+int B_CR_OFF;					/* G=>Cb, B=>Cr are the same */
+int TABLE_SIZE;
+
+void    hp_rgb_ycc_setup (int iFlag)
+{
+    iUseMojaveCsc = iFlag;
+    if (iUseMojaveCsc)
+    {
+         R_Y_OFF	=	0;							/* offset to R => Y section */
+         G_Y_OFF	=	(1*(MAXJSAMPLE+1));	/* offset to G => Y section */
+         B_Y_OFF	=	(2*(MAXJSAMPLE+1));	/* offset to B => Y section */
+         R_CB_OFF	= R_Y_OFF;					/* R=>Y, R=>Cb are the same */
+         G_CB_OFF	= (3*(MAXJSAMPLE+1));	/* offset to G => Cb section */
+         B_CB_OFF	= G_Y_OFF;					/* G=>Y, B=>Cb are the same */
+         R_CR_OFF	= R_Y_OFF;					/* R=>Y, R=>Cr are the same */
+         G_CR_OFF	= G_Y_OFF;					/* G=>Y, G=>Cr are the same */
+         B_CR_OFF	= G_CB_OFF;					/* G=>Cb, B=>Cr are the same */
+         TABLE_SIZE = (4*(MAXJSAMPLE+1));
+    }
+    else
+    {
+         R_Y_OFF	=	0;			/* offset to R => Y section */
+         G_Y_OFF	=	(1*(MAXJSAMPLE+1));	/* offset to G => Y section */
+         B_Y_OFF=		(2*(MAXJSAMPLE+1));	/* etc. */
+         R_CB_OFF=	(3*(MAXJSAMPLE+1));
+         G_CB_OFF=	(4*(MAXJSAMPLE+1));
+         B_CB_OFF=	(5*(MAXJSAMPLE+1));
+         R_CR_OFF=	B_CB_OFF;		/* B=>Cb, R=>Cr are the same */
+         G_CR_OFF=	(6*(MAXJSAMPLE+1));
+         B_CR_OFF=	(7*(MAXJSAMPLE+1));
+         TABLE_SIZE	=(8*(MAXJSAMPLE+1));
+    }
+}
 
 /*
  * Initialize for RGB->YCC colorspace conversion.
@@ -110,58 +129,62 @@ typedef my_color_converter * my_cconvert_ptr;
 METHODDEF(void)
 rgb_ycc_start (j_compress_ptr cinfo)
 {
-  my_cconvert_ptr cconvert = (my_cconvert_ptr) cinfo->cconvert;
-  INT32 * rgb_ycc_tab;
-  INT32 i;
+    my_cconvert_ptr cconvert = (my_cconvert_ptr) cinfo->cconvert;
+    INT32 * rgb_ycc_tab;
+    INT32 i;
 
-  /* Allocate and fill in the conversion tables. */
-  cconvert->rgb_ycc_tab = rgb_ycc_tab = (INT32 *)
-    (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-				(TABLE_SIZE * SIZEOF(INT32)));
+    /* Allocate and fill in the conversion tables. */
+    cconvert->rgb_ycc_tab = rgb_ycc_tab = (INT32 *)
+                            (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
+                                                        (TABLE_SIZE * SIZEOF(INT32)));
 
-  for (i = 0; i <= MAXJSAMPLE; i++) {
-#ifdef USE_MOJAVE_CSC
-    rgb_ycc_tab[i+R_Y_OFF] = FIX(0.50000) * i;
-    rgb_ycc_tab[i+G_Y_OFF] = FIX(0.00000) * i;
-    rgb_ycc_tab[i+B_Y_OFF] = FIX(0.00000) * i		+ ONE_HALF;
-/*	 R=>Y and R=>Cb tables are the same
-    rgb_ycc_tab[i+R_CB_OFF] = (FIX(0.50000)) * i;
-*/
-    rgb_ycc_tab[i+G_CB_OFF] = (-FIX(0.50000)) * i	+ CBCR_OFFSET + ONE_HALF-1;
-    /* We use a rounding fudge-factor of 0.5-epsilon for Cb and Cr.
-     * This ensures that the maximum output will round to MAXJSAMPLE
-     * not MAXJSAMPLE+1, and thus that we don't have to range-limit.
-     */
-/*  G=>Y and B=>Cb tables are the same
-    rgb_ycc_tab[i+B_CB_OFF] = FIX(0.00000) * i;
-*/
-/*  R=>Y and R=>Cr tables are the same
-    rgb_ycc_tab[i+R_CR_OFF] = FIX(0.50000) * i;
-*/
-/*  G=>Y and G=>Cr tables are the same
-    rgb_ycc_tab[i+G_CR_OFF] = (-FIX(0.00000)) * i;
-*/
-/*  G=>Cb and B=>Cr tables are the same
-    rgb_ycc_tab[i+B_CR_OFF] = (-FIX(0.50000)) * i	+ CBCR_OFFSET + ONE_HALF-1;
-*/
-#else
-    rgb_ycc_tab[i+R_Y_OFF] = FIX(0.29900) * i;
-    rgb_ycc_tab[i+G_Y_OFF] = FIX(0.58700) * i;
-    rgb_ycc_tab[i+B_Y_OFF] = FIX(0.11400) * i     + ONE_HALF;
-    rgb_ycc_tab[i+R_CB_OFF] = (-FIX(0.16874)) * i;
-    rgb_ycc_tab[i+G_CB_OFF] = (-FIX(0.33126)) * i;
-    /* We use a rounding fudge-factor of 0.5-epsilon for Cb and Cr.
-     * This ensures that the maximum output will round to MAXJSAMPLE
-     * not MAXJSAMPLE+1, and thus that we don't have to range-limit.
-     */
-    rgb_ycc_tab[i+B_CB_OFF] = FIX(0.50000) * i    + CBCR_OFFSET + ONE_HALF-1;
-/*  B=>Cb and R=>Cr tables are the same
-    rgb_ycc_tab[i+R_CR_OFF] = FIX(0.50000) * i    + CBCR_OFFSET + ONE_HALF-1;
-*/
-    rgb_ycc_tab[i+G_CR_OFF] = (-FIX(0.41869)) * i;
-    rgb_ycc_tab[i+B_CR_OFF] = (-FIX(0.08131)) * i;
-#endif
-  }
+    for (i = 0; i <= MAXJSAMPLE; i++)
+    {
+        if (iUseMojaveCsc)
+        {
+        rgb_ycc_tab[i+R_Y_OFF] = FIX(0.50000) * i;
+        rgb_ycc_tab[i+G_Y_OFF] = FIX(0.00000) * i;
+        rgb_ycc_tab[i+B_Y_OFF] = FIX(0.00000) * i		+ ONE_HALF;
+        /*	 R=>Y and R=>Cb tables are the same
+             rgb_ycc_tab[i+R_CB_OFF] = (FIX(0.50000)) * i;
+        */
+        rgb_ycc_tab[i+G_CB_OFF] = (-FIX(0.50000)) * i	+ CBCR_OFFSET + ONE_HALF-1;
+        /* We use a rounding fudge-factor of 0.5-epsilon for Cb and Cr.
+         * This ensures that the maximum output will round to MAXJSAMPLE
+         * not MAXJSAMPLE+1, and thus that we don't have to range-limit.
+         */
+        /*  G=>Y and B=>Cb tables are the same
+            rgb_ycc_tab[i+B_CB_OFF] = FIX(0.00000) * i;
+        */
+        /*  R=>Y and R=>Cr tables are the same
+            rgb_ycc_tab[i+R_CR_OFF] = FIX(0.50000) * i;
+        */
+        /*  G=>Y and G=>Cr tables are the same
+            rgb_ycc_tab[i+G_CR_OFF] = (-FIX(0.00000)) * i;
+        */
+        /*  G=>Cb and B=>Cr tables are the same
+            rgb_ycc_tab[i+B_CR_OFF] = (-FIX(0.50000)) * i	+ CBCR_OFFSET + ONE_HALF-1;
+        */
+        }
+        else
+        {
+            rgb_ycc_tab[i+R_Y_OFF] = FIX(0.29900) * i;
+            rgb_ycc_tab[i+G_Y_OFF] = FIX(0.58700) * i;
+            rgb_ycc_tab[i+B_Y_OFF] = FIX(0.11400) * i     + ONE_HALF;
+            rgb_ycc_tab[i+R_CB_OFF] = (-FIX(0.16874)) * i;
+            rgb_ycc_tab[i+G_CB_OFF] = (-FIX(0.33126)) * i;
+            /* We use a rounding fudge-factor of 0.5-epsilon for Cb and Cr.
+             * This ensures that the maximum output will round to MAXJSAMPLE
+             * not MAXJSAMPLE+1, and thus that we don't have to range-limit.
+             */
+            rgb_ycc_tab[i+B_CB_OFF] = FIX(0.50000) * i    + CBCR_OFFSET + ONE_HALF-1;
+            /*  B=>Cb and R=>Cr tables are the same
+                rgb_ycc_tab[i+R_CR_OFF] = FIX(0.50000) * i    + CBCR_OFFSET + ONE_HALF-1;
+            */
+            rgb_ycc_tab[i+G_CR_OFF] = (-FIX(0.41869)) * i;
+            rgb_ycc_tab[i+B_CR_OFF] = (-FIX(0.08131)) * i;
+        }
+    }
 }
 
 
@@ -508,4 +531,4 @@ jinit_color_converter (j_compress_ptr cinfo)
     break;
   }
 }
-#endif // APDK_LJJETREADY
+#endif // APDK_LJJETREADY || APDK_QUICKCONNECT

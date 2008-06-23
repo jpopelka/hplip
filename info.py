@@ -101,9 +101,14 @@ try:
 
         elif o in ('-p', '--printer'):
             if a.startswith('*'):
-                printer_name = cups.getDefault()
-                log.info("Using CUPS default printer: %s" % printer_name)
+                printer_name = cups.getDefaultPrinter()
                 log.debug(printer_name)
+                
+                if printer_name is not None:
+                    log.info("Using CUPS default printer: %s" % printer_name)
+                else:
+                    log.error("CUPS default printer is not set.")
+                
             else:
                 printer_name = a
 
@@ -185,7 +190,7 @@ try:
 
         if devid_mode:
             try:
-                print d.dq['deviceid']
+                log.info(d.dq['deviceid'])
                 sys.exit(0)
             except KeyError:
                 log.error("Device ID not available.")

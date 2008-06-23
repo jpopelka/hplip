@@ -66,6 +66,8 @@ def usage(typ='text'):
 
 
 def logBarGraph(agent_level, agent_type, size=DEFAULT_BAR_GRAPH_SIZE, use_colors=True, bar_char='/'):
+    #print agent_level, agent_type, size, use_colors, bar_char
+    
     adj = 100.0/size
     if adj==0.0: adj=100.0
     bar = int(agent_level/adj)
@@ -148,9 +150,14 @@ try:
 
         elif o in ('-p', '--printer'):
             if a.startswith('*'):
-                printer_name = cups.getDefault()
-                log.info("Using CUPS default printer: %s" % printer_name)
+                printer_name = cups.getDefaultPrinter()
                 log.debug(printer_name)
+                
+                if printer_name is not None:
+                    log.info("Using CUPS default printer: %s" % printer_name)
+                else:
+                    log.error("CUPS default printer is not set.")
+                
             else:
                 printer_name = a
 
@@ -196,7 +203,7 @@ try:
     utils.log_title(__title__, __version__)
     
     if os.getuid() == 0:
-        log.error("hp-levels should not be run as root.")
+        log.warn("hp-levels should not be run as root.")
 
     if not device_uri and not printer_name:
         try:
@@ -234,6 +241,8 @@ try:
 
         if d.mq['status-type'] != STATUS_TYPE_NONE:
 
+            #print d.dq
+            
             log.info("")
 
             sorted_supplies = []
@@ -251,6 +260,8 @@ try:
 
             sorted_supplies.sort(lambda x, y: cmp(x[2], y[2]) or cmp(x[1], y[1]))
 
+            #print sorted_supplies
+            
             for x in sorted_supplies:
                 a, agent_kind, agent_type = x
                 agent_health = d.dq['agent%d-health' % a]
@@ -259,7 +270,9 @@ try:
                 agent_desc = d.dq['agent%d-desc' % a]
                 agent_health_desc = d.dq['agent%d-health-desc' % a]
 
-                if agent_health == AGENT_HEALTH_OK and \
+                #print agent_health
+                
+                if agent_health in (AGENT_HEALTH_OK, AGENT_HEALTH_UNKNOWN) and \
                     agent_kind in (AGENT_KIND_SUPPLY,
                                     AGENT_KIND_HEAD_AND_SUPPLY,
                                     AGENT_KIND_TONER_CARTRIDGE,

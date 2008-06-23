@@ -688,7 +688,8 @@ DRIVER_ERROR Printer::Send
             if (m_bStatusByPJL)
             {
                 status_reg = (BYTE) DISPLAY_PRINTING;
-                eDisplayStatus = ParseError (status_reg);
+                if (IOMode.bStatus)
+                    eDisplayStatus = ParseError (status_reg);
                 if (eDisplayStatus != DISPLAY_PRINTING)
                     write_error = IO_ERROR;
             }

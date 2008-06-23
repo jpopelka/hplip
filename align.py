@@ -176,7 +176,14 @@ try:
 
         elif o in ('-p', '--printer'):
             if a.startswith('*'):
-                printer_name = cups.getDefault()
+                printer_name = cups.getDefaultPrinter()
+                log.debug(printer_name)
+                
+                if printer_name is not None:
+                    log.info("Using CUPS default printer: %s" % printer_name)
+                else:
+                    log.error("CUPS default printer is not set.")
+                
             else:
                 printer_name = a
 
@@ -208,7 +215,7 @@ try:
     utils.log_title(__title__, __version__)
     
     if os.getuid() == 0:
-        log.error("hp-align should not be run as root.")
+        log.warn("hp-align should not be run as root.")
 
     if not device_uri and not printer_name:
         try:

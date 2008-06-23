@@ -109,9 +109,14 @@ try:
 
         elif o in ('-p', '--printer'):
             if a.startswith('*'):
-                printer_name = cups.getDefault()
-                log.info("Using CUPS default printer: %s" % printer_name)
+                printer_name = cups.getDefaultPrinter()
                 log.debug(printer_name)
+                
+                if printer_name is not None:
+                    log.info("Using CUPS default printer: %s" % printer_name)
+                else:
+                    log.error("CUPS default printer is not set.")
+                
             else:
                 printer_name = a
 
@@ -162,7 +167,7 @@ try:
     utils.log_title(__title__, __version__)
     
     if os.getuid() == 0:
-        log.error("hp-firmware should not be run as root.")
+        log.warn("hp-firmware should not be run as root.")
 
     if silent:
         # called by .rules file with -s bbb.ddd

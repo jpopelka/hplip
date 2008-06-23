@@ -1,7 +1,7 @@
 /*****************************************************************************\
   printer.h : Interface for the Printer class
 
-  Copyright (c) 1996 - 2006, Hewlett-Packard Co.
+  Copyright (c) 1996 - 2008, Hewlett-Packard Co.
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -72,20 +72,18 @@ friend class DJGenericVIP;
 friend class DJ4100;
 #endif
 public:
-   PrintMode(uint32_t *map1,uint32_t *map2=(uint32_t*)NULL);
+    PrintMode (uint32_t *map1,uint32_t *map2=(uint32_t*)NULL);
+    virtual ~PrintMode ()
+    {
+    }
 
     BOOL Compatible(PEN_TYPE pens);
     inline BOOL ColorCompatible(COLORMODE color) { return (color == pmColor); }
     inline BOOL QualityCompatible(QUALITY_MODE eQuality) { return (eQuality == pmQuality); }
-    inline BOOL MediaCompatible(MEDIATYPE eMedia) { return (eMedia == pmMediaType); }
+    virtual inline BOOL MediaCompatible(MEDIATYPE eMedia) { return (eMedia == pmMediaType); }
     inline QUALITY_MODE GetQualityMode() { return pmQuality;}
     inline MEDIATYPE GetMediaType() { return pmMediaType; }
-    void GetValues(
-        QUALITY_MODE& eQuality,
-        MEDIATYPE& eMedia,
-        COLORMODE& eColor,
-        BOOL& bDeviceText
-    );
+    void GetValues (QUALITY_MODE& eQuality, MEDIATYPE& eMedia, COLORMODE& eColor, BOOL& bDeviceText);
 
 // The resolutions can be different for different planes
     unsigned int ResolutionX[MAXCOLORPLANES];
@@ -115,6 +113,17 @@ public:
         return DuplexMode;
     };
 #endif // APDK_AUTODUPLEX
+
+    DRIVER_ERROR SetMediaType (MEDIATYPE eMediaType)
+    {
+        if (MediaCompatible (eMediaType))
+        {
+            pmMediaType = eMediaType;
+            return NO_ERROR;
+        }
+        return WARN_MODE_MISMATCH;
+    }
+
 protected:
     Quality theQuality;
 #ifdef APDK_AUTODUPLEX
@@ -342,11 +351,11 @@ public:
     {
         return NO_ERROR;
     }
-    virtual DRIVER_ERROR    SetHint (int iHint, int iValue)
+    virtual DRIVER_ERROR    SetHint (PRINTER_HINT eHint, int iValue)
     {
         return NO_ERROR;
     }
-    virtual int GetHint (int iHint)
+    virtual int GetHint (PRINTER_HINT eHint)
     {
         return 0;
     }

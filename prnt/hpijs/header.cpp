@@ -1,7 +1,7 @@
 /*****************************************************************************\
   header.cpp : Implimentation for the Header class
 
-  Copyright (c) 1996 - 2001, Hewlett-Packard Co.
+  Copyright (c) 1996 - 2008, Hewlett-Packard Co.
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -168,13 +168,12 @@ void Header::SetQuality(Quality qual)
         default: DBG1("<out of range, using> Normal\n"); break;
     }
 #endif
+    ASSERT (qual >= qualityAuto || qual <= qualityFastNormal);
 
-    ASSERT (qual < qualityAuto || qual > qualityMarvellous);
-
-    if (qual < qualityAuto || qual > qualityMarvellous)
+    if (qual < qualityAuto || qual > qualityFastNormal)
         qual = qualityNormal;
 
-    qualcount = EscCopy ((BYTE*)quality,"*o",qual,'M');
+    qualcount = EscCopy ((BYTE *) quality,"*o",qual,'M');
 }
 
 BYTE Header::QualityCode()

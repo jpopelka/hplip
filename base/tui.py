@@ -36,7 +36,7 @@ def enter_yes_no(question, default_value='y', choice_prompt=None):
         else:
             default_value = False
     
-    assert default_value in [True, False]
+    #assert default_value in [True, False]
     
     if choice_prompt is None:
         if default_value:
@@ -103,7 +103,7 @@ def enter_choice(question, choices, default_value=None):
             else:
                 return True, default_value
 
-        print user_input
+        #print user_input
         if user_input == 'q':
             return False, user_input
 
@@ -278,23 +278,24 @@ class Formatter(object):
             
             col_widths = []
             formats = []
-            for m1, m2, m3, m4 in zip(self.min_widths, min_calc_widths, self.max_widths, max_calc_widths):
+            for m1, m2, m3, m4 in zip(self.min_widths, min_calc_widths, 
+                                      self.max_widths, max_calc_widths):
                 col_width = max(max(m1, m2), min(m3, m4))
                 col_widths.append(col_width)
                 formats.append({'width': col_width, 'margin': self.margin})
             
             formatter = utils.TextFormatter(tuple(formats))
             
-            print formatter.compose(self.header)
+            log.info(formatter.compose(self.header))
             
             sep = []
             for c in col_widths:
                 sep.append('-'*c)
                 
-            print formatter.compose(tuple(sep))
+            log.info(formatter.compose(tuple(sep)))
             
             for r in self.rows:
-                print formatter.compose(r)
+                log.info(formatter.compose(r))
                 
         else:
             log.error("No data rows")
@@ -327,7 +328,10 @@ def format_paragraph(paragraph, width=None, alignment=ALIGN_LEFT):
     result = []
     #import string
     words = paragraph.split() #string.split(paragraph)
-    current, words = words[0], words[1:]
+    try:
+        current, words = words[0], words[1:]
+    except IndexError:
+        return [paragraph]
     
     for word in words:
         increment = 1 + len(word)

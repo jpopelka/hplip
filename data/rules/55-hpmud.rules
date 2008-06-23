@@ -1,21 +1,24 @@
-# Udev rules file for HP printer products.
+# HPLIP udev rules file for HP printer and all-in-one products.
 
 ACTION!="add", GOTO="hpmud_rules_end"
-SUBSYSTEM=="ppdev", OWNER="lp", GROUP="lp", MODE="0666"
+SUBSYSTEM=="ppdev", OWNER="root", GROUP="lp", MODE="0666"
 SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", GOTO="pid_test"
 SUBSYSTEM!="usb_device", GOTO="hpmud_rules_end"
 
 LABEL="pid_test"
 
 # Check for AiO products (0x03f0xx11).
-SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="??11", OWNER="root", GROUP="lp", MODE="0666"
+SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="??11", OWNER="root", GROUP="lp", MODE="0666", ENV{sane_hpaio}="yes"
 # Check for Photosmart products (0x03f0xx02).
-SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="??02", OWNER="root", GROUP="lp", MODE="0666"
+SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="??02", OWNER="root", GROUP="lp", MODE="0666", ENV{sane_hpaio}="yes"
 # Check for Business Inkjet products (0x03f0xx12).
-SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="??12", OWNER="root", GROUP="lp", MODE="0666"
+SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="??12", OWNER="root", GROUP="lp", MODE="0666", ENV{sane_hpaio}="yes"
 # Check for Deskjet products (0x03f0xx04).
-SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="??04", OWNER="root", GROUP="lp", MODE="0666"
+SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="??04", OWNER="root", GROUP="lp", MODE="0666", ENV{sane_hpaio}="yes"
 # Check for LaserJet products (0x03f0xx17).
-SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="??17", OWNER="root", GROUP="lp", MODE="0666"
+SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="??17", OWNER="root", GROUP="lp", MODE="0666", ENV{sane_hpaio}="yes"
+
+# If sane-bankends is installed add hpaio backend support to dll.conf if needed.
+ENV{sane_hpaio}=="yes", RUN+="/bin/sh -c 'grep -q ^#hpaio /etc/sane.d/dll.conf;if [ $$? -eq 0 ];then sed -i -e s/^#hpaio/hpaio/ /etc/sane.d/dll.conf;else grep -q ^hpaio /etc/sane.d/dll.conf;if [ $$? -ne 0 ];then echo hpaio >>/etc/sane.d/dll.conf;fi;fi'"
 
 LABEL="hpmud_rules_end"

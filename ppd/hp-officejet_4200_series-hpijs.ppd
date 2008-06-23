@@ -1,19 +1,23 @@
 *PPD-Adobe: "4.3"
-*% PPD file for HP OfficeJet 4200 Foomatic/hpijs with CUPS.
+*% PPD file for HP Officejet 4200 series Foomatic/hpijs with CUPS.
 *% Created by the CUPS PPD Compiler v1.2.0.
 *% (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 *FormatVersion: "4.3"
-*FileVersion: "hpijs 2.8.5.23"
+*FileVersion: "hpijs 2.8.6.20"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "hp-officejet_4200_series-hpijs.ppd"
-*Product: "(ESP Ghostscript)"
-*Product: "(GPL Ghostscript)"
-*Product: "(GNU Ghostscript)"
+*Product: "HP Officejet 4200"
+*Product: "HP Officejet 4212"
+*Product: "HP Officejet 4215"
+*Product: "HP Officejet 4215v"
+*Product: "HP Officejet 4215xi"
+*Product: "HP Officejet 4219"
+*Product: "HP Officejet 4211"
 *Manufacturer: "HP"
-*ModelName: "HP OfficeJet 4200 Foomatic/hpijs"
-*ShortNickName: "HP OfficeJet 4200 Foomatic/hpijs"
-*NickName: "HP OfficeJet 4200 Foomatic/hpijs, hpijs 2.8.5.23"
+*ModelName: "HP Officejet 4200 series Foomatic/hpijs"
+*ShortNickName: "HP Officejet 4200 series Foomatic/hpijs"
+*NickName: "HP Officejet 4200 series Foomatic/hpijs, hpijs 2.8.6.20"
 *PSVersion: "(3010.000) 705"
 *PSVersion: "(3010.000) 707"
 *PSVersion: "(3010.000) 815"
@@ -203,7 +207,14 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
 Params=Quality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quali&&
 ty:PenSet=2,Quality:FullBleed=1"
 *End
-*1284DeviceID: "MFG:HP;MDL:officejet 4200 series;DES:officejet 4200 series;"
+*1284DeviceID: "MFG:HP;MDL:officejet_4200_series;DES:officejet_4200_series;"
+*Product: "HP Officejet 4200"
+*Product: "HP Officejet 4212"
+*Product: "HP Officejet 4215"
+*Product: "HP Officejet 4215v"
+*Product: "HP Officejet 4215xi"
+*Product: "HP Officejet 4219"
+*Product: "HP Officejet 4211"
 *cupsVersion: 1.3
 *cupsModelNumber: 0
 *cupsManualCopies: True
@@ -393,4 +404,4 @@ ty:PenSet=2,Quality:FullBleed=1"
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of hp-officejet_4200_series-hpijs.ppd, 20599 bytes.
+*% End of hp-officejet_4200_series-hpijs.ppd, 20963 bytes.

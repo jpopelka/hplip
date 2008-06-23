@@ -1,7 +1,7 @@
 /*****************************************************************************\
     hpijs.cpp : HP Inkjet Server
 
-    Copyright (c) 2001 - 2004, Hewlett-Packard Co.
+    Copyright (c) 2001 - 2008, Hewlett-Packard Co.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -168,143 +168,159 @@ int hpijs_enum_cb(void *enum_cb_data, IjsServerCtx *ctx, IjsJobId job_id,
  * preceded by set DeviceManufacturer and DeviceModel.
  */
 int hpijs_set_cb (void *set_cb_data, IjsServerCtx *ctx, IjsJobId job_id,
-        const char *key, const char *value, int value_size)
+                  const char *key, const char *value, int value_size)
 {
-   UXServices *pSS = (UXServices*)set_cb_data;
-   int fd, r;
-   char *tail;
-   int status = 0;
-   char svalue[IJS_MAX_PARAM+1];   
-   float w, h, dx, dy;
+    UXServices  *pSS = (UXServices*)set_cb_data;
+    int         fd, r;
+    char        *tail;
+    int         status = 0;
+    char        svalue[IJS_MAX_PARAM+1];   
+    float       w, h, dx, dy;
+    int         iVal;
 
-   /* Sanity check input value. */
-   if (value_size > IJS_MAX_PARAM)
-   {
-     memcpy(svalue, value, IJS_MAX_PARAM);
-     svalue[IJS_MAX_PARAM] = 0;
-   }
-   else
-   {
-     memcpy(svalue, value, value_size);
-     svalue[value_size] = 0;
-   }
+    /* Sanity check input value. */
+    if (value_size > IJS_MAX_PARAM)
+    {
+        memcpy(svalue, value, IJS_MAX_PARAM);
+        svalue[IJS_MAX_PARAM] = 0;
+    }
+    else
+    {
+        memcpy(svalue, value, value_size);
+        svalue[value_size] = 0;
+    }
 
-   if (!strcmp (key, "OutputFD"))
-   {
-      fd = strtol(svalue, &tail, 10);
-      pSS->OutputPath = fd;   /* set prn_stream as output of SS::ToDevice */
-   }
-   else if (!strcmp (key, "DeviceManufacturer"))
-   {
-      if ((strncasecmp(svalue, "HEWLETT-PACKARD", 15) != 0) &&
-         (strncasecmp(svalue, "APOLLO", 6) != 0) && (strncasecmp(svalue, "HP", 2) != 0))
-      {
-         bug("unable to set DeviceManufacturer=%s\n", svalue);
-         status = -1;
-      }
-   }
-   else if (!strcmp (key, "DeviceModel"))
-   {
-      if ((r = pSS->pPC->SelectDevice(svalue)) != NO_ERROR)
-      {
-         /* OfficeJet LX is not very unique, do separate check here. */
-         if (!strncmp(svalue,"OfficeJet", 10))
-	    r = pSS->pPC->SelectDevice("DESKJET 540");
-      }
+    if (!strcmp (key, "OutputFD"))
+    {
+        fd = strtol(svalue, &tail, 10);
+        pSS->OutputPath = fd;   /* set prn_stream as output of SS::ToDevice */
+    }
+    else if (!strcmp (key, "DeviceManufacturer"))
+    {
+        if ((strncasecmp(svalue, "HEWLETT-PACKARD", 15) != 0) &&
+            (strncasecmp(svalue, "APOLLO", 6) != 0) && (strncasecmp(svalue, "HP", 2) != 0))
+        {
+            bug("unable to set DeviceManufacturer=%s\n", svalue);
+            status = -1;
+        }
+    }
+    else if (!strcmp (key, "DeviceModel"))
+    {
+        if ((r = pSS->pPC->SelectDevice(svalue)) != NO_ERROR)
+        {
+            /* OfficeJet LX is not very unique, do separate check here. */
+            if (!strncmp(svalue,"OfficeJet", 10))
+            r = pSS->pPC->SelectDevice("DESKJET 540");
+        }
 
-      if (r == NO_ERROR)
-      {
-         pSS->Model = 1;
+        if (r == NO_ERROR)
+        {
+            pSS->Model = 1;
 
-         /* Got a valid device class, let's set some print mode defaults. */
-         BOOL        bDevText;
-         pSS->pPC->GetPrintModeSettings((QUALITY_MODE &)pSS->Quality, (MEDIATYPE &)pSS->MediaType, (COLORMODE &)pSS->ColorMode, bDevText);
-      }
-      else
-      {
-         bug("unable to set device=%s, err=%d\n", svalue, r);
-         status = -1;
-      }
-   }
-   else if ((strcmp (key, "PS:Duplex") == 0) || (strcmp (key, "Duplex") == 0))
-   {
-      if (strncmp(svalue, "true", 4) == 0)
-         pSS->Duplex = 1;
-      else
-         pSS->Duplex = 0;
-   }
-   else if ((strcmp (key, "PS:Tumble") == 0) || (strcmp (key, "Tumble") == 0))
-   {
-      if (strncmp(svalue, "true", 4) == 0)
-         pSS->Tumble = 1;
-      else
-         pSS->Tumble = 0;
-   }
-   else if (!strcmp (key, "PaperSize"))
-   {
-      w = (float)strtod(svalue, &tail);
-      h = (float)strtod(tail+1, &tail);
+            /* Got a valid device class, let's set some print mode defaults. */
+            BOOL        bDevText;
+            pSS->pPC->GetPrintModeSettings((QUALITY_MODE &)pSS->Quality, (MEDIATYPE &)pSS->MediaType, (COLORMODE &)pSS->ColorMode, bDevText);
+        }
+        else
+        {
+            bug("unable to set device=%s, err=%d\n", svalue, r);
+            status = -1;
+        }
+    }
+    else if ((strcmp (key, "PS:Duplex") == 0) || (strcmp (key, "Duplex") == 0))
+    {
+        if (strncmp(svalue, "true", 4) == 0)
+            pSS->Duplex = 1;
+        else
+            pSS->Duplex = 0;
+    }
+    else if ((strcmp (key, "PS:Tumble") == 0) || (strcmp (key, "Tumble") == 0))
+    {
+        if (strncmp(svalue, "true", 4) == 0)
+            pSS->Tumble = 1;
+        else
+            pSS->Tumble = 0;
+    }
+    else if (!strcmp (key, "PaperSize"))
+    {
+        w = (float)strtod(svalue, &tail);
+        h = (float)strtod(tail+1, &tail);
 
-      if (pSS->FirstRaster)
-      {
-         /* Normal start of print Job. */
-         pSS->PaperWidth = w;
-         pSS->PaperHeight = h;
-         hpijs_set_context(pSS);
-      }
-      else
-      {
-
-         dx = w > pSS->PaperWidth ? w - pSS->PaperWidth : pSS->PaperWidth - w;
-         dy = h > pSS->PaperHeight ? h - pSS->PaperHeight :  pSS->PaperHeight - h;
-
-         /* Middle of print Job, ignore paper size if same. */
-         if ((dx > 0.03) || (dy > 0.03))
-         {
-            pSS->FirstRaster = 1;  /* force new Job */
-            pSS->PaperWidth = w;   /* set new paper size */
+        if (pSS->FirstRaster)
+        {
+            /* Normal start of print Job. */
+            pSS->PaperWidth = w;
             pSS->PaperHeight = h;
             hpijs_set_context(pSS);
-         }
-      }
-   }
-   else if (!strcmp (key, "TopLeft"))
-   {
-      /* not currently used */
-   }
-   else if (!strcmp (key, "Quality:Quality"))
-   {
-      pSS->Quality = (QUALITY_MODE) strtol(svalue, &tail, 10);
-   }
-   else if (!strcmp (key, "Quality:MediaType"))
-   {
-      pSS->MediaType = (MEDIATYPE) strtol(svalue, &tail, 10);
-   }
-   else if (!strcmp (key, "Quality:ColorMode"))
-   {
-      pSS->ColorMode = (COLORMODE) strtol(svalue, &tail, 10);
-   }
-   else if (!strcmp (key, "Quality:PenSet"))
-   {
-      pSS->PenSet = (PEN_TYPE) strtol(svalue, &tail, 10);
-   }
-   else if (!strcmp (key, "Quality:FullBleed"))
-   {
-      pSS->FullBleed = strtol(svalue, &tail, 10);
-   }
-   else if (!strcmp (key, "PS:MediaPosition"))
-   {
-      pSS->MediaPosition = strtol(svalue, &tail, 10);
-   }
+        }
+        else
+        {
+
+            dx = w > pSS->PaperWidth ? w - pSS->PaperWidth : pSS->PaperWidth - w;
+            dy = h > pSS->PaperHeight ? h - pSS->PaperHeight :  pSS->PaperHeight - h;
+
+            /* Middle of print Job, ignore paper size if same. */
+            if ((dx > 0.03) || (dy > 0.03))
+            {
+                pSS->FirstRaster = 1;  /* force new Job */
+                pSS->PaperWidth = w;   /* set new paper size */
+                pSS->PaperHeight = h;
+                hpijs_set_context(pSS);
+            }
+        }
+    }
+    else if (!strcmp (key, "TopLeft"))
+    {
+        /* not currently used */
+    }
+    else if (!strcmp (key, "Quality:Quality"))
+    {
+        pSS->Quality = (QUALITY_MODE) strtol(svalue, &tail, 10);
+    }
+    else if (!strcmp (key, "Quality:MediaType"))
+    {
+        pSS->MediaType = (MEDIATYPE) strtol(svalue, &tail, 10);
+    }
+    else if (!strcmp (key, "Quality:ColorMode"))
+    {
+        pSS->ColorMode = (COLORMODE) strtol(svalue, &tail, 10);
+    }
+    else if (!strcmp (key, "Quality:PenSet"))
+    {
+        pSS->PenSet = (PEN_TYPE) strtol(svalue, &tail, 10);
+    }
+    else if (!strcmp (key, "Quality:FullBleed"))
+    {
+        pSS->FullBleed = strtol(svalue, &tail, 10);
+    }
+    else if (!strcmp (key, "PS:MediaPosition"))
+    {
+        pSS->MediaPosition = strtol(svalue, &tail, 10);
+    }
     else if (!strcmp (key, "DryTime"))
     {
-        int    iDryTime = strtol (svalue, &tail, 10);
-        pSS->pPC->SetPrinterHint (0x4, iDryTime);
+        iVal = strtol (svalue, &tail, 10);
+        pSS->pPC->SetPrinterHint (EXTRA_DRYTIME_HINT, iVal);
     }
-   else
-      bug("unable to set key=%s, value=%s\n", key, svalue);    
+    else if (!strcmp (key, "RedEye"))
+    {
+        iVal = strtol (svalue, &tail, 10);
+        pSS->pPC->SetPrinterHint (RED_EYE_REMOVAL_HINT, iVal);
+    }
+    else if (!strcmp (key, "PhotoFix"))
+    {
+        iVal = strtol (svalue, &tail, 10);
+        pSS->pPC->SetPrinterHint (PHOTO_FIX_HINT, iVal);
+    }
+    else if (!strcmp (key, "MaxJpegFileSize"))
+    {
+        iVal = strtol (svalue, &tail, 10);
+        pSS->pPC->SetPrinterHint (MAX_FILE_SIZE_HINT, iVal);
+    }  
+    else
+        bug("unable to set key=%s, value=%s\n", key, svalue);    
 
-   return status;
+    return status;
 }
 
 /* Get parameter (from the server) call back. Note, all calls must be preceded by set DeviceName. */

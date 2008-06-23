@@ -23,86 +23,34 @@ lib_LTLIBRARIES =
 if DOC_BUILD
 wwwsrc = doc
 www0dir = $(docdir)
-dist_www0_DATA = $(wwwsrc)/contacts.html $(wwwsrc)/faqs.html $(wwwsrc)/features.html $(wwwsrc)/index.html $(wwwsrc)/legal.html $(wwwsrc)/license.html $(wwwsrc)/mailing_lists.html \
-   $(wwwsrc)/release_notes.html $(wwwsrc)/screenshots.html $(wwwsrc)/support_statement.html $(wwwsrc)/system_requirements.html $(wwwsrc)/about.html \
-   $(wwwsrc)/other_support.html $(wwwsrc)/downloads.html
-www1dir = $(docdir)/howtos
-dist_www1_DATA = $(wwwsrc)/howtos/*
-www2dir = $(docdir)/install
-dist_www2_DATA = $(wwwsrc)/install/index.html $(wwwsrc)/install/installtree.html
-www21dir = $(docdir)/install/step1
-dist_www21_DATA = $(wwwsrc)/install/step1/*
-www22dir = $(docdir)/install/step2
-dist_www22_DATA = $(wwwsrc)/install/step2/*
-www23dir = $(docdir)/install/step3
-dist_www23_DATA = $(wwwsrc)/install/step3/*
-www24dir = $(docdir)/install/step4
-dist_www24_DATA = $(wwwsrc)/install/step4/index.html
-www241dir = $(docdir)/install/step4/cups
-dist_www241_DATA = $(wwwsrc)/install/step4/cups/*
-www242dir = $(docdir)/install/step4/setup
-dist_www242_DATA = $(wwwsrc)/install/step4/setup/*
-www243dir = $(docdir)/install/step4/suse
-dist_www243_DATA = $(wwwsrc)/install/step4/suse/*
-www251dir = $(docdir)/install/manual
-dist_www251_DATA = $(wwwsrc)/install/manual/*
-www252dir = $(docdir)/install/manual/distros
-dist_www252_DATA = $(wwwsrc)/install/manual/distros/*
-www261dir = $(docdir)/install/install
-dist_www261_DATA = $(wwwsrc)/install/install/*
+dist_www0_DATA = $(wwwsrc)/index.html $(wwwsrc)/commandline.html $(wwwsrc)/copying.html $(wwwsrc)/devicemanager.html $(wwwsrc)/faxtrouble.html $(wwwsrc)/gettinghelp.html $(wwwsrc)/hpscan.html $(wwwsrc)/mainttask.html $(wwwsrc)/plugins.html $(wwwsrc)/print.html $(wwwsrc)/printing.html $(wwwsrc)/printoptions.html $(wwwsrc)/printtroubleshooting.html $(wwwsrc)/scanning.html $(wwwsrc)/scantrouble.html $(wwwsrc)/sendfax.html $(wwwsrc)/setup.html $(wwwsrc)/systray.html $(wwwsrc)/troubleshooting.html $(wwwsrc)/uninstalling.html $(wwwsrc)/upgrading.html
 www3dir = $(docdir)/styles
 dist_www3_DATA = $(wwwsrc)/styles/*
 www4dir = $(docdir)/images
 dist_www4_DATA = $(wwwsrc)/images/*
-www5dir = $(docdir)/supported_devices
-dist_www5_DATA = $(wwwsrc)/supported_devices/*
-www6dir = $(docdir)/tech_docs
-dist_www6_DATA = $(wwwsrc)/tech_docs/*
-www61dir = $(docdir)/tech_docs/man_pages
-dist_www61_DATA = $(wwwsrc)/tech_docs/man_pages/*
-www7dir = $(docdir)/troubleshooting
-dist_www7_DATA = $(wwwsrc)/troubleshooting/*
-www8dir = $(docdir)/models
-dist_www8_DATA = $(wwwsrc)/models/index.html
-www82dir = $(docdir)/models/deskjet
-dist_www82_DATA = $(wwwsrc)/models/deskjet/*
-www83dir = $(docdir)/models/deskjet_aio
-dist_www83_DATA = $(wwwsrc)/models/deskjet_aio/*
-www84dir = $(docdir)/models/photosmart
-dist_www84_DATA = $(wwwsrc)/models/photosmart/*
-www85dir = $(docdir)/models/officejet
-dist_www85_DATA = $(wwwsrc)/models/officejet/*
-www86dir = $(docdir)/models/psc
-dist_www86_DATA = $(wwwsrc)/models/psc/*
-www87dir = $(docdir)/models/laserjet
-dist_www87_DATA = $(wwwsrc)/models/laserjet/*
-www88dir = $(docdir)/models/color_laserjet
-dist_www88_DATA = $(wwwsrc)/models/color_laserjet/*
-www89dir = $(docdir)/models/bij
-dist_www89_DATA = $(wwwsrc)/models/bij/*
-www810dir = $(docdir)/models/edgeline
-dist_www810_DATA = $(wwwsrc)/models/edgeline/*
-www811dir = $(docdir)/models/apollo
-dist_www811_DATA = $(wwwsrc)/models/apollo/*
-www812dir = $(docdir)/models/other
-dist_www812_DATA = $(wwwsrc)/models/other/*
 endif
 
 if HPLIP_BUILD
 
 dist_hplip_DATA = scan/sane/hpaio.desc
-dist_hplip_SCRIPTS = hpssd.py __init__.py install.py hplip-install
+dist_hplip_SCRIPTS = hpssd.py __init__.py install.py hplip-install dat2drv.py
 
 cmddir = $(hplipdir)
 dist_cmd_SCRIPTS = align.py info.py print.py toolbox.py clean.py colorcal.py unload.py testpage.py makeuri.py check.py fab.py levels.py \
-	sendfax.py setup.py makecopies.py probe.py timedate.py firmware.py scan.py systray.py
+	sendfax.py setup.py makecopies.py probe.py timedate.py firmware.py scan.py systray.py plugin.py
 
 # hp backend.
 hpdir = $(cupsbackenddir)
 hp_PROGRAMS = hp
 hp_SOURCES = prnt/backend/hp.c
-hp_LDADD = libhpmud.la
+hp_LDADD = libhpmud.la $(DBUS_LIBS)
 hp_CFLAGS = $(DBUS_CFLAGS)
+
+# hp-mkuri.
+hp_mkuridir = $(bindir)
+hp_mkuri_PROGRAMS = hp-mkuri
+hp_mkuri_SOURCES = io/hpmud/hp-mkuri.c
+hp_mkuri_LDADD = libhpmud.la
 
 # base
 basedir = $(hplipdir)/base
@@ -206,7 +154,7 @@ pcardext_la_CFLAGS = -I$(PYTHONINCLUDEDIR)
 
 # prnt
 prntdir = $(hplipdir)/prnt
-dist_prnt_SCRIPTS = prnt/cups.py prnt/__init__.py prnt/ldl.py prnt/pcl.py prnt/colorcal.py prnt/printable_areas.py
+dist_prnt_SCRIPTS = prnt/cups.py prnt/__init__.py prnt/ldl.py prnt/pcl.py prnt/colorcal.py
 
 # cupsext
 cupsextdir = $(pyexecdir)
@@ -214,10 +162,11 @@ cupsext_LTLIBRARIES = cupsext.la
 cupsext_la_LDFLAGS = -module -avoid-version
 cupsext_la_SOURCES =  prnt/cupsext/cupsext.c 
 cupsext_la_CFLAGS = -I$(PYTHONINCLUDEDIR)
+cupsext_la_LIBADD = -lcups
 
 # ip library
 lib_LTLIBRARIES += libhpip.la
-libhpip_la_LDFLAGS = -version-info 0:1:0
+libhpip_la_LDFLAGS = -lm -version-info 0:1:0
 libhpip_la_SOURCES = ip/xconvolve.c ip/xfax.c ip/xgrayout.c ip/xjpg_dct.c ip/xjpg_fix.c ip/xpad.c ip/xrotate.c ip/xskel.c ip/xtiff.c \
 	ip/ipmain.c ip/xchgbpp.c ip/xcrop.c ip/xgamma.c ip/xjpg_dec.c ip/xjpg_huf.c ip/xpcx.c ip/xsaturation.c ip/xtable.c ip/xtonemap.c \
 	ip/xbi2gray.c ip/xcolrspc.c ip/xfakemono.c ip/xgray2bi.c ip/xinvert.c ip/xjpg_enc.c ip/xmatrix.c ip/xpnm.c ip/xscale.c ip/xthumb.c ip/xyxtract.c \
@@ -233,12 +182,12 @@ libsane_hpaio_la_SOURCES = scan/sane/hpaio.c scan/sane/mfpdtf.c scan/sane/pml.c 
 	  scan/sane/common.c scan/sane/common.h scan/sane/soap.h scan/sane/soapht.h scan/sane/sanei_debug.h scan/sane/sanei.h \
 	  scan/sane/sanei_init_debug.c scan/sane/marvell.h $(BB_SCAN_SOURCES)
 if DARWIN_BUILD
-libsane_hpaio_la_LDFLAGS = -module -framework CoreFoundation -version-info 1:0:0
+libsane_hpaio_la_LDFLAGS = -module -framework CoreFoundation $(BB_SCAN_VERSION)
 else
-libsane_hpaio_la_LDFLAGS = -version-info 1:0:0
+libsane_hpaio_la_LDFLAGS = $(BB_SCAN_VERSION)
 endif
 # The following is a interlibrary dependency that must be compiled first.
-libsane_hpaio_la_LIBADD = libhpip.la libhpmud.la
+libsane_hpaio_la_LIBADD = libhpip.la libhpmud.la $(DBUS_LIBS) -lcups
 #libsane_hpaio_la_CFLAGS = -DWITH_NONAMESPACES -DSOAP_DEBUG
 libsane_hpaio_la_CFLAGS = $(DBUS_CFLAGS) $(BB_SCAN_CFLAGS)
 
@@ -261,7 +210,11 @@ lib_LTLIBRARIES += libhpmud.la
 libhpmud_la_SOURCES = io/hpmud/hpmud.c io/hpmud/mlc.c io/hpmud/model.c io/hpmud/musb.c io/hpmud/pml.c \
 	  io/hpmud/hpmud.h io/hpmud/hpmudi.h io/hpmud/list.h io/hpmud/mlc.h io/hpmud/musb.h io/hpmud/pml.h io/hpmud/dot4.c \
 	  io/hpmud/dot4.h io/hpmud/jd.c io/hpmud/jd.h io/hpmud/pp.c io/hpmud/pp.h 
-libhpmud_la_LDFLAGS = -version-info 0:2:0
+if NETWORK_BUILD
+libhpmud_la_LDFLAGS = -version-info 0:2:0 -lusb -lpthread -lnetsnmp -lcrypto
+else
+libhpmud_la_LDFLAGS = -version-info 0:2:0 -lusb -lpthread
+endif
 libhpmud_la_CFLAGS = -DMUDNAME=\"$(MUDNAME)\" -DCONFDIR=\"$(hplip_confdir)\"
 
 # hpmudext
@@ -296,17 +249,18 @@ dist_ui_SCRIPTS = ui/alignform.py \
 	ui/makecopiesform.py ui/setupform_base.py ui/setupform.py ui/setupmanualfind_base.py \
 	ui/setupmanualfind.py ui/setupsettings_base.py ui/setupsettings.py ui/scrollview.py \
 	ui/scrollprintsettings.py ui/scrollprint.py ui/scrollfax.py \
-	ui/scrollunload.py ui/scrollcopy.py ui/pluginform.py ui/pluginform_base.py ui/systemtray_qt3.py \
-	ui/systemtray_qt4.py ui/ui_utils.py ui/jobstoragemixin.py
+	ui/scrollunload.py ui/scrollcopy.py ui/pluginform2.py ui/pluginform2_base.py ui/systemtray_qt3.py \
+	ui/systemtray_qt4.py ui/ui_utils.py ui/jobstoragemixin.py ui/pluginlicenseform_base.py ui/pluginlicenseform.py
+
 dist_noinst_DATA += ui/colorcalform2_base.ui ui/settingsdialog_base.ui ui/aligntype6form1_base.ui \
 	ui/aboutdlg_base.ui ui/imagepropertiesdlg_base.ui ui/paperedgealignform_base.ui ui/aligntype6form2_base.ui \
 	ui/nodevicesform_base.ui ui/cleaningform_base.ui ui/colorcalform_base.ui ui/devmgr4_base.ui ui/loadpaperform_base.ui \
 	ui/cleaningform2_base.ui ui/waitform_base.ui ui/coloradjform_base.ui ui/faxaddrbookeditform_base.ui \
 	ui/faxaddrbookform_base.ui ui/faxaddrbookgroupeditform_base.ui ui/faxaddrbookgroupsform_base.ui \
-	ui/align10form_base.ui  ui/pluginform_base.ui \
+	ui/align10form_base.ui  ui/pluginform2_base.ui \
 	plugins/powersettingsdialog_base.ui ui/faxsettingsform_base.ui ui/coverpageform_base.ui \
 	ui/allowabletypesdlg_base.ui ui/setupform_base.ui ui/setupmanualfind_base.ui \
-	ui/setupsettings_base.ui
+	ui/setupsettings_base.ui ui/pluginlicenseform_base.ui
 endif
 
 # ui plugins
@@ -345,6 +299,7 @@ noinst_PROGRAMS += hppgsz
 hppgsz_SOURCES = $(apdk_SOURCES) prnt/hpijs/PrinterProperties.cpp prnt/hpijs/PrinterProperties.h
 hppgsz_CXXFLAGS = $(hpijs_CXXFLAGS)
 hppgsz_CFLAGS = $(hpijs_CXXFLAGS) -Iprnt/hpijs
+hppgsz_LDADD = $(hpijs_LDADD)
 
 # hplip.desktop
 hplip_desktopdir = $(icondir)
@@ -405,18 +360,20 @@ apdk_SOURCES = prnt/hpijs/models.cpp prnt/hpijs/breaks_open.cpp \
 	prnt/hpijs/ljjetready.cpp prnt/hpijs/ljjetready.h prnt/hpijs/jdatadbf.c prnt/hpijs/jccolor.c prnt/hpijs/ljfastraster.cpp prnt/hpijs/ljfastraster.h \
 	prnt/hpijs/jinclude.h prnt/hpijs/jpegint.h prnt/hpijs/dj55xx.h prnt/hpijs/hpijsfax.h prnt/hpijs/ojprokx50.h \
 	prnt/hpijs/ljzjs.cpp prnt/hpijs/ljzjs.h prnt/hpijs/ljzjsmono.cpp prnt/hpijs/ljm1005.cpp prnt/hpijs/ljm1005.h \
-                prnt/hpijs/ljzjsmono.h prnt/hpijs/hpjbig_wrapper.h
+	prnt/hpijs/ljzjsmono.h prnt/hpijs/hpjbig_wrapper.h prnt/hpijs/quickconnect.cpp prnt/hpijs/quickconnect.h
 hpijs_SOURCES = $(apdk_SOURCES) prnt/hpijs/hpijs.cpp prnt/hpijs/ijs_server.c prnt/hpijs/ijs.c prnt/hpijs/hpijsfax.cpp prnt/hpijs/services.cpp \
 	prnt/hpijs/hpijs.h prnt/hpijs/ijs.h prnt/hpijs/ijs_server.h prnt/hpijs/services.h prnt/hpijs/ijs_client.h prnt/hpijs/hpiom.c prnt/hpijs/hpiom.h 
 hpijs_CXXFLAGS = -DAPDK_DJ660 -DAPDK_DJ6xx -DAPDK_DJ6xxPhoto -DAPDK_DJ8xx -DAPDK_DJ9xx -DAPDK_DJ9xxVIP -DAPDK_DJ630 \
 	-DAPDK_APOLLO2XXX -DAPDK_APOLLO21XX -DAPDK_APOLLO2560 -DAPDK_DJ600 -DAPDK_DJ350 -DAPDK_DJ8x5 -DAPDK_PSP100 -DAPDK_AUTODUPLEX \
 	-DAPDK_HIGH_RES_MODES -DAPDK_LJMONO -DAPDK_DJ540 -DAPDK_DJ850 -DAPDK_DJ890 -DAPDK_DJ3320 -DAPDK_LJCOLOR -DAPDK_DJGENERICVIP \
 	-DAPDK_LJJETREADY  -DAPDK_LJFASTRASTER -DAPDK_BUFFER_SEND -DAPDK_LDL_COMPRESS -DAPDK_EXTENDED_MEDIASIZE \
-	-DAPDK_MLC_PRINTER -DAPDK_DJ3600 -DAPDK_LJZJS_MONO -DAPDK_LJM1005 \
+	-DAPDK_MLC_PRINTER -DAPDK_DJ3600 -DAPDK_LJZJS_MONO -DAPDK_LJM1005 -DAPDK_QUICKCONNECT \
                 $(APDK_ENDIAN_FLAG) $(APDK_AUTO_INCLUDE_FLAG) -DAPDK_LINUX -DNDEBUG
 hpijs_CFLAGS = $(hpijs_CXXFLAGS) -Iprnt/hpijs
 if HPLIP_BUILD
-hpijs_LDADD = libhpip.la libhpmud.la
+hpijs_LDADD = -ljpeg -ldl libhpip.la libhpmud.la
+else
+hpijs_LDADD = -ljpeg -ldl
 endif
 
 install-data-hook: install-foo
@@ -445,6 +402,7 @@ if HPLIP_BUILD
 	if [ "$(fax_build)" = "yes" ]; then \
 	   mv $(DESTDIR)$(hpfaxdir)/hpfax.py $(DESTDIR)$(hpfaxdir)/hpfax; \
 	   gzip -f $(DESTDIR)$(faxppddir)/HP-Fax-hplip.ppd; \
+	   gzip -f $(DESTDIR)$(faxppddir)/HP-Fax2-hplip.ppd; \
 	fi
 endif # if HPLIP_BUILD
 
@@ -503,5 +461,18 @@ if HPLIP_BUILD
 #	   Remove fax support.
 	rm -f $(DESTDIR)$(hpfaxdir)/hpfax 
 	rm -f $(DESTDIR)$(faxppddir)/HP-Fax-hplip.ppd.gz
+	rm -f $(DESTDIR)$(faxppddir)/HP-Fax2-hplip.ppd.gz
 endif
 
+rpm_unleaded:
+	epm -f rpm hpliplite UNLEADED=1 hplip.list
+rpm_regular:
+	epm -f rpm hplipfull hplip.list
+deb_unleaded:
+	epm -f deb hpliplite UNLEADED=1 hplip.list
+deb_regular:
+	epm -f deb hplipfull hplip.list
+epm_unleaded:
+	epm hpliplite UNLEADED=1 hplip.list
+epm_regular:
+	epm hplipfull hplip.list

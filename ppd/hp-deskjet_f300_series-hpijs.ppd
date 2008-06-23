@@ -1,19 +1,29 @@
 *PPD-Adobe: "4.3"
-*% PPD file for HP DeskJet F300 Foomatic/hpijs with CUPS.
+*% PPD file for HP Deskjet f300 series Foomatic/hpijs with CUPS.
 *% Created by the CUPS PPD Compiler v1.2.0.
 *% (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 *FormatVersion: "4.3"
-*FileVersion: "hpijs 2.8.5.23"
+*FileVersion: "hpijs 2.8.6.20"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "hp-deskjet_f300_series-hpijs.ppd"
-*Product: "(ESP Ghostscript)"
-*Product: "(GPL Ghostscript)"
-*Product: "(GNU Ghostscript)"
+*Product: "HP Deskjet f310"
+*Product: "HP Deskjet f325"
+*Product: "HP Deskjet f335"
+*Product: "HP Deskjet f340"
+*Product: "HP Deskjet f350"
+*Product: "HP Deskjet f370"
+*Product: "HP Deskjet f378"
+*Product: "HP Deskjet f380"
+*Product: "HP Deskjet f385"
+*Product: "HP Deskjet f388"
+*Product: "HP Deskjet f390"
+*Product: "HP Deskjet f394"
+*Product: "HP Deskjet f375"
 *Manufacturer: "HP"
-*ModelName: "HP DeskJet F300 Foomatic/hpijs"
-*ShortNickName: "HP DeskJet F300 Foomatic/hpijs"
-*NickName: "HP DeskJet F300 Foomatic/hpijs, hpijs 2.8.5.23"
+*ModelName: "HP Deskjet f300 series Foomatic/hpijs"
+*ShortNickName: "HP Deskjet f300 series Foomatic/hpijs"
+*NickName: "HP Deskjet f300 series Foomatic/hpijs, hpijs 2.8.6.20"
 *PSVersion: "(3010.000) 705"
 *PSVersion: "(3010.000) 707"
 *PSVersion: "(3010.000) 815"
@@ -203,7 +213,20 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
 Params=Quality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quali&&
 ty:PenSet=2,Quality:FullBleed=1"
 *End
-*1284DeviceID: "MFG:HP;MDL:deskjet f300 series;DES:deskjet f300 series;"
+*1284DeviceID: "MFG:HP;MDL:deskjet_f300_series;DES:deskjet_f300_series;"
+*Product: "HP Deskjet f310"
+*Product: "HP Deskjet f325"
+*Product: "HP Deskjet f335"
+*Product: "HP Deskjet f340"
+*Product: "HP Deskjet f350"
+*Product: "HP Deskjet f370"
+*Product: "HP Deskjet f378"
+*Product: "HP Deskjet f380"
+*Product: "HP Deskjet f385"
+*Product: "HP Deskjet f388"
+*Product: "HP Deskjet f390"
+*Product: "HP Deskjet f394"
+*Product: "HP Deskjet f375"
 *cupsVersion: 1.3
 *cupsModelNumber: 0
 *cupsManualCopies: True
@@ -393,4 +416,4 @@ ty:PenSet=2,Quality:FullBleed=1"
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of hp-deskjet_f300_series-hpijs.ppd, 20583 bytes.
+*% End of hp-deskjet_f300_series-hpijs.ppd, 21249 bytes.

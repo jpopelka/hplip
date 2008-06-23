@@ -53,12 +53,53 @@ typedef struct
 static LabelRecord head;   /* list of labels from include files */
 static char homedir[255] = "";
 
+static int GetPair(char *buf, int buf_len, char *key, char *value, char **tail)
+{
+   int i=0, j;
+
+   key[0] = 0;
+   value[0] = 0;
+
+   if (buf[i] == '#')
+   {
+      for (; buf[i] != '\n' && i < buf_len; i++);  /* eat comment line */
+      if (buf[i] == '\n')
+         i++;   /* bump past '\n' */
+   }
+
+   j = 0;
+   while ((buf[i] != '=') && (i < buf_len) && (j < HPMUD_LINE_SIZE))
+      key[j++] = buf[i++];
+   for (j--; key[j] == ' ' && j > 0; j--);  /* eat white space before = */
+   key[++j] = 0;
+
+   if (buf[i] == '=')
+      for (i++; buf[i] == ' ' && i < buf_len; i++);  /* eat white space after = */
+
+   j = 0;
+   while ((buf[i] != '\n') && (i < buf_len) && (j < HPMUD_LINE_SIZE))
+      value[j++] = buf[i++];
+   for (j--; value[j] == ' ' && j > 0; j--);  /* eat white space before \n */
+   value[++j] = 0;
+
+   if (buf[i] == '\n')
+     i++;   /* bump past '\n' */
+
+   if (tail != NULL)
+      *tail = buf + i;  /* tail points to next line */
+
+   return i;
+}
+
 static int ReadConfig()
 {
+   char key[HPMUD_LINE_SIZE];
+   char value[HPMUD_LINE_SIZE];
    char rcbuf[255];
    char section[32];
+   char *tail;
    FILE *inFile = NULL;
-   int n, stat=1;
+   int stat=1;
 
    homedir[0] = 0;
         
@@ -74,12 +115,17 @@ static int ReadConfig()
    while ((fgets(rcbuf, sizeof(rcbuf), inFile) != NULL))
    {
       if (rcbuf[0] == '[')
-         strncpy(section, rcbuf, sizeof(section)); /* found new section */
-      else if ((strncasecmp(section, "[dirs]", 6) == 0) && (strncasecmp(rcbuf, "home=", 5) == 0))
       {
-         strncpy(homedir, rcbuf+5, sizeof(homedir));
-         n = strlen(homedir);
-         homedir[n-1]=0;  /* remove CR */
+         strncpy(section, rcbuf, sizeof(section)); /* found new section */
+         continue;
+      }
+
+      GetPair(rcbuf, strlen(rcbuf), key, value, &tail);
+
+      if ((strncasecmp(section, "[dirs]", 6) == 0) && (strcasecmp(key, "home") == 0))
+      {
+         strncpy(homedir, value, sizeof(homedir));
+         break;  /* done */
       }
    }
         
@@ -400,41 +446,6 @@ bugout:
    return found;
 }
 
-static int GetPair(char *buf, char *key, char *value, char **tail)
-{
-   int i=0, j;
-
-   key[0] = 0;
-   value[0] = 0;
-
-   if (buf[i] == '#')
-   {
-      for (; buf[i] != '\n' && i < SECTION_SIZE; i++);  /* eat comment line */
-      i++;
-   }
-
-   j = 0;
-   while ((buf[i] != '=') && (i < SECTION_SIZE) && (j < HPMUD_LINE_SIZE))
-      key[j++] = buf[i++];
-   for (j--; key[j] == ' ' && j > 0; j--);  /* eat white space before = */
-   key[++j] = 0;
-
-   for (i++; buf[i] == ' ' && i < SECTION_SIZE; i++);  /* eat white space after = */
-
-   j = 0;
-   while ((buf[i] != '\n') && (i < SECTION_SIZE) && (j < HPMUD_LINE_SIZE))
-      value[j++] = buf[i++];
-   for (j--; value[j] == ' ' && j > 0; j--);  /* eat white space before \n */
-   value[++j] = 0;
-
-   i++;   /* bump past '\n' */
-
-   if (tail != NULL)
-      *tail = buf + i;  /* tail points to next line */
-
-   return i;
-}
-
 /* Parse and convert all known key value pairs in buffer. Do sanity check on values. */
 static int parse_key_value_pair(char *buf, int len, struct hpmud_model_attributes *ma)
 {
@@ -456,7 +467,7 @@ static int parse_key_value_pair(char *buf, int len, struct hpmud_model_attribute
 
    while (i < len)
    {
-      i += GetPair(tail, key, value, &tail);
+      i += GetPair(tail, len-i, key, value, &tail);
 
       if (strcasecmp(key, "io-mode") == 0)
       {

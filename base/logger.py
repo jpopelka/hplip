@@ -37,6 +37,7 @@ DEFAULT_LOG_LEVEL = 'info'
 
 class Logger(object):
     LOG_LEVEL_NONE = 99
+    #LOG_LEVEL_INFO = 50
     LOG_LEVEL_FATAL = 40
     LOG_LEVEL_ERROR = 30
     LOG_LEVEL_WARN = 20
@@ -98,7 +99,7 @@ class Logger(object):
 
     def __init__(self, module='', level=LOG_LEVEL_INFO, where=LOG_TO_CONSOLE_AND_FILE,
                  log_datetime=False, log_file=None):
-        self.set_level(level)
+                 
         self._where = where
         self._log_file = log_file
         self._log_file_f = None
@@ -107,9 +108,10 @@ class Logger(object):
         self.module = module
         self.pid = os.getpid()
         self.fmt = True
-
+        self.set_level(level)
+        
     def set_level(self, level):
-        if isinstance(level,str):
+        if isinstance(level, str):
             level = level.lower()
             if level in Logger.logging_levels.keys():
                 self._level = Logger.logging_levels.get(level, Logger.LOG_LEVEL_INFO)
@@ -118,10 +120,11 @@ class Logger(object):
                 self.error("Invalid logging level: %s" % level)
                 return False
 
-        elif isinstance(level,int):
+        elif isinstance(level, int):
             if Logger.LOG_LEVEL_DEBUG3 <= level <= Logger.LOG_LEVEL_FATAL:
                 self._level = level
             else:
+                self._level = Logger.LOG_LEVEL_ERROR
                 self.error("Invalid logging level: %d" % level)
                 return False
 

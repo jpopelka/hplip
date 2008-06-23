@@ -41,7 +41,7 @@ except ImportError:
 
 # Local
 from base.g import *
-from base import device, utils, tui
+from base import device, utils, tui, models
 from prnt import cups
 
 pm = None
@@ -107,29 +107,29 @@ USAGE = [ (__doc__, "", "name", True),
         ]
 
 
-plugin_eula = """LICENSE TERMS FOR HP Linux Imaging and Printing (HPLIP) Driver Plug-in
-
-These License Terms govern your Use of the HPLIP Driver Plug-in Software (the "Software"). USE OF THE SOFTWARE INCLUDING, WITHOUT LIMITATION, ANY DOCUMENTATION, IS SUBJECT TO THESE LICENSE TERMS AND THE APPLICABLE AS-IS WARRANTY STATEMENT.  BY DOWNLOADING AND INSTALLING THE SOFTWARE, YOU ARE AGREEING TO BE BOUND BY THESE TERMS. IF YOU DO NOT AGREE TO ALL OF THESE TERMS, DO NOT DOWNLOAD AND INSTALL THE SOFTWARE ON YOUR SYSTEM.
-
-1. License Grant.    HP grants you a license to Use one copy of the Software with HP printing products only.  "Use" includes using, storing, loading, installing, executing, and displaying the Software.  You may not modify the Software or disable any licensing or control features of the Software.
-
-2. Ownership.   The Software is owned and copyrighted by HP or its third party suppliers.  Your license confers no title to, or ownership in, the Software and is not a sale of any rights in the Software.  HP's third party suppliers may protect their rights in the Software in the event of any violation of these license terms.
-
-3. Copies and Adaptations.   You may only make copies or adaptations of the Software for archival purposes or when copying or adaptation is an essential step in the authorized Use of the Software. You must reproduce all copyright notices in the original Software on all copies or adaptations.  You may not copy the Software onto any public network.
-
-4. No Disassembly.   You may not Disassemble the Software unless HP's prior written consent is obtained.  "Disassemble" includes disassembling, decompiling, decrypting, and reverse engineering.   In some jurisdictions, HP's consent may not be required for limited Disassembly.  Upon request, you will provide HP with reasonably detailed information regarding any Disassembly.
-
-5. No Transfer.   You may not assign, sublicense or otherwise transfer all or any part of these License Terms or the Software.
-
-6. Termination.   HP may terminate your license, upon notice, for failure to comply with any of these License Terms.  Upon termination, you must immediately destroy the Software, together with all copies, adaptations and merged portions in any form.
-
-7. Export Requirements.   You may not export or re-export the Software or any copy or adaptation in violation of any applicable laws or regulations.
-
-8. U.S. Government Restricted Rights.   The Software has been developed entirely at private expense.  It is delivered and licensed, as defined in any applicable DFARS, FARS, or other equivalent federal agency regulation or contract clause, as either "commercial computer software" or "restricted computer software", whichever is applicable.  You have only those rights provided for such Software by the applicable clause or regulation or by these License Terms.
-
-9. DISCLAIMER OF WARRANTIES.   TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, HP AND ITS SUPPLIERS PROVIDE THE SOFTWARE "AS IS" AND WITH ALL FAULTS, AND HEREBY DISCLAIM ALL OTHER WARRANTIES AND CONDITIONS, EITHER EXPRESS, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, WARRANTIES OF TITLE AND NON-INFRINGEMENT, ANY IMPLIED WARRANTIES, DUTIES OR CONDITIONS OF MERCHANTABILITY, OF FITNESS FOR A PARTICULAR PURPOSE, AND OF LACK OF VIRUSES ALL WITH REGARD TO THE SOFTWARE.  Some states/jurisdictions do not allow exclusion of implied warranties or limitations on the duration of implied warranties, so the above disclaimer may not apply to you in its entirety.
-
-10. LIMITATION OF LIABILITY.  Notwithstanding any damages that you might incur, the entire liability of HP and any of its suppliers under any provision of this agreement and your exclusive remedy for all of the foregoing shall be limited to the greater of the amount actually paid by you separately for the Software or U.S. $5.00.  TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL HP OR ITS SUPPLIERS BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES WHATSOEVER (INCLUDING, BUT NOT LIMITED TO, DAMAGES FOR LOSS OF PROFITS OR CONFIDENTIAL OR OTHER INFORMATION, FOR BUSINESS INTERRUPTION, FOR PERSONAL INJURY, FOR LOSS OF PRIVACY ARISING OUT OF OR IN ANY WAY RELATED TO THE USE OF OR INABILITY TO USE THE SOFTWARE, OR OTHERWISE IN CONNECTION WITH ANY PROVISION OF THIS AGREEMENT, EVEN IF HP OR ANY SUPPLIER HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES AND EVEN IF THE REMEDY FAILS OF ITS ESSENTIAL PURPOSE.  Some states/jurisdictions do not allow the exclusion or limitation of incidental or consequential damages, so the above limitation or exclusion may not apply to you."""
+##plugin_eula = """LICENSE TERMS FOR HP Linux Imaging and Printing (HPLIP) Driver Plug-in
+##
+##These License Terms govern your Use of the HPLIP Driver Plug-in Software (the "Software"). USE OF THE SOFTWARE INCLUDING, WITHOUT LIMITATION, ANY DOCUMENTATION, IS SUBJECT TO THESE LICENSE TERMS AND THE APPLICABLE AS-IS WARRANTY STATEMENT.  BY DOWNLOADING AND INSTALLING THE SOFTWARE, YOU ARE AGREEING TO BE BOUND BY THESE TERMS. IF YOU DO NOT AGREE TO ALL OF THESE TERMS, DO NOT DOWNLOAD AND INSTALL THE SOFTWARE ON YOUR SYSTEM.
+##
+##1. License Grant.    HP grants you a license to Use one copy of the Software with HP printing products only.  "Use" includes using, storing, loading, installing, executing, and displaying the Software.  You may not modify the Software or disable any licensing or control features of the Software.
+##
+##2. Ownership.   The Software is owned and copyrighted by HP or its third party suppliers.  Your license confers no title to, or ownership in, the Software and is not a sale of any rights in the Software.  HP's third party suppliers may protect their rights in the Software in the event of any violation of these license terms.
+##
+##3. Copies and Adaptations.   You may only make copies or adaptations of the Software for archival purposes or when copying or adaptation is an essential step in the authorized Use of the Software. You must reproduce all copyright notices in the original Software on all copies or adaptations.  You may not copy the Software onto any public network.
+##
+##4. No Disassembly.   You may not Disassemble the Software unless HP's prior written consent is obtained.  "Disassemble" includes disassembling, decompiling, decrypting, and reverse engineering.   In some jurisdictions, HP's consent may not be required for limited Disassembly.  Upon request, you will provide HP with reasonably detailed information regarding any Disassembly.
+##
+##5. No Transfer.   You may not assign, sublicense or otherwise transfer all or any part of these License Terms or the Software.
+##
+##6. Termination.   HP may terminate your license, upon notice, for failure to comply with any of these License Terms.  Upon termination, you must immediately destroy the Software, together with all copies, adaptations and merged portions in any form.
+##
+##7. Export Requirements.   You may not export or re-export the Software or any copy or adaptation in violation of any applicable laws or regulations.
+##
+##8. U.S. Government Restricted Rights.   The Software has been developed entirely at private expense.  It is delivered and licensed, as defined in any applicable DFARS, FARS, or other equivalent federal agency regulation or contract clause, as either "commercial computer software" or "restricted computer software", whichever is applicable.  You have only those rights provided for such Software by the applicable clause or regulation or by these License Terms.
+##
+##9. DISCLAIMER OF WARRANTIES.   TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, HP AND ITS SUPPLIERS PROVIDE THE SOFTWARE "AS IS" AND WITH ALL FAULTS, AND HEREBY DISCLAIM ALL OTHER WARRANTIES AND CONDITIONS, EITHER EXPRESS, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, WARRANTIES OF TITLE AND NON-INFRINGEMENT, ANY IMPLIED WARRANTIES, DUTIES OR CONDITIONS OF MERCHANTABILITY, OF FITNESS FOR A PARTICULAR PURPOSE, AND OF LACK OF VIRUSES ALL WITH REGARD TO THE SOFTWARE.  Some states/jurisdictions do not allow exclusion of implied warranties or limitations on the duration of implied warranties, so the above disclaimer may not apply to you in its entirety.
+##
+##10. LIMITATION OF LIABILITY.  Notwithstanding any damages that you might incur, the entire liability of HP and any of its suppliers under any provision of this agreement and your exclusive remedy for all of the foregoing shall be limited to the greater of the amount actually paid by you separately for the Software or U.S. $5.00.  TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL HP OR ITS SUPPLIERS BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES WHATSOEVER (INCLUDING, BUT NOT LIMITED TO, DAMAGES FOR LOSS OF PROFITS OR CONFIDENTIAL OR OTHER INFORMATION, FOR BUSINESS INTERRUPTION, FOR PERSONAL INJURY, FOR LOSS OF PRIVACY ARISING OUT OF OR IN ANY WAY RELATED TO THE USE OF OR INABILITY TO USE THE SOFTWARE, OR OTHERWISE IN CONNECTION WITH ANY PROVISION OF THIS AGREEMENT, EVEN IF HP OR ANY SUPPLIER HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES AND EVEN IF THE REMEDY FAILS OF ITS ESSENTIAL PURPOSE.  Some states/jurisdictions do not allow the exclusion or limitation of incidental or consequential damages, so the above limitation or exclusion may not apply to you."""
 
 def usage(typ='text'):
     if typ == 'text':
@@ -452,141 +452,154 @@ else: # INTERACTIVE_MODE
 
         # ******************************* PLUGIN
 
-        from installer import core_install
-        core = core_install.CoreInstall()
-        norm_model = device.normalizeModelName(model).lower()
-
+##        from installer import core_install
+##        core = core_install.CoreInstall()
+        norm_model = models.normalizeModelName(model).lower()
+##
         plugin = mq.get('plugin', PLUGIN_NONE)
-        skip = False
+        #skip = False
 
-        if plugin > PLUGIN_NONE and not core.check_for_plugin(norm_model):
+        plugin_installed = utils.to_bool(sys_cfg.hplip.plugin)
+        if plugin > PLUGIN_NONE and not plugin_installed: 
             tui.header("PLUG-IN INSTALLATION")
-
-
-            plugin_lib = mq.get("plugin-library")
-            fw_download = mq.get("fw-download")
-
-            log.debug("Plug-in library=%s" % plugin_lib)
-            log.debug("FW download=%s" % fw_download)
-
-            if plugin == PLUGIN_REQUIRED:
-                log.debug("Plug-in required and not installed for model %s" % norm_model)
-                log.info(log.bold("A plug-in is required for this printer."))
-                for line in tui.format_paragraph("""An additional software plug-in is required to operate this printer. You may download the plug-in directly from HP, or, if you already have a copy, you can specify a path to the file."""):
-                    log.info(line)
-
-                ok, ans = tui.enter_choice("\nDownload plug-in from HP (recomended) or specify a path to the plug-in (d=download*, p=specify path, q=quit) ? ", ['d', 'p'], 'd')
-
-                if not ok:
-                    sys.exit(0)
-
-            else:
-                log.debug("Plug-in optional and not installed for model %s" % norm_model)
-                log.info(log.bold("A plug-in is optional for this printer."))
-                for line in tui.format_paragraph("""An optional driver plug-in is available to enhance the operation of this printer. You may skip this installation, download the plug-in directly from an HP authorized server, or, if you already have a copy of the file, you can specify a path to the file."""):
-                    log.info(line)            
-
-                ok, ans = tui.enter_choice("\nDownload plug-in from HP (recomended), specify a path to the plug-in, or skip installation (d=download*, p=specify path, s=skip, q=quit) ? ", ['d', 'p', 's'], 'd')
-
-                if not ok:
-                    sys.exit(0)
-
-                if ans == 's':
-                    skip = True
-
-
-            if not skip:
-                log.info(log.bold("\nPlease read the following license agreement:"))
-
-                for para in plugin_eula.split('\n'):
-                    if para:
-                        for line in tui.format_paragraph(para):
-                            log.info(line)
-                    else:
-                        log.info("")
-
-                ok, agree = tui.enter_yes_no("\nDo you agree to the terms of this license", 'n')
-                if not ok or not agree: sys.exit(0)
-
-                if ans == 'd':
-                    log.info("\nChecking for network connection...")
-                    ok = core.check_network_connection()
-
-                    if ok:
-                        #log.info("Downloading configuration...")
-                        pm = tui.ProgressMeter("Downloading configuration:")
-                        url, size, checksum, timestamp, ok = core.get_plugin_info(norm_model,
-                            plugin_download_callback)
-                        log.info("")
-
-                        log.debug("url= %s" % url)
-                        log.debug("size=%d" % size)
-                        log.debug("checksum=%s" % checksum)
-                        log.debug("timestamp=%f" % timestamp)
-
-                        if url and size and checksum and timestamp and ok:
-                            #log.info("Downloading plug-in...")
-
-                            pm = tui.ProgressMeter("Downloading plugin:")
-                            ok, plugin_file = core.download_plugin(norm_model, url, size, 
-                                checksum, timestamp, plugin_download_callback)
-
-                            log.info("")
-
-                            if not ok:
-                                log.error("Plugin download failed.")
-                                sys.exit(1)
-
-                    else:
-                        log.error("Network connection not found.")
-                        sys.exit(1)
-
-
-                else: # "p": path
-                    while True:
-                        user_input = raw_input(log.bold("Enter the path to the %s.plugin file (q=quit) : " % norm_model)).strip()
-                        if user_input.strip().lower() == 'q':
-                            sys.exit(1)
-
-                        if not user_input.endswith('.plugin'):
-                            log.error("Plug-in filename must end with '.plugin' extension.")
-                            continue
-
-                        if os.path.exists(user_input):
-                            ok = core.copy_plugin(norm_model, user_input)
-
-                            if not ok:
-                                log.error("File copy failed.")
-
-                            else:
-                                break
-                        else:
-                            log.error("File not found.")
-
-                if ok:
-                    log.info("Installing plug-in...")
-                    ok = core.install_plugin(norm_model, plugin_lib)
-
-                    if not ok:
-                        log.error("Plug-in install failed.")
-                        sys.exit(1)
-
-                    else:
-                        log.info("\nPlug-in installation complete.\n")
-
-                        # Download firmware if needed
-                        if mq.get('fw-download', 0):
-                            log.info(log.bold("\nDownloading firmware..."))
-                            try:
-                                d = device.Device(print_uri)
-                            except Error:
-                                log.error("Error opening device. Exiting.")
-                                sys.exit(1)
-
-                            if d.downloadFirmware():
-                                log.info("Done.\n")
-
-                            d.close()
+            
+            hp_plugin = utils.which('hp-plugin')
+            
+            if hp_plugin:
+                os.system("hp_plugin -i")
+                
+##
+##
+####            #plugin_lib = mq.get("plugin-library")
+##            fw_download = mq.get("fw-download")
+####
+####            #log.debug("Plug-in library=%s" % plugin_lib)
+####            log.debug("FW download=%s" % fw_download)
+####
+##            if plugin == PLUGIN_REQUIRED:
+##                log.debug("Plug-in required and not installed for model %s" % norm_model)
+##                log.info(log.bold("A plug-in is required for this printer."))
+##                for line in tui.format_paragraph("""An additional software plug-in is required to operate this printer. You may download the plug-in directly from HP, or, if you already have a copy, you can specify a path to the file."""):
+##                    log.info(line)
+##
+##                ok, ans = tui.enter_choice("\nDownload plug-in from HP (recomended) or specify a path to the plug-in (d=download*, p=specify path, q=quit) ? ", ['d', 'p'], 'd')
+##
+##                if not ok:
+##                    sys.exit(0)
+##
+##            else:
+##                log.debug("Plug-in optional and not installed for model %s" % norm_model)
+##                log.info(log.bold("A plug-in is optional for this printer."))
+##                for line in tui.format_paragraph("""An optional driver plug-in is available to enhance the operation of this printer. You may skip this installation, download the plug-in directly from an HP authorized server, or, if you already have a copy of the file, you can specify a path to the file."""):
+##                    log.info(line)            
+##
+##                ok, ans = tui.enter_choice("\nDownload plug-in from HP (recomended), specify a path to the plug-in, or skip installation (d=download*, p=specify path, s=skip, q=quit) ? ", ['d', 'p', 's'], 'd')
+##
+##                if not ok:
+##                    sys.exit(0)
+##
+##                if ans == 's':
+##                    skip = True
+##
+##
+##            if not skip:
+##
+##                from installer import core_install
+##                core = core_install.CoreInstall()
+##                core.set_plugin_version(sys_cfg.hplip.version)
+##
+##                if ans == 'd':
+##                    plugin_conf_url = core.get_plugin_conf_url(version)
+##                    
+##                    ok = True
+##                    if plugin_conf_url.startswith('http'):    
+##                        log.info("\nChecking for network connection...")
+##                    
+##                        ok = core.check_network_connection()
+##                        
+##                    if ok:
+##                            #def get_plugin_info(self, version, url, local_conf, callback):
+####
+##                        log.info("Downloading configuration...")
+##                        pm = tui.ProgressMeter("Downloading configuration:")
+##                        
+##                        url, size, checksum, timestamp, ok = core.get_plugin_info(version,
+##                            plugin_conf_url, plugin_download_callback)
+##                        
+##                        log.info("")
+##
+##                        log.debug("url= %s" % url)
+##                        log.debug("size=%d" % size)
+##                        log.debug("checksum=%s" % checksum)
+##                        log.debug("timestamp=%f" % timestamp)
+##
+##                        if url and size and checksum and timestamp and ok:
+##                            log.info("Downloading plug-in...")
+##
+##                            pm = tui.ProgressMeter("Downloading plugin:")
+##                            ok, plugin_file = core.download_plugin(norm_model, url, size, 
+##                                checksum, timestamp, plugin_download_callback)
+##
+##                            log.info("")
+##
+##                            if not ok:
+##                                log.error("Plugin download failed.")
+##                                sys.exit(1)
+##
+##                    else:
+##                        log.error("Network connection not found.")
+##                        sys.exit(1)
+##
+##
+##                else: # "p": path
+##                    while True:
+##                        user_input = raw_input(log.bold("Enter the path to the %s.plugin file (q=quit) : " % norm_model)).strip()
+##                        if user_input.strip().lower() == 'q':
+##                            sys.exit(1)
+##
+##                        if not user_input.endswith('.plugin'):
+##                            log.error("Plug-in filename must end with '.plugin' extension.")
+##                            continue
+##
+##                        if os.path.exists(user_input):
+##                            ok = core.copy_plugin(norm_model, user_input)
+##
+##                            if not ok:
+##                                log.error("File copy failed.")
+##
+##                            else:
+##                                break
+##                        else:
+##                            log.error("File not found.")
+##
+##                if ok:
+##                    core.run_plugin()
+##                    #pass
+####                    log.info("Installing plug-in...")
+####                    # TODO:
+####                    #ok = core.install_plugin(norm_model, plugin_lib)
+####                    ok = True
+####                    if not ok:
+####                        log.error("Plug-in install failed.")
+####                        sys.exit(1)
+####
+####                    else:
+####                        log.info("\nPlug-in installation complete.\n")
+####
+##                    # Download firmware if needed
+##                    #if mq.get('fw-download', 0):
+##                    if fw_download:
+##                        log.info(log.bold("\nDownloading firmware..."))
+##                        try:
+##                            d = device.Device(print_uri)
+##                        except Error:
+##                            log.error("Error opening device. Exiting.")
+##                            sys.exit(1)
+##
+##                        if d.downloadFirmware():
+##                            log.info("Done.\n")
+##
+##                        d.close()
 
 
         ppds = cups.getSystemPPDs()
@@ -725,7 +738,7 @@ else: # INTERACTIVE_MODE
 
                 ok, enter_ppd = tui.enter_yes_no("\nWould you like to specify the path to the correct PPD file to use", 'n')
                 if not ok: sys.exit(0)
-
+                
                 if enter_ppd:
                     ok = False
 
@@ -764,7 +777,10 @@ else: # INTERACTIVE_MODE
 
                         if ok:
                             break
-
+                else:
+                    log.error("PPD file required. Setup cannot continue. Exiting.")
+                    sys.exit(1)
+                    
             if auto:
                 location, info = '', 'Automatically setup by HPLIP'
             else:

@@ -1624,6 +1624,8 @@ extern SANE_Status sane_hpaio_open(SANE_String_Const devicename, SANE_Handle * p
     snprintf(devname, sizeof(devname)-1, "hp:%s", devicename);   /* prepend "hp:" */
     hpmud_query_model(devname, &ma);
 #ifdef BB_SOURCES
+    if (ma.scantype == HPMUD_SCANTYPE_SOAP)
+       return soap_open(devicename, pHandle);
     if (ma.scantype == HPMUD_SCANTYPE_SOAPHT)
        return soapht_open(devicename, pHandle);
     else if (ma.scantype == HPMUD_SCANTYPE_MARVELL)
@@ -2300,6 +2302,8 @@ extern void sane_hpaio_close(SANE_Handle handle)
     hpaioScanner_t hpaio = (hpaioScanner_t) handle;
 
 #ifdef BB_SOURCES
+    if (strcmp(*((char **)handle), "SOAP") == 0)
+       return soap_close(handle);
     if (strcmp(*((char **)handle), "SOAPHT") == 0)
        return soapht_close(handle);
     else if (strcmp(*((char **)handle), "MARVELL") == 0)
@@ -2328,6 +2332,8 @@ extern const SANE_Option_Descriptor * sane_hpaio_get_option_descriptor(SANE_Hand
     hpaioScanner_t hpaio = ( hpaioScanner_t ) handle;
 
 #ifdef BB_SOURCES
+    if (strcmp(*((char **)handle), "SOAP") == 0)
+       return soap_get_option_descriptor(handle, option);
     if (strcmp(*((char **)handle), "SOAPHT") == 0)
        return soapht_get_option_descriptor(handle, option);
     else if (strcmp(*((char **)handle), "MARVELL") == 0)
@@ -2354,6 +2360,8 @@ extern SANE_Status sane_hpaio_control_option(SANE_Handle handle, SANE_Int option
     char sz[64];
 
 #ifdef BB_SOURCES
+    if (strcmp(*((char **)handle), "SOAP") == 0)
+       return soap_control_option(handle, option, action, pValue, pInfo);
     if (strcmp(*((char **)handle), "SOAPHT") == 0)
        return soapht_control_option(handle, option, action, pValue, pInfo);
     else if (strcmp(*((char **)handle), "MARVELL") == 0)
@@ -2735,6 +2743,8 @@ extern SANE_Status sane_hpaio_get_parameters(SANE_Handle handle, SANE_Parameters
     char *s = "";
 
 #ifdef BB_SOURCES
+    if (strcmp(*((char **)handle), "SOAP") == 0)
+       return soap_get_parameters(handle, pParams);
     if (strcmp(*((char **)handle), "SOAPHT") == 0)
        return soapht_get_parameters(handle, pParams);
     else if (strcmp(*((char **)handle), "MARVELL") == 0)
@@ -2765,6 +2775,8 @@ extern SANE_Status sane_hpaio_start(SANE_Handle handle)
     WORD wResult;
         
 #ifdef BB_SOURCES
+    if (strcmp(*((char **)handle), "SOAP") == 0)
+       return soap_start(handle);
     if (strcmp(*((char **)handle), "SOAPHT") == 0)
        return soapht_start(handle);
     else if (strcmp(*((char **)handle), "MARVELL") == 0)
@@ -3106,6 +3118,8 @@ extern SANE_Status sane_hpaio_read(SANE_Handle handle, SANE_Byte *data, SANE_Int
     WORD wResult;
 
 #ifdef BB_SOURCES
+    if (strcmp(*((char **)handle), "SOAP") == 0)
+       return soap_read(handle, data, maxLength, pLength);
     if (strcmp(*((char **)handle), "SOAPHT") == 0)
        return soapht_read(handle, data, maxLength, pLength);
     else if (strcmp(*((char **)handle), "MARVELL") == 0)
@@ -3268,6 +3282,8 @@ extern void sane_hpaio_cancel( SANE_Handle handle )
     hpaioScanner_t hpaio = ( hpaioScanner_t ) handle;
 
 #ifdef BB_SOURCES
+    if (strcmp(*((char **)handle), "SOAP") == 0)
+       return soap_cancel(handle);
     if (strcmp(*((char **)handle), "SOAPHT") == 0)
        return soapht_cancel(handle);
     else if (strcmp(*((char **)handle), "MARVELL") == 0)

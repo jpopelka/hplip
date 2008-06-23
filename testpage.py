@@ -95,7 +95,17 @@ try:
             sys.exit(0)
 
         elif o in ('-p', '--printer'):
-            printer_name = a
+            if a.startswith('*'):
+                printer_name = cups.getDefaultPrinter()
+                log.debug(printer_name)
+                
+                if printer_name is not None:
+                    log.info("Using CUPS default printer: %s" % printer_name)
+                else:
+                    log.error("CUPS default printer is not set.")
+                
+            else:
+                printer_name = a
 
         elif o in ('-d', '--device'):
             device_uri = a
@@ -124,7 +134,7 @@ try:
     utils.log_title(__title__, __version__)
     
     if os.getuid() == 0:
-        log.error("hp-testpage should not be run as root.")
+        log.warn("hp-testpage should not be run as root.")
 
     if not device_uri and not printer_name:
         try:

@@ -1,7 +1,7 @@
 /*****************************************************************************\
   LJJetReady.h : Interface for the LJJetReady class
 
-  Copyright (c) 1996 - 2001, Hewlett-Packard Co.
+  Copyright (c) 1996 - 2008, Hewlett-Packard Co.
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -207,7 +207,7 @@ protected:
     //----------------------------------------------------------------
     // IJG dest manager callback
     //----------------------------------------------------------------
-    static void jpeg_flush_output_buffer_callback(BYTE* buffer, DWORD size);
+    static void jpeg_flush_output_buffer_callback(JOCTET *outbuf, BYTE* buffer, DWORD size);
 
 private:
     Printer*            thePrinter;

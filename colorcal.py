@@ -257,7 +257,7 @@ try:
     utils.log_title(__title__, __version__)
     
     if os.getuid() == 0:
-        log.error("hp-colorcal should not be run as root.")
+        log.warn("hp-colorcal should not be run as root.")
 
     if not device_uri and not printer_name:
         try:

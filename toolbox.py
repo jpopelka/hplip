@@ -158,7 +158,7 @@ for o, a in opts:
 utils.log_title(__title__, __version__)
 
 if os.getuid() == 0:
-    log.error("hp-toolbox should not be run as root.")
+    log.warn("hp-toolbox should not be run as root.")
 
 ok, lock_file = utils.lock_app('hp-toolbox')
 if not ok:

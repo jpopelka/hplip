@@ -1,19 +1,18 @@
 *PPD-Adobe: "4.3"
-*% PPD file for HP DeskJet 3420 Foomatic/hpijs with CUPS.
+*% PPD file for HP Deskjet 3420 Foomatic/hpijs with CUPS.
 *% Created by the CUPS PPD Compiler v1.2.0.
 *% (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 *FormatVersion: "4.3"
-*FileVersion: "hpijs 2.8.5.23"
+*FileVersion: "hpijs 2.8.6.20"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "hp-deskjet_3420-hpijs.ppd"
-*Product: "(ESP Ghostscript)"
-*Product: "(GPL Ghostscript)"
-*Product: "(GNU Ghostscript)"
+*Product: "HP Deskjet 3420"
+*Product: "HP Deskjet 3420v"
 *Manufacturer: "HP"
-*ModelName: "HP DeskJet 3420 Foomatic/hpijs"
-*ShortNickName: "HP DeskJet 3420 Foomatic/hpijs"
-*NickName: "HP DeskJet 3420 Foomatic/hpijs, hpijs 2.8.5.23"
+*ModelName: "HP Deskjet 3420 Foomatic/hpijs"
+*ShortNickName: "HP Deskjet 3420 Foomatic/hpijs"
+*NickName: "HP Deskjet 3420 Foomatic/hpijs, hpijs 2.8.6.20"
 *PSVersion: "(3010.000) 705"
 *PSVersion: "(3010.000) 707"
 *PSVersion: "(3010.000) 815"
@@ -185,7 +184,9 @@ lity:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet=&&
 ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
 =2"
 *End
-*1284DeviceID: "MFG:HP;MDL:deskjet 3420;DES:deskjet 3420;"
+*1284DeviceID: "MFG:HP;MDL:deskjet_3420;DES:deskjet_3420;"
+*Product: "HP Deskjet 3420"
+*Product: "HP Deskjet 3420v"
 *cupsVersion: 1.3
 *cupsModelNumber: 0
 *cupsManualCopies: True
@@ -219,6 +220,7 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
 *PageSize Oufuku/Oufuku-Hagaki: "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
 *PageSize w558h774/16K: "%% FoomaticRIPOptionSetting: PageSize=w558h774"
 *PageSize w612h935/Executive (JIS): "%% FoomaticRIPOptionSetting: PageSize=w612h935"
+*PageSize 3425-Cover/Cover for HP DeskJet 3425: "%% FoomaticRIPOptionSetting: PageSize=3425-Cover"
 *CloseUI: *PageSize
 *OpenUI *PageRegion/Media Size: PickOne
 *OrderDependency: 10 AnySetup *PageRegion
@@ -249,6 +251,7 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
 *PageRegion Oufuku/Oufuku-Hagaki: "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
 *PageRegion w558h774/16K: "%% FoomaticRIPOptionSetting: PageSize=w558h774"
 *PageRegion w612h935/Executive (JIS): "%% FoomaticRIPOptionSetting: PageSize=w612h935"
+*PageRegion 3425-Cover/Cover for HP DeskJet 3425: "%% FoomaticRIPOptionSetting: PageSize=3425-Cover"
 *CloseUI: *PageRegion
 *DefaultImageableArea: Letter
 *ImageableArea Letter/Letter: "18.00 36.00 594.00 783.00"
@@ -277,6 +280,7 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
 *ImageableArea Oufuku/Oufuku-Hagaki: "18.00 36.00 402.00 558.00"
 *ImageableArea w558h774/16K: "18.00 36.00 540.00 765.00"
 *ImageableArea w612h935/Executive (JIS): "18.00 36.00 594.00 926.00"
+*ImageableArea 3425-Cover/Cover for HP DeskJet 3425: "18.00 36.00 594.00 1107.00"
 *DefaultPaperDimension: Letter
 *PaperDimension Letter/Letter: "612.00 792.00"
 *PaperDimension A4/A4: "595.00 842.00"
@@ -304,6 +308,7 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
 *PaperDimension Oufuku/Oufuku-Hagaki: "420.00 567.00"
 *PaperDimension w558h774/16K: "558.00 774.00"
 *PaperDimension w612h935/Executive (JIS): "612.00 935.00"
+*PaperDimension 3425-Cover/Cover for HP DeskJet 3425: "612.00 1116.00"
 *OpenUI *PrintoutMode/Printout Mode: PickOne
 *OrderDependency: 10.0 AnySetup *PrintoutMode
 *DefaultPrintoutMode: Normal
@@ -371,4 +376,4 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of hp-deskjet_3420-hpijs.ppd, 19228 bytes.
+*% End of hp-deskjet_3420-hpijs.ppd, 19605 bytes.

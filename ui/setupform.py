@@ -29,7 +29,7 @@ import operator
 
 # Local
 from base.g import *
-from base import device, utils
+from base import device, utils, models
 from prnt import cups
 from installer import core_install
 from ui_utils import load_pixmap
@@ -228,26 +228,36 @@ class SetupForm(SetupForm_base):
             self.bus = bus
             self.mq = device.queryModelByURI(self.device_uri)
                     
-            norm_model = device.normalizeModelName(model).lower()
-                    
+            norm_model = models.normalizeModelName(model).lower()
+            
+            core = core_install.CoreInstall()                    
+            core.set_plugin_version() #sys_cfg.hplip.version)
+            
             plugin = self.mq.get('plugin', PLUGIN_NONE)
-            if plugin > PLUGIN_NONE:
+            if plugin > PLUGIN_NONE and not core.check_for_plugin():
+                # need to install plugin
                 
-                plugin_lib = self.mq.get("plugin-library")
-                fw_download = self.mq.get("fw-download")
+                from pluginform2 import PluginForm2
                 
-                self.core = core_install.CoreInstall()
-                if not self.core.check_for_plugin(norm_model):
+                form = PluginForm2()
+                form.exec_loop()
+                
+                #plugin_lib = self.mq.get("plugin-library")
+                #fw_download = self.mq.get("fw-download")
+                
+                #self.core = core_install.CoreInstall()
+                #if not self.core.check_for_plugin(norm_model):
+                #if 1:    
+                    #from pluginform import PluginForm
+                    #plugin_form = PluginForm(self.core, norm_model, plugin, self.device_uri, plugin_lib, fw_download)
+                    # TODO: 
+                #    ok = plugin_form.exec_loop()
+                #    if not ok:
+                #        self.reject()
+                #        return
                     
-                    from pluginform import PluginForm
-                    plugin_form = PluginForm(self.core, norm_model, plugin, self.device_uri, plugin_lib, fw_download)
-                    ok = plugin_form.exec_loop()
-                    if not ok:
-                        self.reject()
-                        return
-                    
-                else:
-                    log.debug("Plugin support already installed")
+                #else:
+                #    log.debug("Plugin support already installed")
 
             self.updatePPDPage()
 
@@ -441,7 +451,7 @@ class SetupForm(SetupForm_base):
                 back_end, is_hp, bus, model, serial, dev_file, host, port = device.parseDeviceURI(d)
 
                 mq = {}
-                model_ui = device.normalizeModelUIName(model)
+                model_ui = models.normalizeModelUIName(model)
 
                 if self.bus == 'usb':
                     i = DeviceListViewItem(self.probedDevicesListView, d, mq, model_ui, serial, d)

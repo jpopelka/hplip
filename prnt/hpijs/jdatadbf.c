@@ -1,4 +1,4 @@
-#ifdef APDK_LJJETREADY
+#if defined (APDK_LJJETREADY) || defined (APDK_QUICKCONNECT)
 /*
  * jdatadbf.c
  *
@@ -24,7 +24,7 @@ typedef struct {
   JOCTET * outbuff;             // target output buffer
   JOCTET * buffer;                // start of internal buffer
   UINT16   size_outbuff;        // current size of target output buffer
-  JMETHOD (void, flush_output_buffer_callback, (JOCTET* buffer, size_t size));
+  JMETHOD (void, flush_output_buffer_callback, (JOCTET *outbuf, JOCTET* buffer, size_t size));
 } my_destination_mgr;
 
 typedef my_destination_mgr * my_dest_ptr;
@@ -89,7 +89,7 @@ empty_output_buffer (j_compress_ptr cinfo)
 // DG Temp     (*dest->flush_output_buffer_callback)(dest->buffer, OUTPUT_BUF_SIZE);
 // DG Temp   }
 
-  (*dest->flush_output_buffer_callback)(dest->buffer, OUTPUT_BUF_SIZE);
+  (*dest->flush_output_buffer_callback)(dest->outbuff, dest->buffer, OUTPUT_BUF_SIZE);
 
 
   dest->pub.next_output_byte = dest->buffer;
@@ -125,7 +125,7 @@ term_destination (j_compress_ptr cinfo)
 // DG Temp       (*dest->flush_output_buffer_callback)(dest->buffer, datacount);
 // DG Temp     }
 
-    (*dest->flush_output_buffer_callback)(dest->buffer, datacount);
+    (*dest->flush_output_buffer_callback)(dest->outbuff, dest->buffer, datacount);
   }
 }
 
@@ -171,4 +171,4 @@ jpeg_buffer_size_dest (j_compress_ptr cinfo)
 
   return dest->size_outbuff;
 }
-#endif // APDK_LJJETREADY
+#endif // APDK_LJJETREADY || APDK_QUICKCONNECT

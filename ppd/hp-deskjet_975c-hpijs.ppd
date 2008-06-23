@@ -3,17 +3,17 @@
 *% Created by the CUPS PPD Compiler v1.2.0.
 *% (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 *FormatVersion: "4.3"
-*FileVersion: "hpijs 2.8.5.23"
+*FileVersion: "hpijs 2.8.6.20"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "hp-deskjet_975c-hpijs.ppd"
-*Product: "(ESP Ghostscript)"
-*Product: "(GPL Ghostscript)"
-*Product: "(GNU Ghostscript)"
+*Product: "HP Deskjet 975c"
+*Product: "HP Deskjet 975cse"
+*Product: "HP Deskjet 975cxi"
 *Manufacturer: "HP"
 *ModelName: "HP Deskjet 975c Foomatic/hpijs"
 *ShortNickName: "HP Deskjet 975c Foomatic/hpijs"
-*NickName: "HP Deskjet 975c Foomatic/hpijs, hpijs 2.8.5.23"
+*NickName: "HP Deskjet 975c Foomatic/hpijs, hpijs 2.8.6.20"
 *PSVersion: "(3010.000) 705"
 *PSVersion: "(3010.000) 707"
 *PSVersion: "(3010.000) 815"
@@ -198,7 +198,10 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
 Quality:Quality=3,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenS&&
 et=2"
 *End
-*1284DeviceID: "MFG:HP;MDL:deskjet 975c;DES:deskjet 975c;"
+*1284DeviceID: "MFG:HP;MDL:deskjet_975c;DES:deskjet_975c;"
+*Product: "HP Deskjet 975c"
+*Product: "HP Deskjet 975cse"
+*Product: "HP Deskjet 975cxi"
 *cupsVersion: 1.3
 *cupsModelNumber: 0
 *cupsManualCopies: True
@@ -388,4 +391,4 @@ et=2"
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of hp-deskjet_975c-hpijs.ppd, 19527 bytes.
+*% End of hp-deskjet_975c-hpijs.ppd, 19613 bytes.

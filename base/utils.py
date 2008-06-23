@@ -1257,7 +1257,7 @@ def run(cmd, log_output=True, password_func=get_password, timeout=1):
 
 
     except Exception, e:
-        print "Exception", e
+        log.error("Exception: %s" % e)
 
     cleanup_spinner()
     child.close()

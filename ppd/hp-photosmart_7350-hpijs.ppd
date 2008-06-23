@@ -1,19 +1,18 @@
 *PPD-Adobe: "4.3"
-*% PPD file for HP PhotoSmart 7350 Foomatic/hpijs with CUPS.
+*% PPD file for HP Photosmart 7350 Foomatic/hpijs with CUPS.
 *% Created by the CUPS PPD Compiler v1.2.0.
 *% (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 *FormatVersion: "4.3"
-*FileVersion: "hpijs 2.8.5.23"
+*FileVersion: "hpijs 2.8.6.20"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "hp-photosmart_7350-hpijs.ppd"
-*Product: "(ESP Ghostscript)"
-*Product: "(GPL Ghostscript)"
-*Product: "(GNU Ghostscript)"
+*Product: "HP Photosmart 7350"
+*Product: "HP Photosmart 7350v"
 *Manufacturer: "HP"
-*ModelName: "HP PhotoSmart 7350 Foomatic/hpijs"
-*ShortNickName: "HP PhotoSmart 7350 Foomatic/hpijs"
-*NickName: "HP PhotoSmart 7350 Foomatic/hpijs, hpijs 2.8.5.23"
+*ModelName: "HP Photosmart 7350 Foomatic/hpijs"
+*ShortNickName: "HP Photosmart 7350 Foomatic/hpijs"
+*NickName: "HP Photosmart 7350 Foomatic/hpijs, hpijs 2.8.6.20"
 *PSVersion: "(3010.000) 705"
 *PSVersion: "(3010.000) 707"
 *PSVersion: "(3010.000) 815"
@@ -169,6 +168,14 @@ ble=false"
 e=true"
 *End
 *FoomaticRIPOptionSetting Duplex=None: " -dDuplex=false"
+*FoomaticRIPOption DryTime: "enum CmdLine B"
+*FoomaticRIPOptionSetting DryTime=Zero: ""
+*FoomaticRIPOptionSetting DryTime=Five: ",DryTime=5"
+*FoomaticRIPOptionSetting DryTime=Ten: ",DryTime=10"
+*FoomaticRIPOptionSetting DryTime=Fifteen: ",DryTime=15"
+*FoomaticRIPOptionSetting DryTime=Twenty: ",DryTime=20"
+*FoomaticRIPOptionSetting DryTime=TwentyFive: ",DryTime=25"
+*FoomaticRIPOptionSetting DryTime=Thirty: ",DryTime=30"
 *FoomaticRIPOption Quality: "enum CmdLine B"
 *FoomaticRIPOptionSetting Quality=300ColorCMYK: " -r300 -sIjsParams=Qu&&
 ality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quality:PenSet&&
@@ -218,7 +225,9 @@ et=2"
 jsParams=Quality:Quality=3,Quality:ColorMode=2,Quality:MediaType=2,Qua&&
 lity:PenSet=2,Quality:FullBleed=1"
 *End
-*1284DeviceID: "MFG:HP;MDL:photosmart 7350;DES:photosmart 7350;"
+*1284DeviceID: "MFG:HP;MDL:photosmart_7350;DES:photosmart_7350;"
+*Product: "HP Photosmart 7350"
+*Product: "HP Photosmart 7350v"
 *cupsVersion: 1.3
 *cupsModelNumber: 0
 *cupsManualCopies: True
@@ -368,6 +377,17 @@ lity:PenSet=2,Quality:FullBleed=1"
 *Duplex DuplexTumble/Short Edge (Flip): "%% FoomaticRIPOptionSetting: Duplex=DuplexTumble"
 *Duplex None/Off: "%% FoomaticRIPOptionSetting: Duplex=None"
 *CloseUI: *Duplex
+*OpenUI *DryTime/Additional Dry Time: PickOne
+*OrderDependency: 120.0 AnySetup *DryTime
+*DefaultDryTime: Zero
+*DryTime Zero/Printer Default: "%% FoomaticRIPOptionSetting: DryTime=Zero"
+*DryTime Five/5 Seconds: "%% FoomaticRIPOptionSetting: DryTime=Five"
+*DryTime Ten/10 Seconds: "%% FoomaticRIPOptionSetting: DryTime=Ten"
+*DryTime Fifteen/15 Seconds: "%% FoomaticRIPOptionSetting: DryTime=Fifteen"
+*DryTime Twenty/20 Seconds: "%% FoomaticRIPOptionSetting: DryTime=Twenty"
+*DryTime TwentyFive/25 Seconds: "%% FoomaticRIPOptionSetting: DryTime=TwentyFive"
+*DryTime Thirty/30 Seconds: "%% FoomaticRIPOptionSetting: DryTime=Thirty"
+*CloseUI: *DryTime
 *OpenGroup: PrintoutMode/Printout Mode
 *OpenUI *Quality/Resolution, Quality, Ink Type, Media Type: PickOne
 *OrderDependency: 100.0 AnySetup *Quality
@@ -423,4 +443,4 @@ lity:PenSet=2,Quality:FullBleed=1"
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of hp-photosmart_7350-hpijs.ppd, 22036 bytes.
+*% End of hp-photosmart_7350-hpijs.ppd, 23142 bytes.

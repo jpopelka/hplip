@@ -213,7 +213,7 @@ class SystemTrayApp(QApplication):
                 return
 
             log.debug(path)
-            os.spawnvp(os.P_NOWAIT, path, [])
+            os.spawnlp(os.P_NOWAIT, path, 'hp-toolbox')
 
         else: # ...already running, raise it
             args = ['', '', EVENT_RAISE_DEVICE_MANAGER, prop.username, 0, '', '']

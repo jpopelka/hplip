@@ -1,7 +1,7 @@
 /*****************************************************************************\
   context.cpp : Implimentation for the PrintContext class
 
-  Copyright (c) 1996 - 2006, Hewlett-Packard Co.
+  Copyright (c) 1996 - 2008, Hewlett-Packard Co.
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -185,7 +185,9 @@ const PrintContext::PaperSizeMetrics PrintContext::PSM[MAX_PAPER_SIZE] =
 	{
 		(float)3.54, (float)8.07, (float)3.29, (float)7.445,  (float)0.125
 	},
-#endif
+
+#endif // APDK_EXTENDED_MEDIASIZE
+
     // PHOTO_5x7 = 5in x 7in = 127 mm x 177.8 mm
     {
         (float) 5.0, (float) 7.0, (float) 4.75, (float) 6.375, (float) 0.125
@@ -198,6 +200,22 @@ const PrintContext::PaperSizeMetrics PrintContext::PSM[MAX_PAPER_SIZE] =
     {
         (float) 5.0, (float) 5.0, (float) 5.0, (float) 5.0, (float) 0.0
     }
+
+#ifdef APDK_EXTENDED_MEDIASIZE
+    // PHOTO_4x8 - 4x8 panorama photo
+    ,{
+        (float) 4.0, (float) 6.0, (float) 3.75, (float) 7.75, (float) 0.125
+    },
+
+    // PHOTO_4x12 - 4x12 panorama photo
+    {
+        (float) 4.0, (float) 12.0, (float) 3.75, (float) 11.75, (float) 0.125
+    },
+    // L - Japanese Card, 3.5 x 5 in
+    {
+        (float) 3.5, (float) 5.0, (float) 3.25, (float) 4.75, (float) 0.125
+    }
+#endif // APDK_EXTENDED_MEDIASIZE
 
 }; //PSM
 
@@ -2034,13 +2052,20 @@ void PrintContext::ResetIOMode (BOOL bDevID, BOOL bStatus)
     }
 }
 
-DRIVER_ERROR PrintContext::SetPrinterHint (int iHint, int iValue)
+DRIVER_ERROR PrintContext::SetPrinterHint (PRINTER_HINT eHint, int iValue)
 {
     if (thePrinter)
     {
-        return thePrinter->SetHint (iHint, iValue);
+        return thePrinter->SetHint (eHint, iValue);
     }
-    return NO_ERROR;
+    return NO_PRINTER_SELECTED;
+}
+
+DRIVER_ERROR PrintContext::SetMediaType (MEDIATYPE eMediaType)
+{
+    if (CurrentMode == NULL)
+        return NO_PRINTER_SELECTED;
+    return CurrentMode->SetMediaType (eMediaType);
 }
 
 APDK_END_NAMESPACE

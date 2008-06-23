@@ -38,7 +38,7 @@ import tempfile
 # Local
 from base.g import *
 from base.codes import *
-from base import utils, device, status
+from base import utils, device, status, models
 
 # dBus
 try:
@@ -83,7 +83,7 @@ def usage(typ='text'):
 class DeviceCache(object):
     def __init__(self, model=''):
         self.history = utils.RingBuffer(prop.history_size) # circular buffer of ServiceEvent
-        self.model = device.normalizeModelName(model)
+        self.model = models.normalizeModelName(model)
         self.cache = {} # variable name : value
         self.faxes = {} # (username, jobid): FaxEvent
 
@@ -314,9 +314,8 @@ def handle_fax_event(event, pipe_name):
             
             log.debug("Running hp-sendfax: hp-senfax --fax=%s" % event.printer_name)
             
-            os.spawnvp(os.P_NOWAIT, path, ['hp-sendfax', 
-                #'-d %s' % event.device_uri, 
-                '--fax=%s' % event.printer_name])
+            os.spawnlp(os.P_NOWAIT, path, 'hp-sendfax', 
+                '--fax=%s' % event.printer_name)
         
         else: 
             # hp-sendfax running

@@ -152,7 +152,7 @@ try:
     utils.log_title(__title__, __version__)   
    
     if os.getuid() == 0:
-        log.error("hp-makeuri should not be run as root.")
+        log.warn("hp-makeuri should not be run as root.")
 
     if len(args) != 1:
         log.error("You must specify one SERIAL NO., IP, USB ID or DEVNODE on the command line.")
@@ -171,27 +171,27 @@ try:
         sys.exit(1)
 
     if cups_quiet_mode:
-        print cups_uri
+        log.info(cups_uri)
 
     elif not quiet_mode:    
-        print "CUPS URI:", cups_uri
+        log.info("CUPS URI: %s" % cups_uri)
 
     if sane_uri:
         if sane_quiet_mode:
-            print sane_uri
+            log.info(sane_uri)
         
         elif not quiet_mode:
-            print "SANE URI:", sane_uri
+            log.info("SANE URI: %s" % sane_uri)
     
     elif not sane_uri and sane_quiet_mode:
         log.error("Device does not support scan.")
 
     if fax_uri:
         if fax_quiet_mode:
-            print fax_uri
+            log.info(fax_uri)
         
         elif not quiet_mode:
-            print "HP Fax URI:", fax_uri
+            log.info("HP Fax URI: %s" % fax_uri)
             
     elif not fax_uri and fax_quiet_mode:
         log.error("Device does not support fax.")

@@ -925,6 +925,12 @@ PyObject * getDefaultPrinter( PyObject * self, PyObject * args )
 {
     const char * defdest;
     defdest = cupsGetDefault();
+
+    /*char buf[1024];
+    sprintf( buf, "print 'Default Printer: %s'", defdest);
+    PyRun_SimpleString( buf );
+    */
+
     if ( defdest == NULL )
         return Py_BuildValue( "" ); // None
     else

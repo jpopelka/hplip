@@ -181,6 +181,7 @@ public:
         "Deskjet D1360\0"
         "Deskjet d14\0"
         "Deskjet D15\0"
+        "Deskjet F22\0"
 #ifdef APDK_MLC_PRINTER
 		"psc 1100\0"
 		"psc 1200\0"

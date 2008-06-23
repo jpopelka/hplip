@@ -3,17 +3,17 @@
 *% Created by the CUPS PPD Compiler v1.2.0.
 *% (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 *FormatVersion: "4.3"
-*FileVersion: "hpijs 2.8.5.23"
+*FileVersion: "hpijs 2.8.6.20"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "hp-color_laserjet_3500-hpijs.ppd"
-*Product: "(ESP Ghostscript)"
-*Product: "(GPL Ghostscript)"
-*Product: "(GNU Ghostscript)"
+*Product: "HP Color LaserJet 3500"
+*Product: "HP Color LaserJet 3500dn"
+*Product: "HP Color LaserJet 3500dtn"
 *Manufacturer: "HP"
 *ModelName: "HP Color LaserJet 3500 Foomatic/hpijs"
 *ShortNickName: "HP Color LaserJet 3500 Foomatic/hpijs"
-*NickName: "HP Color LaserJet 3500 Foomatic/hpijs, hpijs 2.8.5.23"
+*NickName: "HP Color LaserJet 3500 Foomatic/hpijs, hpijs 2.8.6.20"
 *PSVersion: "(3010.000) 705"
 *PSVersion: "(3010.000) 707"
 *PSVersion: "(3010.000) 815"
@@ -145,7 +145,10 @@ ality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quality:PenSet&&
 s=Quality:Quality=0,Quality:ColorMode=0,Quality:MediaType=0,Quality:Pe&&
 nSet=2"
 *End
-*1284DeviceID: "MFG:HP;MDL:color laserjet 3500;DES:color laserjet 3500;"
+*1284DeviceID: "MFG:HP;MDL:hp_color_laserjet_3500;DES:hp_color_laserjet_3500;"
+*Product: "HP Color LaserJet 3500"
+*Product: "HP Color LaserJet 3500dn"
+*Product: "HP Color LaserJet 3500dtn"
 *cupsVersion: 1.3
 *cupsModelNumber: 0
 *cupsManualCopies: True
@@ -327,4 +330,4 @@ nSet=2"
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of hp-color_laserjet_3500-hpijs.ppd, 16677 bytes.
+*% End of hp-color_laserjet_3500-hpijs.ppd, 16813 bytes.

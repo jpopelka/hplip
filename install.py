@@ -145,7 +145,7 @@ for o, a in opts:
         
         
 if os.getuid() == 0:
-    log.error("hplip-install should not be run as root.")
+    log.warn("hplip-install should not be run as root.")
 
 log_file = os.path.normpath('./hplip-install_%s.log' % time.strftime("%a-%d-%b-%Y_%H:%M:%S"))
 

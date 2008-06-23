@@ -473,6 +473,11 @@ class Apollo21xxProxy;
 #ifdef APDK_APOLLO2XXX
 class Apollo2xxxProxy;
 #endif
+
+#ifdef APDK_QUICKCONNECT
+class QuickConnectProxy;
+#endif
+
 //DeviceRegistry
 //! Isolates device dependencies
 /*!
@@ -622,6 +627,10 @@ public:
 
 #ifdef APDK_APOLLO2XXX
     static Apollo2xxxProxy s_Apollo2xxxProxy;
+#endif
+
+#ifdef APDK_QUICKCONNECT
+    static QuickConnectProxy s_QuickConnectProxy;
 #endif
 
 }; //DeviceRegistry
@@ -1148,6 +1157,24 @@ protected:
     DRIVER_ERROR EndJob ();
     DRIVER_ERROR SendCAPy (unsigned int iAbsY);
 }; // HeaderLJZjs
+
+//ClassName
+/*
+******************************************************************************/
+class HeaderQuickConnect : public Header
+{
+public:
+    HeaderQuickConnect (Printer *p, PrintContext *pc);
+    virtual DRIVER_ERROR Send ();
+    virtual DRIVER_ERROR FormFeed ();
+protected:
+    DRIVER_ERROR EndJob ();
+    DRIVER_ERROR SendCAPy (unsigned int iAbsY);
+}; // HeaderQuickConnect
+
+//ClassName
+/*
+******************************************************************************/
 
 class RasterSender : public Processor
 {

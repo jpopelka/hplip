@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>768</width>
-            <height>343</height>
+            <width>525</width>
+            <height>440</height>
         </rect>
     </property>
     <property name="caption">
@@ -82,7 +82,7 @@
 2. &lt;b&gt;CUPS web interface&lt;/b&gt; (open a browser to: &lt;u&gt;http://localhost:631&lt;/u&gt; or press the button below),&lt;p&gt;
 3. The &lt;b&gt;printer installation utility&lt;/b&gt; that came with your operating system (YaST, PrinterDrake, etc).
 &lt;p&gt;&lt;p&gt;After setting up a printer, you may have to press &lt;tt&gt;F6&lt;/tt&gt; or chose &lt;tt&gt;Device | Refresh All&lt;/tt&gt; for the printer to appear in the HP Device Manager.&lt;p&gt;
-&lt;i&gt;&lt;b&gt;Note: Only devices installed with the &lt;tt&gt;hp:&lt;/tt&gt; CUPS backend will appear in the HP Device Manager.&lt;/b&gt;&lt;/i&gt;&lt;p&gt;</string>
+&lt;i&gt;&lt;b&gt;Note: Only devices installed with the &lt;tt&gt;hp:&lt;/tt&gt; or &lt;tt&gt;hpfax:&lt;/tt&gt; CUPS backend will appear in the HP Device Manager.&lt;/b&gt;&lt;/i&gt;&lt;p&gt;</string>
             </property>
             <property name="alignment">
                 <set>WordBreak|AlignVCenter</set>

@@ -290,6 +290,7 @@ else: # NON_INTERACTIVE_MODE
         log.error("hp-sendfax cannot be run as root.")
         sys.exit(1)
     
+ 
     try:
         import struct, Queue
 
@@ -349,7 +350,7 @@ else: # NON_INTERACTIVE_MODE
 
                 for a in all_entries:
                     aa = db.get(a)
-                    print "%s (fax number: %s)" % (a, aa['fax'])
+                    log.info("%s (fax number: %s)" % (a, aa['fax']))
 
                 print
                 sys.exit(1)
@@ -508,240 +509,248 @@ else: # NON_INTERACTIVE_MODE
 
         log.info(log.bold("Using printer %s (%s)" % (printer_name, device_uri)))
 
-        ppd_file = cups.getPPD(printer_name)
+        ok, lock_file = utils.lock_app('hp-sendfax-%s' % printer_name, True)
+        try:            
+            ppd_file = cups.getPPD(printer_name)
 
-        if ppd_file is not None and os.path.exists(ppd_file):
-            if file(ppd_file, 'r').read(8192).find('HP Fax') == -1:
-                log.error("Fax configuration error. The CUPS fax queue for '%s' is incorrectly configured. Please make sure that the CUPS fax queue is configured with the 'HP Fax' Model/Driver." % printer_name)
-                sys.exit(1)
-
-        if not args:
-            log.error("No files specfied to send. Please specify the file(s) to send on the command line.")
-            usage()
-
-        file_list = []
-
-        for f in args:
-
-            #
-            # Submit each file to CUPS for rendering by hpijsfax
-            #
-            path = os.path.realpath(f)
-            log.debug(path)
-            mime_type = magic.mime_type(path)
-
-            if mime_type == 'application/hplip-fax': # .g3
-                log.info("\nPreparing fax file %s..." % f)
-                fax_file_fd = file(f, 'r')
-                header = fax_file_fd.read(fax.FILE_HEADER_SIZE)
-                fax_file_fd.close()
-
-                mg, version, pages, hort_dpi, vert_dpi, page_size, \
-                    resolution, encoding, reserved1, reserved2 = struct.unpack(">8sBIHHBBBII", header)
-
-                if mg != 'hplip_g3':
-                    log.error("%s: Invalid file header. Bad magic." % f)
+            if ppd_file is not None and os.path.exists(ppd_file):
+                if file(ppd_file, 'r').read(8192).find('HP Fax') == -1:
+                    log.error("Fax configuration error. The CUPS fax queue for '%s' is incorrectly configured. Please make sure that the CUPS fax queue is configured with the 'HP Fax' Model/Driver." % printer_name)
                     sys.exit(1)
 
-                file_list.append((f, mime_type, "", "", pages))
+            if not args:
+                log.error("No files specfied to send. Please specify the file(s) to send on the command line.")
+                usage()
 
-            else:
-                all_pages = True 
-                page_range = ''
-                page_set = 0
-                nup = 1
+            file_list = []
 
-                cups.resetOptions()
+            for f in args:
 
-                if mime_type in ["application/x-cshell",
-                                 "application/x-perl",
-                                 "application/x-python",
-                                 "application/x-shell",
-                                 "text/plain",] and prettyprint:
+                #
+                # Submit each file to CUPS for rendering by hpijsfax
+                #
+                path = os.path.realpath(f)
+                log.debug(path)
+                mime_type = magic.mime_type(path)
 
-                    cups.addOption('prettyprint')
+                if mime_type == 'application/hplip-fax': # .g3
+                    log.info("\nPreparing fax file %s..." % f)
+                    fax_file_fd = file(f, 'r')
+                    header = fax_file_fd.read(fax.FILE_HEADER_SIZE)
+                    fax_file_fd.close()
 
-                if nup > 1:
-                    cups.addOption('number-up=%d' % nup)
+                    mg, version, pages, hort_dpi, vert_dpi, page_size, \
+                        resolution, encoding, reserved1, reserved2 = struct.unpack(">8sBIHHBBBII", header)
 
-                cups_printers = cups.getPrinters()
-                printer_state = cups.IPP_PRINTER_STATE_STOPPED
-                for p in cups_printers:
-                    if p.name == printer_name:
-                        printer_state = p.state
+                    if mg != 'hplip_g3':
+                        log.error("%s: Invalid file header. Bad magic." % f)
+                        sys.exit(1)
 
-                log.debug("Printer state = %d" % printer_state)
+                    file_list.append((f, mime_type, "", "", pages))
 
-                if printer_state == cups.IPP_PRINTER_STATE_IDLE:
-                    log.debug("Printer name = %s file = %s" % (printer_name, path))
-                    sent_job_id = cups.printFile(printer_name, path, os.path.basename(path))
-                    log.info("\nRendering file '%s' (job %d)..." % (path, sent_job_id))
-                    log.debug("Job ID=%d" % sent_job_id)
                 else:
-                    log.error("The CUPS queue for '%s' is in a stopped or busy state. Please check the queue and try again." % printer_name)
-                    sys.exit(1)
+                    all_pages = True 
+                    page_range = ''
+                    page_set = 0
+                    nup = 1
 
-                cups.resetOptions()
+                    cups.resetOptions()
 
-                #
-                # Wait for fax to finish rendering
-                #
+                    if mime_type in ["application/x-cshell",
+                                     "application/x-perl",
+                                     "application/x-python",
+                                     "application/x-shell",
+                                     "text/plain",] and prettyprint:
 
-                end_time = time.time() + 120.0 
-                while time.time() < end_time:
-                    log.debug("Waiting for fax...")
-                    try:
-                        result = list(service.CheckForWaitingFax(device_uri, prop.username, sent_job_id))
-                        print result
-                    except dbus.exceptions.DBusException:
-                        log.error("Cannot communicate with hp-systray. Canceling...")
+                        cups.addOption('prettyprint')
+
+                    if nup > 1:
+                        cups.addOption('number-up=%d' % nup)
+
+                    cups_printers = cups.getPrinters()
+                    printer_state = cups.IPP_PRINTER_STATE_STOPPED
+                    for p in cups_printers:
+                        if p.name == printer_name:
+                            printer_state = p.state
+
+                    log.debug("Printer state = %d" % printer_state)
+
+                    if printer_state == cups.IPP_PRINTER_STATE_IDLE:
+                        log.debug("Printer name = %s file = %s" % (printer_name, path))
+                        sent_job_id = cups.printFile(printer_name, path, os.path.basename(path))
+                        log.info("\nRendering file '%s' (job %d)..." % (path, sent_job_id))
+                        log.debug("Job ID=%d" % sent_job_id)
+                    else:
+                        log.error("The CUPS queue for '%s' is in a stopped or busy state. Please check the queue and try again." % printer_name)
+                        sys.exit(1)
+
+                    cups.resetOptions()
+
+                    #
+                    # Wait for fax to finish rendering
+                    #
+
+                    end_time = time.time() + 120.0 
+                    while time.time() < end_time:
+                        log.debug("Waiting for fax...")
+                        try:
+                            result = list(service.CheckForWaitingFax(device_uri, prop.username, sent_job_id))
+                            log.debug(repr(result))
+                            
+                        except dbus.exceptions.DBusException:
+                            log.error("Cannot communicate with hp-systray. Canceling...")
+                            cups.cancelJob(sent_job_id)
+                            sys.exit(1)
+
+                        fax_file = str(result[7])
+                        log.info(fax_file)
+
+                        if fax_file:
+                            log.debug("Fax file=%s" % fax_file)
+                            title = str(result[5])
+                            break
+
+                        time.sleep(1)
+
+                    else:
+                        log.error("Timeout waiting for rendering. Canceling job #%d..." % sent_job_id)
                         cups.cancelJob(sent_job_id)
                         sys.exit(1)
 
-                    fax_file = str(result[7])
-                    print fax_file
+                    # open the rendered file to read the file header
+                    f = file(fax_file, 'r')
+                    header = f.read(fax.FILE_HEADER_SIZE)
 
-                    if fax_file:
-                        log.debug("Fax file=%s" % fax_file)
-                        title = str(result[5])
-                        break
+                    if len(header) != fax.FILE_HEADER_SIZE:
+                        log.error("Invalid fax file! (truncated header or no data)")
+                        sys.exit(1)
 
-                    time.sleep(1)
+                    mg, version, total_pages, hort_dpi, vert_dpi, page_size, \
+                        resolution, encoding, reserved1, reserved2 = \
+                        struct.unpack(">8sBIHHBBBII", header[:fax.FILE_HEADER_SIZE])
 
-                else:
-                    log.error("Timeout waiting for rendering. Canceling job #%d..." % sent_job_id)
-                    cups.cancelJob(sent_job_id)
+                    log.debug("Magic=%s Ver=%d Pages=%d hDPI=%d vDPI=%d Size=%d Res=%d Enc=%d" %
+                              (mg, version, total_pages, hort_dpi, vert_dpi, page_size, resolution, encoding))
+
+                    file_list.append((fax_file, mime_type, "", title, total_pages))
+                    f.close()
+
+            #
+            # Insure that the device is in an OK state
+            #
+
+            dev = None
+
+            log.debug("\nChecking device state...")
+            try:
+                dev = fax.getFaxDevice(device_uri, printer_name)
+
+                try:
+                    dev.open()
+                except Error, e:
+                    log.warn(e.msg)
+
+                try:
+                    dev.queryDevice(quick=True)
+                except Error, e:
+                    log.error("Query device error (%s)." % e.msg)
+                    dev.error_state = ERROR_STATE_ERROR
+
+                if dev.error_state > ERROR_STATE_MAX_OK and \
+                    dev.error_state not in (ERROR_STATE_LOW_SUPPLIES, ERROR_STATE_LOW_PAPER):
+
+                    log.error("Device is busy or in an error state (code=%d). Please wait for the device to become idle or clear the error and try again." % dev.error_state)
                     sys.exit(1)
 
-                # open the rendered file to read the file header
-                f = file(fax_file, 'r')
-                header = f.read(fax.FILE_HEADER_SIZE)
+                user_cfg.last_used.device_uri = dev.device_uri
 
-                if len(header) != fax.FILE_HEADER_SIZE:
-                    log.error("Invalid fax file! (truncated header or no data)")
+                log.debug("File list:")
+
+                for f in file_list:
+                    log.debug(str(f))
+
+                service.SendEvent(device_uri, printer_name, EVENT_START_FAX_JOB, prop.username, 0, '')
+
+                update_queue = Queue.Queue()
+                event_queue = Queue.Queue()
+
+                log.info("\nSending fax...")
+
+                if not dev.sendFaxes(phone_num_list, file_list, "", 
+                                     "", None, False, printer_name,
+                                     update_queue, event_queue):
+
+                    log.error("Send fax is active. Please wait for operation to complete.")
+                    service.SendEvent(device_uri, printer_name, EVENT_FAX_JOB_FAIL, prop.username, 0, '')
                     sys.exit(1)
 
-                mg, version, total_pages, hort_dpi, vert_dpi, page_size, \
-                    resolution, encoding, reserved1, reserved2 = \
-                    struct.unpack(">8sBIHHBBBII", header[:fax.FILE_HEADER_SIZE])
+                try:
+                    cont = True
+                    while cont:
+                        while update_queue.qsize():
+                            try:
+                                status, page_num, phone_num = update_queue.get(0)
+                            except Queue.Empty:
+                                break
 
-                log.debug("Magic=%s Ver=%d Pages=%d hDPI=%d vDPI=%d Size=%d Res=%d Enc=%d" %
-                          (mg, version, total_pages, hort_dpi, vert_dpi, page_size, resolution, encoding))
+                            if status == fax.STATUS_IDLE:
+                                log.debug("Idle")
 
-                file_list.append((fax_file, mime_type, "", title, total_pages))
-                f.close()
+                            elif status == fax.STATUS_PROCESSING_FILES:
+                                log.info("\nProcessing page %d" % page_num)
 
-        #
-        # Insure that the device is in an OK state
-        #
+                            elif status == fax.STATUS_DIALING:
+                                log.info("\nDialing %s..." % phone_num)
 
-        dev = None
+                            elif status == fax.STATUS_CONNECTING:
+                                log.info("\nConnecting to %s..." % phone_num)
 
-        log.debug("\nChecking device state...")
-        try:
-            dev = fax.getFaxDevice(device_uri, printer_name)
+                            elif status == fax.STATUS_SENDING:
+                                log.info("\nSending page %d to %s..." % (page_num, phone_num))
 
-            try:
-                dev.open()
-            except Error, e:
-                log.warn(e.msg)
+                            elif status == fax.STATUS_CLEANUP:
+                                log.info("\nCleaning up...")
 
-            try:
-                dev.queryDevice(quick=True)
-            except Error, e:
-                log.error("Query device error (%s)." % e.msg)
-                dev.error_state = ERROR_STATE_ERROR
+                            elif status in (fax.STATUS_ERROR, fax.STATUS_BUSY, fax.STATUS_COMPLETED):
+                                cont = False
 
-            if dev.error_state > ERROR_STATE_MAX_OK and \
-                dev.error_state not in (ERROR_STATE_LOW_SUPPLIES, ERROR_STATE_LOW_PAPER):
+                                if status  == fax.STATUS_ERROR:
+                                    log.error("Fax send error.")
+                                    service.SendEvent(device_uri, printer_name, EVENT_FAX_JOB_FAIL, prop.username, 0, '')
 
-                log.error("Device is busy or in an error state (code=%d). Please wait for the device to become idle or clear the error and try again." % dev.error_state)
-                sys.exit(1)
+                                elif status == fax.STATUS_BUSY:
+                                    log.error("Fax device is busy. Please try again later.")
+                                    service.SendEvent(device_uri, printer_name, EVENT_FAX_JOB_FAIL, prop.username, 0, '')
 
-            user_cfg.last_used.device_uri = dev.device_uri
+                                elif status == fax.STATUS_COMPLETED:
+                                    log.info("\nCompleted successfully.")
+                                    service.SendEvent(device_uri, printer_name, EVENT_END_FAX_JOB, prop.username, 0, '')
 
-            log.debug("File list:")
+                        update_spinner()
+                        time.sleep(2)
 
-            for f in file_list:
-                log.debug(str(f))
+                    cleanup_spinner()
 
-            service.SendEvent(device_uri, printer_name, EVENT_START_FAX_JOB, prop.username, 0, '')
+                except KeyboardInterrupt:
+                    event_queue.put((fax.EVENT_FAX_SEND_CANCELED, '', '', ''))
+                    service.SendEvent(device_uri, printer_name, EVENT_FAX_JOB_CANCELED, prop.username, 0, '')
+                    log.error("Cancelling...")
 
-            update_queue = Queue.Queue()
-            event_queue = Queue.Queue()
-
-            log.info("\nSending fax...")
-
-            if not dev.sendFaxes(phone_num_list, file_list, "", 
-                                 "", None, False, printer_name,
-                                 update_queue, event_queue):
-
-                log.error("Send fax is active. Please wait for operation to complete.")
-                service.SendEvent(device_uri, printer_name, EVENT_FAX_JOB_FAIL, prop.username, 0, '')
-                sys.exit(1)
-
-            try:
-                cont = True
-                while cont:
-                    while update_queue.qsize():
-                        try:
-                            status, page_num, phone_num = update_queue.get(0)
-                        except Queue.Empty:
-                            break
-
-                        if status == fax.STATUS_IDLE:
-                            log.debug("Idle")
-
-                        elif status == fax.STATUS_PROCESSING_FILES:
-                            log.info("\nProcessing page %d" % page_num)
-
-                        elif status == fax.STATUS_DIALING:
-                            log.info("\nDialing %s..." % phone_num)
-
-                        elif status == fax.STATUS_CONNECTING:
-                            log.info("\nConnecting to %s..." % phone_num)
-
-                        elif status == fax.STATUS_SENDING:
-                            log.info("\nSending page %d to %s..." % (page_num, phone_num))
-
-                        elif status == fax.STATUS_CLEANUP:
-                            log.info("\nCleaning up...")
-
-                        elif status in (fax.STATUS_ERROR, fax.STATUS_BUSY, fax.STATUS_COMPLETED):
-                            cont = False
-
-                            if status  == fax.STATUS_ERROR:
-                                log.error("Fax send error.")
-                                service.SendEvent(device_uri, printer_name, EVENT_FAX_JOB_FAIL, prop.username, 0, '')
-
-                            elif status == fax.STATUS_BUSY:
-                                log.error("Fax device is busy. Please try again later.")
-                                service.SendEvent(device_uri, printer_name, EVENT_FAX_JOB_FAIL, prop.username, 0, '')
-
-                            elif status == fax.STATUS_COMPLETED:
-                                log.info("\nCompleted successfully.")
-                                service.SendEvent(device_uri, printer_name, EVENT_END_FAX_JOB, prop.username, 0, '')
-
-                    update_spinner()
-                    time.sleep(2)
-
-                cleanup_spinner()
-
-            except KeyboardInterrupt:
-                event_queue.put((fax.EVENT_FAX_SEND_CANCELED, '', '', ''))
-                service.SendEvent(device_uri, printer_name, EVENT_FAX_JOB_CANCELED, prop.username, 0, '')
-                log.error("Cancelling...")
+            finally:
+                log.debug("Waiting for send fax thread to exit...")
+                if dev is not None:
+                    dev.waitForSendFaxThread()
+                    log.debug("Closing device...")
+                    dev.close()
 
         finally:
-            log.debug("Waiting for send fax thread to exit...")
-            if dev is not None:
-                dev.waitForSendFaxThread()
-                log.debug("Closing device...")
-                dev.close()
-
+            utils.unlock(lock_file)
+        
     except KeyboardInterrupt:
         log.error("User exit")    
 
+    
+        
 log.info("")
 log.info("Done.")
 

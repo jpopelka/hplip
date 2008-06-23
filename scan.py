@@ -40,6 +40,7 @@ from base.g import *
 from base import tui
 import base.utils as utils
 from base import device
+from prnt import cups
 
 log.set_module('hp-scan')
 
@@ -559,21 +560,35 @@ try:
                     dest.append('pdf')
 
         elif o in ('-p', '--printer'):
-            pp = a.strip()
-            from prnt import cups
-            printer_list = cups.getPrinters()
-            found = False
-            for p in printer_list:
-                if p.name == pp:
-                    found = True
-                    printer = pp
-                    break
-
-            if found: 
-                if 'printer' not in dest:
-                    dest.append('printer')
+            if a.startswith('*'):
+                printer_name = cups.getDefaultPrinter()
+                log.debug(printer_name)
+                
+                if printer_name is not None:
+                    log.info("Using CUPS default printer: %s" % printer_name)
+                else:
+                    log.error("CUPS default printer is not set.")
+                
             else:
-                log.error("Unknown/invalid printer name: %s" % pp)
+                printer_name = a
+            
+            if printer_name is not None:
+                pp = printer_name.strip()
+                
+                printer_list = cups.getPrinters()
+                found = False
+                for p in printer_list:
+                    if p.name == pp:
+                        found = True
+                        printer = pp
+                        break
+
+                if found: 
+                    if 'printer' not in dest:
+                        dest.append('printer')
+                else:
+                    log.error("Unknown/invalid printer name: %s" % pp)
+                    
 
         elif o == '--fax':
             #print "fax"
@@ -639,7 +654,7 @@ try:
     utils.log_title(__title__, __version__)
 
     if os.getuid() == 0:
-        log.error("hp-scan should not be run as root.")
+        log.warn("hp-scan should not be run as root.")
 
     if 'printer' in dest and not printer:
         from prnt import cups
@@ -1310,8 +1325,13 @@ try:
                     from email.mime.multipart import MIMEMultipart
                     from email.mime.text import MIMEText
                 except ImportError:
-                    log.error("hp-scan email destination requires Python 2.2+.")
-                    continue
+                    try:
+                        from email.MIMEImage import MIMEImage
+                        from email.MIMEMultipart import MIMEMultipart
+                        from email.MIMEText import MIMEText
+                    except ImportError:
+                        log.error("hp-scan email destination requires Python 2.2+.")
+                        continue
 
                 msg = MIMEMultipart()
                 msg['Subject'] = email_subject

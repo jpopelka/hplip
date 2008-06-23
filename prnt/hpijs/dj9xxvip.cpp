@@ -513,10 +513,10 @@ DRIVER_ERROR HeaderDJ990::Send()
     {
         err = thePrinter->Send ((const BYTE *) EnableDuplex, sizeof (EnableDuplex));
         BYTE    cDryTime;
-        cDryTime = (BYTE) ((thePrinter->GetHint (0x4)) & 0xFF);
+        cDryTime = (BYTE) ((thePrinter->GetHint (EXTRA_DRYTIME_HINT)) & 0xFF);
         if (cDryTime != 0)
         {
-            err = thePrinter->Send (ExtraDryTime, sizeof (ExtraDryTime));
+            err = thePrinter->Send (ExtraDryTime, sizeof (ExtraDryTime) - 1);
             err = thePrinter->Send ((const BYTE *) &cDryTime, 1);
             ERRCHECK;
         }

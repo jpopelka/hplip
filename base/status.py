@@ -740,7 +740,7 @@ def BatteryCheck(dev, status_block, battery_check):
                     status_block['agents'].append({
                         'kind'   : AGENT_KIND_INT_BATTERY,
                         'type'   : AGENT_TYPE_UNSPECIFIED,
-                        'health' : AGENT_HEALTH_UNKNOWN,
+                        'health' : AGENT_HEALTH_OK,
                         'level'  : battery_level,
                         'level-trigger' : AGENT_LEVEL_TRIGGER_SUFFICIENT_0,
                         })

@@ -1,7 +1,7 @@
 /*****************************************************************************\
   context.h : Interface/Implimentation for the PrintContext class
 
-  Copyright (c) 1996 - 2006, Hewlett-Packard Co.
+  Copyright (c) 1996 - 2008, Hewlett-Packard Co.
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -232,8 +232,24 @@ public:
 //    PEN_TYPE GetCompatiblePen(unsigned int num);    // get CompatiblePens of Printer
 
 #ifdef APDK_AUTODUPLEX
+    //! Set two-sided printing option.
+    /*!  This has no effect on printers that do not support an automatic duplexer mechanism.
+    Two sided-printing option can be one of
+        DUPLEXMODE_NONE   - one sided printing
+        DUPLEXMODE_TABLET - binding on short edge
+        DUPLEXMODE_BOOK   - binding on long edge
+	*****************************************************************************
+	*/   
     BOOL  SelectDuplexPrinting (DUPLEXMODE duplexmode);
+
+    //! Returns current setting for two-sided printing option
     DUPLEXMODE QueryDuplexMode ();
+
+    //! Does back page needs to be rotated?
+    /*! When automatic two-sided printing is enabled for long edge binging, application may have to
+    rotate the back page by 180 degrees.
+	*****************************************************************************
+	*/   
     BOOL  RotateImageForBackPage ();
 #endif
 
@@ -246,15 +262,39 @@ public:
 
     void    ResetIOMode (BOOL bDevID, BOOL bStatus);
 
+    //! Get number of copies to print
     int     GetCopyCount ()
     {
         return m_iCopyCount;
     }
+
+    //! Set number of copies to print.
+    /*! Copy count has no effect on printers that do not support this feature.
+    Typically, most LaserJet printers support multiple copies, whereas, Inkjets do not.
+	*****************************************************************************
+	*/   
     void    SetCopyCount (int iNumCopies)
     {
         m_iCopyCount = iNumCopies;
     }
-    DRIVER_ERROR    SetPrinterHint (int iHint, int iValue);
+    DRIVER_ERROR    SetPrinterHint (PRINTER_HINT eHint, int iValue);
+
+    //! Returns TRUE if borderless printing is enabled, FALSE otherwise
+    BOOL    IsBorderless ()
+    {
+        return bDoFullBleed;
+    }
+
+    //! SetMediaType
+    /*! Typically, media type is bound to a print mode and is set when a printmode is
+    selected. This is because the mediatype, printmode combination affects colormatching
+    and requires a different colormap data. Some printers do colormatching in firmware
+    and may support multiple mediatypes for a selected printmode.
+    Returns NO_ERROR if requested mediatype is supported for the selected printmode, otherwise
+    returns WARN_PRINTMODE_MISMATCH and the mediatype remains unchanged in the printmode.
+	*****************************************************************************
+	*/
+    DRIVER_ERROR    SetMediaType (MEDIATYPE eMediaType);
 
 private:
 
@@ -310,6 +350,7 @@ private:
 */
 
     MEDIATYPE   m_mtReqMediaType;   // for use by Header - Malibu defect
+    MEDIATYPE   m_eMediaType;
 
 #ifdef APDK_AUTODUPLEX
     DUPLEXMODE  DuplexMode;

@@ -828,7 +828,7 @@ for o, a in opts:
 utils.log_title(__title__, __version__)
 
 if os.getuid() == 0:
-    log.error("hp-fab should not be run as root.")
+    log.warn("hp-fab should not be run as root.")
 
 # Security: Do *not* create files that other users can muck around with
 os.umask(0037)

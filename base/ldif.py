@@ -391,7 +391,7 @@ class LDIFParser:
             
             while attr_type is not None and attr_value is not None:
                 attr_type = attr_type.lower()
-                print "--->", repr(attr_type), repr(attr_value)
+                log.debug("%s ---> %s" % (repr(attr_type), repr(attr_value)))
                 
                 if not attr_type or not attr_value:
                     attr_type, attr_value = self._parseAttrTypeandValue()

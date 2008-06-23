@@ -74,25 +74,32 @@ public:
         return FALSE;
     }
 
-    virtual DRIVER_ERROR SetHint (int iHint, int iValue)
+    virtual DRIVER_ERROR SetHint (PRINTER_HINT eHint, int iValue)
     {
-        if (iHint & 0x1)
+        switch (eHint)
         {
-            m_iNumPages = iValue;
-        }
-        else if (iHint & 0x2)
-        {
-            return SendPerPageHeader (iValue);
-        }
-        else if (iHint & 0x4)
-        {
-            m_cExtraDryTime = (BYTE) (iValue & 0xFF);
+            case PAGES_IN_DOC_HINT:
+            {
+                m_iNumPages = iValue;
+                break;
+            }
+            case SPEED_MECH_HINT:
+            {
+                return SendPerPageHeader (iValue);
+            }
+            case EXTRA_DRYTIME_HINT:
+            {
+                m_cExtraDryTime = (BYTE) (iValue & 0xFF);
+                break;
+            }
+            default:
+                break;
         }
         return NO_ERROR;
     }
-    virtual int GetHint (int iHint)
+    virtual int GetHint (PRINTER_HINT eHint)
     {
-        if (iHint & 0x4)
+        if (eHint == EXTRA_DRYTIME_HINT)
         {
             return (int) m_cExtraDryTime;
         }

@@ -1,7 +1,7 @@
 /*****************************************************************************\
   global_types.h : global types, enums, and #defines for APDK
 
-  Copyright (c) 1996 - 2002, Hewlett-Packard Co.
+  Copyright (c) 1996 - 2008, Hewlett-Packard Co.
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -189,7 +189,8 @@ enum Quality
     qualityDraft        = -1,
     qualityNormal       =  0,
     qualityPresentation =  1,
-    qualityMarvellous   =  2
+    qualityMarvellous   =  2,
+    qualityFastNormal   =  3
 };
 
 //! \internal For use in connection with fullbleed support.  Values are type of fullbleed.
@@ -284,10 +285,14 @@ typedef enum              // typedef'ed for C interface
 	ENVELOPE_JPN3 = 22,             //!< Japanese Envelope #3 (120 x 235 mm)
 	ENVELOPE_JPN4 = 23,             //!< Japanese Envelope #4 (90 x 205 mm)
 #endif
-
-    PHOTO_5x7,
-    CDDVD_80,
-    CDDVD_120,
+    PHOTO_5x7,                      //!< 5x7 Photo
+    CDDVD_80,                       //!< 3 in. CD or DVD
+    CDDVD_120,                      //!< 5 in. CD or DVD
+#ifdef APDK_EXTENDED_MEDIASIZE
+    PHOTO_4x8,                       //!< Panorama 4 in. x 8 in.
+    PHOTO_4x12,                      //!< Panorama 4 in. x 12 in.
+    L,                              //!< Japanese card (3.5 in. x 5 in.)
+#endif
     MAX_PAPER_SIZE                  //!< Only for array size and loops
 } PAPER_SIZE;
 
@@ -361,11 +366,12 @@ typedef enum               // typedef'ed for C interface
 typedef enum                // typedef'ed for C interface
 {
     QUALITY_NORMAL,         //!< Normal quality print mode (probably 300x300)
-    QUALITY_DRAFT,          //!< Draft print mode - the same or faster then normal
+    QUALITY_DRAFT,          //!< Draft print mode - the same or faster than normal
     QUALITY_BEST,           //!< Probably slower and possible higher resolution
     QUALITY_HIGHRES_PHOTO,  //!< 1200 dpi - currently 9xxvip, linux only
     QUALITY_FASTDRAFT,      //!< True draft, 300 dpi - newer VIP printers only
     QUALITY_AUTO,           //!< Printer selects optimum resolution - 05 and later VIP printers only
+    QUALITY_FASTNORMAL,     //!< Normal quality print mode - faster than Normal
     MAX_QUALITY_MODE
 } QUALITY_MODE;
 
@@ -378,6 +384,8 @@ typedef enum               // typedef'ed for C interface
     MEDIA_PHOTO,            //!< Photo paper - for use with photo quality printers
     MEDIA_TRANSPARENCY,
     MEDIA_HIGHRES_PHOTO,
+    MEDIA_AUTO,
+    MEDIA_ADVANCED_PHOTO,
     MEDIA_CDDVD = 7,
     MAX_MEDIATYPE
 } MEDIATYPE;
@@ -511,6 +519,16 @@ enum DUPLEXMODE
     DUPLEXMODE_BOOK
 };
 #endif
+
+typedef enum
+{
+    PAGES_IN_DOC_HINT,
+    SPEED_MECH_HINT,
+    EXTRA_DRYTIME_HINT,
+    MAX_FILE_SIZE_HINT,
+    RED_EYE_REMOVAL_HINT,
+    PHOTO_FIX_HINT
+} PRINTER_HINT;
 
 APDK_END_NAMESPACE
 

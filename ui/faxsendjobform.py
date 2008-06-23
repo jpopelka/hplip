@@ -24,6 +24,7 @@ import operator
 
 # Local
 from base.g import *
+from base.codes import *
 from base import utils, device
 from prnt import cups
 from ui_utils import load_pixmap
@@ -100,7 +101,7 @@ class FaxSendJobForm(QMainWindow):
                 self.init_failed = True
 
         if not self.device_uri and not self.printer_name:
-            t = device.probeDevices(bus=bus, filter={'fax-type':(operator.gt, 0)})
+            t = device.probeDevices(bus=bus, filter={'fax-type':(operator.gt, FAX_TYPE_NONE)})
             probed_devices = []
 
             for d in t:
@@ -135,6 +136,7 @@ class FaxSendJobForm(QMainWindow):
             else:
                 from chooseprinterdlg import ChoosePrinterDlg
                 dlg = ChoosePrinterDlg(self.cups_printers, ['hpfax'])
+                
                 if dlg.exec_loop() == QDialog.Accepted:
                     self.device_uri = dlg.device_uri
                 else:
@@ -146,22 +148,29 @@ class FaxSendJobForm(QMainWindow):
         self.FormLayout.addWidget(self.FaxView,0,0)
 
         if not self.init_failed:
-            try:
-                self.cur_device = device.Device(device_uri=self.device_uri, 
-                                                 printer_name=self.printer_name)
-            except Error, e:
-                log.error("Invalid device URI or printer name.")
-                self.FailureUI("<b>Invalid device URI or printer name.</b><p>Please check the parameters to hp-print and try again.")
+            if not self.device_uri or not self.device_uri.startswith("hpfax:"):
+                log.error("Invalid device URI: %s" % repr(device_uri))
+                self.FailureUI(self.__tr("<b>Invalid device URI %1.</b><p>Please check the parameters to hp-print and try again.").arg(repr(device_uri)));
                 self.init_failed = True
-
+            
             else:
-                self.device_uri = self.cur_device.device_uri
-                user_cfg.last_used.device_uri = self.device_uri
+                try:
+                    self.cur_device = device.Device(device_uri=self.device_uri, 
+                                                     printer_name=self.printer_name)
+                except Error, e:
+                    log.error("Invalid device URI or printer name.")
+                    self.FailureUI("<b>Invalid device URI or printer name.</b><p>Please check the parameters to hp-print and try again.")
+                    self.init_failed = True
 
-                log.debug(self.device_uri)
+                else:
+                    self.device_uri = self.cur_device.device_uri
+                    user_cfg.last_used.device_uri = self.device_uri
 
-                self.statusBar().message(self.device_uri)        
+                    log.debug(self.device_uri)
 
+                    self.statusBar().message(self.device_uri) 
+            
+            
         QTimer.singleShot(0, self.InitialUpdate)
 
 

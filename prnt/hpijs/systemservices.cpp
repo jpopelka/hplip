@@ -94,6 +94,8 @@ BOOL SystemServices::PrinterIsAlive()
 
     // Technically, this function should not even be
     // called if IOMode.bStatus is known to be FALSE
+    if (!IOMode.bStatus)
+        return TRUE;
     if( GetStatusInfo(&status_reg) == FALSE )
     {
         DBG1("PrinterIsAlive: No Status-Byte Available (Default = TRUE)\n");

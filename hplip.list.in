@@ -1,0 +1,408 @@
+# @configure_input@
+#
+#  ESP Package Manager (EPM) "list" file.
+#
+#  (c) 2008 Copyright Hewlett-Packard Development Company, LP
+#
+#  All packages assumes lowest common denominator package support - static PPD install with
+#  foomatic-rip-hplip. Use the following configure options.
+#
+#  ./configure --prefix=/usr --disable-foomatic-drv-install --enable-foomatic-ppd-install --enable-foomatic-rip-hplip-install
+#
+
+%product HPLIP
+%copyright (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
+%vendor Hewlett-Packard
+%license COPYING
+%readme doc/index.html
+%version @VERSION@
+%description The Hewlett-Packard Linux Imaging and Printing (HPLIP) system
+%description provides a unified single and multi-function connectivity
+%description driver solution. HPLIPLITE provides support for print and scan only.
+%description HPLIPFULL provides support for print, scan, fax and toolbox.
+
+%format rpm deb portable
+
+$prefix=@prefix@
+$exec_prefix=@exec_prefix@
+$bindir=@bindir@
+$datarootdir=@datarootdir@
+$datadir=@datadir@
+$libdir=@libdir@
+$srcdir=@srcdir@
+$pyexecdir=@pyexecdir@
+$icondir=@icondir@
+$systraydir=@systraydir@
+$docdir=@hpdocdir@
+$version=@VERSION@
+$internal_tag=@PACKAGE_BUGREPORT@
+
+$home=@abs_datadir@/hplip
+$ppd=@abs_ppddir@
+$cupsbackend=@cupsbackenddir@
+$cupsfilter=@cupsfilterdir@
+$drv=@abs_drvdir@
+$scan-build=@scan_build@
+
+%system linux
+%postinstall ldconfig
+%system all
+
+f 0755 root root $bindir/hpijs .libs/hpijs
+f 0644 root root /etc/hp/hplip.conf hplip.conf
+f 0644 root root $home/data/models/models.dat data/models/models.dat
+f 0755 root root $cupsbackend/hp .libs/hp
+f 0755 root root $bindir/hp-mkuri .libs/hp-mkuri
+f 0644 root root $drv/hpijs.drv prnt/drv/hpijs.drv
+f 0755 root root $cupsfilter/foomatic-rip-hplip prnt/hpijs/foomatic-rip-hplip
+f 0644 root root $ppd/HP ppd/*.ppd
+f 0644 root root $ppd/HP prnt/ps/*.ppd
+
+%postinstall <<EOF
+for i in $ppd/HP/*.ppd; do
+  gzip -f $$i
+done
+EOF
+
+%system darwin
+f 0755 root root $libdir/libhpmud.0.0.2.dylib .libs/libhpmud.0.0.2.dylib
+l 0755 root root $libdir/libhpmud.dylib libhpmud.0.0.2.dylib
+f 0755 root root $libdir/libhpip.0.0.1.dylib .libs/libhpip.0.0.1.dylib
+l 0755 root root $libdir/libhpip.dylib libhpip.0.0.1.dylib
+%system !darwin
+f 0755 root root $libdir/libhpmud.so.0.0.2 .libs/libhpmud.so.0.0.2
+l 0755 root root $libdir/libhpmud.so libhpmud.so.0.0.2
+f 0755 root root $libdir/libhpip.so.0.0.1 .libs/libhpip.so.0.0.1
+l 0755 root root $libdir/libhpip.so libhpip.so.0.0.1
+# Ugly fix for inconsistent libcrypto soname
+l 0755 root root $libdir/libcrypto.so.6 libcrypto.so.0.9.8
+f 0644 root root /etc/udev/rules.d/55-hpmud.rules data/rules/55-hpmud.rules
+%system all
+
+%if scan-build
+%system darwin
+f 0755 root root $libdir/sane/libsane-hpaio.1.0.1.dylib .libs/libsane-hpaio.1.0.1.dylib
+l 0755 root root $libdir/sane/libsane-hpaio.dylib libsane-hpaio.1.0.1.dylib
+%system !darwin
+f 0755 root root $libdir/sane/libsane-hpaio.so.1.0.1 .libs/libsane-hpaio.so.1.0.1
+l 0755 root root $libdir/sane/libsane-hpaio.so libsane-hpaio.so.1.0.1
+l 0755 root root $libdir/sane/libsane-hpaio.so.1 libsane-hpaio.so.1.0.1
+%system all
+%postinstall <<EOF
+if [ -f /etc/sane.d/dll.conf ]; then
+   grep -q ^#hpaio /etc/sane.d/dll.conf
+   if [ $$? -eq 0 ]; then
+      sed -i -e s/^#hpaio/hpaio/ /etc/sane.d/dll.conf
+   else
+      grep -q ^hpaio /etc/sane.d/dll.conf
+      if [ $$? -ne 0 ]; then 
+	 echo hpaio >>/etc/sane.d/dll.conf
+      fi
+   fi
+fi
+EOF
+%endif
+# end scan_build
+
+%if !UNLEADED
+%system darwin
+f 0755 root root $pyexecdir/cupsext.dylib .libs/cupsext.dylib
+f 0755 root root $pyexecdir/hpmudext.dylib .libs/hpmudext.dylib
+f 0755 root root $pyexecdir/pcardext.dylib .libs/pcardext.dylib
+f 0755 root root $pyexecdir/scanext.dylib .libs/scanext.dylib
+%system !darwin
+f 0755 root root $pyexecdir/cupsext.so .libs/cupsext.so
+f 0755 root root $pyexecdir/hpmudext.so .libs/hpmudext.so
+f 0755 root root $pyexecdir/pcardext.so .libs/pcardext.so
+f 0755 root root $pyexecdir/scanext.so .libs/scanext.so
+%system all
+f 644 root root $icondir/hplip.desktop hplip.desktop
+f 644 root root $systraydir/hplip-systray.desktop hplip-systray.desktop
+f 0755 root root $cupsbackend/hpfax fax/backend/hpfax.py
+f 644 root root $ppd/HP fax/ppd/*.ppd
+# /usr/share/hplip files
+f 755 root root $home/levels.py levels.py
+f 755 root root $home/toolbox.py toolbox.py
+f 755 root root $home/probe.py probe.py
+f 755 root root $home/__init__.py __init__.py
+f 755 root root $home/hplip-install hplip-install
+d 775 root root $home/fax -
+f 755 root root $home/fax/__init__.py fax/__init__.py
+f 755 root root $home/fax/pmlfax.py fax/pmlfax.py
+f 755 root root $home/fax/soapfax.py fax/soapfax.py
+f 755 root root $home/fax/coverpages.py fax/coverpages.py
+f 755 root root $home/fax/fax.py fax/fax.py
+f 755 root root $home/fax/faxdevice.py fax/faxdevice.py
+f 755 root root $home/install.py install.py
+d 775 root root $home/ui -
+f 755 root root $home/ui/devmgr4_base.py ui/devmgr4_base.py
+f 755 root root $home/ui/pluginform2.py ui/pluginform2.py
+f 755 root root $home/ui/allowabletypesdlg_base.py ui/allowabletypesdlg_base.py
+f 755 root root $home/ui/loadpaperform.py ui/loadpaperform.py
+f 755 root root $home/ui/systemtray_qt3.py ui/systemtray_qt3.py
+f 755 root root $home/ui/chooseprinterdlg.py ui/chooseprinterdlg.py
+f 755 root root $home/ui/choosedevicedlg.py ui/choosedevicedlg.py
+f 755 root root $home/ui/colorcal4form_base.py ui/colorcal4form_base.py
+f 755 root root $home/ui/aligntype6form2.py ui/aligntype6form2.py
+f 755 root root $home/ui/aligntype6form1_base.py ui/aligntype6form1_base.py
+f 755 root root $home/ui/faxaddrbookgroupeditform_base.py ui/faxaddrbookgroupeditform_base.py
+f 755 root root $home/ui/colorcalform2_base.py ui/colorcalform2_base.py
+f 755 root root $home/ui/waitform.py ui/waitform.py
+f 755 root root $home/ui/align10form.py ui/align10form.py
+f 755 root root $home/ui/allowabletypesdlg.py ui/allowabletypesdlg.py
+f 755 root root $home/ui/__init__.py ui/__init__.py
+f 755 root root $home/ui/scrollfax.py ui/scrollfax.py
+f 755 root root $home/ui/faxaddrbookeditform_base.py ui/faxaddrbookeditform_base.py
+f 755 root root $home/ui/colorcal4form.py ui/colorcal4form.py
+f 755 root root $home/ui/align10form_base.py ui/align10form_base.py
+f 755 root root $home/ui/scrollcopy.py ui/scrollcopy.py
+f 755 root root $home/ui/coloradjform.py ui/coloradjform.py
+f 755 root root $home/ui/printerform.py ui/printerform.py
+f 755 root root $home/ui/scrollprint.py ui/scrollprint.py
+f 755 root root $home/ui/makecopiesform.py ui/makecopiesform.py
+f 755 root root $home/ui/settingsdialog_base.py ui/settingsdialog_base.py
+f 755 root root $home/ui/cleaningform_base.py ui/cleaningform_base.py
+f 755 root root $home/ui/faxaddrbookform_base.py ui/faxaddrbookform_base.py
+f 755 root root $home/ui/pluginform2_base.py ui/pluginform2_base.py
+f 755 root root $home/ui/imagepropertiesdlg.py ui/imagepropertiesdlg.py
+f 755 root root $home/ui/colorcal4form_base.ui ui/colorcal4form_base.ui
+f 755 root root $home/ui/aboutdlg_base.py ui/aboutdlg_base.py
+f 755 root root $home/ui/pluginlicenseform.py ui/pluginlicenseform.py
+f 755 root root $home/ui/devmgr4.py ui/devmgr4.py
+f 755 root root $home/ui/waitform_base.py ui/waitform_base.py
+f 755 root root $home/ui/systemtray_qt4.py ui/systemtray_qt4.py
+f 755 root root $home/ui/cleaningform2_base.py ui/cleaningform2_base.py
+f 755 root root $home/ui/pluginlicenseform_base.py ui/pluginlicenseform_base.py
+f 755 root root $home/ui/setupform_base.py ui/setupform_base.py
+f 755 root root $home/ui/paperedgealignform.py ui/paperedgealignform.py
+f 755 root root $home/ui/scrollprintsettings.py ui/scrollprintsettings.py
+f 755 root root $home/ui/faxaddrbookform.py ui/faxaddrbookform.py
+f 755 root root $home/ui/aligntype6form2_base.py ui/aligntype6form2_base.py
+f 755 root root $home/ui/aligntype6form1.py ui/aligntype6form1.py
+f 755 root root $home/ui/scrollview.py ui/scrollview.py
+f 755 root root $home/ui/coverpageform.py ui/coverpageform.py
+f 755 root root $home/ui/colorcalform_base.py ui/colorcalform_base.py
+f 755 root root $home/ui/faxsettingsform_base.py ui/faxsettingsform_base.py
+f 755 root root $home/ui/scrollunload.py ui/scrollunload.py
+f 755 root root $home/ui/cleaningform2.py ui/cleaningform2.py
+f 755 root root $home/ui/setupmanualfind_base.py ui/setupmanualfind_base.py
+f 755 root root $home/ui/loadpaperform_base.py ui/loadpaperform_base.py
+f 755 root root $home/ui/coloradjform_base.py ui/coloradjform_base.py
+f 755 root root $home/ui/unloadform.py ui/unloadform.py
+f 755 root root $home/ui/aboutdlg.py ui/aboutdlg.py
+f 755 root root $home/ui/faxaddrbookgroupsform_base.py ui/faxaddrbookgroupsform_base.py
+f 755 root root $home/ui/setupsettings.py ui/setupsettings.py
+f 755 root root $home/ui/colorcalform2.py ui/colorcalform2.py
+f 755 root root $home/ui/cleaningform.py ui/cleaningform.py
+f 755 root root $home/ui/imagepropertiesdlg_base.py ui/imagepropertiesdlg_base.py
+f 755 root root $home/ui/settingsdialog.py ui/settingsdialog.py
+f 755 root root $home/ui/jobstoragemixin.py ui/jobstoragemixin.py
+f 755 root root $home/ui/alignform.py ui/alignform.py
+f 755 root root $home/ui/colorcalform.py ui/colorcalform.py
+f 755 root root $home/ui/nodevicesform_base.py ui/nodevicesform_base.py
+f 755 root root $home/ui/ui_utils.py ui/ui_utils.py
+f 755 root root $home/ui/faxsettingsform.py ui/faxsettingsform.py
+f 755 root root $home/ui/setupform.py ui/setupform.py
+f 755 root root $home/ui/nodevicesform.py ui/nodevicesform.py
+f 755 root root $home/ui/faxsendjobform.py ui/faxsendjobform.py
+f 755 root root $home/ui/setupsettings_base.py ui/setupsettings_base.py
+f 755 root root $home/ui/paperedgealignform_base.py ui/paperedgealignform_base.py
+f 755 root root $home/ui/coverpageform_base.py ui/coverpageform_base.py
+f 755 root root $home/ui/setupmanualfind.py ui/setupmanualfind.py
+f 755 root root $home/fab.py fab.py
+f 755 root root $home/hpssd.py hpssd.py
+d 775 root root $home/base -
+f 755 root root $home/base/magic.py base/magic.py
+f 755 root root $home/base/imagesize.py base/imagesize.py
+f 755 root root $home/base/codes.py base/codes.py
+f 755 root root $home/base/mfpdtf.py base/mfpdtf.py
+f 755 root root $home/base/tui.py base/tui.py
+f 755 root root $home/base/pexpect.py base/pexpect.py
+f 755 root root $home/base/__init__.py base/__init__.py
+f 755 root root $home/base/vcard.py base/vcard.py
+f 755 root root $home/base/mdns.py base/mdns.py
+f 755 root root $home/base/dime.py base/dime.py
+f 755 root root $home/base/device.py base/device.py
+f 755 root root $home/base/maint.py base/maint.py
+f 755 root root $home/base/status.py base/status.py
+f 755 root root $home/base/g.py base/g.py
+f 755 root root $home/base/slp.py base/slp.py
+f 755 root root $home/base/models.py base/models.py
+f 755 root root $home/base/strings.py base/strings.py
+f 755 root root $home/base/exif.py base/exif.py
+f 755 root root $home/base/ldif.py base/ldif.py
+f 755 root root $home/base/logger.py base/logger.py
+f 755 root root $home/base/utils.py base/utils.py
+f 755 root root $home/base/pml.py base/pml.py
+f 644 root root $home/hpaio.desc scan/sane/hpaio.desc
+f 755 root root $home/align.py align.py
+f 755 root root $home/timedate.py timedate.py
+d 775 root root $home/copier -
+f 755 root root $home/copier/__init__.py copier/__init__.py
+f 755 root root $home/copier/copier.py copier/copier.py
+f 755 root root $home/makecopies.py makecopies.py
+f 755 root root $home/unload.py unload.py
+f 755 root root $home/scan.py scan.py
+f 755 root root $home/sendfax.py sendfax.py
+d 775 root root $home/data -
+d 775 root root $home/data/pcl -
+f 644 root root $home/data/pcl/align3_9xx.pcl.gz data/pcl/align3_9xx.pcl.gz
+f 644 root root $home/data/pcl/align2_8xx.pcl.gz data/pcl/align2_8xx.pcl.gz
+f 644 root root $home/data/pcl/align2_9xx.pcl.gz data/pcl/align2_9xx.pcl.gz
+f 644 root root $home/data/pcl/align1_8xx.pcl.gz data/pcl/align1_8xx.pcl.gz
+f 644 root root $home/data/pcl/align6_450.pcl.gz data/pcl/align6_450.pcl.gz
+f 644 root root $home/data/pcl/align3_8xx.pcl.gz data/pcl/align3_8xx.pcl.gz
+f 644 root root $home/data/pcl/crccal.pcl.gz data/pcl/crccal.pcl.gz
+f 644 root root $home/data/pcl/crpcal.pcl.gz data/pcl/crpcal.pcl.gz
+f 644 root root $home/data/pcl/align4_450.pcl.gz data/pcl/align4_450.pcl.gz
+f 644 root root $home/data/pcl/colorcal1_450.pcl.gz data/pcl/colorcal1_450.pcl.gz
+f 644 root root $home/data/pcl/align4_8xx.pcl.gz data/pcl/align4_8xx.pcl.gz
+f 644 root root $home/data/pcl/crcaldone.pcl.gz data/pcl/crcaldone.pcl.gz
+f 644 root root $home/data/pcl/align5_8xx.pcl.gz data/pcl/align5_8xx.pcl.gz
+f 644 root root $home/data/pcl/align1_9xx.pcl.gz data/pcl/align1_9xx.pcl.gz
+f 644 root root $home/data/pcl/crbcal.pcl.gz data/pcl/crbcal.pcl.gz
+f 644 root root $home/data/pcl/crcbcal.pcl.gz data/pcl/crcbcal.pcl.gz
+f 644 root root $home/data/pcl/crcpcal.pcl.gz data/pcl/crcpcal.pcl.gz
+f 644 root root $home/data/pcl/colorcal2_450.pcl.gz data/pcl/colorcal2_450.pcl.gz
+d 775 root root $home/data/ldl -
+f 644 root root $home/data/ldl/cb2pcal.ldl.gz data/ldl/cb2pcal.ldl.gz
+f 644 root root $home/data/ldl/cbcpcal.ldl.gz data/ldl/cbcpcal.ldl.gz
+f 644 root root $home/data/ldl/cbccal.ldl.gz data/ldl/cbccal.ldl.gz
+f 644 root root $home/data/ldl/cbccal_done.ldl.gz data/ldl/cbccal_done.ldl.gz
+f 644 root root $home/data/ldl/cbbcal.ldl.gz data/ldl/cbbcal.ldl.gz
+f 644 root root $home/data/ldl/cb2pcal_done.ldl.gz data/ldl/cb2pcal_done.ldl.gz
+f 644 root root $home/data/ldl/cbpcal.ldl.gz data/ldl/cbpcal.ldl.gz
+d 775 root root $home/data/models -
+f 644 root root $home/data/models/models.dat data/models/models.dat
+d 775 root root $home/data/localization -
+f 644 root root $home/data/localization/hplip_de.qm data/localization/hplip_de.qm
+f 644 root root $home/data/localization/hplip_es.qm data/localization/hplip_es.qm
+f 644 root root $home/data/localization/hplip_zh.qm data/localization/hplip_zh.qm
+f 644 root root $home/data/localization/hplip_it.qm data/localization/hplip_it.qm
+f 644 root root $home/data/localization/hplip_fr.qm data/localization/hplip_fr.qm
+f 644 root root $home/data/localization/hplip_ru.qm data/localization/hplip_ru.qm
+f 644 root root $home/data/localization/hplip_pt.qm data/localization/hplip_pt.qm
+d 775 root root $home/data/images -
+d 775 root root $home/data/images/other -
+f 644 root root $home/data/images/other data/images/other/*
+d 775 root root $home/data/images/16x16 -
+f 644 root root $home/data/images/16x16 data/images/16x16/*
+d 775 root root $home/data/images/devices -
+f 644 root root $home/data/images/devices data/images/devices/*
+d 775 root root $home/data/images/32x32 -
+f 644 root root $home/data/images/32x32 data/images/32x32/*
+d 775 root root $home/data/images/128x128 -
+f 644 root root $home/data/images/128x128 data/images/128x128/*
+d 775 root root $home/data/images/48x48 -
+f 644 root root $home/data/images/48x48 data/images/48x48/*
+d 775 root root $home/data/ps -
+f 644 root root $home/data/ps/clean_page.pdf.gz data/ps/clean_page.pdf.gz
+f 644 root root $home/data/ps/testpage.ps.gz data/ps/testpage.ps.gz
+f 755 root root $home/testpage.py testpage.py
+f 755 root root $home/systray.py systray.py
+f 755 root root $home/setup.py setup.py
+f 755 root root $home/makeuri.py makeuri.py
+d 775 root root $home/scan -
+f 755 root root $home/scan/__init__.py scan/__init__.py
+f 755 root root $home/scan/sane.py scan/sane.py
+f 755 root root $home/plugin.py plugin.py
+f 755 root root $home/print.py print.py
+f 755 root root $home/firmware.py firmware.py
+d 775 root root $home/plugins -
+f 755 root root $home/plugins/powersettings2.py plugins/powersettings2.py
+f 755 root root $home/plugins/__init__.py plugins/__init__.py
+f 755 root root $home/plugins/powersettingsdialog_base.py plugins/powersettingsdialog_base.py
+f 755 root root $home/plugins/Officejet_H470.py plugins/Officejet_H470.py
+f 755 root root $home/plugins/powersettingsdialog.py plugins/powersettingsdialog.py
+f 755 root root $home/plugins/Deskjet_460.py plugins/Deskjet_460.py
+f 755 root root $home/plugins/dj450.py plugins/dj450.py
+f 755 root root $home/plugins/powersettings.py plugins/powersettings.py
+d 775 root root $home/installer -
+f 755 root root $home/installer/distros.dat installer/distros.dat
+f 755 root root $home/installer/__init__.py installer/__init__.py
+f 755 root root $home/installer/dcheck.py installer/dcheck.py
+f 755 root root $home/installer/core_install.py installer/core_install.py
+f 755 root root $home/colorcal.py colorcal.py
+d 775 root root $home/prnt -
+f 755 root root $home/prnt/pcl.py prnt/pcl.py
+f 755 root root $home/prnt/cups.py prnt/cups.py
+f 755 root root $home/prnt/__init__.py prnt/__init__.py
+f 755 root root $home/prnt/ldl.py prnt/ldl.py
+f 755 root root $home/prnt/colorcal.py prnt/colorcal.py
+f 755 root root $home/clean.py clean.py
+f 755 root root $home/check.py check.py
+d 775 root root $home/pcard -
+f 755 root root $home/pcard/__init__.py pcard/__init__.py
+f 755 root root $home/pcard/photocard.py pcard/photocard.py
+f 755 root root $home/info.py info.py
+# docs
+f 644 root root $docdir doc/*
+d 775 root root $docdir/images -
+f 644 root root $docdir/images doc/images/*
+d 775 root root $docdir/styles -
+f 644 root root $docdir/styles doc/styles/*
+# python commands
+l 755 root root $bindir/hp-toolbox ../share/hplip/toolbox.py
+l 755 root root $bindir/hp-colorcal ../share/hplip/colorcal.py
+l 755 root root $bindir/hp-sendfax ../share/hplip/sendfax.py
+l 755 root root $bindir/hp-clean ../share/hplip/clean.py
+l 755 root root $bindir/hp-testpage ../share/hplip/testpage.py
+l 755 root root $bindir/hp-systray ../share/hplip/systray.py
+l 755 root root $bindir/hp-firmware ../share/hplip/firmware.py
+l 755 root root $bindir/hp-makeuri ../share/hplip/makeuri.py
+l 755 root root $bindir/hp-fab ../share/hplip/fab.py
+l 755 root root $bindir/hp-align ../share/hplip/align.py
+l 755 root root $bindir/hp-print ../share/hplip/print.py
+l 755 root root $bindir/hp-setup ../share/hplip/setup.py
+l 755 root root $bindir/hp-levels ../share/hplip/levels.py
+l 755 root root $bindir/hp-unload ../share/hplip/unload.py
+l 755 root root $bindir/hp-probe ../share/hplip/probe.py
+l 755 root root $bindir/hp-timedate ../share/hplip/timedate.py
+l 755 root root $bindir/hp-plugin ../share/hplip/plugin.py
+l 755 root root $bindir/hp-check ../share/hplip/check.py
+l 755 root root $bindir/hp-info ../share/hplip/info.py
+l 755 root root $bindir/hp-makecopies ../share/hplip/makecopies.py
+l 755 root root $bindir/hp-scan ../share/hplip/scan.py
+%endif
+# end !UNLEADED
+
+%if PLUGIN
+f 0644 root root $ppd/HP prnt/plugins/*.ppd
+f 0644 root root $home/prnt/plugins/license.txt prnt/plugins/license.txt
+f 0644 root root $home/data/firmware data/firmware/*.fw.gz
+d 775 root root $home/data/plugin -
+%system !darwin
+f 0644 root root /etc/udev/rules.d data/rules/86-hpmud*.rules
+f 0755 root root $home/prnt/plugins/lj-x86_32.so prnt/plugins/lj-x86_32.so
+f 0755 root root $home/prnt/plugins/lj-x86_64.so prnt/plugins/lj-x86_64.so
+%system all
+%postinstall <<EOF
+machine=`uname -m`
+if [ $$machine = 'x86_64' ]; then
+    ln -fs $home/prnt/plugins/lj-x86_64.so $home/prnt/plugins/lj.so
+else
+    ln -fs $home/prnt/plugins/lj-x86_32.so $home/prnt/plugins/lj.so
+fi
+conf=/etc/hp/hplip.conf
+grep -q '^plugin *= *1' $$conf
+if [ $$? -ne 0 ]; then
+   sed -i -e s/version=${version}/version=${version}\\nplugin=1/ $$conf
+fi
+ver=$version
+if [ $version = $internal_tag ]; then
+   touch $home/data/plugin/hplip-$${ver%\.*}-plugin.run   # convert 4-digit to 3-digit
+else
+   touch $home/data/plugin/hplip-$${ver}-plugin.run
+fi
+EOF
+%postremove <<EOF
+rm -f $home/prnt/plugins/lj.so
+ver=$version
+if [ $version = $internal_tag ]; then
+   rm -f $home/data/plugin/hplip-$${ver%\.*}-plugin.run   # convert 4-digit to 3-digit
+else
+   rm -f $home/data/plugin/hplip-$${ver}-plugin.run
+fi
+EOF
+%endif
+#end PLUGIN

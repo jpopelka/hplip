@@ -129,24 +129,24 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
 
         log.info("Please close any running package management systems now (YaST, Adept, Synaptic, Up2date, etc).")
 
-        #
-        # RELEASE NOTES
-        #
-
-        if not auto: 
-            if os.getenv('DISPLAY'):
-                tui.title("VIEW RELEASE NOTES")
-                log.info("Release notes from this version are available as a web (HTML) document.")
-                log.info("The release notes file will be shown in a separate web browser window.")
-
-                ok, ans = tui.enter_yes_no("\nWould you like to view the release notes for this version of HPLIP", 'n')
-
-                if ok and ans:
-                    log.info("Displaying release notes in a browser window...")
-                    core.show_release_notes_in_browser()
-
-                if not ok:
-                    sys.exit(0)
+##        #
+##        # RELEASE NOTES
+##        #
+##
+##        if not auto: 
+##            if os.getenv('DISPLAY'):
+##                tui.title("VIEW RELEASE NOTES")
+##                log.info("Release notes from this version are available as a web (HTML) document.")
+##                log.info("The release notes file will be shown in a separate web browser window.")
+##
+##                ok, ans = tui.enter_yes_no("\nWould you like to view the release notes for this version of HPLIP", 'n')
+##
+##                if ok and ans:
+##                    log.info("Displaying release notes in a browser window...")
+##                    core.show_release_notes_in_browser()
+##
+##                if not ok:
+##                    sys.exit(0)
 
         # For testing, mark all dependencies missing
         if test_depends:

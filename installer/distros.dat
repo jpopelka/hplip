@@ -98,7 +98,7 @@ supported=False
 
 [suse]
 index=3
-versions=9.0,9.1,9.2,9.3,10.0,10.1,10.2,10.3
+versions=9.0,9.1,9.2,9.3,10,10.0,10.1,10.2,10.3,11.0
 display_name=SUSE Linux
 alt_names=
 display=True
@@ -281,6 +281,9 @@ packages=
 
 [suse:10.0:python-ctypes]
 # packages=python-ctypes-1.0.0
+
+[suse:10]
+same_as_version= 10.0
 
 # ********************
 [suse:10.1]
@@ -574,6 +577,106 @@ packages=dbus-1-devel,python-gobject2
 [suse:10.3:python-ctypes]
 packages=python-ctypes
 
+# ********************
+[suse:11.0]
+code_name=
+supported=True
+gui_supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=2.7.7
+release_date=2007-10-04
+notes=Please be sure to disable the CD repositories in YaST.
+ppd_install=drv
+udev_mode_fix=True
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
+cups_path_with_bitness=True
+
+[suse:11.0:cups]
+packages=cups,cups-client
+
+[suse:11.0:cups-devel]
+packages=cups-devel
+
+[suse:11.0:gcc]
+packages=gcc-c++
+
+[suse:11.0:gs]
+packages=ghostscript-library
+
+[suse:11.0:libcrypto]
+packages=openssl
+
+[suse:11.0:libjpeg]
+packages=libjpeg-devel
+
+[suse:11.0:libnetsnmp-devel]
+packages=net-snmp-devel
+
+[suse:11.0:libpthread]
+packages=glibc
+
+[suse:11.0:libtool]
+packages=libtool,libgphoto2-devel
+
+[suse:11.0:libusb]
+packages=libusb,libusb-devel
+
+[suse:11.0:make]
+packages=make
+
+[suse:11.0:pil]
+packages=python-imaging
+
+[suse:11.0:ppdev]
+packages=
+commands=su -c "modprobe ppdev"
+
+[suse:11.0:pyqt]
+packages=python-qt
+
+[suse:11.0:python-devel]
+packages=python-devel,python-xml
+
+[suse:11.0:python23]
+packages=python
+
+[suse:11.0:python2x]
+packages=python
+
+[suse:11.0:reportlab]
+packages=
+
+[suse:11.0:sane]
+packages=sane
+
+[suse:11.0:sane-devel]
+packages=sane-backends
+
+[suse:11.0:scanimage]
+packages=sane-backends
+
+[suse:11.0:xsane]
+packages=xsane,sane-frontends
+
+[suse:11.0:cups-ddk]
+packages=cupsddk
+
+[suse:11.0:python-dbus]
+packages=dbus-1-python
+
+[suse:11.0:dbus]
+packages=dbus-1-devel,python-gobject2
+
+[suse:11.0:python-ctypes]
+packages=python-ctypes
+
 # ****************************************
 [redhat]
 index=6
@@ -781,7 +884,7 @@ drv_dir=/usr/share/cups/drv/hp/
 # ****************************************
 [fedora]
 index=5
-versions=1.0,2.0,3.0,4.0,5,5.0,5.92,6,6.0,7,7.0,8,8.0
+versions=1.0,2.0,3.0,4.0,5,5.0,5.92,6,6.0,7,7.0,8,8.0,9,9.0
 display_name=Fedora
 alt_names=Fedora Core
 display=True
@@ -843,7 +946,7 @@ drv_dir=/usr/share/cups/drv/hp/
 # ********************
 [fedora:3.0]
 code_name=Heidelberg
-supported=True
+supported=False
 gui_supported=1
 scan_supported=1
 fax_supported=0
@@ -1541,6 +1644,109 @@ packages=python-ctypes
 [fedora:8.0]
 same_as_version= 8
 
+# ********************
+[fedora:9]
+code_name=sulphur
+supported=True
+gui_supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=2.7.7
+release_date=2008-05-13
+notes=
+ppd_install=drv
+udev_mode_fix=True
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
+
+[fedora:9:cups]
+packages=cups
+
+[fedora:9:cups-devel]
+packages=cups-devel
+
+[fedora:9:gcc]
+packages=gcc-c++
+
+[fedora:9:gs]
+packages=ghostscript
+
+[fedora:9:libcrypto]
+packages=openssl-devel
+
+[fedora:9:libjpeg]
+packages=libjpeg-devel
+
+[fedora:9:libnetsnmp-devel]
+packages=net-snmp-devel
+
+[fedora:9:libpthread]
+packages=glibc-headers
+
+[fedora:9:libtool]
+packages=libtool
+
+[fedora:9:libusb]
+packages=libusb-devel
+
+[fedora:9:make]
+packages=make
+
+[fedora:9:pil]
+packages=python-imaging
+
+[fedora:9:ppdev]
+packages=
+commands=su -c "/sbin/modprobe ppdev"
+
+[fedora:9:pyqt]
+packages=PyQt
+
+[fedora:9:python-devel]
+packages=python-devel
+
+[fedora:9:python23]
+packages=python
+
+[fedora:9:python2x]
+packages=python
+
+[fedora:9:reportlab]
+packages=python-reportlab
+
+[fedora:9:sane]
+packages=sane-backends
+
+[fedora:9:sane-devel]
+packages=sane-backends-devel
+
+[fedora:9:scanimage]
+packages=sane-frontends
+
+[fedora:9:xsane]
+packages=xsane
+
+[fedora:9:cups-ddk]
+packages=cupsddk,cupsddk-drivers,cupsddk-devel
+
+[fedora:9:python-dbus]
+packages=dbus-python
+
+[fedora:9:dbus]
+packages=dbus-devel
+
+[fedora:9:python-ctypes]
+packages=python-ctypes
+
+# ********************
+[fedora:9.0]
+same_as_version= 9
+
 # ****************************************
 [linspire]
 index=15
@@ -1662,7 +1868,7 @@ release_date=
 notes=
 ppd_install=
 udev_mode_fix=True
-ppd_dir=/usr/share/cups/model/HP
+ppd_dir=/usr/share/cups/model/hplip-ppds
 fix_ppd_symlink=False
 drv_dir=/usr/share/cups/drv/hp/
 
@@ -2987,7 +3193,7 @@ packages=python
 packages=python-reportlab
 
 [ubuntu:7.10:sane]
-packages=libsane
+packages=libsane,sane-utils
 
 [ubuntu:7.10:sane-devel]
 packages=libsane-dev

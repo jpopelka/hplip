@@ -1,19 +1,26 @@
 *PPD-Adobe: "4.3"
-*% PPD file for HP PSC 1200 Foomatic/hpijs with CUPS.
+*% PPD file for HP PSC 1200 series Foomatic/hpijs with CUPS.
 *% Created by the CUPS PPD Compiler v1.2.0.
 *% (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 *FormatVersion: "4.3"
-*FileVersion: "hpijs 2.8.5.23"
+*FileVersion: "hpijs 2.8.6.20"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "hp-psc_1200_series-hpijs.ppd"
-*Product: "(ESP Ghostscript)"
-*Product: "(GPL Ghostscript)"
-*Product: "(GNU Ghostscript)"
+*Product: "HP PSC 1200"
+*Product: "HP PSC 1205"
+*Product: "HP PSC 1209"
+*Product: "HP PSC 1210"
+*Product: "HP PSC 1210v"
+*Product: "HP PSC 1210xi"
+*Product: "HP PSC 1215"
+*Product: "HP PSC 1216"
+*Product: "HP PSC 1217"
+*Product: "HP PSC 1219"
 *Manufacturer: "HP"
-*ModelName: "HP PSC 1200 Foomatic/hpijs"
-*ShortNickName: "HP PSC 1200 Foomatic/hpijs"
-*NickName: "HP PSC 1200 Foomatic/hpijs, hpijs 2.8.5.23"
+*ModelName: "HP PSC 1200 series Foomatic/hpijs"
+*ShortNickName: "HP PSC 1200 series Foomatic/hpijs"
+*NickName: "HP PSC 1200 series Foomatic/hpijs, hpijs 2.8.6.20"
 *PSVersion: "(3010.000) 705"
 *PSVersion: "(3010.000) 707"
 *PSVersion: "(3010.000) 815"
@@ -185,7 +192,17 @@ lity:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet=&&
 ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
 =2"
 *End
-*1284DeviceID: "MFG:HP;MDL:psc 1200 series;DES:psc 1200 series;"
+*1284DeviceID: "MFG:HP;MDL:psc_1200_series;DES:psc_1200_series;"
+*Product: "HP PSC 1200"
+*Product: "HP PSC 1205"
+*Product: "HP PSC 1209"
+*Product: "HP PSC 1210"
+*Product: "HP PSC 1210v"
+*Product: "HP PSC 1210xi"
+*Product: "HP PSC 1215"
+*Product: "HP PSC 1216"
+*Product: "HP PSC 1217"
+*Product: "HP PSC 1219"
 *cupsVersion: 1.3
 *cupsModelNumber: 0
 *cupsManualCopies: True
@@ -371,4 +388,4 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of hp-psc_1200_series-hpijs.ppd, 19224 bytes.
+*% End of hp-psc_1200_series-hpijs.ppd, 19648 bytes.

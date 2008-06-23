@@ -97,7 +97,17 @@ for o, a in opts:
         sys.exit(0)
 
     elif o in ('-p', '-P', '--printer'):
-        printer_name = a
+        if a.startswith('*'):
+            printer_name = cups.getDefaultPrinter()
+            log.debug(printer_name)
+            
+            if printer_name is not None:
+                log.info("Using CUPS default printer: %s" % printer_name)
+            else:
+                log.error("CUPS default printer is not set.")
+            
+        else:
+            printer_name = a
 
     elif o in ('-d', '--device'):
         device_uri = a
@@ -125,7 +135,7 @@ os.umask (0037)
 utils.log_title(__title__, __version__)
 
 if os.getuid() == 0:
-    log.error("hp-print should not be run as root.")
+    log.warn("hp-print should not be run as root.")
 
 if not utils.canEnterGUIMode():
     log.error("hp-print requires GUI support. Exiting.")

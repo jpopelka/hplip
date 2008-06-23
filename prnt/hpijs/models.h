@@ -1,7 +1,7 @@
 /*****************************************************************************\
   models.h : Models types
 
-  Copyright (c) 1996 - 2001, Hewlett-Packard Co.
+  Copyright (c) 1996 - 2008, Hewlett-Packard Co.
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -74,6 +74,7 @@ typedef enum PRINTER_TYPE               // typedef'ed for C interface
     eLJFastRaster,
     eLJZjsMono,
     eLJM1005,
+    eQuickConnect,
     MAX_PRINTER_TYPE
 } PRINTER_TYPE;
 
@@ -113,7 +114,8 @@ const char ModelName[MAX_PRINTER_TYPE][13] =
     "LJJetReady",
     "LJFastRaster",
     "LJZjsMono",
-    "LJM1005"
+    "LJM1005",
+    "QuickConnect"
 };
 
 APDK_END_NAMESPACE

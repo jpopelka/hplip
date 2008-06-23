@@ -162,8 +162,8 @@ def init_dbus():
                     log.warn("Unable to start hp-systray")
                     return False, None
 
-            log.debug("Running hp-systray: %s" % path)
-            os.spawnvp(os.P_NOWAIT, path, [])
+            log.debug("Running hp-systray: %s --force-startup" % path)
+            os.spawnlp(os.P_NOWAIT, path, 'hp-systray', '--force-startup')
 
             log.debug("Waiting for hp-systray to start...")
             time.sleep(1)
@@ -298,7 +298,7 @@ def makeURI(param, port=1):
 
 
 def queryModelByModel(model):
-    model = normalizeModelName(model).lower()
+    model = models.normalizeModelName(model).lower()
     return model_dat[model]
 
 def queryModelByURI(device_uri):
@@ -467,7 +467,7 @@ def probeDevices(bus=DEFAULT_PROBE_BUS, timeout=10,
 
                         if dev is not None and dev != '0':
                             device_id = parseDeviceID(dev)
-                            model = normalizeModelName(device_id.get('MDL', '?UNKNOWN?'))
+                            model = models.normalizeModelName(device_id.get('MDL', '?UNKNOWN?'))
 
                             if num_ports_on_jd == 1:
                                 device_uri = 'hp:/net/%s?ip=%s' % (model, ip)
@@ -668,7 +668,7 @@ def parseDeviceURI(device_uri):
     m = pat_deviceuri.match(device_uri)
 
     if m is None:
-        log.debug("Device URI %s is invalid/unknown")
+        log.debug("Device URI %s is invalid/unknown" % device_uri)
         raise Error(ERROR_INVALID_DEVICE_URI)
 
     back_end = m.group(1).lower() or ''
@@ -676,7 +676,7 @@ def parseDeviceURI(device_uri):
     bus = m.group(2).lower() or ''
 
     if bus not in ('usb', 'net', 'bt', 'fw', 'par'):
-        log.debug("Device URI %s is invalid/unknown")
+        log.debug("Device URI %s is invalid/unknown" % device_uri)
         raise Error(ERROR_INVALID_DEVICE_URI)
 
     model = m.group(3) or ''
@@ -845,38 +845,38 @@ AGENT_levels = {AGENT_LEVEL_TRIGGER_MAY_BE_LOW : 'low',
                }
 
 
-MODEL_UI_REPLACEMENTS = {'laserjet'   : 'LaserJet',
-                          'psc'        : 'PSC',
-                          'officejet'  : 'Officejet',
-                          'deskjet'    : 'Deskjet',
-                          'hp'         : 'HP',
-                          'business'   : 'Business',
-                          'inkjet'     : 'Inkjet',
-                          'photosmart' : 'Photosmart',
-                          'color'      : 'Color',
-                          'series'     : 'series',
-                          'printer'    : 'Printer',
-                          'mfp'        : 'MFP',
-                          'mopier'     : 'Mopier',
-                          'pro'        : 'Pro',
-                        }
+##MODEL_UI_REPLACEMENTS = {'laserjet'   : 'LaserJet',
+##                          'psc'        : 'PSC',
+##                          'officejet'  : 'Officejet',
+##                          'deskjet'    : 'Deskjet',
+##                          'hp'         : 'HP',
+##                          'business'   : 'Business',
+##                          'inkjet'     : 'Inkjet',
+##                          'photosmart' : 'Photosmart',
+##                          'color'      : 'Color',
+##                          'series'     : 'series',
+##                          'printer'    : 'Printer',
+##                          'mfp'        : 'MFP',
+##                          'mopier'     : 'Mopier',
+##                          'pro'        : 'Pro',
+##                        }
 
 
-def normalizeModelUIName(model):
-    if not model.lower().startswith('hp'):
-        z = 'HP ' + model.replace('_', ' ')
-    else:
-        z = model.replace('_', ' ')
+##def normalizeModelUIName(model):
+##    if not model.lower().startswith('hp'):
+##        z = 'HP ' + model.replace('_', ' ')
+##    else:
+##        z = model.replace('_', ' ')
+##
+##    y = []
+##    for x in z.split():
+##        xx = x.lower()
+##        y.append(models.MODEL_UI_REPLACEMENTS.get(xx, xx))
+##
+##    return ' '.join(y)
 
-    y = []
-    for x in z.split():
-        xx = x.lower()
-        y.append(MODEL_UI_REPLACEMENTS.get(xx, xx))
-
-    return ' '.join(y)
-
-def normalizeModelName(model):
-    return utils.xstrip(model.replace(' ', '_').replace('__', '_').replace('~','').replace('/', '_'), '_')
+##def normalizeModelName(model):
+##    return utils.xstrip(model.replace(' ', '_').replace('__', '_').replace('~','').replace('/', '_'), '_')
 
 
 def isLocal(bus):
@@ -943,8 +943,8 @@ class Device(object):
         log.debug("URI: backend=%s, is_hp=%s, bus=%s, model=%s, serial=%s, dev=%s, host=%s, port=%d" % \
             (self.back_end, self.is_hp, self.bus, self.model, self.serial, self.dev_file, self.host, self.port))
 
-        self.model_ui = normalizeModelUIName(self.model)
-        self.model = normalizeModelName(self.model)
+        self.model_ui = models.normalizeModelUIName(self.model)
+        self.model = models.normalizeModelName(self.model)
 
         log.debug("Model/UI model: %s/%s" % (self.model, self.model_ui))
 

@@ -156,7 +156,14 @@ try:
 
         elif o in ('-p', '--printer'):
             if a.startswith('*'):
-                printer_name = cups.getDefault()
+                printer_name = cups.getDefaultPrinter()
+                log.debug(printer_name)
+                
+                if printer_name is not None:
+                    log.info("Using CUPS default printer: %s" % printer_name)
+                else:
+                    log.error("CUPS default printer is not set.")
+                
             else:
                 printer_name = a
 
@@ -178,7 +185,7 @@ try:
 
 
     if os.getuid() == 0:
-        log.error("hp-clean should not be run as root.")
+        log.warn("hp-clean should not be run as root.")
     
     if not device.validateBusList(bus):
         usage()

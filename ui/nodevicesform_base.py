@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui/nodevicesform_base.ui'
 #
-# Created: Fri Apr 25 14:30:04 2008
+# Created: Tue Jun 10 13:34:02 2008
 #      by: The PyQt User Interface Compiler (pyuic) 3.17.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -54,7 +54,7 @@ class NoDevicesForm_base(QDialog):
 
         self.languageChange()
 
-        self.resize(QSize(768,343).expandedTo(self.minimumSizeHint()))
+        self.resize(QSize(525,440).expandedTo(self.minimumSizeHint()))
         self.clearWState(Qt.WState_Polished)
 
         self.connect(self.CUPSButton,SIGNAL("clicked()"),self.CUPSButton_clicked)
@@ -69,7 +69,7 @@ class NoDevicesForm_base(QDialog):
 "2. <b>CUPS web interface</b> (open a browser to: <u>http://localhost:631</u> or press the button below),<p>\n"
 "3. The <b>printer installation utility</b> that came with your operating system (YaST, PrinterDrake, etc).\n"
 "<p><p>After setting up a printer, you may have to press <tt>F6</tt> or chose <tt>Device | Refresh All</tt> for the printer to appear in the HP Device Manager.<p>\n"
-"<i><b>Note: Only devices installed with the <tt>hp:</tt> CUPS backend will appear in the HP Device Manager.</b></i><p>"))
+"<i><b>Note: Only devices installed with the <tt>hp:</tt> or <tt>hpfax:</tt> CUPS backend will appear in the HP Device Manager.</b></i><p>"))
         self.setupPushButton.setText(self.__tr("Setup Device..."))
         self.CUPSButton.setText(self.__tr("CUPS Web Interface"))
         self.ExitButton.setText(self.__tr("Close"))

@@ -1,19 +1,18 @@
 *PPD-Adobe: "4.3"
-*% PPD file for HP OfficeJet Pro K850 Foomatic/hpijs with CUPS.
+*% PPD file for HP Officejet Pro k850 Foomatic/hpijs with CUPS.
 *% Created by the CUPS PPD Compiler v1.2.0.
 *% (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 *FormatVersion: "4.3"
-*FileVersion: "hpijs 2.8.5.23"
+*FileVersion: "hpijs 2.8.6.20"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "hp-officejet_pro_k850-hpijs.ppd"
-*Product: "(ESP Ghostscript)"
-*Product: "(GPL Ghostscript)"
-*Product: "(GNU Ghostscript)"
+*Product: "HP Officejet Pro k850"
+*Product: "HP Officejet Pro k850dn"
 *Manufacturer: "HP"
-*ModelName: "HP OfficeJet Pro K850 Foomatic/hpijs"
-*ShortNickName: "HP OfficeJet Pro K850 Foomatic/hpijs"
-*NickName: "HP OfficeJet Pro K850 Foomatic/hpijs, hpijs 2.8.5.23"
+*ModelName: "HP Officejet Pro k850 Foomatic/hpijs"
+*ShortNickName: "HP Officejet Pro k850 Foomatic/hpijs"
+*NickName: "HP Officejet Pro k850 Foomatic/hpijs, hpijs 2.8.6.20"
 *PSVersion: "(3010.000) 705"
 *PSVersion: "(3010.000) 707"
 *PSVersion: "(3010.000) 815"
@@ -213,7 +212,9 @@ PenSet=2"
 Quality:Quality=3,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenS&&
 et=2"
 *End
-*1284DeviceID: "MFG:HP;MDL:officejet pro k850;DES:officejet pro k850;"
+*1284DeviceID: "MFG:HP;MDL:officejet_pro_k850;DES:officejet_pro_k850;"
+*Product: "HP Officejet Pro k850"
+*Product: "HP Officejet Pro k850dn"
 *cupsVersion: 1.3
 *cupsModelNumber: 0
 *cupsManualCopies: True
@@ -435,4 +436,4 @@ et=2"
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of hp-officejet_pro_k850-hpijs.ppd, 22913 bytes.
+*% End of hp-officejet_pro_k850-hpijs.ppd, 22963 bytes.

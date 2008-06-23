@@ -56,7 +56,6 @@ DEPENDENCY_RUN_AND_COMPILE_TIME = 3
 
 PING_TARGET = "www.google.com"
 HTTP_GET_TARGET = "http://www.google.com"
-PLUGIN_CONF_URL = "http://hplip.sf.net/plugins.conf"
 
 PASSWORD_LIST = [
     pexpect.EOF, # 0
@@ -147,11 +146,15 @@ class CoreInstall(object):
         self.ppd_dir = None
         self.drv_dir = None
         self.distros = {}
-        self.plugin_path = os.path.join(prop.home_dir, "data", "plugins")
         self.logoff_required = False
         self.restart_required = False
         self.network_connected = False
-
+        
+        self.plugin_path = os.path.join(prop.home_dir, "data", "plugin")
+        self.plugin_version = '0.0.0'
+        self.plugin_name = ''
+        
+        
         self.FIELD_TYPES = {
             'distros' : TYPE_LIST,
             'index' : TYPE_INT,
@@ -1583,13 +1586,81 @@ class CoreInstall(object):
             log.debug("Clearing password...")
             self.run("sudo -K")
 
-    # PLUGIN SUPPORT
+
+            
+    # PLUGIN HELPERS
+    
+    def set_plugin_version(self):
+        self.plugin_version = '.'.join(sys_cfg.hplip.version.split('.')[:3])
+        self.plugin_name = 'hplip-%s-plugin.run' % self.plugin_version
+        
+    
+    def get_plugin_conf_url(self):
+        url = "http://hplip.sf.net/plugin.conf"
+        
+        if os.path.exists('/etc/hp/plugin.conf'):
+            url = "file:///etc/hp/plugin.conf"
+            
+        elif os.path.exists(os.path.join(sys_cfg.dirs.home, 'plugin.conf')):
+            url = "file://" + os.path.join(sys_cfg.dirs.home, 'plugin.conf')
+            
+        log.debug("Plugin.conf url: %s" % url)
+        return url
+        
+        
+    def get_plugin_info(self, plugin_conf_url, callback):
+        ok, size, checksum, timestamp, url = False, 0, 0, 0.0, ''
+
+        if not self.create_plugin_dir():
+            log.error("Could not create plug-in directory.")
+            return '', 0, 0, 0, False
+
+        local_conf_fp, local_conf = utils.make_temp_file()
+        
+        if os.path.exists(local_conf):
+            os.remove(local_conf)
+        
+        try:
+            try:
+                filename, headers = urllib.urlretrieve(plugin_conf_url, local_conf, callback)
+            except IOError, e:
+                log.error("I/O Error: %s" % e.strerror)
+                return '', 0, 0, 0, False
+            
+            if not os.path.exists(local_conf):
+                log.error("plugin.conf not found.")
+                return '', 0, 0, 0, False
+            
+            plugin_conf_p = ConfigParser.ConfigParser()
+            
+            try:
+                plugin_conf_p.read(local_conf)
+            except (ConfigParser.MissingSectionHeaderError, ConfigParser.ParsingError):
+                log.error("Error parsing file - 404 error?")
+                return '', 0, 0, 0, False
+
+            try:
+                url = plugin_conf_p.get(self.plugin_version, 'url')
+                size = plugin_conf_p.getint(self.plugin_version, 'size')
+                checksum = plugin_conf_p.get(self.plugin_version, 'checksum')
+                timestamp = plugin_conf_p.getfloat(self.plugin_version, 'timestamp')
+                ok = True
+            except KeyError:
+                log.error("Error reading plugin.conf")
+            
+        finally:
+            os.close(local_conf_fp)
+            os.remove(local_conf)
+
+        return url, size, checksum, timestamp, ok
+        
 
     def create_plugin_dir(self):
         if not os.path.exists(self.plugin_path):
             try:
                 log.debug("Creating plugin directory: %s" % self.plugin_path)
-                os.makedirs(self.plugin_path)
+                os.umask(0)
+                os.makedirs(self.plugin_path, 0755)
                 return True
             except (OSError, IOError), e:
                 log.error("Unable to create directory: %s" % e.strerror)
@@ -1598,146 +1669,42 @@ class CoreInstall(object):
         return True
 
 
-    def get_plugin_info(self, model, callback):
-        ok, url, size, checksum, timestamp = False, '', 0, 0, 0.0
-
-        if self.network_connected:
-            if not self.create_plugin_dir():
-                return '', 0, 0, 0, False
-
-            conf = os.path.join(self.plugin_path, "plugins.conf")
-            filename, headers = urllib.urlretrieve(PLUGIN_CONF_URL, conf, callback)
-            f = file(conf, 'r')
-            t = f.read()
-            log.debug_block("plugins.conf", t)
-            f.close()
-
-            plugin_cfg = Config(conf, True)
-
-            try:
-                url = plugin_cfg[model]['url']
-                size = int(plugin_cfg[model]['size'])
-                checksum = plugin_cfg[model]['checksum']
-                timestamp = float(plugin_cfg[model]['timestamp'])
-                ok = True
-            except KeyError:
-                pass
-        else:
-            log.error("No network connection detected. Cannot download required plugin.")
-
-        return url, size, checksum, timestamp, ok
-
-
-    def download_plugin(self, model, url, size, checksum, timestamp, callback=None):
-        log.debug("Downloading %s.plugin from %s to %s" % (model, url, self.plugin_path))
+    def download_plugin(self, url, size, checksum, timestamp, callback=None):
+        log.debug("Downloading %s plug-in from %s to %s" % (self.plugin_version, url, self.plugin_path))
 
         if not self.create_plugin_dir():
-            return False, ''
+            return False, "Failed to create plug-in directory: %s" % self.plugin_path
 
-        plugin_file = os.path.join(self.plugin_path, model+".plugin")
-        filename, headers = urllib.urlretrieve(url, plugin_file, callback)
+        plugin_file = os.path.join(self.plugin_path, self.plugin_name)
+        
+        try:
+            filename, headers = urllib.urlretrieve(url, plugin_file, callback)
+        except IOError, e:
+            log.error("Plug-in download failed: %s" % e.strerror)
+            return False, e.strerror
+        
         calc_checksum = sha.new(file(plugin_file, 'r').read()).hexdigest()
         log.debug("D/L file checksum=%s" % calc_checksum)
 
         return True, plugin_file
 
 
-    def copy_plugin(self, model, src):
-        plugin_file = os.path.join(self.plugin_path, model+".plugin")
+    def check_for_plugin(self):
+        return os.path.exists(os.path.join(self.plugin_path, self.plugin_name)) and \
+            utils.to_bool(sys_cfg.hplip.plugin)
 
-        if not self.create_plugin_dir():
+    
+    def run_plugin(self, mode=GUI_MODE, callback=None):
+        plugin_file = os.path.join(self.plugin_path, self.plugin_name)
+        
+        if not os.path.exists(plugin_file):
             return False
-
-        import shutil
-        try:
-            log.debug("Copying plugin from %s to %s" % (src, plugin_file))
-            shutil.copyfile(src, plugin_file)
-        except (OSError, IOError), e:
-            log.error("Copy failed: %s" % e.strerror)
-            return False
-
-        return True
-
-
-    def install_plugin(self, model, plugin_lib):
-        log.debug("Installing %s.plugin to %s..." % (model, self.plugin_path))
-        ok = False
-        plugin_file = os.path.join(self.plugin_path, model+".plugin")
-        ppd_path = sys_cfg.dirs.ppd
-        rules_path = '/etc/udev/rules.d'
-
-        if not os.path.exists(rules_path):
-            log.error("Rules path %s does not exist!" % rules_path)
-
-        firmware_path = os.path.join(prop.home_dir, "data", "firmware")
-        if not os.path.exists(firmware_path):
-            try:
-                log.debug("Creating plugin directory: %s" % firmware_path)
-                os.makedirs(firmware_path)
-            except (OSError, IOError), e:
-                log.error("Unable to create directory: %s" % e.strerror)
-
-        lib_path = os.path.join(prop.home_dir, "prnt", "plugins")
-        if not os.path.exists(lib_path):
-            try:
-                log.debug("Creating plugin directory: %s" % lib_path)
-                os.makedirs(lib_path)
-            except (OSError, IOError), e:
-                log.error("Unable to create directory: %s" % e.strerror)
-
-        tar = tarfile.open(plugin_file, "r:gz")
-        for tarinfo in tar:
-            name = tarinfo.name
-            if name.endswith('.fw') or name.endswith('.fw.gz'):
-                # firmware file
-                log.debug("Extracting fw file %s to %s" % (name, firmware_path))
-                tar.extract(tarinfo, firmware_path)
-
-            elif name.endswith('.ppd') or name.endswith('.ppd.gz'):
-                # PPD file
-                log.debug("Extracting ppd file %s to %s" % (name, ppd_path))
-                tar.extract(tarinfo, ppd_path,)
-
-            elif name.endswith('.so'):
-                # Library file(s)
-                log.debug("Extracting library file %s to %s" % (name, lib_path))
-                tar.extract(tarinfo, lib_path)
-
-            elif name.endswith('.rules'):
-                # .rules file
-                log.debug("Extracting .rules file %s to %s" % (name, rules_path))
-                tar.extract(tarinfo, rules_path)
-
-            else:
-                # other files...
-                log.debug("Extracting file %s to %s" % (name, self.plugin_path))
-                tar.extract(tarinfo, self.plugin_path)
-
-
-        tar.close()
-
-        self.bitness = utils.getBitness()
-        self.processor = utils.getProcessor()
-
-        link_file = os.path.join(lib_path, '%s.so' % plugin_lib)
-
-        if self.processor == 'power_macintosh':
-            trg_file = os.path.join(lib_path,'%s-ppc.so' % plugin_lib)
+        
+        if mode == GUI_MODE:
+            return os.system("sh %s -- -u" % plugin_file) == 0
         else:
-            trg_file = os.path.join(lib_path,"%s-x86_%s.so" % (plugin_lib, self.bitness))
-
-        try:
-            log.debug("Creating link: %s -> %s" % (link_file, trg_file))
-            os.symlink(trg_file, link_file)
-        except (OSError, IOError), e:
-            log.warn("Unable to create symlink: %s" % e.strerror)
-
-        return True
-
-
-    def check_for_plugin(self, model): 
-        plugin_file = os.path.join(self.plugin_path, model+".plugin")
-        # TODO: Check for each file of the plugin is installed?
-        return os.path.exists(plugin_file)
-
-
+            return os.system("sh %s -- -i" % plugin_file) == 0
+    
+        
+       
+        

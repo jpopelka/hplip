@@ -837,15 +837,22 @@ class DevMgr4(DevMgr4_base):
                     if d not in devices: 
                         adds.append(d)
 
+                log.debug("Adds: %s" % ','.join(adds))
+
                 removals = []
                 for d in devices: 
                     if d not in self.cups_devices:
                         removals.append(d)
 
+                log.debug("Removals (1): %s" % ','.join(removals))
+
                 updates = []
                 for d in devices:
                     if d not in adds and d not in removals:
                         updates.append(d)
+
+                log.debug("Updates: %s" % ','.join(updates))
+
 
                 for d in adds:
                     log.debug("adding: %s" % d)
@@ -855,6 +862,11 @@ class DevMgr4(DevMgr4_base):
                     except Error:
                         log.error("Unexpected error in Device class.")
                         log.exception()
+
+                    if not dev.supported:
+                        log.debug("Unsupported model - removing device.")
+                        removals.append(d)
+                        continue
 
                     self.CheckForDeviceSettingsUI(dev)
                     icon = self.CreatePixmap(dev)
@@ -872,14 +884,21 @@ class DevMgr4(DevMgr4_base):
 
                     devices[d] = dev
 
+                log.debug("Removals (2): %s" % ','.join(removals))
+
                 for d in removals:
                     item = self.DeviceList.firstItem()
                     log.debug("removing: %s" % d)
+                    
+                    try:
+                        del devices[d]
+                    except KeyError:
+                        pass
+                    
 
                     while item is not None:
                         if item.device_uri == d:
                             self.DeviceList.takeItem(item)
-                            del devices[d]
                             break
 
                         item = item.nextItem()
@@ -924,7 +943,8 @@ class DevMgr4(DevMgr4_base):
                     user_cfg.last_used.device_uri = self.cur_device_uri
 
                     for d in updates + adds:
-                        self.RequestDeviceUpdate(devices[d])
+                        if d not in removals:
+                            self.RequestDeviceUpdate(devices[d])
 
                 else:
                     self.cur_device = None
@@ -1027,20 +1047,23 @@ class DevMgr4(DevMgr4_base):
         if dev is None:
             dev = self.cur_device
 
-        #log.debug("RequestDeviceUpdate(%s)" % dev.device_uri)
-        dev.error_state = ERROR_STATE_REFRESHING
-        self.UpdateDevice(dev, update_tab=False)
-        qApp.processEvents()
+        if dev is not None:
+            #log.debug("RequestDeviceUpdate(%s)" % dev.device_uri)
+            dev.error_state = ERROR_STATE_REFRESHING
+            self.UpdateDevice(dev, update_tab=False)
+            qApp.processEvents()
 
-        self.request_queue.put(dev)
+            self.request_queue.put(dev)
 
 
     def RescanDevices(self):
         #log.debug("RescanDevices()")
         if not self.rescanning:
             self.deviceRefreshAll.setEnabled(False)
-            self.DeviceListRefresh()
-            self.deviceRefreshAll.setEnabled(True)
+            try:
+                self.DeviceListRefresh()
+            finally:
+                self.deviceRefreshAll.setEnabled(True)
 
 
     def callback(self):
@@ -1147,39 +1170,68 @@ class DevMgr4(DevMgr4_base):
     def UpdateFuncsTab(self):
         self.iconList.clear()
 
-        self.d = self.cur_device
+        d = self.cur_device
         
-        if self.d is not None:
+        if d is not None:
         
-            self.avail = self.d.device_state != DEVICE_STATE_NOT_FOUND and self.d.supported
-            self.fax = self.d.fax_type and prop.fax_build and self.d.device_type == DEVICE_TYPE_FAX and \
-                sys.hexversion >= 0x020300f0 and self.avail
-            self.printer = self.d.device_type == DEVICE_TYPE_PRINTER and self.avail
+            avail = d.device_state != DEVICE_STATE_NOT_FOUND and d.supported
+            fax = d.fax_type and prop.fax_build and d.device_type == DEVICE_TYPE_FAX and \
+                sys.hexversion >= 0x020300f0 and avail
+            printer = d.device_type == DEVICE_TYPE_PRINTER and avail
+            req_plugin = d.plugin == PLUGIN_REQUIRED
+            opt_plugin = d.plugin == PLUGIN_OPTIONAL
+            
+            hplip_conf = ConfigParser.ConfigParser()
+            fp = open("/etc/hp/hplip.conf", "r")
+            hplip_conf.readfp(fp)
+            fp.close()
+            
+            try:
+                plugin_installed = utils.to_bool(hplip_conf.get("hplip", "plugin"))
+            except ConfigParser.NoOptionError:
+                plugin_installed = False
+            
+            if d.plugin:
+                if req_plugin and plugin_installed:
+                    x = self.__tr("Download and install<br>required plugin (already installed).")
+                
+                elif req_plugin and not plugin_installed:
+                    x = self.__tr("Download and install<br>required plugin (needs installation).")
+                
+                elif opt_plugin and plugin_installed:
+                    x = self.__tr("Download and install<br>optional plugin (already installed).")
+                
+                elif opt_plugin and not plugin_installed:
+                    x = self.__tr("Download and install<br>optional plugin (needs installation).")
+            
+            else:
+                x = ''
+
             
             self.ICONS = [ 
                 
                 # PRINTER
                 
-                (lambda : self.printer,                 # filter func
+                (lambda : printer,                 # filter func
                 self.__tr("Print"),                      # Text
                 "print",       # Icon
                 self.__tr("Print documents or files."),  # Tooltip
                 self.user_settings.cmd_print),           # command/action
 
-                (lambda : self.d.scan_type and prop.scan_build and \
-                    self.d.device_type == DEVICE_TYPE_PRINTER and self.avail, 
+                (lambda : d.scan_type and prop.scan_build and \
+                    d.device_type == DEVICE_TYPE_PRINTER and avail, 
                 self.__tr("Scan"),
                 "scan", 
                 self.__tr("Scan a document, image, or photograph.<br>"), 
                 self.user_settings.cmd_scan),
 
-                (lambda : self.d.copy_type and self.d.device_type == DEVICE_TYPE_PRINTER and self.avail, 
+                (lambda : d.copy_type and d.device_type == DEVICE_TYPE_PRINTER and avail, 
                 self.__tr("Make Copies"), 
                 "makecopies", 
                 self.__tr("Make copies on the device controlled by the PC.<br>"), 
                 self.user_settings.cmd_copy),
 
-                (lambda : self.d.pcard_type and self.d.device_type == DEVICE_TYPE_PRINTER and self.avail,
+                (lambda : d.pcard_type and d.device_type == DEVICE_TYPE_PRINTER and avail,
                 self.__tr("Unload Photo Card"),
                 "makecopies",
                 self.__tr("Copy images from the device's photo card to the PC."),
@@ -1187,19 +1239,19 @@ class DevMgr4(DevMgr4_base):
 
                 # FAX
 
-                (lambda: self.fax,
+                (lambda: fax,
                 self.__tr("Send Fax"),
                 "fax",
                 self.__tr("Send a fax from the PC."),
                 self.user_settings.cmd_fax),
 
-                (lambda: self.fax,
+                (lambda: fax,
                 self.__tr("Fax Setup"),
                 "fax_setup",
                 self.__tr("Fax support must be setup before you can send faxes."),
                 self.faxSettingsButton_clicked),
 
-                (lambda: self.fax,
+                (lambda: fax,
                 self.__tr("Fax Address Book"),
                 "fab",
                 self.__tr("Setup fax phone numbers to use when sending faxes from the PC."),
@@ -1207,13 +1259,13 @@ class DevMgr4(DevMgr4_base):
 
                 # SETTINGS/TOOLS
 
-                (lambda : self.cur_device.device_settings_ui is not None and self.avail,
+                (lambda : self.cur_device.device_settings_ui is not None and avail,
                 self.__tr("Device Settings"),
                 "settings",
                 self.__tr("Your device has special device settings.<br>You may alter these settings here."), 
                 self.deviceSettingsButton_clicked),
 
-                (lambda : self.printer,
+                (lambda : printer,
                 self.__tr("Print Test Page"),
                 "testpage",
                 self.__tr("Print a test page to test the setup of your printer."),
@@ -1231,53 +1283,77 @@ class DevMgr4(DevMgr4_base):
                 self.__tr("This information is primarily useful for <br>debugging and troubleshooting (advanced)."),
                 self.viewInformation),
 
-                (lambda: self.printer and self.d.align_type,
+                (lambda: printer and d.align_type,
                 self.__tr("Align Cartridges (Print Heads)"), 
                 "align",
                 self.__tr("This will improve the quality of output when a new cartridge is installed."), 
                 self.AlignPensButton_clicked),
 
-                (lambda: self.printer and self.d.clean_type,
+                (lambda: printer and d.clean_type,
                 self.__tr("Clean Cartridges"),
                 "clean",
                 self.__tr("You only need to perform this action if you are<br>having problems with poor printout quality due to clogged ink nozzles."), 
                 self.CleanPensButton_clicked),
 
-                (lambda: self.printer and self.d.color_cal_type and self.d.color_cal_type == COLOR_CAL_TYPE_TYPHOON,
+                (lambda: printer and d.color_cal_type and d.color_cal_type == COLOR_CAL_TYPE_TYPHOON,
                 self.__tr("Color Calibration"),
                 "colorcal",
                 self.__tr("Use this procedure to optimimize your printer's color output<br>(requires glossy photo paper)."),  
                 self.ColorCalibrationButton_clicked),
 
-                (lambda: self.printer and self.d.color_cal_type and self.d.color_cal_type != COLOR_CAL_TYPE_TYPHOON,
+                (lambda: printer and d.color_cal_type and d.color_cal_type != COLOR_CAL_TYPE_TYPHOON,
                 self.__tr("Color Calibration"),
                 "colorcal",
                 self.__tr("Use this procedure to optimimize your printer's color output."), 
                 self.ColorCalibrationButton_clicked),
 
-                (lambda: self.printer and self.d.linefeed_cal_type,
+                (lambda: printer and d.linefeed_cal_type,
                 self.__tr("Line Feed Calibration"), 
                 "linefeed_cal",
                 self.__tr("Use line feed calibration to optimize print quality<br>(to remove gaps in the printed output)."),
                 self.linefeedCalibration),
 
-                (lambda: self.printer and self.d.pq_diag_type,
+                (lambda: printer and d.pq_diag_type,
                 self.__tr("Print Diagnostic Page"), 
                 "pq_diag",
                 self.__tr("Your printer can print a test page <br>to help diagnose print quality problems."),
                 self.pqDiag),
 
-                (lambda : self.printer and self.d.fw_download,
+                # FIRMWARE
+                
+                (lambda : printer and d.fw_download,
                 self.__tr("Download Firmware"),
-                "download",
+                "firmware",
                 self.__tr("Download firmware to your printer <br>(required on some devices after each power-up)."), 
                 self.downloadFirmware),
 
+                # PLUGIN
+                
+                (lambda : req_plugin,
+                self.__tr("Install Required Plugin"),
+                "plugin",
+                x, #self.__tr("Download and install the HPLIP plugin."), 
+                self.downloadPlugin),
+                
+                (lambda : opt_plugin,
+                self.__tr("Install Optional Plugin"),
+                "plugin",
+                x, #self.__tr("Download and install the HPLIP plugin."), 
+                self.downloadPlugin),
+                
+                # HELP/WEBSITE
+                
                 (lambda : True,
-                self.__tr("View Documnetation"),
+                self.__tr("Visit HPLIP Website"),
                 "support2",
-                self.__tr("View HPLIP documentation installed on your system."),  
+                self.__tr("Visit HPLIP website."),  
                 self.viewSupport),
+
+                (lambda : True,
+                self.__tr("Help"),
+                "help",
+                self.__tr("View HPLIP help."),  
+                self.viewHelp),
 
             ]
 
@@ -1299,6 +1375,39 @@ class DevMgr4(DevMgr4_base):
                     cmd)
 
 
+    def downloadPlugin(self):
+        su_sudo = None
+
+        if utils.which('kdesu'):
+            su_sudo = 'kdesu -- %s'
+
+        elif utils.which('gnomesu'):
+            su_sudo = 'gnomesu -c "%s"'
+        
+        elif utils.which('gksu'):
+            su_sudo = 'gksu "%s"'
+
+        if su_sudo is None:
+            QMessageBox.critical(self,
+                self.caption(),
+                self.__tr("<b>Unable to find an appropriate su/sudo utility to run hp-plugin.</b>"),
+                QMessageBox.Ok,
+                QMessageBox.NoButton,
+                QMessageBox.NoButton)
+
+        else:
+            if utils.which('hp-plugin'):
+                cmd = su_sudo % 'hp-plugin -u'
+            else:
+                cmd = su_sudo % 'python ./plugin.py -u'
+
+            log.debug(cmd)
+            utils.run(cmd, log_output=True, password_func=None, timeout=1)
+            #print os.system(cmd)
+            
+            self.UpdateFuncsTab()
+            
+    
     def iconList_clicked(self, item):
         return self.RunFuncCmd(item)
 
@@ -1387,7 +1496,7 @@ class DevMgr4(DevMgr4_base):
         dlg.exec_loop()
 
 
-    def viewSupport(self):
+    def viewHelp(self):
         f = "http://hplip.sf.net"
 
         if prop.doc_build:
@@ -1398,6 +1507,12 @@ class DevMgr4(DevMgr4_base):
         log.debug(f)
         utils.openURL(f)
 
+        
+    def viewSupport(self):
+        f = "http://hplip.sf.net"
+        log.debug(f)
+        utils.openURL(f)
+        
 
     def pqDiag(self):
         d = self.cur_device
@@ -1459,15 +1574,17 @@ class DevMgr4(DevMgr4_base):
 
     def downloadFirmware(self):
         d = self.cur_device
-
+        fail = True
+        
         try:
             QApplication.setOverrideCursor(QApplication.waitCursor)
             d.open()
 
             if d.isIdleAndNoError():
-                d.downloadFirmware()
-            else:
-                self.FailureUI(self.__tr("<b>An error occured downloading firmware file.</b><p>Please check your printer and try again."))
+                fail = d.downloadFirmware()
+                
+            if fail:
+                self.FailureUI(self.__tr("<b>An error occured downloading firmware file.</b><p>Please check your printer and ensure that the HPLIP plugin has been installed."))
 
         finally:
             d.close()
@@ -1811,7 +1928,11 @@ class DevMgr4(DevMgr4_base):
                 line1 = dq.get('panel-line1', '')
                 line2 = dq.get('panel-line2', '')
             else:
-                line1 = device.queryString(self.cur_device.hist[0].event_code)
+                try:
+                    line1 = device.queryString(self.cur_device.hist[0].event_code)
+                except (AttributeError, TypeError):
+                    line1 = ''
+                    
                 line2 = ''
 
             pm = load_pixmap('panel_lcd', 'other')
@@ -1849,45 +1970,50 @@ class DevMgr4(DevMgr4_base):
         self.statusListView.clear()
         row = 0
         hist = self.cur_device.hist[:]
-        hist.reverse()
-        row = len(hist)-1
+        
+        if hist:
+            hist.reverse()
+            row = len(hist)-1
 
-        for e in hist:
-            ess = device.queryString(e.event_code, 0)
-            esl = device.queryString(e.event_code, 1)
+            for e in hist:
+                if e is None:
+                    continue
+                    
+                ess = device.queryString(e.event_code, 0)
+                esl = device.queryString(e.event_code, 1)
 
-            if row == 0:
-                desc = self.__tr("(most recent)")
+                if row == 0:
+                    desc = self.__tr("(most recent)")
 
-            else:
-                desc = self.getTimeDeltaDesc(e.timedate)
-
-            dt = QDateTime()
-            dt.setTime_t(int(e.timedate), Qt.LocalTime)
-
-            # TODO: In Qt4.x, use QLocale.toString(date, format)
-            tt = QString("%1 %2").arg(dt.toString()).arg(desc) 
-
-            if e.job_id:
-                job_id = unicode(e.job_id)
-            else:
-                job_id = u''
-
-            error_state = STATUS_TO_ERROR_STATE_MAP.get(e.event_code, ERROR_STATE_CLEAR)
-            tech_type = self.cur_device.tech_type
-
-            try:
-                if tech_type in (TECH_TYPE_COLOR_INK, TECH_TYPE_MONO_INK):
-                    status_pix = self.STATUS_ICONS[error_state][0] # ink
                 else:
-                    status_pix = self.STATUS_ICONS[error_state][1] # laser
-            except KeyError:
-                status_pix = self.STATUS_ICONS[ERROR_STATE_CLEAR][0]
+                    desc = self.getTimeDeltaDesc(e.timedate)
 
-            StatusListViewItem(self.statusListView, status_pix, ess, tt, unicode(e.event_code), 
-                job_id, unicode(e.username))
+                dt = QDateTime()
+                dt.setTime_t(int(e.timedate), Qt.LocalTime)
 
-            row -= 1
+                # TODO: In Qt4.x, use QLocale.toString(date, format)
+                tt = QString("%1 %2").arg(dt.toString()).arg(desc) 
+
+                if e.job_id:
+                    job_id = unicode(e.job_id)
+                else:
+                    job_id = u''
+
+                error_state = STATUS_TO_ERROR_STATE_MAP.get(e.event_code, ERROR_STATE_CLEAR)
+                tech_type = self.cur_device.tech_type
+
+                try:
+                    if tech_type in (TECH_TYPE_COLOR_INK, TECH_TYPE_MONO_INK):
+                        status_pix = self.STATUS_ICONS[error_state][0] # ink
+                    else:
+                        status_pix = self.STATUS_ICONS[error_state][1] # laser
+                except KeyError:
+                    status_pix = self.STATUS_ICONS[ERROR_STATE_CLEAR][0]
+
+                StatusListViewItem(self.statusListView, status_pix, ess, tt, unicode(e.event_code), 
+                    job_id, unicode(e.username))
+
+                row -= 1
 
         i = self.statusListView.firstChild()
         if i is not None:
@@ -2619,6 +2745,9 @@ class DevMgr4(DevMgr4_base):
         if utils.which('kdesu'):
             su_sudo = 'kdesu -- %s'
 
+        elif utils.which('gnomesu'):
+            su_sudo = 'gnomesu -c "%s"'
+        
         elif utils.which('gksu'):
             su_sudo = 'gksu "%s"'
 
@@ -2910,11 +3039,18 @@ class ScrollTestpageView(ScrollView):
     def CheckDeviceUI(self):
             self.FailureUI(self.__tr("<b>Device is busy or in an error state.</b><p>Please check device and try again."))            
 
+        
+    def FailureUI(self, error_text):
+        QMessageBox.critical(self,
+            self.caption(),
+            error_text,
+            QMessageBox.Ok,
+            QMessageBox.NoButton,
+            QMessageBox.NoButton)
+
 
     def __tr(self,s,c = None):
         return qApp.translate("ScrollTestpageView",s,c)
-
-
 
 # ***********************************************************************************
 #
@@ -3058,5 +3194,15 @@ class ScrollColorCalView(ScrollView):
 
 
     def CheckDeviceUI(self):
-            self.FailureUI(self.__tr("<b>Device is busy or in an error state.</b><p>Please check device and try again."))            
+            self.FailureUI(self.__tr("<b>Device is busy or in an error state.</b><p>Please check device and try again."))      
+      
+    
+    def FailureUI(self, error_text):
+        QMessageBox.critical(self,
+            self.caption(),
+            error_text,
+            QMessageBox.Ok,
+            QMessageBox.NoButton,
+            QMessageBox.NoButton)
+      
 

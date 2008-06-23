@@ -1,19 +1,18 @@
 *PPD-Adobe: "4.3"
-*% PPD file for HP DeskJet 695C Foomatic/hpijs with CUPS.
+*% PPD file for HP Deskjet 695 Foomatic/hpijs with CUPS.
 *% Created by the CUPS PPD Compiler v1.2.0.
 *% (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 *FormatVersion: "4.3"
-*FileVersion: "hpijs 2.8.5.23"
+*FileVersion: "hpijs 2.8.6.20"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "hp-deskjet_695-hpijs.ppd"
-*Product: "(ESP Ghostscript)"
-*Product: "(GPL Ghostscript)"
-*Product: "(GNU Ghostscript)"
+*Product: "HP Deskjet 695c"
+*Product: "HP Deskjet 695cci"
 *Manufacturer: "HP"
-*ModelName: "HP DeskJet 695C Foomatic/hpijs"
-*ShortNickName: "HP DeskJet 695C Foomatic/hpijs"
-*NickName: "HP DeskJet 695C Foomatic/hpijs, hpijs 2.8.5.23"
+*ModelName: "HP Deskjet 695 Foomatic/hpijs"
+*ShortNickName: "HP Deskjet 695 Foomatic/hpijs"
+*NickName: "HP Deskjet 695 Foomatic/hpijs, hpijs 2.8.6.20"
 *PSVersion: "(3010.000) 705"
 *PSVersion: "(3010.000) 707"
 *PSVersion: "(3010.000) 815"
@@ -156,7 +155,9 @@ et=4"
 0 -sIjsParams=Quality:Quality=2,Quality:ColorMode=0,Quality:MediaType=&&
 0,Quality:PenSet=2"
 *End
-*1284DeviceID: "MFG:HP;MDL:deskjet 695;DES:deskjet 695;"
+*1284DeviceID: "MFG:HP;MDL:deskjet_695;DES:deskjet_695;"
+*Product: "HP Deskjet 695c"
+*Product: "HP Deskjet 695cci"
 *cupsVersion: 1.3
 *cupsModelNumber: 0
 *cupsManualCopies: True
@@ -334,4 +335,4 @@ et=4"
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of hp-deskjet_695-hpijs.ppd, 17155 bytes.
+*% End of hp-deskjet_695-hpijs.ppd, 17177 bytes.

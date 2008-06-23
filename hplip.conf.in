@@ -1,10 +1,5 @@
 # @configure_input@
 
-[hpssd]
-# Note: hpssd does not support dynamic ports
-# Port 2207 is the IANA assigned port for hpssd
-port=2207
-
 [hplip]
 version=@VERSION@
 

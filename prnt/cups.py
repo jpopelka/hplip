@@ -31,7 +31,7 @@ import glob
 
 # Local
 from base.g import *
-from base import utils
+from base import utils, models
 
 # Handle case where cups.py (via device.py) is loaded
 # and cupsext doesn't exist yet. This happens in the
@@ -300,9 +300,13 @@ def levenshtein_distance(a,b):
 
 number_pat = re.compile(r""".*?(\d+)""", re.IGNORECASE)
 
-STRIP_STRINGS = ['-ps', '-pcl', 'foomatic:', '-hpijs', 'hp-', 'hp_', 
-                 '_series', '-hpijs', '.gz', '.ppd', '-series',
-                 '-zjs', '-lidil']
+STRIP_STRINGS = ['foomatic:', 'hp-', 'hp_', 'hp ', '_series', '.gz', '.ppd', '-series', ' series', '-hpijs']
+
+for p in models.TECH_CLASS_PDLS.values():
+    pp = '-%s' % p
+    if pp not in STRIP_STRINGS:
+        STRIP_STRINGS.append(pp)
+        
 
 def stripModel(model):
     model = model.lower()
@@ -323,10 +327,11 @@ def getPPDFile(stripped_model, ppds):
     eds = {}
     min_edit_distance = sys.maxint
 
+    log.debug("Determining edit distance from %s..." % stripped_model)
     for f in ppds:
         t = stripModel(os.path.basename(f))
         eds[f] = levenshtein_distance(stripped_model, t)
-        log.debug("dist('%s', '%s') = %d" % (stripped_model, t, eds[f]))
+        log.debug("dist('%s') = %d" % (t, eds[f]))
         min_edit_distance = min(min_edit_distance, eds[f])
 
     log.debug("Min. dist = %d" % min_edit_distance)

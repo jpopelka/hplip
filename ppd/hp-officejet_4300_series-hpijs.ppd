@@ -1,19 +1,29 @@
 *PPD-Adobe: "4.3"
-*% PPD file for HP OfficeJet 4300 Foomatic/hpijs with CUPS.
+*% PPD file for HP Officejet 4300 series Foomatic/hpijs with CUPS.
 *% Created by the CUPS PPD Compiler v1.2.0.
 *% (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 *FormatVersion: "4.3"
-*FileVersion: "hpijs 2.8.5.23"
+*FileVersion: "hpijs 2.8.6.20"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "hp-officejet_4300_series-hpijs.ppd"
-*Product: "(ESP Ghostscript)"
-*Product: "(GPL Ghostscript)"
-*Product: "(GNU Ghostscript)"
+*Product: "HP Officejet 4311"
+*Product: "HP Officejet 4312"
+*Product: "HP Officejet 4314"
+*Product: "HP Officejet 4315"
+*Product: "HP Officejet 4315v"
+*Product: "HP Officejet 4315xi"
+*Product: "HP Officejet 4317"
+*Product: "HP Officejet 4319"
+*Product: "HP Officejet 4352"
+*Product: "HP Officejet 4353"
+*Product: "HP Officejet 4355"
+*Product: "HP Officejet 4357"
+*Product: "HP Officejet 4359"
 *Manufacturer: "HP"
-*ModelName: "HP OfficeJet 4300 Foomatic/hpijs"
-*ShortNickName: "HP OfficeJet 4300 Foomatic/hpijs"
-*NickName: "HP OfficeJet 4300 Foomatic/hpijs, hpijs 2.8.5.23"
+*ModelName: "HP Officejet 4300 series Foomatic/hpijs"
+*ShortNickName: "HP Officejet 4300 series Foomatic/hpijs"
+*NickName: "HP Officejet 4300 series Foomatic/hpijs, hpijs 2.8.6.20"
 *PSVersion: "(3010.000) 705"
 *PSVersion: "(3010.000) 707"
 *PSVersion: "(3010.000) 815"
@@ -185,7 +195,20 @@ lity:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet=&&
 ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
 =2"
 *End
-*1284DeviceID: "MFG:HP;MDL:officejet 4300 series;DES:officejet 4300 series;"
+*1284DeviceID: "MFG:HP;MDL:officejet_4300_series;DES:officejet_4300_series;"
+*Product: "HP Officejet 4311"
+*Product: "HP Officejet 4312"
+*Product: "HP Officejet 4314"
+*Product: "HP Officejet 4315"
+*Product: "HP Officejet 4315v"
+*Product: "HP Officejet 4315xi"
+*Product: "HP Officejet 4317"
+*Product: "HP Officejet 4319"
+*Product: "HP Officejet 4352"
+*Product: "HP Officejet 4353"
+*Product: "HP Officejet 4355"
+*Product: "HP Officejet 4357"
+*Product: "HP Officejet 4359"
 *cupsVersion: 1.3
 *cupsModelNumber: 0
 *cupsManualCopies: True
@@ -371,4 +394,4 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of hp-officejet_4300_series-hpijs.ppd, 19272 bytes.
+*% End of hp-officejet_4300_series-hpijs.ppd, 19996 bytes.
