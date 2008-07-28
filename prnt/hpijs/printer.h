@@ -390,9 +390,7 @@ protected:
     BOOL m_bRotateBackPage;
 #endif
 
-#ifdef  APDK_LINUX
     int m_iNumPages;
-#endif
 
     virtual Printer& operator=(const Printer& rhs) {return *this;} // don't allow assignment
 

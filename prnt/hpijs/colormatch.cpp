@@ -350,6 +350,7 @@ BOOL ColorMatcher::Process(RASTERDATA* pbyInputKRGBRaster)
 			buff4 = buff3 + InputWidth;
 		}
 
+#ifdef APDK_DJ3320
         if (cmap.ulMap3)
         {
 		    ColorMatch( InputWidth, // ASSUMES ALL INPUTWIDTHS EQUAL
@@ -361,6 +362,7 @@ BOOL ColorMatcher::Process(RASTERDATA* pbyInputKRGBRaster)
 			    buff4
 		    );
         }
+#endif
         if (cmap.ulMap1)
         {
 		    // colormatching -- can only handle 4 planes at a time
