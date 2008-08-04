@@ -193,6 +193,9 @@
 :model "HP Officejet series 725"
 :status :good
 
+:model "HP Deskjet f735 All-in-one"
+:status :good
+
 :model "HP PSC 750xi"
 :status :good
 
@@ -682,6 +685,9 @@
 :model "HP LaserJet 3055"
 :status :good
 
+:model "HP LaserJet 3100"
+:status :good
+
 :model "HP Photosmart 3108"
 :status :good
 
@@ -695,6 +701,9 @@
 :status :good
 
 :model "HP Photosmart c3140 All-in-one"
+:status :good
+
+:model "HP LaserJet 3150"
 :status :good
 
 :model "HP Photosmart c3170 All-in-one"
@@ -1190,6 +1199,9 @@
 :status :good
 
 :model "HP Photosmart c5293 All-in-one"
+:status :good
+
+:model "HP Photosmart c5500 All-in-one"
 :status :good
 
 :model "HP Officejet j5505 All-in-one"

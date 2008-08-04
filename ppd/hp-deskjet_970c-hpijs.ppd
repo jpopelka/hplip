@@ -3,7 +3,7 @@
 *% Created by the CUPS PPD Compiler v1.2.0.
 *% (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 *FormatVersion: "4.3"
-*FileVersion: "hpijs 2.8.6.20b"
+*FileVersion: "hpijs 2.8.7.3"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "hp-deskjet_970c-hpijs.ppd"
@@ -13,7 +13,7 @@
 *Manufacturer: "HP"
 *ModelName: "HP Deskjet 970c Foomatic/hpijs"
 *ShortNickName: "HP Deskjet 970c Foomatic/hpijs"
-*NickName: "HP Deskjet 970c Foomatic/hpijs, hpijs 2.8.6.20b"
+*NickName: "HP Deskjet 970c Foomatic/hpijs, hpijs 2.8.7.3"
 *PSVersion: "(3010.000) 705"
 *PSVersion: "(3010.000) 707"
 *PSVersion: "(3010.000) 815"
@@ -202,7 +202,7 @@ et=2"
 *Product: "HP Deskjet 970c"
 *Product: "HP Deskjet 970cse"
 *Product: "HP Deskjet 970cxi"
-*cupsVersion: 1.2
+*cupsVersion: 1.3
 *cupsModelNumber: 0
 *cupsManualCopies: True
 *cupsFilter: "application/vnd.cups-postscript 0 foomatic-rip-hplip"
@@ -391,4 +391,4 @@ et=2"
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of hp-deskjet_970c-hpijs.ppd, 19615 bytes.
+*% End of hp-deskjet_970c-hpijs.ppd, 19611 bytes.

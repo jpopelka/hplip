@@ -1574,21 +1574,21 @@ class DevMgr4(DevMgr4_base):
 
     def downloadFirmware(self):
         d = self.cur_device
-        fail = True
+        ok = False
         
         try:
             QApplication.setOverrideCursor(QApplication.waitCursor)
             d.open()
 
             if d.isIdleAndNoError():
-                fail = d.downloadFirmware()
-                
-            if fail:
-                self.FailureUI(self.__tr("<b>An error occured downloading firmware file.</b><p>Please check your printer and ensure that the HPLIP plugin has been installed."))
-
+                ok = d.downloadFirmware()
+            
         finally:
             d.close()
             QApplication.restoreOverrideCursor()
+        
+            if not ok:
+                self.FailureUI(self.__tr("<b>An error occured downloading firmware file.</b><p>Please check your printer and ensure that the HPLIP plugin has been installed."))
 
 
     def CheckDeviceUI(self):

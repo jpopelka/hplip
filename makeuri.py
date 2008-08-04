@@ -171,14 +171,14 @@ try:
         sys.exit(1)
 
     if cups_quiet_mode:
-        log.info(cups_uri)
+        print cups_uri
 
     elif not quiet_mode:    
         log.info("CUPS URI: %s" % cups_uri)
 
     if sane_uri:
         if sane_quiet_mode:
-            log.info(sane_uri)
+            print sane_uri
         
         elif not quiet_mode:
             log.info("SANE URI: %s" % sane_uri)
@@ -188,7 +188,7 @@ try:
 
     if fax_uri:
         if fax_quiet_mode:
-            log.info(fax_uri)
+            print fax_uri
         
         elif not quiet_mode:
             log.info("HP Fax URI: %s" % fax_uri)

@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '3.3'
+__version__ = '4.0'
 __title__ = 'HPLIP Installer'
 __doc__ = "Installer for HPLIP tarball."
 
@@ -76,9 +76,10 @@ test_unknown = False
 language = None
 assume_network = False
 max_retries = 3
+restricted_override = False
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'hl:giawutxdq:nr:', 
+    opts, args = getopt.getopt(sys.argv[1:], 'hl:giawutxdq:nr:b', 
         ['help', 'help-rest', 'help-man', 'help-desc', 'gui', 'lang=',
         'logging=', 'interactive', 'auto', 'web', 'browser', 'text', 
         'network', 'retries=']) 
@@ -142,6 +143,9 @@ for o, a in opts:
         except ValueError:
             log.error("Invalid value for retries. Set to default of 3.")
             max_retries = 3
+            
+    elif o == '-b':
+        restricted_override = True
         
         
 if os.getuid() == 0:
@@ -175,6 +179,28 @@ utils.log_title(__title__, __version__, True)
 
 log.info("Installer log saved in: %s" % log.bold(log_file))
 log.info("")
+
+
+bb_build_pat = re.compile("BB_BUILD\s*=\s*(.*)", re.I)
+bb_build_value = False
+try:
+    bb_build = file('./bb_build.inc')
+except IOError:
+    pass
+else:
+    input = bb_build.read()
+    bb_build.close()
+    for x in input.splitlines():
+        match = bb_build_pat.match(x)
+        if match is not None:
+            value = match.group(1)
+            bb_build_value = utils.to_bool(value)
+            break
+            
+    if bb_build_value and not restricted_override:
+        log.error("This is a restricted build. The installer is disabled. Exiting.")
+        sys.exit(1)
+    
 
 if mode == BROWSER_MODE:
     if platform.system() != 'Darwin':

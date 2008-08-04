@@ -38,7 +38,8 @@ TYPE_HEX = 5
 TYPE_BITFIELD = 6
 
 TECH_CLASSES = [
-    "Undefined",
+    "Undefined", # This will show an error (and its the default)
+    "Unsupported", # This is for unsupported models, and it will not show an error
     "Postscript",
     "DJGenericVIP",
     #"PSB9100", not used on HPLIP

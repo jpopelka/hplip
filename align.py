@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '4.1'
+__version__ = '4.2'
 __title__ = 'Printer Cartridge Alignment Utility'
 __doc__ = "Cartridge alignment utility for HPLIP supported inkjet printers."
 
@@ -67,42 +67,67 @@ def usage(typ='text'):
     utils.format_text(USAGE, typ, __title__, 'hp-align', __version__)
     sys.exit(0)
 
+    
 def enterAlignmentNumber(letter, hortvert, colors, line_count, maximum):
-    return tui.enter_range("Enter the best aligned value for line %s (1-%d): " % 
+    ok, value = tui.enter_range("Enter the best aligned value for line %s (1-%d): " % 
                         (letter, maximum),
                         1,
                         maximum)
+                        
+    if not ok:
+        sys.exit(0)
+        
+    return ok, value
 
+    
 def enterPaperEdge(maximum):
-    return tui.enter_range("Enter numbered arrow that is best aligned with the paper edge (1-%d): " 
+    ok, value = tui.enter_range("Enter numbered arrow that is best aligned with the paper edge (1-%d): " 
                         % maximum,
                         1,
                         maximum)
+    if not ok:
+        sys.exit(0)
+        
+    return ok, value
+    
 
 def colorAdj(line, maximum):
-    return tui.enter_range("Enter the numbered box on line %s that is best color matched to the background color (1-%d): " % 
+    ok, value = tui.enter_range("Enter the numbered box on line %s that is best color matched to the background color (1-%d): " % 
                         (line, maximum),
                         1,
                         maximum)
+    if not ok:
+        sys.exit(0)
+        
+    return ok, value
 
+    
 def bothPensRequired():
     log.error("Cannot perform alignment with 0 or 1 cartridges installed.\nPlease install both cartridges and try again.")
 
+    
 def invalidPen():
     log.error("Invalid cartridge(s) installed.\nPlease install valid cartridges and try again.")
 
+    
 def invalidPen2():
     log.error("Invalid cartridge(s) installed. Cannot align with only the photo cartridge installed.\nPlease install other cartridges and try again.")
 
+    
 def aioUI1():
     log.info("To perform alignment, you will need the alignment page that is automatically\nprinted after you install a print cartridge.")
-    log.info("If you would like to cancel, enter or 'c'")
-    log.info("If you do not have this page (and need it to be printed), enter 'n'")
-    log.info("If you already have this page, enter  'y'")
+    log.info("\np\t\tPrint the alignment page and continue.")
+    log.info("n\t\tDo Not print the alignment page (you already have one) and continue.")
+    log.info("q\t\tQuit.\n")
 
-    ok, choice = tui.enter_choice("Enter 'c', 'y', or 'n': ", ['c', 'n', 'y'], 'n')
+    ok, choice = tui.enter_choice("Choice (p=print page*, n=do not print page, q=quit) ? ", ['p', 'n', 'q'], 'p')
+    
+    if choice == 'q':
+        sys.exit(0)
+    
     return choice == 'y'
 
+    
 def type10and11Align(pattern, align_type):
     controls = maint.align10and11Controls(pattern, align_type)
     values = []
@@ -116,6 +141,9 @@ def type10and11Align(pattern, align_type):
             ok, value = tui.enter_range("Enter the numbered box on line %s where the inner lines best line up with the outer lines (1-%d): " 
                 % (line, controls[line][1]),  1, controls[line][1])
             values.append(value)
+            
+            if not ok:
+                sys.exit(0)
 
     return values
 

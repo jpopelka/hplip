@@ -26,7 +26,7 @@
 #   104 = no libdl
 
 AC_PREREQ(2.59)
-AC_INIT([HP Linux Imaging and Printing], [2.8.6b], [2.8.6.20b], [hplip])
+AC_INIT([HP Linux Imaging and Printing], [2.8.7], [2.8.7.3], [hplip])
 AM_INIT_AUTOMAKE([1.9 foreign])
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
@@ -258,6 +258,17 @@ else
 fi
 AM_CONDITIONAL(RIP_INSTALL, test x$foomatic_rip_hplip_install = xyes)
 
+AC_MSG_CHECKING(for restricted build)
+grep -q BB_BUILD bb_build.inc
+if test $? -eq 0; then
+  bb_build="yes"
+  hpaio_version=libsane-hpaio.so.1.0.1
+else
+  bb_build="no"
+  hpaio_version=libsane-hpaio.so.1.0.0
+fi
+AC_MSG_RESULT($bb_build)
+
 # Check conditional packages.
 
 if test "$hpijs_only_build" = "no" && test "$network_build" = "yes"; then
@@ -354,6 +365,8 @@ AC_SUBST(doc_build)
 AC_SUBST(shadow_build)
 AC_SUBST(APDK_ENDIAN_FLAG)
 AC_SUBST(APDK_AUTO_INCLUDE_FLAG)
+AC_SUBST(hpaio_version)
+AC_SUBST(bb_build)
 
 AC_CONFIG_FILES(Makefile hplip.conf hplip.desktop hplip-systray.desktop prnt/drv/hpijs.drv hplip.list)
 AC_OUTPUT

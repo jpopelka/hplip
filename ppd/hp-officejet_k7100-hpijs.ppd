@@ -3,7 +3,7 @@
 *% Created by the CUPS PPD Compiler v1.2.0.
 *% (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 *FormatVersion: "4.3"
-*FileVersion: "hpijs 2.8.6.20b"
+*FileVersion: "hpijs 2.8.7.3"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "hp-officejet_k7100-hpijs.ppd"
@@ -13,7 +13,7 @@
 *Manufacturer: "HP"
 *ModelName: "HP Officejet k7100 Foomatic/hpijs"
 *ShortNickName: "HP Officejet k7100 Foomatic/hpijs"
-*NickName: "HP Officejet k7100 Foomatic/hpijs, hpijs 2.8.6.20b"
+*NickName: "HP Officejet k7100 Foomatic/hpijs, hpijs 2.8.7.3"
 *PSVersion: "(3010.000) 705"
 *PSVersion: "(3010.000) 707"
 *PSVersion: "(3010.000) 815"
@@ -28,14 +28,15 @@
 *FoomaticRIPOptionSetting PageSize=Custom: " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
 *End
-*FoomaticIDs: "HP-DeskJet_5650 hpijs"
+*FoomaticIDs: "HP-Business_Inkjet_1000 hpijs"
 *FoomaticRIPCommandLine: "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
 le=- -"
 *End
 *FoomaticRIPOption Model: "enum CmdLine A 100"
-*FoomaticRIPOptionSetting Model=HP-DeskJet_5650: " -sDeviceManufacture&&
-r=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5600&quot;"
+*FoomaticRIPOptionSetting Model=HP-Business_Inkjet_1000: " -sDeviceMan&&
+ufacturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5600&&
+&quot;"
 *End
 *FoomaticRIPOption PrintoutMode: "enum Composite B"
 *FoomaticRIPOptionSetting PrintoutMode=Draft: "Quality=300FastDraftCol&&
@@ -52,9 +53,7 @@ aleK"
 *FoomaticRIPOptionSetting PrintoutMode=High.Gray: "Quality=600Grayscal&&
 eK"
 *End
-*FoomaticRIPOptionSetting PrintoutMode=Photo: "Quality=1200PhotoCMYKFu&&
-llBleed"
-*End
+*FoomaticRIPOptionSetting PrintoutMode=Photo: "Quality=1200PhotoCMYK"
 *FoomaticRIPOption InputSlot: "enum CmdLine C"
 *FoomaticRIPOptionSetting InputSlot=Default: ",PS:MediaPosition=7"
 *FoomaticRIPOptionSetting InputSlot=PhotoTray: ",PS:MediaPosition=6"
@@ -169,22 +168,10 @@ ble=false"
 e=true"
 *End
 *FoomaticRIPOptionSetting Duplex=None: " -dDuplex=false"
-*FoomaticRIPOption DryTime: "enum CmdLine B"
-*FoomaticRIPOptionSetting DryTime=Zero: ""
-*FoomaticRIPOptionSetting DryTime=Five: ",DryTime=5"
-*FoomaticRIPOptionSetting DryTime=Ten: ",DryTime=10"
-*FoomaticRIPOptionSetting DryTime=Fifteen: ",DryTime=15"
-*FoomaticRIPOptionSetting DryTime=Twenty: ",DryTime=20"
-*FoomaticRIPOptionSetting DryTime=TwentyFive: ",DryTime=25"
-*FoomaticRIPOptionSetting DryTime=Thirty: ",DryTime=30"
 *FoomaticRIPOption Quality: "enum CmdLine B"
 *FoomaticRIPOptionSetting Quality=300ColorCMYK: " -r300 -sIjsParams=Qu&&
 ality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quality:PenSet&&
 =2"
-*End
-*FoomaticRIPOptionSetting Quality=300ColorCMYKFullBleed: " -r300 -sIjs&&
-Params=Quality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quali&&
-ty:PenSet=2,Quality:FullBleed=1"
 *End
 *FoomaticRIPOptionSetting Quality=300DraftColorCMYK: " -r300 -sIjsPara&&
 ms=Quality:Quality=1,Quality:ColorMode=2,Quality:MediaType=0,Quality:P&&
@@ -210,27 +197,27 @@ nSet=2"
 ality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quality:PenSet&&
 =2"
 *End
-*FoomaticRIPOptionSetting Quality=600ColorCMYKFullBleed: " -r600 -sIjs&&
-Params=Quality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quali&&
-ty:PenSet=2,Quality:FullBleed=1"
-*End
 *FoomaticRIPOptionSetting Quality=600GrayscaleK: " -r600 -sIjsParam&&
 s=Quality:Quality=0,Quality:ColorMode=0,Quality:MediaType=0,Quality:Pe&&
 nSet=2"
+*End
+*FoomaticRIPOptionSetting Quality=600PhotoCMYK: " -r600 -sIjsParams=Qu&&
+ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
+=2"
+*End
+*FoomaticRIPOptionSetting Quality=600PhotoNormalCMYK: " -r600 -sIjsPar&&
+ams=Quality:Quality=0,Quality:ColorMode=2,Quality:MediaType=2,Quality:&&
+PenSet=2"
 *End
 *FoomaticRIPOptionSetting Quality=1200PhotoCMYK: " -r1200 -sIjsParams=&&
 Quality:Quality=3,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenS&&
 et=2"
 *End
-*FoomaticRIPOptionSetting Quality=1200PhotoCMYKFullBleed: " -r1200 -sI&&
-jsParams=Quality:Quality=3,Quality:ColorMode=2,Quality:MediaType=2,Qua&&
-lity:PenSet=2,Quality:FullBleed=1"
-*End
 *1284DeviceID: "MFG:HP;MDL:officejet_k7100;DES:officejet_k7100;"
 *Product: "HP Officejet k7103 Printer"
 *Product: "HP Officejet k7108 Printer"
 *Product: "HP Officejet k7100 Printer"
-*cupsVersion: 1.2
+*cupsVersion: 1.3
 *cupsModelNumber: 0
 *cupsManualCopies: True
 *cupsFilter: "application/vnd.cups-postscript 0 foomatic-rip-hplip"
@@ -263,6 +250,10 @@ lity:PenSet=2,Quality:FullBleed=1"
 *PageSize Oufuku/Oufuku-Hagaki: "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
 *PageSize w558h774/16K: "%% FoomaticRIPOptionSetting: PageSize=w558h774"
 *PageSize w612h935/Executive (JIS): "%% FoomaticRIPOptionSetting: PageSize=w612h935"
+*PageSize B4JIS/B4 (JIS): "%% FoomaticRIPOptionSetting: PageSize=B4JIS"
+*PageSize Ledger/Ledger: "%% FoomaticRIPOptionSetting: PageSize=Ledger"
+*PageSize SuperB/Super B: "%% FoomaticRIPOptionSetting: PageSize=SuperB"
+*PageSize w774h1116/8K: "%% FoomaticRIPOptionSetting: PageSize=w774h1116"
 *CloseUI: *PageSize
 *OpenUI *PageRegion/Media Size: PickOne
 *OrderDependency: 10 AnySetup *PageRegion
@@ -293,34 +284,42 @@ lity:PenSet=2,Quality:FullBleed=1"
 *PageRegion Oufuku/Oufuku-Hagaki: "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
 *PageRegion w558h774/16K: "%% FoomaticRIPOptionSetting: PageSize=w558h774"
 *PageRegion w612h935/Executive (JIS): "%% FoomaticRIPOptionSetting: PageSize=w612h935"
+*PageRegion B4JIS/B4 (JIS): "%% FoomaticRIPOptionSetting: PageSize=B4JIS"
+*PageRegion Ledger/Ledger: "%% FoomaticRIPOptionSetting: PageSize=Ledger"
+*PageRegion SuperB/Super B: "%% FoomaticRIPOptionSetting: PageSize=SuperB"
+*PageRegion w774h1116/8K: "%% FoomaticRIPOptionSetting: PageSize=w774h1116"
 *CloseUI: *PageRegion
 *DefaultImageableArea: Letter
 *ImageableArea Letter/Letter: "18.00 36.00 594.00 783.00"
 *ImageableArea A4/A4: "9.72 36.00 585.28 833.00"
-*ImageableArea Photo/Photo or 4x6 inch index card: "0.00 36.00 288.00 432.00"
-*ImageableArea Photo5x7/Photo or 5x7 inch index card: "0.00 36.00 360.00 504.00"
-*ImageableArea PhotoTearOff/Photo with tear-off tab: "0.00 0.00 288.00 432.00"
-*ImageableArea 3x5/3x5 inch index card: "0.00 36.00 216.00 360.00"
-*ImageableArea 5x8/5x8 inch index card: "0.00 36.00 360.00 576.00"
+*ImageableArea Photo/Photo or 4x6 inch index card: "9.00 36.00 279.00 423.00"
+*ImageableArea Photo5x7/Photo or 5x7 inch index card: "9.00 36.00 351.00 495.00"
+*ImageableArea PhotoTearOff/Photo with tear-off tab: "9.00 9.00 279.00 423.00"
+*ImageableArea 3x5/3x5 inch index card: "18.00 36.00 198.00 351.00"
+*ImageableArea 5x8/5x8 inch index card: "18.00 36.00 342.00 567.00"
 *ImageableArea A5/A5: "9.00 36.00 411.00 586.00"
-*ImageableArea A6/A6: "0.00 36.00 297.00 420.00"
-*ImageableArea A6TearOff/A6 with tear-off tab: "0.00 0.00 297.00 420.00"
+*ImageableArea A6/A6: "9.00 36.00 288.00 411.00"
+*ImageableArea A6TearOff/A6 with tear-off tab: "9.00 0.00 288.00 411.00"
 *ImageableArea B5JIS/B5 (JIS): "18.00 36.00 498.00 720.00"
-*ImageableArea CDDVD80/CD or DVD 80 mm: "0.00 36.00 237.00 237.00"
-*ImageableArea CDDVD120/CD or DVD 120 mm: "0.00 36.00 360.00 360.00"
-*ImageableArea Env10/Envelope #10: "0.00 36.00 297.00 684.00"
+*ImageableArea CDDVD80/CD or DVD 80 mm: "0.00 0.00 237.00 237.00"
+*ImageableArea CDDVD120/CD or DVD 120 mm: "0.00 0.00 360.00 360.00"
+*ImageableArea Env10/Envelope #10: "18.00 36.00 279.00 675.00"
 *ImageableArea EnvC5/Envelope C5: "18.00 36.00 441.00 640.00"
-*ImageableArea EnvC6/Envelope C6: "0.00 36.00 323.00 459.00"
-*ImageableArea EnvDL/Envelope DL: "0.00 36.00 312.00 624.00"
+*ImageableArea EnvC6/Envelope C6: "18.00 36.00 305.00 450.00"
+*ImageableArea EnvDL/Envelope DL: "18.00 36.00 294.00 615.00"
 *ImageableArea EnvISOB5/Envelope B5: "18.00 36.00 481.00 700.00"
-*ImageableArea EnvMonarch/Envelope Monarch: "0.00 36.00 279.00 540.00"
+*ImageableArea EnvMonarch/Envelope Monarch: "18.00 36.00 261.00 531.00"
 *ImageableArea Executive/Executive: "18.00 36.00 504.00 747.00"
 *ImageableArea FLSA/American Foolscap: "18.00 36.00 594.00 927.00"
-*ImageableArea Hagaki/Hagaki: "0.00 36.00 283.00 420.00"
+*ImageableArea Hagaki/Hagaki: "9.00 36.00 274.00 411.00"
 *ImageableArea Legal/Legal: "18.00 36.00 594.00 999.00"
-*ImageableArea Oufuku/Oufuku-Hagaki: "0.00 36.00 420.00 567.00"
+*ImageableArea Oufuku/Oufuku-Hagaki: "18.00 36.00 402.00 558.00"
 *ImageableArea w558h774/16K: "18.00 36.00 540.00 765.00"
 *ImageableArea w612h935/Executive (JIS): "18.00 36.00 594.00 926.00"
+*ImageableArea B4JIS/B4 (JIS): "18.00 36.00 711.00 1024.00"
+*ImageableArea Ledger/Ledger: "14.40 36.00 777.60 1215.00"
+*ImageableArea SuperB/Super B: "14.40 36.00 921.60 1359.00"
+*ImageableArea w774h1116/8K: "18.00 36.00 756.00 1107.00"
 *DefaultPaperDimension: Letter
 *PaperDimension Letter/Letter: "612.00 792.00"
 *PaperDimension A4/A4: "595.00 842.00"
@@ -348,6 +347,10 @@ lity:PenSet=2,Quality:FullBleed=1"
 *PaperDimension Oufuku/Oufuku-Hagaki: "420.00 567.00"
 *PaperDimension w558h774/16K: "558.00 774.00"
 *PaperDimension w612h935/Executive (JIS): "612.00 935.00"
+*PaperDimension B4JIS/B4 (JIS): "729.00 1033.00"
+*PaperDimension Ledger/Ledger: "792.00 1224.00"
+*PaperDimension SuperB/Super B: "936.00 1368.00"
+*PaperDimension w774h1116/8K: "774.00 1116.00"
 *OpenUI *PrintoutMode/Printout Mode: PickOne
 *OrderDependency: 10.0 AnySetup *PrintoutMode
 *DefaultPrintoutMode: Normal
@@ -358,6 +361,8 @@ lity:PenSet=2,Quality:FullBleed=1"
 *PrintoutMode High/High Quality (auto-detect paper type): "%% FoomaticRIPOptionSetting: PrintoutMode=High"
 *PrintoutMode High.Gray/High Quality Grayscale (auto-detect paper type): "%% FoomaticRIPOptionSetting: PrintoutMode=High.Gray"
 *PrintoutMode Photo/Photo (on photo paper): "%% FoomaticRIPOptionSetting: PrintoutMode=Photo"
+*PrintoutMode PhotoBest/Best Quality (color on photo paper): "%% FoomaticRIPOptionSetting: PrintoutMode=PhotoBest"
+*PrintoutMode PhotoNormal/Normal Quality (color on photo paper): "%% FoomaticRIPOptionSetting: PrintoutMode=PhotoNormal"
 *CloseUI: *PrintoutMode
 *OpenUI *InputSlot/Media Source: PickOne
 *OrderDependency: 100.0 AnySetup *InputSlot
@@ -379,34 +384,22 @@ lity:PenSet=2,Quality:FullBleed=1"
 *Duplex DuplexTumble/Short Edge (Flip): "%% FoomaticRIPOptionSetting: Duplex=DuplexTumble"
 *Duplex None/Off: "%% FoomaticRIPOptionSetting: Duplex=None"
 *CloseUI: *Duplex
-*OpenUI *DryTime/Additional Dry Time: PickOne
-*OrderDependency: 120.0 AnySetup *DryTime
-*DefaultDryTime: Zero
-*DryTime Zero/Printer Default: "%% FoomaticRIPOptionSetting: DryTime=Zero"
-*DryTime Five/5 Seconds: "%% FoomaticRIPOptionSetting: DryTime=Five"
-*DryTime Ten/10 Seconds: "%% FoomaticRIPOptionSetting: DryTime=Ten"
-*DryTime Fifteen/15 Seconds: "%% FoomaticRIPOptionSetting: DryTime=Fifteen"
-*DryTime Twenty/20 Seconds: "%% FoomaticRIPOptionSetting: DryTime=Twenty"
-*DryTime TwentyFive/25 Seconds: "%% FoomaticRIPOptionSetting: DryTime=TwentyFive"
-*DryTime Thirty/30 Seconds: "%% FoomaticRIPOptionSetting: DryTime=Thirty"
-*CloseUI: *DryTime
 *OpenGroup: PrintoutMode/Printout Mode
 *OpenUI *Quality/Resolution, Quality, Ink Type, Media Type: PickOne
 *OrderDependency: 100.0 AnySetup *Quality
 *DefaultQuality: FromPrintoutMode
 *Quality FromPrintoutMode/Controlled by 'Printout Mode': "%% FoomaticRIPOptionSetting: Quality=@PrintoutMode"
 *Quality 300ColorCMYK/300 dpi, Color, Black + Color Cartr.: "%% FoomaticRIPOptionSetting: Quality=300ColorCMYK"
-*Quality 300ColorCMYKFullBleed/300 dpi, Color, Full Bleed, Black + Color Cartr.: "%% FoomaticRIPOptionSetting: Quality=300ColorCMYKFullBleed"
 *Quality 300DraftColorCMYK/300 dpi, Draft, Color, Black + Color Cartr.: "%% FoomaticRIPOptionSetting: Quality=300DraftColorCMYK"
 *Quality 300DraftGrayscaleK/300 dpi, Draft, Grayscale, Black Cartr.: "%% FoomaticRIPOptionSetting: Quality=300DraftGrayscaleK"
 *Quality 300FastDraftColorCMYK/300 dpi, FastDraft, Color, Black + Color Cartr.: "%% FoomaticRIPOptionSetting: Quality=300FastDraftColorCMYK"
 *Quality 300FastDraftGrayscaleK/300 dpi, FastDraft, Grayscale, Black Cartr.: "%% FoomaticRIPOptionSetting: Quality=300FastDraftGrayscaleK"
 *Quality 300GrayscaleK/300 dpi, Grayscale, Black Cartr.: "%% FoomaticRIPOptionSetting: Quality=300GrayscaleK"
 *Quality 600ColorCMYK/600 dpi, Color, Black + Color Cartr.: "%% FoomaticRIPOptionSetting: Quality=600ColorCMYK"
-*Quality 600ColorCMYKFullBleed/600 dpi, Color, Full Bleed, Black + Color Cartr.: "%% FoomaticRIPOptionSetting: Quality=600ColorCMYKFullBleed"
 *Quality 600GrayscaleK/600 dpi, Grayscale, Black Cartr.: "%% FoomaticRIPOptionSetting: Quality=600GrayscaleK"
+*Quality 600PhotoCMYK/600 dpi, Photo, Black + Color Cartr., Photo Paper: "%% FoomaticRIPOptionSetting: Quality=600PhotoCMYK"
+*Quality 600PhotoNormalCMYK/600 dpi, Color, Black + Color Cartr., Photo Paper, Normal: "%% FoomaticRIPOptionSetting: Quality=600PhotoNormalCMYK"
 *Quality 1200PhotoCMYK/1200 dpi, Photo, Black + Color Cartr., Photo Paper: "%% FoomaticRIPOptionSetting: Quality=1200PhotoCMYK"
-*Quality 1200PhotoCMYKFullBleed/1200 dpi, Photo, Full Bleed, Black + Color Cartr., Photo Paper: "%% FoomaticRIPOptionSetting: Quality=1200PhotoCMYKFullBleed"
 *CloseUI: *Quality
 *CloseGroup: PrintoutMode
 *DefaultFont: Courier
@@ -445,4 +438,4 @@ lity:PenSet=2,Quality:FullBleed=1"
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of hp-officejet_k7100-hpijs.ppd, 23252 bytes.
+*% End of hp-officejet_k7100-hpijs.ppd, 23031 bytes.

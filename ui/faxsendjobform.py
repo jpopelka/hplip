@@ -102,10 +102,13 @@ class FaxSendJobForm(QMainWindow):
 
         if not self.device_uri and not self.printer_name:
             t = device.probeDevices(bus=bus, filter={'fax-type':(operator.gt, FAX_TYPE_NONE)})
+            #print t
             probed_devices = []
 
             for d in t:
                 probed_devices.append(d.replace('hp:/', 'hpfax:/'))
+                
+            #print probed_devices
 
             probed_devices = utils.uniqueList(probed_devices)
             log.debug(probed_devices)
@@ -115,14 +118,18 @@ class FaxSendJobForm(QMainWindow):
             for d in probed_devices:
                 printers = []
                 for p in self.cups_printers:
+                    #print p.device_uri, d
                     if p.device_uri == d:
+                        #print "OK"
                         printers.append(p.name)
                 
                 devices[x] = (d, printers)
-                #x += 1
+                x += 1
                 max_deviceid_size = max(len(d), max_deviceid_size)
 
             x = len(devices)
+            
+            #print devices
             
             if x == 0:
                 from nodevicesform import NoDevicesForm
@@ -194,7 +201,7 @@ class FaxSendJobForm(QMainWindow):
         
     def closeEvent(self, event):
         #print "close"
-        print self.FaxView.lock_file
+        #print self.FaxView.lock_file
         utils.unlock(self.FaxView.lock_file)
         event.accept()
 

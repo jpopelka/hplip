@@ -3,7 +3,7 @@
 *% Created by the CUPS PPD Compiler v1.2.0.
 *% (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 *FormatVersion: "4.3"
-*FileVersion: "hpijs 2.8.6.20b"
+*FileVersion: "hpijs 2.8.7.3"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "hp-deskjet_890c-hpijs.ppd"
@@ -12,7 +12,7 @@
 *Manufacturer: "HP"
 *ModelName: "HP Deskjet 890c Foomatic/hpijs"
 *ShortNickName: "HP Deskjet 890c Foomatic/hpijs"
-*NickName: "HP Deskjet 890c Foomatic/hpijs, hpijs 2.8.6.20b"
+*NickName: "HP Deskjet 890c Foomatic/hpijs, hpijs 2.8.7.3"
 *PSVersion: "(3010.000) 705"
 *PSVersion: "(3010.000) 707"
 *PSVersion: "(3010.000) 815"
@@ -156,7 +156,7 @@ r=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;DESKJET 890&quot;"
 *1284DeviceID: "MFG:HP;MDL:deskjet_890c;DES:deskjet_890c;"
 *Product: "HP Deskjet 890c"
 *Product: "HP Deskjet 890cse"
-*cupsVersion: 1.2
+*cupsVersion: 1.3
 *cupsModelNumber: 0
 *cupsManualCopies: True
 *cupsFilter: "application/vnd.cups-postscript 0 foomatic-rip-hplip"
@@ -331,4 +331,4 @@ r=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;DESKJET 890&quot;"
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of hp-deskjet_890c-hpijs.ppd, 16800 bytes.
+*% End of hp-deskjet_890c-hpijs.ppd, 16796 bytes.

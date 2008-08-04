@@ -1926,6 +1926,8 @@ extern SANE_Status sane_hpaio_open(SANE_String_Const devicename, SANE_Handle * p
                     &hpaio->scl.minXRes,
                     0,
                     0 );
+
+        DBG6("min x resolution=%d\n", hpaio->scl.minXRes);
         
         SclInquire( hpaio->deviceid, hpaio->scan_channelid,
                     SCL_CMD_INQUIRE_MINIMUM_VALUE,
@@ -1933,6 +1935,8 @@ extern SANE_Status sane_hpaio_open(SANE_String_Const devicename, SANE_Handle * p
                     &hpaio->scl.minYRes,
                     0,
                     0 );
+
+        DBG6("min y resolution=%d\n", hpaio->scl.minYRes);
         
         if( hpaio->scl.compat & SCL_COMPAT_1150 &&
             hpaio->scl.minYRes < SCL_MIN_Y_RES_1150 )
@@ -1953,6 +1957,8 @@ extern SANE_Status sane_hpaio_open(SANE_String_Const devicename, SANE_Handle * p
                     &hpaio->scl.maxXRes,
                     0,
                     0 );
+
+        DBG6("max x resolution=%d\n", hpaio->scl.maxXRes);
         
         SclInquire( hpaio->deviceid, hpaio->scan_channelid,
                     SCL_CMD_INQUIRE_MAXIMUM_VALUE,
@@ -1960,6 +1966,8 @@ extern SANE_Status sane_hpaio_open(SANE_String_Const devicename, SANE_Handle * p
                     &hpaio->scl.maxYRes,
                     0,
                    0 );
+
+        DBG6("max y resolution=%d\n", hpaio->scl.maxYRes);
         
         r = hpaio->scl.maxXRes;
         

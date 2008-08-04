@@ -39,6 +39,7 @@ import string
 # Local
 from base.g import *
 from base import utils, tui, models
+#from prnt import printable_areas
 
 # Globals
 errors = 0
@@ -368,14 +369,20 @@ def main(args):
         # Output
         drv_in_file = os.path.join(cur_path, 'prnt', 'drv', '%s.drv.in' % basename)
         
-        # XML output
+        # XML output (per model)
         output_path = os.path.join(cur_path, 'prnt', 'drv', 'foomatic_xml', basename)
+        
+        # XML Output (master driver list)
+        driver_path = os.path.join(cur_path, 'prnt', 'drv', 'foomatic_xml', basename, '%s.xml' % basename)
         
         log.info("Working on %s file..." % basename)
         log.info("Input file: %s" % template_file)
         log.info("Output file: %s" % drv_in_file)
         log.info("Output XML directory: %s" % output_path)
+        log.info("Output driver XML file: %s" % driver_path)
 
+        
+        
         # CREATE DRV.IN FILE
         
         log.info("Processing %s.drv.in.template..." % basename)
@@ -476,6 +483,9 @@ def main(args):
 
                         drv_in_file_f.write("%s}\n" % indent)
                         
+                else:
+                    errors.append("(%s:line %d) No models matched the specified classes on line: %s" % (basename, line, x.strip()))
+                        
             else:
                 match = pat_template2.match(x)
                 if match is not None:
@@ -487,7 +497,7 @@ def main(args):
         tui.cleanup_spinner()
       
         for tc in models.TECH_CLASSES:
-            if tc in ('Undefined', 'Postscript'):
+            if tc.lower() in ('undefined', 'postscript', 'unsupported'):
                 continue
                 
             if tc not in template_classes:
@@ -499,13 +509,51 @@ def main(args):
         if not os.path.exists(output_path):
             os.makedirs(output_path)
             
+        if os.path.exists(driver_path):
+            os.remove(driver_path)
+
         files_to_delete = []
-        
         for f in utils.walkFiles(output_path, recurse=True, abs_paths=True, return_folders=False, pattern='*'):
             files_to_delete.append(f)
             
         for f in files_to_delete:
             os.remove(f)
+        
+        driver_f = file(driver_path, 'w')
+
+        driver_doc = XMLDocument("driver", id="driver/%s" % basename)
+        name_node = driver_doc.add("name")
+        name_node.addText(basename)
+        url_node = driver_doc.add("url")
+        url_node.addText("http://hplip.sourceforge.net/")
+        supplier_node = driver_doc.add("supplier")
+        supplier_node.addText("Hewlett-Packard")
+        mfg_node = driver_doc.add("manufacturersupplied")
+        mfg_node.addText("HP|Apollo")
+        lic_node = driver_doc.add("license")
+        lic_node.addText("BSD/GPL/MIT")
+        driver_doc.add("freesoftware")
+        support_node = driver_doc.add("supportcontact", level="voluntary", url="https://launchpad.net/hplip")
+        support_node.addText("HPLIP Support at Launchpad.net")
+        shortdesc_node = driver_doc.add("shortdescription")
+        shortdesc_en_node = shortdesc_node.add("en")
+        shortdesc_en_node.addText("HP's IJS driver for most of their non-PostScript printers")
+        func_node = driver_doc.add("functionality")
+        maxresx_node = func_node.add("maxresx")
+        maxresx_node.addText("1200")
+        maxresy_node = func_node.add("maxresy")
+        maxresy_node.addText("1200")
+        func_node.add("color")
+        exec_node = driver_doc.add("execution")
+        exec_node.add("nopjl")
+        exec_node.add("ijs")
+        proto_node = exec_node.add("prototype")
+        proto_node.addText("gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPAUSE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFile=- -")
+        comments_node = driver_doc.add("comments")
+        comments_en_node = comments_node.add("en")
+        comments_en_node.addText("")
+        
+        printers_node = driver_doc.add("printers")
         
         for m in models_dict:
             if 'apollo' in m.lower():
@@ -523,8 +571,31 @@ def main(args):
             if 'Postscript' in models_dict[m]['tech-class']:
                 postscriptppd = "%s-ps.ppd" % fixFileName(m)
                 
-            outputModel(m, make, postscriptppd, ieee1284, output_path, verbose)
+            fixed_model = m.replace(' ', '_')
             
+            if fixed_model.startswith('hp_'):
+                fixed_model = fixed_model.replace('hp_', 'hp-')
+            
+            elif fixed_model.startswith('apollo_'):
+                fixed_model = fixed_model.replace('apollo_', 'apollo-')
+                
+            else:
+                fixed_model = 'hp-' + fixed_model
+                
+            stripped_model = m
+            if stripped_model.startswith('hp '):
+                stripped_model = stripped_model.replace('hp ', '')
+            
+            
+            # Output to the per-model XML file
+            outputModel(m, fixed_model, stripped_model, make, postscriptppd, ieee1284, output_path, verbose)
+            
+            # Output to driver master XML file
+            outputDriver(m, fixed_model, stripped_model, make, printers_node, verbose)
+            
+        
+        driver_f.write(str(driver_doc))
+        driver_f.close()         
         
         # Make sure all models ended up in drv.in file
         log.info("Checking for errors...")
@@ -558,7 +629,7 @@ def main(args):
                     
         tui.cleanup_spinner()
     
-    # end for 
+        # end for 
     
     if not quiet or verbose:
         if notes:
@@ -616,26 +687,26 @@ def parseDeviceID(device_id):
     return d
     
     
-def outputModel(model, make, postscriptppd, ieee1284, output_path, verbose=False):
+def outputModel(model, fixed_model, stripped_model, make, postscriptppd, ieee1284, output_path, verbose=False):
     global errors
     global count
     
     count += 1
     
-    fixed_model = model.replace(' ', '_')
-    
-    if fixed_model.startswith('hp_'):
-        fixed_model = fixed_model.replace('hp_', 'hp-')
-    
-    elif fixed_model.startswith('apollo_'):
-        fixed_model = fixed_model.replace('apollo_', 'apollo-')
-        
-    else:
-        fixed_model = 'hp-' + fixed_model
-        
-    stripped_model = model
-    if stripped_model.startswith('hp '):
-        stripped_model = stripped_model.replace('hp ', '')
+##    fixed_model = model.replace(' ', '_')
+##    
+##    if fixed_model.startswith('hp_'):
+##        fixed_model = fixed_model.replace('hp_', 'hp-')
+##    
+##    elif fixed_model.startswith('apollo_'):
+##        fixed_model = fixed_model.replace('apollo_', 'apollo-')
+##        
+##    else:
+##        fixed_model = 'hp-' + fixed_model
+##        
+##    stripped_model = model
+##    if stripped_model.startswith('hp '):
+##        stripped_model = stripped_model.replace('hp ', '')
         
     
     output_filename = os.path.join(output_path, fixed_model+".xml")
@@ -700,7 +771,56 @@ def outputModel(model, make, postscriptppd, ieee1284, output_path, verbose=False
     
     output_f.close()    
 
-                
+
+def outputDriver(m, fixed_model, stripped_model, make, printers_node, verbose):
+    tech_classes = models_dict[m]['tech-class']
+    #print tech_classes
+    printer_node = printers_node.add("printer")
+    id_node = printer_node.add("id")
+    id_node.addText("printer/%s" % fixed_model)
+    
+##    margins_node = printer_node.add("margins")
+##    general_margins_node = margins_node.add("general")
+    
+##    unit_node = general_margins_node.add("unit")
+##    unit_node.addText("in")
+##    
+##    for tc in tech_classes:
+##        if tc not in ('Undefined', 'Unsupported', 'PostScript'):
+##            try:
+##                margins_data = printable_areas.data[tc]
+##            except KeyError:
+##                continue
+##            else:
+##                print margins_data
+##                break
+    
+##<printer>
+##   <id>printer/HP-DeskJet_350C</id><!-- HP DeskJet 350C -->
+##   <functionality>
+##    <maxresx>600</maxresx>
+##    <maxresy>300</maxresy>
+##   </functionality>
+##   <ppdentry>
+##     *DefaultResolution: 600dpi
+##    </ppdentry>
+##   <margins>
+##    <general>
+##     <unit>in</unit>
+##     <relative />
+##     <left>0.25</left>
+##     <right>0.25</right>
+##     <top>0.125</top>
+##     <bottom>0.67</bottom>
+##    </general>
+##    <exception PageSize="A4">
+##     <left>0.135</left>
+##     <right>0.135</right>
+##    </exception>
+##   </margins>
+##  </printer>    
+    
+    
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))

@@ -2282,7 +2282,7 @@ same_as_version=2006.0
 # ********************
 [pclinuxos:2007.0]
 code_name=
-supported=True
+supported=False
 gui_supported=1
 scan_supported=1
 fax_supported=1

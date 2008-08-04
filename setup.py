@@ -1033,8 +1033,8 @@ else: # INTERACTIVE_MODE
                             tries += 1
 
                             try:
-                                current_phone_num = d.getPhoneNum()
-                                current_station_name = d.getStationName()
+                                current_phone_num = str(d.getPhoneNum())
+                                current_station_name = str(d.getStationName())
                             except Error:
                                 log.error("Could not communicate with device. Device may be busy. Please wait for retry...")
                                 time.sleep(5)
@@ -1053,13 +1053,12 @@ else: # INTERACTIVE_MODE
                                     phone_num = raw_input(log.bold("\nEnter the fax phone number for this device (c=use current:'%s'*, q=quit) ?" % current_phone_num))
                                 else:
                                     phone_num = raw_input(log.bold("\nEnter the fax phone number for this device (q=quit) ?"))
-
-                                if current_phone_num and (not phone_num or phone_num.strip().lower() == 'c'):
-                                    phone_num = current_phone_num
-
                                 if phone_num.strip().lower() == 'q':
                                     log.info("OK, done.")
                                     sys.exit(0)
+
+                                if current_phone_num and (not phone_num or phone_num.strip().lower() == 'c'):
+                                    phone_num = current_phone_num
 
                                 if len(phone_num) > 50:
                                     log.error("Phone number length is too long (>50 characters). Please enter a shorter number.")
@@ -1082,13 +1081,13 @@ else: # INTERACTIVE_MODE
                                     station_name = raw_input(log.bold("\nEnter the name and/or company for this device (c=use current:'%s'*, q=quit) ?" % current_station_name))
                                 else:
                                     station_name = raw_input(log.bold("\nEnter the name and/or company for this device (q=quit) ?"))
-
-                                if current_station_name and (not station_name or station_name.strip().lower() == 'c'):
-                                    station_name = current_station_name
-
                                 if station_name.strip().lower() == 'q':
                                     log.info("OK, done.")
                                     sys.exit(0)
+                                    
+                                if current_station_name and (not station_name or station_name.strip().lower() == 'c'):
+                                    station_name = current_station_name
+
 
                                 if len(station_name) > 50:
                                     log.error("Name/company length is too long (>50 characters). Please enter a shorter name/company.")

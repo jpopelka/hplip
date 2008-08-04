@@ -20,6 +20,8 @@ dist_noinst_DATA =
 noinst_PROGRAMS =
 lib_LTLIBRARIES = 
 
+include bb_build.inc
+
 if DOC_BUILD
 wwwsrc = doc
 www0dir = $(docdir)
@@ -32,7 +34,7 @@ endif
 
 if HPLIP_BUILD
 
-dist_hplip_DATA = scan/sane/hpaio.desc
+dist_hplip_DATA = scan/sane/hpaio.desc prnt/drv/hpijs.drv.in.template
 dist_hplip_SCRIPTS = hpssd.py __init__.py install.py hplip-install dat2drv.py
 
 cmddir = $(hplipdir)
@@ -174,7 +176,6 @@ libhpip_la_SOURCES = ip/xconvolve.c ip/xfax.c ip/xgrayout.c ip/xjpg_dct.c ip/xjp
 
 # hpaio sane backend
 if SCAN_BUILD
-include bb_scan.inc
 libsane_hpaiodir = $(libdir)/sane
 libsane_hpaio_LTLIBRARIES = libsane-hpaio.la
 libsane_hpaio_la_SOURCES = scan/sane/hpaio.c scan/sane/mfpdtf.c scan/sane/pml.c scan/sane/scl.c scan/sane/io.c scan/sane/hpaio.h \
@@ -198,8 +199,7 @@ dist_scan_SCRIPTS = scan/__init__.py scan/sane.py
 # scanext
 scanextdir = $(pyexecdir)
 scanext_LTLIBRARIES = scanext.la
-#scanext_la_LDFLAGS = -module -avoid-version -lsane
-scanext_la_LDFLAGS = -module -avoid-version
+scanext_la_LDFLAGS = -module -avoid-version -lsane
 scanext_la_SOURCES =  scan/scanext/scanext.c 
 scanext_la_CFLAGS = -I$(PYTHONINCLUDEDIR)
 endif

@@ -103,7 +103,7 @@ Cache-control: No-cache
         self.writeEWS(data)
         ret = cStringIO.StringIO()
         
-        while self.readEWS(4096, ret, timeout=1):
+        while self.readEWS(4096, ret, timeout=5):
             pass
             
         ret = ret.getvalue()
@@ -120,10 +120,12 @@ Cache-control: No-cache
             code = HTTP_ERROR
 
         return code == HTTP_OK
+        
 
     def setPhoneNum(self, num):
         return self.post("/hp/device/set_config.html", {"FaxNumber": str(num)})
 
+        
     def getPhoneNum(self):
         stream = cStringIO.StringIO()
         self.getEWSUrl("/hp/device/settings_fax_setup_wizard.xml", stream)
@@ -136,6 +138,7 @@ Cache-control: No-cache
     def setStationName(self, name): 
         return self.post("/hp/device/set_config.html", {"FaxCompanyName": str(name)})
 
+        
     def getStationName(self):
         stream = cStringIO.StringIO()
         self.getEWSUrl("/hp/device/settings_fax_setup_wizard.xml", stream)
@@ -144,6 +147,7 @@ Cache-control: No-cache
 
     station_name = property(getStationName, setStationName)
 
+    
     def setDateAndTime(self):
         stream = cStringIO.StringIO()
         self.getEWSUrl("/hp/device/settings_fax_setup_wizard.xml", stream)
@@ -456,16 +460,22 @@ class SOAPFaxSendThread(FaxSendThread):
 
                         data = self.format_http(soap)
                         log.log_data(data)
-                        file('beginjob.log', 'w').write(data)
+                        
+                        if log.is_debug():
+                            file('beginjob.log', 'w').write(data)
+                            
                         self.dev.openSoapFax()
                         self.dev.writeSoapFax(data)
                         ret = cStringIO.StringIO()
                         
-                        while self.dev.readSoapFax(8192, ret, timeout=1):
+                        while self.dev.readSoapFax(8192, ret, timeout=5):
                             pass
                             
                         ret = ret.getvalue()
-                        file('beginjob_ret.log', 'w').write(ret)
+                        
+                        if log.is_debug():
+                            file('beginjob_ret.log', 'w').write(ret)
+                            
                         log.log_data(ret)
                         self.dev.closeSoapFax()
                         
@@ -534,15 +544,27 @@ class SOAPFaxSendThread(FaxSendThread):
                             m.generate(output)
                             data = self.format_http(output.getvalue(), content_type="application/dime")
                             log.log_data(data)
-                            file('downloadpages%d.log' % p, 'w').write(data)
-                            self.dev.writeSoapFax(data)
+                            if log.is_debug():
+                                file('downloadpages%d.log' % p, 'w').write(data)
+                            
+                            try:
+                                self.dev.writeSoapFax(data)
+                            except Error:
+                                fax_send_state = FAX_SEND_STATE_ERROR
+                            
                             ret = cStringIO.StringIO()
                             
-                            while self.dev.readSoapFax(8192, ret, timeout=1):
-                                pass
+                            try:
+                                while self.dev.readSoapFax(8192, ret, timeout=5):
+                                    pass
+                            except Error:
+                                fax_send_state = FAX_SEND_STATE_ERROR
                                 
                             ret = ret.getvalue()
-                            file('downloadpages%d_ret.log' % p, 'w').write(ret)
+                            
+                            if log.is_debug():
+                                file('downloadpages%d_ret.log' % p, 'w').write(ret)
+                            
                             log.log_data(ret)
                             self.dev.closeSoapFax()
                             
@@ -568,15 +590,21 @@ class SOAPFaxSendThread(FaxSendThread):
                         data = self.format_http(soap)
 
                         log.log_data(data)
-                        file('endjob.log', 'w').write(data)
+                        
+                        if log.is_debug():
+                            file('endjob.log', 'w').write(data)
+                        
                         self.dev.writeSoapFax(data)
                         ret = cStringIO.StringIO()
                         
-                        while self.dev.readSoapFax(8192, ret, timeout=1):
+                        while self.dev.readSoapFax(8192, ret, timeout=5):
                             pass
                             
                         ret = ret.getvalue()
-                        file('endjob_ret.log', 'w').write(ret)
+                        
+                        if log.is_debug():
+                            file('endjob_ret.log', 'w').write(ret)
+                        
                         log.log_data(ret)
                         self.dev.closeSoapFax()
                         
@@ -596,15 +624,21 @@ class SOAPFaxSendThread(FaxSendThread):
                         data = self.format_http(soap)
                         
                         log.log_data(data)
-                        file('canceljob.log', 'w').write(data)
+                        
+                        if log.is_debug():
+                            file('canceljob.log', 'w').write(data)
+                        
                         self.dev.writeSoapFax(data)
                         ret = cStringIO.StringIO()
                         
-                        while self.dev.readSoapFax(8192, ret, timeout=1):
+                        while self.dev.readSoapFax(8192, ret, timeout=5):
                             pass
                             
                         ret = ret.getvalue()
-                        file('canceljob_ret.log', 'w').write(ret)
+                        
+                        if log.is_debug():
+                            file('canceljob_ret.log', 'w').write(ret)
+                        
                         log.log_data(ret)
                         self.dev.closeSoapFax()
                         
@@ -651,7 +685,7 @@ class SOAPFaxSendThread(FaxSendThread):
 
 
     def get_error_code(self, ret):
-        if not ret: return HTTP_OK
+        if not ret: return HTTP_ERROR
         
         match = http_result_pat.match(ret)
 

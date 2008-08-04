@@ -3,7 +3,7 @@
 *% Created by the CUPS PPD Compiler v1.2.0.
 *% (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 *FormatVersion: "4.3"
-*FileVersion: "hpijs 2.8.6.20b"
+*FileVersion: "hpijs 2.8.7.3"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "hp-photosmart_a820_series-hpijs.ppd"
@@ -13,7 +13,7 @@
 *Manufacturer: "HP"
 *ModelName: "HP Photosmart a820 series Foomatic/hpijs"
 *ShortNickName: "HP Photosmart a820 series Foomatic/hpijs"
-*NickName: "HP Photosmart a820 series Foomatic/hpijs, hpijs 2.8.6.20b"
+*NickName: "HP Photosmart a820 series Foomatic/hpijs, hpijs 2.8.7.3"
 *PSVersion: "(3010.000) 705"
 *PSVersion: "(3010.000) 707"
 *PSVersion: "(3010.000) 815"
@@ -105,7 +105,7 @@ ity:PenSet=1,Quality:FullBleed=1"
 *Product: "HP Photosmart a826 Home Photo Center"
 *Product: "HP Photosmart a828 Home Photo Center"
 *Product: "HP Photosmart a827 Home Photo Center"
-*cupsVersion: 1.2
+*cupsVersion: 1.3
 *cupsModelNumber: 0
 *cupsManualCopies: True
 *cupsFilter: "application/vnd.cups-postscript 0 foomatic-rip-hplip"
@@ -211,4 +211,4 @@ ity:PenSet=1,Quality:FullBleed=1"
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of hp-photosmart_a820_series-hpijs.ppd, 10782 bytes.
+*% End of hp-photosmart_a820_series-hpijs.ppd, 10778 bytes.

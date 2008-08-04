@@ -1507,6 +1507,7 @@ class Device(object):
         dynamic_counters = self.mq.get('status-dynamic-counters', STATUS_DYNAMIC_COUNTERS_NONE)
         io_mode = self.mq.get('io-mode', IO_MODE_UNI)
         io_mfp_mode = self.mq.get('io-mfp-mode', IO_MODE_UNI)
+        status_code = STATUS_UNKNOWN
 
         # Turn off status if local connection and bi-di not avail.
         #if io_mode  == IO_MODE_UNI and self.back_end != 'net':

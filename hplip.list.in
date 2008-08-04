@@ -43,6 +43,7 @@ $cupsbackend=@cupsbackenddir@
 $cupsfilter=@cupsfilterdir@
 $drv=@abs_drvdir@
 $scan-build=@scan_build@
+$hpaio-version=@hpaio_version@
 
 %system linux
 %postinstall ldconfig
@@ -81,12 +82,12 @@ f 0644 root root /etc/udev/rules.d/55-hpmud.rules data/rules/55-hpmud.rules
 
 %if scan-build
 %system darwin
-f 0755 root root $libdir/sane/libsane-hpaio.1.0.1.dylib .libs/libsane-hpaio.1.0.1.dylib
-l 0755 root root $libdir/sane/libsane-hpaio.dylib libsane-hpaio.1.0.1.dylib
+f 0755 root root $libdir/sane/${hpaio-version}.dylib .libs/${hpaio-version}.dylib
+l 0755 root root $libdir/sane/libsane-hpaio.dylib ${hpaio-version}.dylib
 %system !darwin
-f 0755 root root $libdir/sane/libsane-hpaio.so.1.0.1 .libs/libsane-hpaio.so.1.0.1
-l 0755 root root $libdir/sane/libsane-hpaio.so libsane-hpaio.so.1.0.1
-l 0755 root root $libdir/sane/libsane-hpaio.so.1 libsane-hpaio.so.1.0.1
+f 0755 root root $libdir/sane/${hpaio-version} .libs/${hpaio-version}
+l 0755 root root $libdir/sane/libsane-hpaio.so ${hpaio-version}
+l 0755 root root $libdir/sane/libsane-hpaio.so.1 ${hpaio-version}
 %system all
 %postinstall <<EOF
 if [ -f /etc/sane.d/dll.conf ]; then

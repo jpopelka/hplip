@@ -2374,6 +2374,18 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJGenericVIP:Normal%>
   {
+    ModelName "HP Deskjet d730 Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_d730;DES:deskjet_d730;"
+    PCFileName "hp-deskjet_d730-hpijs.ppd"
+    Attribute "Product" "" "HP Deskjet d730 Printer"
+  }
+  {
+    ModelName "HP Deskjet f735 Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_f735;DES:deskjet_f735;"
+    PCFileName "hp-deskjet_f735-hpijs.ppd"
+    Attribute "Product" "" "HP Deskjet f735 All-in-one"
+  }
+  {
     ModelName "HP Business Inkjet 1000 Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:business_inkjet_1000;DES:business_inkjet_1000;"
     PCFileName "hp-business_inkjet_1000-hpijs.ppd"
@@ -2701,6 +2713,12 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart c5293 All-in-one"
   }
   {
+    ModelName "HP Photosmart c5300 series Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_c5300_series;DES:photosmart_c5300_series;"
+    PCFileName "hp-photosmart_c5300_series-hpijs.ppd"
+    Attribute "Product" "" "HP Photosmart c5300 All-in-one"
+  }
+  {
     ModelName "HP Photosmart d5300 series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_d5300_series;DES:photosmart_d5300_series;"
     PCFileName "hp-photosmart_d5300_series-hpijs.ppd"
@@ -2714,6 +2732,14 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_d5400_series;DES:photosmart_d5400_series;"
     PCFileName "hp-photosmart_d5400_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart d5400 Printer"
+    Attribute "Product" "" "HP Photosmart d5460 Printer"
+    Attribute "Product" "" "HP Photosmart d5480 Printer"
+  }
+  {
+    ModelName "HP Photosmart c5500 series Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_c5500_series;DES:photosmart_c5500_series;"
+    PCFileName "hp-photosmart_c5500_series-hpijs.ppd"
+    Attribute "Product" "" "HP Photosmart c5500 All-in-one"
   }
   {
     ModelName "HP Deskjet 5552 Foomatic/hpijs"
@@ -2845,6 +2871,12 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart c6280 All-in-one"
   }
   {
+    ModelName "HP Photosmart c6300 series Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_c6300_series;DES:photosmart_c6300_series;"
+    PCFileName "hp-photosmart_c6300_series-hpijs.ppd"
+    Attribute "Product" "" "HP Photosmart c6300 All-in-one"
+  }
+  {
     ModelName "HP Officejet 6300 series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_6300_series;DES:officejet_6300_series;"
     PCFileName "hp-officejet_6300_series-hpijs.ppd"
@@ -2935,14 +2967,6 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart d7160 Printer"
     Attribute "Product" "" "HP Photosmart d7163 Printer"
     Attribute "Product" "" "HP Photosmart d7168 Printer"
-  }
-  {
-    ModelName "HP Officejet k7100 Foomatic/hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_k7100;DES:officejet_k7100;"
-    PCFileName "hp-officejet_k7100-hpijs.ppd"
-    Attribute "Product" "" "HP Officejet k7103 Printer"
-    Attribute "Product" "" "HP Officejet k7108 Printer"
-    Attribute "Product" "" "HP Officejet k7100 Printer"
   }
   {
     ModelName "HP Photosmart 7150 Foomatic/hpijs"
@@ -3046,6 +3070,14 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 7450xi"
     Attribute "Product" "" "HP Photosmart 7458"
     Attribute "Product" "" "HP Photosmart 7459"
+  }
+  {
+    ModelName "HP Photosmart d7500 series Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_d7500_series;DES:photosmart_d7500_series;"
+    PCFileName "hp-photosmart_d7500_series-hpijs.ppd"
+    Attribute "Product" "" "HP Photosmart d5400 Printer"
+    Attribute "Product" "" "HP Photosmart d5460 Printer"
+    Attribute "Product" "" "HP Photosmart d5480 Printer"
   }
   {
     ModelName "HP Photosmart 7550 Foomatic/hpijs"
@@ -3155,6 +3187,14 @@ lity:PenSet=2,Quality:FullBleed=1"
     CustomMedia "SuperB/Super B" 936.00 1368.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=SuperB" "%% FoomaticRIPOptionSetting: PageSize=SuperB"
     CustomMedia "w774h1116/8K" 774.00 1116.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w774h1116" "%% FoomaticRIPOptionSetting: PageSize=w774h1116"
     // <%DJGenericVIP:LargeFormatSuperB%>
+    {
+      ModelName "HP Officejet k7100 Foomatic/hpijs"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_k7100;DES:officejet_k7100;"
+      PCFileName "hp-officejet_k7100-hpijs.ppd"
+      Attribute "Product" "" "HP Officejet k7103 Printer"
+      Attribute "Product" "" "HP Officejet k7108 Printer"
+      Attribute "Product" "" "HP Officejet k7100 Printer"
+    }
     {
       ModelName "HP Photosmart Pro b8300 series Foomatic/hpijs"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_pro_b8300_series;DES:photosmart_pro_b8300_series;"
@@ -3552,6 +3592,14 @@ et=2"
       Attribute "Product" "" "HP Officejet Pro k5400tn"
       Attribute "Product" "" "HP Officejet Pro k5400"
       Attribute "Product" "" "HP Officejet Pro k5456z"
+    }
+    {
+      ModelName "HP Officejet k7100 Foomatic/hpijs"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_k7100;DES:officejet_k7100;"
+      PCFileName "hp-officejet_k7100-hpijs.ppd"
+      Attribute "Product" "" "HP Officejet k7103 Printer"
+      Attribute "Product" "" "HP Officejet k7108 Printer"
+      Attribute "Product" "" "HP Officejet k7100 Printer"
     }
     {
       ModelName "HP Photosmart Pro b8300 series Foomatic/hpijs"
@@ -5242,7 +5290,19 @@ Bleed=1"
     ModelName "HP Photosmart a530 series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_a530_series;DES:photosmart_a530_series;"
     PCFileName "hp-photosmart_a530_series-hpijs.ppd"
-    Attribute "Product" "" "HP Photosmart a530 Compact Photo Printer"
+    Attribute "Product" "" "HP Photosmart a532 Compact Photo Printer"
+    Attribute "Product" "" "HP Photosmart a536 Compact Photo Printer"
+    Attribute "Product" "" "HP Photosmart a538 Compact Photo Printer"
+  }
+  {
+    ModelName "HP Photosmart a630 series Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_a630_series;DES:photosmart_a630_series;"
+    PCFileName "hp-photosmart_a630_series-hpijs.ppd"
+    Attribute "Product" "" "HP Photosmart a630 Compact Photo Printer"
+    Attribute "Product" "" "HP Photosmart a632 Compact Photo Printer"
+    Attribute "Product" "" "HP Photosmart a636 Compact Photo Printer"
+    Attribute "Product" "" "HP Photosmart a637 Compact Photo Printer"
+    Attribute "Product" "" "HP Photosmart a638 Compact Photo Printer"
   }
 }  // end QuickConnect, 4-sided fullbleed
 
@@ -5791,6 +5851,18 @@ t=0"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_3055;DES:hp_laserjet_3055;"
     PCFileName "hp-laserjet_3055-hpijs.ppd"
     Attribute "Product" "" "HP LaserJet 3055"
+  }
+  {
+    ModelName "HP LaserJet 3100 Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_3100;DES:hp_laserjet_3100;"
+    PCFileName "hp-laserjet_3100-hpijs.ppd"
+    Attribute "Product" "" "HP LaserJet 3100"
+  }
+  {
+    ModelName "HP LaserJet 3150 Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_3150;DES:hp_laserjet_3150;"
+    PCFileName "hp-laserjet_3150-hpijs.ppd"
+    Attribute "Product" "" "HP LaserJet 3150"
   }
   {
     ModelName "HP LaserJet 3200m Foomatic/hpijs"
@@ -6709,12 +6781,6 @@ nSet=2"
     CustomMedia "SuperB/Super B" 936.00 1368.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=SuperB" "%% FoomaticRIPOptionSetting: PageSize=SuperB"
     CustomMedia "w774h1116/8K" 774.00 1116.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w774h1116" "%% FoomaticRIPOptionSetting: PageSize=w774h1116"
     // <%LJColor:LargeFormatSuperB%>
-    {
-      ModelName "HP Color LaserJet 2600 Foomatic/hpijs"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_color_laserjet_2600;DES:hp_color_laserjet_2600;"
-      PCFileName "hp-color_laserjet_2600-hpijs.ppd"
-      Attribute "Product" "" "HP Color LaserJet 2600"
-    }
     {
       ModelName "HP Business Inkjet 2600 Foomatic/hpijs"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_business_inkjet_2600;DES:hp_business_inkjet_2600;"

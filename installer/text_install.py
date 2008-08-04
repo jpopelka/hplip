@@ -171,7 +171,7 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
             (core.distro, core.distro_name, core.distros[core.distro_name]['display_name'], \
             core.distro_version, core.distro_version_supported))        
 
-        distro_ok = False
+        distro_ok, ok = False, True
         if core.distro_known():
             ok, distro_ok = tui.enter_yes_no('Is "%s %s" your correct distro/OS and version'
                 % (core.get_distro_data('display_name', '(unknown)'), core.distro_version))
