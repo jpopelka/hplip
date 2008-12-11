@@ -94,6 +94,13 @@ enum HPMUD_SUPPORT_TYPE
    HPMUD_SUPPORT_TYPE_HPLIP = 2,   /* supported by hpijs and "hp" backend */
 };
 
+enum HPMUD_PLUGIN_TYPE
+{
+   HPMUD_PLUGIN_TYPE_NONE = 0,
+   HPMUD_PLUGIN_TYPE_REQUIRED = 1,  
+   HPMUD_PLUGIN_TYPE_OPTIONAL = 2,   
+};
+
 #define HPMUD_S_PRINT_CHANNEL "PRINT"
 #define HPMUD_S_PML_CHANNEL "HP-MESSAGE"
 #define HPMUD_S_SCAN_CHANNEL "HP-SCAN"
@@ -132,6 +139,8 @@ struct hpmud_model_attributes
    enum HPMUD_SCANTYPE scantype;       /* 0=none */
    enum HPMUD_STATUSTYPE statustype;
    enum HPMUD_SUPPORT_TYPE support;
+   enum HPMUD_PLUGIN_TYPE plugin;
+   enum HPMUD_SUPPORT_TYPE reserved[5];
 };
 
 #ifdef __cplusplus
@@ -433,6 +442,23 @@ enum HPMUD_RESULT hpmud_query_model(char *uri, struct hpmud_model_attributes *ma
 enum HPMUD_RESULT hpmud_make_usb_uri(const char *busnum, const char *devnum, char *uri, int uri_size, int *bytes_read);
 
 /*
+ * hpmud_make_usb_serial_uri - make a usb uri from product serial number
+ *
+ * This function is a stateless hpmud helper function. The lsusb command can be used
+ * determine the product serial number.
+ *
+ * inputs:
+ *  sn - specifies product serial number
+ *  uri_size - size of uri buffer in bytes
+ * 
+ * outputs:
+ *  uri - zero terminated string
+ *  bytes_read - size of uri 
+ *  return value - see enum definition
+ */
+enum HPMUD_RESULT hpmud_make_usb_serial_uri(const char *sn, char *uri, int uri_size, int *bytes_read);
+
+/*
  * hpmud_make_net_uri - make a net uri from IP
  *
  * This function is a stateless hpmud helper function.
@@ -464,6 +490,22 @@ enum HPMUD_RESULT hpmud_make_net_uri(const char *ip, int port, char *uri, int ur
  *  return value - see enum definition
  */
 enum HPMUD_RESULT hpmud_make_par_uri(const char *dnode, char *uri, int uri_size, int *bytes_read);
+
+/*
+ * hpmud_get_conf - get key value from hplip.conf
+ *
+ * This function is a stateless hpmud helper function.
+ *
+ * inputs:
+ *  section - zero terminated string (ie: "[dirs]")
+ *  key - zero terminated string (ie: "home")
+ *  value_size - size of value buffer in bytes
+ * 
+ * outputs:
+ *  value - zero terminated string 
+ *  return value - see enum definition
+ */
+enum HPMUD_RESULT hpmud_get_conf(const char *section, const char *key, char *value, int value_size);
 
 #ifdef __cplusplus
 }

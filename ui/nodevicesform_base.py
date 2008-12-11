@@ -68,7 +68,7 @@ class NoDevicesForm_base(QDialog):
 "1.Run <b>hp-setup</b> (in a shell/terminal or click <tt>Setup Device...</tt> below).<p>\n"
 "2. <b>CUPS web interface</b> (open a browser to: <u>http://localhost:631</u> or press the button below),<p>\n"
 "3. The <b>printer installation utility</b> that came with your operating system (YaST, PrinterDrake, etc).\n"
-"<p><p>After setting up a printer, you may have to press <tt>F6</tt> or chose <tt>Device | Refresh All</tt> for the printer to appear in the HP Device Manager.<p>\n"
+"<p><p>After setting up a printer, you may have to press <tt>F6</tt> or choose <tt>Device | Refresh All</tt> for the printer to appear in the HP Device Manager.<p>\n"
 "<i><b>Note: Only devices installed with the <tt>hp:</tt> or <tt>hpfax:</tt> CUPS backend will appear in the HP Device Manager.</b></i><p>"))
         self.setupPushButton.setText(self.__tr("Setup Device..."))
         self.CUPSButton.setText(self.__tr("CUPS Web Interface"))

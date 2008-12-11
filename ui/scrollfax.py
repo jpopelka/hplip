@@ -21,7 +21,7 @@
 
 # Local
 from base.g import *
-from base import utils, magic
+from base import utils, magic, pml
 from prnt import cups
 from ui_utils import load_pixmap
 
@@ -867,7 +867,8 @@ class ScrollFaxView(ScrollView):
                 self.__tr("Add Individual"), ind)
 
             for e, v in all_entries.items():
-                self.ind_map[ind.insertItem(QIconSet(load_pixmap('add_user', '16x16')), e, None)] = e
+                if not e.startswith('__'):
+                    self.ind_map[ind.insertItem(QIconSet(load_pixmap('add_user', '16x16')), e, None)] = e
 
         all_groups = self.db.get_all_groups()
         if all_groups:
@@ -1044,8 +1045,9 @@ class ScrollFaxView(ScrollView):
         if is_group:
             for i in self.db.group_members(name):
             #for i in self.db.GroupEntries(name):
-                self.recipient_list.append(i)
-                self.prev_selected_recipient = self.recipient_list[-1]
+                if not i.startswith('__'):
+                    self.recipient_list.append(i)
+                    self.prev_selected_recipient = self.recipient_list[-1]
         else:
             self.recipient_list.append(name)
             self.prev_selected_recipient = name
@@ -1059,7 +1061,8 @@ class ScrollFaxView(ScrollView):
         self.addIndividualPushButton.setEnabled(len(all_entries))
 
         for e, v in all_entries.items():
-            self.individualComboBox.insertItem(e)
+            if not e.startswith('__'):
+                self.individualComboBox.insertItem(e)
 
         # Groups
         self.groupComboBox.clear()
@@ -1259,7 +1262,8 @@ class ScrollFaxView(ScrollView):
                     self.waitdlg = None
 
                 if status  == fax.STATUS_ERROR:
-                    self.form.FailureUI(self.__tr("<b>Fax send error.</b><p>"))
+                    result_code, error_state = self.dev.getPML(pml.OID_FAX_DOWNLOAD_ERROR)
+                    self.form.FailureUI(self.__tr("<b>Fax send error (%s).</b><p>" % pml.DN_ERROR_STR.get(error_state, "Unknown error")))
                     self.dev.sendEvent(EVENT_FAX_JOB_FAIL, self.cur_printer, 0, '')
 
                 elif status == fax.STATUS_BUSY:

@@ -46,9 +46,12 @@ def option_question_callback(opt, desc):
     if not ok: sys.exit(0)
     return ans
 
-def start(language, auto=True, test_depends=False, test_unknown=False, assume_network=False, max_retries=3):
+def start(language, auto=True, test_depends=False, test_unknown=False, assume_network=False,
+          max_retries=3, enable=None, disable=None):
     try:
         core =  CoreInstall(MODE_INSTALLER, INTERACTIVE_MODE)
+        core.enable = enable
+        core.disable = disable
 
         if core.running_as_root():
             log.error("You are running the installer as root. It is highly recommended that you run the installer as")
@@ -71,10 +74,10 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
 
             #if os.getenv('DISPLAY') and utils.find_browser() is not None:
             if 0:
-                ok, choice = tui.enter_choice("\nPlease choose the installation mode (a=automatic*, c=custom, w=web installer, q=quit) : ", 
+                ok, choice = tui.enter_choice("\nPlease choose the installation mode (a=automatic*, c=custom, w=web installer, q=quit) : ",
                     ['a', 'c', 'w'], 'a')
             else:
-                ok, choice = tui.enter_choice("\nPlease choose the installation mode (a=automatic*, c=custom, q=quit) : ", 
+                ok, choice = tui.enter_choice("\nPlease choose the installation mode (a=automatic*, c=custom, q=quit) : ",
                     ['a', 'c'], 'a')
 
             if not ok: sys.exit(0)
@@ -104,12 +107,12 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
         if not auto:
             tui.title("INSTALL TYPE")
             log.info("For most users, it is recommended to install HPLIP with full support (scanning, faxing, toolbox, etc).")
-            log.info("For servers or minimal installations, you can also install print support only (using HPIJS).")
+            log.info("For servers or minimal installations, you can also install print support only (HPIJS only).")
 
-            ok, choice = tui.enter_choice("\nInstall full support (recommended) or print-only support (m=multifunction*, s=single func, q=quit) ?", 
-                ['m', 's'], 'm')
+            ok, choice = tui.enter_choice("\nInstall full hplip support (recommended) or print-only support (f=full hplip support*, p=printing only support, q=quit) ?",
+                ['f', 'p'], 'f')
             if not ok: sys.exit(0)
-            if choice  == 's':
+            if choice  == 'p':
                 core.selected_component = 'hpijs'
 
         log.debug(core.selected_component)
@@ -133,7 +136,7 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
 ##        # RELEASE NOTES
 ##        #
 ##
-##        if not auto: 
+##        if not auto:
 ##            if os.getenv('DISPLAY'):
 ##                tui.title("VIEW RELEASE NOTES")
 ##                log.info("Release notes from this version are available as a web (HTML) document.")
@@ -169,7 +172,7 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
 
         log.debug("Distro = %s Distro Name = %s Display Name= %s Version = %s Supported = %s" % \
             (core.distro, core.distro_name, core.distros[core.distro_name]['display_name'], \
-            core.distro_version, core.distro_version_supported))        
+            core.distro_version, core.distro_version_supported))
 
         distro_ok, ok = False, True
         if core.distro_known():
@@ -217,7 +220,7 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
             core.distro = d_temp[y]
             core.distro_name = core.distros_index[core.distro]
             distro_display_name = core.distros[core.distro_name]['display_name']
-            log.debug("Distro = %s Distro Name = %s Display Name= %s" % 
+            log.debug("Distro = %s Distro Name = %s Display Name= %s" %
                 (core.distro, core.distro_name, distro_display_name))
 
             if core.distro != DISTRO_UNKNOWN:
@@ -236,7 +239,7 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
                 log.info(formatter.compose(("Num.", "Distro/OS Version")))
                 log.info(formatter.compose(('-'*4, '-'*40)))
 
-                log.info(formatter.compose(("0", "Unknown or not listed"))) 
+                log.info(formatter.compose(("0", "Unknown or not listed")))
 
                 x = 1
                 for ver in versions:
@@ -257,10 +260,10 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
                     if not ver_info['supported']:
                         text += " [Unsupported]"
 
-                    log.info(formatter.compose((str(x), text))) 
+                    log.info(formatter.compose((str(x), text)))
                     x += 1
 
-                ok, core.distro_version_int = tui.enter_range("\nEnter number 0...%d (q=quit) ?" % 
+                ok, core.distro_version_int = tui.enter_range("\nEnter number 0...%d (q=quit) ?" %
                     (x-1), 0, x-1)
                 if not ok: sys.exit(0)
 
@@ -277,23 +280,17 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
 
                 core.distro_changed()
 
-                log.info("\nDistro set to: %s %s" % 
+                log.info("\nDistro set to: %s %s" %
                     (core.get_distro_data('display_name', '(unknown)'), core.distro_version))
 
 
             if core.distro == DISTRO_UNKNOWN or not core.distro_version_supported:
+                log.error("The distribution/OS that you are running is not supported. This installer\ncannot install an unsupported distribution. Please check your distribution/OS\nand re-run this installer or perform a manual installation.")
                 if num_req_missing:
-                    log.error("The distro/OS that you are running is unknown/unsupported and there are required dependencies missing. Please manually install the missing dependencies and then re-run this installer.")
-
-                    log.error("The following REQUIRED dependencies are missing and need to be installed before the installer can be run:")
+                    log.error("The following REQUIRED dependencies are missing and need to be installed:")
 
                     for d, desc, opt in core.missing_required_dependencies():
                         log.error("Missing REQUIRED dependency: %s (%s)" % (d, desc))
-
-                    sys.exit(1)
-
-                log.error("The distro and/or distro version you are using is unsupported.\nYou may still try to use this installer, but some dependency problems may exist after install.")
-                log.error("The following OPTIONAL dependencies are missing and may need to be installed:")
 
                 for d, desc, req, opt in core.missing_optional_dependencies():
                     if req:
@@ -301,9 +298,7 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
                     else:
                         log.warning("Missing OPTIONAL dependency: %s (%s) [Optional for option '%s']" % (d, desc, opt))
 
-                ok, ans = tui.enter_yes_no("\n\nDo you still wish to continue")
-
-                if not ok or not ans: sys.exit(0)
+                sys.exit(1)
 
         #
         # SELECT OPTIONS TO INSTALL
@@ -333,7 +328,7 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
         #
         # COLLECT SUPERUSER PASSWORD
         #
-        if not core.running_as_root(): 
+        if not core.running_as_root():
             tui.title("ENTER ROOT/SUPERUSER PASSWORD")
 
             ok = core.check_password(password_entry, progress_callback)
@@ -346,7 +341,7 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
         # INSTALLATION NOTES
         #
 
-        if core.distro_supported(): 
+        if core.distro_supported():
             distro_notes = core.get_distro_data('notes', '').strip()
             ver_notes = core.get_ver_data('notes', '').strip()
 
@@ -370,7 +365,7 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
         tui.title("RUNNING PRE-INSTALL COMMANDS")
         if core.run_pre_install(progress_callback): # some cmds were run...
             num_req_missing = core.count_num_required_missing_dependencies()
-            num_opt_missing = core.count_num_optional_missing_dependencies()  
+            num_opt_missing = core.count_num_optional_missing_dependencies()
 
         #
         # REQUIRED DEPENDENCIES INSTALL
@@ -407,7 +402,7 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
                     log.warn("This installer cannot install '%s' for your distro/OS and/or version." % depend)
 
                 if not ok:
-                    log.error("Installation cannot continue without this dependency. Please manually install this dependency and re-run this installer.")                    
+                    log.error("Installation cannot continue without this dependency. Please manually install this dependency and re-run this installer.")
                     sys.exit(0)
 
                 #log.info("-"*10)
@@ -479,7 +474,7 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
 
             pid, cmdline = core.check_pkg_mgr()
             while pid:
-                ok, user_input = tui.enter_choice("A package manager '%s' appears to be running. Please quit the package manager and press enter to continue (i=ignore, r=retry*, f=force, q=quit) :" 
+                ok, user_input = tui.enter_choice("A package manager '%s' appears to be running. Please quit the package manager and press enter to continue (i=ignore, r=retry*, f=force, q=quit) :"
                     % cmdline, ['i', 'r', 'q', 'f'], 'r')
 
                 if not ok: sys.exit(0)
@@ -547,13 +542,13 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
                     pkgs, commands = core.get_dependency_data(d)
 
                     if pkgs:
-                        log.debug("Package(s) '%s' will be installed to satisfy dependency '%s'." % 
+                        log.debug("Package(s) '%s' will be installed to satisfy dependency '%s'." %
                             (','.join(pkgs), d))
 
                         packages.extend(pkgs)
 
                     if commands:
-                        log.debug("Command(s) '%s' will be run to satisfy dependency '%s'." % 
+                        log.debug("Command(s) '%s' will be run to satisfy dependency '%s'." %
                             (','.join(commands), d))
 
                         commands_to_run.extend(commands)
@@ -585,7 +580,7 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
                                 log.error("Package install command failed with error code %d" % status)
                                 ok, ans = tui.enter_yes_no("Would you like to retry installing the missing package(s)")
 
-                                if not ok: 
+                                if not ok:
                                     sys.exit(0)
 
                                 if ans:
@@ -609,7 +604,7 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
                             log.error("Package install command failed with error code %d" % status)
                             ok, ans = tui.enter_yes_no("Would you like to retry installing the missing package(s)")
 
-                            if not ok: 
+                            if not ok:
                                 sys.exit(0)
 
                             if ans:
@@ -700,7 +695,7 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
             core.run_post_depend(progress_callback)
 
 
-            # 
+            #
             # DEPENDENCIES RE-CHECK
             #
 
@@ -722,13 +717,13 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
                 sys.exit(1)
 
             for depend, desc, required_for_opt, opt in core.missing_optional_dependencies():
-                if required_for_opt: 
+                if required_for_opt:
                     log.warn("An optional dependency '%s (%s)' is still missing." % (depend, desc))
                     log.warn("Option '%s' has been turned off." % opt)
                     core.selected_options[opt] = False
                 else:
                     log.warn("An optional dependency '%s (%s)' is still missing." % (depend, desc))
-                    log.warn("Some features may not function as expected.") 
+                    log.warn("Some features may not function as expected.")
 
 
             if not num_opt_missing and not num_req_missing:
@@ -775,20 +770,20 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
 
         log.info("\nBuild complete.")
 
-        tui.title("POST-BUILD COMMANDS")  
+        tui.title("POST-BUILD COMMANDS")
         core.run_post_build(progress_callback)
 
         # Restart or re-plugin if necessary (always True in 2.7.9+)
         if core.restart_required and core.selected_component != 'hpijs':
             tui.title("RESTART OR RE-PLUG IS REQUIRED")
             cmd = core.su_sudo() % "hp-setup"
-            paragraph = """If you are installing a USB connected printer, and the printer was plugged in when you started this installer, you will need to either restart your PC or unplug and re-plug in your printer (USB cable only). If you choose to restart, run this command after restarting: %s  (Note: If you are using a parallel connection, you will have to restart your PC. If you are using network/wireless, you can ignore and continue).""" % cmd 
+            paragraph = """If you are installing a USB connected printer, and the printer was plugged in when you started this installer, you will need to either restart your PC or unplug and re-plug in your printer (USB cable only). If you choose to restart, run this command after restarting: %s  (Note: If you are using a parallel connection, you will have to restart your PC. If you are using network/wireless, you can ignore and continue).""" % cmd
 
             for p in tui.format_paragraph(paragraph):
                 log.info(p)
             log.info("")
 
-            ok, choice = tui.enter_choice("Restart or re-plug in your printer (r=restart, p=re-plug in*, i=ignore/continue, q=quit) : ", 
+            ok, choice = tui.enter_choice("Restart or re-plug in your printer (r=restart, p=re-plug in*, i=ignore/continue, q=quit) : ",
                 ['r', 'p', 'i'], 'p')
 
             if not ok: sys.exit(0)

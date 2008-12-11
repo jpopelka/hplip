@@ -317,9 +317,14 @@ DRIVER_ERROR HeaderLJColor::StartSend ()
     strcpy (res, "@PJL SET DUPLEX=OFF\015\012");
 
 #ifdef APDK_AUTODUPLEX
-    if (thePrintContext->QueryDuplexMode ())
+    DUPLEXMODE  dupmode = thePrintContext->QueryDuplexMode ();
+    if (dupmode != DUPLEXMODE_NONE)
     {
-        strcpy (res, "@PJL SET DUPLEX=ON\015\012");
+        strcpy (res, "@PJL SET DUPLEX=ON\015\012@PJL SET BINDING=");
+        if (dupmode == DUPLEXMODE_BOOK)
+            strcat (res, "LONGEDGE\015\012");
+        else
+            strcat (res, "SHORTEDGE\015\012");
     }
 #endif
 

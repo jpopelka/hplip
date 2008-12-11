@@ -58,6 +58,7 @@ from coloradjform import ColorAdjForm  # Type 5 and 6 color adj
 from colorcalform2 import ColorCalForm2 # Type 2 color cal
 from colorcal4form import ColorCal4Form # Type 4 color cal
 from align10form import Align10Form # Type 10 and 11 alignment
+from align13form import Align13Form # Type 13 alignment
 
 # Misc forms
 from loadpaperform import LoadPaperForm
@@ -133,8 +134,10 @@ class DeviceViewItem(QIconViewItem):
 class SuppliesListViewItem(QListViewItem):
     def __init__(self, parent, pixmap, desc, part_no, level_pixmap, status):
         QListViewItem.__init__(self, parent, '', desc, part_no, '', status)
-        self.setPixmap(0, pixmap)
-        self.setPixmap(3, level_pixmap)
+        if pixmap is not None:
+            self.setPixmap(0, pixmap)
+        if level_pixmap is not None:
+            self.setPixmap(3, level_pixmap)
 
     def paintCell(self, p, cg, c, w, a):
         color = QColorGroup(cg)
@@ -398,7 +401,7 @@ class DevMgr4(DevMgr4_base):
 
         DevMgr4_base.__init__(self, parent, name, fl)
 
-        log.debug("Initializing toolbox UI...")
+        log.debug("Initializing toolbox UI (Qt3)...")
         log.debug("HPLIP Version: %s" % sys_cfg.hplip.version)
 
         self.disable_dbus = disable_dbus
@@ -412,7 +415,7 @@ class DevMgr4(DevMgr4_base):
 
         # dbus setup
         if not self.disable_dbus:
-            self.dbus_avail, self.service = device.init_dbus()
+            self.dbus_avail, self.service, session_bus = device.init_dbus()
 
             if not self.dbus_avail:
                 self.FailureUI("<b>Error</b><p>hp-systray must be running to get device status. hp-systray requires dbus support. Device status will not be available.")
@@ -1652,6 +1655,12 @@ class DevMgr4(DevMgr4_base):
         return dlg.getValues()
 
 
+    def Align13UI(self):
+        dlg = Align13Form(self)
+        dlg.exec_loop()
+        return True
+
+
     def AlignPensButton_clicked(self):
         d = self.cur_device
         align_type = d.align_type
@@ -1698,6 +1707,9 @@ class DevMgr4(DevMgr4_base):
 
                     elif align_type == ALIGN_TYPE_OJ_PRO:
                         maint.AlignType12(d, self.LoadPaperUI)
+
+                    elif align_type == ALIGN_TYPE_AIO:
+                        maint.AlignType13(d, self.LoadPaperUI, self.Align13UI)
 
                 else:
                     self.CheckDeviceUI()
@@ -2160,7 +2172,7 @@ class DevMgr4(DevMgr4_base):
                 # Bar graph level
                 level_pixmap = None
                 if agent_kind in (AGENT_KIND_SUPPLY,
-                                  #AGENT_KIND_HEAD,
+                                  AGENT_KIND_HEAD,
                                   AGENT_KIND_HEAD_AND_SUPPLY,
                                   AGENT_KIND_TONER_CARTRIDGE,
                                   AGENT_KIND_MAINT_KIT,
@@ -3011,15 +3023,18 @@ class ScrollTestpageView(ScrollView):
             except Error:
                 self.CheckDeviceUI()
             else:
-                if d.isIdleAndNoError():
-                    QApplication.restoreOverrideCursor()
-                    d.close()
+                try:
+                    if d.isIdleAndNoError():
+                        QApplication.restoreOverrideCursor()
+                        d.close()
 
-                    d.printTestPage(printer_name)
-                    printed = True
+                        d.printTestPage(printer_name)
+                        printed = True
 
-                else:
-                    d.close()
+                    else:
+                        d.close()
+                        self.CheckDeviceUI()
+                except Error:
                     self.CheckDeviceUI()
 
         finally:
@@ -3206,3 +3221,5 @@ class ScrollColorCalView(ScrollView):
             QMessageBox.NoButton)
       
 
+    def __tr(self,s,c = None):
+        return qApp.translate("ScrollColorCalView",s,c)

@@ -1,4 +1,0 @@
-"""
-CherryPy Standard Library
-"""
-

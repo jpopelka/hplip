@@ -69,6 +69,10 @@ protected:
 private:
     virtual DRIVER_ERROR    EndPage ();
     virtual DRIVER_ERROR    SendPlaneData (int iPlaneNumber, HPLJZjsJbgEncSt *se, HPLJZjcBuff *pcBuff, BOOL bLastStride);
+    virtual int             GetOutputResolutionY ()
+    {
+        return 600;
+    }
 
 }; // LJM1005
 

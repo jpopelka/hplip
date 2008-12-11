@@ -89,8 +89,7 @@ public:
         "HP LaserJet 1018\0"
         "HP LaserJet 1020\0"
         "HP LaserJet 1022\0"
-        "HP LaserJet P1007\0"
-        "HP LaserJet P1008\0"
+        "HP LaserJet P2035\0"
     ) {m_iPrinterType = eLJZjsMono;}
     inline Printer* CreatePrinter(SystemServices* pSS) const { return new LJZjsMono(pSS); }
 	inline PRINTER_TYPE GetPrinterType() const { return eLJZjsMono;}

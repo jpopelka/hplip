@@ -6,9 +6,6 @@
 
 INCLUDES = -Iip -Iio/hpmud -Iscan/sane 
 
-BZRSERVER=http://bzr.linuxprinting.org/devel
-#BZRSERVER=http://dsufflnx/bzr
-
 hplipdir = $(datadir)/hplip
 
 docdir = $(hpdocdir)
@@ -20,7 +17,8 @@ dist_noinst_DATA =
 noinst_PROGRAMS =
 lib_LTLIBRARIES = 
 
-include bb_build.inc
+include foomatic_drv.inc
+include unreleased.inc
 
 if DOC_BUILD
 wwwsrc = doc
@@ -34,8 +32,9 @@ endif
 
 if HPLIP_BUILD
 
-dist_hplip_DATA = scan/sane/hpaio.desc prnt/drv/hpijs.drv.in.template
-dist_hplip_SCRIPTS = hpssd.py __init__.py install.py hplip-install dat2drv.py
+dist_hplip_SCRIPTS = hpssd.py __init__.py 
+dist_noinst_DATA += scan/sane/hpaio.desc prnt/drv/hpijs.drv.in.template
+dist_noinst_SCRIPTS += dat2drv.py install.py hplip-install
 
 cmddir = $(hplipdir)
 dist_cmd_SCRIPTS = align.py info.py print.py toolbox.py clean.py colorcal.py unload.py testpage.py makeuri.py check.py fab.py levels.py \
@@ -61,30 +60,37 @@ dist_base_SCRIPTS = base/maint.py base/codes.py base/g.py base/pml.py base/statu
 	base/__init__.py base/mfpdtf.py base/utils.py \
 	base/device.py base/logger.py base/slp.py base/exif.py base/strings.py base/magic.py \
 	base/imagesize.py base/pexpect.py base/models.py base/mdns.py base/tui.py base/dime.py \
-	base/ldif.py base/vcard.py
+	base/ldif.py base/vcard.py base/module.py
 
 # installer
 installdir = $(hplipdir)/installer
 dist_install_SCRIPTS = installer/__init__.py installer/dcheck.py installer/distros.dat installer/core_install.py
-dist_noinst_SCRIPTS += installer/text_install.py installer/web_install.py installer/trigger.py  installer/fix_symlink.py
-dist_noinst_SCRIPTS += installer/pages/__init__.py installer/pages/install_required.tmpl installer/pages/installation_path.tmpl installer/pages/component.tmpl \
-	installer/pages/mode.tmpl installer/pages/confirm_distro.tmpl installer/pages/notes.tmpl installer/pages/error.tmpl installer/pages/options.tmpl \
-	installer/pages/error_package_manager.tmpl installer/pages/password.tmpl installer/pages/error_required_missing.tmpl installer/pages/progress.tmpl \
-	installer/pages/error_unsupported_distro.tmpl installer/pages/ready_to_build.tmpl installer/pages/finished.tmpl installer/pages/select_distro.tmpl \
-	installer/pages/hplip_remove.tmpl installer/pages/hpoj_remove.tmpl installer/pages/unsupported.tmpl installer/pages/turn_off_options.tmpl \
-	installer/pages/index.tmpl installer/pages/welcome.tmpl installer/pages/install_optional.tmpl installer/pages/quit.tmpl \
-	installer/pages/install_required.tmpl installer/pages/replug.tmpl installer/pages/restart.tmpl installer/pages/network_unavailable.tmpl \
-	installer/pages/warning.tmpl
-dist_noinst_SCRIPTS += installer/scripts/hplip.js installer/scripts/encode.js installer/scripts/misc_code.js
-dist_noinst_DATA += installer/images/button.png installer/images/favicon.ico installer/images/topbar.png installer/images/view.png \
-	installer/images/back.png installer/images/circular.gif installer/images/hplogo.png installer/images/tux.png \
-	installer/images/button1.png installer/images/button1d.png installer/images/replug1.png installer/images/replug2.png \
-	installer/images/replug3.png installer/images/button2.png
-dist_noinst_DATA += installer/localization/gui_strings_de_DE.ts installer/localization/gui_strings_en_US.ts installer/localization/gui_strings_es_MX.ts \
-	installer/localization/gui_strings_fr_FR.ts installer/localization/gui_strings_it_IT.ts installer/localization/gui_strings_pt_BR.ts \
-	installer/localization/gui_strings_ru_RU.ts installer/localization/gui_strings_zh_CN.ts
+dist_noinst_SCRIPTS += installer/text_install.py
 
-dist_noinst_SCRIPTS += installer/styles/hplip.css installer/styles/misc.css
+# installer/web_install.py installer/trigger.py  installer/fix_symlink.py
+#dist_noinst_SCRIPTS += installer/pages/__init__.py installer/pages/install_required.tmpl installer/pages/installation_path.tmpl 
+#installer/pages/component.tmpl \
+#	installer/pages/mode.tmpl installer/pages/confirm_distro.tmpl installer/pages/notes.tmpl installer/pages/error.tmpl 
+#installer/pages/options.tmpl \
+#	installer/pages/error_package_manager.tmpl installer/pages/password.tmpl installer/pages/error_required_missing.tmpl 
+#installer/pages/progress.tmpl \
+#	installer/pages/error_unsupported_distro.tmpl installer/pages/ready_to_build.tmpl installer/pages/finished.tmpl 
+#installer/pages/select_distro.tmpl \
+#	installer/pages/hplip_remove.tmpl installer/pages/hpoj_remove.tmpl installer/pages/unsupported.tmpl installer/pages/turn_off_options.tmpl \
+#	installer/pages/index.tmpl installer/pages/welcome.tmpl installer/pages/install_optional.tmpl installer/pages/quit.tmpl \
+#	installer/pages/install_required.tmpl installer/pages/replug.tmpl installer/pages/restart.tmpl installer/pages/network_unavailable.tmpl \
+#	installer/pages/warning.tmpl
+#dist_noinst_SCRIPTS += installer/scripts/hplip.js installer/scripts/encode.js installer/scripts/misc_code.js
+#dist_noinst_DATA += installer/images/button.png installer/images/favicon.ico installer/images/topbar.png installer/images/view.png \
+#	installer/images/back.png installer/images/circular.gif installer/images/hplogo.png installer/images/tux.png \
+#	installer/images/button1.png installer/images/button1d.png installer/images/replug1.png installer/images/replug2.png \
+#	installer/images/replug3.png installer/images/button2.png
+#dist_noinst_DATA += installer/localization/gui_strings_de_DE.ts installer/localization/gui_strings_en_US.ts 
+#installer/localization/gui_strings_es_MX.ts \
+#	installer/localization/gui_strings_fr_FR.ts installer/localization/gui_strings_it_IT.ts installer/localization/gui_strings_pt_BR.ts \
+#	installer/localization/gui_strings_ru_RU.ts installer/localization/gui_strings_zh_CN.ts
+
+#dist_noinst_SCRIPTS += installer/styles/hplip.css installer/styles/misc.css
 
 # makecopies
 copierdir = $(hplipdir)/copier
@@ -97,7 +103,7 @@ dist_fax_SCRIPTS = fax/fax.py fax/__init__.py fax/coverpages.py fax/pmlfax.py fa
 hpfaxdir = $(cupsbackenddir)
 dist_hpfax_SCRIPTS = fax/backend/hpfax.py
 faxppddir = $(hpppddir)
-dist_faxppd_DATA = fax/ppd/HP-Fax-hplip.ppd fax/ppd/HP-Fax2-hplip.ppd
+dist_faxppd_DATA = fax/ppd/HP-Fax-hplip.ppd.gz fax/ppd/HP-Fax2-hplip.ppd.gz
 endif
 
 # ptest
@@ -108,6 +114,7 @@ ptest_LDADD = libhpmud.la
 # data
 modelsdir = $(hplipdir)/data/models
 images_16x16dir = $(hplipdir)/data/images/16x16
+images_24x24dir = $(hplipdir)/data/images/24x24
 images_32x32dir = $(hplipdir)/data/images/32x32
 images_48x48dir = $(hplipdir)/data/images/48x48
 images_128x128dir = $(hplipdir)/data/images/128x128
@@ -122,6 +129,7 @@ dist_models_DATA = data/models/models.dat
 
 if GUI_BUILD
 dist_images_16x16_DATA = data/images/16x16/*
+dist_images_24x24_DATA = data/images/24x24/*
 dist_images_32x32_DATA = data/images/32x32/*
 dist_images_48x48_DATA = data/images/48x48/*
 dist_images_128x128_DATA = data/images/128x128/*
@@ -139,9 +147,6 @@ dist_localz_DATA = data/localization/hplip_de.qm data/localization/hplip_es.qm d
 	data/localization/hplip_pt.qm data/localization/hplip_ru.qm data/localization/hplip_zh.qm
 dist_noinst_DATA += data/localization/hplip_de.ts data/localization/hplip_es.ts data/localization/hplip_fr.ts data/localization/hplip_it.ts \
 	data/localization/hplip_pt.ts data/localization/hplip_ru.ts data/localization/hplip_zh.ts
-
-# unreleased data
-include unreleased.inc
 
 # pcard 
 pcarddir = $(hplipdir)/pcard
@@ -181,16 +186,17 @@ libsane_hpaio_LTLIBRARIES = libsane-hpaio.la
 libsane_hpaio_la_SOURCES = scan/sane/hpaio.c scan/sane/mfpdtf.c scan/sane/pml.c scan/sane/scl.c scan/sane/io.c scan/sane/hpaio.h \
 	  scan/sane/pml.h scan/sane/saneopts.h scan/sane/io.h scan/sane/mfpdtf.h scan/sane/sane.h scan/sane/scl.h scan/sane/tables.h \
 	  scan/sane/common.c scan/sane/common.h scan/sane/soap.h scan/sane/soapht.h scan/sane/sanei_debug.h scan/sane/sanei.h \
-	  scan/sane/sanei_init_debug.c scan/sane/marvell.h $(BB_SCAN_SOURCES)
+	  scan/sane/sanei_init_debug.c scan/sane/marvell.h scan/sane/marvelli.h scan/sane/marvell.c scan/sane/soapht.c scan/sane/soap.c \
+          scan/sane/soaphti.h scan/sane/soapi.h scan/sane/xml.c scan/sane/xml.h 
 if DARWIN_BUILD
-libsane_hpaio_la_LDFLAGS = -module -framework CoreFoundation $(BB_SCAN_VERSION)
+libsane_hpaio_la_LDFLAGS = -module -framework CoreFoundation -version-info 1:0:0
 else
-libsane_hpaio_la_LDFLAGS = $(BB_SCAN_VERSION)
+libsane_hpaio_la_LDFLAGS = -version-info 1:0:0
 endif
 # The following is a interlibrary dependency that must be compiled first.
 libsane_hpaio_la_LIBADD = libhpip.la libhpmud.la $(DBUS_LIBS) -lcups
 #libsane_hpaio_la_CFLAGS = -DWITH_NONAMESPACES -DSOAP_DEBUG
-libsane_hpaio_la_CFLAGS = $(DBUS_CFLAGS) $(BB_SCAN_CFLAGS)
+libsane_hpaio_la_CFLAGS = $(DBUS_CFLAGS) 
 
 # scan
 scandir = $(hplipdir)/scan
@@ -211,9 +217,9 @@ libhpmud_la_SOURCES = io/hpmud/hpmud.c io/hpmud/mlc.c io/hpmud/model.c io/hpmud/
 	  io/hpmud/hpmud.h io/hpmud/hpmudi.h io/hpmud/list.h io/hpmud/mlc.h io/hpmud/musb.h io/hpmud/pml.h io/hpmud/dot4.c \
 	  io/hpmud/dot4.h io/hpmud/jd.c io/hpmud/jd.h io/hpmud/pp.c io/hpmud/pp.h 
 if NETWORK_BUILD
-libhpmud_la_LDFLAGS = -version-info 0:2:0 -lusb -lpthread -lnetsnmp -lcrypto
+libhpmud_la_LDFLAGS = -version-info 0:4:0 -lusb -lpthread -lnetsnmp -lcrypto
 else
-libhpmud_la_LDFLAGS = -version-info 0:2:0 -lusb -lpthread
+libhpmud_la_LDFLAGS = -version-info 0:4:0 -lusb -lpthread
 endif
 libhpmud_la_CFLAGS = -DMUDNAME=\"$(MUDNAME)\" -DCONFDIR=\"$(hplip_confdir)\"
 
@@ -229,8 +235,9 @@ hpmudext_la_CFLAGS = -I$(PYTHONINCLUDEDIR)
 rulesdir = /etc/udev/rules.d
 dist_rules_DATA = data/rules/55-hpmud.rules
 
-# ui
+# ui (qt3)
 if GUI_BUILD
+if QT3_INSTALL
 uidir = $(hplipdir)/ui
 dist_ui_SCRIPTS = ui/alignform.py \
 	ui/colorcalform_base.py ui/colorcalform.py ui/coloradjform_base.py ui/coloradjform.py ui/devmgr4_base.py ui/devmgr4.py \
@@ -249,8 +256,9 @@ dist_ui_SCRIPTS = ui/alignform.py \
 	ui/makecopiesform.py ui/setupform_base.py ui/setupform.py ui/setupmanualfind_base.py \
 	ui/setupmanualfind.py ui/setupsettings_base.py ui/setupsettings.py ui/scrollview.py \
 	ui/scrollprintsettings.py ui/scrollprint.py ui/scrollfax.py \
-	ui/scrollunload.py ui/scrollcopy.py ui/pluginform2.py ui/pluginform2_base.py ui/systemtray_qt3.py \
-	ui/systemtray_qt4.py ui/ui_utils.py ui/jobstoragemixin.py ui/pluginlicenseform_base.py ui/pluginlicenseform.py
+	ui/scrollunload.py ui/scrollcopy.py ui/pluginform2.py ui/pluginform2_base.py ui/systemtray.py \
+	ui/ui_utils.py ui/jobstoragemixin.py ui/pluginlicenseform_base.py ui/pluginlicenseform.py \
+	ui/align13form_base.py ui/align13form.py
 
 dist_noinst_DATA += ui/colorcalform2_base.ui ui/settingsdialog_base.ui ui/aligntype6form1_base.ui \
 	ui/aboutdlg_base.ui ui/imagepropertiesdlg_base.ui ui/paperedgealignform_base.ui ui/aligntype6form2_base.ui \
@@ -260,39 +268,64 @@ dist_noinst_DATA += ui/colorcalform2_base.ui ui/settingsdialog_base.ui ui/alignt
 	ui/align10form_base.ui  ui/pluginform2_base.ui \
 	plugins/powersettingsdialog_base.ui ui/faxsettingsform_base.ui ui/coverpageform_base.ui \
 	ui/allowabletypesdlg_base.ui ui/setupform_base.ui ui/setupmanualfind_base.ui \
-	ui/setupsettings_base.ui ui/pluginlicenseform_base.ui
+	ui/setupsettings_base.ui ui/pluginlicenseform_base.ui ui/align13form_base.ui
+endif
 endif
 
-# ui plugins
+#ui4 (qt4)
 if GUI_BUILD
+if QT4_INSTALL
+ui4dir=$(hplipdir)/ui4
+#dist_ui4_SCRIPTS = ui4/devmgr5.py ui4/systemtray.py ui4/devmgr5_base.py ui4/__init__.py ui4/ui_utils.py \
+#	ui4/settingsdialog_base.py ui4/settingsdialog.py ui4/printsettingstoolbox.py ui4/printdialog_base.py \
+#	ui4/printdialog.py
+#dist_noinst_DATA += ui4/devmgr5_base.ui ui4/settingsdialog_base.ui ui4/printdialog_base.ui
+dist_ui4_SCRIPTS = ui4/*.py
+dist_noinst_DATA += ui4/*.ui
+endif
+endif
+
+# ui plugins (qt3)
+if GUI_BUILD
+if QT3_INSTALL
 pluginsdir = $(hplipdir)/plugins
 dist_plugins_SCRIPTS = plugins/dj450.py plugins/__init__.py plugins/powersettings.py plugins/powersettingsdialog.py \
 	plugins/powersettingsdialog_base.py plugins/Deskjet_460.py plugins/Officejet_H470.py plugins/powersettings2.py
 endif
+endif
+
+# ui plugins (qt4)
+if GUI_BUILD
+if QT4_INSTALL
+plugins4dir = $(hplipdir)/ui4/plugins
+dist_plugins4_SCRIPTS =
+endif
+endif
+
 
 # cheetah
-dist_noinst_SCRIPTS += Cheetah/Filters.py Cheetah/SettingsManager.py Cheetah/CheetahWrapper.py Cheetah/ImportHooks.py \
-	Cheetah/SourceReader.py Cheetah/Compiler.py Cheetah/ImportManager.py Cheetah/Template.py Cheetah/DummyTransaction.py \
-	Cheetah/NameMapper.py Cheetah/TemplateCmdLineIface.py Cheetah/ErrorCatchers.py Cheetah/Parser.py Cheetah/Version.py \
-	Cheetah/FileUtils.py Cheetah/Servlet.py Cheetah/CacheRegion.py Cheetah/__init__.py
-dist_noinst_SCRIPTS += Cheetah/Utils/Indenter.py Cheetah/Utils/Misc.py Cheetah/Utils/VerifyType.py \
-	Cheetah/Utils/WebInputMixin.py Cheetah/Utils/__init__.py
-dist_noinst_SCRIPTS += Cheetah/Utils/optik/errors.py Cheetah/Utils/optik/option_parser.py Cheetah/Utils/optik/option.py \
-	Cheetah/Utils/optik/__init__.py
+#dist_noinst_SCRIPTS += Cheetah/Filters.py Cheetah/SettingsManager.py Cheetah/CheetahWrapper.py Cheetah/ImportHooks.py \
+#	Cheetah/SourceReader.py Cheetah/Compiler.py Cheetah/ImportManager.py Cheetah/Template.py Cheetah/DummyTransaction.py \
+#	Cheetah/NameMapper.py Cheetah/TemplateCmdLineIface.py Cheetah/ErrorCatchers.py Cheetah/Parser.py Cheetah/Version.py \
+#	Cheetah/FileUtils.py Cheetah/Servlet.py Cheetah/CacheRegion.py Cheetah/__init__.py
+#dist_noinst_SCRIPTS += Cheetah/Utils/Indenter.py Cheetah/Utils/Misc.py Cheetah/Utils/VerifyType.py \
+#	Cheetah/Utils/WebInputMixin.py Cheetah/Utils/__init__.py
+#dist_noinst_SCRIPTS += Cheetah/Utils/optik/errors.py Cheetah/Utils/optik/option_parser.py Cheetah/Utils/optik/option.py \
+#	Cheetah/Utils/optik/__init__.py
 
 # cherrypy
-dist_noinst_SCRIPTS += cherrypy/_cphttptools.py cherrypy/_cpwsgi.py cherrypy/__init__.py cherrypy/_cpserver.py cherrypy/_cpwsgiserver.py \
-	cherrypy/_cpcgifs.py cherrypy/_cpthreadinglocal.py cherrypy/config.py cherrypy/_cpengine.py cherrypy/_cptree.py cherrypy/_cperror.py \
-	cherrypy/_cputil.py 
-dist_noinst_SCRIPTS += cherrypy/lib/covercp.py cherrypy/lib/form.py cherrypy/lib/__init__.py cherrypy/lib/cptools.py \
-	cherrypy/lib/httptools.py cherrypy/lib/autoreload.py cherrypy/lib/defaultformmask.py cherrypy/lib/profiler.py
-dist_noinst_SCRIPTS += cherrypy/filters/nsgmlsfilter.py cherrypy/filters/__init__.py \
-	cherrypy/filters/responseheadersfilter.py \
-	cherrypy/filters/basefilter.py cherrypy/filters/sessionauthenticatefilter.py cherrypy/filters/baseurlfilter.py \
-	cherrypy/filters/sessionfilter.py cherrypy/filters/cachefilter.py cherrypy/filters/staticfilter.py \
-	cherrypy/filters/decodingfilter.py cherrypy/filters/tidyfilter.py cherrypy/filters/encodingfilter.py \
-	cherrypy/filters/virtualhostfilter.py cherrypy/filters/gzipfilter.py cherrypy/filters/wsgiappfilter.py \
-	cherrypy/filters/logdebuginfofilter.py cherrypy/filters/xmlrpcfilter.py
+#dist_noinst_SCRIPTS += cherrypy/_cphttptools.py cherrypy/_cpwsgi.py cherrypy/__init__.py cherrypy/_cpserver.py cherrypy/_cpwsgiserver.py \
+#	cherrypy/_cpcgifs.py cherrypy/_cpthreadinglocal.py cherrypy/config.py cherrypy/_cpengine.py cherrypy/_cptree.py cherrypy/_cperror.py \
+#	cherrypy/_cputil.py 
+#dist_noinst_SCRIPTS += cherrypy/lib/covercp.py cherrypy/lib/form.py cherrypy/lib/__init__.py cherrypy/lib/cptools.py \
+#	cherrypy/lib/httptools.py cherrypy/lib/autoreload.py cherrypy/lib/defaultformmask.py cherrypy/lib/profiler.py
+#dist_noinst_SCRIPTS += cherrypy/filters/nsgmlsfilter.py cherrypy/filters/__init__.py \
+#	cherrypy/filters/responseheadersfilter.py \
+#	cherrypy/filters/basefilter.py cherrypy/filters/sessionauthenticatefilter.py cherrypy/filters/baseurlfilter.py \
+#	cherrypy/filters/sessionfilter.py cherrypy/filters/cachefilter.py cherrypy/filters/staticfilter.py \
+#	cherrypy/filters/decodingfilter.py cherrypy/filters/tidyfilter.py cherrypy/filters/encodingfilter.py \
+#	cherrypy/filters/virtualhostfilter.py cherrypy/filters/gzipfilter.py cherrypy/filters/wsgiappfilter.py \
+#	cherrypy/filters/logdebuginfofilter.py cherrypy/filters/xmlrpcfilter.py
 
 # hppgsz
 noinst_PROGRAMS += hppgsz
@@ -313,22 +346,18 @@ hplip_conf_DATA = hplip.conf
 hplip_systraydir = $(systraydir)
 hplip_systray_DATA = hplip-systray.desktop
 
-endif	# if HPLIP_BUILD
+# hpipjs (CUPS filter)
+hplipjsdir = $(cupsfilterdir)
+hplipjs_PROGRAMS = hplipjs
+hplipjs_SOURCES = prnt/filters/hplipjs.c
 
-# drv
-include foomatic_drv.inc
-dist_noinst_DATA += $(foomatic_ps_printers) $(foomatic_ppd_printers)
+endif	# if HPLIP_BUILD
 
 # foomatic-rip-hplip
 if RIP_INSTALL
 ripdir = $(cupsfilterdir)
 dist_rip_SCRIPTS = prnt/hpijs/foomatic-rip-hplip
 endif
-
-# hpipjs
-hplipjsdir = $(cupsfilterdir)
-hplipjs_PROGRAMS = hplipjs
-hplipjs_SOURCES = prnt/filters/hplipjs.c
 
 # hpijs
 bin_PROGRAMS = hpijs
@@ -360,7 +389,7 @@ apdk_SOURCES = prnt/hpijs/models.cpp prnt/hpijs/breaks_open.cpp \
 	prnt/hpijs/ljjetready.cpp prnt/hpijs/ljjetready.h prnt/hpijs/jdatadbf.c prnt/hpijs/jccolor.c prnt/hpijs/ljfastraster.cpp prnt/hpijs/ljfastraster.h \
 	prnt/hpijs/jinclude.h prnt/hpijs/jpegint.h prnt/hpijs/dj55xx.h prnt/hpijs/hpijsfax.h prnt/hpijs/ojprokx50.h \
 	prnt/hpijs/ljzjs.cpp prnt/hpijs/ljzjs.h prnt/hpijs/ljzjsmono.cpp prnt/hpijs/ljm1005.cpp prnt/hpijs/ljm1005.h \
-	prnt/hpijs/ljzjsmono.h prnt/hpijs/hpjbig_wrapper.h prnt/hpijs/quickconnect.cpp prnt/hpijs/quickconnect.h
+	prnt/hpijs/ljzjsmono.h prnt/hpijs/hpjbig_wrapper.h prnt/hpijs/quickconnect.cpp prnt/hpijs/quickconnect.h prnt/hpijs/ljp1xxx.h
 hpijs_SOURCES = $(apdk_SOURCES) prnt/hpijs/hpijs.cpp prnt/hpijs/ijs_server.c prnt/hpijs/ijs.c prnt/hpijs/hpijsfax.cpp prnt/hpijs/services.cpp \
 	prnt/hpijs/hpijs.h prnt/hpijs/ijs.h prnt/hpijs/ijs_server.h prnt/hpijs/services.h prnt/hpijs/ijs_client.h prnt/hpijs/hpiom.c prnt/hpijs/hpiom.h 
 hpijs_CXXFLAGS = -DAPDK_DJ660 -DAPDK_DJ6xx -DAPDK_DJ6xxPhoto -DAPDK_DJ8xx -DAPDK_DJ9xx -DAPDK_DJ9xxVIP -DAPDK_DJ630 \
@@ -376,7 +405,18 @@ else
 hpijs_LDADD = -ljpeg -ldl
 endif
 
-install-data-hook: install-foo
+# PPDs
+ppddir = $(hpppddir)
+dist_ppd_DATA = $(foomatic_ps_printers)
+if FOOMATIC_PPD_INSTALL
+dist_ppd_DATA += $(foomatic_ppd_printers)
+endif
+if FOOMATIC_DRV_INSTALL
+cupsdrvdir = $(drvdir)
+dist_cupsdrv_DATA = $(foomatic_drv)
+endif
+
+install-data-hook: 
 if HPLIP_BUILD
 #	   If scanner build, add hpaio entry to sane dll.conf.
 	if [ "$(scan_build)" = "yes" ]; then \
@@ -401,56 +441,10 @@ if HPLIP_BUILD
 #	   Install fax support. 
 	if [ "$(fax_build)" = "yes" ]; then \
 	   mv $(DESTDIR)$(hpfaxdir)/hpfax.py $(DESTDIR)$(hpfaxdir)/hpfax; \
-	   gzip -f $(DESTDIR)$(faxppddir)/HP-Fax-hplip.ppd; \
-	   gzip -f $(DESTDIR)$(faxppddir)/HP-Fax2-hplip.ppd; \
 	fi
 endif # if HPLIP_BUILD
 
-install-foo:
-	if [ "$(foomatic_ppd_install)" = "yes" ]; then \
-	   $(mkinstalldirs) $(DESTDIR)$(hpppddir); \
-	   $(INSTALL_DATA) $(foomatic_ppd_printers) $(DESTDIR)$(hpppddir); \
-	   $(INSTALL_DATA) $(foomatic_ps_printers) $(DESTDIR)$(hpppddir); \
-	   for i in $(foomatic_ppd_printers); do \
-		  id=`basename $$i`; \
-		  gzip -f $(DESTDIR)$(hpppddir)/$$id; \
-	   done; \
-	   for i in $(foomatic_ps_printers); do \
-		  id=`basename $$i`; \
-		  gzip -f $(DESTDIR)$(hpppddir)/$$id; \
-	   done; \
-	fi
-	if [ "$(foomatic_drv_install)" = "yes" ]; then \
-	   $(mkinstalldirs) $(DESTDIR)$(drvdir); \
-	   $(INSTALL_DATA) $(foomatic_drv) $(DESTDIR)$(drvdir); \
-	   $(mkinstalldirs) $(DESTDIR)$(hpppddir); \
-	   $(INSTALL_DATA) $(foomatic_ps_printers) $(DESTDIR)$(hpppddir); \
-	   for i in $(foomatic_ps_printers); do \
-		  id=`basename $$i`; \
-		  gzip -f $(DESTDIR)$(hpppddir)/$$id; \
-	   done; \
-	fi
-
-uninstall-foo: 
-	if [ "$(foomatic_ppd_install)" = "yes" ]; then \
-	   for i in $(foomatic_ppd_printers); do \
-		  id=`basename $$i`; \
-		  rm -f $(DESTDIR)$(hpppddir)/$$id.gz; \
-	   done; \
-	   for i in $(foomatic_ps_printers); do \
-		  id=`basename $$i`; \
-		  rm -f $(DESTDIR)$(hpppddir)/$$id.gz; \
-	   done; \
-	fi
-	if [ "$(foomatic_drv_install)" = "yes" ]; then \
-	   rm -f $(DESTDIR)$(drvdir)/$(foomatic_drv); \
-	   for i in $(foomatic_ps_printers); do \
-		  id=`basename $$i`; \
-		  rm -f $(DESTDIR)$(hpppddir)/$$id.gz; \
-	   done; \
-	fi
-
-uninstall-hook: uninstall-foo
+uninstall-hook: 
 if HPLIP_BUILD
 #	   Remove hp-xxx commands.
 	for i in $(dist_cmd_SCRIPTS); do \
@@ -460,8 +454,6 @@ if HPLIP_BUILD
 #
 #	   Remove fax support.
 	rm -f $(DESTDIR)$(hpfaxdir)/hpfax 
-	rm -f $(DESTDIR)$(faxppddir)/HP-Fax-hplip.ppd.gz
-	rm -f $(DESTDIR)$(faxppddir)/HP-Fax2-hplip.ppd.gz
 endif
 
 rpm_unleaded:

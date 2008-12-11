@@ -36,6 +36,7 @@ TYPE_BOOL = 3
 TYPE_INT = 4
 TYPE_HEX = 5
 TYPE_BITFIELD = 6
+TYPE_URI = TYPE_STR # (7) not used (yet)
 
 TECH_CLASSES = [
     "Undefined", # This will show an error (and its the default)
@@ -158,11 +159,11 @@ MODEL_UI_REPLACEMENTS = {'laserjet'   : 'LaserJet',
                           'pro'        : 'Pro',
                           'apollo'     : 'Apollo',
                         }
-        
-        
+
+
 def normalizeModelUIName(model):
     ml = model.lower().strip()
-    
+
     if 'apollo' in ml:
         z = ml.replace('_', ' ')
     else:
@@ -170,7 +171,7 @@ def normalizeModelUIName(model):
             z = ml[3:].replace('_', ' ')
         else:
             z = ml.replace('_', ' ')
-    
+
     y = []
     for x in z.split():
         if pat_prod_num.search(x): # don't cap items like cp1700dn
@@ -182,11 +183,11 @@ def normalizeModelUIName(model):
         return ' '.join(y)
     else:
         return "HP " + ' '.join(y)
-        
+
 
 def normalizeModelName(model):
     return utils.xstrip(model.replace(' ', '_').replace('__', '_').replace('~','').replace('/', '_'), '_')
-        
+
 
 class ModelData:
     def __init__(self, root_path=None):
@@ -201,8 +202,22 @@ class ModelData:
         self.inc = re.compile(r'^\%include (.*)', re.IGNORECASE)
         self.inc_line = re.compile(r'^\%(.*)\%')
         self.eq = re.compile(r'^([^=]+)=(.*)')
-        
+
+        files = [(os.path.join(self.root_path, "models.dat"), 
+                  os.path.join(self.root_path, "unreleased", "unreleased.dat")),
+                 (os.path.join(os.getcwd(), 'data', 'models', 'models.dat'), 
+                  os.path.join(os.getcwd(), 'data', 'models', 'unreleased', 'unreleased.dat'))]
+
+        for self.released_dat, self.unreleased_dat in files:
+            if os.path.exists(self.released_dat):
+                break
+            
+        else:
+            self.released_dat, self.unreleased_dat = None, None
+            log.error("Unable to locate models.dat file")
+
         self.FIELD_TYPES = {
+            # Static model query data (from models.dat)
             'align-type' : TYPE_INT,
             'clean-type' : TYPE_INT,
             'color-cal-type' : TYPE_INT,
@@ -214,6 +229,7 @@ class ModelData:
             'io-mfp-mode' : TYPE_INT,
             'io-mode' : TYPE_INT,
             'io-support' : TYPE_BITFIELD,
+            'monitor-type' : TYPE_INT,
             'linefeed-cal-type' : TYPE_INT,
             'panel-check-type' : TYPE_INT,
             'pcard-type' : TYPE_INT,
@@ -235,31 +251,73 @@ class ModelData:
             'usb-pid' : TYPE_HEX,
             'usb-vid' : TYPE_HEX,
             'job-storage' : TYPE_INT,
+
+            # Dynamic model data (from device query)
+            'dev-file' : TYPE_STR,
+            'fax-uri' : TYPE_STR,
+            'scan-uri' : TYPE_STR,
+            'is-hp' : TYPE_BOOL,
+            'host' : TYPE_STR,
+            'status-desc' : TYPE_STR,
+            'cups-printer' : TYPE_STR,
+            'serial' : TYPE_STR,
+            'error-state' : TYPE_INT,
+            'device-state' : TYPE_INT,
+            'panel' : TYPE_INT,
+            'device-uri' : TYPE_STR,
+            'panel-line1' : TYPE_STR,
+            'panel-line2' : TYPE_STR,
+            'back-end' : TYPE_STR,
+            'port' : TYPE_INT,
+            'deviceid' : TYPE_STR,
+            'cups-uri' : TYPE_STR,
+            'status-code' : TYPE_INT,
+            'rs' : TYPE_STR,
+            'rr' : TYPE_STR,
+            'rg' : TYPE_STR,
+            'r' : TYPE_INT,
+            'duplexer' : TYPE_INT,
+            'supply-door' : TYPE_INT,
+            'revision' : TYPE_INT,
+            'media-path' : TYPE_INT,
+            'top-door' : TYPE_BOOL,
+            'photo-tray' : TYPE_BOOL,
             }
-            
+
         self.RE_FIELD_TYPES = {
-            re.compile('r(\d+)-agent(\d+)-kind', re.IGNORECASE) : TYPE_INT,
-            re.compile('r(\d+)-agent(\d+)-type', re.IGNORECASE) : TYPE_INT,
-            re.compile('r(\d+)-agent(\d+)-sku', re.IGNORECASE) : TYPE_STR,
+            re.compile('^r(\d+)-agent(\d+)-kind', re.IGNORECASE) : TYPE_INT,
+            re.compile('^r(\d+)-agent(\d+)-type', re.IGNORECASE) : TYPE_INT,
+            re.compile('^r(\d+)-agent(\d+)-sku', re.IGNORECASE) : TYPE_STR,
+            re.compile('^agent(\d+)-desc', re.IGNORECASE) : TYPE_STR,
+            re.compile('^agent(\d+)-virgin', re.IGNORECASE) : TYPE_BOOL,
+            re.compile('^agent(\d+)-dvc', re.IGNORECASE) : TYPE_INT,
+            re.compile('^agent(\d+)-kind', re.IGNORECASE) : TYPE_INT,
+            re.compile('^agent(\d+)-type', re.IGNORECASE) : TYPE_INT,
+            re.compile('^agent(\d+)-id', re.IGNORECASE) : TYPE_INT,
+            re.compile('^agent(\d+)-hp-ink', re.IGNORECASE) : TYPE_BOOL,
+            re.compile('^agent(\d+)-health-desc', re.IGNORECASE) : TYPE_STR,
+            re.compile('^agent(\d+)-health$', re.IGNORECASE) : TYPE_INT,
+            re.compile('^agent(\d+)-known', re.IGNORECASE) : TYPE_BOOL,
+            re.compile('^agent(\d+)-level', re.IGNORECASE) : TYPE_INT,
+            re.compile('^agent(\d+)-ack', re.IGNORECASE) : TYPE_BOOL,
+            re.compile('^agent(\d+)-sku', re.IGNORECASE) : TYPE_STR,
+            re.compile('^in-tray(\d+)', re.IGNORECASE) : TYPE_BOOL,
+            re.compile('^out-tray(\d+)', re.IGNORECASE) : TYPE_BOOL,
             re.compile('model(\d+)', re.IGNORECASE) : TYPE_STR,
             }
-            
+
         self.TYPE_CACHE = {}
-            
-          
+
 
     def read_all_files(self, unreleased=True):
-        released_dat = os.path.join(self.root_path, "models.dat")
-        log.debug("Reading file: %s" % released_dat)
-        self.read_section(released_dat)
+        if os.path.exists(self.released_dat):
+            self.read_section(self.released_dat)
 
-        unreleased_dir = os.path.join(self.root_path, 'unreleased')
-        if unreleased and os.path.exists(unreleased_dir):
-            unreleased_dat = os.path.join(self.root_path, "unreleased", "unreleased.dat")
-            log.debug("Reading file: %s" % unreleased_dat)
-            self.read_section(unreleased_dat)
+            if self.unreleased_dat is not None and os.path.exists(self.unreleased_dat):
+                self.read_section(self.unreleased_dat )
 
         return self.__cache
+
 
     def read_section(self, filename, section=None, is_include=False): # section==None, read all sections
         found, in_section = False, False
@@ -340,29 +398,18 @@ class ModelData:
                             else:
                                 log.error("Include %%%s%% not found." % inc_sect)
 
-
             if in_section:
                 match = self.eq.search(line)
 
                 if match is not None:
                     key = match.group(1)
                     value = match.group(2)
-                    typ = self.get_data_type(key)
-                    
-                    if  typ in (TYPE_BITFIELD, TYPE_INT):
-                        value = int(value)
-                    
-                    elif typ == TYPE_BOOL:
-                        #value = utils.to_bool(value)
-                        value = int(value)
-                        
-                    elif typ == TYPE_LIST:
-                        value = [x for x in value.split(',') if x]
-                        
+                    value = self.convert_data(key, value)
                     cache[read_section][key] = value
 
         fd.close()
         return found
+
 
     def reset_includes(self):
         self.__include_files = []
@@ -377,19 +424,15 @@ class ModelData:
         except:
             log.debug("Cache miss: %s" % model)
 
-            released_dat = os.path.join(self.root_path, "models.dat")
-            log.debug("Reading file: %s" % released_dat)
+            log.debug("Reading file: %s" % self.released_dat)
 
-            if self.read_section(released_dat, model):
+            if self.read_section(self.released_dat, model):
                 return self.__cache[model]
 
-            unreleased_dir = os.path.join(self.root_path, 'unreleased')
+            if self.unreleased_dat is not None and os.path.exists(self.unreleased_dat):
+                log.debug("Reading file: %s" % self.unreleased_dat)
 
-            if os.path.exists(unreleased_dir):
-                unreleased_dat = os.path.join(self.root_path, "unreleased", "unreleased.dat")
-                log.debug("Reading file: %s" % unreleased_dat)
-
-                if self.read_section(unreleased_dat, model):
+                if self.read_section(self.unreleased_dat, model):
                     return self.__cache[model]
 
             return {}
@@ -397,7 +440,8 @@ class ModelData:
 
     def all_models(self):
         return self.__cache
-        
+
+
     def get_data_type(self, key):
         try:
             return self.FIELD_TYPES[key]
@@ -410,7 +454,23 @@ class ModelData:
                     if match is not None:
                         self.TYPE_CACHE[key] = typ
                         return typ
-        
-        return TYPE_STR
-    
 
+        log.warn("get_data_type(): Defaulted to TYPE_STR for key %s" % key)
+        return TYPE_STR
+
+
+    def convert_data(self, key, value, typ=None):
+        if typ is None:
+            typ = self.get_data_type(key)
+
+        if  typ in (TYPE_BITFIELD, TYPE_INT):
+            value = int(value)
+
+        elif typ == TYPE_BOOL:
+            value = utils.to_bool(value)
+            #value = int(value)
+
+        elif typ == TYPE_LIST:
+            value = [x for x in value.split(',') if x]
+
+        return value

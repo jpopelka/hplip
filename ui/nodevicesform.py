@@ -36,7 +36,7 @@ from nodevicesform_base import NoDevicesForm_base
 
 class NoDevicesForm(NoDevicesForm_base):
     def __init__(self,parent = None,name = None,modal = 0,fl = 0):
-        NoDevicesForm_base.__init__(self,parent,name,modal,fl)
+        NoDevicesForm_base.__init__(self, parent, name, modal, fl)
 
         self.Icon.setPixmap(load_pixmap("warning.png", '32x32'))
 
@@ -85,7 +85,7 @@ class NoDevicesForm(NoDevicesForm_base):
             except Error:
                 QMessageBox.critical(self,
                                     self.caption(),
-                                    self.__tr("<b>An I/O error occurred.</b><p>Please re-start the Device Manager and try again."),
+                                    self.__tr("<b>An error occurred.</b><p>Please re-start the Device Manager and try again."),
                                     QMessageBox.Ok,
                                     QMessageBox.NoButton,
                                     QMessageBox.NoButton)

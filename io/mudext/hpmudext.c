@@ -20,7 +20,7 @@
 Requires:
 Python 2.2+
 
-Author: Don Welch, David Suffield
+Authors: Don Welch, David Suffield
 
 \*****************************************************************************/
 
@@ -76,7 +76,9 @@ result_code, uri = make_par_uri(devnode)
     if (!PyArg_ParseTuple(args, "si", &uri, &io_mode))
         return NULL;
     
+    Py_BEGIN_ALLOW_THREADS
     result = hpmud_open_device(uri, io_mode, &dd);
+    Py_END_ALLOW_THREADS
     
     return Py_BuildValue("(ii)", result, dd);
 }
@@ -89,7 +91,9 @@ static PyObject *close_device(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "i", &dd))
         return NULL;
     
+    Py_BEGIN_ALLOW_THREADS
     result = hpmud_close_device(dd);
+    Py_END_ALLOW_THREADS
     
     return Py_BuildValue("i", result);
 }
@@ -104,7 +108,9 @@ static PyObject *get_device_id(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "i", &dd))
         return NULL;
     
+    Py_BEGIN_ALLOW_THREADS
     result = hpmud_get_device_id(dd, buf, HPMUD_BUFFER_SIZE, &bytes_read);
+    Py_END_ALLOW_THREADS
     
     return Py_BuildValue("(is#)", result, buf, bytes_read);
     
@@ -121,8 +127,9 @@ static PyObject *probe_devices(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "i", &bus))
         return NULL;
     
-    
+    Py_BEGIN_ALLOW_THREADS
     result = hpmud_probe_devices(bus, buf, HPMUD_BUFFER_SIZE * 4, &cnt, &bytes_read);
+    Py_END_ALLOW_THREADS
     
     return Py_BuildValue("(is#)", result, buf, bytes_read);
 }
@@ -137,7 +144,9 @@ static PyObject *open_channel(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "is", &dd, &channel_name))
         return NULL;
     
+    Py_BEGIN_ALLOW_THREADS
     result = hpmud_open_channel(dd, channel_name, &cd);
+    Py_END_ALLOW_THREADS
     
     return Py_BuildValue("(ii)", result, cd);
     
@@ -152,7 +161,9 @@ static PyObject *close_channel(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "ii", &dd, &cd))
         return NULL;
     
+    Py_BEGIN_ALLOW_THREADS
     result = hpmud_close_channel(dd, cd);
+    Py_END_ALLOW_THREADS
     
     return Py_BuildValue("i", result);
 }
@@ -170,7 +181,9 @@ static PyObject *write_channel(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "iis#|i", &dd, &cd, &buf, &buf_size, &timeout))
         return NULL;
     
+    Py_BEGIN_ALLOW_THREADS
     result = hpmud_write_channel(dd, cd, buf, buf_size,  timeout, &bytes_written);
+    Py_END_ALLOW_THREADS
     
     return Py_BuildValue("(ii)", result, bytes_written);
 }
@@ -191,7 +204,9 @@ static PyObject *read_channel(PyObject *self, PyObject *args)
     if (bytes_to_read > HPMUD_BUFFER_SIZE)
         return Py_BuildValue("(is#)", HPMUD_R_INVALID_LENGTH, "", 0);
     
+    Py_BEGIN_ALLOW_THREADS
     result = hpmud_read_channel(dd, cd, (void *)buf, bytes_to_read,  timeout, &bytes_read);
+    Py_END_ALLOW_THREADS
     
     return Py_BuildValue("(is#)", result, buf, bytes_read);
 }
@@ -210,7 +225,9 @@ static PyObject *set_pml(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "iisis#", &dd, &cd, &oid, &type, &data, &data_size))
         return NULL;
     
+    Py_BEGIN_ALLOW_THREADS
     result = hpmud_set_pml(dd, cd, oid, type, (void *)data, data_size, &pml_result);
+    Py_END_ALLOW_THREADS
     
     return Py_BuildValue("(ii)", result, pml_result);
 }
@@ -229,7 +246,9 @@ static PyObject *get_pml(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "iisi", &dd, &cd, &oid, &type))
         return NULL;
     
+    Py_BEGIN_ALLOW_THREADS
     result = hpmud_get_pml(dd, cd, oid, (void *)buf, HPMUD_BUFFER_SIZE * 4, &bytes_read, &type, &pml_result);
+    Py_END_ALLOW_THREADS
     
     return Py_BuildValue("(is#ii)", result, buf, bytes_read, type, pml_result);
 }
@@ -245,7 +264,9 @@ static PyObject *make_usb_uri(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "ss", &busnum, &devnum))
             return NULL;
      
+    Py_BEGIN_ALLOW_THREADS
     result = hpmud_make_usb_uri(busnum, devnum, uri, HPMUD_BUFFER_SIZE, &bytes_read);
+    Py_END_ALLOW_THREADS
     
     return Py_BuildValue("(is#)", result, uri, bytes_read);
 }
@@ -262,7 +283,9 @@ static PyObject *make_net_uri(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "si", &ip, &port))
             return NULL;
     
+    Py_BEGIN_ALLOW_THREADS
     result = hpmud_make_net_uri(ip, port, uri, HPMUD_BUFFER_SIZE, &bytes_read);
+    Py_END_ALLOW_THREADS
     
     return Py_BuildValue("(is#)", result, uri, bytes_read);
 }
@@ -284,7 +307,9 @@ static PyObject *make_par_uri(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "s", &devnode))
             return NULL;
     
+    Py_BEGIN_ALLOW_THREADS
     result = hpmud_make_par_uri(devnode, uri, HPMUD_BUFFER_SIZE, &bytes_read);
+    Py_END_ALLOW_THREADS
     
     return Py_BuildValue("(is#)", result, uri, bytes_read);
 }

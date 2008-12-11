@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,8 +20,9 @@
 # Author: Don Welch
 #
 
-__version__ = '4.1'
+__version__ = '6.0'
 __title__ = "Fax Address Book"
+__mod__ = 'hp-fab'
 __doc__ = "A simple fax address book for HPLIP."
 
 # Std Lib
@@ -31,35 +32,7 @@ import os
 
 # Local
 from base.g import *
-from base import utils, tui
-
-
-log.set_module("hp-fab")
-
-
-USAGE = [(__doc__, "", "name", True),
-         ("Usage: hp-fab [MODE] [OPTIONS]", "", "summary", True),
-         ("[MODE]", "", "header", False),
-         ("Enter interactive mode:", "-i or --interactive (see Note 1)", "option", False),
-         ("Enter graphical UI mode:", "-u or --gui (Default)", "option", False),
-         utils.USAGE_SPACE,
-         utils.USAGE_OPTIONS,
-         utils.USAGE_LANGUAGE,
-         utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
-         utils.USAGE_HELP,
-         utils.USAGE_NOTES,
-         ("1. Use 'help' command at the fab > prompt for command help (interactive mode (-i) only).", "", "note", False),
-         utils.USAGE_SPACE,
-         utils.USAGE_SEEALSO,
-         ("hp-sendfax", "", "seealso", False),
-         ]
-
-def usage(typ='text'):
-    if typ == 'text':
-        utils.log_title(__title__, __version__)
-
-    utils.format_text(USAGE, typ, __title__, 'hp-fab', __version__)
-    sys.exit(0)
+from base import utils, tui, module
 
 
 # Console class (from ASPN Python Cookbook)
@@ -146,9 +119,9 @@ class Console(cmd.Cmd):
         if not args:
             while True:
                 if alt_text:
-                    nickname = raw_input(log.bold("Enter the name (nickname) to add (<enter>=done*, c=cancel) ? ")).strip()
+                    nickname = raw_input(log.bold("Enter the name to add to the group (<enter>=done*, c=cancel) ? ")).strip()
                 else:
-                    nickname = raw_input(log.bold("Enter the name (nickname) (c=cancel) ? ")).strip()
+                    nickname = raw_input(log.bold("Enter name (c=cancel) ? ")).strip()
 
                 if nickname.lower() == 'c':
                     print log.red("Canceled")
@@ -158,7 +131,7 @@ class Console(cmd.Cmd):
                     if alt_text:
                         return ''
                     else:
-                        log.error("Nickname must not be blank.")
+                        log.error("Name must not be blank.")
                         continue
 
 
@@ -196,9 +169,9 @@ class Console(cmd.Cmd):
         if not args:
             while True:
                 if alt_text:
-                    groupname = raw_input(log.bold("Enter the group name to join (<enter>=done*, c=cancel) ? ")).strip()
+                    groupname = raw_input(log.bold("Enter the group to join (<enter>=done*, c=cancel) ? ")).strip()
                 else:
-                    groupname = raw_input(log.bold("Enter the group name (c=cancel) ? ")).strip()
+                    groupname = raw_input(log.bold("Enter the group (c=cancel) ? ")).strip()
 
 
                 if groupname.lower() == 'c':
@@ -211,15 +184,19 @@ class Console(cmd.Cmd):
                     else:
                         log.error("The group name must not be blank.")
                         continue
+                        
+                if groupname == 'All': 
+                    print "Cannot specify group 'All'. Please choose a different group."
+                    return ''
 
                 if fail_if_match: 
                     if groupname in all_groups:
-                        log.error("Name already exists. Please choose a different name.")
+                        log.error("Group already exists. Please choose a different group.")
                         continue
 
                 else:
                     if groupname not in all_groups:
-                        log.error("Name not found. Please enter a different name.")
+                        log.error("Group not found. Please enter a different group.")
                         continue
 
                 break
@@ -229,12 +206,12 @@ class Console(cmd.Cmd):
 
             if fail_if_match: 
                 if groupname in all_groups:
-                    log.error("Name already exists. Please choose a different name.")
+                    log.error("Group already exists. Please choose a different group.")
                     return ''
 
             else:
                 if groupname not in all_groups:
-                    log.error("Name not found. Please enter a different name.")
+                    log.error("Group not found. Please enter a different group.")
                     return ''
 
         return groupname
@@ -274,9 +251,10 @@ class Console(cmd.Cmd):
         if len(all_entries) > 0:
 
             f = tui.Formatter()
-            f.header = ("Name", "Fax Number", "Member of Group(s)")
+            f.header = ("Name", "Fax Number", "Notes", "Member of Group(s)")
             for name, e in all_entries.items():
-                f.add((name, e['fax'], ', '.join(e['groups'])))
+                if not name.startswith('__'):
+                    f.add((name, e['fax'], e['notes'], ', '.join(e['groups'])))
 
             f.output()
 
@@ -290,7 +268,6 @@ class Console(cmd.Cmd):
         List groups.
         groups
         """
-        #all_groups = self.db.AllGroups() XXXXXXXXXXXXXX
         all_groups = self.db.get_all_groups()
         log.debug(all_groups)
 
@@ -300,7 +277,7 @@ class Console(cmd.Cmd):
             f = tui.Formatter()
             f.header = ("Group", "Members")
             for group in all_groups:
-                f.add((group, ', '.join(self.db.group_members(group))))
+                f.add((group, ', '.join([x for x in self.db.group_members(group) if not x.startswith('__')])))
             f.output()
 
         else:
@@ -323,39 +300,43 @@ class Console(cmd.Cmd):
 
         print log.bold("\nEdit/modify information for %s:\n" % nickname)
 
-        save_title = e['title']
-        title = raw_input(log.bold("Title (<enter>='%s', c=cancel)? " % save_title)).strip()
+#        save_title = e['title']
+#        title = raw_input(log.bold("Title (<enter>='%s', c=cancel) ? " % save_title)).strip()
+#
+#        if title.lower() == 'c':
+#            print log.red("Canceled")
+#            return
+#
+#        if not title:
+#            title = save_title
+#
+#        save_firstname = e['firstname']
+#        firstname = raw_input(log.bold("First name (<enter>='%s', c=cancel) ? " % save_firstname)).strip()
+#
+#        if firstname.lower() == 'c':
+#            print log.red("Canceled")
+#            return
+#
+#        if not firstname:
+#            firstname = save_firstname
+#
+#        save_lastname = e['lastname']
+#        lastname = raw_input(log.bold("Last name (<enter>='%s', c=cancel) ? " % save_lastname)).strip()
+#
+#        if lastname.lower() == 'c':
+#            print log.red("Canceled")
+#            return
+#
+#        if not lastname:
+#            lastname = save_lastname
 
-        if title.lower() == 'c':
-            print log.red("Canceled")
-            return
-
-        if not title:
-            title = save_title
-
-        save_firstname = e['firstname']
-        firstname = raw_input(log.bold("First name (<enter>='%s', c=cancel)? " % save_firstname)).strip()
-
-        if firstname.lower() == 'c':
-            print log.red("Canceled")
-            return
-
-        if not firstname:
-            firstname = save_firstname
-
-        save_lastname = e['lastname']
-        lastname = raw_input(log.bold("Last name (<enter>='%s', c=cancel)? " % save_lastname)).strip()
-
-        if lastname.lower() == 'c':
-            print log.red("Canceled")
-            return
-
-        if not lastname:
-            lastname = save_lastname
+        lastname = ''
+        firstname = ''
+        title = ''
 
         save_faxnum = e['fax']
         while True:
-            faxnum = raw_input(log.bold("Fax Number (<enter>='%s', c=cancel)? " % save_faxnum)).strip()
+            faxnum = raw_input(log.bold("Fax Number (<enter>='%s', c=cancel) ? " % save_faxnum)).strip()
 
             if faxnum.lower() == 'c':
                 print log.red("Canceled")
@@ -379,7 +360,7 @@ class Console(cmd.Cmd):
             if ok: break
 
         save_notes = e['notes']
-        notes = raw_input(log.bold("Notes (<enter>='%s', c=cancel)? " % save_notes)).strip()
+        notes = raw_input(log.bold("Notes (<enter>='%s', c=cancel) ? " % save_notes)).strip()
 
         if notes.lower() == 'c':
             print log.red("Canceled")
@@ -393,8 +374,11 @@ class Console(cmd.Cmd):
 
         new_groups = []
         for g in e['groups']:
-            ok, ans = tui.enter_yes_no("Stay in group %s" % g, 
-                choice_prompt="(y=yes* (stay), n=no (leave), c=cancel)")
+            if g == 'All':
+                continue
+            
+            ok, ans = tui.enter_yes_no("Stay in group %s " % g, 
+                choice_prompt="(y=yes* (stay), n=no (leave), c=cancel) ? ")
 
             if not ok:
                 print log.red("Canceled")
@@ -412,7 +396,7 @@ class Console(cmd.Cmd):
                 print log.red("Canceled")
                 return
 
-            if not add_group.lower():
+            if not add_group:
                 break
 
             get_all_groups = self.db.get_all_groups()
@@ -420,7 +404,7 @@ class Console(cmd.Cmd):
             if add_group not in all_groups:
                 log.warn("Group not found.")
                 ok, ans = tui.enter_yes_no("Is this a new group", 
-                    choice_prompt="(y=yes* (new), n=no, c=cancel)")
+                    choice_prompt="(y=yes* (new), n=no, c=cancel) ? ")
 
                 if not ok:
                     print log.red("Canceled")
@@ -434,7 +418,6 @@ class Console(cmd.Cmd):
                 continue
 
             new_groups.append(add_group)
-
 
         self.db.set(nickname, title, firstname, lastname, faxnum, new_groups, notes)
         self.do_show(nickname)
@@ -457,12 +440,14 @@ class Console(cmd.Cmd):
 
         new_entries = []
 
-        print "\nLeave or Remove Existing Names in Group:\n"
+        print "\nExisting Names in Group:\n"
 
         for e in old_entries:
-
-            ok, ans = tui.enter_yes_no("Leave name '%s' in this group" % e, 
-                choice_prompt="(y=yes* (leave), n=no (remove), c=cancel)")
+            if not e.startswith('__'):
+                ok, ans = tui.enter_yes_no("Should '%s' stay in this group " % e, 
+                    choice_prompt="(y=yes* (stay), n=no (leave), c=cancel) ? ")
+            else:
+                continue
 
             if not ok:
                 print log.red("Canceled")
@@ -471,7 +456,7 @@ class Console(cmd.Cmd):
             if ans:
                 new_entries.append(e)
 
-        print "\nAdd New Names in Group:\n"
+        print "\nAdd New Names to Group:\n"
 
         while True:
             nickname = self.get_nickname('', fail_if_match=False, alt_text=True)
@@ -503,26 +488,30 @@ class Console(cmd.Cmd):
 
         print log.bold("\nEnter information for %s:\n" % nickname)
 
-        title = raw_input(log.bold("Title (c=cancel)? ")).strip()
-
-        if title.lower() == 'c':
-            print log.red("Canceled")
-            return
-
-        firstname = raw_input(log.bold("First name (c=cancel)? ")).strip()
-
-        if firstname.lower() == 'c':
-            print log.red("Canceled")
-            return
-
-        lastname = raw_input(log.bold("Last name (c=cancel)? ")).strip()
-
-        if lastname.lower() == 'c':
-            print log.red("Canceled")
-            return
+#        title = raw_input(log.bold("Title (c=cancel) ? ")).strip()
+#
+#        if title.lower() == 'c':
+#            print log.red("Canceled")
+#            return
+#
+#        firstname = raw_input(log.bold("First name (c=cancel) ? ")).strip()
+#
+#        if firstname.lower() == 'c':
+#            print log.red("Canceled")
+#            return
+#
+#        lastname = raw_input(log.bold("Last name (c=cancel) ? ")).strip()
+#
+#        if lastname.lower() == 'c':
+#            print log.red("Canceled")
+#            return
+    
+        title = ''
+        firstname = ''
+        lastname = ''
 
         while True:
-            faxnum = raw_input(log.bold("Fax Number (c=cancel)? ")).strip()
+            faxnum = raw_input(log.bold("Fax Number (c=cancel) ? ")).strip()
 
             if faxnum.lower() == 'c':
                 print log.red("Canceled")
@@ -542,7 +531,7 @@ class Console(cmd.Cmd):
 
             if ok: break
 
-        notes = raw_input(log.bold("Notes (c=cancel)? ")).strip()
+        notes = raw_input(log.bold("Notes (c=cancel) ? ")).strip()
 
         if notes.strip().lower() == 'c':
             print log.red("Canceled")
@@ -551,7 +540,7 @@ class Console(cmd.Cmd):
         groups = []
         all_groups = self.db.get_all_groups()
         while True:
-            add_group = raw_input(log.bold("Member of group (<enter>=done*, c=cancel) ?" )).strip()
+            add_group = raw_input(log.bold("Member of group (<enter>=done*, c=cancel) ? " )).strip()
 
             if add_group.lower() == 'c':
                 print log.red("Canceled")
@@ -559,12 +548,16 @@ class Console(cmd.Cmd):
 
             if not add_group:
                 break
+                
+            if add_group == 'All':
+                print log.red("Cannot specify 'All'.")
+                continue
 
             if add_group not in all_groups:
                 log.warn("Group not found.")
 
                 while True:
-                    user_input = raw_input(log.bold("Is this a new group (y=yes*, n=no) ?")).lower().strip()
+                    user_input = raw_input(log.bold("Is this a new group (y=yes*, n=no) ? ")).lower().strip()
 
                     if user_input not in ['', 'n', 'y']:
                         log.error("Please enter 'y', 'n' or press <enter> for 'yes'.")
@@ -580,6 +573,8 @@ class Console(cmd.Cmd):
                 continue
 
             groups.append(add_group)
+            
+        groups.append('All')
 
         self.db.set(nickname, title, firstname, lastname, faxnum, groups, notes)
         self.do_show(nickname)
@@ -629,11 +624,11 @@ class Console(cmd.Cmd):
         if len(all_entries) > 0:
 
             f = tui.Formatter()
-            f.header = ("Name", "Title", "First Name", "Last Name", "Fax", "Notes", "Member of Group(s)")
+            f.header = ("Name", "Fax", "Notes", "Member of Group(s)")
 
             for name, e in all_entries.items():
-                f.add((name, e['title'], e['firstname'], e['lastname'], e['fax'], 
-                       e['notes'], ', '.join(e['groups'])))
+                if not name.startswith('__'):
+                    f.add((name, e['fax'], e['notes'], ', '.join(e['groups'])))
 
             f.output()
 
@@ -655,9 +650,9 @@ class Console(cmd.Cmd):
             f = tui.Formatter()
             f.header = ("Key", "Value")
             f.add(("Name:", name))
-            f.add(("Title:", e['title']))
-            f.add(("First Name:", e['firstname']))
-            f.add(("Last Name:", e['lastname']))
+            #f.add(("Title:", e['title']))
+            #f.add(("First Name:", e['firstname']))
+            #f.add(("Last Name:", e['lastname']))
             f.add(("Fax Number:", e['fax']))
             f.add(("Notes:", e['notes']))
             f.add(("Member of Group(s):", ', '.join(e['groups'])))
@@ -694,7 +689,7 @@ class Console(cmd.Cmd):
         """
         group = self.get_groupname(args, fail_if_match=False)
         if not group: return
-
+        
         self.db.delete_group(group)
 
         print
@@ -757,144 +752,116 @@ class Console(cmd.Cmd):
         if not ok:
             log.error(error_str)
         else:
-            self.db.save()
             self.do_list('')
 
         print
 
 
 
-mode = GUI_MODE
-mode_specified = False
-loc = None
 
-try:
-    opts, args = getopt.getopt(sys.argv[1:], 'l:hgiuq:', 
-        ['level=', 'help', 'help-rest', 'help-man',
-         'help-desc', 'gui', 'interactive', 'lang='])
+mod = module.Module(__mod__, __title__, __version__, __doc__, None,
+                    (GUI_MODE, INTERACTIVE_MODE), 
+                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4))
+                    
+mod.setUsage(module.USAGE_FLAG_NONE)
 
-except getopt.GetoptError, e:
-    log.error(e.msg)
-    usage()
+opts, device_uri, printer_name, mode, ui_toolkit, loc = \
+    mod.parseStdOpts(handle_device_printer=False)
 
-if os.getenv("HPLIP_DEBUG"):
-    log.set_level('debug')
-
-for o, a in opts:
-    if o in ('-l', '--logging'):
-        log_level = a.lower().strip()
-        if not log.set_level(log_level):
-            usage()
-
-    elif o == '-g':
-        log.set_level('debug')
-
-    elif o in ('-h', '--help'):
-        usage()
-
-    elif o == '--help-rest':
-        usage('rest')
-
-    elif o == '--help-man':
-        usage('man')
-
-    elif o == '--help-desc':
-        print __doc__,
-        sys.exit(0)
-
-    elif o in ('-i', '--interactive'):
-        if mode_specified:
-            log.error("You may only specify a single mode as a parameter (-i or -u).")
-            sys.exit(1)
-
-        mode = INTERACTIVE_MODE
-        mode_specified = True
-
-    elif o in ('-u', '--gui'):
-        if mode_specified:
-            log.error("You may only specify a single mode as a parameter (-i or -u).")
-            sys.exit(1)
-
-        mode = GUI_MODE
-        mode_specified = True
-
-    elif o in ('-q', '--lang'):
-        if a.strip() == '?':
-            tui.show_languages()
-            sys.exit(0)
-
-        loc = utils.validate_language(a.lower())        
-
-utils.log_title(__title__, __version__)
-
-if os.getuid() == 0:
-    log.warn("hp-fab should not be run as root.")
-
-# Security: Do *not* create files that other users can muck around with
-os.umask(0037)
-
-if mode == GUI_MODE:
+if ui_toolkit == 'qt3':
     if not utils.canEnterGUIMode():
-        mode = NON_INTERACTIVE_MODE
+        log.error("%s GUI mode requires GUI support (try running with --qt4). Entering interactive mode." % __mod__)
+        mode = INTERACTIVE_MODE
+else:
+    if not utils.canEnterGUIMode4():
+        log.error("%s GUI mode requires GUI support (try running with --qt3). Entering interactive mode." % __mod__)
+        mode = INTERACTIVE_MODE
+
 
 if mode == GUI_MODE:
-    from qt import *
-    from ui.faxaddrbookform import FaxAddrBookForm
+    if ui_toolkit == 'qt3':
+        log.set_module("hp-fab(qt3)")
+        from qt import *
+        from ui.faxaddrbookform import FaxAddrBookForm
 
-    app = None
-    addrbook = None
-    # create the main application object
-    app = QApplication(sys.argv)
+        app = None
+        addrbook = None
+        # create the main application object
+        app = QApplication(sys.argv)
 
-    if loc is None:
-        loc = user_cfg.ui.get("loc", "system")
-        if loc.lower() == 'system':
-            loc = str(QTextCodec.locale())
-            log.debug("Using system locale: %s" % loc)
+        if loc is None:
+            loc = user_cfg.ui.get("loc", "system")
+            if loc.lower() == 'system':
+                loc = str(QTextCodec.locale())
+                log.debug("Using system locale: %s" % loc)
 
-    if loc.lower() != 'c':
-        e = 'utf8'
-        try:
-            l, x = loc.split('.')
-            loc = '.'.join([l, e])
-        except ValueError:
-            l = loc
-            loc = '.'.join([loc, e])
+        if loc.lower() != 'c':
+            e = 'utf8'
+            try:
+                l, x = loc.split('.')
+                loc = '.'.join([l, e])
+            except ValueError:
+                l = loc
+                loc = '.'.join([loc, e])
 
-        log.debug("Trying to load .qm file for %s locale." % loc)
-        trans = QTranslator(None)
+            log.debug("Trying to load .qm file for %s locale." % loc)
+            trans = QTranslator(None)
 
-        qm_file = 'hplip_%s.qm' % l
-        log.debug("Name of .qm file: %s" % qm_file)
-        loaded = trans.load(qm_file, prop.localization_dir)
+            qm_file = 'hplip_%s.qm' % l
+            log.debug("Name of .qm file: %s" % qm_file)
+            loaded = trans.load(qm_file, prop.localization_dir)
 
-        if loaded:
-            app.installTranslator(trans)
+            if loaded:
+                app.installTranslator(trans)
+            else:
+                loc = 'c'
+
+        if loc == 'c':
+            log.debug("Using default 'C' locale")
         else:
-            loc = 'c'
+            log.debug("Using locale: %s" % loc)
+            QLocale.setDefault(QLocale(loc))
+            prop.locale = loc
+            try:
+                locale.setlocale(locale.LC_ALL, locale.normalize(loc))
+            except locale.Error:
+                pass
 
-    if loc == 'c':
-        log.debug("Using default 'C' locale")
-    else:
-        log.debug("Using locale: %s" % loc)
-        QLocale.setDefault(QLocale(loc))
-        prop.locale = loc
+        addrbook = FaxAddrBookForm()
+        addrbook.show()
+        app.setMainWidget(addrbook)
+
         try:
-            locale.setlocale(locale.LC_ALL, locale.normalize(loc))
-        except locale.Error:
+            log.debug("Starting GUI loop...")
+            app.exec_loop()
+        except KeyboardInterrupt:
             pass
 
-    addrbook = FaxAddrBookForm()
-    addrbook.show()
-    app.setMainWidget(addrbook)
+        sys.exit(0)
 
-    try:
-        log.debug("Starting GUI loop...")
-        app.exec_loop()
-    except KeyboardInterrupt:
-        pass
+    else: # qt4
+        try:
+            from PyQt4.QtGui import QApplication
+            from ui4.fabwindow import FABWindow
+        except ImportError:
+            log.error("Unable to load Qt4 support. Is it installed?")
+            sys.exit(1)        
+            
+        log.set_module("hp-fab(qt4)")
 
-    sys.exit(0)
+        if 1:
+            app = QApplication(sys.argv)
+
+            fab = FABWindow(None)
+            fab.show()
+
+            try:
+                log.debug("Starting GUI loop...")
+                app.exec_()
+            except KeyboardInterrupt:
+                sys.exit(0)
+
+
 
 else: # INTERACTIVE_MODE
     try:
@@ -905,6 +872,7 @@ else: # INTERACTIVE_MODE
         sys.exit(1)    
 
     console = Console()
+
     try:
         console.cmdloop()
     except KeyboardInterrupt:

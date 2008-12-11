@@ -28,7 +28,6 @@
 
 #include "sane.h"
 
-
 SANE_Status marvell_open(SANE_String_Const device, SANE_Handle *handle);
 void marvell_close(SANE_Handle handle);
 const SANE_Option_Descriptor * marvell_get_option_descriptor(SANE_Handle handle, SANE_Int option);

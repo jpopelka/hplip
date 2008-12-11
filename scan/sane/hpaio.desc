@@ -550,6 +550,18 @@
 :model "HP PSC 2300 series"
 :status :good
 
+:model "HP Color LaserJet cm2320 MFP"
+:status :good
+
+:model "HP Color LaserJet cm2320fxi MFP"
+:status :good
+
+:model "HP Color LaserJet cm2320n MFP"
+:status :good
+
+:model "HP Color LaserJet cm2320nf MFP"
+:status :good
+
 :model "HP PSC 2350"
 :status :good
 
@@ -622,13 +634,13 @@
 :model "HP Photosmart 2608"
 :status :good
 
-:model "HP Photosmart 2610v"
-:status :good
-
 :model "HP Photosmart 2610"
 :status :good
 
 :model "HP Photosmart 2610xi"
+:status :good
+
+:model "HP Photosmart 2610v"
 :status :good
 
 :model "HP Photosmart 2613"
@@ -674,6 +686,12 @@
 :status :good
 
 :model "HP LaserJet 3030"
+:status :good
+
+:model "HP LaserJet m3035xs MFP"
+:status :good
+
+:model "HP LaserJet m3035 MFP"
 :status :good
 
 :model "HP LaserJet 3050"
@@ -806,6 +824,9 @@
 :status :good
 
 :model "HP LaserJet 3392"
+:status :good
+
+:model "HP Officejet j3500 series"
 :status :good
 
 :model "HP Officejet j3608 All-in-one"
@@ -1069,7 +1090,31 @@
 :model "HP Photosmart c4343 All-in-one"
 :status :good
 
+:model "HP LaserJet m4345 MFP"
+:status :good
+
+:model "HP LaserJet 4345mfp"
+:status :good
+
+:model "HP LaserJet m4345xs MFP"
+:status :good
+
+:model "HP LaserJet 4345xm MFP"
+:status :good
+
 :model "HP Photosmart c4345 All-in-one"
+:status :good
+
+:model "HP LaserJet 4345xs MFP"
+:status :good
+
+:model "HP LaserJet m4345x MFP"
+:status :good
+
+:model "HP LaserJet m4345xm MFP"
+:status :good
+
+:model "HP LaserJet 4345x MFP"
 :status :good
 
 :model "HP Officejet 4352"
@@ -1105,7 +1150,49 @@
 :model "HP Photosmart c4388 All-in-one"
 :status :good
 
-:model "HP Photosmart c4400 All-in-one"
+:model "HP Photosmart c4410 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4435 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4440 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4450 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4470 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4472 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4473 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4480 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4483 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4485 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4486 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4488 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4490 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4493 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4494 All-in-one Printer"
 :status :good
 
 :model "HP Officejet Pro j4524 All In One"
@@ -1117,16 +1204,94 @@
 :model "HP Officejet Pro j4535 All In One"
 :status :good
 
+:model "HP Photosmart c4540 All-in-one Printer"
+:status :good
+
 :model "HP Officejet Pro j4540 All In One"
+:status :good
+
+:model "HP Photosmart c4550 All-in-one Printer"
 :status :good
 
 :model "HP Officejet Pro j4550 All In One"
 :status :good
 
+:model "HP Photosmart c4570 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4572 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4573 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4575 All-in-one Printer"
+:status :good
+
 :model "HP Officejet Pro j4580 All In One"
 :status :good
 
+:model "HP Photosmart c4580 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4583 All-in-one Printer"
+:status :good
+
 :model "HP Officejet Pro j4585 All In One"
+:status :good
+
+:model "HP Photosmart c4585 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4588 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4593 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4599 All-in-one Printer"
+:status :good
+
+:model "HP Officejet j4660 All-in-one Printer"
+:status :good
+
+:model "HP Officejet j4680 All-in-one Printer"
+:status :good
+
+:model "HP Officejet j4680c All-in-one Printer"
+:status :good
+
+:model "HP Color LaserJet cm4730fsk MFP"
+:status :good
+
+:model "HP Color LaserJet 4730x MFP"
+:status :good
+
+:model "HP Color LaserJet cm4730fm MFP"
+:status :good
+
+:model "HP Color LaserJet cm4730f MFP"
+:status :good
+
+:model "HP Color LaserJet cm4730 MFP"
+:status :good
+
+:model "HP Color LaserJet 4730xm MFP"
+:status :good
+
+:model "HP Color LaserJet 4730 MFP"
+:status :good
+
+:model "HP Color LaserJet 4730xs MFP"
+:status :good
+
+:model "HP LaserJet m5035x MFP"
+:status :good
+
+:model "HP LaserJet m5035xs MFP"
+:status :good
+
+:model "HP LaserJet m5035 MFP"
 :status :good
 
 :model "HP Officejet 5100"
@@ -1201,7 +1366,25 @@
 :model "HP Photosmart c5293 All-in-one"
 :status :good
 
-:model "HP Photosmart c5500 All-in-one"
+:model "HP Photosmart c5370 All-in-one"
+:status :good
+
+:model "HP Photosmart c5373 All-in-one"
+:status :good
+
+:model "HP Photosmart c5380 All-in-one"
+:status :good
+
+:model "HP Photosmart c5383 All-in-one"
+:status :good
+
+:model "HP Photosmart c5388 All-in-one"
+:status :good
+
+:model "HP Photosmart c5390 All-in-one"
+:status :good
+
+:model "HP Photosmart c5393 All-in-one"
 :status :good
 
 :model "HP Officejet j5505 All-in-one"
@@ -1241,6 +1424,18 @@
 :status :good
 
 :model "HP Officejet j5520 All-in-one"
+:status :good
+
+:model "HP Photosmart c5540 All-in-one"
+:status :good
+
+:model "HP Photosmart c5550 All-in-one"
+:status :good
+
+:model "HP Photosmart c5570 All-in-one"
+:status :good
+
+:model "HP Photosmart c5580 All-in-one"
 :status :good
 
 :model "HP Officejet 5600"
@@ -1357,13 +1552,49 @@
 :model "HP Photosmart c6250 All-in-one"
 :status :good
 
+:model "HP Photosmart c6270 All-in-one"
+:status :good
+
+:model "HP Photosmart c6275 All-in-one"
+:status :good
+
 :model "HP Photosmart c6280 All-in-one"
+:status :good
+
+:model "HP Photosmart c6283 All-in-one"
+:status :good
+
+:model "HP Photosmart c6285 All-in-one"
+:status :good
+
+:model "HP Photosmart c6286 All-in-one"
+:status :good
+
+:model "HP Photosmart c6288 All-in-one"
 :status :good
 
 :model "HP Officejet 6310"
 :status :good
 
 :model "HP Officejet 6310xi"
+:status :good
+
+:model "HP Photosmart c6340 All-in-one"
+:status :good
+
+:model "HP Photosmart c6350 All-in-one"
+:status :good
+
+:model "HP Photosmart c6375 All-in-one"
+:status :good
+
+:model "HP Photosmart c6380 All-in-one"
+:status :good
+
+:model "HP Photosmart c6383 All-in-one"
+:status :good
+
+:model "HP Photosmart c6388 All-in-one"
 :status :good
 
 :model "HP Officejet j6410 All-in-one"
@@ -1519,6 +1750,18 @@
 :model "HP Officejet Pro l7780"
 :status :good
 
+:model "HP cm8050 MFP With Edgeline"
+:status :good
+
+:model "HP cm8060 MFP With Edgeline"
+:status :good
+
+:model "HP LaserJet 8100mfp"
+:status :good
+
+:model "HP LaserJet 8150mfp"
+:status :good
+
 :model "HP Photosmart c8150 All-in-one"
 :status :good
 
@@ -1531,6 +1774,30 @@
 :model "HP Photosmart c8188 All-in-one"
 :status :good
 
+:model "HP LaserJet 9000mfp"
+:status :good
+
+:model "HP LaserJet 9000lmfp"
+:status :good
+
+:model "HP LaserJet 9040dn"
+:status :good
+
+:model "HP LaserJet 9040mfp"
+:status :good
+
+:model "HP LaserJet 9040d"
+:status :good
+
+:model "HP LaserJet 9050mfp"
+:status :good
+
+:model "HP LaserJet 9055mfp"
+:status :good
+
+:model "HP LaserJet 9065mfp"
+:status :good
+
 :model "HP Officejet 9110"
 :status :good
 
@@ -1538,5 +1805,8 @@
 :status :good
 
 :model "HP Officejet 9130"
+:status :good
+
+:model "HP Color LaserJet 9500mfp"
 :status :good
 

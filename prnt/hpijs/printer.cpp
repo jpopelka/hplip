@@ -590,7 +590,8 @@ DRIVER_ERROR Printer::Send
     residual = dwSendSize;
 
     if (bCheckForCancelButton &&
-        (ulBytesSentSinceCancelCheck >= CANCEL_BUTTON_CHECK_THRESHOLD) )
+        (ulBytesSentSinceCancelCheck >= CANCEL_BUTTON_CHECK_THRESHOLD) &&
+        (pSS->IOMode.bDevID))
     {
         ulBytesSentSinceCancelCheck = 0;
         char* tmpStr;

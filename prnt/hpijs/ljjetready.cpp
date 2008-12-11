@@ -283,7 +283,7 @@ DRIVER_ERROR HeaderLJJetReady::Send ()
 DRIVER_ERROR HeaderLJJetReady::StartSend ()
 {
     DRIVER_ERROR err;
-    char    szScratchStr[32];
+    char    szScratchStr[64];
 
     err = thePrinter->Send ((const BYTE*)ccpPJLStartJob,	sizeof(ccpPJLStartJob));
     ERRCHECK;
@@ -316,9 +316,14 @@ DRIVER_ERROR HeaderLJJetReady::StartSend ()
     // Send the Duplex command
     strcpy (szScratchStr, "@PJL SET DUPLEX=OFF\015\012");
 #ifdef APDK_AUTODUPLEX
-    if (thePrintContext->QueryDuplexMode ())
+    DUPLEXMODE  dupmode = thePrintContext->QueryDuplexMode ();
+    if (dupmode != DUPLEXMODE_NONE)
     {
-        strcpy (szScratchStr, "@PJL SET DUPLEX=ON\015\012");
+        strcpy (szScratchStr, "@PJL SET DUPLEX=ON\015\012@PJL SET BINDING=");
+        if (dupmode == DUPLEXMODE_BOOK)
+            strcat (szScratchStr, "LONGEDGE\015\012");
+        else
+            strcat (szScratchStr, "SHORTEDGE\015\012");
     }
 #endif
     err = thePrinter->Send ((const BYTE *) szScratchStr, strlen (szScratchStr));

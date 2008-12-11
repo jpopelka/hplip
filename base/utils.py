@@ -88,7 +88,7 @@ def lock_app(application, suppress_error=False):
             log.error("Unable to open %s lock file." % lock_file) 
         return False, None
 
-    log.debug("Locking file: %s" % lock_file)
+    #log.debug("Locking file: %s" % lock_file)
     
     if not lock(lock_file_f):
         if not suppress_error:
@@ -384,21 +384,7 @@ except AttributeError:
         fd = os.open(path, os.O_RDWR|os.O_CREAT|os.O_EXCL, 0700)
         return ( os.fdopen( fd, 'w+b' ), path )
 
-def log_title(program_name, version, show_ver=True):
-    log.info("")
 
-    if show_ver:
-        log.info(log.bold("HP Linux Imaging and Printing System (ver. %s)" % prop.version))
-    else:    
-        log.info(log.bold("HP Linux Imaging and Printing System"))
-
-    log.info(log.bold("%s ver. %s" % (program_name, version)))
-    log.info("")
-    log.info("Copyright (c) 2001-8 Hewlett-Packard Development Company, LP")
-    log.info("This software comes with ABSOLUTELY NO WARRANTY.")
-    log.info("This is free software, and you are welcome to distribute it")
-    log.info("under certain conditions. See COPYING file for more details.")
-    log.info("")
 
 
 def which(command, return_full_path=False):
@@ -429,7 +415,7 @@ def which(command, return_full_path=False):
         return found_path
 
 
-class UserSettings(object):
+class UserSettings(object): # Note: Deprecated after 2.8.8 (see ui4/ui_utils.py)
     def __init__(self):
         self.load()
 
@@ -442,18 +428,14 @@ class UserSettings(object):
             self.cmd_print = 'hp-print -p%PRINTER%'
         else:
             path = which('kprinter')
-
             if len(path) > 0:
                 self.cmd_print = 'kprinter -P%PRINTER% --system cups'
             else:
                 path = which('gtklp')
-
                 if len(path) > 0:
                     self.cmd_print = 'gtklp -P%PRINTER%'
-
                 else:
                     path = which('xpp')
-
                     if len(path) > 0:
                         self.cmd_print = 'xpp -P%PRINTER%'
 
@@ -465,13 +447,10 @@ class UserSettings(object):
             self.cmd_scan = 'xsane -V %SANE_URI%'
         else:
             path = which('kooka')
-
             if len(path) > 0:
                 self.cmd_scan = 'kooka'
-
             else:
                 path = which('xscanimage')
-
                 if len(path) > 0:
                     self.cmd_scan = 'xscanimage'
 
@@ -480,7 +459,6 @@ class UserSettings(object):
 
         if len(path):
             self.cmd_pcard = 'hp-unload -d %DEVICE_URI%'
-
         else:
             self.cmd_pcard = 'python %HOME%/unload.py -d %DEVICE_URI%'
 
@@ -489,7 +467,6 @@ class UserSettings(object):
 
         if len(path):
             self.cmd_copy = 'hp-makecopies -d %DEVICE_URI%'
-
         else:
             self.cmd_copy = 'python %HOME%/makecopies.py -d %DEVICE_URI%'
 
@@ -498,7 +475,6 @@ class UserSettings(object):
 
         if len(path):
             self.cmd_fax = 'hp-sendfax -d %FAX_URI%'
-
         else:
             self.cmd_fax = 'python %HOME%/sendfax.py -d %FAX_URI%'
 
@@ -507,18 +483,12 @@ class UserSettings(object):
 
         if len(path):
             self.cmd_fab = 'hp-fab'
-
         else:
             self.cmd_fab = 'python %HOME%/fab.py'    
 
     def load(self):
         self.loadDefaults()
-
         log.debug("Loading user settings...")
-
-##        self.email_alerts = to_bool(user_cfg.alerts.email_alerts, False)
-##        self.email_to_addresses = user_cfg.alerts.email_to_addresses
-##        self.email_from_address = user_cfg.alerts.email_from_address
         self.auto_refresh = to_bool(user_cfg.refresh.enable, False)
 
         try:
@@ -532,77 +502,34 @@ class UserSettings(object):
             self.auto_refresh_type = 0 # refresh 1 (1=refresh all)
 
         self.cmd_print = user_cfg.commands.prnt or self.cmd_print
-        #self.cmd_print_int = to_bool(user_cfg.commands.prnt_int, True)
-
         self.cmd_scan = user_cfg.commands.scan or self.cmd_scan
-        #self.cmd_scan_int = to_bool(user_cfg.commands.scan_int, False)
-
         self.cmd_pcard = user_cfg.commands.pcard or self.cmd_pcard
-        #self.cmd_pcard_int = to_bool(user_cfg.commands.pcard_int, True)
-
         self.cmd_copy = user_cfg.commands.cpy or self.cmd_copy
-        #self.cmd_copy_int = to_bool(user_cfg.commands.cpy_int, True)
-
         self.cmd_fax = user_cfg.commands.fax or self.cmd_fax
-        #self.cmd_fax_int = to_bool(user_cfg.commands.fax_int, True)
-
         self.cmd_fab = user_cfg.commands.fab or self.cmd_fab
-        #self.cmd_fab_int = to_bool(user_cfg.commands.fab_int, False)
-
         self.debug()
 
     def debug(self):
         log.debug("Print command: %s" % self.cmd_print)
-        #log.debug("Use Internal print command: %s" % self.cmd_print_int)
-
         log.debug("PCard command: %s" % self.cmd_pcard)
-        #log.debug("Use internal PCard command: %s" % self.cmd_pcard_int)
-
         log.debug("Fax command: %s" % self.cmd_fax)
-        #log.debug("Use internal fax command: %s" % self.cmd_fax_int)
-
         log.debug("FAB command: %s" % self.cmd_fab)
-        #log.debug("Use internal FAB command: %s" % self.cmd_fab_int)
-
         log.debug("Copy command: %s " % self.cmd_copy)
-        #log.debug("Use internal copy command: %s " % self.cmd_copy_int)
-
         log.debug("Scan command: %s" % self.cmd_scan)
-        #log.debug("Use internal scan command: %s" % self.cmd_scan_int)
-
-##        log.debug("Email alerts: %s" % self.email_alerts)
-##        log.debug("Email to address(es): %s" % self.email_to_addresses)
-##        log.debug("Email from address: %s" % self.email_from_address)
         log.debug("Auto refresh: %s" % self.auto_refresh)
         log.debug("Auto refresh rate: %s" % self.auto_refresh_rate)
         log.debug("Auto refresh type: %s" % self.auto_refresh_type)        
 
     def save(self):
         log.debug("Saving user settings...")
-
         user_cfg.commands.prnt = self.cmd_print
-        #user_cfg.commands.prnt_int = self.cmd_print_int
-
         user_cfg.commands.pcard = self.cmd_pcard
-        #user_cfg.commands.pcard_int = self.cmd_pcard_int
-
         user_cfg.commands.fax = self.cmd_fax
-        #user_cfg.commands.fax_int = self.cmd_fax_int
-
         user_cfg.commands.scan = self.cmd_scan
-        #user_cfg.commands.scan_int = self.cmd_scan_int
-
         user_cfg.commands.cpy = self.cmd_copy
-        #user_cfg.commands.cpy_int = self.cmd_copy_int
-
-##        user_cfg.alerts.email_to_addresses = self.email_to_addresses
-##        user_cfg.alerts.email_from_address = self.email_from_address
-##        user_cfg.alerts.email_alerts = self.email_alerts
-
         user_cfg.refresh.enable = self.auto_refresh
         user_cfg.refresh.rate = self.auto_refresh_rate
         user_cfg.refresh.type = self.auto_refresh_type
-
         self.debug()
 
 
@@ -621,7 +548,7 @@ def no_qt_message_gtk():
         log.error("PyQt not installed. GUI not available. Please check that the PyQt package is installed. Exiting.")
 
 
-def canEnterGUIMode():
+def canEnterGUIMode(): # qt3
     if not prop.gui_build:
         log.warn("GUI mode disabled in build.")
         return False
@@ -631,12 +558,27 @@ def canEnterGUIMode():
         return False
 
     elif not checkPyQtImport():
-        log.warn("Qt/PyQt initialization failed.")
+        log.warn("Qt/PyQt 3 initialization failed.")
         return False
 
     return True
 
-def checkPyQtImport():
+def canEnterGUIMode4(): # qt4
+    if not prop.gui_build:
+        log.warn("GUI mode disabled in build.")
+        return False
+
+    elif not os.getenv('DISPLAY'):
+        log.warn("No display found.")
+        return False
+
+    elif not checkPyQtImport4():
+        log.warn("Qt/PyQt 4 initialization failed.")
+        return False
+
+    return True
+
+def checkPyQtImport(): # qt3
     # PyQt
     try:
         import qt
@@ -684,6 +626,15 @@ def checkPyQtImport():
             return True
 
     return True
+    
+def checkPyQtImport4():
+    try:
+        import PyQt4
+    except ImportError:
+        return False
+    else:
+        return True
+    
 
 try:
     from string import Template # will fail in Python <= 2.3
@@ -881,17 +832,27 @@ def uniqueList(input):
     return temp
 
 
-def list_move_up(l, m):
+def list_move_up(l, m, cmp=None):
+    if cmp is None:
+        f = lambda x: l[x] == m
+    else:
+        f = lambda x: cmp(l[x], m)
+    
     for i in range(1, len(l)):
-        if l[i] == m:
+        if f(i):
             l[i-1], l[i] = l[i], l[i-1]
 
 
-def list_move_down(l, m):
+def list_move_down(l, m, cmp=None):
+    if cmp is None:
+        f = lambda x: l[x] == m
+    else:
+        f = lambda x: cmp(l[x], m)
+    
     for i in range(len(l)-2, -1, -1):
-        if l[i] == m:
+        if f(i):
             l[i], l[i+1] = l[i+1], l[i] 
-
+        
 
 
 class XMLToDictParser:
@@ -967,13 +928,309 @@ class XMLToDictParser:
         return self.data
 
 
+def dquote(s):
+    return ''.join(['"', s, '"'])
+
+# Python 2.2 compatibility functions (strip() family with char argument)
+def xlstrip(s, chars=' '):
+    i = 0
+    for c, i in zip(s, range(len(s))):
+        if c not in chars:
+            break
+
+    return s[i:]
+
+def xrstrip(s, chars=' '):
+    return xreverse(xlstrip(xreverse(s), chars))
+
+def xreverse(s):
+    l = list(s)
+    l.reverse()
+    return ''.join(l)
+
+def xstrip(s, chars=' '):
+    return xreverse(xlstrip(xreverse(xlstrip(s, chars)), chars))
+
+def getBitness():
+    if platform_avail:
+        return int(platform.architecture()[0][:-3])
+    else:
+        return struct.calcsize("P") << 3
+
+def getProcessor():
+    if platform_avail:
+        return platform.machine().replace(' ', '_').lower() # i386, i686, power_macintosh, etc.
+    else:
+        return "i686" # TODO: Need a fix here
+    
+
+BIG_ENDIAN = 0
+LITTLE_ENDIAN = 1
+
+def getEndian():
+    if struct.pack("@I", 0x01020304)[0] == '\x01':
+        return BIG_ENDIAN
+    else:
+        return LITTLE_ENDIAN
+
+
+def get_password():
+    return getpass.getpass("Enter password: ")
+    
+
+def run(cmd, log_output=True, password_func=get_password, timeout=1):
+    output = cStringIO.StringIO()
+
+    try:
+        child = pexpect.spawn(cmd, timeout=timeout)
+    except pexpect.ExceptionPexpect:
+        return -1, ''
+
+    try:
+        while True:
+            update_spinner()
+            i = child.expect(["[pP]assword:", pexpect.EOF, pexpect.TIMEOUT])
+
+            if child.before:
+                log.debug(child.before)
+                output.write(child.before)
+
+            if i == 0: # Password:
+                if password_func is not None:
+                    child.sendline(password_func())
+                else:
+                    child.sendline(get_password())
+
+            elif i == 1: # EOF
+                break
+
+            elif i == 2: # TIMEOUT
+                continue
+
+
+    except Exception, e:
+        log.error("Exception: %s" % e)
+
+    cleanup_spinner()
+    child.close()
+
+    return child.exitstatus, output.getvalue()
+
+
+def expand_range(ns): # ns -> string repr. of numeric range, e.g. "1-4, 7, 9-12"
+    """Credit: Jean Brouwers, comp.lang.python 16-7-2004
+       Convert a string representation of a set of ranges into a 
+       list of ints, e.g.
+       u"1-4, 7, 9-12" --> [1,2,3,4,7,9,10,11,12]
+    """
+    fs = []
+    for n in ns.split(u','):
+        n = n.strip()
+        r = n.split('-')
+        if len(r) == 2:  # expand name with range
+            h = r[0].rstrip(u'0123456789')  # header
+            r[0] = r[0][len(h):]
+             # range can't be empty
+            if not (r[0] and r[1]):
+                raise ValueError, 'empty range: ' + n
+             # handle leading zeros
+            if r[0] == u'0' or r[0][0] != u'0':
+                h += '%d'
+            else:
+                w = [len(i) for i in r]
+                if w[1] > w[0]:
+                   raise ValueError, 'wide range: ' + n
+                h += u'%%0%dd' % max(w)
+             # check range
+            r = [int(i, 10) for i in r]
+            if r[0] > r[1]:
+               raise ValueError, 'bad range: ' + n
+            for i in range(r[0], r[1]+1):
+                fs.append(h % i)
+        else:  # simple name
+            fs.append(n)
+
+     # remove duplicates
+    fs = dict([(n, i) for i, n in enumerate(fs)]).keys()
+     # convert to ints and sort
+    fs = [int(x) for x in fs if x]
+    fs.sort()
+
+    return fs
+
+
+def collapse_range(x): # x --> sorted list of ints
+    """ Convert a list of integers into a string
+        range representation: 
+        [1,2,3,4,7,9,10,11,12] --> u"1-4,7,9-12"
+    """
+    if not x:
+        return ''
+
+    s, c, r = [str(x[0])], x[0], False
+
+    for i in x[1:]:
+        if i == (c+1):
+            r = True
+        else:
+            if r:
+                s.append(u'-%s,%s' % (c,i))
+                r = False
+            else:
+                s.append(u',%s' % i)
+
+        c = i
+
+    if r:
+        s.append(u'-%s' % i)
+
+    return ''.join(s)
+
+
+def createSequencedFilename(basename, ext, dir=None, digits=3):
+    if dir is None:
+        dir = os.getcwd()
+
+    m = 0
+    for f in walkFiles(dir, recurse=False, abs_paths=False, return_folders=False, pattern='*', path=None):
+        r, e = os.path.splitext(f)
+
+        if r.startswith(basename) and ext == e:
+            try:
+                i = int(r[len(basename):])
+            except ValueError:
+                continue
+            else:
+                m = max(m, i)
+
+    return os.path.join(dir, "%s%0*d%s" % (basename, digits, m+1, ext))
+
+
+def validate_language(lang, default='en_US'):
+    if lang is None:
+        loc, encoder = locale.getdefaultlocale()
+    else:
+        lang = lang.lower().strip()
+        for loc, ll in supported_locales.items():
+            if lang in ll:
+                break
+        else:
+            loc = user_cfg.ui.get("loc", "en_US")
+            log.warn("Unknown lang/locale. Using default of %s." % loc)
+
+    return loc
+
+   
+def gen_random_uuid():
+    try:
+        import uuid # requires Python 2.5+
+        return str(uuid.uuid4())
+        
+    except ImportError:
+        uuidgen = which("uuidgen")
+        if uuidgen:
+            uuidgen = os.path.join(uuidgen, "uuidgen")
+            return commands.getoutput(uuidgen) # TODO: Replace with subprocess (commands is deprecated in Python 3.0)
+        else:
+            return ''
+            
+            
+class RestTableFormatter(object):
+    def __init__(self, header=None):
+        self.header = header # tuple of strings
+        self.rows = [] # list of tuples
+
+    def add(self, row_data): # tuple of strings
+        self.rows.append(row_data)
+
+    def output(self, w):
+        if self.rows:
+            num_cols = len(self.rows[0])
+            for r in self.rows:
+                if len(r) != num_cols:
+                    log.error("Invalid number of items in row: %s" % r)
+                    return
+
+            if len(self.header) != num_cols:
+                log.error("Invalid number of items in header.")
+
+            col_widths = []
+            for x, c in enumerate(self.header):
+                max_width = len(c)
+                for r in self.rows:
+                    max_width = max(max_width, len(r[x]))
+
+                col_widths.append(max_width+2)
+
+            x = '+'
+            for c in col_widths:
+                x = ''.join([x, '-' * (c+2), '+'])
+
+            x = ''.join([x, '\n'])
+            w.write(x)
+
+            # header
+            if self.header:
+                x = '|'
+                for i, c in enumerate(col_widths):
+                    x = ''.join([x, ' ', self.header[i], ' ' * (c+1-len(self.header[i])), '|'])
+
+                x = ''.join([x, '\n'])
+                w.write(x)
+
+                x = '+'
+                for c in col_widths:
+                    x = ''.join([x, '=' * (c+2), '+'])
+
+                x = ''.join([x, '\n'])
+                w.write(x)
+
+            # data rows
+            for j, r in enumerate(self.rows):
+                x = '|'
+                for i, c in enumerate(col_widths):
+                    x = ''.join([x, ' ', self.rows[j][i], ' ' * (c+1-len(self.rows[j][i])), '|'])
+
+                x = ''.join([x, '\n'])
+                w.write(x)
+
+                x = '+'
+                for c in col_widths:
+                    x = ''.join([x, '-' * (c+2), '+'])
+
+                x = ''.join([x, '\n'])
+                w.write(x)
+
+        else:
+            log.error("No data rows")
+
+
+def mixin(cls):
+    import inspect
+    
+    locals = inspect.stack()[1][0].f_locals
+    if "__module__" not in locals:
+        raise TypeError("Must call mixin() from within class def.")
+        
+    dict = cls.__dict__.copy()
+    dict.pop("__doc__", None)
+    dict.pop("__module__", None)
+    
+    locals.update(dict)
+    
+    
+    
+# TODO: Move usage stuff to to base/module/Module class
+
+
  # ------------------------- Usage Help
 USAGE_OPTIONS = ("[OPTIONS]", "", "heading", False)
 USAGE_LOGGING1 = ("Set the logging level:", "-l<level> or --logging=<level>", 'option', False)
 USAGE_LOGGING2 = ("", "<level>: none, info\*, error, warn, debug (\*default)", "option", False)
 USAGE_LOGGING3 = ("Run in debug mode:", "-g (same as option: -ldebug)", "option", False)
 USAGE_LOGGING_PLAIN = ("Output plain text only:", "-t", "option", False)
-USAGE_ARGS = ("[PRINTER|DEVICE-URI] (See Notes)", "", "heading", False)
+USAGE_ARGS = ("[PRINTER|DEVICE-URI]", "", "heading", False)
+USAGE_ARGS2 = ("[PRINTER]", "", "heading", False)
 USAGE_DEVICE = ("To specify a device-URI:", "-d<device-uri> or --device=<device-uri>", "option", False)
 USAGE_PRINTER = ("To specify a CUPS printer:", "-p<printer> or --printer=<printer>", "option", False)
 USAGE_BUS1 = ("Bus to probe (if device not specified):", "-b<bus> or --bus=<bus>", "option", False)
@@ -982,13 +1239,26 @@ USAGE_HELP = ("This help information:", "-h or --help", "option", True)
 USAGE_SPACE = ("", "", "space", False)
 USAGE_EXAMPLES = ("Examples:", "", "heading", False)
 USAGE_NOTES = ("Notes:", "", "heading", False)
-USAGE_STD_NOTES1 = ("1. If device or printer is not specified, the local device bus is probed and the program enters interactive mode.", "", "note", False)
-USAGE_STD_NOTES2 = ("2. If -p\* is specified, the default CUPS printer will be used.", "", "note", False)
+USAGE_STD_NOTES1 = ("If device or printer is not specified, the local device bus is probed and the program enters interactive mode.", "", "note", False)
+USAGE_STD_NOTES2 = ("If -p\* is specified, the default CUPS printer will be used.", "", "note", False)
 USAGE_SEEALSO = ("See Also:", "", "heading", False)
 USAGE_LANGUAGE = ("Set the language:", "-q <lang> or --lang=<lang>. Use -q? or --lang=? to see a list of available language codes.", "option", False)
 USAGE_LANGUAGE2 = ("Set the language:", "--lang=<lang>. Use --lang=? to see a list of available language codes.", "option", False)
+USAGE_MODE = ("[MODE]", "", "header", False)
+USAGE_NON_INTERACTIVE_MODE = ("Run in non-interactive mode:", "-n or --non-interactive", "option", False)
+USAGE_GUI_MODE = ("Run in graphical UI mode:", "-u or --gui (Default)", "option", False)
+USAGE_INTERACTIVE_MODE = ("Run in interactive mode:", "-i or --interactive", "option", False)
+if sys_cfg.configure.get('ui_toolkit', 'qt3') == 'qt3':
+    USAGE_USE_QT3 = ("Use Qt3:",  "--qt3 (Default)",  "option",  False)
+    USAGE_USE_QT4 = ("Use Qt4:",  "--qt4 (Not yet supported. Do not use.)",  "option",  False)
+else:
+    USAGE_USE_QT3 = ("Use Qt3:",  "--qt3",  "option",  False)
+    USAGE_USE_QT4 = ("Use Qt4:",  "--qt4 (Default)",  "option",  False)
+    
 
-def ttysize():
+
+
+def ttysize(): # TODO: Move to base/tui
     ln1 = commands.getoutput('stty -a').splitlines()[0]
     vals = {'rows':None, 'columns':None}
     for ph in ln1.split(';'):
@@ -1004,7 +1274,7 @@ def ttysize():
     return rows, cols
 
 
-def usage_formatter(override=0):
+def usage_formatter(override=0): # TODO: Move to base/module/Module class
     rows, cols = ttysize()
 
     if override:
@@ -1018,7 +1288,7 @@ def usage_formatter(override=0):
                             {'width': col2, 'margin' : 2},))
 
 
-def format_text(text_list, typ='text', title='', crumb='', version=''):
+def format_text(text_list, typ='text', title='', crumb='', version=''): # TODO: Move to base/module/Module class
     """
     Format usage text in multiple formats:
         text: for --help in the console
@@ -1176,293 +1446,18 @@ encoding: utf8
         log.info("")
 
 
-def dquote(s):
-    return ''.join(['"', s, '"'])
+def log_title(program_name, version, show_ver=True): # TODO: Move to base/module/Module class
+    log.info("")
 
-# Python 2.2 compatibility functions (strip() family with char argument)
-def xlstrip(s, chars=' '):
-    i = 0
-    for c, i in zip(s, range(len(s))):
-        if c not in chars:
-            break
+    if show_ver:
+        log.info(log.bold("HP Linux Imaging and Printing System (ver. %s)" % prop.version))
+    else:    
+        log.info(log.bold("HP Linux Imaging and Printing System"))
 
-    return s[i:]
-
-def xrstrip(s, chars=' '):
-    return xreverse(xlstrip(xreverse(s), chars))
-
-def xreverse(s):
-    l = list(s)
-    l.reverse()
-    return ''.join(l)
-
-def xstrip(s, chars=' '):
-    return xreverse(xlstrip(xreverse(xlstrip(s, chars)), chars))
-
-def getBitness():
-    if platform_avail:
-        return int(platform.architecture()[0][:-3])
-    else:
-        return struct.calcsize("P") << 3
-
-def getProcessor():
-    if platform_avail:
-        return platform.machine().replace(' ', '_').lower() # i386, i686, power_macintosh, etc.
-    else:
-        return "i686" # TODO: Need a fix here
-    
-
-BIG_ENDIAN = 0
-LITTLE_ENDIAN = 1
-
-def getEndian():
-    if struct.pack("@I", 0x01020304)[0] == '\x01':
-        return BIG_ENDIAN
-    else:
-        return LITTLE_ENDIAN
-
-
-def get_password():
-    return getpass.getpass("Enter password: ")
-    
-
-def run(cmd, log_output=True, password_func=get_password, timeout=1):
-    output = cStringIO.StringIO()
-
-    try:
-        child = pexpect.spawn(cmd, timeout=timeout)
-    except pexpect.ExceptionPexpect:
-        return -1, ''
-
-    try:
-        while True:
-            update_spinner()
-            i = child.expect(["[pP]assword:", pexpect.EOF, pexpect.TIMEOUT])
-
-            if child.before:
-                log.debug(child.before)
-                output.write(child.before)
-
-            if i == 0: # Password:
-                if password_func is not None:
-                    child.sendline(password_func())
-                else:
-                    child.sendline(get_password())
-
-            elif i == 1: # EOF
-                break
-
-            elif i == 2: # TIMEOUT
-                continue
-
-
-    except Exception, e:
-        log.error("Exception: %s" % e)
-
-    cleanup_spinner()
-    child.close()
-
-    return child.exitstatus, output.getvalue()
-
-
-def expand_range(ns): # ns -> string repr. of numeric range, e.g. "1-4, 7, 9-12"
-    """Credit: Jean Brouwers, comp.lang.python 16-7-2004
-       Convert a string representation of a set of ranges into a 
-       list of ints, e.g.
-       "1-4, 7, 9-12" --> [1,2,3,4,7,9,10,11,12]
-    """
-    fs = []
-    for n in ns.split(','):
-        n = n.strip()
-        r = n.split('-')
-        if len(r) == 2:  # expand name with range
-            h = r[0].rstrip('0123456789')  # header
-            r[0] = r[0][len(h):]
-             # range can't be empty
-            if not (r[0] and r[1]):
-                raise ValueError, 'empty range: ' + n
-             # handle leading zeros
-            if r[0] == '0' or r[0][0] != '0':
-                h += '%d'
-            else:
-                w = [len(i) for i in r]
-                if w[1] > w[0]:
-                   raise ValueError, 'wide range: ' + n
-                h += '%%0%dd' % max(w)
-             # check range
-            r = [int(i, 10) for i in r]
-            if r[0] > r[1]:
-               raise ValueError, 'bad range: ' + n
-            for i in range(r[0], r[1]+1):
-                fs.append(h % i)
-        else:  # simple name
-            fs.append(n)
-
-     # remove duplicates
-    fs = dict([(n, i) for i, n in enumerate(fs)]).keys()
-     # convert to ints and sort
-    fs = [int(x) for x in fs if x]
-    fs.sort()
-
-    return fs
-
-
-def collapse_range(x): # x --> sorted list of ints
-    """ Convert a list of integers into a string
-        range representation: 
-        [1,2,3,4,7,9,10,11,12] --> "1-4,7,9-12"
-    """
-    if not x:
-        return ''
-
-    s, c, r = [str(x[0])], x[0], False
-
-    for i in x[1:]:
-        if i == (c+1):
-            r = True
-        else:
-            if r:
-                s.append('-%s,%s' % (c,i))
-                r = False
-            else:
-                s.append(',%s' % i)
-
-        c = i
-
-    if r:
-        s.append('-%s' % i)
-
-    return ''.join(s)
-
-def createSequencedFilename(basename, ext, dir=None, digits=3):
-    if dir is None:
-        dir = os.getcwd()
-
-    m = 0
-    for f in walkFiles(dir, recurse=False, abs_paths=False, return_folders=False, pattern='*', path=None):
-        r, e = os.path.splitext(f)
-
-        if r.startswith(basename) and ext == e:
-            try:
-                i = int(r[len(basename):])
-            except ValueError:
-                continue
-            else:
-                m = max(m, i)
-
-    return os.path.join(dir, "%s%0*d%s" % (basename, digits, m+1, ext))
-
-
-def validate_language(lang, default='en_US'):
-    if lang is None:
-        loc, encoder = locale.getdefaultlocale()
-    else:
-        lang = lang.lower().strip()
-        for loc, ll in supported_locales.items():
-            if lang in ll:
-                break
-        else:
-            loc = user_cfg.ui.get("loc", "en_US")
-            log.warn("Unknown lang/locale. Using default of %s." % loc)
-
-    return loc
-
-   
-def gen_random_uuid():
-    try:
-        import uuid # requires Python 2.5+
-        return str(uuid.uuid4())
-        
-    except ImportError:
-        uuidgen = which("uuidgen")
-        if uuidgen:
-            uuidgen = os.path.join(uuidgen, "uuidgen")
-            return commands.getoutput(uuidgen) # TODO: Replace with subprocess (commands is deprecated in Python 3.0)
-        else:
-            return ''
-            
-            
-class RestTableFormatter(object):
-    def __init__(self, header=None):
-        self.header = header # tuple of strings
-        self.rows = [] # list of tuples
-
-    def add(self, row_data): # tuple of strings
-        self.rows.append(row_data)
-
-    def output(self, w):
-        if self.rows:
-            num_cols = len(self.rows[0])
-            for r in self.rows:
-                if len(r) != num_cols:
-                    log.error("Invalid number of items in row: %s" % r)
-                    return
-
-            if len(self.header) != num_cols:
-                log.error("Invalid number of items in header.")
-
-            col_widths = []
-            for x, c in enumerate(self.header):
-                max_width = len(c)
-                for r in self.rows:
-                    max_width = max(max_width, len(r[x]))
-
-                col_widths.append(max_width+2)
-
-            x = '+'
-            for c in col_widths:
-                x = ''.join([x, '-' * (c+2), '+'])
-
-            x = ''.join([x, '\n'])
-            w.write(x)
-
-            # header
-            if self.header:
-                x = '|'
-                for i, c in enumerate(col_widths):
-                    x = ''.join([x, ' ', self.header[i], ' ' * (c+1-len(self.header[i])), '|'])
-
-                x = ''.join([x, '\n'])
-                w.write(x)
-
-                x = '+'
-                for c in col_widths:
-                    x = ''.join([x, '=' * (c+2), '+'])
-
-                x = ''.join([x, '\n'])
-                w.write(x)
-
-            # data rows
-            for j, r in enumerate(self.rows):
-                x = '|'
-                for i, c in enumerate(col_widths):
-                    x = ''.join([x, ' ', self.rows[j][i], ' ' * (c+1-len(self.rows[j][i])), '|'])
-
-                x = ''.join([x, '\n'])
-                w.write(x)
-
-                x = '+'
-                for c in col_widths:
-                    x = ''.join([x, '-' * (c+2), '+'])
-
-                x = ''.join([x, '\n'])
-                w.write(x)
-
-        else:
-            log.error("No data rows")
-
-
-def mixin(cls):
-    import inspect
-    
-    locals = inspect.stack()[1][0].f_locals
-    if "__module__" not in locals:
-        raise TypeError("Must call mixin() from within class def.")
-        
-    dict = cls.__dict__.copy()
-    dict.pop("__doc__", None)
-    dict.pop("__module__", None)
-    
-    locals.update(dict)
-    
-    
+    log.info(log.bold("%s ver. %s" % (program_name, version)))
+    log.info("")
+    log.info("Copyright (c) 2001-8 Hewlett-Packard Development Company, LP")
+    log.info("This software comes with ABSOLUTELY NO WARRANTY.")
+    log.info("This is free software, and you are welcome to distribute it")
+    log.info("under certain conditions. See COPYING file for more details.")
+    log.info("")

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -232,6 +232,7 @@ class ScanDevice:
         self.options = {}
         self.__load_options_dict()
 
+
     def __load_options_dict(self):
         opts = self.options
         opt_list = self.dev.getOptions()
@@ -241,6 +242,7 @@ class ScanDevice:
             
             if o.type != scanext.TYPE_GROUP:
                 opts[o.name] = o
+
 
     def setOption(self, key, value):
         opts = self.options
@@ -252,23 +254,27 @@ class ScanDevice:
         opt = opts[key]
         
         if opt.type == scanext.TYPE_GROUP:
-            raise AttributeError, "Groups can't be set: %s" % key
+            log.error("Groups can't be set: %s" % key)
         
         if not scanext.isOptionActive(opt.cap):
-            raise AttributeError, 'Inactive option: %s' % key
+            log.error("Inactive option: %s" % key)
         
         if not scanext.isOptionSettable(opt.cap):
-            raise AttributeError, "Option can't be set by software: %s" % key
+            log.error("Option can't be set by software: %s" % key)
         
         if type(value) == int and opt.type == scanext.TYPE_FIXED:
             # avoid annoying errors of backend if int is given instead float:
             value = float(value)
         
-        self.last_opt = self.dev.setOption(opt.index, value)
+        try:
+            self.last_opt = self.dev.setOption(opt.index, value)
+        except scanext.error:
+            log.error("Unable to set option %s to value %s" % (key, value))
         
         # do binary AND to find if we have to reload options:
         if self.last_opt & scanext.INFO_RELOAD_OPTIONS:
             self.__load_options_dict()
+            
 
     def getOption(self, key):
         opts = self.options
@@ -295,6 +301,7 @@ class ScanDevice:
         
         return self.dev.getOption(opt.index)
 
+
     def getOptionObj(self, key):
         opts = self.options
         if key in opts:
@@ -314,9 +321,11 @@ class ScanDevice:
         """
         return self.dev.getParameters()
 
+
     def getOptions(self):
         "Return a list of tuples describing all the available options"
         return self.dev.getOptions()
+        
         
     def startScan(self, byte_format='BGRA', update_queue=None, event_queue=None):
         """
@@ -336,9 +345,11 @@ class ScanDevice:
             # Already active
             return False, 0, scanext.SANE_STATUS_DEVICE_BUSY
             
+            
     def cancelScan(self):
         "Cancel an in-progress scanning operation."
         return self.dev.cancelScan()
+
 
     def getScan(self):
         "Get the output buffer and info about a completed scan."
@@ -347,6 +358,7 @@ class ScanDevice:
             
             return s.buffer, s.format, s.format_name, s.pixels_per_line, \
                 s.lines, s.depth, s.bytes_per_line, s.pad_bytes, s.total_read
+                
                 
     def freeScan(self):
         "Cleanup the scan file after a completed scan."
@@ -359,11 +371,13 @@ class ScanDevice:
             except (IOError, AttributeError):
                 pass
         
+        
     def isScanActive(self):
         if self.scan_thread is not None:
             return self.scan_thread.isAlive() and self.scan_thread.scan_active
         else:
             return False
+            
             
     def waitForScanDone(self):
         if self.scan_thread is not None and \
@@ -374,6 +388,7 @@ class ScanDevice:
                 self.scan_thread.join()
             except KeyboardInterrupt:
                 pass
+                
                 
     def waitForScanActive(self):
         time.sleep(0.5)
@@ -388,13 +403,16 @@ class ScanDevice:
                 time.sleep(0.5)
                 #print "Waiting..."
         
+        
 ##    def scanMulti(self):
 ##        return _SaneIterator(self)
+        
         
     def closeScan(self):
         "Close the SANE device after a scan."
         self.dev.closeScan()
 
+        
         
 class ScanThread(threading.Thread):
     def __init__(self, device, byte_format='BGRA', update_queue=None, event_queue=None):
@@ -426,6 +444,7 @@ class ScanThread(threading.Thread):
                 
             self.update_queue.put((status, bytes_read))
             time.sleep(0)
+
 
     def run(self):
         #self.scan_active = True
@@ -572,6 +591,7 @@ class ScanThread(threading.Thread):
         self.scan_active = False
         log.debug("Scan thread exiting...")
         
+        
     def checkCancel(self):
         canceled = False
         while self.event_queue.qsize():
@@ -588,15 +608,19 @@ class ScanThread(threading.Thread):
         return canceled
         
 
+
 def init():
     return scanext.init()
+    
     
 def deInit():
     return scanext.deInit()
     
+    
 def openDevice(dev):
     "Open a device for scanning"
     return ScanDevice(dev)
+    
     
 def getDevices(local_only=0):
     return scanext.getDevices(local_only)

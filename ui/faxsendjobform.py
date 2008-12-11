@@ -76,11 +76,11 @@ class FaxSendJobForm(QMainWindow):
         self.clearWState(Qt.WState_Polished)
         self.languageChange()
 
-        if self.device_uri and self.printer_name:
-            log.error("You may not specify both a printer (-p) and a device (-d).")
-            self.FailureUI(self.__tr("<p><b>You may not specify both a printer (-p) and a device (-d)."))
-            self.device_uri, self.printer_name = None, None
-            self.init_failed = True
+#        if self.device_uri and self.printer_name:
+#            log.error("You may not specify both a printer (-p) and a device (-d).")
+#            self.FailureUI(self.__tr("<p><b>You may not specify both a printer (-p) and a device (-d)."))
+#            self.device_uri, self.printer_name = None, None
+#            self.init_failed = True
 
         self.cups_printers = cups.getPrinters()
         log.debug(self.cups_printers)
@@ -149,7 +149,7 @@ class FaxSendJobForm(QMainWindow):
                 else:
                     self.init_failed = True
                     
-        self.dbus_avail, self.service = device.init_dbus()
+        self.dbus_avail, self.service, session_bus = device.init_dbus()
 
         self.FaxView = ScrollFaxView(self.service, self.centralWidget(), self)
         self.FormLayout.addWidget(self.FaxView,0,0)

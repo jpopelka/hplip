@@ -53,6 +53,7 @@ dbus_avail = False
 dbus_disabled = False
 try:
     import dbus
+    from dbus import lowlevel, SessionBus
     dbus_avail = True
 except ImportError:
     log.warn("python-dbus not installed.")
@@ -63,6 +64,7 @@ VALID_BUSES = ('par', 'net', 'cups', 'usb') #, 'bt', 'fw')
 VALID_BUSES_WO_CUPS = ('par', 'net', 'usb')
 DEFAULT_FILTER = None
 VALID_FILTERS = ('print', 'scan', 'fax', 'pcard', 'copy')
+DEFAULT_BE_FILTER = ('hp',)
 
 pat_deviceuri = re.compile(r"""(.*):/(.*?)/(\S*?)\?(?:serial=(\S*)|device=(\S*)|ip=(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}[^&]*))(?:&port=(\d))?""", re.IGNORECASE)
 http_pat_url = re.compile(r"""/(.*?)/(\S*?)\?(?:serial=(\S*)|device=(\S*))&loc=(\S*)""", re.IGNORECASE)
@@ -82,9 +84,15 @@ ip_pat = re.compile(r"""\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25
 dev_pat = re.compile(r"""/dev/.+""", re.IGNORECASE)
 usb_pat = re.compile(r"""(\d+):(\d+)""", re.IGNORECASE)
 
+#
+# Event Wrapper Class for pipe IPC
+#
 
 class Event(object):
-    def __init__(self, device_uri, printer_name, event_code, username, job_id, title, timedate=0):
+    def __init__(self, device_uri, printer_name, event_code, 
+                 username=prop.username, job_id=0, title='', 
+                 timedate=0):
+                     
         self.device_uri = str(device_uri).replace('\x00', '')
         self.printer_name = str(printer_name).replace('\x00', '')
         self.event_code = int(event_code)
@@ -97,8 +105,10 @@ class Event(object):
         else:
             self.timedate = time.time()
 
-        self.fmt = "64s64sI32sI64sf"
-
+        self.pipe_fmt = "64s64sI32sI64sf"
+        self.dbus_fmt = "ssisisd"
+        
+        
     def debug(self):
         log.debug("    device_uri=%s" % self.device_uri)
         log.debug("    printer_name=%s" % self.printer_name)
@@ -108,9 +118,35 @@ class Event(object):
         log.debug("    title=%s" % self.title)
         log.debug("    timedate=%s" % self.timedate)
 
-    def pack(self): # pack up for transport in pipe between hpssd and systemtray_ui and between toolbox and toolbox dbus receiver
-        return struct.pack(self.fmt, self.device_uri[:64], self.printer_name[:64],
-                self.event_code, self.username[:32], self.job_id, self.title[:64], self.timedate)
+
+    def pack_for_pipe(self):
+        return struct.pack(self.pipe_fmt, self.device_uri[:64], self.printer_name[:64],
+                self.event_code, self.username[:32], self.job_id, self.title[:64], 
+                self.timedate)
+                
+                
+    def send_via_pipe(self, fd, recipient='hpssd'):
+        if fd is not None:
+            log.debug("Sending event %d to %s (via pipe %d)..." % (self.event_code, recipient, fd))
+            try:
+                os.write(fd, self.pack_for_pipe())
+                return True
+            except OSError:
+                log.debug("Failed.")
+                return False
+                
+            
+    def send_via_dbus(self, session_bus, interface='com.hplip.StatusService'):
+        if session_bus is not None and dbus_avail:
+            log.debug("Sending event %d to %s (via dbus)..." % (self.event_code, interface))
+            msg = lowlevel.SignalMessage('/', interface, 'Event')
+            msg.append(signature=self.dbus_fmt, *self.as_tuple())
+            session_bus.send_message(msg)
+            
+            
+    def copy(self):
+        return Event(*self.as_tuple())
+        
 
     def __str__(self):
         return "<Event('%s', '%s', %d, '%s', %d, '%s', %f)>" % self.as_tuple()
@@ -121,19 +157,79 @@ class Event(object):
              self.username, self.job_id, self.title, self.timedate)
 
 
+class FaxEvent(Event):
+    def __init__(self, temp_file, event):
+        Event.__init__(self, *event.as_tuple())
+        self.temp_file = temp_file
+        self.pipe_fmt = "64s64sI32sI64sfs"
+        self.dbus_fmt = "ssisisfs"
 
-def init_dbus():
+
+    def debug(self):
+        log.debug("FAX:")
+        Event.debug(self)
+        log.debug("    temp_file=%s" % self.temp_file)
+
+
+    def __str__(self):
+        return "<FaxEvent('%s', '%s', %d, '%s', %d, '%s', %f, '%s')>" % self.as_tuple()      
+
+
+    def as_tuple(self):
+        return (self.device_uri, self.printer_name, self.event_code, 
+             self.username, self.job_id, self.title, self.timedate,
+             self.temp_file)
+
+
+
+class DeviceIOEvent(Event):
+    def __init__(self, bytes_written, event):
+        Event.__init__(self, *event.as_tuple())
+        self.bytes_written = bytes_written
+        self.pipe_fmt = "64s64sI32sI64sfI"
+        self.dbus_fmt = "ssisisfi"
+        
+        
+    def debug(self):
+        log.debug("DEVIO:")
+        Event.debug(self)
+        log.debug("    bytes_written=%d" % self.bytes_written)
+
+
+    def __str__(self):
+        return "<DeviceIOEvent('%s', '%s', %d, '%s', %d, '%s', %f, '%d')>" % self.as_tuple()      
+
+
+    def as_tuple(self):
+        return (self.device_uri, self.printer_name, self.event_code, 
+             self.username, self.job_id, self.title, self.timedate,
+             self.bytes_written)
+        
+
+#
+# DBus Support
+# 
+
+def init_dbus(dbus_loop=None):
     global dbus_avail
     service = None
+    session_bus = None
 
+    if not prop.gui_build:
+        dbus_avail = False
+        return dbus_avail, None,  None
+    
     if dbus_avail and not dbus_disabled:
         if os.getuid() == 0:
             log.debug("Not starting dbus: running as root.")
             dbus_avail = False
-            return dbus_avail, None
+            return dbus_avail, None,  None
 
         try:
-            session_bus = dbus.SessionBus()
+            if dbus_loop is None:
+                session_bus = dbus.SessionBus()
+            else:   
+                session_bus = dbus.SessionBus(dbus_loop)
         except dbus.exceptions.DBusException, e:
             if os.getuid() != 0:
                 log.error("Unable to connect to dbus session bus.")
@@ -141,7 +237,7 @@ def init_dbus():
                 log.debug("Unable to connect to dbus session bus (running as root?)")
 
             dbus_avail = False
-            return dbus_avail, None
+            return dbus_avail, None,  None
 
         try:
             log.debug("Connecting to com.hplip.StatusService (try #1)...")
@@ -160,10 +256,11 @@ def init_dbus():
                 path = os.path.join(prop.home_dir, 'systray.py')
                 if not os.path.exists(path):
                     log.warn("Unable to start hp-systray")
-                    return False, None
+                    return False, None,  None
 
             log.debug("Running hp-systray: %s --force-startup" % path)
-            os.spawnlp(os.P_NOWAIT, path, 'hp-systray', '--force-startup')
+
+            os.spawnlp(os.P_NOWAIT, path, 'hp-systray', '--force-startup') #,  ui_toolkit)
 
             log.debug("Waiting for hp-systray to start...")
             time.sleep(1)
@@ -180,7 +277,7 @@ def init_dbus():
 
                     if t > 5:
                         log.warn("Unable to connect to dbus. Is hp-systray running?")
-                        return False, None
+                        return False, None,  None
 
                     time.sleep(1)
 
@@ -189,8 +286,12 @@ def init_dbus():
                     dbus_avail = True
                     break
 
-    return dbus_avail, service
+    return dbus_avail, service,  session_bus
 
+
+#
+# Make URI from parameter (bus ID, IP address, etc)
+# 
 
 def makeURI(param, port=1):
     cups_uri, sane_uri, fax_uri = '', '', ''
@@ -267,7 +368,6 @@ def makeURI(param, port=1):
                     hpmudext.close_device(device_id)
 
             if serial.lower() == param.lower():
-                #log.debug("Match")
                 log.debug("Found: %s" % d)
                 found = True
                 cups_uri = d
@@ -282,11 +382,15 @@ def makeURI(param, port=1):
             log.error("Error: %s" % e.msg)
             cups_uri, sane_uri, fax_uri = '', '', ''
         else:
-            if mq.get('scan-type', 0):
-                sane_uri = cups_uri.replace("hp:", "hpaio:")
+            if mq.get('support-type', SUPPORT_TYPE_NONE) > SUPPORT_TYPE_NONE:
+                if mq.get('scan-type', 0):
+                    sane_uri = cups_uri.replace("hp:", "hpaio:")
 
-            if mq.get('fax-type', 0):
-                fax_uri = cups_uri.replace("hp:", "hpfax:")
+                if mq.get('fax-type', 0):
+                    fax_uri = cups_uri.replace("hp:", "hpfax:")
+            
+            else:
+                cups_uri, sane_uri, fax_uri = '', '', ''
 
     else:
         scan_uri, fax_uri = '', ''
@@ -297,9 +401,14 @@ def makeURI(param, port=1):
     return cups_uri, sane_uri, fax_uri
 
 
+#
+# Model Queries
+#
+
 def queryModelByModel(model):
     model = models.normalizeModelName(model).lower()
     return model_dat[model]
+
 
 def queryModelByURI(device_uri):
     try:
@@ -312,115 +421,9 @@ def queryModelByURI(device_uri):
         return queryModelByModel(model)
 
 
-def __checkFilter(filter, mq):
-    for f, p in filter.items():
-        if f is not None:
-            op, val = p
-            if not op(mq[f], val):
-                return False
-
-    return True
-
-
-def enter_range(question, min_value, max_value, default_value=None):
-    while True:
-        user_input = raw_input(log.bold(question)).lower().strip()
-
-        if not user_input:
-            if default_value is not None:
-                return True, default_value
-
-        if user_input == 'q':
-            return False, default_value
-
-        try:
-            value_int = int(user_input)
-        except ValueError:
-            log.error('Please enter a number between %d and %d, or "q" to quit.' %
-                (min_value, max_value))
-            continue
-
-        if value_int < min_value or value_int > max_value:
-            log.error('Please enter a number between %d and %d, or "q" to quit.' %
-                (min_value, max_value))
-            continue
-
-        return True, value_int
-
-
-
-def getInteractiveDeviceURI(bus=DEFAULT_PROBE_BUS, filter=DEFAULT_FILTER, back_end_filter=('hp',)):
-    probed_devices = probeDevices(bus, filter=filter)
-    cups_printers = cups.getPrinters()
-    log.debug(probed_devices)
-    log.debug(cups_printers)
-    max_deviceid_size, x, devices = 0, 0, {}
-
-    for d in probed_devices:
-        printers = []
-
-        back_end, is_hp, b, model, serial, dev_file, host, port = \
-            parseDeviceURI(d)
-
-        if back_end in back_end_filter:
-            for p in cups_printers:
-                if p.device_uri == d:
-                    printers.append(p.name)
-
-            devices[x] = (d, printers)
-            x += 1
-            max_deviceid_size = max(len(d), max_deviceid_size)
-
-    if x == 0:
-        log.error("No devices found.")
-        raise Error(ERROR_NO_PROBED_DEVICES_FOUND)
-
-    elif x == 1:
-        log.info(log.bold("Using device: %s" % devices[0][0]))
-        user_cfg.last_used.device_uri = devices[0][0]
-        return devices[0][0]
-
-    else:
-        last_used_device_uri = user_cfg.last_used.device_uri
-        last_used_index = None
-
-        rows, cols = utils.ttysize()
-        if cols > 100: cols = 100
-
-        log.info(log.bold("\nChoose device from probed devices connected on bus(es): %s:\n" % ','.join(bus)))
-        formatter = utils.TextFormatter(
-                (
-                    {'width': 4},
-                    {'width': max_deviceid_size, 'margin': 2},
-                    {'width': cols-max_deviceid_size-8, 'margin': 2},
-                )
-            )
-        log.info(formatter.compose(("Num.", "Device-URI", "CUPS printer(s)")))
-        log.info(formatter.compose(('-'*4, '-'*(max_deviceid_size), '-'*(cols-max_deviceid_size-10))))
-
-        for y in range(x):
-            log.info(formatter.compose((str(y), devices[y][0], ', '.join(devices[y][1]))))
-
-            if last_used_device_uri == devices[y][0]:
-                last_used_index = y
-
-        if last_used_index is not None:
-            ok, i = enter_range("\nEnter number 0...%d for device (q=quit, enter=last used device: %s) ?" %
-                ((x-1), last_used_device_uri), 0, (x-1), -1)
-
-        else:
-            ok, i = enter_range("\nEnter number 0...%d for device (q=quit) ?" %
-                (x-1), 0, (x-1), -1)
-
-        if not ok:
-            sys.exit(0)
-
-        if last_used_index is not None and i == -1:
-            i = last_used_index
-
-        user_cfg.last_used.device_uri = devices[i][0]
-        return devices[i][0]
-
+#
+# Device Discovery
+# 
 
 def probeDevices(bus=DEFAULT_PROBE_BUS, timeout=10,
                  ttl=4, filter=DEFAULT_FILTER,  search='', net_search='slp',
@@ -590,8 +593,11 @@ def probeDevices(bus=DEFAULT_PROBE_BUS, timeout=10,
     cleanup_spinner()
     return probed_devices
 
+#
+# CUPS Devices
+#
 
-def getSupportedCUPSDevices(back_end_filter=['hp']):
+def getSupportedCUPSDevices(back_end_filter=['hp'], filter=DEFAULT_FILTER):
     devices = {}
     printers = cups.getPrinters()
 
@@ -603,16 +609,107 @@ def getSupportedCUPSDevices(back_end_filter=['hp']):
         except Error:
             continue
 
-        if back_end_filter == '*' or back_end in back_end_filter:
-            try:
-                devices[p.device_uri]
-            except KeyError:
-                devices[p.device_uri] = [p.name]
-            else:
-                devices[p.device_uri].append(p.name)
+        if (back_end_filter == '*' or back_end in back_end_filter or \
+            ('hpaio' in back_end_filter and back_end == 'hp')) and \
+            model and is_hp:
+                
+            include = True
+            mq = queryModelByModel(model)
+
+            if not mq:
+                log.debug("Not found.")
+                include = False
+
+            elif int(mq.get('support-type', SUPPORT_TYPE_NONE)) == SUPPORT_TYPE_NONE:
+                log.debug("Not supported.")
+                include = False
+
+            elif filter not in (None, 'print', 'print-type'):
+                include = __checkFilter(filter, mq)
+
+            if include:
+                if 'hpaio' in back_end_filter:
+                    d = p.device_uri.replace('hp:', 'hpaio:')
+                else:
+                    d = p.device_uri
+                    
+                try:
+                    devices[d]
+                except KeyError:
+                    devices[d] = [p.name]
+                else:
+                    devices[d].append(p.name)
 
     return devices # { 'device_uri' : [ CUPS printer list ], ... }
 
+
+def getSupportedCUPSPrinters(back_end_filter=['hp'], filter=DEFAULT_FILTER):
+    printer_list = []
+    printers = cups.getPrinters()
+
+    for p in printers:
+        try:
+            back_end, is_hp, bus, model, serial, dev_file, host, port = \
+                parseDeviceURI(p.device_uri)
+
+        except Error:
+            continue
+
+        if (back_end_filter == '*' or back_end in back_end_filter) and model and is_hp:
+            include = True
+            mq = queryModelByModel(model)
+
+            if not mq:
+                log.debug("Not found.")
+                include = False
+
+            elif int(mq.get('support-type', SUPPORT_TYPE_NONE)) == SUPPORT_TYPE_NONE:
+                log.debug("Not supported.")
+                include = False
+
+            elif filter not in (None, 'print', 'print-type'):
+                include = __checkFilter(filter, mq)
+
+            if include:
+                p.name = p.name.decode('utf-8')
+                printer_list.append(p)
+            #printer_list[p.name] = p.device_uri
+
+    return printer_list # [ cupsext.Printer, ... ]
+
+
+def getSupportedCUPSPrinterNames(back_end_filter=['hp'], filter=DEFAULT_FILTER):
+    printers = getSupportedCUPSPrinters(back_end_filter, filter)
+    return [p.name for p in printers]
+
+
+def getDeviceURIByPrinterName(printer_name, scan_uri_flag=False):
+    if printer_name is None:
+        return None
+
+    device_uri = None
+    printers = cups.getPrinters()
+
+    for p in printers:
+        try:
+            back_end, is_hp, bus, model, serial, dev_file, host, port = \
+                parseDeviceURI(p.device_uri)
+
+        except Error:
+            continue
+
+        if is_hp and p.name == printer_name:
+            if scan_uri_flag:
+                device_uri = p.device_uri.replace('hp:', 'hpaio:')
+            else:
+                device_uri = p.device_uri
+            break
+
+    return device_uri
+
+#
+# IEEE-1284 Device ID parsing
+#
 
 def parseDeviceID(device_id):
     d= {}
@@ -645,6 +742,9 @@ def parseDeviceID(device_id):
 
     return d
 
+#
+# IEEE-1284 Device ID Dynamic Counter Parsing
+#
 
 def parseDynamicCounter(ctr_field, convert_to_int=True):
     counter, value = ctr_field.split(' ')
@@ -662,9 +762,11 @@ def parseDynamicCounter(ctr_field, convert_to_int=True):
     return counter, value
 
 
+#
+# Parse Device URI Strings
+#
+
 def parseDeviceURI(device_uri):
-    #print repr(pat_deviceuri)
-    #print repr(device_uri)
     m = pat_deviceuri.match(device_uri)
 
     if m is None:
@@ -697,6 +799,28 @@ def parseDeviceURI(device_uri):
     return back_end, is_hp, bus, model, serial, dev_file, host, port
 
 
+def isLocal(bus):
+    return bus in ('par', 'usb', 'fw', 'bt')
+
+
+def isNetwork(bus):
+    return bus in ('net',)
+
+
+#
+# Misc
+#
+
+def __checkFilter(filter, mq):
+    for f, p in filter.items():
+        if f is not None:
+            op, val = p
+            if not op(mq[f], val):
+                return False
+
+    return True
+
+
 def validateBusList(bus, allow_cups=True):
     for b in bus:
         if allow_cups:
@@ -722,6 +846,10 @@ def validateFilterList(filter):
 
     return True
 
+
+#
+# UI String Queries (why is this here?)
+#
 
 inter_pat = re.compile(r"""%(.*)%""", re.IGNORECASE)
 st = StringTable()
@@ -845,42 +973,8 @@ AGENT_levels = {AGENT_LEVEL_TRIGGER_MAY_BE_LOW : 'low',
                }
 
 
-##MODEL_UI_REPLACEMENTS = {'laserjet'   : 'LaserJet',
-##                          'psc'        : 'PSC',
-##                          'officejet'  : 'Officejet',
-##                          'deskjet'    : 'Deskjet',
-##                          'hp'         : 'HP',
-##                          'business'   : 'Business',
-##                          'inkjet'     : 'Inkjet',
-##                          'photosmart' : 'Photosmart',
-##                          'color'      : 'Color',
-##                          'series'     : 'series',
-##                          'printer'    : 'Printer',
-##                          'mfp'        : 'MFP',
-##                          'mopier'     : 'Mopier',
-##                          'pro'        : 'Pro',
-##                        }
+#
 
-
-##def normalizeModelUIName(model):
-##    if not model.lower().startswith('hp'):
-##        z = 'HP ' + model.replace('_', ' ')
-##    else:
-##        z = model.replace('_', ' ')
-##
-##    y = []
-##    for x in z.split():
-##        xx = x.lower()
-##        y.append(models.MODEL_UI_REPLACEMENTS.get(xx, xx))
-##
-##    return ' '.join(y)
-
-##def normalizeModelName(model):
-##    return utils.xstrip(model.replace(' ', '_').replace('__', '_').replace('~','').replace('/', '_'), '_')
-
-
-def isLocal(bus):
-    return bus in ('par', 'usb', 'fw', 'bt')
 
 
 # **************************************************************************** #
@@ -896,10 +990,10 @@ class Device(object):
 
         global dbus_disabled
         dbus_disabled = disable_dbus
-        
+
         if not disable_dbus:
             if service is None:
-                self.dbus_avail, self.service = init_dbus()
+                self.dbus_avail, self.service,  session_bus = init_dbus()
             else:
                 self.dbus_avail = True
                 self.service = service
@@ -915,6 +1009,7 @@ class Device(object):
             for p in printers:
                 if p.name.lower() == printer_name.lower():
                     device_uri = p.device_uri
+                    log.debug("Device URI: %s" % device_uri)
                     break
             else:
                 raise Error(ERROR_DEVICE_NOT_FOUND)
@@ -923,15 +1018,18 @@ class Device(object):
         self.callback = callback
         self.device_type = DEVICE_TYPE_UNKNOWN
         
+        if self.device_uri is None:
+            raise Error(ERROR_DEVICE_NOT_FOUND)            
+
         if self.device_uri.startswith('hp:'):
             self.device_type = DEVICE_TYPE_PRINTER
-        
+
         elif self.device_uri.startswith('hpaio:'):
             self.device_type = DEVICE_TYPE_SCANNER
-        
+
         elif self.device_uri.startswith('hpfax:'):
             self.device_type = DEVICE_TYPE_FAX
-        
+
         try:
             self.back_end, self.is_hp, self.bus, self.model, \
                 self.serial, self.dev_file, self.host, self.port = \
@@ -962,13 +1060,15 @@ class Device(object):
         self.panel_check = True
         self.io_state = IO_STATE_HP_READY
         self.is_local = isLocal(self.bus)
+        self.hist = []
 
         self.supported = False
 
         self.queryModel()
         if not self.supported:
             log.error("Unsupported model: %s" % self.model)
-            self.sendEvent(STATUS_DEVICE_UNSUPPORTED)
+            self.error_code = STATUS_DEVICE_UNSUPPORTED
+            self.sendEvent(self.error_code)
         else:
             self.supported = True
 
@@ -1033,8 +1133,9 @@ class Device(object):
 
 
     def sendEvent(self, event_code, printer_name='', job_id=0, title=''):
-        if self.dbus_avail:
+        if self.dbus_avail and self.service is not None:
             try:
+                log.debug("Sending event %d to hpssd..." % event_code)
                 self.service.SendEvent(self.device_uri, printer_name, event_code, prop.username, job_id, title)
             except dbus.exceptions.DBusException, e:
                 log.debug("dbus call to SendEvent() failed.")
@@ -1060,6 +1161,7 @@ class Device(object):
 
 
     def open(self, open_for_printing=False):
+        #print "open()"
         if self.supported and self.io_state in (IO_STATE_HP_READY, IO_STATE_HP_NOT_AVAIL):
             prev_device_state = self.device_state
             self.io_state = IO_STATE_HP_NOT_AVAIL
@@ -1082,8 +1184,9 @@ class Device(object):
 
             if result_code != hpmudext.HPMUD_R_OK:
                 self.error_state = ERROR_STATE_ERROR
-                self.sendEvent(result_code+ERROR_CODE_BASE)
-                
+                self.error_code = result_code+ERROR_CODE_BASE
+                self.sendEvent(self.error_code)
+
                 if result_code == hpmudext.HPMUD_R_DEVICE_BUSY:
                     log.error("Device busy: %s" % self.device_uri)
                 else:
@@ -1091,7 +1194,7 @@ class Device(object):
 
                 self.last_event = Event(self.device_uri, '', EVENT_ERROR_DEVICE_NOT_FOUND,
                         prop.username, 0, '', time.time())
-                
+
                 raise Error(ERROR_DEVICE_NOT_FOUND)
 
             else:
@@ -1371,14 +1474,18 @@ class Device(object):
                 r_value, r_value_str, rg, rr = self.r_values
 
         return r_value, r_value_str, rg, rr
-    
-    
+
+
     def __queryFax(self, quick=False, reread_cups_printers=False):
+#       print "__queryFax()"
+#       raise Error(ERROR_DEVICE_IO_ERROR)
+#       return
+
         io_mode = self.mq.get('io-mode', IO_MODE_UNI)
         self.status_code = STATUS_PRINTER_IDLE
-        
+
         if io_mode != IO_MODE_UNI:
-        
+
             if self.device_state != DEVICE_STATE_NOT_FOUND:
                 if self.tech_type in (TECH_TYPE_MONO_INK, TECH_TYPE_COLOR_INK):
                     try:
@@ -1387,13 +1494,13 @@ class Device(object):
                         log.error("Error getting device ID.")
                         self.last_event = Event(self.device_uri, '', ERROR_DEVICE_IO_ERROR,
                             prop.username, 0, '', time.time())
-                        
+
                         raise Error(ERROR_DEVICE_IO_ERROR)
 
                 status_desc = self.queryString(self.status_code)
 
                 #print self.status_code
-                
+
                 self.dq.update({
                     'serial'           : self.serial,
                     'cups-printer'     : ','.join(self.cups_printers),
@@ -1407,7 +1514,7 @@ class Device(object):
                     'error-state'      : self.error_state,
                     })
 
-    
+
             log.debug("Fax activity check...")
 
             tx_active, rx_active = status.getFaxStatus(self)
@@ -1416,12 +1523,13 @@ class Device(object):
                 self.status_code = STATUS_FAX_TX_ACTIVE
             elif rx_active:
                 self.status_code = STATUS_FAX_RX_ACTIVE
-                
+
             #print self.status_code                
-            
+
             self.error_state = STATUS_TO_ERROR_STATE_MAP.get(self.status_code, ERROR_STATE_CLEAR)
-            self.sendEvent(self.status_code)
-            
+            self.error_code = self.status_code
+            self.sendEvent(self.error_code)
+
             #print "Error state=", self.error_state, self.device_uri
 
             try:
@@ -1433,11 +1541,11 @@ class Device(object):
                 self.dq.update({'status-desc' : '',
                                 'error-state' : ERROR_STATE_CLEAR,
                                 })
-                                
-                                
+
+
             if self.panel_check:
                 self.panel_check = bool(self.mq.get('panel-check-type', 0))
-            
+
             status_type = self.mq.get('status-type', STATUS_TYPE_NONE)
             if self.panel_check and \
                 status_type in (STATUS_TYPE_LJ, STATUS_TYPE_S, STATUS_TYPE_VSTATUS) and \
@@ -1452,7 +1560,7 @@ class Device(object):
                 self.dq.update({'panel': int(self.panel_check),
                                   'panel-line1': line1,
                                   'panel-line2': line2,}) 
-   
+
             if not quick and reread_cups_printers:
                 self.cups_printers = []
                 log.debug("Re-reading CUPS printer queue information.")
@@ -1471,24 +1579,28 @@ class Device(object):
                     self.first_cups_printer = self.cups_printers[0]
                 except IndexError:
                     self.first_cups_printer = ''
-                                
-                                
+
+
         for d in self.dq:
             self.__dict__[d.replace('-','_')] = self.dq[d]
 
         self.last_event = Event(self.device_uri, '', self.status_code, prop.username, 0, '', time.time())
         #print self.last_event
-        
+
         log.debug(self.dq)
-        
+
         #import pprint
-        
+
         #pprint.pprint(self.dq)
-                                
-                        
-                        
-        
+
+
+
+
     def queryDevice(self, quick=False, reread_cups_printers=False):
+#       print "queryDevice()"
+#       raise Error(ERROR_DEVICE_IO_ERROR)
+#       return
+
         if not self.supported:
             self.dq = {}
 
@@ -1496,7 +1608,7 @@ class Device(object):
                 prop.username, 0, '', time.time())
 
             return
-            
+
         if self.device_type == DEVICE_TYPE_FAX:
             return self.__queryFax(quick, reread_cups_printers)
 
@@ -1523,7 +1635,7 @@ class Device(object):
                     log.error("Error getting device ID.")
                     self.last_event = Event(self.device_uri, '', ERROR_DEVICE_IO_ERROR,
                         prop.username, 0, '', time.time())
-                    
+
                     raise Error(ERROR_DEVICE_IO_ERROR)
 
             status_desc = self.queryString(self.status_code)
@@ -1602,8 +1714,9 @@ class Device(object):
 
 
             self.error_state = STATUS_TO_ERROR_STATE_MAP.get(status_code, ERROR_STATE_CLEAR)
-            self.sendEvent(status_code)
-            
+            self.error_code = status_code
+            self.sendEvent(self.error_code)
+
             #print "Error state=", self.error_state, self.device_uri
 
             try:
@@ -1739,7 +1852,8 @@ class Device(object):
                             self.dq['status-desc'] = self.queryString(code)
 
                             self.dq['error-state'] = STATUS_TO_ERROR_STATE_MAP.get(code, ERROR_STATE_LOW_SUPPLIES)
-                            self.sendEvent(code)
+                            self.error_code = code
+                            self.sendEvent(self.error_code)
 
                             if agent_level_trigger in \
                                 (AGENT_LEVEL_TRIGGER_PROBABLY_OUT, AGENT_LEVEL_TRIGGER_ALMOST_DEFINITELY_OUT):
@@ -1789,12 +1903,12 @@ class Device(object):
                                 'agent%d-id' % aa :            0,
                                 'agent%d-health-desc' % aa :   agent_health_desc,
                             })
-                            
+
                         aa += 1
 
                     else:
                         log.debug("Not found: %d" % a)
-                        
+
                     a += 1
 
         else: # Create agent keys for not-found devices
@@ -1850,12 +1964,19 @@ class Device(object):
 
 
     def isBusyOrInErrorState(self):
-        self.queryDevice(quick=True)
+        try:
+            self.queryDevice(quick=True)
+            #print self.error_state
+        except Error:
+            return True
         return self.error_state > ERROR_STATE_MAX_OK
 
     def isIdleAndNoError(self):
-        self.queryDevice(quick=True)
-        #print self.error_state
+        try:
+            self.queryDevice(quick=True)
+            #print self.error_state
+        except Error:
+            return False
         return self.error_state <= ERROR_STATE_MAX_OK
 
     def getPML(self, oid, desired_int_size=pml.INT_SIZE_INT): # oid => ( 'dotted oid value', pml type )
@@ -1980,6 +2101,9 @@ class Device(object):
 
     def __readChannel(self, opener, bytes_to_read, stream=None,
                       timeout=prop.read_timeout, allow_short_read=False):
+#       print "__readChannel()"
+#       raise Error(ERROR_DEVICE_IO_ERROR)
+#       return 0
 
         channel_id = opener()
 
@@ -2054,6 +2178,10 @@ class Device(object):
 
 
     def __writeChannel(self, opener, data):
+#       print "__writeChannel()"
+#       raise Error(ERROR_DEVICE_IO_ERROR)
+#       return 0
+
         channel_id = opener()
 
         buffer, bytes_out, total_bytes_to_write = data, 0, len(data)
@@ -2222,7 +2350,8 @@ class Device(object):
 
     def cancelJob(self, jobid):
         cups.cancelJob(jobid)
-        self.sendEvent(STATUS_PRINTER_CANCELING)
+        self.error_code = STATUS_PRINTER_CANCELING
+        self.sendEvent(self.error_code)
 
 
     def queryHistory(self):
@@ -2230,23 +2359,23 @@ class Device(object):
 
         if self.dbus_avail:
             try:
-                history = list(self.service.GetHistory(self.device_uri))
+                device_uri, history = self.service.GetHistory(self.device_uri)
             except dbus.exceptions.DBusException, e:
-                log.debug("dbus call to GetHistory() failed.")
-                history = []
-            
+                log.error("dbus call to GetHistory() failed.")
+                return []
+
             history.reverse()
 
             for h in history:
                 result.append(Event(*tuple(h)))
-                
+
             try:
                 self.error_code = result[0].event_code
             except IndexError:
                 self.error_code = STATUS_UNKNOWN
-                
+
             self.error_state = STATUS_TO_ERROR_STATE_MAP.get(self.error_code, ERROR_STATE_CLEAR)
-            
+
         else:
             self.error_code = STATUS_UNKNOWN
             self.error_state = ERROR_STATE_CLEAR
@@ -2283,7 +2412,7 @@ class Device(object):
             self.closeEWS()
 
 
-    def downloadFirmware(self, usb_bus_id=None, usb_device_id=None):
+    def downloadFirmware(self, usb_bus_id=None, usb_device_id=None): # Note: IDs not currently used
         ok = False
         filename = os.path.join(prop.data_dir, "firmware", self.model.lower() + '.fw.gz')
         log.debug(filename)
@@ -2297,11 +2426,9 @@ class Device(object):
                 try:
                     p = "/dev/bus/usb/%s/%s" % (usb_bus_id, usb_device_id)
                     log.debug("Writing to %s..." % p)
-                    #f = file(p, 'w')
                     f = os.open(p, os.O_RDWR)
                     x = gzip.open(filename).read()
                     os.write(f, x)
-                    #f.close()
                     os.close(f)
                     ok = True
                     log.debug("OK")

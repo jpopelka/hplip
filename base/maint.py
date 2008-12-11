@@ -19,6 +19,8 @@
 # Author: Don Welch
 #
 
+# NOTE: Not used by Qt4 code. Use maint_*.py modules instead.
+
 # Local
 from g import *
 from codes import *
@@ -362,20 +364,7 @@ def AlignType8(dev, loadpaper_ui, align_ui): # 450
 
 
 def AlignType10(dev, loadpaper_ui, align_ui):
-    pen_config = status.getPenConfiguration(dev.getStatusFromDeviceID())
-    log.debug("Pen config=%d" % pen_config)
-
-    if pen_config == AGENT_CONFIG_BLACK_ONLY:
-        pattern = 1
-
-    elif pen_config == AGENT_CONFIG_COLOR_AND_BLACK:
-        pattern = 2
-
-    elif pen_config in (AGENT_CONFIG_COLOR_AND_PHOTO, AGENT_CONFIG_COLOR_AND_GREY):
-        pattern = 3
-
-    log.debug("Pattern=%d" % pattern)
-
+    pattern = alignType10SetPattern(dev)
     state = 0
 
     while state != -1:
@@ -399,6 +388,24 @@ def AlignType10(dev, loadpaper_ui, align_ui):
                 alignType10Phase3(dev)
 
 
+def alignType10SetPattern(dev):
+    pattern = None
+    pen_config = status.getPenConfiguration(dev.getStatusFromDeviceID())
+    log.debug("Pen config=%d" % pen_config)
+
+    if pen_config == AGENT_CONFIG_BLACK_ONLY:
+        pattern = 1
+
+    elif pen_config == AGENT_CONFIG_COLOR_AND_BLACK:
+        pattern = 2
+
+    elif pen_config in (AGENT_CONFIG_COLOR_AND_PHOTO, AGENT_CONFIG_COLOR_AND_GREY):
+        pattern = 3
+
+    log.debug("Pattern=%d" % pattern)
+    return pattern
+    
+
 def alignType10Phase1(dev):
     dev.writeEmbeddedPML(pml.OID_PRINT_INTERNAL_PAGE,
                          pml.PRINT_INTERNAL_PAGE_ALIGNMENT_PAGE)
@@ -419,6 +426,7 @@ def alignType10Phase2(dev, values, pattern):
 
     dev.printData(p)
     dev.closePrint()
+
 
 def alignType10Phase3(dev):
     dev.writeEmbeddedPML(pml.OID_PRINT_INTERNAL_PAGE,
@@ -492,26 +500,12 @@ def align10and11Controls(pattern, align_type):
 
 
 def AlignType11(dev, loadpaper_ui, align_ui, invalidpen_ui):
-    pen_config = status.getPenConfiguration(dev.getStatusFromDeviceID())
-    log.debug("Pen config=%d" % pen_config)
-
-    if pen_config in (AGENT_CONFIG_BLACK_ONLY, AGENT_CONFIG_COLOR_ONLY): # (i)
-        pattern = 1
-
-    if pen_config == AGENT_CONFIG_COLOR_AND_BLACK: # (ii)
-        pattern = 2
-
-    elif pen_config == AGENT_CONFIG_COLOR_AND_PHOTO: # (iii)
-        pattern = 3
-
-    elif pen_config == AGENT_CONFIG_PHOTO_ONLY:
+    pattern = alignType11SetPattern(dev)
+    if pattern is None:
         invalidpen_ui()
         return
-
-    log.debug("Pattern=%d" % pattern)
-
+        
     state = 0
-
     while state != -1:
         if state == 0:
             state = -1
@@ -523,7 +517,7 @@ def AlignType11(dev, loadpaper_ui, align_ui, invalidpen_ui):
         elif state == 1:
             values = align_ui(pattern, ALIGN_TYPE_LIDIL_0_5_4)
             log.debug(values)
-            alignType11Phase2(dev, values, pattern, pen_config)
+            alignType11Phase2(dev, values, pattern, dev.pen_config)
             state = 2
 
         elif state == 2:
@@ -532,6 +526,27 @@ def AlignType11(dev, loadpaper_ui, align_ui, invalidpen_ui):
             if ok:
                 alignType11Phase3(dev)
 
+
+def alignType11SetPattern(dev):
+    pattern = None
+    dev.pen_config = status.getPenConfiguration(dev.getStatusFromDeviceID())
+    log.debug("Pen config=%d" % dev.pen_config)
+
+    if dev.pen_config in (AGENT_CONFIG_BLACK_ONLY, AGENT_CONFIG_COLOR_ONLY): # (i)
+        pattern = 1
+
+    if dev.pen_config == AGENT_CONFIG_COLOR_AND_BLACK: # (ii)
+        pattern = 2
+
+    elif dev.pen_config == AGENT_CONFIG_COLOR_AND_PHOTO: # (iii)
+        pattern = 3
+
+    elif dev.pen_config == AGENT_CONFIG_PHOTO_ONLY:
+        return None
+
+    log.debug("Pattern=%d" % pattern) 
+    return pattern
+    
 
 def alignType11Phase1(dev):
     dev.printData(ldl.buildResetPacket())
@@ -562,7 +577,20 @@ def alignType11Phase2(dev, values, pattern, pen_config):
     dev.closePrint()
 
 
+def AlignType13(dev, loadpaper_ui, scanner_align_load_ui): # Auto AiO (Yellowtail)
+    ok = loadpaper_ui()
+    if ok:
+        alignType13Phase1(dev)
+        ok = scanner_align_load_ui()
+
+    return ok
+
+def alignType13Phase1(dev):
+    dev.setPML(pml.OID_AUTO_ALIGNMENT, pml.AUTO_ALIGNMENT)
+    dev.closePML()
+
 def alignType11Phase3(dev):
+    dev.printData(ldl.buildResetPacket())
     dev.printData(ldl.buildReportPagePacket(ldl.COMMAND_REPORT_PAGE_PEN_CALIBRATION_VERIFY))
     dev.closePrint()
 

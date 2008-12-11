@@ -21,6 +21,7 @@
 #
 
 __version__ = '3.3'
+__mod__ = 'hp-unload'
 __title__ = 'Photo Card Access Utility'
 __doc__ = "Access inserted photo cards on supported HPLIP printers. This provides an alternative for older devices that do not support USB mass storage or for access to photo cards over a network."
 
@@ -43,43 +44,9 @@ except ImportError:
 
 # Local
 from base.g import *
-from base import device, utils, tui
+from base import device, utils, tui, module
 from prnt import cups
 from pcard import photocard
-
-log.set_module('hp-unload')
-
-
-USAGE = [(__doc__, "", "name", True),
-         ("Usage: hp-unload [PRINTER|DEVICE-URI] [MODE] [OPTIONS]", "", "summary", True),
-         utils.USAGE_ARGS,
-         utils.USAGE_DEVICE,
-         utils.USAGE_PRINTER,
-         utils.USAGE_SPACE,
-         ("[MODE]", "", "header", False),
-         ("Enter interactive mode (ftp-like interface):", "-i or --interactive", "option", False),
-         ("Enter graphical UI mode:", "-u or --gui (Default)", "option", False),
-         ("Run in non-interactive mode (batch mode):", "-n or --non-interactive", "option", False),
-         # TODO: File glob(s)
-         utils.USAGE_SPACE,
-         utils.USAGE_OPTIONS,
-         ("Output directory:", "-o<dir> or --output=<dir> (Defaults to current directory)(Only used for non-GUI modes)", "option", False),
-         utils.USAGE_BUS1, utils.USAGE_BUS2,
-         utils.USAGE_LANGUAGE,
-         utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
-         utils.USAGE_HELP,
-         utils.USAGE_SPACE,
-         utils.USAGE_NOTES,
-         utils.USAGE_STD_NOTES1, utils.USAGE_STD_NOTES2, 
-         ("3. Use 'help' command at the pcard:> prompt for command help (Interactive mode (-i) only).", "", "note", True),
-         ]
-
-def usage(typ='text'):
-    if typ == 'text':
-        utils.log_title(__title__, __version__)
-
-    utils.format_text(USAGE, typ, __title__, 'hp-unload', __version__)
-    sys.exit(0)
 
 
 # Console class (from ASPN Python Cookbook)
@@ -611,144 +578,36 @@ def status_callback(src, trg, size):
 
 
 
-try:
-    opts, args = getopt.getopt(sys.argv[1:], 'p:d:hb:l:giuno:q:',
-                               ['printer=', 'device=', 'help', 'help-rest', 'help-man',
-                                'bus=', 'logging=', 'interactive', 'gui', 'non-interactive',
-                                'output=', 'help-desc', 'lang='])
-except getopt.GetoptError, e:
-    log.error(e.msg)
-    usage()
+mod = module.Module(__mod__, __title__, __version__, __doc__, None,
+                    (GUI_MODE, INTERACTIVE_MODE, NON_INTERACTIVE_MODE), 
+                    (UI_TOOLKIT_QT3,))
 
-printer_name = None
-device_uri = None
-bus = device.DEFAULT_PROBE_BUS
-log_level = logger.DEFAULT_LOG_LEVEL
-mode = GUI_MODE
-mode_specified = False
+mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS,
+    extra_options=[("Output directory:", "-o<dir> or --output=<dir> (Defaults to current directory)(Only used for non-GUI modes)", "option", False)], 
+    see_also_list=['hp-toolbox'])
+
+opts, device_uri, printer_name, mode, ui_toolkit, loc = \
+    mod.parseStdOpts('o', ['output='])
+
 output_dir = os.getcwd()
-loc = None
-
-if os.getenv("HPLIP_DEBUG"):
-    log.set_level('debug')
 
 for o, a in opts:
-    if o in ('-h', '--help'):
-        usage()
-
-    elif o == '--help-rest':
-        usage('rest')
-
-    elif o == '--help-man':
-        usage('man')
-
-    elif o == '--help-desc':
-        print __doc__,
-        sys.exit(0)
-
-    elif o in ('-p', '--printer'):
-        if a.startswith('*'):
-            printer_name = cups.getDefaultPrinter()
-            log.debug(printer_name)
-            
-            if printer_name is not None:
-                log.info("Using CUPS default printer: %s" % printer_name)
-            else:
-                log.error("CUPS default printer is not set.")
-            
-        else:
-            printer_name = a
-
-    elif o in ('-d', '--device'):
-        device_uri = a
-
-    elif o in ('-b', '--bus'):
-        bus = [x.lower().strip() for x in a.split(',')]
-        if not device.validateBusList(bus):
-            usage()
-
-    elif o in ('-l', '--logging'):
-        log_level = a.lower().strip()
-        if not log.set_level(log_level):
-            usage()
-
-    elif o == '-g':
-        log.set_level('debug')
-
-    elif o in ('-i', '--interactive'):
-        if mode_specified:
-            log.error("You may only specify a single mode as a parameter (-i, -n or -u).")
-            sys.exit(1)
-
-        mode = INTERACTIVE_MODE
-        mode_specified = True
-
-    elif o in ('-u', '--gui'):
-        if mode_specified:
-            log.error("You may only specify a single mode as a parameter (-i, -n or -u).")
-            sys.exit(1)
-
-        mode = GUI_MODE
-        mode_specified = True
-
-    elif o in ('-n', '--non-interactive'):
-        if mode_specified:
-            log.error("You may only specify a single mode as a parameter (-i, -n or -u).")
-            sys.exit(1)
-
-        mode = NON_INTERACTIVE_MODE
-        mode_specified = True
-
-    elif o in ('-o', '--output'):
+    if o in ('-o', '--output'):
         output_dir = a
-
-    elif o in ('-q', '--lang'):
-        if a.strip() == '?':
-            tui.show_languages()
-            sys.exit(0)
-
-        loc = utils.validate_language(a.lower())
-
-
-utils.log_title(__title__, __version__)
-
-if os.getuid() == 0:
-    log.warn("hp-unload should not be run as root.")
-
-# Security: Do *not* create files that other users can muck around with
-os.umask (0037)
 
 if mode == GUI_MODE:
     if not utils.canEnterGUIMode():
         mode = INTERACTIVE_MODE
 
+if mode == GUI_MODE:
+    if ui_toolkit == 'qt4':
+        log.error("%s does not support Qt4. Please use Qt3 or run in -i or -n modes.")
+        sys.exit(1)
+
 if mode in (INTERACTIVE_MODE, NON_INTERACTIVE_MODE):
     try:
-        if device_uri and printer_name:
-            log.error("You may not specify both a printer (-p) and a device (-d).")
-            usage()
-
-
-        if printer_name:
-            printer_list = cups.getPrinters()
-            found = False
-            for p in printer_list:
-                if p.name == printer_name:
-                    found = True
-
-            if not found:
-                log.error("Unknown printer name: %s" % printer_name)
-                sys.exit(1)
-
-
-        if not device_uri and not printer_name:
-            try:
-                device_uri = device.getInteractiveDeviceURI(bus, {'pcard-type' : (operator.gt, 0)})
-                if device_uri is None:
-                    sys.exit(1)
-            except Error:
-                log.error("Error occured during interactive mode. Exiting.")
-                sys.exit(1)
+        device_uri = mod.getDeviceUri(device_uri, printer_name, 
+            {'pcard-type' : (operator.gt, 0)})
 
         try:
             pc = photocard.PhotoCard( None, device_uri, printer_name )
@@ -757,19 +616,6 @@ if mode in (INTERACTIVE_MODE, NON_INTERACTIVE_MODE):
             sys.exit(1)
 
         pc.set_callback(update_spinner)
-
-        if pc.device.device_uri is None and printer_name:
-            log.error("Printer '%s' not found." % printer_name)
-            sys.exit(1)
-
-        if pc.device.device_uri is None and device_uri:
-            log.error("Malformed/invalid device-uri: %s" % device_uri)
-            sys.exit(1)
-
-        user_cfg.last_used.device_uri = pc.device.device_uri
-
-        # TODO: 
-        #pc.device.sendEvent(EVENT_START_PCARD_JOB)
 
         try:
             pc.mount()
@@ -792,9 +638,7 @@ if mode in (INTERACTIVE_MODE, NON_INTERACTIVE_MODE):
             sys.exit(1)
 
 
-
         if mode == INTERACTIVE_MODE: # INTERACTIVE_MODE
-
             console = Console(pc)
             try:
                 try:
@@ -852,8 +696,7 @@ if mode in (INTERACTIVE_MODE, NON_INTERACTIVE_MODE):
         log.error("User exit")
 
 
-else: # GUI_MODE
-
+else: # GUI_MODE (qt3 only)
     from qt import *
     from ui import unloadform
 
@@ -898,9 +741,8 @@ else: # GUI_MODE
         except locale.Error:
             pass 
 
-
     try:
-        w = unloadform.UnloadForm(bus, device_uri, printer_name)
+        w = unloadform.UnloadForm(['cups'], device_uri, printer_name)
     except Error:
         log.error("Unable to connect to HPLIP I/O. Please (re)start HPLIP and try again.")
         sys.exit(1)
@@ -912,5 +754,3 @@ else: # GUI_MODE
 
 log.info("")
 log.info("Done.")
-
-

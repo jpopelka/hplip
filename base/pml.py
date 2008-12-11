@@ -578,6 +578,44 @@ UPDN_STATE_STR = {UPDN_STATE_IDLE: "Idle",
                   UPDN_STATE_NEWPAGE: "New page",
                   UPDN_STATE_DISABLED: "Disabled",}
 
+# Fax download errors (taken from doc/Fax/WindowsFax/sdcore/DevIO/DevIODefs.h)
+#
+DN_ERROR_NONE = 0
+DN_ERROR_HOST_ABORT = 705
+DN_ERROR_STOP_KEY_PRESSED = 706
+DN_ERROR_SESSION_FAIL = 709
+DN_ERROR_TX_ERROR = 710
+DN_ERROR_PHONE_UNAVAILABLE = 711
+DN_ERROR_OUT_OF_MEMORY = 713
+DN_ERROR_RESULT_BUSY = 714
+DN_ERROR_NO_ANSWER = 715
+DN_ERROR_NO_DIAL_TONE = 716
+DN_ERROR_DOC_JAM = 717
+DN_ERROR_DOOR_OPEN = 718
+DN_ERROR_POWER_FAILED = 719
+DN_ERROR_BLACKLIST = 720
+DN_ERROR_DOC_STORAGE_FULL = 721
+DN_ERROR_RESULT_COLOR_UNSUP = 722
+DN_ERROR_UNKNOWN = 9999
+
+DN_ERROR_STR = {DN_ERROR_NONE: "None",
+                DN_ERROR_HOST_ABORT: "Host aborted",
+                DN_ERROR_STOP_KEY_PRESSED: "Stop key pressed",
+                DN_ERROR_SESSION_FAIL: "Session failed",
+                DN_ERROR_TX_ERROR: "Transmit error",
+                DN_ERROR_PHONE_UNAVAILABLE: "Phone unavailable",
+                DN_ERROR_OUT_OF_MEMORY: "Out of memory",
+                DN_ERROR_RESULT_BUSY: "Result busy",
+                DN_ERROR_NO_ANSWER: "No answer",
+                DN_ERROR_NO_DIAL_TONE: "No dial tone",
+                DN_ERROR_DOC_JAM: "Document jammed",
+                DN_ERROR_DOOR_OPEN: "Door open",
+                DN_ERROR_POWER_FAILED: "Power failed",
+                DN_ERROR_BLACKLIST: "Blacklisted",
+                DN_ERROR_DOC_STORAGE_FULL: "Document storage full",
+                DN_ERROR_RESULT_COLOR_UNSUP: "Color unsupported",
+                DN_ERROR_UNKNOWN: "Unknown error"}
+
 OID_FAX_TOKEN = ('1.1.1.27', TYPE_BINARY)
 
 OID_FAX_TX_ID = ('1.1.6.3.2.3', TYPE_SIGNED_INTEGER)

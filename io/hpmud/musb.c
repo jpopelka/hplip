@@ -634,6 +634,52 @@ bugout:
    return stat;
 }
 
+/* See if this usb device and serial number match. Return model if match. */
+static int is_serial(struct usb_device *dev, const char *sn, char *model, int model_size)
+{
+   usb_dev_handle *hd=NULL;
+   char sz[128];
+   char gen[128];
+   int r, stat=0;
+
+   if ((hd = usb_open(dev)) == NULL)
+   {
+      BUG("invalid usb_open: %m\n");
+      goto bugout;
+   }
+
+   if (dev->descriptor.idVendor != 0x3f0)
+      goto bugout;      /* not a HP product */
+
+   if ((r=get_string_descriptor(hd, dev->descriptor.iSerialNumber, sz, sizeof(sz))) < 0)
+   {
+      BUG("invalid serial id string ret=%d\n", r);
+      goto bugout;
+   }
+   if (sz[0])
+      generalize_serial(sz, gen, sizeof(gen));
+   else
+      strcpy(gen, "0");
+
+   if (strncmp(sn, gen, sizeof(gen)) != 0)
+      goto bugout;  /* match failed */
+
+   if ((r=get_string_descriptor(hd, dev->descriptor.iProduct, sz, sizeof(sz))) < 0)
+   {
+      BUG("invalid product id string ret=%d\n", r);
+      goto bugout;
+   }
+   generalize_model(sz, model, model_size);
+
+   stat = 1;    /* found usb device that matches sn */
+     
+bugout:
+   if (hd != NULL)
+      usb_close(hd);
+
+   return stat;
+}
+
 static struct usb_device *get_libusb_device(const char *uri)
 {
    struct usb_bus *bus;
@@ -2063,6 +2109,39 @@ bugout:
    if (hd != NULL)
       usb_close(hd);
 
+   return stat;
+}
+
+enum HPMUD_RESULT hpmud_make_usb_serial_uri(const char *sn, char *uri, int uri_size, int *bytes_read)
+{
+   struct usb_bus *bus;
+   struct usb_device *dev, *found_dev=NULL;
+   char model[128];
+   enum HPMUD_RESULT stat = HPMUD_R_INVALID_DEVICE_NODE;
+
+   DBG("[%d] hpmud_make_usb_serial_uri() sn=%s\n", getpid(), sn);
+
+   *bytes_read=0;
+
+   usb_init();
+   usb_find_busses();
+   usb_find_devices();
+
+   for (bus=usb_busses; bus && !found_dev; bus=bus->next)
+      for (dev=bus->devices; dev && !found_dev; dev=dev->next)
+	if (is_serial(dev, sn, model, sizeof(model)))
+            found_dev = dev;  /* found usb device that matches serial number */
+
+   if (found_dev == NULL)
+   {
+      BUG("invalid sn %s\n", sn);
+      goto bugout;
+   }
+ 
+   *bytes_read = snprintf(uri, uri_size, "hp:/usb/%s?serial=%s", model, sn); 
+   stat = HPMUD_R_OK;
+
+bugout:
    return stat;
 }
 

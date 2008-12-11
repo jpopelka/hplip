@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,8 @@
 # Author: Don Welch
 #
 
-__version__ = '1.0'
+__version__ = '2.0'
+__mod__ = 'hp-timedate'
 __title__ = 'Time/Date Utility'
 __doc__ = "Set the time and date on an HP Officejet."
 
@@ -35,7 +36,7 @@ import os
 # Local
 from base.g import *
 from base.codes import *
-from base import device, status, utils, pml
+from base import device, status, utils, pml, tui, module
 from prnt import cups
 
 try:
@@ -43,29 +44,6 @@ try:
 except ImportError:
     log.error("Unable to load fax services for HPLIP (required for hp-timedate). Exiting.")
     sys.exit(1)
-    
-
-USAGE = [(__doc__, "", "name", True),
-         ("Usage: timedate.py [PRINTER|DEVICE-URI] [OPTIONS]", "", "summary", True),
-         utils.USAGE_ARGS,
-         utils.USAGE_DEVICE,
-         utils.USAGE_PRINTER,
-         utils.USAGE_SPACE,
-         utils.USAGE_OPTIONS,
-         utils.USAGE_BUS1, utils.USAGE_BUS2,
-         utils.USAGE_LOGGING1, utils.USAGE_LOGGING2,
-         utils.USAGE_HELP,
-         utils.USAGE_SPACE,
-         utils.USAGE_NOTES,
-         utils.USAGE_STD_NOTES1, utils.USAGE_STD_NOTES2, 
-        ]
-
-def usage(typ='text'):
-    if typ == 'text':
-        utils.log_title(__title__, __version__)
-
-    utils.format_text(USAGE, typ, __title__, 'timedate.py', __version__)
-    sys.exit(0)
 
 
 PML_ERROR_CODES = {
@@ -82,98 +60,18 @@ PML_ERROR_CODES = {
     pml.ERROR_SYNTAX: "Syntax",
 }
 
-
 try:
+    mod = module.Module(__mod__, __title__, __version__, __doc__, None,
+                        (INTERACTIVE_MODE,))
+                        
+    mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS) 
 
-    try:
-        opts, args = getopt.getopt(sys.argv[1:],
-                                    'p:d:hl:b:g',
-                                    ['printer=',
-                                      'device=',
-                                      'help',
-                                      'help-rest',
-                                      'help-man',
-                                      'help-desc',
-                                      'logging=',
-                                      'bus=',
-                                    ]
-                                  )
-    except getopt.GetoptError, e:
-        log.error(e.msg)
-        usage()
+    opts, device_uri, printer_name, mode, ui_toolkit, lang = \
+        mod.parseStdOpts()
 
-    printer_name = None
-    device_uri = None
-    bus = device.DEFAULT_PROBE_BUS
-    log_level = logger.DEFAULT_LOG_LEVEL
-
-    if os.getenv("HPLIP_DEBUG"):
-        log.set_level('debug')
-
-    for o, a in opts:
-        if o in ('-h', '--help'):
-
-            usage()
-
-        elif o == '--help-rest':
-            usage('rest')
-
-        elif o == '--help-man':
-            usage('man')
-
-        elif o == '--help-desc':
-            print __doc__,
-            sys.exit(0)
-
-        elif o in ('-p', '--printer'):
-            if a.startswith('*'):
-                printer_name = cups.getDefaultPrinter()
-                log.debug(printer_name)
-                
-                if printer_name is not None:
-                    log.info("Using CUPS default printer: %s" % printer_name)
-                else:
-                    log.error("CUPS default printer is not set.")
-                
-            else:
-                printer_name = a
-
-        elif o in ('-d', '--device'):
-            device_uri = a
-
-        elif o in ('-b', '--bus'):
-            bus = [x.lower().strip() for x in a.split(',')]
-            if not device.validateBusList(bus):
-                usage()
-
-        elif o in ('-l', '--logging'):
-            log_level = a.lower().strip()
-            if not log.set_level(log_level):
-                usage()
-
-        elif o == '-g':
-            log.set_level('debug')
-
-        #elif o in ('-v', '--value'):
-        #    print a
-
-    if device_uri and printer_name:
-        log.error("You may not specify both a printer (-p) and a device (-d).")
-        usage()
-
-    utils.log_title(__title__, __version__)
-    
-    if os.getuid() == 0:
-        log.warn("hp-timedate should not be run as root.")
-
-    if not device_uri and not printer_name:
-        try:
-            device_uri = device.getInteractiveDeviceURI(bus, filter={'fax-type' : (operator.gt, 0)})
-            if device_uri is None:
-                sys.exit(1)
-        except Error:
-            log.error("Error occured during interactive mode. Exiting.")
-            sys.exit(0)
+    device_uri = mod.getDeviceUri(device_uri, printer_name, 
+        filter={'fax-type': (operator.gt, 0)},
+        back_end_filter=['hpfax'])
 
     try:
         d = faxdevice.FaxDevice(device_uri, printer_name, disable_dbus=True)
@@ -185,16 +83,6 @@ try:
             log.error(e.msg)
             sys.exit(1)
 
-    if d.device_uri is None and printer_name:
-        log.error("Printer '%s' not found." % printer_name)
-        sys.exit(1)
-
-    if d.device_uri is None and device_uri:
-        log.error("Malformed/invalid device-uri: %s" % device_uri)
-        sys.exit(1)
-
-    user_cfg.last_used.device_uri = d.device_uri
-
     try:
         try:
             d.open()
@@ -203,6 +91,7 @@ try:
             sys.exit(1)
 
         try:
+            log.info("Setting time and date on %s" % device_uri)
             d.setDateAndTime()
         except Error:
             log.error("An error occured!")

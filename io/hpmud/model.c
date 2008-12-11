@@ -489,6 +489,10 @@ static int parse_key_value_pair(char *buf, int len, struct hpmud_model_attribute
       {
          ma->support = strtol(value, &tail2, 10);
       }
+      else if(strcasecmp(key, "plugin") == 0)
+      {
+         ma->plugin = strtol(value, &tail2, 10);
+      }
       else
       {
          /* Unknown keys are ignored (R_AOK). */
@@ -561,6 +565,57 @@ enum HPMUD_RESULT hpmud_query_model(char *uri, struct hpmud_model_attributes *ma
 
 bugout:
 
+   return stat;
+}
+
+/* Get value for specified section and key from hplip.conf. */
+enum HPMUD_RESULT hpmud_get_conf(const char *section, const char *key, char *value, int value_size)
+{
+   char new_key[HPMUD_LINE_SIZE];
+   char new_value[HPMUD_LINE_SIZE];
+   char rcbuf[255];
+   char new_section[32];
+   char *tail;
+   FILE *inFile = NULL;
+   enum HPMUD_RESULT stat = HPMUD_R_DATFILE_ERROR;
+   int i,j;
+
+   if((inFile = fopen(CONFDIR "/hplip.conf", "r")) == NULL) 
+   {
+      BUG("unable to open %s: %m\n", CONFDIR "/hplip.conf");
+      goto bugout;
+   } 
+
+   new_section[0] = 0;
+
+   /* Read the config file */
+   while ((fgets(rcbuf, sizeof(rcbuf), inFile) != NULL))
+   {
+      if (rcbuf[0] == '[')
+      {
+         i = j = 0;
+         while ((rcbuf[i] != ']') && (j < (sizeof(new_section)-2)))
+            new_section[j++] = rcbuf[i++];
+         new_section[j++] = rcbuf[i++];   /* ']' */
+         new_section[j] = 0;        /* zero terminate */
+         continue;
+      }
+
+      GetPair(rcbuf, strlen(rcbuf), new_key, new_value, &tail);
+
+      if ((strcasecmp(new_section, section) == 0) && (strcasecmp(new_key, key) == 0))
+      {
+         strncpy(value, new_value, value_size);
+         break;  /* done */
+      }
+   }
+        
+   stat = HPMUD_R_OK;
+
+bugout:        
+   if (inFile != NULL)
+      fclose(inFile);
+         
    return stat;
 }
 

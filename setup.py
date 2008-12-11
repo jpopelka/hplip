@@ -21,8 +21,9 @@
 #
 
 
-__version__ = '7.2'
+__version__ = '8.0'
 __title__ = 'Printer/Fax Setup Utility'
+__mod__ = 'hp-setup'
 __doc__ = "Installs HPLIP printers and faxes in the CUPS spooler. Tries to automatically determine the correct PPD file to use. Allows the printing of a testpage. Performs basic fax parameter setup."
 
 # Std Lib
@@ -41,7 +42,7 @@ except ImportError:
 
 # Local
 from base.g import *
-from base import device, utils, tui, models
+from base import device, utils, tui, models, module
 from prnt import cups
 
 pm = None
@@ -54,21 +55,18 @@ def plugin_download_callback(c, s, t):
 nickname_pat = re.compile(r'''\*NickName:\s*\"(.*)"''', re.MULTILINE)
 
 USAGE = [ (__doc__, "", "name", True),
-          ("Usage: hp-setup [MODE] [OPTIONS] [SERIAL NO.|USB bus:device|IP|DEVNODE]", "", "summary", True),
-          ("[MODE]", "", "header", False),
-          ("Enter graphical UI mode:", "-u or --gui (Default)", "option", False),
-          ("Run in interactive mode:", "-i or --interactive", "option", False),
+          ("Usage: %s [MODE] [OPTIONS] [SERIAL NO.|USB bus:device|IP|DEVNODE]" % __mod__, "", "summary", True),
+          utils.USAGE_MODE,
+          utils.USAGE_GUI_MODE,
+          utils.USAGE_INTERACTIVE_MODE,
           utils.USAGE_SPACE,
           utils.USAGE_OPTIONS,
           ("Automatic mode:", "-a or --auto (-i mode only)", "option", False),
-          ("To specify the port on a multi-port JetDirect:", "-p<port> or --port=<port> (Valid values are 1\*, 2, and 3. \*default)", "option", False),
+          ("To specify the port on a multi-port JetDirect:", "--port=<port> (Valid values are 1\*, 2, and 3. \*default)", "option", False),
           ("No testpage in automatic mode:", "-x (-i mode only)", "option", False),
-          ("To specify a CUPS printer queue name:", "-n<printer> or --printer=<printer> (-i mode only)", "option", False),
+          ("To specify a CUPS printer queue name:", "-p<printer> or --printer=<printer> (-i mode only)", "option", False),
           ("To specify a CUPS fax queue name:", "-f<fax> or --fax=<fax> (-i mode only)", "option", False),
           ("Type of queue(s) to install:", "-t<typelist> or --type=<typelist>. <typelist>: print*, fax\* (\*default) (-i mode only)", "option", False),
-          ("Bus to probe (if device not specified):", "-b<bus> or --bus=<bus>", "option", False),
-          #utils.USAGE_BUS2,
-          ("", "<bus>: usb\*, net, par (\*default)", 'option', False),
           utils.USAGE_LANGUAGE,
           utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
           utils.USAGE_HELP,
@@ -99,45 +97,12 @@ USAGE = [ (__doc__, "", "name", True),
           ("         Bus 003 Device 011: ID 03f0:c202 Hewlett-Packard", "", 'note', False),
           ("   $ hp-setup --auto 003:011", "", 'note', False),
           ("   (Note: You may have to run 'lsusb' from /sbin or another location. Use '$ locate lsusb' to determine this.)", "", 'note', True),
-          ("3. Parameters -a, -n, -f, or -t are not valid in GUI (-u) mode.", "", 'note', True),
+          ("3. Parameters -a, -f, -p, or -t are not valid in GUI (-u) mode.", "", 'note', True),
           utils.USAGE_SPACE,
           utils.USAGE_SEEALSO,
           ("hp-makeuri", "", "seealso", False),
           ("hp-probe", "", "seealso", False),
         ]
-
-
-##plugin_eula = """LICENSE TERMS FOR HP Linux Imaging and Printing (HPLIP) Driver Plug-in
-##
-##These License Terms govern your Use of the HPLIP Driver Plug-in Software (the "Software"). USE OF THE SOFTWARE INCLUDING, WITHOUT LIMITATION, ANY DOCUMENTATION, IS SUBJECT TO THESE LICENSE TERMS AND THE APPLICABLE AS-IS WARRANTY STATEMENT.  BY DOWNLOADING AND INSTALLING THE SOFTWARE, YOU ARE AGREEING TO BE BOUND BY THESE TERMS. IF YOU DO NOT AGREE TO ALL OF THESE TERMS, DO NOT DOWNLOAD AND INSTALL THE SOFTWARE ON YOUR SYSTEM.
-##
-##1. License Grant.    HP grants you a license to Use one copy of the Software with HP printing products only.  "Use" includes using, storing, loading, installing, executing, and displaying the Software.  You may not modify the Software or disable any licensing or control features of the Software.
-##
-##2. Ownership.   The Software is owned and copyrighted by HP or its third party suppliers.  Your license confers no title to, or ownership in, the Software and is not a sale of any rights in the Software.  HP's third party suppliers may protect their rights in the Software in the event of any violation of these license terms.
-##
-##3. Copies and Adaptations.   You may only make copies or adaptations of the Software for archival purposes or when copying or adaptation is an essential step in the authorized Use of the Software. You must reproduce all copyright notices in the original Software on all copies or adaptations.  You may not copy the Software onto any public network.
-##
-##4. No Disassembly.   You may not Disassemble the Software unless HP's prior written consent is obtained.  "Disassemble" includes disassembling, decompiling, decrypting, and reverse engineering.   In some jurisdictions, HP's consent may not be required for limited Disassembly.  Upon request, you will provide HP with reasonably detailed information regarding any Disassembly.
-##
-##5. No Transfer.   You may not assign, sublicense or otherwise transfer all or any part of these License Terms or the Software.
-##
-##6. Termination.   HP may terminate your license, upon notice, for failure to comply with any of these License Terms.  Upon termination, you must immediately destroy the Software, together with all copies, adaptations and merged portions in any form.
-##
-##7. Export Requirements.   You may not export or re-export the Software or any copy or adaptation in violation of any applicable laws or regulations.
-##
-##8. U.S. Government Restricted Rights.   The Software has been developed entirely at private expense.  It is delivered and licensed, as defined in any applicable DFARS, FARS, or other equivalent federal agency regulation or contract clause, as either "commercial computer software" or "restricted computer software", whichever is applicable.  You have only those rights provided for such Software by the applicable clause or regulation or by these License Terms.
-##
-##9. DISCLAIMER OF WARRANTIES.   TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, HP AND ITS SUPPLIERS PROVIDE THE SOFTWARE "AS IS" AND WITH ALL FAULTS, AND HEREBY DISCLAIM ALL OTHER WARRANTIES AND CONDITIONS, EITHER EXPRESS, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, WARRANTIES OF TITLE AND NON-INFRINGEMENT, ANY IMPLIED WARRANTIES, DUTIES OR CONDITIONS OF MERCHANTABILITY, OF FITNESS FOR A PARTICULAR PURPOSE, AND OF LACK OF VIRUSES ALL WITH REGARD TO THE SOFTWARE.  Some states/jurisdictions do not allow exclusion of implied warranties or limitations on the duration of implied warranties, so the above disclaimer may not apply to you in its entirety.
-##
-##10. LIMITATION OF LIABILITY.  Notwithstanding any damages that you might incur, the entire liability of HP and any of its suppliers under any provision of this agreement and your exclusive remedy for all of the foregoing shall be limited to the greater of the amount actually paid by you separately for the Software or U.S. $5.00.  TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL HP OR ITS SUPPLIERS BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES WHATSOEVER (INCLUDING, BUT NOT LIMITED TO, DAMAGES FOR LOSS OF PROFITS OR CONFIDENTIAL OR OTHER INFORMATION, FOR BUSINESS INTERRUPTION, FOR PERSONAL INJURY, FOR LOSS OF PRIVACY ARISING OUT OF OR IN ANY WAY RELATED TO THE USE OF OR INABILITY TO USE THE SOFTWARE, OR OTHERWISE IN CONNECTION WITH ANY PROVISION OF THIS AGREEMENT, EVEN IF HP OR ANY SUPPLIER HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES AND EVEN IF THE REMEDY FAILS OF ITS ESSENTIAL PURPOSE.  Some states/jurisdictions do not allow the exclusion or limitation of incidental or consequential damages, so the above limitation or exclusion may not apply to you."""
-
-def usage(typ='text'):
-    if typ == 'text':
-        utils.log_title(__title__, __version__)
-
-    utils.format_text(USAGE, typ, __title__, 'hp-setup', __version__)
-    sys.exit(0)
-
 
 def restart_cups():
     if os.path.exists('/etc/init.d/cups'):
@@ -150,21 +115,22 @@ def restart_cups():
         return 'killall -HUP cupsd'
 
 
-log.set_module('hp-setup')
+mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE, 
+                    (INTERACTIVE_MODE, GUI_MODE), 
+                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4),
+                    run_as_root_ok=True)
 
-try:
-    opts, args = getopt.getopt(sys.argv[1:], 'p:n:d:hl:b:t:f:axguiq:',
-        ['printer=', 'fax=', 'device=', 'help', 'help-rest', 'help-man',
-         'logging=', 'bus=', 'type=', 'auto', 'port=', 'gui', 'interactive',
-         'help-desc', 'username=', 'lang='])
-except getopt.GetoptError, e:
-    log.error(e.msg)
-    usage()
+opts, device_uri, printer_name, mode, ui_toolkit, loc = \
+    mod.parseStdOpts('axp:P:f:t:b:',
+                     ['ttl=', 'filter=', 'search=', 'find=', 
+                      'method=', 'time-out=', 'timeout=', 
+                      'printer=', 'fax=', 'type=', 'port=', 
+                      'username=', 'user=', 'auto'],
+                      handle_device_printer=False)
+
 
 printer_name = None
 fax_name = None
-device_uri = None
-log_level = logger.DEFAULT_LOG_LEVEL
 bus = None
 setup_print = True
 setup_fax = True
@@ -172,32 +138,13 @@ makeuri = None
 auto = False
 testpage_in_auto_mode = True
 jd_port = 1
-mode = GUI_MODE
-mode_specified = False
 username = ''
-loc = None
-
-if os.getenv("HPLIP_DEBUG"):
-    log.set_level('debug')
 
 for o, a in opts:
-    if o in ('-h', '--help'):
-        usage('text')
-
-    elif o == '--help-rest':
-        usage('rest')
-
-    elif o == '--help-man':
-        usage('man')
-
-    elif o == '--help-desc':
-        print __doc__,
-        sys.exit(0)
-
-    elif o == '-x':
+    if o == '-x':
         testpage_in_auto_mode = False
 
-    elif o in ('-n', '--printer'):
+    elif o in ('-P', '-p', '--printer'):
         printer_name = a
 
     elif o in ('-f', '--fax'):
@@ -209,161 +156,144 @@ for o, a in opts:
     elif o in ('-b', '--bus'):
         bus = [x.lower().strip() for x in a.split(',')]
         if not device.validateBusList(bus, False):
-            usage()
-
-    elif o in ('-l', '--logging'):
-        log_level = a.lower().strip()
-        if not log.set_level(log_level):
-            usage()
-
-    elif o == '-g':
-        log.set_level('debug')
+            mod.usage(error_msg=['Invalid bus name'])
 
     elif o in ('-t', '--type'):
         setup_fax, setup_print = False, False
         a = a.strip().lower()
         for aa in a.split(','):
             if aa.strip() not in ('print', 'fax'):
-                usage()
-            
+                mod.usage(error_msg=['Invalid type.'])
+
             if aa.strip() == 'print':
                 setup_print = True
-            
+
             elif aa.strip() == 'fax':
                 if not prop.fax_build:
                     log.error("Cannot enable fax setup - HPLIP not built with fax enabled.")
                 else:
                     setup_fax = True
 
-    elif o in ('-p', '--port'):
+    elif o == '--port':
         try:
             jd_port = int(a)
         except ValueError:
-            log.error("Invalid port number. Must be between 1 and 3 inclusive.")
-            usage()
+            #log.error("Invalid port number. Must be between 1 and 3 inclusive.")
+            mod.usage(error_msg=['Invalid port number. Must be between 1 and 3 inclusive.'])
 
     elif o in ('-a', '--auto'):
         auto = True
 
-    elif o in ('-u', '--gui'):
-        if mode_specified:
-            log.error("You may only specify a single mode as a parameter (-i or -u).")
-            sys.exit(1)
-
-        mode = GUI_MODE
-        mode_specified = True
-
-    elif o in ('-i', '--interactive'):
-        if mode_specified:
-            log.error("You may only specify a single mode as a parameter (-i or -u).")
-            sys.exit(1)
-
-        mode = INTERACTIVE_MODE
-        mode_specified = True
-
     elif o == '--username':
         username = a
 
-    elif o in ('-q', '--lang'):
-        if a.strip() == '?':
-            tui.show_languages()
-            sys.exit(0)
-
-        loc = utils.validate_language(a.lower())
-
 try:
-    param = args[0]
+    param = mod.args[0]
 except IndexError:
     param = ''
 
 log.debug("param=%s" % param)
 
-utils.log_title(__title__, __version__)
 
 if mode == GUI_MODE:
-    if not prop.gui_build:
-        log.warn("GUI mode disabled in build. Reverting to interactive mode.")
-        mode = INTERACTIVE_MODE
-
-    elif not os.getenv('DISPLAY'):
-        log.warn("No display found. Reverting to interactive mode.")
-        mode = INTERACTIVE_MODE
-
-    elif not utils.checkPyQtImport():
-        log.warn("PyQt init failed. Reverting to interactive mode.")
-        mode = INTERACTIVE_MODE
-
-        
-if mode == GUI_MODE:
-    from qt import *
-    from ui import setupform
-
-    app = QApplication(sys.argv)
-    QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
-
-    if loc is None:
-        loc = user_cfg.ui.get("loc", "system")
-        if loc.lower() == 'system':
-            loc = str(QTextCodec.locale())
-            log.debug("Using system locale: %s" % loc)
-
-    if loc.lower() != 'c':
-        e = 'utf8'
-        try:
-            l, x = loc.split('.')
-            loc = '.'.join([l, e])
-        except ValueError:
-            l = loc
-            loc = '.'.join([loc, e])
-
-        log.debug("Trying to load .qm file for %s locale." % loc)
-        trans = QTranslator(None)
-
-        qm_file = 'hplip_%s.qm' % l
-        log.debug("Name of .qm file: %s" % qm_file)
-        loaded = trans.load(qm_file, prop.localization_dir)
-
-        if loaded:
-            app.installTranslator(trans)
-        else:
-            loc = 'c'
-
-    if loc == 'c':
-        log.debug("Using default 'C' locale")
+    if ui_toolkit == 'qt3':
+        if not utils.canEnterGUIMode():
+            log.error("%s requires GUI support (try running with --qt4). Also, try using interactive (-i) mode." % __mod__)
+            sys.exit(1)
     else:
-        log.debug("Using locale: %s" % loc)
-        QLocale.setDefault(QLocale(loc))
-        prop.locale = loc
+        if not utils.canEnterGUIMode4():
+            log.error("%s requires GUI support (try running with --qt3). Also, try using interactive (-i) mode." % __mod__)
+            sys.exit(1)
+
+if mode == GUI_MODE:
+    if ui_toolkit == 'qt3':
+        from qt import *
+        from ui import setupform
+
+        app = QApplication(sys.argv)
+        QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
+
+        if loc is None:
+            loc = user_cfg.ui.get("loc", "system")
+            if loc.lower() == 'system':
+                loc = str(QTextCodec.locale())
+                log.debug("Using system locale: %s" % loc)
+
+        if loc.lower() != 'c':
+            e = 'utf8'
+            try:
+                l, x = loc.split('.')
+                loc = '.'.join([l, e])
+            except ValueError:
+                l = loc
+                loc = '.'.join([loc, e])
+
+            log.debug("Trying to load .qm file for %s locale." % loc)
+            trans = QTranslator(None)
+
+            qm_file = 'hplip_%s.qm' % l
+            log.debug("Name of .qm file: %s" % qm_file)
+            loaded = trans.load(qm_file, prop.localization_dir)
+
+            if loaded:
+                app.installTranslator(trans)
+            else:
+                loc = 'c'
+
+        if loc == 'c':
+            log.debug("Using default 'C' locale")
+        else:
+            log.debug("Using locale: %s" % loc)
+            QLocale.setDefault(QLocale(loc))
+            prop.locale = loc
+            try:
+                locale.setlocale(locale.LC_ALL, locale.normalize(loc))
+            except locale.Error:
+                pass
+
+        if not os.geteuid() == 0:
+            log.error("You must be root to run this utility.")
+
+            QMessageBox.critical(None, 
+                                 "HP Device Manager - Printer Setup Wizard",
+                                 "You must be root to run hp-setup.",
+                                  QMessageBox.Ok,
+                                  QMessageBox.NoButton,
+                                  QMessageBox.NoButton)
+
+            sys.exit(1)
+
         try:
-            locale.setlocale(locale.LC_ALL, locale.normalize(loc))
-        except locale.Error:
-            pass
+            w = setupform.SetupForm(bus, param, jd_port, username)
+        except Error:
+            log.error("Unable to connect to HPLIP I/O. Please (re)start HPLIP and try again.")
+            sys.exit(1)
 
-    if not os.geteuid() == 0:
-        log.error("You must be root to run this utility.")
+        app.setMainWidget(w)
+        w.show()
 
-        QMessageBox.critical(None, 
-                             "HP Device Manager - Printer Setup Wizard",
-                             "You must be root to run hp-setup.",
-                              QMessageBox.Ok,
-                              QMessageBox.NoButton,
-                              QMessageBox.NoButton)
-
-        sys.exit(1)
-
-    try:
-        w = setupform.SetupForm(bus, param, jd_port, username)
-    except Error:
-        log.error("Unable to connect to HPLIP I/O. Please (re)start HPLIP and try again.")
-        sys.exit(1)
-
-    app.setMainWidget(w)
-    w.show()
-
-    app.exec_loop()
-
+        app.exec_loop()
     
-    
+    else: # qt4
+        try:
+            from PyQt4.QtGui import QApplication
+            from ui4.setupdialog import SetupDialog
+        except ImportError:
+            log.error("Unable to load Qt4 support. Is it installed?")
+            sys.exit(1)
+            
+        if 1:
+            app = QApplication(sys.argv)
+            
+            dlg = SetupDialog(None, param, jd_port, username)
+            dlg.show()
+            try:
+                log.debug("Starting GUI loop...")
+                app.exec_()
+            except KeyboardInterrupt:
+                sys.exit(0)
+
+
 else: # INTERACTIVE_MODE
     try:
         if not os.geteuid() == 0:
@@ -380,56 +310,22 @@ else: # INTERACTIVE_MODE
 
         # ******************************* CONNECTION TYPE CHOOSER
         if not device_uri and bus is None:
-            x = 1
-            ios = {0: ('usb', "Universal Serial Bus (USB)") }
-            if prop.net_build: 
-                ios[x] = ('net', "Network/Ethernet/Wireless (direct connection or JetDirect)")
-                x += 1
-            if prop.par_build: 
-                ios[x] = ('par', "Parallel Port (LPT:)")
-                x += 1
-
-            if len(ios) > 1:
-                tui.header("CHOOSE CONNECTION TYPE")
-                f = tui.Formatter()
-                f.max_widths = (10, 10, 40)
-                f.header = ("Num.", "Connection Type", "Connection Type Description")
-
-                for x, data in ios.items():
-                    if not x:
-                        f.add((str(x) + "*", data[0], data[1]))
-                    else:
-                        f.add((str(x), data[0], data[1]))
-
-                f.output()
-
-                ok, val = tui.enter_range("\nEnter number 0...%d for connection type (q=quit, enter=usb*) ? " % x, 
-                    0, x, 0)
-
-                if not ok: sys.exit(0)
-
-                bus = [ios[val][0]]
-            else:
-                bus = [ios[0][0]]
-
+            bus = tui.connection_table()
+            
+            if bus is None:
+                sys.exit(0)
+                
             log.info("\nUsing connection type: %s" % bus[0])
+            
+            log.info("")
 
         # ******************************* DEVICE CHOOSER
 
-        if not device_uri: 
-            tui.header("DEVICE DISCOVERY")
-            try:
-                device_uri = device.getInteractiveDeviceURI(bus)
-                if device_uri is None:
-                    sys.exit(1)
-
-            except Error:
-                log.error("Error occured during interactive mode. Exiting.")
-                sys.exit(1)
+        if not device_uri:
+            device_uri = mod.getDeviceUri(device_uri, devices=device.probeDevices(bus))
 
         # ******************************* QUERY MODEL AND COLLECT PPDS
         log.info(log.bold("\nSetting up device: %s\n" % device_uri))
-
 
         log.info("")
         print_uri = device_uri.replace("hpfax:", "hp:")
@@ -446,161 +342,26 @@ else: # INTERACTIVE_MODE
             log.error("Unsupported printer model.")
             sys.exit(1)
 
-        if not mq.get('fax-type', FAX_TYPE_NONE) and setup_fax:
+        if mq.get('fax-type', FAX_TYPE_NONE) in (FAX_TYPE_NONE, FAX_TYPE_NOT_SUPPORTED) and setup_fax:
             #log.warning("Cannot setup fax - device does not have fax feature.")
             setup_fax = False
 
         # ******************************* PLUGIN
 
-##        from installer import core_install
-##        core = core_install.CoreInstall()
         norm_model = models.normalizeModelName(model).lower()
-##
         plugin = mq.get('plugin', PLUGIN_NONE)
-        #skip = False
 
         plugin_installed = utils.to_bool(sys_cfg.hplip.plugin)
         if plugin > PLUGIN_NONE and not plugin_installed: 
             tui.header("PLUG-IN INSTALLATION")
-            
-            hp_plugin = utils.which('hp-plugin')
-            
-            if hp_plugin:
-                os.system("hp_plugin -i")
-                
-##
-##
-####            #plugin_lib = mq.get("plugin-library")
-##            fw_download = mq.get("fw-download")
-####
-####            #log.debug("Plug-in library=%s" % plugin_lib)
-####            log.debug("FW download=%s" % fw_download)
-####
-##            if plugin == PLUGIN_REQUIRED:
-##                log.debug("Plug-in required and not installed for model %s" % norm_model)
-##                log.info(log.bold("A plug-in is required for this printer."))
-##                for line in tui.format_paragraph("""An additional software plug-in is required to operate this printer. You may download the plug-in directly from HP, or, if you already have a copy, you can specify a path to the file."""):
-##                    log.info(line)
-##
-##                ok, ans = tui.enter_choice("\nDownload plug-in from HP (recomended) or specify a path to the plug-in (d=download*, p=specify path, q=quit) ? ", ['d', 'p'], 'd')
-##
-##                if not ok:
-##                    sys.exit(0)
-##
-##            else:
-##                log.debug("Plug-in optional and not installed for model %s" % norm_model)
-##                log.info(log.bold("A plug-in is optional for this printer."))
-##                for line in tui.format_paragraph("""An optional driver plug-in is available to enhance the operation of this printer. You may skip this installation, download the plug-in directly from an HP authorized server, or, if you already have a copy of the file, you can specify a path to the file."""):
-##                    log.info(line)            
-##
-##                ok, ans = tui.enter_choice("\nDownload plug-in from HP (recomended), specify a path to the plug-in, or skip installation (d=download*, p=specify path, s=skip, q=quit) ? ", ['d', 'p', 's'], 'd')
-##
-##                if not ok:
-##                    sys.exit(0)
-##
-##                if ans == 's':
-##                    skip = True
-##
-##
-##            if not skip:
-##
-##                from installer import core_install
-##                core = core_install.CoreInstall()
-##                core.set_plugin_version(sys_cfg.hplip.version)
-##
-##                if ans == 'd':
-##                    plugin_conf_url = core.get_plugin_conf_url(version)
-##                    
-##                    ok = True
-##                    if plugin_conf_url.startswith('http'):    
-##                        log.info("\nChecking for network connection...")
-##                    
-##                        ok = core.check_network_connection()
-##                        
-##                    if ok:
-##                            #def get_plugin_info(self, version, url, local_conf, callback):
-####
-##                        log.info("Downloading configuration...")
-##                        pm = tui.ProgressMeter("Downloading configuration:")
-##                        
-##                        url, size, checksum, timestamp, ok = core.get_plugin_info(version,
-##                            plugin_conf_url, plugin_download_callback)
-##                        
-##                        log.info("")
-##
-##                        log.debug("url= %s" % url)
-##                        log.debug("size=%d" % size)
-##                        log.debug("checksum=%s" % checksum)
-##                        log.debug("timestamp=%f" % timestamp)
-##
-##                        if url and size and checksum and timestamp and ok:
-##                            log.info("Downloading plug-in...")
-##
-##                            pm = tui.ProgressMeter("Downloading plugin:")
-##                            ok, plugin_file = core.download_plugin(norm_model, url, size, 
-##                                checksum, timestamp, plugin_download_callback)
-##
-##                            log.info("")
-##
-##                            if not ok:
-##                                log.error("Plugin download failed.")
-##                                sys.exit(1)
-##
-##                    else:
-##                        log.error("Network connection not found.")
-##                        sys.exit(1)
-##
-##
-##                else: # "p": path
-##                    while True:
-##                        user_input = raw_input(log.bold("Enter the path to the %s.plugin file (q=quit) : " % norm_model)).strip()
-##                        if user_input.strip().lower() == 'q':
-##                            sys.exit(1)
-##
-##                        if not user_input.endswith('.plugin'):
-##                            log.error("Plug-in filename must end with '.plugin' extension.")
-##                            continue
-##
-##                        if os.path.exists(user_input):
-##                            ok = core.copy_plugin(norm_model, user_input)
-##
-##                            if not ok:
-##                                log.error("File copy failed.")
-##
-##                            else:
-##                                break
-##                        else:
-##                            log.error("File not found.")
-##
-##                if ok:
-##                    core.run_plugin()
-##                    #pass
-####                    log.info("Installing plug-in...")
-####                    # TODO:
-####                    #ok = core.install_plugin(norm_model, plugin_lib)
-####                    ok = True
-####                    if not ok:
-####                        log.error("Plug-in install failed.")
-####                        sys.exit(1)
-####
-####                    else:
-####                        log.info("\nPlug-in installation complete.\n")
-####
-##                    # Download firmware if needed
-##                    #if mq.get('fw-download', 0):
-##                    if fw_download:
-##                        log.info(log.bold("\nDownloading firmware..."))
-##                        try:
-##                            d = device.Device(print_uri)
-##                        except Error:
-##                            log.error("Error opening device. Exiting.")
-##                            sys.exit(1)
-##
-##                        if d.downloadFirmware():
-##                            log.info("Done.\n")
-##
-##                        d.close()
 
+            hp_plugin = utils.which('hp-plugin')
+
+            if hp_plugin:
+                if prop.gui_build:
+                    os.system("hp-plugin -i")
+                else:
+                    os.system("hp-plugin")
 
         ppds = cups.getSystemPPDs()
 
@@ -738,7 +499,7 @@ else: # INTERACTIVE_MODE
 
                 ok, enter_ppd = tui.enter_yes_no("\nWould you like to specify the path to the correct PPD file to use", 'n')
                 if not ok: sys.exit(0)
-                
+
                 if enter_ppd:
                     ok = False
 
@@ -780,7 +541,7 @@ else: # INTERACTIVE_MODE
                 else:
                     log.error("PPD file required. Setup cannot continue. Exiting.")
                     sys.exit(1)
-                    
+
             if auto:
                 location, info = '', 'Automatically setup by HPLIP'
             else:
@@ -823,7 +584,7 @@ else: # INTERACTIVE_MODE
                     location, print_ppd, '', info)
 
             log.debug("addPrinter() returned (%d, %s)" % (status, status_str))
-            
+
             installed_print_devices = device.getSupportedCUPSDevices(['hp']) 
 
             log.debug(installed_print_devices)
@@ -852,7 +613,7 @@ else: # INTERACTIVE_MODE
         if setup_fax and not prop.fax_build:
             log.error("Cannot setup fax - HPLIP not built with fax enabled.")
             setup_fax = False
-        
+
         if setup_fax:
             try:
                 from fax import fax
@@ -976,9 +737,9 @@ else: # INTERACTIVE_MODE
             else:
                 status, status_str = cups.addPrinter(fax_name.encode('utf8'), fax_uri,
                     location, fax_ppd, '', info)
-                    
+
             log.debug("addPrinter() returned (%d, %s)" % (status, status_str))
-            
+
             installed_fax_devices = device.getSupportedCUPSDevices(['hpfax']) 
 
             log.debug(installed_fax_devices) 
@@ -1084,7 +845,7 @@ else: # INTERACTIVE_MODE
                                 if station_name.strip().lower() == 'q':
                                     log.info("OK, done.")
                                     sys.exit(0)
-                                    
+
                                 if current_station_name and (not station_name or station_name.strip().lower() == 'c'):
                                     station_name = current_station_name
 

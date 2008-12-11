@@ -19,7 +19,8 @@
 #
 # Author: Don Welch
 
-__version__ = '0.1'
+__version__ = '2.0'
+__mod__ = 'hp-systray'
 __title__ = 'System Tray Status Service'
 __doc__ = ""
 
@@ -31,144 +32,100 @@ import signal
 
 # Local
 from base.g import *
-from base import utils
+from base import utils, module
 from prnt import cups
-
-
-USAGE = [(__doc__, "", "name", True),
-         ("Usage: hp-systray [OPTIONS]", "", "summary", True),
-         utils.USAGE_OPTIONS,
-         ("Force Qt3:", "--qt3 (default)", "option", False),
-         ("Force Qt4:", "--qt4", "option", False),
-         ("Startup even if no hplip CUPS queues are present:", "-x or --force-startup", "option", False),
-         utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
-         utils.USAGE_HELP,
-        ]
-
-
-def usage(typ='text'):
-    if typ == 'text':
-        utils.log_title(__title__, __version__)
-
-    utils.format_text(USAGE, typ, __title__, 'hpssd.py', __version__)
-    sys.exit(0)
 
 
 
 if __name__ == '__main__':
-    log.set_module('hp-systray(init)')
+    mod = module.Module(__mod__, __title__, __version__, __doc__, None,
+                       (GUI_MODE,), (UI_TOOLKIT_QT4, UI_TOOLKIT_QT3))
 
-    prop.prog = sys.argv[0]
-    force_qt3 = False
-    force_qt4 = False
+    mod.setUsage(module.USAGE_FLAG_NONE,
+        extra_options=[("Startup even if no hplip CUPS queues are present:", "-x or --force-startup", "option", False)])
+
+    opts, device_uri, printer_name, mode, ui_toolkit, lang = \
+        mod.parseStdOpts('x', ['force-startup'], False)
+
     force_startup = False
-
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], 'l:hgx', 
-            ['level=', 'help', 'help-man', 'help-rest', 'help-desc',
-            'qt3', 'qt4', 'force-startup'])
-
-    except getopt.GetoptError, e:
-        log.error(e.msg)
-        usage()
-
-    if os.getenv("HPLIP_DEBUG"):
-        log.set_level('debug')
-
     for o, a in opts:
-        if o in ('-l', '--logging'):
-            log_level = a.lower().strip()
-            if not log.set_level(log_level):
-                usage()
-
-        elif o == '-g':
-            log.set_level('debug')
-
-        elif o in ('-h', '--help'):
-            usage()
-
-        elif o == '--help-rest':
-            usage('rest')
-
-        elif o == '--help-man':
-            usage('man')
-
-        elif o == '--help-desc':
-            print __doc__,
-            sys.exit(0)
-
-        elif o == '--qt3':
-            force_qt3 = True
-            force_qt4 = False
-
-        elif o == '--qt4':
-            force_qt4 = True
-            force_qt3 = False
-            
-        elif o in ('-x', '--force-startup'):
+        if o in ('-x', '--force-startup'):
             force_startup = True
 
-
-    utils.log_title(__title__, __version__) 
-    
     if os.getuid() == 0:
         log.error("hp-systray cannot be run as root. Exiting.")
         sys.exit(1)
+
+    if ui_toolkit == 'qt3':
+        if not utils.canEnterGUIMode():
+            log.error("%s requires Qt3 GUI and DBus support. Exiting." % __mod__)
+            sys.exit(1)
+    
+    else:
+        if not utils.canEnterGUIMode4():
+            log.error("%s requires Qt4 GUI and DBus support. Exiting." % __mod__)
+            sys.exit(1)
 
     if not force_startup:
         # Check for any hp: or hpfax: queues. If none, exit
         if not utils.any([p.device_uri for p in cups.getPrinters()], lambda x : x.startswith('hp')):
             log.warn("No hp: or hpfax: devices found in any installed CUPS queue. Exiting.")
             sys.exit(1)
+
+    mod.lockInstance()
     
-    ok, lock_file = utils.lock_app('hp-systray')
-    if not ok:
-        sys.exit(1)
+    r1, w1 = os.pipe()
+    log.debug("Creating pipe: hpssd (%d) ==> systemtray (%d)" % (w1, r1))
     
-    r, w = os.pipe()
     parent_pid = os.getpid()
-    log.debug("Parent PID=%d" % parent_pid)
-    child_pid = os.fork()
-
-    if child_pid:
+    child_pid1 = os.fork()
+    
+    if child_pid1:
         # parent (UI)
-        os.close(w)
+        os.close(w1)
 
-        try:
-            if force_qt3 or (not force_qt3 and not force_qt4):
-                from ui import systemtray_qt3
-                systemtray_qt3.run(r, child_pid)
-    
-            elif force_qt4:
-                from ui import systemtray_qt4
-                systemtray_qt4.run(r, child_pid)
+        if ui_toolkit == 'qt3':
+            import ui.systemtray as systray
         
-        finally:
-            if child_pid:
-                log.debug("Killing child systray process (pid=%d)..." % child_pid)
-                try:
-                    os.kill(child_pid, signal.SIGKILL)
-                except OSError, e:
-                    log.debug("Failed: %s" % e.message)
-                
-            utils.unlock(lock_file)
-
-                
-    else:
-        # child (dbus)
-        os.close(r)
+        else: # qt4
+            try:
+                import ui4.systemtray as systray
+            except ImportError:
+                log.error("Unable to load Qt4 support. Is it installed?")
+                mod.unlockInstance()
+                sys.exit(1)        
 
         try:
-            import hpssd
-            hpssd.run(w, parent_pid)
+            systray.run(r1)
         finally:
-            if parent_pid:
-                log.debug("Killing parent systray process (pid=%d)..." % parent_pid)
-                try:
-                    os.kill(parent_pid, signal.SIGKILL)
-                except OSError, e:
-                    log.debug("Failed: %s" % e.message)
+            mod.unlockInstance()
 
-            utils.unlock(lock_file)
-    
-
+    else:
+        # child (dbus & device i/o [qt4] or dbus [qt3])
+        os.close(r1)
+        
+        if ui_toolkit == 'qt4':
+            r2, w2 = os.pipe()
+            r3, w3 = os.pipe()
+            
+            log.debug("Creating pipe: hpssd (%d) ==> hpdio (%d)" % (w2, r2))
+            log.debug("Creating pipe: hpdio (%d) ==> hpssd (%d)" % (w3, r3))
+            
+            child_pid2 = os.fork()
+            if child_pid2:
+                # parent (dbus)
+                os.close(r2)
+                
+                import hpssd
+                hpssd.run(w1, w2, r3)
+                        
+            else:
+                # child (device i/o)
+                os.close(w2)
+                
+                import hpdio
+                hpdio.run(r2, w3) 
+                
+        else: # qt3
+            import hpssd
+            hpssd.run(w1)

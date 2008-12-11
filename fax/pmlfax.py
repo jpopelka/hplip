@@ -437,6 +437,7 @@ class PMLFaxSendThread(FaxSendThread):
                 FAX_SEND_STATE_CLOSE_SESSION = 170
 
                 monitor_state = False
+                error_state = pml.DN_ERROR_NONE
                 fax_send_state = FAX_SEND_STATE_DEVICE_OPEN
 
                 while fax_send_state != FAX_SEND_STATE_DONE:
@@ -446,7 +447,7 @@ class PMLFaxSendThread(FaxSendThread):
                         fax_send_state = FAX_SEND_STATE_ABORT
 
                     if monitor_state:
-                        fax_state = self.getFaxDownloadState() 
+                        fax_state = self.getFaxDownloadState()
                         if not fax_state in (pml.UPDN_STATE_XFERACTIVE, pml.UPDN_STATE_XFERDONE):
                             log.error("D/L error state=%d" % fax_state)
                             fax_send_state = FAX_SEND_STATE_ERROR
@@ -462,6 +463,8 @@ class PMLFaxSendThread(FaxSendThread):
 
                     elif fax_send_state == FAX_SEND_STATE_ERROR: # -------------- Error (110, 20, 0)
                         log.error("Fax send error.")
+                        error_state = self.getFaxDownloadError()
+                        log.debug("Error State=%d (%s)" % (error_state, pml.DN_ERROR_STR.get(error_state, "Unknown")))
                         monitor_state = False
 
                         fax_send_state = FAX_SEND_STATE_RESET_TOKEN
@@ -918,6 +921,13 @@ class PMLFaxSendThread(FaxSendThread):
             return state
         else:
             return pml.UPDN_STATE_ERRORABORT
+
+    def getFaxDownloadError(self):
+        result_code, state = self.dev.getPML(pml.OID_FAX_DOWNLOAD_ERROR)
+        if state:
+            return state
+        else:
+            return pml.DN_ERROR_UNKNOWN
 
     def getFaxJobTxStatus(self):
         result_code, status = self.dev.getPML(pml.OID_FAXJOB_TX_STATUS)

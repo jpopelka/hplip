@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,8 +20,9 @@
 # Author: Don Welch
 #
 
-__version__ = '1.1'
+__version__ = '2.4'
 __title__ = 'Firmware Download Utility'
+__mod__ = 'hp-firmware'
 __doc__ = "Download firmware to a device."
 
 # Std Lib
@@ -34,109 +35,34 @@ import os
 
 # Local
 from base.g import *
-from base import device, status, utils
+from base import device, status, utils, tui, module
 from prnt import cups
 
-USAGE = [(__doc__, "", "name", True),
-         ("Usage: hp-firmware [PRINTER|DEVICE-URI] [OPTIONS]", "", "summary", True),
-         utils.USAGE_ARGS,
-         utils.USAGE_DEVICE,
-         utils.USAGE_PRINTER,
-         utils.USAGE_SPACE,
-         utils.USAGE_OPTIONS,
-         ("Use USB IDs to specify printer:", "-s bbb:ddd, where bbb is the USB bus ID and ddd is the USB device ID. The ':' and all leading zeroes must be present.", "option", False),
-         ("Seconds to delay before download:", "-y<secs> or --delay=<secs> (float value, e.g. 0.5)", "option", False),
-         utils.USAGE_BUS1, utils.USAGE_BUS2,
-         utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
-         utils.USAGE_HELP,
-         utils.USAGE_SPACE,
-         utils.USAGE_NOTES,
-         utils.USAGE_STD_NOTES1, utils.USAGE_STD_NOTES2, 
-         utils.USAGE_SPACE,
-         utils.USAGE_SEEALSO,
-         ("hp-toolbox", "", "seealso", False),
-
-         ]
-
-def usage(typ='text'):
-    if typ == 'text':
-        utils.log_title(__title__, __version__)
-
-    utils.format_text(USAGE, typ, __title__, 'hp-info', __version__)
-    sys.exit(0)
-
-
-log.set_module('hp-firmware')
 
 try:
+    mod = module.Module(__mod__, __title__, __version__, __doc__, None, 
+                        (INTERACTIVE_MODE, GUI_MODE, NON_INTERACTIVE_MODE), 
+                        (UI_TOOLKIT_QT4,), True, True)
+                        
+    mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS,
+        extra_options=[
+        ("Use USB IDs to specify printer:", "-s bbb:ddd, where bbb is the USB bus ID and ddd is the USB device ID. The ':' and all leading zeroes must be present.", "option", False),
+        ("Seconds to delay before download:", "-y<secs> or --delay=<secs> (float value, e.g. 0.5)", "option", False)],
+         see_also_list=['hp-plugin', 'hp-toolbox'])
+    
+    opts, device_uri, printer_name, mode, ui_toolkit, lang = \
+        mod.parseStdOpts('y:s:', ['delay='])
 
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], 'p:d:hl:b:gs:y:',
-            ['printer=', 'device=', 'help', 'help-rest', 'help-man', 
-             'help-desc', 'logging=', 'bus=', 'delay='])
-
-    except getopt.GetoptError, e:
-        log.error(e.msg)
-        usage()
-
-    printer_name = None
     device_uri = None
-    log_level = logger.DEFAULT_LOG_LEVEL
-    bus = device.DEFAULT_PROBE_BUS
+    printer_name = None
     usb_bus_node = None
     usb_bus_id = None
     usb_device_id = None
     silent = False
     delay = 0.0
 
-    if os.getenv("HPLIP_DEBUG"):
-        log.set_level('debug')
-
-
     for o, a in opts:
-        if o in ('-h', '--help'):
-            usage()
-
-        elif o == '--help-rest':
-            usage('rest')
-
-        elif o == '--help-man':
-            usage('man')
-
-        elif o == '--help-desc':
-            print __doc__,
-            sys.exit(0)
-
-        elif o in ('-p', '--printer'):
-            if a.startswith('*'):
-                printer_name = cups.getDefaultPrinter()
-                log.debug(printer_name)
-                
-                if printer_name is not None:
-                    log.info("Using CUPS default printer: %s" % printer_name)
-                else:
-                    log.error("CUPS default printer is not set.")
-                
-            else:
-                printer_name = a
-
-        elif o in ('-d', '--device'):
-            device_uri = a
-
-        elif o in ('-b', '--bus'):
-            bus = [x.lower().strip() for x in a.split(',')]
-            if not device.validateBusList(bus):
-                usage()
-
-        elif o in ('-l', '--logging'):
-            log_level = a.lower().strip()
-            if not log.set_level(log_level):
-                usage()
-
-        elif o == '-g':
-            log.set_level('debug')
-            
-        elif o == '-s':
+        if o == '-s':
             silent = True
             try:
                 usb_bus_id, usb_device_id = a.split(":", 1)
@@ -147,10 +73,11 @@ try:
                 sys.exit(1)
                 
             if len(usb_bus_id) != 3 or len(usb_device_id) != 3:
-                log.error("Invalid USB IDs: %s" % a)
+                log.error("Invalid USB IDs '%s'. Must be the format: bbb.ddd" % a)
                 sys.exit(1)
                 
             usb_bus_node = a
+            mode = NON_INTERACTIVE_MODE
             
         elif o in ('-y', '--delay'):
             try:
@@ -158,40 +85,58 @@ try:
             except ValueError:
                 log.error("Invalid delay value. Must be numeric (float) value. Setting delay to 0.0")
                 delay = 0.0
-
-
-    if device_uri and printer_name:
-        log.error("You may not specify both a printer (-p) and a device (-d).")
-        usage()
-
-    utils.log_title(__title__, __version__)
-    
-    if os.getuid() == 0:
-        log.warn("hp-firmware should not be run as root.")
-
-    if silent:
-        # called by .rules file with -s bbb.ddd
-        printer_name = None
-        
-        if usb_bus_node is not None:
-            log.debug("USB bus node: %s" % usb_bus_node)
-            device_uri, sane_uri, fax_uri = device.makeURI(usb_bus_node, 1)
             
-            if not device_uri:
-                log.error("Invalid USB IDs: %s" % usb_bus_node)
-                sys.exit(1)
+            mode = NON_INTERACTIVE_MODE
+                
+
+    if mode == GUI_MODE:
+        if not utils.canEnterGUIMode4():
+            log.error("%s -u/--gui requires Qt4 GUI support. Entering interactive mode." % __mod__)
+            mode = INTERACTIVE_MODE
+    
+    if mode in (GUI_MODE, INTERACTIVE_MODE):
+        mod.quiet = False
+    
+    if mode == GUI_MODE:
+        try:
+            from PyQt4.QtGui import QApplication
+            from ui4.firmwaredialog import FirmwareDialog
+        except ImportError:
+            log.error("Unable to load Qt4 support. Is it installed?")
+            sys.exit(1)        
+            
+
+        mod.showTitle()
         
-    else:
-        if not device_uri and not printer_name:
+        device_uri = mod.getDeviceUri(device_uri, printer_name, 
+            filter={'fw-download': (operator.gt, 0)})
+
+        if 1:
+            app = QApplication(sys.argv)
+            
+            dialog = FirmwareDialog(None, device_uri)
+            dialog.show()
             try:
-                device_uri = device.getInteractiveDeviceURI(bus, 
-                    filter={'fw-download' : (operator.gt, 0)})
-                    
-                if device_uri is None:
-                    sys.exit(1)
-            except Error:
-                log.error("Error occured during interactive mode. Exiting.")
-                sys.exit(1)
+                log.debug("Starting GUI loop...")
+                app.exec_()
+            except KeyboardInterrupt:
+                sys.exit(0)
+        
+        sys.exit(0)
+    
+    mod.showTitle()
+    
+    if usb_bus_node is not None:
+        log.debug("USB bus node: %s" % usb_bus_node)
+        device_uri, sane_uri, fax_uri = device.makeURI(usb_bus_node, 1)
+        
+        if not device_uri:
+            log.error("Invalid USB Device ID or USB bus ID. No device found.")
+            sys.exit(1)
+     
+    else:
+        device_uri = mod.getDeviceUri(device_uri, printer_name, 
+            filter={'fw-download': (operator.gt, 0)})
 
     try:
         d = device.Device(device_uri, printer_name)
@@ -199,17 +144,6 @@ try:
         log.error("Error opening device. Exiting.")
         sys.exit(1)
 
-    if d.device_uri is None and printer_name:
-        log.error("Printer '%s' not found." % printer_name)
-        sys.exit(1)
-
-    if d.device_uri is None and device_uri:
-        log.error("Malformed/invalid device-uri: %s" % device_uri)
-        sys.exit(1)
-
-    user_cfg.last_used.device_uri = d.device_uri
-        
-       
     try:
         if delay:
              time.sleep(delay)
@@ -227,18 +161,18 @@ try:
             if d.downloadFirmware(usb_bus_id, usb_device_id):
                 if not silent:
                     log.info("Done.")
+                sys.exit(0)
+                
             else:
                 log.error("Firmware download failed.")
+                sys.exit(1)
                 
         else:
             log.error("Device %s does not support or require firmware download." % device_uri)
+            sys.exit(1)
 
     finally:
         d.close()
     
 except KeyboardInterrupt:
     log.error("User exit")
-
-
-
-

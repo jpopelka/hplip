@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,8 +20,9 @@
 # Author: Don Welch
 #
 
-__version__ = '3.3'
+__version__ = '4.0'
 __title__ = "Make Copies Utility"
+__mod__ = 'hp-makecopies'
 __doc__ = "PC initiated make copies on supported HP AiO and MFP devices."
 
 # Std Lib
@@ -35,115 +36,41 @@ import operator
 
 # Local
 from base.g import *
-from base import utils, device, pml, tui
+from base import utils, device, pml, tui, module
 from copier import copier
 from prnt import cups
 
 
-log.set_module('hp-makecopies')
+mod = module.Module(__mod__, __title__, __version__, __doc__, None,
+                    (NON_INTERACTIVE_MODE, GUI_MODE), 
+                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4))
+                    
+mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS,
+    extra_options=[
+    ("Number of copies:", "-m<num_copies> or --copies=<num_copies> or --num=<num_copies> (1-99)", "option", False),
+    ("Reduction/enlargement:", "-r<%> or --reduction=<%> or --enlargement=<%> (25-400%)", "option", False),
+     ("Quality:", "-q<quality> or --quality=<quality> (where quality is: 'fast', 'draft', 'normal', 'presentation', or 'best')", "option", False),
+     ("Contrast:", "-c<contrast> or --contrast=<contrast> (-5 to +5)", "option", False),
+     ("Fit to page (flatbed only):", "-f or --fittopage or --fit (overrides reduction/enlargement)", "option", False)])
 
-USAGE = [(__doc__, "", "name", True),
-         ("Usage: hp-makecopies [PRINTER|DEVICE-URI] [MODE] [OPTIONS]", "", "summary", True),
-         utils.USAGE_ARGS,
-         utils.USAGE_DEVICE,
-         ("To specify a CUPS printer:", "-P<printer>, -p<printer> or --printer=<printer>", "option", False),
-         utils.USAGE_SPACE,
-         ("[MODE]", "", "header", False),
-         ("Enter graphical UI mode:", "-u or --gui (Default)", "option", False),
-         ("Run in non-interactive mode (batch mode):", "-n or --non-interactive", "option", False),
-         utils.USAGE_SPACE,
-         utils.USAGE_OPTIONS,
-         ("Number of copies:", "-m<num_copies> or --copies=<num_copies> or --num=<num_copies> (1-99)", "option", False),
-         ("Reduction/enlargement:", "-r<%> or --reduction=<%> or --enlargement=<%> (25-400%)", "option", False),
-         ("Quality:", "-q<quality> or --quality=<quality> (where quality is: 'fast', 'draft', 'normal', 'presentation', or 'best')", "option", False),
-         ("Contrast:", "-c<contrast> or --contrast=<contrast> (-5 to +5)", "option", False),
-         ("Fit to page (flatbed only):", "-f or --fittopage or --fit (overrides reduction/enlargement)", "option", False),
-         utils.USAGE_LANGUAGE2,
-         utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
-         utils.USAGE_HELP,
-         utils.USAGE_SPACE,
-         utils.USAGE_NOTES,
-         utils.USAGE_STD_NOTES1, utils.USAGE_STD_NOTES2, 
-         ("3. If any copy parameter is not specified (contrast, reduction, etc), the default values from the device are used.", "", "note", False),
-         ]
+opts, device_uri, printer_name, mode, ui_toolkit, loc = \
+    mod.parseStdOpts('m:r:q:c:f:', 
+                     ['num=', 'copies=', 'reduction=', 'enlargement=', 'quality=',
+                      'contrast=', 'fittopage', 'fit', 'fit-to-page'])
+    
+device_uri = mod.getDeviceUri(device_uri, printer_name, 
+    filter={'copy-type': (operator.gt, 0)})
 
-
-def usage(typ='text'):
-    if typ == 'text':
-        utils.log_title(__title__, __version__)
-
-    utils.format_text(USAGE, typ, __title__, 'hp-makecopies', __version__)
-    sys.exit(0)
-
-
-try:
-    opts, args = getopt.getopt(sys.argv[1:], 'P:p:d:hl:gm:c:q:r:funb:',
-                               ['printer=', 'device=', 'help', 'logging=',
-                                'num=', 'copies=', 'contrast=', 'quality=',
-                                'reduction=', 'enlargement=', 'fittopage', 
-                                'fit', 'gui', 'help-rest', 'help-man',
-                                'help-desc', 'non-interactive', 'bus=', 
-                                'lang='])
-except getopt.GetoptError, e:
-    log.error(e.msg)
-    usage()
-
-printer_name = None
-device_uri = None
-log_level = logger.DEFAULT_LOG_LEVEL
-bus = ['cups']
 num_copies = None
 reduction = None
 reduction_spec = False
 contrast = None
 quality = None
 fit_to_page = None
-mode = GUI_MODE
-mode_specified = False
-loc = None
 
-if os.getenv("HPLIP_DEBUG"):
-    log.set_level('debug')
 
 for o, a in opts:
-    if o in ('-h', '--help'):
-        usage()
-
-    elif o == '--help-rest':
-        usage('rest')
-
-    elif o == '--help-man':
-        usage('man')
-
-    elif o == '--help-desc':
-        print __doc__,
-        sys.exit(0)
-
-    elif o in ('-p', '-P', '--printer'):
-        if a.startswith('*'):
-            printer_name = cups.getDefaultPrinter()
-            log.debug(printer_name)
-            
-            if printer_name is not None:
-                log.info("Using CUPS default printer: %s" % printer_name)
-            else:
-                log.error("CUPS default printer is not set.")
-            
-        else:
-            printer_name = a
-
-    elif o in ('-d', '--device'):
-        device_uri = a
-
-    elif o in ('-l', '--logging'):
-        log_level = a.lower().strip()
-        if not log.set_level(log_level):
-            usage()
-
-    elif o == '-g':
-        log.set_level('debug')
-
-    elif o in ('-m', '--num', '--copies'):
+    if o in ('-m', '--num', '--copies'):
         try:
             num_copies = int(a)
         except ValueError:
@@ -212,36 +139,8 @@ for o, a in opts:
             log.warning("Invalid reduction %. Set to maximum of 400%.")
             reduction = 400
 
-    elif o in ('-f', '--fittopage', '--fit'):
+    elif o in ('-f', '--fittopage', '--fit', '--fit-to-page'):
         fit_to_page = pml.COPIER_FIT_TO_PAGE_ENABLED
-
-    elif o in ('-n', '--non-interactive'):
-        if mode_specified:
-            log.error("You may only specify a single mode as a parameter (-n or -u).")
-            sys.exit(1)
-
-        mode = NON_INTERACTIVE_MODE
-        mode_specified = True
-
-    elif o in ('-u', '--gui'):
-        if mode_specified:
-            log.error("You may only specify a single mode as a parameter (-n or -u).")
-            sys.exit(1)
-
-        mode = GUI_MODE
-        mode_specified = True
-
-    elif o in ('-b', '--bus'):
-        bus = [x.lower().strip() for x in a.split(',')]
-        if not device.validateBusList(bus):
-            usage()
-
-    elif o == '--lang':
-        if a.strip() == '?':
-            tui.show_languages()
-            sys.exit(0)
-
-        loc = utils.validate_language(a.lower())
 
 
 
@@ -249,103 +148,108 @@ if fit_to_page == pml.COPIER_FIT_TO_PAGE_ENABLED and reduction_spec:
     log.warning("Fit to page specfied: Reduction/enlargement parameter ignored.")
 
 
-utils.log_title(__title__, __version__)
-
-if os.getuid() == 0:
-    log.warn("hp-makecopies should not be run as root.")
-
-# Security: Do *not* create files that other users can muck around with
-os.umask (0037)
-
 if mode == GUI_MODE:
-    if not utils.canEnterGUIMode():
-        mode = NON_INTERACTIVE_MODE
-
-if mode == GUI_MODE:
-    app = None
-    makecopiesdlg = None
-
-    from qt import *
-    from ui.makecopiesform import MakeCopiesForm
-
-    # create the main application object
-    app = QApplication(sys.argv)
-
-    if loc is None:
-        loc = user_cfg.ui.get("loc", "system")
-        if loc.lower() == 'system':
-            loc = str(QTextCodec.locale())
-            log.debug("Using system locale: %s" % loc)
-
-    if loc.lower() != 'c':
-        e = 'utf8'
-        try:
-            l, x = loc.split('.')
-            loc = '.'.join([l, e])
-        except ValueError:
-            l = loc
-            loc = '.'.join([loc, e])
-
-        log.debug("Trying to load .qm file for %s locale." % loc)
-        trans = QTranslator(None)
-
-        qm_file = 'hplip_%s.qm' % l
-        log.debug("Name of .qm file: %s" % qm_file)
-        loaded = trans.load(qm_file, prop.localization_dir)
-
-        if loaded:
-            app.installTranslator(trans)
-        else:
-            loc = 'c'
-
-    if loc == 'c':
-        log.debug("Using default 'C' locale")
+    if ui_toolkit == 'qt3':
+        if not utils.canEnterGUIMode():
+            log.error("%s requires GUI support (try running with --qt4). Also, try using non-interactive (-n) mode." % __mod__)
+            sys.exit(1)
     else:
-        log.debug("Using locale: %s" % loc)
-        QLocale.setDefault(QLocale(loc))
-        prop.locale = loc
+        if not utils.canEnterGUIMode4():
+            log.error("%s requires GUI support (try running with --qt3). Also, try using non-interactive (-n) mode." % __mod__)
+            sys.exit(1)
+
+
+if mode == GUI_MODE:
+    if ui_toolkit == 'qt3':
+        app = None
+        makecopiesdlg = None
+
+        from qt import *
+        from ui.makecopiesform import MakeCopiesForm
+
+        # create the main application object
+        app = QApplication(sys.argv)
+
+        if loc is None:
+            loc = user_cfg.ui.get("loc", "system")
+            if loc.lower() == 'system':
+                loc = str(QTextCodec.locale())
+                log.debug("Using system locale: %s" % loc)
+
+        if loc.lower() != 'c':
+            e = 'utf8'
+            try:
+                l, x = loc.split('.')
+                loc = '.'.join([l, e])
+            except ValueError:
+                l = loc
+                loc = '.'.join([loc, e])
+
+            log.debug("Trying to load .qm file for %s locale." % loc)
+            trans = QTranslator(None)
+
+            qm_file = 'hplip_%s.qm' % l
+            log.debug("Name of .qm file: %s" % qm_file)
+            loaded = trans.load(qm_file, prop.localization_dir)
+
+            if loaded:
+                app.installTranslator(trans)
+            else:
+                loc = 'c'
+
+        if loc == 'c':
+            log.debug("Using default 'C' locale")
+        else:
+            log.debug("Using locale: %s" % loc)
+            QLocale.setDefault(QLocale(loc))
+            prop.locale = loc
+            try:
+                locale.setlocale(locale.LC_ALL, locale.normalize(loc))
+            except locale.Error:
+                pass
+
+        bus = ['cups']
+        makecopiesdlg = MakeCopiesForm(bus, device_uri, printer_name, 
+                                       num_copies, contrast, quality, 
+                                       reduction, fit_to_page)
+
+        makecopiesdlg.show()
+        app.setMainWidget(makecopiesdlg)
+
         try:
-            locale.setlocale(locale.LC_ALL, locale.normalize(loc))
-        except locale.Error:
+            log.debug("Starting GUI loop...")
+            app.exec_loop()
+        except KeyboardInterrupt:
             pass
 
-    makecopiesdlg = MakeCopiesForm(bus, device_uri, printer_name, 
-                                   num_copies, contrast, quality, 
-                                   reduction, fit_to_page)
+    else: # qt4   
+        try:
+            from PyQt4.QtGui import QApplication
+            from ui4.makecopiesdialog import MakeCopiesDialog
+        except ImportError:
+            log.error("Unable to load Qt4 support. Is it installed?")
+            sys.exit(1)        
 
-    makecopiesdlg.show()
-    app.setMainWidget(makecopiesdlg)
+        #try:
+        if 1:
+            app = QApplication(sys.argv)
 
-    try:
-        log.debug("Starting GUI loop...")
-        app.exec_loop()
-    except KeyboardInterrupt:
-        pass
+            dlg = MakeCopiesDialog(None, device_uri)
+            dlg.show()
+            try:
+                log.debug("Starting GUI loop...")
+                app.exec_()
+            except KeyboardInterrupt:
+                sys.exit(0)
 
-
-
+        #finally:
+        if 1:
+            sys.exit(0)
 
 
 else: # NON_INTERACTIVE_MODE
     try:
-        if not device_uri and not printer_name:
-            try:
-                device_uri = device.getInteractiveDeviceURI(bus, 
-                    filter={'copy-type': (operator.gt, 0)})
-
-                if device_uri is None:
-                    sys.exit(1)
-            except Error:
-                log.error("Error occured during interactive mode. Exiting.")
-                sys.exit(1)
-
         dev = copier.PMLCopyDevice(device_uri, printer_name)
-
-        if dev.copy_type == COPY_TYPE_NONE:
-            log.error("Sorry, make copies functionality is not supported on this device.")
-            sys.exit(1)
-
-        user_cfg.last_used.device_uri = dev.device_uri
 
         try:
             try:

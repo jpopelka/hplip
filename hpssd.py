@@ -20,8 +20,9 @@
 # Author: Don Welch
 #
 
-__version__ = '10.1'
-__title__ = "Services and Status System Tray dBus Child Process"
+__version__ = '12.0'
+__title__ = "Services and Status System Tray dBus Child/Parent Process"
+__mod__ = 'hpssd'
 __doc__ = "Provides persistent data and event services to HPLIP client applications. Required to be running for PC send fax, optional in all other cases."
 
 
@@ -34,6 +35,9 @@ import getopt
 import select
 import signal
 import tempfile
+#import threading
+#import Queue
+from cPickle import loads, HIGHEST_PROTOCOL
 
 # Local
 from base.g import *
@@ -45,7 +49,7 @@ try:
     from dbus import lowlevel, SystemBus, SessionBus
     import dbus.service
     from dbus.mainloop.glib import DBusGMainLoop
-    from gobject import MainLoop
+    from gobject import MainLoop, timeout_add, threads_init, io_add_watch, IO_IN
     dbus_loaded = True
 except ImportError:
     log.error("dbus failed to load (python-dbus ver. 0.80+ required). Exiting...")
@@ -55,71 +59,30 @@ except ImportError:
 
 # Globals
 PIPE_BUF = 4096
-dbus_loop = None
+dbus_loop, main_loop = None, None
 system_bus = None
 session_bus = None
-w = None
+w1, w2, r3 = None, None, None
 devices = {} # { 'device_uri' : DeviceCache, ... }
 
 
-USAGE = [(__doc__, "", "name", True),
-         ("Usage: hpssd.py [OPTIONS]", "", "summary", True),
-         utils.USAGE_OPTIONS,
-         utils.USAGE_LOGGING1, utils.USAGE_LOGGING2,
-         ("Run in debug mode:", "-g (same as options: -ldebug -x)", "option", False),
-         utils.USAGE_HELP,
-        ]
-
-
-def usage(typ='text'):
-    if typ == 'text':
-        utils.log_title(__title__, __version__)
-
-    utils.format_text(USAGE, typ, __title__, 'hpssd.py', __version__)
-    sys.exit(0)
-
-
+# ***********************************************************************************
+#
+# DEVICE CACHE
+#
+# ***********************************************************************************
 
 class DeviceCache(object):
     def __init__(self, model=''):
-        self.history = utils.RingBuffer(prop.history_size) # circular buffer of ServiceEvent
+        self.history = utils.RingBuffer(prop.history_size) # circular buffer of device.Event
         self.model = models.normalizeModelName(model)
         self.cache = {} # variable name : value
         self.faxes = {} # (username, jobid): FaxEvent
-
-
-
-class ServiceEvent(device.Event):
-    def __init__(self, device_uri, printer_name, event_code, username, job_id, title):
-        device.Event.__init__(self, device_uri, printer_name, event_code, username, job_id, title, time.time())
-
-    def debug(self):
-        log.debug("EVENT:")
-        device.Event.debug(self)
-
-    def __str__(self):
-        return "<ServiceEvent('%s', '%s', %d, '%s', %d, '%s', %f)>" % self.as_tuple()
-
-
-
-class FaxEvent(device.Event):
-    def __init__(self, temp_file, event):
-        device.Event.__init__(self, *event.as_tuple())
-        self.temp_file = temp_file
-
-    def debug(self):
-        log.debug("FAX:")
-        device.Event.debug(self)
-        log.debug("    temp_file=%s" % self.temp_file)
-
-    def __str__(self):
-        return "<FaxEvent('%s', '%s', %d, '%s', %d, '%s', %f, '%s')>" % self.as_tuple()      
-
-    def as_tuple(self):
-        return (self.device_uri, self.printer_name, self.event_code, 
-             self.username, self.job_id, self.title, self.timedate,
-             self.temp_file)
-
+        self.dq = {} # last device query results
+        #self.backoff = False
+        self.backoff_counter = 0  # polling backoff: 0 = none, x = backed off by x intervals
+        self.backoff_countdown = 0
+        self.polling = False # indicates whether its in the device polling list
 
 
 #  dbus interface on session bus
@@ -128,26 +91,43 @@ class StatusService(dbus.service.Object):
         dbus.service.Object.__init__(self, name, object_path)
 
 
-    @dbus.service.method('com.hplip.StatusService', in_signature='s', out_signature='a(ssisisd)')
+    @dbus.service.method('com.hplip.StatusService', in_signature='s', out_signature='sa(ssisisd)')
     def GetHistory(self, device_uri):
         log.debug("GetHistory('%s')" % device_uri)
+        send_systray_blip()
         try:
             devices[device_uri]
         except KeyError:
             #log.warn("Unknown device URI: %s" % device_uri)
-            return []
+            return (device_uri, [])
         else:
             h = devices[device_uri].history.get()
             log.debug("%d events in history:" % len(h))
             [x.debug() for x in h]
-            return [x.as_tuple() for x in h]
+            return (device_uri, [x.as_tuple() for x in h])
 
+
+    @dbus.service.method('com.hplip.StatusService', in_signature='s', out_signature='sa{ss}')
+    def GetStatus(self, device_uri):
+        log.debug("GetStatus('%s')" % device_uri)
+        send_systray_blip()
+        try:
+            devices[device_uri]
+        except KeyError:
+            #log.warn("Unknown device URI: %s" % device_uri)
+            return (device_uri, {})
+        else:
+            t = {}
+            dq = devices[device_uri].dq
+            [t.setdefault(x, str(dq[x])) for x in dq.keys()]
+            log.debug(t)
+            return (device_uri, t)
 
 
     @dbus.service.method('com.hplip.StatusService', in_signature='ssi', out_signature='i')
     def SetCachedIntValue(self, device_uri, key, value):
         log.debug("SetCachedIntValue('%s', '%s', %d)" % (device_uri, key, value))
-        if check_device(device_uri) == ERROR_SUCCESS: 
+        if check_device(device_uri) == ERROR_SUCCESS:
             devices[device_uri].cache[key] = value
             return value
 
@@ -168,7 +148,7 @@ class StatusService(dbus.service.Object):
     @dbus.service.method('com.hplip.StatusService', in_signature='sss', out_signature='s')
     def SetCachedStrValue(self, device_uri, key, value):
         log.debug("SetCachedStrValue('%s', '%s', '%s')" % (device_uri, key, value))
-        if check_device(device_uri) == ERROR_SUCCESS: 
+        if check_device(device_uri) == ERROR_SUCCESS:
             devices[device_uri].cache[key] = value
             return value
 
@@ -190,34 +170,26 @@ class StatusService(dbus.service.Object):
     # Pass zero for job_id to retrieve any avail. fax
     @dbus.service.method('com.hplip.StatusService', in_signature='ssi', out_signature='ssisisds')
     def CheckForWaitingFax(self, device_uri, username, job_id=0):
-        #device_uri = device_uri.replace('hp:', 'hpfax:')
         log.debug("CheckForWaitingFax('%s', '%s', %d)" % (device_uri, username, job_id))
+        send_systray_blip()
         r = (device_uri, '', 0, username, job_id, '', 0.0, '')
-        
         check_device(device_uri)
-        #try:
-        #    devices[device_uri]
-        #except KeyError:
-        #    log.warn("Unknown device URI: %s" % device_uri)
-        #    return r
-        #else:
-        if 1:
-            show_waiting_faxes(device_uri)
+        show_waiting_faxes(device_uri)
 
-            if job_id: # check for specific job_id
-                try:
-                    devices[device_uri].faxes[(username, job_id)]
-                except KeyError:
-                    return r
-                else:
-                    return self.check_for_waiting_fax_return(device_uri, username, job_id)
-
-            else: # return any matching one from cache. call mult. times to get all.
-                for u, j in devices[device_uri].faxes.keys():
-                    if u == username:
-                        return self.check_for_waiting_fax_return(device_uri, u, j)
-
+        if job_id: # check for specific job_id
+            try:
+                devices[device_uri].faxes[(username, job_id)]
+            except KeyError:
                 return r
+            else:
+                return self.check_for_waiting_fax_return(device_uri, username, job_id)
+
+        else: # return any matching one from cache. call mult. times to get all.
+            for u, j in devices[device_uri].faxes.keys():
+                if u == username:
+                    return self.check_for_waiting_fax_return(device_uri, u, j)
+
+            return r
 
 
     # if CheckForWaitingFax returns a fax job, that job is removed from the cache
@@ -226,13 +198,13 @@ class StatusService(dbus.service.Object):
         r = devices[d].faxes[(u, j)].as_tuple()
         del devices[d].faxes[(u, j)]
         show_waiting_faxes(d)
-        return r 
+        return r
 
 
     # Alternate way to "send" an event rather than using a signal message
     @dbus.service.method('com.hplip.StatusService', in_signature='ssisis', out_signature='')
     def SendEvent(self, device_uri, printer_name, event_code, username, job_id, title):
-        event = ServiceEvent(device_uri, printer_name, event_code, username, job_id, title)
+        event = device.Event(device_uri, printer_name, event_code, username, job_id, title)
         handle_event(event)
 
 
@@ -246,16 +218,18 @@ def check_device(device_uri):
             back_end, is_hp, bus, model, serial, dev_file, host, port = \
                 device.parseDeviceURI(device_uri)
         except Error:
-            log.error("Invalid device URI")
+            log.debug("Invalid device URI: %s" % device_uri)
             return ERROR_INVALID_DEVICE_URI
 
         devices[device_uri] = DeviceCache(model)
 
-    return ERROR_SUCCESS   
+    return ERROR_SUCCESS
 
 
 def create_history(event):
     history = devices[event.device_uri].history.get()
+
+    #send_toolbox_event(event, EVENT_HISTORY_UPDATE)
 
     if history and history[-1].event_code == event.event_code:
         log.debug("Duplicate event. Replacing previous event.")
@@ -266,16 +240,17 @@ def create_history(event):
         return False
 
 
+
 def handle_fax_event(event, pipe_name):
     if event.event_code == EVENT_FAX_RENDER_COMPLETE and \
         event.username == prop.username:
 
         fax_file_fd, fax_file_name = tempfile.mkstemp(prefix="hpfax-")
-        pipe = os.open(pipe_name, os.O_RDONLY) 
+        pipe = os.open(pipe_name, os.O_RDONLY)
         bytes_read = 0
         while True:
             data = os.read(pipe, PIPE_BUF)
-            if not data: 
+            if not data:
                 break
 
             os.write(fax_file_fd, data)
@@ -287,7 +262,7 @@ def handle_fax_event(event, pipe_name):
         os.close(fax_file_fd)
 
         devices[event.device_uri].faxes[(event.username, event.job_id)] = \
-            FaxEvent(fax_file_name, event)
+            device.FaxEvent(fax_file_name, event)
 
         show_waiting_faxes(event.device_uri)
 
@@ -299,10 +274,10 @@ def handle_fax_event(event, pipe_name):
         # See if hp-sendfax is already running for this queue
         ok, lock_file = utils.lock_app('hp-sendfax-%s' % event.printer_name, True)
 
-        if ok: 
+        if ok:
             # able to lock, not running...
             utils.unlock(lock_file)
-            
+
             path = utils.which('hp-sendfax')
             if path:
                 path = os.path.join(path, 'hp-sendfax')
@@ -311,13 +286,13 @@ def handle_fax_event(event, pipe_name):
                 return
 
             log.debug(path)
-            
+
             log.debug("Running hp-sendfax: hp-senfax --fax=%s" % event.printer_name)
-            
-            os.spawnlp(os.P_NOWAIT, path, 'hp-sendfax', 
+
+            os.spawnlp(os.P_NOWAIT, path, 'hp-sendfax',
                 '--fax=%s' % event.printer_name)
-        
-        else: 
+
+        else:
             # hp-sendfax running
             # no need to do anything... hp-sendfax is polling
             log.debug("hp-sendfax is running. Waiting for CheckForWaitingFax() call.")
@@ -329,6 +304,7 @@ def handle_fax_event(event, pipe_name):
 
 def show_waiting_faxes(d):
     f = devices[d].faxes
+
     if not len(f):
         log.debug("No faxes waiting for %s" % d)
     else:
@@ -340,66 +316,175 @@ def show_waiting_faxes(d):
         [f[x].debug() for x in f]
 
 
+# Qt4 only
+def handle_hpdio_event(event, bytes_written):
+    log.debug("Reading %d bytes from hpdio pipe..." % bytes_written)
+    total_read, data = 0, ''
+
+    while True:
+        r, w, e = select.select([r3], [], [r3], 0.0)
+        if not r: break
+
+        x = os.read(r3, PIPE_BUF)
+        if not x: break
+
+        data = ''.join([data, x])
+        total_read += len(x)
+
+        if total_read == bytes_written: break
+
+    log.debug("Read %d bytes" % total_read)
+
+    if total_read == bytes_written:
+        dq = loads(data)
+
+        if check_device(event.device_uri) == ERROR_SUCCESS:
+            devices[event.device_uri].dq = dq.copy()
+
+            handle_event(device.Event(event.device_uri, '',
+                dq.get('status-code', STATUS_PRINTER_IDLE), prop.username, 0, ''))
+
+            send_toolbox_event(event, EVENT_DEVICE_UPDATE_REPLY)
+
+
+
 def handle_event(event, more_args=None):
+    #global polling_blocked
+    #global request_queue
+
     log.debug("Handling event...")
-    if more_args is None: 
+
+    if more_args is None:
         more_args = []
 
     event.debug()
 
     if event.device_uri and check_device(event.device_uri) != ERROR_SUCCESS:
         return
-   
+
     # If event-code > 10001, its a PJL error code, so convert it
     if event.event_code > EVENT_MAX_EVENT:
         event.event_code = status.MapPJLErrorCode(event.event_code)
 
     # regular user/device status event
     if EVENT_MIN_USER_EVENT <= event.event_code <= EVENT_MAX_USER_EVENT:
-        
+
         if event.device_uri:
             #event.device_uri = event.device_uri.replace('hpfax:', 'hp:')
             dup_event = create_history(event)
 
+            if event.event_code in (EVENT_DEVICE_STOP_POLLING,
+                                    EVENT_START_MAINT_JOB,
+                                    EVENT_START_COPY_JOB,
+                                    EVENT_START_FAX_JOB,
+                                    EVENT_START_PRINT_JOB):
+                pass # stop polling (increment counter)
+
+            elif event.event_code in (EVENT_DEVICE_START_POLLING, # should this event force counter to 0?
+                                      EVENT_END_MAINT_JOB,
+                                      EVENT_END_COPY_JOB,
+                                      EVENT_END_FAX_JOB,
+                                      EVENT_END_PRINT_JOB,
+                                      EVENT_SCANNER_FAIL,
+                                      EVENT_FAX_JOB_FAIL,
+                                      EVENT_FAX_JOB_CANCELED,
+                                      EVENT_COPY_JOB_FAIL,
+                                      EVENT_COPY_JOB_CANCELED):
+                pass # start polling if counter <= 0
+                # TODO: Do tools send END event if canceled or failed? Should they?
+                # TODO: What to do if counter doesn't hit 0 after a period? Timeout?
+                # TODO: Also, need to deal with the backoff setting (or it completely sep?)
+
         # Send to system tray icon if available
         if not dup_event and event.event_code != STATUS_PRINTER_IDLE:
-            if w is not None:
-                log.debug("Sending event to system tray icon UI...")
-                try:
-                    os.write(w, event.pack())
-                except OSError:
-                    log.debug("Failed.")
-                    
+            send_event_to_systray_ui(event)
+
         # send EVENT_HISTORY_UPDATE signal to hp-toolbox
         send_toolbox_event(event, EVENT_HISTORY_UPDATE)
 
-        
     # Handle fax signals
     elif EVENT_FAX_MIN <= event.event_code <= EVENT_FAX_MAX and more_args:
         log.debug("Fax event")
         pipe_name = str(more_args[0])
         handle_fax_event(event, pipe_name)
 
+    elif event.event_code == EVENT_USER_CONFIGURATION_CHANGED:
+        # Sent if polling, hiding, etc. configuration has changed
+    #    send_event_to_hpdio(event)
+        send_event_to_systray_ui(event)
 
-def send_toolbox_event(event, event_code):
-    args = [event.device_uri, event.printer_name, event_code, 
-            prop.username, event.job_id, event.title, '']
-            
-    msg = lowlevel.SignalMessage('/', 'com.hplip.Toolbox', 'Event')
-    msg.append(signature='ssisiss', *args)
+    elif event.event_code == EVENT_SYS_CONFIGURATION_CHANGED: # Not implemented
+        #send_event_to_hpdio(event)
+        send_event_to_systray_ui(event)
 
-    SessionBus().send_message(msg)
+    # Qt4 only
+    elif event.event_code in (EVENT_DEVICE_UPDATE_REQUESTED,):
+                              #EVENT_DEVICE_START_POLLING,  # ?  Who handles polling? hpssd? probably...
+                              #EVENT_DEVICE_STOP_POLLING):  # ?
+        send_event_to_hpdio(event)
+
+    # Qt4 only
+    elif event.event_code in (EVENT_DEVICE_UPDATE_ACTIVE, EVENT_DEVICE_UPDATE_INACTIVE):
+        send_event_to_systray_ui(event)
+
+    # Qt4 only
+    elif event.event_code == EVENT_DEVICE_UPDATE_REPLY:
+        bytes_written = int(more_args[1])
+        handle_hpdio_event(event, bytes_written)
+
+    # Qt4 only
+    elif event.event_code == EVENT_SYSTEMTRAY_EXIT:
+        send_event_to_hpdio(event)
+        send_toolbox_event(event)
+        log.debug("Exiting")
+        main_loop.quit()
+
+    else:
+        log.error("Unhandled event: %d" % event.event_code)
+
+
+
+def send_systray_blip():
+    send_event_to_systray_ui(device.Event('', '', EVENT_DEVICE_UPDATE_BLIP))
+
+
+def send_event_to_systray_ui(event, event_code=None):
+    e = event.copy()
+
+    if event_code is not None:
+        e.event_code = event_code
+
+    #print "event:"
+    #e.debug()
+
+    e.send_via_pipe(w1, 'systemtray')
+
+
+def send_event_to_hpdio(event):
+    event.send_via_pipe(w2, 'hpdio')
+
+
+def send_toolbox_event(event, event_code=None):
+    global session_bus
+
+    e = event.copy()
+
+    if event_code is not None:
+        e.event_code = event_code
+
+    e.send_via_dbus(session_bus, 'com.hplip.Toolbox')
+
 
 
 def handle_signal(typ, *args, **kwds):
-    if kwds['interface'] == 'com.hplip.Service' and \
+    if kwds['interface'] == 'com.hplip.StatusService' and \
         kwds['member'] == 'Event':
 
-        event = ServiceEvent(*args[:6])
+        event = device.Event(*args[:6])
         return handle_event(event, args[6:])
 
 
-def handle_system_signal(*args,**kwds):
+def handle_system_signal(*args, **kwds):
     return handle_signal('system', *args, **kwds)
 
 
@@ -407,21 +492,25 @@ def handle_session_signal(*args, **kwds):
     return handle_signal('session', *args, **kwds)
 
 
-# Entry point for hp-systray
-def run(write_pipe=None, parent_pid=0):
-    global dbus_loop
-    global system_bus
-    global session_bus
-    global w
+
+def run(write_pipe1=None,  # write pipe to systemtray
+        write_pipe2=None,  # write pipe to hpdio
+        read_pipe3=None):  # read pipe from hpdio
+
+    global dbus_loop, main_loop
+    global system_bus, session_bus
+    global w1, w2, r3
 
     log.set_module("hp-systray(hpssd)")
-    w = write_pipe
+    log.debug("PID=%d" % os.getpid())
+    w1, w2, r3 = write_pipe1, write_pipe2, read_pipe3
 
     dbus_loop = DBusGMainLoop(set_as_default=True)
-    
+    main_loop = MainLoop()
+
     try:
         system_bus = SystemBus(mainloop=dbus_loop)
-    except dbus.exceptions.DBusException, e:        
+    except dbus.exceptions.DBusException, e:
         log.error("Unable to connect to dbus system bus. Exiting.")
         sys.exit(1)
 
@@ -432,8 +521,8 @@ def run(write_pipe=None, parent_pid=0):
             log.error("Unable to connect to dbus session bus. Exiting.")
             sys.exit(1)
         else:
-            log.error("Unable to connect to dbus session bus (running as root?)")            
-            sys.exit(1)    
+            log.error("Unable to connect to dbus session bus (running as root?)")
+            sys.exit(1)
 
     # Receive events from the system bus
     system_bus.add_signal_receiver(handle_system_signal, sender_keyword='sender',
@@ -449,50 +538,31 @@ def run(write_pipe=None, parent_pid=0):
     session_name = dbus.service.BusName("com.hplip.StatusService", session_bus)
     status_service = StatusService(session_name, "/com/hplip/StatusService")
 
-    log.debug("Entering main loop...")
+    #threads_init()
+
+#    global polling, polling_interval
+#    polling = user_cfg.polling.enabled
+#    polling_interval = user_cfg.polling.interval or 5 # s
+#    if not polling_interval or polling_interval < 5:
+#        polling_interval = 5
+
+    # timers
+    #log.debug("Starting thread timer at %dms" % THREAD_TIMER)
+    #timeout_add(500, handle_timeout)
+    #io_add_watch(r3, IO_IN, handle_hpdio)
+
+#    if polling:
+#        log.debug("Starting polling timer at %dms" % (polling_interval * 1000))
+#        timeout_add(polling_interval * 1000, handle_polling)
+#        device_list = user_cfg.polling.device_list.split(u',') or []
+#        for d in device_list:
+#            if check_device(d) == ERROR_SUCCESS:
+#                devices[d].polling = True
+
+
+    log.debug("Entering main dbus loop...")
     try:
-        MainLoop().run()
+        main_loop.run()
     except KeyboardInterrupt:
         log.debug("Ctrl-C: Exiting...")
 
-
-
-if __name__ == '__main__':
-    log.set_module('hpssd')
-
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], 'l:hg', 
-            ['level=', 'help', 'help-man', 'help-rest', 'help-desc'])
-
-    except getopt.GetoptError, e:
-        log.error(e.msg)
-        usage()
-
-    if os.getenv("HPLIP_DEBUG"):
-        log.set_level('debug')
-
-    for o, a in opts:
-        if o in ('-l', '--logging'):
-            log_level = a.lower().strip()
-            if not log.set_level(log_level):
-                usage()
-
-        elif o == '-g':
-            log.set_level('debug')
-
-        elif o in ('-h', '--help'):
-            usage()
-
-        elif o == '--help-rest':
-            usage('rest')
-
-        elif o == '--help-man':
-            usage('man')
-
-        elif o == '--help-desc':
-            print __doc__,
-            sys.exit(0)
-
-
-    utils.log_title(__title__, __version__)    
-    sys.exit(run())

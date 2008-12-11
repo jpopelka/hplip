@@ -79,7 +79,6 @@ LJM1005::~LJM1005 ()
 LJM1005DraftGrayMode::LJM1005DraftGrayMode ()
 : GrayMode(/*ulMapDJ600_CCM_K*/ulMapGRAY_K_6x6x1)
 {
-
     ResolutionX[0] =
     ResolutionY[0] = 600;
     BaseResX =

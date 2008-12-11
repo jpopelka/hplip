@@ -43,91 +43,91 @@ class StringTable:
             'press_continue' :  ('',
                                  self.__tr('Please correct the problem and press continue on the printer.')),
 
-            '500' :             (self.__tr('Started a print job.'),
+            '500' :             (self.__tr('Started a print job'),
                                  ''),
 
-            '501' :             (self.__tr('Print job has completed.'),
+            '501' :             (self.__tr('Print job has completed'),
                                  ''),
 
-            '600' :             (self.__tr('Started a fax job.'),
-                                 ''),
-                                 
-            '601' :             (self.__tr('Fax job is ready for send.'),
-                                 ''),
-
-            '700' :             (self.__tr('Printer queue stopped.'),
+            '600' :             (self.__tr('Started a fax job'),
                                  ''),
                                  
-            '701' :             (self.__tr('Printer queue started.'),
+            '601' :             (self.__tr('Fax job is ready for send'),
                                  ''),
 
-            '702' :             (self.__tr('Printer is rejecting jobs.'),
-                                 ''),
-
-            '703' :             (self.__tr('Printer is accepting jobs.'),
-                                 ''),
-
-            '704' :             (self.__tr('Printer set as default.'),
+            '700' :             (self.__tr('Printer queue stopped'),
                                  ''),
                                  
-            '800' :             (self.__tr('Fax queue stopped.'),
+            '701' :             (self.__tr('Printer queue started'),
+                                 ''),
+
+            '702' :             (self.__tr('Printer is rejecting jobs'),
+                                 ''),
+
+            '703' :             (self.__tr('Printer is accepting jobs'),
+                                 ''),
+
+            '704' :             (self.__tr('Printer set as default'),
                                  ''),
                                  
-            '801' :             (self.__tr('Fax queue started.'),
+            '800' :             (self.__tr('Fax queue stopped'),
+                                 ''),
+                                 
+            '801' :             (self.__tr('Fax queue started'),
                                  ''),
 
-            '802' :             (self.__tr('Fax is rejecting jobs.'),
+            '802' :             (self.__tr('Fax is rejecting jobs'),
                                  ''),
 
-            '803' :             (self.__tr('Fax is accepting jobs.'),
+            '803' :             (self.__tr('Fax is accepting jobs'),
                                  ''),
 
-            '804' :             (self.__tr('Fax set as default.'),
+            '804' :             (self.__tr('Fax set as default'),
                                  ''),
 
-            '1000' :            (self.__tr('Idle.'),
+            '1000' :            (self.__tr('Idle'),
                                   ''),
 
-            '1001' :            (self.__tr('Busy.'),
+            '1001' :            (self.__tr('Busy'),
                                  ''),
 
-            '1002' :            (self.__tr('Print job is continuing.'),
+            '1002' :            (self.__tr('Print job is continuing'),
                                   ''),
 
-            '1003' :            (self.__tr('Turning off.'),
+            '1003' :            (self.__tr('Turning off'),
                                   ''),
 
-            '1004' :            (self.__tr('Report printing.'),
+            '1004' :            (self.__tr('Report printing'),
                                   ''),
 
-            '1005' :            (self.__tr('Canceling.'),
+            '1005' :            (self.__tr('Canceling'),
                                   ''),
 
             '1006' :            ('%5002%',
                                 '%try_again%'),
 
-            '1007' :            (self.__tr('Waiting for ink to dry.'),
+            '1007' :            (self.__tr('Waiting for ink to dry'),
                                  ''),
 
-            '1008' :            (self.__tr('Pen change.'),
+            '1008' :            (self.__tr('Pen change'),
                                  ''),
 
-            '1009' :            (self.__tr('The printer is out of paper.'),
+            '1009' :            (self.__tr('The printer is out of paper'),
                                  self.__tr('Please load more paper and follow the instructions on the front panel (if any) to continue printing.')),
 
-            '1010' :            (self.__tr('Banner eject needed.'),
+            '1010' :            (self.__tr('Banner eject needed'),
                                  ''),
 
-            '1011' :            (self.__tr('Banner mismatch.'),
+            '1011' :            (self.__tr('Banner mismatch'),
                                  '%try_again%'),
 
-            '1012' :            (self.__tr('Photo mismatch.'),
+            '1012' :            (self.__tr('Photo mismatch'),
                                  '%try_again%'),
 
-            '1013' :            (self.__tr('Duplex mismatch.'),
+            '1013' :            (self.__tr('Duplex mismatch'),
                                  '%try_again'),
 
-            '1014' :            (self.__tr('Paper or cartridge carriage jammed.'),
+            '1014' :            (self.__tr('Paper or cartridge carriage jammed'),
                                  self.__tr('Please clear the jam and press continue on the printer.')),
 
             '1015' :            ('%1014%',
@@ -136,91 +136,91 @@ class StringTable:
             '1016' :            ('%1014%',
                                  '%1014%'),
 
-            '1017' :            (self.__tr('There is a problem with a cartridge.'),
+            '1017' :            (self.__tr('There is a problem with a print cartridge'),
                                  '%press_continue%'),
 
             '1018' :            ('%unknown_error%',
                                   '%try_again%'),
 
-            '1019' :            (self.__tr('Powering down.'),
+            '1019' :            (self.__tr('Powering down'),
                                  ''),
 
-            '1020' :            (self.__tr('Front panel test.'),
+            '1020' :            (self.__tr('Front panel test'),
                                  ''),
 
-            '1021' :            (self.__tr('Clean out tray missing.'),
+            '1021' :            (self.__tr('Clean out tray missing'),
                                  '%try_again%'),
 
-            '1022' :            (self.__tr('Output bin full.'),
+            '1022' :            (self.__tr('Output bin full'),
                                  '%try_again%'),
 
-            '1023' :            (self.__tr('Media size mismatch.'),
+            '1023' :            (self.__tr('Media size mismatch'),
                                  '%try_again%'),
 
-            '1024' :            (self.__tr('Duplexer is jammed.'),
+            '1024' :            (self.__tr('Duplexer is jammed'),
                                  '%1014%'),
 
             '1025' :            ('%1014%',
                                  '%1014%'),
 
-            '1026' :            (self.__tr('An ink cartridge is out of ink.'),
+            '1026' :            (self.__tr('An ink cartridge is out of ink'),
                                  '%try_again%'),
 
-            '1027' :            (self.__tr('Internal device error.'),
+            '1027' :            (self.__tr('Internal device error'),
                                  '%try_again%'),
 
             '1028' :            ('%1014%',
                                  '%1014%'),
 
-            '1029' :            (self.__tr('Second tray missing.'),
+            '1029' :            (self.__tr('Second tray missing'),
                                  '%try_again%'),
 
-            '1030' :            (self.__tr('Duplexer missing.'),
+            '1030' :            (self.__tr('Duplexer missing'),
                                  '%try_again%'),
 
-            '1031' :            (self.__tr('Rear tray missing.'),
+            '1031' :            (self.__tr('Rear tray missing'),
                                  '%try_again%'),
 
-            '1032' :            (self.__tr('Cartridge not latched.'),
+            '1032' :            (self.__tr('Cartridge not latched'),
                                  '%try_again%'),
 
-            '1033' :            (self.__tr('Battery very low.'),
+            '1033' :            (self.__tr('Battery very low'),
                                  '%try_again%'),
 
             '1034' :            ('%1017%',
                                  '%try_again%'),
 
-            '1035' :            (self.__tr('Output tray closed.'),
+            '1035' :            (self.__tr('Output tray closed'),
                                  '%try_again%'),
 
-            '1036' :            (self.__tr('Manual feed blocked.'),
+            '1036' :            (self.__tr('Manual feed blocked'),
                                  '%1014%'),
 
-            '1037' :            (self.__tr('Rear feed blocked.'),
+            '1037' :            (self.__tr('Rear feed blocked'),
                                  '%1014%'),
 
-            '1038' :            (self.__tr('Second tray out of paper.'),
+            '1038' :            (self.__tr('Second tray out of paper'),
                                  '%1009%'),
 
-            '1039' :            (self.__tr('Input tray locked.'),
+            '1039' :            (self.__tr('Input tray locked'),
                                  '%try_again%'),
 
-            '1040' :            (self.__tr('Non-HP ink.'),
+            '1040' :            (self.__tr('Non-HP ink'),
                                  '%try_again%'),
 
-            '1041' :            (self.__tr('Pen calibration needs resume.'),
+            '1041' :            (self.__tr('Pen calibration needs resume'),
                                  '%press_continue%'),
 
-            '1042' :            (self.__tr('Media type mismatch.'),
+            '1042' :            (self.__tr('Media type mismatch'),
                                  '%try_again%'),
 
-            '1043' :            (self.__tr('Custom media mismatch.'),
+            '1043' :            (self.__tr('Custom media mismatch'),
                                  '%try_again%'),
 
-            '1044' :            (self.__tr('Pen cleaning in progress.'),
+            '1044' :            (self.__tr('Pen cleaning in progress'),
                                  ''),
 
-            '1045' :            (self.__tr('Pen checking in progress.'),
+            '1045' :            (self.__tr('Pen checking in progress'),
                                  ''),
 
             '1501' :            (self.__tr('Black cartridge is low on ink'),
@@ -268,109 +268,109 @@ class StringTable:
             '1606' :            (self.__tr('Yellow cartridge is low on toner'),
                                  ''),
 
-            '1800' :            (self.__tr('Warming up.'),
+            '1800' :            (self.__tr('Warming up'),
                                  ''),
 
-            '1801' :            (self.__tr('Low paper.'),
+            '1801' :            (self.__tr('Low paper'),
                                  ''),
 
-            '1802' :            (self.__tr('Door open.'),
+            '1802' :            (self.__tr('Door open'),
                                  '%try_again%'),
 
-            '1803' :            (self.__tr('Offline.'),
+            '1803' :            (self.__tr('Offline'),
                                  ''),
 
-            '1804' :            (self.__tr('Low toner.'),
+            '1804' :            (self.__tr('Low toner'),
                                  ''),
 
-            '1805' :            (self.__tr('No toner.'),
+            '1805' :            (self.__tr('No toner'),
                                  '%try_again%'),
 
-            '1806' :            (self.__tr('Service request.'),
+            '1806' :            (self.__tr('Service request'),
                                  '%try_again%'),
 
-            '1807' :            (self.__tr('Fuser error.'),
+            '1807' :            (self.__tr('Fuser error'),
                                  '%try_again%'),
 
-            '1900' :            (self.__tr('Unsupported printer model.'),
+            '1900' :            (self.__tr('Unsupported printer model'),
                                  ''),
 
-            '2000' :            (self.__tr('Scan job started.'),
+            '2000' :            (self.__tr('Scan job started'),
                                  ''),
 
-            '2001' :            (self.__tr('Scan job completed.'),
+            '2001' :            (self.__tr('Scan job completed'),
                                  ''),
 
-            '2002' :            (self.__tr('Scan job failed.'),
+            '2002' :            (self.__tr('Scan job failed'),
                                  '%try_again%'),
 
-            '3000' :            (self.__tr('Fax job started.'),
+            '3000' :            (self.__tr('Fax job started'),
                                  ''),
 
-            '3001' :            (self.__tr('Fax job complete.'),
+            '3001' :            (self.__tr('Fax job complete'),
                                  ''),
 
-            '3002' :            (self.__tr('Fax job failed.'),
+            '3002' :            (self.__tr('Fax job failed'),
                                  '%try_again%'),
 
-            '3003' :            (self.__tr('Fax job canceled.'),
+            '3003' :            (self.__tr('Fax job canceled'),
                                  ''),
 
-            '3004' :            (self.__tr('Fax send job continuing.'),
+            '3004' :            (self.__tr('Fax send job continuing'),
                                  ''),
 
-            '3005' :            (self.__tr('Fax receive job continuing.'),
+            '3005' :            (self.__tr('Fax receive job continuing'),
                                  ''),
 
-            '4000' :            (self.__tr('Copy job started.'),
+            '4000' :            (self.__tr('Copy job started'),
                                  ''),
 
-            '4001' :            (self.__tr('Copy job complete.'),
+            '4001' :            (self.__tr('Copy job complete'),
                                  ''),
 
-            '4002' :            (self.__tr('Copy job failed.'),
+            '4002' :            (self.__tr('Copy job failed'),
                                  '%try_again%'),
 
-            '4003' :            (self.__tr('Copy job canceled.'),
+            '4003' :            (self.__tr('Copy job canceled'),
                                  ''),
 
-            '5002' :            (self.__tr('Device is busy, powered down, or unplugged.'),
+            '5002' :            (self.__tr('Device is busy, powered down, or unplugged'),
                                  '%5012%'),
 
-            '5004' :            (self.__tr('Invalid device URI.'),
+            '5004' :            (self.__tr('Invalid device URI'),
                                  '%5012%'),
 
-            '5012' :            (self.__tr('Device communication error.'),
+            '5012' :            (self.__tr('Device communication error'),
                                  '%try_again%'),
 
-            '5021' :            (self.__tr('Device is busy.'),
+            '5021' :            (self.__tr('Device is busy'),
                                  ''),
 
-            '5026' :            (self.__tr("Device status not available."),
+            '5026' :            (self.__tr("Device status not available"),
                                  ''),
 
             '5031' :            ('%5021%',
                                  ''),
 
-            '5034' :            (self.__tr('Device does not support requested operation.'),
+            '5034' :            (self.__tr('Device does not support requested operation'),
                                  '%try_again%'),
 
-            '6000' :            (self.__tr('Photocard unload started.'),
+            '6000' :            (self.__tr('Photocard unload started'),
                                  ''),
 
-            '6001' :            (self.__tr('Photocard unload ended.'),
+            '6001' :            (self.__tr('Photocard unload ended'),
                                  ''),
 
-            '6002' :            (self.__tr('Photocard unload failed.'),
+            '6002' :            (self.__tr('Photocard unload failed'),
                                  self.__tr('Make sure photocard is inserted properly and try again.')),
 
-            '6003' :            (self.__tr('Unable to mount photocard on device.'),
+            '6003' :            (self.__tr('Unable to mount photocard on device'),
                                  '%6002%'),
 
-            '6004' :            (self.__tr('Photocard unloaded successfully.'),
+            '6004' :            (self.__tr('Photocard unloaded successfully'),
                                  ''),
 
-            'unknown_error' :   (self.__tr('Unknown error.'),
+            'unknown_error' :   (self.__tr('Unknown error'),
                                  ''),
 
             'print' :           (self.__tr('Print'),
@@ -595,14 +595,14 @@ class StringTable:
             'agent_level_out'          : (self.__tr('Very low'),
                                           ''),
 
-            'email_test_subject'      : (self.__tr('HPLIP: Email alert test message'),
-                                         ''),
-
-            'email_test_message'      : (self.__tr('This email is to test the functionality of HPLIP email alerts.'),
-                                         ''),
-
-            'email_alert_subject'      : (self.__tr('HPLIP: Error/alert on device: '),
-                                          ''),
+#            'email_test_subject'      : (self.__tr('HPLIP: Email alert test message'),
+#                                         ''),
+#
+#            'email_test_message'      : (self.__tr('This email is to test the functionality of HPLIP email alerts'),
+#                                         ''),
+#
+#            'email_alert_subject'      : (self.__tr('HPLIP: Error/alert on device: '),
+#                                          ''),
 
         }
 

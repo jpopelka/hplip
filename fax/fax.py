@@ -188,10 +188,10 @@ class FaxAddressBook(object): # Pickle based address book
     def __init__(self):
         self._data = {}
         #
-        # { 'name' : {'name': 'name',
-        #             'firstname' : u'', 
-        #             'lastname': u',
-        #             'title' : u'', 
+        # { 'name' : {'name': u'',
+        #             'firstname' : u'', # NOT USED STARTING IN 2.8.9
+        #             'lastname': u', # NOT USED STARTING IN 2.8.9
+        #             'title' : u'',  # NOT USED STARTING IN 2.8.9
         #             'fax': u'',
         #             'groups' : [u'', u'', ...],
         #             'notes' : u'', } ...
@@ -201,7 +201,7 @@ class FaxAddressBook(object): # Pickle based address book
 
     def load(self):
         self._fab = os.path.join(prop.user_dir, "fab.pickle")
-        old_fab = os.path.join(prop.user_dir, "fab.db")
+        #old_fab = os.path.join(prop.user_dir, "fab.db")
 
         # Load the existing pickle if present
         if os.path.exists(self._fab):
@@ -220,9 +220,9 @@ class FaxAddressBook(object): # Pickle based address book
             grps = [unicode(s.decode('utf-8')) for s in groups]
 
         self._data[unicode(name)] = {'name' : unicode(name),
-                                    'title': unicode(title), 
-                                    'firstname': unicode(firstname),
-                                    'lastname': unicode(lastname),
+                                    'title': unicode(title),  # NOT USED STARTING IN 2.8.9
+                                    'firstname': unicode(firstname), # NOT USED STARTING IN 2.8.9
+                                    'lastname': unicode(lastname), # NOT USED STARTING IN 2.8.9
                                     'fax': unicode(fax), 
                                     'notes': unicode(notes),
                                     'groups': grps}
@@ -231,10 +231,31 @@ class FaxAddressBook(object): # Pickle based address book
 
     insert = set
 
+
+    def set_key_value(self, name, key, value):
+        self._data[unicode(name)][key] = value
+        self.save()
+        
+
     def get(self, name):
         return self._data.get(name, None)
 
     select = get
+
+    def rename(self, old_name, new_name):
+        try:
+            self._data[old_name]
+        except KeyError:
+            return
+        else:
+            try:
+                self._data[new_name]
+            except KeyError:
+                self._data[new_name] = self._data[old_name].copy()
+                del self._data[old_name]
+            else:
+                return
+        
 
     def get_all_groups(self):
         all_groups = []
@@ -244,11 +265,14 @@ class FaxAddressBook(object): # Pickle based address book
                     all_groups.append(g)
         return all_groups
 
+
     def get_all_records(self):
         return self._data
 
+
     def get_all_names(self):
         return self._data.keys()
+
 
     def save(self):
         try:
@@ -258,21 +282,26 @@ class FaxAddressBook(object): # Pickle based address book
         except IOError:
             log.error("I/O error saving fab file.")
 
+
     def clear(self):
         self._data = {}
 
+
     def delete(self, name):
-        if name in self._data: #self.current
+        if name in self._data:
             del self._data[name]
+            self.save()
             return True
 
         return False
+
 
     def last_modification_time(self):
         try:
             return os.stat(self._fab).st_mtime
         except OSError:
             return 0
+
 
     def update_groups(self, group, members):
         for e, v in self._data.items():
@@ -282,11 +311,15 @@ class FaxAddressBook(object): # Pickle based address book
             else:
                 if group in v['groups']:
                     v['groups'].remove(unicode(group))
+        self.save()
+
 
     def delete_group(self, group):
         for e, v in self._data.items():
             if group in v['groups']:
                 v['groups'].remove(unicode(group))
+        self.save()
+
 
     def group_members(self, group):
         members = []
@@ -295,6 +328,28 @@ class FaxAddressBook(object): # Pickle based address book
                 members.append(e)
         return members
         
+        
+    def add_to_group(self, group, members):
+        group_members = self.group_members(group)
+        self.update_groups(group, group_members + members)
+        
+        
+    def remove_from_group(self, group, remove_members):
+        group_members = self.group_members(group)
+        new_group_members = []
+        for m in group_members:
+            if m not in remove_members:
+                new_group_members.append(m)
+                
+        self.update_groups(group, new_group_members)
+        
+        
+    def rename_group(self, old_group, new_group):
+        members = self.group_members(old_group)
+        self.update_groups(old_group, [])
+        self.update_groups(new_group, members)
+        
+        
     def import_ldif(self, filename):
         try:
             parser = FaxLDIFParser(open(filename, 'r'), self)
@@ -302,6 +357,7 @@ class FaxAddressBook(object): # Pickle based address book
             return True, ''
         except ValueError, e:
             return False, e.message
+            
             
     def import_vcard(self, filename):
         for card in vcard.VCards(vcard.VFile(vcard.opentextfile(filename))):
@@ -334,7 +390,7 @@ class FaxAddressBook(object): # Pickle based address book
                 
                 self.set(card['name'], '', card.get('first name', ''), card.get('last name', ''), 
                     fax, org, card.get('notes', ''))
-        
+
         return True, ''
 
 

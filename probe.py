@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 
 
 __version__ = '4.1'
+__mod__ = 'hp-probe'
 __title__ = 'Printer Discovery Utility'
 __doc__ = "Discover USB, parallel, and network printers."
 
@@ -34,11 +35,11 @@ import os
 
 # Local
 from base.g import *
-from base import device, utils, tui
+from base import device, utils, tui, module
 
 
 USAGE = [(__doc__, "", "name", True),
-         ("Usage: hp-probe [OPTIONS]", "", "summary", True),
+         ("Usage: %s [OPTIONS]" % __mod__, "", "summary", True),
          utils.USAGE_OPTIONS,
          ("Bus to probe:", "-b<bus> or --bus=<bus>", "option", False),
          ("", "<bus>: cups, usb\*, net, bt, fw, par (\*default) (Note: bt and fw not supported in this release.)", "option", False),
@@ -60,88 +61,40 @@ USAGE = [(__doc__, "", "name", True),
          ("Find all devices on the USB bus:", "hp-probe", "example", False),
          ]
 
-def usage(typ='text'):
-    if typ == 'text':
-        utils.log_title(__title__, __version__)
 
-    utils.format_text(USAGE, typ, __title__, 'hp-probe', __version__)
-    sys.exit(0)
-
-
-log.set_module('hp-probe')
 
 try:
+    mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
+                        (INTERACTIVE_MODE,))
 
-    try:
-        opts, args = getopt.getopt(sys.argv[1:],
-                                    'hl:b:t:o:e:s:gm:',
-                                    ['help', 'help-rest', 'help-man',
-                                      'help-desc',
-                                      'logging=',
-                                      'bus=',
-                                      'event=',
-                                      'ttl=',
-                                      'timeout=',
-                                      'filter=',
-                                      'search=',
-                                      'method=',
-                                    ]
-                                  )
-    except getopt.GetoptError, e:
-        log.error(e.msg)
-        usage()
+    opts, device_uri, printer_name, mode, ui_toolkit, loc = \
+        mod.parseStdOpts('b:t:o:e:s:m:',
+                         ['ttl=', 'filter=', 'search=', 'find=', 
+                          'method=', 'time-out=', 'timeout=', 'bus='],
+                          handle_device_printer=False)
 
-    log_level = logger.DEFAULT_LOG_LEVEL
     bus = None
-    align_debug = False
     timeout=10
     ttl=4
     filter = []
     search = ''
     method = 'slp'
 
-    if os.getenv("HPLIP_DEBUG"):
-        log.set_level('debug')
-
     for o, a in opts:
-
-        if o in ('-h', '--help'):
-            usage()
-
-        elif o == '--help-rest':
-            usage('rest')
-
-        elif o == '--help-man':
-            usage('man')
-
-        elif o == '--help-desc':
-            print __doc__,
-            sys.exit(0)
-
-        elif o == '-g':
-            log.set_level('debug')
-
-        elif o in ('-b', '--bus'):
+        if o in ('-b', '--bus'):
             try:
                 bus = [x.lower().strip() for x in a.split(',')]
             except TypeError:
                 bus = ['usb']
 
             if not device.validateBusList(bus):
-                usage()
-
-        elif o in ('-l', '--logging'):
-            log_level = a.lower().strip()
-            if not log.set_level(log_level):
-                usage()
+                mod.usage(error_msg=['Invalid bus name'])
 
         elif o in ('-m', '--method'):
             method = a.lower().strip()
 
             if method not in ('slp', 'mdns', 'bonjour'):
-                log.error("Invalid network search protocol: %s (must be 'slp' or 'mdns')" % method)
-                method = 'slp'
-
+                mod.usage(error_msg=["Invalid network search protocol name. Must be 'slp' or 'mdns'."])
             else:
                 bus = ['net']
 
@@ -152,7 +105,7 @@ try:
                 ttl = 4
                 log.note("TTL value error. TTL set to default of 4 hops.")
 
-        elif o in ('-o', '--timeout'):
+        elif o in ('-o', '--timeout', '--time-out'):
             try:
                 timeout = int(a)
                 if timeout > 45:
@@ -163,63 +116,32 @@ try:
                 log.note("Timeout value error. Timeout set to default of 5secs.")
 
             if timeout < 0:
-                log.error("You must specify a positive timeout in seconds.")
-                usage()
+                mod.usage(error_msg=["You must specify a positive timeout in seconds."])
 
         elif o in ('-e', '--filter'):
             filter = [x.strip().lower() for x in a.split(',')]
             if not device.validateFilterList(filter):
-                usage()
+                mod.usage(error_msg=["Invalid term in filter"])
 
-        elif o in ('-s', '--search'):
+        elif o in ('-s', '--search', '--find'):
             search = a.lower().strip()
 
-    utils.log_title(__title__, __version__)
-    
-    if os.getuid() == 0:
-        log.warn("hp-probe should not be run as root.")
-
     if bus is None:
-        x = 1
-        ios = {0: ('usb', "Universal Serial Bus (USB)") }
-        if sys_cfg.configure['network-build']: 
-            ios[x] = ('net', "Network/Ethernet/Wireless (direct connection or JetDirect)")
-            x += 1
-        if sys_cfg.configure['pp-build']: 
-            ios[x] = ('par', "Parallel Port (LPT:)")
-            x += 1
+        bus = tui.connection_table()
         
-        if len(ios) > 1:
-            tui.header("CHOOSE CONNECTION TYPE")
-            f = tui.Formatter()
-            f.max_widths = (10, 10, 40)
-            f.header = ("Num.", "Connection Type", "Connection Type Description")
+        if bus is None:
+            sys.exit(0)
             
-            for x, data in ios.items():
-                if not x:
-                    f.add((str(x) + "*", data[0], data[1]))
-                else:
-                    f.add((str(x), data[0], data[1]))
-                
-            f.output()
+        log.info("\nUsing connection type: %s" % bus[0])
         
-            ok, val = tui.enter_range("\nEnter number 0...%d for connection type (q=quit, enter=usb*) ? " % x, 
-                0, x, 0)
-
-            if not ok: sys.exit(0)
-            
-            bus = [ios[val][0]]
-        else:
-            bus = [ios[0][0]]
-            
         log.info("")
-        
+
     tui.header("DEVICE DISCOVERY")
 
     for b in bus:
         if b == 'net':
             log.info(log.bold("Probing network for printers. Please wait, this will take approx. %d seconds...\n" % timeout))
-            
+
         FILTER_MAP = {'print' : None,
                       'none' : None,
                       'scan': 'scan-type', 
@@ -227,14 +149,14 @@ try:
                       'pcard': 'pcard-type',
                       'fax': 'fax-type',
                       }
-        
+
         filter_dict = {}
         for f in filter:
             if f in FILTER_MAP:
                 filter_dict[FILTER_MAP[f]] = (operator.gt, 0)
             else:
                 filter_dict[f] = (operator.gt, 0)
-                
+
         log.debug(filter_dict)
 
         devices = device.probeDevices([b], timeout, ttl, filter_dict, search, method)

@@ -49,7 +49,8 @@ enum COMPRESS_MODE  {	COMPRESS_MODE0 = 0,
 						COMPRESS_MODE9 = 9,
 						COMPRESS_MODE_AUTO = 10,
 						COMPRESS_MODE_JPEG = 11,
-						COMPRESS_MODE_LJ =   12
+						COMPRESS_MODE_LJ =   12,
+                        COMPRESS_MODE_GRAFIT = 16
 					};
 
 class LJJetReady : public Printer

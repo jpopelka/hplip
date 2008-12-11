@@ -132,7 +132,7 @@ static const char pjl_job_end_cmd[] = "\e%-12345X@PJL EOJ \r\n\e%-12345X";
 static const char pjl_ustatus_off_cmd[] = "\e%-12345X@PJL USTATUSOFF \r\n\e%-12345X";
 
 #ifdef HAVE_DBUS
-#define DBUS_INTERFACE "com.hplip.Service"
+#define DBUS_INTERFACE "com.hplip.StatusService"
 #define DBUS_PATH "/"
 static DBusError dbus_err;
 static DBusConnection *dbus_conn;
@@ -244,7 +244,7 @@ static int map_ipp_printer_state_reason(int status, const char **state_msg)
       else if (status == 40600)
          *state_msg = "toner-empty-error";
       else
-         *state_msg = "other";      
+         *state_msg = "other";      /* 40017 - cartridge E-LABEL is unreadable (ie: ljp1005) */ 
    }
    else
    {
@@ -345,6 +345,7 @@ static void pjl_read_thread(struct pjl_attributes *pa)
          parse_pjl_device_status(buf, &pa->current_status);
          parse_pjl_job_end(buf, &pa->eoj_pages);
          pthread_mutex_unlock(&pa->mutex);
+         BUG("read new status: %d\n", pa->current_status);
       }
       else
          sleep(1);
@@ -561,13 +562,13 @@ static int loop_test(HPMUD_DEVICE dd, HPMUD_CHANNEL cd, struct pjl_attributes *p
       status = get_printer_status(dd, cd, pa);
       map_ipp_printer_state_reason(status, &pstate);
 
-      if (strcmp(pstate, "none")==0)
+      if (strstr(pstate, "error") == NULL)
       {
          if (retry)
          {
             /* Clear error. */
             device_event(dev, printer, VSTATUS_PRNT, username, jobid, title);
-            fputs("INFO: Printing...\n", stderr);
+            BUG("INFO: status=%d printing...\n", status);
             fprintf(stderr, "STATE: -%s\n", error_state);
             retry=0;
          }
@@ -670,9 +671,9 @@ int main(int argc, char *argv[])
    while ((stat = hpmud_open_device(argv[0], ma.prt_mode, &hd)) != HPMUD_R_OK)
    {
        /* Display user error. */
-        device_event(argv[0], printer, 5000+stat, argv[2], argv[1], argv[3]);
+       device_event(argv[0], printer, 5000+stat, argv[2], argv[1], argv[3]);
 
-       BUG("INFO: open device failed; will retry in %d seconds...\n", RETRY_TIMEOUT);
+       BUG("INFO: open device failed stat=%d; will retry in %d seconds...\n", stat, RETRY_TIMEOUT);
        sleep(RETRY_TIMEOUT);
        retry = 1;
    }
@@ -708,7 +709,7 @@ int main(int argc, char *argv[])
                while ((stat = hpmud_open_channel(hd, HPMUD_S_PRINT_CHANNEL, &cd)) != HPMUD_R_OK)
                {
                   device_event(argv[0], printer, 5000+stat, argv[2], argv[1], argv[3]);
-                  BUG("INFO: open print channel failed; will retry in %d seconds...\n", RETRY_TIMEOUT);
+                  BUG("INFO: open print channel failed stat=%d; will retry in %d seconds...\n", stat, RETRY_TIMEOUT);
                   sleep(RETRY_TIMEOUT);
                   retry = 1;
                }

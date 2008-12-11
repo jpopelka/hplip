@@ -91,13 +91,17 @@ Filter "application/vnd.cups-postscript 0 @foomatic_filter@"
 
 /////////////// Apollo
 {
+  // Set an up-stream hint for applications that we suppport 300/600/1200dpi. 
+  Attribute "DefaultResolution" "" "300dpi"
+
+  // Custom page sizes from 1x4in to Legal
+  HWMargins 18 48.24 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 8.5in 14in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "Apollo-P-2100 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -262,13 +266,17 @@ et=4"
 
 ///////// DJ9xx
 {
+  // Set an up-stream hint for applications that we suppport 300/600/1200dpi. 
+  Attribute "DefaultResolution" "" "1200dpi"
+
+  // Custom page sizes from 1x4in to SuperB
+  HWMargins 18 36 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 936 1368
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-PSC_750 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -450,19 +458,24 @@ et=2"
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"
     CustomMedia "SuperB/Super B" 936.00 1368.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=SuperB" "%% FoomaticRIPOptionSetting: PageSize=SuperB"
     CustomMedia "w774h1116/8K" 774.00 1116.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w774h1116" "%% FoomaticRIPOptionSetting: PageSize=w774h1116"
+    CustomMedia "A3/A3" 842.00 1190.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=A3" "%% FoomaticRIPOptionSetting: PageSize=A3"
     // <%DJ9xx:LargeFormatSuperB%>
   }
 }  // end DJ9xx
 
 /////////// DJ9xx but without photo modes
 {
+  // Set an up-stream hint for applications that we suppport 300/600/1200dpi. 
+  Attribute "DefaultResolution" "" "600dpi"
+
+  // Custom page sizes from 1x4in to SuperB
+  HWMargins 18 36 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 936 1368
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-PSC_750 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -638,19 +651,24 @@ et=2"
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"
     CustomMedia "SuperB/Super B" 936.00 1368.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=SuperB" "%% FoomaticRIPOptionSetting: PageSize=SuperB"
     CustomMedia "w774h1116/8K" 774.00 1116.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w774h1116" "%% FoomaticRIPOptionSetting: PageSize=w774h1116"
+    CustomMedia "A3/A3" 842.00 1190.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=A3" "%% FoomaticRIPOptionSetting: PageSize=A3"
     // <%DJ9xx:NoPhotoMode:LargeFormatSuperB%>
   }
 } // end DJ9xx but without photo modes
 
 ///////// DJ9xx but without photo/hires/best color modes
 {
+  // Set an up-stream hint for applications that we suppport 300/600/1200dpi. 
+  Attribute "DefaultResolution" "" "600dpi"
+
+  // Custom page sizes from 1x4in to SuperB
+  HWMargins 18 36 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 936 1368
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-PSC_750 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -826,18 +844,22 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"
     CustomMedia "SuperB/Super B" 936.00 1368.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=SuperB" "%% FoomaticRIPOptionSetting: PageSize=SuperB"
     CustomMedia "w774h1116/8K" 774.00 1116.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w774h1116" "%% FoomaticRIPOptionSetting: PageSize=w774h1116"
+    CustomMedia "A3/A3" 842.00 1190.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=A3" "%% FoomaticRIPOptionSetting: PageSize=A3"
   // <%DJ9xx:LargeFormatSuperB:NoPhotoBestHiresModes%>
 } // DJ9xx but without photo/hires/best color modes
 
 //////// DJ9xxVIP
 {
+  Attribute "DefaultResolution" "" "1200dpi"
+
+  // Custom page sizes from 1x4in to SuperB
+  HWMargins 18 36 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 936 1368
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-DeskJet_990C hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -1046,19 +1068,23 @@ et=2"
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"
     CustomMedia "SuperB/Super B" 936.00 1368.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=SuperB" "%% FoomaticRIPOptionSetting: PageSize=SuperB"
     CustomMedia "w774h1116/8K" 774.00 1116.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w774h1116" "%% FoomaticRIPOptionSetting: PageSize=w774h1116"
+    CustomMedia "A3/A3" 842.00 1190.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=A3" "%% FoomaticRIPOptionSetting: PageSize=A3"
     // <%DJ9xxVIP:LargeFormatSuperB%>
   }
 } // end DJ9xxVIP
 
 //////// DJ9xxVIP but without 1200-dpi mode and without paper type sensor
 {
+  Attribute "DefaultResolution" "" "600dpi"
+
+  // Custom page sizes from 1x4in to Legal
+  HWMargins 18 36 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 8.5in 14in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-DeskJet_990C hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -1234,13 +1260,16 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
 
 ////////// DJ55xx (a VIP)
 {
+  Attribute "DefaultResolution" "" "1200dpi"
+
+  // Custom page sizes from 1x4in to Legal
+  HWMargins 18 36 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 8.5in 14in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-DeskJet_5550 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -1453,13 +1482,16 @@ lity:PenSet=2,Quality:FullBleed=1"
 
 /////////////// DJGenericVIP
 {
+  Attribute "DefaultResolution" "" "1200dpi"
+
+  // Custom page sizes from 1x4in to SuperB
+  HWMargins 18 36 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 936 1368
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-DeskJet_5650 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -1685,19 +1717,23 @@ lity:PenSet=2,Quality:FullBleed=1"
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"
     CustomMedia "SuperB/Super B" 936.00 1368.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=SuperB" "%% FoomaticRIPOptionSetting: PageSize=SuperB"
     CustomMedia "w774h1116/8K" 774.00 1116.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w774h1116" "%% FoomaticRIPOptionSetting: PageSize=w774h1116"
+    CustomMedia "A3/A3" 842.00 1190.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=A3" "%% FoomaticRIPOptionSetting: PageSize=A3"
     // <%DJGenericVIP:LargeFormatSuperB%>
   }
 }  // end DJGenericVIP
 
 ////////////// OJProKx50 and DJGenericVIP without full bleed
 {
+  Attribute "DefaultResolution" "" "1200dpi"
+
+  // Custom page sizes from 1x4in to SuperB
+  HWMargins 18 36 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 936 1368
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-Business_Inkjet_1000 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -1906,6 +1942,7 @@ et=2"
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"
     CustomMedia "SuperB/Super B" 936.00 1368.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=SuperB" "%% FoomaticRIPOptionSetting: PageSize=SuperB"
     CustomMedia "w774h1116/8K" 774.00 1116.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w774h1116" "%% FoomaticRIPOptionSetting: PageSize=w774h1116"
+    CustomMedia "A3/A3" 842.00 1190.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=A3" "%% FoomaticRIPOptionSetting: PageSize=A3"
     // <%DJGenericVIP:LargeFormatSuperB:NoFullBleed%>
     // <%OJProKx50:LargeFormatSuperB:NoFullBleed%>
   }
@@ -1913,13 +1950,16 @@ et=2"
 
 ///////////////// DJ3320
 {
+  Attribute "DefaultResolution" "" "600dpi"
+
+  // Custom page sizes from 1x4in to Legal
+  HWMargins 18 36 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 8.5in 14in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-DeskJet_3320 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -2092,13 +2132,16 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
 
 //////////////////////// DJ3600
 {
+  Attribute "DefaultResolution" "" "600dpi"
+
+  // Custom page sizes from 1x4in to Legal
+  HWMargins 18 36 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 8.5in 14in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-DeskJet_3650 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -2284,13 +2327,16 @@ ty:PenSet=2,Quality:FullBleed=1"
 
 ////////////////// DJ4100
 {
+  Attribute "DefaultResolution" "" "600dpi"
+
+  // Custom page sizes from 1x4in to Legal
+  HWMargins 18 36 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 8.5in 14in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-DeskJet_D4100 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -2453,13 +2499,16 @@ ty:PenSet=2,Quality:FullBleed=1"
 
 //////////////////// PSP100 4x6, three-sided fullbleed
 {
+  Attribute "DefaultResolution" "" "1200dpi"
+
+  // Custom page sizes from 1x4in to A6
+  HWMargins 0 36 0 0
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 297 420
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-PhotoSmart_P100 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -2535,13 +2584,16 @@ ity:PenSet=1,Quality:FullBleed=1"
 
 //////////////// DJGenericVIP 4x6, 4-sided fullbleed
 {
+  Attribute "DefaultResolution" "" "1200dpi"
+
+  // Custom page sizes from 1x4in to A6
+  HWMargins 0 0 0 0
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 297 420
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-PhotoSmart_320 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -2617,13 +2669,16 @@ ity:PenSet=1,Quality:FullBleed=1"
 
 //////////////// PSP470 5x7, 4-sided fullbleed
 {
+  Attribute "DefaultResolution" "" "1200dpi"
+
+  // Custom page sizes from 1x4in to 5x7
+  HWMargins 0 0 0 0
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 5in 7in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-PhotoSmart_470 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -2705,16 +2760,19 @@ ity:PenSet=1,Quality:FullBleed=1"
 
 //////////////// QuickConnect 5x7, 4-sided fullbleed
 {
+  Attribute "DefaultResolution" "" "300dpi"
+
+  // Custom page sizes from 1x4in to 5x7
+  HWMargins 0 0 0 0
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 5in 7in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-PhotoSmart_A530 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
-USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
+USE -sDEVICE=ijs -r300 -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
 le=- -"
   Attribute "FoomaticRIPOption" "Model" "enum CmdLine A 100"
   Attribute "FoomaticRIPOptionSetting" "Model=HP-Photosmart_A53" " -sDeviceManufacture&&
@@ -2796,13 +2854,16 @@ Bleed=1"
 
 ///////////////// LJMono
 {
+  Attribute "DefaultResolution" "" "600dpi"
+
+  // Custom page sizes from 1x4in to Ledger
+  HWMargins 18 14.4 18 14.4
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 11in 17in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-LaserJet_4 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -2964,13 +3025,16 @@ t=0"
 
 ///////////////// LJMono 300 dpi only
 {
+  Attribute "DefaultResolution" "" "300dpi"
+
+  // Custom page sizes from 1x4in to Legal
+  HWMargins 18 14.4 18 14.4
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 8.5in 14in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-LaserJet_4L hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -3095,13 +3159,16 @@ PenSet=0"
 
 ////////////// LJColor
 {
+  Attribute "DefaultResolution" "" "600dpi"
+
+  // Custom page sizes from 1x4in to SuperB
+  HWMargins 18 14.4 18 14.4
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 936 1368
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-Color_LaserJet_2500 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -3296,6 +3363,7 @@ nSet=2"
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"
     CustomMedia "SuperB/Super B" 936.00 1368.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=SuperB" "%% FoomaticRIPOptionSetting: PageSize=SuperB"
     CustomMedia "w774h1116/8K" 774.00 1116.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w774h1116" "%% FoomaticRIPOptionSetting: PageSize=w774h1116"
+    CustomMedia "A3/A3" 842.00 1190.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=A3" "%% FoomaticRIPOptionSetting: PageSize=A3"
     // <%LJColor:LargeFormatSuperB%>
   }
   {
@@ -3310,13 +3378,16 @@ nSet=2"
 
 ////////////// LJColor 300 dpi max. only
 {
+  Attribute "DefaultResolution" "" "300dpi"
+
+  // Custom page sizes from 1x4in to Ledger
+  HWMargins 18 14.4 18 14.4
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 11in 17in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-Color_LaserJet_5 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -3507,13 +3578,16 @@ nSet=2"
 
 //////////////// LJFastRaster
 {
+  Attribute "DefaultResolution" "" "600dpi"
+
+  // Custom page sizes from 1x4in to Legal
+  HWMargins 18 14.4 18 14.4
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 8.5in 14in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-LaserJet_1010 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -3653,13 +3727,16 @@ t=0"
 
 ///////////////// LJJetReady
 {
+  Attribute "DefaultResolution" "" "600dpi"
+
+  // Custom page sizes from 1x4in to Legal
+  HWMargins 18 14.4 18 14.4
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 8.5in 14in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-Color_LaserJet_3500 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -3797,13 +3874,16 @@ nSet=2"
 
 /////////////// DJ350
 {
+  Attribute "DefaultResolution" "" "300dpi"
+
+  // Custom page sizes from 1x4in to Legal
+  HWMargins 18 48.24 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 8.5in 14in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-DeskJet_350C hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -3936,13 +4016,16 @@ uality:PenSet=0"
 
 //////////// DJ540 grayscale only
 {
+  Attribute "DefaultResolution" "" "300dpi"
+
+  // Custom page sizes from 1x4in to Legal
+  HWMargins 18 48.24 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 8.5in 14in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-DeskJet_500 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -4054,13 +4137,16 @@ t=0"
 
 /////////////// DJ540
 {
+  Attribute "DefaultResolution" "" "300dpi"
+
+  // Custom page sizes from 1x4in to Legal
+  HWMargins 18 48.24 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 8.5in 14in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-DeskJet_400 hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -4186,13 +4272,16 @@ t=0"
 
 /////////////// DJ630
 {
+  Attribute "DefaultResolution" "" "300dpi"
+
+  // Custom page sizes from 1x4in to Legal
+  HWMargins 18 48.24 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 8.5in 14in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-DeskJet_630C hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -4339,13 +4428,16 @@ uality:PenSet=0"
 
 /////////////// DJ600 and DJ6xx
 {
+  Attribute "DefaultResolution" "" "300dpi"
+
+  // Custom page sizes from 1x4in to Legal
+  HWMargins 18 48.24 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 8.5in 14in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-DeskJet_660C hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -4485,13 +4577,16 @@ r=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;DESKJET 660&quot;"
 
 ///////////// DJ6xxPhoto
 {
+  Attribute "DefaultResolution" "" "300dpi"
+
+  // Custom page sizes from 1x4in to Legal
+  HWMargins 18 48.24 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 8.5in 14in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-DeskJet_610C hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -4630,13 +4725,16 @@ et=4"
 
 ///////////////// DJ8xx
 {
+  Attribute "DefaultResolution" "" "600dpi"
+
+  // Custom page sizes from 1x4in to Legal
+  HWMargins 18 36 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 8.5in 14in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-DeskJet_810C hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -4778,13 +4876,16 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
 
 ////////////// DJ8x5
 {
+  Attribute "DefaultResolution" "" "600dpi"
+
+  // Custom page sizes from 1x4in to Legal
+  HWMargins 18 36 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 8.5in 14in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-DeskJet_825C hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
@@ -4943,13 +5044,16 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
 
 ///////////////////// DJ850 and DJ890
 {
+  Attribute "DefaultResolution" "" "600dpi"
+
+  // Custom page sizes from 1x4in to Legal
+  HWMargins 18 36 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 8.5in 14in
   Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
-  Attribute "ParamCustomPageSize" "Width" "1 points 36 100000"
-  Attribute "ParamCustomPageSize" "Height" "2 points 36 100000"
-  Attribute "ParamCustomPageSize" "Orientation" "3 int 0 0"
-  Attribute "ParamCustomPageSize" "WidthOffset" "4 points 0 0"
-  Attribute "ParamCustomPageSize" "HeightOffset" "5 points 0 0"
+
   Attribute "FoomaticIDs" "" "HP-DeskJet_850C hpijs"
   Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
 USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&

@@ -429,17 +429,7 @@ DRIVER_ERROR HeaderLJFastRaster::SendCAPy (unsigned int iAbsY)
 #define		ABS_Y_ADDRESS_LO				23
 #define		BIT_DEPTH_ADDRESS				24
 
-//** this enumeration is for specifying the current color plane that is being
-//** sent via fast raster path.  Toucan ordering is YMCK
-
-typedef enum TonerColor
-{
-	eYellow = 0,
-	eMagenta,
-	eCyan,
-	eK
-};
-
+#define eK 3
 typedef enum
 {
 	eDelta32,
@@ -1077,8 +1067,10 @@ BOOL ModeDeltaPlus::Compress (HPUInt8   *outmem,
                                &&
                                (
                                  /* seedrow and run */
-                                 ((col + 2) >= horz_ht_dist) &&
-                                 (cur_row[col+2-horz_ht_dist] == cur_row[col+2])
+                                 (
+                                   ((col + 2) >= horz_ht_dist) &&
+                                   (cur_row[col+2-horz_ht_dist] == cur_row[col+2])
+                                 )
                                  ||
                                  /* seedrow and northeast predict */
                                  (cur_row[col+1] == LVAL_NE(col+1))

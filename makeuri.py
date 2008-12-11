@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,8 +20,9 @@
 # Authors: Don Welch, Smith Kennedy
 #
 
-__version__ = '4.4'
+__version__ = '5.0'
 __title__ = 'Device URI Creation Utility'
+__mod__ = 'hp-makeuri'
 __doc__ = "Creates device URIs for local and network connected printers for use with CUPS."
 
 # Std Lib
@@ -33,11 +34,11 @@ import os
 # Local
 from base.g import *
 from base.codes import *
-from base import device, utils
+from base import device, utils, module
 
 
 USAGE = [ (__doc__, "", "name", True),
-          ("Usage: hp-makeuri [OPTIONS] [SERIAL NO.|USB ID|IP|DEVNODE]", "", "summary", True),
+          ("Usage: %s [OPTIONS] [SERIAL NO.|USB ID|IP|DEVNODE]" % __mod__, "", "summary", True),
           ("[SERIAL NO.|USB ID|IP|DEVNODE]", "", "heading", False),
           ("USB IDs (usb only):", """"xxx:yyy" where xxx is the USB bus ID and yyy is the USB device ID. The ':' and all leading zeroes must be present.""", 'option', False),
           ("", """(Use the 'lsusb' command to obtain this information. See Note 1.)""", "option", False),
@@ -68,63 +69,22 @@ USAGE = [ (__doc__, "", "name", True),
           ("hp-setup", "", "seealso", False),
         ]
 
-def usage(typ='text'):
-    if typ == 'text':
-        utils.log_title(__title__, __version__)
 
-    utils.format_text(USAGE, typ, __title__, 'hp-makeuri', __version__)
-    sys.exit(0)
+mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE, 
+                    (INTERACTIVE_MODE,), None, True, True)
 
+opts, device_uri, printer_name, mode, ui_toolkit, lang = \
+    mod.parseStdOpts('p:csf', ['port', 'cups', 'sane', 'fax'],
+                     handle_device_printer=False)
 
-
-log.set_module('hp-makeuri')
 try:
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], 
-                                    'hl:csfp:g', 
-                                    ['help', 'help-rest', 'help-man', 'help-desc',
-                                      'logging=',
-                                      'cups',
-                                      'sane',
-                                      'fax',
-                                      'port=',
-                                    ] 
-                                  ) 
-    except getopt.GetoptError, e:
-        log.error(e.msg)
-        usage()
-        sys.exit(1)
-
-    if os.getenv("HPLIP_DEBUG"):
-        log.set_level('debug')
-
-    log_level = 'info'
     cups_quiet_mode = False
     sane_quiet_mode = False
     fax_quiet_mode = False
     jd_port = 1
 
     for o, a in opts:
-
-        if o in ('-h', '--help'):
-            usage()
-
-        elif o == '--help-rest':
-            usage('rest')
-
-        elif o == '--help-man':
-            usage('man')
-
-        elif o == '--help-desc':
-            print __doc__,
-            sys.exit(0)
-
-        elif o in ('-l', '--logging'):
-            log_level = a.lower().strip()
-            if not log.set_level(log_level):
-                usage()
-
-        elif o in ('-c', '--cups'):
+        if o in ('-c', '--cups'):
             cups_quiet_mode = True
 
         elif o in ('-s', '--sane'):
@@ -137,32 +97,28 @@ try:
             try:
                 jd_port = int(a)
             except ValueError:
-                log.error("Invalid port number. Must be between 1 and 3 inclusive.")
-                usage()
+                mod.usage(error_msg=["Invalid port number. Must be between 1 and 3 inclusive."])
 
         elif o == '-g':
             log.set_level('debug')
 
 
     quiet_mode = cups_quiet_mode or sane_quiet_mode or fax_quiet_mode
+    mod.quiet = quiet_mode
+    
+    #if quiet_mode:
+    #    log.set_level('warn')
 
-    if quiet_mode:
-        log.set_level('warn')
+    #utils.log_title(__title__, __version__) 
+    mod.showTitle()
 
-    utils.log_title(__title__, __version__)   
-   
-    if os.getuid() == 0:
-        log.warn("hp-makeuri should not be run as root.")
+    if len(mod.args) != 1:
+        mod.usage(error_msg=["You must specify one SERIAL NO., IP, USB ID or DEVNODE parameter."])
 
-    if len(args) != 1:
-        log.error("You must specify one SERIAL NO., IP, USB ID or DEVNODE on the command line.")
-        usage()
-
-    param = args[0]
+    param = mod.args[0]
 
     if 'localhost' in param.lower():
-        log.error("Invalid hostname")
-        usage()
+        mod.usage(error_msg=['Invalid hostname'])
 
     cups_uri, sane_uri, fax_uri = device.makeURI(param, jd_port)
 
@@ -174,14 +130,14 @@ try:
         print cups_uri
 
     elif not quiet_mode:    
-        log.info("CUPS URI: %s" % cups_uri)
+        print "CUPS URI: %s" % cups_uri
 
     if sane_uri:
         if sane_quiet_mode:
             print sane_uri
         
         elif not quiet_mode:
-            log.info("SANE URI: %s" % sane_uri)
+            print "SANE URI: %s" % sane_uri
     
     elif not sane_uri and sane_quiet_mode:
         log.error("Device does not support scan.")
@@ -191,7 +147,7 @@ try:
             print fax_uri
         
         elif not quiet_mode:
-            log.info("HP Fax URI: %s" % fax_uri)
+            print "HP Fax URI: %s" % fax_uri
             
     elif not fax_uri and fax_quiet_mode:
         log.error("Device does not support fax.")

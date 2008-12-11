@@ -211,7 +211,6 @@ class FaxAddrBookGroupsForm(FaxAddrBookGroupsForm_base):
         if dlg.exec_loop() == QDialog.Accepted:
             group_name, entries = dlg.getDlgData()
             db.update_groups(group_name, entries)
-            db.save()
             self.UpdateList()
 
     def editButton_clicked(self):
@@ -221,7 +220,6 @@ class FaxAddrBookGroupsForm(FaxAddrBookGroupsForm_base):
         if dlg.exec_loop() == QDialog.Accepted:
             group_name, entries = dlg.getDlgData()
             db.update_groups(group_name, entries)
-            db.save()
             self.UpdateList()
 
 
@@ -234,7 +232,6 @@ class FaxAddrBookGroupsForm(FaxAddrBookGroupsForm_base):
                                   QMessageBox.NoButton)
         if x == QMessageBox.Yes:
             db.delete_group(unicode(self.current.text(0)))
-            db.save()
             self.UpdateList()
 
     def groupListView_currentChanged(self, a0):
@@ -369,6 +366,10 @@ class FaxAddrBookForm(FaxAddrBookForm_base):
 
         if all_entries:
             for e, v in all_entries.items():
+                
+                if v['name'].startswith('__'):
+                    continue
+                    
                 i = AddressBookItem2(self.addressListView, v)
 
                 if first_rec is None:
@@ -395,7 +396,6 @@ class FaxAddrBookForm(FaxAddrBookForm_base):
         if dlg.exec_loop() == QDialog.Accepted:
             d = dlg.getDlgData()
             db.set(**d)
-            db.save()
             self.sendUpdateEvent()
             self.UpdateList()
 
@@ -412,7 +412,6 @@ class FaxAddrBookForm(FaxAddrBookForm_base):
                 db.delete(prev_name)
 
             db.set(**d)
-            db.save()
             self.sendUpdateEvent()
             self.UpdateList()
 
@@ -425,7 +424,6 @@ class FaxAddrBookForm(FaxAddrBookForm_base):
               QMessageBox.No | QMessageBox.Default,
               QMessageBox.NoButton) == QMessageBox.Yes:
             db.delete(self.current.entry['name'])
-            db.save()
             self.UpdateList()
             self.sendUpdateEvent()
 
@@ -498,6 +496,5 @@ class FaxAddrBookForm(FaxAddrBookForm_base):
                         self.FailureUI(error_str)
                     
                     else:
-                        db.save()
                         self.UpdateList()
                 

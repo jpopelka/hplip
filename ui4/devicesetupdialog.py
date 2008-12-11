@@ -1,0 +1,93 @@
+# -*- coding: utf-8 -*-
+#
+# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#  
+# Authors: Don Welch
+#
+
+# StdLib
+import operator
+
+# Local
+from base.g import *
+from base import device, utils
+from prnt import cups
+from base.codes import *
+from ui_utils import *
+
+# Qt
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+
+# Ui
+from devicesetupdialog_base import Ui_Dialog
+
+
+class DeviceSetupDialog(QDialog, Ui_Dialog):
+    def __init__(self, parent, device_uri):
+        QDialog.__init__(self, parent)
+        self.setupUi(self)
+        self.device_uri = device_uri
+        self.initUi()
+
+        QTimer.singleShot(0, self.updateUi)
+
+
+    def initUi(self):
+        # connect signals/slots
+        self.connect(self.CancelButton, SIGNAL("clicked()"), self.CancelButton_clicked)
+        self.connect(self.ApplyButton, SIGNAL("clicked()"), self.ApplyButton_clicked)
+        self.connect(self.DeviceComboBox, SIGNAL("DeviceUriComboBox_noDevices"), self.DeviceUriComboBox_noDevices)
+        self.connect(self.DeviceComboBox, SIGNAL("DeviceUriComboBox_currentChanged"), self.DeviceUriComboBox_currentChanged)
+        #self.DeviceComboBox.setFilter({'-type': (operator.gt, 0)}) # TODO
+    
+        # Application icon
+        self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
+        
+        if self.device_uri:
+            self.DeviceComboBox.setInitialDevice(self.device_uri)
+
+
+    def updateUi(self):
+        self.DeviceComboBox.updateUi()
+    
+    
+    def DeviceUriComboBox_currentChanged(self, device_uri):
+        self.device_uri = device_uri
+        # Update
+        
+    
+    def DeviceUriComboBox_noDevices(self):
+        FailureUI(self, self.__tr("<b>No devices that support device setup found.</b>"))
+        self.close()
+    
+    
+    def CancelButton_clicked(self):
+        self.close()
+        
+        
+    def ApplyButton_clicked(self):
+        pass
+
+    #
+    # Misc
+    # 
+
+    def __tr(self,s,c = None):
+        return qApp.translate("DeviceSetupDialog",s,c)
+
+

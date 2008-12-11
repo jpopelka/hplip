@@ -41,7 +41,7 @@ try:
     import cupsext
 except ImportError:
     if not os.getenv("HPLIP_BUILD"):
-        log.error("CUPSEXT could not be loaded. Please check HPLIP installation.")
+        log.warn("CUPSEXT could not be loaded. Please check HPLIP installation.")
         sys.exit(1)
 
 nickname_pat = re.compile(r'''\*NickName:\s*\"(.*)"''', re.MULTILINE)
@@ -59,6 +59,7 @@ PPD_UI_PICKMANY = 2  # Pick zero or more from a list
 UI_SPINNER = 100           # Simple spinner with opt. suffix (ie, %)
 UI_UNITS_SPINNER = 101     # Spinner control w/pts, cm, in, etc. units
 UI_BANNER_JOB_SHEETS = 102 # dual combos for banner job-sheets
+UI_PAGE_RANGE = 103        # Radio + page range entry field
 
 # ipp_op_t
 IPP_PAUSE_PRINTER = 0x0010
@@ -89,50 +90,50 @@ IPP_JOB_ABORTED = 8    # Job has aborted due to error
 IPP_JOB_COMPLETED = 8  # Job has completed successfully
 
 # ipp_status_e
-IPP_OK = 0x0000 # successful-ok 
-IPP_OK_SUBST = 0x001 # successful-ok-ignored-or-substituted-attributes 
-IPP_OK_CONFLICT = 0x002 # successful-ok-conflicting-attributes 
-IPP_OK_IGNORED_SUBSCRIPTIONS = 0x003 # successful-ok-ignored-subscriptions 
-IPP_OK_IGNORED_NOTIFICATIONS = 0x004 # successful-ok-ignored-notifications 
-IPP_OK_TOO_MANY_EVENTS = 0x005 # successful-ok-too-many-events 
-IPP_OK_BUT_CANCEL_SUBSCRIPTION = 0x006 # successful-ok-but-cancel-subscription 
-IPP_OK_EVENTS_COMPLETE = 0x007 # successful-ok-events-complete 
+IPP_OK = 0x0000 # successful-ok
+IPP_OK_SUBST = 0x001 # successful-ok-ignored-or-substituted-attributes
+IPP_OK_CONFLICT = 0x002 # successful-ok-conflicting-attributes
+IPP_OK_IGNORED_SUBSCRIPTIONS = 0x003 # successful-ok-ignored-subscriptions
+IPP_OK_IGNORED_NOTIFICATIONS = 0x004 # successful-ok-ignored-notifications
+IPP_OK_TOO_MANY_EVENTS = 0x005 # successful-ok-too-many-events
+IPP_OK_BUT_CANCEL_SUBSCRIPTION = 0x006 # successful-ok-but-cancel-subscription
+IPP_OK_EVENTS_COMPLETE = 0x007 # successful-ok-events-complete
 IPP_REDIRECTION_OTHER_SITE = 0x300
-IPP_BAD_REQUEST = 0x0400 # client-error-bad-request 
-IPP_FORBIDDEN = 0x0401 # client-error-forbidden 
-IPP_NOT_AUTHENTICATED = 0x0402 # client-error-not-authenticated 
-IPP_NOT_AUTHORIZED = 0x0403 # client-error-not-authorized 
-IPP_NOT_POSSIBLE = 0x0404 # client-error-not-possible 
-IPP_TIMEOUT = 0x0405 # client-error-timeout 
-IPP_NOT_FOUND = 0x0406 # client-error-not-found 
-IPP_GONE = 0x0407 # client-error-gone 
-IPP_REQUEST_ENTITY = 0x0408 # client-error-request-entity-too-large 
-IPP_REQUEST_VALUE = 0x0409 # client-error-request-value-too-long 
-IPP_DOCUMENT_FORMAT = 0x040a # client-error-document-format-not-supported 
-IPP_ATTRIBUTES = 0x040b # client-error-attributes-or-values-not-supported 
-IPP_URI_SCHEME = 0x040c # client-error-uri-scheme-not-supported 
-IPP_CHARSET = 0x040d # client-error-charset-not-supported 
-IPP_CONFLICT = 0x040e # client-error-conflicting-attributes 
-IPP_COMPRESSION_NOT_SUPPORTED = 0x040f # client-error-compression-not-supported 
-IPP_COMPRESSION_ERROR = 0x0410 # client-error-compression-error 
-IPP_DOCUMENT_FORMAT_ERROR = 0x0411 # client-error-document-format-error 
-IPP_DOCUMENT_ACCESS_ERROR = 0x0412 # client-error-document-access-error 
-IPP_ATTRIBUTES_NOT_SETTABLE = 0x0413 # client-error-attributes-not-settable 
-IPP_IGNORED_ALL_SUBSCRIPTIONS = 0x0414 # client-error-ignored-all-subscriptions 
-IPP_TOO_MANY_SUBSCRIPTIONS = 0x0415 # client-error-too-many-subscriptions 
-IPP_IGNORED_ALL_NOTIFICATIONS = 0x0416 # client-error-ignored-all-notifications 
-IPP_PRINT_SUPPORT_FILE_NOT_FOUND = 0x0417 # client-error-print-support-file-not-found 
-IPP_INTERNAL_ERROR = 0x0500 # server-error-internal-error 
-IPP_OPERATION_NOT_SUPPORTED = 0x0501 # server-error-operation-not-supported 
-IPP_SERVICE_UNAVAILABLE = 0x0502 # server-error-service-unavailable 
-IPP_VERSION_NOT_SUPPORTED = 0x0503 # server-error-version-not-supported 
-IPP_DEVICE_ERROR = 0x0504 # server-error-device-error 
-IPP_TEMPORARY_ERROR = 0x0505 # server-error-temporary-error 
-IPP_NOT_ACCEPTING = 0x0506 # server-error-not-accepting-jobs 
-IPP_PRINTER_BUSY = 0x0507 # server-error-busy 
-IPP_ERROR_JOB_CANCELLED = 0x0508 # server-error-job-canceled 
-IPP_MULTIPLE_JOBS_NOT_SUPPORTED = 0x0509 # server-error-multiple-document-jobs-not-supported 
-IPP_PRINTER_IS_DEACTIVATED = 0x050a # server-error-printer-is-deactivated 
+IPP_BAD_REQUEST = 0x0400 # client-error-bad-request
+IPP_FORBIDDEN = 0x0401 # client-error-forbidden
+IPP_NOT_AUTHENTICATED = 0x0402 # client-error-not-authenticated
+IPP_NOT_AUTHORIZED = 0x0403 # client-error-not-authorized
+IPP_NOT_POSSIBLE = 0x0404 # client-error-not-possible
+IPP_TIMEOUT = 0x0405 # client-error-timeout
+IPP_NOT_FOUND = 0x0406 # client-error-not-found
+IPP_GONE = 0x0407 # client-error-gone
+IPP_REQUEST_ENTITY = 0x0408 # client-error-request-entity-too-large
+IPP_REQUEST_VALUE = 0x0409 # client-error-request-value-too-long
+IPP_DOCUMENT_FORMAT = 0x040a # client-error-document-format-not-supported
+IPP_ATTRIBUTES = 0x040b # client-error-attributes-or-values-not-supported
+IPP_URI_SCHEME = 0x040c # client-error-uri-scheme-not-supported
+IPP_CHARSET = 0x040d # client-error-charset-not-supported
+IPP_CONFLICT = 0x040e # client-error-conflicting-attributes
+IPP_COMPRESSION_NOT_SUPPORTED = 0x040f # client-error-compression-not-supported
+IPP_COMPRESSION_ERROR = 0x0410 # client-error-compression-error
+IPP_DOCUMENT_FORMAT_ERROR = 0x0411 # client-error-document-format-error
+IPP_DOCUMENT_ACCESS_ERROR = 0x0412 # client-error-document-access-error
+IPP_ATTRIBUTES_NOT_SETTABLE = 0x0413 # client-error-attributes-not-settable
+IPP_IGNORED_ALL_SUBSCRIPTIONS = 0x0414 # client-error-ignored-all-subscriptions
+IPP_TOO_MANY_SUBSCRIPTIONS = 0x0415 # client-error-too-many-subscriptions
+IPP_IGNORED_ALL_NOTIFICATIONS = 0x0416 # client-error-ignored-all-notifications
+IPP_PRINT_SUPPORT_FILE_NOT_FOUND = 0x0417 # client-error-print-support-file-not-found
+IPP_INTERNAL_ERROR = 0x0500 # server-error-internal-error
+IPP_OPERATION_NOT_SUPPORTED = 0x0501 # server-error-operation-not-supported
+IPP_SERVICE_UNAVAILABLE = 0x0502 # server-error-service-unavailable
+IPP_VERSION_NOT_SUPPORTED = 0x0503 # server-error-version-not-supported
+IPP_DEVICE_ERROR = 0x0504 # server-error-device-error
+IPP_TEMPORARY_ERROR = 0x0505 # server-error-temporary-error
+IPP_NOT_ACCEPTING = 0x0506 # server-error-not-accepting-jobs
+IPP_PRINTER_BUSY = 0x0507 # server-error-busy
+IPP_ERROR_JOB_CANCELLED = 0x0508 # server-error-job-canceled
+IPP_MULTIPLE_JOBS_NOT_SUPPORTED = 0x0509 # server-error-multiple-document-jobs-not-supported
+IPP_PRINTER_IS_DEACTIVATED = 0x050a # server-error-printer-is-deactivated
 
 CUPS_ERROR_BAD_NAME = 0x0f00
 CUPS_ERROR_BAD_PARAMETERS = 0x0f01
@@ -186,6 +187,7 @@ def getAllowableMIMETypes():
 
     return allowable_mime_types
 
+
 def getPPDDescription(f):
     if f.endswith('.gz'):
         nickname = gzip.GzipFile(f, 'r').read(4096)
@@ -210,8 +212,8 @@ def getSystemPPDs():
         for f in utils.walkFiles(sys_cfg.dirs.ppd, pattern="HP*ppd*;hp*ppd*", abs_paths=True):
             desc = getPPDDescription(f)
 
-            if not ('foo2' in desc or 
-                    'gutenprint' in desc.lower() or 
+            if not ('foo2' in desc or
+                    'gutenprint' in desc.lower() or
                     'gutenprint' in f):
 
                 ppds[f] = desc
@@ -239,15 +241,15 @@ def getSystemPPDs():
                 desc = ppd_dict[ppd]['ppd-make-and-model']
                 #print ppd, desc
 
-                if not ('foo2' in desc.lower() or 
-                        'gutenprint' in desc.lower() or 
+                if not ('foo2' in desc.lower() or
+                        'gutenprint' in desc.lower() or
                         'gutenprint' in ppd):
 
                     # PPD files returned by CUPS_GET_PPDS (and by lpinfo -m)
-                    # can be relative to /usr/share/ppd/ or to 
+                    # can be relative to /usr/share/ppd/ or to
                     # /usr/share/cups/model/. Not sure why this is.
                     # Here we will try both and see which one it is...
-                    
+
                     if os.path.exists(ppd):
                         path = ppd
                     else:
@@ -300,13 +302,15 @@ def levenshtein_distance(a,b):
 
 number_pat = re.compile(r""".*?(\d+)""", re.IGNORECASE)
 
-STRIP_STRINGS = ['foomatic:', 'hp-', 'hp_', 'hp ', '_series', '.gz', '.ppd', '-series', ' series', '-hpijs']
+STRIP_STRINGS = ['foomatic:', 'hp-', 'hp_', 'hp ', '_series', '.gz', '.ppd', '-series', ' series',
+                 '-hpijs', 'drv:', '-pcl', '-pcl3', '-jetready', '-zxs', '-zjs', '-ps', '-postscript',
+                 '-jr', '-lidl', '-lidil', '-ldl']
 
 for p in models.TECH_CLASS_PDLS.values():
     pp = '-%s' % p
     if pp not in STRIP_STRINGS:
         STRIP_STRINGS.append(pp)
-        
+
 
 def stripModel(model):
     model = model.lower()
@@ -521,9 +525,9 @@ def getPrinters():
 ##            pn = pp.name.decode('utf-8')
 ##        except UnicodeError:
 ##            pass
-##            
+##
 ##        p2.append(pp)
-##        
+##
 ##    return p2
     return cupsext.getPrinters()
 

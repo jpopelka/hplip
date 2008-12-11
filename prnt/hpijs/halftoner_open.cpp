@@ -61,7 +61,8 @@ BOOL Halftoner_Open::Process
     unsigned int i;
     int j, k;
 
-    if (pbyInputKRGBRaster==NULL ||  pbyInputKRGBRaster->rasterdata[COLORTYPE_COLOR]==NULL && pbyInputKRGBRaster->rasterdata[COLORTYPE_BLACK]==NULL)
+    if ((pbyInputKRGBRaster == NULL) ||
+       (pbyInputKRGBRaster && pbyInputKRGBRaster->rasterdata[COLORTYPE_COLOR]==NULL && pbyInputKRGBRaster->rasterdata[COLORTYPE_BLACK]==NULL))
     {
         Restart();
         return FALSE;   // no output

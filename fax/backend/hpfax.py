@@ -107,7 +107,7 @@ def usage(typ='text'):
 # Send dbus event to hpssd on dbus system bus
 def send_message(device_uri, printer_name, event_code, username, job_id, title, pipe_name=''):
     args = [device_uri, printer_name, event_code, username, job_id, title, pipe_name]
-    msg = lowlevel.SignalMessage('/', 'com.hplip.Service', 'Event')
+    msg = lowlevel.SignalMessage('/', 'com.hplip.StatusService', 'Event')
     msg.append(signature='ssisiss', *args)
     
     SystemBus().send_message(msg) 

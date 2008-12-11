@@ -264,7 +264,9 @@ class SetupForm(SetupForm_base):
         elif page is self.PrinterNamePage:
             self.setDefaultPrinterName()
 
-            if fax_import_ok and prop.fax_build and self.mq.get('fax-type', FAX_TYPE_NONE) != FAX_TYPE_NONE:
+            if fax_import_ok and prop.fax_build and \
+                self.mq.get('fax-type', FAX_TYPE_NONE) not in (FAX_TYPE_NONE, FAX_TYPE_NOT_SUPPORTED):
+                    
                 self.faxCheckBox.setEnabled(True)
                 self.faxCheckBox.setEnabled(True)
                 self.faxNameLineEdit.setEnabled(True)

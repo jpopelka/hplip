@@ -628,7 +628,7 @@ DRIVER_ERROR QuickConnect::AddExifHeader ()
  *  BYTE YThumbnail;      // 0Fh  Vertical Pixel Count
  */
 
-    short sJFIFHeaderSize = ((short) pBuffer[4]) << 8 | pBuffer[5] + 4;
+    short sJFIFHeaderSize = ((((short) pBuffer[4]) << 8) | pBuffer[5]) + 4;
     err = Send ((const BYTE *) pBuffer, sJFIFHeaderSize);
     ERRCHECK;
 

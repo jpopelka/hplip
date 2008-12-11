@@ -34,6 +34,18 @@ import os.path
 import os
 
 
+class RangeValidator(QValidator):
+    def __init__(self, parent=None, name=None):
+        QValidator.__init__(self, parent, name)
+
+    def validate(self, input, pos):
+        for x in unicode(input)[pos-1:]:
+            if x not in u'0123456789,- ':
+                return QValidator.Invalid, pos
+
+        return QValidator.Acceptable, pos
+        
+
 class OptionComboBox(QComboBox):
     def __init__(self, rw, parent, name, group, option, choices, default, typ=cups.PPD_UI_PICKONE, other=None):
         QComboBox.__init__(self, rw, parent, name)

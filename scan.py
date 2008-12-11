@@ -22,7 +22,8 @@
 
 from __future__ import division
 
-__version__ = '1.0'
+__version__ = '2.1'
+__mod__ = 'hp-scan'
 __title__ = 'Scan Utility'
 __doc__ = "SANE-based scan utility for HPLIP." 
 
@@ -34,22 +35,15 @@ import getopt
 import signal
 import time
 import socket
+import operator
 
 # Local
 from base.g import *
-from base import tui
-import base.utils as utils
-from base import device
+from base import tui, device, module, utils
 from prnt import cups
 
-log.set_module('hp-scan')
 
-prop.prog = sys.argv[0]
-
-device_uri = None
 username = prop.username
-mode = GUI_MODE
-mode_specified = False
 res = 300
 scan_mode = 'color'
 tlx = None
@@ -67,7 +61,7 @@ fax = ''
 resize = 100
 contrast = 0
 brightness = 0
-printer = ''
+#printer = ''
 page_size = ''
 size_desc = ''
 page_units = 'mm'
@@ -102,118 +96,6 @@ PAGE_SIZES = { # in mm
     "super_b" : (330, 483, "Super B", 'in'),
     }
 
-USAGE = [(__doc__, "", "name", True),
-         ("Usage: hp-scan [SANE-DEVICE-URI] [MODE] [-n OPTIONS] [OPTIONS]", "", "summary", True),
-         ("[SANE-DEVICE-URI]", "", "header", False),
-         ("SANE device URI:", "-d<sane_device_uri> or --device=<sane_device_uri>", "option", False),
-         ("", "URI format: hpaio:/<bus>/<model>?<identification>", "option", False),
-
-         utils.USAGE_SPACE,
-         ("[MODE]", "", "header", False),
-         ("Enter graphical UI mode:", "-u or --gui (Default)", "option", False),
-         ("Run in non-interactive mode:", "-n or --non-interactive", "option", False),
-
-         utils.USAGE_SPACE,
-         ("[-n OPTIONS] (General) (Not applicable to GUI mode)", "", "header", False),
-         ("Scan destinations:", "-s<dest_list> or --dest=<dest_list>", "option", False),
-         ("", "where <dest_list> is a comma separated list containing one or more of: 'file'\*, ", "option", False),
-         ("", "'viewer', 'editor', 'pdf', 'fax', or 'print'. Use only commas between values, no spaces.", "option", False), 
-         ("Scan mode:", "-m<mode> or --mode=<mode>. Where <mode> is 'color'\*, 'gray' or 'lineart'.", "option", False),
-         ("Scanning resolution:", "-r<resolution_in_dpi> or --res=<resolution_in_dpi> or --resolution=<resolution_in_dpi>", "option", False),
-         ("", "where <resolution_in_dpi> is %s (300 is default)." % ', '.join([str(x) for x in valid_res]), "option", False),
-         ("Image resize:", "--resize=<scale_in_%> (min=1%, max=400%, default=100%)", "option", False),
-         ("Image contrast:", "--contrast=<contrast>", "option", False),
-         ("ADF mode (EXPERIMENTAL):", "--adf (Note, only PDF output is supported when using the ADF)", "option", False),
-
-         utils.USAGE_SPACE,
-         ("[-n OPTIONS] (Scan area) (Not applicable to GUI mode)", "", "header", False),
-         ("Specify the units for area/box measurements:", "-t<units> or --units=<units>", "option", False),
-         ("", "where <units> is 'mm'\*, 'cm', 'in', 'px', or 'pt' ('mm' is default).", "option", False),
-         ("Scan area:", "-a<tlx>,<tly>,<brx>,<bry> or --area=<tlx>,<tly>,<brx>,<bry>", "option", False),
-         ("", "Coordinates are relative to the upper left corner of the scan area.", "option", False),
-         ("", "Units for tlx, tly, brx, and bry are specified by -t/--units (default is 'mm').", "option", False),
-         ("", "Use only commas between values, no spaces.", "option", False),
-         ("Scan box:", "--box=<tlx>,<tly>,<width>,<height>", "option", False),
-         ("", "tlx and tly coordinates are relative to the upper left corner of the scan area.", "option", False),
-         ("", "Units for tlx, tly, width, and height are specified by -t/--units (default is 'mm').", "option", False),         
-         ("", "Use only commas between values, no spaces.", "option", False),
-         ("Top left x of the scan area:", "--tlx=<tlx>", "option", False),
-         ("", "Coordinates are relative to the upper left corner of the scan area.", "option", False),
-         ("", "Units are specified by -t/--units (default is 'mm').", "option", False),
-         ("Top left y of the scan area:", "--tly=<tly>", "option", False),
-         ("", "Coordinates are relative to the upper left corner of the scan area.", "option", False),
-         ("", "Units are specified by -t/--units (default is 'mm').", "option", False),
-         ("Bottom right x of the scan area:", "--brx=<brx>", "option", False),
-         ("", "Coordinates are relative to the upper left corner of the scan area.", "option", False),
-         ("", "Units are specified by -t/--units (default is 'mm').", "option", False),
-         ("Bottom right y   of the scan area:", "--bry=<bry>", "option", False),
-         ("", "Coordinates are relative to the upper left corner of the scan area.", "option", False),
-         ("", "Units are specified by -t/--units (default is 'mm').", "option", False),
-         ("Specify the scan area based on a paper size:", "--size=<paper size name>", "option", False),
-         ("", "where <paper size name> is one of: %s" % ', '.join(PAGE_SIZES.keys()), "option", False), 
-
-         utils.USAGE_SPACE,
-         ("[-n OPTIONS] ('file' dest) (Not applicable to GUI mode)", "", "header", False),
-         ("Filename for 'file' destination:", "-o<file> or -f<file> or --file=<file> or --output=<file>", "option", False),
-
-         utils.USAGE_SPACE,
-         ("[-n OPTIONS] ('pdf' dest) (Not applicable to GUI mode)", "", "header", False),
-         ("PDF viewer application:", "--pdf=<pdf_viewer>", "option", False),
-
-         utils.USAGE_SPACE,
-         ("[-n OPTIONS] ('viewer' dest) (Not applicable to GUI mode)", "", "header", False),
-         ("Image viewer application:", "-v<viewer> or --viewer=<viewer>", "option", False),
-         utils.USAGE_SPACE,
-
-         ("[-n OPTIONS] ('editor' dest) (Not applicable to GUI mode)", "", "header", False),
-         ("Image editor application:", "-e<editor> or --editor=<editor>", "option", False),
-         utils.USAGE_SPACE,
-
-         ("[-n OPTIONS] ('email' dest) (Not applicable to GUI mode)", "", "header", False),
-         ("From: address for 'email' dest:", "--email-from=<email_from_address> (required for 'email' dest.)", "option", False),
-
-         ("To: address for 'email' dest:", "--email-to=<email__to_address> (required for 'email' dest.)", "option", False),
-         ("Email subject for 'email' dest:", '--email-subject="<subject>"', "option", False),
-         ("", 'Use double quotes (") around the subject if it contains space characters.', "option", False),
-         ("Note or message for the 'email' dest:", '--email-msg="<msg>" or --email-note="<note>"', "option", False),
-         ("", 'Use double quotes (") around the note/message if it contains space characters.', "option", False),
-
-         utils.USAGE_SPACE,
-         ("[-n OPTIONS] ('fax' dest) (Not applicable to GUI mode)", "", "header", False),
-         ("Fax queue/printer:", "--fax=<fax_printer_name>", "option", False),
-         utils.USAGE_SPACE,
-         ("[-n OPTIONS] ('printer' dest) (Not applicable to GUI mode)", "", "header", False),
-         ("Printer queue/printer:", "--printer=<printer_name>", "option", False),
-         utils.USAGE_SPACE,
-         ("[-n OPTIONS] (advanced) (Not applicable to GUI mode)", "", "header", False),
-         ("Set the scanner compression mode:", "-x<mode> or --compression=<mode>, <mode>='raw', 'none' or 'jpeg' ('jpeg' is default) ('raw' and 'none' are equivalent)", "option", False),
-         utils.USAGE_SPACE,
-         utils.USAGE_OPTIONS,
-         utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
-         utils.USAGE_HELP,
-         utils.USAGE_NOTES,
-         ("1. If no dest is provided, the 'file' dest will be automatically invoked.", "", "note", False),
-         ("2. If applications for viewer, editor, or pdf viewer are not provided, reasonable defaults will be used.", "", "note", False),
-         ("3. If --printer is not specified, the CUPS default will be used if available.", "", "note", False),
-         ("4. If an output file is not specified with the 'file' dest, a reasonable default will be used.", "", "note", False),
-         ("5. Some options may not be valid on some scanning devices.", "", "note", False),
-         ("6. The following features are not yet implemented: GUI mode, batch scanning, film/negative scanning, contrast adjustment, brightness adjustment, autocrop, resize to axb, resize to xKB, ", "", "note", False),
-
-         utils.USAGE_SPACE,
-         utils.USAGE_EXAMPLES,
-         ("Quickly (low-res) scan entire page in color to file:", "$ hp-scan -n -r75",  "example", False),
-         ("Scan upper left 1in corner and send as email:", '$ hp-scan -n --box=0,0,1,1 -tin -semail --email-from=foo@bar.org --email-to=bar@foo.org --email-note="Test scan" --email-subject="Test scan email"', "example", False),
-         ("Scan entire page in 300dpi grayscale and then edit:", "$ hp-scan -n -seditor -mgray",  "example", False),
-         ("Launch the hp-scan GUI:", "$ hp-scan",  "example", False),
-         ("Scan into The GIMP:", "$ hp-scan -n --editor=gimp",  "example", False),
-        ]
-
-def usage(typ='text'):
-    if typ == 'text':
-        utils.log_title(__title__, __version__)
-
-    utils.format_text(USAGE, typ, __title__, 'hp-scan', __version__)
-    sys.exit(0)
 
 try:
     viewer = ''
@@ -241,73 +123,102 @@ try:
             pdf_viewer = os.path.join(vv, v)
             break
 
-    try:
-        opts, args = getopt.getopt(sys.argv[1:],'l:hd:p:b:gunr:m:t:o:s:f:v:e:c:a:x:', 
-            ['device=', 'printer=', 'level=', 
-             'help', 'help-rest', 
-             'help-man', 'logfile=', 
-             'gui', 'non-interactive', 'logging=',
-              'help-desc', 'resolution=', 'res=', 'mode=',
-              'tlx=', 'tly=', 'brx=', 'bry=', 'units=', 
-              'area=', 'box=', 'output=', 'dest=', 'destination=',
-              'file=', 'pdf=', 'viewer=', 'editor=',
-              'email-from=', 'email-to=', 'resize=',
-              'email-subject=', 'email-note=', 'email-msg=',
-              'contrast=', 'brightness=', 'size=', 'compression=',
-              'adf', 'fax='])
+    mod = module.Module(__mod__, __title__, __version__, __doc__, None,
+                        (NON_INTERACTIVE_MODE,))
 
+    mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS,
+        extra_options=[utils.USAGE_SPACE,
+        ("[OPTIONS] (General)", "", "header", False),
+        ("Scan destinations:", "-s<dest_list> or --dest=<dest_list>", "option", False),
+        ("", "where <dest_list> is a comma separated list containing one or more of: 'file'\*, ", "option", False),
+        ("", "'viewer', 'editor', 'pdf', 'fax', or 'print'. Use only commas between values, no spaces.", "option", False), 
+        ("Scan mode:", "-m<mode> or --mode=<mode>. Where <mode> is 'color'\*, 'gray' or 'lineart'.", "option", False),
+        ("Scanning resolution:", "-r<resolution_in_dpi> or --res=<resolution_in_dpi> or --resolution=<resolution_in_dpi>", "option", False),
+        ("", "where <resolution_in_dpi> is %s (300 is default)." % ', '.join([str(x) for x in valid_res]), "option", False),
+        ("Image resize:", "--resize=<scale_in_%> (min=1%, max=400%, default=100%)", "option", False),
+        ("Image contrast:", "--contrast=<contrast>", "option", False),
+        ("ADF mode (EXPERIMENTAL):", "--adf (Note, only PDF output is supported when using the ADF)", "option", False),
+        utils.USAGE_SPACE,
+        ("[OPTIONS] (Scan area)", "", "header", False),
+        ("Specify the units for area/box measurements:", "-t<units> or --units=<units>", "option", False),
+        ("", "where <units> is 'mm'\*, 'cm', 'in', 'px', or 'pt' ('mm' is default).", "option", False),
+        ("Scan area:", "-a<tlx>,<tly>,<brx>,<bry> or --area=<tlx>,<tly>,<brx>,<bry>", "option", False),
+        ("", "Coordinates are relative to the upper left corner of the scan area.", "option", False),
+        ("", "Units for tlx, tly, brx, and bry are specified by -t/--units (default is 'mm').", "option", False),
+        ("", "Use only commas between values, no spaces.", "option", False),
+        ("Scan box:", "--box=<tlx>,<tly>,<width>,<height>", "option", False),
+        ("", "tlx and tly coordinates are relative to the upper left corner of the scan area.", "option", False),
+        ("", "Units for tlx, tly, width, and height are specified by -t/--units (default is 'mm').", "option", False),         
+        ("", "Use only commas between values, no spaces.", "option", False),
+        ("Top left x of the scan area:", "--tlx=<tlx>", "option", False),
+        ("", "Coordinates are relative to the upper left corner of the scan area.", "option", False),
+        ("", "Units are specified by -t/--units (default is 'mm').", "option", False),
+        ("Top left y of the scan area:", "--tly=<tly>", "option", False),
+        ("", "Coordinates are relative to the upper left corner of the scan area.", "option", False),
+        ("", "Units are specified by -t/--units (default is 'mm').", "option", False),
+        ("Bottom right x of the scan area:", "--brx=<brx>", "option", False),
+        ("", "Coordinates are relative to the upper left corner of the scan area.", "option", False),
+        ("", "Units are specified by -t/--units (default is 'mm').", "option", False),
+        ("Bottom right y   of the scan area:", "--bry=<bry>", "option", False),
+        ("", "Coordinates are relative to the upper left corner of the scan area.", "option", False),
+        ("", "Units are specified by -t/--units (default is 'mm').", "option", False),
+        ("Specify the scan area based on a paper size:", "--size=<paper size name>", "option", False),
+        ("", "where <paper size name> is one of: %s" % ', '.join(PAGE_SIZES.keys()), "option", False), 
+        utils.USAGE_SPACE,
+        ("[OPTIONS] ('file' dest)", "", "header", False),
+        ("Filename for 'file' destination:", "-o<file> or -f<file> or --file=<file> or --output=<file>", "option", False),
+        utils.USAGE_SPACE,
+        ("[OPTIONS] ('pdf' dest)", "", "header", False),
+        ("PDF viewer application:", "--pdf=<pdf_viewer>", "option", False),
+        utils.USAGE_SPACE,
+        ("[OPTIONS] ('viewer' dest)", "", "header", False),
+        ("Image viewer application:", "-v<viewer> or --viewer=<viewer>", "option", False),
+        utils.USAGE_SPACE,
+        ("[OPTIONS] ('editor' dest)", "", "header", False),
+        ("Image editor application:", "-e<editor> or --editor=<editor>", "option", False),
+        utils.USAGE_SPACE,
+        ("[OPTIONS] ('email' dest)", "", "header", False),
+        ("From: address for 'email' dest:", "--email-from=<email_from_address> (required for 'email' dest.)", "option", False),
+        ("To: address for 'email' dest:", "--email-to=<email__to_address> (required for 'email' dest.)", "option", False),
+        ("Email subject for 'email' dest:", '--email-subject="<subject>" or --subject="<subject>"', "option", False),
+        ("", 'Use double quotes (") around the subject if it contains space characters.', "option", False),
+        ("Note or message for the 'email' dest:", '--email-msg="<msg>" or --email-note="<note>"', "option", False),
+        ("", 'Use double quotes (") around the note/message if it contains space characters.', "option", False),
+        utils.USAGE_SPACE,
+        ("[OPTIONS] ('fax' dest)", "", "header", False),
+        ("Fax queue/printer:", "--fax=<fax_printer_name>", "option", False),
+        utils.USAGE_SPACE,
+        ("[OPTIONS] ('printer' dest)", "", "header", False),
+        ("Printer queue/printer:", "--printer=<printer_name>", "option", False),
+        utils.USAGE_SPACE,
+        ("[OPTIONS] (advanced)", "", "header", False),
+        ("Set the scanner compression mode:", "-x<mode> or --compression=<mode>, <mode>='raw', 'none' or 'jpeg' ('jpeg' is default) ('raw' and 'none' are equivalent)", "option", False),],
+        see_also_list=[])
+              
+    opts, device_uri, printer_name, mode, ui_toolkit, lang = \
+        mod.parseStdOpts('s:m:r:c:t:a:b:o:v:f:c:x:',
+                         ['dest=', 'mode=', 'res=', 'resolution=',
+                          'resize=', 'contrast=', 'adf', 'unit=',
+                          'units=', 'area=', 'box=', 'tlx=',
+                          'tly=', 'brx=', 'bry=', 'size=',
+                          'file=', 'output=', 'pdf=', 'viewer=',
+                          'email-from=', 'from=', 'email-to=',
+                          'to=', 'email-msg=', 'msg=', 'fax=',
+                          'printer=', 'compression=' , 'raw',
+                          'jpeg', 'color', 'lineart', 'colour',
+                          'bw', 'gray', 'grayscale', 'grey',
+                          'greyscale', 'email-subject=',
+                          'subject=', 'to=', 'from=', 'jpg',
+                          'grey-scale', 'gray-scale', 'about=',
+                         ])
+                          
+ 
 
-
-    except getopt.GetoptError, e:
-        log.error(e.msg)
-        usage()
-        sys.exit(1)
-
-    if os.getenv("HPLIP_DEBUG"):
-        log.set_level('debug')
+    device_uri = mod.getDeviceUri(device_uri, printer_name, 
+        back_end_filter=['hpaio'], filter={'scan-type': (operator.gt, 0)})
 
     for o, a in opts:
-        if o in ('-l', '--logging'):
-            log_level = a.lower().strip()
-            if not log.set_level(log_level):
-                usage()
-
-        elif o == '-g':
-            log.set_level('debug')
-
-        elif o in ('-h', '--help'):
-            usage()
-
-        elif o == '--help-rest':
-            usage('rest')
-
-        elif o == '--help-man':
-            usage('man')
-
-        elif o == '--help-desc':
-            print __doc__,
-            sys.exit(0)
-
-        elif o in ('-d', '--device'):
-            device_uri = a
-
-        elif o in ('-n', '--non-interactive'):
-            if mode_specified:
-                log.error("You may only specify a single mode as a parameter (-n or -u).")
-                sys.exit(1)
-
-            mode = NON_INTERACTIVE_MODE
-            mode_specified = True
-
-        elif o in ('-u', '--gui'):
-            if mode_specified:
-                log.error("You may only specify a single mode as a parameter (-n or -u).")
-                sys.exit(1)
-
-            mode = GUI_MODE
-            mode_specified = True
-
-        elif o in ('-x', '--compression'):
+        if o in ('-x', '--compression'):
             a = a.strip().lower()
 
             if a in ('jpeg', 'jpg'):
@@ -321,6 +232,21 @@ try:
                 log.error("Using default value of 'jpeg'.")
                 scanner_compression = 'JPEG'
 
+        elif o == 'raw':
+            scanner_compression = 'None'
+
+        elif o == 'jpeg':
+            scanner_compression = 'JPEG'
+
+        elif o in ('--color', '--colour'):
+            scan_mode = 'color'
+                
+        elif o in ('--lineart', '--line-art', '--bw'):
+            scan_mode = 'lineart'
+            
+        elif o in ('--gray', '--grayscale', '--gray-scale', '--grey', '--greyscale', '--grey-scale'):
+            scan_mode = 'gray'
+            
         elif o in ('-m', '--mode'):
             a = a.strip().lower()
 
@@ -359,7 +285,7 @@ try:
                     log.warn("Invalid resolution. Using closest valid resolution of %d dpi" % res)
                     log.error("Valid resolutions are %s dpi." % ', '.join([str(x) for x in valid_res]))
 
-        elif o in ('-t', '--units'):
+        elif o in ('-t', '--units', '--unit'):
             a = a.strip().lower()
 
             if a in ('in', 'inch', 'inches'):
@@ -374,11 +300,11 @@ try:
             elif a in ('px', 'pixel', 'pixels', 'pel', 'pels'):
                 units = 'px'
 
-            elif a in ('pt', 'point', 'points'):
+            elif a in ('pt', 'point', 'points', 'pts'):
                 units = 'pt'
 
             else:
-                log.error("Invalid units. Using default of mm.")
+                log.error("Invalid units. Using default of 'mm'.")
                 units = 'mm'
 
         elif o == '--tlx':
@@ -448,7 +374,7 @@ try:
                     log.error("Invalid value for bry. Using defaults.")
                     bry = None
 
-        elif o == '--box': # tlx, tly, w, h
+        elif o in ('-b', '--box'): # tlx, tly, w, h
             a = a.strip().lower()
             try:
                 tlx, tly, width, height = a.split(',')[:4]
@@ -559,71 +485,39 @@ try:
                 if 'pdf' not in dest:
                     dest.append('pdf')
 
-        elif o in ('-p', '--printer'):
-            if a.startswith('*'):
-                printer_name = cups.getDefaultPrinter()
-                log.debug(printer_name)
-                
-                if printer_name is not None:
-                    log.info("Using CUPS default printer: %s" % printer_name)
-                else:
-                    log.error("CUPS default printer is not set.")
-                
-            else:
-                printer_name = a
-            
-            if printer_name is not None:
-                pp = printer_name.strip()
-                
-                printer_list = cups.getPrinters()
-                found = False
-                for p in printer_list:
-                    if p.name == pp:
-                        found = True
-                        printer = pp
-                        break
+#        elif o == '--fax':
+#            pp = a.strip()
+#            from prnt import cups
+#            printer_list = cups.getPrinters()
+#            found = False
+#            for p in printer_list:
+#                if p.name == pp:
+#                    found = True
+#                    fax = pp
+#                    break
+#
+#            if found: 
+#                if 'fax' not in dest:
+#                    dest.append('fax')
+#            else:
+#                log.error("Unknown/invalid fax name: %s" % pp)
 
-                if found: 
-                    if 'printer' not in dest:
-                        dest.append('printer')
-                else:
-                    log.error("Unknown/invalid printer name: %s" % pp)
-                    
-
-        elif o == '--fax':
-            #print "fax"
-            pp = a.strip()
-            from prnt import cups
-            printer_list = cups.getPrinters()
-            found = False
-            for p in printer_list:
-                if p.name == pp:
-                    found = True
-                    fax = pp
-                    break
-
-            if found: 
-                if 'fax' not in dest:
-                    dest.append('fax')
-            else:
-                log.error("Unknown/invalid fax name: %s" % pp)
-
-        elif o == '--email-to':
+        elif o in ('--email-to', '--to'):
             email_to = a.split(',')
             if 'email' not in dest:
                 dest.append('email')
 
-        elif o == '--email-from':
+        elif o in ('--email-from', '--from'):
             email_from = a
             if 'email' not in dest:
                 dest.append('email')
 
-        elif o == '--email-subject':
+        elif o in ('--email-subject', '--subject', '--about'):
             email_subject = a
             if 'email' not in dest:
                 dest.append('email')
 
-        elif o in ('--email-note', '--email-msg'):
+        elif o in ('--email-note', '--email-msg', '--msg', '--message', '--note', '--notes'):
             email_note = a
             if 'email' not in dest:
                 dest.append('email')
@@ -651,22 +545,23 @@ try:
             output_type = 'pdf'
 
 
-    utils.log_title(__title__, __version__)
+    if printer_name is not None and \
+        device.getDeviceURIByPrinterName(printer_name) is not None and \
+        'printer' not in dest:
 
-    if os.getuid() == 0:
-        log.warn("hp-scan should not be run as root.")
+        dest.append('printer')        
 
-    if 'printer' in dest and not printer:
-        from prnt import cups
-        printer = cups.getDefaultPrinter()
-
-        if printer is not None:
-            log.warn("Print destination enabled with no printer specified.")
-            log.warn("Using CUPS default printer '%s'." % printer)
-        else:
-            log.error("Print destination enabled with no printer specified.")
-            log.error("No CUPS default printer found. Disabling 'print' destination.")
-            dest.remove("printer")
+#    if 'printer' in dest and not printer:
+#        from prnt import cups
+#        printer = cups.getDefaultPrinter()
+#
+#        if printer is not None:
+#            log.warn("Print destination enabled with no printer specified.")
+#            log.warn("Using CUPS default printer '%s'." % printer)
+#        else:
+#            log.error("Print destination enabled with no printer specified.")
+#            log.error("No CUPS default printer found. Disabling 'print' destination.")
+#            dest.remove("printer")
 
     if 'fax' in dest and 'file' not in dest:
         log.error("Fax destination not implemented. Adding 'file' destination. Use output file to fax.")
@@ -757,12 +652,6 @@ try:
         log.error("Invalid values for tly (%d) and bry (%d) (tly>=bry). Using defaults." % (tly, bry))
         tly = bry = None
 
-
-
-
-    # Security: Do *not* create files that other users can muck around with
-    os.umask (0037)
-
     if not prop.scan_build:
         log.error("Scanning disabled in build. Exiting")
         sys.exit(1)
@@ -771,88 +660,89 @@ try:
         log.error("GUI mode is not implemented yet. Please use -n. Refer to 'hp-scan -h' for help.")
         sys.exit(1)
 
-        if not prop.gui_build:
-            log.warn("GUI mode disabled in build. Reverting to interactive mode.")
-            mode = NON_INTERACTIVE_MODE
+#        if not prop.gui_build:
+#            log.warn("GUI mode disabled in build. Reverting to interactive mode.")
+#            mode = NON_INTERACTIVE_MODE
+#
+#        elif not os.getenv('DISPLAY'):
+#            log.warn("No display found. Reverting to interactive mode.")
+#            mode = NON_INTERACTIVE_MODE
+#
+#        elif not utils.checkPyQtImport():
+#            log.warn("PyQt init failed. Reverting to interactive mode.")
+#            mode = NON_INTERACTIVE_MODE
 
-        elif not os.getenv('DISPLAY'):
-            log.warn("No display found. Reverting to interactive mode.")
-            mode = NON_INTERACTIVE_MODE
+#    if mode == GUI_MODE:
+#        app = None
+#        sendfax = None
+#
+#        from qt import *
+#
+#        # UI Forms
+#        from ui.scanform import ScanForm
+#
+#        # create the main application object
+#        app = QApplication(sys.argv)
+#
+#        if loc is None:
+#            loc = user_cfg.ui.get("loc", "system")
+#            if loc.lower() == 'system':
+#                loc = str(QTextCodec.locale())
+#                log.debug("Using system locale: %s" % loc)
+#
+#        if loc.lower() != 'c':
+#            e = 'utf8'
+#            try:
+#                l, x = loc.split('.')
+#                loc = '.'.join([l, e])
+#            except ValueError:
+#                l = loc
+#                loc = '.'.join([loc, e])
+#
+#            log.debug("Trying to load .qm file for %s locale." % loc)
+#            trans = QTranslator(None)
+#
+#            qm_file = 'hplip_%s.qm' % l
+#            log.debug("Name of .qm file: %s" % qm_file)
+#            loaded = trans.load(qm_file, prop.localization_dir)
+#
+#            if loaded:
+#                app.installTranslator(trans)
+#            else:
+#                loc = 'c'
+#
+#        if loc == 'c':
+#            log.debug("Using default 'C' locale")
+#        else:
+#            log.debug("Using locale: %s" % loc)
+#            QLocale.setDefault(QLocale(loc))
+#            prop.locale = loc
+#            try:
+#                locale.setlocale(locale.LC_ALL, locale.normalize(loc))
+#            except locale.Error:
+#                pass
+#
+#        scanui = ScanForm(device_uri, printer_name, args) 
+#
+#        app.setMainWidget(scanui)
+#
+#        pid = os.getpid()
+#        log.debug('pid=%d' % pid)
+#
+#        scanui.show()
+#
+#        signal.signal(signal.SIGPIPE, signal.SIG_IGN)
+#
+#        try:
+#            log.debug("Starting GUI loop...")
+#            app.exec_loop()
+#        except KeyboardInterrupt:
+#            pass
+#        #except:
+#        #    log.exception()
 
-        elif not utils.checkPyQtImport():
-            log.warn("PyQt init failed. Reverting to interactive mode.")
-            mode = NON_INTERACTIVE_MODE
-
-    if mode == GUI_MODE:
-        app = None
-        sendfax = None
-
-        from qt import *
-
-        # UI Forms
-        from ui.scanform import ScanForm
-
-        # create the main application object
-        app = QApplication(sys.argv)
-
-        if loc is None:
-            loc = user_cfg.ui.get("loc", "system")
-            if loc.lower() == 'system':
-                loc = str(QTextCodec.locale())
-                log.debug("Using system locale: %s" % loc)
-
-        if loc.lower() != 'c':
-            e = 'utf8'
-            try:
-                l, x = loc.split('.')
-                loc = '.'.join([l, e])
-            except ValueError:
-                l = loc
-                loc = '.'.join([loc, e])
-
-            log.debug("Trying to load .qm file for %s locale." % loc)
-            trans = QTranslator(None)
-
-            qm_file = 'hplip_%s.qm' % l
-            log.debug("Name of .qm file: %s" % qm_file)
-            loaded = trans.load(qm_file, prop.localization_dir)
-
-            if loaded:
-                app.installTranslator(trans)
-            else:
-                loc = 'c'
-
-        if loc == 'c':
-            log.debug("Using default 'C' locale")
-        else:
-            log.debug("Using locale: %s" % loc)
-            QLocale.setDefault(QLocale(loc))
-            prop.locale = loc
-            try:
-                locale.setlocale(locale.LC_ALL, locale.normalize(loc))
-            except locale.Error:
-                pass
-
-        scanui = ScanForm(device_uri, printer_name, args) 
-
-        app.setMainWidget(scanui)
-
-        pid = os.getpid()
-        log.debug('pid=%d' % pid)
-
-        scanui.show()
-
-        signal.signal(signal.SIGPIPE, signal.SIG_IGN)
-
-        try:
-            log.debug("Starting GUI loop...")
-            app.exec_loop()
-        except KeyboardInterrupt:
-            pass
-        #except:
-        #    log.exception()
-
-    else: # NON_INTERACTIVE_MODE
+    if 1:
+        #else: # NON_INTERACTIVE_MODE
         import Queue
         from scan import sane
         import scanext
@@ -867,7 +757,7 @@ try:
         try:
             import Image
         except ImportError:
-            log.error("'hp-scan -n' requires the Python Imaging Library (PIL). Please install it and try again or run 'hp-scan -u' instead.")
+            log.error("%s requires the Python Imaging Library (PIL). Exiting." % __mod__)
             sys.exit(1)
 
     ##    if output_type == 'pdf':
@@ -879,42 +769,15 @@ try:
 
         sane.init()
         devices = sane.getDevices()
-
-        if not device_uri:
-            if len(devices) == 0:
-                log.error("No scanning devices found.")
-                sys.exit(1)
-
-            elif len(devices) == 1:
-                device_uri = devices[0][0]
-
-            else:
-                log.info(log.bold("\nChoose device:\n"))
-
-                max_deviceid_size = 0
-                for d in devices:
-                    max_deviceid_size = max(len(d[0]), max_deviceid_size)
-
-                formatter = utils.TextFormatter(
-                        (
-                            {'width': 4},
-                            {'width': max_deviceid_size, 'margin': 2},
-                        )
-                    )
-
-                log.info(formatter.compose(("Num.", "Device URI")))
-                log.info(formatter.compose(('-'*4, '-'*(max_deviceid_size))))
-
-                i = 0
-                for d in devices:
-                    log.info(formatter.compose((str(i), d[0])))
-                    i += 1
-
-                ok, x = tui.enter_range("\nEnter number 0...%d for device (q=quit) ?" % (i-1), 0, (i-1))
-                if not ok: sys.exit(0)
-                device_uri = devices[x][0]
-
-
+        
+        # Make sure SANE backend sees the device...
+        for d, mfg, mdl, t in devices:
+            if d == device_uri:
+                break
+        else:
+            log.error("Unable to locate device %s using SANE backend hpaio:. Please check HPLIP installation." % device_uri)
+            sys.exit(1)
+            
         log.info(log.bold("Using device %s" % device_uri))
         log.info("Opening connection to device...")
 
@@ -1022,7 +885,7 @@ try:
 
         if not adf:
             try:
-                device.setOption("source", "Auto")
+                #device.setOption("source", "Auto")
                 device.setOption("batch-scan", False)
             except scanext.error:
                 log.debug("Error setting source or batch-scan option (this is probably OK).")
@@ -1049,6 +912,8 @@ try:
                 try:
                     try:
                         ok, expected_bytes, status = device.startScan("RGBA", update_queue, event_queue)
+                        # Note: On some scanners (Marvell) expected_bytes will be < 0 (if lines == -1)
+                        log.debug("expected_bytes = %d" % expected_bytes)
                     except scanext.error, e:
                         log.error(e)
                         sys.exit(1)
@@ -1066,10 +931,11 @@ try:
                             no_docs = True
                             break
 
-                    if adf:
-                        log.info("Expecting to read %s from scanner (per page)." % utils.format_bytes(expected_bytes))
-                    else:
-                        log.info("Expecting to read %s from scanner." % utils.format_bytes(expected_bytes))
+                    if expected_bytes > 0:
+                        if adf:
+                            log.info("Expecting to read %s from scanner (per page)." % utils.format_bytes(expected_bytes))
+                        else:
+                            log.info("Expecting to read %s from scanner." % utils.format_bytes(expected_bytes))
 
                     device.waitForScanActive()
 
@@ -1082,8 +948,13 @@ try:
 
                                 #if log.get_level() >= log.LOG_LEVEL_INFO:
                                 if not log.is_debug():
-                                    pm.update(int(100*bytes_read/expected_bytes), 
-                                        utils.format_bytes(bytes_read))
+                                    if expected_bytes > 0:
+                                        pm.update(int(100*bytes_read/expected_bytes), 
+                                            utils.format_bytes(bytes_read))
+                                    else:
+                                        pm.update(0, 
+                                            utils.format_bytes(bytes_read))
+                                        
 
     ##                            if status == scanext.SANE_STATUS_EOF:
     ##                                log.debug("EOF")
@@ -1111,9 +982,13 @@ try:
                     status, bytes_read = update_queue.get(0)
 
                     if not log.is_debug():
-                        pm.update(int(100*bytes_read/expected_bytes), 
-                            utils.format_bytes(bytes_read))
-
+                        if expected_bytes > 0:
+                            pm.update(int(100*bytes_read/expected_bytes), 
+                                utils.format_bytes(bytes_read))
+                        else:
+                            pm.update(0, 
+                                utils.format_bytes(bytes_read))
+                            
     ##                if status == scanext.SANE_STATUS_EOF:
     ##                    log.debug("EOF")
     ##                elif status == scanext.SANE_STATUS_NO_DOCS:
@@ -1131,6 +1006,12 @@ try:
 
                     buffer, format, format_name, pixels_per_line, \
                         lines, depth, bytes_per_line, pad_bytes, total_read = device.getScan()
+                        
+                    log.debug("PPL=%d lines=%d depth=%d BPL=%d pad=%d total=%d" % 
+                        (pixels_per_line, lines, depth, bytes_per_line, pad_bytes, total_read))
+                        
+                    if lines == -1:
+                        lines = int(total_read / bytes_per_line)
 
                     if scan_mode in ('color', 'gray'):
                         try:

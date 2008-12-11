@@ -94,6 +94,10 @@ protected:
     {
         return SYSTEM_ERROR;
     }
+    virtual int GetOutputResolutionY ()
+    {
+        return 600;
+    }
 
     static const unsigned char szByte1[256];
     static const unsigned char szByte2[256];

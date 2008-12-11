@@ -22,6 +22,7 @@
 
 __version__ = '4.0'
 __title__ = 'Print Utility'
+__mod__ = 'hp-print'
 __doc__ = "A simple front end to 'lp'. Provides a print UI from the Device Manager if kprinter, gtklp, or xpp are not installed."
 
 # Std Lib
@@ -31,7 +32,7 @@ import getopt
 
 # Local
 from base.g import *
-from base import utils, device, tui
+from base import utils, device, tui, module
 from prnt import cups
 
 log.set_module('hp-print')
@@ -39,168 +40,104 @@ log.set_module('hp-print')
 app = None
 printdlg = None
 
-USAGE = [(__doc__, "", "name", True),
-         ("Usage: hp-print [PRINTER|DEVICE-URI] [OPTIONS] [FILE LIST]", "", "summary", True),
-         utils.USAGE_ARGS,
-         utils.USAGE_DEVICE,
-         ("To specify a CUPS printer:", "-P<printer>, -p<printer> or --printer=<printer>", "option", False),
-         utils.USAGE_SPACE,
-         utils.USAGE_OPTIONS,
-         utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
-         utils.USAGE_HELP,
-         ("[FILELIST]", "", "heading", False),
-         ("Optional list of files:", """Space delimited list of files to print. Files can also be selected for print by adding them to the file list in the UI.""", "option", False),
-         utils.USAGE_SPACE,
-         utils.USAGE_NOTES,
-         utils.USAGE_STD_NOTES1, utils.USAGE_STD_NOTES2, 
-         ]
 
+mod = module.Module(__mod__, __title__, __version__, __doc__, None,
+                    (GUI_MODE,), (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4))
+                    
+mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS | module.USAGE_FLAG_FILE_ARGS,
+             see_also_list=['hp-printsettings'])
 
-def usage(typ='text'):
-    if typ == 'text':
-        utils.log_title(__title__, __version__)
+opts, device_uri, printer_name, mode, ui_toolkit, loc = \
+    mod.parseStdOpts()
+    
+printer_name, device_uri = mod.getPrinterName(printer_name, device_uri)
 
-    utils.format_text(USAGE, typ, __title__, 'hp-print', __version__)
-    sys.exit(0)
-
-
-try:
-    opts, args = getopt.getopt(sys.argv[1:], 'P:p:d:hl:gq:',
-                               ['printer=', 'device=', 'help', 
-                                'help-rest', 'help-man', 'logging=', 
-                                'lang=', 'help-desc'])
-except getopt.GetoptError, e:
-    log.error(e.msg)
-    usage()
-
-printer_name = None
-device_uri = None
-log_level = logger.DEFAULT_LOG_LEVEL
-loc = None
-bus = ['cups']
-
-if os.getenv("HPLIP_DEBUG"):
-    log.set_level('debug')
-
-for o, a in opts:
-    if o in ('-h', '--help'):
-        usage()
-
-    elif o == '--help-rest':
-        usage('rest')
-
-    elif o == '--help-man':
-        usage('man')
-
-    elif o == '--help-desc':
-        print __doc__,
-        sys.exit(0)
-
-    elif o in ('-p', '-P', '--printer'):
-        if a.startswith('*'):
-            printer_name = cups.getDefaultPrinter()
-            log.debug(printer_name)
-            
-            if printer_name is not None:
-                log.info("Using CUPS default printer: %s" % printer_name)
-            else:
-                log.error("CUPS default printer is not set.")
-            
-        else:
-            printer_name = a
-
-    elif o in ('-d', '--device'):
-        device_uri = a
-
-    elif o in ('-l', '--logging'):
-        log_level = a.lower().strip()
-        if not log.set_level(log_level):
-            usage()
-
-    elif o == '-g':
-        log.set_level('debug')
-
-    elif o in ('-q', '--lang'):
-        if a.strip() == '?':
-            tui.show_languages()
-            sys.exit(0)
-
-        loc = utils.validate_language(a.lower())
-
-
-
-# Security: Do *not* create files that other users can muck around with
-os.umask (0037)
-
-utils.log_title(__title__, __version__)
-
-if os.getuid() == 0:
-    log.warn("hp-print should not be run as root.")
-
-if not utils.canEnterGUIMode():
-    log.error("hp-print requires GUI support. Exiting.")
-    sys.exit(1)
-
-
-from qt import *
-from ui.printerform import PrinterForm
-
-
-# create the main application object
-app = QApplication(sys.argv)
-
-if loc is None:
-    loc = user_cfg.ui.get("loc", "system")
-    if loc.lower() == 'system':
-        loc = str(QTextCodec.locale())
-        log.debug("Using system locale: %s" % loc)
-
-if loc.lower() != 'c':
-    e = 'utf8'
-    try:
-        l, x = loc.split('.')
-        loc = '.'.join([l, e])
-    except ValueError:
-        l = loc
-        loc = '.'.join([loc, e])
-
-    log.debug("Trying to load .qm file for %s locale." % loc)
-    trans = QTranslator(None)
-
-    qm_file = 'hplip_%s.qm' % l
-    log.debug("Name of .qm file: %s" % qm_file)
-    loaded = trans.load(qm_file, prop.localization_dir)
-
-    if loaded:
-        app.installTranslator(trans)
-    else:
-        loc = 'c'
-
-if loc == 'c':
-    log.debug("Using default 'C' locale")
+if ui_toolkit == 'qt3':
+    if not utils.canEnterGUIMode():
+        log.error("%s requires GUI support (try running with --qt4). Exiting." % __mod__)
+        sys.exit(1)
 else:
-    log.debug("Using locale: %s" % loc)
-    QLocale.setDefault(QLocale(loc))
-    prop.locale = loc
+    if not utils.canEnterGUIMode4():
+        log.error("%s requires GUI support (try running with --qt3). Exiting." % __mod__)
+        sys.exit(1)
+
+if ui_toolkit == 'qt3':
+    from qt import *
+    from ui.printerform import PrinterForm
+
+    # create the main application object
+    app = QApplication(sys.argv)
+
+    if loc is None:
+        loc = user_cfg.ui.get("loc", "system")
+        if loc.lower() == 'system':
+            loc = str(QTextCodec.locale())
+            log.debug("Using system locale: %s" % loc)
+
+    if loc.lower() != 'c':
+        e = 'utf8'
+        try:
+            l, x = loc.split('.')
+            loc = '.'.join([l, e])
+        except ValueError:
+            l = loc
+            loc = '.'.join([loc, e])
+
+        log.debug("Trying to load .qm file for %s locale." % loc)
+        trans = QTranslator(None)
+
+        qm_file = 'hplip_%s.qm' % l
+        log.debug("Name of .qm file: %s" % qm_file)
+        loaded = trans.load(qm_file, prop.localization_dir)
+
+        if loaded:
+            app.installTranslator(trans)
+        else:
+            loc = 'c'
+
+    if loc == 'c':
+        log.debug("Using default 'C' locale")
+    else:
+        log.debug("Using locale: %s" % loc)
+        QLocale.setDefault(QLocale(loc))
+        prop.locale = loc
+        try:
+            locale.setlocale(locale.LC_ALL, locale.normalize(loc))
+        except locale.Error:
+            pass
+
+    #print printer_name
+    printdlg = PrinterForm(printer_name, mod.args)
+    printdlg.show()
+    app.setMainWidget(printdlg)
+
     try:
-        locale.setlocale(locale.LC_ALL, locale.normalize(loc))
-    except locale.Error:
+        log.debug("Starting GUI loop...")
+        app.exec_loop()
+    except KeyboardInterrupt:
         pass
 
 
-printdlg = PrinterForm(bus, device_uri, printer_name, args)
-printdlg.show()
-app.setMainWidget(printdlg)
+else: # qt4
+    try:
+        from PyQt4.QtGui import QApplication
+        from ui4.printdialog import PrintDialog
+    except ImportError:
+        log.error("Unable to load Qt4 support. Is it installed?")
+        sys.exit(1)        
+    
+    if 1:
+        app = QApplication(sys.argv)
+        
+        dlg = PrintDialog(None, printer_name, mod.args) 
+        dlg.show()
+        try:
+            log.debug("Starting GUI loop...")
+            app.exec_()
+        except KeyboardInterrupt:
+            sys.exit(0)
+        
 
-try:
-    log.debug("Starting GUI loop...")
-    app.exec_loop()
-except KeyboardInterrupt:
-    pass
-#except:
-#    log.exception()
-
-#sock.close()
 sys.exit(0)
 
 

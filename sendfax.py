@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,8 +22,9 @@
 # Thanks to Henrique M. Holschuh <hmh@debian.org> for various security patches
 #
 
-__version__ = '8.1'
+__version__ = '9.0'
 __title__ = 'PC Sendfax Utility'
+__mod__ = 'hp-sendfax'
 __doc__ = "Allows for sending faxes from the PC using HPLIP supported multifunction printers." 
 
 # Std Lib
@@ -33,140 +34,48 @@ import os.path
 import getopt
 import signal
 import time
+import operator
 
 # Local
 from base.g import *
 import base.utils as utils
-from base import device, tui
+from base import device, tui, module
 
-log.set_module('hp-sendfax')
-
-USAGE = [(__doc__, "", "name", True),
-         ("Usage: hp-sendfax [PRINTER|DEVICE-URI] [OPTIONS] [MODE] [FILES]", "", "summary", True),
-         utils.USAGE_ARGS,
-         ("To specify a fax-URI:", "-d<device-uri> or --device=<device-uri>", "option", False),
-         ("To specify a CUPS fax:", "--fax=<fax>", "option", False),
-         utils.USAGE_SPACE,
-         ("[MODE]", "", "header", False),
-         ("Enter graphical UI mode:", "-u or --gui (Default)", "option", False),
-         ("Run in non-interactive mode (batch mode):", "-n or --non-interactive", "option", False),
-         utils.USAGE_SPACE,
-         utils.USAGE_OPTIONS,
-         ("Specify the fax number(s):", "-f<number(s)> or --faxnum=<number(s)> (-n only)", "option", False),
-         ("Specify the recipient(s):", "-r<recipient(s)> or --recipient=<recipient(s)> (-n only)", "option", False), 
-         ("Specify the groups(s):", "-g<group(s)> or --group=<group(s)> (-n only)", "option", False), 
-         utils.USAGE_BUS1, utils.USAGE_BUS2,         
-         utils.USAGE_LOGGING1, utils.USAGE_LOGGING2,
-         ("Run in debug mode:", "--gg (same as option: -ldebug)", "option", False),
-         utils.USAGE_LANGUAGE,
-         utils.USAGE_HELP,
-         ("[FILES]", "", "header", False),
-         ("A list of files to add to the fax job.", "(Required for -n, optional for -u)", "option", True),
-         utils.USAGE_NOTES,
-         utils.USAGE_STD_NOTES1,
-         ("2. If --fax=\* is specified, the default CUPS fax (printer queue) will be used.", "", "note", False),
-         ("3. Coversheets are not supported in non-interactive mode (-n)", "", "note", False),
-         ("4. Fax numbers and/or recipients should be listed in comma separated lists (-n only).", "", "note", False),
-         utils.USAGE_SPACE,
-         utils.USAGE_SEEALSO,
-         ("hp-fab", "", "seealso", False),
-        ]
-
-def usage(typ='text'):
-    if typ == 'text':
-        utils.log_title(__title__, __version__)
-
-    utils.format_text(USAGE, typ, __title__, 'hp-sendfax', __version__)
-    sys.exit(0)
-
-
-
-prop.prog = sys.argv[0]
-
-device_uri = None
-printer_name = None
 username = prop.username
-mode = GUI_MODE
-mode_specified = False
 faxnum_list = []
 recipient_list = []
 group_list = []
-bus = device.DEFAULT_PROBE_BUS
 prettyprint = False
-loc = None
 
-try:
-    opts, args = getopt.getopt(sys.argv[1:],'l:hz:d:b:g:unf:r:tq:', 
-        ['device=', 'fax=', 'level=', 
-         'help', 'help-rest', 'lang=',
-         'help-man', 'logfile=', 'bus=',
-         'gui', 'non-interactive', 'logging=',
-         'faxnum=', 'recipients=',
-         'gg', 'group=', 'help-desc'])
+mod = module.Module(__mod__, __title__, __version__, __doc__, None,
+                    (GUI_MODE, NON_INTERACTIVE_MODE), 
+                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4))
+                    
+mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS | module.USAGE_FLAG_SUPRESS_G_DEBUG_FLAG,
+    extra_options=[
+    ("Specify the fax number(s):", "-f<number(s)> or --faxnum=<number(s)> or --fax-num=<number(s)>  or --num=<number(s)>(-n only)", "option", False),
+    ("Specify the recipient(s):", "-r<recipient(s)> or --recipient=<recipient(s)> (-n only)", "option", False), 
+    ("Specify the groups(s):", "--group=<group(s)> or --groups=<group(s)> (-n only)", "option", False) ],
+    see_also_list=['hp-faxsetup', 'hp-fab'])
 
-except getopt.GetoptError, e:
-    log.error(e.msg)
-    sys.exit(1)
-
-
-if os.getenv("HPLIP_DEBUG"):
-    log.set_level('debug')
+opts, device_uri, printer_name, mode, ui_toolkit, loc = \
+    mod.parseStdOpts('f:r:g:',
+                     ['faxnum=', 'fax-num=', 'recipient=', 'group=',
+                      'groups=', 'gg'], 
+                      supress_g_debug_flag=True)
 
 for o, a in opts:
-    if o in ('-l', '--logging'):
-        log_level = a.lower().strip()
-        if not log.set_level(log_level):
-            usage()
-
-    elif o == '--gg':
+    if o == '--gg':
         log.set_level('debug')
 
     elif o in ('-z', '--logfile'):
         log.set_logfile(a)
         log.set_where(log.LOG_TO_CONSOLE_AND_FILE)
 
-    elif o in ('-h', '--help'):
-        usage()
-
-    elif o == '--help-rest':
-        usage('rest')
-
-    elif o == '--help-man':
-        usage('man')
-
-    elif o == '--help-desc':
-        print __doc__,
-        sys.exit(0)
-
-    elif o in ('-d', '--device'):
-        device_uri = a
-
-    #elif o in ('-p', '--printer'):
     elif o == '--fax':
         printer_name = a
 
-    elif o in ('-b', '--bus'):
-        bus = [x.lower().strip() for x in a.split(',')]
-        if not device.validateBusList(bus):
-            usage()
-
-    elif o in ('-n', '--non-interactive'):
-        if mode_specified:
-            log.error("You may only specify a single mode as a parameter (-n or -u).")
-            sys.exit(1)
-
-        mode = NON_INTERACTIVE_MODE
-        mode_specified = True
-
-    elif o in ('-u', '--gui'):
-        if mode_specified:
-            log.error("You may only specify a single mode as a parameter (-n or -u).")
-            sys.exit(1)
-
-        mode = GUI_MODE
-        mode_specified = True
-
-    elif o in ('-f', '--faxnum'):
+    elif o in ('-f', '--faxnum', '--fax-num', '--num'):
         faxnum_list.extend(a.split(','))
 
     elif o in ('-r', '--recipient'):
@@ -175,125 +84,138 @@ for o, a in opts:
     elif o in ('-g', '--group'):
         group_list.extend(a.split(','))
 
-    elif o in ('-q', '--lang'):
-        if a.strip() == '?':
-            tui.show_languages()
-            sys.exit(0)
-
-        loc = utils.validate_language(a.lower())
-
-
-
-utils.log_title(__title__, __version__)
-
-# Security: Do *not* create files that other users can muck around with
-os.umask (0037)
 
 if not prop.fax_build:
     log.error("Fax is disabled (turned off during build). Exiting")
     sys.exit(1)
+    
+printer_name, device_uri = mod.getPrinterName(printer_name, device_uri, 
+    filter={'fax-type': (operator.gt, 0)}, back_end_filter=['hpfax'])
+
+#if printer_name is not None:
+#    mod.lockInstance(printer_name)
+
 
 if mode == GUI_MODE:
-    if not utils.canEnterGUIMode():
-        mode = NON_INTERACTIVE_MODE
-
-if mode == GUI_MODE:
-    app = None
-    sendfax = None
-
-    from qt import *
-
-    # UI Forms
-    from ui.faxsendjobform import FaxSendJobForm
-
-    # create the main application object
-    app = QApplication(sys.argv)
-
-    if loc is None:
-        loc = user_cfg.ui.get("loc", "system")
-        if loc.lower() == 'system':
-            loc = str(QTextCodec.locale())
-            log.debug("Using system locale: %s" % loc)
-
-    if loc.lower() != 'c':
-        e = 'utf8'
-        try:
-            l, x = loc.split('.')
-            loc = '.'.join([l, e])
-        except ValueError:
-            l = loc
-            loc = '.'.join([loc, e])
-
-        log.debug("Trying to load .qm file for %s locale." % loc)
-        trans = QTranslator(None)
-
-        qm_file = 'hplip_%s.qm' % l
-        log.debug("Name of .qm file: %s" % qm_file)
-        loaded = trans.load(qm_file, prop.localization_dir)
-
-        if loaded:
-            app.installTranslator(trans)
-        else:
-            loc = 'c'
-
-    if loc == 'c':
-        log.debug("Using default 'C' locale")
+    if ui_toolkit == 'qt3':
+        if not utils.canEnterGUIMode():
+            log.error("%s requires GUI support (try running with --qt4). Also, try using non-interactive (-n) mode." % __mod__)
+            sys.exit(1)
     else:
-        log.debug("Using locale: %s" % loc)
+        if not utils.canEnterGUIMode4():
+            log.error("%s requires GUI support (try running with --qt3). Also, try using non-interactive (-n) mode." % __mod__)
+            sys.exit(1)
 
-        QLocale.setDefault(QLocale(loc))
-        prop.locale = loc
+if mode == GUI_MODE:
+    if ui_toolkit == 'qt3':
+        app = None
+        sendfax = None
+        from qt import *
+
+        # UI Forms
+        from ui.faxsendjobform import FaxSendJobForm
+
+        # create the main application object
+        app = QApplication(sys.argv)
+
+        if loc is None:
+            loc = user_cfg.ui.get("loc", "system")
+            if loc.lower() == 'system':
+                loc = str(QTextCodec.locale())
+                log.debug("Using system locale: %s" % loc)
+
+        if loc.lower() != 'c':
+            e = 'utf8'
+            try:
+                l, x = loc.split('.')
+                loc = '.'.join([l, e])
+            except ValueError:
+                l = loc
+                loc = '.'.join([loc, e])
+
+            log.debug("Trying to load .qm file for %s locale." % loc)
+            trans = QTranslator(None)
+
+            qm_file = 'hplip_%s.qm' % l
+            log.debug("Name of .qm file: %s" % qm_file)
+            loaded = trans.load(qm_file, prop.localization_dir)
+
+            if loaded:
+                app.installTranslator(trans)
+            else:
+                loc = 'c'
+
+        if loc == 'c':
+            log.debug("Using default 'C' locale")
+        else:
+            log.debug("Using locale: %s" % loc)
+
+            QLocale.setDefault(QLocale(loc))
+            prop.locale = loc
+            try:
+                locale.setlocale(locale.LC_ALL, locale.normalize(loc))
+            except locale.Error:
+                pass
+
+
+        if os.geteuid() == 0:
+            log.error("You must not be root to run this utility.")
+
+            QMessageBox.critical(None, 
+                                 "HP Device Manager - Send Fax",
+                                 "You must not be root to run hp-sendfax.",
+                                  QMessageBox.Ok,
+                                  QMessageBox.NoButton,
+                                  QMessageBox.NoButton)
+
+            sys.exit(1)
+
+        # TODO: Fix instance lock
+        sendfax = FaxSendJobForm(device_uri,  
+                                 printer_name, 
+                                 mod.args) 
+
+        app.setMainWidget(sendfax)
+
+        pid = os.getpid()
+        log.debug('pid=%d' % pid)
+
+        sendfax.show()
+
         try:
-            locale.setlocale(locale.LC_ALL, locale.normalize(loc))
-        except locale.Error:
+            log.debug("Starting GUI loop...")
+            app.exec_loop()
+        except KeyboardInterrupt:
             pass
-            
-            
-    if os.geteuid() == 0:
-        log.error("You must not be root to run this utility.")
 
-        QMessageBox.critical(None, 
-                             "HP Device Manager - Send Fax",
-                             "You must not be root to run hp-sendfax.",
-                              QMessageBox.Ok,
-                              QMessageBox.NoButton,
-                              QMessageBox.NoButton)
+    else: # qt4
+        try:
+            from PyQt4.QtGui import QApplication
+            from ui4.sendfaxdialog import SendFaxDialog
+        except ImportError:
+            log.error("Unable to load Qt4 support. Is it installed?")
+            sys.exit(1)            
 
-        sys.exit(1)
-            
+        app = QApplication(sys.argv)
 
-
-    sendfax = FaxSendJobForm(device_uri,  
-                             printer_name, 
-                             args) 
-
-    app.setMainWidget(sendfax)
-
-    pid = os.getpid()
-    log.debug('pid=%d' % pid)
-
-    sendfax.show()
-
-    #signal.signal(signal.SIGPIPE, signal.SIG_IGN)
-
-    try:
-        log.debug("Starting GUI loop...")
-        app.exec_loop()
-    except KeyboardInterrupt:
-        pass
+        toolbox = SendFaxDialog(None, device_uri, mod.args) # TODO: Add instance lock in GUI code
+        toolbox.show()
+        try:
+            log.debug("Starting GUI loop...")
+            app.exec_()
+        except KeyboardInterrupt:
+            sys.exit(0)
 
 
 
 
 else: # NON_INTERACTIVE_MODE
     if os.getuid() == 0:
-        log.error("hp-sendfax cannot be run as root.")
+        log.error("%s cannot be run as root." % __mod__)
         sys.exit(1)
-    
- 
+
     try:
         import struct, Queue
-
         from prnt import cups
         from base import magic
 
@@ -309,10 +231,14 @@ else: # NON_INTERACTIVE_MODE
         try:
             import dbus
         except ImportError:
-            log.error("PC send fax requires dbus and python-dbus")
+            log.error("PC send fax requires dBus and python-dbus")
             sys.exit(1)
 
-        dbus_avail, service = device.init_dbus()
+        dbus_avail, service, session_bus = device.init_dbus()
+        
+        if not dbus_avail or service is None:
+            log.error("Unable to initialize dBus. PC send fax requires dBus and hp-systray support. Exiting.")
+            sys.exit(1)
 
         phone_num_list = []
 
@@ -367,14 +293,13 @@ else: # NON_INTERACTIVE_MODE
         log.debug("Phone num list = %s" % phone_num_list)
 
         if not phone_num_list:
-            log.error("No recipients specified. Please use -f, -r, and/or -g to specify recipients.")
-            usage()
+            mod.usage(error_msg=["No recipients specified. Please use -f, -r, and/or -g to specify recipients."])
 
         allowable_mime_types = cups.getAllowableMIMETypes()
         allowable_mime_types.append("application/hplip-fax")
         allowable_mime_types.append("application/x-python")
 
-        for f in args:
+        for f in mod.args:
             path = os.path.realpath(f)
             log.debug(path)
 
@@ -389,127 +314,11 @@ else: # NON_INTERACTIVE_MODE
                 log.error("File '%s' has a non-allowed mime-type of '%s'" % (path, mime_type))
                 sys.exit(1)
 
-        if printer_name:
-            printer_list = cups.getPrinters()
-            found = False
-            for p in printer_list:
-                if p.name == printer_name:
-                    device_uri = p.device_uri
-                    found = True
-                    break
+        log.info(log.bold("Using fax %s (%s)" % (printer_name, device_uri)))
 
-            if not found:
-                log.error("Unknown printer name: %s" % printer_name)
-                sys.exit(1)
+        #ok, lock_file = utils.lock_app('%s-%s' % (__mod__, printer_name), True)
+        mod.lockInstance(printer_name)
 
-            if not p.device_uri.startswith('hpfax:/'):
-                log.error("You must specify a printer that has a device URI in the form 'hpfax:/'")
-                sys.exit(1)
-
-        if device_uri and not printer_name:
-            cups_printers = cups.getPrinters()
-
-            max_printer_size = 20
-            printers = []
-            for p in cups_printers:
-                try:
-                    back_end, is_hp, bus, model, serial, dev_file, host, port = \
-                        device.parseDeviceURI(p.device_uri)
-                except Error:
-                    continue
-
-                if back_end == 'hpfax' and p.device_uri == device_uri:
-                    printers.append((p.name, p.device_uri))
-                    max_printer_size = max(len(p.name), max_printer_size)
-
-            if not printers:
-                log.error("No CUPS queue found for device %s" % device_uri)
-                sys.exit(1)
-
-            elif len(printers) == 1:
-                printer_name = printers[0][0]
-
-            else:
-                log.info(log.bold("\nChoose printer (fax queue) from installed printers in CUPS:\n"))
-
-                formatter = utils.TextFormatter(
-                        (
-                            {'width': 4},
-                            {'width': max_printer_size, 'margin': 2},
-                        )
-                    )
-
-                log.info(formatter.compose(("Num.", "CUPS Printer (queue)")))
-                log.info(formatter.compose(('-'*4, '-'*(max_printer_size), )))
-
-                i = 0
-                for p in printers:
-                    log.info(formatter.compose((str(i), p[0])))
-                    i += 1
-
-                ok, x = tui.enter_range("\nEnter number 0...%d for printer (q=quit) ?" % (i-1), 0, (i-1))
-
-                if not ok: 
-                    sys.exit(0)
-
-                printer_name = printers[x][0]
-
-        if not device_uri and not printer_name:
-            cups_printers = cups.getPrinters()
-            log.debug(cups_printers)
-
-            printers = []
-            max_deviceid_size, max_printer_size = 0, 0
-
-            for p in cups_printers:
-                try:
-                    back_end, is_hp, bus, model, serial, dev_file, host, port = \
-                        device.parseDeviceURI(p.device_uri)
-                except Error:
-                    continue
-
-                if back_end == 'hpfax':
-                    printers.append((p.name, p.device_uri))
-                    max_deviceid_size = max(len(p.device_uri), max_deviceid_size)
-                    max_printer_size = max(len(p.name), max_printer_size)
-
-            if not printers:
-                log.error("No devices found.")
-                sys.exit(1)
-
-            if len(printers) == 1:
-                printer_name, device_uri = printers[0]
-
-            else:
-                log.info(log.bold("\nChoose printer (fax queue) from installed printers in CUPS:\n"))
-
-                formatter = utils.TextFormatter(
-                        (
-                            {'width': 4},
-                            {'width': max_printer_size, 'margin': 2},
-                            {'width': max_deviceid_size, 'margin': 2},
-                        )
-                    )
-
-                log.info(formatter.compose(("Num.", "CUPS Printer", "Device URI")))
-                log.info(formatter.compose(('-'*4, '-'*(max_printer_size), '-'*(max_deviceid_size))))
-
-                i = 0
-                for p in printers:
-                    log.info(formatter.compose((str(i), p[0], p[1])))
-                    i += 1
-
-                ok, x = tui.enter_range("\nEnter number 0...%d for printer (q=quit) ?" % (i-1), 0, (i-1))
-
-                if not ok: 
-                    sys.exit(0)
-
-                printer_name, device_uri = printers[x]
-
-
-        log.info(log.bold("Using printer %s (%s)" % (printer_name, device_uri)))
-
-        ok, lock_file = utils.lock_app('hp-sendfax-%s' % printer_name, True)
         try:            
             ppd_file = cups.getPPD(printer_name)
 
@@ -518,13 +327,12 @@ else: # NON_INTERACTIVE_MODE
                     log.error("Fax configuration error. The CUPS fax queue for '%s' is incorrectly configured. Please make sure that the CUPS fax queue is configured with the 'HP Fax' Model/Driver." % printer_name)
                     sys.exit(1)
 
-            if not args:
-                log.error("No files specfied to send. Please specify the file(s) to send on the command line.")
-                usage()
+            if not mod.args:
+                mod.usage(error_msg=["No files specfied to send. Please specify the file(s) to send on the command line."])
 
             file_list = []
 
-            for f in args:
+            for f in mod.args:
 
                 #
                 # Submit each file to CUPS for rendering by hpijsfax
@@ -596,7 +404,7 @@ else: # NON_INTERACTIVE_MODE
                         try:
                             result = list(service.CheckForWaitingFax(device_uri, prop.username, sent_job_id))
                             log.debug(repr(result))
-                            
+
                         except dbus.exceptions.DBusException:
                             log.error("Cannot communicate with hp-systray. Canceling...")
                             cups.cancelJob(sent_job_id)
@@ -744,16 +552,10 @@ else: # NON_INTERACTIVE_MODE
                     dev.close()
 
         finally:
-            utils.unlock(lock_file)
+            mod.unlockInstance()
         
     except KeyboardInterrupt:
         log.error("User exit")    
-
     
-        
 log.info("")
 log.info("Done.")
-
-
-
-

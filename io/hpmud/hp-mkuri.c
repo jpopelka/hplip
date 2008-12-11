@@ -43,6 +43,7 @@ static void usage()
    fprintf(stdout, "(c) 2008 Copyright Hewlett-Packard Development Company, LP\n");
    fprintf(stdout, "usage: hp-mkuri -i ip [-p port]\n");
    fprintf(stdout, "usage: hp-mkuri -b busnum -d devnum\n");
+   fprintf(stdout, "usage: hp-mkuri -s serialnum\n");
    fprintf(stdout, "usage: hp-mkuri -l /dev/parportx\n");
    fprintf(stdout, "usage: hp-mkuri -o (probe)\n");
 }
@@ -52,6 +53,7 @@ int main(int argc, char *argv[])
    char ip[HPMUD_LINE_SIZE];  /* internet address */
    char bn[HPMUD_LINE_SIZE];  /* usb bus number */
    char dn[HPMUD_LINE_SIZE];  /* usb device number */
+   char sn[HPMUD_LINE_SIZE];  /* usb serial number */
    char pp[HPMUD_LINE_SIZE];  /* parallel port device */
    char uri[HPMUD_LINE_SIZE];
    int i, port=1, ret=1, probe=0;
@@ -59,8 +61,8 @@ int main(int argc, char *argv[])
    char buf[HPMUD_LINE_SIZE*64];
    int cnt, bytes_read;
 
-   ip[0] = bn[0] = dn[0] = pp[0] = uri[0] = 0;
-   while ((i = getopt(argc, argv, "vhoi:p:b:d:l:")) != -1)
+   ip[0] = bn[0] = dn[0] = pp[0] = uri[0] = sn[0] = 0;
+   while ((i = getopt(argc, argv, "vhoi:p:b:d:l:s:")) != -1)
    {
       switch (i)
       {
@@ -78,6 +80,9 @@ int main(int argc, char *argv[])
          break;
       case 'l':
          strncpy(pp, optarg, sizeof(pp));
+         break;
+      case 's':
+         strncpy(sn, optarg, sizeof(sn));
          break;
       case 'o':
          probe++;
@@ -97,7 +102,7 @@ int main(int argc, char *argv[])
       }
    }
 
-   if (ip[0]==0 && (!(bn[0] && dn[0])) && pp[0]==0 && probe==0)
+   if (ip[0]==0 && (!(bn[0] && dn[0])) && pp[0]==0 && probe==0 && sn[0]==0)
    {
       BUG("invalid command parameter(s)\n");
       usage();
@@ -126,6 +131,16 @@ int main(int argc, char *argv[])
    if (bn[0] && dn[0])
    {
       stat = hpmud_make_usb_uri(bn, dn, uri, sizeof(uri), &bytes_read);
+      if (stat == HPMUD_R_OK)
+      {
+         fprintf(stdout, "%s\n", uri);
+         fprintf(stdout, "hpaio%s\n", &uri[2]);
+      }
+   }
+
+   if (sn[0])
+   {
+      stat = hpmud_make_usb_serial_uri(sn, uri, sizeof(uri), &bytes_read);
       if (stat == HPMUD_R_OK)
       {
          fprintf(stdout, "%s\n", uri);

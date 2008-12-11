@@ -591,7 +591,7 @@ BUGOUT:
 }
 
 // GrayLevel = (5/16)R + (9/16)G + (2/16)B
-#define RGB2BW(r, g, b) (BYTE) ((((r << 2) + r + (g << 3) + g + b << 1) >> 4))
+#define RGB2BW(r, g, b) (BYTE) (((r << 2) + r + (g << 3) + g + (b << 1)) >> 4)
 
 void RGB2Gray (BYTE *pRGBData, int iNumPixels, BYTE *pGData)
 {
@@ -600,7 +600,7 @@ void RGB2Gray (BYTE *pRGBData, int iNumPixels, BYTE *pGData)
 	BYTE	*pOut = pGData;
 	for (i = 0; i < iNumPixels; i++, pIn += 3)
 	{
-	    *pOut++ = RGB2BW ((unsigned short) *pIn, (unsigned short) *(pIn+1), (unsigned short) *(pIn+2));
+	    *pOut++ = RGB2BW ((unsigned short) *pIn, (unsigned short) pIn[1], (unsigned short) pIn[2]);
 	}
 }
 

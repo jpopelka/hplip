@@ -20,8 +20,8 @@
 # Author: Don Welch
 #
 
-
-__version__ = '1.0'
+__version__ = '2.1'
+__mod__ = 'hp-plugin'
 __title__ = 'Plugin Download and Install Utility'
 __doc__ = ""
 
@@ -34,220 +34,190 @@ import re
 import os
 import gzip
 
-
 # Local
 from base.g import *
-from base import device, utils, tui
+from base import device, utils, tui, module
 from prnt import cups
 
 pm = None
 
-
 def plugin_download_callback(c, s, t):
-    pm.update(int(100*c*s/t), 
+    pm.update(int(100*c*s/t),
              utils.format_bytes(c*s))
 
-             
+
 def plugin_install_callback(s):
     print s
-    
-    
+
+
 
 USAGE = [ (__doc__, "", "name", True),
-          ("Usage: hp-plugin [OPTIONS]", "", "summary", True),
-          ("Enter graphical UI mode:", "-u or --gui (Default)", "option", False),
-          ("Run in interactive mode:", "-i or --interactive", "option", False),
+          ("Usage: %s [MODE] [OPTIONS]" % __mod__, "", "summary", True),
+          utils.USAGE_MODE,
+          utils.USAGE_GUI_MODE,
+          utils.USAGE_INTERACTIVE_MODE,
+          ("Installation for required printer mode:", "--required (Qt4 only)", "option", False),
+          ("Installation for optional printer mode:", "--optional (Qt4 only)", "option", False),
+          #("Installation generic mode:", "--generic (default)", "option", False),
           utils.USAGE_LANGUAGE,
+          utils.USAGE_OPTIONS,
+          ("Specify the path to the plugin file:", "-p <path> or --path=<path> or --plugin=<path>", "option", False),
           utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
           utils.USAGE_HELP,
           utils.USAGE_SPACE,
           utils.USAGE_SEEALSO,
           ("hp-setup", "", "seealso", False),
+          ("hp-firmware", "", "seealso", False),
         ]
 
 
-def usage(typ='text'):
-    if typ == 'text':
-        utils.log_title(__title__, __version__)
+mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
+                    (INTERACTIVE_MODE, GUI_MODE),
+                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4), True)
 
-    utils.format_text(USAGE, typ, __title__, 'hp-plugin', __version__)
-    sys.exit(0)
+opts, device_uri, printer_name, mode, ui_toolkit, loc = \
+    mod.parseStdOpts('p:', ['path=', 'plugin=', 'plug-in=',
+                            'generic', 'optional', 'required'],
+                     handle_device_printer=False)
 
-
-
-
-log.set_module('hp-plugin')
-
-try:
-    opts, args = getopt.getopt(sys.argv[1:], 'hl:guiq:p:',
-        ['help', 'help-rest', 'help-man',
-         'logging=', 'gui', 'interactive',
-         'help-desc', 'lang=', 'plugin=', 'path='])
-         
-except getopt.GetoptError, e:
-    log.error(e.msg)
-    usage()
-
-log_level = logger.DEFAULT_LOG_LEVEL
-mode = GUI_MODE
-mode_specified = False
-loc = None
 plugin_path = None
-
-if os.getenv("HPLIP_DEBUG"):
-    log.set_level('debug')
+install_mode = PLUGIN_NONE # reuse plugin types for mode (PLUGIN_NONE = generic)
 
 for o, a in opts:
-    if o in ('-h', '--help'):
-        usage('text')
-
-    elif o == '--help-rest':
-        usage('rest')
-
-    elif o == '--help-man':
-        usage('man')
-
-    elif o == '--help-desc':
-        print __doc__,
-        sys.exit(0)
-
-    elif o in ('-l', '--logging'):
-        log_level = a.lower().strip()
-        if not log.set_level(log_level):
-            usage()
-
-    elif o == '-g':
-        log.set_level('debug')
-
-    elif o in ('-u', '--gui'):
-        if mode_specified:
-            log.error("You may only specify a single mode as a parameter (-i or -u).")
-            sys.exit(1)
-
-        mode = GUI_MODE
-        mode_specified = True
-
-    elif o in ('-i', '--interactive'):
-        if mode_specified:
-            log.error("You may only specify a single mode as a parameter (-i or -u).")
-            sys.exit(1)
-
-        mode = INTERACTIVE_MODE
-        mode_specified = True
-
-    elif o in ('-q', '--lang'):
-        if a.strip() == '?':
-            tui.show_languages()
-            sys.exit(0)
-
-        loc = utils.validate_language(a.lower())
-        
-    elif o in ('-p', '--path', '--plugin'):
+    if o in ('-p', '--path', '--plugin', '--plug-in'):
         plugin_path = os.path.normpath(os.path.abspath(os.path.expanduser(a)))
 
+    elif o == '--required':
+        install_mode = PLUGIN_REQUIRED
+        if ui_toolkit == 'qt3':
+            log.warn("--required switch ignored.")
 
-utils.log_title(__title__, __version__)
+    elif o == '--optional':
+        install_mode = PLUGIN_OPTIONAL
+        if ui_toolkit == 'qt3':
+            log.warn("--optional switch ignored.")
 
-#version = sys_cfg.hplip.version
+
 version = '.'.join(sys_cfg.hplip.version.split('.')[:3])
+plugin_filename = 'hplip-%s-plugin.run' % version
 
 if plugin_path is not None:
     if not os.path.exists(plugin_path):
         log.error("Plug-in path '%s' not found." % plugin_path)
         sys.exit(1)
-        
+
     if os.path.isdir(plugin_path):
         plugin_path = os.path.join(plugin_path, 'hplip-%s-plugin.run' % version)
-        
+
         if not os.path.exists(plugin_path):
             log.error("Plug-in path '%s' not found." % plugin_path)
             sys.exit(1)
 
-        
-if mode == GUI_MODE:
-    if not prop.gui_build:
-        log.warn("GUI mode disabled in build. Reverting to interactive mode.")
-        mode = INTERACTIVE_MODE
-
-    elif not os.getenv('DISPLAY'):
-        log.warn("No display found. Reverting to interactive mode.")
-        mode = INTERACTIVE_MODE
-
-    elif not utils.checkPyQtImport():
-        log.warn("PyQt init failed. Reverting to interactive mode.")
-        mode = INTERACTIVE_MODE
-
-        
-if mode == GUI_MODE:
-    from qt import *
-    from ui import pluginform2
-
-    app = QApplication(sys.argv)
-    QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
-
-    if loc is None:
-        loc = user_cfg.ui.get("loc", "system")
-        if loc.lower() == 'system':
-            loc = str(QTextCodec.locale())
-            log.debug("Using system locale: %s" % loc)
-
-    if loc.lower() != 'c':
-        e = 'utf8'
-        try:
-            l, x = loc.split('.')
-            loc = '.'.join([l, e])
-        except ValueError:
-            l = loc
-            loc = '.'.join([loc, e])
-
-        log.debug("Trying to load .qm file for %s locale." % loc)
-        trans = QTranslator(None)
-
-        qm_file = 'hplip_%s.qm' % l
-        log.debug("Name of .qm file: %s" % qm_file)
-        loaded = trans.load(qm_file, prop.localization_dir)
-
-        if loaded:
-            app.installTranslator(trans)
-        else:
-            loc = 'c'
-
-    if loc == 'c':
-        log.debug("Using default 'C' locale")
-    else:
-        log.debug("Using locale: %s" % loc)
-        QLocale.setDefault(QLocale(loc))
-        prop.locale = loc
-        try:
-            locale.setlocale(locale.LC_ALL, locale.normalize(loc))
-        except locale.Error:
-            pass
-
-    if not os.geteuid() == 0:
-        log.error("You must be root to run this utility.")
-
-        QMessageBox.critical(None, 
-                             "HP Device Manager - Plug-in Installer",
-                             "You must be root to run hp-plugin.",
-                              QMessageBox.Ok,
-                              QMessageBox.NoButton,
-                              QMessageBox.NoButton)
-
+    if os.path.basename(plugin_path) != plugin_filename:
+        log.error("Plug-in filename must be '%s'." % plugin_filename)
         sys.exit(1)
 
-    #try:
-    w = pluginform2.PluginForm2()
-    #except Error:
-    #    log.error("Unable to connect to HPLIP I/O. Please (re)start HPLIP and try again.")
-    #    sys.exit(1)
 
-    app.setMainWidget(w)
-    w.show()
+    size, checksum, timestamp = os.stat(plugin_path)[6], '', 0.0
+    plugin_path = 'file://' + plugin_path
+    log.debug("Plugin path=%s (%d)" % (plugin_path, size))
 
-    app.exec_loop()
 
-    
-    
+if mode == GUI_MODE:
+    if ui_toolkit == 'qt3':
+        if not utils.canEnterGUIMode():
+            log.error("%s requires GUI support (try running with --qt4). Try using non-interactive (-n) mode." % __mod__)
+            sys.exit(1)
+    else:
+        if not utils.canEnterGUIMode4():
+            log.error("%s requires GUI support (try running with --qt3). Try using non-interactive (-n) mode." % __mod__)
+            sys.exit(1)
+
+
+if mode == GUI_MODE:
+    if ui_toolkit == 'qt3':
+        from qt import *
+        from ui import pluginform2
+
+        app = QApplication(sys.argv)
+        QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
+
+        if loc is None:
+            loc = user_cfg.ui.get("loc", "system")
+            if loc.lower() == 'system':
+                loc = str(QTextCodec.locale())
+                log.debug("Using system locale: %s" % loc)
+
+        if loc.lower() != 'c':
+            e = 'utf8'
+            try:
+                l, x = loc.split('.')
+                loc = '.'.join([l, e])
+            except ValueError:
+                l = loc
+                loc = '.'.join([loc, e])
+
+            log.debug("Trying to load .qm file for %s locale." % loc)
+            trans = QTranslator(None)
+
+            qm_file = 'hplip_%s.qm' % l
+            log.debug("Name of .qm file: %s" % qm_file)
+            loaded = trans.load(qm_file, prop.localization_dir)
+
+            if loaded:
+                app.installTranslator(trans)
+            else:
+                loc = 'c'
+
+        if loc == 'c':
+            log.debug("Using default 'C' locale")
+        else:
+            log.debug("Using locale: %s" % loc)
+            QLocale.setDefault(QLocale(loc))
+            prop.locale = loc
+            try:
+                locale.setlocale(locale.LC_ALL, locale.normalize(loc))
+            except locale.Error:
+                pass
+
+        if not os.geteuid() == 0:
+            log.error("You must be root to run this utility.")
+
+            QMessageBox.critical(None,
+                                 "HP Device Manager - Plug-in Installer",
+                                 "You must be root to run hp-plugin.",
+                                  QMessageBox.Ok,
+                                  QMessageBox.NoButton,
+                                  QMessageBox.NoButton)
+
+            sys.exit(1)
+
+        w = pluginform2.PluginForm2()
+        app.setMainWidget(w)
+        w.show()
+
+        app.exec_loop()
+
+    else: # qt4
+        try:
+            from PyQt4.QtGui import QApplication
+            from ui4.plugindialog import PluginDialog
+        except ImportError:
+            log.error("Unable to load Qt4 support. Is it installed?")
+            sys.exit(1)
+
+        app = QApplication(sys.argv)
+
+        dialog = PluginDialog(None, install_mode)
+        dialog.show()
+        try:
+            log.debug("Starting GUI loop...")
+            app.exec_()
+        except KeyboardInterrupt:
+            log.error("User exit")
+            sys.exit(0)
+
+
 else: # INTERACTIVE_MODE
     try:
         if not os.geteuid() == 0:
@@ -259,84 +229,82 @@ else: # INTERACTIVE_MODE
 
         from installer import core_install
         core = core_install.CoreInstall()
-        
-        core.set_plugin_version() #version)
-        
-        plugin_filename = 'hplip-%s-plugin.run' % version
-        
+
+        core.set_plugin_version()
+
         tui.header("PLUG-IN INSTALLATION FOR HPLIP %s" % version)
-        
-        if core.check_for_plugin():
-            log.info("The driver plugin for HPLIP %s appears to already be installed.")
-            
+
+        if core.check_for_plugin() and plugin_path is None:
+            log.info("The driver plugin for HPLIP %s appears to already be installed." % version)
+
             cont, ans = tui.enter_yes_no("Do you wish to download and re-install the plug-in?")
-            
+
             if not cont or not ans:
                 sys.exit(0)
-                
-        
+
+
         if plugin_path is None:
             table = tui.Formatter(header=('Option', 'Description'), min_widths=(10, 50))
             table.add(('d', 'Download plug-in from HP (recomended)'))
             table.add(('p', 'Specify a path to the plug-in (advanced)'))
             table.add(('q', 'Quit hp-plugin (skip installation)'))
-            
+
             table.output()
-            
-            cont, ans = tui.enter_choice("\nEnter option (d=download*, p=specify path, q=quit) ? ", 
+
+            cont, ans = tui.enter_choice("\nEnter option (d=download*, p=specify path, q=quit) ? ",
                 ['d', 'p'], 'd')
-            
+
             if not cont: # q
                 sys.exit(0)
-                
-                        
+
+
             if ans == 'd': # d - download
                 # read plugin.conf (local or on sf.net) to get plugin_path (http://)
                 plugin_conf_url = core.get_plugin_conf_url()
-                
+
                 if plugin_conf_url.startswith('file://'):
                     tui.header("COPY CONFIGURATION")
                 else:
                     tui.header("DOWNLOAD CONFIGURATION")
-                    
+
                     log.info("Checking for network connection...")
                     ok = core.check_network_connection()
-                    
+
                     if not ok:
                         log.error("Network connection not detected.")
                         sys.exit(1)
-                    
-                
+
+
                 log.info("Downloading configuration file from: %s" % plugin_conf_url)
                 pm = tui.ProgressMeter("Downloading configuration:")
-                
-                plugin_path, size, checksum, timestamp, ok = core.get_plugin_info(plugin_conf_url, 
+
+                plugin_path, size, checksum, timestamp, ok = core.get_plugin_info(plugin_conf_url,
                     plugin_download_callback)
-                
+
                 print
-                
+
                 if not plugin_path.startswith('http://') and not plugin_path.startswith('file://'):
                     plugin_path = 'file://' + plugin_path
-            
+
             else: # p - specify plugin path
-            
+
                 while True:
                     plugin_path = raw_input(log.bold("Enter the path to the 'hplip-%s-plugin.run' file (q=quit) : " %
                         version)).strip()
-                        
+
                     if plugin_path.strip().lower() == 'q':
                         sys.exit(1)
-                        
+
                     if not plugin_path.startswith('http://'):
                         plugin_path = os.path.normpath(os.path.abspath(os.path.expanduser(plugin_path)))
-                        
+
                         if not os.path.exists(plugin_path):
                             log.error("Plug-in path '%s' not found." % plugin_path)
                             continue
-                            
+
                         if os.path.isdir(plugin_path):
                             plugin_path = os.path.join(plugin_path, plugin_filename)
-                            
+
                             if not os.path.exists(plugin_path):
                                 log.error("Plug-in path '%s' not found." % plugin_path)
                                 continue
@@ -344,54 +312,53 @@ else: # INTERACTIVE_MODE
                         if os.path.basename(plugin_path) != plugin_filename:
                             log.error("Plug-in filename must be '%s'." % plugin_filename)
                             continue
-                        
+
+                        size, checksum, timestamp = os.stat(plugin_path)[6], '', 0.0
                         plugin_path = 'file://' + plugin_path
-                    
-                    size, checksum, timestamp = 0, '', 0.0
-                    
+
                     break
-        
-        
+
+
         if plugin_path.startswith('file://'):
             tui.header("COPY PLUGIN")
         else:
             tui.header("DOWNLOAD PLUGIN")
-            
+
             log.info("Checking for network connection...")
             ok = core.check_network_connection()
-            
+
             if not ok:
                 log.error("Network connection not detected.")
                 sys.exit(1)
-    
+
         log.info("Downloading plug-in from: %s" % plugin_path)
         pm = tui.ProgressMeter("Downloading plug-in:")
-        
+
         ok, local_plugin = core.download_plugin(plugin_path, size, checksum, timestamp, plugin_download_callback)
         print
-        
+
         if not ok:
             log.error("Plug-in download failed: %s" % local_plugin)
             sys.exit(1)
-        
+
         tui.header("INSTALLING PLUG-IN")
-        
+
         core.run_plugin(mode, plugin_install_callback)
 
         cups_devices = device.getSupportedCUPSDevices(['hp']) #, 'hpfax'])
         #print cups_devices
-        
+
         title = False
-        
+
         for dev in cups_devices:
             mq = device.queryModelByURI(dev)
-            
+
             if mq.get('fw-download', 0):
-                
+
                 if not title:
                     tui.header("DOWNLOADING FIRMWARE")
                     title = True
-                
+
                 # Download firmware if needed
                 log.info(log.bold("\nDownloading firmware to device %s..." % dev))
                 try:

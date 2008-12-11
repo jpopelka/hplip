@@ -93,7 +93,7 @@ class UnloadForm(QMainWindow):
                 else:
                     self.init_failed = True
 
-        self.dbus_avail, self.service = device.init_dbus()
+        self.dbus_avail, self.service, session_bus = device.init_dbus()
         
         self.UnloadView = ScrollUnloadView(self.service, 
             self.centralWidget(), self, "UnloadView")

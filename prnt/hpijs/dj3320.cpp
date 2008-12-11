@@ -1890,7 +1890,7 @@ DRIVER_ERROR LDLEncap::Encapsulate (const BYTE *input, DWORD size, BOOL bLastPla
                     {
                         if (rt2 == 0)
                         {
-                            r1b1 = r1b1 | 0xff & (cbyte1 & bitmask[ibit]);
+                            r1b1 = r1b1 | (0xff & (cbyte1 & bitmask[ibit]));
                             r2b2 = r2b2 | (0xff & bitmask[ibit]);
                         }
                         else if (rt2 == 1)

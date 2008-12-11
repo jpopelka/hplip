@@ -32,6 +32,7 @@ class ChoosePrinterDlg(QDialog):
             self.setName("ChooseDeviceDlg")
 
         self.device_uri = ''
+        self.printer_name = ''
         self.back_end_filter = back_end_filter
 
         ChooseDeviceDlg_Layout = QGridLayout(self,1,1,6,6,"ChooseDeviceDlg_Layout")
@@ -74,6 +75,7 @@ class ChoosePrinterDlg(QDialog):
         for y in range(len(self.printer_index)):
             if y == 0:
                 self.device_uri = self.printer_index[y][1]
+                self.printer_name = self.printer_index[y][0]
 
             self.radio_buttons[y] = QRadioButton(self.DevicesButtonGroup,"radioButton%d" % y)
 
@@ -119,6 +121,7 @@ class ChoosePrinterDlg(QDialog):
             pp = self.printer_index[p]
             if unicode(self.radio_buttons[a0].text()).startswith(pp[0]):
                 self.device_uri = pp[1]
+                self.printer_name = pp[0]
                 break
 
 

@@ -30,4 +30,5 @@ foomatic-ppd-install=@foomatic_ppd_install@
 foomatic-rip-hplip-install=@foomatic_rip_hplip_install@
 internal-tag=@PACKAGE_BUGREPORT@
 restricted-build=@bb_build@
+ui-toolkit=@ui_toolkit@
 

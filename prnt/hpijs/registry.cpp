@@ -79,6 +79,7 @@
 #endif
 #ifdef APDK_LJM1005
 #include "ljm1005.h"
+#include "ljp1xxx.h"
 #endif
 
 #ifdef APDK_QUICKCONNECT
@@ -113,6 +114,7 @@ LJZjsMonoProxy DeviceRegistry::s_LJZjsMonoProxy;
 
 #ifdef APDK_LJM1005
 LJM1005Proxy DeviceRegistry::s_LJM1005Proxy;
+LJP1XXXProxy DeviceRegistry::s_LJP1XXXProxy;
 #endif
 
 #if defined(APDK_PSP100) && defined (APDK_DJ9xxVIP)

@@ -34,12 +34,11 @@ from scrollprint import ScrollPrintView
 
 
 class PrinterForm(QMainWindow):
-    def __init__(self, bus=['cups'], device_uri=None, printer_name=None, args=None, 
+    def __init__(self, printer_name=None, args=None, 
                  parent=None,name=None,modal=0,fl=0):
 
         QMainWindow.__init__(self,parent,name,fl)
 
-        self.device_uri = device_uri
         self.printer_name = printer_name
         self.file_list = []
         self.args = args
@@ -58,17 +57,11 @@ class PrinterForm(QMainWindow):
         self.clearWState(Qt.WState_Polished)
         self.languageChange()
         
-        if self.device_uri and self.printer_name:
-            log.error("You may not specify both a printer (-p) and a device (-d).")
-            self.FailureUI(self.__tr("<p><b>You may not specify both a printer (-p) and a device (-d)."))
-            self.device_uri, self.printer_name = None, None
-            self.init_failed = True
-
-        self.cups_printers = cups.getPrinters()
+        self.cups_printers = device.getSupportedCUPSPrinters()
         log.debug(self.cups_printers)
 
-        if not self.device_uri and not self.printer_name:
-            t = device.probeDevices(bus=bus)
+        if  not self.printer_name: # no -p provided
+            t = device.probeDevices(['cups'])
             probed_devices = []
 
             for d in t:
@@ -98,13 +91,23 @@ class PrinterForm(QMainWindow):
                 self.device_uri = devices[0][0]
 
             else:
-                from choosedevicedlg import ChooseDeviceDlg
-                dlg = ChooseDeviceDlg(devices)
-
+                from chooseprinterdlg import ChoosePrinterDlg
+                dlg = ChoosePrinterDlg(self.cups_printers)
                 if dlg.exec_loop() == QDialog.Accepted:
+                    self.printer_name = dlg.printer_name
                     self.device_uri = dlg.device_uri
                 else:
                     self.init_failed = True
+        
+        else: # -p provided
+            for p in self.cups_printers:
+                if p.name == self.printer_name:
+                    self.device_uri = p.device_uri
+                    break
+            else:
+                self.FailureUI("<b>Invalid printer name.</b><p>Please check the parameters to hp-print and try again.")
+                self.init_failed = True
+                
 
         if not self.init_failed:
             self.PrintView = ScrollPrintView(None, self.centralWidget(), self, "PrintView")

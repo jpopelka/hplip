@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,8 +20,9 @@
 # Author: Don Welch
 #
 
-__version__ = '2.2'
+__version__ = '3.0'
 __title__ = 'Printer Cartridge Color Calibration Utility'
+__mod__ = 'hp-colorcal'
 __doc__ = "Perform color calibration on HPLIP supported inkjet printers. (Note: Not all printers require the use of this utility)."
 
 # Std Lib
@@ -31,40 +32,11 @@ import getopt
 import operator
 import os
 
-
 # Local
 from base.g import *
-from base import device, status, utils, maint, tui
+from base import device, status, utils, maint, tui, module
 from prnt import cups
 
-USAGE = [(__doc__, "", "name", True),
-         ("Usage: hp-colorcal [PRINTER|DEVICE-URI] [OPTIONS]", "", "summary", True),
-         utils.USAGE_ARGS,
-         utils.USAGE_DEVICE,
-         utils.USAGE_PRINTER,
-         utils.USAGE_SPACE,
-         utils.USAGE_OPTIONS,
-         utils.USAGE_BUS1, utils.USAGE_BUS2,
-         utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
-         utils.USAGE_HELP,
-         utils.USAGE_EXAMPLES,
-         ("""Color calibrate CUPS printer named 'hp5550':""", """$ hp-colorcal -php5550""",  "example", False),
-         ("""Color calibrate printer with URI of 'hp:/usb/DESKJET_990C?serial=12345':""", """$ hp-colorcal -dhp:/usb/DESKJET_990C?serial=12345""", 'example', False),
-         utils.USAGE_SPACE,
-         utils.USAGE_NOTES,
-         utils.USAGE_STD_NOTES1, utils.USAGE_STD_NOTES2, 
-         utils.USAGE_SEEALSO,
-         ("hp-clean", "", "seealso", False),
-         ("hp-align", "", "seealso", False),
-         ]
-
-
-def usage(typ='text'):
-    if typ == 'text':
-        utils.log_title(__title__, __version__)
-
-    utils.format_text(USAGE, typ, __title__, 'hp-colorcal', __version__)
-    sys.exit(0)
 
 def enterAlignmentNumber(letter, hortvert, colors, minimum, maximum):
     return tui.enter_range("Enter the best aligned value for line %s (%d-%d or q=quit): " % 
@@ -182,156 +154,103 @@ def colorCal4():
     return ok, values
 
 
-
-log.set_module("hp-colorcal")
-
 try:
-    try:
-        opts, args = getopt.getopt(sys.argv[1:],
-                                    'p:d:hl:b:g',
-                                    ['printer=',
-                                      'device=',
-                                      'help',
-                                      'help-rest',
-                                      'help-man',
-                                      'help-desc',
-                                      'logging=',
-                                      'bus='
-                                    ]
-                                  )
-    except getopt.GetoptError, e:
-        log.error(e.msg)
-        usage()
+    mod = module.Module(__mod__, __title__, __version__, __doc__, None, 
+                        (INTERACTIVE_MODE, GUI_MODE), (UI_TOOLKIT_QT4,))
+                        
+    mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS,
+                 see_also_list=['hp-align', 'hp-clean', 'hp-linefeedcal',
+                                'hp-pqdiag'])
 
-    printer_name = None
-    device_uri = None
-    bus = device.DEFAULT_PROBE_BUS
-    log_level = logger.DEFAULT_LOG_LEVEL
+    opts, device_uri, printer_name, mode, ui_toolkit, lang = \
+        mod.parseStdOpts()
 
-    if os.getenv("HPLIP_DEBUG"):
-        log.set_level('debug')
-
-    for o, a in opts:
-
-        if o in ('-h', '--help'):
-            usage()
-
-        elif o == '--help-rest':
-            usage('rest')
-
-        elif o == '--help-man':
-            usage('man')
-
-        elif o == '--help-desc':
-            print __doc__,
-            sys.exit(0)
-
-        elif o in ('-p', '--printer'):
-            if a.startswith('*'):
-                printer_name = cups.getDefault()
-            else:
-                printer_name = a
-
-        elif o in ('-d', '--device'):
-            device_uri = a
-
-        elif o in ('-b', '--bus'):
-            bus = [x.lower().strip() for x in a.split(',')]
-            if not device.validateBusList(bus):
-                usage()
-
-        elif o in ('-l', '--logging'):
-            log_level = a.lower().strip()
-            if not log.set_level(log_level):
-                usage()
-
-        elif o == '-g':
-            log.set_level('debug')
-
-
-
-    if device_uri and printer_name:
-        log.error("You may not specify both a printer (-p) and a device (-d).")
-        usage()
-
-    utils.log_title(__title__, __version__)
+    device_uri = mod.getDeviceUri(device_uri, printer_name,
+        filter={'color-cal-type': (operator.gt, 0)})
     
-    if os.getuid() == 0:
-        log.warn("hp-colorcal should not be run as root.")
+    if mode == GUI_MODE:
+        if not utils.canEnterGUIMode4():
+            log.error("%s -u/--gui requires Qt4 GUI support. Entering interactive mode." % __mod__)
+            mode = INTERACTIVE_MODE        
 
-    if not device_uri and not printer_name:
+    if mode == INTERACTIVE_MODE:
         try:
-            device_uri = device.getInteractiveDeviceURI(bus, filter={'color-cal-type': (operator.gt, 0)})
-            if device_uri is None:
-                sys.exit(1)
-        except Error:
-            log.error( "Error occured during interactive mode. Exiting." )
+            d = device.Device(device_uri, printer_name)
+        except Error, e:
+            log.error("Unable to open device: %s" % e.msg)
             sys.exit(1)
 
-    try:
-        d = device.Device(device_uri, printer_name)
-    except Error, e:
-        log.error("Unable to open device: %s" % e.msg)
-        sys.exit(1)
-
-    if d.device_uri is None and printer_name:
-        log.error("Printer '%s' not found." % printer_name)
-        sys.exit(1)
-
-    if d.device_uri is None and device_uri:
-        log.error("Malformed/invalid device-uri: %s" % device_uri)
-        sys.exit(1)
-        
-    user_cfg.last_used.device_uri = d.device_uri    
-
-    try:
         try:
-            d.open()
-        except Error:
-            log.error("Unable to print to printer. Please check device and try again.")
-            sys.exit(1)
-
-        if d.isIdleAndNoError():
-            color_cal_type = d.mq.get('color-cal-type', 0)
-            log.debug("Color calibration type=%d" % color_cal_type)
-
-            if color_cal_type == 0:
-                log.error("Color calibration not supported or required by device.")
+            try:
+                d.open()
+            except Error:
+                log.error("Unable to print to printer. Please check device and try again.")
                 sys.exit(1)
 
-            elif color_cal_type == COLOR_CAL_TYPE_DESKJET_450: #1
-                maint.colorCalType1(d, tui.load_paper_prompt, colorCal, photoPenRequired)
+            if d.isIdleAndNoError():
+                color_cal_type = d.mq.get('color-cal-type', 0)
+                log.debug("Color calibration type=%d" % color_cal_type)
 
-            elif color_cal_type == COLOR_CAL_TYPE_MALIBU_CRICK: #2
-                maint.colorCalType2(d, tui.load_paper_prompt, colorCal2, invalidPen)
+                if color_cal_type == 0:
+                    log.error("Color calibration not supported or required by device.")
+                    sys.exit(1)
 
-            elif color_cal_type == COLOR_CAL_TYPE_STRINGRAY_LONGBOW_TORNADO: #2
-                maint.colorCalType3(d, tui.load_paper_prompt, colorAdj, photoPenRequired2)
+                elif color_cal_type == COLOR_CAL_TYPE_DESKJET_450: #1
+                    maint.colorCalType1(d, tui.load_paper_prompt, colorCal, photoPenRequired)
 
-            elif color_cal_type == COLOR_CAL_TYPE_CONNERY: # 4
-                maint.colorCalType4(d, tui.load_paper_prompt, colorCal4, None)
+                elif color_cal_type == COLOR_CAL_TYPE_MALIBU_CRICK: #2
+                    maint.colorCalType2(d, tui.load_paper_prompt, colorCal2, invalidPen)
 
-            elif color_cal_type == COLOR_CAL_TYPE_COUSTEAU: # 5
-                maint.colorCalType5(d, tui.load_paper_prompt)
-            
-            elif color_cal_type == COLOR_CAL_TYPE_CARRIER: # 6
-                maint.colorCalType6(d, tui.load_paper_prompt)
-            
-            elif color_cal_type == COLOR_CAL_TYPE_TYPHOON: # 7
-                maint.colorCalType7(d, tui.load_photo_paper_prompt)
-            
+                elif color_cal_type == COLOR_CAL_TYPE_STRINGRAY_LONGBOW_TORNADO: #2
+                    maint.colorCalType3(d, tui.load_paper_prompt, colorAdj, photoPenRequired2)
+
+                elif color_cal_type == COLOR_CAL_TYPE_CONNERY: # 4
+                    maint.colorCalType4(d, tui.load_paper_prompt, colorCal4, None)
+
+                elif color_cal_type == COLOR_CAL_TYPE_COUSTEAU: # 5
+                    maint.colorCalType5(d, tui.load_paper_prompt)
+
+                elif color_cal_type == COLOR_CAL_TYPE_CARRIER: # 6
+                    maint.colorCalType6(d, tui.load_paper_prompt)
+
+                elif color_cal_type == COLOR_CAL_TYPE_TYPHOON: # 7
+                    maint.colorCalType7(d, tui.load_photo_paper_prompt)
+
+                else:
+                    log.error("Invalid color calibration type.")
+
             else:
-                log.error("Invalid color calibration type.")
+                log.error("Device is busy or in an error state. Please check device and try again.")
+                sys.exit(1)
+        finally:
+            d.close()
+    
+    else:
+        try:
+            from PyQt4.QtGui import QApplication
+            from ui4.colorcaldialog import ColorCalDialog
+        except ImportError:
+            log.error("Unable to load Qt4 support. Is it installed?")
+            sys.exit(1)        
 
-        else:
-            log.error("Device is busy or in an error state. Please check device and try again.")
-            sys.exit(1)
-    finally:
-        d.close()
+        #try:
+        if 1:
+            app = QApplication(sys.argv)
 
+            dlg = ColorCalDialog(None, device_uri)
+            dlg.show()
+            try:
+                log.debug("Starting GUI loop...")
+                app.exec_()
+            except KeyboardInterrupt:
+                sys.exit(0)
+
+        #finally:
+        if 1:
+            sys.exit(0)
+            
 except KeyboardInterrupt:
     log.error("User exit")
 
 log.info("")
 log.info('Done.')
-

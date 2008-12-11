@@ -68,8 +68,9 @@
  */
 
 #define PP_DEVICE_TIMEOUT 30000000   /* device timeout (us) */
-//#define PP_SIGNAL_TIMEOUT 1000000   /* signal timeout (us) */
-#define PP_SIGNAL_TIMEOUT 1000   /* signal timeout (us) */
+//#define PP_SIGNAL_TIMEOUT 1000000   /* signal timeout (us), too long for 1ms timeout, DES 8/18/08  */
+//#define PP_SIGNAL_TIMEOUT 1000   /* signal timeout (us), too short for DJ540, DES 8/18/08 */  
+#define PP_SIGNAL_TIMEOUT 100000   /* signal timeout (us), DES 8/18/08 */
 #define PP_SETUP_TIMEOUT 10   /* setup timeout (us) */
 
 struct _mud_device;
