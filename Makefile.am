@@ -32,13 +32,14 @@ endif
 
 if HPLIP_BUILD
 
-dist_hplip_SCRIPTS = hpssd.py __init__.py 
+dist_hplip_SCRIPTS = hpssd.py __init__.py hpdio.py
 dist_noinst_DATA += scan/sane/hpaio.desc prnt/drv/hpijs.drv.in.template
 dist_noinst_SCRIPTS += dat2drv.py install.py hplip-install
 
 cmddir = $(hplipdir)
 dist_cmd_SCRIPTS = align.py info.py print.py toolbox.py clean.py colorcal.py unload.py testpage.py makeuri.py check.py fab.py levels.py \
-	sendfax.py setup.py makecopies.py probe.py timedate.py firmware.py scan.py systray.py plugin.py
+	sendfax.py setup.py makecopies.py probe.py timedate.py firmware.py scan.py systray.py plugin.py linefeedcal.py pqdiag.py \
+	faxsetup.py devicesetup.py printsettings.py
 
 # hp backend.
 hpdir = $(cupsbackenddir)
@@ -234,6 +235,8 @@ hpmudext_la_CFLAGS = -I$(PYTHONINCLUDEDIR)
 # hpmud.rules
 rulesdir = /etc/udev/rules.d
 dist_rules_DATA = data/rules/55-hpmud.rules
+halpredir = /usr/share/hal/fdi/preprobe/10osvendor
+dist_halpre_DATA = data/rules/20-hplip-devices.fdi
 
 # ui (qt3)
 if GUI_BUILD
@@ -331,7 +334,8 @@ endif
 noinst_PROGRAMS += hppgsz
 hppgsz_SOURCES = $(apdk_SOURCES) prnt/hpijs/PrinterProperties.cpp prnt/hpijs/PrinterProperties.h
 hppgsz_CXXFLAGS = $(hpijs_CXXFLAGS)
-hppgsz_CFLAGS = $(hpijs_CXXFLAGS) -Iprnt/hpijs
+#hppgsz_CFLAGS = $(hpijs_CXXFLAGS) -Iprnt/hpijs
+hppgsz_CFLAGS = $(hpijs_CFLAGS)
 hppgsz_LDADD = $(hpijs_LDADD)
 
 # hplip.desktop
@@ -397,10 +401,11 @@ hpijs_CXXFLAGS = -DAPDK_DJ660 -DAPDK_DJ6xx -DAPDK_DJ6xxPhoto -DAPDK_DJ8xx -DAPDK
 	-DAPDK_HIGH_RES_MODES -DAPDK_LJMONO -DAPDK_DJ540 -DAPDK_DJ850 -DAPDK_DJ890 -DAPDK_DJ3320 -DAPDK_LJCOLOR -DAPDK_DJGENERICVIP \
 	-DAPDK_LJJETREADY  -DAPDK_LJFASTRASTER -DAPDK_BUFFER_SEND -DAPDK_LDL_COMPRESS -DAPDK_EXTENDED_MEDIASIZE \
 	-DAPDK_MLC_PRINTER -DAPDK_DJ3600 -DAPDK_LJZJS_MONO -DAPDK_LJM1005 -DAPDK_QUICKCONNECT \
-                $(APDK_ENDIAN_FLAG) $(APDK_AUTO_INCLUDE_FLAG) -DAPDK_LINUX -DNDEBUG
-hpijs_CFLAGS = $(hpijs_CXXFLAGS) -Iprnt/hpijs
+                $(APDK_ENDIAN_FLAG) $(APDK_AUTO_INCLUDE_FLAG) -DAPDK_LINUX -DNDEBUG $(DBUS_CFLAGS)
+hpijs_CFLAGS = $(hpijs_CXXFLAGS) -Iprnt/hpijs 
+
 if HPLIP_BUILD
-hpijs_LDADD = -ljpeg -ldl libhpip.la libhpmud.la
+hpijs_LDADD = -ljpeg -ldl libhpip.la libhpmud.la $(DBUS_LIBS)
 else
 hpijs_LDADD = -ljpeg -ldl
 endif
@@ -441,7 +446,11 @@ if HPLIP_BUILD
 #	   Install fax support. 
 	if [ "$(fax_build)" = "yes" ]; then \
 	   mv $(DESTDIR)$(hpfaxdir)/hpfax.py $(DESTDIR)$(hpfaxdir)/hpfax; \
+	   chmod 700 $(DESTDIR)$(hpfaxdir)/hpfax; \
 	fi
+#
+#       Make backend run as root.
+#	chmod 700 $(DESTDIR)$(hpdir)/hp
 endif # if HPLIP_BUILD
 
 uninstall-hook: 

@@ -31,10 +31,10 @@ documentation for any purpose and without fee is hereby granted,
 provided that the above copyright notice appear in all copies and that
 both that copyright notice and this permission notice appear in
 supporting documentation, and that the name of A.M. Kuchling and
-Ralph Heinkel not be used in advertising or publicity pertaining to 
+Ralph Heinkel not be used in advertising or publicity pertaining to
 distribution of the software without specific, written prior permission.
 
-A.M. KUCHLING, R.H. HEINKEL DISCLAIM ALL WARRANTIES WITH REGARD TO THIS 
+A.M. KUCHLING, R.H. HEINKEL DISCLAIM ALL WARRANTIES WITH REGARD TO THIS
 SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS,
 IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY SPECIAL, INDIRECT OR
 CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
@@ -74,7 +74,8 @@ PyObject *raiseSaneError (SANE_Status st)
     }
 
     string = sane_strstatus (st);
-    PyErr_SetString (ErrorObject, string);
+    //PyErr_SetString (ErrorObject, string);
+    PyErr_SetObject(ErrorObject,  PyInt_FromLong(st));
     return NULL;
 }
 
@@ -91,6 +92,15 @@ PyObject * raiseDeviceClosedError(void)
     return raiseError ("_ScanDevice object is closed");
 }
 
+static PyObject *getErrorMessage(PyObject * self, PyObject * args)
+{
+    int st;
+
+    if (!PyArg_ParseTuple (args, "i", &st))
+        raiseError("Invalid arguments.");
+
+    return Py_BuildValue("s", sane_strstatus (st));
+}
 
 staticforward PyTypeObject ScanDevice_type;
 
@@ -146,10 +156,10 @@ static PyObject *getParameters (_ScanDevice * self, PyObject * args)
     if (self->h == NULL)
         return raiseDeviceClosedError();
 
-    Py_BEGIN_ALLOW_THREADS 
+    Py_BEGIN_ALLOW_THREADS
     st = sane_get_parameters (self->h, &p);
-    Py_END_ALLOW_THREADS 
-    
+    Py_END_ALLOW_THREADS
+
     if (st != SANE_STATUS_GOOD)
         return raiseSaneError (st);
 
@@ -172,7 +182,7 @@ static PyObject *getParameters (_ScanDevice * self, PyObject * args)
             break;
     }
 
-    return Py_BuildValue ("isiiiii", p.format, format_name, 
+    return Py_BuildValue ("isiiiii", p.format, format_name,
                           p.last_frame, p.pixels_per_line,
                           p.lines, p.depth, p.bytes_per_line);
 }
@@ -186,7 +196,7 @@ static PyObject *startScan (_ScanDevice * self, PyObject * args)
 
     if (self->h == NULL)
         return raiseDeviceClosedError();
-    
+
     /* sane_start can take several seconds, if the user initiates
        a new scan, while the scan head of a flatbed scanner moves
        back to the start position after finishing a previous scan.
@@ -196,8 +206,8 @@ static PyObject *startScan (_ScanDevice * self, PyObject * args)
     st = sane_start (self->h);
     Py_END_ALLOW_THREADS
 
-    if (st != SANE_STATUS_GOOD && 
-        st != SANE_STATUS_EOF && 
+    if (st != SANE_STATUS_GOOD &&
+        st != SANE_STATUS_EOF &&
         st != SANE_STATUS_NO_DOCS)
           return raiseSaneError(st);
 
@@ -296,7 +306,7 @@ static PyObject *getOptions (_ScanDevice * self, PyObject * args)
         }
         i++;
     }
-    
+
     while (d != NULL);
     return list;
 }
@@ -331,15 +341,15 @@ static PyObject *getOption (_ScanDevice * self, PyObject * args)
         case (SANE_TYPE_INT):
             value = Py_BuildValue ("i", *((SANE_Int *) v));
             break;
-        
+
         case (SANE_TYPE_FIXED):
             value = Py_BuildValue ("d", SANE_UNFIX ((*((SANE_Fixed *) v))));
             break;
-        
+
         case (SANE_TYPE_STRING):
             value = Py_BuildValue ("s", v);
             break;
-        
+
         case (SANE_TYPE_BUTTON):
         case (SANE_TYPE_GROUP):
             value = Py_BuildValue ("O", Py_None);
@@ -357,7 +367,7 @@ static PyObject *setOption (_ScanDevice * self, PyObject * args)
     SANE_Int i;
     PyObject *value;
     int n;
-    
+
     if (!PyArg_ParseTuple (args, "iO", &n, &value))
         raiseError("Invalid arguments.");
 
@@ -370,42 +380,42 @@ static PyObject *setOption (_ScanDevice * self, PyObject * args)
         case (SANE_TYPE_BOOL):
             if (!PyInt_Check (value))
                 return raiseError("SANE_Bool requires an integer.");
-                
+
             SANE_Bool b = PyInt_AsLong(value);
-            
+
             if (b != SANE_FALSE && b > SANE_TRUE)
                 b = SANE_TRUE;
-                
+
             st = sane_control_option (self->h, n, SANE_ACTION_SET_VALUE, (void *)&b, &i);
             break;
-        
+
         case (SANE_TYPE_INT):
             if (!PyInt_Check (value))
                 return raiseError("SANE_Int requires an integer.");
-            
+
             SANE_Int j = PyInt_AsLong (value);
             st = sane_control_option (self->h, n, SANE_ACTION_SET_VALUE, (void *)&j, &i);
             break;
-            
+
         case (SANE_TYPE_FIXED):
             if (!PyFloat_Check (value))
                 return raiseError("SANE_Fixed requires an float.");
-            
+
             SANE_Fixed f = SANE_FIX (PyFloat_AsDouble (value));
             st = sane_control_option (self->h, n, SANE_ACTION_SET_VALUE, (void *)&f, &i);
             break;
-            
+
         case (SANE_TYPE_STRING):
             if (!PyString_Check (value))
                 return raiseError("SANE_String requires a a string.");
-            
+
             SANE_String s = malloc (d->size + 1);
             strncpy (s, PyString_AsString (value), d->size - 1);
             ((SANE_String) s)[d->size - 1] = 0;
             st = sane_control_option (self->h, n, SANE_ACTION_SET_VALUE, (void *)s, &i);
             free(s);
             break;
-            
+
         case (SANE_TYPE_BUTTON):
         case (SANE_TYPE_GROUP):
             break;
@@ -432,7 +442,7 @@ static PyObject *setAutoOption (_ScanDevice * self, PyObject * args)
 
     d = sane_get_option_descriptor (self->h, n);
     st = sane_control_option (self->h, n, SANE_ACTION_SET_AUTO, NULL, &i);
-    
+
     if (st != SANE_STATUS_GOOD)
         return raiseSaneError (st);
 
@@ -463,8 +473,8 @@ static PyObject *readScan (_ScanDevice * self, PyObject * args)
     //Py_END_ALLOW_THREADS
     Py_BLOCK_THREADS
 
-    if (st != SANE_STATUS_GOOD && 
-        st != SANE_STATUS_EOF && 
+    if (st != SANE_STATUS_GOOD &&
+        st != SANE_STATUS_EOF &&
         st != SANE_STATUS_NO_DOCS)
     {
         sane_cancel(self->h);
@@ -488,7 +498,7 @@ static PyMethodDef ScanDevice_methods[] = {
     {"cancelScan", (PyCFunction) cancelScan, METH_VARARGS},
     {"readScan", (PyCFunction) readScan, METH_VARARGS},
     {"closeScan", (PyCFunction) closeScan, METH_VARARGS},
-    {NULL, NULL}              
+    {NULL, NULL}
 };
 
 static PyObject *getAttr (_ScanDevice * self, char *name)
@@ -532,7 +542,7 @@ static PyObject *init (PyObject * self, PyObject * args)
 
     /* XXX Authorization is not yet supported */
     st = sane_init (&version, auth_callback);
-    
+
     if (st != SANE_STATUS_GOOD)
         return raiseSaneError (st);
 
@@ -565,10 +575,10 @@ static PyObject *getDevices (PyObject * self, PyObject * args)
         raiseError("Invalid arguments");
 
     st = sane_get_devices (&device_list, local_only);
-    
+
     if (st != SANE_STATUS_GOOD)
         return raiseSaneError (st);
-    
+
     if (!(list = PyList_New (0)))
         return raiseError("Unable to allocate device list.");
 
@@ -593,12 +603,12 @@ static PyObject *openDevice (PyObject * self, PyObject * args)
         raiseError("Invalid arguments");
 
     rv = newScanDeviceObject ();
-    
+
     if (rv == NULL)
         return raiseError("Unable to create _ScanDevice object.");
-    
+
     st = sane_open (name, &(rv->h));
-    
+
     if (st != SANE_STATUS_GOOD)
     {
         Py_DECREF (rv);
@@ -641,6 +651,7 @@ static PyMethodDef ScanExt_methods[] = {
     {"openDevice", openDevice, METH_VARARGS},
     {"isOptionActive", isOptionActive, METH_VARARGS},
     {"isOptionSettable", isOptionSettable, METH_VARARGS},
+    {"getErrorMessage", getErrorMessage, METH_VARARGS},
     {NULL, NULL}                /* sentinel */
 };
 
@@ -725,7 +736,7 @@ void initscanext (void)
     insint (d, "SANE_STATUS_COVER_OPEN", SANE_STATUS_COVER_OPEN); // Scanner cover is open.
     insint (d, "SANE_STATUS_IO_ERROR", SANE_STATUS_IO_ERROR); // Error during device I/O.
     insint (d, "SANE_STATUS_NO_MEM", SANE_STATUS_NO_MEM); // Out of memory.
-    insint (d, "SANE_STATUS_ACCESS_DENIED", SANE_STATUS_ACCESS_DENIED);  // Access to resource has been denied.    
+    insint (d, "SANE_STATUS_ACCESS_DENIED", SANE_STATUS_ACCESS_DENIED);  // Access to resource has been denied.
 
     // Maximum buffer size for read()
     insint(d, "MAX_READSIZE", MAX_READSIZE);

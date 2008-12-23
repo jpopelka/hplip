@@ -91,9 +91,9 @@ def CleanUI3():
 
 
 try:
-    mod = module.Module(__mod__, __title__, __version__, __doc__, None, 
+    mod = module.Module(__mod__, __title__, __version__, __doc__, None,
                         (INTERACTIVE_MODE, GUI_MODE), (UI_TOOLKIT_QT4,))
-                        
+
     mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS,
                  see_also_list=['hp-align', 'hp-colorcal', 'hp-linefeedcal',
                                 'hp-pqdiag'])
@@ -101,13 +101,13 @@ try:
     opts, device_uri, printer_name, mode, ui_toolkit, lang = \
         mod.parseStdOpts()
 
-    device_uri = mod.getDeviceUri(device_uri, printer_name, 
-        filter={'clean-type': (operator.gt, 0)})
-        
+    device_uri = mod.getDeviceUri(device_uri, printer_name,
+       filter={'clean-type': (operator.ne, CLEAN_TYPE_NONE)})
+
     if mode == GUI_MODE:
         if not utils.canEnterGUIMode4():
             log.error("%s -u/--gui requires Qt4 GUI support. Entering interactive mode." % __mod__)
-            mode = INTERACTIVE_MODE        
+            mode = INTERACTIVE_MODE
 
     if mode == INTERACTIVE_MODE:
         try:
@@ -124,12 +124,15 @@ try:
                 sys.exit(1)
 
             if d.isIdleAndNoError():
-                clean_type = d.mq.get('clean-type', 0)
+                clean_type = d.mq.get('clean-type', CLEAN_TYPE_NONE)
                 log.debug("Clean type=%d" % clean_type)
                 d.close()
 
                 try:
-                    if clean_type == CLEAN_TYPE_PCL:
+                    if clean_type == CLEAN_TYPE_UNSUPPORTED:
+                        log.error("Cleaning through HPLIP not supported for this printer. Please use the printer's front panel to perform cartridge cleaning.")
+
+                    elif clean_type == CLEAN_TYPE_PCL:
                         maint.cleaning(d, clean_type, maint.cleanType1, maint.primeType1,
                                         maint.wipeAndSpitType1, tui.load_paper_prompt,
                                         CleanUI1, CleanUI2, CleanUI3,
@@ -158,14 +161,14 @@ try:
                 sys.exit(1)
         finally:
             d.close()
-    
+
     else:
         try:
             from PyQt4.QtGui import QApplication
             from ui4.cleandialog import CleanDialog
         except ImportError:
             log.error("Unable to load Qt4 support. Is it installed?")
-            sys.exit(1)        
+            sys.exit(1)
 
 
         #try:
@@ -183,7 +186,7 @@ try:
         #finally:
         if 1:
             sys.exit(0)
-        
+
 except KeyboardInterrupt:
     log.error("User exit")
 

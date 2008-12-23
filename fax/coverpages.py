@@ -177,9 +177,58 @@ def createStandardCoverPage(page_size=PAGE_SIZE_LETTER,
     return f
 
 
+def createConfidentialCoverPage(page_size=PAGE_SIZE_LETTER,
+                            total_pages=1, 
+                            recipient_name='', 
+                            recipient_phone='', 
+                            recipient_fax='', 
+                            sender_name='', 
+                            sender_phone='',
+                            sender_fax='', 
+                            sender_email='', 
+                            regarding='', 
+                            message='',
+                            preserve_formatting=False,
+                            output=None):
+    pass
+    
+    
+def  createGenericCoverPage(page_size=PAGE_SIZE_LETTER,
+                            total_pages=1, 
+                            recipient_name='', 
+                            recipient_phone='', 
+                            recipient_fax='', 
+                            sender_name='', 
+                            sender_phone='',
+                            sender_fax='', 
+                            sender_email='', 
+                            regarding='', 
+                            message='',
+                            preserve_formatting=False,
+                            output=None):
+    pass
+    
+    
+def createUrgentCoverPage(page_size=PAGE_SIZE_LETTER,
+                            total_pages=1, 
+                            recipient_name='', 
+                            recipient_phone='', 
+                            recipient_fax='', 
+                            sender_name='', 
+                            sender_phone='',
+                            sender_fax='', 
+                            sender_email='', 
+                            regarding='', 
+                            message='',
+                            preserve_formatting=False,
+                            output=None):
+    pass
 
 #            { "name" : (function, "thumbnail.png"), ... }    
 COVERPAGES = { "basic": (createStandardCoverPage, 'standard_coverpage.png'),
+               "confidential": (createConfidentialCoverPage, 'confidential_coverpage.png'),
+               "generic": (createGenericCoverPage, "generic_coverpage.png"),
+               "urgent": (createUrgentCoverPage, "urgent_coverpage.png"),
              }
 
              

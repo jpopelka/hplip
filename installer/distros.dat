@@ -660,7 +660,7 @@ commands=su -c "modprobe ppdev"
 packages=python-qt
 
 [suse:11.0:pyqt4]
-packages=
+packages=python-qt4
 
 [suse:11.0:python-devel]
 packages=python-devel,python-xml
@@ -909,7 +909,7 @@ drv_dir=/usr/share/cups/drv/hp/
 # ****************************************
 [fedora]
 index=5
-versions=1.0,2.0,3.0,4.0,5,5.0,5.92,6,6.0,7,7.0,8,8.0,9,9.0
+versions=1.0,2.0,3.0,4.0,5,5.0,5.92,6,6.0,7,7.0,8,8.0,9,9.0,10,10.0
 display_name=Fedora
 alt_names=Fedora Core
 display=True
@@ -1771,6 +1771,109 @@ packages=python-ctypes
 # ********************
 [fedora:9.0]
 same_as_version= 9
+
+# ********************
+[fedora:10]
+code_name=sulphur
+supported=True
+gui_supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=2.8.7
+release_date=2009-11-25
+notes=
+ppd_install=drv
+udev_mode_fix=True
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
+
+[fedora:10:cups]
+packages=cups
+
+[fedora:10:cups-devel]
+packages=cups-devel
+
+[fedora:10:gcc]
+packages=gcc-c++
+
+[fedora:10:gs]
+packages=ghostscript
+
+[fedora:10:libcrypto]
+packages=openssl-devel
+
+[fedora:10:libjpeg]
+packages=libjpeg-devel
+
+[fedora:10:libnetsnmp-devel]
+packages=net-snmp-devel
+
+[fedora:10:libpthread]
+packages=glibc-headers
+
+[fedora:10:libtool]
+packages=libtool
+
+[fedora:10:libusb]
+packages=libusb-devel
+
+[fedora:10:make]
+packages=make
+
+[fedora:10:pil]
+packages=python-imaging
+
+[fedora:10:ppdev]
+packages=
+commands=su -c "/sbin/modprobe ppdev"
+
+[fedora:10:pyqt]
+packages=PyQt
+
+[fedora:10:python-devel]
+packages=python-devel
+
+[fedora:10:python23]
+packages=python
+
+[fedora:10:python2x]
+packages=python
+
+[fedora:10:reportlab]
+packages=python-reportlab
+
+[fedora:10:sane]
+packages=sane-backends
+
+[fedora:10:sane-devel]
+packages=sane-backends-devel
+
+[fedora:10:scanimage]
+packages=sane-frontends
+
+[fedora:10:xsane]
+packages=xsane
+
+[fedora:10:cups-ddk]
+packages=cupsddk,cupsddk-drivers,cupsddk-devel
+
+[fedora:10:python-dbus]
+packages=dbus-python
+
+[fedora:10:dbus]
+packages=dbus-devel
+
+[fedora:10:python-ctypes]
+packages=python-ctypes
+
+# ********************
+[fedora:10.0]
+same_as_version= 10
 
 # ****************************************
 [linspire]
@@ -3367,7 +3470,7 @@ commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppd
 packages=python-qt3
 
 [ubuntu:8.04:pyqt4]
-packages=python-qt4
+packages=python-qt4,python-qt4-dbus
 
 [ubuntu:8.04:python-devel]
 packages=python2.5-dev
@@ -3470,7 +3573,7 @@ commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppd
 packages=python-qt3
 
 [ubuntu:8.10:pyqt4]
-packages=python-qt4
+packages=python-qt4,python-qt4-dbus
 
 [ubuntu:8.10:python-devel]
 packages=python2.5-dev
@@ -5142,7 +5245,7 @@ packages=
 # ****************************************
 [mandriva]
 index=4
-versions=9.1,9.2,10.0,10.1,10.2,2006.0,2007.0,2007.1,2008.0,2008.1
+versions=9.1,9.2,10.0,10.1,10.2,2006.0,2007.0,2007.1,2008.0,2008.1,2009,2009.0
 display_name=Mandriva Linux
 alt_names=Mandrakelinux,Mandrake Linux
 display=True
@@ -5815,7 +5918,7 @@ packages=python-ctypes
 
 # ********************
 [mandriva:2008.1]
-code_name=2k8
+code_name=
 supported=True 
 gui_supported=1
 scan_supported=1
@@ -5911,6 +6014,205 @@ packages=libdbus-1_3-devel
 
 
 [mandriva:2008.1:python-ctypes]
+packages=python-ctypes
+
+
+# ********************
+[mandriva:2009]
+code_name=
+supported=True 
+gui_supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=2.8.7
+release_date=2007-4-17
+notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
+ppd_install=drv
+udev_mode_fix=True
+ppd_dir=/usr/share/ppd/hpijs/HP
+fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
+
+[mandriva:2009:cups]
+packages=cups
+
+[mandriva:2009:cups-devel]
+packages=cups-devel
+
+[mandriva:2009:gcc]
+packages=gcc-c++
+
+[mandriva:2009:gs]
+packages=ghostscript
+
+[mandriva:2009:libcrypto]
+packages=libcryptopp5,libcryptopp5-devel
+
+[mandriva:2009:libjpeg]
+packages=libjpeg62-dev
+
+[mandriva:2009:libnetsnmp-devel]
+packages=libsnmp0-devel
+
+[mandriva:2009:libpthread]
+packages=glibc-i18ndata-2.4-4mdk,glibc_lsb-2.3.6-1mdk
+
+[mandriva:2009:libtool]
+packages=libtool
+
+[mandriva:2009:libusb]
+packages=libusb0.1_4-devel
+
+[mandriva:2009:make]
+packages=make
+
+[mandriva:2009:pil]
+packages=python-imaging
+
+[mandriva:2009:ppdev]
+packages=
+commands=su -c "modprobe ppdev"
+
+[mandriva:2009:pyqt]
+packages=PyQt
+
+[mandriva:2009:python-devel]
+packages=python-devel
+
+[mandriva:2009:python23]
+packages=python
+
+[mandriva:2009:python2x]
+packages=python
+
+[mandriva:2009:reportlab]
+packages=python-reportlab
+
+[mandriva:2009:sane]
+packages=sane
+
+[mandriva:2009:sane-devel]
+packages=libsane1-devel
+
+[mandriva:2009:scanimage]
+packages=sane-utils
+
+[mandriva:2009:xsane]
+packages=xsane
+
+[mandriva:2009:cups-ddk]
+packages=cupsddk,cupsddk-drivers
+
+[mandriva:2009:python-dbus]
+packages=python-dbus
+
+[mandriva:2009:dbus]
+packages=libdbus-1_3-devel
+
+[mandriva:2009:python-ctypes]
+packages=python-ctypes
+
+# ********************
+[mandriva:2009.0]
+code_name=
+supported=True 
+gui_supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=2.8.7
+release_date=2007-4-17
+notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
+ppd_install=drv
+udev_mode_fix=True
+ppd_dir=/usr/share/ppd/hpijs/HP
+fix_ppd_symlink=False
+drv_dir=/usr/share/cups/drv/hp/
+
+[mandriva:2009.0:cups]
+packages=cups
+
+[mandriva:2009.0:cups-devel]
+packages=cups-devel
+
+[mandriva:2009.0:gcc]
+packages=gcc-c++
+
+[mandriva:2009.0:gs]
+packages=ghostscript
+
+[mandriva:2009.0:libcrypto]
+packages=libcryptopp5,libcryptopp5-devel
+
+[mandriva:2009.0:libjpeg]
+packages=libjpeg62-dev
+
+[mandriva:2009.0:libnetsnmp-devel]
+packages=libsnmp0-devel
+
+[mandriva:2009.0:libpthread]
+packages=glibc-i18ndata-2.4-4mdk,glibc_lsb-2.3.6-1mdk
+
+[mandriva:2009.0:libtool]
+packages=libtool
+
+[mandriva:2009.0:libusb]
+packages=libusb0.1_4-devel
+
+[mandriva:2009.0:make]
+packages=make
+
+[mandriva:2009.0:pil]
+packages=python-imaging
+
+[mandriva:2009.0:ppdev]
+packages=
+commands=su -c "modprobe ppdev"
+
+[mandriva:2009.0:pyqt]
+packages=PyQt
+
+[mandriva:2009.0:python-devel]
+packages=python-devel
+
+[mandriva:2009.0:python23]
+packages=python
+
+[mandriva:2009.0:python2x]
+packages=python
+
+[mandriva:2009.0:reportlab]
+packages=python-reportlab
+
+[mandriva:2009.0:sane]
+packages=sane
+
+[mandriva:2009.0:sane-devel]
+packages=libsane1-devel
+
+[mandriva:2009.0:scanimage]
+packages=sane-utils
+
+[mandriva:2009.0:xsane]
+packages=xsane
+
+[mandriva:2009.0:cups-ddk]
+packages=cupsddk,cupsddk-drivers
+
+[mandriva:2009.0:python-dbus]
+packages=python-dbus
+
+[mandriva:2009.0:dbus]
+packages=libdbus-1_3-devel
+
+[mandriva:2009.0:python-ctypes]
 packages=python-ctypes
 
 # ****************************************

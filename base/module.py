@@ -34,8 +34,10 @@ USAGE_FLAG_DEVICE_ARGS = 0x01
 USAGE_FLAG_SUPRESS_G_DEBUG_FLAG = 0x02
 USAGE_FLAG_FILE_ARGS = 0x04
 
+
+
 class Module(object):
-    def __init__(self, mod, title, version, doc, 
+    def __init__(self, mod, title, version, doc,
                  usage_data=None, avail_modes=None,
                  supported_ui_toolkits=None,
                  run_as_root_ok=False, quiet=False):
@@ -82,11 +84,11 @@ class Module(object):
         if self.supported_ui_toolkits is not None and prop.gui_build:
             if self.default_ui_toolkit == 'qt3' and UI_TOOLKIT_QT4 in self.supported_ui_toolkits and \
                 UI_TOOLKIT_QT3 not in self.supported_ui_toolkits and INTERACTIVE_MODE in self.avail_modes:
-                
+
                 # interactive + qt4 and default is qt3 --> set to interactive (if avail) (e.g., hp-align)
                 self.default_mode = INTERACTIVE_MODE
                 self.default_ui_toolkit = 'none'
-            
+
             elif (UI_TOOLKIT_QT4 in self.supported_ui_toolkits and self.default_ui_toolkit == 'qt4') or \
                  (UI_TOOLKIT_QT3 in self.supported_ui_toolkits and self.default_ui_toolkit == 'qt3'):
 
@@ -126,7 +128,7 @@ class Module(object):
             log.warn("%s should not be run as root/superuser." % mod)
 
 
-    def setUsage(self, include_flags=0, extra_options=None, 
+    def setUsage(self, include_flags=0, extra_options=None,
                  extra_notes=None, see_also_list=None):
 
         if self.doc:
@@ -196,10 +198,10 @@ class Module(object):
         if extra_notes is not None or notes:
             content.append(utils.USAGE_SPACE)
             content.append(utils.USAGE_NOTES)
-            
+
             for n in notes:
                 content.append(n)
-            
+
             if extra_notes is not None:
                 for n in extra_notes:
                     content.append(n)
@@ -217,8 +219,8 @@ class Module(object):
             self.usage_data.append(c)
 
 
-    def parseStdOpts(self, extra_params=None, 
-                     extra_long_params=None, 
+    def parseStdOpts(self, extra_params=None,
+                     extra_long_params=None,
                      handle_device_printer=True,
                      supress_g_debug_flag=False):
 
@@ -226,8 +228,8 @@ class Module(object):
         if not supress_g_debug_flag:
             params = ''.join([params, 'g'])
 
-        long_params = ['logging=', 'help', 'help-rest', 'help-man', 
-                       'help-desc', 'lang=', 'loc=', 'debug']
+        long_params = ['logging=', 'help', 'help-rest', 'help-man',
+                       'help-desc', 'lang=', 'loc=', 'debug', 'dbg']
 
         if handle_device_printer:
             params = ''.join([params, 'd:p:P:'])
@@ -255,7 +257,7 @@ class Module(object):
 
             if UI_TOOLKIT_QT4 in self.supported_ui_toolkits:
                 long_params.extend(['qt4', 'use-qt4'])
-            
+
         if extra_params is not None:
             params = ''.join([params, extra_params])
 
@@ -292,7 +294,7 @@ class Module(object):
                     if not log.set_level(log_level):
                         show_usage = 'text'
 
-                elif o in ('-g', '--debug'):
+                elif o in ('-g', '--debug', '--dbg'):
                     log.set_level('debug')
 
                 elif o in ('-u', '--gui', '--ui'):
@@ -350,7 +352,7 @@ class Module(object):
                         self.showLanguages()
                         sys.exit(0)
                     else:
-                        lang = utils.validate_language(a.lower())        
+                        lang = utils.validate_language(a.lower())
 
         if error_msg:
             show_usage = 'text'
@@ -360,12 +362,12 @@ class Module(object):
         if show_usage is not None:
             sys.exit(0)
 
-        if (ui_toolkit == 'qt4' or \
-            (mode == GUI_MODE and UI_TOOLKIT_QT3 not in self.supported_ui_toolkits)) and not self.quiet:
-            log.error("Qt4 support is unfinished and unsupported. Please use Qt3 mode (if avail).")
+#        if (ui_toolkit == 'qt4' or \
+#            (mode == GUI_MODE and UI_TOOLKIT_QT3 not in self.supported_ui_toolkits)) and not self.quiet:
+#            log.error("Qt4 support is unfinished and unsupported. Please use Qt3 mode (if avail).")
 
         self.mode = mode
-        return opts, device_uri, printer_name, mode, ui_toolkit, lang            
+        return opts, device_uri, printer_name, mode, ui_toolkit, lang
 
 
     def showLanguages(self):
@@ -374,7 +376,7 @@ class Module(object):
         for loc, ll in supported_locales.items():
             f.add((ll[0], ', '.join(ll[1:])))
 
-        f.output()        
+        f.output()
 
 
     def usage(self, show_usage='text', error_msg=None):
@@ -405,13 +407,13 @@ class Module(object):
                 sys.exit(0)
 
 
-    def showTitle(self, show_ver=True): 
+    def showTitle(self, show_ver=True):
         if not self.quiet:
             log.info("")
 
             if show_ver:
                 log.info(log.bold("HP Linux Imaging and Printing System (ver. %s)" % prop.version))
-            else:    
+            else:
                 log.info(log.bold("HP Linux Imaging and Printing System"))
 
             log.info(log.bold("%s ver. %s" % (self.title, self.version)))
@@ -423,23 +425,27 @@ class Module(object):
             log.info("")
 
 
-    def getDeviceUri(self, device_uri=None, printer_name=None, back_end_filter=device.DEFAULT_BE_FILTER, 
+    def getDeviceUri(self, device_uri=None, printer_name=None, back_end_filter=device.DEFAULT_BE_FILTER,
                      filter=device.DEFAULT_FILTER, devices=None):
+        """ Validate passed in parameters, and, if in text mode, have user select desired device to use.
+            Used for tools that are device-centric and accept -d (and maybe also -p).
+            Use the filter(s) to restrict what constitute valid devices.
 
-        log.debug("getDeviceUri(%s, %s, %s, %s)" % (device_uri, printer_name, back_end_filter, filter))
-        log.debug("Mode=%s" % self.mode)
-        """ Used for tools that are device-centric and accept -d (and maybe also -p)
             Return the matching device URI based on:
             1. Passed in device_uri if it is valid (filter passes)
             2. Corresponding device_uri from the printer_name if it is valid (filter passes) ('*' means default printer)
             3. User input from menu (based on bus and filter)
 
-            device_uri and printer_name can both be specified if they coorespond to the same device.
+            device_uri and printer_name can both be specified if they correspond to the same device.
 
             Returns:
                 device_uri|None
                 (returns None if passed in device_uri is invalid or printer_name doesn't correspond to device_uri)
         """
+
+        log.debug("getDeviceUri(%s, %s, %s, %s)" % (device_uri, printer_name, back_end_filter, filter))
+        log.debug("Mode=%s" % self.mode)
+
         scan_uri_flag = False
         if 'hpaio' in back_end_filter:
             scan_uri_flag = True
@@ -502,11 +508,12 @@ class Module(object):
         return device_uri_ret
 
 
-    def getPrinterName(self, printer_name, device_uri, back_end_filter=device.DEFAULT_BE_FILTER, 
+    def getPrinterName(self, printer_name, device_uri, back_end_filter=device.DEFAULT_BE_FILTER,
                        filter=device.DEFAULT_FILTER):
-        log.debug("getPrinterName(%s, %s, %s, %s)" % (device_uri, printer_name, back_end_filter, filter))
-        log.debug("Mode=%s" % self.mode)
-        """ Used for tools that are printer queue-centric and accept (-p and maybe also -d)
+        """ Validate passed in parameters, and, if in text mode, have user select desired printer to use.
+            Used for tools that are printer queue-centric and accept -p (and maybe also -d).
+            Use the filter(s) to restrict what constitute valid printers.
+
             Return the matching printer_name based on:
             1. Passed in printer_name if it is valid (filter passes) ('*' means default printer)
             2. From single printer_name of corresponding passed in device_uri (filter passes)
@@ -518,6 +525,10 @@ class Module(object):
                 (printer_name|None, device_uri|None) (tuple)
                 (returns None if passed in printer_name is invalid or device_uri doesn't correspond to printer_name)
         """
+
+        log.debug("getPrinterName(%s, %s, %s, %s)" % (device_uri, printer_name, back_end_filter, filter))
+        log.debug("Mode=%s" % self.mode)
+
         device_uri_ok = False
         printer_name_ok = False
         printer_name_ret = None
@@ -544,7 +555,7 @@ class Module(object):
                 else:
                     log.error("CUPS default printer not set")
                     printer_name = None
-                    
+
             else:
                 if printer_name in printers:
                     printer_name_ok = True
@@ -598,7 +609,7 @@ class Module(object):
             ok, self.lock_file = utils.lock_app('-'.join([self.mod, suffix]))
         else:
             ok, self.lock_file = utils.lock_app(self.mod)
-        
+
         if not ok:
             sys.exit(1)
 

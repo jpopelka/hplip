@@ -697,8 +697,12 @@ if mode in (INTERACTIVE_MODE, NON_INTERACTIVE_MODE):
 
 
 else: # GUI_MODE (qt3 only)
-    from qt import *
-    from ui import unloadform
+    try:
+        from qt import *
+        from ui import unloadform
+    except ImportError:
+        log.error("Unable to load Qt3 support. Is it installed?")
+        sys.exit(1)         
 
     app = QApplication(sys.argv)
     QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))

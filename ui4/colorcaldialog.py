@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-#  
+#
 # Authors: Don Welch
 #
 
@@ -37,16 +37,8 @@ from PyQt4.QtGui import *
 from colorcaldialog_base import Ui_Dialog
 
 
-#COLOR_CAL_TYPE_DESKJET_450 = 1
-#COLOR_CAL_TYPE_MALIBU_CRICK = 2
-#COLOR_CAL_TYPE_STRINGRAY_LONGBOW_TORNADO = 3
-#COLOR_CAL_TYPE_CONNERY = 4
-#COLOR_CAL_TYPE_COUSTEAU = 5
-#COLOR_CAL_TYPE_CARRIER = 6
-#COLOR_CAL_TYPE_TYPHOON = 7
-
-COLOR_CAL_TYPE_INITIAL = -1
-COLOR_CAL_TYPE_TEST = -2
+COLOR_CAL_TYPE_INITIAL = 1000
+COLOR_CAL_TYPE_TEST = 1001
 
 PAGE_START = 0
 PAGE_LOAD_PAPER = 1
@@ -54,6 +46,7 @@ PAGE_DESKJET_450 = 2
 PAGE_CRICK = 3
 PAGE_LBOW = 4
 PAGE_CONNERY = 5
+PAGE_FRONT_PANEL = 6
 
 
 BUTTON_CALIBRATE = 0
@@ -77,8 +70,10 @@ class ColorCalDialog(QDialog, Ui_Dialog):
         self.seq_index = 0
         self.value = 0
         self.values = []
+        self.step_max = 0
 
         self.max_steps = {
+                    COLOR_CAL_TYPE_UNSUPPORTED : 1,
                     COLOR_CAL_TYPE_DESKJET_450 : 2,
                     COLOR_CAL_TYPE_MALIBU_CRICK : 0,
                     COLOR_CAL_TYPE_STRINGRAY_LONGBOW_TORNADO : 0,
@@ -86,93 +81,100 @@ class ColorCalDialog(QDialog, Ui_Dialog):
                     COLOR_CAL_TYPE_COUSTEAU : 0,
                     COLOR_CAL_TYPE_CARRIER : 0,
                     COLOR_CAL_TYPE_TYPHOON : 0,
-                   } 
+                   }
 
         self.seq = { # (func|method, tuple of params|None)
                     COLOR_CAL_TYPE_INITIAL: [ # (used when starting up and align-type isn't known)
                                (self.showStartPage, None),
                                (self.endStartPage, None), # switch to a valid align-type here
-                            ], 
+                            ],
 
+                    COLOR_CAL_TYPE_UNSUPPORTED : [
+                                (self.showFrontPanelPage, None),
+                                (self.endFrontPanelPage, None),
+                                (self.close, None),
+                                    ],
+                    
                     COLOR_CAL_TYPE_DESKJET_450 : [ # 1
-                                        (self.colorCalType1PenCheck, None),
-                                        (self.showLoadPaperPage, None),
-                                        (self.endLoadPaperPage, None),
-                                        (maint.colorCalType1Phase1, (lambda: self.dev,)),
-                                        (self.setColorCalButton, (BUTTON_CALIBRATE,)),
-                                        (self.showDeskjet450Page, None),
-                                        (self.endDeskjet450Page, None),
-                                        (maint.colorCalType1Phase2, (lambda: self.dev, lambda: self.value)),
-                                        (self.close, None),
+                                (self.colorCalType1PenCheck, None),
+                                (self.showLoadPaperPage, None),
+                                (self.endLoadPaperPage, None),
+                                (maint.colorCalType1Phase1, (lambda: self.dev,)),
+                                (self.setColorCalButton, (BUTTON_CALIBRATE,)),
+                                (self.showDeskjet450Page, None),
+                                (self.endDeskjet450Page, None),
+                                (maint.colorCalType1Phase2, (lambda: self.dev, lambda: self.value)),
+                                (self.close, None),
                                     ],
 
                     COLOR_CAL_TYPE_MALIBU_CRICK : [ # 2
-                                        (self.colorCalType2PenCheck, None),
-                                        (self.showLoadPaperPage, None),
-                                        (self.endLoadPaperPage, None),
-                                        (maint.colorCalType1Phase1, (lambda: self.dev,)),
-                                        (self.setColorCalButton, (BUTTON_CALIBRATE,)),
-                                        (self.showCrick, None),
-                                        (self.endCrick, None),
-                                        (maint.colorCalType2Phase2, (lambda: self.dev, lambda: self.value)),
-                                        (self.close, None),
+                                (self.colorCalType2PenCheck, None),
+                                (self.showLoadPaperPage, None),
+                                (self.endLoadPaperPage, None),
+                                (maint.colorCalType1Phase1, (lambda: self.dev,)),
+                                (self.setColorCalButton, (BUTTON_CALIBRATE,)),
+                                (self.showCrick, None),
+                                (self.endCrick, None),
+                                (maint.colorCalType2Phase2, (lambda: self.dev, lambda: self.value)),
+                                (self.close, None),
                                     ],
 
                     COLOR_CAL_TYPE_STRINGRAY_LONGBOW_TORNADO : [ # 3
-                                        (self.colorCalType3PenCheck, None),
-                                        (self.showLoadPaperPage, None),
-                                        (self.endLoadPaperPage, None),
-                                        (maint.colorCalType3Phase1, (lambda: self.dev,)),
-                                        (self.showLBow, ('A', 21)),
-                                        (self.endLBox, ('A',)),
-                                        (self.setColorCalButton, (BUTTON_CALIBRATE,)),
-                                        (self.showLBow, ('B', 21)),
-                                        (self.endLBox, ('B',)),
-                                        (maint.colorCalType3Phase2, (lambda: self.dev, lambda: self.a, 
-                                                                     lambda: self.b)),
-                                        (self.close, None),
+                                (self.colorCalType3PenCheck, None),
+                                (self.showLoadPaperPage, None),
+                                (self.endLoadPaperPage, None),
+                                (maint.colorCalType3Phase1, (lambda: self.dev,)),
+                                (self.showLBowPage, ('A', 21)),
+                                (self.endLBowPage, ('A',)),
+                                (self.setColorCalButton, (BUTTON_CALIBRATE,)),
+                                (self.showLBowPage, ('B', 21)),
+                                (self.endLBowPage, ('B',)),
+                                (maint.colorCalType3Phase2, (lambda: self.dev, lambda: self.a,
+                                                             lambda: self.b)),
+                                (self.close, None),
                                     ],
 
                     COLOR_CAL_TYPE_CONNERY : [ #4
-                                        (self.showLoadPaperPage, None),
-                                        (self.endLoadPaperPage, None),
-                                        (maint.colorCalType4Phase1, (lambda: self.dev,)),
-                                        (self.setColorCalButton, (BUTTON_CALIBRATE,)),
-                                        (self.showConneryPage, None),
-                                        (self.endConneryPage, None), # sets self.values (list)
-                                        (maint.colorCalType4Phase2, (lambda: self.dev, lambda: self.values)),
-                                        (self.showLoadPaperPage, None),
-                                        (self.endLoadPaperPage, None),
-                                        (maint.colorCalType4Phase3, (lambda: self.dev,)),
-                                        (self.close, None),
+                                (self.showLoadPaperPage, None),
+                                (self.endLoadPaperPage, None),
+                                (maint.colorCalType4Phase1, (lambda: self.dev,)),
+                                (self.setColorCalButton, (BUTTON_CALIBRATE,)),
+                                (self.showConneryPage, None),
+                                (self.endConneryPage, None), # sets self.values (list)
+                                (maint.colorCalType4Phase2, (lambda: self.dev, lambda: self.values)),
+                                (self.showLoadPaperPage, None),
+                                (self.endLoadPaperPage, None),
+                                (maint.colorCalType4Phase3, (lambda: self.dev,)),
+                                (self.close, None),
                                     ],
 
                     COLOR_CAL_TYPE_COUSTEAU : [ #5
-                                        (self.setColorCalButton, (BUTTON_CALIBRATE,)),
-                                        (self.showLoadPaperPage, None),
-                                        (self.endLoadPaperPage, None),
-                                        (maint.colorCalType5, (lambda: self.dev, lambda: true)),
-                                        (self.showConneryPage, None),
-                                        (self.endConneryPage, None),
-                                        (self.close, None),
+                                (self.setColorCalButton, (BUTTON_CALIBRATE,)),
+                                (self.showLoadPaperPage, None),
+                                (self.endLoadPaperPage, None),
+                                (maint.colorCalType5, (lambda: self.dev, lambda: true)),
+                                (self.showConneryPage, None),
+                                (self.endConneryPage, None),
+                                (self.close, None),
                                     ],
 
                     COLOR_CAL_TYPE_CARRIER : [ #6
-                                        (self.setColorCalButton, (BUTTON_CALIBRATE,)),
-                                        (self.showLoadPaperPage, None),
-                                        (self.endLoadPaperPage, None),
-                                        (maint.colorCalType6, (lambda: self.dev, lambda: true)),
-                                        (self.close, None),
+                                (self.setColorCalButton, (BUTTON_CALIBRATE,)),
+                                (self.showLoadPaperPage, None),
+                                (self.endLoadPaperPage, None),
+                                (maint.colorCalType6, (lambda: self.dev, lambda: true)),
+                                (self.close, None),
                                     ],
 
                     COLOR_CAL_TYPE_TYPHOON : [ #7
-                                        (self.setColorCalButton, (BUTTON_CALIBRATE,)),
-                                        (self.showLoadPaperPage, None),
-                                        (self.endLoadPaperPage, None),
-                                        (maint.colorCalType7, (lambda: self.dev, lambda: true)),
-                                        (self.close, None),
-                                    ],    
+                                (self.setColorCalButton, (BUTTON_CALIBRATE,)),
+                                (self.showLoadPaperPage, None),
+                                (self.endLoadPaperPage, None),
+                                (maint.colorCalType7, (lambda: self.dev, lambda: true)),
+                                (self.close, None),
+                                    ],
         }
+
 
         self.initUi()
 
@@ -192,6 +194,9 @@ class ColorCalDialog(QDialog, Ui_Dialog):
 
         # Application icon
         self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
+        self.updateStepText()
+
+
 
 
     def DeviceUriComboBox_noDevices(self):
@@ -257,7 +262,7 @@ class ColorCalDialog(QDialog, Ui_Dialog):
         self.BackButton.setEnabled(False)
         num_devices = self.DeviceComboBox.setDevices()
 
-        if num_devices == 1: 
+        if num_devices == 1:
             self.skipPage()
             return
 
@@ -273,7 +278,7 @@ class ColorCalDialog(QDialog, Ui_Dialog):
         #self.color_cal_type = COLOR_CAL_TYPE_TEST # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
         log.debug("color-cal-type=%d" % self.color_cal_type)
-        self.step_max = self.max_steps[self.color_cal_type]   
+        self.step_max = self.max_steps[self.color_cal_type]
 
         try:
             self.dev = device.Device(self.device_uri)
@@ -355,9 +360,17 @@ class ColorCalDialog(QDialog, Ui_Dialog):
                 (ord(str(self.ConneryGrayLetterComboBox.currentText())) - ord('A')),
                 int(str(self.ConneryGrayNumberComboBox.currentText())),
                 (ord(str(self.ConneryColorLetterComboBox.currentText())) - ord('A')),
-                int(str(self.ConneryColorNumberComboBox.currentText())) 
+                int(str(self.ConneryColorNumberComboBox.currentText()))
             ]
 
+    def showFrontPanelPage(self):
+        self.BackButton.setEnabled(False)
+        self.setColorCalButton(BUTTON_FINISH)
+        self.displayPage(PAGE_FRONT_PANEL)
+        
+        
+    def endFrontPanelPage(self):
+        pass
 
     #
     # Color cal specific
@@ -372,13 +385,14 @@ class ColorCalDialog(QDialog, Ui_Dialog):
         if not maint.colorCalType2PenCheck(self.dev):
             pass # TODO: Error message (photo pen must be inserted)
 
+
     def colorCalType3PenCheck(self):
         if not maint.colorCalType3PenCheck(self.dev):
             pass # TODO:
 
     #
     # Misc
-    # 
+    #
 
     def displayPage(self, page):
         self.updateStepText(self.step)

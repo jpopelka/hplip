@@ -19,6 +19,8 @@
 # Author: Don Welch
 #
 
+# Local
+from base.g import *
 
 # Qt
 from PyQt4.QtCore import *

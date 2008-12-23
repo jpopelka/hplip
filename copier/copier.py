@@ -117,7 +117,8 @@ class PMLCopyThread(threading.Thread):
         STATE_ACTIVE = 70
         STATE_RESET_TOKEN = 80
 
-        state = STATE_SET_TOKEN
+#       state = STATE_SET_TOKEN
+        state = STATE_SETUP_STATE
 
         while state != STATE_DONE: # ------------------------- Copier Thread
             # revisit - Checking cancel and setting state here means

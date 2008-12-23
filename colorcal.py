@@ -39,15 +39,15 @@ from prnt import cups
 
 
 def enterAlignmentNumber(letter, hortvert, colors, minimum, maximum):
-    return tui.enter_range("Enter the best aligned value for line %s (%d-%d or q=quit): " % 
+    return tui.enter_range("Enter the best aligned value for line %s (%d-%d or q=quit): " %
         (letter, minimum, maximum), minimum, maximum)
 
 def enterPaperEdge(maximum):
-    return tui.enter_range("Enter numbered arrow that is best aligned with the paper edge (1-%d or q=quit): " % 
+    return tui.enter_range("Enter numbered arrow that is best aligned with the paper edge (1-%d or q=quit): " %
         maximum, 1, maximum)
 
 def colorAdj(line, maximum):
-    return tui.enter_range("Enter the numbered box on line %s that is best color matched to the background color (1-%d or q=quit): " % 
+    return tui.enter_range("Enter the numbered box on line %s that is best color matched to the background color (1-%d or q=quit): " %
         (line, maximum), 1, maximum)
 
 def colorCal():
@@ -155,9 +155,9 @@ def colorCal4():
 
 
 try:
-    mod = module.Module(__mod__, __title__, __version__, __doc__, None, 
+    mod = module.Module(__mod__, __title__, __version__, __doc__, None,
                         (INTERACTIVE_MODE, GUI_MODE), (UI_TOOLKIT_QT4,))
-                        
+
     mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS,
                  see_also_list=['hp-align', 'hp-clean', 'hp-linefeedcal',
                                 'hp-pqdiag'])
@@ -166,12 +166,12 @@ try:
         mod.parseStdOpts()
 
     device_uri = mod.getDeviceUri(device_uri, printer_name,
-        filter={'color-cal-type': (operator.gt, 0)})
-    
+        filter={'color-cal-type': (operator.ne, COLOR_CAL_TYPE_NONE)})
+
     if mode == GUI_MODE:
         if not utils.canEnterGUIMode4():
             log.error("%s -u/--gui requires Qt4 GUI support. Entering interactive mode." % __mod__)
-            mode = INTERACTIVE_MODE        
+            mode = INTERACTIVE_MODE
 
     if mode == INTERACTIVE_MODE:
         try:
@@ -188,12 +188,11 @@ try:
                 sys.exit(1)
 
             if d.isIdleAndNoError():
-                color_cal_type = d.mq.get('color-cal-type', 0)
+                color_cal_type = d.mq.get('color-cal-type', COLOR_CAL_TYPE_NONE)
                 log.debug("Color calibration type=%d" % color_cal_type)
 
-                if color_cal_type == 0:
-                    log.error("Color calibration not supported or required by device.")
-                    sys.exit(1)
+                if color_cal_type == COLOR_CAL_TYPE_UNSUPPORTED:
+                    log.error("Color calibration through HPLIP not supported for this printer. Please use the printer's front panel to perform color calibration.")
 
                 elif color_cal_type == COLOR_CAL_TYPE_DESKJET_450: #1
                     maint.colorCalType1(d, tui.load_paper_prompt, colorCal, photoPenRequired)
@@ -224,14 +223,14 @@ try:
                 sys.exit(1)
         finally:
             d.close()
-    
+
     else:
         try:
             from PyQt4.QtGui import QApplication
             from ui4.colorcaldialog import ColorCalDialog
         except ImportError:
             log.error("Unable to load Qt4 support. Is it installed?")
-            sys.exit(1)        
+            sys.exit(1)
 
         #try:
         if 1:
@@ -248,7 +247,7 @@ try:
         #finally:
         if 1:
             sys.exit(0)
-            
+
 except KeyboardInterrupt:
     log.error("User exit")
 

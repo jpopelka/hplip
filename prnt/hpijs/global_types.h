@@ -434,6 +434,9 @@ typedef enum                // typedef'ed for C interface
     BAD_DEVICE_ID        =  0x21,    //!< bad or garbled device id from printer
     CONTINUE_FROM_BLOCK  =  0x22,    //!< continue from blocked state for printers with no buttons
 
+//  Run time related
+    PLUGIN_LIBRARY_MISSING = 0x30,   //!< a required plugin (dynamic) library is missing
+
 // WARNINGS
 // convention is that values < 0 can be ignored (at user's peril)
     WARN_MODE_MISMATCH    =  -1,     //!< printmode selection incompatible with pen, tray, etc.

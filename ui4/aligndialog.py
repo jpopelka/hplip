@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-#  
+#
 # Authors: Don Welch
 #
 
@@ -43,13 +43,14 @@ PAGE_ALIGNMENT_NUMBER = 3
 PAGE_COLOR_ADJ = 4 # types 4, 5 & 7
 PAGE_LBOW = 5 # types 10 & 11
 PAGE_AIO = 6 # Place on scanner, ...
+PAGE_FRONT_PANEL = 7 # Use front panel menu
 
 BUTTON_ALIGN = 0
 BUTTON_NEXT = 1
 BUTTON_FINISH = 2
 
-ALIGN_TYPE_INITIAL = -1
-ALIGN_TYPE_TEST = -2
+ALIGN_TYPE_INITIAL = 1000
+ALIGN_TYPE_TEST = 1001
 
 # xBow offset types
 ALIGN_TYPE_XBOW_OFFSET = 100
@@ -80,13 +81,14 @@ class AlignDialog(QDialog, Ui_Dialog):
         self.abort = False
         self.seq_index = 0
 
-        self.max_steps = { 
+        self.max_steps = {
+            ALIGN_TYPE_UNSUPPORTED : 1,
             ALIGN_TYPE_AUTO : 2,
             ALIGN_TYPE_9XX : 7,
             ALIGN_TYPE_8XX : 6,
             ALIGN_TYPE_LIDIL_0_3_8 : 0,
             ALIGN_TYPE_LIDIL_0_4_3 : 0,
-            ALIGN_TYPE_LIDIL_AIO : 0,
+            ALIGN_TYPE_LIDIL_AIO : 3,
             ALIGN_TYPE_LIDIL_VIP : 0,
             ALIGN_TYPE_DESKJET_450 : 0,
             ALIGN_TYPE_9XX_NO_EDGE_ALIGN : 6,
@@ -94,14 +96,14 @@ class AlignDialog(QDialog, Ui_Dialog):
             ALIGN_TYPE_LIDIL_0_5_4 : 0,
             ALIGN_TYPE_OJ_PRO : 0,
             ALIGN_TYPE_TEST : 0,
-            ALIGN_TYPE_AIO : 2,
+            ALIGN_TYPE_AIO : 3,
             }
 
         self.seq = { # (func|method, tuple of params|None)
             ALIGN_TYPE_TEST : [ # testing only
-                               (self.showColorAdjustPage, ('F', 21)), 
+                               (self.showColorAdjustPage, ('F', 21)),
                                (self.endColorAdjustPage, ('F',)),
-                               (self.showColorAdjustPage, ('G', 11)), 
+                               (self.showColorAdjustPage, ('G', 11)),
                                (self.endColorAdjustPage, ('G',)),
                                (self.close, None),
                             ],
@@ -109,11 +111,17 @@ class AlignDialog(QDialog, Ui_Dialog):
             ALIGN_TYPE_INITIAL : [ # (used when starting up and align-type isn't known)
                                (self.showStartPage, None),
                                (self.endStartPage, None), # switch to a valid align-type here
-                            ], 
+                            ],
 
-            ALIGN_TYPE_NONE : [ # 0 
-                               (self.close, None)
-                            ], 
+            ALIGN_TYPE_UNSUPPORTED : [ # -1
+                                (self.showFrontPanelPage, None),
+                                (self.endFronPanelPage, None),
+                                (self.close, None),
+                            ],
+            
+#            ALIGN_TYPE_NONE : [ # 0
+#                               (self.close, None)
+#                            ],
 
             ALIGN_TYPE_AUTO : [ # 1
                                (self.showLoadPaperPage, None),
@@ -126,16 +134,16 @@ class AlignDialog(QDialog, Ui_Dialog):
                                 (self.showLoadPaperPage, None),
                                 (maint.alignType2Phase1, (lambda: self.dev,)),
                                 (self.showAlignmentNumberPage, ('A', 'h', 'kc', 2, 11)),
-                                (self.endAlignmentNumberPage, ('A',)),    
+                                (self.endAlignmentNumberPage, ('A',)),
                                 (self.showAlignmentNumberPage, ('B', 'v', 'kc', 2, 11)),
-                                (self.endAlignmentNumberPage, ('B',)), 
+                                (self.endAlignmentNumberPage, ('B',)),
                                 (self.showAlignmentNumberPage, ('C', 'v', 'kc', 2, 5)),
                                 (self.endAlignmentNumberPage, ('C',)),
                                 (self.setAlignButton, (BUTTON_ALIGN,)),
                                 (self.showAlignmentNumberPage, ('D', 'v', 'c', 2, 5)),
                                 (self.endAlignmentNumberPage, ('D',)),
                                 (self.showLoadPaperPage, None),
-                                (maint.alignType2Phase2, (lambda: self.dev, lambda: self.a, lambda: self.b, 
+                                (maint.alignType2Phase2, (lambda: self.dev, lambda: self.a, lambda: self.b,
                                                           lambda: self.c, lambda: self.d)),
                                 (self.close, None),
                               ],
@@ -143,21 +151,21 @@ class AlignDialog(QDialog, Ui_Dialog):
             ALIGN_TYPE_9XX : [  # 3
                                 (self.showLoadPaperPage, None),
                                 (self.showAlignmentNumberPage, ('A', 'h', 'kc', 2, 11)),
-                                (self.endAlignmentNumberPage, ('A',)),    
+                                (self.endAlignmentNumberPage, ('A',)),
                                 (self.showAlignmentNumberPage, ('B', 'v', 'kc', 2, 11)),
-                                (self.endAlignmentNumberPage, ('B',)), 
+                                (self.endAlignmentNumberPage, ('B',)),
                                 (self.showAlignmentNumberPage, ('C', 'v', 'k', 2, 11)),
                                 (self.endAlignmentNumberPage, ('C',)),
                                 (self.setAlignButton, (BUTTON_ALIGN,)),
                                 (self.showAlignmentNumberPage, ('D', 'v', 'kc', 2, 11)),
                                 (self.endAlignmentNumberPage, ('D',)),
-                                (maint.alignType3Phase2, (lambda: self.dev, lambda: self.a, lambda: self.b, 
+                                (maint.alignType3Phase2, (lambda: self.dev, lambda: self.a, lambda: self.b,
                                                           lambda: self.c, lambda: self.d)),
                                 (maint.alignType3Phase3, (lambda: self.dev,)),
                                 (self.showPageEdgePage, None),
                                 (self.endPageEdgePage, None),
                                 (maint.alignType3Phase4, (lambda: self.dev, lambda: self.zca)),
-                                (self.close, None),   
+                                (self.close, None),
                              ],
 
             ALIGN_TYPE_LIDIL_0_3_8 : [ # 4
@@ -185,7 +193,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                                 (self.setXBow, None),
                                 # switches to offset align_type here (next 5 types)
                             ],
-                            
+
             # xBow offset alignment type
             ALIGN_TYPE_XBOW_BLACK_ONLY : [ # 4, 5 & 7
                             (self.showAlignmentNumberPage, ('B', 'v', 'k', 2, 11)),
@@ -201,7 +209,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                             (self.setXBowValues, None),
                             (self.close, None),
                             ],
-                                          
+
             # xBow offset alignment type
             ALIGN_TYPE_XBOW_COLOR_ONLY : [ # 4, 5 & 7
                             (self.showAlignmentNumberPage, ('B', 'v', 'kc', 2, 11)),
@@ -209,7 +217,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                             (self.setXBowValues, None),
                             (self.close, None),
                             ],
-                            
+
             # xBow offset alignment type
             ALIGN_TYPE_XBOW_COLOR_AND_BLACK : [ # 4, 5 & 7
                             (self.showAlignmentNumberPage, ('B', 'h', 'kc', 2, 17)),
@@ -223,7 +231,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                             (self.setXBowValues, None),
                             (self.close, None),
                             ],
-                            
+
             # xBow offset alignment type
             ALIGN_TYPE_XBOW_COLOR_AND_PHOTO : [ # 4, 5 & 7
                             (self.showAlignmentNumberPage, ('B', 'h', 'kc', 2, 17)),
@@ -254,15 +262,15 @@ class AlignDialog(QDialog, Ui_Dialog):
                                 (self.showLoadPaperPage, None),
                                 (self.alignType8Phase1, None), # sets num_inks
                                 (self.showAlignmentNumberPage, ('A', 'v', 'k', 3, 9)),
-                                (self.endAlignmentNumberPage, ('A',)),    
+                                (self.endAlignmentNumberPage, ('A',)),
                                 (self.showAlignmentNumberPage, ('B', 'v', 'c', 3, 9)),
-                                (self.endAlignmentNumberPage, ('B',)), 
+                                (self.endAlignmentNumberPage, ('B',)),
                                 (self.showAlignmentNumberPage, ('C', 'v', 'kc', 3, 9)),
                                 (self.endAlignmentNumberPage, ('C',)),
                                 (self.setAlignButton, (BUTTON_ALIGN,)),
                                 (self.showAlignmentNumberPage, ('D', 'h', 'kc', 3, 9)),
                                 (self.endAlignmentNumberPage, ('D',)),
-                                (maint.alignType3Phase2, (lambda: self.dev, lambda: self.num_inks, lambda: self.a, 
+                                (maint.alignType3Phase2, (lambda: self.dev, lambda: self.num_inks, lambda: self.a,
                                                           lambda: self.b, lambda: self.c, lambda: self.d)),
                                 (self.close, None),
                             ],
@@ -270,17 +278,17 @@ class AlignDialog(QDialog, Ui_Dialog):
             ALIGN_TYPE_9XX_NO_EDGE_ALIGN : [  # 9
                                 (self.showLoadPaperPage, None),
                                 (self.showAlignmentNumberPage, ('A', 'h', 'kc', 2, 11)),
-                                (self.endAlignmentNumberPage, ('A',)),    
+                                (self.endAlignmentNumberPage, ('A',)),
                                 (self.showAlignmentNumberPage, ('B', 'v', 'kc', 2, 11)),
-                                (self.endAlignmentNumberPage, ('B',)), 
+                                (self.endAlignmentNumberPage, ('B',)),
                                 (self.showAlignmentNumberPage, ('C', 'v', 'k', 2, 11)),
                                 (self.endAlignmentNumberPage, ('C',)),
                                 (self.setAlignButton, (BUTTON_ALIGN,)),
                                 (self.showAlignmentNumberPage, ('D', 'v', 'kc', 2, 11)),
                                 (self.endAlignmentNumberPage, ('D',)),
-                                (maint.alignType3Phase2, (lambda: self.dev, lambda: self.a, lambda: self.b, 
+                                (maint.alignType3Phase2, (lambda: self.dev, lambda: self.a, lambda: self.b,
                                                           lambda: self.c, lambda: self.d)),
-                                (self.close, None),   
+                                (self.close, None),
                             ],
 
             ALIGN_TYPE_LBOW : [ # 10
@@ -289,7 +297,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                                (self.setAlignButton, (BUTTON_ALIGN,)),
                                (self.showLBowPage, (lambda: self.pattern,)),
                                (self.endLBowPage, None), # sets values
-                               (maint.alignType10Phase2, (lambda: self.dev, lambda: self.values, 
+                               (maint.alignType10Phase2, (lambda: self.dev, lambda: self.values,
                                                           lambda: self.pattern)),
                                (self.setAlignButton, (BUTTON_FINISH,)),
                                (self.showLoadPaperPage, None),
@@ -303,7 +311,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                                (self.setAlignButton, (BUTTON_ALIGN,)),
                                (self.showLBowPage, (lambda: self.pattern,)),
                                (self.endLBowPage, None), # sets values
-                               (maint.alignType11Phase2, (lambda: self.dev, lambda: self.values, 
+                               (maint.alignType11Phase2, (lambda: self.dev, lambda: self.values,
                                                           lambda: self.pattern)),
                                (self.setAlignButton, (BUTTON_FINISH,)),
                                (self.showLoadPaperPage, None),
@@ -311,12 +319,12 @@ class AlignDialog(QDialog, Ui_Dialog):
                                (self.close, None),
                             ],
 
-            ALIGN_TYPE_OJ_PRO : [ # 12 
+            ALIGN_TYPE_OJ_PRO : [ # 12
                                 (self.showLoadPaperPage, None),
                                 (maint.AlignType12, (lambda : self.dev, lambda: true)),
                                 (self.close, None),
                             ],
-                                 
+
             ALIGN_TYPE_AIO : [ #13
                               (self.showLoadPaperPage, None),
                               (maint.alignType13Phase1, (lambda: self.dev,)),
@@ -329,7 +337,7 @@ class AlignDialog(QDialog, Ui_Dialog):
             }
 
         self.setupUi(self)
-        self.initUi()        
+        self.initUi()
 
         QTimer.singleShot(0, self.nextSequence)
 
@@ -392,7 +400,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                 log.debug("%s(%s)" % (seq.func_name, ','.join([repr(x) for x in t])))
             except AttributeError:
                 pass
-                
+
             try:
                 seq(*t)
             except Error:
@@ -413,7 +421,7 @@ class AlignDialog(QDialog, Ui_Dialog):
         self.BackButton.setEnabled(False)
         num_devices = self.DeviceComboBox.setDevices()
 
-        if num_devices == 1: 
+        if num_devices == 1:
             self.skipPage()
             return
 
@@ -425,11 +433,11 @@ class AlignDialog(QDialog, Ui_Dialog):
         self.mq = device.queryModelByURI(self.device_uri)
         self.align_type = self.mq.get('align-type', ALIGN_TYPE_NONE)
         self.seq_index = -1
-        
+
         #self.align_type = ALIGN_TYPE_TEST# XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
         log.debug("align-type=%d" % self.align_type)
-        self.step_max = self.max_steps[self.align_type]   
+        self.step_max = self.max_steps[self.align_type]
 
         try:
             self.dev = device.Device(self.device_uri)
@@ -467,7 +475,7 @@ class AlignDialog(QDialog, Ui_Dialog):
         v = int(str(self.AlignmentNumberComboBox.currentText())[1:])
 
         if line_id == 'A':
-            self.a = v 
+            self.a = v
             log.debug("A=%d" % v)
 
         elif line_id == 'B':
@@ -508,14 +516,14 @@ class AlignDialog(QDialog, Ui_Dialog):
 
         if self.align_type == ALIGN_TYPE_LBOW:
             pattern = maint.alignType10SetPattern(self.dev)
-        
+
         else: # ALIGN_TYPE_LIDIL_0_5_4
             pattern = maint.alignType11SetPattern(self.dev)
-        
+
         if pattern is None:
             log.error("Invalid pattern!")
             # TODO: ...
-        
+
         self.controls = maint.align10and11Controls(pattern, self.align_type)
 
         max_line = 'A'
@@ -554,43 +562,51 @@ class AlignDialog(QDialog, Ui_Dialog):
                     selected = 0
 
                 self.values.append(selected)
-                
-                
+
+
     def showAioPage(self):
         self.AioIcon.setPixmap(load_pixmap('aio_align', 'other'))
         self.displayPage(PAGE_AIO)
-        
-        
+
+
     def endAioPage(self):
         pass
-        
-    
+
+
     def showColorAdjustPage(self, line_id, count=21):
         self.ColorAdjustComboBox.clear()
         self.ColorAdjustIcon.setPixmap(load_pixmap('color_adj', 'other'))
         self.ColorAdjustLabel.setText(self.__tr("Line %1:").arg(line_id))
-        
+
         for x in range(count):
             self.ColorAdjustComboBox.addItem(QString("%1%2").arg(line_id).arg(x+1))
-        
+
         self.displayPage(PAGE_COLOR_ADJ)
-        
-        
+
+
     def endColorAdjustPage(self, line_id):
         v = int(str(self.ColorAdjustComboBox.currentText())[1:])
 
         if line_id == 'F':
             self.f = v
             log.debug("F=%d" % v)
-        
+
         elif line_id == 'G':
             self.g = v
             log.debug("G=%d" % v)
-            
-            
+
+
+    def showFrontPanelPage(self):
+        self.BackButton.setEnabled(False)
+        self.setAlignButton(BUTTON_FINISH)
+        self.displayPage(PAGE_FRONT_PANEL)
+        
+        
+    def endFronPanelPage(self):
+        pass
 
     #
-    #  ALIGN-TYPE SPECIFIC 
+    #  ALIGN-TYPE SPECIFIC
     #
 
     def checkType2PenConfig(self):
@@ -607,13 +623,13 @@ class AlignDialog(QDialog, Ui_Dialog):
         self.real_align_type = self.align_type
         self.align_type = ALIGN_TYPE_XBOW_OFFSET + self.dev.pen_config
         self.seq_index = -1
-    
-    
+
+
     def setXBowValues(self):
         if self.real_align_type ==  ALIGN_TYPE_LIDIL_0_3_8:
             maint.alignType4Phase2(self.dev, self.zca, self.b, self.c, self.d, self.e)
             maint.alignType4Phase3(self.dev)
-            
+
         elif self.real_align_type == ALIGN_TYPE_LIDIL_0_4_3:
             maint.alignType5Phase2(self.dev, self.zca, self.b, self.c, self.d, self.e, self.f, self.g)
             maint.alignType5Phase3(self.dev)
@@ -621,11 +637,11 @@ class AlignDialog(QDialog, Ui_Dialog):
         elif self.real_align_type == ALIGN_TYPE_LIDIL_VIP:
             maint.alignType7Phase2(self.dev, self.zca, self.b, self.c, self.d, self.e, self.f, self.g)
             maint.alignType7Phase3(self.dev)
-            
-            
+
+
     #
     # Misc
-    # 
+    #
 
     def displayPage(self, page):
         self.updateStepText(self.step)

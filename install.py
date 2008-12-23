@@ -51,11 +51,14 @@ USAGE = [(__doc__, "", "name", True),
          utils.USAGE_HELP,
          utils.USAGE_SPACE,
          utils.USAGE_SPACE,
-         ("[OPTIONS] (FOR TESTING ONLY)", "", "header", False),
+         ("[OPTIONS] (FOR TESTING ONLY/ADVANCED)", "", "header", False),
          ("Force install of all dependencies:", "-x", "option", False),
          ("Force unknown distro mode:", "-d", "option", False),
          ("Force installation of Qt4 support:", "--qt4 (same as --enable=qt4)", "option", False),
-         ("Force configure enable/disable flag:", "--enable=<flag> or --disable=<flag>, where <flag> is 'fax-build', 'qt4', pp-build', etc. See ./configure --help for more info.", "option", False),
+         ("Force disable Qt4 support:", "--no-qt4 (same as --disable=qt4", "option", False),
+         ("Force installation of Qt3 support:", "--qt3 (same as --enable=qt3)", "option", False),
+         ("Force disable Qt3 support:", "--no-qt3 (same as --disable=qt3", "option", False),
+         ("Force configure enable/disable flag:", "--enable=<flag> or --disable=<flag>, where <flag> is 'fax-build', 'qt4', 'pp-build', etc. See ./configure --help for more info.", "option", False),
         ]
 
 def usage(typ='text'):
@@ -83,8 +86,9 @@ disable = []
 try:
     opts, args = getopt.getopt(sys.argv[1:], 'hl:giatxdq:nr:b',
         ['help', 'help-rest', 'help-man', 'help-desc', 'gui', 'lang=',
-        'logging=', 'interactive', 'auto', 'text', 'qt4',
-        'network', 'retries=', 'enable=', 'disable='])
+        'logging=', 'interactive', 'auto', 'text', 'qt4', 'qt3',
+        'network', 'retries=', 'enable=', 'disable=',
+        'no-qt3', 'no-qt4'])
 
 except getopt.GetoptError, e:
     log.error(e.msg)
@@ -149,6 +153,27 @@ for o, a in opts:
     elif o == '--qt4':
         if 'qt4' not in enable and 'qt4' not in disable:
             enable.append('qt4')
+        else:
+            log.error("Duplicate configuration flag: %s" % a)
+            sys.exit(1)
+
+    elif o == '--no-qt4':
+        if 'qt4' not in disable and 'qt4' not in enable:
+            disable.append('qt4')
+        else:
+            log.error("Duplicate configuration flag: %s" % a)
+            sys.exit(1)
+
+    elif o == '--qt3':
+        if 'qt3' not in enable and 'qt3' not in disable:
+            enable.append('qt3')
+        else:
+            log.error("Duplicate configuration flag: %s" % a)
+            sys.exit(1)
+
+    elif o == '--no-qt3':
+        if 'qt3' not in disable and 'qt3' not in enable:
+            disable.append('qt3')
         else:
             log.error("Duplicate configuration flag: %s" % a)
             sys.exit(1)

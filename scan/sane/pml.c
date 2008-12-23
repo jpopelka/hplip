@@ -765,10 +765,10 @@ int __attribute__ ((visibility ("hidden"))) pml_start(HPAIO_RECORD *hpaio)
       goto bugout; 
 
    /* Read SOP record and set image pipeline input traits. */
-   traits.iPixelsPerRow = letoh16(ps->BlackPixelsPerRow);
-   traits.iBitsPerPixel = letoh16(ps->BlackBitsPerPixel);
-   traits.lHorizDPI = letoh16(ps->BlackHorzDPI);
-   traits.lVertDPI = letoh16(ps->BlackVertDPI);
+   traits.iPixelsPerRow = le16toh(ps->BlackPixelsPerRow);
+   traits.iBitsPerPixel = le16toh(ps->BlackBitsPerPixel);
+   traits.lHorizDPI = le16toh(ps->BlackHorzDPI);
+   traits.lVertDPI = le16toh(ps->BlackVertDPI);
 
    /* Set up image-processing pipeline. */
    switch(ps->Code)
@@ -925,7 +925,7 @@ int __attribute__ ((visibility ("hidden"))) pml_read(HPAIO_RECORD *hpaio, SANE_B
       if (pd->ID == ID_RASTER_DATA)
       {
          /* Raster Record */
-         hpaio->RecordSize = letoh16(pd->Size);
+         hpaio->RecordSize = le16toh(pd->Size);
          hpaio->RecordIndex = 0;
       }
       else if (pd->ID == ID_END_PAGE)

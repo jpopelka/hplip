@@ -21,10 +21,12 @@
 
 # StdLib
 import operator
+import struct
+import Queue
 
 # Local
 from base.g import *
-from base import device, utils
+from base import device, utils, pml
 from prnt import cups
 from base.codes import *
 from ui_utils import *
@@ -48,65 +50,84 @@ PAGE_RECIPIENTS = 3
 PAGE_SEND_FAX = 4
 PAGE_MAX = 4
 
+STATUS_INFORMATION = 0
+STATUS_WARNING = 1
+STATUS_ERROR = 2
+
+MIME_TYPE_COVERPAGE = "application/hplip-fax-coverpage"
+
+fax_enabled = prop.fax_build
+
+if fax_enabled:
+    try:
+        from fax import fax
+    except ImportError:
+        # This can fail on Python < 2.3 due to the datetime module
+        # or if fax was diabled during the build
+        log.warn("Fax send disabled - Python 2.3+ required.")
+        fax_enabled = False
+
+
+coverpages_enabled = False
+if fax_enabled:
+    try:
+        import reportlab
+        ver = reportlab.Version
+        try:
+            ver_f = float(ver)
+        except ValueError:
+            ver_f = 0.0
+
+        if ver_f >= 2.0:
+            coverpages_enabled = True
+        else:
+            log.warn("Pre-2.0 version of Reportlab installed. Fax coverpages disabled.")
+
+    except ImportError:
+        log.warn("Reportlab not installed. Fax coverpages disabled.")
+
+
+if not coverpages_enabled:
+    log.warn("Please install version 2.0+ of Reportlab for coverpage support.")
+
+if fax_enabled and coverpages_enabled:
+    from fax import coverpages
+    from fabwindow import FABWindow
+
+
 
 
 class SendFaxDialog(QDialog, Ui_Dialog):
-    def __init__(self, parent, device_uri, args=None):
+    def __init__(self, parent, printer_name, device_uri=None, args=None):
         QDialog.__init__(self, parent)
         self.setupUi(self)
 
-        self.device_uri = device_uri
-        self.printer_name = None
+        self.printer_name = printer_name
+        if device_uri is not None:
+            self.device_uri = device_uri
+        else:
+            self.device_uri = device.getDeviceURIByPrinterName(self.printer_name)
+
+        self.args = args
+        self.dev = None
+
+        self.dbus_avail, self.service, session_bus = device.init_dbus()
+
+        self.CheckTimer = None
+        self.lock_file = None
         self.file_list = []
-        
-        if args is not None:
-            for a in args:
-                print a
-
-        self.allowable_mime_types = cups.getAllowableMIMETypes()
-        self.allowable_mime_types.append("application/x-python")
-
-        log.debug(self.allowable_mime_types)
-
-        self.MIME_TYPES_DESC = \
-        {
-            "application/pdf" : (self.__tr("PDF Document"), '.pdf'),
-            "application/postscript" : (self.__tr("Postscript Document"), '.ps'),
-            "application/vnd.hp-HPGL" : (self.__tr("HP Graphics Language File"), '.hgl, .hpg, .plt, .prn'),
-            "application/x-cshell" : (self.__tr("C Shell Script"), '.csh, .sh'),
-            "application/x-csource" : (self.__tr("C Source Code"), '.c'),
-            "text/cpp": (self.__tr("C++ Source Code"), '.cpp, .cxx'),
-            "application/x-perl" : (self.__tr("Perl Script"), '.pl'),
-            "application/x-python" : (self.__tr("Python Program"), '.py'),
-            "application/x-shell" : (self.__tr("Shell Script"), '.sh'),
-            "text/plain" : (self.__tr("Plain Text"), '.txt, .log, etc'),
-            "text/html" : (self.__tr("HTML Dcoument"), '.htm, .html'),
-            "image/gif" : (self.__tr("GIF Image"), '.gif'),
-            "image/png" : (self.__tr("PNG Image"), '.png'),
-            "image/jpeg" : (self.__tr("JPEG Image"), '.jpg, .jpeg'),
-            "image/tiff" : (self.__tr("TIFF Image"), '.tif, .tiff'),
-            "image/x-bitmap" : (self.__tr("Bitmap (BMP) Image"), '.bmp'),
-            "image/x-bmp" : (self.__tr("Bitmap (BMP) Image"), '.bmp'),
-            "image/x-photocd" : (self.__tr("Photo CD Image"), '.pcd'),
-            "image/x-portable-anymap" : (self.__tr("Portable Image (PNM)"), '.pnm'),
-            "image/x-portable-bitmap" : (self.__tr("Portable B&W Image (PBM)"), '.pbm'),
-            "image/x-portable-graymap" : (self.__tr("Portable Grayscale Image (PGM)"), '.pgm'),
-            "image/x-portable-pixmap" : (self.__tr("Portable Color Image (PPM)"), '.ppm'),
-            "image/x-sgi-rgb" : (self.__tr("SGI RGB"), '.rgb'),
-            "image/x-xbitmap" : (self.__tr("X11 Bitmap (XBM)"), '.xbm'),
-            "image/x-xpixmap" : (self.__tr("X11 Pixmap (XPM)"), '.xpm'),
-            "image/x-sun-raster" : (self.__tr("Sun Raster Format"), '.ras'),
-        }
-
-        # User settings
-        self.user_settings = UserSettings()
-        self.user_settings.load()
-        self.user_settings.debug()
-        #self.cur_printer = self.user_settings.last_used_printer
+        self.recipient_list = []
 
         self.initUi()
 
-        QTimer.singleShot(0, self.updateSelectFaxPage)
+        if self.printer_name:
+            if coverpages_enabled:
+                QTimer.singleShot(0, self.displayCoverpagePage)
+            else:
+                self.lockAndLoad()
+                QTimer.singleShot(0, self.displayFilesPage)
+        else:
+            QTimer.singleShot(0, self.displaySelectFaxPage)
 
 
     def initUi(self):
@@ -123,9 +144,22 @@ class SendFaxDialog(QDialog, Ui_Dialog):
 
         # Application icon
         self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
-        
-        self.StackedWidget.setCurrentIndex(0)
 
+
+    def lockAndLoad(self):
+        # Start up check timer here, since the fax name is now known
+        if self.CheckTimer is None:
+            self.CheckTimer = QTimer(self)
+            self.connect(self.CheckTimer, SIGNAL("timeout()"), self.CheckTimer_timeout)
+            self.CheckTimer.start(3000)
+
+        # Lock the app
+        if self.printer_name and self.lock_file is None:
+            ok, self.lock_file = utils.lock_app('hp-sendfax-%s' % self.printer_name, True)
+
+            if not ok:
+                log.error("hp-sendfax is already running for fax %s" % self.printer_name)
+                # TODO:
 
     #
     # Select Fax Page
@@ -138,21 +172,35 @@ class SendFaxDialog(QDialog, Ui_Dialog):
         self.connect(self.FaxOptionsButton, SIGNAL("clicked()"), self.FaxOptionsButton_clicked)
         self.connect(self.FaxSetupButton, SIGNAL("clicked()"), self.FaxSetupButton_clicked)
 
+        if self.printer_name is not None:
+            self.FaxComboBox.setInitialPrinter(self.printer_name)
 
-    def updateSelectFaxPage(self):
+
+    def displaySelectFaxPage(self):
         self.BackButton.setEnabled(False)
         self.updateStepText(PAGE_SELECT_FAX)
+
+        if not fax_enabled:
+            FailureUI(self, self.__tr("<b>PC send fax support is not enabled.</b><p>Re-install HPLIP with fax support or use the device front panel to send a fax.</p><p>Click <i>OK</i> to exit.</p>"))
+            self.close()
+            return
+
+        if not self.dbus_avail:
+            FailureUI(self, self.__tr("<b>PC send fax support requires DBus and hp-systray.</b><p>Please check the HPLIP installation for proper installation of DBus and hp-systray support.</p><p>Click <i>OK</i> to exit.</p>"))
+            self.close()
+            return
+
         self.FaxComboBox.updateUi()
 
 
     def FaxComboBox_currentChanged(self, device_uri, printer_name):
-        print device_uri, printer_name
         self.printer_name = printer_name
         self.device_uri = device_uri
 
 
     def FaxComboBox_noPrinters(self):
-        FailureUI(self, self.__tr("<b>No fax installed fax devices found.</b><p>Please setup a fax device and try again.</p><p>Click <i>OK</i> to exit.</p>"))
+        FailureUI(self, self
+                  .__tr("<b>No installed fax devices found.</b><p>Please setup a fax device and try again (try using 'hp-setup').</p><p>Click <i>OK</i> to exit.</p>"))
         self.close()
 
 
@@ -170,34 +218,140 @@ class SendFaxDialog(QDialog, Ui_Dialog):
     #
 
     def initCoverpagePage(self):
-        pass
+        self.cover_page_message = ''
+        self.cover_page_re = ''
+        self.preserve_formatting = False
+        self.cover_page_func, cover_page_png = None, None
+        self.last_job_id = 0
+        self.busy = False
+        self.PrevCoverPageButton.setIcon(QIcon(load_pixmap("prev", "16x16")))
+        self.NextCoverPageButton.setIcon(QIcon(load_pixmap("next", "16x16")))
 
-    def updateCoverpagePage(self):
-        QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
-        try:
-            self.updateStepText(PAGE_COVERPAGE)
-            self.BackButton.setEnabled(False)
-        finally:
-            QApplication.restoreOverrideCursor()
+        self.cover_page_list = coverpages.COVERPAGES.keys()
+        self.cover_page_index = self.cover_page_list.index("basic")
+        self.cover_page_max = len(self.cover_page_list)-1
+        self.cover_page_name = self.cover_page_list[self.cover_page_index]
+
+        self.connect(self.PrevCoverPageButton, SIGNAL("clicked()"), self.PrevCoverPageButton_clicked)
+        self.connect(self.NextCoverPageButton, SIGNAL("clicked()"), self.NextCoverPageButton_clicked)
+        self.connect(self.CoverPageGroupBox, SIGNAL("toggled(bool)"), self.CoverPageGroupBox_toggled)
+        self.connect(self.MessageEdit, SIGNAL("textChanged()"), self.MessageEdit_textChanged)
+        self.connect(self.RegardingEdit, SIGNAL("textChanged(const QString &)"), self.RegardingEdit_textChanged)
+        self.connect(self.PreserveFormattingCheckBox, SIGNAL("toggled(bool)"),
+                    self.PreserveFormattingCheckBox_toggled)
 
 
-    # 
+    def displayCoverpagePage(self):
+        self.BackButton.setEnabled(False) # No going back once printer is chosen
+
+        self.lockAndLoad()
+
+        self.updateCoverpageButtons()
+        self.displayCoverpagePreview()
+        self.displayPage(PAGE_COVERPAGE)
+
+
+    def MessageEdit_textChanged(self):
+        self.cover_page_message = unicode(self.MessageEdit.toPlainText())
+
+
+    def RegardingEdit_textChanged(self, t):
+        self.cover_page_re = unicode(t)
+
+
+    def PreserveFormattingCheckBox_toggled(self, b):
+        self.preserve_formatting = b
+
+
+    def PrevCoverPageButton_clicked(self):
+        self.cover_page_index -= 1
+        if self.cover_page_index < 0:
+            self.cover_page_index = 0
+        else:
+            self.updateCoverpageButtons()
+            self.displayCoverpagePage()
+
+
+    def NextCoverPageButton_clicked(self):
+        self.cover_page_index += 1
+        if self.cover_page_index > self.cover_page_max:
+            self.cover_page_index = self.cover_page_max
+        else:
+            self.updateCoverpageButtons()
+            self.displayCoverpagePage()
+
+
+    def displayCoverpagePreview(self):
+        self.cover_page_name = self.cover_page_list[self.cover_page_index]
+        self.cover_page_func = coverpages.COVERPAGES[self.cover_page_name][0]
+        self.CoverPageName.setText(QString('<i>"%1"</i>').arg(self.cover_page_name))
+        self.CoverPagePreview.setPixmap(load_pixmap(coverpages.COVERPAGES[self.cover_page_name][1], 'other'))
+
+        if self.CoverPageGroupBox.isChecked():
+            self.addCoverPage()
+        else:
+            self.removeCoverPage()
+
+
+    def updateCoverpageButtons(self):
+        enabled = self.CoverPageGroupBox.isChecked()
+        self.PrevCoverPageButton.setEnabled(enabled and self.cover_page_index != 0)
+        self.NextCoverPageButton.setEnabled(enabled and self.cover_page_index != self.cover_page_max)
+
+
+    def CoverPageGroupBox_toggled(self, b):
+        self.updateCoverpageButtons()
+        if b:
+            self.addCoverPage()
+        else:
+            self.removeCoverPage()
+
+
+    def addCoverPage(self):
+        self.removeCoverPage()
+        self.FilesTable.addFile(self.cover_page_name, MIME_TYPE_COVERPAGE,
+                                self.__tr('HP Fax Coverpage: "%1"').arg(self.cover_page_name),
+                                self.__tr("Cover Page"), 1)
+
+
+    def removeCoverPage(self):
+        self.FilesTable.removeFileByMIMEType(MIME_TYPE_COVERPAGE)
+
+
+    def toggleCoverPage(self, b):
+        self.disconnect(self.CoverPageGroupBox, SIGNAL("toggled(bool)"), self.CoverPageGroupBox_toggled)
+        self.CoverPageGroupBox.setChecked(b)
+        self.connect(self.CoverPageGroupBox, SIGNAL("toggled(bool)"), self.CoverPageGroupBox_toggled)
+
+
+    #
     # Files Page
     #
 
     def initFilesPage(self):
         self.FilesTable.setType(FILETABLE_TYPE_FAX)
+        self.FilesTable.setFaxCallback(self.FileTable_callback)
         self.connect(self.FilesTable, SIGNAL("isEmpty"), self.FilesTable_isEmpty)
         self.connect(self.FilesTable, SIGNAL("isNotEmpty"), self.FilesTable_isNotEmpty)
+        self.connect(self.FilesTable, SIGNAL("fileListChanged"), self.FilesTable_fileListChanged)
 
 
-    def updateFilesPage(self):
+    def displayFilesPage(self):
         self.FilesTable.updateUi(False)
+
+        if self.args is not None:
+            for a in self.args:
+                f = os.path.abspath(os.path.expanduser(a))
+                if os.path.exists(f) and os.access(f, os.R_OK):
+                    self.renderFile(f)
+
+            self.args = None
 
         self.restoreNextButton()
         self.NextButton.setEnabled(self.FilesTable.isNotEmpty())
         self.BackButton.setEnabled(True)
-        self.updateStepText(PAGE_FILES)
+        self.FilesPageNote.setText(self.__tr("Note: You may also add files to the fax by printing from any application to the '%1' fax printer.").arg(self.printer_name))
+        self.displayPage(PAGE_FILES)
 
 
     def FilesTable_isEmpty(self):
@@ -208,21 +362,332 @@ class SendFaxDialog(QDialog, Ui_Dialog):
         self.NextButton.setEnabled(True)
 
 
+    def FilesTable_fileListChanged(self):
+        self.file_list = self.FilesTable.file_list
+        self.toggleCoverPage(self.FilesTable.isMIMETypeInList(MIME_TYPE_COVERPAGE))
+
+
     #
     # Recipients Page
     #
 
     def initRecipientsPage(self):
-        pass
+        # setup validators
+        self.QuickAddFaxEdit.setValidator(PhoneNumValidator(self.QuickAddFaxEdit))
+        #self.QuickAddNameEdit.setValidator(AddressBookNameValidator(self.db, self.QuickAddNameEdit))
 
-    def updateRecipientsPage(self):
-        QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
+        # Fax address book database
+        self.db = fax.FaxAddressBook()
+
+        # Fax address book window
+        self.fab = FABWindow(self)
+        self.connect(self.fab, SIGNAL("databaseChanged"), self.FABWindow_databaseChanged)
+
+        # connect signals
+        self.connect(self.QuickAddFaxEdit, SIGNAL("textChanged(const QString &)"),
+                    self.QuickAddFaxEdit_textChanged)
+        self.connect(self.QuickAddNameEdit, SIGNAL("textChanged(const QString &)"),
+                    self.QuickAddNameEdit_textChanged)
+        self.connect(self.QuickAddButton, SIGNAL("clicked()"), self.QuickAddButton_clicked)
+        self.connect(self.FABButton, SIGNAL("clicked()"), self.FABButton_clicked)
+        self.connect(self.AddIndividualButton, SIGNAL("clicked()"), self.AddIndividualButton_clicked)
+        self.connect(self.AddGroupButton, SIGNAL("clicked()"), self.AddGroupButton_clicked)
+        self.connect(self.RemoveRecipientButton, SIGNAL("clicked()"), self.RemoveRecipientButton_clicked)
+        self.connect(self.MoveRecipientUpButton, SIGNAL("clicked()"), self.MoveRecipientUpButton_clicked)
+        self.connect(self.MoveRecipientDownButton, SIGNAL("clicked()"), self.MoveRecipientDownButton_clicked)
+        self.connect(self.RecipientsTable, SIGNAL("itemSelectionChanged()"),
+                    self.RecipientsTable_itemSelectionChanged)
+        self.connect(self.RecipientsTable, SIGNAL("itemDoubleClicked(QTableWidgetItem *)"),
+                    self.RecipientsTable_itemDoubleClicked)
+
+        # setup icons
+        self.FABButton.setIcon(QIcon(load_pixmap("fab", "16x16")))
+        self.AddIndividualButton.setIcon(QIcon(load_pixmap("add_user", "16x16")))
+        self.AddGroupButton.setIcon(QIcon(load_pixmap("add_users", "16x16")))
+        self.RemoveRecipientButton.setIcon(QIcon(load_pixmap("remove_user", "16x16")))
+        self.MoveRecipientUpButton.setIcon(QIcon(load_pixmap("up_user", "16x16")))
+        self.MoveRecipientDownButton.setIcon(QIcon(load_pixmap("down_user", "16x16")))
+        self.QuickAddButton.setIcon(QIcon(load_pixmap("add_user_quick", "16x16")))
+
+        # setup initial state
+        self.QuickAddButton.setEnabled(False)
+
+        self.recipient_headers = [self.__tr("Name"), self.__tr("Fax number"), self.__tr("Notes")]
+
+
+    def FABWindow_databaseChanged(self, action, s1='', s2=''):
+        self.db.load()
+
+        if action in (FAB_NAME_ADD, FAB_GROUP_ADD, FAB_GROUP_RENAME,
+                      FAB_GROUP_REMOVE, FAB_GROUP_MEMBERSHIP_CHANGED):
+
+            log.debug("Fax address book has changed")
+            self.updateAddressBook()
+
+        elif action == FAB_NAME_REMOVE:
+            log.debug("Fax address book has changed: '%s' removed" % s1)
+            all_names = self.db.get_all_names()
+            self.recipient_list = filter(lambda x: x in self.recipient_list, all_names)
+            self.updateAddressBook()
+            self.updateRecipientTable()
+
+        elif action == FAB_NAME_RENAME:
+            log.debug("Fax address book has changed: '%s' renamed to '%s'" % (s1, s2))
+            for i, n in enumerate(self.recipient_list):
+                if n == s1:
+                    self.recipient_list[i] = s2
+                    self.updateRecipientTable()
+                    break
+            else:
+                self.updateAddressBook()
+
+        elif action == FAB_NAME_DETAILS_CHANGED:
+            log.debug("Fax address book has changed: '%s' details changed" % s1)
+            self.updateRecipientTable()
+
+
+    def displayRecipientsPage(self):
+        self.updateAddressBook()
+        self.updateRecipientTable()
+        self.enableQuickAddButton()
+        self.displayPage(PAGE_RECIPIENTS)
+        self.restoreNextButton()
+
+
+    def updateAddressBook(self):
+        names = [n for n in self.db.get_all_names() if not n.startswith('__')]
+        groups = self.db.get_all_groups()
+        self.AddIndividualComboBox.clear()
+        self.AddGroupComboBox.clear()
+
+        i = 0
+        names.sort()
+        for n in names:
+            if n not in self.recipient_list:
+                self.AddIndividualComboBox.addItem(n)
+                i += 1
+
+        if i:
+            self.AddIndividualButton.setEnabled(True)
+            self.AddIndividualComboBox.setEnabled(True)
+            #self.AddIndividualButton.setIcon(QIcon(load_pixmap("add_user", "16x16")))
+
+        else:
+            self.AddIndividualButton.setEnabled(False)
+            self.AddIndividualComboBox.setEnabled(False)
+            #self.AddIndividualButton.setIcon(QIcon(load_pixmap("add_user-disabled", "16x16")))
+
+        i = 0
+        groups.sort()
+        for g in groups:
+            for n in self.db.group_members(g):
+                if not n.startswith('__') and n not in self.recipient_list:
+                    self.AddGroupComboBox.addItem(g)
+                    i += 1
+                    break
+
+        if i:
+            self.AddGroupButton.setEnabled(True)
+            self.AddGroupComboBox.setEnabled(True)
+            #self.AddGroupButton.setIcon(QIcon(load_pixmap("add_users", "16x16")))
+
+        else:
+            self.AddGroupButton.setEnabled(False)
+            self.AddGroupComboBox.setEnabled(False)
+            #self.AddGroupButton.setIcon(QIcon(load_pixmap("add_users-disabled", "16x16")))
+
+
+    def updateRecipientTable(self):
         try:
-            self.updateStepText(PAGE_RECIPIENTS)
-            self.restoreNextButton()
+            prev = self.getCurrentRecipient()
+        except (TypeError, AttributeError):
+            prev = None
 
-        finally:
-            QApplication.restoreOverrideCursor()
+        self.RecipientsTable.clear()
+        self.RecipientsTable.setRowCount(0)
+        self.RecipientsTable.setColumnCount(0)
+
+        if self.recipient_list:
+            num_recipients = len(self.recipient_list)
+
+            self.RecipientsTable.setColumnCount(len(self.recipient_headers))
+            self.RecipientsTable.setHorizontalHeaderLabels(self.recipient_headers)
+            self.RecipientsTable.setRowCount(num_recipients)
+            flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
+
+            j = None
+            for row, n in enumerate(self.recipient_list):
+                i = QTableWidgetItem(QString(n))
+                i.setFlags(flags)
+                self.RecipientsTable.setItem(row, 0, i)
+                if prev is not None and n == prev:
+                    j = i
+
+                k = self.db.get(n)
+                if not k:
+                    continue
+
+                i = QTableWidgetItem(QString(k['fax']))
+                i.setFlags(flags)
+                self.RecipientsTable.setItem(row, 1, i)
+
+                i = QTableWidgetItem(QString(k['notes']))
+                i.setFlags(flags)
+                self.RecipientsTable.setItem(row, 2, i)
+
+            self.RecipientsTable.resizeColumnsToContents()
+            self.RecipientsTable.resizeRowsToContents()
+
+            if j is not None:
+                self.RecipientsTable.setCurrentItem(j)
+            else:
+                self.RecipientsTable.setCurrentItem(self.RecipientsTable.item(0, 0))
+
+            self.NextButton.setEnabled(True)
+
+        else:
+            self.enableRecipientListButtons()
+            self.NextButton.setEnabled(False)
+
+
+    def RecipientsTable_itemSelectionChanged(self):
+        current_row = self.RecipientsTable.currentRow()
+        num_recipients = len(self.recipient_list)
+        self.enableRecipientListButtons(num_recipients > 0,  # remove
+                                            num_recipients > 1 and current_row > 0, # up
+                                            num_recipients > 1 and current_row < (num_recipients-1)) # down
+
+
+    def enableRecipientListButtons(self, enable_remove=False, enable_up_move=False, enable_down_move=False):
+        if enable_remove:
+            self.RemoveRecipientButton.setEnabled(True)
+            #self.RemoveRecipientButton.setIcon(QIcon(load_pixmap("remove_user", "16x16")))
+        else:
+            self.RemoveRecipientButton.setEnabled(False)
+            #self.RemoveRecipientButton.setIcon(QIcon(load_pixmap("remove_user-disabled", "16x16")))
+
+        if enable_up_move:
+            self.MoveRecipientUpButton.setEnabled(True)
+            #self.MoveRecipientUpButton.setIcon(QIcon(load_pixmap("up_user", "16x16")))
+        else:
+            self.MoveRecipientUpButton.setEnabled(False)
+            #self.MoveRecipientUpButton.setIcon(QIcon(load_pixmap("up_user-disabled", "16x16")))
+
+        if enable_down_move:
+            self.MoveRecipientDownButton.setEnabled(True)
+            #self.MoveRecipientDownButton.setIcon(QIcon(load_pixmap("down_user", "16x16")))
+        else:
+            self.MoveRecipientDownButton.setEnabled(False)
+            #self.MoveRecipientDownButton.setIcon(QIcon(load_pixmap("down_user-disabled", "16x16")))
+
+
+    def QuickAddFaxEdit_textChanged(self, fax):
+        self.enableQuickAddButton(None, unicode(fax))
+
+
+    def QuickAddNameEdit_textChanged(self, name):
+        self.enableQuickAddButton(unicode(name))
+
+
+    def enableQuickAddButton(self, name=None, fax=None):
+        if name is None:
+            name = unicode(self.QuickAddNameEdit.text())
+        if fax is None:
+            fax = unicode(self.QuickAddFaxEdit.text())
+
+        existing_name = False
+        if name:
+            existing_name = name in self.db.get_all_names()
+
+        if existing_name:
+            self.QuickAddNameEdit.setStyleSheet("background-color: yellow")
+        else:
+            self.QuickAddNameEdit.setStyleSheet("")
+
+        if name and not existing_name and fax:
+            self.QuickAddButton.setEnabled(True)
+            #self.QuickAddButton.setIcon(QIcon(load_pixmap("add_user_quick", "16x16")))
+        else:
+            self.QuickAddButton.setEnabled(False)
+            #self.QuickAddButton.setIcon(QIcon(load_pixmap("add_user_quick-disabled", "16x16")))
+
+
+    def QuickAddButton_clicked(self):
+        name = unicode(self.QuickAddNameEdit.text())
+        fax = unicode(self.QuickAddFaxEdit.text())
+        self.fab.addName(name, fax)
+        self.addRecipient(name)
+        self.updateRecipientTable()
+        self.QuickAddNameEdit.clear()
+        self.QuickAddFaxEdit.clear()
+        self.enableQuickAddButton('', '')
+
+
+    def AddIndividualButton_clicked(self):
+        self.addRecipient(unicode(self.AddIndividualComboBox.currentText()))
+
+
+    def AddGroupButton_clicked(self):
+        self.addGroup(unicode(self.AddGroupComboBox.currentText()))
+
+
+    def RemoveRecipientButton_clicked(self):
+        name = self.getCurrentRecipient()
+        temp = self.recipient_list[:]
+        for i, n in enumerate(temp):
+            if name == n:
+                del self.recipient_list[i]
+                self.updateRecipientTable()
+                self.updateAddressBook()
+                break
+
+
+    def MoveRecipientUpButton_clicked(self):
+        utils.list_move_up(self.recipient_list, self.getCurrentRecipient())
+        self.updateRecipientTable()
+
+
+    def MoveRecipientDownButton_clicked(self):
+        utils.list_move_down(self.recipient_list, self.getCurrentRecipient())
+        self.updateRecipientTable()
+
+
+    def getCurrentRecipient(self):
+        item = self.RecipientsTable.item(self.RecipientsTable.currentRow(), 0)
+        if item is not None:
+            return unicode(item.text())
+        else:
+            return u''
+
+
+    def addRecipient(self, name, update=True):
+        if name not in self.recipient_list and not name.startswith('__'):
+            self.recipient_list.append(name)
+            if update:
+                self.updateRecipientTable()
+                self.updateAddressBook()
+
+
+    def addGroup(self, group):
+        for n in self.db.group_members(group):
+            self.addRecipient(n, False)
+
+        self.updateRecipientTable()
+        self.updateAddressBook()
+
+
+    def FABButton_clicked(self):
+        self.fab.show()
+
+
+    def RecipientsTable_itemDoubleClicked(self, item):
+        if item is not None:
+            row, col = item.row(), item.column()
+            if col != 0:
+                item = self.RecipientsTable.item(row, 0)
+
+            self.fab.selectByName(unicode(item.text()))
+            self.fab.show()
 
 
     #
@@ -230,16 +695,20 @@ class SendFaxDialog(QDialog, Ui_Dialog):
     #
 
     def initSendFaxPage(self):
-        pass
+        self.info_icon = QIcon(load_pixmap("info", "16x16"))
+        self.warn_icon = QIcon(load_pixmap("warning", "16x16"))
+        self.error_icon = QIcon(load_pixmap("error", "16x16"))
+        self.busy_icon = QIcon(load_pixmap("busy", "16x16"))
+        self.update_queue = Queue.Queue() # UI updates from send thread
+        self.event_queue = Queue.Queue() # UI events (cancel) to send thread
+        self.send_fax_active = False
 
-    def updateSendFaxPage(self):
-        QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
-        try:
-            self.updateStepText(PAGE_SEND_FAX)
-            self.NextButton.setText(self.__tr("Send Fax"))
 
-        finally:
-            QApplication.restoreOverrideCursor()
+    def displaySendFaxPage(self):
+        self.displayPage(PAGE_SEND_FAX)
+        self.addStatusMessage(self.__tr("Ready to send fax."), self.info_icon)
+        self.NextButton.setText(self.__tr("Send Fax"))
+
 
 
     #
@@ -247,15 +716,251 @@ class SendFaxDialog(QDialog, Ui_Dialog):
     #
 
     def executeSendFax(self):
-        print "fax"
+        self.NextButton.setEnabled(False)
+        self.BackButton.setEnabled(False)
+        self.CheckTimer.stop()
+        self.busy = True
+        phone_num_list = []
+
+        ppd_file = cups.getPPD(self.printer_name)
+
+        if ppd_file is not None and os.path.exists(ppd_file):
+            if file(ppd_file, 'r').read().find('HP Fax') == -1:
+                FailureUI(self, self.__tr("<b>Fax configuration error.</b><p>The CUPS fax queue for '%1' is incorrectly configured.<p>Please make sure that the CUPS fax queue is configured with the 'HPLIP Fax' Model/Driver.").arg(self.printer_name))
+                self.close()
+                return
+
+        beginWaitCursor()
+
+        mq = device.queryModelByURI(self.device_uri)
+
+        self.dev = fax.getFaxDevice(self.device_uri,
+                                   self.printer_name, None,
+                                   mq['fax-type'])
+
+        try:
+            try:
+                self.dev.open()
+            except Error, e:
+                log.warn(e.msg)
+
+            try:
+                self.dev.queryDevice(quick=True)
+            except Error, e:
+                log.error("Query device error (%s)." % e.msg)
+                self.dev.error_state = ERROR_STATE_ERROR
+
+        finally:
+            self.dev.close()
+            endWaitCursor()
+
+        if self.dev.error_state > ERROR_STATE_MAX_OK and \
+            self.dev.error_state not in (ERROR_STATE_LOW_SUPPLIES, ERROR_STATE_LOW_PAPER):
+
+            FailureUI(self, self.__tr("<b>Device is busy or in an error state (code=%1)</b><p>Please wait for the device to become idle or clear the error and try again.").arg(self.cur_device.status_code))
+            self.NextButton.setEnabled(True)
+            return
+
+        # Check to make sure queue in CUPS is idle
+        self.cups_printers = cups.getPrinters()
+        for p in self.cups_printers:
+            if p.name == self.printer_name:
+                if p.state == cups.IPP_PRINTER_STATE_STOPPED:
+                    FailureUI(self, self.__tr("<b>The CUPS queue for '%1' is in a stopped or busy state.</b><p>Please check the queue and try again.").arg(self.printer_name))
+                    self.NextButton.setEnabled(False)
+                    return
+                break
+
+        log.debug("Recipient list:")
+
+        for p in self.recipient_list:
+            entry = self.db.get(p)
+            phone_num_list.append(entry)
+            log.debug("Name=%s Number=%s" % (entry["name"], entry["fax"]))
+
+        log.debug("File list:")
+
+        for f in self.file_list:
+            log.debug(f)
+
+        self.dev.sendEvent(EVENT_START_FAX_JOB, self.printer_name, 0, '')
+
+        if not self.dev.sendFaxes(phone_num_list, self.file_list, self.cover_page_message,
+                                  self.cover_page_re, self.cover_page_func, self.preserve_formatting,
+                                  self.printer_name, self.update_queue, self.event_queue):
+
+            FailureUI(self, self.__tr("<b>Send fax is active.</b><p>Please wait for operation to complete."))
+            self.dev.sendEvent(EVENT_FAX_JOB_FAIL, self.printer_name, 0, '')
+            self.busy = False
+            self.send_fax_active = False
+            #self.NextButton.setEnabled(False)
+            self.setCancelCloseButton()
+            return
+
+        self.send_fax_active = True
+        self.setCancelCloseButton()
+        self.SendFaxTimer = QTimer(self)
+        self.connect(self.SendFaxTimer, SIGNAL('timeout()'), self.SendFaxTimer_timeout)
+        self.SendFaxTimer.start(1000) # 1 sec UI updates
 
 
-    #
-    # Misc    
-    #
+    def setCancelCloseButton(self):
+        if self.send_fax_active:
+            self.CancelButton.setText(self.__tr("Cancel Send"))
+        else:
+            self.CancelButton.setText(self.__tr("Close"))
+
 
     def CancelButton_clicked(self):
-        self.close()
+        if self.send_fax_active:
+            self.addStatusMessage(self.__tr("Cancelling job..."), self.warn_icon)
+            self.event_queue.put((fax.EVENT_FAX_SEND_CANCELED, '', '', ''))
+            self.dev.sendEvent(EVENT_FAX_JOB_CANCELED, self.printer_name, 0, '')
+        else:
+            self.close()
+
+
+    def SendFaxTimer_timeout(self):
+        while self.update_queue.qsize():
+            try:
+                status, page_num, phone_num = self.update_queue.get(0)
+            except Queue.Empty:
+                break
+
+            if status == fax.STATUS_IDLE:
+                self.busy = False
+                self.send_fax_active = False
+                self.setCancelCloseButton()
+                self.SendFaxTimer.stop()
+
+            elif status == fax.STATUS_PROCESSING_FILES:
+                self.addStatusMessage(self.__tr("Processing page %1...").arg(page_num), self.busy_icon)
+
+            elif status == fax.STATUS_DIALING:
+                self.addStatusMessage(self.__tr("Dialing %1...").arg(phone_num), self.busy_icon)
+
+            elif status == fax.STATUS_CONNECTING:
+                self.addStatusMessage(self.__tr("Connecting to %1...").arg(phone_num), self.busy_icon)
+
+            elif status == fax.STATUS_SENDING:
+                self.addStatusMessage(self.__tr("Sending page %1 to %2...").arg(page_num).arg(phone_num),
+                                      self.busy_icon)
+
+            elif status == fax.STATUS_CLEANUP:
+                self.addStatusMessage(self.__tr("Cleaning up..."), self.busy_icon)
+
+            elif status in (fax.STATUS_ERROR, fax.STATUS_BUSY, fax.STATUS_COMPLETED):
+                self.busy = False
+                self.send_fax_active = False
+                self.setCancelCloseButton()
+                self.SendFaxTimer.stop()
+
+                if status  == fax.STATUS_ERROR:
+                    result_code, error_state = self.dev.getPML(pml.OID_FAX_DOWNLOAD_ERROR)
+                    #FailureUI(self, self.__tr("<b>Fax send error (%s).</b><p>" % pml.DN_ERROR_STR.get(error_state, "Unknown error")))
+                    self.addStatusMessage(self.__tr("Fax send error (%s)").arg(pml.DN_ERROR_STR.get(error_state, "Unknown error")), self.error_icon)
+                    self.dev.sendEvent(EVENT_FAX_JOB_FAIL, self.printer_name, 0, '')
+
+                elif status == fax.STATUS_BUSY:
+                    #FailureUI(self, self.__tr("<b>Fax device is busy.</b><p>Please try again later."))
+                    self.addStatusMessage(self.__tr("Fax is busy."), self.error_icon)
+                    self.dev.sendEvent(EVENT_FAX_JOB_FAIL, self.printer_name, 0, '')
+
+                elif status == fax.STATUS_COMPLETED:
+                    self.addStatusMessage(self.__tr("Send fax job complete."), self.info_icon)
+
+                    self.dev.sendEvent(EVENT_END_FAX_JOB, self.printer_name, 0, '')
+
+
+    def addStatusMessage(self, text, icon):
+        log.debug(text)
+        #self.StatusList.addItem(QListWidgetItem(icon, text, self.StatusList))
+        QListWidgetItem(icon, text, self.StatusList)
+
+    #
+    # CheckTimer and Fax Rendering
+    #
+
+    def FileTable_callback(self, f):
+        # Called by FileTable when user adds a file using "Add file..."
+        log.debug("FileTable_callback(%s)" % f)
+        self.renderFile(f)
+
+
+    def renderFile(self, f):
+        self.busy = True
+        beginWaitCursor()
+        try:
+            self.last_job_id = cups.printFile(self.printer_name, f, os.path.basename(f))
+
+        finally:
+            self.busy = False
+            #endWaitCursor()
+            #pass
+
+
+    def CheckTimer_timeout(self):
+        if not self.busy:
+            #log.debug("Checking for incoming faxes...")
+            device_uri, printer_name, event_code, username, job_id, title, timedate, fax_file = \
+                self.service.CheckForWaitingFax(self.device_uri, prop.username, self.last_job_id)
+
+            if fax_file:
+                self.last_job_id = 0
+                log.debug("A new fax has arrived: %s (%d)" % (fax_file, job_id))
+                self.addFileFromJob(fax_file, title)
+
+
+    def addFileFromJob(self, fax_file, title):
+        self.busy = True
+        #beginWaitCursor()
+        try:
+            num_pages, hort_dpi, vert_dpi, page_size, resolution, encoding = \
+                self.getFileInfo(fax_file)
+
+            self.FilesTable.addFile(fax_file, 'application/hplip-fax', 'HPLIP Fax', title, num_pages)
+        finally:
+            self.busy = False
+            endWaitCursor()
+
+
+    def getFileInfo(self, fax_file):
+        f = file(fax_file, 'r')
+        header = f.read(fax.FILE_HEADER_SIZE)
+        f.close()
+
+        if len(header) != fax.FILE_HEADER_SIZE:
+            log.error("Invalid fax file! (truncated header or no data)")
+            return (0, 0, 0, 0, 0, 0)
+
+        mg, version, num_pages, hort_dpi, vert_dpi, page_size, \
+            resolution, encoding, reserved1, reserved2 = \
+            struct.unpack(">8sBIHHBBBII", header[:fax.FILE_HEADER_SIZE])
+
+        log.debug("Magic=%s Ver=%d Pages=%d hDPI=%d vDPI=%d Size=%d Res=%d Enc=%d" %
+                  (mg, version, num_pages, hort_dpi, vert_dpi, page_size, resolution, encoding))
+
+        return (num_pages, hort_dpi, vert_dpi, page_size, resolution, encoding)
+
+
+    #
+    # Misc
+    #
+
+    def closeEvent(self, e):
+        if self.lock_file is not None:
+            utils.unlock(self.lock_file)
+        e.accept()
+
+
+    def displayPage(self, page):
+        self.updateStepText(page)
+        self.StackedWidget.setCurrentIndex(page)
+
+
+#    def CancelButton_clicked(self):
+#        self.close()
+
 
     def BackButton_clicked(self):
         p = self.StackedWidget.currentIndex()
@@ -267,34 +972,34 @@ class SendFaxDialog(QDialog, Ui_Dialog):
 
         elif p == PAGE_FILES:
             self.StackedWidget.setCurrentIndex(PAGE_COVERPAGE)
-            self.updateCoverpagePage()
+            self.displayCoverpagePage()
 
         elif p == PAGE_RECIPIENTS:
             self.StackedWidget.setCurrentIndex(PAGE_FILES)
-            self.updateFilesPage()
+            self.displayFilesPage()
 
         elif p == PAGE_SEND_FAX:
             self.StackedWidget.setCurrentIndex(PAGE_RECIPIENTS)
-            self.updateRecipientsPage()
+            self.displayRecipientsPage()
 
 
     def NextButton_clicked(self):
         p = self.StackedWidget.currentIndex()
         if p == PAGE_SELECT_FAX:
             self.StackedWidget.setCurrentIndex(PAGE_COVERPAGE)
-            self.updateCoverpagePage()
+            self.displayCoverpagePage()
 
         elif p == PAGE_COVERPAGE:
             self.StackedWidget.setCurrentIndex(PAGE_FILES)
-            self.updateFilesPage()
+            self.displayFilesPage()
 
         elif p == PAGE_FILES:
             self.StackedWidget.setCurrentIndex(PAGE_RECIPIENTS)
-            self.updateRecipientsPage()
+            self.displayRecipientsPage()
 
         elif p == PAGE_RECIPIENTS:
             self.StackedWidget.setCurrentIndex(PAGE_SEND_FAX)
-            self.updateSendFaxPage()
+            self.displaySendFaxPage()
 
         elif p == PAGE_SEND_FAX:
             self.executeSendFax()

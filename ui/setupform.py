@@ -79,7 +79,7 @@ class PrinterNameValidator(QValidator):
 
     def validate(self, input, pos):
         input = unicode(input)
-        
+
         if not input:
             return QValidator.Acceptable, pos
 
@@ -102,13 +102,13 @@ class PhoneNumValidator(QValidator):
 
     def validate(self, input, pos):
         input = unicode(input)
-        
+
         if not input:
             return QValidator.Acceptable, pos
-        
+
         elif input[pos-1] not in u'0123456789-(+) ':
             return QValidator.Invalid, pos
-        
+
         else:
             return QValidator.Acceptable, pos
 
@@ -127,13 +127,13 @@ class SetupForm(SetupForm_base):
         else:
             self.bus = bus[0]
             self.start_page = self.ProbedDevicesPage
-            
+
         if not prop.par_build:
             self.parRadioButton.setEnabled(False)
-            
+
         if not prop.net_build:
             self.netRadioButton.setEnabled(False)
-            
+
         if not prop.par_build and not prop.net_build:
             self.bus = 'usb'
             self.start_page = self.ProbedDevicesPage
@@ -146,9 +146,9 @@ class SetupForm(SetupForm_base):
             device_uri, sane_uri, fax_uri = device.makeURI(self.param, self.jd_port)
 
             if device_uri:
-                self.device_uri = device_uri            
+                self.device_uri = device_uri
                 self.start_page = self.PPDPage
-            
+
             else:
                 self.FailureUI(self.__tr("<b>Device not found.</b> <p>Please make sure your printer is properly connected and powered-on."))
 
@@ -187,7 +187,7 @@ class SetupForm(SetupForm_base):
         self.setHelpEnabled(self.PPDPage, False)
         self.setHelpEnabled(self.PrinterNamePage, False)
         self.setHelpEnabled(self.FinishedPage, False)
-        
+
         self.faxNameLineEdit.setMaxLength(50)
         self.printerNameLineEdit.setMaxLength(50)
 
@@ -212,10 +212,10 @@ class SetupForm(SetupForm_base):
         if page is self.ConnectionPage: # start --> ConnectionPage
             pass
 
-        elif page is self.ProbedDevicesPage: 
+        elif page is self.ProbedDevicesPage:
             # ConnectionPage --> ProbedDevicesPage/EnterIPPage/DeviceNotFoundPage
             devices_found = self.updateProbedDevicesPage()
-            
+
 
         elif page is self.PPDPage: # ProbedDevicesPage --> PPDPage
             if self.param:
@@ -223,39 +223,41 @@ class SetupForm(SetupForm_base):
 
                 if device_uri:
                     self.device_uri = device_uri
-            
-            back_end, is_hp, bus, model, serial, dev_file, host, port = device.parseDeviceURI(self.device_uri)
+
+            back_end, is_hp, bus, model, serial, dev_file, host, port = \
+                device.parseDeviceURI(self.device_uri)
+
             self.bus = bus
             self.mq = device.queryModelByURI(self.device_uri)
-                    
+
             norm_model = models.normalizeModelName(model).lower()
-            
-            core = core_install.CoreInstall()                    
+
+            core = core_install.CoreInstall()
             core.set_plugin_version() #sys_cfg.hplip.version)
-            
+
             plugin = self.mq.get('plugin', PLUGIN_NONE)
             if plugin > PLUGIN_NONE and not core.check_for_plugin():
                 # need to install plugin
-                
+
                 from pluginform2 import PluginForm2
-                
+
                 form = PluginForm2()
                 form.exec_loop()
-                
+
                 #plugin_lib = self.mq.get("plugin-library")
                 #fw_download = self.mq.get("fw-download")
-                
+
                 #self.core = core_install.CoreInstall()
                 #if not self.core.check_for_plugin(norm_model):
-                #if 1:    
+                #if 1:
                     #from pluginform import PluginForm
                     #plugin_form = PluginForm(self.core, norm_model, plugin, self.device_uri, plugin_lib, fw_download)
-                    # TODO: 
+                    # TODO:
                 #    ok = plugin_form.exec_loop()
                 #    if not ok:
                 #        self.reject()
                 #        return
-                    
+
                 #else:
                 #    log.debug("Plugin support already installed")
 
@@ -266,7 +268,7 @@ class SetupForm(SetupForm_base):
 
             if fax_import_ok and prop.fax_build and \
                 self.mq.get('fax-type', FAX_TYPE_NONE) not in (FAX_TYPE_NONE, FAX_TYPE_NOT_SUPPORTED):
-                    
+
                 self.faxCheckBox.setEnabled(True)
                 self.faxCheckBox.setEnabled(True)
                 self.faxNameLineEdit.setEnabled(True)
@@ -417,22 +419,22 @@ class SetupForm(SetupForm_base):
 
         if devices is None:
             FILTER_MAP = {'print' : None,
-                          'none' : None, 
-                          'scan': 'scan-type', 
-                          'copy': 'copy-type', 
+                          'none' : None,
+                          'scan': 'scan-type',
+                          'copy': 'copy-type',
                           'pcard': 'pcard-type',
                           'fax': 'fax-type',
                           }
-            
+
             filter_dict = {}
             for f in self.filter:
                 if f in FILTER_MAP:
                     filter_dict[FILTER_MAP[f]] = (operator.gt, 0)
                 else:
                     filter_dict[f] = (operator.gt, 0)
-                    
+
             devices = device.probeDevices([self.bus], self.timeout, self.ttl, filter_dict, self.search)
-            
+
             self.probeHeadingTextLabel.setText(self.__tr("%1 device(s) found on the %1:").arg(len(devices)).arg(io_str))
 
         else:
@@ -541,30 +543,32 @@ class SetupForm(SetupForm_base):
 
         if ppds is None or not ppds:
             ppds = cups.getSystemPPDs()
-            
+
         #print ppds
 
         default_model = utils.xstrip(model.replace('series', '').replace('Series', ''), '_')
-        stripped_model = cups.stripModel(default_model)
+        stripped_model = cups.stripModel2(models.normalizeModelName(model).lower())
 
-        self.ppd_dict = cups.getPPDFile(stripped_model, ppds)
-        log.debug(self.ppd_dict)
+        self.ppd = cups.getPPDFile2(stripped_model, ppds)
+        log.debug(self.ppd)
         self.ppdListView.clear()
 
-        if self.ppd_dict:
-            for ppd in self.ppd_dict:
-                PPDListViewItem(self.ppdListView, ppd, self.ppd_dict[ppd])
+        if self.ppd is not None:
+            #for ppd in self.ppd_dict:
+            PPDListViewItem(self.ppdListView, self.ppd[0], self.ppd[1])
 
-            i = self.ppdListView.firstChild()
-            self.ppdListView.setCurrentItem(i)
-            self.ppdListView.setSelected(i, True)
-            self.ppd_file = self.ppdListView.currentItem().ppd_file
+#            i = self.ppdListView.firstChild()
+#            self.ppdListView.setCurrentItem(i)
+#            self.ppdListView.setSelected(i, True)
+#            self.ppd_file = self.ppdListView.currentItem().ppd_file
+            self.ppd_file = self.ppd[0]
             log.debug(self.ppd_file)
 
         else:
             self.FailureUI(self.__tr('<b>PPD not file found.</b><p>An appropriate PPD file could not be found. Please check your HPLIP install, use <i>Select Other...</i>, or download one from linuxprinting.org.'))
 
         QApplication.restoreOverrideCursor()
+
 
     def ppdListView_currentChanged(self,a0):
         self.ppd_file = a0.ppd_file
@@ -591,7 +595,7 @@ class SetupForm(SetupForm_base):
         self.installed_print_devices = device.getSupportedCUPSDevices(['hp'])
         #self.installed_print_devices = device.getSupportedCUPSDevices('*')
         log.debug(self.installed_print_devices)
-        
+
         self.installed_queues = [p.name for p in cups.getPrinters()]
 
         back_end, is_hp, bus, model, serial, dev_file, host, port = device.parseDeviceURI(self.device_uri)
@@ -617,7 +621,7 @@ class SetupForm(SetupForm_base):
         self.defaultPrinterNamePushButton.setEnabled(False)
         self.printer_name = printer_name
 
-        
+
     def setEditErrors(self):
         if self.printer_name_ok:
             self.printerNameLineEdit.setPaletteBackgroundColor(self.bg)
@@ -627,11 +631,11 @@ class SetupForm(SetupForm_base):
                 self.setNextEnabled(self.PrinterNamePage, True)
 
             QToolTip.remove(self.printerNameLineEdit)
-        
+
         else:
             self.printerNameLineEdit.setPaletteBackgroundColor(QColor(0xff, 0x99, 0x99))
             self.setNextEnabled(self.PrinterNamePage, False)
-            
+
         if self.fax_name_ok:
             self.fax_name_ok = True
             self.faxNameLineEdit.setPaletteBackgroundColor(self.bg)
@@ -640,22 +644,22 @@ class SetupForm(SetupForm_base):
                 self.setNextEnabled(self.PrinterNamePage, True)
 
             QToolTip.remove(self.faxNameLineEdit)
-        
+
         else:
             self.faxNameLineEdit.setPaletteBackgroundColor(QColor(0xff, 0x99, 0x99))
             self.setNextEnabled(self.PrinterNamePage, False)
-    
-    
+
+
     def printerNameLineEdit_textChanged(self,a0):
         self.printer_name = unicode(a0)
         self.defaultPrinterNamePushButton.setEnabled(True)
-        
+
         self.printer_name_ok = True
-        
+
         if not self.printer_name:
             QToolTip.add(self.printerNameLineEdit, self.__tr('You must enter a name for the printer.'))
             self.printer_name_ok = False
-        
+
         elif self.fax_name == self.printer_name:
             s = self.__tr('The printer name and fax name must be different. Please choose different names.')
             QToolTip.add(self.faxNameLineEdit, s)
@@ -663,20 +667,20 @@ class SetupForm(SetupForm_base):
             self.fax_name_ok = False
             self.printer_name_ok = False
             self.printer_fax_names_same = True
-        
+
         elif self.printer_name in self.installed_queues:
-            QToolTip.add(self.printerNameLineEdit, 
+            QToolTip.add(self.printerNameLineEdit,
                 self.__tr('A printer already exists with this name. Please choose a different name.'))
             self.printer_name_ok = False
-            
+
         elif self.printer_fax_names_same:
             if self.fax_name != self.printer_name:
                 self.printer_fax_names_same = False
                 self.printer_name_ok = True
-                
-                self.faxNameLineEdit.emit(SIGNAL("textChanged(const QString&)"), 
+
+                self.faxNameLineEdit.emit(SIGNAL("textChanged(const QString&)"),
                             (self.faxNameLineEdit.text(),))
-        
+
         self.setEditErrors()
 
 
@@ -729,13 +733,13 @@ class SetupForm(SetupForm_base):
     def faxNameLineEdit_textChanged(self, a0):
         self.fax_name = unicode(a0)
         self.defaultFaxNamePushButton.setEnabled(True)
-        
+
         self.fax_name_ok = True
-        
+
         if not self.fax_name:
             QToolTip.add(self.faxNameLineEdit, self.__tr('You must enter a fax name.'))
             self.fax_name_ok = False
-        
+
         elif self.fax_name == self.printer_name:
             s = self.__tr('The printer name and fax name must be different. Please choose different names.')
             QToolTip.add(self.faxNameLineEdit, s)
@@ -743,21 +747,21 @@ class SetupForm(SetupForm_base):
             self.printer_name_ok = False
             self.fax_name_ok = False
             self.printer_fax_names_same = True
-        
+
         elif self.fax_name in self.installed_queues:
-            QToolTip.add(self.faxNameLineEdit, 
+            QToolTip.add(self.faxNameLineEdit,
                 self.__tr('A fax already exists with this name. Please choose a different name.'))
             self.fax_name_ok = False
-            
+
         elif self.printer_fax_names_same:
             if self.fax_name != self.printer_name:
                 self.printer_fax_names_same = False
                 self.fax_name_ok = True
-                
-                self.printerNameLineEdit.emit(SIGNAL("textChanged(const QString&)"), 
+
+                self.printerNameLineEdit.emit(SIGNAL("textChanged(const QString&)"),
                             (self.printerNameLineEdit.text(),))
-                
-        self.setEditErrors() 
+
+        self.setEditErrors()
 
 
     def faxNumberLineEdit_textChanged(self, a0):
@@ -785,7 +789,7 @@ class SetupForm(SetupForm_base):
     def readwriteFaxInformation(self, read=True):
         try:
             QApplication.setOverrideCursor(QApplication.waitCursor)
-            
+
             d = fax.getFaxDevice(self.fax_uri, disable_dbus=True)
 
             while True:
@@ -881,23 +885,23 @@ class SetupForm(SetupForm_base):
             # TODO:
             #service.sendEvent(self.hpssd_sock, EVENT_CUPS_QUEUES_CHANGED, device_uri=self.device_uri)
             pass
-            
+
         QApplication.restoreOverrideCursor()
 
     def setupFax(self):
         QApplication.setOverrideCursor(QApplication.waitCursor)
-        
+
         if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_SOAP:
             fax_ppd_name = "HP-Fax2-hplip" # Fixed width (2528 pixels) and 300dpi rendering
             nick = "HP Fax 2"
         else:
             fax_ppd_name = "HP-Fax-hplip" # Standard
             nick = "HP Fax"
-        
+
         ppds = []
 
         log.debug("Searching for fax file %s..." % fax_ppd_name)
-        
+
         for f in utils.walkFiles(sys_cfg.dirs.ppd, pattern="HP-Fax*.ppd*", abs_paths=True):
             ppds.append(f)
 
@@ -910,21 +914,21 @@ class SetupForm(SetupForm_base):
         else:
             QApplication.restoreOverrideCursor()
             log.error("Fax PPD file not found.")
-            
+
             if QMessageBox.warning(self, self.__tr("Unable to find HP fax PPD file."),
                 self.__tr("The PPD file (%1.ppd) needed to setup the fax queue was not found.").arg(fax_ppd_name),
                 self.__tr("Browse to file..."), # button 0
                 self.__tr("Quit") # button 1
                 ) == 0: # Browse
-                
+
                 while True:
-                    fax_ppd = unicode(QFileDialog.getOpenFileName(sys_cfg.dirs.ppd, 
-                        "HP Fax PPD Files (*.ppd *.ppd.gz);;All Files (*)", self, 
+                    fax_ppd = unicode(QFileDialog.getOpenFileName(sys_cfg.dirs.ppd,
+                        "HP Fax PPD Files (*.ppd *.ppd.gz);;All Files (*)", self,
                         "open file dialog", "Choose the fax PPD file"))
 
                     if not fax_ppd: # user hit cancel
                         return
-                    
+
                     if os.path.exists(fax_ppd):
                         n = cups.getPPDDescription(fax_ppd)
                         if n == nick:
@@ -933,17 +937,17 @@ class SetupForm(SetupForm_base):
                             self.FailureUI(self.__tr("<b>Incorrect fax PPD file.</b><p>The fax PPD file must have a nickname of '%1', not '%1'.").arg(nick).arg(n))
                     else:
                         self.FailureUI(self.__tr("<b>File not found.</b><p>hp-setup cannot find the file %1").arg(fax_ppd))
-                    
+
             else: # Quit
                 return
 
         if not os.path.exists(fax_ppd):
-            status, status_str = cups.addPrinter(self.fax_name.encode('utf8'), 
+            status, status_str = cups.addPrinter(self.fax_name.encode('utf8'),
                 self.fax_uri, self.fax_location, '', fax_ppd,  self.fax_desc)
-        else:        
-            status, status_str = cups.addPrinter(self.fax_name.encode('utf8'), 
+        else:
+            status, status_str = cups.addPrinter(self.fax_name.encode('utf8'),
                 self.fax_uri, self.fax_location, fax_ppd, '', self.fax_desc)
-            
+
         log.debug("addPrinter() returned (%d, %s)" % (status, status_str))
         self.installed_fax_devices = device.getSupportedCUPSDevices(['hpfax'])
 

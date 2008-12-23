@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-#  
+#
 # Authors: Don Welch
 #
 
@@ -64,6 +64,10 @@ class InfoDialog(QDialog, Ui_Dialog):
         self.DeviceComboBox.setType(DEVICEURICOMBOBOX_TYPE_PRINTER_AND_FAX)
 
         self.headers = [self.__tr("Key"), self.__tr("Value")]
+        self.history_headers = [self.__tr("Date/Time"), None,
+                                self.__tr("Event Code"), self.__tr("Description"),
+                                self.__tr("User"), self.__tr("CUPS Job ID"),
+                                self.__tr("Doc. Title")]
 
 
     def updateUi(self):
@@ -78,14 +82,17 @@ class InfoDialog(QDialog, Ui_Dialog):
         self.DynamicTableWidget.setColumnCount(0)
         flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
 
-        while self.TabWidget.count() > 2:
-            self.TabWidget.removeTab(2)   
-
+        while self.TabWidget.count() > 3:
+            self.TabWidget.removeTab(3)
 
         self.DynamicTableWidget.clear()
         self.DynamicTableWidget.setRowCount(0)
         self.DynamicTableWidget.setColumnCount(len(self.headers))
         self.DynamicTableWidget.setHorizontalHeaderLabels(self.headers)
+
+        #
+        # Static Data
+        #
 
         try:
             d = device.Device(self.device_uri, None)
@@ -105,17 +112,23 @@ class InfoDialog(QDialog, Ui_Dialog):
 
         self.StaticTableWidget.setRowCount(len(mq_keys))
 
-        for row, key in enumerate(mq_keys):            
+        for row, key in enumerate(mq_keys):
             i = QTableWidgetItem(QString(key))
             i.setFlags(flags)
-            self.StaticTableWidget.setItem(row, 0, i)  
+            self.StaticTableWidget.setItem(row, 0, i)
 
             i = QTableWidgetItem(QString(str(d.mq[key])))
             i.setFlags(flags)
-            self.StaticTableWidget.setItem(row, 1, i)  
+            self.StaticTableWidget.setItem(row, 1, i)
 
         self.StaticTableWidget.resizeColumnToContents(0)
         self.StaticTableWidget.resizeColumnToContents(1)
+        self.StaticTableWidget.setSortingEnabled(True)
+        self.StaticTableWidget.sortItems(0)
+
+        #
+        # Dynamic Data
+        #
 
         try:
             try:
@@ -135,20 +148,64 @@ class InfoDialog(QDialog, Ui_Dialog):
             for row, key in enumerate(dq_keys):
                 i = QTableWidgetItem(QString(key))
                 i.setFlags(flags)
-                self.DynamicTableWidget.setItem(row, 0, i)  
+                self.DynamicTableWidget.setItem(row, 0, i)
 
                 i = QTableWidgetItem(QString(str(d.dq[key])))
                 i.setFlags(flags)
-                self.DynamicTableWidget.setItem(row, 1, i)  
+                self.DynamicTableWidget.setItem(row, 1, i)
 
 
             self.DynamicTableWidget.resizeColumnToContents(0)
             self.DynamicTableWidget.resizeColumnToContents(1)
+            self.DynamicTableWidget.setSortingEnabled(True)
+            self.DynamicTableWidget.sortItems(0)
 
         finally:
             d.close()
 
-        #self.StaticTableWidget.setColumnWidth(1, self.StaticTableWidget.width() - self.StaticTableWidget.columnWidth(0))
+        #
+        # History Table
+        #
+
+        self.HistoryTableWidget.clear()
+        self.HistoryTableWidget.setRowCount(0)
+
+        if d.device_type == DEVICE_TYPE_FAX:
+            self.history_headers[1] = self.__tr("Fax")
+        else:
+            self.history_headers[1] = self.__tr("Printer")
+
+        self.HistoryTableWidget.setColumnCount(len(self.history_headers))
+        self.HistoryTableWidget.setHorizontalHeaderLabels(self.history_headers)
+
+        history = d.queryHistory()
+        history.reverse()
+        self.HistoryTableWidget.setRowCount(len(history))
+
+        for row, h in enumerate(history):
+            dt = QDateTime()
+            dt.setTime_t(int(h.timedate))
+            dt = dt.toString()
+
+            ess = device.queryString(h.event_code, 0)
+
+            for col, t in enumerate([dt, h.printer_name,
+                           unicode(h.event_code), ess,
+                           h.username, unicode(h.job_id),
+                           h.title]):
+
+                i = QTableWidgetItem(QString(t))
+                i.setFlags(flags)
+                self.HistoryTableWidget.setItem(row, col, i)
+
+        self.HistoryTableWidget.resizeColumnToContents(0)
+        self.HistoryTableWidget.resizeColumnToContents(1)
+        self.HistoryTableWidget.setSortingEnabled(True)
+        self.HistoryTableWidget.sortItems(0)
+
+        #
+        # Printer Data
+        #
 
         printers = cups.getPrinters()
 
@@ -169,7 +226,7 @@ class InfoDialog(QDialog, Ui_Dialog):
                 Table.setGridStyle(Qt.DotLine)
                 Table.setObjectName(QString("Table-%s" % p.name))
                 GridLayout.addWidget(Table, 0, 0, 1, 1)
-                self.TabWidget.addTab(Tab, QString(p.name))    
+                self.TabWidget.addTab(Tab, QString(p.name))
 
                 Table.setColumnCount(len(self.headers))
                 Table.setHorizontalHeaderLabels(self.headers)
@@ -199,10 +256,10 @@ class InfoDialog(QDialog, Ui_Dialog):
 
                 Table.setRowCount(len(keys))
 
-                for row, key in enumerate(keys):            
+                for row, key in enumerate(keys):
                     i = QTableWidgetItem(QString(key))
                     i.setFlags(flags)
-                    Table.setItem(row, 0, i)  
+                    Table.setItem(row, 0, i)
 
                     if key == 'printer-state':
                         state = int(current_options[key])
@@ -218,10 +275,12 @@ class InfoDialog(QDialog, Ui_Dialog):
                         i = QTableWidgetItem(QString(str(current_options[key])))
 
                     i.setFlags(flags)
-                    Table.setItem(row, 1, i)  
+                    Table.setItem(row, 1, i)
 
                 Table.resizeColumnToContents(0)
                 Table.resizeColumnToContents(1)
+                Table.setSortingEnabled(True)
+                Table.sortItems(0)
 
         cups.closePPD()
         self.TabWidget.setCurrentIndex(0)
@@ -243,7 +302,7 @@ class InfoDialog(QDialog, Ui_Dialog):
 
     #
     # Misc
-    # 
+    #
 
     def __tr(self,s,c = None):
         return qApp.translate("InfoDialog",s,c)

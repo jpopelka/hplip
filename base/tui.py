@@ -78,12 +78,12 @@ def enter_range(question, min_value, max_value, default_value=None):
         try:
             value_int = int(user_input)
         except ValueError:
-            log.error('Please enter a number between %d and %d, or "q" to quit.' % 
+            log.error('Please enter a number between %d and %d, or "q" to quit.' %
                 (min_value, max_value))
             continue
 
         if value_int < min_value or value_int > max_value:
-            log.error('Please enter a number between %d and %d, or "q" to quit.' % 
+            log.error('Please enter a number between %d and %d, or "q" to quit.' %
                 (min_value, max_value))
             continue
 
@@ -110,7 +110,7 @@ def enter_choice(question, choices, default_value=None):
         if user_input in choices:
             return True, user_input
 
-        log.error("Please enter %s or press <enter> for the default of '%s'." % 
+        log.error("Please enter %s or press <enter> for the default of '%s'." %
             (', '.join(["'%s'" % x for x in choices]), default_value))
 
 
@@ -175,15 +175,18 @@ def enter_regex(regex, prompt, pattern, default_value=None):
 
 
 def ttysize():
-    import commands # TODO: Replace with subprocess (commands is deprecated in Python 3.0)
-    ln1 = commands.getoutput('stty -a').splitlines()[0]
-    vals = {'rows':None, 'columns':None}
-    for ph in ln1.split(';'):
-        x = ph.split()
-        if len(x) == 2:
-            vals[x[0]] = x[1]
-            vals[x[1]] = x[0]
-    return int(vals['rows']), int(vals['columns'])
+    try:
+        import commands # TODO: Replace with subprocess (commands is deprecated in Python 3.0)
+        ln1 = commands.getoutput('stty -a').splitlines()[0]
+        vals = {'rows':None, 'columns':None}
+        for ph in ln1.split(';'):
+            x = ph.split()
+            if len(x) == 2:
+                vals[x[0]] = x[1]
+                vals[x[1]] = x[0]
+        return int(vals['rows']), int(vals['columns'])
+    except TypeError:
+        return 40, 64
 
 
 class ProgressMeter(object):
@@ -209,7 +212,7 @@ class ProgressMeter(object):
         sys.stdout.write("\b" * self.prev_length)
 
         y = "%s [%s%s%s] %d%%  %s   " % \
-            (self.prompt, '*'*(x-1), self.spinner[self.spinner_pos], 
+            (self.prompt, '*'*(x-1), self.spinner[self.spinner_pos],
              ' '*(self.max_size-x), self.progress, msg)
 
         sys.stdout.write(y)
@@ -286,7 +289,7 @@ class Formatter(object):
 
             col_widths = []
             formats = []
-            for m1, m2, m3, m4 in zip(self.min_widths, min_calc_widths, 
+            for m1, m2, m3, m4 in zip(self.min_widths, min_calc_widths,
                                       self.max_widths, max_calc_widths):
                 col_width = max(max(m1, m2), min(m3, m4))
                 col_widths.append(col_width)
@@ -359,7 +362,7 @@ def printer_table(printers):
     last_used_printer_name = user_cfg.last_used.printer_name
     ret = None
 
-    table = Formatter(header=('Num', 'CUPS Printer'), 
+    table = Formatter(header=('Num', 'CUPS Printer'),
                               max_widths=(8, 100), min_widths=(8, 20))
 
     default_index = None
@@ -373,7 +376,7 @@ def printer_table(printers):
     table.output()
 
     if default_index is not None:
-        ok, i = enter_range("\nEnter number 0...%d for printer (q=quit, <enter>=default: *%d) ?" % (x, default_index), 
+        ok, i = enter_range("\nEnter number 0...%d for printer (q=quit, <enter>=default: *%d) ?" % (x, default_index),
                                 0, x, default_index)
     else:
         ok, i = enter_range("\nEnter number 0...%d for printer (q=quit) ?" % x, 0, x)
@@ -390,10 +393,10 @@ def device_table(devices, scan_flag=False):
     ret = None
 
     if scan_flag:
-        table = Formatter(header=('Num', 'Scan device URI'), 
+        table = Formatter(header=('Num', 'Scan device URI'),
                                  max_widths=(8, 100), min_widths=(8, 12))
     else:
-        table = Formatter(header=('Num', 'Device URI', 'CUPS Printer(s)'), 
+        table = Formatter(header=('Num', 'Device URI', 'CUPS Printer(s)'),
                                  max_widths=(8, 100, 100), min_widths=(8, 12, 12))
 
     default_index = None
@@ -415,7 +418,7 @@ def device_table(devices, scan_flag=False):
     table.output()
 
     if default_index is not None:
-        ok, i = enter_range("\nEnter number 0...%d for device (q=quit, <enter>=default: %d*) ?" % (x, default_index), 
+        ok, i = enter_range("\nEnter number 0...%d for device (q=quit, <enter>=default: %d*) ?" % (x, default_index),
                                 0, x, default_index)
     else:
         ok, i = enter_range("\nEnter number 0...%d for device (q=quit) ?" % x, 0, x)
@@ -428,19 +431,19 @@ def device_table(devices, scan_flag=False):
 
 def connection_table():
     ret, ios, x = None, {0: ('usb', "Universal Serial Bus (USB)") }, 1
-    
-    if prop.net_build: 
+
+    if prop.net_build:
         ios[x] = ('net', "Network/Ethernet/Wireless (direct connection or JetDirect)")
         x += 1
 
-    if prop.par_build: 
+    if prop.par_build:
         ios[x] = ('par', "Parallel Port (LPT:)")
         x += 1
 
     if len(ios) > 1:
         header("SELECT CONNECTION (I/O) TYPE")
 
-        table = Formatter(header=('Num', 'Connection Type', 'Description'), 
+        table = Formatter(header=('Num', 'Connection Type', 'Description'),
                           max_widths=(8, 20, 80), min_widths=(8, 10, 40))
 
         for x, data in ios.items():
@@ -451,7 +454,7 @@ def connection_table():
 
         table.output()
 
-        ok, val = enter_range("\nEnter number 0...%d for connection type (q=quit, enter=usb*) ? " % x, 
+        ok, val = enter_range("\nEnter number 0...%d for connection type (q=quit, enter=usb*) ? " % x,
             0, x, 0)
 
         if ok:

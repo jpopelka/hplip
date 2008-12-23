@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui4/infodialog_base.ui'
 #
-# Created: Thu Oct 30 15:47:08 2008
+# Created: Mon Dec 15 16:59:00 2008
 #      by: PyQt4 UI code generator 4.3.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PyQt4 import QtCore, QtGui
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(QtCore.QSize(QtCore.QRect(0,0,600,500).size()).expandedTo(Dialog.minimumSizeHint()))
+        Dialog.resize(QtCore.QSize(QtCore.QRect(0,0,700,500).size()).expandedTo(Dialog.minimumSizeHint()))
 
         self.gridlayout = QtGui.QGridLayout(Dialog)
         self.gridlayout.setObjectName("gridlayout")
@@ -71,6 +71,23 @@ class Ui_Dialog(object):
         self.DynamicTableWidget.setObjectName("DynamicTableWidget")
         self.gridlayout2.addWidget(self.DynamicTableWidget,0,0,1,1)
         self.TabWidget.addTab(self.tab,"")
+
+        self.tab_3 = QtGui.QWidget()
+        self.tab_3.setObjectName("tab_3")
+
+        self.gridlayout3 = QtGui.QGridLayout(self.tab_3)
+        self.gridlayout3.setObjectName("gridlayout3")
+
+        self.HistoryTableWidget = QtGui.QTableWidget(self.tab_3)
+        self.HistoryTableWidget.setAlternatingRowColors(True)
+        self.HistoryTableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.HistoryTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.HistoryTableWidget.setVerticalScrollMode(QtGui.QAbstractItemView.ScrollPerPixel)
+        self.HistoryTableWidget.setGridStyle(QtCore.Qt.DotLine)
+        self.HistoryTableWidget.setSortingEnabled(False)
+        self.HistoryTableWidget.setObjectName("HistoryTableWidget")
+        self.gridlayout3.addWidget(self.HistoryTableWidget,0,0,1,1)
+        self.TabWidget.addTab(self.tab_3,"")
         self.gridlayout.addWidget(self.TabWidget,3,0,1,2)
 
         spacerItem = QtGui.QSpacerItem(470,31,QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Maximum)
@@ -98,6 +115,10 @@ class Ui_Dialog(object):
         self.DynamicTableWidget.setColumnCount(0)
         self.DynamicTableWidget.setRowCount(0)
         self.TabWidget.setTabText(self.TabWidget.indexOf(self.tab), QtGui.QApplication.translate("Dialog", "Status Data (Dynamic)", None, QtGui.QApplication.UnicodeUTF8))
+        self.HistoryTableWidget.clear()
+        self.HistoryTableWidget.setColumnCount(0)
+        self.HistoryTableWidget.setRowCount(0)
+        self.TabWidget.setTabText(self.TabWidget.indexOf(self.tab_3), QtGui.QApplication.translate("Dialog", "Status History", None, QtGui.QApplication.UnicodeUTF8))
         self.CancelButton.setText(QtGui.QApplication.translate("Dialog", "Close", None, QtGui.QApplication.UnicodeUTF8))
 
 from deviceuricombobox import DeviceUriComboBox

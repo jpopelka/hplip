@@ -85,7 +85,11 @@ if __name__ == '__main__':
         os.close(w1)
 
         if ui_toolkit == 'qt3':
-            import ui.systemtray as systray
+            try:
+                import ui.systemtray as systray
+            except ImportError:
+                log.error("Unable to load Qt3 support. Is it installed?")
+                sys.exit(1)                  
         
         else: # qt4
             try:

@@ -138,8 +138,6 @@ class FaxLDIFParser(LDIFParser):
         self.db = db
     
     def handle(self, dn, entry):
-        ##for i in skip_dn:
-        ##    if i == dn: return
         if dn:
             try:
                 firstname = entry['givenName'][0]
@@ -173,14 +171,13 @@ class FaxLDIFParser(LDIFParser):
             except KeyError:
                 pass
                 
-            try:
-                title = entry['title'][0]
-            except KeyError:
-                title = ''
-             
+            grps.append(u'All')
+            groups = [g for g in grps if g]
+                
             if nickname:
-                log.debug("%s, %s, %s, %s, %s, %s, %s" % ( nickname, title, firstname, lastname, fax, grps, dn))
-                self.db.set(nickname, title, firstname, lastname, fax, grps, dn)
+                log.debug("Import: name=%s, fax=%s, group(s)=%s, notes=%s" % ( nickname, fax, ','.join(groups), dn))
+                self.db.set(nickname, title, firstname, lastname, fax, groups, dn)
+                
     
 
 # **************************************************************************** #
@@ -253,8 +250,7 @@ class FaxAddressBook(object): # Pickle based address book
             except KeyError:
                 self._data[new_name] = self._data[old_name].copy()
                 del self._data[old_name]
-            else:
-                return
+                self.save()
         
 
     def get_all_groups(self):
@@ -285,6 +281,7 @@ class FaxAddressBook(object): # Pickle based address book
 
     def clear(self):
         self._data = {}
+        self.save()
 
 
     def delete(self, name):
@@ -352,20 +349,26 @@ class FaxAddressBook(object): # Pickle based address book
         
     def import_ldif(self, filename):
         try:
+            data = open(filename, 'r').read()
+            log.debug_block(filename, data)
             parser = FaxLDIFParser(open(filename, 'r'), self)
             parser.parse()
+            self.save()
             return True, ''
         except ValueError, e:
             return False, e.message
             
             
     def import_vcard(self, filename):
+        data = file(filename, 'r').read()
+        log.debug_block(filename, data)
+        
         for card in vcard.VCards(vcard.VFile(vcard.opentextfile(filename))):
             log.debug(card)
             
             if card['name']:
                 fax = ''
-                for x in range(1,9999):
+                for x in range(1, 9999):
                     if x == 1:
                         s = 'phone'
                     else:
@@ -387,9 +390,14 @@ class FaxAddressBook(object): # Pickle based address book
                     org = card.get('categories', '').split(';')
                     if not org:
                         org = []
+                        
+                org.append(u'All')
+                groups = [o for o in org if o]
                 
-                self.set(card['name'], '', card.get('first name', ''), card.get('last name', ''), 
-                    fax, org, card.get('notes', ''))
+                name = card['name']
+                notes = card.get('notes', u'')
+                log.debug("Import: name=%s, fax=%s group(s)=%s notes=%s" % (name, fax, ','.join(groups), notes))
+                self.set(name, u'', u'', u'', fax, groups, notes)
 
         return True, ''
 

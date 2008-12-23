@@ -51,7 +51,7 @@ def handle_session_signal(*args, **kwds):
 
         event = device.Event(*args)
         event.debug()
-        
+
         if event.event_code > EVENT_MAX_EVENT:
             event.event_code = status.MapPJLErrorCode(event.event_code)
 
@@ -68,11 +68,11 @@ mod = module.Module(__mod__, __title__, __version__, __doc__, None,
                     (GUI_MODE,), (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4))
 mod.lockInstance()
 
-mod.setUsage(module.USAGE_FLAG_NONE, 
+mod.setUsage(module.USAGE_FLAG_NONE,
              extra_options=[("Disable dbus (Qt3 only):", "-x or --disable-dbus", "option", False)],
-             see_also_list = ['hp-align', 'hp-clean', 'hp-colorcal', 'hp-devicesetup', 
+             see_also_list = ['hp-align', 'hp-clean', 'hp-colorcal', 'hp-devicesetup',
                               'hp-hp-faxsetup', 'hp-firmware', 'hp-info', 'hp-levels',
-                              'hp-linefeedcal', 'hp-makecopies', 'hp-plugin', 
+                              'hp-linefeedcal', 'hp-makecopies', 'hp-plugin',
                               'hp-pqdiag', 'hp-print', 'hp-printsettings', 'hp-scan',
                               'hp-sendfax', 'hp-testpage', 'hp-timedate', 'hp-unload'])
 
@@ -102,10 +102,9 @@ if ui_toolkit == 'qt3':
         import dbus.service
         from dbus.mainloop.glib import DBusGMainLoop
         from gobject import MainLoop
-
     except ImportError:
         log.error("Unable to load dbus - Automatic status updates in HPLIP Device Manager will be disabled.")
-        disable_dbus = True    
+        disable_dbus = True
 
     if not disable_dbus:
         r, w = os.pipe()
@@ -120,8 +119,12 @@ if ui_toolkit == 'qt3':
         if w:
             os.close(w)
 
-        from qt import *
-        from ui.devmgr4 import DevMgr4
+        try:
+            from qt import *
+            from ui.devmgr4 import DevMgr4
+        except ImportError:
+            log.error("Unable to load Qt3 support. Is it installed?")
+            sys.exit(1)
 
         # create the main application object
         app = QApplication(sys.argv)
@@ -132,7 +135,7 @@ if ui_toolkit == 'qt3':
                 loc = str(QTextCodec.locale())
                 log.debug("Using system locale: %s" % loc)
 
-        if loc.lower() != 'c':    
+        if loc.lower() != 'c':
             e = 'utf8'
             try:
                 l, x = loc.split('.')
@@ -205,7 +208,7 @@ if ui_toolkit == 'qt3':
                     log.error("Unable to connect to dbus session bus. Exiting.")
                     sys.exit(1)
                 else:
-                    log.error("Unable to connect to dbus session bus (running as root?)")            
+                    log.error("Unable to connect to dbus session bus (running as root?)")
                     sys.exit(1)
 
             # Receive events from the session bus
@@ -230,20 +233,20 @@ if ui_toolkit == 'qt3':
 
             mod.unlockInstance()
 
-        sys.exit(0)        
+        sys.exit(0)
 
-else: # qt4 
+else: # qt4
     try:
         from PyQt4.QtGui import QApplication
         from ui4.devmgr5 import DevMgr5
     except ImportError:
         log.error("Unable to load Qt4 support. Is it installed?")
-        sys.exit(1)        
-    
+        sys.exit(1)
+
     log.set_module("hp-toolbox(UI)")
 
-    #if 1:
-    try:
+    if 1:
+    #try:
         app = QApplication(sys.argv)
 
         toolbox = DevMgr5(__version__, device_uri,  None)
@@ -254,7 +257,7 @@ else: # qt4
         except KeyboardInterrupt:
             sys.exit(0)
 
-    #if 1:
-    finally:
+    if 1:
+    #finally:
         mod.unlockInstance()
         sys.exit(0)

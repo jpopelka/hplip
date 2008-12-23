@@ -1,4 +1,4 @@
-#if defined (APDK_LJJETREADY) || defined (APDK_QUICKCONNECT)
+#if defined (APDK_LJJETREADY) || defined (APDK_QUICKCONNECT) || defined (APDK_PSCRIPT)
 /*
  * jdatadbf.c
  *
@@ -171,4 +171,4 @@ jpeg_buffer_size_dest (j_compress_ptr cinfo)
 
   return dest->size_outbuff;
 }
-#endif // APDK_LJJETREADY || APDK_QUICKCONNECT
+#endif // APDK_LJJETREADY || APDK_QUICKCONNECT || APDK_PSCRIPT

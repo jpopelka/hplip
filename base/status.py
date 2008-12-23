@@ -1027,8 +1027,11 @@ def StatusType6(dev): #  LaserJet Status (XML)
     info_device_status = cStringIO.StringIO()
     info_ssp = cStringIO.StringIO()
 
-    dev.getEWSUrl("/hp/device/info_device_status.xml", info_device_status)
-    dev.getEWSUrl("/hp/device/info_ssp.xml", info_ssp)
+    try:
+        dev.getEWSUrl("/hp/device/info_device_status.xml", info_device_status)
+        dev.getEWSUrl("/hp/device/info_ssp.xml", info_ssp)
+    except:
+        pass
 
     info_device_status = info_device_status.getvalue()
     info_ssp = info_ssp.getvalue()
@@ -1038,8 +1041,8 @@ def StatusType6(dev): #  LaserJet Status (XML)
 
     if info_device_status:
         try:
-            device_status = utils.XMLToDictParser().parseXML(info_device_status)
             log.debug_block("info_device_status", info_device_status)
+            device_status = utils.XMLToDictParser().parseXML(info_device_status)
             log.debug(device_status)
         except expat.ExpatError:
             log.error("Device Status XML parse error")
@@ -1047,8 +1050,8 @@ def StatusType6(dev): #  LaserJet Status (XML)
 
     if info_ssp:
         try:
-            ssp = utils.XMLToDictParser().parseXML(info_ssp)
             log.debug_block("info_spp", info_ssp)
+            ssp = utils.XMLToDictParser().parseXML(info_ssp)
             log.debug(ssp)
         except expat.ExpatError:
             log.error("SSP XML parse error")            

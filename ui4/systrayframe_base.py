@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui4/systrayframe_base.ui'
 #
-# Created: Thu Oct 30 15:47:10 2008
+# Created: Mon Dec 15 16:59:01 2008
 #      by: PyQt4 UI code generator 4.3.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PyQt4 import QtCore, QtGui
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(QtCore.QSize(QtCore.QRect(0,0,525,512).size()).expandedTo(Dialog.minimumSizeHint()))
+        Dialog.resize(QtCore.QSize(QtCore.QRect(0,0,500,540).size()).expandedTo(Dialog.minimumSizeHint()))
 
         self.gridlayout = QtGui.QGridLayout(Dialog)
         self.gridlayout.setObjectName("gridlayout")

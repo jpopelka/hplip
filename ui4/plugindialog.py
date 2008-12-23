@@ -46,6 +46,8 @@ class PluginDialog(QDialog, Ui_Dialog):
     def __init__(self, parent, install_mode=PLUGIN_NONE):
         QDialog.__init__(self, parent)
         self.install_mode = install_mode
+        self.plugin_path = None
+        self.result = False
         self.core = CoreInstall()
         self.core.set_plugin_version()
         self.setupUi(self)
@@ -54,6 +56,10 @@ class PluginDialog(QDialog, Ui_Dialog):
         QTimer.singleShot(0, self.showSourcePage)
 
 
+    def isPluginInstalled(self):
+        return self.core.check_for_plugin()
+    
+    
     def initUi(self):
         # connect signals/slots
         self.connect(self.CancelButton, SIGNAL("clicked()"), self.CancelButton_clicked)
@@ -91,6 +97,7 @@ class PluginDialog(QDialog, Ui_Dialog):
             self.BrowseToolButton.setEnabled(False)
             self.NextButton.setEnabled(True)
             self.PathLineEdit.setStyleSheet("")
+            self.plugin_path = None
 
 
     def CopyRadioButton_toggled(self, b):
@@ -107,6 +114,7 @@ class PluginDialog(QDialog, Ui_Dialog):
             self.BrowseToolButton.setEnabled(False)
             self.NextButton.setEnabled(True)
             self.PathLineEdit.setStyleSheet("")
+            self.plugin_path = None
 
 
     def PathLineEdit_textChanged(self, t):
@@ -135,7 +143,10 @@ class PluginDialog(QDialog, Ui_Dialog):
     def BrowseToolButton_clicked(self):
         t = unicode(self.PathLineEdit.text())
         if not os.path.exists(t):
-            t = os.path.expanduser('~')
+            t = user_cfg.last_used.working_dir
+
+            if not t or not os.path.exists(t):
+                t = os.path.expanduser("~")
 
         x = unicode(QFileDialog.getOpenFileName(self, self.__tr("Select Plug-in File"),
                                                t,
@@ -144,6 +155,7 @@ class PluginDialog(QDialog, Ui_Dialog):
         if x:
             self.plugin_path = x
             self.PathLineEdit.setText(self.plugin_path)
+            user_cfg.last_used.working_dir = x
 
         self.setPathIndicators()
 
@@ -161,8 +173,102 @@ class PluginDialog(QDialog, Ui_Dialog):
 
 
     def NextButton_clicked(self):
-#        p = self.StackedWidget.currentIndex()
+        if self.SkipRadioButton.isChecked():
+            log.debug("Skipping plug-in installation.")
+            self.close()
+            return
+
+        if self.plugin_path is None: # download
+            # read plugin.conf (local or on sf.net) to get plugin_path (http://)
+            plugin_conf_url = self.core.get_plugin_conf_url()
+
+            if plugin_conf_url.startswith('file://'):
+                pass
+            else:
+                log.info("Checking for network connection...")
+                ok = self.core.check_network_connection()
+
+                if not ok:
+                    log.error("Network connection not detected.")
+                    FailureUI(self, self.__tr("Network connection not detected."))
+                    self.close()
+                    return
+
+            log.info("Downloading configuration file from: %s" % plugin_conf_url)
+            self.plugin_path, size, checksum, timestamp, ok = self.core.get_plugin_info(plugin_conf_url,
+                self.plugin_download_callback)
+
+            log.debug("path=%s, size=%d, checksum=%d, timestamp=%d, ok=%s" % (self.plugin_path, size, checksum, timestamp, ok))
+            if not self.plugin_path.startswith('http://') and not self.plugin_path.startswith('file://'):
+                self.plugin_path = 'file://' + self.plugin_path
+
+        else: # path
+            if not self.plugin_path.startswith('http://'):
+                self.plugin_path = 'file://' + self.plugin_path
+
+            size, checksum, timestamp = 0, '', 0
+
+        if self.plugin_path.startswith('file://'):
+            pass
+        else:
+            log.info("Checking for network connection...")
+            ok = self.core.check_network_connection()
+
+            if not ok:
+                log.error("Network connection not detected.")
+                FailureUI(self, self.__tr("Network connection not detected."))
+                self.close()
+                return
+
+        log.info("Downloading plug-in from: %s" % self.plugin_path)
+
+        ok, local_plugin = self.core.download_plugin(self.plugin_path, size, checksum, timestamp,
+            self.plugin_download_callback)
+
+        if not ok:
+            log.error("Plug-in download failed: %s" % local_plugin)
+            FailureUI(self, self.__tr("Plug-in download failed."))
+            self.close()
+            return
+
+        if not self.core.run_plugin(GUI_MODE, self.plugin_install_callback):
+            FailureUI(self, self.__tr("Plug-in install failed."))
+            self.close()
+            return
+
+        cups_devices = device.getSupportedCUPSDevices(['hp'])
+        for dev in cups_devices:
+            mq = device.queryModelByURI(dev)
+
+            if mq.get('fw-download', False):
+                # Download firmware if needed
+                log.info(log.bold("\nDownloading firmware to device %s..." % dev))
+                try:
+                    d = None
+                    try:
+                        d = device.Device(dev)
+                    except Error:
+                        log.error("Error opening device.")
+                        continue
+
+                    if d.downloadFirmware():
+                        log.info("Firmware download successful.\n")
+
+                finally:
+                    if d is not None:
+                        d.close()
+
+        SuccessUI(self, self.__tr("Plug-in install successful."))
+        self.result = True
+        self.close()
+
+
+    def plugin_download_callback(self, c, s, t):
         pass
+
+
+    def plugin_install_callback(self, s):
+        print s
 
 
     def updateStepText(self, p):

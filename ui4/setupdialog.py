@@ -29,6 +29,7 @@ from base import device, utils,  models
 from prnt import cups
 from base.codes import *
 from ui_utils import *
+#from installer import core_install
 
 # Qt
 from PyQt4.QtCore import *
@@ -36,6 +37,7 @@ from PyQt4.QtGui import *
 
 # Ui
 from setupdialog_base import Ui_Dialog
+from plugindialog import PluginDialog
 
 # Fax
 try:
@@ -73,14 +75,17 @@ class DeviceTableWidgetItem(QTableWidgetItem):
 
 
 class SetupDialog(QDialog, Ui_Dialog):
-    def __init__(self, parent, param, jd_port, username):
+    def __init__(self, parent, param, jd_port, username, device_uri=None):
         QDialog.__init__(self, parent)
         self.setupUi(self)
 
         self.param = param
         self.jd_port = jd_port
         self.username = username
-        self.device_uri = None
+        self.device_uri = device_uri
+
+        if device_uri:
+            log.info("Using device: %s" % device_uri)
 
         self.initUi()
 
@@ -162,12 +167,36 @@ class SetupDialog(QDialog, Ui_Dialog):
                         else:
                             FailureUI(self, self.__tr("<b>Invalid manual discovery parameter.</b>"))
 
+        elif self.device_uri: # If device URI specified on the command line, skip discovery
+                              # if the device URI is well-formed (but not necessarily valid)
+            try:
+                back_end, is_hp, self.bus, model, serial, dev_file, host, port = \
+                device.parseDeviceURI(self.device_uri)
+
+            except Error:
+                log.error("Invalid device URI specified: %s" % self.device_uri)
+
+            else:
+                name = ''
+                if self.bus == 'net':
+                    try:
+                        log.debug("Trying to get hostname for device...")
+                        name = socket.gethostbyaddr(host)[0]
+                    except socket.herror:
+                        log.debug("Failed.")
+                    else:
+                        log.debug("Host name=%s" % name)
+
+                self.devices = {self.device_uri : (model, model, name)}
+                self.skip_discovery = True
+
         # If no network or parallel, usb is only option, skip initial page...
         elif not prop.par_build and not prop.net_build:
             self.skip_discovery = True
             self.bus = 'usb'
             self.UsbRadioButton.setChecked(True)
             self.setUsbRadioButton(True)
+
 
         self.DeviceTypeComboBox.addItem("All devices/printers", QVariant(DEVICE_DESC_ALL))
         self.DeviceTypeComboBox.addItem("Single function printers only", QVariant(DEVICE_DESC_SINGLE_FUNC))
@@ -331,6 +360,7 @@ class SetupDialog(QDialog, Ui_Dialog):
         #filename =  "/home/dwelch/svn/trunk/src/data/images/other/hp-tux-printer.png"
         #self.DevicesTableWidget.setStyleSheet('background-image: url("%s"); background-attachment: fixed;' % filename)
 
+
     def showDevicesPage(self):
         self.BackButton.setEnabled(True)
         self.setNextButton(BUTTON_NEXT)
@@ -424,6 +454,8 @@ class SetupDialog(QDialog, Ui_Dialog):
 
         self.DevicesTableWidget.resizeColumnsToContents()
         self.DevicesTableWidget.selectRow(0)
+        self.DevicesTableWidget.setSortingEnabled(True)
+        self.DevicesTableWidget.sortItems(0)
 
 
     def clearDevicesTable(self):
@@ -467,6 +499,17 @@ class SetupDialog(QDialog, Ui_Dialog):
 
 
     def showAddPrinterPage(self):
+       # Install the plugin if needed...
+        plugin = self.mq.get('plugin', PLUGIN_NONE)
+        if plugin > PLUGIN_NONE: 
+            form = PluginDialog(self, plugin)
+            if not form.isPluginInstalled():
+                form.exec_()
+                
+                if not form.result and plugin == PLUGIN_REQUIRED:
+                    FailureUI(self, self.__tr("<b>The printer you are trying to setup requires a binary driver plug-in and it failed to install.</b><p>Please check you internet connection and try again.</p></p>Visit <u>http://hplipopensource.com</u> for more infomation.</p>"))
+                    return
+        
         self.setNextButton(BUTTON_ADD_PRINTER)
         if not self.printer_name:
             self.setDefaultPrinterName()
@@ -499,16 +542,20 @@ class SetupDialog(QDialog, Ui_Dialog):
         self.setAddPrinterButton()
         self.displayPage(PAGE_ADD_PRINTER)
 
+ 
+
 
     def updatePPD(self):
         if self.print_ppd is None:
             log.error("No appropriate print PPD file found for model %s" % self.model)
             self.PPDFileLineEdit.setText(self.__tr('(Not found. Click browse button to select a PPD file.)'))
+            self.PPDFileLineEdit.setStyleSheet("background-color: yellow")
             self.PrinterDescriptionLineEdit.setText(QString(""))
 
         else:
             self.PPDFileLineEdit.setText(self.print_ppd[0])
             self.PrinterDescriptionLineEdit.setText(self.print_ppd[1])
+            self.PPDFileLineEdit.setStyleSheet("")
 
 
     def OtherPPDButton_clicked(self, b):
@@ -519,31 +566,16 @@ class SetupDialog(QDialog, Ui_Dialog):
         if ppd_file and os.path.exists(ppd_file):
             self.print_ppd = (ppd_file, cups.getPPDDescription(ppd_file))
             self.updatePPD()
+            self.setAddPrinterButton()
 
 
     def findPrinterPPD(self):
         QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
         try:
-            log.debug("Searching for print PPD for model %s" % self.model)
+            self.print_ppd = None
             self.ppds = cups.getSystemPPDs()
-            model = self.model.replace('hp_', '').replace('hp-', '')
-            found_ppds = {}
-
-            for p in self.ppds:
-                if model in p:
-                    print "Found print PPD: %s (%s)" % (p, self.ppds[p])
-                    found_ppds[p] = self.ppds[p]
-
-            if len(found_ppds) == 0:
-                self.print_ppd = None
-
-            elif len(found_ppds) == 1:
-                self.print_ppd = found_ppds.items()[0] # (filename, description)
-
-            elif len(found_ppds) > 1:
-                ppd = cups.getPPDFile(self.model, found_ppds)
-                self.print_ppd = ppd.items()[0]
-
+            model = cups.stripModel2(self.model)
+            self.print_ppd = cups.getPPDFile2(model, self.ppds)
         finally:
             QApplication.restoreOverrideCursor()
 
@@ -916,6 +948,15 @@ class SetupDialog(QDialog, Ui_Dialog):
             self.mq = device.queryModelByURI(self.device_uri)
             back_end, is_hp, bus, model, serial, dev_file, host, port = device.parseDeviceURI(self.device_uri)
             self.model = models.normalizeModelName(model).lower()
+
+#            core = core_install.CoreInstall()
+#            core.set_plugin_version()
+#
+#            plugin = self.mq.get('plugin', PLUGIN_NONE)
+#            if plugin > PLUGIN_NONE and not core.check_for_plugin():
+#                form = PluginDialog(self, plugin)
+#                form.exec_()
+
             self.showAddPrinterPage()
 
         elif p == PAGE_ADD_PRINTER:

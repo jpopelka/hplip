@@ -48,7 +48,7 @@ from prnt import cups
 pm = None
 
 def plugin_download_callback(c, s, t):
-    pm.update(int(100*c*s/t), 
+    pm.update(int(100*c*s/t),
              utils.format_bytes(c*s))
 
 
@@ -67,6 +67,7 @@ USAGE = [ (__doc__, "", "name", True),
           ("To specify a CUPS printer queue name:", "-p<printer> or --printer=<printer> (-i mode only)", "option", False),
           ("To specify a CUPS fax queue name:", "-f<fax> or --fax=<fax> (-i mode only)", "option", False),
           ("Type of queue(s) to install:", "-t<typelist> or --type=<typelist>. <typelist>: print*, fax\* (\*default) (-i mode only)", "option", False),
+          ("To specify the device URI to install:", "-d<device> or --device=<device> (--qt4 mode only)", "option", False),
           utils.USAGE_LANGUAGE,
           utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
           utils.USAGE_HELP,
@@ -79,7 +80,7 @@ USAGE = [ (__doc__, "", "name", True),
           utils.USAGE_EXAMPLES,
           ("Setup using GUI mode:", "$ hp-setup", "example", False),
           ("Setup using GUI mode, specifying usb:", "$ hp-setup -b usb", "example", False),
-          ("Setup using GUI mode, specifying an IP:", "$ hp-setup 192.168.0.101", "example", False),          
+          ("Setup using GUI mode, specifying an IP:", "$ hp-setup 192.168.0.101", "example", False),
           ("One USB printer attached, automatic:", "$ hp-setup -i -a", "example", False),
           ("USB, IDs specified:", "$ hp-setup -i 001:002", "example", False),
           ("Network:", "$ hp-setup -i 66.35.250.209", "example", False),
@@ -115,17 +116,17 @@ def restart_cups():
         return 'killall -HUP cupsd'
 
 
-mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE, 
-                    (INTERACTIVE_MODE, GUI_MODE), 
+mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
+                    (INTERACTIVE_MODE, GUI_MODE),
                     (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4),
                     run_as_root_ok=True)
 
 opts, device_uri, printer_name, mode, ui_toolkit, loc = \
-    mod.parseStdOpts('axp:P:f:t:b:',
-                     ['ttl=', 'filter=', 'search=', 'find=', 
-                      'method=', 'time-out=', 'timeout=', 
-                      'printer=', 'fax=', 'type=', 'port=', 
-                      'username=', 'user=', 'auto'],
+    mod.parseStdOpts('axp:P:f:t:b:d:',
+                     ['ttl=', 'filter=', 'search=', 'find=',
+                      'method=', 'time-out=', 'timeout=',
+                      'printer=', 'fax=', 'type=', 'port=',
+                      'username=', 'user=', 'auto', 'device='],
                       handle_device_printer=False)
 
 
@@ -207,8 +208,12 @@ if mode == GUI_MODE:
 
 if mode == GUI_MODE:
     if ui_toolkit == 'qt3':
-        from qt import *
-        from ui import setupform
+        try:
+            from qt import *
+            from ui import setupform
+        except ImportError:
+            log.error("Unable to load Qt3 support. Is it installed?")
+            sys.exit(1)              
 
         app = QApplication(sys.argv)
         QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
@@ -254,7 +259,7 @@ if mode == GUI_MODE:
         if not os.geteuid() == 0:
             log.error("You must be root to run this utility.")
 
-            QMessageBox.critical(None, 
+            QMessageBox.critical(None,
                                  "HP Device Manager - Printer Setup Wizard",
                                  "You must be root to run hp-setup.",
                                   QMessageBox.Ok,
@@ -273,25 +278,37 @@ if mode == GUI_MODE:
         w.show()
 
         app.exec_loop()
-    
+
     else: # qt4
         try:
-            from PyQt4.QtGui import QApplication
+            from PyQt4.QtGui import QApplication, QMessageBox
             from ui4.setupdialog import SetupDialog
         except ImportError:
             log.error("Unable to load Qt4 support. Is it installed?")
             sys.exit(1)
-            
-        if 1:
-            app = QApplication(sys.argv)
-            
-            dlg = SetupDialog(None, param, jd_port, username)
-            dlg.show()
-            try:
-                log.debug("Starting GUI loop...")
-                app.exec_()
-            except KeyboardInterrupt:
-                sys.exit(0)
+
+        app = QApplication(sys.argv)
+        
+        if not os.geteuid() == 0:
+            log.error("You must be root to run this utility.")
+
+            QMessageBox.critical(None,
+                                 "HP Device Manager - Printer Setup Wizard",
+                                 "You must be root to run hp-setup.",
+                                  QMessageBox.Ok,
+                                  QMessageBox.NoButton,
+                                  QMessageBox.NoButton)
+
+            sys.exit(1)        
+        
+
+        dlg = SetupDialog(None, param, jd_port, username, device_uri)
+        dlg.show()
+        try:
+            log.debug("Starting GUI loop...")
+            app.exec_()
+        except KeyboardInterrupt:
+            sys.exit(0)
 
 
 else: # INTERACTIVE_MODE
@@ -311,12 +328,12 @@ else: # INTERACTIVE_MODE
         # ******************************* CONNECTION TYPE CHOOSER
         if not device_uri and bus is None:
             bus = tui.connection_table()
-            
+
             if bus is None:
                 sys.exit(0)
-                
+
             log.info("\nUsing connection type: %s" % bus[0])
-            
+
             log.info("")
 
         # ******************************* DEVICE CHOOSER
@@ -352,7 +369,7 @@ else: # INTERACTIVE_MODE
         plugin = mq.get('plugin', PLUGIN_NONE)
 
         plugin_installed = utils.to_bool(sys_cfg.hplip.plugin)
-        if plugin > PLUGIN_NONE and not plugin_installed: 
+        if plugin > PLUGIN_NONE and not plugin_installed:
             tui.header("PLUG-IN INSTALLATION")
 
             hp_plugin = utils.which('hp-plugin')
@@ -366,17 +383,17 @@ else: # INTERACTIVE_MODE
         ppds = cups.getSystemPPDs()
 
         default_model = utils.xstrip(model.replace('series', '').replace('Series', ''), '_')
-        stripped_model = cups.stripModel(default_model)
+        stripped_model = cups.stripModel2(default_model)
 
         # ******************************* PRINT QUEUE SETUP
         if setup_print:
             tui.header("PRINT QUEUE SETUP")
 
-            installed_print_devices = device.getSupportedCUPSDevices(['hp'])  
+            installed_print_devices = device.getSupportedCUPSDevices(['hp'])
             log.debug(installed_print_devices)
 
             if not auto and print_uri in installed_print_devices:
-                log.warning("One or more print queues already exist for this device: %s." % 
+                log.warning("One or more print queues already exist for this device: %s." %
                     ', '.join(installed_print_devices[print_uri]))
 
                 ok, setup_print = tui.enter_yes_no("\nWould you like to install another print queue for this device", 'n')
@@ -435,7 +452,7 @@ else: # INTERACTIVE_MODE
             default_model = utils.xstrip(model.replace('series', '').replace('Series', ''), '_')
             stripped_model = default_model.lower().replace('hp-', '').replace('hp_', '')
 
-            mins = cups.getPPDFile(stripped_model, ppds)
+            mins = cups.getPPDFile2(stripped_model, ppds)
             x = len(mins)
 
             enter_ppd = False
@@ -585,7 +602,7 @@ else: # INTERACTIVE_MODE
 
             log.debug("addPrinter() returned (%d, %s)" % (status, status_str))
 
-            installed_print_devices = device.getSupportedCUPSDevices(['hp']) 
+            installed_print_devices = device.getSupportedCUPSDevices(['hp'])
 
             log.debug(installed_print_devices)
 
@@ -626,7 +643,7 @@ else: # INTERACTIVE_MODE
 
         if setup_fax:
             tui.header("FAX QUEUE SETUP")
-            installed_fax_devices = device.getSupportedCUPSDevices(['hpfax'])    
+            installed_fax_devices = device.getSupportedCUPSDevices(['hpfax'])
             log.debug(installed_fax_devices)
 
             if not auto and fax_uri in installed_fax_devices:
@@ -740,9 +757,9 @@ else: # INTERACTIVE_MODE
 
             log.debug("addPrinter() returned (%d, %s)" % (status, status_str))
 
-            installed_fax_devices = device.getSupportedCUPSDevices(['hpfax']) 
+            installed_fax_devices = device.getSupportedCUPSDevices(['hpfax'])
 
-            log.debug(installed_fax_devices) 
+            log.debug(installed_fax_devices)
 
             if fax_uri not in installed_fax_devices or \
                 fax_name not in installed_fax_devices[fax_uri]:

@@ -1161,7 +1161,10 @@ class Device(object):
 
 
     def open(self, open_for_printing=False):
-        #print "open()"
+#       print "open()"
+#       raise Error(ERROR_DEVICE_NOT_FOUND)
+#       return
+
         if self.supported and self.io_state in (IO_STATE_HP_READY, IO_STATE_HP_NOT_AVAIL):
             prev_device_state = self.device_state
             self.io_state = IO_STATE_HP_NOT_AVAIL
@@ -1215,7 +1218,6 @@ class Device(object):
                 return self.device_id
 
 
-
     def close(self):
         if self.io_state == IO_STATE_HP_OPEN:
             log.debug("Closing device...")
@@ -1233,15 +1235,19 @@ class Device(object):
 
 
     def __openChannel(self, service_name):
-        if self.io_state == IO_STATE_HP_OPEN:
-            if service_name == hpmudext.HPMUD_S_PRINT_CHANNEL and not self.open_for_printing:
-                self.close()
-                self.open(True)
-            elif service_name != hpmudext.HPMUD_S_PRINT_CHANNEL and self.open_for_printing:
-                self.close()
-                self.open(False)
-        else:
-            self.open(service_name == hpmudext.HPMUD_S_PRINT_CHANNEL)
+        try:
+            if self.io_state == IO_STATE_HP_OPEN:
+                if service_name == hpmudext.HPMUD_S_PRINT_CHANNEL and not self.open_for_printing:
+                    self.close()
+                    self.open(True)
+                elif service_name != hpmudext.HPMUD_S_PRINT_CHANNEL and self.open_for_printing:
+                    self.close()
+                    self.open(False)
+            else:
+                self.open(service_name == hpmudext.HPMUD_S_PRINT_CHANNEL)
+        except:
+            log.error("unable to open channel")
+            return -1
 
         #if not self.mq['io-mode'] == IO_MODE_UNI:
         if 1:
@@ -1334,7 +1340,10 @@ class Device(object):
     def getDeviceID(self):
         needs_close = False
         if self.io_state != IO_STATE_HP_OPEN:
-           self.open()
+           try:
+               self.open()
+           except:
+               return -1
            needs_close = True
 
         result_code, data = hpmudext.get_device_id(self.device_id)

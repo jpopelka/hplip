@@ -616,7 +616,7 @@ et=2"
     Attribute "Product" "" "HP PSC 760"
   }
   {
-    ModelName "HP PSC 900 series Foomatic/hpijs"
+    ModelName "HP PSC 900 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:psc_900_series;DES:psc_900_series;"
     PCFileName "hp-psc_900_series-hpijs.ppd"
     Attribute "Product" "" "HP PSC 900"
@@ -804,7 +804,7 @@ et=2"
     Attribute "Product" "" "HP Deskjet 3870"
   }
   {
-    ModelName "HP Officejet 5100 series Foomatic/hpijs"
+    ModelName "HP Officejet 5100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_5100_series;DES:officejet_5100_series;"
     PCFileName "hp-officejet_5100_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet 5100"
@@ -1495,7 +1495,7 @@ et=2"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJ9xxVIP:Normal%>
   {
-    ModelName "HP Officejet D series Foomatic/hpijs"
+    ModelName "HP Officejet D Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_d_series;DES:officejet_d_series;"
     PCFileName "hp-officejet_d_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet d125xi"
@@ -1585,7 +1585,7 @@ et=2"
     Attribute "Product" "" "HP Color Inkjet cp1700"
   }
   {
-    ModelName "HP PSC 2100 series Foomatic/hpijs"
+    ModelName "HP PSC 2100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:psc_2100_series;DES:psc_2100_series;"
     PCFileName "hp-psc_2100_series-hpijs.ppd"
     Attribute "Product" "" "HP PSC 2105"
@@ -1594,13 +1594,13 @@ et=2"
     Attribute "Product" "" "HP PSC 2110"
   }
   {
-    ModelName "HP PSC 2150 series Foomatic/hpijs"
+    ModelName "HP PSC 2150 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:psc_2150_series;DES:psc_2150_series;"
     PCFileName "hp-psc_2150_series-hpijs.ppd"
     Attribute "Product" "" "HP PSC 2150"
   }
   {
-    ModelName "HP PSC 2170 series Foomatic/hpijs"
+    ModelName "HP PSC 2170 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:psc_2170_series;DES:psc_2170_series;"
     PCFileName "hp-psc_2170_series-hpijs.ppd"
     Attribute "Product" "" "HP PSC 2170"
@@ -1629,7 +1629,7 @@ et=2"
     Attribute "Product" "" "HP Deskjet 6127"
   }
   {
-    ModelName "HP Officejet 7100 series Foomatic/hpijs"
+    ModelName "HP Officejet 7100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_7100_series;DES:officejet_7100_series;"
     PCFileName "hp-officejet_7100_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet 7100"
@@ -2375,7 +2375,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Business Inkjet 1000"
   }
   {
-    ModelName "HP PSC 1500 series Foomatic/hpijs"
+    ModelName "HP PSC 1500 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:psc_1500_series;DES:psc_1500_series;"
     PCFileName "hp-psc_1500_series-hpijs.ppd"
     Attribute "Product" "" "HP PSC 1507"
@@ -2384,7 +2384,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP PSC 1508"
   }
   {
-    ModelName "HP PSC 1510 series Foomatic/hpijs"
+    ModelName "HP PSC 1510 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:psc_1510_series;DES:psc_1510_series;"
     PCFileName "hp-psc_1510_series-hpijs.ppd"
     Attribute "Product" "" "HP PSC 1510"
@@ -2394,7 +2394,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP PSC 1513s"
   }
   {
-    ModelName "HP PSC 1600 series Foomatic/hpijs"
+    ModelName "HP PSC 1600 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:psc_1600_series;DES:psc_1600_series;"
     PCFileName "hp-psc_1600_series-hpijs.ppd"
     Attribute "Product" "" "HP PSC 1600"
@@ -2404,13 +2404,13 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP PSC 1613"
   }
   {
-    ModelName "HP PSC 2200 series Foomatic/hpijs"
+    ModelName "HP PSC 2200 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:psc_2200_series;DES:psc_2200_series;"
     PCFileName "hp-psc_2200_series-hpijs.ppd"
     Attribute "Product" "" "HP PSC 2200"
   }
   {
-    ModelName "HP PSC 2210 series Foomatic/hpijs"
+    ModelName "HP PSC 2210 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:psc_2210_series;DES:psc_2210_series;"
     PCFileName "hp-psc_2210_series-hpijs.ppd"
     Attribute "Product" "" "HP PSC 2210"
@@ -2418,13 +2418,13 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP PSC 2210xi"
   }
   {
-    ModelName "HP PSC 2300 series Foomatic/hpijs"
+    ModelName "HP PSC 2300 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:psc_2300_series;DES:psc_2300_series;"
     PCFileName "hp-psc_2300_series-hpijs.ppd"
-    Attribute "Product" "" "HP PSC 2300 series"
+    Attribute "Product" "" "HP PSC 2300 Series"
   }
   {
-    ModelName "HP PSC 2350 series Foomatic/hpijs"
+    ModelName "HP PSC 2350 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:psc_2350_series;DES:psc_2350_series;"
     PCFileName "hp-psc_2350_series-hpijs.ppd"
     Attribute "Product" "" "HP PSC 2350"
@@ -2435,7 +2435,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP PSC 2355xi"
   }
   {
-    ModelName "HP PSC 2400 series Foomatic/hpijs"
+    ModelName "HP PSC 2400 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:psc_2400_series;DES:psc_2400_series;"
     PCFileName "hp-psc_2400_series-hpijs.ppd"
     Attribute "Product" "" "HP PSC 2410"
@@ -2446,7 +2446,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP PSC 2450"
   }
   {
-    ModelName "HP Deskjet d2500 series Foomatic/hpijs"
+    ModelName "HP Deskjet d2500 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_d2500_series;DES:deskjet_d2500_series;"
     PCFileName "hp-deskjet_d2500_series-hpijs.ppd"
     Attribute "Product" "" "HP Deskjet d2545 Printer"
@@ -2454,7 +2454,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Deskjet d2560 Printer"
   }
   {
-    ModelName "HP PSC 2500 series Foomatic/hpijs"
+    ModelName "HP PSC 2500 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:psc_2500_series;DES:psc_2500_series;"
     PCFileName "hp-psc_2500_series-hpijs.ppd"
     Attribute "Product" "" "HP PSC 2500"
@@ -2463,7 +2463,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP PSC 2550"
   }
   {
-    ModelName "HP Photosmart 2570 series Foomatic/hpijs"
+    ModelName "HP Photosmart 2570 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_2570_series;DES:photosmart_2570_series;"
     PCFileName "hp-photosmart_2570_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 2573"
@@ -2474,7 +2474,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 2578"
   }
   {
-    ModelName "HP Photosmart 2600 series Foomatic/hpijs"
+    ModelName "HP Photosmart 2600 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_2600_series;DES:photosmart_2600_series;"
     PCFileName "hp-photosmart_2600_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 2605"
@@ -2486,7 +2486,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 2615"
   }
   {
-    ModelName "HP Photosmart 2700 series Foomatic/hpijs"
+    ModelName "HP Photosmart 2700 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_2700_series;DES:photosmart_2700_series;"
     PCFileName "hp-photosmart_2700_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 2710"
@@ -2494,7 +2494,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 2713"
   }
   {
-    ModelName "HP Photosmart c3100 series Foomatic/hpijs"
+    ModelName "HP Photosmart c3100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_c3100_series;DES:photosmart_c3100_series;"
     PCFileName "hp-photosmart_c3100_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart c3135 All-in-one"
@@ -2511,7 +2511,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart c3194 All-in-one"
   }
   {
-    ModelName "HP Photosmart 3100 series Foomatic/hpijs"
+    ModelName "HP Photosmart 3100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_3100_series;DES:photosmart_3100_series;"
     PCFileName "hp-photosmart_3100_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 3110"
@@ -2519,7 +2519,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 3108"
   }
   {
-    ModelName "HP Photosmart 3200 series Foomatic/hpijs"
+    ModelName "HP Photosmart 3200 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_3200_series;DES:photosmart_3200_series;"
     PCFileName "hp-photosmart_3200_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 3207"
@@ -2531,7 +2531,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 3214"
   }
   {
-    ModelName "HP Photosmart 3300 series Foomatic/hpijs"
+    ModelName "HP Photosmart 3300 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_3300_series;DES:photosmart_3300_series;"
     PCFileName "hp-photosmart_3300_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 3308"
@@ -2541,7 +2541,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 3314"
   }
   {
-    ModelName "HP Photosmart c4100 series Foomatic/hpijs"
+    ModelName "HP Photosmart c4100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_c4100_series;DES:photosmart_c4100_series;"
     PCFileName "hp-photosmart_c4100_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart c4110 All-in-one"
@@ -2558,7 +2558,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart c4194 All-in-one"
   }
   {
-    ModelName "HP Photosmart c4200 series Foomatic/hpijs"
+    ModelName "HP Photosmart c4200 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_c4200_series;DES:photosmart_c4200_series;"
     PCFileName "hp-photosmart_c4200_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart c4240 All-in-one"
@@ -2577,7 +2577,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart c4294 All-in-one"
   }
   {
-    ModelName "HP Deskjet f4200 series Foomatic/hpijs"
+    ModelName "HP Deskjet f4200 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_f4200_series;DES:deskjet_f4200_series;"
     PCFileName "hp-deskjet_f4200_series-hpijs.ppd"
     Attribute "Product" "" "HP Deskjet f4280 All-in-one"
@@ -2597,19 +2597,19 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Deskjet f4280 All-in-one"
   }
   {
-    ModelName "HP Deskjet f4210 series Foomatic/hpijs"
+    ModelName "HP Deskjet f4210 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_f4210_series;DES:deskjet_f4210_series;"
     PCFileName "hp-deskjet_f4210_series-hpijs.ppd"
     Attribute "Product" "" "HP Deskjet f4210 All-in-one"
   }
   {
-    ModelName "HP Deskjet f4213 series Foomatic/hpijs"
+    ModelName "HP Deskjet f4213 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_f4213_series;DES:deskjet_f4213_series;"
     PCFileName "hp-deskjet_f4213_series-hpijs.ppd"
     Attribute "Product" "" "HP Deskjet f4213 All-in-one"
   }
   {
-    ModelName "HP Photosmart c4340 series Foomatic/hpijs"
+    ModelName "HP Photosmart c4340 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_c4340_series;DES:photosmart_c4340_series;"
     PCFileName "hp-photosmart_c4340_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart c4340 All-in-one"
@@ -2617,7 +2617,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart c4345 All-in-one"
   }
   {
-    ModelName "HP Photosmart c4380 series Foomatic/hpijs"
+    ModelName "HP Photosmart c4380 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_c4380_series;DES:photosmart_c4380_series;"
     PCFileName "hp-photosmart_c4380_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart c4380 All-in-one"
@@ -2628,7 +2628,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart c4388 All-in-one"
   }
   {
-    ModelName "HP Photosmart c4400 series Foomatic/hpijs"
+    ModelName "HP Photosmart c4400 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_c4400_series;DES:photosmart_c4400_series;"
     PCFileName "hp-photosmart_c4400_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart c4410 All-in-one Printer"
@@ -2648,7 +2648,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart c4494 All-in-one Printer"
   }
   {
-    ModelName "HP Officejet j4500 series Foomatic/hpijs"
+    ModelName "HP Officejet j4500 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_j4500_series;DES:officejet_j4500_series;"
     PCFileName "hp-officejet_j4500_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet Pro j4525 All In One"
@@ -2660,7 +2660,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Officejet Pro j4524 All In One"
   }
   {
-    ModelName "HP Photosmart c4500 series Foomatic/hpijs"
+    ModelName "HP Photosmart c4500 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_c4500_series;DES:photosmart_c4500_series;"
     PCFileName "hp-photosmart_c4500_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart c4540 All-in-one Printer"
@@ -2677,27 +2677,27 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart c4599 All-in-one Printer"
   }
   {
-    ModelName "HP Officejet j4660 series Foomatic/hpijs"
+    ModelName "HP Officejet j4660 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_j4660_series;DES:officejet_j4660_series;"
     PCFileName "hp-officejet_j4660_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet j4660 All-in-one Printer"
   }
   {
-    ModelName "HP Officejet j4680 series Foomatic/hpijs"
+    ModelName "HP Officejet j4680 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_j4680_series;DES:officejet_j4680_series;"
     PCFileName "hp-officejet_j4680_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet j4680 All-in-one Printer"
     Attribute "Product" "" "HP Officejet j4680c All-in-one Printer"
   }
   {
-    ModelName "HP Photosmart d5060 series Foomatic/hpijs"
+    ModelName "HP Photosmart d5060 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_d5060_series;DES:photosmart_d5060_series;"
     PCFileName "hp-photosmart_d5060_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart d5063 Printer"
     Attribute "Product" "" "HP Photosmart d5065 Printer"
   }
   {
-    ModelName "HP Photosmart c5100 series Foomatic/hpijs"
+    ModelName "HP Photosmart c5100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_c5100_series;DES:photosmart_c5100_series;"
     PCFileName "hp-photosmart_c5100_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart c5140 All-in-one"
@@ -2724,7 +2724,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Deskjet 5168"
   }
   {
-    ModelName "HP Photosmart d5100 series Foomatic/hpijs"
+    ModelName "HP Photosmart d5100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_d5100_series;DES:photosmart_d5100_series;"
     PCFileName "hp-photosmart_d5100_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart d5145 Printer"
@@ -2735,7 +2735,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart d5168 Printer"
   }
   {
-    ModelName "HP Photosmart c5200 series Foomatic/hpijs"
+    ModelName "HP Photosmart c5200 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_c5200_series;DES:photosmart_c5200_series;"
     PCFileName "hp-photosmart_c5200_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart c5240 All-in-one"
@@ -2750,7 +2750,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart c5293 All-in-one"
   }
   {
-    ModelName "HP Photosmart c5300 series Foomatic/hpijs"
+    ModelName "HP Photosmart c5300 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_c5300_series;DES:photosmart_c5300_series;"
     PCFileName "hp-photosmart_c5300_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart c5370 All-in-one"
@@ -2762,7 +2762,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart c5393 All-in-one"
   }
   {
-    ModelName "HP Photosmart d5300 series Foomatic/hpijs"
+    ModelName "HP Photosmart d5300 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_d5300_series;DES:photosmart_d5300_series;"
     PCFileName "hp-photosmart_d5300_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart d5345 Printer"
@@ -2771,7 +2771,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart d5368 Printer"
   }
   {
-    ModelName "HP Deskjet 5400 series Foomatic/hpijs"
+    ModelName "HP Deskjet 5400 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_5400_series;DES:deskjet_5400_series;"
     PCFileName "hp-deskjet_5400_series-hpijs.ppd"
     Attribute "Product" "" "HP Deskjet 5440"
@@ -2784,7 +2784,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Deskjet 5443"
   }
   {
-    ModelName "HP Photosmart d5400 series Foomatic/hpijs"
+    ModelName "HP Photosmart d5400 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_d5400_series;DES:photosmart_d5400_series;"
     PCFileName "hp-photosmart_d5400_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart d5460 Printer"
@@ -2792,7 +2792,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart d5468 Printer"
   }
   {
-    ModelName "HP Photosmart c5500 series Foomatic/hpijs"
+    ModelName "HP Photosmart c5500 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_c5500_series;DES:photosmart_c5500_series;"
     PCFileName "hp-photosmart_c5500_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart c5540 All-in-one"
@@ -2839,7 +2839,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Deskjet 5748"
   }
   {
-    ModelName "HP Officejet j5700 series Foomatic/hpijs"
+    ModelName "HP Officejet j5700 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_j5700_series;DES:officejet_j5700_series;"
     PCFileName "hp-officejet_j5700_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet j5740 All-in-one"
@@ -2868,7 +2868,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Deskjet 5850w"
   }
   {
-    ModelName "HP Deskjet 5900 series Foomatic/hpijs"
+    ModelName "HP Deskjet 5900 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_5900_series;DES:deskjet_5900_series;"
     PCFileName "hp-deskjet_5900_series-hpijs.ppd"
     Attribute "Product" "" "HP Deskjet 5938"
@@ -2877,7 +2877,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Deskjet 5943"
   }
   {
-    ModelName "HP Photosmart c6100 series Foomatic/hpijs"
+    ModelName "HP Photosmart c6100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_c6100_series;DES:photosmart_c6100_series;"
     PCFileName "hp-photosmart_c6100_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart c6150 All-in-one"
@@ -2889,7 +2889,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart c6188 All-in-one"
   }
   {
-    ModelName "HP Photosmart d6100 series Foomatic/hpijs"
+    ModelName "HP Photosmart d6100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_d6100_series;DES:photosmart_d6100_series;"
     PCFileName "hp-photosmart_d6100_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart d6160 Printer"
@@ -2897,7 +2897,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart d6168 Printer"
   }
   {
-    ModelName "HP Officejet 6100 series Foomatic/hpijs"
+    ModelName "HP Officejet 6100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_6100_series;DES:officejet_6100_series;"
     PCFileName "hp-officejet_6100_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet 6105"
@@ -2906,13 +2906,13 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Officejet 6110xi"
   }
   {
-    ModelName "HP Officejet 6150 series Foomatic/hpijs"
+    ModelName "HP Officejet 6150 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_6150_series;DES:officejet_6150_series;"
     PCFileName "hp-officejet_6150_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet 6150"
   }
   {
-    ModelName "HP Officejet 6200 series Foomatic/hpijs"
+    ModelName "HP Officejet 6200 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_6200_series;DES:officejet_6200_series;"
     PCFileName "hp-officejet_6200_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet 6210"
@@ -2922,7 +2922,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Officejet 6215"
   }
   {
-    ModelName "HP Photosmart c6200 series Foomatic/hpijs"
+    ModelName "HP Photosmart c6200 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_c6200_series;DES:photosmart_c6200_series;"
     PCFileName "hp-photosmart_c6200_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart c6240 All-in-one"
@@ -2936,7 +2936,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart c6288 All-in-one"
   }
   {
-    ModelName "HP Photosmart c6300 series Foomatic/hpijs"
+    ModelName "HP Photosmart c6300 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_c6300_series;DES:photosmart_c6300_series;"
     PCFileName "hp-photosmart_c6300_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart c6340 All-in-one"
@@ -2947,14 +2947,14 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart c6388 All-in-one"
   }
   {
-    ModelName "HP Officejet 6300 series Foomatic/hpijs"
+    ModelName "HP Officejet 6300 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_6300_series;DES:officejet_6300_series;"
     PCFileName "hp-officejet_6300_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet 6310"
     Attribute "Product" "" "HP Officejet 6310xi"
   }
   {
-    ModelName "HP Officejet j6400 series Foomatic/hpijs"
+    ModelName "HP Officejet j6400 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_j6400_series;DES:officejet_j6400_series;"
     PCFileName "hp-officejet_j6400_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet j6410 All-in-one"
@@ -3000,7 +3000,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Deskjet 6840dt"
   }
   {
-    ModelName "HP Deskjet 6940 series Foomatic/hpijs"
+    ModelName "HP Deskjet 6940 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_6940_series;DES:deskjet_6940_series;"
     PCFileName "hp-deskjet_6940_series-hpijs.ppd"
     Attribute "Product" "" "HP Deskjet 6940"
@@ -3009,14 +3009,14 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Deskjet 6988dt"
   }
   {
-    ModelName "HP Deskjet 6980 series Foomatic/hpijs"
+    ModelName "HP Deskjet 6980 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_6980_series;DES:deskjet_6980_series;"
     PCFileName "hp-deskjet_6980_series-hpijs.ppd"
     Attribute "Product" "" "HP Deskjet 6980"
     Attribute "Product" "" "HP Deskjet 6980dt"
   }
   {
-    ModelName "HP Photosmart c7100 series Foomatic/hpijs"
+    ModelName "HP Photosmart c7100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_c7100_series;DES:photosmart_c7100_series;"
     PCFileName "hp-photosmart_c7100_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart c7150 All-in-one"
@@ -3029,7 +3029,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart c7190 All-in-one"
   }
   {
-    ModelName "HP Photosmart d7100 series Foomatic/hpijs"
+    ModelName "HP Photosmart d7100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_d7100_series;DES:photosmart_d7100_series;"
     PCFileName "hp-photosmart_d7100_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart d7145 Printer"
@@ -3055,7 +3055,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 7155w"
   }
   {
-    ModelName "HP Photosmart d7200 series Foomatic/hpijs"
+    ModelName "HP Photosmart d7200 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_d7200_series;DES:photosmart_d7200_series;"
     PCFileName "hp-photosmart_d7200_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart d7245 Printer"
@@ -3074,7 +3074,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 7268"
   }
   {
-    ModelName "HP Officejet 7200 series Foomatic/hpijs"
+    ModelName "HP Officejet 7200 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_7200_series;DES:officejet_7200_series;"
     PCFileName "hp-officejet_7200_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet 7210"
@@ -3083,7 +3083,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Officejet 7213"
   }
   {
-    ModelName "HP Photosmart c7200 series Foomatic/hpijs"
+    ModelName "HP Photosmart c7200 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_c7200_series;DES:photosmart_c7200_series;"
     PCFileName "hp-photosmart_c7200_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart c7250 All-in-one"
@@ -3093,7 +3093,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart c7288 All-in-one"
   }
   {
-    ModelName "HP Photosmart 7200 series Foomatic/hpijs"
+    ModelName "HP Photosmart 7200 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_7200_series;DES:photosmart_7200_series;"
     PCFileName "hp-photosmart_7200_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 7260"
@@ -3102,7 +3102,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 7268"
   }
   {
-    ModelName "HP Photosmart d7300 series Foomatic/hpijs"
+    ModelName "HP Photosmart d7300 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_d7300_series;DES:photosmart_d7300_series;"
     PCFileName "hp-photosmart_d7300_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart d7345 Printer"
@@ -3112,7 +3112,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart d7368 Printer"
   }
   {
-    ModelName "HP Officejet 7300 series Foomatic/hpijs"
+    ModelName "HP Officejet 7300 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_7300_series;DES:officejet_7300_series;"
     PCFileName "hp-officejet_7300_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet 7310"
@@ -3140,7 +3140,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 7350v"
   }
   {
-    ModelName "HP Officejet 7400 series Foomatic/hpijs"
+    ModelName "HP Officejet 7400 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_7400_series;DES:officejet_7400_series;"
     PCFileName "hp-officejet_7400_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet 7410"
@@ -3148,7 +3148,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Officejet 7413"
   }
   {
-    ModelName "HP Photosmart 7400 series Foomatic/hpijs"
+    ModelName "HP Photosmart 7400 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_7400_series;DES:photosmart_7400_series;"
     PCFileName "hp-photosmart_7400_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 7450"
@@ -3158,7 +3158,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 7459"
   }
   {
-    ModelName "HP Photosmart d7400 series Foomatic/hpijs"
+    ModelName "HP Photosmart d7400 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_d7400_series;DES:photosmart_d7400_series;"
     PCFileName "hp-photosmart_d7400_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart d7460 Printer"
@@ -3166,7 +3166,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart d7468 Printer"
   }
   {
-    ModelName "HP Photosmart d7500 series Foomatic/hpijs"
+    ModelName "HP Photosmart d7500 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_d7500_series;DES:photosmart_d7500_series;"
     PCFileName "hp-photosmart_d7500_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart d7560 Printer"
@@ -3180,14 +3180,14 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 7550w"
   }
   {
-    ModelName "HP Photosmart 7600 series Foomatic/hpijs"
+    ModelName "HP Photosmart 7600 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_7600_series;DES:photosmart_7600_series;"
     PCFileName "hp-photosmart_7600_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 7660"
     Attribute "Product" "" "HP Photosmart 7665"
   }
   {
-    ModelName "HP Photosmart 7700 series Foomatic/hpijs"
+    ModelName "HP Photosmart 7700 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_7700_series;DES:photosmart_7700_series;"
     PCFileName "hp-photosmart_7700_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 7755"
@@ -3200,7 +3200,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 7760v"
   }
   {
-    ModelName "HP Photosmart 7800 series Foomatic/hpijs"
+    ModelName "HP Photosmart 7800 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_7800_series;DES:photosmart_7800_series;"
     PCFileName "hp-photosmart_7800_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 7830"
@@ -3211,7 +3211,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 7853"
   }
   {
-    ModelName "HP Photosmart 7900 series Foomatic/hpijs"
+    ModelName "HP Photosmart 7900 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_7900_series;DES:photosmart_7900_series;"
     PCFileName "hp-photosmart_7900_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 7960"
@@ -3220,7 +3220,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 7960gp"
   }
   {
-    ModelName "HP Photosmart 8000 series Foomatic/hpijs"
+    ModelName "HP Photosmart 8000 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_8000_series;DES:photosmart_8000_series;"
     PCFileName "hp-photosmart_8000_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 8030"
@@ -3232,7 +3232,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 8053"
   }
   {
-    ModelName "HP Photosmart 8100 series Foomatic/hpijs"
+    ModelName "HP Photosmart 8100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_8100_series;DES:photosmart_8100_series;"
     PCFileName "hp-photosmart_8100_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 8150"
@@ -3242,7 +3242,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 8158"
   }
   {
-    ModelName "HP Photosmart c8100 series Foomatic/hpijs"
+    ModelName "HP Photosmart c8100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_c8100_series;DES:photosmart_c8100_series;"
     PCFileName "hp-photosmart_c8100_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart c8150 All-in-one"
@@ -3251,7 +3251,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart c8188 All-in-one"
   }
   {
-    ModelName "HP Photosmart 8200 series Foomatic/hpijs"
+    ModelName "HP Photosmart 8200 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_8200_series;DES:photosmart_8200_series;"
     PCFileName "hp-photosmart_8200_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 8230"
@@ -3262,7 +3262,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 8253"
   }
   {
-    ModelName "HP Photosmart 8400 series Foomatic/hpijs"
+    ModelName "HP Photosmart 8400 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_8400_series;DES:photosmart_8400_series;"
     PCFileName "hp-photosmart_8400_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 8450"
@@ -3289,7 +3289,7 @@ lity:PenSet=2,Quality:FullBleed=1"
       Attribute "Product" "" "HP Officejet k7100 Printer"
     }
     {
-      ModelName "HP Photosmart Pro b8300 series Foomatic/hpijs"
+      ModelName "HP Photosmart Pro b8300 Series Foomatic/hpijs"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_pro_b8300_series;DES:photosmart_pro_b8300_series;"
       PCFileName "hp-photosmart_pro_b8300_series-hpijs.ppd"
       Attribute "Product" "" "HP Photosmart Pro b8330 Printer"
@@ -3298,7 +3298,7 @@ lity:PenSet=2,Quality:FullBleed=1"
       Attribute "Product" "" "HP Photosmart Pro b8353 Printer"
     }
     {
-      ModelName "HP Photosmart b8500 series Foomatic/hpijs"
+      ModelName "HP Photosmart b8500 Series Foomatic/hpijs"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_b8500_series;DES:photosmart_b8500_series;"
       PCFileName "hp-photosmart_b8500_series-hpijs.ppd"
       Attribute "Product" "" "HP Photosmart b8550 Photo Printer"
@@ -3306,7 +3306,7 @@ lity:PenSet=2,Quality:FullBleed=1"
       Attribute "Product" "" "HP Photosmart b8558 Photo Printer"
     }
     {
-      ModelName "HP Photosmart 8700 series Foomatic/hpijs"
+      ModelName "HP Photosmart 8700 Series Foomatic/hpijs"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_8700_series;DES:photosmart_8700_series;"
       PCFileName "hp-photosmart_8700_series-hpijs.ppd"
       Attribute "Product" "" "HP Photosmart 8750"
@@ -3316,7 +3316,7 @@ lity:PenSet=2,Quality:FullBleed=1"
       Attribute "Product" "" "HP Photosmart 8758"
     }
     {
-      ModelName "HP Photosmart Pro b8800 series Foomatic/hpijs"
+      ModelName "HP Photosmart Pro b8800 Series Foomatic/hpijs"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_pro_b8800_series;DES:photosmart_pro_b8800_series;"
       PCFileName "hp-photosmart_pro_b8800_series-hpijs.ppd"
       Attribute "Product" "" "HP Photosmart Pro b8850 Printer"
@@ -3588,7 +3588,7 @@ et=2"
     ModelName "HP Officejet Pro k5300 Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_pro_k5300;DES:officejet_pro_k5300;"
     PCFileName "hp-officejet_pro_k5300-hpijs.ppd"
-    Attribute "Product" "" "HP Officejet Pro k5300 series"
+    Attribute "Product" "" "HP Officejet Pro k5300 Series"
   }
   {
     ModelName "HP Officejet Pro k5400 Foomatic/hpijs"
@@ -3859,7 +3859,7 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
     Attribute "Product" "" "HP 910"
   }
   {
-    ModelName "HP PSC 1000 series Foomatic/hpijs"
+    ModelName "HP PSC 1000 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:psc_1000_series;DES:psc_1000_series;"
     PCFileName "hp-psc_1000_series-hpijs.ppd"
     Attribute "Product" "" "HP PSC 1110"
@@ -3867,7 +3867,7 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
     Attribute "Product" "" "HP PSC 1118"
   }
   {
-    ModelName "HP PSC 1100 series Foomatic/hpijs"
+    ModelName "HP PSC 1100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:psc_1100_series;DES:psc_1100_series;"
     PCFileName "hp-psc_1100_series-hpijs.ppd"
     Attribute "Product" "" "HP PSC 1110"
@@ -3875,7 +3875,7 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
     Attribute "Product" "" "HP PSC 1118"
   }
   {
-    ModelName "HP PSC 1200 series Foomatic/hpijs"
+    ModelName "HP PSC 1200 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:psc_1200_series;DES:psc_1200_series;"
     PCFileName "hp-psc_1200_series-hpijs.ppd"
     Attribute "Product" "" "HP PSC 1200"
@@ -3890,7 +3890,7 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
     Attribute "Product" "" "HP PSC 1219"
   }
   {
-    ModelName "HP Deskjet d1300 series Foomatic/hpijs"
+    ModelName "HP Deskjet d1300 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_d1300_series;DES:deskjet_d1300_series;"
     PCFileName "hp-deskjet_d1300_series-hpijs.ppd"
     Attribute "Product" "" "HP Deskjet d1360"
@@ -3901,7 +3901,7 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
     Attribute "Product" "" "HP Deskjet d1368"
   }
   {
-    ModelName "HP Deskjet d1400 series Foomatic/hpijs"
+    ModelName "HP Deskjet d1400 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_d1400_series;DES:deskjet_d1400_series;"
     PCFileName "hp-deskjet_d1400_series-hpijs.ppd"
     Attribute "Product" "" "HP Deskjet d1420 Printer"
@@ -3914,7 +3914,7 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
     Attribute "Product" "" "HP Deskjet d1470 Printer"
   }
   {
-    ModelName "HP Deskjet d1500 series Foomatic/hpijs"
+    ModelName "HP Deskjet d1500 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_d1500_series;DES:deskjet_d1500_series;"
     PCFileName "hp-deskjet_d1500_series-hpijs.ppd"
     Attribute "Product" "" "HP Deskjet d1520 Printer"
@@ -3922,7 +3922,7 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
     Attribute "Product" "" "HP Deskjet d1560 Printer"
   }
   {
-    ModelName "HP Deskjet f2100 series Foomatic/hpijs"
+    ModelName "HP Deskjet f2100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_f2100_series;DES:deskjet_f2100_series;"
     PCFileName "hp-deskjet_f2100_series-hpijs.ppd"
     Attribute "Product" "" "HP Deskjet f2120 All-in-one"
@@ -3936,7 +3936,7 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
     Attribute "Product" "" "HP Deskjet f2185 All-in-one"
   }
   {
-    ModelName "HP Deskjet f2200 series Foomatic/hpijs"
+    ModelName "HP Deskjet f2200 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_f2200_series;DES:deskjet_f2200_series;"
     PCFileName "hp-deskjet_f2200_series-hpijs.ppd"
     Attribute "Product" "" "HP Deskjet f2210 All-in-one"
@@ -4032,10 +4032,10 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
     Attribute "Product" "" "HP Deskjet 3940"
   }
   {
-    ModelName "HP Officejet 4100 series Foomatic/hpijs"
+    ModelName "HP Officejet 4100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_4100_series;DES:officejet_4100_series;"
     PCFileName "hp-officejet_4100_series-hpijs.ppd"
-    Attribute "Product" "" "HP Officejet 4100 series"
+    Attribute "Product" "" "HP Officejet 4100 Series"
     Attribute "Product" "" "HP Officejet 4110 All-in-one"
     Attribute "Product" "" "HP Officejet 4110v All-in-one"
     Attribute "Product" "" "HP Officejet 4110xi All-in-one"
@@ -4047,13 +4047,13 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
     Attribute "Product" "" "HP Officejet 4105 All-in-one"
   }
   {
-    ModelName "HP Officejet 4115 series Foomatic/hpijs"
+    ModelName "HP Officejet 4115 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_4115_series;DES:officejet_4115_series;"
     PCFileName "hp-officejet_4115_series-hpijs.ppd"
-    Attribute "Product" "" "HP Officejet 4115 series"
+    Attribute "Product" "" "HP Officejet 4115 Series"
   }
   {
-    ModelName "HP Officejet 4300 series Foomatic/hpijs"
+    ModelName "HP Officejet 4300 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_4300_series;DES:officejet_4300_series;"
     PCFileName "hp-officejet_4300_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet 4311"
@@ -4289,7 +4289,7 @@ ty:PenSet=2,Quality:FullBleed=1"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJ3600:Normal%>
   {
-    ModelName "HP Deskjet f300 series Foomatic/hpijs"
+    ModelName "HP Deskjet f300 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_f300_series;DES:deskjet_f300_series;"
     PCFileName "hp-deskjet_f300_series-hpijs.ppd"
     Attribute "Product" "" "HP Deskjet f310"
@@ -4325,7 +4325,7 @@ ty:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP 915"
   }
   {
-    ModelName "HP PSC 1300 series Foomatic/hpijs"
+    ModelName "HP PSC 1300 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:psc_1300_series;DES:psc_1300_series;"
     PCFileName "hp-psc_1300_series-hpijs.ppd"
     Attribute "Product" "" "HP PSC 1300"
@@ -4336,7 +4336,7 @@ ty:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP PSC 1340 All-in-one"
   }
   {
-    ModelName "HP PSC 1310 series Foomatic/hpijs"
+    ModelName "HP PSC 1310 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:psc_1310_series;DES:psc_1310_series;"
     PCFileName "hp-psc_1310_series-hpijs.ppd"
     Attribute "Product" "" "HP PSC 1310"
@@ -4348,7 +4348,7 @@ ty:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP PSC 1318"
   }
   {
-    ModelName "HP PSC 1358 series Foomatic/hpijs"
+    ModelName "HP PSC 1358 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:psc_1358_series;DES:psc_1358_series;"
     PCFileName "hp-psc_1358_series-hpijs.ppd"
     Attribute "Product" "" "HP PSC 1300"
@@ -4359,7 +4359,7 @@ ty:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP PSC 1340 All-in-one"
   }
   {
-    ModelName "HP PSC 1400 series Foomatic/hpijs"
+    ModelName "HP PSC 1400 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:psc_1400_series;DES:psc_1400_series;"
     PCFileName "hp-psc_1400_series-hpijs.ppd"
     Attribute "Product" "" "HP PSC 1401"
@@ -4370,7 +4370,7 @@ ty:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP PSC 1417"
   }
   {
-    ModelName "HP Deskjet d2300 series Foomatic/hpijs"
+    ModelName "HP Deskjet d2300 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_d2300_series;DES:deskjet_d2300_series;"
     PCFileName "hp-deskjet_d2300_series-hpijs.ppd"
     Attribute "Product" "" "HP Deskjet d2320 Printer"
@@ -4379,7 +4379,7 @@ ty:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Deskjet d2368 Printer"
   }
   {
-    ModelName "HP Deskjet d2400 series Foomatic/hpijs"
+    ModelName "HP Deskjet d2400 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_d2400_series;DES:deskjet_d2400_series;"
     PCFileName "hp-deskjet_d2400_series-hpijs.ppd"
     Attribute "Product" "" "HP Deskjet d2430 Printer"
@@ -4389,13 +4389,13 @@ ty:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Deskjet d2468 Printer"
   }
   {
-    ModelName "HP Officejet j3500 series Foomatic/hpijs"
+    ModelName "HP Officejet j3500 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_j3500_series;DES:officejet_j3500_series;"
     PCFileName "hp-officejet_j3500_series-hpijs.ppd"
-    Attribute "Product" "" "HP Officejet j3500 series"
+    Attribute "Product" "" "HP Officejet j3500 Series"
   }
   {
-    ModelName "HP Officejet j3600 series Foomatic/hpijs"
+    ModelName "HP Officejet j3600 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_j3600_series;DES:officejet_j3600_series;"
     PCFileName "hp-officejet_j3600_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet j3608 All-in-one"
@@ -4437,7 +4437,7 @@ ty:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Deskjet 3843"
   }
   {
-    ModelName "HP Deskjet f4100 series Foomatic/hpijs"
+    ModelName "HP Deskjet f4100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_f4100_series;DES:deskjet_f4100_series;"
     PCFileName "hp-deskjet_f4100_series-hpijs.ppd"
     Attribute "Product" "" "HP Deskjet f4140 All-in-one"
@@ -4453,7 +4453,7 @@ ty:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Deskjet f4194 All-in-one"
   }
   {
-    ModelName "HP Officejet 4200 series Foomatic/hpijs"
+    ModelName "HP Officejet 4200 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_4200_series;DES:officejet_4200_series;"
     PCFileName "hp-officejet_4200_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet 4200"
@@ -4474,7 +4474,7 @@ ty:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Officejet 4259"
   }
   {
-    ModelName "HP Officejet 5500 series Foomatic/hpijs"
+    ModelName "HP Officejet 5500 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_5500_series;DES:officejet_5500_series;"
     PCFileName "hp-officejet_5500_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet 5505"
@@ -4485,7 +4485,7 @@ ty:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Officejet 5515"
   }
   {
-    ModelName "HP Officejet j5500 series Foomatic/hpijs"
+    ModelName "HP Officejet j5500 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_j5500_series;DES:officejet_j5500_series;"
     PCFileName "hp-officejet_j5500_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet j5505 All-in-one"
@@ -4497,7 +4497,7 @@ ty:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Officejet j5520 All-in-one"
   }
   {
-    ModelName "HP Officejet 5600 series Foomatic/hpijs"
+    ModelName "HP Officejet 5600 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_5600_series;DES:officejet_5600_series;"
     PCFileName "hp-officejet_5600_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet 5600"
@@ -4682,7 +4682,7 @@ ty:PenSet=2,Quality:FullBleed=1"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJ4100:Normal%>
   {
-    ModelName "HP Deskjet d4100 series Foomatic/hpijs"
+    ModelName "HP Deskjet d4100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_d4100_series;DES:deskjet_d4100_series;"
     PCFileName "hp-deskjet_d4100_series-hpijs.ppd"
     Attribute "Product" "" "HP Deskjet d4145 Printer"
@@ -4692,7 +4692,7 @@ ty:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Deskjet d4168 Printer"
   }
   {
-    ModelName "HP Deskjet d4200 series Foomatic/hpijs"
+    ModelName "HP Deskjet d4200 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_d4200_series;DES:deskjet_d4200_series;"
     PCFileName "hp-deskjet_d4200_series-hpijs.ppd"
     Attribute "Product" "" "HP Deskjet d4245 Printer"
@@ -4701,7 +4701,7 @@ ty:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "HP Deskjet d4268 Printer"
   }
   {
-    ModelName "HP Deskjet d4300 series Foomatic/hpijs"
+    ModelName "HP Deskjet d4300 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_d4300_series;DES:deskjet_d4300_series;"
     PCFileName "hp-deskjet_d4300_series-hpijs.ppd"
     Attribute "Product" "" "HP Deskjet d4360 Printer"
@@ -4808,7 +4808,7 @@ ity:PenSet=1,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 130xi"
   }
   {
-    ModelName "HP Photosmart 140 series Foomatic/hpijs"
+    ModelName "HP Photosmart 140 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_140_series;DES:photosmart_140_series;"
     PCFileName "hp-photosmart_140_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 140"
@@ -4826,7 +4826,7 @@ ity:PenSet=1,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 230xi"
   }
   {
-    ModelName "HP Photosmart 240 series Foomatic/hpijs"
+    ModelName "HP Photosmart 240 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_240_series;DES:photosmart_240_series;"
     PCFileName "hp-photosmart_240_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 240"
@@ -4920,7 +4920,7 @@ ity:PenSet=1,Quality:FullBleed=1"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   // <%DJGenericVIP:4x6FullBleed%>
   {
-    ModelName "HP Photosmart a310 series Foomatic/hpijs"
+    ModelName "HP Photosmart a310 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_a310_series;DES:photosmart_a310_series;"
     PCFileName "hp-photosmart_a310_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart a310 Compact Photo Printer"
@@ -4929,7 +4929,7 @@ ity:PenSet=1,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart a316 Compact Photo Printer"
   }
   {
-    ModelName "HP Photosmart 320 series Foomatic/hpijs"
+    ModelName "HP Photosmart 320 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_320_series;DES:photosmart_320_series;"
     PCFileName "hp-photosmart_320_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 320"
@@ -4939,14 +4939,14 @@ ity:PenSet=1,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 329"
   }
   {
-    ModelName "HP Photosmart a320 series Foomatic/hpijs"
+    ModelName "HP Photosmart a320 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_a320_series;DES:photosmart_a320_series;"
     PCFileName "hp-photosmart_a320_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart a320 Compact Photo Printer"
     Attribute "Product" "" "HP Photosmart a321 Compact Photo Printer"
   }
   {
-    ModelName "HP Photosmart 330 series Foomatic/hpijs"
+    ModelName "HP Photosmart 330 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_330_series;DES:photosmart_330_series;"
     PCFileName "hp-photosmart_330_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 330"
@@ -4956,7 +4956,7 @@ ity:PenSet=1,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 337"
   }
   {
-    ModelName "HP Photosmart 370 series Foomatic/hpijs"
+    ModelName "HP Photosmart 370 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_370_series;DES:photosmart_370_series;"
     PCFileName "hp-photosmart_370_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 370"
@@ -4967,7 +4967,7 @@ ity:PenSet=1,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 375bxi"
   }
   {
-    ModelName "HP Photosmart 380 series Foomatic/hpijs"
+    ModelName "HP Photosmart 380 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_380_series;DES:photosmart_380_series;"
     PCFileName "hp-photosmart_380_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 385"
@@ -4975,7 +4975,7 @@ ity:PenSet=1,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 385xi"
   }
   {
-    ModelName "HP Photosmart 420 series Foomatic/hpijs"
+    ModelName "HP Photosmart 420 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_420_series;DES:photosmart_420_series;"
     PCFileName "hp-photosmart_420_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 420"
@@ -4989,7 +4989,7 @@ ity:PenSet=1,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 428xi"
   }
   {
-    ModelName "HP Photosmart a430 series Foomatic/hpijs"
+    ModelName "HP Photosmart a430 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_a430_series;DES:photosmart_a430_series;"
     PCFileName "hp-photosmart_a430_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart a430"
@@ -4999,7 +4999,7 @@ ity:PenSet=1,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart a436"
   }
   {
-    ModelName "HP Photosmart a440 series Foomatic/hpijs"
+    ModelName "HP Photosmart a440 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_a440_series;DES:photosmart_a440_series;"
     PCFileName "hp-photosmart_a440_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart a440"
@@ -5007,7 +5007,7 @@ ity:PenSet=1,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart a446"
   }
   {
-    ModelName "HP Photosmart a510 series Foomatic/hpijs"
+    ModelName "HP Photosmart a510 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_a510_series;DES:photosmart_a510_series;"
     PCFileName "hp-photosmart_a510_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart a510 Compact Photo Printer"
@@ -5015,7 +5015,7 @@ ity:PenSet=1,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart a516 Compact Photo Printer"
   }
   {
-    ModelName "HP Photosmart a520 series Foomatic/hpijs"
+    ModelName "HP Photosmart a520 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_a520_series;DES:photosmart_a520_series;"
     PCFileName "hp-photosmart_a520_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart a522 Compact Photo Printer"
@@ -5116,7 +5116,7 @@ ity:PenSet=1,Quality:FullBleed=1"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   // <%PSP470:FullBleed%>
   {
-    ModelName "HP Photosmart 470 series Foomatic/hpijs"
+    ModelName "HP Photosmart 470 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_470_series;DES:photosmart_470_series;"
     PCFileName "hp-photosmart_470_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart 470"
@@ -5125,7 +5125,7 @@ ity:PenSet=1,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart 475xi"
   }
   {
-    ModelName "HP Photosmart a610 series Foomatic/hpijs"
+    ModelName "HP Photosmart a610 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_a610_series;DES:photosmart_a610_series;"
     PCFileName "hp-photosmart_a610_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart a610 Compact Photo Printer"
@@ -5135,7 +5135,7 @@ ity:PenSet=1,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart a618 Compact Photo Printer"
   }
   {
-    ModelName "HP Photosmart a620 series Foomatic/hpijs"
+    ModelName "HP Photosmart a620 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_a620_series;DES:photosmart_a620_series;"
     PCFileName "hp-photosmart_a620_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart a620 Compact Photo Printer"
@@ -5145,7 +5145,7 @@ ity:PenSet=1,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart a628 Compact Photo Printer"
   }
   {
-    ModelName "HP Photosmart a710 series Foomatic/hpijs"
+    ModelName "HP Photosmart a710 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_a710_series;DES:photosmart_a710_series;"
     PCFileName "hp-photosmart_a710_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart a712 Compact Photo Printer"
@@ -5153,7 +5153,7 @@ ity:PenSet=1,Quality:FullBleed=1"
     Attribute "Product" "" "HP Photosmart a717 Compact Photo Printer"
   }
   {
-    ModelName "HP Photosmart a820 series Foomatic/hpijs"
+    ModelName "HP Photosmart a820 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_a820_series;DES:photosmart_a820_series;"
     PCFileName "hp-photosmart_a820_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart a826 Home Photo Center"
@@ -5255,7 +5255,7 @@ Bleed=1"
   CustomMedia "4x12/4x12in, 10x30cm" 288.00 864.00 0.00 0.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=4x12" "%% FoomaticRIPOptionSetting: PageSize=4x12"
   // <%QuickConnect:Normal%>
   {
-    ModelName "HP Photosmart a530 series Foomatic/hpijs"
+    ModelName "HP Photosmart a530 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_a530_series;DES:photosmart_a530_series;"
     PCFileName "hp-photosmart_a530_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart a532 Compact Photo Printer"
@@ -5263,7 +5263,7 @@ Bleed=1"
     Attribute "Product" "" "HP Photosmart a538 Compact Photo Printer"
   }
   {
-    ModelName "HP Photosmart a630 series Foomatic/hpijs"
+    ModelName "HP Photosmart a630 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart_a630_series;DES:photosmart_a630_series;"
     PCFileName "hp-photosmart_a630_series-hpijs.ppd"
     Attribute "Product" "" "HP Photosmart a636 Compact Photo Printer"
@@ -5556,10 +5556,10 @@ t=0"
     Attribute "Product" "" "HP LaserJet 1160le"
   }
   {
-    ModelName "HP LaserJet 1160 series Foomatic/hpijs"
+    ModelName "HP LaserJet 1160 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_1160_series;DES:hp_laserjet_1160_series;"
     PCFileName "hp-laserjet_1160_series-hpijs.ppd"
-    Attribute "Product" "" "HP LaserJet 1160 series"
+    Attribute "Product" "" "HP LaserJet 1160 Series"
   }
   {
     ModelName "HP LaserJet 1200 Foomatic/hpijs"
@@ -5606,7 +5606,7 @@ t=0"
     Attribute "Product" "" "HP LaserJet 1300xi"
   }
   {
-    ModelName "HP LaserJet 1320 series Foomatic/hpijs"
+    ModelName "HP LaserJet 1320 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_1320_series;DES:hp_laserjet_1320_series;"
     PCFileName "hp-laserjet_1320_series-hpijs-pcl3.ppd"
     Attribute "Product" "" "HP LaserJet 1320t"
@@ -5660,31 +5660,31 @@ t=0"
     Attribute "Product" "" "HP Laserjer p2014"
   }
   {
-    ModelName "HP LaserJet p2015dn series Foomatic/hpijs"
+    ModelName "HP LaserJet p2015dn Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_p2015dn_series;DES:hp_laserjet_p2015dn_series;"
     PCFileName "hp-laserjet_p2015dn_series-hpijs.ppd"
     Attribute "Product" "" "HP LaserJet p2015dn"
   }
   {
-    ModelName "HP LaserJet p2015x series Foomatic/hpijs"
+    ModelName "HP LaserJet p2015x Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_p2015x_series;DES:hp_laserjet_p2015x_series;"
     PCFileName "hp-laserjet_p2015x_series-hpijs.ppd"
     Attribute "Product" "" "HP LaserJet p2015x"
   }
   {
-    ModelName "HP LaserJet p2015d series Foomatic/hpijs"
+    ModelName "HP LaserJet p2015d Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_p2015d_series;DES:hp_laserjet_p2015d_series;"
     PCFileName "hp-laserjet_p2015d_series-hpijs.ppd"
     Attribute "Product" "" "HP LaserJet p2015d"
   }
   {
-    ModelName "HP LaserJet p2015 series Foomatic/hpijs"
+    ModelName "HP LaserJet p2015 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_p2015_series;DES:hp_laserjet_p2015_series;"
     PCFileName "hp-laserjet_p2015_series-hpijs-pcl3.ppd"
     Attribute "Product" "" "HP LaserJet p2015"
   }
   {
-    ModelName "HP LaserJet p2015n series Foomatic/hpijs"
+    ModelName "HP LaserJet p2015n Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_p2015n_series;DES:hp_laserjet_p2015n_series;"
     PCFileName "hp-laserjet_p2015n_series-hpijs.ppd"
     Attribute "Product" "" "HP LaserJet p2015n"
@@ -5708,6 +5708,24 @@ t=0"
     Attribute "Product" "" "HP LaserJet p2055 Printer"
   }
   {
+    ModelName "HP LaserJet p2055dn Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_p2055dn;DES:hp_laserjet_p2055dn;"
+    PCFileName "hp-laserjet_p2055dn-hpijs-pcl3.ppd"
+    Attribute "Product" "" "HP LaserJet p2055dn Printer"
+  }
+  {
+    ModelName "HP LaserJet p2055d Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_p2055d;DES:hp_laserjet_p2055d;"
+    PCFileName "hp-laserjet_p2055d-hpijs-pcl3.ppd"
+    Attribute "Product" "" "HP LaserJet p2055d Printer"
+  }
+  {
+    ModelName "HP LaserJet p2055x Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_p2055x;DES:hp_laserjet_p2055x;"
+    PCFileName "hp-laserjet_p2055x-hpijs-pcl3.ppd"
+    Attribute "Product" "" "HP LaserJet p2055x Printer"
+  }
+  {
     ModelName "HP LaserJet 2100 Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_2100;DES:hp_laserjet_2100;"
     PCFileName "hp-laserjet_2100-hpijs.ppd"
@@ -5718,16 +5736,16 @@ t=0"
     Attribute "Product" "" "HP LaserJet 2100xi"
   }
   {
-    ModelName "HP LaserJet 2100 series Foomatic/hpijs"
+    ModelName "HP LaserJet 2100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_2100_series;DES:hp_laserjet_2100_series;"
     PCFileName "hp-laserjet_2100_series-hpijs-pcl3.ppd"
-    Attribute "Product" "" "HP LaserJet 2100 series"
+    Attribute "Product" "" "HP LaserJet 2100 Series"
   }
   {
-    ModelName "HP LaserJet 2200 series Foomatic/hpijs"
+    ModelName "HP LaserJet 2200 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_2200_series;DES:hp_laserjet_2200_series;"
     PCFileName "hp-laserjet_2200_series-hpijs.ppd"
-    Attribute "Product" "" "HP LaserJet 2200 series"
+    Attribute "Product" "" "HP LaserJet 2200 Series"
   }
   {
     ModelName "HP LaserJet 2200 Foomatic/hpijs"
@@ -5752,10 +5770,10 @@ t=0"
     Attribute "Product" "" "HP LaserJet 2300tdtn"
   }
   {
-    ModelName "HP LaserJet 2300 series Foomatic/hpijs"
+    ModelName "HP LaserJet 2300 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_2300_series;DES:hp_laserjet_2300_series;"
     PCFileName "hp-laserjet_2300_series-hpijs.ppd"
-    Attribute "Product" "" "HP LaserJet 2300 series"
+    Attribute "Product" "" "HP LaserJet 2300 Series"
   }
   {
     ModelName "HP LaserJet 2410 Foomatic/hpijs"
@@ -5914,7 +5932,7 @@ t=0"
     Attribute "Product" "" "HP LaserJet 3392"
   }
   {
-    ModelName "HP LaserJet 4000 series Foomatic/hpijs"
+    ModelName "HP LaserJet 4000 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_4000_series;DES:hp_laserjet_4000_series;"
     PCFileName "hp-laserjet_4000_series-hpijs-pcl3.ppd"
     Attribute "Product" "" "HP LaserJet 4000"
@@ -5972,7 +5990,7 @@ t=0"
     Attribute "Product" "" "HP LaserJet p4015dn Printer"
   }
   {
-    ModelName "HP LaserJet 4050 series Foomatic/hpijs"
+    ModelName "HP LaserJet 4050 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_4050_series;DES:hp_laserjet_4050_series;"
     PCFileName "hp-laserjet_4050_series-hpijs-pcl3.ppd"
     Attribute "Product" "" "HP LaserJet 4050"
@@ -5989,7 +6007,7 @@ t=0"
     Attribute "Product" "" "HP LaserJet 4101mfp"
   }
   {
-    ModelName "HP LaserJet 4100 series Foomatic/hpijs"
+    ModelName "HP LaserJet 4100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_4100_series;DES:hp_laserjet_4100_series;"
     PCFileName "hp-laserjet_4100_series-hpijs-pcl3.ppd"
     Attribute "Product" "" "HP LaserJet 4100"
@@ -5998,7 +6016,7 @@ t=0"
     Attribute "Product" "" "HP LaserJet 4100tn"
   }
   {
-    ModelName "HP LaserJet 4150 series Foomatic/hpijs"
+    ModelName "HP LaserJet 4150 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_4150_series;DES:hp_laserjet_4150_series;"
     PCFileName "hp-laserjet_4150_series-hpijs.ppd"
     Attribute "Product" "" "HP LaserJet 4150"
@@ -6104,10 +6122,10 @@ t=0"
     Attribute "Product" "" "HP LaserJet p4515x Printer"
   }
   {
-    ModelName "HP LaserJet 5000 series Foomatic/hpijs"
+    ModelName "HP LaserJet 5000 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_5000_series;DES:hp_laserjet_5000_series;"
     PCFileName "hp-laserjet_5000_series-hpijs-pcl3.ppd"
-    Attribute "Product" "" "HP LaserJet 5000 series"
+    Attribute "Product" "" "HP LaserJet 5000 Series"
   }
   {
     ModelName "HP LaserJet 5200lx Foomatic/hpijs"
@@ -6116,10 +6134,10 @@ t=0"
     Attribute "Product" "" "HP LaserJet 5200lx"
   }
   {
-    ModelName "HP LaserJet 8000 series Foomatic/hpijs"
+    ModelName "HP LaserJet 8000 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_8000_series;DES:hp_laserjet_8000_series;"
     PCFileName "hp-laserjet_8000_series-hpijs-pcl3.ppd"
-    Attribute "Product" "" "HP LaserJet 8000 series"
+    Attribute "Product" "" "HP LaserJet 8000 Series"
   }
   {
     ModelName "HP LaserJet 8100 MFP Foomatic/hpijs"
@@ -6211,7 +6229,7 @@ t=0"
       Attribute "Product" "" "HP LaserJet m5035xs MFP"
     }
     {
-      ModelName "HP LaserJet 5100 series Foomatic/hpijs"
+      ModelName "HP LaserJet 5100 Series Foomatic/hpijs"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_5100_series;DES:hp_laserjet_5100_series;"
       PCFileName "hp-laserjet_5100_series-hpijs-pcl3.ppd"
       Attribute "Product" "" "HP LaserJet 5100le"
@@ -6245,7 +6263,7 @@ t=0"
       Attribute "Product" "" "HP LaserJet 8000n"
     }
     {
-      ModelName "HP LaserJet 8100 series Foomatic/hpijs"
+      ModelName "HP LaserJet 8100 Series Foomatic/hpijs"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_8100_series;DES:hp_laserjet_8100_series;"
       PCFileName "hp-laserjet_8100_series-hpijs-pcl3.ppd"
       Attribute "Product" "" "HP LaserJet 8100"
@@ -6253,7 +6271,7 @@ t=0"
       Attribute "Product" "" "HP LaserJet 8100n"
     }
     {
-      ModelName "HP LaserJet 8150 series Foomatic/hpijs"
+      ModelName "HP LaserJet 8150 Series Foomatic/hpijs"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_8150_series;DES:hp_laserjet_8150_series;"
       PCFileName "hp-laserjet_8150_series-hpijs-pcl3.ppd"
       Attribute "Product" "" "HP LaserJet 8150"
@@ -6262,7 +6280,7 @@ t=0"
       Attribute "Product" "" "HP LaserJet 8150n"
     }
     {
-      ModelName "HP LaserJet 9000 series Foomatic/hpijs"
+      ModelName "HP LaserJet 9000 Series Foomatic/hpijs"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_9000_series;DES:hp_laserjet_9000_series;"
       PCFileName "hp-laserjet_9000_series-hpijs-pcl3.ppd"
       Attribute "Product" "" "HP LaserJet 9000"
@@ -6685,6 +6703,12 @@ nSet=2"
     Attribute "Product" "" "HP Color LaserJet cm1312nfi MFP"
   }
   {
+    ModelName "HP Color LaserJet cp1514n Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_color_laserjet_cp1514n;DES:hp_color_laserjet_cp1514n;"
+    PCFileName "hp-color_laserjet_cp1514n-hpijs-pcl3.ppd"
+    Attribute "Product" "" "HP Color LaserJet cp1514n Printer"
+  }
+  {
     ModelName "HP Color LaserJet cp1515n Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_color_laserjet_cp1515n;DES:hp_color_laserjet_cp1515n;"
     PCFileName "hp-color_laserjet_cp1515n-hpijs-pcl3.ppd"
@@ -6759,7 +6783,7 @@ nSet=2"
     Attribute "Product" "" "HP Color LaserJet 2500"
   }
   {
-    ModelName "HP Color LaserJet 2500 series Foomatic/hpijs"
+    ModelName "HP Color LaserJet 2500 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_color_laserjet_2500_series;DES:hp_color_laserjet_2500_series;"
     PCFileName "hp-color_laserjet_2500_series-hpijs.ppd"
     Attribute "Product" "" "HP Color LaserJet 2500l"
@@ -6845,7 +6869,7 @@ nSet=2"
     Attribute "Product" "" "HP Color LaserJet 4550n"
   }
   {
-    ModelName "HP Color LaserJet 4600 series Foomatic/hpijs"
+    ModelName "HP Color LaserJet 4600 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_color_laserjet_4600_series;DES:hp_color_laserjet_4600_series;"
     PCFileName "hp-color_laserjet_4600_series-hpijs.ppd"
     Attribute "Product" "" "HP Color LaserJet 4600dn"
@@ -6904,7 +6928,7 @@ nSet=2"
     Attribute "Product" "" "HP Color LaserJet 4730xs MFP"
   }
   {
-    ModelName "HP Officejet 9100 series Foomatic/hpijs"
+    ModelName "HP Officejet 9100 Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_9100_series;DES:officejet_9100_series;"
     PCFileName "hp-officejet_9100_series-hpijs-pcl3.ppd"
     Attribute "Product" "" "HP Officejet 9110"
@@ -7895,16 +7919,16 @@ t=0"
     Attribute "Product" "" "HP Officejet Lx"
   }
   {
-    ModelName "HP Officejet series 330 Foomatic/hpijs"
+    ModelName "HP Officejet Series 330 Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_series_330;DES:officejet_series_330;"
     PCFileName "hp-officejet_series_330-hpijs.ppd"
-    Attribute "Product" "" "HP Officejet series 330"
+    Attribute "Product" "" "HP Officejet Series 330"
   }
   {
-    ModelName "HP Officejet series 350 Foomatic/hpijs"
+    ModelName "HP Officejet Series 350 Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_series_350;DES:officejet_series_350;"
     PCFileName "hp-officejet_series_350-hpijs.ppd"
-    Attribute "Product" "" "HP Officejet series 350"
+    Attribute "Product" "" "HP Officejet Series 350"
   }
   {
     ModelName "HP Deskjet 500 Foomatic/hpijs"
@@ -8066,22 +8090,22 @@ t=0"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJ540:Normal%>
   {
-    ModelName "HP Officejet series 300 Foomatic/hpijs"
+    ModelName "HP Officejet Series 300 Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_series_300;DES:officejet_series_300;"
     PCFileName "hp-officejet_series_300-hpijs.ppd"
-    Attribute "Product" "" "HP Officejet series 300"
+    Attribute "Product" "" "HP Officejet Series 300"
   }
   {
-    ModelName "HP Officejet series 310 Foomatic/hpijs"
+    ModelName "HP Officejet Series 310 Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_series_310;DES:officejet_series_310;"
     PCFileName "hp-officejet_series_310-hpijs.ppd"
-    Attribute "Product" "" "HP Officejet series 310"
+    Attribute "Product" "" "HP Officejet Series 310"
   }
   {
-    ModelName "HP Officejet series 320 Foomatic/hpijs"
+    ModelName "HP Officejet Series 320 Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_series_320;DES:officejet_series_320;"
     PCFileName "hp-officejet_series_320-hpijs.ppd"
-    Attribute "Product" "" "HP Officejet series 320"
+    Attribute "Product" "" "HP Officejet Series 320"
   }
   {
     ModelName "HP Deskjet 400 Foomatic/hpijs"
@@ -8444,53 +8468,53 @@ r=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;DESKJET 660&quot;"
       Attribute "Product" "" "HP Printer Scanner Copier 300"
     }
     {
-      ModelName "HP Officejet series 500 Foomatic/hpijs"
+      ModelName "HP Officejet Series 500 Foomatic/hpijs"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_series_500;DES:officejet_series_500;"
       PCFileName "hp-officejet_series_500-hpijs.ppd"
-      Attribute "Product" "" "HP Officejet series 500"
+      Attribute "Product" "" "HP Officejet Series 500"
     }
     {
-      ModelName "HP Officejet series 520 Foomatic/hpijs"
+      ModelName "HP Officejet Series 520 Foomatic/hpijs"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_series_520;DES:officejet_series_520;"
       PCFileName "hp-officejet_series_520-hpijs.ppd"
-      Attribute "Product" "" "HP Officejet series 520"
+      Attribute "Product" "" "HP Officejet Series 520"
     }
     {
-      ModelName "HP Officejet series 570 Foomatic/hpijs"
+      ModelName "HP Officejet Series 570 Foomatic/hpijs"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_series_570;DES:officejet_series_570;"
       PCFileName "hp-officejet_series_570-hpijs.ppd"
-      Attribute "Product" "" "HP Officejet series 570"
+      Attribute "Product" "" "HP Officejet Series 570"
     }
     {
-      ModelName "HP Officejet series 580 Foomatic/hpijs"
+      ModelName "HP Officejet Series 580 Foomatic/hpijs"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_series_580;DES:officejet_series_580;"
       PCFileName "hp-officejet_series_580-hpijs.ppd"
-      Attribute "Product" "" "HP Officejet series 580"
+      Attribute "Product" "" "HP Officejet Series 580"
     }
     {
-      ModelName "HP Officejet series 590 Foomatic/hpijs"
+      ModelName "HP Officejet Series 590 Foomatic/hpijs"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_series_590;DES:officejet_series_590;"
       PCFileName "hp-officejet_series_590-hpijs.ppd"
-      Attribute "Product" "" "HP Officejet series 590"
+      Attribute "Product" "" "HP Officejet Series 590"
     }
     {
-      ModelName "HP Officejet series 600 Foomatic/hpijs"
+      ModelName "HP Officejet Series 600 Foomatic/hpijs"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_series_600;DES:officejet_series_600;"
       PCFileName "hp-officejet_series_600-hpijs.ppd"
-      Attribute "Product" "" "HP Officejet series 600"
+      Attribute "Product" "" "HP Officejet Series 600"
     }
     {
-      ModelName "HP Officejet series 610 Foomatic/hpijs"
+      ModelName "HP Officejet Series 610 Foomatic/hpijs"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_series_610;DES:officejet_series_610;"
       PCFileName "hp-officejet_series_610-hpijs.ppd"
-      Attribute "Product" "" "HP Officejet series 610"
+      Attribute "Product" "" "HP Officejet Series 610"
     }
     {
-      ModelName "HP Officejet series 630 Foomatic/hpijs"
+      ModelName "HP Officejet Series 630 Foomatic/hpijs"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_series_630;DES:officejet_series_630;"
       PCFileName "hp-officejet_series_630-hpijs.ppd"
-      Attribute "Product" "" "HP Officejet series 630"
-      Attribute "Product" "" "HP Officejet series 635"
+      Attribute "Product" "" "HP Officejet Series 630"
+      Attribute "Product" "" "HP Officejet Series 635"
     }
     {
       ModelName "HP Deskjet 660 Foomatic/hpijs"
@@ -8765,28 +8789,28 @@ et=4"
     Attribute "Product" "" "HP Deskjet 697c"
   }
   {
-    ModelName "HP Officejet series 700 Foomatic/hpijs"
+    ModelName "HP Officejet Series 700 Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_series_700;DES:officejet_series_700;"
     PCFileName "hp-officejet_series_700-hpijs.ppd"
-    Attribute "Product" "" "HP Officejet series 700"
+    Attribute "Product" "" "HP Officejet Series 700"
   }
   {
-    ModelName "HP Officejet series 710 Foomatic/hpijs"
+    ModelName "HP Officejet Series 710 Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_series_710;DES:officejet_series_710;"
     PCFileName "hp-officejet_series_710-hpijs.ppd"
-    Attribute "Product" "" "HP Officejet series 710"
+    Attribute "Product" "" "HP Officejet Series 710"
   }
   {
-    ModelName "HP Officejet series 720 Foomatic/hpijs"
+    ModelName "HP Officejet Series 720 Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_series_720;DES:officejet_series_720;"
     PCFileName "hp-officejet_series_720-hpijs.ppd"
-    Attribute "Product" "" "HP Officejet series 720"
+    Attribute "Product" "" "HP Officejet Series 720"
   }
   {
-    ModelName "HP Officejet series 725 Foomatic/hpijs"
+    ModelName "HP Officejet Series 725 Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_series_725;DES:officejet_series_725;"
     PCFileName "hp-officejet_series_725-hpijs.ppd"
-    Attribute "Product" "" "HP Officejet series 725"
+    Attribute "Product" "" "HP Officejet Series 725"
   }
 } // end DJ6xxPhoto
 
@@ -8940,7 +8964,7 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJ8xx:Normal%>
   {
-    ModelName "HP Officejet T series Foomatic/hpijs"
+    ModelName "HP Officejet T Series Foomatic/hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_t_series;DES:officejet_t_series;"
     PCFileName "hp-officejet_t_series-hpijs.ppd"
     Attribute "Product" "" "HP Officejet t45"
@@ -9449,7 +9473,7 @@ r=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;DESKJET 890&quot;"
       Attribute "Product" "" "HP Deskjet 890cse"
     }
     {
-      ModelName "HP Officejet Pro 1170c series Foomatic/hpijs"
+      ModelName "HP Officejet Pro 1170c Series Foomatic/hpijs"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet_pro_1170c_series;DES:officejet_pro_1170c_series;"
       PCFileName "hp-officejet_pro_1170c_series-hpijs.ppd"
       Attribute "Product" "" "HP Officejet Pro 1170c"
@@ -9461,6 +9485,567 @@ r=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;DESKJET 890&quot;"
     }
   }
 }  // end DJ850 and DJ890
+
+///////////////////// LJZjsMono (for proprietary plugin)
+{
+  Attribute "DefaultResolution" "" "600dpi"
+
+  // Custom page sizes from 1x4in to Ledger
+  HWMargins 18 14.4 18 14.4
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 11in 17in
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
+EVICEHEIGHTPOINTS=0"
+
+  Attribute "FoomaticIDs" "" "HP-LaserJet_1018 hpijs"
+  Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
+USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C%D -dIjsUseOutputFD%Z -sOutputFi&&
+le=- -"
+  Attribute "FoomaticRIPOption" "Model" "enum CmdLine A 100"
+  Attribute "FoomaticRIPOptionSetting" "Model=HP-LaserJet_1018" " -sDeviceManufactur&&
+er=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;HP LaserJet 1018&quot;"
+  Attribute "FoomaticRIPOption" "PrintoutMode" "enum Composite B"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Draft" "Quality=600DraftGraysca&&
+leK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Normal" "Quality=600GrayscaleK"
+  Attribute "FoomaticRIPOption" "MediaType" "enum CmdLine C"
+  Attribute "FoomaticRipOptionSetting" "MediaType=Plain" ",Quality:MediaType=0"
+  Attribute "FoomaticRipOptionSetting" "MediaType=Transparency" ",Quality:MediaType=3"
+  Attribute "FoomaticRipOptionSetting" "MediaType=Photo" ",Quality:MediaType=3"
+  Attribute "FoomaticRIPOption" "InputSlot" "enum CmdLine D"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Default" ",PS:MediaPosition=7"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Manual" ",PS:MediaPosition=2"
+  Attribute "FoomaticRIPOption" "PageSize" "enum CmdLine A"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Letter" " -dDEVICEWIDTHPOINTS=612 -&&
+dDEVICEHEIGHTPOINTS=792"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A4" " -dDEVICEWIDTHPOINTS=595 -dDEV&&
+ICEHEIGHTPOINTS=842"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Photo" " -dDEVICEWIDTHPOINTS=288 -d&&
+DEVICEHEIGHTPOINTS=432"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Photo5x7" " -dDEVICEWIDTHPOINTS=360&&
+ -dDEVICEHEIGHTPOINTS=504"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=3x5" " -dDEVICEWIDTHPOINTS=216 -dDE&&
+VICEHEIGHTPOINTS=360"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=5x8" " -dDEVICEWIDTHPOINTS=360 -dDE&&
+VICEHEIGHTPOINTS=576"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A5" " -dDEVICEWIDTHPOINTS=420 -dDEV&&
+ICEHEIGHTPOINTS=595"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A6" " -dDEVICEWIDTHPOINTS=297 -dDEV&&
+ICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=B5JIS" " -dDEVICEWIDTHPOINTS=516 -d&&
+DEVICEHEIGHTPOINTS=729"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Env10" " -dDEVICEWIDTHPOINTS=297 -d&&
+DEVICEHEIGHTPOINTS=684"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvC5" " -dDEVICEWIDTHPOINTS=459 -d&&
+DEVICEHEIGHTPOINTS=649"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvC6" " -dDEVICEWIDTHPOINTS=323 -d&&
+DEVICEHEIGHTPOINTS=459"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvDL" " -dDEVICEWIDTHPOINTS=312 -d&&
+DEVICEHEIGHTPOINTS=624"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvISOB5" " -dDEVICEWIDTHPOINTS=499&&
+ -dDEVICEHEIGHTPOINTS=709"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvMonarch" " -dDEVICEWIDTHPOINTS=2&&
+79 -dDEVICEHEIGHTPOINTS=540"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Executive" " -dDEVICEWIDTHPOINTS=52&&
+2 -dDEVICEHEIGHTPOINTS=756"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=FLSA" " -dDEVICEWIDTHPOINTS=612 -dD&&
+EVICEHEIGHTPOINTS=936"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Hagaki" " -dDEVICEWIDTHPOINTS=283 -&&
+dDEVICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
+DEVICEHEIGHTPOINTS=1008"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
+dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
+ -dDEVICEHEIGHTPOINTS=774"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
+ -dDEVICEHEIGHTPOINTS=935"
+  Attribute "FoomaticRIPOption" "Quality" "enum CmdLine B"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600DraftGrayscaleK" " -r600 -sIjsPar&&
+ams=Quality:Quality=1,Quality:ColorMode=0,Quality:PenSet=0"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600GrayscaleK" " -r600 -sIjsParams=Q&&
+uality:Quality=0,Quality:ColorMode=0,Quality:PenSet=0"
+  Group "General/General"
+    Option "PrintoutMode/Printout Mode" PickOne AnySetup 10.0
+      Choice "Draft/Draft (Economy)" "%% FoomaticRIPOptionSetting: PrintoutMode=Draft"
+      *Choice "Normal/Normal" "%% FoomaticRIPOptionSetting: PrintoutMode=Normal"
+    Option "MediaType/Media Type" PickOne AnySetup 10.0
+      *Choice "Plain/Plain Paper" "%% FoomaticRIPOptionSetting: MediaType=Plain"
+      Choice "Transparency/Transparency" "%% FoomaticRIPOptionSetting: MediaType=&&
+Transparency"
+      Choice "Photo/Photo Paper" "%% FoomaticRIPOptionSetting: MediaType=Photo"
+    Option "InputSlot/Media Source" PickOne AnySetup 100.0
+      *Choice "Default/Automatic" "%% FoomaticRIPOptionSetting: InputSlot=Default"
+      Choice "Manual/Manual Feeder" "%% FoomaticRIPOptionSetting: InputSlot=Manual"
+  Group "PrintoutMode/Printout Mode"
+    Option "Quality/Resolution, Quality, Toner Type, Media Type" PickOne AnySetup 100.0
+      *Choice "FromPrintoutMode/Controlled by 'Printout Mode'" "%% FoomaticRIPOptionSetting: Quality=@PrintoutMode"
+      Choice "600DraftGrayscaleK/600 dpi, Draft, Grayscale, Black Toner" "%% FoomaticRIPOptionSetting: Quality=600DraftGrayscaleK"
+      Choice "600GrayscaleK/600 dpi, Normal, Grayscale, Black Toner" "%% FoomaticRIPOptionSetting: Quality=600GrayscaleK"
+  *CustomMedia "Letter/Letter" 612.00 792.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Letter" "%% FoomaticRIPOptionSetting: PageSize=Letter"
+  CustomMedia "A4/A4" 595.00 842.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=A4" "%% FoomaticRIPOptionSetting: PageSize=A4"
+  CustomMedia "Photo/Photo/4x6 inch index card" 288.00 432.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Photo" "%% FoomaticRIPOptionSetting: PageSize=Photo"
+  CustomMedia "Photo5x7/Photo/5x7 inch index card" 360.00 504.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Photo5x7" "%% FoomaticRIPOptionSetting: PageSize=Photo5x7"
+  CustomMedia "3x5/3x5 inch index card" 216.00 360.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=3x5" "%% FoomaticRIPOptionSetting: PageSize=3x5"
+  CustomMedia "5x8/5x8 inch index card" 360.00 576.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=5x8" "%% FoomaticRIPOptionSetting: PageSize=5x8"
+  CustomMedia "A5/A5" 420.00 595.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=A5" "%% FoomaticRIPOptionSetting: PageSize=A5"
+  CustomMedia "A6/A6" 297.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=A6" "%% FoomaticRIPOptionSetting: PageSize=A6"
+  CustomMedia "B5JIS/B5 (JIS)" 516.00 729.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=B5JIS" "%% FoomaticRIPOptionSetting: PageSize=B5JIS"
+  CustomMedia "Env10/Envelope #10" 297.00 684.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Env10" "%% FoomaticRIPOptionSetting: PageSize=Env10"
+  CustomMedia "EnvC5/Envelope C5" 459.00 649.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=EnvC5" "%% FoomaticRIPOptionSetting: PageSize=EnvC5"
+  CustomMedia "EnvC6/Envelope C6" 323.00 459.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=EnvC6" "%% FoomaticRIPOptionSetting: PageSize=EnvC6"
+  CustomMedia "EnvDL/Envelope DL" 312.00 624.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=EnvDL" "%% FoomaticRIPOptionSetting: PageSize=EnvDL"
+  CustomMedia "EnvISOB5/Envelope B5" 499.00 709.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5" "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5"
+  CustomMedia "EnvMonarch/Envelope Monarch" 279.00 540.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=EnvMonarch" "%% FoomaticRIPOptionSetting: PageSize=EnvMonarch"
+  CustomMedia "Executive/Executive" 522.00 756.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Executive" "%% FoomaticRIPOptionSetting: PageSize=Executive"
+  CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
+  CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
+  CustomMedia "Legal/Legal" 612.00 1008.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "w558h774/16K" 558.00 774.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
+  CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
+  // <%LJZjsMono:Normal%>
+  {
+    ModelName "HP LaserJet 1000 Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_1000;DES:hp_laserjet_1000;"
+    PCFileName "hp-laserjet_1000-hpijs.ppd"
+    Attribute "Product" "" "HP LaserJet 1000"
+  }
+  {
+    ModelName "HP LaserJet 1005 Series Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_1005_series;DES:hp_laserjet_1005_series;"
+    PCFileName "hp-laserjet_1005_series-hpijs.ppd"
+    Attribute "Product" "" "HP LaserJet 1005"
+  }
+  {
+    ModelName "HP LaserJet 1018 Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_1018;DES:hp_laserjet_1018;"
+    PCFileName "hp-laserjet_1018-hpijs.ppd"
+    Attribute "Product" "" "HP LaserJet 1018"
+    Attribute "Product" "" "HP LaserJet 1018s"
+  }
+  {
+    ModelName "HP LaserJet 1020 Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_1020;DES:hp_laserjet_1020;"
+    PCFileName "hp-laserjet_1020-hpijs.ppd"
+    Attribute "Product" "" "HP LaserJet 1020"
+  }
+  {
+    ModelName "HP LaserJet 1022nw Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_1022nw;DES:hp_laserjet_1022nw;"
+    PCFileName "hp-laserjet_1022nw-hpijs-zjs.ppd"
+    Attribute "Product" "" "HP LaserJet 1022nw"
+  }
+  {
+    ModelName "HP LaserJet 1022n Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_1022n;DES:hp_laserjet_1022n;"
+    PCFileName "hp-laserjet_1022n-hpijs-zjs.ppd"
+    Attribute "Product" "" "HP LaserJet 1022n"
+  }
+  {
+    ModelName "HP LaserJet 1022 Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_1022;DES:hp_laserjet_1022;"
+    PCFileName "hp-laserjet_1022-hpijs-zjs.ppd"
+    Attribute "Product" "" "HP LaserJet 1022"
+  }
+  {
+    ModelName "HP LaserJet m1120 MFP Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_m1120_mfp;DES:hp_laserjet_m1120_mfp;"
+    PCFileName "hp-laserjet_m1120_mfp-hpijs.ppd"
+    Attribute "Product" "" "HP LaserJet m1120 MFP"
+  }
+  {
+    ModelName "HP LaserJet m1120n MFP Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_m1120n_mfp;DES:hp_laserjet_m1120n_mfp;"
+    PCFileName "hp-laserjet_m1120n_mfp-hpijs.ppd"
+    Attribute "Product" "" "HP LaserJet m1120n MFP"
+  }
+  {
+    ModelName "HP LaserJet m1319f MFP Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_m1319f_mfp;DES:hp_laserjet_m1319f_mfp;"
+    PCFileName "hp-laserjet_m1319f_mfp-hpijs.ppd"
+    Attribute "Product" "" "HP LaserJet m1319f MFP"
+  }
+  {
+    ModelName "HP LaserJet p2035n Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_p2035n;DES:hp_laserjet_p2035n;"
+    PCFileName "hp-laserjet_p2035n-hpijs-zjs.ppd"
+    Attribute "Product" "" "HP LaserJet p2035n Printer"
+  }
+  {
+    ModelName "HP LaserJet p2035 Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_p2035;DES:hp_laserjet_p2035;"
+    PCFileName "hp-laserjet_p2035-hpijs-zjs.ppd"
+    Attribute "Product" "" "HP LaserJet p2035 Printer"
+  }
+} // end LJZjsMono (for proprietary plugin)
+
+///////////// LJJetReady (for proprietary plugin)
+{
+  Attribute "DefaultResolution" "" "600dpi"
+
+  // Custom page sizes from 1x4in to Ledger
+  HWMargins 18 14.4 18 14.4
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 11in 17in
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
+EVICEHEIGHTPOINTS=0"
+
+  Attribute "FoomaticIDs" "" "HP-Color_LaserJet_3500 hpijs"
+  Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
+USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
+le=- -"
+  Attribute "FoomaticRIPOption" "Model" "enum CmdLine A 100"
+  Attribute "FoomaticRIPOptionSetting" "Model=HP-Color_LaserJet_3500" " -sDeviceManu&&
+facturer=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;hp color Lase&&
+rJet 3500&quot;"
+  Attribute "FoomaticRIPOption" "PrintoutMode" "enum Composite B"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=NormalColor" "Quality=NormalColorCMYK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=NormalGray" "Quality=NormalGraysc&&
+aleCMYK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=BestColor" "Quality=BestColorCMYK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=BestGray" "Quality=BestGraysc&&
+aleCMYK"
+  Attribute "FoomaticRIPOption" "InputSlot" "enum CmdLine C"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Default" ",PS:MediaPosition=7"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=PhotoTray" ",PS:MediaPosition=6"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Upper" ",PS:MediaPosition=1"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Lower" ",PS:MediaPosition=4"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Envelope" ",PS:MediaPosition=3"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=LargeCapacity" ",PS:MediaPosition=&&
+5"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Manual" ",PS:MediaPosition=2"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=MPTray" ",PS:MediaPosition=8"
+  Attribute "FoomaticRIPOption" "PageSize" "enum CmdLine A"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Letter" " -dDEVICEWIDTHPOINTS=612 -&&
+dDEVICEHEIGHTPOINTS=792"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A4" " -dDEVICEWIDTHPOINTS=595 -dDEV&&
+ICEHEIGHTPOINTS=842"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Photo" " -dDEVICEWIDTHPOINTS=288 -d&&
+DEVICEHEIGHTPOINTS=432"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Photo5x7" " -dDEVICEWIDTHPOINTS=360&&
+ -dDEVICEHEIGHTPOINTS=504"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=3x5" " -dDEVICEWIDTHPOINTS=216 -dDE&&
+VICEHEIGHTPOINTS=360"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=5x8" " -dDEVICEWIDTHPOINTS=360 -dDE&&
+VICEHEIGHTPOINTS=576"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A5" " -dDEVICEWIDTHPOINTS=420 -dDEV&&
+ICEHEIGHTPOINTS=595"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A6" " -dDEVICEWIDTHPOINTS=297 -dDEV&&
+ICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=B5JIS" " -dDEVICEWIDTHPOINTS=516 -d&&
+DEVICEHEIGHTPOINTS=729"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Env10" " -dDEVICEWIDTHPOINTS=297 -d&&
+DEVICEHEIGHTPOINTS=684"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvC5" " -dDEVICEWIDTHPOINTS=459 -d&&
+DEVICEHEIGHTPOINTS=649"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvC6" " -dDEVICEWIDTHPOINTS=323 -d&&
+DEVICEHEIGHTPOINTS=459"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvDL" " -dDEVICEWIDTHPOINTS=312 -d&&
+DEVICEHEIGHTPOINTS=624"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvISOB5" " -dDEVICEWIDTHPOINTS=499&&
+ -dDEVICEHEIGHTPOINTS=709"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvMonarch" " -dDEVICEWIDTHPOINTS=2&&
+79 -dDEVICEHEIGHTPOINTS=540"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Executive" " -dDEVICEWIDTHPOINTS=52&&
+2 -dDEVICEHEIGHTPOINTS=756"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=FLSA" " -dDEVICEWIDTHPOINTS=612 -dD&&
+EVICEHEIGHTPOINTS=936"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Hagaki" " -dDEVICEWIDTHPOINTS=283 -&&
+dDEVICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
+DEVICEHEIGHTPOINTS=1008"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
+dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
+ -dDEVICEHEIGHTPOINTS=774"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
+ -dDEVICEHEIGHTPOINTS=935"
+  Attribute "FoomaticRIPOption" "Duplex" "enum CmdLine A"
+  Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexNoTumble" " -dDuplex=true -dTum&&
+ble=false"
+  Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexTumble" " -dDuplex=true -dTumbl&&
+e=true"
+  Attribute "FoomaticRIPOptionSetting" "Duplex=None" " -dDuplex=false"
+  Attribute "FoomaticRIPOption" "Quality" "enum CmdLine B"
+  Attribute "FoomaticRIPOptionSetting" "Quality=NormalColorCMYK" " -r600 -sIjsParams=Qu&&
+ality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quality:PenSet&&
+=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=NormalGrayscaleCMYK" " -r600 -sIjsParam&&
+s=Quality:Quality=0,Quality:ColorMode=0,Quality:MediaType=0,Quality:Pe&&
+nSet=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=BestColorCMYK" " -r600 -sIjsParams=Qu&&
+ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=0,Quality:PenSet&&
+=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=BestGrayscaleCMYK" " -r600 -sIjsParam&&
+s=Quality:Quality=2,Quality:ColorMode=0,Quality:MediaType=0,Quality:Pe&&
+nSet=2"
+  Group "General/General"
+    Option "PrintoutMode/Printout Mode" PickOne AnySetup 10.0
+      *Choice "NormalColor/Normal Color" "%% FoomaticRIPOptionSetting: PrintoutMode=NormalColor"
+      Choice "NormalGray/Normal Grayscale" "%% FoomaticRIPOptionSetting: PrintoutMode=NormalGray"
+      Choice "BestColor/Best Color" "%% FoomaticRIPOptionSetting: PrintoutMode=BestColor"
+      Choice "BestGray/Best Grayscale" "%% FoomaticRIPOptionSetting: PrintoutMode=BestGray"
+    Option "InputSlot/Media Source" PickOne AnySetup 100.0
+      *Choice "Default/Printer default" "%% FoomaticRIPOptionSetting: InputSlot=Default"
+      Choice "PhotoTray/Photo Tray" "%% FoomaticRIPOptionSetting: InputSlot=PhotoTray"
+      Choice "Upper/Upper Tray" "%% FoomaticRIPOptionSetting: InputSlot=Upper"
+      Choice "Lower/Lower Tray" "%% FoomaticRIPOptionSetting: InputSlot=Lower"
+      Choice "Envelope/Envelope Feeder" "%% FoomaticRIPOptionSetting: InputSlot=Envelope"
+      Choice "LargeCapacity/Large Capacity Tray" "%% FoomaticRIPOptionSetting: InputSlot=LargeCapacity"
+      Choice "Manual/Manual Feeder" "%% FoomaticRIPOptionSetting: InputSlot=Manual"
+      Choice "MPTray/Multi Purpose Tray" "%% FoomaticRIPOptionSetting: InputSlot=MPTray"
+    Option "Duplex/Double-Sided Printing" PickOne AnySetup 120.0
+      Choice "DuplexNoTumble/Long Edge (Standard)" "%% FoomaticRIPOptionSetting: Duplex=DuplexNoTumble"
+      Choice "DuplexTumble/Short Edge (Flip)" "%% FoomaticRIPOptionSetting: Duplex=DuplexTumble"
+      *Choice "None/Off" "%% FoomaticRIPOptionSetting: Duplex=None"
+  Group "PrintoutMode/Printout Mode"
+    Option "Quality/Resolution, Quality, Ink Type, Media Type" PickOne AnySetup 100.0
+      *Choice "FromPrintoutMode/Controlled by 'Printout Mode'" "%% FoomaticRIPOptionSetting: Quality=@PrintoutMode"
+      Choice "NormalColorCMYK/600 dpi, Normal, Color, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=NormalColorCMYK"
+      Choice "NormalGrayscaleCMYK/600 dpi, Normal, Grayscale, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=NormalGrayscaleCMYK"
+      Choice "BestColorCMYK/600 dpi, Best, Color, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=BestColorCMYK"
+      Choice "BestGrayscaleCMYK/600 dpi, Best, Grayscale, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=BestGrayscaleCMYK"
+  *CustomMedia "Letter/Letter" 612.00 792.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Letter" "%% FoomaticRIPOptionSetting: PageSize=Letter"
+  CustomMedia "A4/A4" 595.00 842.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=A4" "%% FoomaticRIPOptionSetting: PageSize=A4"
+  CustomMedia "Photo/Photo/4x6 inch index card" 288.00 432.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Photo" "%% FoomaticRIPOptionSetting: PageSize=Photo"
+  CustomMedia "Photo5x7/Photo/5x7 inch index card" 360.00 504.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Photo5x7" "%% FoomaticRIPOptionSetting: PageSize=Photo5x7"
+  CustomMedia "3x5/3x5 inch index card" 216.00 360.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=3x5" "%% FoomaticRIPOptionSetting: PageSize=3x5"
+  CustomMedia "5x8/5x8 inch index card" 360.00 576.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=5x8" "%% FoomaticRIPOptionSetting: PageSize=5x8"
+  CustomMedia "A5/A5" 420.00 595.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=A5" "%% FoomaticRIPOptionSetting: PageSize=A5"
+  CustomMedia "A6/A6" 297.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=A6" "%% FoomaticRIPOptionSetting: PageSize=A6"
+  CustomMedia "B5JIS/B5 (JIS)" 516.00 729.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=B5JIS" "%% FoomaticRIPOptionSetting: PageSize=B5JIS"
+  CustomMedia "Env10/Envelope #10" 297.00 684.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Env10" "%% FoomaticRIPOptionSetting: PageSize=Env10"
+  CustomMedia "EnvC5/Envelope C5" 459.00 649.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=EnvC5" "%% FoomaticRIPOptionSetting: PageSize=EnvC5"
+  CustomMedia "EnvC6/Envelope C6" 323.00 459.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=EnvC6" "%% FoomaticRIPOptionSetting: PageSize=EnvC6"
+  CustomMedia "EnvDL/Envelope DL" 312.00 624.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=EnvDL" "%% FoomaticRIPOptionSetting: PageSize=EnvDL"
+  CustomMedia "EnvISOB5/Envelope B5" 499.00 709.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5" "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5"
+  CustomMedia "EnvMonarch/Envelope Monarch" 279.00 540.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=EnvMonarch" "%% FoomaticRIPOptionSetting: PageSize=EnvMonarch"
+  CustomMedia "Executive/Executive" 522.00 756.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Executive" "%% FoomaticRIPOptionSetting: PageSize=Executive"
+  CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
+  CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
+  CustomMedia "Legal/Legal" 612.00 1008.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "w558h774/16K" 558.00 774.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
+  CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
+  // <%LJJetReady:Normal%>
+  {
+    ModelName "HP Color LaserJet 3500n Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_color_laserjet_3500n;DES:hp_color_laserjet_3500n;"
+    PCFileName "hp-color_laserjet_3500n-hpijs.ppd"
+    Attribute "Product" "" "HP Color LaserJet 3500n"
+  }
+  {
+    ModelName "HP Color LaserJet 3500 Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_color_laserjet_3500;DES:hp_color_laserjet_3500;"
+    PCFileName "hp-color_laserjet_3500-hpijs.ppd"
+    Attribute "Product" "" "HP Color LaserJet 3500"
+    Attribute "Product" "" "HP Color LaserJet 3500dn"
+    Attribute "Product" "" "HP Color LaserJet 3500dtn"
+  }
+  {
+    ModelName "HP Color LaserJet 3550 Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_color_laserjet_3550;DES:hp_color_laserjet_3550;"
+    PCFileName "hp-color_laserjet_3550-hpijs.ppd"
+    Attribute "Product" "" "HP Color LaserJet 3550"
+  }
+  {
+    ModelName "HP Color LaserJet 3550n Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_color_laserjet_3550n;DES:hp_color_laserjet_3550n;"
+    PCFileName "hp-color_laserjet_3550n-hpijs.ppd"
+    Attribute "Product" "" "HP Color LaserJet 3550n"
+  }
+  {
+    ModelName "HP Color LaserJet 3600 Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_color_laserjet_3600;DES:hp_color_laserjet_3600;"
+    PCFileName "hp-color_laserjet_3600-hpijs.ppd"
+    Attribute "Product" "" "HP Color LaserJet 3600"
+    Attribute "Product" "" "HP Color LaserJet 3600dn"
+    Attribute "Product" "" "HP Color LaserJet 3600n"
+  }
+} // end LJJetReady (for proprietary plugin)
+
+///////////// LJm1005 (for proprietary plugin)
+{
+  Attribute "DefaultResolution" "" "600dpi"
+
+  // Custom page sizes from 1x4in to Ledger
+  HWMargins 18 14.4 18 14.4
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 11in 17in
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
+EVICEHEIGHTPOINTS=0"
+
+  Attribute "FoomaticIDs" "" "HP-LaserJet_M1005 hpijs"
+  Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
+USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C%D -dIjsUseOutputFD%Z -sOutputFi&&
+le=- -"
+  Attribute "FoomaticRIPOption" "Model" "enum CmdLine A 100"
+  Attribute "FoomaticRIPOptionSetting" "Model=HP-LaserJet_M1005" " -sDeviceManufactur&&
+er=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;HP LaserJet M1005&quot;"
+  Attribute "FoomaticRIPOption" "PrintoutMode" "enum Composite B"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Draft" "Quality=600DraftGraysca&&
+leK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Normal" "Quality=600GrayscaleK"
+  Attribute "FoomaticRIPOption" "MediaType" "enum CmdLine C"
+  Attribute "FoomaticRipOptionSetting" "MediaType=Plain" ",Quality:MediaType=0"
+  Attribute "FoomaticRipOptionSetting" "MediaType=Transparency" ",Quality:MediaType=3"
+  Attribute "FoomaticRipOptionSetting" "MediaType=Photo" ",Quality:MediaType=3"
+  Attribute "FoomaticRIPOption" "InputSlot" "enum CmdLine D"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Default" ",PS:MediaPosition=7"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Manual" ",PS:MediaPosition=2"
+  Attribute "FoomaticRIPOption" "PageSize" "enum CmdLine A"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Letter" " -dDEVICEWIDTHPOINTS=612 -&&
+dDEVICEHEIGHTPOINTS=792"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A4" " -dDEVICEWIDTHPOINTS=595 -dDEV&&
+ICEHEIGHTPOINTS=842"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Photo" " -dDEVICEWIDTHPOINTS=288 -d&&
+DEVICEHEIGHTPOINTS=432"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Photo5x7" " -dDEVICEWIDTHPOINTS=360&&
+ -dDEVICEHEIGHTPOINTS=504"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=3x5" " -dDEVICEWIDTHPOINTS=216 -dDE&&
+VICEHEIGHTPOINTS=360"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=5x8" " -dDEVICEWIDTHPOINTS=360 -dDE&&
+VICEHEIGHTPOINTS=576"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A5" " -dDEVICEWIDTHPOINTS=420 -dDEV&&
+ICEHEIGHTPOINTS=595"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A6" " -dDEVICEWIDTHPOINTS=297 -dDEV&&
+ICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=B5JIS" " -dDEVICEWIDTHPOINTS=516 -d&&
+DEVICEHEIGHTPOINTS=729"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Env10" " -dDEVICEWIDTHPOINTS=297 -d&&
+DEVICEHEIGHTPOINTS=684"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvC5" " -dDEVICEWIDTHPOINTS=459 -d&&
+DEVICEHEIGHTPOINTS=649"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvC6" " -dDEVICEWIDTHPOINTS=323 -d&&
+DEVICEHEIGHTPOINTS=459"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvDL" " -dDEVICEWIDTHPOINTS=312 -d&&
+DEVICEHEIGHTPOINTS=624"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvISOB5" " -dDEVICEWIDTHPOINTS=499&&
+ -dDEVICEHEIGHTPOINTS=709"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvMonarch" " -dDEVICEWIDTHPOINTS=2&&
+79 -dDEVICEHEIGHTPOINTS=540"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Executive" " -dDEVICEWIDTHPOINTS=52&&
+2 -dDEVICEHEIGHTPOINTS=756"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=FLSA" " -dDEVICEWIDTHPOINTS=612 -dD&&
+EVICEHEIGHTPOINTS=936"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Hagaki" " -dDEVICEWIDTHPOINTS=283 -&&
+dDEVICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
+DEVICEHEIGHTPOINTS=1008"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
+dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
+ -dDEVICEHEIGHTPOINTS=774"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
+ -dDEVICEHEIGHTPOINTS=935"
+  Attribute "FoomaticRIPOption" "Quality" "enum CmdLine B"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600DraftGrayscaleK" " -r600 -sIjsPar&&
+ams=Quality:Quality=1,Quality:ColorMode=0,Quality:PenSet=0"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600GrayscaleK" " -r600 -sIjsParams=Q&&
+uality:Quality=0,Quality:ColorMode=0,Quality:PenSet=0"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600BestGrayscaleK" " -r600 -sIjsParams=Q&&
+uality:Quality=2,Quality:ColorMode=0,Quality:PenSet=0"
+  Group "General/General"
+    Option "PrintoutMode/Printout Mode" PickOne AnySetup 10.0
+      Choice "Draft/Draft (Economy)" "%% FoomaticRIPOptionSetting: PrintoutMode=Draft"
+      *Choice "Normal/Normal" "%% FoomaticRIPOptionSetting: PrintoutMode=Normal"
+    Option "MediaType/Media Type" PickOne AnySetup 10.0
+      *Choice "Plain/Plain Paper" "%% FoomaticRIPOptionSetting: MediaType=Plain"
+      Choice "Transparency/Transparency" "%% FoomaticRIPOptionSetting: MediaType=&&
+Transparency"
+      Choice "Photo/Photo Paper" "%% FoomaticRIPOptionSetting: MediaType=Photo"
+    Option "InputSlot/Media Source" PickOne AnySetup 100.0
+      *Choice "Default/Automatic" "%% FoomaticRIPOptionSetting: InputSlot=Default"
+      Choice "Manual/Manual Feeder" "%% FoomaticRIPOptionSetting: InputSlot=Manual"
+  Group "PrintoutMode/Printout Mode"
+    Option "Quality/Resolution, Quality, Toner Type, Media Type" PickOne AnySetup 100.0
+      *Choice "FromPrintoutMode/Controlled by 'Printout Mode'" "%% FoomaticRIPOptionSetting: Quality=@PrintoutMode"
+      Choice "600DraftGrayscaleK/600 dpi, Draft, Grayscale, Black Toner" "%% FoomaticRIPOptionSetting: Quality=600DraftGrayscaleK"
+      Choice "600GrayscaleK/600 dpi, Normal, Grayscale, Black Toner" "%% FoomaticRIPOptionSetting: Quality=600GrayscaleK"
+      Choice "600BestGrayscaleK/600 dpi, Best, Grayscale, Black Toner" "%% FoomaticRIPOptionSetting: Quality=600BestGrayscaleK"
+  *CustomMedia "Letter/Letter" 612.00 792.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Letter" "%% FoomaticRIPOptionSetting: PageSize=Letter"
+  CustomMedia "A4/A4" 595.00 842.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=A4" "%% FoomaticRIPOptionSetting: PageSize=A4"
+  CustomMedia "Photo/Photo/4x6 inch index card" 288.00 432.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Photo" "%% FoomaticRIPOptionSetting: PageSize=Photo"
+  CustomMedia "Photo5x7/Photo/5x7 inch index card" 360.00 504.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Photo5x7" "%% FoomaticRIPOptionSetting: PageSize=Photo5x7"
+  CustomMedia "3x5/3x5 inch index card" 216.00 360.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=3x5" "%% FoomaticRIPOptionSetting: PageSize=3x5"
+  CustomMedia "5x8/5x8 inch index card" 360.00 576.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=5x8" "%% FoomaticRIPOptionSetting: PageSize=5x8"
+  CustomMedia "A5/A5" 420.00 595.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=A5" "%% FoomaticRIPOptionSetting: PageSize=A5"
+  CustomMedia "A6/A6" 297.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=A6" "%% FoomaticRIPOptionSetting: PageSize=A6"
+  CustomMedia "B5JIS/B5 (JIS)" 516.00 729.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=B5JIS" "%% FoomaticRIPOptionSetting: PageSize=B5JIS"
+  CustomMedia "Env10/Envelope #10" 297.00 684.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Env10" "%% FoomaticRIPOptionSetting: PageSize=Env10"
+  CustomMedia "EnvC5/Envelope C5" 459.00 649.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=EnvC5" "%% FoomaticRIPOptionSetting: PageSize=EnvC5"
+  CustomMedia "EnvC6/Envelope C6" 323.00 459.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=EnvC6" "%% FoomaticRIPOptionSetting: PageSize=EnvC6"
+  CustomMedia "EnvDL/Envelope DL" 312.00 624.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=EnvDL" "%% FoomaticRIPOptionSetting: PageSize=EnvDL"
+  CustomMedia "EnvISOB5/Envelope B5" 499.00 709.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5" "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5"
+  CustomMedia "EnvMonarch/Envelope Monarch" 279.00 540.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=EnvMonarch" "%% FoomaticRIPOptionSetting: PageSize=EnvMonarch"
+  CustomMedia "Executive/Executive" 522.00 756.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Executive" "%% FoomaticRIPOptionSetting: PageSize=Executive"
+  CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
+  CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
+  CustomMedia "Legal/Legal" 612.00 1008.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "w558h774/16K" 558.00 774.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
+  CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
+  // <%LJm1005:Normal%>
+  {
+    ModelName "HP LaserJet p1005 Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_p1005;DES:hp_laserjet_p1005;"
+    PCFileName "hp-laserjet_p1005-hpijs.ppd"
+    Attribute "Product" "" "HP LaserJet p1005 Printer"
+  }
+  {
+    ModelName "HP LaserJet m1005 Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_m1005;DES:hp_laserjet_m1005;"
+    PCFileName "hp-laserjet_m1005-hpijs.ppd"
+    Attribute "Product" "" "HP LaserJet m1005 MFP"
+  }
+  {
+    ModelName "HP LaserJet p1006 Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_p1006;DES:hp_laserjet_p1006;"
+    PCFileName "hp-laserjet_p1006-hpijs.ppd"
+    Attribute "Product" "" "HP LaserJet p1006 Printer"
+  }
+  {
+    ModelName "HP LaserJet p1007 Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_p1007;DES:hp_laserjet_p1007;"
+    PCFileName "hp-laserjet_p1007-hpijs.ppd"
+    Attribute "Product" "" "HP LaserJet p1007 Printer"
+  }
+  {
+    ModelName "HP LaserJet p1008 Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_p1008;DES:hp_laserjet_p1008;"
+    PCFileName "hp-laserjet_p1008-hpijs.ppd"
+    Attribute "Product" "" "HP LaserJet p1008 Printer"
+  }
+  {
+    ModelName "HP LaserJet p1505n Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_p1505n;DES:hp_laserjet_p1505n;"
+    PCFileName "hp-laserjet_p1505n-hpijs-zxs.ppd"
+    Attribute "Product" "" "HP LaserJet p1505n Printer"
+  }
+  {
+    ModelName "HP LaserJet p1505 Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_p1505;DES:hp_laserjet_p1505;"
+    PCFileName "hp-laserjet_p1505-hpijs.ppd"
+    Attribute "Product" "" "HP LaserJet p1505 Printer"
+  }
+  {
+    ModelName "HP LaserJet p2014 Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_p2014;DES:hp_laserjet_p2014;"
+    PCFileName "hp-laserjet_p2014-hpijs-zxs.ppd"
+    Attribute "Product" "" "HP Laserjer p2014"
+  }
+  {
+    ModelName "HP LaserJet p2014n Foomatic/hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp_laserjet_p2014n;DES:hp_laserjet_p2014n;"
+    PCFileName "hp-laserjet_p2014n-hpijs-zxs.ppd"
+    Attribute "Product" "" "HP Laserjer p2014"
+  }
+} // end LJm1005 (for proprietary plugin)
+
 } // end Manufacturer "HP"
 
 

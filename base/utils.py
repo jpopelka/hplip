@@ -48,7 +48,7 @@ try:
     platform_avail = True
 except ImportError:
     platform_avail = False
-    
+
 # Local
 from g import *
 from codes import *
@@ -65,7 +65,7 @@ def lock(f):
         log.debug("Failed to unlock %s." % f.name)
         return False
 
-        
+
 def unlock(f):
     if f is not None:
         log.debug("Unlocking: %s" % f.name)
@@ -74,27 +74,31 @@ def unlock(f):
             os.remove(f.name)
         except (IOError, OSError):
             pass
-        
-        
+
+
 def lock_app(application, suppress_error=False):
-    if not os.path.exists(prop.user_dir):
-        os.makedirs(prop.user_dir)
-        
-    lock_file = os.path.join(prop.user_dir, '.'.join([application, 'lock']))
+    dir = prop.user_dir
+    if os.geteuid() == 0:
+        dir = '/var'
+    
+    elif not os.path.exists(dir):
+        os.makedirs(dir)
+
+    lock_file = os.path.join(dir, '.'.join([application, 'lock']))
     try:
         lock_file_f = open(lock_file, "w")
     except IOError:
         if not suppress_error:
-            log.error("Unable to open %s lock file." % lock_file) 
+            log.error("Unable to open %s lock file." % lock_file)
         return False, None
 
     #log.debug("Locking file: %s" % lock_file)
-    
+
     if not lock(lock_file_f):
         if not suppress_error:
             log.error("Unable to lock %s. Is %s already running?" % (lock_file, application))
         return False, None
-    
+
     return True, lock_file_f
 
 
@@ -264,7 +268,7 @@ class Column:
             return ' ' * (self.margin + self.width)
 
 
-            
+
 class Stack:
     def __init__(self):
         self.stack = []
@@ -274,29 +278,29 @@ class Stack:
 
     def push(self, value):
         self.stack.append(value)
-        
+
     def as_list(self):
         return self.stack
 
     def clear(self):
         self.stack = []
-        
+
     def __len__(self):
         return len(self.stack)
-        
-        
-        
+
+
+
 class Queue(Stack):
     def __init__(self):
         Stack.__init__(self)
 
     def get(self):
         return self.stack.pop(0)
-        
+
     def put(self, value):
         Stack.push(self, value)
 
-   
+
 
 
 # RingBuffer class
@@ -304,7 +308,7 @@ class Queue(Stack):
 # Credit: Sebastien Keim
 # License: Modified BSD
 class RingBuffer:
-    def __init__(self,size_max=50):
+    def __init__(self, size_max=50):
         self.max = size_max
         self.data = []
 
@@ -326,11 +330,11 @@ class RingBuffer:
 
 
 class RingBufferFull:
-    def __init__(self,n):
+    def __init__(self, n):
         #raise "you should use RingBuffer"
         pass
 
-    def append(self,x):
+    def append(self, x):
         self.data[self.cur] = x
         self.cur = (self.cur+1) % self.max
 
@@ -344,6 +348,8 @@ class RingBufferFull:
     def get(self):
         return self.data[self.cur:] + self.data[:self.cur]
 
+
+
 def sort_dict_by_value(d):
     """ Returns the keys of dictionary d sorted by their values """
     items=d.items()
@@ -351,7 +357,8 @@ def sort_dict_by_value(d):
     backitems.sort()
     return [backitems[i][1] for i in range(0, len(backitems))]
 
-def commafy(val): 
+
+def commafy(val):
     return unicode(locale.format("%d", val, grouping=True))
 
 
@@ -484,7 +491,7 @@ class UserSettings(object): # Note: Deprecated after 2.8.8 (see ui4/ui_utils.py)
         if len(path):
             self.cmd_fab = 'hp-fab'
         else:
-            self.cmd_fab = 'python %HOME%/fab.py'    
+            self.cmd_fab = 'python %HOME%/fab.py'
 
     def load(self):
         self.loadDefaults()
@@ -493,7 +500,7 @@ class UserSettings(object): # Note: Deprecated after 2.8.8 (see ui4/ui_utils.py)
 
         try:
             self.auto_refresh_rate = int(user_cfg.refresh.rate)
-        except ValueError:    
+        except ValueError:
             self.auto_refresh_rate = 30 # (secs)
 
         try:
@@ -518,7 +525,7 @@ class UserSettings(object): # Note: Deprecated after 2.8.8 (see ui4/ui_utils.py)
         log.debug("Scan command: %s" % self.cmd_scan)
         log.debug("Auto refresh: %s" % self.auto_refresh)
         log.debug("Auto refresh rate: %s" % self.auto_refresh_rate)
-        log.debug("Auto refresh type: %s" % self.auto_refresh_type)        
+        log.debug("Auto refresh type: %s" % self.auto_refresh_type)
 
     def save(self):
         log.debug("Saving user settings...")
@@ -539,7 +546,7 @@ def no_qt_message_gtk():
         import gtk
         w = gtk.Window()
         dialog = gtk.MessageDialog(w, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                                   gtk.MESSAGE_WARNING, gtk.BUTTONS_OK, 
+                                   gtk.MESSAGE_WARNING, gtk.BUTTONS_OK,
                                    "PyQt not installed. GUI not available. Please check that the PyQt package is installed. Exiting.")
         dialog.run()
         dialog.destroy()
@@ -626,7 +633,7 @@ def checkPyQtImport(): # qt3
             return True
 
     return True
-    
+
 def checkPyQtImport4():
     try:
         import PyQt4
@@ -634,7 +641,7 @@ def checkPyQtImport4():
         return False
     else:
         return True
-    
+
 
 try:
     from string import Template # will fail in Python <= 2.3
@@ -771,13 +778,13 @@ def cat(s):
     globals = sys._getframe(1).f_globals.copy()
     if 'self' in globals:
         del globals['self']
-    
+
     locals = sys._getframe(1).f_locals.copy()
     if 'self' in locals:
         del locals['self']
-        
+
     return Template(s).substitute(sys._getframe(1).f_globals, **locals)
-    
+
 identity = string.maketrans('','')
 unprintable = identity.translate(identity, string.printable)
 
@@ -807,7 +814,7 @@ def find_browser():
                 return b
         else:
             return None
-    
+
 def openURL(url):
     if platform_avail and platform.system() == 'Darwin':
         cmd = 'open "%s"' % url
@@ -837,7 +844,7 @@ def list_move_up(l, m, cmp=None):
         f = lambda x: l[x] == m
     else:
         f = lambda x: cmp(l[x], m)
-    
+
     for i in range(1, len(l)):
         if f(i):
             l[i-1], l[i] = l[i], l[i-1]
@@ -848,11 +855,11 @@ def list_move_down(l, m, cmp=None):
         f = lambda x: l[x] == m
     else:
         f = lambda x: cmp(l[x], m)
-    
+
     for i in range(len(l)-2, -1, -1):
         if f(i):
-            l[i], l[i+1] = l[i+1], l[i] 
-        
+            l[i], l[i+1] = l[i+1], l[i]
+
 
 
 class XMLToDictParser:
@@ -875,7 +882,7 @@ class XMLToDictParser:
     def endElement(self, name):
         if name.lower() == self.last_start:
             self.addData('')
-        
+
         #print "END:", name
         self.stack.pop()
 
@@ -911,7 +918,7 @@ class XMLToDictParser:
                     except KeyError:
                         self.data['-'.join([stack_str, str(j)])] = data
                         break
-                    j += 1                    
+                    j += 1
 
         else:
             self.data[stack_str_0] = self.data[stack_str]
@@ -962,7 +969,7 @@ def getProcessor():
         return platform.machine().replace(' ', '_').lower() # i386, i686, power_macintosh, etc.
     else:
         return "i686" # TODO: Need a fix here
-    
+
 
 BIG_ENDIAN = 0
 LITTLE_ENDIAN = 1
@@ -976,7 +983,7 @@ def getEndian():
 
 def get_password():
     return getpass.getpass("Enter password: ")
-    
+
 
 def run(cmd, log_output=True, password_func=get_password, timeout=1):
     output = cStringIO.StringIO()
@@ -1019,7 +1026,7 @@ def run(cmd, log_output=True, password_func=get_password, timeout=1):
 
 def expand_range(ns): # ns -> string repr. of numeric range, e.g. "1-4, 7, 9-12"
     """Credit: Jean Brouwers, comp.lang.python 16-7-2004
-       Convert a string representation of a set of ranges into a 
+       Convert a string representation of a set of ranges into a
        list of ints, e.g.
        u"1-4, 7, 9-12" --> [1,2,3,4,7,9,10,11,12]
     """
@@ -1061,7 +1068,7 @@ def expand_range(ns): # ns -> string repr. of numeric range, e.g. "1-4, 7, 9-12"
 
 def collapse_range(x): # x --> sorted list of ints
     """ Convert a list of integers into a string
-        range representation: 
+        range representation:
         [1,2,3,4,7,9,10,11,12] --> u"1-4,7,9-12"
     """
     if not x:
@@ -1120,12 +1127,12 @@ def validate_language(lang, default='en_US'):
 
     return loc
 
-   
+
 def gen_random_uuid():
     try:
         import uuid # requires Python 2.5+
         return str(uuid.uuid4())
-        
+
     except ImportError:
         uuidgen = which("uuidgen")
         if uuidgen:
@@ -1133,8 +1140,8 @@ def gen_random_uuid():
             return commands.getoutput(uuidgen) # TODO: Replace with subprocess (commands is deprecated in Python 3.0)
         else:
             return ''
-            
-            
+
+
 class RestTableFormatter(object):
     def __init__(self, header=None):
         self.header = header # tuple of strings
@@ -1207,19 +1214,19 @@ class RestTableFormatter(object):
 
 def mixin(cls):
     import inspect
-    
+
     locals = inspect.stack()[1][0].f_locals
     if "__module__" not in locals:
         raise TypeError("Must call mixin() from within class def.")
-        
+
     dict = cls.__dict__.copy()
     dict.pop("__doc__", None)
     dict.pop("__module__", None)
-    
+
     locals.update(dict)
-    
-    
-    
+
+
+
 # TODO: Move usage stuff to to base/module/Module class
 
 
@@ -1254,7 +1261,7 @@ if sys_cfg.configure.get('ui_toolkit', 'qt3') == 'qt3':
 else:
     USAGE_USE_QT3 = ("Use Qt3:",  "--qt3",  "option",  False)
     USAGE_USE_QT4 = ("Use Qt4:",  "--qt4 (Default)",  "option",  False)
-    
+
 
 
 
@@ -1414,22 +1421,23 @@ encoding: utf8
         log.info("")
 
     elif typ == 'man':
-        log.info('.TH "%s" 1 "%s" Linux "User Manuals"' % (title, version))
+        log.info('.TH "%s" 1 "%s" Linux "User Manuals"' % (crumb, version))
+        log.info(".SH NAME\n%s \- %s" % (crumb, title))
 
         for line in text_list:
             text1, text2, format, trailing_space = line
 
             text1 = text1.replace("\\*", "*")
-            text2 = text2.replace("\\*", "*")            
+            text2 = text2.replace("\\*", "*")
 
             len1, len2 = len(text1), len(text2)
 
             if format == 'summary':
                 log.info(".SH SYNOPSIS")
-                log.info(".B %s" % text1)
+                log.info(".B %s" % text1.replace('Usage:', ''))
 
             elif format == 'name':
-                log.info(".SH NAME\n%s" % text1)
+                log.info(".SH DESCRIPTION\n%s" % text1)
 
             elif format in ('option', 'example', 'note'):
                 if text1:
@@ -1443,6 +1451,25 @@ encoding: utf8
             elif format in ('seealso, para'):
                 log.info(text1)
 
+        log.info(".SH AUTHOR")
+        log.info("HPLIP (Hewlett-Packard Linux Imaging and Printing) is an")
+        log.info("HP developed solution for printing, scanning, and faxing with")
+        log.info("HP inkjet and laser based printers in Linux.")
+
+        log.info(".SH REPORTING BUGS")
+        log.info("The HPLIP Launchpad.net site")
+        log.info(".B https://launchpad.net/hplip")
+        log.info("is available to get help, report")
+        log.info("bugs, make suggestions, discuss the HPLIP project or otherwise")
+        log.info("contact the HPLIP Team.")
+
+        log.info(".SH COPYRIGHT")
+        log.info("Copyright (c) 2001-8 Hewlett-Packard Development Company, L.P.")
+        log.info(".LP")
+        log.info("This software comes with ABSOLUTELY NO WARRANTY.")
+        log.info("This is free software, and you are welcome to distribute it")
+        log.info("under certain conditions. See COPYING file for more details.")
+
         log.info("")
 
 
@@ -1451,7 +1478,7 @@ def log_title(program_name, version, show_ver=True): # TODO: Move to base/module
 
     if show_ver:
         log.info(log.bold("HP Linux Imaging and Printing System (ver. %s)" % prop.version))
-    else:    
+    else:
         log.info(log.bold("HP Linux Imaging and Printing System"))
 
     log.info(log.bold("%s ver. %s" % (program_name, version)))

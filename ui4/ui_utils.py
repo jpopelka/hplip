@@ -35,15 +35,28 @@ from PyQt4.QtGui import *
 
 pat_html_remove = re.compile("(?is)<.*?>", re.I)
 
+# databaseChanged signal values (for FABWindow)
+FAB_NAME_ADD = 0  # s1 - new name
+FAB_NAME_RENAME = 1 # s1 - old name, s2 - new name
+FAB_NAME_REMOVE = 2 # s1 - removed name
+FAB_NAME_DETAILS_CHANGED = 3 # s1 - name
+FAB_GROUP_ADD = 4 # s1 - new group
+FAB_GROUP_RENAME = 5 # s1 - old group, s2 - new group
+FAB_GROUP_REMOVE = 6 # s1 - removed group
+FAB_GROUP_MEMBERSHIP_CHANGED = 7 # s1 - group
+
+
+def __translate(t):
+    return QApplication.translate("ui_utils", t, None, QApplication.UnicodeUTF8)
 
 
 def beginWaitCursor():
     QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
-    
-    
+
+
 def endWaitCursor():
     QApplication.restoreOverrideCursor()
-    
+
 
 # TODO: Cache pixmaps
 def load_pixmap(name, subdir=None, resize_to=None):
@@ -247,11 +260,19 @@ def su_sudo():
     return su_sudo_str
 
 
+
+DEFAULT_TITLE =  __translate("HP Device Manager")
+
+#QApplication.translate("ui_utils", "HPLIP Device Manager", None, QApplication.UnicodeUTF8)
+
 def FailureUI(parent, error_text, title_text=None):
     log.error(pat_html_remove.sub(' ', unicode(error_text)))
 
     if title_text is None:
-        title_text = parent.windowTitle()
+        if parent is not None:
+            title_text = parent.windowTitle()
+        else:
+            title_text = DEFAULT_TITLE
 
     QMessageBox.critical(parent,
         title_text,
@@ -262,11 +283,16 @@ def FailureUI(parent, error_text, title_text=None):
 
 showFailureUi = FailureUI
 
+
 def WarningUI(parent,  warn_text, title_text=None):
     log.warn(pat_html_remove.sub(' ', unicode(warn_text)))
 
     if title_text is None:
-        title_text = parent.windowTitle()
+        if parent is not None:
+            title_text = parent.windowTitle()
+        else:
+            title_text = DEFAULT_TITLE
+
 
     QMessageBox.warning(parent,
         title_text,
@@ -278,16 +304,36 @@ def WarningUI(parent,  warn_text, title_text=None):
 showWarningUi = WarningUI
 
 
+def SuccessUI(parent, text, title_text=None):
+    log.info(pat_html_remove.sub(' ', unicode(text)))
+
+    if title_text is None:
+        if parent is not None:
+            title_text = parent.windowTitle()
+        else:
+            title_text = DEFAULT_TITLE
+
+
+    QMessageBox.information(parent,
+        title_text,
+        text,
+        QMessageBox.Ok,
+        QMessageBox.NoButton,
+        QMessageBox.NoButton)
+
+showSuccessUi = SuccessUI
+
+
 def CheckDeviceUI(parent, title_text=None):
-    text = QApplication.translate("Utils", "<b>Unable to communicate with device or device is in an error state.</b><p>Please check device setup and try again.</p>", None, QApplication.UnicodeUTF8)
+    text = __translate("<b>Unable to communicate with device or device is in an error state.</b><p>Please check device setup and try again.</p>")
     return FailureUI(parent, text, title_text)
 
 checkDeviceUi = CheckDeviceUI
 
 
 class PrinterNameValidator(QValidator):
-    def __init__(self, parent=None): #, name=None):
-        QValidator.__init__(self, parent) #, name)
+    def __init__(self, parent=None):
+        QValidator.__init__(self, parent)
 
     def validate(self, input, pos):
         input = unicode(input)
@@ -295,7 +341,7 @@ class PrinterNameValidator(QValidator):
         if not input:
             return QValidator.Acceptable, pos
 
-        elif input[pos-1] in u"""~`!@#$%^&*()-=+[]{}()\\/,.<>?'\";:| """:
+        if input[pos-1] in u"""~`!@#$%^&*()-=+[]{}()\\/,.<>?'\";:| """:
             return QValidator.Invalid, pos
 
         # TODO: How to determine if unicode char is "printable" and acceptable
@@ -303,14 +349,13 @@ class PrinterNameValidator(QValidator):
         #elif input != utils.printable(input):
         #    return QValidator.Invalid, pos
 
-        else:
-            return QValidator.Acceptable, pos
+        return QValidator.Acceptable, pos
 
 
 
 class PhoneNumValidator(QValidator):
-    def __init__(self, parent=None): #, name=None):
-        QValidator.__init__(self, parent) #, name)
+    def __init__(self, parent=None):
+        QValidator.__init__(self, parent)
 
     def validate(self, input, pos):
         input = unicode(input)
@@ -318,10 +363,180 @@ class PhoneNumValidator(QValidator):
         if not input:
             return QValidator.Acceptable, pos
 
-        elif input[pos-1] not in u'0123456789-(+) ':
+        if input[pos-1] not in u'0123456789-(+).,#* ':
             return QValidator.Invalid, pos
 
-        else:
+        return QValidator.Acceptable, pos
+
+
+class AddressBookNameValidator(QValidator):
+    def __init__(self, db, parent=None):
+        QValidator.__init__(self, parent)
+        self.db = db
+
+    def validate(self, input, pos):
+        input = unicode(input)
+
+        if not input:
             return QValidator.Acceptable, pos
+
+        if input in self.db.get_all_names():
+            return QValidator.Invalid, pos
+
+        if input[pos-1] in u'''|\\/"''': # | is the drag 'n drop separator
+            return QValidator.Invalid, pos
+
+        return QValidator.Acceptable, pos
+
+
+
+MIME_TYPES_DESC = \
+{
+    "application/pdf" : (__translate("PDF Document"), '.pdf'),
+    "application/postscript" : (__translate("Postscript Document"), '.ps'),
+    "application/vnd.hp-HPGL" : (__translate("HP Graphics Language File"), '.hgl, .hpg, .plt, .prn'),
+    "application/x-cshell" : (__translate("C Shell Script"), '.csh, .sh'),
+    "application/x-csource" : (__translate("C Source Code"), '.c'),
+    "text/cpp": (__translate("C++ Source Code"), '.cpp, .cxx'),
+    "application/x-perl" : (__translate("Perl Script"), '.pl'),
+    "application/x-python" : (__translate("Python Program"), '.py'),
+    "application/x-shell" : (__translate("Shell Script"), '.sh'),
+    "text/plain" : (__translate("Plain Text"), '.txt, .log'),
+    "text/html" : (__translate("HTML Dcoument"), '.htm, .html'),
+    "image/gif" : (__translate("GIF Image"), '.gif'),
+    "image/png" : (__translate("PNG Image"), '.png'),
+    "image/jpeg" : (__translate("JPEG Image"), '.jpg, .jpeg'),
+    "image/tiff" : (__translate("TIFF Image"), '.tif, .tiff'),
+    "image/x-bitmap" : (__translate("Bitmap (BMP) Image"), '.bmp'),
+    "image/x-bmp" : (__translate("Bitmap (BMP) Image"), '.bmp'),
+    "image/x-photocd" : (__translate("Photo CD Image"), '.pcd'),
+    "image/x-portable-anymap" : (__translate("Portable Image (PNM)"), '.pnm'),
+    "image/x-portable-bitmap" : (__translate("Portable B&W Image (PBM)"), '.pbm'),
+    "image/x-portable-graymap" : (__translate("Portable Grayscale Image (PGM)"), '.pgm'),
+    "image/x-portable-pixmap" : (__translate("Portable Color Image (PPM)"), '.ppm'),
+    "image/x-sgi-rgb" : (__translate("SGI RGB"), '.rgb'),
+    "image/x-xbitmap" : (__translate("X11 Bitmap (XBM)"), '.xbm'),
+    "image/x-xpixmap" : (__translate("X11 Pixmap (XPM)"), '.xpm'),
+    "image/x-sun-raster" : (__translate("Sun Raster Format"), '.ras'),
+    "application/hplip-fax" : (__translate("HPLIP Fax File"), '.g3, .g4'),
+}
+
+# pixmaps for status list(s) (inkjet, laserjet)
+status_icons = None
+
+def getStatusListIcon(error_state):
+    global status_icons
+    if status_icons is None:
+        status_icons = {
+          ERROR_STATE_CLEAR : (load_pixmap('idle', '16x16'), load_pixmap('idle', '16x16')),
+          ERROR_STATE_BUSY : (load_pixmap('busy', '16x16'), load_pixmap('busy', '16x16')),
+          ERROR_STATE_ERROR : (load_pixmap('error', '16x16'), load_pixmap('error', '16x16')),
+          ERROR_STATE_LOW_SUPPLIES : (load_pixmap('inkdrop', '16x16'), load_pixmap('toner', '16x16')),
+          ERROR_STATE_OK : (load_pixmap('ok', '16x16'), load_pixmap('ok', '16x16')),
+          ERROR_STATE_WARNING : (load_pixmap('warning', '16x16'), load_pixmap('warning', '16x16')),
+          ERROR_STATE_LOW_PAPER: (load_pixmap('paper', '16x16'), load_pixmap('paper', '16x16')),
+          ERROR_STATE_PRINTING : (load_pixmap("print", '16x16'), load_pixmap("print", '16x16')),
+          ERROR_STATE_SCANNING : (load_pixmap("scan", '16x16'), load_pixmap("scan", '16x16')),
+          ERROR_STATE_PHOTOCARD : (load_pixmap("pcard", '16x16'), load_pixmap("pcard", '16x16')),
+          ERROR_STATE_FAXING : (load_pixmap("fax", '16x16'), load_pixmap("fax", '16x16')),
+          ERROR_STATE_COPYING :  (load_pixmap("makecopies", '16x16'), load_pixmap("makecopies", '16x16')),
+        }
+
+    return status_icons.get(error_state, status_icons[ERROR_STATE_CLEAR])
+
+# pixmaps for device icons (inkjet, laserjet)
+overlay_icons = None
+
+def getStatusOverlayIcon(error_state):
+    global overlay_icons
+    if overlay_icons is None:
+        overlay_icons = {
+            ERROR_STATE_CLEAR : (None, None),
+            ERROR_STATE_BUSY : (load_pixmap('busy', '16x16'), load_pixmap('busy', '16x16')),
+            ERROR_STATE_ERROR : (load_pixmap('error', '16x16'), load_pixmap('error', '16x16')),
+            ERROR_STATE_LOW_SUPPLIES : (load_pixmap('inkdrop', '16x16'), load_pixmap('toner', '16x16')),
+            ERROR_STATE_OK : (load_pixmap('ok', '16x16'), load_pixmap('ok', '16x16')),
+            ERROR_STATE_WARNING : (load_pixmap('warning', '16x16'), load_pixmap('warning', '16x16')),
+            ERROR_STATE_LOW_PAPER: (load_pixmap('paper', '16x16'), load_pixmap('paper', '16x16')),
+            ERROR_STATE_PRINTING : (load_pixmap('busy', '16x16'), load_pixmap('busy', '16x16')),
+            ERROR_STATE_SCANNING : (load_pixmap('busy', '16x16'), load_pixmap('busy', '16x16')),
+            ERROR_STATE_PHOTOCARD : (load_pixmap('busy', '16x16'), load_pixmap('busy', '16x16')),
+            ERROR_STATE_FAXING : (load_pixmap('busy', '16x16'), load_pixmap('busy', '16x16')),
+            ERROR_STATE_COPYING : (load_pixmap('busy', '16x16'), load_pixmap('busy', '16x16')),
+            ERROR_STATE_REFRESHING : (load_pixmap('refresh1', '16x16'), load_pixmap('refresh1', '16x16')),
+        }
+
+    return overlay_icons.get(error_state, overlay_icons[ERROR_STATE_CLEAR])
+
+
+NUM_REPRS = {
+      1 : __translate("one"),
+      2 : __translate("two"),
+      3 : __translate("three"),
+      4 : __translate("four"),
+      5 : __translate("five"),
+      6 : __translate("six"),
+      7 : __translate("seven"),
+      8 : __translate("eight"),
+      9 : __translate("nine"),
+      10 : __translate("ten"),
+      11 : __translate("eleven"),
+      12 : __translate("twelve")
+}
+
+UNIT_NAMES = {
+    "year" : (__translate("year"), __translate("years")),
+    "month" : (__translate("month"), __translate("months")),
+    "week" : (__translate("week"), __translate("weeks")),
+    "day" : (__translate("day"), __translate("days")),
+    "hour" : (__translate("hour"), __translate("hours")),
+    "minute" : (__translate("minute"), __translate("minutes")),
+    "second" : (__translate("second"), __translate("seconds")),
+}
+
+
+def getTimeDeltaDesc(past):
+    t1 = QDateTime()
+    t1.setTime_t(int(past))
+    t2 = QDateTime.currentDateTime()
+    delta = t1.secsTo(t2)
+    return __translate("(%1 ago)").arg(stringify(delta))
+
+
+# "Nicely readable timedelta"
+# Credit: Bjorn Lindqvist
+# ASPN Python Recipe 498062
+# http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/498062
+# Note: Modified from recipe
+def getSecondsInUnits(seconds):
+    unit_limits = [("year", 31536000),
+                   ("month", 2592000),
+                   ("week", 604800),
+                   ("day", 86400),
+                   ("hour", 3600),
+                   ("minute", 60)]
+
+    for unit_name, limit in unit_limits:
+        if seconds >= limit:
+            amount = int(round(float(seconds) / limit))
+            return amount, unit_name
+
+    return seconds, "second"
+
+
+def stringify(seconds):
+    amount, unit_name = getSecondsInUnits(seconds)
+
+    try:
+        i18n_amount = NUM_REPRS[amount]
+    except KeyError:
+        i18n_amount = unicode(amount)
+
+    if amount == 1:
+        i18n_unit = UNIT_NAMES[unit_name][0]
+    else:
+        i18n_unit = UNIT_NAMES[unit_name][1]
+
+    return QString("%1 %2").arg(i18n_amount).arg(i18n_unit)
 
 

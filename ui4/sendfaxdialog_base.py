@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui4/sendfaxdialog_base.ui'
 #
-# Created: Thu Oct 30 15:47:09 2008
+# Created: Mon Dec 15 16:59:01 2008
 #      by: PyQt4 UI code generator 4.3.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -49,7 +49,7 @@ class Ui_Dialog(object):
         self.FaxComboBox.setObjectName("FaxComboBox")
         self.gridlayout2.addWidget(self.FaxComboBox,0,0,1,3)
 
-        spacerItem = QtGui.QSpacerItem(20,20,QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
+        spacerItem = QtGui.QSpacerItem(20,20,QtGui.QSizePolicy.MinimumExpanding,QtGui.QSizePolicy.Minimum)
         self.gridlayout2.addItem(spacerItem,1,0,1,1)
 
         self.FaxOptionsButton = QtGui.QPushButton(self.SelectFax)
@@ -103,6 +103,7 @@ class Ui_Dialog(object):
         self.gridlayout3.addWidget(self.line_2,1,0,1,1)
 
         self.CoverPageGroupBox = QtGui.QGroupBox(self.CoverPage)
+        self.CoverPageGroupBox.setEnabled(True)
         self.CoverPageGroupBox.setCheckable(True)
         self.CoverPageGroupBox.setChecked(False)
         self.CoverPageGroupBox.setObjectName("CoverPageGroupBox")
@@ -113,9 +114,11 @@ class Ui_Dialog(object):
         self.gridlayout5 = QtGui.QGridLayout()
         self.gridlayout5.setObjectName("gridlayout5")
 
-        self.label_18 = QtGui.QLabel(self.CoverPageGroupBox)
-        self.label_18.setObjectName("label_18")
-        self.gridlayout5.addWidget(self.label_18,0,0,1,4)
+        self.CoverPageName = QtGui.QLabel(self.CoverPageGroupBox)
+        self.CoverPageName.setFrameShape(QtGui.QFrame.NoFrame)
+        self.CoverPageName.setAlignment(QtCore.Qt.AlignCenter)
+        self.CoverPageName.setObjectName("CoverPageName")
+        self.gridlayout5.addWidget(self.CoverPageName,0,0,1,4)
 
         self.CoverPagePreview = QtGui.QLabel(self.CoverPageGroupBox)
 
@@ -124,9 +127,11 @@ class Ui_Dialog(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.CoverPagePreview.sizePolicy().hasHeightForWidth())
         self.CoverPagePreview.setSizePolicy(sizePolicy)
-        self.CoverPagePreview.setMinimumSize(QtCore.QSize(164,228))
-        self.CoverPagePreview.setMaximumSize(QtCore.QSize(164,228))
-        self.CoverPagePreview.setFrameShape(QtGui.QFrame.Box)
+        self.CoverPagePreview.setMinimumSize(QtCore.QSize(134,192))
+        self.CoverPagePreview.setMaximumSize(QtCore.QSize(134,192))
+        self.CoverPagePreview.setFrameShape(QtGui.QFrame.NoFrame)
+        self.CoverPagePreview.setScaledContents(True)
+        self.CoverPagePreview.setAlignment(QtCore.Qt.AlignCenter)
         self.CoverPagePreview.setObjectName("CoverPagePreview")
         self.gridlayout5.addWidget(self.CoverPagePreview,1,0,1,4)
 
@@ -178,6 +183,7 @@ class Ui_Dialog(object):
         self.gridlayout3.addWidget(self.CoverPageGroupBox,2,0,1,1)
 
         self.label_13 = QtGui.QLabel(self.CoverPage)
+        self.label_13.setWordWrap(True)
         self.label_13.setObjectName("label_13")
         self.gridlayout3.addWidget(self.label_13,3,0,1,1)
         self.StackedWidget.addWidget(self.CoverPage)
@@ -213,10 +219,10 @@ class Ui_Dialog(object):
         self.FilesTable.setObjectName("FilesTable")
         self.gridlayout7.addWidget(self.FilesTable,2,0,1,1)
 
-        self.label_19 = QtGui.QLabel(self.SelectFiles)
-        self.label_19.setWordWrap(True)
-        self.label_19.setObjectName("label_19")
-        self.gridlayout7.addWidget(self.label_19,3,0,1,1)
+        self.FilesPageNote = QtGui.QLabel(self.SelectFiles)
+        self.FilesPageNote.setWordWrap(True)
+        self.FilesPageNote.setObjectName("FilesPageNote")
+        self.gridlayout7.addWidget(self.FilesPageNote,3,0,1,1)
         self.StackedWidget.addWidget(self.SelectFiles)
 
         self.SelectRecipients = QtGui.QWidget()
@@ -250,14 +256,17 @@ class Ui_Dialog(object):
         self.gridlayout9.addWidget(self.RecipientsTable,0,0,1,5)
 
         self.RemoveRecipientButton = QtGui.QPushButton(self.groupBox_4)
+        self.RemoveRecipientButton.setEnabled(False)
         self.RemoveRecipientButton.setObjectName("RemoveRecipientButton")
         self.gridlayout9.addWidget(self.RemoveRecipientButton,1,0,1,1)
 
         self.MoveRecipientUpButton = QtGui.QPushButton(self.groupBox_4)
+        self.MoveRecipientUpButton.setEnabled(False)
         self.MoveRecipientUpButton.setObjectName("MoveRecipientUpButton")
         self.gridlayout9.addWidget(self.MoveRecipientUpButton,1,1,1,1)
 
         self.MoveRecipientDownButton = QtGui.QPushButton(self.groupBox_4)
+        self.MoveRecipientDownButton.setEnabled(False)
         self.MoveRecipientDownButton.setObjectName("MoveRecipientDownButton")
         self.gridlayout9.addWidget(self.MoveRecipientDownButton,1,2,1,1)
 
@@ -296,6 +305,7 @@ class Ui_Dialog(object):
         self.hboxlayout.addWidget(self.AddIndividualComboBox)
 
         self.AddIndividualButton = QtGui.QPushButton(self.groupBox)
+        self.AddIndividualButton.setEnabled(False)
         self.AddIndividualButton.setObjectName("AddIndividualButton")
         self.hboxlayout.addWidget(self.AddIndividualButton)
         self.gridlayout10.addLayout(self.hboxlayout,0,0,1,1)
@@ -321,6 +331,7 @@ class Ui_Dialog(object):
         self.hboxlayout1.addWidget(self.AddGroupComboBox)
 
         self.AddGroupButton = QtGui.QPushButton(self.groupBox)
+        self.AddGroupButton.setEnabled(False)
         self.AddGroupButton.setObjectName("AddGroupButton")
         self.hboxlayout1.addWidget(self.AddGroupButton)
         self.gridlayout10.addLayout(self.hboxlayout1,1,0,1,1)
@@ -352,6 +363,7 @@ class Ui_Dialog(object):
         self.hboxlayout2.addWidget(self.QuickAddFaxEdit)
 
         self.QuickAddButton = QtGui.QPushButton(self.groupBox_3)
+        self.QuickAddButton.setEnabled(False)
         self.QuickAddButton.setObjectName("QuickAddButton")
         self.hboxlayout2.addWidget(self.QuickAddButton)
         self.gridlayout11.addLayout(self.hboxlayout2,0,0,1,1)
@@ -418,7 +430,7 @@ class Ui_Dialog(object):
         self.gridlayout.addWidget(self.CancelButton,2,4,1,1)
 
         self.retranslateUi(Dialog)
-        self.StackedWidget.setCurrentIndex(0)
+        self.StackedWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
@@ -429,19 +441,18 @@ class Ui_Dialog(object):
         self.label_12.setText(QtGui.QApplication.translate("Dialog", "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
         "p, li { white-space: pre-wrap; }\n"
         "</style></head><body style=\" font-family:\'Sans Serif\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-        "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Select the desired fax printer queue and click <span style=\" font-style:italic;\">Next &gt;</span> to continue. Note: Once you continue to the next step, you will not be able to change to a different fax queue.</p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
+        "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Select the desired fax printer queue and click <span style=\" font-style:italic;\">Next</span> to continue. Note: Once you continue to the next step, you will not be able to change to a different fax queue.</p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
         self.label_3.setText(QtGui.QApplication.translate("Dialog", "Select and Edit Fax Coverpage (Optional)", None, QtGui.QApplication.UnicodeUTF8))
         self.CoverPageGroupBox.setTitle(QtGui.QApplication.translate("Dialog", "Include Coverpage", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_18.setText(QtGui.QApplication.translate("Dialog", "Coverpage design preview:", None, QtGui.QApplication.UnicodeUTF8))
         self.label_16.setText(QtGui.QApplication.translate("Dialog", "Regarding:", None, QtGui.QApplication.UnicodeUTF8))
         self.label_17.setText(QtGui.QApplication.translate("Dialog", "Optional Message: (max. 2000 characters or 32 preformatted lines)", None, QtGui.QApplication.UnicodeUTF8))
         self.PreserveFormattingCheckBox.setText(QtGui.QApplication.translate("Dialog", "Preformatted (preserve formatting)", None, QtGui.QApplication.UnicodeUTF8))
         self.label_13.setText(QtGui.QApplication.translate("Dialog", "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
         "p, li { white-space: pre-wrap; }\n"
-        "</style></head><body style=\" font-family:\'Sans Serif\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-        "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">To send a fax without a coverpage, click <span style=\" font-style:italic;\">Next &gt;</span>.</p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
+        "</style></head><body style=\" font-family:\'DejaVu Sans\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+        "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Sans Serif\'; font-size:9pt;\">Check<span style=\" font-style:italic;\"> Include Coverpage </span>to add a coverpage to this fax. To continue without a coverpage, click <span style=\" font-style:italic;\">Next &gt;</span>.</p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
         self.label_2.setText(QtGui.QApplication.translate("Dialog", "Select Files to Send", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_19.setText(QtGui.QApplication.translate("Dialog", "Note: You may also add files to the fax by printing from any application to the \'%1\' fax printer.", None, QtGui.QApplication.UnicodeUTF8))
+        self.FilesPageNote.setText(QtGui.QApplication.translate("Dialog", "Note: You may also add files to the fax by printing from any application to the \'%1\' fax printer.", None, QtGui.QApplication.UnicodeUTF8))
         self.label_4.setText(QtGui.QApplication.translate("Dialog", "Select Fax Recipients", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBox_4.setTitle(QtGui.QApplication.translate("Dialog", "Recipients", None, QtGui.QApplication.UnicodeUTF8))
         self.RecipientsTable.clear()

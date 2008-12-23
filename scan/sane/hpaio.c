@@ -2768,6 +2768,8 @@ extern SANE_Status sane_hpaio_start(SANE_Handle handle)
     IP_XFORM_SPEC xforms[IP_MAX_XFORMS], * pXform = xforms;
     WORD wResult;
         
+    hpaio->user_cancel = FALSE;
+
     if (strcmp(*((char **)handle), "MARVELL") == 0)
        return marvell_start(handle);
     if (strcmp(*((char **)handle), "SOAP") == 0)
@@ -3109,6 +3111,11 @@ extern SANE_Status sane_hpaio_read(SANE_Handle handle, SANE_Byte *data, SANE_Int
     DWORD dwOutputUsed, dwOutputThisPos;
     WORD wResult;
 
+    if (hpaio->user_cancel)  {
+        bug("sane_hpaio_read(maxLength=%d): User cancelled!\n", maxLength);
+        return SANE_STATUS_CANCELLED;
+    }
+
     if (strcmp(*((char **)handle), "MARVELL") == 0)
        return marvell_read(handle, data, maxLength, pLength);
     if (strcmp(*((char **)handle), "SOAP") == 0)
@@ -3270,6 +3277,11 @@ abort:
 extern void sane_hpaio_cancel( SANE_Handle handle )
 {
     hpaioScanner_t hpaio = ( hpaioScanner_t ) handle;
+
+    if (hpaio->user_cancel)  {
+        bug("sane_hpaio_cancel: already cancelled!\n");
+    }
+    hpaio->user_cancel = TRUE;
 
     if (strcmp(*((char **)handle), "MARVELL") == 0)
        return marvell_cancel(handle);

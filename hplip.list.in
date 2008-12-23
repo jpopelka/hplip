@@ -73,6 +73,7 @@ l 0755 root root $libdir/libhpip.so libhpip.so.0.0.1
 # Ugly fix for inconsistent libcrypto soname
 l 0755 root root $libdir/libcrypto.so.6 libcrypto.so.0.9.8
 f 0644 root root /etc/udev/rules.d/55-hpmud.rules data/rules/55-hpmud.rules
+f 0644 root root /usr/share/hal/fdi/preprobe/10osvendor/20-hplip-devices.fdi data/rules/20-hplip-devices.fdi
 %system all
 
 %if scan-build
@@ -268,8 +269,15 @@ l 755 root root $bindir/hp-scan ../share/hplip/scan.py
 %endif
 # end !UNLEADED
 
+%ifdef UBUNTU804_DEPENDENCY
+%requires python-qt3
+%replaces foomatic-db-hpijs
+%replaces hpijs
+%replaces hplip
+%replaces hplip-data
+%endif
+
 %if PLUGIN
-f 0644 root root $ppd/HP prnt/plugins/*.ppd.gz
 f 0644 root root $home/prnt/plugins/license.txt prnt/plugins/license.txt
 f 0644 root root $home/data/firmware data/firmware/*.fw.gz
 d 775 root root $home/data/plugin -

@@ -47,10 +47,10 @@ class PrinterNameComboBox(QWidget):
         self.updating = False
         self.typ = PRINTERNAMECOMBOBOX_TYPE_PRINTER_ONLY
         self.initUi()
-        
-        
+
+
     def initUi(self):
-        print "PrinterNameComboBox.initUi()"
+        #print "PrinterNameComboBox.initUi()"
         HBoxLayout = QHBoxLayout(self)
         HBoxLayout.setObjectName("HBoxLayout")
 
@@ -69,78 +69,78 @@ class PrinterNameComboBox(QWidget):
         self.ComboBox.setSizePolicy(sizePolicy)
         self.ComboBox.setObjectName("ComboBox")
         HBoxLayout.addWidget(self.ComboBox)
-        
+
         self.NameLabel.setText(self.__tr("Printer:"))
-        
-        #self.connect(self.ComboBox, SIGNAL("currentIndexChanged(int)"), 
-        #    self.ComboBox_currentIndexChanged)        
-        
-        self.connect(self.ComboBox, SIGNAL("currentIndexChanged(const QString &)"), 
-            self.ComboBox_currentIndexChanged)        
-        
+
+        #self.connect(self.ComboBox, SIGNAL("currentIndexChanged(int)"),
+        #    self.ComboBox_currentIndexChanged)
+
+        self.connect(self.ComboBox, SIGNAL("currentIndexChanged(const QString &)"),
+            self.ComboBox_currentIndexChanged)
+
     def setType(self, typ):
-        if typ in (PRINTERNAMECOMBOBOX_TYPE_PRINTER_ONLY, 
-                   PRINTERNAMECOMBOBOX_TYPE_FAX_ONLY, 
+        if typ in (PRINTERNAMECOMBOBOX_TYPE_PRINTER_ONLY,
+                   PRINTERNAMECOMBOBOX_TYPE_FAX_ONLY,
                    PRINTERNAMECOMBOBOX_TYPE_PRINTER_AND_FAX):
             self.typ = typ
-            
-            
+
+
     def setInitialPrinter(self, printer_name):
         self.initial_printer = printer_name
-        
-        
+
+
     def updateUi(self):
-        print "PrinterNameComboBox.updateUi()"
+        #print "PrinterNameComboBox.updateUi()"
         if self.typ == PRINTERNAMECOMBOBOX_TYPE_PRINTER_ONLY:
             self.NameLabel.setText(self.__tr("Printer Name:"))
             be_filter = ['hp']
-            
+
         elif self.typ == PRINTERNAMECOMBOBOX_TYPE_FAX_ONLY:
             self.NameLabel.setText(self.__tr("Fax Name:"))
             be_filter = ['hpfax']
-            
+
         else: # PRINTERNAMECOMBOBOX_TYPE_PRINTER_AND_FAX
             self.NameLabel.setText(self.__tr("Printer/Fax Name:"))
             be_filter = ['hp', 'hpfax']
-            
+
         self.printers = device.getSupportedCUPSPrinters(be_filter)
         self.printer_index.clear() # = {}
-        
+
         if self.printers:
             if self.initial_printer is None:
                 self.initial_printer = user_cfg.last_used.printer_name
-            
+
             self.updating = True
             try:
                 k = 0
                 for i, p in enumerate(self.printers):
                     self.printer_index[p.name] = p.device_uri
                     self.ComboBox.insertItem(i, p.name)
-                    
+
                     if self.initial_printer is not None and p.name == self.initial_printer:
                         self.initial_printer = None
                         k = i
-                
+
                 self.ComboBox.setCurrentIndex(-1)
-            
+
             finally:
                 self.updating = False
-                
+
             self.ComboBox.setCurrentIndex(k)
         else:
             self.emit(SIGNAL("PrinterNameComboBox_noPrinters"))
-            
-            
-    def ComboBox_currentIndexChanged(self, t):            
+
+
+    def ComboBox_currentIndexChanged(self, t):
         self.printer_name = unicode(t)
-        
+
         if self.updating:
             return
 
         self.device_uri = self.printer_index[self.printer_name]
         user_cfg.last_used.printer_name = self.printer_name
         self.emit(SIGNAL("PrinterNameComboBox_currentChanged"), self.device_uri, self.printer_name)
-        
-        
+
+
     def __tr(self,s,c = None):
         return qApp.translate("PrinterNameComboBox",s,c)

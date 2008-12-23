@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui4/devmgr5_base.ui'
 #
-# Created: Thu Oct 30 15:47:07 2008
+# Created: Mon Dec 15 16:58:59 2008
 #      by: PyQt4 UI code generator 4.3.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -13,7 +13,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setWindowModality(QtCore.Qt.ApplicationModal)
-        MainWindow.resize(QtCore.QSize(QtCore.QRect(0,0,720,535).size()).expandedTo(MainWindow.minimumSizeHint()))
+        MainWindow.resize(QtCore.QSize(QtCore.QRect(0,0,700,500).size()).expandedTo(MainWindow.minimumSizeHint()))
 
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -173,35 +173,176 @@ class Ui_MainWindow(object):
         self.gridlayout6 = QtGui.QGridLayout(self.groupBox)
         self.gridlayout6.setObjectName("gridlayout6")
 
+        self.vboxlayout = QtGui.QVBoxLayout()
+        self.vboxlayout.setObjectName("vboxlayout")
+
+        self.groupBox_3 = QtGui.QGroupBox(self.groupBox)
+
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred,QtGui.QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.groupBox_3.sizePolicy().hasHeightForWidth())
+        self.groupBox_3.setSizePolicy(sizePolicy)
+        self.groupBox_3.setObjectName("groupBox_3")
+
+        self.gridlayout7 = QtGui.QGridLayout(self.groupBox_3)
+        self.gridlayout7.setMargin(1)
+        self.gridlayout7.setHorizontalSpacing(6)
+        self.gridlayout7.setVerticalSpacing(1)
+        self.gridlayout7.setObjectName("gridlayout7")
+
+        self.hboxlayout3 = QtGui.QHBoxLayout()
+        self.hboxlayout3.setObjectName("hboxlayout3")
+
+        self.StartStopIcon = QtGui.QLabel(self.groupBox_3)
+
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.StartStopIcon.sizePolicy().hasHeightForWidth())
+        self.StartStopIcon.setSizePolicy(sizePolicy)
+        self.StartStopIcon.setMinimumSize(QtCore.QSize(16,16))
+        self.StartStopIcon.setMaximumSize(QtCore.QSize(16,16))
+        self.StartStopIcon.setObjectName("StartStopIcon")
+        self.hboxlayout3.addWidget(self.StartStopIcon)
+
+        self.StartStopLabel = QtGui.QLabel(self.groupBox_3)
+        self.StartStopLabel.setFrameShape(QtGui.QFrame.NoFrame)
+        self.StartStopLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.StartStopLabel.setObjectName("StartStopLabel")
+        self.hboxlayout3.addWidget(self.StartStopLabel)
+        self.gridlayout7.addLayout(self.hboxlayout3,0,0,1,1)
+        self.vboxlayout.addWidget(self.groupBox_3)
+
         self.StartStopButton = QtGui.QPushButton(self.groupBox)
         self.StartStopButton.setObjectName("StartStopButton")
-        self.gridlayout6.addWidget(self.StartStopButton,0,0,1,1)
+        self.vboxlayout.addWidget(self.StartStopButton)
+        self.gridlayout6.addLayout(self.vboxlayout,0,0,1,1)
+
+        self.vboxlayout1 = QtGui.QVBoxLayout()
+        self.vboxlayout1.setObjectName("vboxlayout1")
+
+        self.groupBox_4 = QtGui.QGroupBox(self.groupBox)
+
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred,QtGui.QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.groupBox_4.sizePolicy().hasHeightForWidth())
+        self.groupBox_4.setSizePolicy(sizePolicy)
+        self.groupBox_4.setObjectName("groupBox_4")
+
+        self.gridlayout8 = QtGui.QGridLayout(self.groupBox_4)
+        self.gridlayout8.setMargin(1)
+        self.gridlayout8.setHorizontalSpacing(6)
+        self.gridlayout8.setVerticalSpacing(1)
+        self.gridlayout8.setObjectName("gridlayout8")
+
+        self.hboxlayout4 = QtGui.QHBoxLayout()
+        self.hboxlayout4.setObjectName("hboxlayout4")
+
+        self.AcceptRejectIcon = QtGui.QLabel(self.groupBox_4)
+
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.AcceptRejectIcon.sizePolicy().hasHeightForWidth())
+        self.AcceptRejectIcon.setSizePolicy(sizePolicy)
+        self.AcceptRejectIcon.setMinimumSize(QtCore.QSize(16,16))
+        self.AcceptRejectIcon.setMaximumSize(QtCore.QSize(16,16))
+        self.AcceptRejectIcon.setObjectName("AcceptRejectIcon")
+        self.hboxlayout4.addWidget(self.AcceptRejectIcon)
+
+        self.AcceptRejectLabel = QtGui.QLabel(self.groupBox_4)
+        self.AcceptRejectLabel.setFrameShape(QtGui.QFrame.NoFrame)
+        self.AcceptRejectLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.AcceptRejectLabel.setObjectName("AcceptRejectLabel")
+        self.hboxlayout4.addWidget(self.AcceptRejectLabel)
+        self.gridlayout8.addLayout(self.hboxlayout4,0,0,1,1)
+        self.vboxlayout1.addWidget(self.groupBox_4)
 
         self.AcceptRejectButton = QtGui.QPushButton(self.groupBox)
         self.AcceptRejectButton.setObjectName("AcceptRejectButton")
-        self.gridlayout6.addWidget(self.AcceptRejectButton,0,1,1,1)
+        self.vboxlayout1.addWidget(self.AcceptRejectButton)
+        self.gridlayout6.addLayout(self.vboxlayout1,0,1,1,1)
+
+        self.vboxlayout2 = QtGui.QVBoxLayout()
+        self.vboxlayout2.setObjectName("vboxlayout2")
+
+        self.groupBox_5 = QtGui.QGroupBox(self.groupBox)
+
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred,QtGui.QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.groupBox_5.sizePolicy().hasHeightForWidth())
+        self.groupBox_5.setSizePolicy(sizePolicy)
+        self.groupBox_5.setObjectName("groupBox_5")
+
+        self.gridlayout9 = QtGui.QGridLayout(self.groupBox_5)
+        self.gridlayout9.setMargin(1)
+        self.gridlayout9.setHorizontalSpacing(6)
+        self.gridlayout9.setVerticalSpacing(1)
+        self.gridlayout9.setObjectName("gridlayout9")
+
+        self.hboxlayout5 = QtGui.QHBoxLayout()
+        self.hboxlayout5.setObjectName("hboxlayout5")
+
+        self.SetDefaultIcon = QtGui.QLabel(self.groupBox_5)
+
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.SetDefaultIcon.sizePolicy().hasHeightForWidth())
+        self.SetDefaultIcon.setSizePolicy(sizePolicy)
+        self.SetDefaultIcon.setMinimumSize(QtCore.QSize(16,16))
+        self.SetDefaultIcon.setMaximumSize(QtCore.QSize(16,16))
+        self.SetDefaultIcon.setObjectName("SetDefaultIcon")
+        self.hboxlayout5.addWidget(self.SetDefaultIcon)
+
+        self.SetDefaultLabel = QtGui.QLabel(self.groupBox_5)
+        self.SetDefaultLabel.setFrameShape(QtGui.QFrame.NoFrame)
+        self.SetDefaultLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.SetDefaultLabel.setObjectName("SetDefaultLabel")
+        self.hboxlayout5.addWidget(self.SetDefaultLabel)
+        self.gridlayout9.addLayout(self.hboxlayout5,0,0,1,1)
+        self.vboxlayout2.addWidget(self.groupBox_5)
 
         self.SetDefaultButton = QtGui.QPushButton(self.groupBox)
         self.SetDefaultButton.setObjectName("SetDefaultButton")
-        self.gridlayout6.addWidget(self.SetDefaultButton,0,2,1,1)
+        self.vboxlayout2.addWidget(self.SetDefaultButton)
+        self.gridlayout6.addLayout(self.vboxlayout2,0,2,1,1)
         self.gridlayout5.addWidget(self.groupBox,1,0,1,1)
 
         self.groupBox_2 = QtGui.QGroupBox(self.Control)
         self.groupBox_2.setObjectName("groupBox_2")
 
-        self.gridlayout7 = QtGui.QGridLayout(self.groupBox_2)
-        self.gridlayout7.setObjectName("gridlayout7")
+        self.gridlayout10 = QtGui.QGridLayout(self.groupBox_2)
+        self.gridlayout10.setObjectName("gridlayout10")
 
         self.JobTable = QtGui.QTableWidget(self.groupBox_2)
+        self.JobTable.setAlternatingRowColors(True)
+        self.JobTable.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.JobTable.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.JobTable.setGridStyle(QtCore.Qt.DotLine)
         self.JobTable.setObjectName("JobTable")
-        self.gridlayout7.addWidget(self.JobTable,0,0,1,1)
+        self.gridlayout10.addWidget(self.JobTable,0,0,1,3)
+
+        self.CancelJobButton = QtGui.QPushButton(self.groupBox_2)
+        self.CancelJobButton.setObjectName("CancelJobButton")
+        self.gridlayout10.addWidget(self.CancelJobButton,1,0,1,1)
+
+        spacerItem2 = QtGui.QSpacerItem(131,20,QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
+        self.gridlayout10.addItem(spacerItem2,1,1,1,1)
+
+        self.RefreshButton = QtGui.QPushButton(self.groupBox_2)
+        self.RefreshButton.setObjectName("RefreshButton")
+        self.gridlayout10.addWidget(self.RefreshButton,1,2,1,1)
         self.gridlayout5.addWidget(self.groupBox_2,2,0,1,1)
         self.Tabs.addTab(self.Control,"")
         self.gridlayout.addWidget(self.splitter,0,0,1,1)
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0,0,720,31))
+        self.menubar.setGeometry(QtCore.QRect(0,0,700,27))
         self.menubar.setObjectName("menubar")
 
         self.menuDevice = QtGui.QMenu(self.menubar)
@@ -292,13 +433,18 @@ class Ui_MainWindow(object):
         self.Tabs.setTabText(self.Tabs.indexOf(self.Settings), QtGui.QApplication.translate("MainWindow", "Print Settings", None, QtGui.QApplication.UnicodeUTF8))
         self.PrintControlPrinterNameLabel.setText(QtGui.QApplication.translate("MainWindow", "Printer Name:", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBox.setTitle(QtGui.QApplication.translate("MainWindow", "Printer/Queue Control", None, QtGui.QApplication.UnicodeUTF8))
+        self.StartStopLabel.setText(QtGui.QApplication.translate("MainWindow", "Started", None, QtGui.QApplication.UnicodeUTF8))
         self.StartStopButton.setText(QtGui.QApplication.translate("MainWindow", "Stop Printer", None, QtGui.QApplication.UnicodeUTF8))
+        self.AcceptRejectLabel.setText(QtGui.QApplication.translate("MainWindow", "Accepting", None, QtGui.QApplication.UnicodeUTF8))
         self.AcceptRejectButton.setText(QtGui.QApplication.translate("MainWindow", "Reject Jobs", None, QtGui.QApplication.UnicodeUTF8))
+        self.SetDefaultLabel.setText(QtGui.QApplication.translate("MainWindow", "Not default", None, QtGui.QApplication.UnicodeUTF8))
         self.SetDefaultButton.setText(QtGui.QApplication.translate("MainWindow", "Set as Default", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBox_2.setTitle(QtGui.QApplication.translate("MainWindow", "Job Queue", None, QtGui.QApplication.UnicodeUTF8))
         self.JobTable.clear()
         self.JobTable.setColumnCount(0)
         self.JobTable.setRowCount(0)
+        self.CancelJobButton.setText(QtGui.QApplication.translate("MainWindow", "Cancel Job", None, QtGui.QApplication.UnicodeUTF8))
+        self.RefreshButton.setText(QtGui.QApplication.translate("MainWindow", "Refresh", None, QtGui.QApplication.UnicodeUTF8))
         self.Tabs.setTabText(self.Tabs.indexOf(self.Control), QtGui.QApplication.translate("MainWindow", "Printer Control", None, QtGui.QApplication.UnicodeUTF8))
         self.menuDevice.setTitle(QtGui.QApplication.translate("MainWindow", "&Device", None, QtGui.QApplication.UnicodeUTF8))
         self.menuConfigure.setTitle(QtGui.QApplication.translate("MainWindow", "&Configure", None, QtGui.QApplication.UnicodeUTF8))

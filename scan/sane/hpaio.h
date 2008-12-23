@@ -189,6 +189,7 @@ struct  hpaioScanner_s
         int ip_done;
         int page_done;
         int upload_state;                                 /* last pml upload state */
+        int user_cancel;                                  /* user cancelled operation */
 
         struct 
         {

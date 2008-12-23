@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui4/fabwindow_base.ui'
 #
-# Created: Thu Oct 30 15:47:07 2008
+# Created: Mon Dec 15 16:58:59 2008
 #      by: PyQt4 UI code generator 4.3.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PyQt4 import QtCore, QtGui
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(QtCore.QSize(QtCore.QRect(0,0,828,512).size()).expandedTo(MainWindow.minimumSizeHint()))
+        MainWindow.resize(QtCore.QSize(QtCore.QRect(0,0,700,440).size()).expandedTo(MainWindow.minimumSizeHint()))
 
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -68,7 +68,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0,0,828,26))
+        self.menubar.setGeometry(QtCore.QRect(0,0,700,27))
         self.menubar.setObjectName("menubar")
 
         self.menuGroup = QtGui.QMenu(self.menubar)

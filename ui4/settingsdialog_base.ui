@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>488</width>
-    <height>565</height>
+    <width>500</width>
+    <height>540</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -16,7 +16,7 @@
    <item row="0" column="0" colspan="2" >
     <widget class="QTabWidget" name="TabWidget" >
      <property name="currentIndex" >
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="AutoRefresh" >
       <attribute name="title" >

@@ -53,7 +53,7 @@ enum HPMUD_IO_MODE
    HPMUD_RAW_MODE=1,   /* bi-di */
    HPMUD_DOT4_MODE=3,
    HPMUD_DOT4_PHOENIX_MODE=4,  /* (ie: clj2550, clj2840, lj3050, lj3055, clj4730mfp) */
-   HPMUD_DOT4_BRIDGE_MODE=5,  /* (ie: clj2500) */
+   HPMUD_DOT4_BRIDGE_MODE=5,  /* (ie: clj2500) not USB compatable, use HPMUD_RAW_MODE, tested on F10 12/10/08 DES */
    HPMUD_MLC_GUSHER_MODE=6,   /* most new devices */
    HPMUD_MLC_MISER_MODE=7,  /* old stuff */
 };

@@ -44,22 +44,29 @@ except ImportError:
         log.warn("CUPSEXT could not be loaded. Please check HPLIP installation.")
         sys.exit(1)
 
-nickname_pat = re.compile(r'''\*NickName:\s*\"(.*)"''', re.MULTILINE)
-pat_cups_error_log = re.compile("""^loglevel\s?(debug|debug2|warn|info|error|none)""", re.I)
 
 IPP_PRINTER_STATE_IDLE = 3
 IPP_PRINTER_STATE_PROCESSING = 4
 IPP_PRINTER_STATE_STOPPED = 5
 
+# Std CUPS option types
 PPD_UI_BOOLEAN = 0   # True or False option
 PPD_UI_PICKONE = 1   # Pick one from a list
 PPD_UI_PICKMANY = 2  # Pick zero or more from a list
 
-# Non-std
+# Non-std: General
 UI_SPINNER = 100           # Simple spinner with opt. suffix (ie, %)
-UI_UNITS_SPINNER = 101     # Spinner control w/pts, cm, in, etc. units
+UI_UNITS_SPINNER = 101     # Spinner control w/pts, cm, in, etc. units (not impl.)
 UI_BANNER_JOB_SHEETS = 102 # dual combos for banner job-sheets
 UI_PAGE_RANGE = 103        # Radio + page range entry field
+
+# Non-std: Job storage
+UI_JOB_STORAGE_MODE = 104      # Combo w/linkage
+UI_JOB_STORAGE_PIN = 105       # Radios w/PIN entry
+UI_JOB_STORAGE_USERNAME = 106  # Radios w/text entry
+UI_JOB_STORAGE_ID = 107        # Radios w/text entry
+UI_JOB_STORAGE_ID_EXISTS = 108 # Combo
+
 
 # ipp_op_t
 IPP_PAUSE_PRINTER = 0x0010
@@ -138,10 +145,11 @@ IPP_PRINTER_IS_DEACTIVATED = 0x050a # server-error-printer-is-deactivated
 CUPS_ERROR_BAD_NAME = 0x0f00
 CUPS_ERROR_BAD_PARAMETERS = 0x0f01
 
+nickname_pat = re.compile(r'''\*NickName:\s*\"(.*)"''', re.MULTILINE)
+pat_cups_error_log = re.compile("""^loglevel\s?(debug|debug2|warn|info|error|none)""", re.I)
+ppd_pat = re.compile(r'''.*hp-(.*?)(-.*)+\.ppd.*''', re.I)
 
 
-##def restartCUPS(): # must be root. How do you check for this?
-##    os.system('killall -HUP cupsd')
 
 def getPPDPath(addtional_paths=None):
     """
@@ -184,6 +192,8 @@ def getAllowableMIMETypes():
     # Add some well-known MIME types that may not appear in the .convs files
     allowable_mime_types.append("image/x-bmp")
     allowable_mime_types.append("text/cpp")
+    allowable_mime_types.append("application/x-python")
+    allowable_mime_types.append("application/hplip-fax")
 
     return allowable_mime_types
 
@@ -268,12 +278,12 @@ def getSystemPPDs():
                                         path = ppd # foomatic: or some other driver
 
                     ppds[path] = desc
-                    log.debug("%s: %s" % (path, desc))
+                    #log.debug("%s: %s" % (path, desc))
 
     return ppds
 
 
-# TODO: Move this to CUPSEXT for better performance
+## TODO: Move this to CUPSEXT for better performance
 def levenshtein_distance(a,b):
     """
     Calculates the Levenshtein distance between a and b.
@@ -302,17 +312,33 @@ def levenshtein_distance(a,b):
 
 number_pat = re.compile(r""".*?(\d+)""", re.IGNORECASE)
 
-STRIP_STRINGS = ['foomatic:', 'hp-', 'hp_', 'hp ', '_series', '.gz', '.ppd', '-series', ' series',
-                 '-hpijs', 'drv:', '-pcl', '-pcl3', '-jetready', '-zxs', '-zjs', '-ps', '-postscript',
+
+STRIP_STRINGS2 = ['foomatic:', 'hp-', 'hp_', 'hp ', '.gz', '.ppd',
+                 '-hpijs', 'drv:', '-pcl', '-pcl3', '-jetready',
+                 '-zxs', '-zjs', '-ps', '-postscript',
                  '-jr', '-lidl', '-lidil', '-ldl']
+
 
 for p in models.TECH_CLASS_PDLS.values():
     pp = '-%s' % p
-    if pp not in STRIP_STRINGS:
-        STRIP_STRINGS.append(pp)
+    if pp not in STRIP_STRINGS2:
+        STRIP_STRINGS2.append(pp)
 
 
-def stripModel(model):
+STRIP_STRINGS = STRIP_STRINGS2[:]
+STRIP_STRINGS.extend(['-series', ' series', '_series'])
+
+
+def stripModel2(model): # For new 2.8.10+ PPD find algorithm
+    model = model.lower()
+
+    for x in STRIP_STRINGS2:
+        model = model.replace(x, '')
+
+    return model
+
+
+def stripModel(model): # for old PPD find algorithm (removes "series" as well)
     model = model.lower()
 
     for x in STRIP_STRINGS:
@@ -321,8 +347,7 @@ def stripModel(model):
     return model
 
 
-
-def getPPDFile(stripped_model, ppds):
+def getPPDFile(stripped_model, ppds): # Old PPD find
     """
         Match up a model name to a PPD from a list of system PPD files.
     """
@@ -331,11 +356,12 @@ def getPPDFile(stripped_model, ppds):
     eds = {}
     min_edit_distance = sys.maxint
 
-    log.debug("Determining edit distance from %s..." % stripped_model)
+    log.debug("Determining edit distance from %s (only showing edit distances < 4)..." % stripped_model)
     for f in ppds:
         t = stripModel(os.path.basename(f))
         eds[f] = levenshtein_distance(stripped_model, t)
-        log.debug("dist('%s') = %d" % (t, eds[f]))
+        if eds[f] < 4:
+            log.debug("dist('%s') = %d" % (t, eds[f]))
         min_edit_distance = min(min_edit_distance, eds[f])
 
     log.debug("Min. dist = %d" % min_edit_distance)
@@ -396,6 +422,54 @@ def getPPDFile(stripped_model, ppds):
                     break
 
     return mins
+
+
+def getPPDFile2(stripped_model, ppds): # New PPD find
+    # This routine is for the new PPD naming scheme begun in 2.8.10
+    # and beginning with implementation in 2.8.12 (Qt4 hp-setup)
+    # hp-<model name from models.dat w/o beginning hp_>[-<pdl>][-<pdl>][...].ppd[.gz]
+    log.debug("Matching PPD list to model %s..." % stripped_model)
+    matches = []
+    for f in ppds:
+        match = ppd_pat.match(f)
+        if match is not None:
+            if match.group(1) == stripped_model:
+                log.debug("Found match: %s" % f)
+                pdls = match.group(2).split('-')
+                matches.append((f, [p for p in pdls if p and p != 'hpijs']))
+
+    log.debug(matches)
+    num_matches = len(matches)
+
+    if num_matches == 0:
+        log.error("No PPD found for model %s. Trying old algorithm..." % stripped_model)
+        matches = getPPDFile(stripModel(stripped_model), ppds).items()
+        log.debug(matches)
+        num_matches = len(matches)
+
+    if num_matches == 0:
+        log.error("No PPD found for model %s using old algorithm." % stripModel(stripped_model))
+        return None
+
+    elif num_matches == 1:
+        log.debug("One match found.")
+        return (matches[0][0], '')
+
+    # > 1
+    log.debug("%d matches found. Selecting based on PDL: Host > PS > PCL/Other" % num_matches)
+    for p in [models.PDL_TYPE_HOST, models.PDL_TYPE_PS, models.PDL_TYPE_PCL]:
+        for m in matches:
+            for x in m[1]:
+                # default to HOST-based PDLs, as newly supported PDLs will most likely be of this type
+                if models.PDL_TYPES.get(x, models.PDL_TYPE_HOST) == p:
+                    log.debug("Selecting '-%s' PPD: %s" % (x, m[0]))
+                    return (m[0], '')
+
+    # No specific PDL found, so just return 1st found PPD file
+    # (e.g., files only have -hpijs, no PDL indicators)
+    log.debug("No specific PDL located. Defaulting to first found PPD file.")
+    return (matches[0][0], '')
+
 
 
 def getErrorLogLevel():

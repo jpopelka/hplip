@@ -38,6 +38,7 @@ import logger
 log = logger.Logger('', logger.Logger.LOG_LEVEL_INFO, logger.Logger.LOG_TO_CONSOLE)
 log.set_level('info')
 
+
 MINIMUM_PYQT_MAJOR_VER = 3
 MINIMUM_PYQT_MINOR_VER = 14
 MINIMUM_QT_MAJOR_VER = 3
@@ -89,7 +90,7 @@ class ConfigSection(dict):
             self.config_obj.add_section(self.section_name)
 
         self.config_obj.set(self.section_name, option, val)
-        
+
         try:
             f = file(self.filename, 'w')
             self.config_obj.write(f)
@@ -132,29 +133,37 @@ class Config(dict):
     def __setattr__(self, sect, val):
         self.__setitem__(sect, val)
 
-# Config file: directories and ports
-prop.sys_config_file = '/etc/hp/hplip.conf'
-prop.user_dir = os.path.expanduser('~/.hplip')
 
 os.umask(0037)
-try:
-    if not os.path.exists(prop.user_dir):
-        os.makedirs(prop.user_dir)
-except OSError:
-    pass # This is sometimes OK, if running hpfax: for example
-    
-prop.user_config_file = os.path.join(prop.user_dir, 'hplip.conf')
 
-if not os.path.exists(prop.user_config_file):
-    try:
-        file(prop.user_config_file, 'w').close()
-        s = os.stat(os.path.dirname(prop.user_config_file))
-        os.chown(prop.user_config_file, s[stat.ST_UID], s[stat.ST_GID])
-    except IOError:
-        pass
-    
+# Config file: directories and build settings
+prop.sys_config_file = '/etc/hp/hplip.conf'
 sys_cfg = Config(prop.sys_config_file, True)
-user_cfg = Config(prop.user_config_file)
+
+if not os.geteuid() == 0:
+    prop.user_dir = os.path.expanduser('~/.hplip')
+
+    try:
+        if not os.path.exists(prop.user_dir):
+            os.makedirs(prop.user_dir)
+    except OSError:
+        pass # This is sometimes OK, if running hpfax: for example
+
+    prop.user_config_file = os.path.join(prop.user_dir, 'hplip.conf')
+
+    if not os.path.exists(prop.user_config_file):
+        try:
+            file(prop.user_config_file, 'w').close()
+            s = os.stat(os.path.dirname(prop.user_config_file))
+            os.chown(prop.user_config_file, s[stat.ST_UID], s[stat.ST_GID])
+        except IOError:
+            pass
+
+    user_cfg = Config(prop.user_config_file)
+
+else:
+    # If running as root, make the "user" config file the "system" file
+    user_cfg = Config(prop.sys_config_file)
 
 
 # Language settings
@@ -163,12 +172,14 @@ try:
 except ValueError:
     prop.locale = 'en_US'
     prop.encoding = 'UTF8'
-    
+
 prop.version = sys_cfg.hplip.version or 'x.x.x'
 prop.home_dir = sys_cfg.dirs.home or os.path.realpath(os.path.normpath(os.getcwd()))
 prop.username = pwd.getpwuid(os.getuid())[0]
 pdb = pwd.getpwnam(prop.username)
 prop.userhome = pdb[5]
+
+prop.history_size = 50
 
 prop.data_dir = os.path.join(prop.home_dir, 'data')
 prop.image_dir = os.path.join(prop.home_dir, 'data', 'images')
@@ -189,7 +200,7 @@ prop.ppd_file_suffix = '-hpijs.ppd'
 prop.gui_build = to_bool(sys_cfg.configure.get('gui-build', '0'))
 prop.net_build = to_bool(sys_cfg.configure.get('network-build', '0'))
 prop.par_build = to_bool(sys_cfg.configure.get('pp-build', '0'))
-prop.usb_build = True 
+prop.usb_build = True
 prop.scan_build = to_bool(sys_cfg.configure.get('scanner-build', '0'))
 prop.fax_build = to_bool(sys_cfg.configure.get('fax-build', '0'))
 prop.doc_build = to_bool(sys_cfg.configure.get('doc-build', '0'))
@@ -221,59 +232,29 @@ ERROR_STRINGS = {
                 ERROR_DEVICE_NOT_FOUND : 'Device not found',
                 ERROR_INVALID_DEVICE_ID : 'Unknown/invalid device-id field',
                 ERROR_INVALID_DEVICE_URI : 'Unknown/invalid device-uri field',
-                #ERROR_INVALID_MSG_TYPE : 'Unknown message type',
-                #ERROR_INVALID_DATA_ENCODING : 'Unknown data encoding',
-                #ERROR_INVALID_CHAR_ENCODING : 'Unknown character encoding',
                 ERROR_DATA_LENGTH_EXCEEDS_MAX : 'Data length exceeds maximum',
-                #ERROR_DATA_LENGTH_MISMATCH : "Data length doesn't match length field",
-                #ERROR_DATA_DIGEST_MISMATCH : "Digest of data doesn't match digest field",
-                #ERROR_INVALID_JOB_ID : 'Invalid job-id',
                 ERROR_DEVICE_IO_ERROR : 'Device I/O error',
-                #ERROR_STRING_QUERY_FAILED : 'String/error query failed',
-                #ERROR_QUERY_FAILED : 'Query failed',
-                #ERROR_GUI_NOT_AVAILABLE : 'hpguid not running',
-                #ERROR_NO_CUPS_DEVICES_FOUND : 'No CUPS devices found (deprecated)',
                 ERROR_NO_PROBED_DEVICES_FOUND : 'No probed devices found',
-                #ERROR_INVALID_BUS_TYPE : 'Invalid bus type',
-                #ERROR_BUS_TYPE_CANNOT_BE_PROBED : 'Bus cannot be probed',
                 ERROR_DEVICE_BUSY : 'Device busy',
-                #ERROR_NO_DATA_AVAILABLE : 'No data avaiable',
-                #ERROR_INVALID_DEVICEID : 'Invalid/missing DeviceID',
-                #ERROR_INVALID_CUPS_VERSION : 'Invlaid CUPS version',
-                #ERROR_CUPS_NOT_RUNNING : 'CUPS not running',
                 ERROR_DEVICE_STATUS_NOT_AVAILABLE : 'DeviceStatus not available',
-                #ERROR_DATA_IN_SHORT_READ: 'ChannelDataIn short read',
                 ERROR_INVALID_SERVICE_NAME : 'Invalid service name',
-                #ERROR_INVALID_USER_ERROR_CODE : 'Invalid user level error code',
                 ERROR_ERROR_INVALID_CHANNEL_ID : 'Invalid channel-id (service name)',
                 ERROR_CHANNEL_BUSY : 'Channel busy',
-                #ERROR_CHANNEL_CLOSE_FAILED : 'ChannelClose failed. Channel not open',
-                #ERROR_UNSUPPORTED_BUS_TYPE : 'Unsupported bus type',
                 ERROR_DEVICE_DOES_NOT_SUPPORT_OPERATION : 'Device does not support operation',
-                #ERROR_DEVICE_NOT_OPEN : 'Device not open',
-                #ERROR_UNABLE_TO_CONTACT_SERVICE : 'Unable to contact service',
-                #ERROR_UNABLE_TO_BIND_SOCKET : 'Unable to bind to socket',
                 ERROR_DEVICEOPEN_FAILED : 'Device open failed',
                 ERROR_INVALID_DEVNODE : 'Invalid device node',
-                #ERROR_TEST_EMAIL_FAILED : "Email test failed",
                 ERROR_INVALID_HOSTNAME : "Invalid hostname ip address",
                 ERROR_INVALID_PORT_NUMBER : "Invalid JetDirect port number",
-                #ERROR_INTERFACE_BUSY : "Interface busy",
                 ERROR_NO_CUPS_QUEUE_FOUND_FOR_DEVICE : "No CUPS queue found for device.",
-                #ERROR_UNSUPPORTED_MODEL : "Unsupported printer model.",
-                #ERROR_INVALID_GUI_NAME: "Invalid GUI",
                 ERROR_DATFILE_ERROR: "DAT file error",
                 ERROR_INVALID_TIMEOUT: "Invalid timeout",
                 ERROR_IO_TIMEOUT: "I/O timeout",
                 ERROR_FAX_INCOMPATIBLE_OPTIONS: "Incompatible fax options",
                 ERROR_FAX_INVALID_FAX_FILE: "Invalid fax file",
-                #ERROR_FAX_MUST_RUN_SENDFAX_FIRST: "Run sendfax first",
-                #ERROR_FAX_PROCESSING: "Fax processing",
-                #ERROR_FAX_READY: "Fax ready",
                 ERROR_FAX_FILE_NOT_FOUND: "Fax file not found",
                 ERROR_INTERNAL : 'Unknown internal error',
                }
-               
+
 
 class Error(Exception):
     def __init__(self, opt=ERROR_INTERNAL):
@@ -300,5 +281,5 @@ supported_locales =  { 'en_US': ('us', 'en', 'en_us', 'american', 'america', 'us
                        'pt_BR': ('pt', 'br', 'pt_br', 'brazil', 'brazilian', 'portuguese', 'brasil', 'portuguesa'),
                        'es_MX': ('es', 'mx', 'es_mx', 'mexico', 'spain', 'spanish', 'espanol', 'español'),
                      }
-                     
-                     
+
+

@@ -136,9 +136,13 @@ if mode == GUI_MODE:
 
 if mode == GUI_MODE:
     if ui_toolkit == 'qt3':
-        from qt import *
-        from ui import pluginform2
-
+        try:
+            from qt import *
+            from ui import pluginform2
+        except ImportError:
+            log.error("Unable to load Qt3 support. Is it installed?")
+            sys.exit(1)  
+            
         app = QApplication(sys.argv)
         QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
 
@@ -200,13 +204,26 @@ if mode == GUI_MODE:
 
     else: # qt4
         try:
-            from PyQt4.QtGui import QApplication
+            from PyQt4.QtGui import QApplication, QMessageBox
             from ui4.plugindialog import PluginDialog
         except ImportError:
             log.error("Unable to load Qt4 support. Is it installed?")
             sys.exit(1)
 
         app = QApplication(sys.argv)
+
+        if not os.geteuid() == 0:
+            log.error("You must be root to run this utility.")
+
+            QMessageBox.critical(None,
+                                 "HP Device Manager - Plug-in Installer",
+                                 "You must be root to run hp-plugin.",
+                                  QMessageBox.Ok,
+                                  QMessageBox.NoButton,
+                                  QMessageBox.NoButton)
+
+            sys.exit(1)
+
 
         dialog = PluginDialog(None, install_mode)
         dialog.show()

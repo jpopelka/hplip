@@ -512,7 +512,7 @@ int __attribute__ ((visibility ("hidden"))) read_mfpdtf_block(int device, int ch
    if ((len = ReadChannelEx(device, channel, (unsigned char *)buf, size, timeout)) != size)
       goto bugout;
 
-   bsize = letoh32(phd->BlockLength);
+   bsize = le32toh(phd->BlockLength);
    if (bsize > bufSize)
    {
       bug("invalid bufsize: size=%d max=%d ReadMfpdtfBlock %s %d\n", bsize, bufSize, __FILE__, __LINE__);

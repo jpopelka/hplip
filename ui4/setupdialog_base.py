@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui4/setupdialog_base.ui'
 #
-# Created: Thu Oct 30 15:47:10 2008
+# Created: Mon Dec 15 16:59:01 2008
 #      by: PyQt4 UI code generator 4.3.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -13,7 +13,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.setWindowModality(QtCore.Qt.ApplicationModal)
-        Dialog.resize(QtCore.QSize(QtCore.QRect(0,0,600,500).size()).expandedTo(Dialog.minimumSizeHint()))
+        Dialog.resize(QtCore.QSize(QtCore.QRect(0,0,700,500).size()).expandedTo(Dialog.minimumSizeHint()))
 
         self.gridlayout = QtGui.QGridLayout(Dialog)
         self.gridlayout.setObjectName("gridlayout")
@@ -211,6 +211,7 @@ class Ui_Dialog(object):
         self.DevicesTableWidget.setAlternatingRowColors(True)
         self.DevicesTableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.DevicesTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.DevicesTableWidget.setSortingEnabled(False)
         self.DevicesTableWidget.setObjectName("DevicesTableWidget")
         self.gridlayout6.addWidget(self.DevicesTableWidget,2,0,1,3)
 

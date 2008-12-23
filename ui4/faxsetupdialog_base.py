@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui4/faxsetupdialog_base.ui'
 #
-# Created: Thu Oct 30 15:47:07 2008
+# Created: Mon Dec 15 16:58:59 2008
 #      by: PyQt4 UI code generator 4.3.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PyQt4 import QtCore, QtGui
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(QtCore.QSize(QtCore.QRect(0,0,600,500).size()).expandedTo(Dialog.minimumSizeHint()))
+        Dialog.resize(QtCore.QSize(QtCore.QRect(0,0,700,500).size()).expandedTo(Dialog.minimumSizeHint()))
 
         self.gridlayout = QtGui.QGridLayout(Dialog)
         self.gridlayout.setObjectName("gridlayout")
@@ -84,7 +84,7 @@ class Ui_Dialog(object):
 
         self.VoiceNumberLineEdit = QtGui.QLineEdit(self.tab_2)
         self.VoiceNumberLineEdit.setObjectName("VoiceNumberLineEdit")
-        self.gridlayout2.addWidget(self.VoiceNumberLineEdit,1,1,1,2)
+        self.gridlayout2.addWidget(self.VoiceNumberLineEdit,1,1,1,1)
 
         self.label_7 = QtGui.QLabel(self.tab_2)
         self.label_7.setObjectName("label_7")
@@ -92,10 +92,10 @@ class Ui_Dialog(object):
 
         self.EmailLineEdit = QtGui.QLineEdit(self.tab_2)
         self.EmailLineEdit.setObjectName("EmailLineEdit")
-        self.gridlayout2.addWidget(self.EmailLineEdit,2,1,1,2)
+        self.gridlayout2.addWidget(self.EmailLineEdit,2,1,1,1)
 
-        spacerItem1 = QtGui.QSpacerItem(20,40,QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Expanding)
-        self.gridlayout2.addItem(spacerItem1,3,2,1,1)
+        spacerItem1 = QtGui.QSpacerItem(20,131,QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Expanding)
+        self.gridlayout2.addItem(spacerItem1,3,1,1,1)
         self.tabWidget.addTab(self.tab_2,"")
         self.gridlayout.addWidget(self.tabWidget,3,0,1,3)
 
@@ -107,7 +107,7 @@ class Ui_Dialog(object):
         self.gridlayout.addWidget(self.CancelButton,4,2,1,1)
 
         self.retranslateUi(Dialog)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):

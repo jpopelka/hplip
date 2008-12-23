@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui4/settingsdialog_base.ui'
 #
-# Created: Thu Oct 30 15:47:09 2008
+# Created: Mon Dec 15 16:59:01 2008
 #      by: PyQt4 UI code generator 4.3.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PyQt4 import QtCore, QtGui
 class Ui_SettingsDialog_base(object):
     def setupUi(self, SettingsDialog_base):
         SettingsDialog_base.setObjectName("SettingsDialog_base")
-        SettingsDialog_base.resize(QtCore.QSize(QtCore.QRect(0,0,488,565).size()).expandedTo(SettingsDialog_base.minimumSizeHint()))
+        SettingsDialog_base.resize(QtCore.QSize(QtCore.QRect(0,0,500,540).size()).expandedTo(SettingsDialog_base.minimumSizeHint()))
 
         self.gridlayout = QtGui.QGridLayout(SettingsDialog_base)
         self.gridlayout.setObjectName("gridlayout")
@@ -228,7 +228,7 @@ class Ui_SettingsDialog_base(object):
         self.textLabel5.setBuddy(self.MakeCopiesCommandLineEdit)
 
         self.retranslateUi(SettingsDialog_base)
-        self.TabWidget.setCurrentIndex(1)
+        self.TabWidget.setCurrentIndex(2)
         QtCore.QObject.connect(self.AutoRefreshCheckBox,QtCore.SIGNAL("toggled(bool)"),self.AutoRefreshRateSpinBox.setEnabled)
         QtCore.QObject.connect(self.AutoRefreshCheckBox,QtCore.SIGNAL("toggled(bool)"),self.RefreshAllRadioButton.setEnabled)
         QtCore.QObject.connect(self.AutoRefreshCheckBox,QtCore.SIGNAL("toggled(bool)"),self.RefreshCurrentRadioButton.setEnabled)

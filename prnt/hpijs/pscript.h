@@ -32,6 +32,12 @@
 #ifndef APDK_PSCRIPT_H
 #define APDK_PSCRIPT_H
 
+extern "C"
+{
+#include "jpeglib.h"
+}
+#include <setjmp.h>
+
 APDK_BEGIN_NAMESPACE
 
 #ifdef  APDK_HIGH_RES_MODES
@@ -63,27 +69,25 @@ public:
     virtual DRIVER_ERROR ParsePenInfo (PEN_TYPE& ePen, BOOL QueryPrinter=TRUE);
     virtual DISPLAY_STATUS ParseError (BYTE status_reg);
     virtual DRIVER_ERROR Encapsulate (const RASTERDATA* InputRaster, BOOL bLastPlane);
-	inline virtual BOOL SupportSeparateBlack (PrintMode *pCurrentMode) {return FALSE;}
-	virtual DRIVER_ERROR Flush (int FlushSize)
-	{
-		return NO_ERROR;
-	}
+    inline virtual BOOL SupportSeparateBlack (PrintMode *pCurrentMode) {return FALSE;}
+    virtual DRIVER_ERROR Flush (int FlushSize);
+    DRIVER_ERROR SkipRasters (int nBlankRasters);
 
-	virtual int PrinterLanguage ()
-	{
-		return 10;	// PostScript
-	}
+    virtual int PrinterLanguage ()
+    {
+        return 10;	// PostScript
+    }
 
-	virtual DRIVER_ERROR SaveText (const char *psStr, int iPointSize, int iX, int iY,
-								   const char *pTextString, int iTextStringLen,
-								   BOOL bUnderline);
+    virtual DRIVER_ERROR SaveText (const char *psStr, int iPointSize, int iX, int iY,
+                                   const char *pTextString, int iTextStringLen,
+                                   BOOL bUnderline);
 
     virtual BOOL UseCMYK(unsigned int iPrintMode) { return FALSE;}
 
-    Compressor* CreateCompressor (unsigned int RasterSize);
-	DRIVER_ERROR SendText (int iCurYPos);
-	void FreeList ();
-	int		m_pCurResolution;
+    DRIVER_ERROR SendText (int iCurYPos);
+    void FreeList ();
+    void            JpegData (BYTE *buffer, int iSize);
+
 protected:
 
 #ifdef APDK_HP_UX
@@ -93,8 +97,29 @@ protected:
     }
 #endif
 
-	StrList	*m_pHeadPtr;
-	StrList	*m_pCurItem;
+private:
+    DRIVER_ERROR    SendImage ();
+    void            AddRaster (BYTE *pbyRow, int iLength);
+    void            JpegRaster ();
+    int             EncodeJpeg ();
+    DRIVER_ERROR    StartJpegCompression ();
+    void            FinishJpegCompression ();
+    StrList         *m_pHeadPtr;
+    StrList         *m_pCurItem;
+    PrintContext    *m_pPC;
+    struct jpeg_compress_struct m_cinfo;
+    struct jpeg_error_mgr       m_jerr;
+    jmp_buf                     m_setjmp_buffer;
+
+    int     m_iRowNumber;
+    int     m_iRowWidth;
+    int     m_iJpegBufferPos;
+    int     m_iJpegBufferSize;
+    BYTE    *m_pbyInputRaster;
+    BYTE    *m_pbyJpegBuffer;
+    BYTE    *m_pbyEncodedBuffer;
+    int     m_iPageNumber;
+    COLORMODE    m_eColorMode;
 }; // PScript
 
 class PScriptDraftMode : public PrintMode
@@ -115,14 +140,6 @@ public:
 	PScriptGrayMode ();
 }; // PScriptGrayMode
 
-class ModePS0 : public Compressor
-{
-public:
-    ModePS0 (SystemServices* pSys,unsigned int RasterSize);
-    virtual ~ModePS0 ();
-    BOOL Process (RASTERDATA* input);
-}; //Mode2
-
 #ifdef APDK_PSCRIPT
 //! PScriptProxy
 /*!
@@ -131,14 +148,16 @@ class PScriptProxy : public PrinterProxy
 {
 public:
     PScriptProxy() : PrinterProxy(
-        "PostScript",                   // family name
-        "postscript\0"                  // models
+    "PostScript",                   // family name
+    "postscript\0"                  // models
+    "HP Color LaserJet 2605\0"
+    "HP Color LaserJet 2605dn\0"
 #ifdef APDK_MLC_PRINTER
 #endif
     ) {m_iPrinterType = ePScript;}
     inline Printer* CreatePrinter(SystemServices* pSS) const { return new PScript(pSS); }
-	inline PRINTER_TYPE GetPrinterType() const { return ePScript;}
-	inline unsigned int GetModelBit() const { return 0x10;}
+    inline PRINTER_TYPE GetPrinterType() const { return ePScript;}
+    inline unsigned int GetModelBit() const { return 0x10;}
 };
 #endif
 

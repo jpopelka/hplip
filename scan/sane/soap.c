@@ -55,6 +55,7 @@
 #include "common.h"
 #include "soap.h"
 #include "soapi.h"
+#include "io.h"
 
 #define DEBUG_DECLARE_ONLY
 #include "sanei_debug.h"
@@ -77,8 +78,11 @@ static int bb_load(struct soap_session *ps, const char *so)
    /* Load math library manually with symbols exported (Ubuntu 8.04). Otherwise the plugin will not find it. */ 
    if ((ps->math_handle = dlopen("libm.so", RTLD_LAZY|RTLD_GLOBAL)) == NULL)
    {
-      BUG("unable to load restricted library: %s\n", dlerror());
-      goto bugout;
+      if ((ps->math_handle = dlopen("libm.so.6", RTLD_LAZY|RTLD_GLOBAL)) == NULL)
+      {
+         BUG("unable to load restricted library: %s\n", dlerror());
+         goto bugout;
+      }
    } 
 
    if (hpmud_get_conf("[dirs]", "home", home, sizeof(home)) != HPMUD_R_OK)
@@ -87,6 +91,7 @@ static int bb_load(struct soap_session *ps, const char *so)
    if ((ps->bb_handle = dlopen(sz, RTLD_NOW|RTLD_GLOBAL)) == NULL)
    {
       BUG("unable to load restricted library %s: %s\n", sz, dlerror());
+      SendScanEvent(ps->uri, EVENT_PLUGIN_FAIL);
       goto bugout;
    } 
    

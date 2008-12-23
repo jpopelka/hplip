@@ -62,8 +62,12 @@ else:
         sys.exit(1)
 
 if ui_toolkit == 'qt3':
-    from qt import *
-    from ui.printerform import PrinterForm
+    try:
+        from qt import *
+        from ui.printerform import PrinterForm
+    except ImportError:
+        log.error("Unable to load Qt3 support. Is it installed?")
+        sys.exit(1)          
 
     # create the main application object
     app = QApplication(sys.argv)

@@ -43,9 +43,27 @@
 #include "hpijs.h"
 #include "services.h"
 
+#define EVENT_PRINT_FAILED_MISSING_PLUGIN 502
+#if defined(HAVE_LIBHPIP) && defined(HAVE_DBUS) 
+#include <dbus/dbus.h>
+#define DBUS_INTERFACE "com.hplip.StatusService"
+#define DBUS_PATH "/"
+static DBusError dbus_err;
+static DBusConnection *dbus_conn;
+void InitDbus (void);
+static void SendDbusMessage (const char *dev, const char *printer, int code, 
+                             const char *username, const int jobid, const char *title);
+#else
+static void SendDbusMessage (const char *dev, const char *printer, int code, 
+                             const char *username, const int jobid, const char *title)
+{
+}
+#endif
+
 #ifdef HAVE_LIBHPIP
 extern  int hpijsFaxServer (int argc, char **argv);
 #endif
+
 
 int bug(const char *fmt, ...)
 {
@@ -208,9 +226,24 @@ int hpijs_set_cb (void *set_cb_data, IjsServerCtx *ctx, IjsJobId job_id,
     {
         if ((r = pSS->pPC->SelectDevice(svalue)) != NO_ERROR)
         {
-            /* OfficeJet LX is not very unique, do separate check here. */
-            if (!strncmp(svalue,"OfficeJet", 10))
-            r = pSS->pPC->SelectDevice("DESKJET 540");
+	    if (r == PLUGIN_LIBRARY_MISSING)
+	    {
+		// call dbus here
+		const char    *user_name = " ";
+		const char    *title     = " ";
+		int     job_id = 0;
+                SendDbusMessage (getenv ("DEVICE_URI"), getenv("PRINTER"),
+	     	                 EVENT_PRINT_FAILED_MISSING_PLUGIN,
+				 user_name, job_id, title);
+                bug("unable to set device=%s, err=%d\n", svalue, r);
+                status = -1;
+	    }
+	    else
+	    {
+                /* OfficeJet LX is not very unique, do separate check here. */
+                if (!strncmp(svalue,"OfficeJet", 10))
+                r = pSS->pPC->SelectDevice("DESKJET 540");
+	    }
         }
 
         if (r == NO_ERROR)
@@ -706,6 +739,7 @@ int main (int argc, char *argv[], char *evenp[])
 
       pSS->pJob->NewPage();
 
+      
    } /* end while (1) */
 
    if (pSS->pPC->QueryDuplexMode() != DUPLEXMODE_NONE)
@@ -742,4 +776,57 @@ BUGOUT:
 
    exit(status);
 }
+
+#if defined(HAVE_LIBHPIP) && defined(HAVE_DBUS) 
+static void SendDbusMessage (const char *dev, const char *printer, int code, 
+                             const char *username, const int jobid, const char *title)
+{
+    DBusMessage * msg = NULL;
+
+    InitDbus ();
+    if (dbus_conn == NULL)
+        return;
+    msg = dbus_message_new_signal(DBUS_PATH, DBUS_INTERFACE, "Event");
+
+    if (NULL == msg)
+    {
+        bug("dbus message is NULL!\n");
+        return;
+    }
+
+    dbus_message_append_args(msg, 
+        DBUS_TYPE_STRING, &dev,
+        DBUS_TYPE_STRING, &printer,
+        DBUS_TYPE_UINT32, &code, 
+        DBUS_TYPE_STRING, &username, 
+        DBUS_TYPE_UINT32, &jobid,
+        DBUS_TYPE_STRING, &title, 
+        DBUS_TYPE_INVALID);
+
+    if (!dbus_connection_send(dbus_conn, msg, NULL))
+    {
+        bug("dbus message send failed!\n");
+        return;
+    }
+
+    dbus_connection_flush(dbus_conn);
+    dbus_message_unref(msg);
+
+    return;
+}
+
+void InitDbus (void)
+{
+   dbus_error_init (&dbus_err);
+   dbus_conn = dbus_bus_get (DBUS_BUS_SYSTEM, &dbus_err);
+    
+   if (dbus_error_is_set (&dbus_err))
+   { 
+      bug ("dBus Connection Error (%s)!\n", dbus_err.message); 
+      dbus_error_free (&dbus_err); 
+   }
+
+   return;
+}
+#endif  /* HAVE_DBUS */
 

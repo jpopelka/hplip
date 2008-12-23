@@ -399,7 +399,7 @@ class Console(cmd.Cmd):
             if not add_group:
                 break
 
-            get_all_groups = self.db.get_all_groups()
+            all_groups = self.db.get_all_groups()
 
             if add_group not in all_groups:
                 log.warn("Group not found.")
@@ -781,8 +781,12 @@ else:
 if mode == GUI_MODE:
     if ui_toolkit == 'qt3':
         log.set_module("hp-fab(qt3)")
-        from qt import *
-        from ui.faxaddrbookform import FaxAddrBookForm
+        try:
+            from qt import *
+            from ui.faxaddrbookform import FaxAddrBookForm
+        except ImportError:
+            log.error("Unable to load Qt3 support. Is it installed?")
+            sys.exit(1)  
 
         app = None
         addrbook = None

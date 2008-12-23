@@ -38,10 +38,10 @@ class StringTable:
                                  ''),
 
             'try_again' :       ('',
-                                 self.__tr('Please correct the problem and try again.')),
+                                 self.__tr('Please correct the problem and try again')),
 
             'press_continue' :  ('',
-                                 self.__tr('Please correct the problem and press continue on the printer.')),
+                                 self.__tr('Please correct the problem and press continue on the printer')),
 
             '500' :             (self.__tr('Started a print job'),
                                  ''),
@@ -49,15 +49,18 @@ class StringTable:
             '501' :             (self.__tr('Print job has completed'),
                                  ''),
 
+            '502' :             (self.__tr("Print job failed - required plug-in not found"),
+                                 self.__tr("Please run hp-plugin (as root) to install the required plug-in")),
+
             '600' :             (self.__tr('Started a fax job'),
                                  ''),
-                                 
+
             '601' :             (self.__tr('Fax job is ready for send'),
                                  ''),
 
             '700' :             (self.__tr('Printer queue stopped'),
                                  ''),
-                                 
+
             '701' :             (self.__tr('Printer queue started'),
                                  ''),
 
@@ -69,10 +72,10 @@ class StringTable:
 
             '704' :             (self.__tr('Printer set as default'),
                                  ''),
-                                 
+
             '800' :             (self.__tr('Fax queue stopped'),
                                  ''),
-                                 
+
             '801' :             (self.__tr('Fax queue started'),
                                  ''),
 
@@ -84,6 +87,9 @@ class StringTable:
 
             '804' :             (self.__tr('Fax set as default'),
                                  ''),
+
+            '805' :             (self.__tr("Fax job failed - required plug-in not found"),
+                                 '%502%'),
 
             '1000' :            (self.__tr('Idle'),
                                   ''),
@@ -113,7 +119,7 @@ class StringTable:
                                  ''),
 
             '1009' :            (self.__tr('The printer is out of paper'),
-                                 self.__tr('Please load more paper and follow the instructions on the front panel (if any) to continue printing.')),
+                                 self.__tr('Please load more paper and follow the instructions on the front panel (if any) to continue printing')),
 
             '1010' :            (self.__tr('Banner eject needed'),
                                  ''),
@@ -128,7 +134,7 @@ class StringTable:
                                  '%try_again'),
 
             '1014' :            (self.__tr('Paper or cartridge carriage jammed'),
-                                 self.__tr('Please clear the jam and press continue on the printer.')),
+                                 self.__tr('Please clear the jam and press continue on the printer')),
 
             '1015' :            ('%1014%',
                                  '%1014%'),
@@ -304,6 +310,9 @@ class StringTable:
             '2002' :            (self.__tr('Scan job failed'),
                                  '%try_again%'),
 
+            '2003' :            (self.__tr("Scan job failed - Required plug-in not found"),
+                                 '%502%'),
+
             '3000' :            (self.__tr('Fax job started'),
                                  ''),
 
@@ -362,7 +371,7 @@ class StringTable:
                                  ''),
 
             '6002' :            (self.__tr('Photocard unload failed'),
-                                 self.__tr('Make sure photocard is inserted properly and try again.')),
+                                 self.__tr('Make sure photocard is inserted properly and try again')),
 
             '6003' :            (self.__tr('Unable to mount photocard on device'),
                                  '%6002%'),
@@ -511,7 +520,7 @@ class StringTable:
             'agent_photo_cyan_and_photo_magenta_head' : (self.__tr('Photo magenta and photo cyan print head'),
                                                          ''),
 
-            'agent_yellow_and_magenta_head' :           (self.__tr('Magenta and yellow print head'), 
+            'agent_yellow_and_magenta_head' :           (self.__tr('Magenta and yellow print head'),
                                                          '' ),
 
             'agent_cyan_and_black_head' :               (self.__tr('Black and cyan print head'),
@@ -523,7 +532,7 @@ class StringTable:
             'agent_light_gray_supply' :                 (self.__tr('Light gray ink cartridge'), # LG
                                                          '' ),
 
-            'agent_medium_gray_supply' :                (self.__tr('Medium gray ink cartridge'), 
+            'agent_medium_gray_supply' :                (self.__tr('Medium gray ink cartridge'),
                                                          '' ),
 
             'agent_photo_gray_supply' :                 (self.__tr('Photo black ink cartridge'), # PK
@@ -594,15 +603,6 @@ class StringTable:
 
             'agent_level_out'          : (self.__tr('Very low'),
                                           ''),
-
-#            'email_test_subject'      : (self.__tr('HPLIP: Email alert test message'),
-#                                         ''),
-#
-#            'email_test_message'      : (self.__tr('This email is to test the functionality of HPLIP email alerts'),
-#                                         ''),
-#
-#            'email_alert_subject'      : (self.__tr('HPLIP: Error/alert on device: '),
-#                                          ''),
 
         }
 

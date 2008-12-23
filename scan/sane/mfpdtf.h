@@ -321,18 +321,21 @@ typedef struct
    uint32_t CMYRows;
 } __attribute__((packed)) MFPDTF_END_PAGE;
 
+/* Folloing macros are now in gcc 4.3.2 endian.h */
+#if !defined(htole16) 
 #if defined(WORDS_BIGENDIAN)
 #define htole16(A) ((((uint16_t)(A) & 0xff00) >> 8) | (((uint16_t)(A) & 0x00ff) << 8))    /* host to little-endian 16-bit value */
-#define letoh16 htole16                         /* little-endian to host 16-bit value */
+#define le16toh htole16                         /* little-endian to host 16-bit value */
 #define htole32(A) ((((uint32_t)(A) & (uint32_t)0x000000ff) << 24) | (((uint32_t)(A) & (uint32_t)0x0000ff00) << 8) | \
                   (((uint32_t)(A) & (uint32_t)0x00ff0000) >> 8) | (((uint32_t)(A) & (uint32_t)0xff000000) >> 24))
-#define letoh32 htole32
+#define le32toh htole32
 #else
 #define htole16(A) (A)
-#define letoh16(A) (A)
-#define letoh32(A) (A)
+#define le16toh(A) (A)
+#define le32toh(A) (A)
 #define htole32(A) (A)
-#endif
+#endif   // #if defined(WORDS_BIGENDIAN)
+#endif   // #if !defined(htole16)
 
 int __attribute__ ((visibility ("hidden"))) read_mfpdtf_block(int device, int channel, char *buf, int bufSize, int timeout);
 

@@ -48,6 +48,7 @@
 #include "common.h"
 #include "soapht.h"
 #include "soaphti.h"
+#include "io.h"
 
 #define DEBUG_DECLARE_ONLY
 #include "sanei_debug.h"
@@ -70,8 +71,11 @@ static int bb_load(struct soap_session *ps, const char *so)
    /* Load math library manually with symbols exported (Ubuntu 8.04). Otherwise the plugin will not find it. */ 
    if ((ps->math_handle = dlopen("libm.so", RTLD_LAZY|RTLD_GLOBAL)) == NULL)
    {
-      BUG("unable to load restricted library: %s\n", dlerror());
-      goto bugout;
+      if ((ps->math_handle = dlopen("libm.so.6", RTLD_LAZY|RTLD_GLOBAL)) == NULL)
+      {
+         BUG("unable to load restricted library: %s\n", dlerror());
+         goto bugout;
+      }
    } 
 
    if (hpmud_get_conf("[dirs]", "home", home, sizeof(home)) != HPMUD_R_OK)
@@ -80,6 +84,7 @@ static int bb_load(struct soap_session *ps, const char *so)
    if ((ps->bb_handle = dlopen(sz, RTLD_NOW|RTLD_GLOBAL)) == NULL)
    {
       BUG("unable to load restricted library %s: %s\n", sz, dlerror());
+      SendScanEvent(ps->uri, EVENT_PLUGIN_FAIL);
       goto bugout;
    } 
    
@@ -181,8 +186,8 @@ static int get_ip_data(struct soap_session *ps, SANE_Byte *data, SANE_Int maxLen
    /* Transform input data to output. Note, output buffer may consume more bytes than input buffer (ie: jpeg to raster). */
    ip_ret = ipConvert(ps->ip_handle, inputAvail, input, &inputUsed, &inputNextPos, outputAvail, output, &outputUsed, &outputThisPos);
 
-   DBG6("cnt=%d index=%d input=%p inputAvail=%d inputUsed=%d inputNextPos=%d output=%p outputAvail=%d outputThisPos=%d\n", ps->cnt, ps->index, input, 
-         inputAvail, inputUsed, inputNextPos, output, outputAvail, outputThisPos);
+   DBG6("cnt=%d index=%d input=%p inputAvail=%d inputUsed=%d inputNextPos=%d output=%p outputAvail=%d outputUsed=%d outputThisPos=%d\n", ps->cnt, ps->index, input, 
+         inputAvail, inputUsed, inputNextPos, output, outputAvail, outputUsed, outputThisPos);
 
    if (input != NULL)
    {

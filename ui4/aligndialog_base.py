@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui4/aligndialog_base.ui'
 #
-# Created: Thu Oct 30 15:47:06 2008
+# Created: Mon Dec 15 16:58:59 2008
 #      by: PyQt4 UI code generator 4.3.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PyQt4 import QtCore, QtGui
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(QtCore.QSize(QtCore.QRect(0,0,600,500).size()).expandedTo(Dialog.minimumSizeHint()))
+        Dialog.resize(QtCore.QSize(QtCore.QRect(0,0,700,500).size()).expandedTo(Dialog.minimumSizeHint()))
 
         self.gridlayout = QtGui.QGridLayout(Dialog)
         self.gridlayout.setObjectName("gridlayout")
@@ -392,6 +392,22 @@ class Ui_Dialog(object):
         spacerItem23 = QtGui.QSpacerItem(20,40,QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Expanding)
         self.gridlayout9.addItem(spacerItem23,2,1,1,1)
         self.StackedWidget.addWidget(self.AioPage)
+
+        self.FrontPanelPage = QtGui.QWidget()
+        self.FrontPanelPage.setObjectName("FrontPanelPage")
+
+        self.gridlayout10 = QtGui.QGridLayout(self.FrontPanelPage)
+        self.gridlayout10.setObjectName("gridlayout10")
+
+        self.label_13 = QtGui.QLabel(self.FrontPanelPage)
+        self.label_13.setTextFormat(QtCore.Qt.RichText)
+        self.label_13.setWordWrap(True)
+        self.label_13.setObjectName("label_13")
+        self.gridlayout10.addWidget(self.label_13,0,0,1,1)
+
+        spacerItem24 = QtGui.QSpacerItem(20,40,QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Expanding)
+        self.gridlayout10.addItem(spacerItem24,1,0,1,1)
+        self.StackedWidget.addWidget(self.FrontPanelPage)
         self.gridlayout.addWidget(self.StackedWidget,2,0,1,5)
 
         self.line_2 = QtGui.QFrame(Dialog)
@@ -404,8 +420,8 @@ class Ui_Dialog(object):
         self.StepText.setObjectName("StepText")
         self.gridlayout.addWidget(self.StepText,4,0,1,1)
 
-        spacerItem24 = QtGui.QSpacerItem(191,29,QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
-        self.gridlayout.addItem(spacerItem24,4,1,1,1)
+        spacerItem25 = QtGui.QSpacerItem(191,29,QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
+        self.gridlayout.addItem(spacerItem25,4,1,1,1)
 
         self.BackButton = QtGui.QPushButton(Dialog)
         self.BackButton.setObjectName("BackButton")
@@ -420,7 +436,7 @@ class Ui_Dialog(object):
         self.gridlayout.addWidget(self.CancelButton,4,4,1,1)
 
         self.retranslateUi(Dialog)
-        self.StackedWidget.setCurrentIndex(4)
+        self.StackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
@@ -447,6 +463,10 @@ class Ui_Dialog(object):
         "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">1.</span> Place the alignment page, with the printed side facing down, on the scanner. </p>\n"
         "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">2.</span> Press the <span style=\" font-style:italic;\">Enter</span> or <span style=\" font-style:italic;\">Scan</span> button on the printer. </p>\n"
         "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">3.</span> \"Alignment Complete\" will be displayed when the process is finished (on some models with a front panel display) or the green light that was blinking during the process will stop blinking and remain green (on some models without a front panel display).</p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_13.setText(QtGui.QApplication.translate("Dialog", "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+        "p, li { white-space: pre-wrap; }\n"
+        "</style></head><body style=\" font-family:\'DejaVu Sans\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+        "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">Cartridge alignment on this printer is only available by accessing the front panel of the printer. </span>Please refer to the user guide for the printer for more information. Click <span style=\" font-style:italic;\">Finish</span> to exit.</p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
         self.StepText.setText(QtGui.QApplication.translate("Dialog", "Step %1 of %2", None, QtGui.QApplication.UnicodeUTF8))
         self.BackButton.setText(QtGui.QApplication.translate("Dialog", "< Back", None, QtGui.QApplication.UnicodeUTF8))
         self.NextButton.setText(QtGui.QApplication.translate("Dialog", "Next >", None, QtGui.QApplication.UnicodeUTF8))

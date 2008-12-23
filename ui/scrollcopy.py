@@ -35,7 +35,7 @@ import Queue
 
 
 class ScrollCopyView(ScrollView):
-    def __init__(self, service, num_copies=None, contrast=None, quality=None, 
+    def __init__(self, service, num_copies=None, contrast=None, quality=None,
                 reduction=None, fit_to_page=None, parent=None, form=None, name=None, fl=0):
         ScrollView.__init__(self, service, parent, name, fl)
 
@@ -98,7 +98,7 @@ class ScrollCopyView(ScrollView):
             self.contrastDefaultPushButton.setEnabled(a != 0)
 
             # reduction/enlargement/fittopage
-            
+
             self.reductionSlider.setRange(self.max_reduction, self.max_enlargement)
             self.reductionSlider.setTickmarks(QSlider.Below)
             self.reductionSlider.setTickInterval(10)
@@ -161,7 +161,7 @@ class ScrollCopyView(ScrollView):
                 s = 'Disabled' # 1
 
             log.debug("Default Fit to page: %s (%s)" % (self.fit_to_page, s))
-            log.debug("Scan style (models.dat: scan-style): %d" % self.scan_style)            
+            log.debug("Scan style (models.dat: scan-style): %d" % self.scan_style)
 
         finally:
             self.dev.closePML()
@@ -185,8 +185,8 @@ class ScrollCopyView(ScrollView):
 
         self.addGroupHeading("space1", "")
 
-        self.copyButton = self.addActionButton("bottom_nav", self.__tr("Make Copies(s)"), 
-                                self.copyButton_clicked, 'print.png', 'print-disabled.png', 
+        self.copyButton = self.addActionButton("bottom_nav", self.__tr("Make Copies(s)"),
+                                self.copyButton_clicked, 'print.png', 'print.png',
                                 self.__tr("Close"), self.funcButton_clicked)
 
 
@@ -197,7 +197,7 @@ class ScrollCopyView(ScrollView):
     def onDeviceChange(self, cur_device=None):
         ScrollView.onDeviceChange(self, cur_device)
 
-        self.dev = copier.PMLCopyDevice(device_uri=self.cur_device.device_uri, 
+        self.dev = copier.PMLCopyDevice(device_uri=self.cur_device.device_uri,
                                         printer_name=self.cur_printer)
 
         self.scan_style = self.dev.mq.get('scan-style', SCAN_STYLE_FLATBED)
@@ -406,7 +406,7 @@ class ScrollCopyView(ScrollView):
         self.connect(self.contrastSpinBox, SIGNAL("valueChanged(int)"), self.contrastSpinBox_valueChanged)
         self.connect(self.contrastDefaultPushButton, SIGNAL("clicked()"), self.contrastDefaultPushButton_clicked)
 
-        self.addWidget(widget, "contrast")        
+        self.addWidget(widget, "contrast")
 
 
     def contrastSlider_valueChanged(self, a0):
@@ -518,7 +518,7 @@ class ScrollCopyView(ScrollView):
                 s = 'Presentation'
             elif self.quality == pml.COPIER_QUALITY_BEST:
                 s = 'Best'
-            
+
             log.debug("Quality: %d (%s)" % (self.quality, s))
 
             if self.fit_to_page == pml.COPIER_FIT_TO_PAGE_ENABLED:
@@ -540,7 +540,7 @@ class ScrollCopyView(ScrollView):
 
             self.dev.copy(self.num_copies, self.contrast, self.reduction,
                           self.quality, self.fit_to_page, self.scan_style,
-                          self.update_queue, self.event_queue)                
+                          self.update_queue, self.event_queue)
 
         finally:
             #self.cur_device.close()

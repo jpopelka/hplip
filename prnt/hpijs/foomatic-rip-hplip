@@ -5,7 +5,7 @@ use strict;
 use POSIX;
 use Cwd;
 
-my $ripversion='$Revision: 1.1 $';
+my $ripversion='$Revision=3.0.2.131$';
 #'# Fix emacs syntax highlighting
 
 # foomatic-rip is a spooler-independent filter script which takes
@@ -44,10 +44,10 @@ my $ripversion='$Revision: 1.1 $';
 # possibly other stuff.	 The default path is often fine on Linux, but
 # may not be on other systems.
 #
-my $execpath = "NONE/bin:/usr/local/bin:/usr/bin:/bin";
+my $execpath = "/usr/bin:/usr/local/bin:/usr/bin:/bin";
 
 # CUPS raster drivers are searched here
-my $cupsfilterpath = "/usr/local/lib/cups/filter:/usr/local/lib/cups/filter:/usr/local/libexec/cups/filter:/opt/cups/filter:/usr/lib/cups/filter";
+my $cupsfilterpath = "/usr/lib/cups/filter:/usr/local/lib/cups/filter:/usr/local/libexec/cups/filter:/opt/cups/filter:/usr/lib/cups/filter";
 
 # Location of the configuration file "filter.conf", this file can be
 # used to change the settings of foomatic-rip without editing
@@ -55,8 +55,8 @@ my $cupsfilterpath = "/usr/local/lib/cups/filter:/usr/local/lib/cups/filter:/usr
 # of the directory which contains the configuration file, usually
 # "/etc/foomatic".
 # Some versions of configure do not fully expand $sysconfdir
-my $prefix = "/usr/local";
-my $configpath = "${prefix}/etc/foomatic";
+my $prefix = "/usr";
+my $configpath = "/etc/foomatic";
 
 # For the stuff below, the settings in the configuration file have priority.
 
@@ -114,7 +114,7 @@ my $logfile = "/tmp/foomatic-rip";
 #
 # foomatic-rip spooler-independent PS->Printer filter (RIP) of Foomatic
 #
-# Copyright 2002 - 2007 Grant Taylor <gtaylor@picante.com>
+# Copyright 2002 - 2008 Grant Taylor <gtaylor@picante.com>
 #		 & Till Kamppeter <till.kamppeter@gmail.com>
 #                & Helge Blischke <h.blischke@srz.de>
 #
@@ -155,19 +155,19 @@ my $EXIT_PRNERR_NORETRY = 2;  # printer error with no hope of retry
 my $EXIT_JOBERR = 3;          # job is defective
 my $EXIT_SIGNAL = 4;          # terminated after catching signal
 my $EXIT_ENGAGED = 5;         # printer is otherwise engaged (connection 
-                           # refused)
+                              # refused)
 my $EXIT_STARVED = 6;         # starved for system resources
 my $EXIT_PRNERR_NORETRY_ACCESS_DENIED = 7;     # bad password? bad port
-                                            # permissions?
+                                               # permissions?
 my $EXIT_PRNERR_NOT_RESPONDING = 8;            # just doesn't answer at all 
-                                            # (turned off?)
+                                               # (turned off?)
 my $EXIT_PRNERR_NORETRY_BAD_SETTINGS = 9;      # interface settings are invalid
 my $EXIT_PRNERR_NO_SUCH_ADDRESS = 10;          # address lookup failed, may be 
-                                            # transient
+                                               # transient
 my $EXIT_PRNERR_NORETRY_NO_SUCH_ADDRESS = 11;  # address lookup failed, not 
-                                            # transient
+                                               # transient
 my $EXIT_INCAPABLE = 50;                       # printer wants (lacks) features
-                                            # or resources
+                                               # or resources
 # Standard Unix signal names
 #my SIGHUP = 1;
 #my SIGINT = 2;
@@ -181,6 +181,21 @@ my $EXIT_INCAPABLE = 50;                       # printer wants (lacks) features
 
 my $ESPIPE = 29;	# the errno value when seeking a pipe or socket
 
+# The modern_shell() function will register the PIDs of all shell calls,
+# so that rip_die() can kill these processes 
+my %pids;
+
+# $kidgeneration stays 0 for the main process, child processes of the
+# main process get $kidgeneration = 1, their children 2, ...
+my $kidgeneration = 0;
+
+# Catch signals
+my $retval = $EXIT_PRINTED;
+use sigtrap qw(handler set_exit_canceled normal-signals
+               handler set_exit_error error-signals
+               handler set_exit_prnerr USR1 
+	       handler set_exit_prnerr_noretry USR2
+	       handler set_exit_engaged TTIN);
 
 
 ## Some important variables
@@ -230,6 +245,7 @@ my $jobtitle = "$jobuser\@$jobhost";
 
 # Number of copies
 my $copies = "1";
+my $rbinumcopies = "0";
 
 # Post pipe (command into which the output of this filter should be piped)
 my $postpipe = "";
@@ -409,6 +425,19 @@ if (defined($ENV{'LPOPTS'})) {
 my $argstr = "\x01" . 
     join("\x01", map { removeunprintables($_) } @ARGV) . "\x01";
 
+# Version check
+if ($argstr =~ /^\x01-(h|v|-help|-version)\x01$/i) {
+    my $ver;
+    if ($ripversion =~ /^\$Revision=(.*)\$$/) {
+	$ver = $1;
+    } else {
+	$ver = "Unknown";
+    }
+    print "foomatic-rip revision $ver\n";
+    print "\"man foomatic-rip\" for help.\n";
+    exit 0;
+}
+
 # Debug mode activated via command line
 if ($argstr =~ s/\x01--debug\x01/\x01/) {
     $debug = 1;
@@ -488,10 +517,10 @@ if (defined($ENV{'PRINTCAP_ENTRY'})){
 # PPD file name given via the command line
 # allow duplicates, and use the last specified one
 while ( ($spooler ne 'lprng') and ($argstr =~ s/\x01-p(\x01|)([^\x01]+)\x01/\x01/)) {
-    $ppdfile = removeshellescapes($2);
+    $ppdfile = $2;
 }
 while ($argstr =~ s/\x01--ppd(\x01|=|)([^\x01]+)\x01/\x01/) {
-    $ppdfile = removeshellescapes($2);
+    $ppdfile = $2;
 }
 
 # Check for LPD/GNUlpr by typical options which the spooler puts onto
@@ -789,7 +818,7 @@ if (($spooler eq 'lpd') ||
     ($spooler eq 'gnulpr')) {
 
     # Get PPD file name as the last command line argument
-    $ppdfile = removeshellescapes($rargs[$#rargs]);
+    $ppdfile = $rargs[$#rargs];
 
 }
 
@@ -2153,7 +2182,7 @@ if ($debug) {
 }
 
 
-	    
+
 ## From here on we have to repeat all the rest of the program for
 ## every file to print
 
@@ -2573,7 +2602,7 @@ for $file (@filelist) {
 		    }
 		}
 	    } else {
-		if ($line =~ /^\%\%/) {
+		if ($line =~ /^\%/) {
 		    if ($line =~ m/^\s*\%\%BeginDocument[: ]/) {
 			# Beginning of an embedded document
 			# Note that Adobe Acrobat has a bug and so uses
@@ -2729,6 +2758,8 @@ for $file (@filelist) {
 			    #$line .= "/foomatic-saved-state save def\n";
 			    # Here begins a new page
 			    if ($inheader) {
+				# One last update for the header
+				buildcommandline($dat, $optionset);
 				# Here we add some stuff which still belongs
 				# into the header
 				my $stillforheader;
@@ -2802,14 +2833,6 @@ for $file (@filelist) {
 				    }
 				}
 			    }
-			    # Insert PostScript option settings
-			    # (options for section "PageSetup".
-			    if ($isdscjob) {
-				$line .= 
-				    makepagesetupsection($dat, $optionset,
-							 0);
-				$pagesetupfound = 1;
-			    }
 			    # Now the page header comes, so buffer the data,
 			    # because we must perhaps shut down and restart 
 			    # the renderer
@@ -2832,6 +2855,14 @@ for $file (@filelist) {
 			    $optionsalsointoheader = 1;
 			} else {
 			    $optionsalsointoheader = 0;
+			}
+			# Insert PostScript option settings
+			# (options for section "PageSetup".
+			if ($isdscjob) {
+			    $line .= 
+				makepagesetupsection($dat, $optionset,
+						     0);
+			    $pagesetupfound = 1;
 			}
 		    } elsif (($line =~ m/^\%\%EndPageSetup/) &&
 			     ($nestinglevel == 0) &&
@@ -2930,6 +2961,9 @@ for $file (@filelist) {
 					    push(@{$dest}, $arg->{'protof'} .
 						 "\n");
 					}
+					# We have replaced this option on the 
+					# FIFO
+					$optionreplaced = 1;
 				    } elsif ((($arg->{'type'} eq 'enum') ||
 					      ($arg->{'type'} eq 'string') ||
 					      ($arg->{'type'} eq
@@ -2942,6 +2976,9 @@ for $file (@filelist) {
 					     "%%BeginFeature: " .
 					     "*$option $arg->{$optionset}\n");
 					push(@{$dest}, $val->{'driverval'} . "\n");
+					# We have replaced this option on the 
+					# FIFO
+					$optionreplaced = 1;
 				    } elsif ((($arg->{'type'} eq 'string') ||
 					      ($arg->{'type'} eq 
 					       'password')) &&
@@ -2954,7 +2991,13 @@ for $file (@filelist) {
 					my $driverval = $arg->{'proto'};
 					$driverval =~ s/\%s//g;
 					push(@{$dest}, $driverval . "\n");
-				    } else {
+					# We have replaced this option on the 
+					# FIFO
+					$optionreplaced = 1;
+				    } elsif (($arg->{'type'} eq 'int') ||
+					     ($arg->{'type'} eq 'float') ||
+					     ($arg->{'type'} eq 'string') ||
+					     ($arg->{'type'} eq 'password')) {
 					# Setting for numerical or string
 					# option which is not under the
 					# enumerated choices
@@ -2967,19 +3010,23 @@ for $file (@filelist) {
 					     sprintf($sprintfproto,
 						     $arg->{$optionset}) .
 					     "\n");
+					# We have replaced this option on the 
+					# FIFO
+					$optionreplaced = 1;
 				    }
 				} else {
 				    # Command line or JCL option
 				    push(@{$dest},
 					 "%% FoomaticRIPOptionSetting: " .
 					 "$option=$arg->{$optionset}\n");
-				}
-				print $logh " --> Correcting numerical/string " .
-				    "option to $option=$arg->{$optionset}" .
-				    " (Command line argument)\n";
 				# We have replaced this option on the 
 				# FIFO
 				$optionreplaced = 1;
+			    }
+				print $logh " --> Correcting numerical/string " .
+				    "option to $option=$arg->{$optionset}" .
+				    " (Command line argument)\n" if
+				    $optionreplaced;
 			    }
 			    # Mark that we have already found this option
 			    $arg->{'notfirst'} = 1;
@@ -3125,6 +3172,11 @@ for $file (@filelist) {
 				$line;
 			}
 			$prologfound = 1;
+		    } elsif (($line =~ m/^\s*\%(\%?)RBINumCopies:\s*(\d+)\s*$/) &&
+			     ($nestinglevel == 0)) {
+			# RBINumCopies entry
+			$rbinumcopies = $2;
+			print $logh "Found: %${1}RBINumCopies: $rbinumcopies\n";
 		    } elsif (($line =~ m/^\s*\%/) || ($line =~ m/^\s*$/)) {
 			# This is an unknown PostScript comment or a blank
 			# line, no active code
@@ -3195,6 +3247,14 @@ for $file (@filelist) {
 				# it
 				$ignorepageheader = 1;
 				$optionsalsointoheader = 0;
+			    }
+			    # Insert PostScript option settings
+			    # (options for section "PageSetup".
+			    if ($isdscjob && !$pagesetupfound) {
+				$line .= 
+				    makepagesetupsection($dat, $optionset,
+							 1);
+				$pagesetupfound = 1;
 			    }
 			}
 		    }
@@ -3373,6 +3433,8 @@ for $file (@filelist) {
 	    print $logh "Flushing FIFO.\n";
 	}
 	if ($inheader) {
+	    # One last update for the header
+	    buildcommandline($dat, $optionset);
 	    # No page initialized yet? Copy the "header" option set into the
 	    # "currentpage" option set, so that the renderer will find the
 	    # options settings.
@@ -3538,13 +3600,8 @@ sub getrendererhandle {
 
     print $logh "${added_lf}Starting renderer\n";
 
-    # Catch signals
+    # Reset return value of the renderer
     $retval = $EXIT_PRINTED;
-    use sigtrap qw(handler set_exit_prnerr USR1 
-		   handler set_exit_prnerr_noretry USR2
-		   handler set_exit_engaged TTIN);
-
-    # Variables for the kid processes reporting their state
 
     # Set up a pipe for the kids to pass their exit stat to the main process
     pipe KID_MESSAGE, KID_MESSAGE_IN;
@@ -3585,8 +3642,11 @@ sub getrendererhandle {
         return ( *KID3, $kid3 );
 
     } else {
+	$kidgeneration += 1;
+
         close KID3;
 
+        $SIG{PIPE} = 'DEFAULT';
         pipe KID4_IN, KID4;
 	KID4->autoflush(1);
         $kid4 = fork();
@@ -3767,13 +3827,19 @@ sub getrendererhandle {
 	    # When arrived here the renderer command line was successful
 	    # So exit with zero exit value here and inform the main process
 	    close KID_MESSAGE;
-	    print KID_MESSAGE_IN "3 $EXIT_PRINTED\n";
-	    close KID_MESSAGE_IN;
 	    # Wait for postpipe/output child
 	    waitpid($kid4, 0);
-	    print $logh "KID3 finished\n";
+	    if ($? != 0) {
+		print KID_MESSAGE_IN "3 $EXIT_SIGNAL\n";
+	    } else {
+		print KID_MESSAGE_IN "3 $EXIT_PRINTED\n";
+	    }
+	    close KID_MESSAGE_IN;
+	    print $logh "KID3 finished with $?\n";
 	    exit $EXIT_PRINTED;
         } else {
+	    $kidgeneration += 1;
+
             # child, trailing task on the pipe; we write jcl stuff
             close KID4;
 	    close KID3_IN;
@@ -4112,10 +4178,13 @@ sub getfileconverterhandle {
         return ( *KID1_IN, $kid1 );
 
     } else {
+	$kidgeneration += 1;
+
 	# We go on reading the job data and stuff it into the file
 	# converter
         close KID1_IN;
 
+        $SIG{PIPE} = 'DEFAULT';
         pipe KID2_IN, KID2;
 	KID2->autoflush(1);
         $kid2 = fork();
@@ -4253,6 +4322,8 @@ sub getfileconverterhandle {
 	    print $logh "KID1 finished\n";
 	    exit $EXIT_PRINTED;
         } else {
+	    $kidgeneration += 1;
+
             # child, first part of the pipe, reading in the data from
 	    # standard input and stuffing it into the file converter
 	    # after putting in the already read data (in $alreadyread)
@@ -4580,9 +4651,12 @@ sub getdocgeneratorhandle {
         return ( *KID0_IN, $kid0 );
     }
 
+    $kidgeneration += 1;
+
     # we are the kid; we generate the documentation page
 
     close KID0_IN;
+    $SIG{PIPE} = 'DEFAULT';
 
     # Kill data on STDIN to satisfy PPR
     if (($spooler eq 'ppr_int') || ($spooler eq 'ppr')) {
@@ -4867,65 +4941,99 @@ sub rip_die {
     my $errmsg = "$!";
     my $errcod = $! + 0;
 
-    # Close the documentation page generator (if it was used)
-    if ($docgeneratorpid) {
-	if ($kid0) {
-	    print $logh "Killing process $kid0 (KID0)\n";
-	    kill(9, $kid0);
-	}
-	$docgeneratorpid = 0;
-    }
+    # Log that we are dying ...
+    print $logh "Process dying with \"$message\", exit stat: $exitstat\n\terror: $errmsg ($errcod)\n";
 
-    # Close the file converter (if it was used)
-    if ($fileconverterpid) {
+    print $logh "Cleaning up ...\n";
+    foreach my $killsignal (15, 9) {
+
+	# Kill all registered subshells
+	foreach my $pid (keys %pids) {
+	    print $logh "Killing process $pid ($pids{$pid}) and its subprocesses with signal $killsignal\n";
+	    # This call kills the process group with group ID $pid, the
+	    # group which was formed from the initial process $pid which
+	    # contains $pid and all its subprocesses
+	    kill(-$killsignal, $pid);
+	    # If the system does not support process groups and therefore
+	    # the call above does not kill anything, kill at least $pid
+	    kill($killsignal, $pid);
+	}
+
+	# Close the documentation page generator (if it was used)
+	if ($kid0) {
+	    print $logh "Killing process $kid0 (KID0) with signal $killsignal\n";
+	    kill($killsignal, $kid0);
+	}
+	
+	# Close the file converter (if it was used)
 	if ($kid2) {
-	    print $logh "Killing process $kid2 (KID2)\n";
-	    kill(9, $kid2);
+	    print $logh "Killing process $kid2 (KID2) with signal $killsignal\n";
+	    kill($killsignal, $kid2);
 	}
 	if ($kid1) {
-	    print $logh "Killing process $kid1 (KID1)\n";
-	    kill(9, $kid1);
+	    print $logh "Killing process $kid1 (KID1) with signal $killsignal\n";
+	    kill($killsignal, $kid1);
 	}
-	$fileconverterpid = 0;
-    }
 
-    # Close the renderer
-    if ($rendererpid) {
+	# Close the renderer
 	if ($kid4) {
-	    print $logh "Killing process $kid4 (KID4)\n";
-	    kill(9, $kid4);
+	    print $logh "Killing process $kid4 (KID4) with signal $killsignal\n";
+	    kill($killsignal, $kid4);
 	}
 	if ($kid3) {
-	    print $logh "Killing process $kid3 (KID3)\n";
-	    kill(9, $kid3);
+	    print $logh "Killing process $kid3 (KID3) with signal $killsignal\n";
+	    kill($killsignal, $kid3);
 	}
-	$rendererpid = 0;
+
+	# Wait some time for the processes to close
+	sleep(5 - $kidgeneration) if $killsignal != 9;
     }
 
-    print $logh "Process dying with \"$message\", exit stat: $exitstat\n\terror: $errmsg ($errcod)\n";
-    if ($spooler eq 'ppr_int') {
-	# Special error handling for PPR intefaces
-	$message =~ s/\\/\\\\/;
-	$message =~ s/\"/\\\"/;
-	my @messagelines = split("\n", $message);
-	my $firstline = "TRUE";
-	for my $line (@messagelines) {
-	    modern_system("lib/alert $printer $firstline \"$line\"");
-	    $firstline = "FALSE";
+    # Do the debug dump and the PPR error handling only from the main process
+    if ($kidgeneration == 0) { # We are the main process
+
+	if ($spooler eq 'ppr_int') {
+	    # Special error handling for PPR intefaces
+	    $message =~ s/\\/\\\\/;
+	    $message =~ s/\"/\\\"/;
+	    my @messagelines = split("\n", $message);
+	    my $firstline = "TRUE";
+	    for my $line (@messagelines) {
+		modern_system("lib/alert $printer $firstline \"$line\"");
+		$firstline = "FALSE";
+	    }
+	} else {
+	    print STDERR $message . "\n";
 	}
-    } else {
-	print STDERR $message . "\n";
+	if ($debug) {
+	    use Data::Dumper;
+	    local $Data::Dumper::Purity=1;
+	    local $Data::Dumper::Indent=1;
+	    print $logh Dumper($dat);
+	}
     }
-    if ($debug) {
-	use Data::Dumper;
-	local $Data::Dumper::Purity=1;
-	local $Data::Dumper::Indent=1;
-	print $logh Dumper($dat);
-    }
+
+    ## The End
+    print $logh "${added_lf}Closing foomatic-rip.\n";
+    close $logh;
+
     exit $exitstat;
 }
 
 # Signal handling routines
+
+sub do_nothing {
+}
+
+sub set_exit_canceled {
+    $retval = $EXIT_PRINTED;
+    rip_die ("Caught termination signal: Job canceled", $retval);
+}
+
+sub set_exit_error {
+    $retval = $EXIT_SIGNAL;
+    rip_die ("Caught error signal: Error in renderer, driver, or foomatic-rip", $retval);
+}
 
 sub set_exit_prnerr {
     $retval = $EXIT_PRNERR;
@@ -4987,11 +5095,13 @@ sub unhtmlify {
     $str =~ s/\&amp;/\&/g;
 
     # Replace special entities by job data
+    $rbinumcopies = $copies if !$rbinumcopies;
     $str =~ s/\&job;/$jobid/g;
     $str =~ s/\&user;/$jobuser/g;
     $str =~ s/\&host;/$jobhost/g;
     $str =~ s/\&title;/$jobtitle/g;
     $str =~ s/\&copies;/$copies/g;
+    $str =~ s/\&rbinumcopies;/$rbinumcopies/g;
     $str =~ s/\&options;/$optstr/g;
     
     my ($sec, $min, $hour, $mday, $mon, $year) = (localtime)[0..5];
@@ -6592,20 +6702,37 @@ sub read_attribute_file {
 sub modern_system {
     my (@list) = @_;
 
-    if (($modern_shell =~ /.+/) && ($modern_shell ne '/bin/sh')) {
-        # a "modern" shell other than the default shell was specified
-        my $pid = fork();
+    if ($modern_shell |~ /.+/) {
+        # No "modern" shell other than the default shell was specified
+	$modern_shell = '/bin/sh';
+    }
 
-        ($pid < 0) && die "failed to fork()";
+    my $pid = fork();
+    ($pid < 0) && die "failed to fork()";
 
-        if ($pid == 0) {  # child, execute the commands under a modern shell
-            exec($modern_shell, "-c", @list);
-            die "exec($modern_shell, \"-c\", @list);";
-        } else {  # parent, wait for the child
-            waitpid($pid, 0);
-        }
-    } else {  # the system shell is "modern" enough.
-        system(@list);
+    if ($pid == 0) {  # child, execute the commands under a modern shell
+	# If the system supports process groups, we create a process
+	# group of this subshell process. All the children of this
+	# process (calls of external filters, renderers, or drivers)
+	# will be members of this process group and so by killing this
+	# process group we can kill all subprocesses and so we can
+	# cleanly cancel print jobs
+	$SIG{PIPE} = 'DEFAULT';
+	eval("setpgrp()");
+	# Stop catching signals
+	#use sigtrap qw(die normal-signals error-signals
+        #               handler do_nothing USR1 USR2 TTIN);
+	exec($modern_shell, "-c", @list);
+	rip_die("exec($modern_shell, \"-c\", @list);",
+		$EXIT_PRNERR_NORETRY_BAD_SETTINGS);
+    } else { # parent, register child's PID, wait for the child, and
+	     # unregister the PID
+	$pids{$pid} = substr(join(" ", @list), 0, 100) .
+	    (length(join(" ", @list)) > 100 ? "..." : "");
+	print $logh "Starting process $pid: \"$pids{$pid}\"\n";
+	waitpid($pid, 0);
+	print $logh "Process $pid ending: \"$pids{$pid}\"\n";
+	delete $pids{$pid};
     }
 }
 

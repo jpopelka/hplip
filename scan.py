@@ -25,7 +25,7 @@ from __future__ import division
 __version__ = '2.1'
 __mod__ = 'hp-scan'
 __title__ = 'Scan Utility'
-__doc__ = "SANE-based scan utility for HPLIP." 
+__doc__ = "SANE-based scan utility for HPLIP."
 
 # Std Lib
 import sys
@@ -131,7 +131,7 @@ try:
         ("[OPTIONS] (General)", "", "header", False),
         ("Scan destinations:", "-s<dest_list> or --dest=<dest_list>", "option", False),
         ("", "where <dest_list> is a comma separated list containing one or more of: 'file'\*, ", "option", False),
-        ("", "'viewer', 'editor', 'pdf', 'fax', or 'print'. Use only commas between values, no spaces.", "option", False), 
+        ("", "'viewer', 'editor', 'pdf', 'fax', or 'print'. Use only commas between values, no spaces.", "option", False),
         ("Scan mode:", "-m<mode> or --mode=<mode>. Where <mode> is 'color'\*, 'gray' or 'lineart'.", "option", False),
         ("Scanning resolution:", "-r<resolution_in_dpi> or --res=<resolution_in_dpi> or --resolution=<resolution_in_dpi>", "option", False),
         ("", "where <resolution_in_dpi> is %s (300 is default)." % ', '.join([str(x) for x in valid_res]), "option", False),
@@ -148,7 +148,7 @@ try:
         ("", "Use only commas between values, no spaces.", "option", False),
         ("Scan box:", "--box=<tlx>,<tly>,<width>,<height>", "option", False),
         ("", "tlx and tly coordinates are relative to the upper left corner of the scan area.", "option", False),
-        ("", "Units for tlx, tly, width, and height are specified by -t/--units (default is 'mm').", "option", False),         
+        ("", "Units for tlx, tly, width, and height are specified by -t/--units (default is 'mm').", "option", False),
         ("", "Use only commas between values, no spaces.", "option", False),
         ("Top left x of the scan area:", "--tlx=<tlx>", "option", False),
         ("", "Coordinates are relative to the upper left corner of the scan area.", "option", False),
@@ -163,7 +163,7 @@ try:
         ("", "Coordinates are relative to the upper left corner of the scan area.", "option", False),
         ("", "Units are specified by -t/--units (default is 'mm').", "option", False),
         ("Specify the scan area based on a paper size:", "--size=<paper size name>", "option", False),
-        ("", "where <paper size name> is one of: %s" % ', '.join(PAGE_SIZES.keys()), "option", False), 
+        ("", "where <paper size name> is one of: %s" % ', '.join(PAGE_SIZES.keys()), "option", False),
         utils.USAGE_SPACE,
         ("[OPTIONS] ('file' dest)", "", "header", False),
         ("Filename for 'file' destination:", "-o<file> or -f<file> or --file=<file> or --output=<file>", "option", False),
@@ -194,7 +194,7 @@ try:
         ("[OPTIONS] (advanced)", "", "header", False),
         ("Set the scanner compression mode:", "-x<mode> or --compression=<mode>, <mode>='raw', 'none' or 'jpeg' ('jpeg' is default) ('raw' and 'none' are equivalent)", "option", False),],
         see_also_list=[])
-              
+
     opts, device_uri, printer_name, mode, ui_toolkit, lang = \
         mod.parseStdOpts('s:m:r:c:t:a:b:o:v:f:c:x:',
                          ['dest=', 'mode=', 'res=', 'resolution=',
@@ -211,10 +211,10 @@ try:
                           'subject=', 'to=', 'from=', 'jpg',
                           'grey-scale', 'gray-scale', 'about=',
                          ])
-                          
- 
 
-    device_uri = mod.getDeviceUri(device_uri, printer_name, 
+
+
+    device_uri = mod.getDeviceUri(device_uri, printer_name,
         back_end_filter=['hpaio'], filter={'scan-type': (operator.gt, 0)})
 
     for o, a in opts:
@@ -240,13 +240,13 @@ try:
 
         elif o in ('--color', '--colour'):
             scan_mode = 'color'
-                
+
         elif o in ('--lineart', '--line-art', '--bw'):
             scan_mode = 'lineart'
-            
+
         elif o in ('--gray', '--grayscale', '--gray-scale', '--grey', '--greyscale', '--grey-scale'):
             scan_mode = 'gray'
-            
+
         elif o in ('-m', '--mode'):
             a = a.strip().lower()
 
@@ -272,12 +272,12 @@ try:
                 log.error("Valid resolutions are %s dpi." % ', '.join([str(x) for x in valid_res]))
                 res = default_res
             else:
-                if r in valid_res: 
+                if r in valid_res:
                     res = r
                 else:
                     res = valid_res[0]
                     min_dist = sys.maxint
-                    for x in valid_res: 
+                    for x in valid_res:
                         if abs(r-x) < min_dist:
                             min_dist = abs(r-x)
                             res = x
@@ -408,7 +408,7 @@ try:
                         bry = float(height) + tly
                     except ValueError:
                         log.error("Invalid value for height. Using defaults.")
-                        bry = None    
+                        bry = None
                 else:
                     log.error("Cannot calculate bry since tly is invalid. Using defaults.")
                     bry = None
@@ -496,7 +496,7 @@ try:
 #                    fax = pp
 #                    break
 #
-#            if found: 
+#            if found:
 #                if 'fax' not in dest:
 #                    dest.append('fax')
 #            else:
@@ -549,7 +549,7 @@ try:
         device.getDeviceURIByPrinterName(printer_name) is not None and \
         'printer' not in dest:
 
-        dest.append('printer')        
+        dest.append('printer')
 
 #    if 'printer' in dest and not printer:
 #        from prnt import cups
@@ -722,7 +722,7 @@ try:
 #            except locale.Error:
 #                pass
 #
-#        scanui = ScanForm(device_uri, printer_name, args) 
+#        scanui = ScanForm(device_uri, printer_name, args)
 #
 #        app.setMainWidget(scanui)
 #
@@ -769,7 +769,7 @@ try:
 
         sane.init()
         devices = sane.getDevices()
-        
+
         # Make sure SANE backend sees the device...
         for d, mfg, mdl, t in devices:
             if d == device_uri:
@@ -777,14 +777,15 @@ try:
         else:
             log.error("Unable to locate device %s using SANE backend hpaio:. Please check HPLIP installation." % device_uri)
             sys.exit(1)
-            
+
         log.info(log.bold("Using device %s" % device_uri))
         log.info("Opening connection to device...")
 
         try:
             device = sane.openDevice(device_uri)
         except scanext.error, e:
-            log.error(e)
+            #log.error("Error: %d (%s)" % (e, sane.getErrorMessage(e)))
+            sane.reportError(e)
             sys.exit(1)
 
         #print device.options
@@ -915,18 +916,19 @@ try:
                         # Note: On some scanners (Marvell) expected_bytes will be < 0 (if lines == -1)
                         log.debug("expected_bytes = %d" % expected_bytes)
                     except scanext.error, e:
-                        log.error(e)
+                        #log.error(e)
+                        sane.reportError(e)
                         sys.exit(1)
                     except KeyboardInterrupt:
                         log.error("Aborted.")
                         device.cancelScan()
-                        sys.exit(1) 
+                        sys.exit(1)
 
                     if adf and status == scanext.SANE_STATUS_NO_DOCS:
                         if page-1 == 0:
                             log.error("No document(s). Please load documents and try again.")
                             sys.exit(0)
-                        else:    
+                        else:
                             log.info("Out of documents. Scanned %d pages total." % (page-1))
                             no_docs = True
                             break
@@ -949,12 +951,12 @@ try:
                                 #if log.get_level() >= log.LOG_LEVEL_INFO:
                                 if not log.is_debug():
                                     if expected_bytes > 0:
-                                        pm.update(int(100*bytes_read/expected_bytes), 
+                                        pm.update(int(100*bytes_read/expected_bytes),
                                             utils.format_bytes(bytes_read))
                                     else:
-                                        pm.update(0, 
+                                        pm.update(0,
                                             utils.format_bytes(bytes_read))
-                                        
+
 
     ##                            if status == scanext.SANE_STATUS_EOF:
     ##                                log.debug("EOF")
@@ -963,7 +965,8 @@ try:
     ##                                no_docs = True
                                 #elif status != scanext.SANE_STATUS_GOOD:
                                 if status != scanext.SANE_STATUS_GOOD:
-                                    log.error("SANE error %d" % status)
+                                    sane.reportError(e)
+                                    #log.error("SANE error %d during readScan()" % status)
                                     sys.exit(1)
 
                             except Queue.Empty:
@@ -983,21 +986,21 @@ try:
 
                     if not log.is_debug():
                         if expected_bytes > 0:
-                            pm.update(int(100*bytes_read/expected_bytes), 
+                            pm.update(int(100*bytes_read/expected_bytes),
                                 utils.format_bytes(bytes_read))
                         else:
-                            pm.update(0, 
+                            pm.update(0,
                                 utils.format_bytes(bytes_read))
-                            
+
     ##                if status == scanext.SANE_STATUS_EOF:
     ##                    log.debug("EOF")
     ##                elif status == scanext.SANE_STATUS_NO_DOCS:
     ##                    log.debug("NO DOCS")
     ##                    no_docs = True
 
-                    if status != scanext.SANE_STATUS_GOOD:
-                        log.error("SANE error %d" % status)
-                        sys.exit(1)
+#                    if status != scanext.SANE_STATUS_GOOD:
+#                        log.error("SANE error %d during queue clear" % status)
+#                        sys.exit(1)
 
                 log.info("")
 
@@ -1006,28 +1009,28 @@ try:
 
                     buffer, format, format_name, pixels_per_line, \
                         lines, depth, bytes_per_line, pad_bytes, total_read = device.getScan()
-                        
-                    log.debug("PPL=%d lines=%d depth=%d BPL=%d pad=%d total=%d" % 
+
+                    log.debug("PPL=%d lines=%d depth=%d BPL=%d pad=%d total=%d" %
                         (pixels_per_line, lines, depth, bytes_per_line, pad_bytes, total_read))
-                        
+
                     if lines == -1:
                         lines = int(total_read / bytes_per_line)
 
                     if scan_mode in ('color', 'gray'):
                         try:
-                            im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(), 
+                            im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(),
                                 'raw', 'RGBA', 0, 1)
                         except ValueError:
                             log.error("Did not read enough data from scanner (I/O Error?)")
                             sys.exit(1)
 
     ##                elif scan_mode == 'gray':
-    ##                    im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(), 
+    ##                    im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(),
     ##                        'raw', 'RGBA', 0, 1).convert('P')
 
                     elif scan_mode == 'lineart':
                         try:
-                            im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(), 
+                            im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(),
                                 'raw', 'RGBA', 0, 1).convert('L')
                         except ValueError:
                             log.error("Did not read enough data from scanner (I/O Error?)")
@@ -1036,7 +1039,7 @@ try:
                     if adf:
                         temp_output = utils.createSequencedFilename("hpscan_pg%d_" % page, ".png")
                         adf_page_files.append(temp_output)
-                        im.save(temp_output)  
+                        im.save(temp_output)
                         log.debug("Saved page %d to file %s" % (page, temp_output))
                         #adf_pages.append(im)
                 else:
@@ -1086,7 +1089,7 @@ try:
                 #print image
 
                 try:
-                    c.drawInlineImage(image, (tlx/0.3528), ((bry_max/0.3528)-(bry/0.3528)), 
+                    c.drawInlineImage(image, (tlx/0.3528), ((bry_max/0.3528)-(bry/0.3528)),
 
                     #c.drawInlineImage(image, 0, bry/0.3528,
                         width=None,height=None)
@@ -1099,7 +1102,7 @@ try:
             log.info("Saving to file %s" % output)
             c.save()
             log.info("Viewing PDF file in %s" % pdf_viewer)
-            os.system("%s %s &" % (pdf_viewer, output))            
+            os.system("%s %s &" % (pdf_viewer, output))
 
 
             sys.exit(0)
@@ -1156,8 +1159,8 @@ try:
 
                 sys.exit(1)
 
-            os.close(output_fd) 
-            temp_saved = True      
+            os.close(output_fd)
+            temp_saved = True
 
         for d in dest:
             log.info("\nSending to destination '%s':" % d)
@@ -1179,7 +1182,7 @@ try:
                 c = canvas.Canvas(pdf_output, (tlx_max/0.3528, bry_max/0.3528))
 
                 try:
-                    c.drawInlineImage(im, (tlx/0.3528), ((bry_max/0.3528)-(bry/0.3528)), 
+                    c.drawInlineImage(im, (tlx/0.3528), ((bry_max/0.3528)-(bry/0.3528)),
                         width=None,height=None)
                 except NameError:
                     log.error("A problem has occurred with PDF generation. This is a known bug in ReportLab. Please update your install of ReportLab to version 2.0 or greater.")
@@ -1225,12 +1228,12 @@ try:
                     msg.attach(txt)
 
                 if file_saved:
-                    txt = MIMEText("attached: %s: %dx%d %s PNG image." % 
+                    txt = MIMEText("attached: %s: %dx%d %s PNG image." %
                         (os.path.basename(output), pixels_per_line, lines, scan_mode))
                 else:
                     txt = MIMEText("attached: %dx%d %s PNG image." % (pixels_per_line, lines, scan_mode))
 
-                msg.attach(txt) 
+                msg.attach(txt)
 
                 fp = open(output, 'r')
                 img = MIMEImage(fp.read())
@@ -1279,7 +1282,7 @@ try:
                     log.error("Editor not found.")
 
         device.freeScan()
-        sane.deInit()    
+        sane.deInit()
 
 
 except KeyboardInterrupt:

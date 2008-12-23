@@ -222,14 +222,14 @@ class FaxSendJobForm(QMainWindow):
                               QMessageBox.NoButton,
                               QMessageBox.NoButton)
 
-    def WarningUI(self, msg):
+    def WarningUI(self, error_text):
         log.warn(unicode(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", " "))   
         QMessageBox.warning(self,
                              self.caption(),
-                             msg,
-                              QMessageBox.Ok,
-                              QMessageBox.NoButton,
-                              QMessageBox.NoButton)        
+                             error_text,
+                             QMessageBox.Ok,
+                             QMessageBox.NoButton,
+                             QMessageBox.NoButton)        
 
     def __tr(self,s,c = None):
         return qApp.translate("FaxSendJobForm", s, c)

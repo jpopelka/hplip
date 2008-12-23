@@ -46,7 +46,7 @@ class RangeValidator(QValidator):
                 return QValidator.Invalid, pos
 
         return QValidator.Acceptable, pos
-        
+
 
 
 class FileListViewItem(QListViewItem):
@@ -58,20 +58,18 @@ class FileListViewItem(QListViewItem):
 
 class ScrollPrintView(ScrollView):
     utils.mixin(JobStorageMixin)
-    
+
     def __init__(self, service, parent=None, form=None, name=None, fl=0):
         ScrollView.__init__(self, service, parent, name, fl)
-        
+
         self.initJobStorage()
-        
+
         self.form = form
         self.file_list = []
         self.pages_button_group = 0
         self.prev_selected_file_index = 0
-        
-        self.allowable_mime_types = cups.getAllowableMIMETypes()
-        self.allowable_mime_types.append("application/x-python")
 
+        self.allowable_mime_types = cups.getAllowableMIMETypes()
         log.debug(self.allowable_mime_types)
 
         self.MIME_TYPES_DESC = \
@@ -115,32 +113,32 @@ class ScrollPrintView(ScrollView):
             self.addCopies()
             self.addPageRange()
             self.addPageSet()
-            
+
             self.job_storage_avail = self.cur_device.mq['job-storage'] == JOB_STORAGE_ENABLE
-            
+
             if self.job_storage_avail:
                 self.addGroupHeading("jobstorage", self.__tr("Job Storage and Secure Printing"))
                 self.addJobStorage()
-            
+
             self.addGroupHeading("space1", "")
-    
-            self.printButton = self.addActionButton("bottom_nav", self.__tr("Print File(s)"), 
-                                    self.printButton_clicked, 'print.png', 'print-disabled.png', 
+
+            self.printButton = self.addActionButton("bottom_nav", self.__tr("Print File(s)"),
+                                    self.printButton_clicked, 'print.png', 'print.png',
                                     self.__tr("Close"), self.funcButton_clicked)
-    
+
             self.printButton.setEnabled(False)
             self.maximizeControl()
-        
+
         else:
             QApplication.restoreOverrideCursor()
             self.form.FailureUI("<b>Print is disabled.</b><p>No CUPS print queue found for this device.")
             self.funcButton_clicked()
-            
-        
+
+
     def onUpdate(self, cur_device=None):
         log.debug("ScrollPrintView.onUpdate()")
         self.updateFileList()
-        
+
     def onDeviceChange(self, cur_device=None):
         self.file_list = []
         ScrollView.onDeviceChange(self, cur_device)
@@ -149,27 +147,27 @@ class ScrollPrintView(ScrollView):
         widget = self.getWidget()
         layout37 = QGridLayout(widget,1,1,5,10,"layout37")
 
-        self.addFilePushButton = PixmapLabelButton(widget, 
-            "list_add.png", "list_add-disabled.png")
+        self.addFilePushButton = PixmapLabelButton(widget,
+            "list_add.png", "list_add.png")
 
         layout37.addWidget(self.addFilePushButton,2,0)
 
-        self.removeFilePushButton = PixmapLabelButton(widget, 
-            "list_remove.png", "list_remove-disabled.png")
+        self.removeFilePushButton = PixmapLabelButton(widget,
+            "list_remove.png", "list_remove.png")
 
         layout37.addWidget(self.removeFilePushButton,2,1)
 
-        self.moveFileUpPushButton = PixmapLabelButton(widget, "up.png", 
-            "up-disabled.png", name='moveFileUpPushButton')
+        self.moveFileUpPushButton = PixmapLabelButton(widget, "up.png",
+            "up.png", name='moveFileUpPushButton')
 
         layout37.addWidget(self.moveFileUpPushButton,2,2)
 
-        self.moveFileDownPushButton = PixmapLabelButton(widget, "down.png", 
-            "down-disabled.png", name='moveFileDownPushButton')
+        self.moveFileDownPushButton = PixmapLabelButton(widget, "down.png",
+            "down.png", name='moveFileDownPushButton')
 
         layout37.addWidget(self.moveFileDownPushButton,2,3)
 
-        self.showTypesPushButton = PixmapLabelButton(widget, "mimetypes.png", 
+        self.showTypesPushButton = PixmapLabelButton(widget, "mimetypes.png",
             None, name='addFilePushButton')
 
         layout37.addWidget(self.showTypesPushButton,2,5)
@@ -209,7 +207,7 @@ class ScrollPrintView(ScrollView):
 
         self.connect(self.moveFileUpPushButton, SIGNAL("clicked()"), self.moveFileUp_clicked)
         self.connect(self.moveFileDownPushButton, SIGNAL("clicked()"), self.moveFileDown_clicked)
-        self.connect(self.fileListView, SIGNAL("selectionChanged(QListViewItem*)"), 
+        self.connect(self.fileListView, SIGNAL("selectionChanged(QListViewItem*)"),
             self.fileListView_selectionChanged)
 
         self.addWidget(widget, "file_list", maximize=True)
@@ -228,7 +226,7 @@ class ScrollPrintView(ScrollView):
                 last_item = last_item.nextSibling()
 
             self.moveFileDownPushButton.setEnabled(file_count > 1 and selected_item is not last_item)
-            self.moveFileUpPushButton.setEnabled(file_count > 1 and selected_item is not flv.firstChild())        
+            self.moveFileUpPushButton.setEnabled(file_count > 1 and selected_item is not flv.firstChild())
 
     def fileListView_rightButtonClicked(self, item, pos, col):
         popup = QPopupMenu(self)
@@ -238,16 +236,16 @@ class ScrollPrintView(ScrollView):
         if item is not None:
             popup.insertItem(QIconSet(load_pixmap('list_remove', '16x16')),
                 self.__tr("Remove File"), self.removeFile_clicked)
-                
+
             if self.fileListView.childCount() > 1:
                 last_item = self.fileListView.firstChild()
                 while last_item is not None and last_item.nextSibling():
                     last_item = last_item.nextSibling()
-                    
+
                 if item is not self.fileListView.firstChild():
                     popup.insertItem(QIconSet(load_pixmap('up', '16x16')),
                         self.__tr("Move Up"), self.moveFileUp_clicked)
-    
+
                 if item is not last_item:
                     popup.insertItem(QIconSet(load_pixmap('down', '16x16')),
                         self.__tr("Move Down"), self.moveFileDown_clicked)
@@ -281,7 +279,7 @@ class ScrollPrintView(ScrollView):
             return
         else:
             new_pos = index+1
-            self.file_list[index], self.file_list[new_pos] = self.file_list[new_pos], self.file_list[index] 
+            self.file_list[index], self.file_list[new_pos] = self.file_list[new_pos], self.file_list[index]
             item.index = new_pos
             self.prev_selected_file_index = new_pos
             self.updateFileList()
@@ -316,12 +314,12 @@ class ScrollPrintView(ScrollView):
         for path, mime_type, desc in temp:
             log.debug("path=%s, mime_type=%s, desc=%s, index=%d" % (path, mime_type, desc, index))
             i = FileListViewItem(self.fileListView, index, os.path.basename(path), desc, path)
-            
+
             if self.prev_selected_file_index == index:
                 self.fileListView.setSelected(i, True)
                 self.prev_selected_file_index = index
                 selected_item = i
-                
+
             index -= 1
 
         last_item = self.fileListView.firstChild()
@@ -552,11 +550,11 @@ class ScrollPrintView(ScrollView):
 
     def pageSetComboBox_activated(self, i):
         self.pagesetDefaultPushButton.setEnabled(i != 0)
-        
-##    # 
+
+##    #
 ##    # JOB STORAGE
 ##    #
-##    
+##
 ##    def addJobStorage(self):
 ##        self.addJobStorageMode()
 ##        self.addJobStoragePIN()
@@ -564,8 +562,8 @@ class ScrollPrintView(ScrollView):
 ##        self.addJobStorageID()
 ##        self.addJobStorageIDExists()
 ##        self.jobStorageDisable()
-##        
-##        
+##
+##
 ##    def addJobStorageMode(self):
 ##        widget = self.getWidget()
 ##
@@ -589,7 +587,7 @@ class ScrollPrintView(ScrollView):
 ##        self.jobStorageModeComboBox.insertItem(self.__tr("Personal/Private Job"))
 ##        self.jobStorageModeComboBox.insertItem(self.__tr("Quick Copy"))
 ##        self.jobStorageModeComboBox.insertItem(self.__tr("Stored Job"))
-##        
+##
 ##        self.jobStorageModeDefaultPushButton.setText(self.__tr("Default"))
 ##        self.jobStorageModeDefaultPushButton.setEnabled(False)
 ##
@@ -597,13 +595,13 @@ class ScrollPrintView(ScrollView):
 ##        self.connect(self.jobStorageModeDefaultPushButton, SIGNAL("clicked()"), self.jobStorageModeDefaultPushButton_clicked)
 ##
 ##        self.addWidget(widget, "job_storage_mode")
-##        
+##
 ##    def jobStorageModeComboBox_activated(self, a):
 ##        self.job_storage_mode = a
-##        
+##
 ##        if a == 0: # Off
 ##            self.jobStorageDisable()
-##        
+##
 ##        elif a == 1: # Proof and Hold
 ##            self.jobStorageModeDefaultPushButton.setEnabled(True)
 ##            self.jobStorageUserJobEnable(True)
@@ -613,52 +611,52 @@ class ScrollPrintView(ScrollView):
 ##            self.jobStorageModeDefaultPushButton.setEnabled(True)
 ##            self.jobStoragePINEnable(True)
 ##            self.jobStorageUserJobEnable(True)
-##        
+##
 ##        elif a == 3: # Quick Copy
 ##            self.jobStorageModeDefaultPushButton.setEnabled(True)
 ##            self.jobStoragePINEnable(False)
 ##            self.jobStorageUserJobEnable(True)
-##        
+##
 ##        elif a == 4: # Stored Job
 ##            self.jobStorageModeDefaultPushButton.setEnabled(True)
 ##            self.jobStoragePINEnable(True) # ???
 ##            self.jobStorageUserJobEnable(True)
-##        
+##
 ##    def jobStorageModeDefaultPushButton_clicked(self):
 ##        self.jobStorageModeComboBox.setCurrentItem(0)
 ##        self.job_storage_mode = 0
-##    
+##
 ##    def jobStorageDisable(self): # Turn all Off
 ##        self.jobStorageModeDefaultPushButton.setEnabled(False)
 ##        self.jobStoragePINEnable(False)
 ##        self.jobStorageUserJobEnable(False)
-##        
+##
 ##    def jobStoragePINEnable(self, e=True): # PIN On/Off
 ##        t = e and self.jobStoragePINButtonGroup.selectedId() == 1
 ##        self.jobStoragePINButtonGroup.setEnabled(e)
 ##        self.jobStoragePINEdit.setEnabled(t)
 ##        self.jobStoragePINDefaultPushButton.setEnabled(t)
-##        
+##
 ##    def jobStorageUserJobEnable(self, e=True): # Username/Job ID/Job ID Exists On/Off
 ##        t = e and self.jobStorageUsernameButtonGroup.selectedId() == 1
 ##        self.jobStorageUsernameButtonGroup.setEnabled(e)
 ##        self.jobStorageUsernameDefaultPushButton.setEnabled(t)
 ##        self.jobStorageUsernameEdit.setEnabled(t)
-##            
+##
 ##        t = e and self.jobStorageIDButtonGroup.selectedId() == 1
 ##        self.jobStorageIDButtonGroup.setEnabled(e)
 ##        self.jobStorageIDDefaultPushButton.setEnabled(t)
 ##        self.jobStorageIDEdit.setEnabled(t)
-##        
+##
 ##        t = e and self.jobStorageIDExistsComboBox.currentItem() == 1
 ##        self.jobStorageIDExistsComboBox.setEnabled(e)
 ##        self.jobStorageIDExistsDefaultPushButton.setEnabled(t)
-##        
-##    
-##        
+##
+##
+##
 ##    # PIN
-##    
-##        
+##
+##
 ##    def addJobStoragePIN(self):
 ##        widget = self.getWidget()
 ##
@@ -714,33 +712,33 @@ class ScrollPrintView(ScrollView):
 ##        self.connect(self.jobStoragePINDefaultPushButton, SIGNAL("clicked()"), self.jobStoragePINDefaultPushButton_clicked)
 ##
 ##        self.addWidget(widget, "job_storage_pin")
-##        
+##
 ##    def jobStoragePINButtonGroup_clicked(self, a):
 ##        if a == 0: # Public/Off
 ##            self.jobStoragePINDefaultPushButton.setEnabled(False)
 ##            self.jobStoragePINEdit.setEnabled(False)
 ##            self.job_storage_use_pin = False
 ##            self.job_storage_pin = u"0000"
-##            
+##
 ##        else: # On/Private/Use PIN
 ##            self.jobStoragePINDefaultPushButton.setEnabled(True)
 ##            self.jobStoragePINEdit.setEnabled(True)
 ##            self.job_storage_use_pin = True
 ##            self.job_storage_pin = unicode(self.jobStoragePINEdit.text())
-##        
+##
 ##    def jobStoragePINEdit_lostFocus(self):
 ##        pafss
-##        
+##
 ##    def jobStoragePINEdit_textChanged(self, a):
 ##        self.job_storage_pin = unicode(a)
-##        
+##
 ##    def jobStoragePINDefaultPushButton_clicked(self):
 ##        self.jobStoragePINButtonGroup.setButton(0)
 ##        self.jobStoragePINDefaultPushButton.setEnabled(False)
 ##        self.jobStoragePINEdit.setEnabled(False)
 ##        self.job_storage_use_pin = False
 ##
-##    # Username    
+##    # Username
 ##
 ##    def addJobStorageUsername(self):
 ##        widget = self.getWidget()
@@ -751,7 +749,7 @@ class ScrollPrintView(ScrollView):
 ##        self.jobStorageUsernameEdit.setMaxLength(16)
 ##        self.jobStorageUsernameEdit.setText(self.job_storage_username)
 ##        layout39.addWidget(self.jobStorageUsernameEdit,0,3)
-##        
+##
 ##        spacer20_2 = QSpacerItem(20,20,QSizePolicy.Expanding,QSizePolicy.Minimum)
 ##        layout39.addItem(spacer20_2,0,1)
 ##
@@ -797,26 +795,26 @@ class ScrollPrintView(ScrollView):
 ##        self.connect(self.jobStorageUsernameDefaultPushButton, SIGNAL("clicked()"), self.jobStorageUsernameDefaultPushButton_clicked)
 ##
 ##        self.addWidget(widget, "job_storage_username")
-##        
+##
 ##    def jobStorageUsernameButtonGroup_clicked(self, a):
 ##        if a == 0: # Automatic
 ##            self.jobStorageUsernameDefaultPushButton.setEnabled(False)
 ##            self.jobStorageUsernameEdit.setEnabled(False)
 ##            self.job_storage_auto_username = True
 ##            self.job_storage_username = unicode(prop.username[:16])
-##        
+##
 ##        else: # Custom
 ##            self.jobStorageUsernameDefaultPushButton.setEnabled(True)
 ##            self.jobStorageUsernameEdit.setEnabled(True)
 ##            self.job_storage_auto_username = False
 ##            self.job_storage_username = unicode(self.jobStorageUsernameEdit.text())
-##            
+##
 ##    def jobStorageUsernameEdit_lostFocus(saddJobStorageIDelf):
 ##        pass
-##        
+##
 ##    def jobStorageUsernameEdit_textChanged(self, a):
 ##        self.job_storage_username = unicode(a)
-##        
+##
 ##    def jobStorageUsernameDefaultPushButton_clicked(self):
 ##        self.jobStorageUsernameButtonGroup.setButton(0)
 ##        self.jobStorageUsernameDefaultPushButton.setEnabled(False)
@@ -824,7 +822,7 @@ class ScrollPrintView(ScrollView):
 ##        self.job_storage_auto_username = True
 ##        self.job_storage_username = unicode(prop.username[:16])
 ##
-##    # Job ID    
+##    # Job ID
 ##
 ##    def addJobStorageID(self):
 ##        widget = self.getWidget()
@@ -881,26 +879,26 @@ class ScrollPrintView(ScrollView):
 ##        self.connect(self.jobStorageIDDefaultPushButton, SIGNAL("clicked()"), self.jobStorageIDDefaultPushButton_clicked)
 ##
 ##        self.addWidget(widget, "job_storage_ID")
-##        
+##
 ##    def jobStorageIDButtonGroup_clicked(self, a):
 ##        if a == 0: # Automatic
 ##            self.jobStorageIDDefaultPushButton.setEnabled(False)
 ##            self.jobStorageIDEdit.setEnabled(False)
 ##            self.job_storage_auto_jobname = True
 ##            self.job_storage_jobname = unicode(time.strftime("%a, %d %b %Y %H:%M:%S"))
-##            
+##
 ##        else: # Custom
 ##            self.jobStorageIDDefaultPushButton.setEnabled(True)
 ##            self.jobStorageIDEdit.setEnabled(True)
 ##            self.job_storage_auto_jobname = False
 ##            self.job_storage_jobname = unicode(self.jobStorageIDEdit.text())
-##        
+##
 ##    def jobStorageIDEdit_lostFocus(self):
 ##        pass
-##        
+##
 ##    def jobStorageIDEdit_textChanged(self, a):
 ##        self.job_storage_jobname = unicode(a)
-##                
+##
 ##    def jobStorageIDDefaultPushButton_clicked(self):
 ##        self.jobStorageIDButtonGroup.setButton(0)
 ##        self.jobStorageIDDefaultPushButton.setEnabled(False)
@@ -930,27 +928,27 @@ class ScrollPrintView(ScrollView):
 ##        self.jobStorageIDExistsComboBox.clear()
 ##        self.jobStorageIDExistsComboBox.insertItem(self.__tr("Replace existing job"))
 ##        self.jobStorageIDExistsComboBox.insertItem(self.__tr("Use Job Name + (1-99)"))
-##        
+##
 ##        self.jobStorageIDExistsDefaultPushButton.setText(self.__tr("Default"))
 ##
 ##        self.connect(self.jobStorageIDExistsComboBox, SIGNAL("activated(int)"), self.jobStorageIDExistsComboBox_activated)
 ##        self.connect(self.jobStorageIDExistsDefaultPushButton, SIGNAL("clicked()"), self.jobStorageIDExistsDefaultPushButton_clicked)
 ##
 ##        self.addWidget(widget, "job_storage_id_exists")
-##        
+##
 ##    def jobStorageIDExistsComboBox_activated(self, a):
 ##        self.jobStorageIDExistsDefaultPushButton.setEnabled(a==1)
 ##        self.job_storage_job_exist = a
-##        
+##
 ##    def jobStorageIDExistsDefaultPushButton_clicked(self):
 ##        self.jobStorageIDExistsComboBox.setCurrentItem(0)
 ##        self.jobStorageIDExistsDefaultPushButton.setEnabled(False)
 ##        self.job_storage_job_exist = 0
 ##
-##        
+##
 ##    #
-##    #    
-##    #    
+##    #
+##    #
 
     def printButton_clicked(self):
         if self.invalid_page_range:
@@ -969,14 +967,14 @@ class ScrollPrintView(ScrollView):
                 for p in printers:
                     if p.name == self.cur_printer:
                         break
-                
+
                 if p.state == cups.IPP_PRINTER_STATE_STOPPED:
                     self.form.FailureUI(self.__tr("<b>Cannot print: Printer is stopped.</b><p>Please START the printer to continue this print. Job will begin printing once printer is started."))
 
                 if not p.accepting:
                     self.form.FailureUI(self.__tr("<b>Cannot print: Printer is not accepting jobs.</b><p>Please set the printer to ACCEPTING JOBS to continue printing."))
                     return
-                
+
                 copies = int(self.copiesSpinBox.value())
                 all_pages = self.pages_button_group == 0
                 page_range = unicode(self.pageRangeEdit.text())
@@ -988,6 +986,7 @@ class ScrollPrintView(ScrollView):
                 cups.closePPD()
 
                 nup = int(current_options.get("number-up", 1))
+                log.debug("number-up = %d" % nup)
 
                 for p, t, d in self.file_list:
 
@@ -1021,7 +1020,7 @@ class ScrollPrintView(ScrollView):
                         else:
                             cmd = ' '.join([cmd, '-o page-set=odd'])
 
-                    
+
                     # Job Storage
                     # self.job_storage_mode = (0=Off, 1=P&H, 2=PJ, 3=QC, 4=SJ)
                     # self.job_storage_pin = u"" (dddd)
@@ -1031,13 +1030,13 @@ class ScrollPrintView(ScrollView):
                     # self.job_storage_jobname = u""
                     # self.job_storage_auto_jobname = True|False
                     # self.job_storage_job_exist = (0=replace, 1=job name+(1-99))
-                    
-                    if self.job_storage_avail: 
+
+                    if self.job_storage_avail:
                         if self.job_storage_mode: # On
-                            
+
                             if self.job_storage_mode == 1: # Proof and Hold
                                 cmd = ' '.join([cmd, '-o HOLD=PROOF'])
-                                
+
                             elif self.job_storage_mode == 2: # Private Job
                                 if self.job_storage_use_pin:
                                     cmd = ' '.join([cmd, '-o HOLD=ON'])
@@ -1046,7 +1045,7 @@ class ScrollPrintView(ScrollView):
                                 else:
                                     cmd = ' '.join([cmd, '-o HOLD=PROOF'])
                                     cmd = ' '.join([cmd, '-o HOLDTYPE=PRIVATE'])
-                                
+
                             elif self.job_storage_mode == 3: # Quick Copy
                                 cmd = ' '.join([cmd, '-o HOLD=ON'])
                                 cmd = ' '.join([cmd, '-o HOLDTYPE=PUBLIC'])
@@ -1058,22 +1057,22 @@ class ScrollPrintView(ScrollView):
                                     cmd = ' '.join([cmd, '-o HOLDKEY=%s' % self.job_storage_pin.encode('ascii')])
                                 else:
                                     cmd = ' '.join([cmd, '-o HOLD=STORE'])
-                                
+
                             cmd = ' '.join([cmd, '-o USERNAME=%s' % self.job_storage_username.encode('ascii')\
                                 .replace(" ", "_")])
-                            
+
                             cmd = ' '.join([cmd, '-o JOBNAME=%s' % self.job_storage_jobname.encode('ascii')\
                                 .replace(" ", "_")])
-                            
+
                             if self.job_storage_job_exist == 1:
-                                cmd = ' '.join([cmd, '-o DUPLICATEJOB=APPEND']) 
+                                cmd = ' '.join([cmd, '-o DUPLICATEJOB=APPEND'])
                             else:
                                 cmd = ' '.join([cmd, '-o DUPLICATEJOB=REPLACE'])
-                        
+
                         else: # Off
                             cmd = ' '.join([cmd, '-o HOLD=OFF'])
-                    
-                    
+
+
                     if not alt_nup:
                         cmd = ''.join([cmd, ' "', p, '"'])
 

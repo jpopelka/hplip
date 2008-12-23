@@ -285,15 +285,12 @@ def handle_fax_event(event, pipe_name):
                 log.error("Unable to find hp-sendfax on PATH.")
                 return
 
-            log.debug(path)
-
-            log.debug("Running hp-sendfax: hp-senfax --fax=%s" % event.printer_name)
-
+            log.debug("Running hp-sendfax: %s --printer=%s" % (path, event.printer_name))
             os.spawnlp(os.P_NOWAIT, path, 'hp-sendfax',
-                '--fax=%s' % event.printer_name)
+                '--printer=%s' % event.printer_name)
 
         else:
-            # hp-sendfax running
+            # cannot lock file - hp-sendfax is running
             # no need to do anything... hp-sendfax is polling
             log.debug("hp-sendfax is running. Waiting for CheckForWaitingFax() call.")
 
@@ -385,9 +382,13 @@ def handle_event(event, more_args=None):
                                       EVENT_END_COPY_JOB,
                                       EVENT_END_FAX_JOB,
                                       EVENT_END_PRINT_JOB,
+                                      EVENT_PRINT_FAILED_MISSING_PLUGIN,
                                       EVENT_SCANNER_FAIL,
+                                      EVENT_END_SCAN_JOB,
+                                      EVENT_SCAN_FAILED_MISSING_PLUGIN,
                                       EVENT_FAX_JOB_FAIL,
                                       EVENT_FAX_JOB_CANCELED,
+                                      EVENT_FAX_FAILED_MISSING_PLUGIN,
                                       EVENT_COPY_JOB_FAIL,
                                       EVENT_COPY_JOB_CANCELED):
                 pass # start polling if counter <= 0
@@ -424,7 +425,8 @@ def handle_event(event, more_args=None):
         send_event_to_hpdio(event)
 
     # Qt4 only
-    elif event.event_code in (EVENT_DEVICE_UPDATE_ACTIVE, EVENT_DEVICE_UPDATE_INACTIVE):
+    elif event.event_code in (EVENT_DEVICE_UPDATE_ACTIVE, 
+                              EVENT_DEVICE_UPDATE_INACTIVE):
         send_event_to_systray_ui(event)
 
     # Qt4 only
@@ -438,6 +440,10 @@ def handle_event(event, more_args=None):
         send_toolbox_event(event)
         log.debug("Exiting")
         main_loop.quit()
+        
+    elif event.event_code in (EVENT_DEVICE_START_POLLING,
+                              EVENT_DEVICE_STOP_POLLING):
+        pass
 
     else:
         log.error("Unhandled event: %d" % event.event_code)

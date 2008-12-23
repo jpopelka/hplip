@@ -151,46 +151,46 @@
 :model "HP PSC 500xi"
 :status :good
 
-:model "HP Officejet series 500"
+:model "HP Officejet Series 500"
 :status :good
 
-:model "HP Officejet series 520"
+:model "HP Officejet Series 520"
 :status :good
 
-:model "HP Officejet series 570"
+:model "HP Officejet Series 570"
 :status :good
 
-:model "HP Officejet series 580"
+:model "HP Officejet Series 580"
 :status :good
 
-:model "HP Officejet series 590"
+:model "HP Officejet Series 590"
 :status :good
 
-:model "HP Officejet series 600"
+:model "HP Officejet Series 600"
 :status :good
 
-:model "HP Officejet series 610"
+:model "HP Officejet Series 610"
 :status :good
 
-:model "HP Officejet series 630"
+:model "HP Officejet Series 630"
 :status :good
 
-:model "HP Officejet series 635"
+:model "HP Officejet Series 635"
 :status :good
 
-:model "HP Officejet series 700"
+:model "HP Officejet Series 700"
 :status :good
 
-:model "HP Officejet series 710"
+:model "HP Officejet Series 710"
 :status :good
 
-:model "HP Officejet series 720"
+:model "HP Officejet Series 720"
 :status :good
 
 :model "HP PSC 720"
 :status :good
 
-:model "HP Officejet series 725"
+:model "HP Officejet Series 725"
 :status :good
 
 :model "HP Deskjet f735 All-in-one"
@@ -254,6 +254,9 @@
 :status :good
 
 :model "HP PSC 1118"
+:status :good
+
+:model "HP LaserJet m1120n MFP"
 :status :good
 
 :model "HP LaserJet m1120 MFP"
@@ -547,7 +550,7 @@
 :model "HP Deskjet f2290 All-in-one"
 :status :good
 
-:model "HP PSC 2300 series"
+:model "HP PSC 2300 Series"
 :status :good
 
 :model "HP Color LaserJet cm2320 MFP"
@@ -754,10 +757,10 @@
 :model "HP LaserJet 3200se"
 :status :good
 
-:model "HP LaserJet 3200m"
+:model "HP LaserJet 3200"
 :status :good
 
-:model "HP LaserJet 3200"
+:model "HP LaserJet 3200m"
 :status :good
 
 :model "HP Photosmart 3207"
@@ -826,7 +829,7 @@
 :model "HP LaserJet 3392"
 :status :good
 
-:model "HP Officejet j3500 series"
+:model "HP Officejet j3500 Series"
 :status :good
 
 :model "HP Officejet j3608 All-in-one"
@@ -847,10 +850,10 @@
 :model "HP Officejet j3680 All-in-one"
 :status :good
 
-:model "HP LaserJet 4100mfp"
+:model "HP Officejet 4100 Series"
 :status :good
 
-:model "HP Officejet 4100 series"
+:model "HP LaserJet 4100mfp"
 :status :good
 
 :model "HP LaserJet 4101mfp"
@@ -871,7 +874,7 @@
 :model "HP Officejet 4110v All-in-one"
 :status :good
 
-:model "HP Officejet 4115 series"
+:model "HP Officejet 4115 Series"
 :status :good
 
 :model "HP Deskjet f4135 All-in-one"
@@ -1783,10 +1786,10 @@
 :model "HP LaserJet 9040dn"
 :status :good
 
-:model "HP LaserJet 9040mfp"
+:model "HP LaserJet 9040d"
 :status :good
 
-:model "HP LaserJet 9040d"
+:model "HP LaserJet 9040mfp"
 :status :good
 
 :model "HP LaserJet 9050mfp"

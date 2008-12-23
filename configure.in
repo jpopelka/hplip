@@ -26,7 +26,7 @@
 #   104 = no libdl
 
 AC_PREREQ(2.59)
-AC_INIT([HP Linux Imaging and Printing], [2.8.10], [2.8.10.33], [hplip])
+AC_INIT([HP Linux Imaging and Printing], [2.8.12], [2.8.12.26], [hplip])
 AM_INIT_AUTOMAKE([1.9 foreign])
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
@@ -282,10 +282,17 @@ else
 fi
 AM_CONDITIONAL(QT3_INSTALL, test x$qt3 = xyes)
 
+if test "$gui_build" = "no"; then
+   qt3=no
+   qt4=no
+fi
+
 if test "$qt3" = "yes" && test "$qt4" = "no"; then
    ui_toolkit=qt3
 elif test "$qt4" = "yes"; then
    ui_toolkit=qt4
+else
+   ui_toolkit=no
 fi
 
 AC_MSG_CHECKING(for restricted build)
@@ -344,7 +351,7 @@ fi
 
 if test "$hpijs_only_build" = "no" && test "$dbus_build" = "yes"; then
 #   PKG_CHECK_MODULES(DBUS, [dbus-1 >= 1.0.0, dbus-glib-1 >= 0.61],,[AC_MSG_ERROR([cannot find dbus-devel support: $DBUS_PKG_ERRORS], 14)])
-   PKG_CHECK_MODULES(DBUS, [dbus-1 >= 1.0.0],,[AC_MSG_ERROR([cannot find dbus-devel support: $DBUS_PKG_ERRORS], 14)])
+   PKG_CHECK_MODULES([DBUS], [dbus-1 >= 1.0.0],,[AC_MSG_ERROR([cannot find dbus-devel support: $DBUS_PKG_ERRORS], 14)])
    AC_CHECK_LIB([dbus-1], [dbus_connection_open], [LIBS="$LIBS"], [AC_MSG_ERROR([cannot find libdbus support], 13)])
 fi
 
@@ -412,6 +419,8 @@ AC_SUBST(hpaio_version)
 AC_SUBST(bb_build)
 AC_SUBST(ui_toolkit)
 AC_SUBST(platform)
+AC_SUBST(qt3)
+AC_SUBST(qt4)
 
 AC_CONFIG_FILES(Makefile hplip.conf hplip.desktop hplip-systray.desktop prnt/drv/hpijs.drv hplip.list)
 AC_OUTPUT

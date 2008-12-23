@@ -163,10 +163,14 @@ if mode == GUI_MODE:
     if ui_toolkit == 'qt3':
         app = None
         makecopiesdlg = None
-
-        from qt import *
-        from ui.makecopiesform import MakeCopiesForm
-
+        
+        try:
+            from qt import *
+            from ui.makecopiesform import MakeCopiesForm
+        except ImportError:
+            log.error("Unable to load Qt3 support. Is it installed?")
+            sys.exit(1) 
+            
         # create the main application object
         app = QApplication(sys.argv)
 

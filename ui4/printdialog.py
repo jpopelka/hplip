@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-#  
+#
 # Authors: Don Welch
 #
 
@@ -45,20 +45,20 @@ class PrintDialog(QDialog, Ui_Dialog):
     def __init__(self, parent, printer_name, args=None):
         QDialog.__init__(self, parent)
         self.setupUi(self)
-        
+
         self.printer_name = printer_name
-        
+
         # User settings
         self.user_settings = UserSettings()
         self.user_settings.load()
         self.user_settings.debug()
 
         self.initUi()
-        
+
         self.file_list = []
         if args is not None:
             for a in args:
-                self.Files.addFile(os.path.abspath(a))
+                self.Files.addFileFromUI(os.path.abspath(a))
 
         self.devices = {}
 
@@ -68,7 +68,7 @@ class PrintDialog(QDialog, Ui_Dialog):
 
     def initUi(self):
         self.OptionsToolBox.include_job_options = True
-        
+
         # connect signals/slots
         self.connect(self.CancelButton, SIGNAL("clicked()"), self.CancelButton_clicked)
         self.connect(self.BackButton, SIGNAL("clicked()"), self.BackButton_clicked)
@@ -76,17 +76,17 @@ class PrintDialog(QDialog, Ui_Dialog):
 
         self.initFilePage()
         self.initOptionsPage()
-        
+
         # Application icon
         self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
-        
+
         if self.printer_name:
             self.PrinterName.setInitialPrinter(self.printer_name)
-        
+
         self.StackedWidget.setCurrentIndex(0)
 
 
-    # 
+    #
     # File Page
     #
 
@@ -98,12 +98,11 @@ class PrintDialog(QDialog, Ui_Dialog):
 
 
     def updateFilePage(self):
-        self.Files.updateUi()
         self.NextButton.setText(self.__tr("Next >"))
         self.NextButton.setEnabled(self.Files.isNotEmpty())
         self.BackButton.setEnabled(False)
         self.updateStepText(PAGE_FILE)
-
+        self.Files.updateUi()
 
     def Files_isEmpty(self):
         self.NextButton.setEnabled(False)
@@ -121,10 +120,10 @@ class PrintDialog(QDialog, Ui_Dialog):
         self.BackButton.setEnabled(True)
         self.PrinterName.setType(PRINTERNAMECOMBOBOX_TYPE_PRINTER_ONLY)
 
-        self.connect(self.PrinterName, SIGNAL("PrinterNameComboBox_currentChanged"), 
+        self.connect(self.PrinterName, SIGNAL("PrinterNameComboBox_currentChanged"),
             self.PrinterNameComboBox_currentChanged)
 
-        self.connect(self.PrinterName, SIGNAL("PrinterNameComboBox_noPrinters"), 
+        self.connect(self.PrinterName, SIGNAL("PrinterNameComboBox_noPrinters"),
             self.PrinterNameComboBox_noPrinters)
 
 
@@ -134,12 +133,12 @@ class PrintDialog(QDialog, Ui_Dialog):
             self.PrinterName.updateUi()
             self.BackButton.setEnabled(True)
             num_files = len(self.Files.file_list)
-            
+
             if  num_files > 1:
                 self.NextButton.setText(self.__tr("Print %1 Files").arg(num_files))
             else:
                 self.NextButton.setText(self.__tr("Print File"))
-            
+
             self.updateStepText(PAGE_OPTIONS)
             # TODO: Enable print button only if printer is accepting and all options are OK (esp. page range)
         finally:
@@ -170,12 +169,12 @@ class PrintDialog(QDialog, Ui_Dialog):
             status, output = utils.run(cmd, log_output=True, password_func=None, timeout=1)
             if status != 0:
                 FailureUI(self, self.__tr("<b>Print command failed with status code %1.</b><p>%2</p>").arg(status).arg(cmd))
-           
+
         self.close()
         #print file('/home/dwelch/.cups/lpoptions', 'r').read()
-        
+
     #
-    # Misc    
+    # Misc
     #
 
     def CancelButton_clicked(self):
@@ -205,7 +204,7 @@ class PrintDialog(QDialog, Ui_Dialog):
     def updateStepText(self, p):
         self.StepText.setText(self.__tr("Step %1 of %2").arg(p+1).arg(PAGE_MAX+1))
 
-    
+
     def __tr(self,s,c = None):
         return qApp.translate("PrintDialog",s,c)
 
@@ -229,14 +228,14 @@ class PrintDialog(QDialog, Ui_Dialog):
                 for p in printers:
                     if p.name == self.cur_printer:
                         break
-                
+
                 if p.state == cups.IPP_PRINTER_STATE_STOPPED:
                     self.form.FailureUI(self.__tr("<b>Cannot print: Printer is stopped.</b><p>Please START the printer to continue this print. Job will begin printing once printer is started."))
 
                 if not p.accepting:
                     self.form.FailureUI(self.__tr("<b>Cannot print: Printer is not accepting jobs.</b><p>Please set the printer to ACCEPTING JOBS to continue printing."))
                     return
-                
+
                 copies = int(self.copiesSpinBox.value())
                 all_pages = self.pages_button_group == 0
                 page_range = unicode(self.pageRangeEdit.text())
@@ -281,7 +280,7 @@ class PrintDialog(QDialog, Ui_Dialog):
                         else:
                             cmd = ' '.join([cmd, '-o page-set=odd'])
 
-                    
+
                     # Job Storage
                     # self.job_storage_mode = (0=Off, 1=P&H, 2=PJ, 3=QC, 4=SJ)
                     # self.job_storage_pin = u"" (dddd)
@@ -291,13 +290,13 @@ class PrintDialog(QDialog, Ui_Dialog):
                     # self.job_storage_jobname = u""
                     # self.job_storage_auto_jobname = True|False
                     # self.job_storage_job_exist = (0=replace, 1=job name+(1-99))
-                    
-                    if self.job_storage_avail: 
+
+                    if self.job_storage_avail:
                         if self.job_storage_mode: # On
-                            
+
                             if self.job_storage_mode == 1: # Proof and Hold
                                 cmd = ' '.join([cmd, '-o HOLD=PROOF'])
-                                
+
                             elif self.job_storage_mode == 2: # Private Job
                                 if self.job_storage_use_pin:
                                     cmd = ' '.join([cmd, '-o HOLD=ON'])
@@ -306,7 +305,7 @@ class PrintDialog(QDialog, Ui_Dialog):
                                 else:
                                     cmd = ' '.join([cmd, '-o HOLD=PROOF'])
                                     cmd = ' '.join([cmd, '-o HOLDTYPE=PRIVATE'])
-                                
+
                             elif self.job_storage_mode == 3: # Quick Copy
                                 cmd = ' '.join([cmd, '-o HOLD=ON'])
                                 cmd = ' '.join([cmd, '-o HOLDTYPE=PUBLIC'])
@@ -318,22 +317,22 @@ class PrintDialog(QDialog, Ui_Dialog):
                                     cmd = ' '.join([cmd, '-o HOLDKEY=%s' % self.job_storage_pin.encode('ascii')])
                                 else:
                                     cmd = ' '.join([cmd, '-o HOLD=STORE'])
-                                
+
                             cmd = ' '.join([cmd, '-o USERNAME=%s' % self.job_storage_username.encode('ascii')\
                                 .replace(" ", "_")])
-                            
+
                             cmd = ' '.join([cmd, '-o JOBNAME=%s' % self.job_storage_jobname.encode('ascii')\
                                 .replace(" ", "_")])
-                            
+
                             if self.job_storage_job_exist == 1:
-                                cmd = ' '.join([cmd, '-o DUPLICATEJOB=APPEND']) 
+                                cmd = ' '.join([cmd, '-o DUPLICATEJOB=APPEND'])
                             else:
                                 cmd = ' '.join([cmd, '-o DUPLICATEJOB=REPLACE'])
-                        
+
                         else: # Off
                             cmd = ' '.join([cmd, '-o HOLD=OFF'])
-                    
-                    
+
+
                     if not alt_nup:
                         cmd = ''.join([cmd, ' "', p, '"'])
 
@@ -348,5 +347,5 @@ class PrintDialog(QDialog, Ui_Dialog):
 
         finally:
             self.cur_device.close()
-            
+
 """

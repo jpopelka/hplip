@@ -127,13 +127,13 @@ LJZjs::LJZjs (SystemServices* pSS, int numfonts, BOOL proto)
         *(void **) (&HPLJSoInit) = dlsym (m_hHPLibHandle, "hp_init_lib");
         if (!HPLJSoInit || (HPLJSoInit && !HPLJSoInit (1)))
         {
-            constructor_error = UNSUPPORTED_PRINTER;
+            constructor_error = PLUGIN_LIBRARY_MISSING;
         }
     }
 #endif
     if (HPLJJBGCompress == NULL)
     {
-        constructor_error = UNSUPPORTED_PRINTER;
+        constructor_error = PLUGIN_LIBRARY_MISSING;
     }
 }
 

@@ -25,7 +25,7 @@
 __version__ = '9.0'
 __title__ = 'PC Sendfax Utility'
 __mod__ = 'hp-sendfax'
-__doc__ = "Allows for sending faxes from the PC using HPLIP supported multifunction printers." 
+__doc__ = "Allows for sending faxes from the PC using HPLIP supported multifunction printers."
 
 # Std Lib
 import sys
@@ -48,20 +48,20 @@ group_list = []
 prettyprint = False
 
 mod = module.Module(__mod__, __title__, __version__, __doc__, None,
-                    (GUI_MODE, NON_INTERACTIVE_MODE), 
+                    (GUI_MODE, NON_INTERACTIVE_MODE),
                     (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4))
-                    
+
 mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS | module.USAGE_FLAG_SUPRESS_G_DEBUG_FLAG,
     extra_options=[
     ("Specify the fax number(s):", "-f<number(s)> or --faxnum=<number(s)> or --fax-num=<number(s)>  or --num=<number(s)>(-n only)", "option", False),
-    ("Specify the recipient(s):", "-r<recipient(s)> or --recipient=<recipient(s)> (-n only)", "option", False), 
+    ("Specify the recipient(s):", "-r<recipient(s)> or --recipient=<recipient(s)> (-n only)", "option", False),
     ("Specify the groups(s):", "--group=<group(s)> or --groups=<group(s)> (-n only)", "option", False) ],
     see_also_list=['hp-faxsetup', 'hp-fab'])
 
 opts, device_uri, printer_name, mode, ui_toolkit, loc = \
     mod.parseStdOpts('f:r:g:',
                      ['faxnum=', 'fax-num=', 'recipient=', 'group=',
-                      'groups=', 'gg'], 
+                      'groups=', 'gg'],
                       supress_g_debug_flag=True)
 
 for o, a in opts:
@@ -88,8 +88,8 @@ for o, a in opts:
 if not prop.fax_build:
     log.error("Fax is disabled (turned off during build). Exiting")
     sys.exit(1)
-    
-printer_name, device_uri = mod.getPrinterName(printer_name, device_uri, 
+
+printer_name, device_uri = mod.getPrinterName(printer_name, device_uri,
     filter={'fax-type': (operator.gt, 0)}, back_end_filter=['hpfax'])
 
 #if printer_name is not None:
@@ -110,11 +110,14 @@ if mode == GUI_MODE:
     if ui_toolkit == 'qt3':
         app = None
         sendfax = None
-        from qt import *
-
-        # UI Forms
-        from ui.faxsendjobform import FaxSendJobForm
-
+        
+        try:
+            from qt import *
+            from ui.faxsendjobform import FaxSendJobForm
+        except ImportError:
+            log.error("Unable to load Qt3 support. Is it installed?")
+            sys.exit(1)  
+            
         # create the main application object
         app = QApplication(sys.argv)
 
@@ -161,7 +164,7 @@ if mode == GUI_MODE:
         if os.geteuid() == 0:
             log.error("You must not be root to run this utility.")
 
-            QMessageBox.critical(None, 
+            QMessageBox.critical(None,
                                  "HP Device Manager - Send Fax",
                                  "You must not be root to run hp-sendfax.",
                                   QMessageBox.Ok,
@@ -171,9 +174,9 @@ if mode == GUI_MODE:
             sys.exit(1)
 
         # TODO: Fix instance lock
-        sendfax = FaxSendJobForm(device_uri,  
-                                 printer_name, 
-                                 mod.args) 
+        sendfax = FaxSendJobForm(device_uri,
+                                 printer_name,
+                                 mod.args)
 
         app.setMainWidget(sendfax)
 
@@ -189,16 +192,18 @@ if mode == GUI_MODE:
             pass
 
     else: # qt4
-        try:
+        #try:
+        if 1:
             from PyQt4.QtGui import QApplication
             from ui4.sendfaxdialog import SendFaxDialog
-        except ImportError:
+        #except ImportError:
+        if 0:
             log.error("Unable to load Qt4 support. Is it installed?")
-            sys.exit(1)            
+            sys.exit(1)
 
         app = QApplication(sys.argv)
 
-        toolbox = SendFaxDialog(None, device_uri, mod.args) # TODO: Add instance lock in GUI code
+        toolbox = SendFaxDialog(None, printer_name, device_uri, mod.args)
         toolbox.show()
         try:
             log.debug("Starting GUI loop...")
@@ -224,7 +229,7 @@ else: # NON_INTERACTIVE_MODE
         except ImportError:
             # This can fail on Python < 2.3 due to the datetime module
             log.error("Fax address book disabled - Python 2.3+ required.")
-            sys.exit(1)    
+            sys.exit(1)
 
         db =  fax.FaxAddressBook() # FAB instance
 
@@ -235,7 +240,7 @@ else: # NON_INTERACTIVE_MODE
             sys.exit(1)
 
         dbus_avail, service, session_bus = device.init_dbus()
-        
+
         if not dbus_avail or service is None:
             log.error("Unable to initialize dBus. PC send fax requires dBus and hp-systray support. Exiting.")
             sys.exit(1)
@@ -296,8 +301,6 @@ else: # NON_INTERACTIVE_MODE
             mod.usage(error_msg=["No recipients specified. Please use -f, -r, and/or -g to specify recipients."])
 
         allowable_mime_types = cups.getAllowableMIMETypes()
-        allowable_mime_types.append("application/hplip-fax")
-        allowable_mime_types.append("application/x-python")
 
         for f in mod.args:
             path = os.path.realpath(f)
@@ -319,7 +322,7 @@ else: # NON_INTERACTIVE_MODE
         #ok, lock_file = utils.lock_app('%s-%s' % (__mod__, printer_name), True)
         mod.lockInstance(printer_name)
 
-        try:            
+        try:
             ppd_file = cups.getPPD(printer_name)
 
             if ppd_file is not None and os.path.exists(ppd_file):
@@ -357,7 +360,7 @@ else: # NON_INTERACTIVE_MODE
                     file_list.append((f, mime_type, "", "", pages))
 
                 else:
-                    all_pages = True 
+                    all_pages = True
                     page_range = ''
                     page_set = 0
                     nup = 1
@@ -398,7 +401,7 @@ else: # NON_INTERACTIVE_MODE
                     # Wait for fax to finish rendering
                     #
 
-                    end_time = time.time() + 120.0 
+                    end_time = time.time() + 120.0
                     while time.time() < end_time:
                         log.debug("Waiting for fax...")
                         try:
@@ -484,7 +487,7 @@ else: # NON_INTERACTIVE_MODE
 
                 log.info("\nSending fax...")
 
-                if not dev.sendFaxes(phone_num_list, file_list, "", 
+                if not dev.sendFaxes(phone_num_list, file_list, "",
                                      "", None, False, printer_name,
                                      update_queue, event_queue):
 
@@ -553,9 +556,9 @@ else: # NON_INTERACTIVE_MODE
 
         finally:
             mod.unlockInstance()
-        
+
     except KeyboardInterrupt:
-        log.error("User exit")    
-    
+        log.error("User exit")
+
 log.info("")
 log.info("Done.")

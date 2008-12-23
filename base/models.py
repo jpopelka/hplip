@@ -19,12 +19,22 @@
 #
 # Author: Don Welch
 
+# Local
 from base.g import *
 from base import utils
 
+# StdLib
 import os.path
 import re
 import glob
+
+try:
+    import datetime
+    datetime_avail = True
+except ImportError:
+    datetime_avail = False
+    datetime = None
+
 
 pat_prod_num = re.compile("""(\d+)""", re.I)
 
@@ -37,6 +47,8 @@ TYPE_INT = 4
 TYPE_HEX = 5
 TYPE_BITFIELD = 6
 TYPE_URI = TYPE_STR # (7) not used (yet)
+TYPE_DATE = 8  # format: dd/mm/yyyy
+
 
 TECH_CLASSES = [
     "Undefined", # This will show an error (and its the default)
@@ -89,7 +101,7 @@ TECH_CLASS_PDLS = {
     "LJColor"      : 'pcl3',
     "LJFastRaster" : 'pclxl',
     "LJJetReady"   : 'pclxl',
-    "DJ350"        : 'pcl3', 
+    "DJ350"        : 'pcl3',
     #"DJ400"        : 'pcl3',
     "DJ540"        : 'pcl3',
     "DJ600"        : 'pcl3',
@@ -113,10 +125,33 @@ TECH_CLASS_PDLS = {
     "PSP470"       : 'pcl3',
     "LJZjsMono"    : 'zjs',
     "LJZjsColor"   : 'zjs',
-    "LJm1005"      : 'zxstream',
+    "LJm1005"      : 'zxs',
     "QuickConnect" : 'jpeg',
     "DJ55xx"       : 'pcl3',
     "OJProKx50"    : 'pcl3',
+}
+
+PDL_TYPE_PCL = 0  # less preferred
+PDL_TYPE_PS = 1   #      /\
+PDL_TYPE_HOST = 2 # more preferred (however, may req. plugin)
+
+PDL_TYPES = { # Used to prioritize PPD file selection in prnt.cups.getPPDFile2()
+    'pcl3' : PDL_TYPE_PCL,
+    'pcl5' : PDL_TYPE_PCL,
+    'pcl6' : PDL_TYPE_PCL,
+    'pcl5e' : PDL_TYPE_PCL,
+    'pcl' : PDL_TYPE_PCL,
+    'pclxl' : PDL_TYPE_PCL,
+    'ps' : PDL_TYPE_PS,
+    'lidil' : PDL_TYPE_HOST,
+    'zjs' : PDL_TYPE_HOST,
+    'zjstream' : PDL_TYPE_HOST,
+    'zxs' : PDL_TYPE_HOST,
+    'zxstream' : PDL_TYPE_HOST,
+    'jpeg' : PDL_TYPE_HOST,
+    'jpg' : PDL_TYPE_HOST,
+    'jetready' : PDL_TYPE_HOST,
+    'jr' : PDL_TYPE_HOST,
 }
 
 
@@ -145,19 +180,8 @@ TECH_SUBCLASSES.sort()
 # Items will be capitalized unless in this dict
 MODEL_UI_REPLACEMENTS = {'laserjet'   : 'LaserJet',
                           'psc'        : 'PSC',
-                          'officejet'  : 'Officejet',
-                          'deskjet'    : 'Deskjet',
                           'hp'         : 'HP',
-                          'business'   : 'Business',
-                          'inkjet'     : 'Inkjet',
-                          'photosmart' : 'Photosmart',
-                          'color'      : 'Color',
-                          'series'     : 'series',
-                          'printer'    : 'Printer',
                           'mfp'        : 'MFP',
-                          'mopier'     : 'Mopier',
-                          'pro'        : 'Pro',
-                          'apollo'     : 'Apollo',
                         }
 
 
@@ -199,19 +223,20 @@ class ModelData:
         self.__cache = {}
         self.reset_includes()
         self.sec = re.compile(r'^\[(.*)\]')
-        self.inc = re.compile(r'^\%include (.*)', re.IGNORECASE)
+        self.inc = re.compile(r'^\%include (.*)', re.I)
         self.inc_line = re.compile(r'^\%(.*)\%')
         self.eq = re.compile(r'^([^=]+)=(.*)')
+        self.date = re.compile(r'^(\d{1,2})/(\d{1,2})/(\d{4,4})')
 
-        files = [(os.path.join(self.root_path, "models.dat"), 
+        files = [(os.path.join(self.root_path, "models.dat"),
                   os.path.join(self.root_path, "unreleased", "unreleased.dat")),
-                 (os.path.join(os.getcwd(), 'data', 'models', 'models.dat'), 
+                 (os.path.join(os.getcwd(), 'data', 'models', 'models.dat'),
                   os.path.join(os.getcwd(), 'data', 'models', 'unreleased', 'unreleased.dat'))]
 
         for self.released_dat, self.unreleased_dat in files:
             if os.path.exists(self.released_dat):
                 break
-            
+
         else:
             self.released_dat, self.unreleased_dat = None, None
             log.error("Unable to locate models.dat file")
@@ -234,6 +259,7 @@ class ModelData:
             'panel-check-type' : TYPE_INT,
             'pcard-type' : TYPE_INT,
             'plugin' : TYPE_INT,
+            'plugin-reason' : TYPE_BITFIELD,
             'power-settings': TYPE_INT,
             'pq-diag-type' : TYPE_INT,
             'r-type' : TYPE_INT,
@@ -384,7 +410,7 @@ class ModelData:
                 if in_section:
                     match = self.inc_line.match(line)
 
-                    if match is not None: 
+                    if match is not None:
                         inc_sect = match.group(1)
                         log.debug("Found include directive %%%s%%" % inc_sect)
 
@@ -464,13 +490,28 @@ class ModelData:
             typ = self.get_data_type(key)
 
         if  typ in (TYPE_BITFIELD, TYPE_INT):
-            value = int(value)
+            try:
+                value = int(value)
+            except (ValueError, TypeError):
+                log.error("Invalid value in .dat file: %s=%s" % (key, value))
+                value = 0
 
         elif typ == TYPE_BOOL:
             value = utils.to_bool(value)
-            #value = int(value)
 
         elif typ == TYPE_LIST:
             value = [x for x in value.split(',') if x]
+
+        elif typ == TYPE_DATE: # dd/mm/yyyy
+            if datetime_avail:
+                # ...don't use datetime.strptime(), wasn't avail. until 2.5
+                match = self.date.search(value)
+
+                if match is not None:
+                    day = int(match.group(1))
+                    month = int(match.group(2))
+                    year = int(match.group(3))
+
+                    value = datetime.date(year, month, day)
 
         return value

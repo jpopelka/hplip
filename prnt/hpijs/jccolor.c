@@ -1,4 +1,4 @@
-#if defined (APDK_LJJETREADY) || defined (APDK_QUICKCONNECT)
+#if defined (APDK_LJJETREADY) || defined (APDK_QUICKCONNECT) || defined (APDK_PSCRIPT)
 /*
  * jccolor.c
  *
@@ -531,4 +531,4 @@ jinit_color_converter (j_compress_ptr cinfo)
     break;
   }
 }
-#endif // APDK_LJJETREADY || APDK_QUICKCONNECT
+#endif // APDK_LJJETREADY || APDK_QUICKCONNECT || APDK_PSCRIPT

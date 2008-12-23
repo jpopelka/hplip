@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>720</width>
-    <height>535</height>
+    <width>700</width>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -256,25 +256,262 @@
            </property>
            <layout class="QGridLayout" >
             <item row="0" column="0" >
-             <widget class="QPushButton" name="StartStopButton" >
-              <property name="text" >
-               <string>Stop Printer</string>
-              </property>
-             </widget>
+             <layout class="QVBoxLayout" >
+              <item>
+               <widget class="QGroupBox" name="groupBox_3" >
+                <property name="sizePolicy" >
+                 <sizepolicy vsizetype="Maximum" hsizetype="Preferred" >
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="title" >
+                 <string/>
+                </property>
+                <layout class="QGridLayout" >
+                 <property name="leftMargin" >
+                  <number>1</number>
+                 </property>
+                 <property name="topMargin" >
+                  <number>1</number>
+                 </property>
+                 <property name="rightMargin" >
+                  <number>1</number>
+                 </property>
+                 <property name="bottomMargin" >
+                  <number>1</number>
+                 </property>
+                 <property name="horizontalSpacing" >
+                  <number>6</number>
+                 </property>
+                 <property name="verticalSpacing" >
+                  <number>1</number>
+                 </property>
+                 <item row="0" column="0" >
+                  <layout class="QHBoxLayout" >
+                   <item>
+                    <widget class="QLabel" name="StartStopIcon" >
+                     <property name="sizePolicy" >
+                      <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize" >
+                      <size>
+                       <width>16</width>
+                       <height>16</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize" >
+                      <size>
+                       <width>16</width>
+                       <height>16</height>
+                      </size>
+                     </property>
+                     <property name="text" >
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="StartStopLabel" >
+                     <property name="frameShape" >
+                      <enum>QFrame::NoFrame</enum>
+                     </property>
+                     <property name="text" >
+                      <string>Started</string>
+                     </property>
+                     <property name="alignment" >
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="StartStopButton" >
+                <property name="text" >
+                 <string>Stop Printer</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item row="0" column="1" >
-             <widget class="QPushButton" name="AcceptRejectButton" >
-              <property name="text" >
-               <string>Reject Jobs</string>
-              </property>
-             </widget>
+             <layout class="QVBoxLayout" >
+              <item>
+               <widget class="QGroupBox" name="groupBox_4" >
+                <property name="sizePolicy" >
+                 <sizepolicy vsizetype="Maximum" hsizetype="Preferred" >
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="title" >
+                 <string/>
+                </property>
+                <layout class="QGridLayout" >
+                 <property name="leftMargin" >
+                  <number>1</number>
+                 </property>
+                 <property name="topMargin" >
+                  <number>1</number>
+                 </property>
+                 <property name="rightMargin" >
+                  <number>1</number>
+                 </property>
+                 <property name="bottomMargin" >
+                  <number>1</number>
+                 </property>
+                 <property name="horizontalSpacing" >
+                  <number>6</number>
+                 </property>
+                 <property name="verticalSpacing" >
+                  <number>1</number>
+                 </property>
+                 <item row="0" column="0" >
+                  <layout class="QHBoxLayout" >
+                   <item>
+                    <widget class="QLabel" name="AcceptRejectIcon" >
+                     <property name="sizePolicy" >
+                      <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize" >
+                      <size>
+                       <width>16</width>
+                       <height>16</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize" >
+                      <size>
+                       <width>16</width>
+                       <height>16</height>
+                      </size>
+                     </property>
+                     <property name="text" >
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="AcceptRejectLabel" >
+                     <property name="frameShape" >
+                      <enum>QFrame::NoFrame</enum>
+                     </property>
+                     <property name="text" >
+                      <string>Accepting</string>
+                     </property>
+                     <property name="alignment" >
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="AcceptRejectButton" >
+                <property name="text" >
+                 <string>Reject Jobs</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item row="0" column="2" >
-             <widget class="QPushButton" name="SetDefaultButton" >
-              <property name="text" >
-               <string>Set as Default</string>
-              </property>
-             </widget>
+             <layout class="QVBoxLayout" >
+              <item>
+               <widget class="QGroupBox" name="groupBox_5" >
+                <property name="sizePolicy" >
+                 <sizepolicy vsizetype="Maximum" hsizetype="Preferred" >
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="title" >
+                 <string/>
+                </property>
+                <layout class="QGridLayout" >
+                 <property name="leftMargin" >
+                  <number>1</number>
+                 </property>
+                 <property name="topMargin" >
+                  <number>1</number>
+                 </property>
+                 <property name="rightMargin" >
+                  <number>1</number>
+                 </property>
+                 <property name="bottomMargin" >
+                  <number>1</number>
+                 </property>
+                 <property name="horizontalSpacing" >
+                  <number>6</number>
+                 </property>
+                 <property name="verticalSpacing" >
+                  <number>1</number>
+                 </property>
+                 <item row="0" column="0" >
+                  <layout class="QHBoxLayout" >
+                   <item>
+                    <widget class="QLabel" name="SetDefaultIcon" >
+                     <property name="sizePolicy" >
+                      <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize" >
+                      <size>
+                       <width>16</width>
+                       <height>16</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize" >
+                      <size>
+                       <width>16</width>
+                       <height>16</height>
+                      </size>
+                     </property>
+                     <property name="text" >
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="SetDefaultLabel" >
+                     <property name="frameShape" >
+                      <enum>QFrame::NoFrame</enum>
+                     </property>
+                     <property name="text" >
+                      <string>Not default</string>
+                     </property>
+                     <property name="alignment" >
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="SetDefaultButton" >
+                <property name="text" >
+                 <string>Set as Default</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
            </layout>
           </widget>
@@ -285,8 +522,48 @@
             <string>Job Queue</string>
            </property>
            <layout class="QGridLayout" >
-            <item row="0" column="0" >
-             <widget class="QTableWidget" name="JobTable" />
+            <item row="0" column="0" colspan="3" >
+             <widget class="QTableWidget" name="JobTable" >
+              <property name="alternatingRowColors" >
+               <bool>true</bool>
+              </property>
+              <property name="selectionMode" >
+               <enum>QAbstractItemView::SingleSelection</enum>
+              </property>
+              <property name="selectionBehavior" >
+               <enum>QAbstractItemView::SelectRows</enum>
+              </property>
+              <property name="gridStyle" >
+               <enum>Qt::DotLine</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" >
+             <widget class="QPushButton" name="CancelJobButton" >
+              <property name="text" >
+               <string>Cancel Job</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1" >
+             <spacer>
+              <property name="orientation" >
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" >
+               <size>
+                <width>131</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="2" >
+             <widget class="QPushButton" name="RefreshButton" >
+              <property name="text" >
+               <string>Refresh</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -303,8 +580,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>720</width>
-     <height>31</height>
+     <width>700</width>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuDevice" >
