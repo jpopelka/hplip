@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,7 +38,38 @@ from base import utils, models
 # installer and in a fresh sandbox if the Python extensions
 # aren't installed yet.
 try:
+    current_language = os.getenv("LANG")
+    newlang = "C"
+
+    # this is a workaround due CUPS rejecting all encoding except ASCII
+    # and utf-8
+    # if the locale contains the encoding, switch to the same locale,
+    # but with utf-8 encoding. Otherwise use C locale.
+    if current_language is not None and current_language.count('.'):
+        newlang, encoding = current_language.split('.')
+        newlang += ".UTF-8"
+
+    os.environ['LANG'] = newlang
+
+    # the same works for LC_CTYPE, in case it's not set
+    current_ctype = os.getenv("LC_CTYPE")
+    newctype = "C"
+
+    if current_ctype is not None and current_ctype.count('.'):
+        newctype, encoding = current_ctype.split('.')
+        newctype += ".UTF-8"
+
+    os.environ['LC_CTYPE'] = newctype
+
     import cupsext
+
+    # restore the old env values
+    if current_ctype is not None:
+        os.environ['LC_CTYPE'] = current_ctype
+
+    if current_language is not None:
+        os.environ['LANG'] = current_language
+
 except ImportError:
     if not os.getenv("HPLIP_BUILD"):
         log.warn("CUPSEXT could not be loaded. Please check HPLIP installation.")
@@ -217,9 +248,10 @@ def getSystemPPDs():
     ppds = {} # {'ppd name' : 'desc', ...}
 
     if major == 1 and minor < 2:
-        log.debug("(CUPS 1.1.x) Searching for PPDs in: %s" % sys_cfg.dirs.ppd)
+        ppd_dir = sys_conf.get('dirs', 'ppd')
+        log.debug("(CUPS 1.1.x) Searching for PPDs in: %s" % ppd_dir)
 
-        for f in utils.walkFiles(sys_cfg.dirs.ppd, pattern="HP*ppd*;hp*ppd*", abs_paths=True):
+        for f in utils.walkFiles(ppd_dir, pattern="HP*ppd*;hp*ppd*", abs_paths=True):
             desc = getPPDDescription(f)
 
             if not ('foo2' in desc or
@@ -233,7 +265,7 @@ def getSystemPPDs():
         log.debug("(CUPS 1.2.x) Getting list of PPDs using CUPS_GET_PPDS...")
         ppd_dict = cupsext.getPPDList()
         cups_ppd_path = getPPDPath() # usually /usr/share/cups/model
-        foomatic_ppd_path = sys_cfg.dirs.ppdbase # usually /usr/share/ppd
+        foomatic_ppd_path = sys_conf.get('dirs', 'ppdbase', '/usr/share/ppd')
 
         if not foomatic_ppd_path or not os.path.exists(foomatic_ppd_path):
             foomatic_ppd_path = '/usr/share/ppd'

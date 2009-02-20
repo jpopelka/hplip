@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -184,12 +184,12 @@ class Console(cmd.Cmd):
                     else:
                         log.error("The group name must not be blank.")
                         continue
-                        
-                if groupname == 'All': 
+
+                if groupname == 'All':
                     print "Cannot specify group 'All'. Please choose a different group."
                     return ''
 
-                if fail_if_match: 
+                if fail_if_match:
                     if groupname in all_groups:
                         log.error("Group already exists. Please choose a different group.")
                         continue
@@ -204,7 +204,7 @@ class Console(cmd.Cmd):
         else:
             groupname = args.strip()
 
-            if fail_if_match: 
+            if fail_if_match:
                 if groupname in all_groups:
                     log.error("Group already exists. Please choose a different group.")
                     return ''
@@ -217,7 +217,7 @@ class Console(cmd.Cmd):
         return groupname
 
     def do_list(self, args):
-        """ 
+        """
         List names and/or groups.
         list [names|groups|all|]
         dir [names|groups|all|]
@@ -264,7 +264,7 @@ class Console(cmd.Cmd):
         print
 
     def do_groups(self, args):
-        """ 
+        """
         List groups.
         groups
         """
@@ -376,8 +376,8 @@ class Console(cmd.Cmd):
         for g in e['groups']:
             if g == 'All':
                 continue
-            
-            ok, ans = tui.enter_yes_no("Stay in group %s " % g, 
+
+            ok, ans = tui.enter_yes_no("Stay in group %s " % g,
                 choice_prompt="(y=yes* (stay), n=no (leave), c=cancel) ? ")
 
             if not ok:
@@ -390,7 +390,7 @@ class Console(cmd.Cmd):
         print "\nJoin New Group(s):\n"
 
         while True:
-            add_group = self.get_groupname('', fail_if_match=False, alt_text=True) 
+            add_group = self.get_groupname('', fail_if_match=False, alt_text=True)
 
             if add_group.lower() == 'c':
                 print log.red("Canceled")
@@ -403,7 +403,7 @@ class Console(cmd.Cmd):
 
             if add_group not in all_groups:
                 log.warn("Group not found.")
-                ok, ans = tui.enter_yes_no("Is this a new group", 
+                ok, ans = tui.enter_yes_no("Is this a new group",
                     choice_prompt="(y=yes* (new), n=no, c=cancel) ? ")
 
                 if not ok:
@@ -444,7 +444,7 @@ class Console(cmd.Cmd):
 
         for e in old_entries:
             if not e.startswith('__'):
-                ok, ans = tui.enter_yes_no("Should '%s' stay in this group " % e, 
+                ok, ans = tui.enter_yes_no("Should '%s' stay in this group " % e,
                     choice_prompt="(y=yes* (stay), n=no (leave), c=cancel) ? ")
             else:
                 continue
@@ -505,7 +505,7 @@ class Console(cmd.Cmd):
 #        if lastname.lower() == 'c':
 #            print log.red("Canceled")
 #            return
-    
+
         title = ''
         firstname = ''
         lastname = ''
@@ -548,7 +548,7 @@ class Console(cmd.Cmd):
 
             if not add_group:
                 break
-                
+
             if add_group == 'All':
                 print log.red("Cannot specify 'All'.")
                 continue
@@ -573,7 +573,7 @@ class Console(cmd.Cmd):
                 continue
 
             groups.append(add_group)
-            
+
         groups.append('All')
 
         self.db.set(nickname, title, firstname, lastname, faxnum, groups, notes)
@@ -689,7 +689,7 @@ class Console(cmd.Cmd):
         """
         group = self.get_groupname(args, fail_if_match=False)
         if not group: return
-        
+
         self.db.delete_group(group)
 
         print
@@ -702,7 +702,7 @@ class Console(cmd.Cmd):
         utils.log_title(__title__, __version__)
 
     def do_import(self, args):
-        """ 
+        """
         Import LDIF
         import <filename> [type]
         [type] = vcf|ldif|auto
@@ -760,9 +760,9 @@ class Console(cmd.Cmd):
 
 
 mod = module.Module(__mod__, __title__, __version__, __doc__, None,
-                    (GUI_MODE, INTERACTIVE_MODE), 
+                    (GUI_MODE, INTERACTIVE_MODE),
                     (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4))
-                    
+
 mod.setUsage(module.USAGE_FLAG_NONE)
 
 opts, device_uri, printer_name, mode, ui_toolkit, loc = \
@@ -786,7 +786,7 @@ if mode == GUI_MODE:
             from ui.faxaddrbookform import FaxAddrBookForm
         except ImportError:
             log.error("Unable to load Qt3 support. Is it installed?")
-            sys.exit(1)  
+            sys.exit(1)
 
         app = None
         addrbook = None
@@ -794,7 +794,7 @@ if mode == GUI_MODE:
         app = QApplication(sys.argv)
 
         if loc is None:
-            loc = user_cfg.ui.get("loc", "system")
+            loc = user_conf.get('ui', 'loc', 'system')
             if loc.lower() == 'system':
                 loc = str(QTextCodec.locale())
                 log.debug("Using system locale: %s" % loc)
@@ -849,8 +849,8 @@ if mode == GUI_MODE:
             from ui4.fabwindow import FABWindow
         except ImportError:
             log.error("Unable to load Qt4 support. Is it installed?")
-            sys.exit(1)        
-            
+            sys.exit(1)
+
         log.set_module("hp-fab(qt4)")
 
         if 1:
@@ -873,7 +873,7 @@ else: # INTERACTIVE_MODE
     except ImportError:
         # This can fail on Python < 2.3 due to the datetime module
         log.error("Fax address book disabled - Python 2.3+ required.")
-        sys.exit(1)    
+        sys.exit(1)
 
     console = Console()
 

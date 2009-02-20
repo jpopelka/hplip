@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -54,18 +54,18 @@ class ChooseDeviceDlg(QDialog):
         DevicesButtonGroupLayout.setAlignment(Qt.AlignTop)
 
         self.radio_buttons = {}
-        
-        last_used_device_uri = user_cfg.last_used.device_uri
+
+        last_used_device_uri = user_conf.get('last_used', 'device_uri')
         last_used_index = None
 
         for y in range(len(devices)):
             self.radio_buttons[y] = QRadioButton(self.DevicesButtonGroup,"radioButton%d" % y)
             self.radio_buttons[y].setText(devices[y][0])
-            
+
             if devices[y][0] == last_used_device_uri:
                 last_used_index = y
                 self.device_uri = devices[y][0]
-            
+
             DevicesButtonGroupLayout.addWidget(self.radio_buttons[y], y, 0)
 
         if last_used_index is not None:
@@ -73,7 +73,7 @@ class ChooseDeviceDlg(QDialog):
         else:
             self.radio_buttons[0].setChecked(1)
             self.device_uri = devices[0][0]
-            
+
         ChooseDeviceDlg_Layout.addMultiCellWidget(self.DevicesButtonGroup,0,0,0,2)
 
         self.languageChange()

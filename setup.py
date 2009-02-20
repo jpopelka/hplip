@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -126,7 +126,7 @@ opts, device_uri, printer_name, mode, ui_toolkit, loc = \
                      ['ttl=', 'filter=', 'search=', 'find=',
                       'method=', 'time-out=', 'timeout=',
                       'printer=', 'fax=', 'type=', 'port=',
-                      'username=', 'user=', 'auto', 'device='],
+                       'auto', 'device='],
                       handle_device_printer=False)
 
 
@@ -139,7 +139,6 @@ makeuri = None
 auto = False
 testpage_in_auto_mode = True
 jd_port = 1
-username = ''
 
 for o, a in opts:
     if o == '-x':
@@ -185,8 +184,6 @@ for o, a in opts:
     elif o in ('-a', '--auto'):
         auto = True
 
-    elif o == '--username':
-        username = a
 
 try:
     param = mod.args[0]
@@ -213,13 +210,13 @@ if mode == GUI_MODE:
             from ui import setupform
         except ImportError:
             log.error("Unable to load Qt3 support. Is it installed?")
-            sys.exit(1)              
+            sys.exit(1)
 
         app = QApplication(sys.argv)
         QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
 
         if loc is None:
-            loc = user_cfg.ui.get("loc", "system")
+            loc = user_conf.get('ui', 'loc', 'system')
             if loc.lower() == 'system':
                 loc = str(QTextCodec.locale())
                 log.debug("Using system locale: %s" % loc)
@@ -269,7 +266,7 @@ if mode == GUI_MODE:
             sys.exit(1)
 
         try:
-            w = setupform.SetupForm(bus, param, jd_port, username)
+            w = setupform.SetupForm(bus, param, jd_port)
         except Error:
             log.error("Unable to connect to HPLIP I/O. Please (re)start HPLIP and try again.")
             sys.exit(1)
@@ -288,7 +285,7 @@ if mode == GUI_MODE:
             sys.exit(1)
 
         app = QApplication(sys.argv)
-        
+
         if not os.geteuid() == 0:
             log.error("You must be root to run this utility.")
 
@@ -299,10 +296,10 @@ if mode == GUI_MODE:
                                   QMessageBox.NoButton,
                                   QMessageBox.NoButton)
 
-            sys.exit(1)        
-        
+            sys.exit(1)
 
-        dlg = SetupDialog(None, param, jd_port, username, device_uri)
+
+        dlg = SetupDialog(None, param, jd_port, device_uri)
         dlg.show()
         try:
             log.debug("Starting GUI loop...")
@@ -368,7 +365,7 @@ else: # INTERACTIVE_MODE
         norm_model = models.normalizeModelName(model).lower()
         plugin = mq.get('plugin', PLUGIN_NONE)
 
-        plugin_installed = utils.to_bool(sys_cfg.hplip.plugin)
+        plugin_installed = utils.to_bool(sys_state.get('plugin', 'installed', '0'))
         if plugin > PLUGIN_NONE and not plugin_installed:
             tui.header("PLUG-IN INSTALLATION")
 
@@ -385,12 +382,20 @@ else: # INTERACTIVE_MODE
         default_model = utils.xstrip(model.replace('series', '').replace('Series', ''), '_')
         stripped_model = cups.stripModel2(default_model)
 
+        installed_print_devices = device.getSupportedCUPSDevices(['hp'])
+        for d in installed_print_devices.keys():
+            for p in installed_print_devices[d]:
+                log.debug("found print queue '%s'" % p)
+
+        installed_fax_devices = device.getSupportedCUPSDevices(['hpfax'])
+        for d in installed_fax_devices.keys():
+            for f in installed_fax_devices[d]:
+                log.debug("found fax queue '%s'" % f)
+
         # ******************************* PRINT QUEUE SETUP
         if setup_print:
-            tui.header("PRINT QUEUE SETUP")
 
-            installed_print_devices = device.getSupportedCUPSDevices(['hp'])
-            log.debug(installed_print_devices)
+            tui.header("PRINT QUEUE SETUP")
 
             if not auto and print_uri in installed_print_devices:
                 log.warning("One or more print queues already exist for this device: %s." %
@@ -430,10 +435,17 @@ else: # INTERACTIVE_MODE
 
                         name_ok = True
 
-                        if print_uri in installed_print_devices:
-                            for d in installed_print_devices[print_uri]:
-                                if printer_name in d:
+                        for d in installed_print_devices.keys():
+                            for p in installed_print_devices[d]:
+                                if printer_name == p:
                                     log.error("A print queue with that name already exists. Please enter a different name.")
+                                    name_ok = False
+                                    break
+
+                        for d in installed_fax_devices.keys():
+                            for f in installed_fax_devices[d]:
+                                if printer_name == f:
+                                    log.error("A fax queue with that name already exists. Please enter a different name.")
                                     name_ok = False
                                     break
 
@@ -452,66 +464,29 @@ else: # INTERACTIVE_MODE
             default_model = utils.xstrip(model.replace('series', '').replace('Series', ''), '_')
             stripped_model = default_model.lower().replace('hp-', '').replace('hp_', '')
 
-            mins = cups.getPPDFile2(stripped_model, ppds)
-            x = len(mins)
-
+            log.info("Locating PPD file... Please wait.")
+            print_ppd = cups.getPPDFile2(stripped_model, ppds)
             enter_ppd = False
 
-            if x == 0:
+            if print_ppd is None:
                 enter_ppd = True
-
-            elif x == 1:
-                print_ppd = mins.keys()[0]
-                log.info("\nFound a possible PPD file: %s" % print_ppd)
-                log.info("Desc: %s" % mins[print_ppd])
-
-                if not auto:
-                    log.info("\nNote: The model number may vary slightly from the actual model number on the device.")
-                    ok, ans = tui.enter_yes_no("\nDoes this PPD file appear to be the correct one")
-                    if not ok: sys.exit(0)
-                    if not ans: enter_ppd = True
+                log.error("Unable to find an appropriate PPD file.")
 
             else:
-                log.info("")
-                log.warn("Found multiple possible PPD files")
+                print_ppd, desc = print_ppd
+                log.info("\nFound PPD file: %s" % print_ppd)
 
-                max_ppd_filename_size = 0
-                for p in mins:
-                    max_ppd_filename_size = max(len(p), max_ppd_filename_size)
+                if desc:
+                    log.info("Description: %s" % desc)
+#
+                    if not auto:
+                        log.info("\nNote: The model number may vary slightly from the actual model number on the device.")
+                        ok, ans = tui.enter_yes_no("\nDoes this PPD file appear to be the correct one")
+                        if not ok: sys.exit(0)
+                        if not ans: enter_ppd = True
 
-                log.info(log.bold("\nChoose a PPD file that most closely matches your device:"))
-                log.info("(Note: The model number may vary slightly from the actual model number on the device.)\n")
-
-                formatter = utils.TextFormatter(
-                        (
-                            {'width': 4},
-                            {'width': max_ppd_filename_size, 'margin': 2},
-                            {'width': 40, 'margin': 2},
-                        )
-                    )
-
-                log.info(formatter.compose(("Num.", "PPD Filename", "Description")))
-                log.info(formatter.compose(('-'*4, '-'*(max_ppd_filename_size), '-'*40 )))
-
-                mins_list = mins.keys()
-
-                for y in range(x):
-                    log.info(formatter.compose((str(y), mins_list[y], mins[mins_list[y]])))
-
-                x += 1
-                none_of_the_above = y+1
-                log.info(formatter.compose((str(none_of_the_above), "(None of the above match)", '')))
-
-                ok, i = tui.enter_range("\nEnter number 0...%d for printer (q=quit) ?" % (x-1), 0, (x-1))
-                if not ok: sys.exit(0)
-
-                if i == none_of_the_above:
-                    enter_ppd = True
-                else:
-                    print_ppd = mins_list[i]
 
             if enter_ppd:
-                log.error("Unable to find an appropriate PPD file.")
                 enter_ppd = False
 
                 ok, enter_ppd = tui.enter_yes_no("\nWould you like to specify the path to the correct PPD file to use", 'n')
@@ -604,8 +579,6 @@ else: # INTERACTIVE_MODE
 
             installed_print_devices = device.getSupportedCUPSDevices(['hp'])
 
-            log.debug(installed_print_devices)
-
             if print_uri not in installed_print_devices or \
                 printer_name not in installed_print_devices[print_uri]:
 
@@ -616,15 +589,6 @@ else: # INTERACTIVE_MODE
                 # TODO:
                 #service.sendEvent(hpssd_sock, EVENT_CUPS_QUEUES_CHANGED, device_uri=print_uri)
 
-            if username:
-                import pwd
-                user_path = pwd.getpwnam(username)[5]
-                user_config_file = os.path.join(user_path, '.hplip.conf')
-
-                if os.path.exists(user_config_file):
-                    cfg = Config(user_config_file)
-                    cfg.last_used.device_uri = print_uri
-
 
         # ******************************* FAX QUEUE SETUP
         if setup_fax and not prop.fax_build:
@@ -632,6 +596,7 @@ else: # INTERACTIVE_MODE
             setup_fax = False
 
         if setup_fax:
+
             try:
                 from fax import fax
             except ImportError:
@@ -642,9 +607,8 @@ else: # INTERACTIVE_MODE
         log.info("")
 
         if setup_fax:
+
             tui.header("FAX QUEUE SETUP")
-            installed_fax_devices = device.getSupportedCUPSDevices(['hpfax'])
-            log.debug(installed_fax_devices)
 
             if not auto and fax_uri in installed_fax_devices:
                 log.warning("One or more fax queues already exist for this device: %s." % ', '.join(installed_fax_devices[fax_uri]))
@@ -682,9 +646,16 @@ else: # INTERACTIVE_MODE
 
                         name_ok = True
 
-                        if fax_uri in installed_fax_devices:
-                            for d in installed_fax_devices[fax_uri]:
-                                if fax_name in d:
+                        for d in installed_print_devices.keys():
+                            for p in installed_print_devices[d]:
+                                if fax_name == p:
+                                    log.error("A print queue with that name already exists. Please enter a different name.")
+                                    name_ok = False
+                                    break
+
+                        for d in installed_fax_devices.keys():
+                            for f in installed_fax_devices[d]:
+                                if fax_name == f:
                                     log.error("A fax queue with that name already exists. Please enter a different name.")
                                     name_ok = False
                                     break

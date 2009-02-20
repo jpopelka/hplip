@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -64,9 +64,10 @@ if fax_enabled:
     except ImportError:
         # This can fail on Python < 2.3 due to the datetime module
         # or if fax was diabled during the build
-        log.warn("Fax send disabled - Python 2.3+ required.")
         fax_enabled = False
 
+if not fax_enabled:
+    log.error("Fax disabled.")
 
 coverpages_enabled = False
 if fax_enabled:
@@ -86,15 +87,14 @@ if fax_enabled:
     except ImportError:
         log.warn("Reportlab not installed. Fax coverpages disabled.")
 
-
 if not coverpages_enabled:
     log.warn("Please install version 2.0+ of Reportlab for coverpage support.")
 
-if fax_enabled and coverpages_enabled:
-    from fax import coverpages
+if fax_enabled:
     from fabwindow import FABWindow
 
-
+if coverpages_enabled:
+    from fax import coverpages
 
 
 class SendFaxDialog(QDialog, Ui_Dialog):
@@ -227,22 +227,26 @@ class SendFaxDialog(QDialog, Ui_Dialog):
         self.PrevCoverPageButton.setIcon(QIcon(load_pixmap("prev", "16x16")))
         self.NextCoverPageButton.setIcon(QIcon(load_pixmap("next", "16x16")))
 
-        self.cover_page_list = coverpages.COVERPAGES.keys()
-        self.cover_page_index = self.cover_page_list.index("basic")
-        self.cover_page_max = len(self.cover_page_list)-1
-        self.cover_page_name = self.cover_page_list[self.cover_page_index]
+        if coverpages_enabled:
+            self.cover_page_list = coverpages.COVERPAGES.keys()
+            self.cover_page_index = self.cover_page_list.index("basic")
+            self.cover_page_max = len(self.cover_page_list)-1
+            self.cover_page_name = self.cover_page_list[self.cover_page_index]
 
-        self.connect(self.PrevCoverPageButton, SIGNAL("clicked()"), self.PrevCoverPageButton_clicked)
-        self.connect(self.NextCoverPageButton, SIGNAL("clicked()"), self.NextCoverPageButton_clicked)
-        self.connect(self.CoverPageGroupBox, SIGNAL("toggled(bool)"), self.CoverPageGroupBox_toggled)
-        self.connect(self.MessageEdit, SIGNAL("textChanged()"), self.MessageEdit_textChanged)
-        self.connect(self.RegardingEdit, SIGNAL("textChanged(const QString &)"), self.RegardingEdit_textChanged)
-        self.connect(self.PreserveFormattingCheckBox, SIGNAL("toggled(bool)"),
-                    self.PreserveFormattingCheckBox_toggled)
+            self.connect(self.PrevCoverPageButton, SIGNAL("clicked()"), self.PrevCoverPageButton_clicked)
+            self.connect(self.NextCoverPageButton, SIGNAL("clicked()"), self.NextCoverPageButton_clicked)
+            self.connect(self.CoverPageGroupBox, SIGNAL("toggled(bool)"), self.CoverPageGroupBox_toggled)
+            self.connect(self.MessageEdit, SIGNAL("textChanged()"), self.MessageEdit_textChanged)
+            self.connect(self.RegardingEdit, SIGNAL("textChanged(const QString &)"), self.RegardingEdit_textChanged)
+            self.connect(self.PreserveFormattingCheckBox, SIGNAL("toggled(bool)"),
+                        self.PreserveFormattingCheckBox_toggled)
+        else:
+            self.CoverPageGroupBox.setEnabled(False)
 
 
     def displayCoverpagePage(self):
         self.BackButton.setEnabled(False) # No going back once printer is chosen
+        self.NextButton.setEnabled(True)
 
         self.lockAndLoad()
 
@@ -349,7 +353,7 @@ class SendFaxDialog(QDialog, Ui_Dialog):
 
         self.restoreNextButton()
         self.NextButton.setEnabled(self.FilesTable.isNotEmpty())
-        self.BackButton.setEnabled(True)
+        self.BackButton.setEnabled(coverpages_enabled)
         self.FilesPageNote.setText(self.__tr("Note: You may also add files to the fax by printing from any application to the '%1' fax printer.").arg(self.printer_name))
         self.displayPage(PAGE_FILES)
 
@@ -374,13 +378,14 @@ class SendFaxDialog(QDialog, Ui_Dialog):
     def initRecipientsPage(self):
         # setup validators
         self.QuickAddFaxEdit.setValidator(PhoneNumValidator(self.QuickAddFaxEdit))
-        #self.QuickAddNameEdit.setValidator(AddressBookNameValidator(self.db, self.QuickAddNameEdit))
 
         # Fax address book database
         self.db = fax.FaxAddressBook()
 
         # Fax address book window
         self.fab = FABWindow(self)
+        self.fab.setWindowFlags(Qt.Tool) # Keeps the Fab window on top
+
         self.connect(self.fab, SIGNAL("databaseChanged"), self.FABWindow_databaseChanged)
 
         # connect signals
@@ -452,6 +457,7 @@ class SendFaxDialog(QDialog, Ui_Dialog):
         self.enableQuickAddButton()
         self.displayPage(PAGE_RECIPIENTS)
         self.restoreNextButton()
+        self.BackButton.setEnabled(True)
 
 
     def updateAddressBook(self):
@@ -561,24 +567,18 @@ class SendFaxDialog(QDialog, Ui_Dialog):
     def enableRecipientListButtons(self, enable_remove=False, enable_up_move=False, enable_down_move=False):
         if enable_remove:
             self.RemoveRecipientButton.setEnabled(True)
-            #self.RemoveRecipientButton.setIcon(QIcon(load_pixmap("remove_user", "16x16")))
         else:
             self.RemoveRecipientButton.setEnabled(False)
-            #self.RemoveRecipientButton.setIcon(QIcon(load_pixmap("remove_user-disabled", "16x16")))
 
         if enable_up_move:
             self.MoveRecipientUpButton.setEnabled(True)
-            #self.MoveRecipientUpButton.setIcon(QIcon(load_pixmap("up_user", "16x16")))
         else:
             self.MoveRecipientUpButton.setEnabled(False)
-            #self.MoveRecipientUpButton.setIcon(QIcon(load_pixmap("up_user-disabled", "16x16")))
 
         if enable_down_move:
             self.MoveRecipientDownButton.setEnabled(True)
-            #self.MoveRecipientDownButton.setIcon(QIcon(load_pixmap("down_user", "16x16")))
         else:
             self.MoveRecipientDownButton.setEnabled(False)
-            #self.MoveRecipientDownButton.setIcon(QIcon(load_pixmap("down_user-disabled", "16x16")))
 
 
     def QuickAddFaxEdit_textChanged(self, fax):
@@ -600,16 +600,20 @@ class SendFaxDialog(QDialog, Ui_Dialog):
             existing_name = name in self.db.get_all_names()
 
         if existing_name:
-            self.QuickAddNameEdit.setStyleSheet("background-color: yellow")
+            try:
+                self.QuickAddNameEdit.setStyleSheet("background-color: yellow")
+            except AttributeError:
+                pass
         else:
-            self.QuickAddNameEdit.setStyleSheet("")
+            try:
+                self.QuickAddNameEdit.setStyleSheet("")
+            except AttributeError:
+                pass
 
         if name and not existing_name and fax:
             self.QuickAddButton.setEnabled(True)
-            #self.QuickAddButton.setIcon(QIcon(load_pixmap("add_user_quick", "16x16")))
         else:
             self.QuickAddButton.setEnabled(False)
-            #self.QuickAddButton.setIcon(QIcon(load_pixmap("add_user_quick-disabled", "16x16")))
 
 
     def QuickAddButton_clicked(self):
@@ -823,7 +827,7 @@ class SendFaxDialog(QDialog, Ui_Dialog):
     def SendFaxTimer_timeout(self):
         while self.update_queue.qsize():
             try:
-                status, page_num, phone_num = self.update_queue.get(0)
+                status, page_num, arg = self.update_queue.get(0)
             except Queue.Empty:
                 break
 
@@ -836,14 +840,17 @@ class SendFaxDialog(QDialog, Ui_Dialog):
             elif status == fax.STATUS_PROCESSING_FILES:
                 self.addStatusMessage(self.__tr("Processing page %1...").arg(page_num), self.busy_icon)
 
+            elif status == fax.STATUS_SENDING_TO_RECIPIENT:
+                self.addStatusMessage(self.__tr("Sending fax to %1...").arg(arg), self.busy_icon)
+
             elif status == fax.STATUS_DIALING:
-                self.addStatusMessage(self.__tr("Dialing %1...").arg(phone_num), self.busy_icon)
+                self.addStatusMessage(self.__tr("Dialing %1...").arg(arg), self.busy_icon)
 
             elif status == fax.STATUS_CONNECTING:
-                self.addStatusMessage(self.__tr("Connecting to %1...").arg(phone_num), self.busy_icon)
+                self.addStatusMessage(self.__tr("Connecting to %1...").arg(arg), self.busy_icon)
 
             elif status == fax.STATUS_SENDING:
-                self.addStatusMessage(self.__tr("Sending page %1 to %2...").arg(page_num).arg(phone_num),
+                self.addStatusMessage(self.__tr("Sending page %1 to %2...").arg(page_num).arg(arg),
                                       self.busy_icon)
 
             elif status == fax.STATUS_CLEANUP:
@@ -858,7 +865,7 @@ class SendFaxDialog(QDialog, Ui_Dialog):
                 if status  == fax.STATUS_ERROR:
                     result_code, error_state = self.dev.getPML(pml.OID_FAX_DOWNLOAD_ERROR)
                     #FailureUI(self, self.__tr("<b>Fax send error (%s).</b><p>" % pml.DN_ERROR_STR.get(error_state, "Unknown error")))
-                    self.addStatusMessage(self.__tr("Fax send error (%s)").arg(pml.DN_ERROR_STR.get(error_state, "Unknown error")), self.error_icon)
+                    self.addStatusMessage(self.__tr("Fax send error (%1)").arg(pml.DN_ERROR_STR.get(error_state, "Unknown error")), self.error_icon)
                     self.dev.sendEvent(EVENT_FAX_JOB_FAIL, self.printer_name, 0, '')
 
                 elif status == fax.STATUS_BUSY:

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -58,14 +58,30 @@ class Module(object):
             log.set_level('debug')
 
         self.avail_modes = avail_modes
-        self.supported_ui_toolkits = supported_ui_toolkits
-        self.default_ui_toolkit = sys_cfg.configure.get('ui-toolkit', 'qt3')
+        if supported_ui_toolkits is not None:
+            self.supported_ui_toolkits = supported_ui_toolkits
+            self.num_supported_ui_toolkits = len(self.supported_ui_toolkits)
+        else:
+            self.supported_ui_toolkits = []
+            self.num_supported_ui_toolkits = 0
+
+        self.default_ui_toolkit = sys_conf.get('configure', 'ui-toolkit', 'qt4')
+
+        self.num_installed_ui_toolkits = 0
+        self.installed_ui_toolkits = []
+        if utils.to_bool(sys_conf.get('configure', 'qt3', '0')):
+            self.installed_ui_toolkits.append(UI_TOOLKIT_QT3)
+            self.num_installed_ui_toolkits += 1
+
+        if utils.to_bool(sys_conf.get('configure', 'qt4', '0')):
+            self.installed_ui_toolkits.append(UI_TOOLKIT_QT4)
+            self.num_installed_ui_toolkits += 1
 
         self.default_mode = INTERACTIVE_MODE
 
         self.num_valid_modes = 0
         if self.avail_modes is not None:
-            if GUI_MODE in self.avail_modes and prop.gui_build:
+            if GUI_MODE in self.avail_modes and prop.gui_build and self.installed_ui_toolkits:
                 self.num_valid_modes += 1
 
             if INTERACTIVE_MODE in self.avail_modes:
@@ -81,7 +97,8 @@ class Module(object):
             elif NON_INTERACTIVE_MODE in self.avail_modes:
                 self.default_mode = NON_INTERACTIVE_MODE
 
-        if self.supported_ui_toolkits is not None and prop.gui_build:
+        if self.supported_ui_toolkits is not None and prop.gui_build and self.installed_ui_toolkits:
+
             if self.default_ui_toolkit == 'qt3' and UI_TOOLKIT_QT4 in self.supported_ui_toolkits and \
                 UI_TOOLKIT_QT3 not in self.supported_ui_toolkits and INTERACTIVE_MODE in self.avail_modes:
 
@@ -89,30 +106,38 @@ class Module(object):
                 self.default_mode = INTERACTIVE_MODE
                 self.default_ui_toolkit = 'none'
 
-            elif (UI_TOOLKIT_QT4 in self.supported_ui_toolkits and self.default_ui_toolkit == 'qt4') or \
-                 (UI_TOOLKIT_QT3 in self.supported_ui_toolkits and self.default_ui_toolkit == 'qt3'):
+            elif (UI_TOOLKIT_QT4 in self.supported_ui_toolkits and self.default_ui_toolkit == 'qt4' and UI_TOOLKIT_QT4 in self.installed_ui_toolkits) or \
+                 (UI_TOOLKIT_QT3 in self.supported_ui_toolkits and self.default_ui_toolkit == 'qt3' and UI_TOOLKIT_QT3 in self.installed_ui_toolkits):
 
                 self.default_mode = GUI_MODE
 
             elif self.default_ui_toolkit == 'qt3' and UI_TOOLKIT_QT3 not in self.supported_ui_toolkits:
-                if UI_TOOLKIT_QT4 in self.supported_ui_toolkits: # (e.g, hp-linefeedcal?)
+
+                if UI_TOOLKIT_QT4 in self.supported_ui_toolkits and UI_TOOLKIT_QT4 in self.installed_ui_toolkits: # (e.g, hp-linefeedcal?)
                     self.default_ui_toolkit = 'qt4'
                     self.default_mode = GUI_MODE
 
                 elif INTERACTIVE_MODE in self.avail_modes:
                     self.default_mode = INTERACTIVE_MODE
 
+                elif NON_INTERACTIVE_MODE in self.avail_modes:
+                    self.default_mode = NON_INTERACTIVE_MODE
+
                 else:
                     log.error("%s cannot be run using Qt3 toolkit." % self.mod)
                     sys.exit(1)
 
             elif self.default_ui_toolkit == 'qt4' and UI_TOOLKIT_QT4 not in self.supported_ui_toolkits:
-                if UI_TOOLKIT_QT3 in self.supported_ui_toolkits: # (e.g., hp-unload)
+
+                if UI_TOOLKIT_QT3 in self.supported_ui_toolkits and UI_TOOLKIT_QT3 in self.installed_ui_toolkits: # (e.g., hp-unload)
                     self.default_ui_toolkit = 'qt3'
                     self.default_mode = GUI_MODE
 
                 elif INTERACTIVE_MODE in self.avail_modes:
                     self.default_mode = INTERACTIVE_MODE
+
+                elif NON_INTERACTIVE_MODE in self.avail_modes:
+                    self.default_mode = NON_INTERACTIVE_MODE
 
                 else:
                     log.error("%s cannot be run using Qt4 toolkit." % self.mod)
@@ -146,7 +171,7 @@ class Module(object):
             content.append(utils.USAGE_DEVICE)
             content.append(utils.USAGE_PRINTER)
 
-        if self.avail_modes is not None and self.num_valid_modes > 1:
+        if self.avail_modes is not None and self.num_valid_modes > 1 and self.num_installed_ui_toolkits > 1:
             summary.append('[MODE]')
             content.append(utils.USAGE_SPACE)
             content.append(utils.USAGE_MODE)
@@ -166,13 +191,13 @@ class Module(object):
         content.append(utils.USAGE_OPTIONS)
 
         if self.avail_modes is not None and GUI_MODE in self.avail_modes and \
-            self.supported_ui_toolkits is not None and len(self.supported_ui_toolkits) > 1 and \
-            prop.gui_build:
+            self.supported_ui_toolkits is not None and self.num_supported_ui_toolkits > 1 and \
+            prop.gui_build and self.num_installed_ui_toolkits > 1:
 
-            if UI_TOOLKIT_QT3 in self.supported_ui_toolkits:
+            if UI_TOOLKIT_QT3 in self.supported_ui_toolkits and UI_TOOLKIT_QT3 in self.installed_ui_toolkits:
                 content.append(utils.USAGE_USE_QT3)
 
-            if UI_TOOLKIT_QT4 in self.supported_ui_toolkits:
+            if UI_TOOLKIT_QT4 in self.supported_ui_toolkits and UI_TOOLKIT_QT4 in self.installed_ui_toolkits:
                 content.append(utils.USAGE_USE_QT4)
 
         content.append(utils.USAGE_LOGGING1)
@@ -181,8 +206,8 @@ class Module(object):
             content.append(utils.USAGE_LOGGING3) # Issue with --gg in hp-sendfax
 
         # -q/--lang
-        if self.avail_modes is not None and GUI_MODE in self.avail_modes and prop.gui_build:
-            content.append(utils.USAGE_LANGUAGE)
+        #if self.avail_modes is not None and GUI_MODE in self.avail_modes and prop.gui_build:
+        #    content.append(utils.USAGE_LANGUAGE)
 
         content.append(utils.USAGE_HELP)
 
@@ -224,12 +249,14 @@ class Module(object):
                      handle_device_printer=True,
                      supress_g_debug_flag=False):
 
-        params = 'l:hq:'
+        params = 'l:h' # 'l:hq:'
         if not supress_g_debug_flag:
             params = ''.join([params, 'g'])
 
         long_params = ['logging=', 'help', 'help-rest', 'help-man',
-                       'help-desc', 'lang=', 'loc=', 'debug', 'dbg']
+                       'help-desc',
+                       #'lang=', 'loc=',
+                       'debug', 'dbg']
 
         if handle_device_printer:
             params = ''.join([params, 'd:p:P:'])
@@ -249,13 +276,13 @@ class Module(object):
                 long_params.extend(['noninteractive', 'non-interactive', 'batch'])
 
         if self.supported_ui_toolkits is not None and \
-            len(self.supported_ui_toolkits) > 1 and prop.gui_build and \
+            self.num_supported_ui_toolkits > 1 and prop.gui_build and \
             self.avail_modes is not None and GUI_MODE in self.avail_modes:
 
-            if UI_TOOLKIT_QT3 in self.supported_ui_toolkits:
+            if UI_TOOLKIT_QT3 in self.supported_ui_toolkits and UI_TOOLKIT_QT3 in self.installed_ui_toolkits:
                 long_params.extend(['qt3', 'use-qt3'])
 
-            if UI_TOOLKIT_QT4 in self.supported_ui_toolkits:
+            if UI_TOOLKIT_QT4 in self.supported_ui_toolkits and UI_TOOLKIT_QT4 in self.installed_ui_toolkits:
                 long_params.extend(['qt4', 'use-qt4'])
 
         if extra_params is not None:
@@ -329,7 +356,8 @@ class Module(object):
                 elif o in ('--qt3', '--use-qt3'):
                     if self.avail_modes is not None and GUI_MODE in self.avail_modes:
                         if self.supported_ui_toolkits is not None and \
-                            UI_TOOLKIT_QT3 in self.supported_ui_toolkits and prop.gui_build:
+                            UI_TOOLKIT_QT3 in self.supported_ui_toolkits and prop.gui_build and \
+                            UI_TOOLKIT_QT3 in self.installed_ui_toolkits:
 
                             mode = GUI_MODE
                             ui_toolkit = 'qt3'
@@ -339,20 +367,21 @@ class Module(object):
                 elif o in ('--qt4', '--use-qt4'):
                     if self.avail_modes is not None and GUI_MODE in self.avail_modes:
                         if self.supported_ui_toolkits is not None and \
-                            UI_TOOLKIT_QT4 in self.supported_ui_toolkits and prop.gui_build:
+                            UI_TOOLKIT_QT4 in self.supported_ui_toolkits and prop.gui_build and \
+                            UI_TOOLKIT_QT4 in self.installed_ui_toolkits:
 
                             mode = GUI_MODE
                             ui_toolkit = 'qt4'
                         else:
                             error_msg.append("%s does not support Qt4. Unable to enter GUI mode." % self.mod)
 
-                elif o in ('-q', '--lang', '--loc'):
-                    if a.strip() == '?':
-                        utils.log_title(self.title, self.version)
-                        self.showLanguages()
-                        sys.exit(0)
-                    else:
-                        lang = utils.validate_language(a.lower())
+                #elif o in ('-q', '--lang', '--loc'):
+                #    if a.strip() == '?':
+                #        utils.log_title(self.title, self.version)
+                #        self.showLanguages()
+                #        sys.exit(0)
+                #    else:
+                #        lang = utils.validate_language(a.lower())
 
         if error_msg:
             show_usage = 'text'
@@ -361,10 +390,6 @@ class Module(object):
 
         if show_usage is not None:
             sys.exit(0)
-
-#        if (ui_toolkit == 'qt4' or \
-#            (mode == GUI_MODE and UI_TOOLKIT_QT3 not in self.supported_ui_toolkits)) and not self.quiet:
-#            log.error("Qt4 support is unfinished and unsupported. Please use Qt3 mode (if avail).")
 
         self.mode = mode
         return opts, device_uri, printer_name, mode, ui_toolkit, lang
@@ -418,7 +443,7 @@ class Module(object):
 
             log.info(log.bold("%s ver. %s" % (self.title, self.version)))
             log.info("")
-            log.info("Copyright (c) 2001-8 Hewlett-Packard Development Company, LP")
+            log.info("Copyright (c) 2001-9 Hewlett-Packard Development Company, LP")
             log.info("This software comes with ABSOLUTELY NO WARRANTY.")
             log.info("This is free software, and you are welcome to distribute it")
             log.info("under certain conditions. See COPYING file for more details.")
@@ -426,7 +451,7 @@ class Module(object):
 
 
     def getDeviceUri(self, device_uri=None, printer_name=None, back_end_filter=device.DEFAULT_BE_FILTER,
-                     filter=device.DEFAULT_FILTER, devices=None):
+                     filter=device.DEFAULT_FILTER, devices=None, restrict_to_installed_devices=True):
         """ Validate passed in parameters, and, if in text mode, have user select desired device to use.
             Used for tools that are device-centric and accept -d (and maybe also -p).
             Use the filter(s) to restrict what constitute valid devices.
@@ -443,7 +468,8 @@ class Module(object):
                 (returns None if passed in device_uri is invalid or printer_name doesn't correspond to device_uri)
         """
 
-        log.debug("getDeviceUri(%s, %s, %s, %s)" % (device_uri, printer_name, back_end_filter, filter))
+        log.debug("getDeviceUri(%s, %s, %s, %s, , %s)" %
+            (device_uri, printer_name, back_end_filter, filter, restrict_to_installed_devices))
         log.debug("Mode=%s" % self.mode)
 
         scan_uri_flag = False
@@ -461,9 +487,13 @@ class Module(object):
         if device_uri is not None:
             if device_uri in devices:
                 device_uri_ok = True
-            else:
+
+            elif restrict_to_installed_devices:
                 log.error("Invalid device URI: %s" % device_uri)
                 device_uri = None
+
+            else:
+                device_uri_ok = True
 
         if printer_name is not None:
             printers = device.getSupportedCUPSPrinterNames(back_end_filter, filter)
@@ -496,7 +526,7 @@ class Module(object):
             device_uri_ret = tui.device_table(devices, scan_uri_flag)
 
         if device_uri_ret is not None:
-            user_cfg.last_used.device_uri = device_uri_ret
+            user_conf.set('last_used', 'device_uri', device_uri_ret)
 
         else:
             if self.mode in (INTERACTIVE_MODE, NON_INTERACTIVE_MODE):
@@ -589,10 +619,10 @@ class Module(object):
             device_uri_ret = device.getDeviceURIByPrinterName(printer_name_ret)
 
         if device_uri_ret is not None:
-            user_cfg.last_used.device_uri = device_uri_ret
+            user_conf.set('last_used', 'device_uri', device_uri_ret)
 
         if printer_name_ret is not None:
-            user_cfg.last_used.printer_name = printer_name_ret
+            user_conf.set('last_used', 'printer_name', printer_name_ret)
 
         else:
             if self.mode in (INTERACTIVE_MODE, NON_INTERACTIVE_MODE):

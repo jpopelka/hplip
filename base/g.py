@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ import ConfigParser
 import locale
 import pwd
 import stat
+import re
 
 # Local
 from codes import *
@@ -44,6 +45,7 @@ MINIMUM_PYQT_MINOR_VER = 14
 MINIMUM_QT_MAJOR_VER = 3
 MINIMUM_QT_MINOR_VER = 0
 
+
 def to_bool(s, default=False):
     if isinstance(s, str) and s:
         if s[0].lower() in ['1', 't', 'y']:
@@ -54,6 +56,7 @@ def to_bool(s, default=False):
         return s
 
     return default
+
 
 # System wide properties
 class Properties(dict):
@@ -70,100 +73,128 @@ class Properties(dict):
 prop = Properties()
 
 
-# User config file
-class ConfigSection(dict):
-    def __init__(self, section_name, config_obj, filename, *args, **kwargs):
-        dict.__setattr__(self, "section_name", section_name)
-        dict.__setattr__(self, "config_obj", config_obj)
-        dict.__setattr__(self, "filename", filename)
-        dict.__init__(self, *args, **kwargs)
 
-    def __getattr__(self, attr):
-        if attr in self.keys():
-            return self.__getitem__(attr)
+class ConfigBase(object):
+    def __init__(self, filename):
+        self.filename = filename
+        self.conf = ConfigParser.ConfigParser()
+        self.read()
+
+
+    def get(self, section, key, default=u''):
+        try:
+            return self.conf.get(section, key)
+        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+            return default
+
+
+    def set(self, section, key, value):
+        if not self.conf.has_section(section):
+            self.conf.add_section(section)
+
+        self.conf.set(section, key, value)
+        self.write()
+
+
+    def sections(self):
+        return self.conf.sections()
+
+
+    def has_section(self, section):
+        return self.conf.has_section(section)
+
+
+    def options(self, section):
+        return self.conf.options(section)
+
+    keys = options
+
+    def read(self):
+        if self.filename is not None:
+            try:
+                fp = open(self.filename, "r")
+                self.conf.readfp(fp)
+                fp.close()
+            except (OSError, IOError):
+                log.debug("Unable to open file %s for reading." % self.filename)
+
+    def write(self):
+        if self.filename is not None:
+            try:
+                fp = open(self.filename, "w")
+                self.conf.write(fp)
+                fp.close()
+            except (OSError, IOError):
+                log.debug("Unable to open file %s for writing." % self.filename)
+
+
+
+class SysConfig(ConfigBase):
+    def __init__(self):
+        ConfigBase.__init__(self, '/etc/hp/hplip.conf')
+
+
+class State(ConfigBase):
+    def __init__(self):
+        ConfigBase.__init__(self, '/var/lib/hp/hplip.state')
+
+
+class UserConfig(ConfigBase):
+    def __init__(self):
+        if not os.geteuid() == 0:
+            prop.user_dir = os.path.expanduser('~/.hplip')
+
+            try:
+                if not os.path.exists(prop.user_dir):
+                    os.makedirs(prop.user_dir)
+            except OSError:
+                pass # This is sometimes OK, if running hpfax: for example
+
+            prop.user_config_file = os.path.join(prop.user_dir, 'hplip.conf')
+
+            if not os.path.exists(prop.user_config_file):
+                try:
+                    file(prop.user_config_file, 'w').close()
+                    s = os.stat(os.path.dirname(prop.user_config_file))
+                    os.chown(prop.user_config_file, s[stat.ST_UID], s[stat.ST_GID])
+                except IOError:
+                    pass
+
+            ConfigBase.__init__(self, prop.user_config_file)
+
         else:
-            return ""
+            # If running as root, conf file is None
+            prop.user_dir = None
+            prop.user_config_file = None
+            ConfigBase.__init__(self, None)
 
-    def __setattr__(self, option, val):
-        self.__setitem__(option, val)
-        if not self.config_obj.has_section(self.section_name):
-            self.config_obj.add_section(self.section_name)
 
-        self.config_obj.set(self.section_name, option, val)
-
+    def workingDirectory(self):
+        t = self.get('last_used', 'working_dir', os.path.expanduser("~"))
         try:
-            f = file(self.filename, 'w')
-            self.config_obj.write(f)
-            f.close()
-        except IOError:
-            pass
+            t = t.decode('utf-8')
+        except UnicodeError:
+            log.error("Invalid unicode: %s"  % t)
+        log.debug("working directory: %s" % t)
+        return t
 
 
-class Config(dict):
-    def __init__(self, filename, error_if_not_found=False, *args, **kwargs):
-        dict.__init__(self, *args, **kwargs)
-        dict.__setattr__(self, "config_obj", ConfigParser.ConfigParser())
-        dict.__setattr__(self, "filename", filename)
+    def setWorkingDirectory(self, t):
+        self.set('last_used', 'working_dir', t.encode('utf-8'))
+        log.debug("working directory: %s" % t.encode('utf-8'))
 
-        log.debug("Reading config file %s" % filename)
-
-        try:
-            f = file(filename, 'r')
-            self.config_obj.readfp(f)
-            f.close()
-        except ConfigParser.Error:
-            log.error("There is an error in the config file: %s" % filename)
-            sys.exit(1)
-        except IOError:
-            pass
-
-        for s in self.config_obj.sections():
-            opts = []
-            for o in self.config_obj.options(s):
-                opts.append((o, self.config_obj.get(s, o)))
-
-            self.__setitem__(s, ConfigSection(s, self.config_obj, filename, opts))
-
-    def __getattr__(self, sect):
-        if sect not in self.keys():
-            self.__setitem__(sect, ConfigSection(sect, self.config_obj, self.filename))
-
-        return self.__getitem__(sect)
-
-    def __setattr__(self, sect, val):
-        self.__setitem__(sect, val)
 
 
 os.umask(0037)
 
-# Config file: directories and build settings
-prop.sys_config_file = '/etc/hp/hplip.conf'
-sys_cfg = Config(prop.sys_config_file, True)
+# System Config File: Directories and build settings. Not altered after installation.
+sys_conf = SysConfig()
 
-if not os.geteuid() == 0:
-    prop.user_dir = os.path.expanduser('~/.hplip')
+# System State File: System-wide runtime settings
+sys_state = State()
 
-    try:
-        if not os.path.exists(prop.user_dir):
-            os.makedirs(prop.user_dir)
-    except OSError:
-        pass # This is sometimes OK, if running hpfax: for example
-
-    prop.user_config_file = os.path.join(prop.user_dir, 'hplip.conf')
-
-    if not os.path.exists(prop.user_config_file):
-        try:
-            file(prop.user_config_file, 'w').close()
-            s = os.stat(os.path.dirname(prop.user_config_file))
-            os.chown(prop.user_config_file, s[stat.ST_UID], s[stat.ST_GID])
-        except IOError:
-            pass
-
-    user_cfg = Config(prop.user_config_file)
-
-else:
-    # If running as root, make the "user" config file the "system" file
-    user_cfg = Config(prop.sys_config_file)
+# Per-user Settings File:
+user_conf = UserConfig()
 
 
 # Language settings
@@ -173,8 +204,20 @@ except ValueError:
     prop.locale = 'en_US'
     prop.encoding = 'UTF8'
 
-prop.version = sys_cfg.hplip.version or 'x.x.x'
-prop.home_dir = sys_cfg.dirs.home or os.path.realpath(os.path.normpath(os.getcwd()))
+prop.version = sys_conf.get('hplip', 'version', '0.0.0') # e.g., 3.9.2b.10
+_p, _x = re.compile(r'(\d*)', re.I), []
+for _y in prop.version.split('.')[:3]:
+    _z = _p.match(_y)
+    if _z is not None:
+        _x.append(_z.group(1))
+
+prop.installed_version = '.'.join(_x) # e.g., '3.9.2'
+try:
+    prop.installed_version_int = int(''.join(['%02x' % int(_y) for _y in _x]), 16) # e.g., 0x030902 -> 198914
+except ValueError:
+    prop.installed_version_int = 0
+
+prop.home_dir = sys_conf.get('dirs', 'home', os.path.realpath(os.path.normpath(os.getcwd())))
 prop.username = pwd.getpwuid(os.getuid())[0]
 pdb = pwd.getpwnam(prop.username)
 prop.userhome = pdb[5]
@@ -197,15 +240,15 @@ prop.ppd_download_url = 'http://www.linuxprinting.org/ppd-o-matic.cgi'
 prop.ppd_file_suffix = '-hpijs.ppd'
 
 # Build and install configurations
-prop.gui_build = to_bool(sys_cfg.configure.get('gui-build', '0'))
-prop.net_build = to_bool(sys_cfg.configure.get('network-build', '0'))
-prop.par_build = to_bool(sys_cfg.configure.get('pp-build', '0'))
+prop.gui_build = to_bool(sys_conf.get('configure', 'gui-build', '0'))
+prop.net_build = to_bool(sys_conf.get('configure', 'network-build', '0'))
+prop.par_build = to_bool(sys_conf.get('configure', 'pp-build', '0'))
 prop.usb_build = True
-prop.scan_build = to_bool(sys_cfg.configure.get('scanner-build', '0'))
-prop.fax_build = to_bool(sys_cfg.configure.get('fax-build', '0'))
-prop.doc_build = to_bool(sys_cfg.configure.get('doc-build', '0'))
-prop.foomatic_xml_install = to_bool(sys_cfg.configure.get('foomatic-xml-install', '0'))
-prop.foomatic_ppd_install = to_bool(sys_cfg.configure.get('foomatic-ppd-install', '0'))
+prop.scan_build = to_bool(sys_conf.get('configure', 'scanner-build', '0'))
+prop.fax_build = to_bool(sys_conf.get('configure', 'fax-build', '0'))
+prop.doc_build = to_bool(sys_conf.get('configure', 'doc-build', '0'))
+prop.foomatic_xml_install = to_bool(sys_conf.get('configure', 'foomatic-xml-install', '0'))
+prop.foomatic_ppd_install = to_bool(sys_conf.get('configure', 'foomatic-ppd-install', '0'))
 
 # Spinner, ala Gentoo Portage
 spinner = "\|/-\|/-"
@@ -272,14 +315,15 @@ except NameError:
     False = not True
 
 # as new translations are completed, add them here
-supported_locales =  { 'en_US': ('us', 'en', 'en_us', 'american', 'america', 'usa', 'english'),
-                       'zh_CN': ('zh', 'cn', 'zh_cn' , 'china', 'chinese', 'prc'),
-                       'de_DE': ('de', 'de_de', 'german', 'deutsche'),
-                       'fr_FR': ('fr', 'fr_fr', 'france', 'french', 'français'),
-                       'it_IT': ('it', 'it_it', 'italy', 'italian', 'italiano'),
-                       'ru_RU': ('ru', 'ru_ru', 'russian'),
-                       'pt_BR': ('pt', 'br', 'pt_br', 'brazil', 'brazilian', 'portuguese', 'brasil', 'portuguesa'),
-                       'es_MX': ('es', 'mx', 'es_mx', 'mexico', 'spain', 'spanish', 'espanol', 'español'),
-                     }
+supported_locales =  { 'en_US': ('us', 'en', 'en_us', 'american', 'america', 'usa', 'english'),}
+# Localization support was disabled in 3.9.2
+                       #'zh_CN': ('zh', 'cn', 'zh_cn' , 'china', 'chinese', 'prc'),
+                       #'de_DE': ('de', 'de_de', 'german', 'deutsche'),
+                       #'fr_FR': ('fr', 'fr_fr', 'france', 'french', 'français'),
+                       #'it_IT': ('it', 'it_it', 'italy', 'italian', 'italiano'),
+                       #'ru_RU': ('ru', 'ru_ru', 'russian'),
+                       #'pt_BR': ('pt', 'br', 'pt_br', 'brazil', 'brazilian', 'portuguese', 'brasil', 'portuguesa'),
+                       #'es_MX': ('es', 'mx', 'es_mx', 'mexico', 'spain', 'spanish', 'espanol', 'español'),
+                     #}
 
 

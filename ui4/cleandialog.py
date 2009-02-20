@@ -298,14 +298,14 @@ class CleanDialog(QDialog, Ui_Dialog):
                         else: # 3
                             maint.wipeAndSpitType2(self.dev)
 
+                    maint.print_clean_test_page(self.dev)
+
                 else:
                     CheckDeviceUI(self)
 
         finally:
             if self.dev is not None:
                 self.dev.close()
-
-        # TODO: Add call to maint.print_clean_test_page() (CLEAN_TYPE_PCL_WITH_PRINTOUT)
 
 
     #

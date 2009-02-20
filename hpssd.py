@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -229,8 +229,6 @@ def check_device(device_uri):
 def create_history(event):
     history = devices[event.device_uri].history.get()
 
-    #send_toolbox_event(event, EVENT_HISTORY_UPDATE)
-
     if history and history[-1].event_code == event.event_code:
         log.debug("Duplicate event. Replacing previous event.")
         devices[event.device_uri].history.replace(event)
@@ -364,7 +362,10 @@ def handle_event(event, more_args=None):
         event.event_code = status.MapPJLErrorCode(event.event_code)
 
     # regular user/device status event
-    if EVENT_MIN_USER_EVENT <= event.event_code <= EVENT_MAX_USER_EVENT:
+    if event.event_code < EVENT_MIN_USER_EVENT:
+        pass
+
+    elif EVENT_MIN_USER_EVENT <= event.event_code <= EVENT_MAX_USER_EVENT:
 
         if event.device_uri:
             #event.device_uri = event.device_uri.replace('hpfax:', 'hp:')
@@ -397,7 +398,7 @@ def handle_event(event, more_args=None):
                 # TODO: Also, need to deal with the backoff setting (or it completely sep?)
 
         # Send to system tray icon if available
-        if not dup_event and event.event_code != STATUS_PRINTER_IDLE:
+        if not dup_event: # and event.event_code != STATUS_PRINTER_IDLE:
             send_event_to_systray_ui(event)
 
         # send EVENT_HISTORY_UPDATE signal to hp-toolbox
@@ -425,7 +426,7 @@ def handle_event(event, more_args=None):
         send_event_to_hpdio(event)
 
     # Qt4 only
-    elif event.event_code in (EVENT_DEVICE_UPDATE_ACTIVE, 
+    elif event.event_code in (EVENT_DEVICE_UPDATE_ACTIVE,
                               EVENT_DEVICE_UPDATE_INACTIVE):
         send_event_to_systray_ui(event)
 
@@ -438,9 +439,10 @@ def handle_event(event, more_args=None):
     elif event.event_code == EVENT_SYSTEMTRAY_EXIT:
         send_event_to_hpdio(event)
         send_toolbox_event(event)
+        send_event_to_systray_ui(event)
         log.debug("Exiting")
         main_loop.quit()
-        
+
     elif event.event_code in (EVENT_DEVICE_START_POLLING,
                               EVENT_DEVICE_STOP_POLLING):
         pass
@@ -459,9 +461,6 @@ def send_event_to_systray_ui(event, event_code=None):
 
     if event_code is not None:
         e.event_code = event_code
-
-    #print "event:"
-    #e.debug()
 
     e.send_via_pipe(w1, 'systemtray')
 
@@ -543,28 +542,6 @@ def run(write_pipe1=None,  # write pipe to systemtray
     # Export an object on the session bus
     session_name = dbus.service.BusName("com.hplip.StatusService", session_bus)
     status_service = StatusService(session_name, "/com/hplip/StatusService")
-
-    #threads_init()
-
-#    global polling, polling_interval
-#    polling = user_cfg.polling.enabled
-#    polling_interval = user_cfg.polling.interval or 5 # s
-#    if not polling_interval or polling_interval < 5:
-#        polling_interval = 5
-
-    # timers
-    #log.debug("Starting thread timer at %dms" % THREAD_TIMER)
-    #timeout_add(500, handle_timeout)
-    #io_add_watch(r3, IO_IN, handle_hpdio)
-
-#    if polling:
-#        log.debug("Starting polling timer at %dms" % (polling_interval * 1000))
-#        timeout_add(polling_interval * 1000, handle_polling)
-#        device_list = user_cfg.polling.device_list.split(u',') or []
-#        for d in device_list:
-#            if check_device(d) == ERROR_SUCCESS:
-#                devices[d].polling = True
-
 
     log.debug("Entering main dbus loop...")
     try:

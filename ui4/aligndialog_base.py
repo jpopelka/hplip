@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui4/aligndialog_base.ui'
 #
-# Created: Mon Dec 15 16:58:59 2008
+# Created: Tue Feb 17 11:36:12 2009
 #      by: PyQt4 UI code generator 4.3.3
 #
 # WARNING! All changes made in this file will be lost!

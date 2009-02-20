@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -500,22 +500,14 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
 
 
     def ImportAction_triggered(self):
-        working_directory = user_cfg.last_used.working_dir
-
-        if not working_directory or not os.path.exists(working_directory):
-            working_directory = os.path.expanduser("~")
-
-        log.debug("working_directory: %s" % working_directory)
-
         result = unicode(QFileDialog.getOpenFileName(self,
                          self.__tr("Import fax addresses from LDIF or vCard"),
-                         working_directory, "vCard (*.vcf);;LDIF (*.ldif *.ldi)"))
+                         user_conf.workingDirectory(), "vCard (*.vcf);;LDIF (*.ldif *.ldi)"))
 
         if result:
             working_directory = unicode(os.path.dirname(result))
             log.debug("result: %s" % result)
-            log.debug("working_directory: %s" % working_directory)
-            user_cfg.last_used.working_dir = working_directory
+            user_conf.setWorkingDirectory(working_directory)
 
             if result:
                 if result.endswith('.vcf'):

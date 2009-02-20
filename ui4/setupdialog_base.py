@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui4/setupdialog_base.ui'
 #
-# Created: Mon Dec 15 16:59:01 2008
+# Created: Tue Feb 17 11:36:14 2009
 #      by: PyQt4 UI code generator 4.3.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -367,6 +367,7 @@ class Ui_Dialog(object):
         self.gridlayout7.addItem(spacerItem3,4,0,1,1)
 
         self.SendTestPageCheckBox = QtGui.QCheckBox(self.page_3)
+        self.SendTestPageCheckBox.setChecked(True)
         self.SendTestPageCheckBox.setObjectName("SendTestPageCheckBox")
         self.gridlayout7.addWidget(self.SendTestPageCheckBox,5,0,1,1)
         self.StackedWidget.addWidget(self.page_3)

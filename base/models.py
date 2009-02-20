@@ -47,7 +47,7 @@ TYPE_INT = 4
 TYPE_HEX = 5
 TYPE_BITFIELD = 6
 TYPE_URI = TYPE_STR # (7) not used (yet)
-TYPE_DATE = 8  # format: dd/mm/yyyy
+TYPE_DATE = 8  # format: mm/dd/yyyy
 
 
 TECH_CLASSES = [
@@ -88,6 +88,7 @@ TECH_CLASSES = [
     "QuickConnect",
     "DJ55xx",
     "OJProKx50",
+    'LJP1XXX',
 ]
 
 TECH_CLASSES.sort()
@@ -129,6 +130,7 @@ TECH_CLASS_PDLS = {
     "QuickConnect" : 'jpeg',
     "DJ55xx"       : 'pcl3',
     "OJProKx50"    : 'pcl3',
+    'LJP1XXX'      : 'zxs',
 }
 
 PDL_TYPE_PCL = 0  # less preferred
@@ -268,6 +270,7 @@ class ModelData:
             'status-battery-check' : TYPE_INT,
             'status-dynamic-counters' : TYPE_INT,
             'status-type' : TYPE_INT,
+            'support-subtype' : TYPE_HEX,
             'support-released' : TYPE_BOOL,
             'support-type' : TYPE_INT,
             'support-ver' : TYPE_STR,
@@ -502,16 +505,23 @@ class ModelData:
         elif typ == TYPE_LIST:
             value = [x for x in value.split(',') if x]
 
-        elif typ == TYPE_DATE: # dd/mm/yyyy
+        elif typ == TYPE_DATE: # mm/dd/yyyy
             if datetime_avail:
                 # ...don't use datetime.strptime(), wasn't avail. until 2.5
                 match = self.date.search(value)
 
                 if match is not None:
-                    day = int(match.group(1))
-                    month = int(match.group(2))
+                    month = int(match.group(1))
+                    day = int(match.group(2))
                     year = int(match.group(3))
 
                     value = datetime.date(year, month, day)
+
+        elif typ == TYPE_HEX:
+            try:
+                value = int(value, 16)
+            except (ValueError, TypeError):
+                log.error("Invalid hex value in .dat file: %s=%s" % (key, value))
+                value = 0
 
         return value

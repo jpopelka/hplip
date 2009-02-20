@@ -350,6 +350,11 @@ int hpijs_set_cb (void *set_cb_data, IjsServerCtx *ctx, IjsJobId job_id,
         iVal = strtol (svalue, &tail, 10);
         pSS->pPC->SetPrinterHint (MAX_FILE_SIZE_HINT, iVal);
     }  
+    else if (!strcmp (key, "Quality:SpeedMech"))
+    {
+        pSS->pPC->SetPrinterHint (PAGES_IN_DOC_HINT, 512);
+	pSS->EnableSpeedMech (TRUE);
+    }
     else
         bug("unable to set key=%s, value=%s\n", key, svalue);    
 
@@ -559,6 +564,7 @@ int main (int argc, char *argv[], char *evenp[])
       bug("unable to init capture");
 #endif
 
+   
    pSS->pPC = new PrintContext (pSS, 0, 0);
 
    /* Ignore JOB_CANCELED. This a bi-di hack that allows the job to continue even if bi-di communication failed. */
@@ -659,6 +665,17 @@ int main (int argc, char *argv[], char *evenp[])
 //         pSS->IOMode.bDevID = pSS->IOMode.bStatus = FALSE;
          pSS->ResetIOMode (FALSE, FALSE);
 
+//       Turn off SpeedMech in duplex printing mode
+         if (pSS->Duplex)
+	 {
+	     pSS->EnableSpeedMech (FALSE);
+	 }
+
+	 if (pSS->IsSpeedMechEnabled ())
+	 {
+	     pSS->InitSpeedMechBuffer ();
+	 }
+
          if (pSS->pJob != NULL)
             delete pSS->pJob;
          pSS->pJob = new Job(pSS->pPC);
@@ -704,6 +721,7 @@ int main (int argc, char *argv[], char *evenp[])
       }
       memset(k_raster, 0, k_width);
 
+      pSS->SendPreviousPage ();
       for (i=0; i < pSS->ph.height; i++)      
       {
          if ((n = hpijs_get_client_raster(ctx, raster, pSS->ph.width*3, 0xff)) < 0)

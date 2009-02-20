@@ -11,10 +11,10 @@
 *% distribute, sublicense, and/or sell copies of the Software, and to
 *% permit persons to whom the Software is furnished to do so, subject to
 *% the following conditions:
-*% 
+*%
 *% The above copyright notice and this permission notice shall be
 *% included in all copies or substantial portions of the Software.
-*% 
+*%
 *% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 *% EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 *% MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -22,7 +22,7 @@
 *% LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 *% OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 *% WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*% 
+*%
 *% [this is the MIT open source license -- please see www.opensource.org]
 *%
 
@@ -38,15 +38,6 @@
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "HP2500.PPD"
-*APDialogExtension: "/Library/Printers/hp/PDEs/hpColorOptions.plugin"
-*APDialogExtension: "/Library/Printers/hp/PDEs/hpEdgeToEdge.plugin"
-*APDialogExtension: "/Library/Printers/hp/PDEs/hpFinishing.plugin"
-*APDialogExtension: "/Library/Printers/hp/PDEs/hpImageQuality.plugin"
-*APDialogExtension: "/Library/Printers/hp/PDEs/hpProofAndPrint.plugin"
-*cupsICCProfile RGB../sRGB Matching Profile: "/Library/Printers/hp/Profiles/sRGB_A.icc"
-*cupsICCProfile CMYK../CMYK Matching Profile: "/Library/Printers/hp/Profiles/CMYK_A.icc"
-*cupsICCProfile Gray../Gray Matching Profile: "/Library/Printers/hp/Profiles/Gray_A.icc"
-*APPrinterIconPath: "/Library/Printers/hp/Icons/hp color LaserJet 2500.icns"
 
 *% Product Name and Version Information
 *Manufacturer:	"HP"

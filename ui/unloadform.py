@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -94,28 +94,28 @@ class UnloadForm(QMainWindow):
                     self.init_failed = True
 
         self.dbus_avail, self.service, session_bus = device.init_dbus()
-        
-        self.UnloadView = ScrollUnloadView(self.service, 
+
+        self.UnloadView = ScrollUnloadView(self.service,
             self.centralWidget(), self, "UnloadView")
-            
+
         self.FormLayout.addWidget(self.UnloadView,0,0)
 
 
         if not self.init_failed:
             try:
-                self.cur_device = device.Device(device_uri=self.device_uri, 
+                self.cur_device = device.Device(device_uri=self.device_uri,
                                                  printer_name=self.printer_name)
             except Error, e:
                 log.error("Invalid device URI or printer name.")
                 self.FailureUI("<b>Invalid device URI or printer name.</b><p>Please check the parameters to hp-print and try again.")
                 self.init_failed = True
-    
+
             else:
                 self.device_uri = self.cur_device.device_uri
-                user_cfg.last_used.device_uri = self.device_uri
-    
+                user_conf.set('last_used', 'device_uri', self.device_uri)
+
                 log.debug(self.device_uri)
-    
+
                 self.statusBar().message(self.device_uri)
 
 
@@ -137,7 +137,7 @@ class UnloadForm(QMainWindow):
                               QMessageBox.Ok,
                               QMessageBox.NoButton,
                               QMessageBox.NoButton)
-        
+
 
     def languageChange(self):
         self.setCaption(self.__tr("HP Device Manager - Unload Photo Card"))

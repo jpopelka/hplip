@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -58,8 +58,8 @@ class PluginDialog(QDialog, Ui_Dialog):
 
     def isPluginInstalled(self):
         return self.core.check_for_plugin()
-    
-    
+
+
     def initUi(self):
         # connect signals/slots
         self.connect(self.CancelButton, SIGNAL("clicked()"), self.CancelButton_clicked)
@@ -96,7 +96,10 @@ class PluginDialog(QDialog, Ui_Dialog):
             self.PathLineEdit.setEnabled(False)
             self.BrowseToolButton.setEnabled(False)
             self.NextButton.setEnabled(True)
-            self.PathLineEdit.setStyleSheet("")
+            try:
+                self.PathLineEdit.setStyleSheet("")
+            except AttributeError:
+                pass
             self.plugin_path = None
 
 
@@ -113,7 +116,10 @@ class PluginDialog(QDialog, Ui_Dialog):
             self.PathLineEdit.setEnabled(False)
             self.BrowseToolButton.setEnabled(False)
             self.NextButton.setEnabled(True)
-            self.PathLineEdit.setStyleSheet("")
+            try:
+                self.PathLineEdit.setStyleSheet("")
+            except AttributeError:
+                pass
             self.plugin_path = None
 
 
@@ -132,30 +138,32 @@ class PluginDialog(QDialog, Ui_Dialog):
             ok = False
 
         if not ok:
-            self.PathLineEdit.setStyleSheet("background-color: yellow; ")
+            try:
+                self.PathLineEdit.setStyleSheet("background-color: yellow; ")
+            except AttributeError:
+                pass
             self.NextButton.setEnabled(False)
         else:
-            self.PathLineEdit.setStyleSheet("")
+            try:
+                self.PathLineEdit.setStyleSheet("")
+            except AttributeError:
+                pass
             self.NextButton.setEnabled(True)
             self.PathLineEdit.setToolTip(QString(""))
 
 
     def BrowseToolButton_clicked(self):
         t = unicode(self.PathLineEdit.text())
+
         if not os.path.exists(t):
-            t = user_cfg.last_used.working_dir
+            path = unicode(QFileDialog.getOpenFileName(self, self.__tr("Select Plug-in File"),
+                                                user_conf.workingDirectory(),
+                                                self.__tr("Plugin Files (*.run)")))
 
-            if not t or not os.path.exists(t):
-                t = os.path.expanduser("~")
-
-        x = unicode(QFileDialog.getOpenFileName(self, self.__tr("Select Plug-in File"),
-                                               t,
-                                               self.__tr("Plugin Files (*.run)")))
-
-        if x:
-            self.plugin_path = x
+        if path:
+            self.plugin_path = path
             self.PathLineEdit.setText(self.plugin_path)
-            user_cfg.last_used.working_dir = x
+            user_conf.setWorkingDirectory(self.plugin_path)
 
         self.setPathIndicators()
 
@@ -198,7 +206,11 @@ class PluginDialog(QDialog, Ui_Dialog):
             self.plugin_path, size, checksum, timestamp, ok = self.core.get_plugin_info(plugin_conf_url,
                 self.plugin_download_callback)
 
-            log.debug("path=%s, size=%d, checksum=%d, timestamp=%d, ok=%s" % (self.plugin_path, size, checksum, timestamp, ok))
+            print self.plugin_path, size, checksum, timestamp, ok
+
+            log.debug("path=%s, size=%d, checksum=%s, timestamp=%f, ok=%s" %
+                      (self.plugin_path, size, checksum, timestamp, ok))
+
             if not self.plugin_path.startswith('http://') and not self.plugin_path.startswith('file://'):
                 self.plugin_path = 'file://' + self.plugin_path
 

@@ -108,6 +108,44 @@ validate_name( const char *name )         /* I - Name to check */
     return 1; // TODO: Make it work with utf-8 encoding
 }
 
+static PyObject * PyObj_from_UTF8(const char *utf8)
+{
+    PyObject *val = PyUnicode_Decode(utf8, strlen(utf8), "utf-8", NULL);
+
+    if (!val)
+    {
+        // CUPS 1.2 always gives us UTF-8.  Before CUPS 1.2, the
+        // ppd-* strings come straight from the PPD with no
+        // transcoding, but the attributes-charset is still 'utf-8'
+        // so we've no way of knowing the real encoding.
+        // In that case, detect the error and force it to ASCII.
+        char * ascii;
+        const char * orig = utf8;
+        int i;
+
+        PyErr_Clear();
+        ascii = malloc(1 + strlen (orig));
+
+        for (i = 0; orig[i]; i++)
+        {
+            ascii[i] = orig[i] & 0x7f;
+        }
+
+        ascii[i] = '\0';
+        val = PyString_FromString( ascii );
+        free( ascii );
+    }
+
+    return val;
+}
+
+void debug(const char * text)
+{
+    char buf[4096];
+    sprintf( buf, "print '%s'", text);
+    PyRun_SimpleString( buf );
+
+}
 
 staticforward PyTypeObject printer_Type;
 
@@ -645,7 +683,7 @@ PyObject * setDefaultPrinter( PyObject * self, PyObject * args )
     {
         goto abort;
     }
-                
+
     //char buf[1024];
     //sprintf( buf, "print '%s'", name);
     //PyRun_SimpleString( buf );
@@ -654,7 +692,7 @@ PyObject * setDefaultPrinter( PyObject * self, PyObject * args )
     {
         goto abort;
     }
-    
+
     /* Connect to the HTTP server */
     if ( ( http = httpConnectEncrypt( cupsServer(), ippPort(), cupsEncryption() ) ) == NULL )
     {
@@ -881,17 +919,17 @@ static /*job_Object **/ PyObject * _newJob( int id, int state, char * dest, char
     jo->size = size;
     jo->state = state;
     if ( dest != NULL )
-        jo->dest = PyString_FromString( dest );
+        jo->dest = PyObj_from_UTF8( dest );
     else
         jo->dest = Py_BuildValue( "" );
 
     if ( title != NULL )
-        jo->title = PyString_FromString( title );
+        jo->title = PyObj_from_UTF8( title );
     else
         jo->title = Py_BuildValue( "" );
 
     if ( user != NULL )
-        jo->user = PyString_FromString( user );
+        jo->user = PyObj_from_UTF8( user );
     else
         jo->user = Py_BuildValue( "" );
 
@@ -1018,7 +1056,7 @@ PyObject * setServer( PyObject * self, PyObject * args )
 
     if (!PyArg_ParseTuple(args, "z", &server))
         return Py_BuildValue( "" );
-    
+
     if (!strlen(server)) // Pass an empty string to restore default server
         server = NULL;
 
@@ -1050,7 +1088,7 @@ PyObject * getPPDList( PyObject * self, PyObject * args )
     //PyObject * ppd_list;
     http_t *http = NULL;     /* HTTP object */
     //char buf[1024];
-    
+
     result = PyDict_New ();
 
     if ( ( http = httpConnectEncrypt( cupsServer(), ippPort(), cupsEncryption() ) ) == NULL )
@@ -1073,13 +1111,13 @@ PyObject * getPPDList( PyObject * self, PyObject * args )
 
     //ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
     //             NULL, "ipp://localhost/printers/");
-    
+
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, "ipp://localhost/printers/officejet_4100");
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "requested-attributes",
                  NULL, "all");
-   
+
     /*
     * Do the request and get back a response...
     */
@@ -1107,7 +1145,7 @@ PyObject * getPPDList( PyObject * self, PyObject * args )
                 if (!strcmp (attr->name, "ppd-name") && attr->value_tag == IPP_TAG_NAME)
                 {
                     ppdname = attr->values[0].string.text;
-                
+
                     //sprintf( buf, "print '%s'", ppdname);
                     //PyRun_SimpleString( buf );
                 }
@@ -1118,32 +1156,7 @@ PyObject * getPPDList( PyObject * self, PyObject * args )
                 //    (!strcmp (attr->name, "ppd-make") && attr->value_tag == IPP_TAG_TEXT) ||
                 //    (!strcmp (attr->name, "ppd-device-id") && attr->value_tag == IPP_TAG_TEXT))
                 {
-                    val = PyUnicode_DecodeUTF8 (attr->values[0].string.text,
-                                                strlen (attr->values[0].string.text),
-                                                NULL);
-                    if (!val)
-                    {
-                        // CUPS 1.2 always gives us UTF-8.  Before CUPS 1.2, the
-                        // ppd-* strings come straight from the PPD with no
-                        // transcoding, but the attributes-charset is still 'utf-8'
-                        // so we've no way of knowing the real encoding.
-                        // In that case, detect the error and force it to ASCII.
-                        char * ascii;
-                        char * orig = attr->values[0].string.text;
-                        int i;
-
-                        PyErr_Clear();
-                        ascii = malloc (1 + strlen (orig));
-
-                        for (i = 0; orig[i]; i++)
-                        {
-                            ascii[i] = orig[i] & 0x7f;
-                        }
-
-                        ascii[i] = '\0';
-                        val = PyString_FromString( ascii );
-                        free( ascii );
-                    }
+                    val = PyObj_from_UTF8(attr->values[0].string.text);
                 }
 
                 if (val)
@@ -1408,12 +1421,17 @@ PyObject * getGroupList( PyObject * self, PyObject * args )
     ppd_group_t *group;
     int i;
 
+/*  debug("at 0"); */
+
     if ( ppd != NULL && dest != NULL )
     {
+/*      debug("at 1"); */
+
         group_list = PyList_New( ( Py_ssize_t ) 0 );
         for ( i = ppd->num_groups, group = ppd->groups; i > 0; i--, group++ )
         {
-            PyList_Append( group_list, PyString_FromString( group->name ) );
+/*          debug(group->name); */
+            PyList_Append( group_list, PyObj_from_UTF8( group->name ) );
         }
 
         return group_list;
@@ -1474,7 +1492,7 @@ PyObject * getOptionList( PyObject * self, PyObject * args )
             {
                 for ( j = group->num_options, option = group->options; j > 0; j--, option++ )
                 {
-                    PyList_Append( option_list, PyString_FromString( option->keyword ) );
+                    PyList_Append( option_list, PyObj_from_UTF8( option->keyword ) );
                 }
 
                 break;
@@ -1560,7 +1578,7 @@ PyObject * getChoiceList( PyObject * self, PyObject * args )
                     {
                         for ( k = option->num_choices, choice = option->choices; k > 0; k--, choice++ )
                         {
-                            PyList_Append( choice_list, PyString_FromString( choice->choice ) );
+                            PyList_Append( choice_list, PyObj_from_UTF8( choice->choice ) );
                         }
 
                         break;
@@ -1661,21 +1679,21 @@ PyObject * printFileWithOptions( PyObject * self, PyObject * args )
 
     num_dests = cupsGetDests(&dests);
     dest = cupsGetDest( printer, NULL, num_dests, dests );
-    
+
     if ( dest != NULL )
     {
         for( i = 0; i < dest->num_options; i++ )
         {
             if ( cupsGetOption( dest->options[i].name, g_num_options, g_options ) == NULL )
                 g_num_options = cupsAddOption( dest->options[i].name, dest->options[i].value, g_num_options, &g_options );
-                
+
         }
-        
+
         job_id = cupsPrintFile( dest->name, filename, title, g_num_options, g_options );
-    
+
         return Py_BuildValue( "i", job_id );
     }
-    
+
     return Py_BuildValue( "i", -1 );
 }
 
@@ -1687,51 +1705,51 @@ const char * password_callback(const char * prompt)
 {
     PyObject * result;
     char * result_str = NULL;
-    
+
     if ( passwordFunc != NULL )
     {
         result = PyObject_CallFunction( passwordFunc, "s", prompt );
-        
+
         if( result )
         {
             result_str = PyString_AsString( result );
-        
+
             if ( result_str != NULL )
             {
                 return result_str;
             }
         }
-     
+
     }
-    
+
     return "";
 }
 
 PyObject * setPasswordCallback( PyObject * self, PyObject * args )
-{   
+{
     if( !PyArg_ParseTuple( args, "O", &passwordFunc ) )
     {
         return Py_BuildValue( "i", 0 );
     }
 
     cupsSetPasswordCB(password_callback);
-    
+
     return Py_BuildValue( "i", 1 );
 }
 
 
 PyObject * getPassword( PyObject * self, PyObject * args )
-{   
+{
     const char * pwd;
     char * prompt;
-    
+
     if( !PyArg_ParseTuple( args, "s", &prompt ) )
     {
         return Py_BuildValue( "" );
     }
-    
+
     pwd = cupsGetPassword( prompt );
-    
+
     if( pwd )
     {
         return Py_BuildValue( "s", pwd );

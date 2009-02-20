@@ -50,7 +50,7 @@ int (*HPLJSoInit) (int iFlag);
 APDK_BEGIN_NAMESPACE
 
 #ifdef HAVE_LIBDL
-extern void *LoadPlugin (char *szPluginName);
+extern void *LoadPlugin (const char *szPluginName);
 #endif
 
 const unsigned char LJZjs::szByte1[256] =

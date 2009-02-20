@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -64,6 +64,8 @@ from cleandialog import CleanDialog
 from colorcaldialog import ColorCalDialog
 from linefeedcaldialog import LineFeedCalDialog
 from pqdiagdialog import PQDiagDialog
+from nodevicesdialog import NoDevicesDialog
+from aboutdialog import AboutDialog
 
 # Other forms and controls
 from settingsdialog import SettingsDialog
@@ -93,8 +95,6 @@ class FuncViewItem(QListWidgetItem):
         self.tooltip_text = tooltip_text
         self.cmd = cmd
 
-        #self.tooltip = IconViewToolTip(parent, tooltip_text)
-
 
 
 class DeviceViewItem(QListWidgetItem):
@@ -104,6 +104,50 @@ class DeviceViewItem(QListWidgetItem):
         self.is_avail = is_avail
         self.setTextAlignment(Qt.AlignHCenter)
 
+
+
+class PluginInstall(QObject):
+    def __init__(self, parent, plugin_type, plugin_installed):
+        self.parent = parent
+        self.plugin_type = plugin_type
+        self.plugin_installed = plugin_installed
+
+
+    def exec_(self):
+        install_plugin = True
+
+        if self.plugin_installed:
+            i = QMessageBox.warning(self.parent,
+                self.parent.windowTitle(),
+                self.__tr("<b>The HPLIP plugin is already installed.</b><p>Do you want to continue and re-install it?"),
+                QMessageBox.Yes,
+                QMessageBox.No,
+                QMessageBox.NoButton)
+
+            install_plugin = (i == QMessageBox.Yes)
+
+        if install_plugin:
+            su_sudo_str = su_sudo()
+            if su_sudo_str is None:
+                QMessageBox.critical(self.parent,
+                    self.parent.windowTitle(),
+                    self.__tr("<b>Unable to find an appropriate su/sudo utility to run hp-plugin.</b>"),
+                    QMessageBox.Ok,
+                    QMessageBox.NoButton,
+                    QMessageBox.NoButton)
+
+            else:
+                if utils.which('hp-plugin'):
+                    cmd = su_sudo_str % 'hp-plugin'
+                else:
+                    cmd = su_sudo_str % 'python ./plugin.py'
+
+                log.debug(cmd)
+                utils.run(cmd, log_output=True, password_func=None, timeout=1)
+
+
+    def __tr(self,s,c = None):
+        return qApp.translate("DevMgr5",s,c)
 
 
 
@@ -120,7 +164,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         QMainWindow.__init__(self, parent)
 
         log.debug("Initializing toolbox UI (Qt4)...")
-        log.debug("HPLIP Version: %s" % sys_cfg.hplip.version)
+        log.debug("HPLIP Version: %s" % prop.installed_version)
 
         self.setupUi(self)
 
@@ -129,6 +173,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         self.device_vars = {}
         self.num_devices = 0
         self.cur_device = None
+        self.cur_printer = None
         self.updating = False
         self.init_failed = False
         self.service = None
@@ -145,7 +190,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         self.initMisc()
         self.initUI()
 
-        #cups.setPasswordCallback(showPasswordUI)
+        cups.setPasswordCallback(showPasswordUI)
 
         if not prop.doc_build:
             self.ContentsAction.setEnabled(False)
@@ -189,8 +234,6 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
 
     def initUI(self):
         # Setup device icon list
-        #self.DeviceList.setAutoArrange(True)
-        #self.DeviceList.setSorting(True)
         self.DeviceList.setSortingEnabled(True)
 
         # Setup main menu
@@ -212,11 +255,14 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         self.ContentsAction.setIcon(QIcon(load_pixmap("help", "16x16")))
         self.connect(self.ContentsAction, SIGNAL("triggered()"), self.helpContents)
 
+        self.QuitAction.setIcon(QIcon(load_pixmap("quit", "16x16")))
+        self.connect(self.QuitAction, SIGNAL("triggered()"), self.quit)
+
+        self.connect(self.AboutAction, SIGNAL("triggered()"), self.helpAbout)
 
 
          # Init tabs/controls
         self.initActionsTab()
-        #self.InitFuncsTab()
         self.initStatusTab()
         self.initSuppliesTab()
         self.initPrintSettingsTab()
@@ -245,7 +291,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         self.docs = "http://hplip.sf.net"
 
         if prop.doc_build:
-            g = os.path.join(sys_cfg.dirs.doc, 'index.html')
+            g = os.path.join(sys_conf.get('dirs', 'doc'), 'index.html')
             if os.path.exists(g):
                 self.docs = "file://%s" % g
 
@@ -255,7 +301,6 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
 
 
     def initalUpdate(self):
-        #print "InitialUpdate()"
         if self.init_failed:
             self.close()
             return
@@ -268,21 +313,14 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                 log.error("Device %s not found" % self.initial_device_uri)
                 cont = False
 
-#        self.refresh_timer = QTimer(self) #, "RefreshTimer")
-#        self.connect(self.refresh_timer, SIGNAL('timeout()'), self.TimedRefresh)
-#
-#        if MIN_AUTO_REFRESH_RATE <= self.user_settings.auto_refresh_rate <= MAX_AUTO_REFRESH_RATE:
-#            self.refresh_timer.start(self.user_settings.auto_refresh_rate * 1000)
-#
-
         if self.cur_printer:
             self.getPrinterState()
-            
+
             if self.printer_state == cups.IPP_PRINTER_STATE_STOPPED:
                 self.cur_device.sendEvent(EVENT_PRINTER_QUEUE_STOPPED, self.cur_printer)
-                
+
             if not self.printer_accepting:
-                self.cur_device.sendEvent(EVENT_PRINTER_QUEUE_REJECTING_JOBS, self.cur_printer)        
+                self.cur_device.sendEvent(EVENT_PRINTER_QUEUE_REJECTING_JOBS, self.cur_printer)
 
 
     def activateDevice(self, device_uri):
@@ -312,7 +350,6 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
     # ***********************************************************************************
 
     def handleSessionSignal(self, *args, **kwds):
-        #print args, kwds
         if kwds['interface'] == 'com.hplip.Toolbox' and \
             kwds['member'] == 'Event':
 
@@ -320,12 +357,14 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
             event = device.Event(*args[:6])
             event.debug()
 
-            if event.event_code == EVENT_DEVICE_UPDATE_REPLY:
+            if event.event_code < EVENT_MIN_USER_EVENT:
+                pass
+
+            elif event.event_code == EVENT_DEVICE_UPDATE_REPLY:
                 log.debug("EVENT_DEVICE_UPDATE_REPLY (%s)" % event.device_uri)
                 dev = self.findDeviceByURI(event.device_uri)
 
                 if dev is not None:
-                    #print "GetStatus() call"
                     try:
                         self.service.GetStatus(event.device_uri, reply_handler=self.handleStatusReply,
                             error_handler=self.handleStatusError)
@@ -386,7 +425,6 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         if dev is None:
             dev = self.cur_device
 
-        #print "GetHistory() call"
         try:
             self.service.GetHistory(dev.device_uri, reply_handler=self.handleHistoryReply,
                                     error_handler=self.handleHistoryError)
@@ -446,7 +484,8 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         """ Called when the active tab changes.
             Update newly displayed tab.
         """
-        self.TabIndex[tab]()
+        if self.cur_device is not None:
+            self.TabIndex[tab]()
 
     def updateAllTabs(self):
         for tab in self.TabIndex:
@@ -465,9 +504,6 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
     #
     # ***********************************************************************************
 
-#    def DeviceList_onItem(self, a0):
-#        pass
-
 
     def DeviceRefreshAction_activated(self):
         self.DeviceRefreshAction.setEnabled(False)
@@ -477,10 +513,6 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
 
     def RefreshAllAction_activated(self):
         self.rescanDevices()
-
-
-#    def DeviceList_clicked(self,a0):
-#        pass
 
 
     def createDeviceIcon(self, dev=None):
@@ -531,7 +563,6 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         global devices
         log.debug("Rescanning device list...")
 
-        #if not self.updating:
         if 1:
             beginWaitCursor()
             self.updating = True
@@ -541,7 +572,6 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
 
             self.cups_devices = device.getSupportedCUPSDevices(['hp', 'hpfax'])
 
-            #devices_lock.acquire()
             current = None
 
             try:
@@ -576,7 +606,6 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                         removals.append(d)
                         continue
 
-                    self.checkForDeviceSettingsPlugin(dev)
                     icon = self.createDeviceIcon(dev)
 
                     if dev.device_type == DEVICE_TYPE_FAX:
@@ -595,8 +624,8 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                 log.debug("Removals (2): %s" % ','.join(removals))
 
                 for d in removals:
-                    index = 0
-                    item = self.DeviceList.item(index) #firstItem()
+                    index = self.DeviceList.count()-1
+                    item = self.DeviceList.item(index)
                     log.debug("removing: %s" % d)
 
                     try:
@@ -604,17 +633,16 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                     except KeyError:
                         pass
 
-                    while item is not None:
+                    while index >= 0 and item is not None:
                         if item.device_uri == d:
-                            self.DeviceList.takeItem(item)
+                            self.DeviceList.takeItem(index)
                             break
 
-                        index += 1
-                        item = self.DeviceList.item(index) #nextItem()
+                        index -= 1
+                        item = self.DeviceList.item(index)
 
                     qApp.processEvents()
 
-                #self.DeviceList.adjustItems()
                 self.DeviceList.updateGeometry()
                 qApp.processEvents()
 
@@ -624,38 +652,33 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
 
                     if self.cur_device_uri:
                         index = 0
-                        item = first_item = self.DeviceList.item(index) #firstItem()
+                        item = first_item = self.DeviceList.item(index)
 
                         while item is not None:
                             qApp.processEvents()
                             if item.device_uri == self.cur_device_uri:
-                                #self.DeviceList.setCurrentItem(item)
                                 current = item
-                                #self.DeviceList.setSelected(item, True)
                                 self.statusBar().showMessage(self.cur_device_uri)
                                 break
 
                             index += 1
-                            item = self.DeviceList.item(index) #nextItem()
+                            item = self.DeviceList.item(index)
 
                         else:
                             self.cur_device = None
                             self.cur_device_uri = ''
 
                     if self.cur_device is None:
-                        #self.cur_device_uri = self.DeviceList.firstItem().device_uri
-                        self.cur_device_uri = self.DeviceList.item(0).device_uri
-                        self.cur_device = device_list[self.cur_device_uri]
-                        #self.DeviceList.setCurrentItem(self.DeviceList.firstItem())
-                        #self.DeviceList.setCurrentItem(self.DeviceList.item(0))
-                        current = self.DeviceList.item(0)
-
-                    #self.Tabs.setTabEnabled(self.SuppliesTab, self.cur_device.device_type == DEVICE_TYPE_PRINTER and
-                    #    self.cur_device.error_state != ERROR_STATE_ERROR)
+                        i = self.DeviceList.item(0)
+                        if i is not None:
+                            self.cur_device_uri = i.device_uri
+                            self.cur_device = device_list[self.cur_device_uri]
+                            current = i
 
                     self.updatePrinterCombos()
 
-                    user_cfg.last_used.device_uri = self.cur_device_uri
+                    if self.cur_device_uri:
+                        user_conf.set('last_used', 'device_uri',self.cur_device_uri)
 
                     for d in updates + adds:
                         if d not in removals:
@@ -671,23 +694,26 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                     for tab in self.TabIndex:
                         self.Tabs.setTabEnabled(tab, False)
 
-                    dlg = NoDevicesForm(self, "", True)
-                    dlg.show()
+                    endWaitCursor()
+
+                    dlg = NoDevicesDialog(self)
+                    dlg.exec_()
 
             finally:
                 self.updating = False
-                #devices_lock.release()
+                endWaitCursor()
 
             if current is not None:
                 self.DeviceList.setCurrentItem(current)
 
             self.DeviceRefreshAction.setEnabled(True)
-            self.RemoveDeviceAction.setEnabled(True)
 
-            #self.setWindowTitle(self.__tr("Refreshing Device List - HP Device Manager"))
-            self.statusBar().showMessage(self.cur_device_uri)
-            self.updateWindowTitle()
-            endWaitCursor()
+            if self.cur_device is not None:
+                self.RemoveDeviceAction.setEnabled(True)
+
+                self.statusBar().showMessage(self.cur_device_uri)
+                self.updateWindowTitle()
+
 
 
     def updateWindowTitle(self):
@@ -698,6 +724,8 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                 self.setWindowTitle(self.__tr("HP Device Manager - %1 (Printer)").arg(self.cur_device.model_ui))
             else:
                 self.setWindowTitle(self.__tr("HP Device Manager - %1").arg(self.cur_device.model_ui))
+
+        self.statusBar().showMessage(self.cur_device_uri)
 
 
     def updateDeviceByURI(self, device_uri):
@@ -711,32 +739,24 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         if dev is None:
             dev = self.cur_device
 
-        log.debug("UpdateDevice(%s)" % dev.device_uri)
+        log.debug("updateDevice(%s)" % dev.device_uri)
 
         item = self.findItem(dev)
-        #print item
 
         if item is not None:
             item.setIcon(QIcon(self.createDeviceIcon(dev)))
 
-        #if dev is self.cur_device and dev.error_state == ERROR_STATE_ERROR:
-            #self.Tabs.setCurrentPage(1)
-            #self.Tabs.setCurrentIndex(1)
-
         if dev is self.cur_device and update_tab:
             self.updatePrinterCombos()
             self.updateCurrentTab()
+            self.statusBar().showMessage(self.cur_device_uri)
 
 
     def DeviceList_currentChanged(self, i,  j):
-        #print "DeviceList_currentChanged()"
         if i is not None and not self.updating:
             self.cur_device_uri = self.DeviceList.currentItem().device_uri
             self.cur_device = device_list[self.cur_device_uri]
-            user_cfg.last_used.device_uri = self.cur_device_uri
-
-            #self.Tabs.setTabEnabled(self.SuppliesTab, self.cur_device.device_type == DEVICE_TYPE_PRINTER and
-            #    self.cur_device.error_state != ERROR_STATE_ERROR)
+            user_conf.set('last_used', 'device_uri', self.cur_device_uri)
 
             self.updateDevice()
             self.updateWindowTitle()
@@ -775,17 +795,14 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
             dev = self.cur_device
 
         if dev is not None:
-            #log.debug("RequestDeviceUpdate(%s)" % dev.device_uri)
             dev.error_state = ERROR_STATE_REFRESHING
             self.updateDevice(dev, update_tab=False)
-            #qApp.processEvents()
 
             self.sendMessage(dev.device_uri, '', EVENT_DEVICE_UPDATE_REQUESTED)
 
 
     def rescanDevices(self):
         """ Rescan and update all devices. """
-        #log.debug("RescanDevices()")
         if not self.updating:
             self.RefreshAllAction.setEnabled(False)
             try:
@@ -827,9 +844,6 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
 
                 popup.insertSeparator()
 
-                if self.cur_device.device_settings_ui is not None:
-                    popup.insertItem(self.__tr("Device Settings..."), self.deviceSettingsButton_clicked)
-
             if not self.updating:
                 popup.insertItem(self.__tr("Refresh Device"), self.DeviceRefreshAction_activated)
 
@@ -845,17 +859,6 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
     #
     # ***********************************************************************************
 
-#    def updatePrinterList(self):
-#        if self.cur_device is not None and \
-#            self.cur_device.supported:
-#
-#            printers = cups.getPrinters()
-#            self.cur_device.cups_printers = []
-#
-#            for p in printers:
-#                if p.device_uri == self.cur_device_uri:
-#                    self.cur_device.cups_printers.append(p.name)
-
 
     def updatePrinterCombos(self):
         self.PrintSettingsPrinterNameCombo.clear()
@@ -865,27 +868,26 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
             self.cur_device.supported:
 
             for c in self.cur_device.cups_printers:
-                #print repr(c)
                 self.PrintSettingsPrinterNameCombo.insertItem(0, c.decode("utf-8"))
                 self.PrintControlPrinterNameCombo.insertItem(0, c.decode("utf-8"))
 
             self.cur_printer = unicode(self.PrintSettingsPrinterNameCombo.currentText())
-            #print self.cur_printer
+
 
     def PrintSettingsPrinterNameCombo_activated(self, s):
         self.cur_printer = unicode(s)
         self.PrintControlPrinterNameCombo.setCurrentText(self.cur_printer.encode("latin1")) # TODO: ?
         return self.PrinterCombo_activated(self.cur_printer)
 
+
     def PrintControlPrinterNameCombo_activated(self, s):
         self.cur_printer = unicode(s)
         self.PrintSettingsPrinterNameCombo.setCurrentText(self.cur_printer.encode("latin1")) # TODO: ?
         return self.PrinterCombo_activated(self.cur_printer)
 
+
     def PrinterCombo_activated(self, printer):
-        #self.TabIndex[self.Tabs.currentIndex()]()
         self.updateCurrentTab()
-        #self.UpdatePrintSettingsTabPrinter()
 
 
 
@@ -898,34 +900,11 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
     def initActionsTab(self):
         self.click_lock = None
         self.ActionsList.setIconSize(QSize(32, 32))
-        #self.ActionsList.setContextMenuPolicy(Qt.CustomContextMenu)
         self.connect(self.ActionsList, SIGNAL("itemClicked(QListWidgetItem *)"),  self.ActionsList_clicked)
         self.connect(self.ActionsList, SIGNAL("itemDoubleClicked(QListWidgetItem *)"),  self.ActionsList_clicked)
-        #self.connect(self.ActionsList, SIGNAL("customContextMenuRequested(const QPoint &)"), self.ActionsList_customContextMenuRequested)
-
-#        self.ActionListViewAsListAction = QAction(self.__tr("View as list"), self.ActionsList)
-#        self.ActionListViewAsIconsAction = QAction(self.__tr("View as icons"), self.ActionsList)
-#        self.ActionsList.setContextMenuPolicy(Qt.ActionsContextMenu)
-#        self.ActionsList.addAction(self.ActionListViewAsListAction)
-#        self.ActionsList.addAction(self.ActionListViewAsIconsAction)
-#        #self.ActionsList.setWrapping(True)
-#        #self.ActionsList.setSpacing(100)
-#        self.ActionsList.setGridSize(QSize(100, 100))
-#
-#        self.connect(self.ActionListViewAsListAction, SIGNAL("triggered()"), self.ActionListViewAsListAction_triggered)
-#        self.connect(self.ActionListViewAsIconsAction, SIGNAL("triggered()"), self.ActionListViewAsIconsAction_triggered)
-#
-#
-#    def ActionListViewAsListAction_triggered(self):
-#        self.ActionsList.setViewMode(QListView.ListMode)
-#
-#
-#    def ActionListViewAsIconsAction_triggered(self):
-#        self.ActionsList.setViewMode(QListView.IconMode)
 
 
     def updateActionsTab(self):
-        #print "UpdateActionsTab()"
         beginWaitCursor()
         try:
             self.ActionsList.clear()
@@ -1002,7 +981,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                     self.__tr("Send Fax"),
                     "fax",
                     self.__tr("Send a fax from the PC."),
-                    lambda : SendFaxDialog(self, self.cur_device_uri)),
+                    lambda : SendFaxDialog(self, self.cur_printer, self.cur_device_uri)),
 
                     (lambda: fax,
                     self.__tr("Fax Setup"),
@@ -1018,7 +997,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
 
                     # SETTINGS/TOOLS
 
-                    (lambda : self.cur_device.device_settings_ui is not None and avail,
+                    (lambda : d.power_settings != POWER_SETTINGS_NONE and avail,
                     self.__tr("Device Settings"),
                     "settings",
                     self.__tr("Your device has special device settings.<br>You may alter these settings here."),
@@ -1086,20 +1065,20 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                     self.__tr("Install Required Plugin"),
                     "plugin",
                     x,
-                    lambda : PluginDialog(self)),
+                    lambda : PluginInstall(self, d.plugin, plugin_installed)),
 
                     (lambda : opt_plugin,
                     self.__tr("Install Optional Plugin"),
                     "plugin",
                     x,
-                    lambda : PluginDialog(self)),
+                    lambda : PluginInstall(self, d.plugin, plugin_installed)),
 
                     # HELP/WEBSITE
 
                     (lambda : True,
-                    self.__tr("Visit HPLIP support Website"),
+                    self.__tr("Visit HPLIP Support Website"),
                     "support2",
-                    self.__tr("Visit HPLIP support website."),
+                    self.__tr("Visit HPLIP Support Website."),
                     self.support),
 
                     (lambda : True,
@@ -1133,6 +1112,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
             self.click_lock = item
 
             if item.cmd and callable(item.cmd):
+
                 dlg = item.cmd()
                 self.sendMessage('', '', EVENT_DEVICE_STOP_POLLING)
                 try:
@@ -1202,42 +1182,58 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
 
                 line2 = ''
 
-            pm = load_pixmap('panel_lcd', 'other')
-
-            p = QPainter()
-            p.begin(pm)
-            p.setPen(QColor(0, 0, 0))
-            p.setFont(self.font())
-
-            x, y_line1, y_line2 = 10, 17, 33
-
-            # TODO: Scroll long lines
-            p.drawText(x, y_line1, line1)
-            p.drawText(x, y_line2, line2)
-            p.end()
-
-            self.LCD.setPixmap(pm)
+            self.drawStatusLCD(line1, line2)
 
         else:
-            self.LCD.setPixmap(load_pixmap('panel_lcd', 'other'))
+            if self.cur_device.status_type == STATUS_TYPE_NONE:
+                self.drawStatusLCD(self.__tr("Status information not"), self.__tr("available for this device."))
 
+            elif not self.cur_device.supported:
+                self.drawStatusLCD(self.__tr("Device not supported."))
+
+            elif not self.cur_device.hist:
+                self.drawStatusLCD(self.__tr("No status history available."))
+
+            else:
+                self.drawStatusLCD()
+
+
+    def drawStatusLCD(self, line1='', line2=''):
+        pm = load_pixmap('panel_lcd', 'other')
+
+        p = QPainter()
+        p.begin(pm)
+        p.setPen(QColor(0, 0, 0))
+        p.setFont(self.font())
+
+        x, y_line1, y_line2 = 10, 17, 33
+
+        # TODO: Scroll long lines
+        if line1:
+            p.drawText(x, y_line1, line1)
+
+        if line2:
+            p.drawText(x, y_line2, line2)
+
+        p.end()
+
+        self.LCD.setPixmap(pm)
 
 
 
     def updateStatusTable(self):
-        #print "UpdateStatusTab()"
         self.StatusTable.clear()
         flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
 
         row = 0
         hist = self.cur_device.hist[:]
-        #print hist
 
         if hist:
             self.StatusTable.setRowCount(len(hist))
             self.StatusTable.setColumnCount(len(self.status_headers))
             self.StatusTable.setHorizontalHeaderLabels(self.status_headers)
             self.StatusTable.verticalHeader().hide()
+            self.StatusTable.horizontalHeader().show()
 
             hist.reverse()
             row = len(hist)-1
@@ -1284,11 +1280,6 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                     i = QTableWidgetItem(QString(t))
                     i.setFlags(flags)
 
-#                    if row == 0:
-#                        f = i.font()
-#                        f.setBold(True)
-#                        i.setFont(f)
-
                     self.StatusTable.setItem(row, col, i)
 
                 row -= 1
@@ -1296,6 +1287,26 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
             self.StatusTable.resizeColumnsToContents()
             self.StatusTable.setColumnWidth(0, 24)
 
+        else:
+            self.StatusTable.setRowCount(1)
+            self.StatusTable.setColumnCount(2)
+            self.StatusTable.setHorizontalHeaderLabels(["", ""])
+            self.StatusTable.verticalHeader().hide()
+            self.StatusTable.horizontalHeader().hide()
+
+            flags = Qt.ItemIsEnabled
+
+            pixmap = getStatusListIcon(ERROR_STATE_ERROR)[0]
+            i = QTableWidgetItem(QIcon(pixmap), self.__tr(""))
+            i.setFlags(flags)
+            self.StatusTable.setItem(row, 0, i)
+
+            i = QTableWidgetItem(self.__tr("Status information not available for this device."))
+            i.setFlags(flags)
+            self.StatusTable.setItem(0, 1, i)
+
+            self.StatusTable.resizeColumnsToContents()
+            self.StatusTable.setColumnWidth(0, 24)
 
 
     # ***********************************************************************************
@@ -1349,7 +1360,6 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
 
 
     def updateSuppliesTab(self):
-        #print "UpdateSuppliesTab()"
         beginWaitCursor()
         flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
 
@@ -1387,6 +1397,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                 self.SuppliesTable.setColumnCount(len(self.supplies_headers))
                 self.SuppliesTable.setHorizontalHeaderLabels(self.supplies_headers)
                 self.SuppliesTable.verticalHeader().hide()
+                self.SuppliesTable.horizontalHeader().show()
                 self.SuppliesTable.setIconSize(QSize(100, 18))
 
                 for row, x in enumerate(self.cur_device.sorted_supplies):
@@ -1442,6 +1453,27 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                 self.SuppliesTable.resizeColumnsToContents()
                 self.SuppliesTable.setColumnWidth(0, 24)
                 self.SuppliesTable.setColumnWidth(3, 120)
+
+            else: # No supplies info
+                log.warning("Supplies information not available for this device.")
+                flags = Qt.ItemIsEnabled
+                self.SuppliesTable.setRowCount(1)
+                self.SuppliesTable.setColumnCount(2)
+                self.SuppliesTable.setHorizontalHeaderLabels(["", ""])
+                self.SuppliesTable.verticalHeader().hide()
+                self.SuppliesTable.horizontalHeader().hide()
+
+                i = QTableWidgetItem(self.__tr("Supplies information not available for this device."))
+                i.setFlags(flags)
+                self.SuppliesTable.setItem(0, 1, i)
+
+                pixmap = getStatusListIcon(ERROR_STATE_ERROR)[0]
+                i = QTableWidgetItem(QIcon(pixmap), self.__tr(""))
+                i.setFlags(flags)
+                self.SuppliesTable.setItem(0, 0, i)
+
+                self.SuppliesTable.resizeColumnsToContents()
+                self.SuppliesTable.setColumnWidth(0, 24)
 
         finally:
             endWaitCursor()
@@ -1621,17 +1653,6 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                                  cups.IPP_JOB_COMPLETED : QIcon(load_pixmap("ok", "16x16")),
                                 }
 
-#        self.JobTable.setSorting(-1)
-#        self.JobTable.setColumnText(0, QString(""))
-#        #self.JobTable.setColumnWidthMode(0, QListView.Manual)
-#        self.JobTable.setColumnWidth(0, 16)
-#        self.JobTable.setColumnText(1, QString(""))
-#        #self.JobTable.setColumnWidthMode(1, QListView.Manual)
-#        self.JobTable.setColumnWidth(1, 16)
-#        self.JobTable.setColumnWidth(2, 300)
-#        self.cancelToolButton.setEnabled(False)
-#        self.infoToolButton.setEnabled(False)
-
         self.connect(self.StartStopButton, SIGNAL("clicked()"), self.StartStopButton_clicked)
         self.connect(self.AcceptRejectButton, SIGNAL("clicked()"), self.AcceptRejectButton_clicked)
         self.connect(self.SetDefaultButton, SIGNAL("clicked()"), self.SetDefaultButton_clicked)
@@ -1641,16 +1662,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         self.job_headers = [self.__tr("Status"), self.__tr("Title/Description"), self.__tr("Job ID")]
 
         # TODO: Check queues at startup and send events if stopped or rejecting
-        
-#        if self.cur_printer:
-#            self.getPrinterState()
-#            
-#            if self.printer_state == cups.IPP_PRINTER_STATE_STOPPED:
-#                self.cur_device.sendEvent(EVENT_PRINTER_QUEUE_STOPPED, self.cur_printer)
-#                
-#            if not self.printer_accepting:
-#                self.cur_device.sendEvent(EVENT_PRINTER_QUEUE_REJECTING_JOBS, self.cur_printer)
-#        
+
 
     def CancelJobButton_clicked(self):
         item = self.JobTable.currentItem()
@@ -1658,14 +1670,14 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         if item is not None:
             job_id, ok = item.data(Qt.UserRole).toInt()
             if ok and job_id:
-               self.cur_device.cancelJob(job_id) 
+               self.cur_device.cancelJob(job_id)
                QTimer.singleShot(1000, self.updatePrintControlTab)
-        
-    
+
+
     def RefreshButton_clicked(self):
         self.updatePrintControlTab()
-        
-        
+
+
     def updatePrintControlTab(self):
         if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
             self.PrintControlPrinterNameLabel.setText(self.__tr("Printer Name:"))
@@ -1703,32 +1715,14 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                     i = QTableWidgetItem(unicode(j.id))
                     i.setFlags(flags)
                     self.JobTable.setItem(row, 2, i)
-                    
-        
+
+
             self.JobTable.setCurrentCell(0, 0)
             self.JobTable.resizeColumnsToContents()
-        
+
         else:
             self.CancelJobButton.setEnabled(False)
 
-
-#    def getJobInfo(self):
-#        return self.showJobInfoDialog(self.JobTable.currentItem())
-#
-#
-#    def showJobInfoDialog(self, item):
-#        if item is not None:
-#            text = cups.getPrintJobErrorLog(int(item.job_id))
-#
-#            if text:
-#                dlg = JobInfoDialog(text, self)
-#                dlg.setWindowTitle(self.__tr("HP Device Manager - Job Log - %1 - Job %2").\
-#                    arg(self.cur_printer).arg(unicode(item.job_id)))
-#
-#                dlg.exec_loop()
-#
-#            else:
-#                self.FailureUI(self.__tr("<b>No log output found.</b><p>If the print job is stopped or the printer is rejecting jobs, there might not be any output. Also, you will receive more output in the CUPS LogLevel is set to 'debug'."))
 
     def getPrinterState(self):
         self.printer_state = cups.IPP_PRINTER_STATE_IDLE
@@ -1743,8 +1737,6 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
 
 
     def updatePrintController(self):
-        #print "updatePrintController()"
-        
         # default printer
         self.SetDefaultButton.setText(self.__tr("Set as Default"))
 
@@ -1762,18 +1754,8 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
             self.SetDefaultIcon.setPixmap(load_pixmap("info", "16x16"))
             self.SetDefaultButton.setEnabled(True)
 
-#        self.printer_state = cups.IPP_PRINTER_STATE_IDLE
-#
-#        cups_printers = cups.getPrinters()
-#
-#        for p in cups_printers:
-#            if p.name.decode('utf-8') == self.cur_printer:
-#                self.printer_state = p.state
-#                self.printer_accepting = p.accepting
-#                break
-
         self.getPrinterState()
-        
+
         # start/stop
         if self.printer_state == cups.IPP_PRINTER_STATE_IDLE:
             self.StartStopLabel.setText(self.__tr("Started/Idle"))
@@ -1821,23 +1803,26 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         beginWaitCursor()
         try:
             if self.printer_state in (cups.IPP_PRINTER_STATE_IDLE, cups.IPP_PRINTER_STATE_PROCESSING):
-                cups.stop(self.cur_printer)
-
-                if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
-                    e = EVENT_PRINTER_QUEUE_STOPPED
-                else:
-                    e = EVENT_FAX_QUEUE_STOPPED
+                result = cups.stop(self.cur_printer)
+                if result:
+                    if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
+                        e = EVENT_PRINTER_QUEUE_STOPPED
+                    else:
+                        e = EVENT_FAX_QUEUE_STOPPED
 
             else:
-                cups.start(self.cur_printer)
+                result = cups.start(self.cur_printer)
+                if result:
+                    if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
+                        e = EVENT_PRINTER_QUEUE_STARTED
+                    else:
+                        e = EVENT_FAX_QUEUE_STARTED
 
-                if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
-                    e = EVENT_PRINTER_QUEUE_STARTED
-                else:
-                    e = EVENT_FAX_QUEUE_STARTED
-
-            self.updatePrintController()
-            self.cur_device.sendEvent(e, self.cur_printer)
+            if result:
+                self.updatePrintController()
+                self.cur_device.sendEvent(e, self.cur_printer)
+            else:
+                log.error("Start/Stop printer operation failed")
 
         finally:
             endWaitCursor()
@@ -1848,20 +1833,27 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         beginWaitCursor()
         try:
             if self.printer_accepting:
-                cups.reject(self.cur_printer)
-                if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
-                    e = EVENT_PRINTER_QUEUE_REJECTING_JOBS
-                else:
-                    e = EVENT_FAX_QUEUE_REJECTING_JOBS
-            else:
-                cups.accept(self.cur_printer)
-                if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
-                    e = EVENT_PRINTER_QUEUE_ACCEPTING_JOBS
-                else:
-                    e = EVENT_FAX_QUEUE_ACCEPTING_JOBS
+                result = cups.reject(self.cur_printer)
+                if result:
+                    if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
+                        e = EVENT_PRINTER_QUEUE_REJECTING_JOBS
+                    else:
+                        e = EVENT_FAX_QUEUE_REJECTING_JOBS
 
-            self.updatePrintController()
-            self.cur_device.sendEvent(e, self.cur_printer)
+            else:
+                result = cups.accept(self.cur_printer)
+                if result:
+                    if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
+                        e = EVENT_PRINTER_QUEUE_ACCEPTING_JOBS
+                    else:
+                        e = EVENT_FAX_QUEUE_ACCEPTING_JOBS
+
+            if result:
+                self.updatePrintController()
+                self.cur_device.sendEvent(e, self.cur_printer)
+            else:
+                log.error("Reject/Accept jobs operation failed")
+
 
         finally:
             endWaitCursor()
@@ -1930,27 +1922,16 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
             pass
 
 
+    def quit(self):
+        self.cleanupChildren()
+        self.close()
+
+
     # ***********************************************************************************
     #
     # DEVICE SETTINGS PLUGIN
     #
     # ***********************************************************************************
-
-    def checkForDeviceSettingsPlugin(self, dev):
-        dev.device_settings_ui = None
-        name = '.'.join(['ui4',  'plugins', dev.model])
-        log.debug("Attempting to load plugin: %s" % name)
-        try:
-            mod = __import__(name, globals(), locals(), [])
-        except ImportError:
-            log.debug("No plugin found.")
-            return
-        else:
-            components = name.split('.')
-            for c in components[1:]:
-                mod = getattr(mod, c)
-            log.debug("Loaded: %s" % repr(mod))
-            dev.device_settings_ui = mod.settingsUI
 
 
     # ***********************************************************************************
@@ -1964,14 +1945,9 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         dlg.TabWidget.setCurrentIndex(tab_to_show)
 
         if dlg.exec_() == QDialog.Accepted:
-            #old_auto_refresh = self.user_settings.auto_refresh_rate
             self.user_settings.load()
 
-            #if self.user_settings.auto_refresh and old_auto_refresh != self.user_settings.auto_refresh_rate:
-            #    self.refresh_timer.changeInterval(self.user_settings.auto_refresh_rate * 1000)
-
-            #if old_auto_refresh != self.user_settings.auto_refresh:
-            #    self.autoRefresh.toggle()
+            self.cur_device.sendEvent(EVENT_USER_CONFIGURATION_CHANGED, self.cur_printer)
 
 
     # ***********************************************************************************
@@ -2027,8 +2003,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
 
                 self.cur_device = None
                 self.cur_device_uri = ''
-                user_cfg.last_used.device_uri = ''
-
+                user_conf.set('last_used', 'device_uri', '')
                 endWaitCursor()
 
                 self.rescanDevices()
@@ -2045,7 +2020,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
 
         try:
             if len(cmd) == 0:
-                self.FailureUI(self.__tr("<p><b>Unable to run command. No command specified.</b><p>Use <pre>Configure...</pre> to specify a command to run."))
+                FailureUI(self.__tr("<p><b>Unable to run command. No command specified.</b><p>Use <pre>Configure...</pre> to specify a command to run."))
                 log.error("No command specified. Use settings to configure commands.")
             else:
                 log.debug("Run: %s %s (%s) %s" % ("*"*20, cmd, self.cur_device_uri, "*"*20))
@@ -2078,9 +2053,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
 
 
     def helpAbout(self):
-        dlg = AboutDlg(self)
-        dlg.VersionText.setText(prop.version)
-        dlg.ToolboxVersionText.setText(self.toolbox_version)
+        dlg = AboutDialog(self, prop.version, self.toolbox_version + " (Qt4)")
         dlg.exec_()
 
 
@@ -2088,4 +2061,64 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         return qApp.translate("DevMgr5",s,c)
 
 
+class PasswordDialog(QDialog):
+    def __init__(self, prompt, parent=None, name=None, modal=0, fl=0):
+        log.debug("PasswordDialog")
+        QDialog.__init__(self)
 
+        if not name:
+            self.setObjectName("PasswordDialog")
+
+        passwordDlg_baseLayout = QGridLayout(self)
+        passwordDlg_baseLayout.setMargin(11)
+        passwordDlg_baseLayout.setSpacing(6)
+        passwordDlg_baseLayout.setObjectName("passwordDlg_baseLayout")
+
+        self.promptTextLabel = QLabel(self)
+        self.promptTextLabel.setObjectName("promptTextLabel")
+        self.promptTextLabel.setText(prompt)
+        passwordDlg_baseLayout.addWidget(self.promptTextLabel,0,0)
+
+        self.passwordLineEdit = QLineEdit(self)
+        self.passwordLineEdit.setObjectName("passwordLineEdit")
+        self.passwordLineEdit.setEchoMode(QLineEdit.Password)
+        passwordDlg_baseLayout.addWidget(self.passwordLineEdit,1,0,1,2)
+
+        spacer1 = QSpacerItem(20,61,QSizePolicy.Minimum,QSizePolicy.Expanding)
+        passwordDlg_baseLayout.addItem(spacer1,2,0)
+
+        spacer2 = QSpacerItem(321,20,QSizePolicy.Expanding,QSizePolicy.Minimum)
+        passwordDlg_baseLayout.addItem(spacer2,3,0)
+
+        self.okPushButton = QPushButton(self)
+        self.okPushButton.setObjectName("okPushButton")
+        passwordDlg_baseLayout.addWidget(self.okPushButton,3,1)
+
+        self.languageChange()
+
+        self.resize(QSize(420,163).expandedTo(self.minimumSizeHint()))
+
+        self.connect(self.okPushButton,SIGNAL("clicked()"),self.accept)
+        self.connect(self.passwordLineEdit,SIGNAL("returnPressed()"),self.accept)
+    def getPassword(self):
+        return unicode(self.passwordLineEdit.text())
+
+    def languageChange(self):
+        self.setWindowTitle(self.__tr("HP Device Manager - Enter Password"))
+        self.okPushButton.setText(self.__tr("OK"))
+
+    def __tr(self,s,c = None):
+        return qApp.translate("PasswordDialog",s,c)
+
+
+def showPasswordUI(prompt):
+    try:
+        dlg = PasswordDialog(prompt, None)
+
+        if dlg.exec_() == QDialog.Accepted:
+            return dlg.getPassword()
+
+    finally:
+        pass
+
+    return ""

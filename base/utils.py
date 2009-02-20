@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ def lock_app(application, suppress_error=False):
     dir = prop.user_dir
     if os.geteuid() == 0:
         dir = '/var'
-    
+
     elif not os.path.exists(dir):
         os.makedirs(dir)
 
@@ -496,24 +496,24 @@ class UserSettings(object): # Note: Deprecated after 2.8.8 (see ui4/ui_utils.py)
     def load(self):
         self.loadDefaults()
         log.debug("Loading user settings...")
-        self.auto_refresh = to_bool(user_cfg.refresh.enable, False)
+        self.auto_refresh = to_bool(user_conf.get('refresh', 'enable', '0'))
 
         try:
-            self.auto_refresh_rate = int(user_cfg.refresh.rate)
+            self.auto_refresh_rate = int(user_conf.get('refresh', 'rate', '30'))
         except ValueError:
             self.auto_refresh_rate = 30 # (secs)
 
         try:
-            self.auto_refresh_type = int(user_cfg.refresh.type)
+            self.auto_refresh_type = int(user_conf.get('refresh', 'type', '0'))
         except ValueError:
             self.auto_refresh_type = 0 # refresh 1 (1=refresh all)
 
-        self.cmd_print = user_cfg.commands.prnt or self.cmd_print
-        self.cmd_scan = user_cfg.commands.scan or self.cmd_scan
-        self.cmd_pcard = user_cfg.commands.pcard or self.cmd_pcard
-        self.cmd_copy = user_cfg.commands.cpy or self.cmd_copy
-        self.cmd_fax = user_cfg.commands.fax or self.cmd_fax
-        self.cmd_fab = user_cfg.commands.fab or self.cmd_fab
+        self.cmd_print = user_conf.get('commands', 'prnt', self.cmd_print)
+        self.cmd_scan = user_conf.get('commands', 'scan', self.cmd_scan)
+        self.cmd_pcard = user_conf.get('commands', 'pcard', self.cmd_pcard)
+        self.cmd_copy = user_conf.get('commands', 'cpy', self.cmd_copy)
+        self.cmd_fax = user_conf.get('commands', 'fax', self.cmd_fax)
+        self.cmd_fab = user_conf.get('commands', 'fab', self.cmd_fab)
         self.debug()
 
     def debug(self):
@@ -529,14 +529,14 @@ class UserSettings(object): # Note: Deprecated after 2.8.8 (see ui4/ui_utils.py)
 
     def save(self):
         log.debug("Saving user settings...")
-        user_cfg.commands.prnt = self.cmd_print
-        user_cfg.commands.pcard = self.cmd_pcard
-        user_cfg.commands.fax = self.cmd_fax
-        user_cfg.commands.scan = self.cmd_scan
-        user_cfg.commands.cpy = self.cmd_copy
-        user_cfg.refresh.enable = self.auto_refresh
-        user_cfg.refresh.rate = self.auto_refresh_rate
-        user_cfg.refresh.type = self.auto_refresh_type
+        user_conf.set('commands', 'prnt', self.cmd_print)
+        user_conf.set('commands', 'pcard', self.cmd_pcard)
+        user_conf.set('commands', 'fax', self.cmd_fax)
+        user_conf.set('commands', 'scan', self.cmd_scan)
+        user_conf.set('commands', 'cpy', self.cmd_copy)
+        user_conf.set('refresh', 'enable',self.auto_refresh)
+        user_conf.set('refresh', 'rate', self.auto_refresh_rate)
+        user_conf.set('refresh', 'type', self.auto_refresh_type)
         self.debug()
 
 
@@ -938,25 +938,32 @@ class XMLToDictParser:
 def dquote(s):
     return ''.join(['"', s, '"'])
 
-# Python 2.2 compatibility functions (strip() family with char argument)
-def xlstrip(s, chars=' '):
-    i = 0
-    for c, i in zip(s, range(len(s))):
-        if c not in chars:
-            break
+# Python 2.2.x compatibility functions (strip() family with char argument added in Python 2.2.3)
+if sys.hexversion < 0x020203f0:
+    def xlstrip(s, chars=' '):
+        i = 0
+        for c, i in zip(s, range(len(s))):
+            if c not in chars:
+                break
 
-    return s[i:]
+        return s[i:]
 
-def xrstrip(s, chars=' '):
-    return xreverse(xlstrip(xreverse(s), chars))
+    def xrstrip(s, chars=' '):
+        return xreverse(xlstrip(xreverse(s), chars))
 
-def xreverse(s):
-    l = list(s)
-    l.reverse()
-    return ''.join(l)
+    def xreverse(s):
+        l = list(s)
+        l.reverse()
+        return ''.join(l)
 
-def xstrip(s, chars=' '):
-    return xreverse(xlstrip(xreverse(xlstrip(s, chars)), chars))
+    def xstrip(s, chars=' '):
+        return xreverse(xlstrip(xreverse(xlstrip(s, chars)), chars))
+
+else:
+    xlstrip = string.lstrip
+    xrstrip = string.rstrip
+    xstrip = string.strip
+
 
 def getBitness():
     if platform_avail:
@@ -974,8 +981,14 @@ def getProcessor():
 BIG_ENDIAN = 0
 LITTLE_ENDIAN = 1
 
+#def getEndian():
+    #if struct.pack("@I", 0x01020304)[0] == '\x01':
+        #return BIG_ENDIAN
+    #else:
+        #return LITTLE_ENDIAN
+
 def getEndian():
-    if struct.pack("@I", 0x01020304)[0] == '\x01':
+    if sys.byteorder == 'big':
         return BIG_ENDIAN
     else:
         return LITTLE_ENDIAN
@@ -999,8 +1012,9 @@ def run(cmd, log_output=True, password_func=get_password, timeout=1):
             i = child.expect(["[pP]assword:", pexpect.EOF, pexpect.TIMEOUT])
 
             if child.before:
-                log.debug(child.before)
                 output.write(child.before)
+                if log_output:
+                    log.debug(child.before)
 
             if i == 0: # Password:
                 if password_func is not None:
@@ -1122,7 +1136,7 @@ def validate_language(lang, default='en_US'):
             if lang in ll:
                 break
         else:
-            loc = user_cfg.ui.get("loc", "en_US")
+            loc = 'en_US'
             log.warn("Unknown lang/locale. Using default of %s." % loc)
 
     return loc
@@ -1255,9 +1269,10 @@ USAGE_MODE = ("[MODE]", "", "header", False)
 USAGE_NON_INTERACTIVE_MODE = ("Run in non-interactive mode:", "-n or --non-interactive", "option", False)
 USAGE_GUI_MODE = ("Run in graphical UI mode:", "-u or --gui (Default)", "option", False)
 USAGE_INTERACTIVE_MODE = ("Run in interactive mode:", "-i or --interactive", "option", False)
-if sys_cfg.configure.get('ui_toolkit', 'qt3') == 'qt3':
+
+if sys_conf.get('configure', 'ui-toolkit', 'qt3') == 'qt3':
     USAGE_USE_QT3 = ("Use Qt3:",  "--qt3 (Default)",  "option",  False)
-    USAGE_USE_QT4 = ("Use Qt4:",  "--qt4 (Not yet supported. Do not use.)",  "option",  False)
+    USAGE_USE_QT4 = ("Use Qt4:",  "--qt4",  "option",  False)
 else:
     USAGE_USE_QT3 = ("Use Qt3:",  "--qt3",  "option",  False)
     USAGE_USE_QT4 = ("Use Qt4:",  "--qt4 (Default)",  "option",  False)
@@ -1341,16 +1356,34 @@ def format_text(text_list, typ='text', title='', crumb='', version=''): # TODO: 
 
 
     elif typ == 'rest':
-        colwidth1, colwidth2 = 0, 0
+        opt_colwidth1, opt_colwidth2 = 0, 0
+        exmpl_colwidth1, exmpl_colwidth2 = 0, 0
+        note_colwidth1, note_colwidth2 = 0, 0
+
         for line in text_list:
             text1, text2, format, trailing_space = line
 
-            if format in ('option', 'example', 'note'):
-                colwidth1 = max(len(text1), colwidth1)
-                colwidth2 = max(len(text2), colwidth2)
+            if format  == 'option':
+                opt_colwidth1 = max(len(text1), opt_colwidth1)
+                opt_colwidth2 = max(len(text2), opt_colwidth2)
 
-        colwidth1 += 3
-        tablewidth = colwidth1 + colwidth2
+            elif format == 'example':
+                exmpl_colwidth1 = max(len(text1), exmpl_colwidth1)
+                exmpl_colwidth2 = max(len(text2), exmpl_colwidth2)
+
+            elif format == 'note':
+                note_colwidth1 = max(len(text1), note_colwidth1)
+                note_colwidth2 = max(len(text2), note_colwidth2)
+
+        opt_colwidth1 += 4
+        opt_colwidth2 += 4
+        exmpl_colwidth1 += 4
+        exmpl_colwidth2 += 4
+        note_colwidth1 += 4
+        note_colwidth2 += 4
+        opt_tablewidth = opt_colwidth1 + opt_colwidth2
+        exmpl_tablewidth = exmpl_colwidth1 + exmpl_colwidth2
+        note_tablewidth = note_colwidth1 + note_colwidth2
 
         # write the rst2web header
         log.info("""restindex
@@ -1361,12 +1394,13 @@ file-extension: html
 encoding: utf8
 /restindex\n""" % (title, crumb))
 
-        log.info("%s: %s (ver. %s)" % (crumb, title, version))
-        log.info("="*80)
+        t = "%s: %s (ver. %s)" % (crumb, title, version)
+        log.info(t)
+        log.info("="*len(t))
         log.info("")
 
         links = []
-
+        needs_header = False
         for line in text_list:
             text1, text2, format, trailing_space = line
 
@@ -1390,27 +1424,57 @@ encoding: utf8
                 log.info("")
                 log.info("**" + text1 + "**")
                 log.info("")
-                log.info(".. class:: borderless")
-                log.info("")
-                log.info(''.join(["+", "-"*colwidth1, "+", "-"*colwidth2, "+"]))
+                needs_header = True
 
-            elif format in ('option', 'example', 'seealso'):
+            elif format == 'option':
+                if needs_header:
+                    log.info(".. class:: borderless")
+                    log.info("")
+                    log.info(''.join(["+", "-"*opt_colwidth1, "+", "-"*opt_colwidth2, "+"]))
+                    needs_header = False
 
                 if text1 and '`_' not in text1:
-                    log.info(''.join(["| *", text1, '*', " "*(colwidth1-len1-3), "|", text2, " "*(colwidth2-len2), "|"]))
+                    log.info(''.join(["| *", text1, '*', " "*(opt_colwidth1-len1-3), "|", text2, " "*(opt_colwidth2-len2), "|"]))
                 elif text1:
-                    log.info(''.join(["|", text1, " "*(colwidth1-len1), "|", text2, " "*(colwidth2-len2), "|"]))
+                    log.info(''.join(["|", text1, " "*(opt_colwidth1-len1), "|", text2, " "*(opt_colwidth2-len2), "|"]))
                 else:
-                    log.info(''.join(["|", " "*(colwidth1), "|", text2, " "*(colwidth2-len2), "|"]))
+                    log.info(''.join(["|", " "*(opt_colwidth1), "|", text2, " "*(opt_colwidth2-len2), "|"]))
 
-                log.info(''.join(["+", "-"*colwidth1, "+", "-"*colwidth2, "+"]))
+                log.info(''.join(["+", "-"*opt_colwidth1, "+", "-"*opt_colwidth2, "+"]))
+
+            elif format == 'example':
+                if needs_header:
+                    log.info(".. class:: borderless")
+                    log.info("")
+                    log.info(''.join(["+", "-"*exmpl_colwidth1, "+", "-"*exmpl_colwidth2, "+"]))
+                    needs_header = False
+
+                if text1 and '`_' not in text1:
+                    log.info(''.join(["| *", text1, '*', " "*(exmpl_colwidth1-len1-3), "|", text2, " "*(exmpl_colwidth2-len2), "|"]))
+                elif text1:
+                    log.info(''.join(["|", text1, " "*(exmpl_colwidth1-len1), "|", text2, " "*(exmpl_colwidth2-len2), "|"]))
+                else:
+                    log.info(''.join(["|", " "*(exmpl_colwidth1), "|", text2, " "*(exmpl_colwidth2-len2), "|"]))
+
+                log.info(''.join(["+", "-"*exmpl_colwidth1, "+", "-"*exmpl_colwidth2, "+"]))
+
+            elif format == 'seealso':
+                if text1 and '`_' not in text1:
+                    log.info(text1)
+
 
             elif format == 'note':
-                if text1.startswith(' '):
-                    log.info(''.join(["|", " "*(tablewidth+1), "|"]))
+                if needs_header:
+                    log.info(".. class:: borderless")
+                    log.info("")
+                    log.info(''.join(["+", "-"*note_colwidth1, "+", "-"*note_colwidth2, "+"]))
+                    needs_header = False
 
-                log.info(''.join(["|", text1, " "*(tablewidth-len1+1), "|"]))
-                log.info(''.join(["+", "-"*colwidth1, "+", "-"*colwidth2, "+"]))
+                if text1.startswith(' '):
+                    log.info(''.join(["|", " "*(note_tablewidth+1), "|"]))
+
+                log.info(''.join(["|", text1, " "*(note_tablewidth-len1+1), "|"]))
+                log.info(''.join(["+", "-"*note_colwidth1, "+", "-"*note_colwidth2, "+"]))
 
             elif format == 'space':
                 log.info("")
@@ -1488,3 +1552,13 @@ def log_title(program_name, version, show_ver=True): # TODO: Move to base/module
     log.info("This is free software, and you are welcome to distribute it")
     log.info("under certain conditions. See COPYING file for more details.")
     log.info("")
+
+
+def ireplace(old, search, replace):
+    regex = '(?i)' + re.escape(search)
+    return re.sub(regex, replace, old)
+
+
+
+
+

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -115,12 +115,11 @@ class PhoneNumValidator(QValidator):
 
 
 class SetupForm(SetupForm_base):
-    def __init__(self, bus, param, jd_port=1, username='', parent=None, name=None, modal=0, fl=0):
+    def __init__(self, bus, param, jd_port=1, parent=None, name=None, modal=0, fl=0):
         SetupForm_base.__init__(self, parent, name, modal, fl)
 
         self.start_page = self.ConnectionPage
         self.first_page = True
-        self.username = username
 
         if bus is None:
             self.bus = 'usb'
@@ -233,7 +232,7 @@ class SetupForm(SetupForm_base):
             norm_model = models.normalizeModelName(model).lower()
 
             core = core_install.CoreInstall()
-            core.set_plugin_version() #sys_cfg.hplip.version)
+            core.set_plugin_version()
 
             plugin = self.mq.get('plugin', PLUGIN_NONE)
             if plugin > PLUGIN_NONE and not core.check_for_plugin():
@@ -576,7 +575,8 @@ class SetupForm(SetupForm_base):
 
 
     def otherPPDPushButton_clicked(self):
-        ppd_file = unicode(QFileDialog.getOpenFileName(sys_cfg.dirs.ppd, "PPD Files (*.ppd *.ppd.gz);;All Files (*)", self, "open file dialog", "Choose a PPD file"))
+        ppd_dir = sys_conf.get('dirs', 'ppd')
+        ppd_file = unicode(QFileDialog.getOpenFileName(ppd_dir, "PPD Files (*.ppd *.ppd.gz);;All Files (*)", self, "open file dialog", "Choose a PPD file"))
 
         if ppd_file and os.path.exists(ppd_file):
             self.updatePPDPage({ppd_file: cups.getPPDDescription(ppd_file)})
@@ -902,7 +902,8 @@ class SetupForm(SetupForm_base):
 
         log.debug("Searching for fax file %s..." % fax_ppd_name)
 
-        for f in utils.walkFiles(sys_cfg.dirs.ppd, pattern="HP-Fax*.ppd*", abs_paths=True):
+        ppd_dir = sys_conf.get('dirs', 'ppd')
+        for f in utils.walkFiles(ppd_dir, pattern="HP-Fax*.ppd*", abs_paths=True):
             ppds.append(f)
 
         for f in ppds:
@@ -922,7 +923,8 @@ class SetupForm(SetupForm_base):
                 ) == 0: # Browse
 
                 while True:
-                    fax_ppd = unicode(QFileDialog.getOpenFileName(sys_cfg.dirs.ppd,
+                    ppd_dir = sys_conf.get('dirs', 'ppd')
+                    fax_ppd = unicode(QFileDialog.getOpenFileName(ppd_dir,
                         "HP Fax PPD Files (*.ppd *.ppd.gz);;All Files (*)", self,
                         "open file dialog", "Choose the fax PPD file"))
 
@@ -991,15 +993,6 @@ class SetupForm(SetupForm_base):
                         self.FailureUI(self.__tr("<b>Printer Error.</b><p>Printer is busy, offline, or in an error state. Please check the device and try again."))
                         d.close()
 
-
-        if self.username:
-            import pwd
-            user_path = pwd.getpwnam(self.username)[5]
-            user_config_file = os.path.join(user_path, '.hplip.conf')
-
-            if os.path.exists(user_config_file):
-                cfg = Config(user_config_file)
-                cfg.last_used.device_uri = self.device_uri
 
         QWizard.accept(self)
 

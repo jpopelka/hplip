@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -70,16 +70,16 @@ class DeviceUriComboBox(QWidget):
 
         self.NameLabel.setText(self.__tr("Device:"))
 
-#        self.connect(self.ComboBox, SIGNAL("currentIndexChanged(int)"), 
+#        self.connect(self.ComboBox, SIGNAL("currentIndexChanged(int)"),
 #            self.ComboBox_currentIndexChanged)
 
-        self.connect(self.ComboBox, SIGNAL("currentIndexChanged(const QString &)"), 
+        self.connect(self.ComboBox, SIGNAL("currentIndexChanged(const QString &)"),
             self.ComboBox_currentIndexChanged)
 
 
     def setType(self, typ):
-        if typ in (DEVICEURICOMBOBOX_TYPE_PRINTER_ONLY, 
-                   DEVICEURICOMBOBOX_TYPE_FAX_ONLY, 
+        if typ in (DEVICEURICOMBOBOX_TYPE_PRINTER_ONLY,
+                   DEVICEURICOMBOBOX_TYPE_FAX_ONLY,
                    DEVICEURICOMBOBOX_TYPE_PRINTER_AND_FAX):
             self.typ = typ
 
@@ -90,8 +90,8 @@ class DeviceUriComboBox(QWidget):
 
     def setInitialDevice(self, device_uri):
         self.initial_device = device_uri
-        
-    
+
+
     def setDevices(self):
         if self.typ == DEVICEURICOMBOBOX_TYPE_PRINTER_ONLY:
             be_filter = ['hp']
@@ -115,27 +115,27 @@ class DeviceUriComboBox(QWidget):
 
         if self.devices:
             if self.initial_device is None:
-                self.initial_device = user_cfg.last_used.device_uri
-                
+                self.initial_device = user_conf.get('last_used', 'device_uri')
+
             self.updating = True
             try:
                 k = 0
                 for i, d in enumerate(self.devices):
                     self.ComboBox.insertItem(i, d)
-                    
+
                     if self.initial_device is not None and d == self.initial_device:
                         self.initial_device = None
                         k = i
-                        
+
                 self.ComboBox.setCurrentIndex(-1)
             finally:
                 self.updating = False
-                
+
             self.ComboBox.setCurrentIndex(k)
-            
+
             if len(self.devices) == 1:
                 self.emit(SIGNAL("DeviceUriComboBox_oneDevice"))
-            
+
         else:
             self.emit(SIGNAL("DeviceUriComboBox_noDevices"))
 
@@ -143,10 +143,10 @@ class DeviceUriComboBox(QWidget):
     def ComboBox_currentIndexChanged(self, t):
         if self.updating:
             return
-            
+
         self.device_uri = unicode(t)
         if self.device_uri:
-            user_cfg.last_used.device_uri = self.device_uri
+            user_conf.set('last_used', 'device_uri', self.device_uri)
             self.emit(SIGNAL("DeviceUriComboBox_currentChanged"), self.device_uri)
 
 

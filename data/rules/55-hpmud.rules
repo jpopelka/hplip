@@ -46,6 +46,7 @@ SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="1502", OWNER="lp", GROUP="lp", MODE=
 SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="1802", OWNER="lp", GROUP="lp", MODE="660", ENV{sane_hpaio}="yes"
 # photosmart_7150
 SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="3a02", OWNER="lp", GROUP="lp", MODE="660", ENV{sane_hpaio}="yes"
+SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="3b02", OWNER="lp", GROUP="lp", MODE="660", ENV{sane_hpaio}="yes"
 # photosmart_7200_series
 SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="b002", OWNER="lp", GROUP="lp", MODE="660", ENV{sane_hpaio}="yes"
 # photosmart_7345

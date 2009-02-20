@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -579,11 +579,11 @@ def status_callback(src, trg, size):
 
 
 mod = module.Module(__mod__, __title__, __version__, __doc__, None,
-                    (GUI_MODE, INTERACTIVE_MODE, NON_INTERACTIVE_MODE), 
+                    (GUI_MODE, INTERACTIVE_MODE, NON_INTERACTIVE_MODE),
                     (UI_TOOLKIT_QT3,))
 
 mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS,
-    extra_options=[("Output directory:", "-o<dir> or --output=<dir> (Defaults to current directory)(Only used for non-GUI modes)", "option", False)], 
+    extra_options=[("Output directory:", "-o<dir> or --output=<dir> (Defaults to current directory)(Only used for non-GUI modes)", "option", False)],
     see_also_list=['hp-toolbox'])
 
 opts, device_uri, printer_name, mode, ui_toolkit, loc = \
@@ -606,8 +606,8 @@ if mode == GUI_MODE:
 
 if mode in (INTERACTIVE_MODE, NON_INTERACTIVE_MODE):
     try:
-        device_uri = mod.getDeviceUri(device_uri, printer_name, 
-            {'pcard-type' : (operator.gt, 0)})
+        device_uri = mod.getDeviceUri(device_uri, printer_name,
+            filter={'pcard-type' : (operator.eq, 1)})
 
         try:
             pc = photocard.PhotoCard( None, device_uri, printer_name )
@@ -702,13 +702,13 @@ else: # GUI_MODE (qt3 only)
         from ui import unloadform
     except ImportError:
         log.error("Unable to load Qt3 support. Is it installed?")
-        sys.exit(1)         
+        sys.exit(1)
 
     app = QApplication(sys.argv)
     QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
 
     if loc is None:
-        loc = user_cfg.ui.get("loc", "system")
+        loc = user_conf.get('ui', 'loc', 'system')
         if loc.lower() == 'system':
             loc = str(QTextCodec.locale())
             log.debug("Using system locale: %s" % loc)
@@ -743,7 +743,7 @@ else: # GUI_MODE (qt3 only)
         try:
             locale.setlocale(locale.LC_ALL, locale.normalize(loc))
         except locale.Error:
-            pass 
+            pass
 
     try:
         w = unloadform.UnloadForm(['cups'], device_uri, printer_name)

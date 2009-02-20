@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -49,13 +49,13 @@ try:
     import dbus
 except ImportError:
     dbus_avail = False
-    
-    
-    
+
+
+
 class FaxSendJobForm(QMainWindow):
 
-    def __init__(self, device_uri, printer_name, args, 
-                 parent=None, name=None, 
+    def __init__(self, device_uri, printer_name, args,
+                 parent=None, name=None,
                  modal=0, fl=0):
 
         QMainWindow.__init__(self,parent,name,fl)
@@ -107,7 +107,7 @@ class FaxSendJobForm(QMainWindow):
 
             for d in t:
                 probed_devices.append(d.replace('hp:/', 'hpfax:/'))
-                
+
             #print probed_devices
 
             probed_devices = utils.uniqueList(probed_devices)
@@ -122,15 +122,15 @@ class FaxSendJobForm(QMainWindow):
                     if p.device_uri == d:
                         #print "OK"
                         printers.append(p.name)
-                
+
                 devices[x] = (d, printers)
                 x += 1
                 max_deviceid_size = max(len(d), max_deviceid_size)
 
             x = len(devices)
-            
+
             #print devices
-            
+
             if x == 0:
                 from nodevicesform import NoDevicesForm
                 self.FailureUI(self.__tr("<p><b>No devices found.</b><p>Please make sure your device is properly installed and try again."))
@@ -143,12 +143,12 @@ class FaxSendJobForm(QMainWindow):
             else:
                 from chooseprinterdlg import ChoosePrinterDlg
                 dlg = ChoosePrinterDlg(self.cups_printers, ['hpfax'])
-                
+
                 if dlg.exec_loop() == QDialog.Accepted:
                     self.device_uri = dlg.device_uri
                 else:
                     self.init_failed = True
-                    
+
         self.dbus_avail, self.service, session_bus = device.init_dbus()
 
         self.FaxView = ScrollFaxView(self.service, self.centralWidget(), self)
@@ -159,10 +159,10 @@ class FaxSendJobForm(QMainWindow):
                 log.error("Invalid device URI: %s" % repr(device_uri))
                 self.FailureUI(self.__tr("<b>Invalid device URI %1.</b><p>Please check the parameters to hp-print and try again.").arg(repr(device_uri)));
                 self.init_failed = True
-            
+
             else:
                 try:
-                    self.cur_device = device.Device(device_uri=self.device_uri, 
+                    self.cur_device = device.Device(device_uri=self.device_uri,
                                                      printer_name=self.printer_name)
                 except Error, e:
                     log.error("Invalid device URI or printer name.")
@@ -171,20 +171,20 @@ class FaxSendJobForm(QMainWindow):
 
                 else:
                     self.device_uri = self.cur_device.device_uri
-                    user_cfg.last_used.device_uri = self.device_uri
+                    user_conf.set('last_used', 'device_uri', self.device_uri)
 
                     log.debug(self.device_uri)
 
-                    self.statusBar().message(self.device_uri) 
-            
-            
+                    self.statusBar().message(self.device_uri)
+
+
         QTimer.singleShot(0, self.InitialUpdate)
 
 
     def InitialUpdate(self):
         if self.init_failed:
             self.close()
-            return      
+            return
 
         self.FaxView.onDeviceChange(self.cur_device)
 
@@ -198,7 +198,7 @@ class FaxSendJobForm(QMainWindow):
 
     def languageChange(self):
         self.setCaption(self.__tr("HP Device Manager - Send Fax"))
-        
+
     def closeEvent(self, event):
         #print "close"
         #print self.FaxView.lock_file
@@ -223,13 +223,13 @@ class FaxSendJobForm(QMainWindow):
                               QMessageBox.NoButton)
 
     def WarningUI(self, error_text):
-        log.warn(unicode(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", " "))   
+        log.warn(unicode(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", " "))
         QMessageBox.warning(self,
                              self.caption(),
                              error_text,
                              QMessageBox.Ok,
                              QMessageBox.NoButton,
-                             QMessageBox.NoButton)        
+                             QMessageBox.NoButton)
 
     def __tr(self,s,c = None):
         return qApp.translate("FaxSendJobForm", s, c)

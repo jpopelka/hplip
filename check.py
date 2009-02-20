@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 __version__ = '14.1'
 __title__ = 'Dependency/Version Check Utility'
 __mod__ = 'hp-check'
-__doc__ = "Check the existence and versions of HPLIP dependencies."
+__doc__ = """Check the existence and versions of HPLIP dependencies. (Run as 'python ./check.py' from the HPLIP tarball before installation.)"""
 
 # Std Lib
 import sys
@@ -58,9 +58,9 @@ USAGE = [(__doc__, "", "name", True),
          utils.USAGE_LOGGING_PLAIN,
          utils.USAGE_HELP,
          utils.USAGE_NOTES,
-         ("1. For checking for the proper build environment for the HPLIP supplied tarball (.tar.gz or .run),", "", "note", False), 
+         ("1. For checking for the proper build environment for the HPLIP supplied tarball (.tar.gz or .run),", "", "note", False),
          ("use the --compile or --both switches.", "", "note", False),
-         ("2. For checking for the proper runtime environment for a distro supplied package (.deb, .rpm, etc),", "", "note", False), 
+         ("2. For checking for the proper runtime environment for a distro supplied package (.deb, .rpm, etc),", "", "note", False),
          ("use the --runtime switch.", "", "note", False),
         ]
 
@@ -69,7 +69,7 @@ def usage(typ='text'):
         utils.log_title(__title__, __version__)
 
     utils.format_text(USAGE, typ, __title__, __mod__, __version__)
-    sys.exit(0)        
+    sys.exit(0)
 
 
 build_str = "HPLIP will not build, install, and/or function properly without this dependency."
@@ -118,9 +118,9 @@ try:
     log.set_module(__mod__)
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hl:gtcrb', 
-            ['help', 'help-rest', 'help-man', 'help-desc', 'logging=', 
-             'run', 'runtime', 'compile', 'both']) 
+        opts, args = getopt.getopt(sys.argv[1:], 'hl:gtcrb',
+            ['help', 'help-rest', 'help-man', 'help-desc', 'logging=',
+             'run', 'runtime', 'compile', 'both'])
 
     except getopt.GetoptError, e:
         log.error(e.msg)
@@ -197,6 +197,7 @@ try:
     log.info("\nInitializing. Please wait...")
     core =  CoreInstall(MODE_CHECK)
     core.init()
+    core.set_plugin_version()
 
     tui.header("SYSTEM INFO")
 
@@ -232,67 +233,70 @@ try:
             sys.exit(1)
 
 
-    log.info()
-    log.info(log.bold("Checking PyQt 3.x version..."))
+    if core.ui_toolkit == 'qt3':
 
-    # PyQt 3
-    try:
-        import qt
-    except ImportError:
-        num_errors += 1
-        log.error("NOT FOUND OR FAILED TO LOAD!")
-    else:
-        # check version of Qt
-        qtMajor = int(qt.qVersion().split('.')[0])
+        log.info()
+        log.info(log.bold("Checking PyQt 3.x version..."))
 
-        if qtMajor < MINIMUM_QT_MAJOR_VER:
-            log.error("Incorrect version of Qt installed. Ver. 3.0.0 or greater required.")
+        # PyQt 3
+        try:
+            import qt
+        except ImportError:
+            num_errors += 1
+            log.error("NOT FOUND OR FAILED TO LOAD!")
         else:
-            #check version of PyQt
-            try:
-                pyqtVersion = qt.PYQT_VERSION_STR
-            except AttributeError:
-                pyqtVersion = qt.PYQT_VERSION
+            # check version of Qt
+            qtMajor = int(qt.qVersion().split('.')[0])
 
-            while pyqtVersion.count('.') < 2:
-                pyqtVersion += '.0'
-
-            (maj_ver, min_ver, pat_ver) = pyqtVersion.split('.')
-
-            if pyqtVersion.find('snapshot') >= 0:
-                log.error("A non-stable snapshot version of PyQt is installed (%s)." % pyqtVersion)
-                num_errors += 1
+            if qtMajor < MINIMUM_QT_MAJOR_VER:
+                log.error("Incorrect version of Qt installed. Ver. 3.0.0 or greater required.")
             else:
+                #check version of PyQt
                 try:
-                    maj_ver = int(maj_ver)
-                    min_ver = int(min_ver)
-                    pat_ver = int(pat_ver)
-                except ValueError:
-                    maj_ver, min_ver, pat_ver = 0, 0, 0
+                    pyqtVersion = qt.PYQT_VERSION_STR
+                except AttributeError:
+                    pyqtVersion = qt.PYQT_VERSION
 
-                if maj_ver < MINIMUM_PYQT_MAJOR_VER or \
-                    (maj_ver == MINIMUM_PYQT_MAJOR_VER and min_ver < MINIMUM_PYQT_MINOR_VER):
+                while pyqtVersion.count('.') < 2:
+                    pyqtVersion += '.0'
+
+                (maj_ver, min_ver, pat_ver) = pyqtVersion.split('.')
+
+                if pyqtVersion.find('snapshot') >= 0:
+                    log.error("A non-stable snapshot version of PyQt is installed (%s)." % pyqtVersion)
                     num_errors += 1
-                    log.error("HPLIP may not function properly with the version of PyQt that is installed (%d.%d.%d)." % (maj_ver, min_ver, pat_ver))
-                    log.error("Ver. %d.%d or greater required." % (MINIMUM_PYQT_MAJOR_VER, MINIMUM_PYQT_MINOR_VER))
                 else:
-                    log.info("OK, version %d.%d installed." % (maj_ver, min_ver))
-        del qt
+                    try:
+                        maj_ver = int(maj_ver)
+                        min_ver = int(min_ver)
+                        pat_ver = int(pat_ver)
+                    except ValueError:
+                        maj_ver, min_ver, pat_ver = 0, 0, 0
 
-    
-    
-    log.info()
-    log.info(log.bold("Checking PyQt 4.x version..."))
+                    if maj_ver < MINIMUM_PYQT_MAJOR_VER or \
+                        (maj_ver == MINIMUM_PYQT_MAJOR_VER and min_ver < MINIMUM_PYQT_MINOR_VER):
+                        num_errors += 1
+                        log.error("HPLIP may not function properly with the version of PyQt that is installed (%d.%d.%d)." % (maj_ver, min_ver, pat_ver))
+                        log.error("Ver. %d.%d or greater required." % (MINIMUM_PYQT_MAJOR_VER, MINIMUM_PYQT_MINOR_VER))
+                    else:
+                        log.info("OK, version %d.%d installed." % (maj_ver, min_ver))
+            del qt
 
-#    # PyQt 4
-#    try:
-#        import PyQt4
-#    except ImportError:
-#        num_errors += 1
-#        log.error("NOT FOUND OR FAILED TO LOAD!")
-#    else:
-#        from PyQt4 import QtCore
-#        log.info("OK, version %s installed." % QtCore.PYQT_VERSION_STR)
+
+    else:
+
+        log.info()
+        log.info(log.bold("Checking PyQt 4.x version..."))
+
+        # PyQt 4
+        try:
+            import PyQt4
+        except ImportError:
+            num_errors += 1
+            log.error("NOT FOUND OR FAILED TO LOAD!")
+        else:
+            from PyQt4 import QtCore
+            log.info("OK, version %s installed." % QtCore.PYQT_VERSION_STR)
 
 
 #    log.info()
@@ -304,7 +308,7 @@ try:
 #    except ImportError:
 #        pass
 #    else:
-#        sip_ver = pyqtconfig.Configuration().sip_version_str 
+#        sip_ver = pyqtconfig.Configuration().sip_version_str
 #
 #    if sip_ver is not None:
 #        log.info("OK, Version %s installed" % sip_ver)
@@ -347,16 +351,16 @@ try:
                     level = m.group(1).lower()
                     log.info("error_log is set to level: %s" % level)
 
-                    if level not in ('debug', 'debug2'):
-                        log.note("For troubleshooting printing issues, it is best to have the CUPS 'LogLevel'")
-                        log.note("set to 'debug'. To set the LogLevel to debug, edit the file %s (as root)," % cups_conf)
-                        log.note("and change the line near the top of the file that begins with 'LogLevel' to read:")
-                        log.note("LogLevel debug")
-                        log.note("Save the file and then restart CUPS (see your OS/distro docs on how to restart CUPS).")
-                        log.note("Now, when you print, helpful debug information will be saved to the file:")
-                        log.note("/var/log/cups/error_log")
-                        log.note("You can monitor this file by running this command in a console/shell:")
-                        log.note("tail -f /var/log/cups/error_log")
+                    #if level not in ('debug', 'debug2'):
+                        #log.note("For troubleshooting printing issues, it is best to have the CUPS 'LogLevel'")
+                        #log.note("set to 'debug'. To set the LogLevel to debug, edit the file %s (as root)," % cups_conf)
+                        #log.note("and change the line near the top of the file that begins with 'LogLevel' to read:")
+                        #log.note("LogLevel debug")
+                        #log.note("Save the file and then restart CUPS (see your OS/distro docs on how to restart CUPS).")
+                        #log.note("Now, when you print, helpful debug information will be saved to the file:")
+                        #log.note("/var/log/cups/error_log")
+                        #log.note("You can monitor this file by running this command in a console/shell:")
+                        #log.note("tail -f /var/log/cups/error_log")
 
                     break
 
@@ -401,6 +405,10 @@ try:
     dd = core.dependencies.keys()
     dd.sort()
     for d in dd:
+        if (d == 'pyqt' and core.ui_toolkit != 'qt3') or \
+           (d == 'pyqt4' and core.ui_toolkit != 'qt4'):
+            continue
+
         log.debug("***")
 
         if time_flag == DEPENDENCY_RUN_AND_COMPILE_TIME or time_flag == core.dependencies[d][4]:
@@ -457,12 +465,12 @@ try:
     if time_flag in (DEPENDENCY_RUN_TIME, DEPENDENCY_RUN_AND_COMPILE_TIME):
         tui.header("HPLIP INSTALLATION")
 
-        scanning_enabled = utils.to_bool(sys_cfg.configure.get("scanner-build", False))
+        scanning_enabled = utils.to_bool(sys_conf.get('configure', 'scanner-build', '0'))
 
         log.info()
         log.info(log.bold("Currently installed HPLIP version..."))
-        v = sys_cfg.hplip.version
-        home = sys_cfg.dirs.home
+        v = sys_conf.get('hplip', 'version')
+        home = sys_conf.get('dirs', 'home')
 
         if v:
             log.info("HPLIP %s currently installed in '%s'." % (v, home))
@@ -472,21 +480,21 @@ try:
             try:
                 output = file('/etc/hp/hplip.conf', 'r').read()
             except (IOError, OSError), e:
-                log.error("Could not access file: %s" % e.strerror) 
+                log.error("Could not access file: %s" % e.strerror)
             else:
                 log.info(output)
-            
+
             log.info()
             log.info(log.bold("Current contents of '~/.hplip/hplip.conf' file:"))
             try:
                 output = file(os.path.expanduser('~/.hplip/hplip.conf'), 'r').read()
             except (IOError, OSError), e:
-                log.error("Could not access file: %s" % e.strerror) 
+                log.error("Could not access file: %s" % e.strerror)
             else:
                 log.info(output)
 
         else:
-            log.info("Not found.")  
+            log.info("Not found.")
 
 
         if device_avail:
@@ -511,7 +519,7 @@ try:
                         log.error("'ppdev' kernel module not loaded.")
 
             if prop.usb_build:
-                tui.header("DISCOVERED USB DEVICES")                
+                tui.header("DISCOVERED USB DEVICES")
 
                 devices = device.probeDevices(['usb'])
 
@@ -619,13 +627,8 @@ try:
 
                         plugin = d.mq.get('plugin', PLUGIN_NONE)
                         if plugin in (PLUGIN_REQUIRED, PLUGIN_OPTIONAL):
-                            home = sys_cfg.dirs.home or os.path.realpath(os.path.normpath(os.getcwd()))
 
-                            log.debug("home=%s" % home)
-
-                            model = model.lower()
-
-                            if os.path.exists(os.path.join(home, "data", "plugins", "%s.plugin" % model)):
+                            if core.check_for_plugin():
                                 if plugin == PLUGIN_REQUIRED:
                                     log.info("Required plug-in status: Installed")
                                 else:
@@ -636,7 +639,7 @@ try:
                                 if plugin == PLUGIN_REQUIRED:
                                     log.error("Required plug-in status: Not installed")
                                 else:
-                                    log.warn("Optional plug-in status: Not installed") 
+                                    log.warn("Optional plug-in status: Not installed")
 
 
                         if bus in ('par', 'usb'):
@@ -738,7 +741,7 @@ try:
             num_errors += 1
             log.error("NOT FOUND OR FAILED TO LOAD! Please reinstall HPLIP and check for the proper installation of hpmudext.")
         else:
-            log.info("OK, found.")        
+            log.info("OK, found.")
 
         if scanning_enabled:
             log.info()
@@ -749,7 +752,7 @@ try:
                 num_errors += 1
                 log.error("NOT FOUND OR FAILED TO LOAD! Please reinstall HPLIP and check for the proper installation of scanext.")
             else:
-                log.info("OK, found.")        
+                log.info("OK, found.")
 
                 log.info()
 

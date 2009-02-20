@@ -134,6 +134,30 @@ PAPER_SIZE MediaSizeToPaper(MediaSize msize)
     }
 }
 
+MediaType MediaTypeToPcl (MEDIATYPE eMediaType)
+{
+    switch (eMediaType)
+    {
+        case MEDIA_PLAIN:
+	        return mediaPlain;
+	    case MEDIA_PREMIUM:
+	        return mediaSpecial;
+            case MEDIA_PHOTO:
+	    case MEDIA_ADVANCED_PHOTO:
+	        return mediaGlossy;
+	    case MEDIA_TRANSPARENCY:
+	        return mediaTransparency;
+	    case MEDIA_HIGHRES_PHOTO:
+	        return mediaHighresPhoto;
+	    case MEDIA_AUTO:
+	        return mediaAuto;
+	    case MEDIA_CDDVD:
+	        return mediaCDDVD;
+	    default:
+	        return mediaPlain;
+    }
+}
+
 void AsciiHexToBinary(BYTE* dest, char* src, int count)
 {
     int i;
@@ -217,7 +241,7 @@ void AsciiHexToBinary(BYTE* dest, char* src, int count)
 #ifdef HAVE_LIBDL
 #include <dlfcn.h>
 
-void *LoadPlugin (char *szPluginName)
+void *LoadPlugin (const char *szPluginName)
 {
     FILE    *fp;
     char    szLine[256];

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ from scrollprint import ScrollPrintView
 
 
 class PrinterForm(QMainWindow):
-    def __init__(self, printer_name=None, args=None, 
+    def __init__(self, printer_name=None, args=None,
                  parent=None,name=None,modal=0,fl=0):
 
         QMainWindow.__init__(self,parent,name,fl)
@@ -56,7 +56,7 @@ class PrinterForm(QMainWindow):
         self.resize(QSize(600,480).expandedTo(self.minimumSizeHint()))
         self.clearWState(Qt.WState_Polished)
         self.languageChange()
-        
+
         self.cups_printers = device.getSupportedCUPSPrinters()
         log.debug(self.cups_printers)
 
@@ -98,7 +98,7 @@ class PrinterForm(QMainWindow):
                     self.device_uri = dlg.device_uri
                 else:
                     self.init_failed = True
-        
+
         else: # -p provided
             for p in self.cups_printers:
                 if p.name == self.printer_name:
@@ -107,14 +107,14 @@ class PrinterForm(QMainWindow):
             else:
                 self.FailureUI("<b>Invalid printer name.</b><p>Please check the parameters to hp-print and try again.")
                 self.init_failed = True
-                
+
 
         if not self.init_failed:
             self.PrintView = ScrollPrintView(None, self.centralWidget(), self, "PrintView")
             self.FormLayout.addWidget(self.PrintView,0,0)
 
             try:
-                self.cur_device = device.Device(device_uri=self.device_uri, 
+                self.cur_device = device.Device(device_uri=self.device_uri,
                                                  printer_name=self.printer_name)
             except Error, e:
                 log.error("Invalid device URI or printer name.")
@@ -123,7 +123,7 @@ class PrinterForm(QMainWindow):
 
             else:
                 self.device_uri = self.cur_device.device_uri
-                user_cfg.last_used.device_uri = self.device_uri
+                user_conf.set('last_used', 'device_uri', self.device_uri)
 
                 log.debug(self.device_uri)
 
@@ -135,7 +135,7 @@ class PrinterForm(QMainWindow):
     def InitialUpdate(self):
         if self.init_failed:
             self.close()
-            return        
+            return
 
         self.PrintView.onDeviceChange(self.cur_device)
 

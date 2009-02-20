@@ -59,24 +59,24 @@ def send_message(device_uri, event_code, bytes_written=0):
     msg = lowlevel.SignalMessage('/', 'com.hplip.StatusService', 'Event')
     msg.append(signature='ssisissi', *args)
     SessionBus().send_message(msg)
-    
+
 
 def run(read_pipe2=None,  # pipe from hpssd
         write_pipe3=None): # pipe to hpssd
-    
+
     global r2, w3
     tmp_dir = '/tmp'
     os.umask(0111)
-    
+
     try:
         log.set_module("hp-systray(hpdio)")
         log.debug("PID=%d" % os.getpid())
-        
+
         r2, w3 = read_pipe2, write_pipe3
-        
+
         fmt = "64s64sI32sI64sf" # TODO: Move to Event class
         fmt_size = struct.calcsize(fmt)
-        
+
         response = {}
         dev = None
         m = ''
@@ -85,40 +85,43 @@ def run(read_pipe2=None,  # pipe from hpssd
                 r, w, e = select.select([r2], [], [r2], 1.0)
             except KeyboardInterrupt:
                 break
-                
+
             if not r: continue
             if e: break
-                
+
             m = ''.join([m, os.read(r2, fmt_size)])
-            
+
             while len(m) >= fmt_size:
                 response.clear()
                 event = device.Event(*struct.unpack(fmt, m[:fmt_size]))
                 m = m[fmt_size:]
-                        
+
                 action = event.event_code
                 device_uri = event.device_uri
-                
+
                 log.debug("Handling event...")
                 event.debug()
-                
+
                 send_message(device_uri, EVENT_DEVICE_UPDATE_ACTIVE)
-                
+
                 if action in (EVENT_DEVICE_UPDATE_REQUESTED, EVENT_POLLING_REQUEST):
                     #try:
                     if 1:
                         #log.debug("%s starting for %s" % (ACTION_NAMES[action], device_uri))
-                        
+
                         try:
                             dev = devices[device_uri]
                         except KeyError:
                             dev = devices[device_uri] = device.Device(device_uri, disable_dbus=True)
-                        
+
                         try:
                             #print "Device.open()"
                             dev.open()
                         except Error, e:
-                            log.warn(e.msg)
+                            log.error(e.msg)
+                            response = {'error-state': ERROR_STATE_ERROR,
+                                        'device-state': DEVICE_STATE_NOT_FOUND,
+                                        'status-code' : EVENT_ERROR_DEVICE_IO_ERROR}
 
                         if dev.device_state == DEVICE_STATE_NOT_FOUND:
                             dev.error_state = ERROR_STATE_ERROR
@@ -127,13 +130,15 @@ def run(read_pipe2=None,  # pipe from hpssd
                                 try:
                                     #print "Device.queryDevice()"
                                     dev.queryDevice()
-                                    
+
                                 except Error, e:
                                     log.error("Query device error (%s)." % e.msg)
                                     dev.error_state = ERROR_STATE_ERROR
-                                
+                                    dev.status_code = EVENT_ERROR_DEVICE_IO_ERROR
+
                                 response = dev.dq
-                            
+                                #print response
+
                                 log.debug("Device state = %d" % dev.device_state)
                                 log.debug("Status code = %d" % dev.status_code)
                                 log.debug("Error state = %d" % dev.error_state)
@@ -141,33 +146,34 @@ def run(read_pipe2=None,  # pipe from hpssd
                             else: # EVENT_POLLING_REQUEST
                                 try:
                                     dev.pollDevice()
-                                    
+
                                 except Error, e:
                                     log.error("Poll device error (%s)." % e.msg)
                                     dev.error_state = ERROR_STATE_ERROR
-                                    
+
                                 else:
                                     response = {'test' : 1}
-                                    
+
                     #finally:
                     if 1:
                         if dev is not None:
                             dev.close()
-                        
+
                     #thread_activity_lock.release()
-                    
+
                 elif action == EVENT_USER_CONFIGURATION_CHANGED:
                     pass
-                    
+
                 elif action == EVENT_SYSTEMTRAY_EXIT:
                     log.debug("Exiting")
                     sys.exit(1)
-                    
+
                 send_message(device_uri, EVENT_DEVICE_UPDATE_INACTIVE)
-                
+
                 if action == EVENT_DEVICE_UPDATE_REQUESTED:
+                    #print response
                     data = dumps(response, HIGHEST_PROTOCOL)
-                    
+
                     log.debug("Sending data through pipe to hpssd...")
                     total_written = 0
                     while True:
@@ -175,17 +181,17 @@ def run(read_pipe2=None,  # pipe from hpssd
                         data = data[PIPE_BUF:]
                         if not data:
                             break
-                    
+
                     log.debug("Wrote %d bytes" % total_written)
-                    
+
                     send_message(device_uri, EVENT_DEVICE_UPDATE_REPLY, total_written)
-                    
+
                 elif action == EVENT_POLLING_REQUEST:
                     # TODO: Translate into event: scan requested, copy requested, etc.. send as event
                     #try:
                     #    os.write
                     pass
-                    
-                
+
+
     except KeyboardInterrupt:
-        log.debug("Ctrl-C: Exiting...")        
+        log.debug("Ctrl-C: Exiting...")

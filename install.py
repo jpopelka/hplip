@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 __version__ = '5.0'
 __title__ = 'HPLIP Installer'
 __mod__ = 'hplip-install'
-__doc__ = "Installer for HPLIP tarball."
+__doc__ = "Installer for HPLIP tarball (called automatically after invoking the .run file)."
 
 
 # Std Lib
@@ -88,7 +88,7 @@ try:
         ['help', 'help-rest', 'help-man', 'help-desc', 'gui', 'lang=',
         'logging=', 'interactive', 'auto', 'text', 'qt4', 'qt3',
         'network', 'retries=', 'enable=', 'disable=',
-        'no-qt3', 'no-qt4'])
+        'no-qt3', 'no-qt4', 'debug'])
 
 except getopt.GetoptError, e:
     log.error(e.msg)
@@ -120,7 +120,7 @@ for o, a in opts:
         if not log.set_level(log_level):
             usage()
 
-    elif o == '-g':
+    elif o in ('-g', '--debug'):
         log.set_level('debug')
 
     elif o in ('-i', '--interactive', '--text', '-t'):
@@ -226,25 +226,6 @@ utils.log_title(__title__, __version__, True)
 log.info("Installer log saved in: %s" % log.bold(log_file))
 log.info("")
 
-bb_build_pat = re.compile("BB_BUILD\s*=\s*(.*)", re.I)
-bb_build_value = False
-try:
-    bb_build = file('./bb_build.inc')
-except IOError:
-    pass
-else:
-    input = bb_build.read()
-    bb_build.close()
-    for x in input.splitlines():
-        match = bb_build_pat.match(x)
-        if match is not None:
-            value = match.group(1)
-            bb_build_value = utils.to_bool(value)
-            break
-
-    if bb_build_value and not restricted_override:
-        log.error("This is a restricted build. The installer is disabled. Exiting.")
-        sys.exit(1)
 
 try:
     from installer import text_install

@@ -588,7 +588,7 @@ void DJGenericVIP::AdjustModeSettings (BOOL bDoFullBleed, MEDIATYPE ReqMedia,
 } // AdjustModeSettings
 
 #ifdef APDK_LINUX
-DRIVER_ERROR DJGenericVIP::SendPerPageHeader (BOOL bLastPage)
+DRIVER_ERROR DJGenericVIP::SendSpeedMechCmd (BOOL bLastPage)
 {
     DRIVER_ERROR    err = NO_ERROR;
     BYTE            szStr[16];

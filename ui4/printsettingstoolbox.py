@@ -262,8 +262,8 @@ class PrintSettingsToolbox(QToolBox):
             # self.job_storage_job_exist = (0=replace, 1=job name+(1-99))
 
             if self.job_storage_enable:
-                if self.job_storage_mode != JOB_STORAGE_TYPE_OFF: 
-                    if self.job_storage_mode == JOB_STORAGE_TYPE_PROOF_AND_HOLD: 
+                if self.job_storage_mode != JOB_STORAGE_TYPE_OFF:
+                    if self.job_storage_mode == JOB_STORAGE_TYPE_PROOF_AND_HOLD:
                         cmd = ' '.join([cmd, '-o HOLD=PROOF'])
 
                     elif self.job_storage_mode == JOB_STORAGE_TYPE_PERSONAL:
@@ -275,7 +275,7 @@ class PrintSettingsToolbox(QToolBox):
                             cmd = ' '.join([cmd, '-o HOLD=PROOF'])
                             cmd = ' '.join([cmd, '-o HOLDTYPE=PRIVATE'])
 
-                    elif self.job_storage_mode == JOB_STORAGE_TYPE_QUICK_COPY: 
+                    elif self.job_storage_mode == JOB_STORAGE_TYPE_QUICK_COPY:
                         cmd = ' '.join([cmd, '-o HOLD=ON'])
                         cmd = ' '.join([cmd, '-o HOLDTYPE=PUBLIC'])
 
@@ -419,7 +419,7 @@ class PrintSettingsToolbox(QToolBox):
                     log.debug("Option: outputorder")
                     log.debug("Current value: %s" % current)
 
-                    current = int(utils.to_bool(current_options.get('Collate', '0')))
+                    current = utils.to_bool(current_options.get('Collate', '0'))
 
                     self.addControlRow("Collate",
                         self.__tr("Collate (Group together multiple copies)"),
@@ -541,9 +541,9 @@ class PrintSettingsToolbox(QToolBox):
 
                 self.addControlRow("number-up", self.__tr("Pages per Sheet"),
                     cups.PPD_UI_PICKONE, current,
-                    [('1', self.__tr('1 sheet per page')),
-                     ('2', self.__tr('2 sheets per page')),
-                     ('4', self.__tr('4 sheets per page'))], '1')
+                    [('1', self.__tr('1 page per sheet')),
+                     ('2', self.__tr('2 pages per sheet')),
+                     ('4', self.__tr('4 pages per sheet'))], '1')
 
                 log.debug("  Option: number-up")
                 log.debug("  Current value: %s" % current)
@@ -652,7 +652,7 @@ class PrintSettingsToolbox(QToolBox):
 
                 self.beginControlGroup("image", self.__tr("Image Printing"))
 
-                current = current_options.get('fitplot', 'false')
+                current = utils.to_bool(current_options.get('fitplot', 'false'))
 
                 self.addControlRow("fitplot",
                     self.__tr("Fit to Page"),
@@ -723,7 +723,7 @@ class PrintSettingsToolbox(QToolBox):
 
                 log.debug("Group: Misc")
 
-                current = int(utils.to_bool(current_options.get('prettyprint', '0')))
+                current = utils.to_bool(current_options.get('prettyprint', '0'))
 
                 self.addControlRow("prettyprint",
                     self.__tr('"Pretty Print" Text Documents (Add headers and formatting)'),
@@ -759,7 +759,7 @@ class PrintSettingsToolbox(QToolBox):
                     log.debug("  Option: job-sheets")
                     log.debug("  Current value: %s,%s" % (start, end))
 
-                current = int(utils.to_bool(current_options.get('mirror', '0')))
+                current = utils.to_bool(current_options.get('mirror', '0'))
 
                 self.addControlRow("mirror", self.__tr('Mirror Printing'),
                     cups.PPD_UI_BOOLEAN, current, [], 0)
@@ -984,10 +984,11 @@ class PrintSettingsToolbox(QToolBox):
 #            elif y is not None:
 #                QToolTip.add(defaultPushButton, self.__tr('Set to default value of "%1".').arg(y))
 #
+
             self.connect(DefaultButton, SIGNAL("clicked()"), self.DefaultButton_clicked)
             self.connect(ComboBox, SIGNAL("highlighted(const QString &)"), self.ComboBox_highlighted)
-#
-#            control = optionComboBox
+
+            control = ComboBox
 
         elif typ == cups.UI_SPINNER: # Spinner widget
 
@@ -1568,7 +1569,8 @@ class PrintSettingsToolbox(QToolBox):
             if choice is not None:
                 if not sender.job_option:
                     self.removePrinterOption(sender.option)
-
+                    index = sender.control.findText(text)
+                    sender.control.setCurrentIndex(index)
 
                 #self.linkPrintoutModeAndQuality(sender.option, choice) # TODO:
                 sender.control.setFocus(Qt.OtherFocusReason)
@@ -1592,15 +1594,17 @@ class PrintSettingsToolbox(QToolBox):
                     end_text = t
 
             if start is not None:
-                sender.control[0].setCurrentText(start_text)
+                index = sender.control[0].findText(start_text)
+                sender.control[0].setCurrentIndex(index)
 
             if end is not None:
-                sender.control[1].setCurrentText(end_text)
+                index = sender.control[1].findText(end_text)
+                sender.control[1].setCurrentIndex(index)
 
             if not sender.job_option:
                 self.removePrinterOption('job-sheets')
 
-            sender.control.setFocus(Qt.OtherFocusReason)
+            sender.control[0].setFocus(Qt.OtherFocusReason)
 
         elif sender.typ == cups.UI_PAGE_RANGE: # (*) All () Pages: [    ]
             sender.control[0].setChecked(True) # all radio button

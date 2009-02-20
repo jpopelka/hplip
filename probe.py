@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 __version__ = '4.1'
 __mod__ = 'hp-probe'
 __title__ = 'Printer Discovery Utility'
-__doc__ = "Discover USB, parallel, and network printers."
+__doc__ = "Discover HPLIP supported USB, parallel, and network attached printers."
 
 
 # Std Lib
@@ -69,7 +69,7 @@ try:
 
     opts, device_uri, printer_name, mode, ui_toolkit, loc = \
         mod.parseStdOpts('b:t:o:e:s:m:',
-                         ['ttl=', 'filter=', 'search=', 'find=', 
+                         ['ttl=', 'filter=', 'search=', 'find=',
                           'method=', 'time-out=', 'timeout=', 'bus='],
                           handle_device_printer=False)
 
@@ -128,12 +128,12 @@ try:
 
     if bus is None:
         bus = tui.connection_table()
-        
+
         if bus is None:
             sys.exit(0)
-            
+
         log.info("\nUsing connection type: %s" % bus[0])
-        
+
         log.info("")
 
     tui.header("DEVICE DISCOVERY")
@@ -144,8 +144,8 @@ try:
 
         FILTER_MAP = {'print' : None,
                       'none' : None,
-                      'scan': 'scan-type', 
-                      'copy': 'copy-type', 
+                      'scan': 'scan-type',
+                      'copy': 'copy-type',
                       'pcard': 'pcard-type',
                       'fax': 'fax-type',
                       }

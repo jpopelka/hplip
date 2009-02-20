@@ -180,6 +180,8 @@ class AlignDialog(QDialog, Ui_Dialog):
                                 (self.showLoadPaperPage, None),
                                 (self.setPenConfig, None),
                                 (maint.alignType5Phase1, (lambda: self.dev,)),
+                                (self.showPageEdgePage, ('A',)),
+                                (self.endPageEdgePage, None),
                                 (self.setXBow, None),
                                 # switches to offset align_type here
                             ],
@@ -491,7 +493,7 @@ class AlignDialog(QDialog, Ui_Dialog):
             log.debug("D=%d" % v)
 
 
-    def showPageEdgePage(self, prefix=None):
+    def showPageEdgePage(self, prefix=None, count=13):
         self.PageEdgeTitle.setText(self.__tr("Choose the <b>numbered arrow</b> that <b>best </b>marks the edge of the paper."))
         self.PageEdgeIcon.setPixmap(load_pixmap('zca.png', 'other'))
 
@@ -506,7 +508,7 @@ class AlignDialog(QDialog, Ui_Dialog):
 
 
     def endPageEdgePage(self):
-        v = int(self.PageEdgeComboBox.currentText())
+        v = int(str(self.PageEdgeComboBox.currentText())[1:])
         self.zca = v
         log.debug("ZCA=%d" % v)
 
@@ -528,7 +530,7 @@ class AlignDialog(QDialog, Ui_Dialog):
 
         max_line = 'A'
         for line in self.controls:
-            if self.controls[x][0]:
+            if self.controls[line][0]:
                 max_line = line
             else:
                 break
@@ -540,7 +542,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                 eval('self.%sComboBox%s.setEnabled(False)' % line.lower())
             else:
                 for x in range(self.controls[line][1]):
-                    eval('self.%sComboBox.addItem("%s%d")' % (line.lower(), line, x+1))
+                    eval('self.%sComboBox.addItem("%s%d")' % (line.lower(), line, x + 1))
 
         self.displayPage(PAGE_LBOW)
 
@@ -672,7 +674,7 @@ class AlignDialog(QDialog, Ui_Dialog):
 
 
     def setPenConfig(self):
-        self.dev.pen_config = status.getPenConfiguration(dev.getStatusFromDeviceID())
+        self.dev.pen_config = status.getPenConfiguration(self.dev.getStatusFromDeviceID())
 
 
     def __tr(self,s,c = None):

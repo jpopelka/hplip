@@ -106,7 +106,7 @@ class ScrollCopyView(ScrollView):
 
             self.reductionSpinBox.setMaxValue(self.max_enlargement)
             self.reductionSpinBox.setMinValue(self.max_reduction)
-            self.reductionSlider.setValue(self.reduction)
+            self.reductionSpinBox.setValue(self.reduction)
             self.reductionSpinBox.setSuffix("%")
 
             if self.fit_to_page == pml.COPIER_FIT_TO_PAGE_ENABLED:
@@ -311,6 +311,9 @@ class ScrollCopyView(ScrollView):
         layout43.addWidget(self.reductionSlider,0,2)
 
         self.reductionSpinBox = QSpinBox(widget, "reductionSpinBox")
+        self.reductionSpinBox.setMaxValue(100)
+        self.reductionSpinBox.setMinValue(0)
+        self.reductionSpinBox.setValue(100)
         self.reductionSpinBox.setSuffix("%")
         layout43.addWidget(self.reductionSpinBox,0,3)
 
@@ -433,9 +436,7 @@ class ScrollCopyView(ScrollView):
 
     def copy_canceled(self):
         self.event_queue.put(copier.COPY_CANCELED)
-        # TODO:
-        #service.sendEvent(self.sock, EVENT_COPY_JOB_CANCELED, device_uri=self.device_uri)
-
+        self.dev.sendEvent(EVENT_COPY_JOB_CANCELED)
 
     def copy_timer_timeout(self):
         while self.update_queue.qsize():
@@ -472,13 +473,11 @@ class ScrollCopyView(ScrollView):
 
                 if status == copier.STATUS_ERROR:
                     self.form.FailureUI(self.__tr("<b>Copier error.</b><p>"))
-                    # TODO:
-                    #service.sendEvent(self.sock, EVENT_COPY_JOB_FAIL, device_uri=self.cur_device.device_uri)
+                    self.dev.sendEvent(EVENT_COPY_JOB_FAIL)
 
                 elif status == copier.STATUS_DONE:
                     pass
-                    # TODO:
-                    #service.sendEvent(self.sock, EVENT_END_COPY_JOB, device_uri=self.cur_device.device_uri)
+                    self.dev.sendEvent(EVENT_END_COPY_JOB)
 
                 self.cur_device.close()
                 self.copyButton.setEnabled(True)
@@ -495,9 +494,7 @@ class ScrollCopyView(ScrollView):
                 self.form.FailureUI(self.__tr("<b>Cannot copy: Device is busy or not available.</b><p>Please check device and try again. [1]"))
                 return
 
-            # TODO:
-            #service.sendEvent(self.sock, EVENT_START_COPY_JOB, device_uri=self.cur_device.device_uri)
-
+            self.dev.sendEvent(EVENT_START_COPY_JOB, self.cur_printer, 0, '')
             #self.pb = QProgressBar()
             #self.pb.setTotalSteps(2)
             #self.form.statusBar().addWidget(self.pb)

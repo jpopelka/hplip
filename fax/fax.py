@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -41,24 +41,25 @@ try:
     import coverpages
 except ImportError:
     pass
-    
+
 try:
     import dbus
 except ImportError:
     log.error("dbus is required for PC send fax.")
-    
-    
+
+
 # Update queue values (Send thread ==> UI)
 STATUS_IDLE = 0
 STATUS_PROCESSING_FILES = 1
-STATUS_DIALING = 2
-STATUS_CONNECTING = 3
-STATUS_SENDING = 4
-STATUS_COMPLETED = 5
-STATUS_CREATING_COVER_PAGE = 6
-STATUS_ERROR = 7
-STATUS_BUSY = 8
-STATUS_CLEANUP = 9
+STATUS_SENDING_TO_RECIPIENT = 2
+STATUS_DIALING = 3
+STATUS_CONNECTING = 4
+STATUS_SENDING = 5
+STATUS_COMPLETED = 6
+STATUS_CREATING_COVER_PAGE = 7
+STATUS_ERROR = 8
+STATUS_BUSY = 9
+STATUS_CLEANUP = 10
 
 # Event queue values (UI ==> Send thread)
 EVENT_FAX_SEND_CANCELED = 1
@@ -136,7 +137,7 @@ class FaxLDIFParser(LDIFParser):
     def __init__(self, input, db):
         LDIFParser.__init__(self, input)
         self.db = db
-    
+
     def handle(self, dn, entry):
         if dn:
             try:
@@ -146,17 +147,17 @@ class FaxLDIFParser(LDIFParser):
                     firstname = entry['givenname'][0]
                 except KeyError:
                     firstname = ''
-                
+
             try:
                 lastname = entry['sn'][0]
             except KeyError:
                 lastname = ''
-            
+
             try:
                 nickname = entry['cn'][0]
             except KeyError:
                 nickname = firstname + ' ' + lastname
-            
+
             try:
                 fax = entry['facsimiletelephonenumber'][0] # fax
             except KeyError:
@@ -164,21 +165,21 @@ class FaxLDIFParser(LDIFParser):
                     fax = entry['fax'][0]
                 except KeyError:
                     fax  = ''
-                
+
             grps = []
             try:
                 grps = entry['ou']
             except KeyError:
                 pass
-                
+
             grps.append(u'All')
             groups = [g for g in grps if g]
-                
+
             if nickname:
                 log.debug("Import: name=%s, fax=%s, group(s)=%s, notes=%s" % ( nickname, fax, ','.join(groups), dn))
                 self.db.set(nickname, title, firstname, lastname, fax, groups, dn)
-                
-    
+
+
 
 # **************************************************************************** #
 class FaxAddressBook(object): # Pickle based address book
@@ -220,7 +221,7 @@ class FaxAddressBook(object): # Pickle based address book
                                     'title': unicode(title),  # NOT USED STARTING IN 2.8.9
                                     'firstname': unicode(firstname), # NOT USED STARTING IN 2.8.9
                                     'lastname': unicode(lastname), # NOT USED STARTING IN 2.8.9
-                                    'fax': unicode(fax), 
+                                    'fax': unicode(fax),
                                     'notes': unicode(notes),
                                     'groups': grps}
 
@@ -232,7 +233,7 @@ class FaxAddressBook(object): # Pickle based address book
     def set_key_value(self, name, key, value):
         self._data[unicode(name)][key] = value
         self.save()
-        
+
 
     def get(self, name):
         return self._data.get(name, None)
@@ -251,7 +252,7 @@ class FaxAddressBook(object): # Pickle based address book
                 self._data[new_name] = self._data[old_name].copy()
                 del self._data[old_name]
                 self.save()
-        
+
 
     def get_all_groups(self):
         all_groups = []
@@ -324,29 +325,29 @@ class FaxAddressBook(object): # Pickle based address book
             if group in v['groups']:
                 members.append(e)
         return members
-        
-        
+
+
     def add_to_group(self, group, members):
         group_members = self.group_members(group)
         self.update_groups(group, group_members + members)
-        
-        
+
+
     def remove_from_group(self, group, remove_members):
         group_members = self.group_members(group)
         new_group_members = []
         for m in group_members:
             if m not in remove_members:
                 new_group_members.append(m)
-                
+
         self.update_groups(group, new_group_members)
-        
-        
+
+
     def rename_group(self, old_group, new_group):
         members = self.group_members(old_group)
         self.update_groups(old_group, [])
         self.update_groups(new_group, members)
-        
-        
+
+
     def import_ldif(self, filename):
         try:
             data = open(filename, 'r').read()
@@ -357,15 +358,15 @@ class FaxAddressBook(object): # Pickle based address book
             return True, ''
         except ValueError, e:
             return False, e.message
-            
-            
+
+
     def import_vcard(self, filename):
         data = file(filename, 'r').read()
         log.debug_block(filename, data)
-        
+
         for card in vcard.VCards(vcard.VFile(vcard.opentextfile(filename))):
             log.debug(card)
-            
+
             if card['name']:
                 fax = ''
                 for x in range(1, 9999):
@@ -373,7 +374,7 @@ class FaxAddressBook(object): # Pickle based address book
                         s = 'phone'
                     else:
                         s = 'phone%d' % x
-                        
+
                     try:
                         card[s]
                     except KeyError:
@@ -382,7 +383,7 @@ class FaxAddressBook(object): # Pickle based address book
                         if 'fax' in card[s]['type']:
                             fax = card[s]['number']
                             break
-                
+
                 org = card.get('organisation', '')
                 if org:
                     org = [org]
@@ -390,10 +391,10 @@ class FaxAddressBook(object): # Pickle based address book
                     org = card.get('categories', '').split(';')
                     if not org:
                         org = []
-                        
+
                 org.append(u'All')
                 groups = [o for o in org if o]
-                
+
                 name = card['name']
                 notes = card.get('notes', u'')
                 log.debug("Import: name=%s, fax=%s group(s)=%s notes=%s" % (name, fax, ','.join(groups), notes))
@@ -406,7 +407,7 @@ class FaxAddressBook(object): # Pickle based address book
 class FaxDevice(device.Device):
 
     def __init__(self, device_uri=None, printer_name=None,
-                 callback=None, 
+                 callback=None,
                  fax_type=FAX_TYPE_NONE,
                  disable_dbus=False):
 
@@ -416,7 +417,7 @@ class FaxDevice(device.Device):
         self.send_fax_thread = None
         self.upload_log_thread = None
         self.fax_type = fax_type
-        
+
         if not disable_dbus:
             session_bus = dbus.SessionBus()
             self.service = session_bus.get_object('com.hplip.StatusService', "/com/hplip/StatusService")
@@ -453,8 +454,8 @@ class FaxDevice(device.Device):
     def waitForUploadLogThread(self):
         raise AttributeError
 
-    def sendFaxes(self, phone_num_list, fax_file_list, cover_message='', cover_re='', 
-                  cover_func=None, preserve_formatting=False, printer_name='', 
+    def sendFaxes(self, phone_num_list, fax_file_list, cover_message='', cover_re='',
+                  cover_func=None, preserve_formatting=False, printer_name='',
                   update_queue=None, event_queue=None):
 
         raise AttributeError
@@ -479,35 +480,35 @@ class FaxDevice(device.Device):
 
 
 def getFaxDevice(device_uri=None, printer_name=None,
-                 callback=None, 
+                 callback=None,
                  fax_type=FAX_TYPE_NONE,
                  disable_dbus=False):
-                 
+
     if fax_type == FAX_TYPE_NONE:
         if device_uri is None and printer_name is not None:
             printers = cups.getPrinters()
-    
+
             for p in printers:
                 if p.name.lower() == printer_name.lower():
                     device_uri = p.device_uri
                     break
             else:
                 raise Error(ERROR_DEVICE_NOT_FOUND)
-                
+
         if device_uri is not None:
             mq = device.queryModelByURI(device_uri)
             fax_type = mq['fax-type']
-            
+
     log.debug("fax-type=%d" % fax_type)
-                    
+
     if fax_type in (FAX_TYPE_BLACK_SEND_EARLY_OPEN, FAX_TYPE_BLACK_SEND_LATE_OPEN):
         from pmlfax import PMLFaxDevice
         return PMLFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
-    
+
     elif fax_type == FAX_TYPE_SOAP:
         from soapfax import SOAPFaxDevice
         return SOAPFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
-    
+
     else:
         raise Error(ERROR_DEVICE_DOES_NOT_SUPPORT_OPERATION)
 
@@ -529,15 +530,15 @@ STATE_MERGE_FILES = 90
 STATE_SINGLE_FILE = 100
 STATE_SEND_FAX = 110
 STATE_CLEANUP = 120
-STATE_ERROR = 130 
-    
+STATE_ERROR = 130
+
 class FaxSendThread(threading.Thread):
-    def __init__(self, dev, service, phone_num_list, fax_file_list, 
+    def __init__(self, dev, service, phone_num_list, fax_file_list,
                  cover_message='', cover_re='', cover_func=None, preserve_formatting=False,
                  printer_name='', update_queue=None, event_queue=None):
 
         threading.Thread.__init__(self)
-        
+
         self.dev = dev # device.Device
         self.service = service # dbus proxy to status server object
         self.phone_num_list = phone_num_list
@@ -548,7 +549,7 @@ class FaxSendThread(threading.Thread):
         self.cover_re = cover_re
         self.cover_func = cover_func
         self.current_printer = printer_name
-        self.stream = StringIO()  
+        self.stream = StringIO()
         self.prev_update = ''
         self.remove_temp_file = False
         self.preserve_formatting = preserve_formatting
@@ -583,13 +584,13 @@ class FaxSendThread(threading.Thread):
                 self.rendered_file_list.append((fax_file_name, "application/hplip-fax",
                     "HP Fax", fax_file_title))
 
-                log.debug("Processing pre-rendered file: %s (%d pages)" % 
+                log.debug("Processing pre-rendered file: %s (%d pages)" %
                     (fax_file_name, fax_file_pages))
 
             if self.check_for_cancel():
                 state = STATE_ABORTED
 
-        log.debug(self.rendered_file_list)  
+        log.debug(self.rendered_file_list)
 
         if self.check_for_cancel():
             state = STATE_ABORTED
@@ -644,7 +645,7 @@ class FaxSendThread(threading.Thread):
 
 
                 log.debug("Magic=%s Ver=%d Pages=%d hDPI=%d vDPI=%d Size=%d Res=%d Enc=%d" %
-                          (magic, version, total_pages, hort_dpi, 
+                          (magic, version, total_pages, hort_dpi,
                            vert_dpi, page_size, resolution, encoding))
 
                 self.job_total_pages += total_pages
@@ -668,7 +669,7 @@ class FaxSendThread(threading.Thread):
         log.debug("Total fax pages=%d" % self.job_total_pages)
 
         return state
-        
+
     def decode_fax_header(self, header):
         try:
             return struct.unpack(">8sBIHHBBBII", header)
@@ -696,7 +697,7 @@ class FaxSendThread(threading.Thread):
             elif not fax_file:
                 state = STATE_ERROR # timeout
             else:
-                self.recipient_file_list.insert(0, (fax_file, "application/hplip-fax", 
+                self.recipient_file_list.insert(0, (fax_file, "application/hplip-fax",
                                                     "HP Fax", 'Cover Page'))
 
                 log.debug("Cover page G3 file: %s" % fax_file)
@@ -730,7 +731,7 @@ class FaxSendThread(threading.Thread):
                 state = STATE_ERROR
 
             log.debug("Magic=%s Ver=%d Pages=%d hDPI=%d vDPI=%d Size=%d Res=%d Enc=%d" %
-                      (magic, version, total_pages, hort_dpi, vert_dpi, 
+                      (magic, version, total_pages, hort_dpi, vert_dpi,
                        page_size, resolution, encoding))
 
             f_fd.close()
@@ -748,9 +749,9 @@ class FaxSendThread(threading.Thread):
             f_fd, self.f = utils.make_temp_file()
             log.debug("Temp file=%s" % self.f)
 
-            data = struct.pack(">8sBIHHBBBII", "hplip_g3", 1L, self.job_total_pages,  
-                self.job_hort_dpi, self.job_vert_dpi, self.job_page_size, 
-                self.job_resolution, self.job_encoding, 
+            data = struct.pack(">8sBIHHBBBII", "hplip_g3", 1L, self.job_total_pages,
+                self.job_hort_dpi, self.job_vert_dpi, self.job_page_size,
+                self.job_resolution, self.job_encoding,
                 0L, 0L)
 
             os.write(f_fd, data)
@@ -793,7 +794,7 @@ class FaxSendThread(threading.Thread):
                         self.write_queue((STATUS_PROCESSING_FILES, job_page_num, ''))
 
                         log.debug("Page=%d PPR=%d RPP=%d BPP=%d Thumb=%s" %
-                                  (page_num, ppr, rpp, bytes_to_read, thumbnail_bytes))                    
+                                  (page_num, ppr, rpp, bytes_to_read, thumbnail_bytes))
 
                         os.write(f_fd, fax_file_fd.read(bytes_to_read))
                         job_page_num += 1
@@ -820,7 +821,7 @@ class FaxSendThread(threading.Thread):
 
 
     def render_file(self, path, title, mime_type, force_single_page=False):
-        all_pages = True 
+        all_pages = True
         page_range = ''
         page_set = 0
         nup = 1
@@ -844,7 +845,7 @@ class FaxSendThread(threading.Thread):
         sent_job_id = cups.printFile(self.current_printer, path, title)
         cups.resetOptions()
 
-        log.debug("Job ID=%d" % sent_job_id)    
+        log.debug("Job ID=%d" % sent_job_id)
         job_id = 0
 
         time.sleep(1)
@@ -852,18 +853,18 @@ class FaxSendThread(threading.Thread):
         fax_file = ''
         complete = False
 
-        end_time = time.time() + 300.0 # wait for 5 min. max 
+        end_time = time.time() + 300.0 # wait for 5 min. max
         while time.time() < end_time:
             log.debug("Waiting for fax...")
-            
+
             result = list(self.service.CheckForWaitingFax(self.dev.device_uri, prop.username, sent_job_id))
 
             fax_file = str(result[7])
             log.debug("Fax file=%s" % fax_file)
-            
+
             if fax_file:
                 break
-            
+
             if self.check_for_cancel():
                 log.error("Render canceled. Canceling job #%d..." % sent_job_id)
                 cups.cancelJob(sent_job_id)
@@ -896,24 +897,24 @@ class FaxSendThread(threading.Thread):
         log.debug("Creating cover page...")
 
         pdf = self.cover_func(page_size=coverpages.PAGE_SIZE_LETTER,
-                              total_pages=self.job_total_pages, 
+                              total_pages=self.job_total_pages,
 
-                              recipient_name=a['name'], 
+                              recipient_name=a['name'],
                               recipient_phone='', # ???
-                              recipient_fax=a['fax'], 
+                              recipient_fax=a['fax'],
 
-                              sender_name=self.sender_name, 
-                              sender_phone=user_cfg.fax.voice_phone, 
+                              sender_name=self.sender_name,
+                              sender_phone=user_conf.get('fax', 'voice_phone'),
                               sender_fax=self.sender_fax,
-                              sender_email=user_cfg.fax.email_address, 
+                              sender_email=user_conf.get('fax', 'email_address'),
 
-                              regarding=self.cover_re, 
+                              regarding=self.cover_re,
                               message=self.cover_message,
                               preserve_formatting=self.preserve_formatting)
 
         log.debug("PDF File=%s" % pdf)
-        fax_file, canceled = self.render_file(pdf, 'Cover Page', "application/pdf", 
-            force_single_page=True) 
+        fax_file, canceled = self.render_file(pdf, 'Cover Page', "application/pdf",
+            force_single_page=True)
 
         try:
             os.remove(pdf)
@@ -928,10 +929,10 @@ class FaxSendThread(threading.Thread):
             self.update_queue.put(message)
             time.sleep(0)
             self.prev_update = message
-            
-    
+
+
     def run(self):
         pass
-        
-        
+
+
 

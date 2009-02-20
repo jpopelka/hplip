@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -89,16 +89,16 @@ usb_pat = re.compile(r"""(\d+):(\d+)""", re.IGNORECASE)
 #
 
 class Event(object):
-    def __init__(self, device_uri, printer_name, event_code, 
-                 username=prop.username, job_id=0, title='', 
+    def __init__(self, device_uri, printer_name, event_code,
+                 username=prop.username, job_id=0, title='',
                  timedate=0):
-                     
-        self.device_uri = str(device_uri).replace('\x00', '')
-        self.printer_name = str(printer_name).replace('\x00', '')
+
+        self.device_uri = unicode(utils.xrstrip(device_uri, '\x00'))[:64].encode('utf-8')
+        self.printer_name = unicode(utils.xrstrip(printer_name, '\x00'))[:64].encode('utf-8')
         self.event_code = int(event_code)
-        self.username = str(username).replace('\x00', '')
+        self.username = unicode(utils.xrstrip(username, '\x00'))[:32].encode('utf-8')
         self.job_id = int(job_id)
-        self.title = str(title).replace('\x00', '')
+        self.title = unicode(utils.xrstrip(title, '\x00'))[:64].encode('utf-8')
 
         if timedate:
             self.timedate = float(timedate)
@@ -107,8 +107,8 @@ class Event(object):
 
         self.pipe_fmt = "64s64sI32sI64sf"
         self.dbus_fmt = "ssisisd"
-        
-        
+
+
     def debug(self):
         log.debug("    device_uri=%s" % self.device_uri)
         log.debug("    printer_name=%s" % self.printer_name)
@@ -120,11 +120,11 @@ class Event(object):
 
 
     def pack_for_pipe(self):
-        return struct.pack(self.pipe_fmt, self.device_uri[:64], self.printer_name[:64],
-                self.event_code, self.username[:32], self.job_id, self.title[:64], 
+        return struct.pack(self.pipe_fmt, self.device_uri, self.printer_name,
+                self.event_code, self.username, self.job_id, self.title,
                 self.timedate)
-                
-                
+
+
     def send_via_pipe(self, fd, recipient='hpssd'):
         if fd is not None:
             log.debug("Sending event %d to %s (via pipe %d)..." % (self.event_code, recipient, fd))
@@ -134,19 +134,19 @@ class Event(object):
             except OSError:
                 log.debug("Failed.")
                 return False
-                
-            
+
+
     def send_via_dbus(self, session_bus, interface='com.hplip.StatusService'):
         if session_bus is not None and dbus_avail:
             log.debug("Sending event %d to %s (via dbus)..." % (self.event_code, interface))
             msg = lowlevel.SignalMessage('/', interface, 'Event')
             msg.append(signature=self.dbus_fmt, *self.as_tuple())
             session_bus.send_message(msg)
-            
-            
+
+
     def copy(self):
         return Event(*self.as_tuple())
-        
+
 
     def __str__(self):
         return "<Event('%s', '%s', %d, '%s', %d, '%s', %f)>" % self.as_tuple()
@@ -172,11 +172,11 @@ class FaxEvent(Event):
 
 
     def __str__(self):
-        return "<FaxEvent('%s', '%s', %d, '%s', %d, '%s', %f, '%s')>" % self.as_tuple()      
+        return "<FaxEvent('%s', '%s', %d, '%s', %d, '%s', %f, '%s')>" % self.as_tuple()
 
 
     def as_tuple(self):
-        return (self.device_uri, self.printer_name, self.event_code, 
+        return (self.device_uri, self.printer_name, self.event_code,
              self.username, self.job_id, self.title, self.timedate,
              self.temp_file)
 
@@ -188,8 +188,8 @@ class DeviceIOEvent(Event):
         self.bytes_written = bytes_written
         self.pipe_fmt = "64s64sI32sI64sfI"
         self.dbus_fmt = "ssisisfi"
-        
-        
+
+
     def debug(self):
         log.debug("DEVIO:")
         Event.debug(self)
@@ -197,18 +197,18 @@ class DeviceIOEvent(Event):
 
 
     def __str__(self):
-        return "<DeviceIOEvent('%s', '%s', %d, '%s', %d, '%s', %f, '%d')>" % self.as_tuple()      
+        return "<DeviceIOEvent('%s', '%s', %d, '%s', %d, '%s', %f, '%d')>" % self.as_tuple()
 
 
     def as_tuple(self):
-        return (self.device_uri, self.printer_name, self.event_code, 
+        return (self.device_uri, self.printer_name, self.event_code,
              self.username, self.job_id, self.title, self.timedate,
              self.bytes_written)
-        
+
 
 #
 # DBus Support
-# 
+#
 
 def init_dbus(dbus_loop=None):
     global dbus_avail
@@ -218,7 +218,7 @@ def init_dbus(dbus_loop=None):
     if not prop.gui_build:
         dbus_avail = False
         return dbus_avail, None,  None
-    
+
     if dbus_avail and not dbus_disabled:
         if os.getuid() == 0:
             log.debug("Not starting dbus: running as root.")
@@ -228,7 +228,7 @@ def init_dbus(dbus_loop=None):
         try:
             if dbus_loop is None:
                 session_bus = dbus.SessionBus()
-            else:   
+            else:
                 session_bus = dbus.SessionBus(dbus_loop)
         except dbus.exceptions.DBusException, e:
             if os.getuid() != 0:
@@ -260,7 +260,7 @@ def init_dbus(dbus_loop=None):
 
             log.debug("Running hp-systray: %s --force-startup" % path)
 
-            os.spawnlp(os.P_NOWAIT, path, 'hp-systray', '--force-startup') #,  ui_toolkit)
+            os.spawnlp(os.P_NOWAIT, path, 'hp-systray', '--force-startup')
 
             log.debug("Waiting for hp-systray to start...")
             time.sleep(1)
@@ -291,7 +291,7 @@ def init_dbus(dbus_loop=None):
 
 #
 # Make URI from parameter (bus ID, IP address, etc)
-# 
+#
 
 def makeURI(param, port=1):
     cups_uri, sane_uri, fax_uri = '', '', ''
@@ -388,7 +388,7 @@ def makeURI(param, port=1):
 
                 if mq.get('fax-type', 0):
                     fax_uri = cups_uri.replace("hp:", "hpfax:")
-            
+
             else:
                 cups_uri, sane_uri, fax_uri = '', '', ''
 
@@ -396,7 +396,7 @@ def makeURI(param, port=1):
         scan_uri, fax_uri = '', ''
 
     if cups_uri:
-        user_cfg.last_used.device_uri = cups_uri
+        user_conf.set('last_used', 'device_uri', cups_uri)
 
     return cups_uri, sane_uri, fax_uri
 
@@ -423,7 +423,7 @@ def queryModelByURI(device_uri):
 
 #
 # Device Discovery
-# 
+#
 
 def probeDevices(bus=DEFAULT_PROBE_BUS, timeout=10,
                  ttl=4, filter=DEFAULT_FILTER,  search='', net_search='slp',
@@ -612,7 +612,7 @@ def getSupportedCUPSDevices(back_end_filter=['hp'], filter=DEFAULT_FILTER):
         if (back_end_filter == '*' or back_end in back_end_filter or \
             ('hpaio' in back_end_filter and back_end == 'hp')) and \
             model and is_hp:
-                
+
             include = True
             mq = queryModelByModel(model)
 
@@ -632,7 +632,7 @@ def getSupportedCUPSDevices(back_end_filter=['hp'], filter=DEFAULT_FILTER):
                     d = p.device_uri.replace('hp:', 'hpaio:')
                 else:
                     d = p.device_uri
-                    
+
                 try:
                     devices[d]
                 except KeyError:
@@ -1017,9 +1017,9 @@ class Device(object):
         self.device_uri = device_uri
         self.callback = callback
         self.device_type = DEVICE_TYPE_UNKNOWN
-        
+
         if self.device_uri is None:
-            raise Error(ERROR_DEVICE_NOT_FOUND)            
+            raise Error(ERROR_DEVICE_NOT_FOUND)
 
         if self.device_uri.startswith('hp:'):
             self.device_type = DEVICE_TYPE_PRINTER
@@ -1533,7 +1533,7 @@ class Device(object):
             elif rx_active:
                 self.status_code = STATUS_FAX_RX_ACTIVE
 
-            #print self.status_code                
+            #print self.status_code
 
             self.error_state = STATUS_TO_ERROR_STATE_MAP.get(self.status_code, ERROR_STATE_CLEAR)
             self.error_code = self.status_code
@@ -1568,7 +1568,7 @@ class Device(object):
 
                 self.dq.update({'panel': int(self.panel_check),
                                   'panel-line1': line1,
-                                  'panel-line2': line2,}) 
+                                  'panel-line2': line2,})
 
             if not quick and reread_cups_printers:
                 self.cups_printers = []
@@ -1975,18 +1975,18 @@ class Device(object):
     def isBusyOrInErrorState(self):
         try:
             self.queryDevice(quick=True)
-            #print self.error_state
         except Error:
             return True
-        return self.error_state > ERROR_STATE_MAX_OK
+        return self.error_state in (ERROR_STATE_ERROR, ERROR_STATE_BUSY)
+
 
     def isIdleAndNoError(self):
         try:
             self.queryDevice(quick=True)
-            #print self.error_state
         except Error:
             return False
-        return self.error_state <= ERROR_STATE_MAX_OK
+        return self.error_state not in (ERROR_STATE_ERROR, ERROR_STATE_BUSY)
+
 
     def getPML(self, oid, desired_int_size=pml.INT_SIZE_INT): # oid => ( 'dotted oid value', pml type )
         channel_id = self.openPML()

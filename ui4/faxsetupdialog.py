@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@ from base import device, utils
 from prnt import cups
 from base.codes import *
 from ui_utils import *
-from fax import fax
 
 # Qt
 from PyQt4.QtCore import *
@@ -37,6 +36,19 @@ from PyQt4.QtGui import *
 # Ui
 from faxsetupdialog_base import Ui_Dialog
 from deviceuricombobox import DEVICEURICOMBOBOX_TYPE_FAX_ONLY
+
+fax_enabled = prop.fax_build
+
+if fax_enabled:
+    try:
+        from fax import fax
+    except ImportError:
+        # This can fail on Python < 2.3 due to the datetime module
+        # or if fax was diabled during the build
+        fax_enabled = False
+
+if not fax_enabled:
+    log.error("Fax disabled.")
 
 
 class FaxSetupDialog(QDialog, Ui_Dialog):
@@ -100,6 +112,11 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
 
 
     def updateUi(self):
+        if not fax_enabled:
+            FailureUI(self, self.__tr("<b>PC send fax support is not enabled.</b><p>Re-install HPLIP with fax support or use the device front panel to send a fax.</p><p>Click <i>OK</i> to exit.</p>"))
+            self.close()
+            return
+
         self.FaxComboBox.updateUi()
 
 
@@ -187,7 +204,7 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
     def saveVoiceNumber(self, s):
         log.debug("Saving voice number (%s) to ~/.hplip/hplip.conf" % s)
         self.voice_number_dirty = False
-        user_cfg.fax.voice_phone = s
+        user_conf.set('fax', 'voice_phone', s)
 
     #
     # EMail (for coverpage) (stored in ~/.hplip/hplip.conf)
@@ -204,7 +221,7 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
     def saveEmail(self, s):
         log.debug("Saving email address (%s) to ~/.hplip/hplip.conf" % s)
         self.email_dirty = False
-        user_cfg.fax.email_address = s
+        user_conf.set('fax', 'email_address', s)
 
     #
     #
@@ -230,8 +247,8 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
 
 
     def updateCoverpageTab(self):
-        self.VoiceNumberLineEdit.setText(user_cfg.fax.voice_phone or u'')
-        self.EmailLineEdit.setText(user_cfg.fax.email_address or u'')
+        self.VoiceNumberLineEdit.setText(user_conf.get('fax', 'voice_phone'))
+        self.EmailLineEdit.setText(user_conf.get('fax', 'email_address'))
 
 
     def closeEvent(self, e):

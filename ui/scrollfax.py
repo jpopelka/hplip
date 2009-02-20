@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -605,14 +605,7 @@ class ScrollFaxView(ScrollView):
 
 
     def addFile_clicked(self):
-        workingDirectory = user_cfg.last_used.working_dir
-
-        if not workingDirectory or not os.path.exists(workingDirectory):
-            workingDirectory = os.path.expanduser("~")
-
-        log.debug("workingDirectory: %s" % workingDirectory)
-
-        dlg = QFileDialog(workingDirectory, QString.null, None, None, True)
+        dlg = QFileDialog(user_conf.workingDirectory(), QString.null, None, None, True)
 
         dlg.setCaption("openfile")
         dlg.setMode(QFileDialog.ExistingFile)
@@ -620,11 +613,9 @@ class ScrollFaxView(ScrollView):
 
         if dlg.exec_loop() == QDialog.Accepted:
                 results = dlg.selectedFile()
-                workingDirectory = unicode(dlg.dir().absPath())
+                working_directory = unicode(dlg.dir().absPath())
                 log.debug("results: %s" % results)
-                log.debug("workingDirectory: %s" % workingDirectory)
-
-                user_cfg.last_used.working_dir = workingDirectory
+                user_conf.setWorkingDirectory(working_directory)
 
                 if results:
                     path = unicode(results)
@@ -1223,7 +1214,7 @@ class ScrollFaxView(ScrollView):
     def send_fax_timer_timeout(self):
         while self.update_queue.qsize():
             try:
-                status, page_num, phone_num = self.update_queue.get(0)
+                status, page_num, arg = self.update_queue.get(0)
             except Queue.Empty:
                 break
 
@@ -1239,14 +1230,17 @@ class ScrollFaxView(ScrollView):
             elif status == fax.STATUS_PROCESSING_FILES:
                 self.waitdlg.setMessage(self.__tr("Processing page %1...").arg(page_num))
 
+            elif status == fax.STATUS_SENDING_TO_RECIPIENT:
+                self.waitdlg.setMessage(self.__tr("Sending fax to %1...").arg(arg))
+
             elif status == fax.STATUS_DIALING:
-                self.waitdlg.setMessage(self.__tr("Dialing %1...").arg(phone_num))
+                self.waitdlg.setMessage(self.__tr("Dialing %1...").arg(arg))
 
             elif status == fax.STATUS_CONNECTING:
-                self.waitdlg.setMessage(self.__tr("Connecting to %1...").arg(phone_num))
+                self.waitdlg.setMessage(self.__tr("Connecting to %1...").arg(arg))
 
             elif status == fax.STATUS_SENDING:
-                self.waitdlg.setMessage(self.__tr("Sending page %1 to %2...").arg(page_num).arg(phone_num))
+                self.waitdlg.setMessage(self.__tr("Sending page %1 to %2...").arg(page_num).arg(arg))
 
             elif status == fax.STATUS_CLEANUP:
                 self.waitdlg.setMessage(self.__tr("Cleaning up..."))

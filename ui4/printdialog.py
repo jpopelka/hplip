@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -92,7 +92,7 @@ class PrintDialog(QDialog, Ui_Dialog):
 
     def initFilePage(self):
         self.Files.setType(FILETABLE_TYPE_PRINT)
-        self.Files.setWorkingDir(self.user_settings.last_used_working_dir)
+        self.Files.setWorkingDir(user_conf.workingDirectory())
         self.connect(self.Files, SIGNAL("isEmpty"), self.Files_isEmpty)
         self.connect(self.Files, SIGNAL("isNotEmpty"), self.Files_isNotEmpty)
 

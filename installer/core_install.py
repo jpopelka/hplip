@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,15 +28,31 @@ import time
 import cStringIO
 import grp
 import pwd
-import urllib # TODO: Replace with urllib2 (urllib is deprecated in Python 3.0)
-import sha # TODO: Replace with hashlib (sha is deprecated in Python 3.0)
 import tarfile
+
+try:
+    import hashlib # new in 2.5
+
+    def get_checksum(s):
+        return hashlib.sha1(s).hexdigest()
+
+except ImportError:
+    import sha # deprecated in 2.6/3.0
+
+    def get_checksum(s):
+        return sha.new(s).hexdigest()
+
+
+import urllib # TODO: Replace with urllib2 (urllib is deprecated in Python 3.0)
+
 
 # Local
 from base.g import *
 from base.codes import *
 from base import utils, pexpect
 from dcheck import *
+
+
 
 DISTRO_UNKNOWN = 0
 DISTRO_VER_UNKNOWN = '0.0'
@@ -127,7 +143,7 @@ else: # using Python 2.5+
 
 
 class CoreInstall(object):
-    def __init__(self, mode=MODE_INSTALLER, ui_mode=INTERACTIVE_MODE):
+    def __init__(self, mode=MODE_INSTALLER, ui_mode=INTERACTIVE_MODE, ui_toolkit='qt4'):
         os.umask(0022)
         self.mode = mode
         self.ui_mode = ui_mode
@@ -149,7 +165,7 @@ class CoreInstall(object):
         self.logoff_required = False
         self.restart_required = False
         self.network_connected = False
-        self.ui_toolkit = 'qt3'
+        self.ui_toolkit = ui_toolkit
         self.enable = None
         self.disable = None
         self.plugin_path = os.path.join(prop.home_dir, "data", "plugin")
@@ -200,7 +216,8 @@ class CoreInstall(object):
         # components
         # 'name': ('description', [<option list>])
         self.components = {
-            'hplip': ("HP Linux Imaging and Printing System", ['base', 'network', 'gui', 'fax', 'scan', 'parallel', 'docs']),
+            'hplip': ("HP Linux Imaging and Printing System", ['base', 'network', 'gui_qt3', 'gui_qt4',
+                                                               'fax', 'scan', 'parallel', 'docs']),
             'hpijs': ("HP IJS Printer Driver", ['hpijs', 'hpijs-cups'])
         }
 
@@ -211,7 +228,8 @@ class CoreInstall(object):
         self.options = {
             'base':     (True,  'Required HPLIP base components', []), # HPLIP
             'network' : (False, 'Network/JetDirect I/O', []),
-            'gui' :     (False, 'Graphical User Interfaces (GUIs)', []),
+            'gui_qt3' : (False, 'Graphical User Interfaces (Qt3)', []),
+            'gui_qt4' : (False, 'Graphical User Interfaces (Qt4)', []),
             'fax' :     (False, 'PC Send Fax support', []),
             'scan':     (False, 'Scanning support', []),
             'parallel': (False, 'Parallel I/O (LPT)', []),
@@ -228,7 +246,8 @@ class CoreInstall(object):
         self.selected_options = {
             'base':        True,
             'network':     True,
-            'gui':         True,
+            'gui_qt3':     False,
+            'gui_qt4':     True,
             'fax':         True,
             'scan':        True,
             'parallel':    False,
@@ -246,11 +265,11 @@ class CoreInstall(object):
             # Required base packages
             'libjpeg':          (True,  ['base', 'hpijs'], "libjpeg - JPEG library", self.check_libjpeg, DEPENDENCY_RUN_AND_COMPILE_TIME),
             'libtool':          (True,  ['base'], "libtool - Library building support services", self.check_libtool, DEPENDENCY_COMPILE_TIME),
-            'cups' :            (True,  ['base', 'hpijs-cups'], 'cups - Common Unix Printing System', self.check_cups, DEPENDENCY_RUN_TIME),
-            'cups-devel':       (True,  ['base'], 'cups-devel- Common Unix Printing System development files', self.check_cups_devel, DEPENDENCY_COMPILE_TIME),
+            'cups' :            (True,  ['base', 'hpijs-cups'], 'CUPS - Common Unix Printing System', self.check_cups, DEPENDENCY_RUN_TIME),
+            'cups-devel':       (True,  ['base'], 'CUPS devel- Common Unix Printing System development files', self.check_cups_devel, DEPENDENCY_COMPILE_TIME),
             'gcc' :             (True,  ['base', 'hpijs'], 'gcc - GNU Project C and C++ Compiler', self.check_gcc, DEPENDENCY_COMPILE_TIME),
             'make' :            (True,  ['base', 'hpijs'], "make - GNU make utility to maintain groups of programs", self.check_make, DEPENDENCY_COMPILE_TIME),
-            'python-devel' :    (True,  ['base'], "python-devel - Python development files", self.check_python_devel, DEPENDENCY_COMPILE_TIME),
+            'python-devel' :    (True,  ['base'], "Python devel - Python development files", self.check_python_devel, DEPENDENCY_COMPILE_TIME),
             'libpthread' :      (True,  ['base'], "libpthread - POSIX threads library", self.check_libpthread, DEPENDENCY_RUN_AND_COMPILE_TIME),
             'python2x':         (True,  ['base'], "Python 2.2 or greater - Python programming language", self.check_python2x, DEPENDENCY_RUN_AND_COMPILE_TIME),
             'python-xml'  :     (True, ['base'], "Python XML libraries", self.check_python_xml, DEPENDENCY_RUN_TIME),
@@ -260,7 +279,7 @@ class CoreInstall(object):
 
 
             # Optional base packages
-            'cups-ddk':          (False, ['base'], "cups-ddk - CUPS driver development kit", self.check_cupsddk, DEPENDENCY_RUN_TIME), # req. for .drv PPD installs
+            'cups-ddk':          (False, ['base'], "CUPS DDK - CUPS driver development kit", self.check_cupsddk, DEPENDENCY_RUN_TIME), # req. for .drv PPD installs
 
             # Required scan packages
             'sane':             (True,  ['scan'], "SANE - Scanning library", self.check_sane, DEPENDENCY_RUN_TIME),
@@ -273,9 +292,9 @@ class CoreInstall(object):
 
             # Required fax packages
             'python23':         (True,  ['fax'], "Python 2.3 or greater - Required for fax functionality", self.check_python23, DEPENDENCY_RUN_TIME),
-            'dbus':             (True,  ['fax'], "dbus - Message bus system", self.check_dbus, DEPENDENCY_RUN_AND_COMPILE_TIME),
-            'python-dbus':      (True,  ['fax'], "python-dbus - Python bindings for dbus", self.check_python_dbus, DEPENDENCY_RUN_TIME),
-            'python-ctypes':    (True,  ['fax'], "python-ctypes - A foreign function library for Python", self.check_python_ctypes, DEPENDENCY_RUN_TIME),
+            'dbus':             (True,  ['fax'], "DBus - Message bus system", self.check_dbus, DEPENDENCY_RUN_AND_COMPILE_TIME),
+            'python-dbus':      (True,  ['fax'], "Python DBus - Python bindings for DBus", self.check_python_dbus, DEPENDENCY_RUN_TIME),
+            'python-ctypes':    (True,  ['fax', 'gui_qt3'], "Python ctypes - A foreign function library for Python", self.check_python_ctypes, DEPENDENCY_RUN_TIME),
 
             # Optional fax packages
             'reportlab':        (False, ['fax'], "Reportlab - PDF library for Python", self.check_reportlab, DEPENDENCY_RUN_TIME),
@@ -283,9 +302,12 @@ class CoreInstall(object):
             # Required parallel I/O packages
             'ppdev':            (True,  ['parallel'], "ppdev - Parallel port support kernel module.", self.check_ppdev, DEPENDENCY_RUN_TIME),
 
-            # Required gui packages
-            'pyqt':             [True,  ['gui'], "PyQt 3- Qt interface for Python (for Qt version 3.x)", self.check_pyqt, DEPENDENCY_RUN_TIME], # PyQt 3.x
-            'pyqt4':            [False,  ['gui'], "PyQt 4- Qt interface for Python (for Qt version 4.x)", self.check_pyqt4, DEPENDENCY_RUN_TIME], # PyQt 4.x )
+            # Required qt3 packages
+            'pyqt':             [True,  ['gui_qt3'], "PyQt 3- Qt interface for Python (for Qt version 3.x)", self.check_pyqt, DEPENDENCY_RUN_TIME], # PyQt 3.x
+
+            # Required qt4 packages
+            'pyqt4':            [True,  ['gui_qt4'], "PyQt 4- Qt interface for Python (for Qt version 4.x)", self.check_pyqt4, DEPENDENCY_RUN_TIME], # PyQt 4.x )
+            'pyqt4-dbus' :      [True,  ['gui_qt4'], "PyQt 4 DBus - DBus Support for PyQt4", self.check_pyqt4_dbus, DEPENDENCY_RUN_TIME],
 
             # Required network I/O packages
             'libnetsnmp-devel': (True,  ['network'], "libnetsnmp-devel - SNMP networking library development files", self.check_libnetsnmp, DEPENDENCY_RUN_AND_COMPILE_TIME),
@@ -332,6 +354,7 @@ class CoreInstall(object):
             self.have_dependencies[d] = False
 
         self.get_distro()
+        self.distro_changed()
 
         if callback is not None:
             callback("Distro: %s\n" % self.distro)
@@ -386,16 +409,14 @@ class CoreInstall(object):
         self.sys_uname_info = self.sys_uname_info.replace('\n', '')
         log.debug(self.sys_uname_info)
 
-
-
-        self.distro_changed()
+        #self.distro_changed()
 
         # Record the installation time/date and version.
         # Also has the effect of making the .hplip.conf file user r/w
         # on the 1st run so that running hp-setup as root doesn't lock
         # the user out of owning the file
-        user_cfg.installation.date_time = time.strftime("%x %H:%M:%S", time.localtime())
-        user_cfg.installation.version = self.version_public
+        user_conf.set('installation', 'date_time', time.strftime("%x %H:%M:%S", time.localtime()))
+        user_conf.set('installation', 'version', self.version_public)
 
         if callback is not None:
             callback("Done")
@@ -614,32 +635,59 @@ class CoreInstall(object):
 
         self.ppd_dir = self.get_distro_ver_data('ppd_dir')
 
-        if not self.ppd_dir:
-            log.warning("Invalid ppd_dir value: %s" % self.ppd_dir)
+        #if not self.ppd_dir:
+        #    log.warning("Invalid ppd_dir value: %s" % self.ppd_dir)
 
         self.drv_dir = self.get_distro_ver_data('drv_dir')
         if not self.enable_ppds and not self.drv_dir:
             log.warning("Invalid drv_dir value: %s" % self.drv_dir)
 
         self.distro_version_supported = self.get_distro_ver_data('supported', False)
-        self.selected_options['fax'] = self.get_distro_ver_data('fax-supported', True)
-        self.selected_options['gui'] = self.get_distro_ver_data('gui-supported', True)
-        self.selected_options['network'] = self.get_distro_ver_data('network-supported', True)
-        self.selected_options['scan'] = self.get_distro_ver_data('scan-supported', True)
-        self.selected_options['parallel'] = self.get_distro_ver_data('parallel-supported', False)
+        self.selected_options['fax'] = self.get_distro_ver_data('fax_supported', True)
+        self.selected_options['network'] = self.get_distro_ver_data('network_supported', True)
+        self.selected_options['scan'] = self.get_distro_ver_data('scan_supported', True)
+        self.selected_options['parallel'] = self.get_distro_ver_data('parallel_supported', False)
 
-        # Adjust required flag based on the distro ver ui_toolkit value
-        if self.get_distro_ver_data('ui_toolkit',  'qt3').lower() == 'qt4':
-            log.debug("UI toolkit: Qt4")
-            self.ui_toolkit = 'qt4'
-            self.dependencies['pyqt4'][0] = True
-            self.dependencies['pyqt'][0] = False
-        else: # qt3
-            self.ui_toolkit = 'qt3'
-            log.debug("UI toolkit: Qt3")
-            self.dependencies['pyqt'][0] = True
-            self.dependencies['pyqt4'][0] = False
-        # todo: gtk
+        gui_supported = self.get_distro_ver_data('gui_supported', True)
+
+        if gui_supported:
+            # Adjust required flag based on the distro ver ui_toolkit value
+            ui_toolkit = self.get_distro_ver_data('ui_toolkit',  'qt4').lower()
+
+            if ui_toolkit == 'qt4':
+                log.debug("Default UI toolkit: Qt4")
+                self.ui_toolkit = 'qt4'
+                self.selected_options['gui_qt4'] = True
+                self.selected_options['gui_qt3'] = False
+
+            elif ui_toolkit == 'qt3':
+                log.debug("Default UI toolkit: Qt3")
+                self.ui_toolkit = 'qt3'
+                self.selected_options['gui_qt4'] = False
+                self.selected_options['gui_qt3'] = True
+            # todo: gtk
+        else:
+                self.selected_options['gui_qt3'] = False
+                self.selected_options['gui_qt4'] = False
+
+        # Override with --qt3 or --qt4 command args
+        if self.enable is not None:
+            if 'qt3' in self.enable:
+                log.debug("User selected UI toolkit: Qt3")
+                self.ui_toolkit = 'qt3'
+                self.selected_options['gui_qt3'] = True
+            if 'qt4' in self.enable:
+                log.debug("User selected UI toolkit: Qt4")
+                self.ui_toolkit = 'qt4'
+                self.selected_options['gui_qt4'] = True
+
+        if self.disable is not None:
+            if 'qt3' in self.disable:
+                log.debug("User deselected UI toolkit: Qt3")
+                self.selected_options['gui_qt3'] = False
+            if 'qt4' in self.disable:
+                log.debug("User deselected UI toolkit: Qt4")
+                self.selected_options['gui_qt4'] = False
 
 
     def __fixup_data(self, key, data):
@@ -679,60 +727,70 @@ class CoreInstall(object):
                 log.debug("DAT file not found at %s. Using local relative path..." % distros_dat_file)
                 distros_dat_file = os.path.join('installer', 'distros.dat')
 
-        distros_dat = Config(distros_dat_file, True)
-        distros_list = self.__fixup_data('distros', distros_dat.distros.distros)
+        distros_dat = ConfigBase(distros_dat_file)
+        distros_list = self.__fixup_data('distros', distros_dat.get('distros', 'distros'))
         log.debug(distros_list)
 
         for distro in distros_list:
             update_spinner()
             d = {}
-            try:
-                distro_section = distros_dat[distro]
-            except KeyError:
+
+            if not distros_dat.has_section(distro):
                 log.debug("Missing distro section in distros.dat: [%s]" % distro)
                 continue
 
-            for key in distro_section:
-                d[key] = self.__fixup_data(key, distro_section[key])
+            for key in distros_dat.keys(distro):
+                d[key] = self.__fixup_data(key, distros_dat.get(distro, key))
 
             self.distros[distro] = d
-            versions = self.__fixup_data("versions", distros_dat[distro]['versions'])
+            versions = self.__fixup_data("versions", distros_dat.get(distro, 'versions'))
             self.distros[distro]['versions'] = {}
 
             for ver in versions:
+                same_as_version, supported = False, True
                 v = {}
-                try:
-                    ver_section = distros_dat["%s:%s" % (distro, ver)]
-                except KeyError:
-                    log.debug("Missing version section in distros.dat: [%s:%s]" % (distro, ver))
+                ver_section = "%s:%s" % (distro, ver)
+
+                if not distros_dat.has_section(ver_section):
+                    log.error("Missing version section in distros.dat: [%s:%s]" % (distro, ver))
                     continue
 
-                for key in ver_section:
-                    v[key] = self.__fixup_data(key, ver_section[key])
+                if 'same_as_version' in distros_dat.keys(ver_section):
+                    same_as_version = True
+
+                supported = self.__fixup_data('supported', distros_dat.get(ver_section, 'supported'))
+
+                for key in distros_dat.keys(ver_section):
+                    v[key] = self.__fixup_data(key, distros_dat.get(ver_section, key))
 
                 self.distros[distro]['versions'][ver] = v
                 self.distros[distro]['versions'][ver]['dependency_cmds'] = {}
 
+                if same_as_version or not supported:
+                    continue
+
                 for dep in self.dependencies:
                     dd = {}
-                    try:
-                        dep_section = distros_dat["%s:%s:%s" % (distro, ver, dep)].copy()
-                    except KeyError:
+                    dep_section = "%s:%s:%s" % (distro, ver, dep)
+
+                    if not distros_dat.has_section(dep_section) and not same_as_version:
                         log.debug("Missing dependency section in distros.dat: [%s:%s:%s]" % (distro, ver, dep))
                         continue
 
+                    #if same_as_version:
+                    #    continue
 
-                    for key in dep_section:
-                        dd[key] = self.__fixup_data(key, dep_section[key])
+                    for key in distros_dat.keys(dep_section):
+                        dd[key] = self.__fixup_data(key, distros_dat.get(dep_section, key))
 
                     self.distros[distro]['versions'][ver]['dependency_cmds'][dep] = dd
 
             versions = self.distros[distro]['versions']
             for ver in versions:
-                ver_section = distros_dat["%s:%s" % (distro, ver)]
+                ver_section = "%s:%s" % (distro, ver)
 
-                if 'same_as_version' in ver_section:
-                    v = self.__fixup_data("same_as_version", ver_section['same_as_version'])
+                if 'same_as_version' in distros_dat.keys(ver_section):
+                    v = self.__fixup_data("same_as_version", distros_dat.get(ver_section, 'same_as_version'))
                     log.debug("Setting %s:%s to %s:%s" % (distro, ver, distro, v))
 
                     try:
@@ -743,6 +801,8 @@ class CoreInstall(object):
                         log.debug("Missing 'same_as_version=' version in distros.dat for section [%s:%s]." % (distro, v))
                         continue
 
+        #import pprint
+        #pprint.pprint(self.distros)
 
     def pre_install(self):
         pass
@@ -858,57 +918,78 @@ class CoreInstall(object):
 
 
     def check_pyqt(self):
-        try:
-            import qt
-            pyqtVersion = None
+        if self.ui_toolkit == 'qt3':
             try:
-                pyqtVersion = qt.PYQT_VERSION_STR
-                log.debug("PYQT_VERSION_STR = %s" % pyqtVersion)
-            except AttributeError:
+                import qt
+                pyqtVersion = None
                 try:
-                    pyqtVersion = qt.PYQT_VERSION
-                    log.debug("PYQT_VERSION = %s" % pyqtVersion)
+                    pyqtVersion = qt.PYQT_VERSION_STR
+                    log.debug("PYQT_VERSION_STR = %s" % pyqtVersion)
                 except AttributeError:
-                    pass
-
-            if pyqtVersion is not None:
-                while pyqtVersion.count('.') < 2:
-                    pyqtVersion += '.0'
-
-                (maj_ver, min_ver, pat_ver) = pyqtVersion.split('.')
-
-                if pyqtVersion.find('snapshot') >= 0:
-                    log.debug("A non-stable snapshot version of PyQt is installed.")
-                    pass
-                else:
                     try:
-                        maj_ver = int(maj_ver)
-                        min_ver = int(min_ver)
-                        pat_ver = int(pat_ver)
-                    except ValueError:
-                        maj_ver, min_ver, pat_ver = 0, 0, 0
-                    else:
-                        log.debug("Version %d.%d.%d installed." % (maj_ver, min_ver, pat_ver))
+                        pyqtVersion = qt.PYQT_VERSION
+                        log.debug("PYQT_VERSION = %s" % pyqtVersion)
+                    except AttributeError:
+                        pass
 
-                    if maj_ver < MINIMUM_PYQT_MAJOR_VER or \
-                        (maj_ver == MINIMUM_PYQT_MAJOR_VER and min_ver < MINIMUM_PYQT_MINOR_VER):
-                        log.debug("HPLIP may not function properly with the version of PyQt that is installed (%d.%d.%d)." % (maj_ver, min_ver, pat_ver))
-                        log.debug("Incorrect version of PyQt installed. Ver. %d.%d or greater required." % (MINIMUM_PYQT_MAJOR_VER, MINIMUM_PYQT_MINOR_VER))
-                        return True
-                    else:
-                        return True
+                if pyqtVersion is not None:
+                    while pyqtVersion.count('.') < 2:
+                        pyqtVersion += '.0'
 
-        except (ImportError, TypeError): # Note: IGOS 1.0 produces a TypeError when importing Qt3
-             return False
+                    (maj_ver, min_ver, pat_ver) = pyqtVersion.split('.')
+
+                    if pyqtVersion.find('snapshot') >= 0:
+                        log.debug("A non-stable snapshot version of PyQt is installed.")
+                        pass
+                    else:
+                        try:
+                            maj_ver = int(maj_ver)
+                            min_ver = int(min_ver)
+                            pat_ver = int(pat_ver)
+                        except ValueError:
+                            maj_ver, min_ver, pat_ver = 0, 0, 0
+                        else:
+                            log.debug("Version %d.%d.%d installed." % (maj_ver, min_ver, pat_ver))
+
+                        if maj_ver < MINIMUM_PYQT_MAJOR_VER or \
+                            (maj_ver == MINIMUM_PYQT_MAJOR_VER and min_ver < MINIMUM_PYQT_MINOR_VER):
+                            log.debug("HPLIP may not function properly with the version of PyQt that is installed (%d.%d.%d)." % (maj_ver, min_ver, pat_ver))
+                            log.debug("Incorrect version of PyQt installed. Ver. %d.%d or greater required." % (MINIMUM_PYQT_MAJOR_VER, MINIMUM_PYQT_MINOR_VER))
+                            return True
+                        else:
+                            return True
+
+            except (ImportError, TypeError): # Note: IGOS 1.0 produces a TypeError when importing Qt3
+                return False
+
+        else:
+            return False
 
 
     def check_pyqt4(self):
-        try:
-            import PyQt4
-        except ImportError:
-            return False
+        if self.ui_toolkit == 'qt4':
+            try:
+                import PyQt4
+            except ImportError:
+                return False
+            else:
+                return True
+
         else:
-            return True
+            return False
+
+
+    def check_pyqt4_dbus(self):
+        if self.ui_toolkit == 'qt4':
+            try:
+                from dbus.mainloop.qt import DBusQtMainLoop
+            except ImportError:
+                return False
+            else:
+                return True
+        else:
+            return False
+
 
     def check_python_devel(self):
         return check_file('Python.h')
@@ -947,9 +1028,20 @@ class CoreInstall(object):
 
 
     def check_dbus(self):
-        log.debug("Checking for dbus running...")
-        return check_ps(['dbus-daemon']) and \
+        log.debug("Checking for dbus running and header files present (dbus-devel)...")
+        return check_ps(['dbus-daemon'])  and \
             len(locate_file_contains("dbus-message.h", '/usr/include', 'dbus_message_new_signal'))
+
+        #try:
+            #from dbus import lowlevel, SystemBus, SessionBus
+            #import dbus.service
+            #from dbus.mainloop.glib import DBusGMainLoop
+            #from gobject import MainLoop
+            #python_dbus = True
+        #except ImportError:
+            #python_dbus = False
+
+        #return dbus_running and python_dbus
 
 
     def check_cups_devel(self):
@@ -973,8 +1065,8 @@ class CoreInstall(object):
 
 
     def check_hplip(self):
-        log.debug("Checking for HPLIP (pre-2.x)...")
-        return check_ps(['hpiod', 'hpssd']) and locate_files('hplip.conf', '/etc/hp')
+        log.debug("Checking for HPLIP...")
+        return locate_files('hplip.conf', '/etc/hp')
 
 
     def check_hpssd(self):
@@ -1000,7 +1092,9 @@ class CoreInstall(object):
         log.debug("Checking for cups-ddk...")
         # TODO: Compute these paths some way or another...
         #return check_tool("/usr/lib/cups/driver/drv list") and os.path.exists("/usr/share/cupsddk/include/media.defs")
-        return check_file('drv', "/usr/lib/cups/driver") and check_file('media.defs', "/usr/share/cupsddk/include")
+        return (check_file('drv', "/usr/lib/cups/driver") or check_file('drv', "/usr/lib64/cups/driver")) and \
+            check_file('media.defs', "/usr/share/cupsddk/include")
+
 
     def check_pkg_mgr(self):
         """
@@ -1032,7 +1126,7 @@ class CoreInstall(object):
                 config_in = open('./configure.in', 'r')
             except IOError:
                 self.version_description, self.version_public, self.version_internal = \
-                    '', sys_cfg.configure['internal-tag'], sys_cfg.hplip.version
+                    '', sys_conf.get('configure', 'internal-tag', '0.0.0'), prop.installed_version
             else:
                 for c in config_in:
                     if c.startswith("AC_INIT"):
@@ -1052,7 +1146,7 @@ class CoreInstall(object):
         else: # MODE_CHECK
             try:
                 self.version_description, self.version_public, self.version_internal = \
-                    '', sys_cfg.configure['internal-tag'], sys_cfg.hplip.version
+                    '', sys_conf.get('configure', 'internal-tag', '0.0.0'), prop.installed_version
             except KeyError:
                 self.version_description, self.version_public, self.version_internal = '', '', ''
 
@@ -1069,18 +1163,8 @@ class CoreInstall(object):
         configuration['pp-build'] = self.selected_options['parallel']
         configuration['fax-build'] = self.selected_options['fax'] and dbus_avail
         configuration['dbus-build'] = dbus_avail
-
-        if self.selected_options['gui']:
-            configuration['gui-build'] = True
-            if self.ui_toolkit == 'qt4':
-                configuration['qt4'] = True
-                configuration['qt3'] = False
-            else:
-                configuration['qt3'] = True
-                configuration['qt4'] = False
-        else:
-            configuration['gui-build'] = False
-
+        configuration['qt3'] = self.selected_options['gui_qt3']
+        configuration['qt4'] = self.selected_options['gui_qt4']
         configuration['scan-build'] = self.selected_options['scan']
         configuration['doc-build'] = self.selected_options['docs']
 
@@ -1299,7 +1383,6 @@ class CoreInstall(object):
 
     def missing_optional_dependencies(self):
         # missing deps in opt. options
-
         for opt in self.components[self.selected_component][1]:
             if not self.options[opt][0]: # not required option
                 if self.selected_options[opt]: # only for options that are ON
@@ -1325,7 +1408,12 @@ class CoreInstall(object):
         # not-required options
         for opt in self.components[self.selected_component][1]:
             if not self.options[opt][0]: # not required
-                self.selected_options[opt] = answer_callback(opt, self.options[opt][1])
+                default = 'y'
+
+                if not self.selected_options[opt]:
+                    default = 'n'
+
+                self.selected_options[opt] = answer_callback(opt, self.options[opt][1], default)
 
                 if self.selected_options[opt]: # only for options that are ON
                     for d in self.options[opt][2]: # dependencies
@@ -1471,10 +1559,6 @@ class CoreInstall(object):
 
                 cmds.append(self.su_sudo() % kill)
 
-        # Record the UI toolkit in use
-        # Now, done in configure!
-        #sys_cfg.configure['ui-toolkit'] = self.ui_toolkit
-
         return cmds
 
 
@@ -1504,38 +1588,18 @@ class CoreInstall(object):
         return ok
 
 
-    def check_for_gui_support(self):
-        if self.ui_toolkit == 'qt4':
-            return os.getenv('DISPLAY') and self.selected_options['gui'] and utils.checkPyQtImport4()
-        else:
-            return os.getenv('DISPLAY') and self.selected_options['gui'] and utils.checkPyQtImport()
-
-
     def run_hp_setup(self):
         status = 0
         hpsetup = utils.which("hp-setup")
 
-        if self.check_for_gui_support():
-            if hpsetup:
-                c = 'hp-setup -u --username=%s' % prop.username
-            else:
-                c = 'python ./setup.py -u --username=%s' % prop.username
-
-            cmd = self.su_sudo() % c
-            log.debug(cmd)
-
-            status, output = self.run(cmd)
+        if hpsetup:
+            c = 'hp-setup'
         else:
-            if hpsetup:
-                c = "hp-setup -i"
-            else:
-                c = "python ./setup.py -i"
+            c = './setup.py'
 
-            cmd = self.su_sudo() % c
-            log.debug(cmd)
-            os.system(cmd)
-
-
+        cmd = self.su_sudo() % c
+        log.debug(cmd)
+        status, output = self.run(cmd)
         return status == 0
 
 
@@ -1626,7 +1690,7 @@ class CoreInstall(object):
     # PLUGIN HELPERS
 
     def set_plugin_version(self):
-        self.plugin_version = '.'.join(sys_cfg.hplip.version.split('.')[:3])
+        self.plugin_version = prop.installed_version
         log.debug("Plug-in version=%s" % self.plugin_version)
         self.plugin_name = 'hplip-%s-plugin.run' % self.plugin_version
         log.debug("Plug-in=%s" % self.plugin_name)
@@ -1634,12 +1698,13 @@ class CoreInstall(object):
 
     def get_plugin_conf_url(self):
         url = "http://hplip.sf.net/plugin.conf"
+        home = sys_conf.get('dirs', 'home')
 
         if os.path.exists('/etc/hp/plugin.conf'):
             url = "file:///etc/hp/plugin.conf"
 
-        elif os.path.exists(os.path.join(sys_cfg.dirs.home, 'plugin.conf')):
-            url = "file://" + os.path.join(sys_cfg.dirs.home, 'plugin.conf')
+        elif os.path.exists(os.path.join(home, 'plugin.conf')):
+            url = "file://" + os.path.join(home, 'plugin.conf')
 
         log.debug("Plugin.conf url: %s" % url)
         return url
@@ -1721,15 +1786,20 @@ class CoreInstall(object):
             log.error("Plug-in download failed: %s" % e.strerror)
             return False, e.strerror
 
-        calc_checksum = sha.new(file(plugin_file, 'r').read()).hexdigest()
+        calc_checksum = get_checksum(file(plugin_file, 'r').read())
         log.debug("D/L file checksum=%s" % calc_checksum)
 
         return True, plugin_file
 
 
     def check_for_plugin(self):
-        return os.path.exists(os.path.join(self.plugin_path, self.plugin_name)) and \
-            utils.to_bool(sys_cfg.hplip.plugin)
+        if not self.plugin_name:
+            self.plugin_name = 'hplip-%s-plugin.run' % self.plugin_version
+
+        plugin = os.path.join(self.plugin_path, self.plugin_name)
+        log.debug("Checking for plugin: %s" % plugin)
+        return os.path.exists(plugin) and \
+            utils.to_bool(sys_state.get('plugin', 'installed', '0'))
 
 
     def run_plugin(self, mode=GUI_MODE, callback=None):

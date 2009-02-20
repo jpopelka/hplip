@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -75,13 +75,12 @@ class DeviceTableWidgetItem(QTableWidgetItem):
 
 
 class SetupDialog(QDialog, Ui_Dialog):
-    def __init__(self, parent, param, jd_port, username, device_uri=None):
+    def __init__(self, parent, param, jd_port, device_uri=None):
         QDialog.__init__(self, parent)
         self.setupUi(self)
 
         self.param = param
         self.jd_port = jd_port
-        self.username = username
         self.device_uri = device_uri
 
         if device_uri:
@@ -357,8 +356,6 @@ class SetupDialog(QDialog, Ui_Dialog):
 
     def initDevicesPage(self):
         self.connect(self.RefreshButton,  SIGNAL("clicked()"),  self.RefreshButton_clicked)
-        #filename =  "/home/dwelch/svn/trunk/src/data/images/other/hp-tux-printer.png"
-        #self.DevicesTableWidget.setStyleSheet('background-image: url("%s"); background-attachment: fixed;' % filename)
 
 
     def showDevicesPage(self):
@@ -501,15 +498,15 @@ class SetupDialog(QDialog, Ui_Dialog):
     def showAddPrinterPage(self):
        # Install the plugin if needed...
         plugin = self.mq.get('plugin', PLUGIN_NONE)
-        if plugin > PLUGIN_NONE: 
+        if plugin > PLUGIN_NONE:
             form = PluginDialog(self, plugin)
             if not form.isPluginInstalled():
                 form.exec_()
-                
+
                 if not form.result and plugin == PLUGIN_REQUIRED:
                     FailureUI(self, self.__tr("<b>The printer you are trying to setup requires a binary driver plug-in and it failed to install.</b><p>Please check you internet connection and try again.</p></p>Visit <u>http://hplipopensource.com</u> for more infomation.</p>"))
                     return
-        
+
         self.setNextButton(BUTTON_ADD_PRINTER)
         if not self.printer_name:
             self.setDefaultPrinterName()
@@ -542,25 +539,31 @@ class SetupDialog(QDialog, Ui_Dialog):
         self.setAddPrinterButton()
         self.displayPage(PAGE_ADD_PRINTER)
 
- 
+
 
 
     def updatePPD(self):
         if self.print_ppd is None:
             log.error("No appropriate print PPD file found for model %s" % self.model)
             self.PPDFileLineEdit.setText(self.__tr('(Not found. Click browse button to select a PPD file.)'))
-            self.PPDFileLineEdit.setStyleSheet("background-color: yellow")
+            try:
+                self.PPDFileLineEdit.setStyleSheet("background-color: yellow")
+            except AttributeError:
+                pass
             self.PrinterDescriptionLineEdit.setText(QString(""))
 
         else:
             self.PPDFileLineEdit.setText(self.print_ppd[0])
             self.PrinterDescriptionLineEdit.setText(self.print_ppd[1])
-            self.PPDFileLineEdit.setStyleSheet("")
+            try:
+                self.PPDFileLineEdit.setStyleSheet("")
+            except AttributeError:
+                pass
 
 
     def OtherPPDButton_clicked(self, b):
         ppd_file = unicode(QFileDialog.getOpenFileName(self, self.__tr("Select PPD File"),
-                                                       sys_cfg.dirs.ppd,
+                                                       sys_conf.get('dirs', 'ppd'),
                                                        self.__tr("PPD Files (*.ppd *.ppd.gz);;All Files (*)")))
 
         if ppd_file and os.path.exists(ppd_file):
@@ -594,7 +597,7 @@ class SetupDialog(QDialog, Ui_Dialog):
 
             ppds = []
 
-            for f in utils.walkFiles(sys_cfg.dirs.ppd, pattern="HP-Fax*.ppd*", abs_paths=True):
+            for f in utils.walkFiles(sys_conf.get('dirs', 'ppd'), pattern="HP-Fax*.ppd*", abs_paths=True):
                 ppds.append(f)
 
             for f in ppds:
@@ -734,15 +737,27 @@ class SetupDialog(QDialog, Ui_Dialog):
     def setIndicators(self):
         if self.printer_name_ok:
             self.PrinterNameLineEdit.setToolTip(QString(""))
-            self.PrinterNameLineEdit.setStyleSheet("")
+            try:
+                self.PrinterNameLineEdit.setStyleSheet("")
+            except AttributeError:
+                pass
         else:
-            self.PrinterNameLineEdit.setStyleSheet("background-color: yellow")
+            try:
+                self.PrinterNameLineEdit.setStyleSheet("background-color: yellow")
+            except AttributeError:
+                pass
 
         if self.fax_name_ok:
             self.FaxNameLineEdit.setToolTip(QString(""))
-            self.PrinterNameLineEdit.setStyleSheet("")
+            try:
+                self.PrinterNameLineEdit.setStyleSheet("")
+            except AttributeError:
+                pass
         else:
-            self.PrinterNameLineEdit.setStyleSheet("background-color: yellow")
+            try:
+                self.PrinterNameLineEdit.setStyleSheet("background-color: yellow")
+            except AttributeError:
+                pass
 
 
     def setAddPrinterButton(self):
@@ -843,7 +858,7 @@ class SetupDialog(QDialog, Ui_Dialog):
                     error_text = self.__tr("Unable to communicate with the device. Please check the device and try again.")
                     log.error(unicode(error_text))
                     if QMessageBox.critical(self,
-                                           self.caption(),
+                                           self.windowTitle(),
                                            error_text,
                                            QMessageBox.Retry | QMessageBox.Default,
                                            QMessageBox.Cancel | QMessageBox.Escape,
@@ -871,7 +886,7 @@ class SetupDialog(QDialog, Ui_Dialog):
                                 log.error(unicode(error_text))
 
                                 if QMessageBox.critical(self,
-                                                       self.caption(),
+                                                       self.windowTitle(),
                                                        error_text,
                                                        QMessageBox.Retry | QMessageBox.Default,
                                                        QMessageBox.Cancel | QMessageBox.Escape,
@@ -906,13 +921,13 @@ class SetupDialog(QDialog, Ui_Dialog):
         try:
             d = device.Device(self.device_uri)
         except Error, e:
-            self.FailureUI(self.__tr("<b>Device error:</b><p>%s (%s)." % (e.msg, e.opt)))
+            FailureUI(self, self.__tr("<b>Device error:</b><p>%s (%s)." % (e.msg, e.opt)))
 
         else:
             try:
                 d.open()
             except Error:
-                self.FailureUI(self.__tr("<b>Unable to print to printer.</b><p>Please check device and try again."))
+                FailureUI(self, self.__tr("<b>Unable to print to printer.</b><p>Please check device and try again."))
             else:
                 if d.isIdleAndNoError():
                     d.close()
@@ -921,11 +936,11 @@ class SetupDialog(QDialog, Ui_Dialog):
                         d.printTestPage(self.printer_name)
                     except Error, e:
                         if e.opt == ERROR_NO_CUPS_QUEUE_FOUND_FOR_DEVICE:
-                            self.FailureUI(self.__tr("<b>No CUPS queue found for device.</b><p>Please install the printer in CUPS and try again."))
+                            FailureUI(self, self.__tr("<b>No CUPS queue found for device.</b><p>Please install the printer in CUPS and try again."))
                         else:
-                            self.FailureUI(self.__tr("<b>Printer Error</b><p>An error occured: %s (code=%d)." % (e.msg, e.opt)))
+                            FailureUI(self, self.__tr("<b>Printer Error</b><p>An error occured: %s (code=%d)." % (e.msg, e.opt)))
                 else:
-                    self.FailureUI(self.__tr("<b>Printer Error.</b><p>Printer is busy, offline, or in an error state. Please check the device and try again."))
+                    FailureUI(self, self.__tr("<b>Printer Error.</b><p>Printer is busy, offline, or in an error state. Please check the device and try again."))
                     d.close()
 
     #

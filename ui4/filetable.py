@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ class FileTable(QWidget):
     def __init__(self, parent):
         QWidget.__init__(self, parent)
         self.parent = parent
-        self.working_dir = os.path.expanduser('~')
+        self.working_dir = user_conf.workingDirectory()
         self.initUi()
         self.file_list = []
         self.typ = FILETABLE_TYPE_PRINT
@@ -113,6 +113,7 @@ class FileTable(QWidget):
     def getWorkingDir(self):
         if self.file_list:
             self.working_dir = os.path.pathname(self.file_list[0][0])
+            user_conf.setWorkingDirectory(self.working_dir)
 
         return self.working_dir
 
@@ -317,7 +318,7 @@ class FileTable(QWidget):
         filename = self.currentFilename()
         if filename is None:
             return
-        
+
         return self.removeFile(filename)
 
 
@@ -343,15 +344,15 @@ class FileTable(QWidget):
                 self.updateUi(False)
                 break
             index += 1
-        
-        
+
+
     def isMIMETypeInList(self, mime_type):
         for filename, m, mime_type_desc, title, num_pages in self.file_list:
             if m == mime_type:
                 return True
-                
+
         return False
-        
+
 
     def ShowTypesButton_clicked(self):
         x = {}

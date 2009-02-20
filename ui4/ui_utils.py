@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -69,7 +69,6 @@ def load_pixmap(name, subdir=None, resize_to=None):
         dir = os.path.join(prop.image_dir, subdir)
         ldir = os.path.join(os.getcwd(), 'data', 'images', subdir)
 
-    #print dir, ldir
     for d in [dir, ldir]:
         f = os.path.join(d, name)
         if os.path.exists(f):
@@ -97,11 +96,9 @@ loadPixmap = load_pixmap
 class UserSettings(QSettings):
     def __init__(self):
         QSettings.__init__(self, os.path.join(prop.user_dir,  'hplip.conf'),  QSettings.IniFormat)
-        #self.hide_tray_when_inactive = False
         self.systray_visible = SYSTRAY_VISIBLE_SHOW_ALWAYS
         self.last_used_device_uri = ''
         self.last_used_printer = ''
-        self.last_used_working_dir = os.path.expanduser('~')
         self.version = ''
         self.date_time = ''
         self.auto_refresh = False
@@ -123,34 +120,15 @@ class UserSettings(QSettings):
         return ''
 
     def loadDefaults(self):
-        #self.cmd_print = self.__setup(['hp-print -p%PRINTER',
-        #                               'kprinter -P%PRINTER% --system cups',
-        #                               'gtklp -P%PRINTER%',
-        #                               'xpp -P%PRINTER%'])
-
         self.cmd_scan = self.__setup(['xsane -V %SANE_URI%', 'kooka', 'xscanimage'])
-        #self.cmd_pcard = self.__setup(['hp-unload -d%DEVICE_URI%'])
-        #self.cmd_fax = self.__setup(['hp-sendfax -p%PRINTER%'])
-        #self.cmd_copy = self.__setup(['hp-makecopies -d%DEVICE_URI%'])
-        #self.cmd_faxsetup = self.__setup(['hp-faxsetup -d$FAX_URI%'])
         self.cmd_fab = self.__setup(['hp-fab'])
-        #self.cmd_align = self.__setup(['hp-align -d%DEVICE_URI%'])
-        #self.cmd_pqdiag = self.__setup(['hp-pqdiag -d%DEVICE_URI%'])
-        #self.cmd_colorcal = self.__setup(['hp-colorcal -d%DEVICE_URI%'])
-        #self.cmd_testpage = self.__setup(['hp-testpage -p%PRINTER%'])
-        #self.cmd_devicesetup = self.__setup(['hp-devicesetup -d%DEVICE_URI%'])
-        #self.cmd_clean = self.__setup(['hp-clean -d%DEVICE_URI%'])
-        #self.cmd_linefeedcal = self.__setup(['hp-linefeedcal -d%DEVICE_URI%'])
-        #self.cmd_firmware = self.__setup(['hp-firmware -d%DEVICE_URI%'])
-        #self.cmd_plugin = self.__setup(['hp-plugin -d%DEVICE_URI%'])
-        #self.cmd_info = self.__setup(['hp-info -d%DEVICE_URI%'])
 
 
     def load(self):
         log.debug("Loading user settings...")
+        self.sync()
 
         self.beginGroup("settings")
-        #self.hide_tray_when_inactive = bool(self.value("hide_tray_when_inactive").toBool()) or self.hide_tray_when_inactive
         i, ok = self.value("systray_visible").toInt()
         if ok:
             self.systray_visible = i
@@ -160,16 +138,10 @@ class UserSettings(QSettings):
         self.beginGroup("last_used")
         self.last_used_device_uri = unicode(self.value("device_uri").toString()) or self.last_used_device_uri
         self.last_used_printer = unicode(self.value("printer").toString()) or self.last_used_printer
-        self.last_used_working_dir = unicode(self.value("working_dir").toString()) or self.last_used_working_dir
         self.endGroup()
 
         self.beginGroup("commands")
-        #self.cmd_print = unicode(self.value("prnt").toString()) or self.cmd_print
-        #self.cmd_copy = unicode(self.value("cpy").toString()) or self.cmd_copy
-        #self.cmd_fax = unicode(self.value("fax").toString()) or self.cmd_fax
         self.cmd_scan = unicode(self.value("scan").toString()) or self.cmd_scan
-        #self.cmd_pcard = unicode(self.value("pcard").toString()) or self.cmd_pcard
-        #self.cmd_fab = unicode(self.value("fab").toString()) or self.cmd_fab
         self.endGroup()
 
         self.beginGroup("refresh")
@@ -194,25 +166,17 @@ class UserSettings(QSettings):
         log.debug("Saving user settings...")
 
         self.beginGroup("settings")
-        #self.setValue("hide_tray_when_inactive",  QVariant(self.hide_tray_when_inactive))
         i = QVariant(self.systray_visible)
-        #print i.toInt()
         self.setValue("systray_visible", QVariant(self.systray_visible))
         self.endGroup()
 
         self.beginGroup("last_used")
         self.setValue("device_uri",  QVariant(self.last_used_device_uri))
         self.setValue("printer", QVariant(self.last_used_printer))
-        self.setValue("working_dir", QVariant(self.last_used_working_dir))
         self.endGroup()
 
         self.beginGroup("commands")
-        #self.setValue("prnt",  QVariant(self.cmd_print))
-        #self.setValue("cpy",  QVariant(self.cmd_copy))
-        #self.setValue("fax",  QVariant(self.cmd_fax))
         self.setValue("scan",  QVariant(self.cmd_scan))
-        #self.setValue("pcard",  QVariant(self.cmd_pcard))
-        #self.setValue("fab",  QVariant(self.cmd_fab))
         self.endGroup()
 
         self.beginGroup("refresh")
@@ -227,22 +191,18 @@ class UserSettings(QSettings):
         self.setValue("device_list", QVariant(u','.join(self.polling_device_list)))
         self.endGroup()
 
+        self.sync()
+
 
     def debug(self):
-        #log.debug("Print command: %s" % self.cmd_print)
-        #log.debug("PCard command: %s" % self.cmd_pcard)
-        #log.debug("Fax command: %s" % self.cmd_fax)
         log.debug("FAB command: %s" % self.cmd_fab)
-        #log.debug("Copy command: %s " % self.cmd_copy)
         log.debug("Scan command: %s" % self.cmd_scan)
         log.debug("Auto refresh: %s" % self.auto_refresh)
         log.debug("Auto refresh rate: %s" % self.auto_refresh_rate)
         log.debug("Auto refresh type: %s" % self.auto_refresh_type)
-        #log.debug("Hide tray when inactive: %s" % self.hide_tray_when_inactive)
         log.debug("Systray visible: %d" % self.systray_visible)
         log.debug("Last used device URI: %s" % self.last_used_device_uri)
         log.debug("Last used printer: %s" % self.last_used_printer)
-        log.debug("Last used working dir: %s" % self.last_used_working_dir)
 
 
 def su_sudo():
@@ -263,7 +223,6 @@ def su_sudo():
 
 DEFAULT_TITLE =  __translate("HP Device Manager")
 
-#QApplication.translate("ui_utils", "HPLIP Device Manager", None, QApplication.UnicodeUTF8)
 
 def FailureUI(parent, error_text, title_text=None):
     log.error(pat_html_remove.sub(' ', unicode(error_text)))

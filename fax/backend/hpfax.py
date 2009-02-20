@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '4.0'
+__version__ = '4.1'
 __title__ = 'CUPS Fax Backend (hpfax:)'
 __doc__ = "CUPS backend for PC send fax. Generally this backend is run by CUPS, not directly by a user. To send a fax as a user, run hp-sendfax or print to the device's CUPS fax queue."
 
@@ -53,8 +53,8 @@ home_dir = ''
 def bug(msg):
     syslog.syslog("hpfax[%d]: error: %s\n" % (pid, msg))
     log.stderr("ERROR: %s\n" % msg)
-    
-    
+
+
 if os.path.exists(config_file):
     config = ConfigParser.ConfigParser()
     config.read(config_file)
@@ -88,7 +88,7 @@ except ImportError, e:
 
 def handle_sigpipe():
     syslog.syslog("SIGPIPE!")
-    
+
 
 USAGE = [(__doc__, "", "para", True),
          ("Usage: hpfax [job_id] [username] [title] [copies] [options]", "", "summary", True),
@@ -102,16 +102,16 @@ def usage(typ='text'):
         utils.log_title(__title__, __version__)
 
     utils.format_text(USAGE, typ, title=__title__, crumb='hpfax:')
-    sys.exit(CUPS_BACKEND_OK)   
+    sys.exit(CUPS_BACKEND_OK)
 
 # Send dbus event to hpssd on dbus system bus
 def send_message(device_uri, printer_name, event_code, username, job_id, title, pipe_name=''):
     args = [device_uri, printer_name, event_code, username, job_id, title, pipe_name]
     msg = lowlevel.SignalMessage('/', 'com.hplip.StatusService', 'Event')
     msg.append(signature='ssisiss', *args)
-    
-    SystemBus().send_message(msg) 
- 
+
+    SystemBus().send_message(msg)
+
 
 try:
     opts, args = getopt.getopt(sys.argv[1:], 'l:hg', ['level=', 'help', 'help-rest', 'help-man'])
@@ -139,8 +139,8 @@ for o, a in opts:
 
 
 if len( args ) == 0:
-    cups11 = utils.to_bool(sys_cfg.configure.cups11, False)
-    
+    cups11 = utils.to_bool(sys_conf.get('configure', 'cups11', '0'))
+
     try:
         probed_devices = device.probeDevices(['usb', 'par'], filter={'fax-type': (operator.gt, 0)})
     except Error:
@@ -155,24 +155,34 @@ if len( args ) == 0:
             continue
 
         mq = device.queryModelByModel(model)
-        
+
         if mq.get('fax-type', FAX_TYPE_NONE) in (FAX_TYPE_SOAP,):
             # HP Fax 2
-            print 'direct %s "HP Fax 2" "%s HP Fax HPLIP" "MFG:HP;MDL:Fax 2;DES:HP Fax 2;"' % \
-                (uri.replace("hp:", "hpfax:"), model.replace('_', ' '))
-        
+            if bus == 'usb':
+                print 'direct %s "HP Fax 2" "%s USB %s HP Fax HPLIP" "MFG:HP;MDL:Fax 2;DES:HP Fax 2;"' % \
+                    (uri.replace("hp:", "hpfax:"), model.replace('_', ' '), serial)
+
+            else: # par
+                print 'direct %s "HP Fax 2" "%s LPT HP Fax HPLIP" "MFG:HP;MDL:Fax 2;DES:HP Fax 2;"' % \
+                    (uri.replace("hp:", "hpfax:"), model.replace('_', ' '))
+
         else:
             # HP Fax
-            print 'direct %s "HP Fax" "%s HP Fax HPLIP" "MFG:HP;MDL:Fax;DES:HP Fax;"' % \
-                (uri.replace("hp:", "hpfax:"),  model.replace('_', ' '))
-            
+            if bus == 'usb':
+                print 'direct %s "HP Fax" "%s USB %s HP Fax HPLIP" "MFG:HP;MDL:Fax;DES:HP Fax;"' % \
+                    (uri.replace("hp:", "hpfax:"),  model.replace('_', ' '), serial)
+
+            else: # par
+                print 'direct %s "HP Fax" "%s LPT HP Fax HPLIP" "MFG:HP;MDL:Fax;DES:HP Fax;"' % \
+                    (uri.replace("hp:", "hpfax:"),  model.replace('_', ' '))
+
         good_devices += 1
 
     if good_devices == 0:
         if cups11:
             print 'direct hpfax:/no_device_found "HP Fax" "no_device_found" ""'
         else:
-            print 'direct hpfax "Unknown" "HP Fax (HPLIP)" ""' 
+            print 'direct hpfax "Unknown" "HP Fax (HPLIP)" ""'
 
     sys.exit(CUPS_BACKEND_OK)
 
@@ -203,16 +213,16 @@ else:
         sys.exit(CUPS_BACKEND_FAILED)
 
     send_message(device_uri, printer_name, EVENT_START_FAX_PRINT_JOB, username, job_id, title)
-    
+
     try:
         input_fd = file(args[5], 'r')
     except IndexError:
         input_fd = 0
- 
+
     # REVISIT:
     tmp_dir = '/tmp'
     pipe_name = os.path.join(tmp_dir, "hpfax-pipe-%d" % job_id)
-    
+
     # Create the named pipe. Make sure it exists before sending
     # message to hppsd.
     os.umask(0111)
@@ -227,26 +237,26 @@ else:
 
     # REVISIT:
     pipe = os.open(pipe_name, os.O_WRONLY)
-            
+
     bytes_read = 0
     while True:
         data = os.read(input_fd, PIPE_BUF)
-        
+
         if not data:
             break
-        
+
         os.write(pipe, data)
         #syslog.syslog("Writing %d to pipe..." % len(data))
         bytes_read += len(data)
-            
+
     if not bytes_read:
         bug("No data on input file descriptor.")
         sys.exit(CUPS_BACKEND_FAILED)
-    
+
     os.close(input_fd)
     os.close(pipe)
     os.unlink(pipe_name)
-    
+
     send_message(device_uri, printer_name, EVENT_END_FAX_PRINT_JOB, username, job_id, title)
-    
+
     sys.exit(CUPS_BACKEND_OK)

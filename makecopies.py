@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 __version__ = '4.0'
 __title__ = "Make Copies Utility"
 __mod__ = 'hp-makecopies'
-__doc__ = "PC initiated make copies on supported HP AiO and MFP devices."
+__doc__ = "PC initiated make copies function on supported HP AiO and MFP devices. (Note: Currently unsupported in Qt4.)"
 
 # Std Lib
 import sys
@@ -42,9 +42,9 @@ from prnt import cups
 
 
 mod = module.Module(__mod__, __title__, __version__, __doc__, None,
-                    (NON_INTERACTIVE_MODE, GUI_MODE), 
+                    (NON_INTERACTIVE_MODE, GUI_MODE),
                     (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4))
-                    
+
 mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS,
     extra_options=[
     ("Number of copies:", "-m<num_copies> or --copies=<num_copies> or --num=<num_copies> (1-99)", "option", False),
@@ -54,11 +54,11 @@ mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS,
      ("Fit to page (flatbed only):", "-f or --fittopage or --fit (overrides reduction/enlargement)", "option", False)])
 
 opts, device_uri, printer_name, mode, ui_toolkit, loc = \
-    mod.parseStdOpts('m:r:q:c:f:', 
+    mod.parseStdOpts('m:r:q:c:f',
                      ['num=', 'copies=', 'reduction=', 'enlargement=', 'quality=',
                       'contrast=', 'fittopage', 'fit', 'fit-to-page'])
-    
-device_uri = mod.getDeviceUri(device_uri, printer_name, 
+
+device_uri = mod.getDeviceUri(device_uri, printer_name,
     filter={'copy-type': (operator.gt, 0)})
 
 num_copies = None
@@ -77,11 +77,11 @@ for o, a in opts:
             log.warning("Invalid number of copies. Set to default of 1.")
             num_copies = 1
 
-        if num_copies < 1: 
+        if num_copies < 1:
             log.warning("Invalid number of copies. Set to minimum of 1.")
             num_copies = 1
 
-        elif num_copies > 99: 
+        elif num_copies > 99:
             log.warning("Invalid number of copies. Set to maximum of 99.")
             num_copies = 99
 
@@ -92,11 +92,11 @@ for o, a in opts:
             log.warning("Invalid contrast setting. Set to default of 0.")
             contrast = 0
 
-        if contrast < -5: 
+        if contrast < -5:
             log.warning("Invalid contrast setting. Set to minimum of -5.")
             contrast = -5
 
-        elif contrast > 5: 
+        elif contrast > 5:
             log.warning("Invalid contrast setting. Set to maximum of +5.")
             contrast = 5
 
@@ -163,19 +163,19 @@ if mode == GUI_MODE:
     if ui_toolkit == 'qt3':
         app = None
         makecopiesdlg = None
-        
+
         try:
             from qt import *
             from ui.makecopiesform import MakeCopiesForm
         except ImportError:
             log.error("Unable to load Qt3 support. Is it installed?")
-            sys.exit(1) 
-            
+            sys.exit(1)
+
         # create the main application object
         app = QApplication(sys.argv)
 
         if loc is None:
-            loc = user_cfg.ui.get("loc", "system")
+            loc = user_conf.get('ui', 'loc', 'system')
             if loc.lower() == 'system':
                 loc = str(QTextCodec.locale())
                 log.debug("Using system locale: %s" % loc)
@@ -213,8 +213,8 @@ if mode == GUI_MODE:
                 pass
 
         bus = ['cups']
-        makecopiesdlg = MakeCopiesForm(bus, device_uri, printer_name, 
-                                       num_copies, contrast, quality, 
+        makecopiesdlg = MakeCopiesForm(bus, device_uri, printer_name,
+                                       num_copies, contrast, quality,
                                        reduction, fit_to_page)
 
         makecopiesdlg.show()
@@ -226,13 +226,13 @@ if mode == GUI_MODE:
         except KeyboardInterrupt:
             pass
 
-    else: # qt4   
+    else: # qt4
         try:
             from PyQt4.QtGui import QApplication
             from ui4.makecopiesdialog import MakeCopiesDialog
         except ImportError:
             log.error("Unable to load Qt4 support. Is it installed?")
-            sys.exit(1)        
+            sys.exit(1)
 
         #try:
         if 1:

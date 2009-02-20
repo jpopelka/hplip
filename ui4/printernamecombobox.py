@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ class PrinterNameComboBox(QWidget):
 
         if self.printers:
             if self.initial_printer is None:
-                self.initial_printer = user_cfg.last_used.printer_name
+                self.initial_printer = user_conf.get('last_used', 'printer_name')
 
             self.updating = True
             try:
@@ -138,7 +138,7 @@ class PrinterNameComboBox(QWidget):
             return
 
         self.device_uri = self.printer_index[self.printer_name]
-        user_cfg.last_used.printer_name = self.printer_name
+        user_conf.set('last_used', 'printer_name', self.printer_name)
         self.emit(SIGNAL("PrinterNameComboBox_currentChanged"), self.device_uri, self.printer_name)
 
 

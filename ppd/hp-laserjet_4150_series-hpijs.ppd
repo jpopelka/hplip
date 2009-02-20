@@ -1,17 +1,17 @@
 *PPD-Adobe: "4.3"
-*% PPD file for HP LaserJet 4150 Series Foomatic/hpijs with CUPS.
-*% Created by the CUPS PPD Compiler v1.2.0.
+*% PPD file for HP LaserJet 4150 Series hpijs with CUPS.
+*% Created by the CUPS PPD Compiler v1.2.3.
 *% (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 *FormatVersion: "4.3"
-*FileVersion: "hpijs 2.8.12.26"
+*FileVersion: "hpijs 3.9.2.49"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "hp-laserjet_4150_series-hpijs.ppd"
-*Product: "HP LaserJet 4150"
+*Product: "(HP LaserJet 4150 Printer)"
 *Manufacturer: "HP"
-*ModelName: "HP LaserJet 4150 Series Foomatic/hpijs"
-*ShortNickName: "HP LaserJet 4150 Series Foomatic/hpijs"
-*NickName: "HP LaserJet 4150 Series Foomatic/hpijs, hpijs 2.8.12.26"
+*ModelName: "HP LaserJet 4150 Series hpijs"
+*ShortNickName: "HP LaserJet 4150 Series hpijs"
+*NickName: "HP LaserJet 4150 Series hpijs, hpijs 3.9.2.49"
 *PSVersion: "(3010.000) 705"
 *PSVersion: "(3010.000) 707"
 *PSVersion: "(3010.000) 815"
@@ -23,7 +23,8 @@
 *Throughput: "1"
 *LandscapeOrientation: Plus90
 *% Driver-defined attributes...
-*DefaultResolution: 600dpi*FoomaticRIPOptionSetting PageSize=Custom: " -dDEVICEWIDTHPOINTS=0 -dD&&
+*DefaultResolution: 600dpi
+*FoomaticRIPOptionSetting PageSize=Custom: " -dDEVICEWIDTHPOINTS=0 -dD&&
 EVICEHEIGHTPOINTS=0"
 *End
 *FoomaticIDs: "HP-LaserJet_4 hpijs"
@@ -163,11 +164,11 @@ uality:Quality=0,Quality:ColorMode=0,Quality:MediaType=0,Quality:PenSe&&
 t=0"
 *End
 *1284DeviceID: "MFG:HP;MDL:hp_laserjet_4150_series;DES:hp_laserjet_4150_series;"
-*Product: "HP LaserJet 4150"
 *cupsVersion: 1.3
 *cupsModelNumber: 0
 *cupsManualCopies: True
-*cupsFilter: "application/vnd.cups-postscript 0 foomatic-rip-hplip"
+*cupsFilter: "application/vnd.cups-postscript 100 foomatic-rip-hplip"
+*cupsFilter: "application/vnd.cups-pdf 0 foomatic-rip-hplip"
 *OpenUI *PageSize/Media Size: PickOne
 *OrderDependency: 10 AnySetup *PageSize
 *DefaultPageSize: Letter
@@ -356,4 +357,4 @@ t=0"
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of hp-laserjet_4150_series-hpijs.ppd, 18019 bytes.
+*% End of hp-laserjet_4150_series-hpijs.ppd, 18026 bytes.

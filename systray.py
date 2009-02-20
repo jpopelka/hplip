@@ -38,6 +38,16 @@ from prnt import cups
 
 
 if __name__ == '__main__':
+
+    # Create a new session ID for the tray.  This disassociates the
+    # tray from the controlling terminal so that it cannot receive
+    # keyboard interrupts.
+    #
+    # Only do this if we aren't already a session leader.  This test
+    # only succeeds if we are executed from hp-toolbox.
+    if os.getpgid(os.getpid()) != os.getpid():
+        os.setsid()
+
     mod = module.Module(__mod__, __title__, __version__, __doc__, None,
                        (GUI_MODE,), (UI_TOOLKIT_QT4, UI_TOOLKIT_QT3))
 

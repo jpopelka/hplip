@@ -56,10 +56,10 @@ class NoDevicesForm(NoDevicesForm_base):
 
         if utils.which('kdesu'):
             su_sudo = 'kdesu -- %s'
-            
+
         elif utils.which('gnomesu'):
             su_sudo = 'gnomesu -c "%s"'
-            
+
         elif utils.which('gksu'):
             su_sudo = 'gksu "%s"'
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -88,16 +88,16 @@ RESPONSE_DONE = 2
 #
 # LISTVIEW/UTILITY UI CLASSES
 #
-# ***********************************************************************************  
+# ***********************************************************************************
 
 class IconViewToolTip(QToolTip):
     def __init__(self, parent, tooltip_text):
         QToolTip.__init__(self, parent.viewport())
         self.parent = parent
 
-        
+
     def maybeTip(self, pos):
-        abs_coords = QPoint(pos.x() + self.parent.contentsX(), 
+        abs_coords = QPoint(pos.x() + self.parent.contentsX(),
             pos.y() + self.parent.contentsY())
 
         item = self.parent.findItem(abs_coords)
@@ -147,7 +147,7 @@ class SuppliesListViewItem(QListViewItem):
         if (pos/h) % 2:
             color.setColor(QColorGroup.Base,  QColor(220, 228, 249))
 
-        QListViewItem.paintCell(self, p, color, c, w, a)        
+        QListViewItem.paintCell(self, p, color, c, w, a)
 
 
 
@@ -199,7 +199,7 @@ class PasswordDialog(QDialog):
 
 
 class ScrollDialog(QDialog):
-    def __init__(self, scrollview_cls, cur_device, cur_printer, service, 
+    def __init__(self, scrollview_cls, cur_device, cur_printer, service,
         parent = None, name=None, modal=0, fl=0):
 
         QDialog.__init__(self,parent,name,modal,fl)
@@ -248,8 +248,8 @@ def showPasswordUI(prompt):
 
     finally:
         pass
-        
-    return ""        
+
+    return ""
 
 
 class StatusListViewItem(QListViewItem):
@@ -402,11 +402,11 @@ class DevMgr4(DevMgr4_base):
         DevMgr4_base.__init__(self, parent, name, fl)
 
         log.debug("Initializing toolbox UI (Qt3)...")
-        log.debug("HPLIP Version: %s" % sys_cfg.hplip.version)
+        log.debug("HPLIP Version: %s" % prop.installed_version)
 
         self.disable_dbus = disable_dbus
         self.toolbox_version = toolbox_version
-        self.cur_device_uri = user_cfg.last_used.device_uri # Device URI
+        self.cur_device_uri = user_conf.get('last_used', 'device_uri')
         self.device_vars = {}
         self.num_devices = 0
         self.cur_device = None
@@ -508,7 +508,7 @@ class DevMgr4(DevMgr4_base):
             ERROR_STATE_OK : (self.ok_pix, self.ok_pix),
             ERROR_STATE_WARNING : (self.warning_pix, self.warning_pix),
             ERROR_STATE_LOW_PAPER: (self.lowpaper_pix, self.lowpaper_pix),
-            ERROR_STATE_PRINTING : (self.busy_pix, self.busy_pix),   
+            ERROR_STATE_PRINTING : (self.busy_pix, self.busy_pix),
             ERROR_STATE_SCANNING : (self.busy_pix, self.busy_pix),
             ERROR_STATE_PHOTOCARD : (self.busy_pix, self.busy_pix),
             ERROR_STATE_FAXING : (self.busy_pix, self.busy_pix),
@@ -563,7 +563,7 @@ class DevMgr4(DevMgr4_base):
         self.InitPrintControlTab()
 
         # Resize the splitter so that the device list starts as a single column
-        self.splitter2.setSizes([120, 700]) 
+        self.splitter2.setSizes([120, 700])
 
 
 
@@ -635,8 +635,8 @@ class DevMgr4(DevMgr4_base):
             d = d.nextItem()
 
         return found
-        
-        
+
+
 
     # ***********************************************************************************
     #
@@ -653,7 +653,7 @@ class DevMgr4(DevMgr4_base):
                 m = ''.join([m, os.read(sock, self.fmt_size)])
                 if len(m) == self.fmt_size:
                     if self.cur_device is None or self.rescanning:
-                        return                    
+                        return
 
                     event = device.Event(*struct.unpack(self.fmt, m))
                     desc = device.queryString(event.event_code)
@@ -730,7 +730,7 @@ class DevMgr4(DevMgr4_base):
     # ***********************************************************************************
 
     def Tabs_currentChanged(self, tab=None):
-        """ Called when the active tab changes. 
+        """ Called when the active tab changes.
             Update newly displayed tab.
         """
 
@@ -743,13 +743,13 @@ class DevMgr4(DevMgr4_base):
             pass
 
     def Tabs_deviceChanged(self, tab=None):
-        """ Called when the device changes. 
+        """ Called when the device changes.
             Update the currently displayed tab.
         """
         if tab is None:
             tab = self.Tabs.currentPage()
 
-        self.TabIndex[tab]() 
+        self.TabIndex[tab]()
 
 
     # ***********************************************************************************
@@ -784,7 +784,7 @@ class DevMgr4(DevMgr4_base):
             dev.icon
         except AttributeError:
             dev.icon = "default_printer"
-        
+
         try:
             self.device_icons[dev.icon]
         except:
@@ -837,13 +837,13 @@ class DevMgr4(DevMgr4_base):
             try:
                 adds = []
                 for d in self.cups_devices:
-                    if d not in devices: 
+                    if d not in devices:
                         adds.append(d)
 
                 log.debug("Adds: %s" % ','.join(adds))
 
                 removals = []
-                for d in devices: 
+                for d in devices:
                     if d not in self.cups_devices:
                         removals.append(d)
 
@@ -860,7 +860,7 @@ class DevMgr4(DevMgr4_base):
                 for d in adds:
                     log.debug("adding: %s" % d)
                     try:
-                        dev = device.Device(d, service=self.service, callback=self.callback, 
+                        dev = device.Device(d, service=self.service, callback=self.callback,
                   disable_dbus=self.disable_dbus)
                     except Error:
                         log.error("Unexpected error in Device class.")
@@ -892,12 +892,12 @@ class DevMgr4(DevMgr4_base):
                 for d in removals:
                     item = self.DeviceList.firstItem()
                     log.debug("removing: %s" % d)
-                    
+
                     try:
                         del devices[d]
                     except KeyError:
                         pass
-                    
+
 
                     while item is not None:
                         if item.device_uri == d:
@@ -914,7 +914,7 @@ class DevMgr4(DevMgr4_base):
 
                 if len(devices):
                     for tab in self.TabIndex:
-                        self.Tabs.setTabEnabled(tab, True)                
+                        self.Tabs.setTabEnabled(tab, True)
 
                     if self.cur_device_uri:
                         item = first_item = self.DeviceList.firstItem()
@@ -938,12 +938,12 @@ class DevMgr4(DevMgr4_base):
                         self.cur_device = devices[self.cur_device_uri]
                         self.DeviceList.setCurrentItem(self.DeviceList.firstItem())
 
-                    self.Tabs.setTabEnabled(self.SuppliesTab, self.cur_device.device_type == DEVICE_TYPE_PRINTER and 
+                    self.Tabs.setTabEnabled(self.SuppliesTab, self.cur_device.device_type == DEVICE_TYPE_PRINTER and
                         self.cur_device.error_state != ERROR_STATE_ERROR)
-                        
-                    self.UpdatePrinterCombos()  
 
-                    user_cfg.last_used.device_uri = self.cur_device_uri
+                    self.UpdatePrinterCombos()
+
+                    user_conf.set('last_used', 'device_uri', self.cur_device_uri)
 
                     for d in updates + adds:
                         if d not in removals:
@@ -975,10 +975,10 @@ class DevMgr4(DevMgr4_base):
         if self.cur_device.device_type == DEVICE_TYPE_FAX:
                 self.setCaption(self.__tr("HP Device Manager - %1 (Fax)").arg(self.cur_device.model_ui))
         else:
-            if self.cur_device.fax_type:    
-                self.setCaption(self.__tr("HP Device Manager - %1 (Printer)").arg(self.cur_device.model_ui))                        
+            if self.cur_device.fax_type:
+                self.setCaption(self.__tr("HP Device Manager - %1 (Printer)").arg(self.cur_device.model_ui))
             else:
-                self.setCaption(self.__tr("HP Device Manager - %1").arg(self.cur_device.model_ui)) 
+                self.setCaption(self.__tr("HP Device Manager - %1").arg(self.cur_device.model_ui))
 
 
     def UpdateDeviceByURI(self, device_uri):
@@ -1012,11 +1012,11 @@ class DevMgr4(DevMgr4_base):
         if i is not None: # and not self.rescanning:
             self.cur_device_uri = self.DeviceList.currentItem().device_uri
             self.cur_device = devices[self.cur_device_uri]
-            user_cfg.last_used.device_uri = self.cur_device_uri
+            user_conf.set('last_used', 'device_uri', self.cur_device_uri)
 
-            self.Tabs.setTabEnabled(self.SuppliesTab, self.cur_device.device_type == DEVICE_TYPE_PRINTER and 
+            self.Tabs.setTabEnabled(self.SuppliesTab, self.cur_device.device_type == DEVICE_TYPE_PRINTER and
                 self.cur_device.error_state != ERROR_STATE_ERROR)
-                
+
             self.UpdateDevice()
             self.UpdateTitle()
 
@@ -1111,7 +1111,7 @@ class DevMgr4(DevMgr4_base):
         if not self.rescanning:
             popup.insertItem(self.__tr("Refresh All"), self.deviceRefreshAll_activated)
 
-        popup.popup(pos)            
+        popup.popup(pos)
 
 
     # ***********************************************************************************
@@ -1151,7 +1151,7 @@ class DevMgr4(DevMgr4_base):
         return self.PrinterCombo_activated(self.cur_printer)
 
     def PrintJobPrinterCombo_activated(self, s):
-        self.cur_printer = unicode(s) 
+        self.cur_printer = unicode(s)
         self.PrintSettingsPrinterCombo.setCurrentText(self.cur_printer.encode("latin1")) # TODO: ?
         return self.PrinterCombo_activated(self.cur_printer)
 
@@ -1165,7 +1165,7 @@ class DevMgr4(DevMgr4_base):
     #
     # FUNCTIONS/ACTION TAB
     #
-    # ***********************************************************************************    
+    # ***********************************************************************************
 
     def InitFuncsTab(self):
         self.click_lock = None
@@ -1174,47 +1174,47 @@ class DevMgr4(DevMgr4_base):
         self.iconList.clear()
 
         d = self.cur_device
-        
+
         if d is not None:
-        
+
             avail = d.device_state != DEVICE_STATE_NOT_FOUND and d.supported
             fax = d.fax_type and prop.fax_build and d.device_type == DEVICE_TYPE_FAX and \
                 sys.hexversion >= 0x020300f0 and avail
             printer = d.device_type == DEVICE_TYPE_PRINTER and avail
             req_plugin = d.plugin == PLUGIN_REQUIRED
             opt_plugin = d.plugin == PLUGIN_OPTIONAL
-            
+
             hplip_conf = ConfigParser.ConfigParser()
             fp = open("/etc/hp/hplip.conf", "r")
             hplip_conf.readfp(fp)
             fp.close()
-            
+
             try:
                 plugin_installed = utils.to_bool(hplip_conf.get("hplip", "plugin"))
             except ConfigParser.NoOptionError:
                 plugin_installed = False
-            
+
             if d.plugin:
                 if req_plugin and plugin_installed:
                     x = self.__tr("Download and install<br>required plugin (already installed).")
-                
+
                 elif req_plugin and not plugin_installed:
                     x = self.__tr("Download and install<br>required plugin (needs installation).")
-                
+
                 elif opt_plugin and plugin_installed:
                     x = self.__tr("Download and install<br>optional plugin (already installed).")
-                
+
                 elif opt_plugin and not plugin_installed:
                     x = self.__tr("Download and install<br>optional plugin (needs installation).")
-            
+
             else:
                 x = ''
 
-            
-            self.ICONS = [ 
-                
+
+            self.ICONS = [
+
                 # PRINTER
-                
+
                 (lambda : printer,                 # filter func
                 self.__tr("Print"),                      # Text
                 "print",       # Icon
@@ -1222,23 +1222,23 @@ class DevMgr4(DevMgr4_base):
                 self.user_settings.cmd_print),           # command/action
 
                 (lambda : d.scan_type and prop.scan_build and \
-                    d.device_type == DEVICE_TYPE_PRINTER and avail, 
+                    d.device_type == DEVICE_TYPE_PRINTER and avail,
                 self.__tr("Scan"),
-                "scan", 
-                self.__tr("Scan a document, image, or photograph.<br>"), 
+                "scan",
+                self.__tr("Scan a document, image, or photograph.<br>"),
                 self.user_settings.cmd_scan),
 
-                (lambda : d.copy_type and d.device_type == DEVICE_TYPE_PRINTER and avail, 
-                self.__tr("Make Copies"), 
-                "makecopies", 
-                self.__tr("Make copies on the device controlled by the PC.<br>"), 
+                (lambda : d.copy_type and d.device_type == DEVICE_TYPE_PRINTER and avail,
+                self.__tr("Make Copies"),
+                "makecopies",
+                self.__tr("Make copies on the device controlled by the PC.<br>"),
                 self.user_settings.cmd_copy),
 
                 (lambda : d.pcard_type and d.device_type == DEVICE_TYPE_PRINTER and avail,
                 self.__tr("Unload Photo Card"),
                 "makecopies",
                 self.__tr("Copy images from the device's photo card to the PC."),
-                self.user_settings.cmd_pcard),
+                self.PCardButton_clicked),
 
                 # FAX
 
@@ -1265,7 +1265,7 @@ class DevMgr4(DevMgr4_base):
                 (lambda : self.cur_device.device_settings_ui is not None and avail,
                 self.__tr("Device Settings"),
                 "settings",
-                self.__tr("Your device has special device settings.<br>You may alter these settings here."), 
+                self.__tr("Your device has special device settings.<br>You may alter these settings here."),
                 self.deviceSettingsButton_clicked),
 
                 (lambda : printer,
@@ -1277,7 +1277,7 @@ class DevMgr4(DevMgr4_base):
                 (lambda : True,
                 self.__tr("View Printer (Queue) Information"),
                 "cups",
-                self.__tr("View the printers (queues) installed in CUPS."), 
+                self.__tr("View the printers (queues) installed in CUPS."),
                 self.viewPrinterInformation),
 
                 (lambda : True,
@@ -1287,75 +1287,75 @@ class DevMgr4(DevMgr4_base):
                 self.viewInformation),
 
                 (lambda: printer and d.align_type,
-                self.__tr("Align Cartridges (Print Heads)"), 
+                self.__tr("Align Cartridges (Print Heads)"),
                 "align",
-                self.__tr("This will improve the quality of output when a new cartridge is installed."), 
+                self.__tr("This will improve the quality of output when a new cartridge is installed."),
                 self.AlignPensButton_clicked),
 
                 (lambda: printer and d.clean_type,
                 self.__tr("Clean Cartridges"),
                 "clean",
-                self.__tr("You only need to perform this action if you are<br>having problems with poor printout quality due to clogged ink nozzles."), 
+                self.__tr("You only need to perform this action if you are<br>having problems with poor printout quality due to clogged ink nozzles."),
                 self.CleanPensButton_clicked),
 
                 (lambda: printer and d.color_cal_type and d.color_cal_type == COLOR_CAL_TYPE_TYPHOON,
                 self.__tr("Color Calibration"),
                 "colorcal",
-                self.__tr("Use this procedure to optimimize your printer's color output<br>(requires glossy photo paper)."),  
+                self.__tr("Use this procedure to optimimize your printer's color output<br>(requires glossy photo paper)."),
                 self.ColorCalibrationButton_clicked),
 
                 (lambda: printer and d.color_cal_type and d.color_cal_type != COLOR_CAL_TYPE_TYPHOON,
                 self.__tr("Color Calibration"),
                 "colorcal",
-                self.__tr("Use this procedure to optimimize your printer's color output."), 
+                self.__tr("Use this procedure to optimimize your printer's color output."),
                 self.ColorCalibrationButton_clicked),
 
                 (lambda: printer and d.linefeed_cal_type,
-                self.__tr("Line Feed Calibration"), 
+                self.__tr("Line Feed Calibration"),
                 "linefeed_cal",
                 self.__tr("Use line feed calibration to optimize print quality<br>(to remove gaps in the printed output)."),
                 self.linefeedCalibration),
 
                 (lambda: printer and d.pq_diag_type,
-                self.__tr("Print Diagnostic Page"), 
+                self.__tr("Print Diagnostic Page"),
                 "pq_diag",
                 self.__tr("Your printer can print a test page <br>to help diagnose print quality problems."),
                 self.pqDiag),
 
                 # FIRMWARE
-                
+
                 (lambda : printer and d.fw_download,
                 self.__tr("Download Firmware"),
                 "firmware",
-                self.__tr("Download firmware to your printer <br>(required on some devices after each power-up)."), 
+                self.__tr("Download firmware to your printer <br>(required on some devices after each power-up)."),
                 self.downloadFirmware),
 
                 # PLUGIN
-                
+
                 (lambda : req_plugin,
                 self.__tr("Install Required Plugin"),
                 "plugin",
-                x, #self.__tr("Download and install the HPLIP plugin."), 
+                x, #self.__tr("Download and install the HPLIP plugin."),
                 self.downloadPlugin),
-                
+
                 (lambda : opt_plugin,
                 self.__tr("Install Optional Plugin"),
                 "plugin",
-                x, #self.__tr("Download and install the HPLIP plugin."), 
+                x, #self.__tr("Download and install the HPLIP plugin."),
                 self.downloadPlugin),
-                
+
                 # HELP/WEBSITE
-                
+
                 (lambda : True,
                 self.__tr("Visit HPLIP Website"),
                 "support2",
-                self.__tr("Visit HPLIP website."),  
+                self.__tr("Visit HPLIP website."),
                 self.viewSupport),
 
                 (lambda : True,
                 self.__tr("Help"),
                 "help",
-                self.__tr("View HPLIP help."),  
+                self.__tr("View HPLIP help."),
                 self.viewHelp),
 
             ]
@@ -1369,12 +1369,12 @@ class DevMgr4(DevMgr4_base):
 
             for filter, text, icon, tooltip, cmd in self.ICONS:
                 if filter is not None:
-                    if not filter(): 
+                    if not filter():
                         continue
 
-                FuncViewItem(self.iconList, text, 
-                    self.func_icons[icon], 
-                    tooltip, 
+                FuncViewItem(self.iconList, text,
+                    self.func_icons[icon],
+                    tooltip,
                     cmd)
 
 
@@ -1386,7 +1386,7 @@ class DevMgr4(DevMgr4_base):
 
         elif utils.which('gnomesu'):
             su_sudo = 'gnomesu -c "%s"'
-        
+
         elif utils.which('gksu'):
             su_sudo = 'gksu "%s"'
 
@@ -1407,10 +1407,10 @@ class DevMgr4(DevMgr4_base):
             log.debug(cmd)
             utils.run(cmd, log_output=True, password_func=None, timeout=1)
             #print os.system(cmd)
-            
+
             self.UpdateFuncsTab()
-            
-    
+
+
     def iconList_clicked(self, item):
         return self.RunFuncCmd(item)
 
@@ -1438,7 +1438,7 @@ class DevMgr4(DevMgr4_base):
         if item is not None and item is self.iconList.currentItem():
             popup = QPopupMenu(self)
             popup.insertItem(self.__tr("Open..."), self.RunFuncCmdContext)
-            popup.popup(pos)            
+            popup.popup(pos)
 
 
     def iconList_returnPressed(self, item):
@@ -1503,19 +1503,19 @@ class DevMgr4(DevMgr4_base):
         f = "http://hplip.sf.net"
 
         if prop.doc_build:
-            g = os.path.join(sys_cfg.dirs.doc, 'index.html')
+            g = os.path.join(sys_conf.get('dirs', 'doc'), 'index.html')
             if os.path.exists(g):
                 f = "file://%s" % g
 
         log.debug(f)
         utils.openURL(f)
 
-        
+
     def viewSupport(self):
         f = "http://hplip.sf.net"
         log.debug(f)
         utils.openURL(f)
-        
+
 
     def pqDiag(self):
         d = self.cur_device
@@ -1550,7 +1550,7 @@ class DevMgr4(DevMgr4_base):
         d = self.cur_device
         linefeed_type = d.linefeed_cal_type
 
-        try:    
+        try:
             QApplication.setOverrideCursor(QApplication.waitCursor)
 
             try:
@@ -1578,18 +1578,18 @@ class DevMgr4(DevMgr4_base):
     def downloadFirmware(self):
         d = self.cur_device
         ok = False
-        
+
         try:
             QApplication.setOverrideCursor(QApplication.waitCursor)
             d.open()
 
             if d.isIdleAndNoError():
                 ok = d.downloadFirmware()
-            
+
         finally:
             d.close()
             QApplication.restoreOverrideCursor()
-        
+
             if not ok:
                 self.FailureUI(self.__tr("<b>An error occured downloading firmware file.</b><p>Please check your printer and ensure that the HPLIP plugin has been installed."))
 
@@ -1700,10 +1700,10 @@ class DevMgr4(DevMgr4_base):
                         maint.AlignType8(d, self.LoadPaperUI, self.AlignmentNumberUI)
 
                     elif align_type == ALIGN_TYPE_LBOW:
-                        maint.AlignType10(d, self.LoadPaperUI, self.Align10and11UI) 
+                        maint.AlignType10(d, self.LoadPaperUI, self.Align10and11UI)
 
                     elif align_type == ALIGN_TYPE_LIDIL_0_5_4:
-                        maint.AlignType11(d, self.LoadPaperUI, self.Align10and11UI, self.NotPhotoOnlyRequired) 
+                        maint.AlignType11(d, self.LoadPaperUI, self.Align10and11UI, self.NotPhotoOnlyRequired)
 
                     elif align_type == ALIGN_TYPE_OJ_PRO:
                         maint.AlignType12(d, self.LoadPaperUI)
@@ -1802,7 +1802,7 @@ class DevMgr4(DevMgr4_base):
 
 
     def PrintTestPageButton_clicked(self):
-        dlg = ScrollDialog(ScrollTestpageView, self.cur_device, self.cur_printer, self.service, self)        
+        dlg = ScrollDialog(ScrollTestpageView, self.cur_device, self.cur_printer, self.service, self)
         dlg.exec_loop()
 
 
@@ -1913,7 +1913,7 @@ class DevMgr4(DevMgr4_base):
     #
     # STATUS TAB
     #
-    # ***********************************************************************************      
+    # ***********************************************************************************
 
     def InitStatusTab(self):
         self.statusListView.setSorting(-1)
@@ -1944,7 +1944,7 @@ class DevMgr4(DevMgr4_base):
                     line1 = device.queryString(self.cur_device.hist[0].event_code)
                 except (AttributeError, TypeError):
                     line1 = ''
-                    
+
                 line2 = ''
 
             pm = load_pixmap('panel_lcd', 'other')
@@ -1982,7 +1982,7 @@ class DevMgr4(DevMgr4_base):
         self.statusListView.clear()
         row = 0
         hist = self.cur_device.hist[:]
-        
+
         if hist:
             hist.reverse()
             row = len(hist)-1
@@ -1990,7 +1990,7 @@ class DevMgr4(DevMgr4_base):
             for e in hist:
                 if e is None:
                     continue
-                    
+
                 ess = device.queryString(e.event_code, 0)
                 esl = device.queryString(e.event_code, 1)
 
@@ -2004,7 +2004,7 @@ class DevMgr4(DevMgr4_base):
                 dt.setTime_t(int(e.timedate), Qt.LocalTime)
 
                 # TODO: In Qt4.x, use QLocale.toString(date, format)
-                tt = QString("%1 %2").arg(dt.toString()).arg(desc) 
+                tt = QString("%1 %2").arg(dt.toString()).arg(desc)
 
                 if e.job_id:
                     job_id = unicode(e.job_id)
@@ -2022,7 +2022,7 @@ class DevMgr4(DevMgr4_base):
                 except KeyError:
                     status_pix = self.STATUS_ICONS[ERROR_STATE_CLEAR][0]
 
-                StatusListViewItem(self.statusListView, status_pix, ess, tt, unicode(e.event_code), 
+                StatusListViewItem(self.statusListView, status_pix, ess, tt, unicode(e.event_code),
                     job_id, unicode(e.username))
 
                 row -= 1
@@ -2042,7 +2042,7 @@ class DevMgr4(DevMgr4_base):
 
     # "Nicely readable timedelta"
     # Credit: Bjorn Lindqvist
-    # ASPN Python Recipe 498062 
+    # ASPN Python Recipe 498062
     # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/498062
     # Note: Modified from recipe
     def seconds_in_units(self, seconds):
@@ -2083,7 +2083,7 @@ class DevMgr4(DevMgr4_base):
     #
     # SUPPLIES TAB
     #
-    # ***********************************************************************************      
+    # ***********************************************************************************
 
     def InitSuppliesTab(self):
         self.pix_battery = load_pixmap('battery', '16x16')
@@ -2143,7 +2143,7 @@ class DevMgr4(DevMgr4_base):
 
             try:
                 self.cur_device.sorted_supplies
-            except AttributeError:                
+            except AttributeError:
                 self.cur_device.sorted_supplies = []
 
             if not self.cur_device.sorted_supplies:
@@ -2198,7 +2198,7 @@ class DevMgr4(DevMgr4_base):
                     pixmap = self.getIcon(agent_kind, agent_type)
 
 
-                SuppliesListViewItem(self.suppliesList, pixmap, agent_desc, 
+                SuppliesListViewItem(self.suppliesList, pixmap, agent_desc,
                     agent_sku, level_pixmap, agent_health_desc)
 
             i = self.suppliesList.firstChild()
@@ -2320,7 +2320,7 @@ class DevMgr4(DevMgr4_base):
         pp.drawLine(w4, 0, w4, h6)
         pp.drawLine(w4, h, w4, h-h6)
 
-        return px   
+        return px
 
 
 
@@ -2349,12 +2349,12 @@ class DevMgr4(DevMgr4_base):
         self.settingTextLabel.setText(self.__tr("Printer Name:"))
 
         spacer34 = QSpacerItem(20,20,QSizePolicy.Preferred, QSizePolicy.Minimum)
-        PrintJobsTabLayout.addItem(spacer34,0,3) 
+        PrintJobsTabLayout.addItem(spacer34,0,3)
 
         spacer35 = QSpacerItem(20,20,QSizePolicy.Preferred, QSizePolicy.Minimum)
         PrintJobsTabLayout.addItem(spacer35,0,0)
 
-        self.connect(self.PrintSettingsPrinterCombo, SIGNAL("activated(const QString&)"), 
+        self.connect(self.PrintSettingsPrinterCombo, SIGNAL("activated(const QString&)"),
             self.PrintSettingsPrinterCombo_activated)
 
 
@@ -2398,7 +2398,7 @@ class DevMgr4(DevMgr4_base):
                                  cups.IPP_JOB_CANCELLED : self.warning_pix,
                                  cups.IPP_JOB_ABORTED : self.error_pix,
                                  cups.IPP_JOB_COMPLETED : self.ok_pix,
-                                }        
+                                }
 
         self.jobList.setSorting(-1)
         self.jobList.setColumnText(0, QString(""))
@@ -2421,7 +2421,7 @@ class DevMgr4(DevMgr4_base):
 
         if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
             self.printerTextLabel.setText(self.__tr("Printer Name:"))
-        
+
         else:
             self.printerTextLabel.setText(self.__tr("Fax Name:"))
 
@@ -2436,7 +2436,7 @@ class DevMgr4(DevMgr4_base):
 
         for j in jobs:
             if j.dest == self.cur_printer:
-                JobListViewItem(self.jobList, self.JOB_STATE_ICONS[j.state], 
+                JobListViewItem(self.jobList, self.JOB_STATE_ICONS[j.state],
                     j.title, self.JOB_STATES[j.state], unicode(j.id))
 
         i = self.jobList.firstChild()
@@ -2445,13 +2445,13 @@ class DevMgr4(DevMgr4_base):
 
 
     def jobList_clicked(self, i):
-        num = 0    
+        num = 0
         item = self.jobList.firstChild()
         while item is not None:
             if item.isOn():
                 num += 1
 
-            item = item.nextSibling()   
+            item = item.nextSibling()
 
         self.cancelToolButton.setEnabled(num)
         self.infoToolButton.setEnabled(num == 1)
@@ -2485,7 +2485,7 @@ class DevMgr4(DevMgr4_base):
         item = self.jobList.currentItem()
 
         if item is not None:
-            self.cur_device.cancelJob(item.job_id)
+            self.cur_device.cancelJob(int(item.job_id))
 
 
     def getJobInfo(self):
@@ -2502,9 +2502,9 @@ class DevMgr4(DevMgr4_base):
                     arg(self.cur_printer).arg(unicode(item.job_id)))
 
                 dlg.exec_loop()
-            
+
             else:
-                self.FailureUI(self.__tr("<b>No log output found.</b><p>If the print job is stopped or the printer is rejecting jobs, there might not be any output. Also, you will receive more output in the CUPS LogLevel is set to 'debug'."))          
+                self.FailureUI(self.__tr("<b>No log output found.</b><p>If the print job is stopped or the printer is rejecting jobs, there might not be any output. Also, you will receive more output in the CUPS LogLevel is set to 'debug'."))
 
 
     def UpdatePrintController(self):
@@ -2518,21 +2518,21 @@ class DevMgr4(DevMgr4_base):
         if default_printer == self.cur_printer:
             s = self.__tr("SET AS DEFAULT")
             self.defaultPushButton.setEnabled(False)
-        
+
         else:
             s = self.__tr("NOT SET AS DEFAULT")
             self.defaultPushButton.setEnabled(True)
 
         if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
             QToolTip.add(self.defaultPushButton, self.__tr("The printer is currently: %1").arg(s))
-        
+
         else:
             QToolTip.add(self.defaultPushButton, self.__tr("The fax is currently: %1").arg(s))
 
         self.printer_state = cups.IPP_PRINTER_STATE_IDLE
 
         cups_printers = cups.getPrinters()
-        
+
         for p in cups_printers:
             if p.name.decode('utf-8') == self.cur_printer:
                 self.printer_state = p.state
@@ -2542,33 +2542,33 @@ class DevMgr4(DevMgr4_base):
         # start/stop
         if self.printer_state == cups.IPP_PRINTER_STATE_IDLE:
             s = self.__tr("IDLE")
-            
+
             if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
                 self.stopstartPushButton.setText(self.__tr("Stop Printer"))
-            
+
             else:
                 self.stopstartPushButton.setText(self.__tr("Stop Fax"))
 
         elif self.printer_state == cups.IPP_PRINTER_STATE_PROCESSING:
             s = self.__tr("PROCESSING")
-            
+
             if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
                 self.stopstartPushButton.setText(self.__tr("Stop Printer"))
-            
+
             else:
                 self.stopstartPushButton.setText(self.__tr("Stop Fax"))
         else:
             s = self.__tr("STOPPED")
-            
+
             if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
                 self.stopstartPushButton.setText(self.__tr("Start Printer"))
-            
+
             else:
                 self.stopstartPushButton.setText(self.__tr("Start Fax"))
 
         if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
             QToolTip.add(self.stopstartPushButton, self.__tr("The printer is currently: %1").arg(s))
-        
+
         else:
             QToolTip.add(self.stopstartPushButton, self.__tr("The fax is currently: %1").arg(s))
 
@@ -2576,14 +2576,14 @@ class DevMgr4(DevMgr4_base):
         if self.printer_accepting:
             s = self.__tr("ACCEPTING JOBS")
             self.rejectacceptPushButton.setText(self.__tr("Reject Jobs"))
-        
+
         else:
             s = self.__tr("REJECTING JOBS")
             self.rejectacceptPushButton.setText(self.__tr("Accept Jobs"))
 
         if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
             QToolTip.add(self.rejectacceptPushButton, self.__tr("The printer is currently: %1").arg(s))
-        
+
         else:
             QToolTip.add(self.rejectacceptPushButton, self.__tr("The fax is currently: %1").arg(s))
 
@@ -2592,24 +2592,27 @@ class DevMgr4(DevMgr4_base):
         QApplication.setOverrideCursor(QApplication.waitCursor)
         try:
             if self.printer_state in (cups.IPP_PRINTER_STATE_IDLE, cups.IPP_PRINTER_STATE_PROCESSING):
-                cups.stop(self.cur_printer)
-                
-                if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
-                    e = EVENT_PRINTER_QUEUE_STOPPED
-                else:
-                    e = EVENT_FAX_QUEUE_STOPPED
+                result = cups.stop(self.cur_printer)
+                if result:
+                    if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
+                        e = EVENT_PRINTER_QUEUE_STOPPED
+                    else:
+                        e = EVENT_FAX_QUEUE_STOPPED
 
             else:
-                cups.start(self.cur_printer)
-                
-                if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
-                    e = EVENT_PRINTER_QUEUE_STARTED
-                else:
-                    e = EVENT_FAX_QUEUE_STARTED
+                result = cups.start(self.cur_printer)
+                if result:
+                    if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
+                        e = EVENT_PRINTER_QUEUE_STARTED
+                    else:
+                        e = EVENT_FAX_QUEUE_STARTED
 
-            self.UpdatePrintController()
-            self.cur_device.sendEvent(e, self.cur_printer)
-        
+            if result:
+                self.UpdatePrintController()
+                self.cur_device.sendEvent(e, self.cur_printer)
+            else:
+                log.error("Start/Stop printer operation failed")
+
         finally:
             QApplication.restoreOverrideCursor()
 
@@ -2618,21 +2621,27 @@ class DevMgr4(DevMgr4_base):
         QApplication.setOverrideCursor(QApplication.waitCursor)
         try:
             if self.printer_accepting:
-                cups.reject(self.cur_printer)
-                if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
-                    e = EVENT_PRINTER_QUEUE_REJECTING_JOBS
-                else:
-                    e = EVENT_FAX_QUEUE_REJECTING_JOBS
-            else:
-                cups.accept(self.cur_printer)
-                if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
-                    e = EVENT_PRINTER_QUEUE_ACCEPTING_JOBS
-                else:
-                    e = EVENT_FAX_QUEUE_ACCEPTING_JOBS
+                result = cups.reject(self.cur_printer)
+                if result:
+                    if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
+                        e = EVENT_PRINTER_QUEUE_REJECTING_JOBS
+                    else:
+                        e = EVENT_FAX_QUEUE_REJECTING_JOBS
 
-            self.UpdatePrintController()
-            self.cur_device.sendEvent(e, self.cur_printer)
-        
+            else:
+                result = cups.accept(self.cur_printer)
+                if result:
+                    if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
+                        e = EVENT_PRINTER_QUEUE_ACCEPTING_JOBS
+                    else:
+                        e = EVENT_FAX_QUEUE_ACCEPTING_JOBS
+
+            if result:
+                self.UpdatePrintController()
+                self.cur_device.sendEvent(e, self.cur_printer)
+            else:
+                log.error("Reject/Accept jobs operation failed")
+
         finally:
             QApplication.restoreOverrideCursor()
 
@@ -2651,7 +2660,7 @@ class DevMgr4(DevMgr4_base):
                     e = EVENT_FAX_QUEUE_SET_AS_DEFAULT
 
                 self.cur_device.sendEvent(e, self.cur_printer)
-        
+
         finally:
             QApplication.restoreOverrideCursor()
 
@@ -2662,17 +2671,17 @@ class DevMgr4(DevMgr4_base):
             item = self.jobList.firstChild()
             while item is not None:
                 if item.isOn():
-                    self.cur_device.cancelJob(item.job_id)
+                    self.cur_device.cancelJob(int(item.job_id))
 
-                item = item.nextSibling() 
-        
+                item = item.nextSibling()
+
         finally:
             QApplication.restoreOverrideCursor()
 
         self.UpdatePrintControlTab()
 
-        
-        
+
+
 
     # ***********************************************************************************
     #
@@ -2698,10 +2707,10 @@ class DevMgr4(DevMgr4_base):
         try:
             os.waitpid(-1, os.WNOHANG)
         except OSError:
-            pass    
+            pass
 
 
-    # ***********************************************************************************   
+    # ***********************************************************************************
     #
     # DEVICE SETTINGS PLUGIN
     #
@@ -2742,14 +2751,14 @@ class DevMgr4(DevMgr4_base):
                 self.refresh_timer.changeInterval(self.user_settings.auto_refresh_rate * 1000)
 
             if old_auto_refresh != self.user_settings.auto_refresh:
-                self.autoRefresh.toggle()        
+                self.autoRefresh.toggle()
 
 
     # ***********************************************************************************
     #
     # SETUP/REMOVE
     #
-    # ***********************************************************************************         
+    # ***********************************************************************************
 
     def deviceInstallAction_activated(self):
         su_sudo = None
@@ -2759,7 +2768,7 @@ class DevMgr4(DevMgr4_base):
 
         elif utils.which('gnomesu'):
             su_sudo = 'gnomesu -c "%s"'
-        
+
         elif utils.which('gksu'):
             su_sudo = 'gksu "%s"'
 
@@ -2779,7 +2788,7 @@ class DevMgr4(DevMgr4_base):
 
             log.debug(cmd)
             utils.run(cmd, log_output=True, password_func=None, timeout=1)
-            self.RescanDevices()        
+            self.RescanDevices()
 
 
     def deviceRemoveAction_activated(self):
@@ -2808,8 +2817,7 @@ class DevMgr4(DevMgr4_base):
 
                 self.cur_device = None
                 self.cur_device_uri = ''
-                user_cfg.last_used.device_uri = ''
-
+                user_conf.set('last_used', 'device_uri', '')
                 QApplication.restoreOverrideCursor()
 
                 self.RescanDevices()
@@ -2821,7 +2829,7 @@ class DevMgr4(DevMgr4_base):
     #
     # ***********************************************************************************
 
-    
+
     def RunCommand(self, cmd, macro_char='%'):
         QApplication.setOverrideCursor(QApplication.waitCursor)
 
@@ -2859,7 +2867,7 @@ class DevMgr4(DevMgr4_base):
         f = "http://hplip.sf.net"
 
         if prop.doc_build:
-            g = os.path.join(sys_cfg.dirs.doc, 'index.html')
+            g = os.path.join(sys_conf.get('dirs', 'doc'), 'index.html')
             if os.path.exists(g):
                 f = "file://%s" % g
 
@@ -2870,7 +2878,7 @@ class DevMgr4(DevMgr4_base):
     def helpAbout(self):
         dlg = AboutDlg(self)
         dlg.VersionText.setText(prop.version)
-        dlg.ToolboxVersionText.setText(self.toolbox_version)
+        dlg.ToolboxVersionText.setText(self.toolbox_version + " (Qt3)")
         dlg.exec_loop()
 
 
@@ -2975,7 +2983,7 @@ class ScrollTestpageView(ScrollView):
 
             self.addLoadPaper()
 
-            self.printButton = self.addActionButton("bottom_nav", self.__tr("Print Test Page"), 
+            self.printButton = self.addActionButton("bottom_nav", self.__tr("Print Test Page"),
                 self.printButton_clicked, 'print.png', None)
 
 
@@ -3052,9 +3060,9 @@ class ScrollTestpageView(ScrollView):
 
 
     def CheckDeviceUI(self):
-            self.FailureUI(self.__tr("<b>Device is busy or in an error state.</b><p>Please check device and try again."))            
+            self.FailureUI(self.__tr("<b>Device is busy or in an error state.</b><p>Please check device and try again."))
 
-        
+
     def FailureUI(self, error_text):
         QMessageBox.critical(self,
             self.caption(),
@@ -3083,7 +3091,7 @@ class ScrollPrinterInfoView(ScrollView):
 
         printers = []
         for p in self.printers:
-            if p.device_uri == self.cur_device.device_uri: 
+            if p.device_uri == self.cur_device.device_uri:
                 printers.append(p)
 
         if not printers:
@@ -3166,7 +3174,7 @@ class ScrollColorCalView(ScrollView):
         ScrollView.fillControls(self)
         self.addLoadPaper(PAPER_TYPE_HP_ADV_PHOTO)
 
-        self.printButton = self.addActionButton("bottom_nav", self.__tr("Perform Color Calibration"), 
+        self.printButton = self.addActionButton("bottom_nav", self.__tr("Perform Color Calibration"),
             self.colorcalButton_clicked, 'print.png', None)
 
 
@@ -3209,9 +3217,9 @@ class ScrollColorCalView(ScrollView):
 
 
     def CheckDeviceUI(self):
-            self.FailureUI(self.__tr("<b>Device is busy or in an error state.</b><p>Please check device and try again."))      
-      
-    
+            self.FailureUI(self.__tr("<b>Device is busy or in an error state.</b><p>Please check device and try again."))
+
+
     def FailureUI(self, error_text):
         QMessageBox.critical(self,
             self.caption(),
@@ -3219,7 +3227,7 @@ class ScrollColorCalView(ScrollView):
             QMessageBox.Ok,
             QMessageBox.NoButton,
             QMessageBox.NoButton)
-      
+
 
     def __tr(self,s,c = None):
         return qApp.translate("ScrollColorCalView",s,c)

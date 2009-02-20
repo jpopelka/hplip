@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -47,7 +47,10 @@ def enter_yes_no(question, default_value='y', choice_prompt=None):
         question += choice_prompt
 
     while True:
-        user_input = raw_input(log.bold(question)).lower().strip()
+        try:
+            user_input = raw_input(log.bold(question)).lower().strip()
+        except EOFError:
+            continue
 
         if not user_input:
             return True, default_value
@@ -66,7 +69,10 @@ def enter_yes_no(question, default_value='y', choice_prompt=None):
 
 def enter_range(question, min_value, max_value, default_value=None):
     while True:
-        user_input = raw_input(log.bold(question)).lower().strip()
+        try:
+            user_input = raw_input(log.bold(question)).lower().strip()
+        except EOFError:
+            continue
 
         if not user_input:
             if default_value is not None:
@@ -95,7 +101,11 @@ def enter_choice(question, choices, default_value=None):
         choices.append('q')
 
     while True:
-        user_input = raw_input(log.bold(question)).lower().strip()
+        try:
+            user_input = raw_input(log.bold(question)).lower().strip()
+        except EOFError:
+            continue
+
 
         if (not user_input and default_value) or user_input == default_value:
             if default_value == 'q':
@@ -143,7 +153,10 @@ def load_photo_paper_prompt():
 
 def continue_prompt(prompt=''):
     while True:
-        x = raw_input(log.bold(prompt + " Press <enter> to continue or 'q' to quit: ")).lower().strip()
+        try:
+            x = raw_input(log.bold(prompt + " Press <enter> to continue or 'q' to quit: ")).lower().strip()
+        except EOFError:
+            continue
 
         if not x:
             return True
@@ -157,7 +170,10 @@ def continue_prompt(prompt=''):
 def enter_regex(regex, prompt, pattern, default_value=None):
     re_obj = re.compile(regex)
     while True:
-        x = raw_input(log.bold(prompt))
+        try:
+            x = raw_input(log.bold(prompt))
+        except EOFError:
+            continue
 
         if not x and default_value is not None:
             return default_value, x
@@ -359,7 +375,7 @@ def format_paragraph(paragraph, width=None, alignment=ALIGN_LEFT):
 
 def printer_table(printers):
     header("SELECT PRINTER")
-    last_used_printer_name = user_cfg.last_used.printer_name
+    last_used_printer_name = user_conf.get('last_used', 'printer_name')
     ret = None
 
     table = Formatter(header=('Num', 'CUPS Printer'),
@@ -389,7 +405,7 @@ def printer_table(printers):
 
 def device_table(devices, scan_flag=False):
     header("SELECT DEVICE")
-    last_used_device_uri = user_cfg.last_used.device_uri
+    last_used_device_uri = user_conf.get('last_used', 'device_uri')
     ret = None
 
     if scan_flag:

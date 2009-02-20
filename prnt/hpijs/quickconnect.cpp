@@ -365,10 +365,10 @@ DRIVER_ERROR    QuickConnect::Flush (int iBufferSize)
     {
         char    szStr[256];
         int     iPaperSize, iMediaType, iPrintQuality;
-        char        szCopiesStr[64];
-        char        szNullBytes[632];
-        char    *szPJLHeader = "\x1B\x45\x1B%-12345X@PJL ENTER LANGUAGE=PHOTOJPEG\012";
-        char    *szPJLEndJob = "\x1B\x45\x1B%-12345X";
+        char    szCopiesStr[64];
+        char    szNullBytes[632];
+        char    *szPJLHeader = (char *) "\x1B\x45\x1B%-12345X@PJL ENTER LANGUAGE=PHOTOJPEG\012";
+        char    *szPJLEndJob = (char *) "\x1B\x45\x1B%-12345X";
 
         err = Compress ();
         ERRCHECK;

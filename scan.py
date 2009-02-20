@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ from __future__ import division
 __version__ = '2.1'
 __mod__ = 'hp-scan'
 __title__ = 'Scan Utility'
-__doc__ = "SANE-based scan utility for HPLIP."
+__doc__ = "SANE-based scan utility for HPLIP supported all-in-one/mfp devices (EXPERIMENTAL)."
 
 # Std Lib
 import sys
@@ -485,22 +485,6 @@ try:
                 if 'pdf' not in dest:
                     dest.append('pdf')
 
-#        elif o == '--fax':
-#            pp = a.strip()
-#            from prnt import cups
-#            printer_list = cups.getPrinters()
-#            found = False
-#            for p in printer_list:
-#                if p.name == pp:
-#                    found = True
-#                    fax = pp
-#                    break
-#
-#            if found:
-#                if 'fax' not in dest:
-#                    dest.append('fax')
-#            else:
-#                log.error("Unknown/invalid fax name: %s" % pp)
 
         elif o in ('--email-to', '--to'):
             email_to = a.split(',')
@@ -551,18 +535,6 @@ try:
 
         dest.append('printer')
 
-#    if 'printer' in dest and not printer:
-#        from prnt import cups
-#        printer = cups.getDefaultPrinter()
-#
-#        if printer is not None:
-#            log.warn("Print destination enabled with no printer specified.")
-#            log.warn("Using CUPS default printer '%s'." % printer)
-#        else:
-#            log.error("Print destination enabled with no printer specified.")
-#            log.error("No CUPS default printer found. Disabling 'print' destination.")
-#            dest.remove("printer")
-
     if 'fax' in dest and 'file' not in dest:
         log.error("Fax destination not implemented. Adding 'file' destination. Use output file to fax.")
         dest.append('file')
@@ -601,11 +573,6 @@ try:
     if output_type and output_type not in ('jpeg', 'png', 'pdf'):
         log.error("Invalid output file format. File formats must be 'jpeg', 'png', or 'pdf'.")
         sys.exit(1)
-
-    #sys.exit(0)
-    ##if scan_mode == 'gray' and output_type and output_type != 'png':
-    ##    log.error("Grayscale scans must be saved in PNG file format. To save in other formats, set the 'editor' destination and save the image from the editor in the desired format.")
-    ##    sys.exit(1)
 
     if adf and output_type and output_type != 'pdf':
         log.error("ADF scans must be saved in PDF file format.")
@@ -660,86 +627,6 @@ try:
         log.error("GUI mode is not implemented yet. Please use -n. Refer to 'hp-scan -h' for help.")
         sys.exit(1)
 
-#        if not prop.gui_build:
-#            log.warn("GUI mode disabled in build. Reverting to interactive mode.")
-#            mode = NON_INTERACTIVE_MODE
-#
-#        elif not os.getenv('DISPLAY'):
-#            log.warn("No display found. Reverting to interactive mode.")
-#            mode = NON_INTERACTIVE_MODE
-#
-#        elif not utils.checkPyQtImport():
-#            log.warn("PyQt init failed. Reverting to interactive mode.")
-#            mode = NON_INTERACTIVE_MODE
-
-#    if mode == GUI_MODE:
-#        app = None
-#        sendfax = None
-#
-#        from qt import *
-#
-#        # UI Forms
-#        from ui.scanform import ScanForm
-#
-#        # create the main application object
-#        app = QApplication(sys.argv)
-#
-#        if loc is None:
-#            loc = user_cfg.ui.get("loc", "system")
-#            if loc.lower() == 'system':
-#                loc = str(QTextCodec.locale())
-#                log.debug("Using system locale: %s" % loc)
-#
-#        if loc.lower() != 'c':
-#            e = 'utf8'
-#            try:
-#                l, x = loc.split('.')
-#                loc = '.'.join([l, e])
-#            except ValueError:
-#                l = loc
-#                loc = '.'.join([loc, e])
-#
-#            log.debug("Trying to load .qm file for %s locale." % loc)
-#            trans = QTranslator(None)
-#
-#            qm_file = 'hplip_%s.qm' % l
-#            log.debug("Name of .qm file: %s" % qm_file)
-#            loaded = trans.load(qm_file, prop.localization_dir)
-#
-#            if loaded:
-#                app.installTranslator(trans)
-#            else:
-#                loc = 'c'
-#
-#        if loc == 'c':
-#            log.debug("Using default 'C' locale")
-#        else:
-#            log.debug("Using locale: %s" % loc)
-#            QLocale.setDefault(QLocale(loc))
-#            prop.locale = loc
-#            try:
-#                locale.setlocale(locale.LC_ALL, locale.normalize(loc))
-#            except locale.Error:
-#                pass
-#
-#        scanui = ScanForm(device_uri, printer_name, args)
-#
-#        app.setMainWidget(scanui)
-#
-#        pid = os.getpid()
-#        log.debug('pid=%d' % pid)
-#
-#        scanui.show()
-#
-#        signal.signal(signal.SIGPIPE, signal.SIG_IGN)
-#
-#        try:
-#            log.debug("Starting GUI loop...")
-#            app.exec_loop()
-#        except KeyboardInterrupt:
-#            pass
-#        #except:
-#        #    log.exception()
 
     if 1:
         #else: # NON_INTERACTIVE_MODE
@@ -760,13 +647,6 @@ try:
             log.error("%s requires the Python Imaging Library (PIL). Exiting." % __mod__)
             sys.exit(1)
 
-    ##    if output_type == 'pdf':
-    ##        try:
-    ##            from reportlab.pdfgen import canvas
-    ##        except ImportError:
-    ##            log.error("PDF output requires ReportLab.")
-    ##            sys.exit(1)
-
         sane.init()
         devices = sane.getDevices()
 
@@ -784,12 +664,8 @@ try:
         try:
             device = sane.openDevice(device_uri)
         except scanext.error, e:
-            #log.error("Error: %d (%s)" % (e, sane.getErrorMessage(e)))
             sane.reportError(e)
             sys.exit(1)
-
-        #print device.options
-        #sys.exit(0)
 
         tlx = device.getOptionObj('tl-x').limitAndSet(tlx)
         tly = device.getOptionObj('tl-y').limitAndSet(tly)

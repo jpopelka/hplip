@@ -24,7 +24,7 @@
       </property>
       <widget class="QListWidget" name="DeviceList" >
        <property name="movement" >
-        <enum>QListView::Free</enum>
+        <enum>QListView::Static</enum>
        </property>
        <property name="flow" >
         <enum>QListView::TopToBottom</enum>

@@ -551,6 +551,9 @@
          <property name="text" >
           <string>Send test page to printer</string>
          </property>
+         <property name="checked" >
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
       </layout>

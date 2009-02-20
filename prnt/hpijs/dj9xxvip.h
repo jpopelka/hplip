@@ -85,7 +85,7 @@ public:
             }
             case SPEED_MECH_HINT:
             {
-                return SendPerPageHeader (iValue);
+                return SendSpeedMechCmd (iValue);
             }
             case EXTRA_DRYTIME_HINT:
             {
@@ -120,6 +120,10 @@ protected:
 
 private:
     BOOL IsPCL3DriverwareAvailable();
+    virtual DRIVER_ERROR SendSpeedMechCmd (BOOL bLastPage)
+    {
+        return NO_ERROR;
+    }
     BYTE    m_cExtraDryTime;
 }; //DJ9xxVIP
 
@@ -154,6 +158,10 @@ class DJ9902400Mode : public PrintMode
 {
 public:
     DJ9902400Mode ();
+    virtual inline BOOL MediaCompatible (MEDIATYPE eMedia)
+    {
+        return (eMedia == pmMediaType || eMedia == MEDIA_PHOTO);
+    }
 }; // DJ9902400Mode
 
 class DJ990DraftMode : public PrintMode

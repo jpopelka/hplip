@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 __version__ = '15.0'
 __mod__ = 'hp-toolbox'
 __title__ = 'HP Device Manager'
-__doc__ = "The HP Device Manager (aka Toolbox) for HPLIP supported devices. Provides status, tools, and supplies levels."
+__doc__ = """The HP Device Manager (aka "Toolbox") for HPLIP supported devices. Provides access to status, tools, and supplies levels."""
 
 # Std Lib
 import sys
@@ -89,7 +89,7 @@ if ui_toolkit == 'qt3':
     if not utils.canEnterGUIMode():
         log.error("%s requires GUI support. Exiting." % __mod__)
         sys.exit(1)
-else:
+elif ui_toolkit == 'qt4':
     if not utils.canEnterGUIMode4():
         log.error("%s requires GUI support. Exiting." % __mod__)
         sys.exit(1)
@@ -130,7 +130,7 @@ if ui_toolkit == 'qt3':
         app = QApplication(sys.argv)
 
         if loc is None:
-            loc = user_cfg.ui.get("loc", "system")
+            loc = user_conf.get('ui', 'loc', 'system')
             if loc.lower() == 'system':
                 loc = str(QTextCodec.locale())
                 log.debug("Using system locale: %s" % loc)
@@ -238,10 +238,12 @@ if ui_toolkit == 'qt3':
 else: # qt4
     try:
         from PyQt4.QtGui import QApplication
-        from ui4.devmgr5 import DevMgr5
+
     except ImportError:
         log.error("Unable to load Qt4 support. Is it installed?")
         sys.exit(1)
+
+    from ui4.devmgr5 import DevMgr5
 
     log.set_module("hp-toolbox(UI)")
 

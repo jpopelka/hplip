@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 __version__ = '9.0'
 __title__ = 'PC Sendfax Utility'
 __mod__ = 'hp-sendfax'
-__doc__ = "Allows for sending faxes from the PC using HPLIP supported multifunction printers."
+__doc__ = "PC send fax for HPLIP supported multifunction printers."
 
 # Std Lib
 import sys
@@ -110,19 +110,19 @@ if mode == GUI_MODE:
     if ui_toolkit == 'qt3':
         app = None
         sendfax = None
-        
+
         try:
             from qt import *
             from ui.faxsendjobform import FaxSendJobForm
         except ImportError:
             log.error("Unable to load Qt3 support. Is it installed?")
-            sys.exit(1)  
-            
+            sys.exit(1)
+
         # create the main application object
         app = QApplication(sys.argv)
 
         if loc is None:
-            loc = user_cfg.ui.get("loc", "system")
+            loc = user_conf.get('ui', 'loc', 'system')
             if loc.lower() == 'system':
                 loc = str(QTextCodec.locale())
                 log.debug("Using system locale: %s" % loc)
@@ -203,8 +203,9 @@ if mode == GUI_MODE:
 
         app = QApplication(sys.argv)
 
-        toolbox = SendFaxDialog(None, printer_name, device_uri, mod.args)
-        toolbox.show()
+        dlg = SendFaxDialog(None, printer_name, device_uri, mod.args)
+        dlg.show()
+
         try:
             log.debug("Starting GUI loop...")
             app.exec_()
@@ -473,7 +474,7 @@ else: # NON_INTERACTIVE_MODE
                     log.error("Device is busy or in an error state (code=%d). Please wait for the device to become idle or clear the error and try again." % dev.error_state)
                     sys.exit(1)
 
-                user_cfg.last_used.device_uri = dev.device_uri
+                user_conf.set('last_used', 'device_uri', dev.device_uri)
 
                 log.debug("File list:")
 

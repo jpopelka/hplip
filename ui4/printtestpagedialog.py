@@ -36,32 +36,32 @@ from printtestpagedialog_base import Ui_Dialog
 class PrintTestPageDialog(QDialog, Ui_Dialog):
     def __init__(self, parent, printer_name):
         QDialog.__init__(self, parent)
-        
+
         self.printer_name = printer_name
         self.device_uri = ''
         self.setupUi(self)
         self.initUi()
-        
+
         QTimer.singleShot(0, self.updateUi)
-        
-        
+
+
     def initUi(self):
         #print "PrintTestPageDialog.initUi()"
         self.HPLIPTestPageRadioButton.setChecked(True)
         self.LoadPaper.setButtonName(self.__tr("Print Test Page"))
-        
+
         self.connect(self.CancelButton, SIGNAL("clicked()"), self.CancelButton_clicked)
         self.connect(self.PrintTestpageButton, SIGNAL("clicked()"), self.PrintTestpageButton_clicked)
-        
-        self.connect(self.PrinterNameCombo, SIGNAL("PrinterNameComboBox_currentChanged"), 
+
+        self.connect(self.PrinterNameCombo, SIGNAL("PrinterNameComboBox_currentChanged"),
             self.PrinterNameCombo_currentChanged)
-        
-        self.connect(self.PrinterNameCombo, SIGNAL("PrinterNameComboBox_noPrinters"), 
+
+        self.connect(self.PrinterNameCombo, SIGNAL("PrinterNameComboBox_noPrinters"),
             self.PrinterNameComboBox_noPrinters)
-            
+
         if self.printer_name:
             self.PrinterNameCombo.setInitialPrinter(self.printer_name)
-    
+
         # Application icon
         self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
 
@@ -70,13 +70,13 @@ class PrintTestPageDialog(QDialog, Ui_Dialog):
         self.PrinterNameCombo.updateUi()
         self.LoadPaper.updateUi()
         #self.updatePrintButton()
-        
-        
+
+
     def PrinterNameComboBox_noPrinters(self):
         FailureUI(self, self.__tr("<b>No printers found.</b><p>Please setup a printer and try again."))
         self.close()
-        
-        
+
+
     def updatePrintButton(self):
         QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
         self.PrintTestpageButton.setEnabled(False)
@@ -93,32 +93,33 @@ class PrintTestPageDialog(QDialog, Ui_Dialog):
                     log.error("Unable to print to printer. Please check device and try again.")
                 else:
                     ok = d.isIdleAndNoError()
-            
+
             self.PrintTestpageButton.setEnabled(ok)
-            
+
             if not ok:
                 QApplication.restoreOverrideCursor()
                 FailureUI(self, self.__tr("<b>Unable to communicate with printer %1.</b><p>Please check the printer and try again.").arg(self.printer_name))
-            
+
             d.close()
-        
+
         finally:
             QApplication.restoreOverrideCursor()
-        
-        
+
+
     def CancelButton_clicked(self):
         self.close()
-    
-    
+
+
     def PrinterNameCombo_currentChanged(self, device_uri, printer_name):
         self.printer_name = printer_name
         self.device_uri = device_uri
         self.updatePrintButton()
         #self.updateUi()
-        
-        
+
+
     def PrintTestpageButton_clicked(self):
         QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
+        ok = False
         try:
             try:
                 d = device.Device(self.device_uri, self.printer_name)
@@ -131,24 +132,24 @@ class PrintTestPageDialog(QDialog, Ui_Dialog):
                     log.error("Unable to print to printer. Please check device and try again.")
                 else:
                     ok = d.isIdleAndNoError()
-            
+
         finally:
             QApplication.restoreOverrideCursor()
-            
+
         if ok:
             QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
             try:
                 d.printTestPage(self.printer_name)
             finally:
                 QApplication.restoreOverrideCursor()
-        
+
             self.close()
-            
+
         else:
             FailureUI(self, self.__tr("<b>A error occured sending the test page to printer %1.</b><p>Please check the printer and try again.").arg(self.printer_name))
-        
-        
+
+
     def __tr(self, s, c=None):
         return qApp.translate("PrintTestPageDialog", s, c)
-        
+
 

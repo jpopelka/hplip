@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -146,7 +146,7 @@ class ScrollUnloadView(ScrollView):
                     return
 
                 self.device_uri = self.pc.device.device_uri
-                user_cfg.last_used.device_uri = self.device_uri
+                user_conf.set('last_used', 'device_uri', self.device_uri)
 
                 # TODO:
                 #self.pc.device.sendEvent(EVENT_START_PCARD_JOB)
@@ -162,10 +162,7 @@ class ScrollUnloadView(ScrollView):
                 if not self.pc.write_protect:
                     log.info("DO NOT REMOVE PHOTO CARD UNTIL YOU EXIT THIS PROGRAM")
 
-                if user_cfg.last_used.working_dir and \
-                    os.path.exists(user_cfg.last_used.working_dir):
-
-                    self.unload_dir = user_cfg.last_used.working_dir
+                self.unload_dir = user_conf.workingDirectory()
 
                 try:
                     os.chdir(self.unload_dir)
@@ -510,7 +507,7 @@ class ScrollUnloadView(ScrollView):
         else:
             self.UnloadDirectoryEdit.setText(self.unload_dir)
             os.chdir(self.unload_dir)
-            user_cfg.last_used.working_dir = self.unload_dir.encode('utf-8')
+            user_conf.setWorkingDirectory(self.unload_dir)
 
     def addOptions(self):
         widget = self.getWidget()

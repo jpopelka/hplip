@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -333,14 +333,7 @@ class ScrollPrintView(ScrollView):
         self.printButton.setEnabled(file_count > 0)
 
     def addFile_clicked(self):
-        workingDirectory = user_cfg.last_used.working_dir
-
-        if not workingDirectory or not os.path.exists(workingDirectory):
-            workingDirectory = os.path.expanduser("~")
-
-        log.debug("workingDirectory: %s" % workingDirectory)
-
-        dlg = QFileDialog(workingDirectory, QString.null, None, None, True)
+        dlg = QFileDialog(user_conf.workingDirectory(), QString.null, None, None, True)
 
         dlg.setCaption("openfile")
         dlg.setMode(QFileDialog.ExistingFile)
@@ -348,10 +341,9 @@ class ScrollPrintView(ScrollView):
 
         if dlg.exec_loop() == QDialog.Accepted:
                 results = dlg.selectedFile()
-                workingDirectory = unicode(dlg.dir().absPath())
+                working_directory = unicode(dlg.dir().absPath())
                 log.debug("results: %s" % results)
-                log.debug("workingDirectory: %s" % workingDirectory)
-                user_cfg.last_used.working_dir = workingDirectory
+                user_conf.setWorkingDirectory(working_directory)
 
                 if results:
                     self.addFile(unicode(results))

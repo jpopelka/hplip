@@ -50,6 +50,7 @@ const BYTE ExtraDryTime[] = "\033&b16WPML \004\000\006\001\004\001\004\001\006\0
 
 extern BYTE EscAmplCopy(BYTE *dest, int num, char end);
 extern void AsciiHexToBinary(BYTE* dest, char* src, int count);
+extern MediaType MediaTypeToPcl (MEDIATYPE eMediaType);
 
 DJ9xxVIP::DJ9xxVIP
 (
@@ -506,6 +507,18 @@ DRIVER_ERROR HeaderDJ990::Send()
         SetMediaSource (sourceTrayCDDVD);
     }
 
+#ifdef APDK_LINUX
+/*
+ *  A different media type may have been set via ppd that is different than
+ *  what is initialized in the PrintMode constructor, for example, eMediaType
+ *  set to 2, which maps to PCL mediatype of 3, rather than PCL mediatype 5
+ *  for 1200 dpi mode for Officejet Pro K5400. Here, set the media type based
+ *  on what was selected from ppd.
+ */
+
+    SetMediaType (MediaTypeToPcl (eMediaType));
+#endif
+
     StartSend();
 
 #ifdef APDK_AUTODUPLEX
@@ -637,6 +650,9 @@ DRIVER_ERROR HeaderDJ990::Send()
 //  Now send media pre-load command
     err = thePrinter->Send ((const BYTE *) "\033&l-2H", 6);   // Moved from Modes(), des 3/11/03
     ERRCHECK;
+
+//  Send speed mech command
+    thePrinter->SetHint (SPEED_MECH_HINT, 0);
 
     // no need for compression command, it's in the CRD
 

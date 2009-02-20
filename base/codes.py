@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -700,6 +700,10 @@ MODEL_TYPE2_APOLLO = 10
 MODEL_TYPE2_SCANJET = 11 # not supported
 MODEL_TYPE2_DESIGNJET = 12 # not supported
 MODEL_TYPE2_OTHER = 13 # No specific "sub-brand" (e.g., 910, cp1610)
+
+MONITOR_TYPE_UNSUPPORTED = -1
+MONITOR_TYPE_NONE = 0
+MONITOR_TYPE_STD = 1
 
 # 'io-mode' and 'io-mfp-mode'
 IO_MODE_UNI = 0

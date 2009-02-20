@@ -44,6 +44,8 @@ class OJProKx50 : public DJ9xxVIP
 public:
     OJProKx50 (SystemServices* pSS, BOOL proto = FALSE) : DJ9xxVIP (pSS, proto)
     {
+        // Papertype for marvellous mode must be mediaGlossy (3) for these printers
+        pMode[4]->medium = mediaGlossy;
     }
     virtual BOOL GetMargins (PAPER_SIZE ps, float *fMargins)
     {
@@ -73,14 +75,6 @@ public:
         "OJProKx50",                // family name
         "Officejet Pro K550\0"
         "Officejet Pro K850\0"
-        "OfficeJet Pro K53\0"
-        "OfficeJet Pro K54\0"
-        "OfficeJet Pro K56\0"
-        "OfficeJet pro K86\0"
-        "Officejet Pro L73\0"
-        "Officejet Pro L75\0"
-        "Officejet Pro L76\0"
-        "Officejet Pro L77\0"
     ) {m_iPrinterType = eOJProKx50;}
     inline Printer* CreatePrinter(SystemServices* pSS) const { return new OJProKx50(pSS); }
 	inline PRINTER_TYPE GetPrinterType() const { return eOJProKx50;}

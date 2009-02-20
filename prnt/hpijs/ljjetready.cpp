@@ -60,7 +60,7 @@ int (*HPLJJRCompress) (BYTE       *pbOutBuffer,
 APDK_BEGIN_NAMESPACE
 
 #ifdef HAVE_LIBDL
-extern void *LoadPlugin (char *szPluginName);
+extern void *LoadPlugin (const char *szPluginName);
 #endif
 
 extern MediaSize PaperToMediaSize(PAPER_SIZE psize);

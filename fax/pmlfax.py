@@ -37,7 +37,7 @@ from fax import *
 
 # **************************************************************************** #
 
-# Page flags 
+# Page flags
 PAGE_FLAG_NONE = 0x00
 PAGE_FLAG_NEW_PAGE = 0x01
 PAGE_FLAG_END_PAGE = 0x02
@@ -69,12 +69,12 @@ DT_SPEED_DIALS   = 5
 DT_FAX_LOGS      = 6
 DT_CFG_PARMS     = 7
 DT_LANG_STRS     = 8
-DT_JUNK_FAX_CSIDS= 9  
-DT_REPORT_STRS   = 10  
+DT_JUNK_FAX_CSIDS= 9
+DT_REPORT_STRS   = 10
 DT_FONTS         = 11
 DT_TTI_BITMAP    = 12
 DT_COUNTERS      = 13
-DT_DEF_PARMS     = 14  
+DT_DEF_PARMS     = 14
 DT_SCAN_OPTIONS  = 15
 DT_FW_JOB_TABLE  = 17
 
@@ -97,7 +97,7 @@ RASTER_RECORD_SIZE = 4
 EOP_RECORD_SIZE = 12
 DIAL_STRING_RECORD_SIZE = 51
 
-# Page flags 
+# Page flags
 PAGE_FLAG_NEW_PAGE = 0x01
 PAGE_FLAG_END_PAGE = 0x02
 PAGE_FLAG_NEW_DOC = 0x04
@@ -124,18 +124,18 @@ RASTER_DATA_SIZE = 504
 class PMLFaxDevice(FaxDevice):
 
     def __init__(self, device_uri=None, printer_name=None,
-                 callback=None, 
+                 callback=None,
                  fax_type=FAX_TYPE_NONE,
                  disable_dbus=False):
 
-        FaxDevice.__init__(self, device_uri, 
-                           printer_name, 
+        FaxDevice.__init__(self, device_uri,
+                           printer_name,
                            callback, fax_type,
                            disable_dbus)
 
         self.send_fax_thread = None
         self.upload_log_thread = None
-        
+
 
     def setPhoneNum(self, num):
         return self.setPML(pml.OID_FAX_LOCAL_PHONE_NUM, str(num))
@@ -180,25 +180,25 @@ class PMLFaxDevice(FaxDevice):
 
             self.upload_log_thread.join()
 
-    def sendFaxes(self, phone_num_list, fax_file_list, cover_message='', cover_re='', 
-                  cover_func=None, preserve_formatting=False, printer_name='', 
+    def sendFaxes(self, phone_num_list, fax_file_list, cover_message='', cover_re='',
+                  cover_func=None, preserve_formatting=False, printer_name='',
                   update_queue=None, event_queue=None):
 
         if not self.isSendFaxActive():
-    
-            self.send_fax_thread = PMLFaxSendThread(self, self.service, phone_num_list, fax_file_list, 
-                                                    cover_message, cover_re, cover_func, 
-                                                    preserve_formatting, 
-                                                    printer_name, update_queue, 
+
+            self.send_fax_thread = PMLFaxSendThread(self, self.service, phone_num_list, fax_file_list,
+                                                    cover_message, cover_re, cover_func,
+                                                    preserve_formatting,
+                                                    printer_name, update_queue,
                                                     event_queue)
-            
+
             self.send_fax_thread.start()
             return True
         else:
             return False
 
-            
-            
+
+
 # **************************************************************************** #
 class PMLUploadLogThread(threading.Thread):
     def __init__(self, dev):
@@ -221,7 +221,7 @@ class PMLUploadLogThread(threading.Thread):
         state = STATE_CHECK_IDLE
 
         while state != STATE_DONE: # --------------------------------- Log upload state machine
-            if state == STATE_ABORT: 
+            if state == STATE_ABORT:
                 pass
             elif state == STATE_SUCCESS:
                 pass
@@ -284,14 +284,14 @@ class PMLUploadLogThread(threading.Thread):
                 self.dev.close()
 
 
-        
+
 # **************************************************************************** #
 class PMLFaxSendThread(FaxSendThread):
-    def __init__(self, dev, service, phone_num_list, fax_file_list, 
+    def __init__(self, dev, service, phone_num_list, fax_file_list,
                  cover_message='', cover_re='', cover_func=None, preserve_formatting=False,
                  printer_name='', update_queue=None, event_queue=None):
-                 
-        FaxSendThread.__init__(self, dev, service, phone_num_list, fax_file_list, 
+
+        FaxSendThread.__init__(self, dev, service, phone_num_list, fax_file_list,
              cover_message, cover_re, cover_func, preserve_formatting,
              printer_name, update_queue, event_queue)
 
@@ -376,12 +376,12 @@ class PMLFaxSendThread(FaxSendThread):
             elif state == STATE_PRERENDER: # --------------------------------- Pre-render non-G3 files (40, 0, 0)
                 log.debug("%s State: Pre-render non-G3 files" % ("*"*20))
                 state = self.pre_render(STATE_COUNT_PAGES)
-                
+
 
             elif state == STATE_COUNT_PAGES: # --------------------------------- Get total page count (50, 0, 0)
                 log.debug("%s State: Get total page count" % ("*"*20))
                 state = self.count_pages(STATE_NEXT_RECIPIENT)
-                
+
 
             elif state == STATE_NEXT_RECIPIENT: # --------------------------------- Loop for multiple recipients (60, 0, 0)
                 log.debug("%s State: Next recipient" % ("*"*20))
@@ -391,6 +391,9 @@ class PMLFaxSendThread(FaxSendThread):
                     recipient = next_recipient.next()
                     #print recipient
                     log.debug("Processing for recipient %s" % recipient['name'])
+
+                    self.write_queue((STATUS_SENDING_TO_RECIPIENT, 0, recipient['name']))
+
                 except StopIteration:
                     state = STATE_SUCCESS
                     log.debug("Last recipient.")
@@ -562,7 +565,7 @@ class PMLFaxSendThread(FaxSendThread):
                         else:
                             fax_send_state = FAX_SEND_STATE_BUSY
 
-                    elif fax_send_state == FAX_SEND_STATE_START_REQUEST: # -------------- Request fax start (110, 90, 0) 
+                    elif fax_send_state == FAX_SEND_STATE_START_REQUEST: # -------------- Request fax start (110, 90, 0)
                         log.debug("%s State: Request start" % ("*"*20))
                         fax_send_state = FAX_SEND_STATE_SET_PARAMS
 
@@ -595,7 +598,7 @@ class PMLFaxSendThread(FaxSendThread):
 
                                 i += 1
 
-                            else:  
+                            else:
                                 log.error("Could not get into active state!")
                                 fax_send_state = FAX_SEND_STATE_BUSY
 
@@ -613,8 +616,8 @@ class PMLFaxSendThread(FaxSendThread):
                         try:
                             self.dev.setPML(pml.OID_DEV_DOWNLOAD_TIMEOUT, pml.DEFAULT_DOWNLOAD_TIMEOUT)
                             self.dev.setPML(pml.OID_FAXJOB_TX_TYPE, pml.FAXJOB_TX_TYPE_HOST_ONLY)
-                            log.debug("Setting date and time on device.")                            
-                            self.dev.setDateAndTime() 
+                            log.debug("Setting date and time on device.")
+                            self.dev.setDateAndTime()
                         except Error, e:
                             log.error("PML/SNMP error (%s)" % e.msg)
                             fax_send_state = FAX_SEND_STATE_ERROR
@@ -642,7 +645,7 @@ class PMLFaxSendThread(FaxSendThread):
                         log.debug("Dialing: %s" % recipient['fax'])
 
                         log.debug("Sending dial strings...")
-                        self.create_mfpdtf_fixed_header(DT_DIAL_STRINGS, True, 
+                        self.create_mfpdtf_fixed_header(DT_DIAL_STRINGS, True,
                             PAGE_FLAG_NEW_DOC | PAGE_FLAG_END_DOC | PAGE_FLAG_END_STREAM) # 0x1c on Windows, we were sending 0x0c
                         #print recipient
                         dial_strings = recipient['fax'].encode('ascii')
@@ -785,7 +788,7 @@ class PMLFaxSendThread(FaxSendThread):
 
                                 if fax_send_state not in (FAX_SEND_STATE_ABORT, FAX_SEND_STATE_ERROR):
 
-                                    while status  == pml.FAXJOB_TX_STATUS_CONNECTING: 
+                                    while status  == pml.FAXJOB_TX_STATUS_CONNECTING:
                                         self.write_queue((STATUS_CONNECTING, 0, recipient['fax']))
                                         time.sleep(1.0)
 
@@ -800,7 +803,7 @@ class PMLFaxSendThread(FaxSendThread):
 
                                         status = self.getFaxJobTxStatus()
 
-                                if status == pml.FAXJOB_TX_STATUS_TRANSMITTING:    
+                                if status == pml.FAXJOB_TX_STATUS_TRANSMITTING:
                                     self.write_queue((STATUS_SENDING, page_num, recipient['fax']))
 
                                 self.create_mfpdtf_fixed_header(DT_FAX_IMAGES, page_flags=0)
@@ -810,7 +813,7 @@ class PMLFaxSendThread(FaxSendThread):
                                     break
 
                             page.truncate(0)
-                            page.seek(0)                
+                            page.seek(0)
 
 
                     elif fax_send_state == FAX_SEND_STATE_SEND_END_OF_STREAM: # -------------- EOS (110, 140, 0)
@@ -840,7 +843,7 @@ class PMLFaxSendThread(FaxSendThread):
                                 self.write_queue((STATUS_DIALING, 0, recipient['fax']))
                                 log.debug("Dialing ...")
 
-                        elif status == pml.FAXJOB_TX_STATUS_TRANSMITTING:    
+                        elif status == pml.FAXJOB_TX_STATUS_TRANSMITTING:
                             self.write_queue((STATUS_SENDING, page_num, recipient['fax']))
                             log.debug("Transmitting ...")
 
@@ -963,12 +966,12 @@ class PMLFaxSendThread(FaxSendThread):
             elif data_type == DT_FAX_IMAGES:
                 header_len += FAX_IMAGE_VARIANT_HEADER_SIZE
 
-        self.stream.write(struct.pack("<IHBB", 
+        self.stream.write(struct.pack("<IHBB",
                           0, header_len, data_type, page_flags))
 
 
     def create_mfpdtf_dial_strings(self, number):
-        p = struct.pack("<BBHH51s", 
+        p = struct.pack("<BBHH51s",
                           MAJOR_VER, MINOR_VER,
                           1, 51, number[:51])
         log.debug(repr(p))
@@ -992,7 +995,7 @@ class PMLFaxSendThread(FaxSendThread):
 
     def create_eop_record(self, rpp):
         self.stream.write(struct.pack("<BBBBII",
-                            RT_END_PAGE, 0, 0, 0, 
+                            RT_END_PAGE, 0, 0, 0,
                             rpp, 0,))
 
 
@@ -1004,20 +1007,20 @@ class PMLFaxSendThread(FaxSendThread):
 
 
     def create_mfpdtf_fax_header(self, total_pages):
-        self.stream.write(struct.pack("<BBBHBI20s20s20sI", 
-                            MAJOR_VER, MINOR_VER, SRC_HOST, total_pages, 
+        self.stream.write(struct.pack("<BBBHBI20s20s20sI",
+                            MAJOR_VER, MINOR_VER, SRC_HOST, total_pages,
                             TTI_PREPENDED_TO_IMAGE, 0, '', '', '', 0))
 
 
     def write_stream(self):
-        self.adjust_fixed_header_block_size() 
+        self.adjust_fixed_header_block_size()
         self.dev.writeFax(self.stream.getvalue())
         self.stream.truncate(0)
-        self.stream.seek(0)    
+        self.stream.seek(0)
 
 
 
-            
-            
-            
-  
+
+
+
+

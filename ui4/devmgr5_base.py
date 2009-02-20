@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui4/devmgr5_base.ui'
 #
-# Created: Mon Dec 15 16:58:59 2008
+# Created: Tue Feb 17 11:36:12 2009
 #      by: PyQt4 UI code generator 4.3.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ class Ui_MainWindow(object):
         self.splitter.setObjectName("splitter")
 
         self.DeviceList = QtGui.QListWidget(self.splitter)
-        self.DeviceList.setMovement(QtGui.QListView.Free)
+        self.DeviceList.setMovement(QtGui.QListView.Static)
         self.DeviceList.setFlow(QtGui.QListView.TopToBottom)
         self.DeviceList.setResizeMode(QtGui.QListView.Adjust)
         self.DeviceList.setSpacing(10)

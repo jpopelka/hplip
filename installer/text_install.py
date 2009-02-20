@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,18 +38,25 @@ def progress_callback(cmd="", desc="Working..."):
     else:
         log.info(desc)
 
+
 def password_entry():
     return getpass.getpass(log.bold("Please enter the root/superuser password: "))
 
-def option_question_callback(opt, desc):
-    ok, ans = tui.enter_yes_no("Do you wish to enable '%s'" % desc)
+
+def option_question_callback(opt, desc, default='y'):
+    ok, ans = tui.enter_yes_no("Do you wish to enable '%s'" % desc, default)
     if not ok: sys.exit(0)
     return ans
 
-def start(language, auto=True, test_depends=False, test_unknown=False, assume_network=False,
+
+
+def start(language, auto=True, test_depends=False,
+          test_unknown=False, assume_network=False,
           max_retries=3, enable=None, disable=None):
     try:
         core =  CoreInstall(MODE_INSTALLER, INTERACTIVE_MODE)
+        current_version = prop.installed_version_int
+        log.debug("Currently installed version: 0x%06x" % current_version)
         core.enable = enable
         core.disable = disable
 
@@ -70,7 +77,7 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
         if not auto:
             tui.title("INSTALLATION MODE")
             log.info("Automatic mode will install the full HPLIP solution with the most common options.")
-            log.info("Custom mode allows you to chose installation options to fit specific requirements.")
+            log.info("Custom mode allows you to choose installation options to fit specific requirements.")
 
             #if os.getenv('DISPLAY') and utils.find_browser() is not None:
             if 0:
@@ -181,6 +188,8 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
 
         if not ok:
             sys.exit(0)
+
+        core.distro_changed()
 
         if not distro_ok:
             tui.title("DISTRO/OS SELECTION")
@@ -773,6 +782,26 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
         tui.title("POST-BUILD COMMANDS")
         core.run_post_build(progress_callback)
 
+        #
+        # Try to close running hp-systray (3.9.2 or later)
+        #
+
+        if current_version >= 0x030902: # 3.9.2
+            try:
+                # dBus
+                #import dbus
+                from dbus import SessionBus, lowlevel
+            except ImportError:
+                #log.error("Unable to load DBus")
+                pass
+            else:
+                args = ['', '', EVENT_SYSTEMTRAY_EXIT, prop.username, 0, '', '']
+                msg = lowlevel.SignalMessage('/', 'com.hplip.StatusService', 'Event')
+                msg.append(signature='ssisiss', *args)
+                log.info("Sending close message to hp-systray...")
+                SessionBus().send_message(msg)
+
+
         # Restart or re-plugin if necessary (always True in 2.7.9+)
         if core.restart_required and core.selected_component != 'hpijs':
             tui.title("RESTART OR RE-PLUG IS REQUIRED")
@@ -804,6 +833,7 @@ def start(language, auto=True, test_depends=False, test_unknown=False, assume_ne
             elif choice == 'p': # 'p'
                 if not tui.continue_prompt("Please unplug and re-plugin your printer now. "):
                     sys.exit(0)
+
 
         #
         # SETUP PRINTER

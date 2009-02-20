@@ -305,10 +305,21 @@ UXServices::UXServices():SystemServices()
    VertAlign = -1;
    DisplayStatus = NODISPLAYSTATUS;
    OutputPath = -1;
+
+   m_pbyPclBuffer      = NULL;
+   m_iPclBufferSize    = BUFFER_CHUNK_SIZE;
+   m_iCurPclBufferPos  = 0;
+   m_iPageCount        = 0;
+   m_bSpeedMechEnabled = FALSE;
 }
 
 UXServices::~UXServices()
 {
+   if (m_bSpeedMechEnabled)
+   {
+       SendLastPage ();
+   }
+
    if (RastersOnPage)
       delete [] RastersOnPage;
    if (KRastersOnPage)
@@ -325,6 +336,15 @@ DRIVER_ERROR UXServices::ToDevice(const BYTE * pBuffer, DWORD * Count)
     {
         return IO_ERROR;
     }
+
+   if (m_bSpeedMechEnabled)
+   {
+       if ((CopyData (pBuffer, *Count)) == 0)
+       {
+           *Count = 0;
+	   return NO_ERROR;
+       }
+   }
 
    /* Write must be not-buffered, don't use streams */
    if (write(OutputPath, pBuffer, *Count) != (ssize_t)*Count) 
@@ -548,3 +568,101 @@ void UXServices::ResetIOMode (BOOL bDevID, BOOL bStatus)
         pPC->ResetIOMode (bDevID, bStatus);
     }
 }
+
+void UXServices::InitSpeedMechBuffer ()
+{
+    if (m_pbyPclBuffer)
+    {
+        return;
+    }
+    m_pbyPclBuffer = new BYTE[m_iPclBufferSize + 2];
+    if (m_pbyPclBuffer)
+    {
+        iSendBufferSize = 0;
+    }
+}
+
+int UXServices::SendPreviousPage ()
+{
+    DRIVER_ERROR    err;
+    if (m_bSpeedMechEnabled == FALSE)
+    {
+        return 0;
+    }
+    m_iPageCount++;
+    if (m_iPageCount == 1)
+    {
+        return 0;
+    }
+    m_bSpeedMechEnabled = FALSE;
+    err = ToDevice (m_pbyPclBuffer, (DWORD *) &m_iCurPclBufferPos);
+    if (err != NO_ERROR)
+    {
+        return 1;
+    }
+    m_bSpeedMechEnabled = TRUE;
+    m_iCurPclBufferPos = 0;
+
+//  Request the printer to inject speed mech command. Also, let it know this is not the last page
+
+    pPC->SetPrinterHint (SPEED_MECH_HINT, 0);
+    return 0;
+}
+
+int UXServices::CopyData (const BYTE *pBuffer, DWORD iCount)
+{
+    if (m_iCurPclBufferPos + (int) iCount < m_iPclBufferSize)
+    {
+        memcpy (m_pbyPclBuffer + m_iCurPclBufferPos, pBuffer, iCount);
+        m_iCurPclBufferPos += iCount;
+       return 0;
+    }
+    BYTE    *p = new BYTE[m_iPclBufferSize + BUFFER_CHUNK_SIZE + 2];
+    if (p == NULL)
+    {
+        m_bSpeedMechEnabled = FALSE;
+	return 1;
+    }
+    memcpy (p, m_pbyPclBuffer, m_iCurPclBufferPos);
+    delete [] m_pbyPclBuffer;
+    m_pbyPclBuffer = p;
+    memcpy (m_pbyPclBuffer + m_iCurPclBufferPos, pBuffer, iCount);
+    m_iCurPclBufferPos += iCount;
+    m_iPclBufferSize += BUFFER_CHUNK_SIZE;
+    return 0;
+}
+
+//  Note that this is good only for VIP printers
+const char *pbySpeedMechCmd = "\x1B*o5W\x0D\x02\x00";
+
+void UXServices::SendLastPage ()
+{
+    if (m_pbyPclBuffer == NULL)
+    {
+        return;
+    }
+    // Look for speed mech command in the buffer, set the page count and last page flag
+    int    i = 0;
+    BYTE   *p = m_pbyPclBuffer;
+    while (i < m_iPclBufferSize)
+    {
+        if (*p == '\x1B')
+	{
+	    if (!(memcmp (p, pbySpeedMechCmd, 8)))
+	    {
+	        p += 8;
+		*p++ = (BYTE) ((m_iPageCount & 0xFF00) >> 8);
+		*p++ = (BYTE) ((m_iPageCount & 0x00FF));
+		*(p + 9) = 1;
+		break;
+	    }
+	}
+        i++;
+	p++;
+    }
+    m_bSpeedMechEnabled = FALSE;
+    ToDevice (m_pbyPclBuffer, (DWORD *) &m_iCurPclBufferPos);
+    delete [] m_pbyPclBuffer;
+}
+
+

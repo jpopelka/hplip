@@ -39,6 +39,8 @@
 
 APDK_USING_NAMESPACE
 
+#define BUFFER_CHUNK_SIZE 1024 * 1024 * 2
+
 class UXServices:public SystemServices
 {
 public:
@@ -115,6 +117,19 @@ public:
 
   void  ResetIOMode (BOOL bDevID, BOOL bStatus);
 
+  void InitSpeedMechBuffer ();
+  int  CopyData (const BYTE *pBuffer, DWORD iCount);
+  int  SendPreviousPage ();
+  void SendLastPage ();
+  BOOL IsSpeedMechEnabled ()
+  {
+      return m_bSpeedMechEnabled;
+  }
+  void EnableSpeedMech (BOOL bFlag)
+  {
+      m_bSpeedMechEnabled = bFlag;
+  }
+
   BOOL BackPage;
   int CurrentRaster;
   BYTE **RastersOnPage;
@@ -154,9 +169,13 @@ protected:
   { FreeMem(pMem); }
   BOOL  CanDoBiDi ();
 
+private:
+    int    m_iPageCount;
+    BOOL   m_bSpeedMechEnabled;
+    int    m_iPclBufferSize;
+    int    m_iCurPclBufferPos;
+    BYTE   *m_pbyPclBuffer;
 };
 
 #endif        /* hpijs_services_INCLUDED */
-
-
 

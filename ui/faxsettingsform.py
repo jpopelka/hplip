@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ class PhoneNumValidator(QValidator):
             input = input.encode('ascii')
         except UnicodeEncodeError:
             return QValidator.Invalid, pos
-        
+
         if not input:
             return QValidator.Acceptable, pos
         elif input[pos-1] not in '0123456789-(+) ':
@@ -53,16 +53,16 @@ class StationNameValidator(QValidator):
 
     def validate(self, input, pos):
         input = unicode(input)
-        
+
         try:
             input = input.encode('ascii')
         except UnicodeEncodeError:
             return QValidator.Invalid, pos
-            
+
         if not input:
             return QValidator.Acceptable, pos
         # TODO: Find valid chars for this field
-        elif input != utils.printable(input): 
+        elif input != utils.printable(input):
             return QValidator.Invalid, pos
         elif len(input) > 50:
             return QValidator.Invalid, pos
@@ -82,8 +82,8 @@ class FaxSettingsForm(FaxSettingsForm_base):
         self.faxEdit.setText(fax_num)
         self.nameEdit.setText(name_co)
         self.setOKButton(fax_num and name_co)
-        self.voiceEdit.setText(user_cfg.fax.voice_phone or '')
-        self.emailEdit.setText(user_cfg.fax.email_address or user_cfg.alerts.email_address or '')
+        self.voiceEdit.setText(QString(user_conf.get('fax', 'voice_phone')))
+        self.emailEdit.setText(QString(user_conf.get('fax', 'email_address')))
 
     def faxEdit_textChanged(self,a0):
         self.setOKButton()
@@ -113,7 +113,7 @@ class FaxSettingsForm(FaxSettingsForm_base):
 
         # TODO: This is a problem - user can enter non-ascii chars...
         # user config needs to be in utf-8 encoding (but its not right now)
-        user_cfg.fax.voice_phone = unicode(self.voiceEdit.text()).encode('ascii')
-        user_cfg.fax.email_address = unicode(self.emailEdit.text()).encode('ascii')
+        user_conf.set('fax', 'voice_phone', unicode(self.voiceEdit.text()).encode('utf-8'))
+        user_conf.set('fax', 'email_address', unicode(self.emailEdit.text()).encode('utf-8'))
         FaxSettingsForm_base.accept(self)
 

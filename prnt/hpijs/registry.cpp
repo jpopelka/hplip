@@ -77,6 +77,9 @@
 #ifdef APDK_LJZJS_MONO
 #include "ljzjsmono.h"
 #endif
+#ifdef APDK_LJZJS_COLOR
+#include "ljzjscolor.h"
+#endif
 #ifdef APDK_LJM1005
 #include "ljm1005.h"
 #include "ljp1xxx.h"
@@ -110,6 +113,10 @@ LJFastRasterProxy DeviceRegistry::s_LJFastRasterProxy;
 
 #ifdef APDK_LJZJS_MONO
 LJZjsMonoProxy DeviceRegistry::s_LJZjsMonoProxy;
+#endif
+
+#ifdef APDK_LJZJS_COLOR
+LJZjsColorProxy DeviceRegistry::s_LJZjsColorProxy;
 #endif
 
 #ifdef APDK_LJM1005

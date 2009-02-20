@@ -51,7 +51,7 @@ public:
 typedef struct
 {
     PAPER_SIZE      iPaperSize;
-    char            *szName;
+    const char      *szName;
 } PaperSizeInfo;
 
 PaperSizeInfo   PaperSizeInfoData[] =

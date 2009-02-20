@@ -384,6 +384,10 @@ class LJFastRasterProxy;
 class LJZjsMonoProxy;
 #endif
 
+#ifdef APDK_LJZJS_COLOR
+class LJZjsColorProxy;
+#endif
+
 #ifdef APDK_LJM1005
 class LJM1005Proxy;
 class LJP1XXXProxy;
@@ -538,6 +542,10 @@ public:
 
 #ifdef APDK_LJZJS_MONO
     static LJZjsMonoProxy s_LJZjsMonoProxy;
+#endif
+
+#ifdef APDK_LJZJS_COLOR
+    static LJZjsColorProxy s_LJZjsColorProxy;
 #endif
 
 #ifdef APDK_LJM1005

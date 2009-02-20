@@ -40,17 +40,17 @@ from prnt import cups
 
 
 try:
-    mod = module.Module(__mod__, __title__, __version__, __doc__, None, 
+    mod = module.Module(__mod__, __title__, __version__, __doc__, None,
                         (INTERACTIVE_MODE, GUI_MODE),
                         (UI_TOOLKIT_QT4,))
-                        
-    mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS) 
+
+    mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS)
 
     opts, device_uri, printer_name, mode, ui_toolkit, loc = \
         mod.parseStdOpts()
 
     printer_name, device_uri = mod.getPrinterName(printer_name, device_uri)
-    wait_for_printout = False 
+    wait_for_printout = False
 
     if mode == GUI_MODE:
         if not utils.canEnterGUIMode4():
@@ -64,7 +64,7 @@ try:
         except ImportError:
             log.error("Unable to load Qt4 support. Is it installed?")
             sys.exit(1)
-            
+
         log.set_module("%s(UI)" % __mod__)
 
         if 1:
@@ -77,7 +77,7 @@ try:
                 app.exec_()
             except KeyboardInterrupt:
                 sys.exit(0)
-        
+
         sys.exit(0)
 
     if mode == INTERACTIVE_MODE:

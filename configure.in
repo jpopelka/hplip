@@ -26,7 +26,7 @@
 #   104 = no libdl
 
 AC_PREREQ(2.59)
-AC_INIT([HP Linux Imaging and Printing], [2.8.12], [2.8.12.26], [hplip])
+AC_INIT([HP Linux Imaging and Printing], [3.9.2], [3.9.2.49], [hplip])
 AM_INIT_AUTOMAKE([1.9 foreign])
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
@@ -228,6 +228,7 @@ AC_ARG_ENABLE(foomatic_ppd_install,
   foomatic_ppd_install=$enableval, foomatic_ppd_install=no)
 if test $foomatic_ppd_install = yes; then
    AC_MSG_RESULT(yes)
+   epm_foomatic_ppd_install=yes
 else
    AC_MSG_RESULT(no)
 fi
@@ -249,11 +250,12 @@ AM_CONDITIONAL(FOOMATIC_DRV_INSTALL, test x$foomatic_drv_install = xyes)
 
 AC_MSG_CHECKING([for foomatic-rip-hplip install])
 AC_ARG_ENABLE(foomatic_rip_hplip_install,
-  [  --enable-foomatic-rip-hplip-install    enable foomatic-rip-hplip install (default=yes), uses cupsfilterdir],
-  foomatic_rip_hplip_install=$enableval, foomatic_rip_hplip_install=yes)
+  [  --enable-foomatic-rip-hplip-install    enable foomatic-rip-hplip install (default=no), uses cupsfilterdir],
+  foomatic_rip_hplip_install=$enableval, foomatic_rip_hplip_install=no)
 if test "$foomatic_rip_hplip_install" = "yes"; then
    AC_MSG_RESULT(yes)
    foomatic_filter="foomatic-rip-hplip"
+   epm_foomatic_rip_hplip_install=yes
 else
    AC_MSG_RESULT(no)
    foomatic_filter="foomatic-rip"
@@ -291,20 +293,10 @@ if test "$qt3" = "yes" && test "$qt4" = "no"; then
    ui_toolkit=qt3
 elif test "$qt4" = "yes"; then
    ui_toolkit=qt4
+   epm_qt4_install=yes
 else
    ui_toolkit=no
 fi
-
-AC_MSG_CHECKING(for restricted build)
-grep -q BB_BUILD bb_build.inc
-if test $? -eq 0; then
-  bb_build="yes"
-  hpaio_version=libsane-hpaio.so.1.0.1
-else
-  bb_build="no"
-  hpaio_version=libsane-hpaio.so.1.0.0
-fi
-AC_MSG_RESULT($bb_build)
 
 AC_MSG_CHECKING(for host machine platform)
 machine=`uname -m`
@@ -322,7 +314,7 @@ AC_MSG_RESULT($platform)
 # Check conditional packages.
 
 if test "$hpijs_only_build" = "no" && test "$network_build" = "yes"; then
-   AC_CHECK_LIB([crypto], [CRYPTO_free],, [AC_MSG_ERROR([cannot find net-snmp support (or --disable-network-build)], 4)])
+   AC_CHECK_LIB([crypto], [CRYPTO_free], [LIBS="$LIBS"], [AC_MSG_ERROR([cannot find net-snmp support (or --disable-network-build)], 4)])
    AC_CHECK_LIB([netsnmp], [snmp_timeout], [LIBS="$LIBS" AC_DEFINE([HAVE_LIBNETSNMP])], [AC_MSG_ERROR([cannot find net-snmp support (or --disable-network-build)], 4)])
    AC_CHECK_HEADERS(net-snmp/net-snmp-config.h,, [AC_MSG_ERROR([cannot find net-snmp-devel support (or --disable-network-build)], 5)])
 fi
@@ -415,12 +407,13 @@ AC_SUBST(doc_build)
 AC_SUBST(shadow_build)
 AC_SUBST(APDK_ENDIAN_FLAG)
 AC_SUBST(APDK_AUTO_INCLUDE_FLAG)
-AC_SUBST(hpaio_version)
-AC_SUBST(bb_build)
 AC_SUBST(ui_toolkit)
 AC_SUBST(platform)
 AC_SUBST(qt3)
 AC_SUBST(qt4)
+AC_SUBST(epm_foomatic_rip_hplip_install)
+AC_SUBST(epm_foomatic_ppd_install)
+AC_SUBST(epm_qt4_install)
 
 AC_CONFIG_FILES(Makefile hplip.conf hplip.desktop hplip-systray.desktop prnt/drv/hpijs.drv hplip.list)
 AC_OUTPUT

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2008-9 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = "2.3"
+__version__ = "3.0"
 __title__ = 'DAT to DRV.IN converter. Also creates Foomatic XML files.'
 __doc__ = "Create DRV.IN file and Foomatic XML files from MODELS.DAT data. Processes all *.in.template files in prnt/drv directory."
 
@@ -59,6 +59,20 @@ pat_template = re.compile("""^(\s*)//\s*<%(\S+)%>""", re.I)
 pat_template2 = re.compile("""^\s*<%(\S+)%>""", re.I)
 
 
+SHORTENING_REPLACEMENTS = {
+'color laserjet' : 'CLJ',
+'laserjet' : 'LJ',
+'photosmart': 'PS',
+'deskjet' : 'DJ',
+'color inkjet printer' : '',
+'officejet' : 'OJ',
+'business inkjet' : 'BIJ',
+'designjet' : 'DESIGNJ',
+'printer scanner copier' : 'PSC',
+'color lj' : 'CLJ',
+}
+
+
 USAGE = [(__doc__, "", "name", True),
          ("Usage: dat2drv.py [OPTIONS]", "", "summary", True),
          utils.USAGE_OPTIONS,
@@ -75,14 +89,14 @@ def usage(typ='text'):
     utils.format_text(USAGE, typ, __title__, 'drv2xml.py', __version__)
     sys.exit(0)
 
-    
-    
+
+
 def _encode(v):
     if isinstance(v, UnicodeType):
         v = v.encode(enc)
     return v
-    
-    
+
+
 
 class XMLElement:
     def __init__(self, doc, el):
@@ -158,24 +172,23 @@ class XMLDocument(XMLElement):
     def parseString(self, d):
         self.doc = self.el = parseString(_encode(d))
         return self
-    
 
 
-        
+
+
 def fixFileName(model):
     if model.startswith('hp_'):
         model = model.replace('hp_', 'hp-')
-    
+
     elif model.startswith('apollo_'):
         model = model.replace('apollo_', 'apollo-')
-        
+
     elif not model.startswith('hp-'):
         model = 'hp-' + model
-    
-        
-    return model
 
-	
+    return model.strip('~')
+
+
 def categorize2(m):
     is_aio = (models_dict[m]['scan-type'] != SCAN_TYPE_NONE or
         models_dict[m]['copy-type'] != COPY_TYPE_NONE or
@@ -248,7 +261,7 @@ def sort_product(x, y):
 def sort_product2(x, y): # sort key is first element of tuple
     return sort_product(x[0], y[0])
 
-    
+
 def load_models(unreleased=True):
     global models_dict
     global norm_models
@@ -264,7 +277,7 @@ def load_models(unreleased=True):
 
     for m in models_dict:
         nm = models.normalizeModelUIName(m)
-        models_dict[m]['norm_model'] = nm
+        models_dict[m]['norm_model'] = nm.strip('~')
         models_dict[m]['case_models'] = []
 
         i, case_models = 1, []
@@ -298,10 +311,10 @@ def load_models(unreleased=True):
     total_models = len(norm_models)
 
     #log.info("Loaded %d models." % total_models)
-    
-    
-    
-    
+
+
+
+
 def main(args):
     global errors
     global model_dat
@@ -311,16 +324,16 @@ def main(args):
     dat_path = os.path.join(cur_path, 'data', 'models')
     model_dat = models.ModelData(dat_path)
     load_models()
-    
-    
-    
+
+
+
     verbose = False
     quiet = False
-    
+
     try:
         opts, args = getopt.getopt(args, 'd:l:ho:vq',
                                    ['logging=', 'help',
-                                    'help-rest', 'help-man', 
+                                    'help-rest', 'help-man',
                                     'drv=', 'output=',
                                     'verbose', 'quiet'])
     except getopt.GetoptError, e:
@@ -341,7 +354,7 @@ def main(args):
 
         elif o == '--help-man':
             usage('man')
-            
+
         elif o in ('-v', '--verbose'):
             verbose = True
 
@@ -354,55 +367,55 @@ def main(args):
 
     if not quiet:
         utils.log_title(__title__, __version__)
-    
+
     drv_dir = os.path.join(cur_path, 'prnt', 'drv')
-    
+
     errors = []
     warns = []
     notes = []
-    
-    for template_file in utils.walkFiles(drv_dir, recurse=False, abs_paths=True, 
+
+    for template_file in utils.walkFiles(drv_dir, recurse=False, abs_paths=True,
         return_folders=False, pattern='*.in.template'):
-        
+
         basename = os.path.basename(template_file).split('.')[0]
-        
+
         # Output
         drv_in_file = os.path.join(cur_path, 'prnt', 'drv', '%s.drv.in' % basename)
-        
+
         # XML output (per model)
         output_path = os.path.join(cur_path, 'prnt', 'drv', 'foomatic_xml', basename)
-        
+
         # XML Output (master driver list)
         driver_path = os.path.join(cur_path, 'prnt', 'drv', 'foomatic_xml', basename, '%s.xml' % basename)
-        
+
         log.info("Working on %s file..." % basename)
         log.info("Input file: %s" % template_file)
         log.info("Output file: %s" % drv_in_file)
         log.info("Output XML directory: %s" % output_path)
         log.info("Output driver XML file: %s" % driver_path)
 
-        
-        
+
+
         # CREATE DRV.IN FILE
-        
+
         log.info("Processing %s.drv.in.template..." % basename)
         tui.update_spinner()
-        
+
         template_classes = []
-        
+
         template_file_f = open(template_file, 'r')
         drv_in_file_f = open(drv_in_file, 'w')
-        
+
         models_placement = {}
         for m in models_dict:
             models_placement[m] = 0
-            
+
         line = 0
-        
+
         for x in template_file_f:
             if verbose:
                 log.info(x.strip())
-                
+
             line += 1
             tui.update_spinner()
             drv_in_file_f.write(x)
@@ -411,116 +424,155 @@ def main(args):
                 matches = []
                 indent = match.group(1)
                 indent2 = ' '*(len(indent)+2)
-                
+
                 classes = match.group(2).split(':')
                 tech_class = classes[0]
-                
+
                 if tech_class not in models.TECH_CLASSES:
                     errors.append("(%s:line %d) Invalid tech-class (%s): %s" % (basename, line, tech_class, x.strip()))
                     continue
-                
+
                 template_classes.append(tech_class)
-                
+
                 tech_subclass = classes[1:]
-                
+
                 ok = True
                 for sc in tech_subclass:
                     if sc not in models.TECH_SUBCLASSES:
                         errors.append("(%s:line %d) Invalid tech-subclass (%s): %s" % (basename, line, sc, x.strip()))
                         ok = False
-                        
+
                 if not ok:
                     continue
-                
+
                 for m in models_dict:
                     include = False
-                    
+
                     if tech_class in models_dict[m]['tech-class'] and \
                         len(models_dict[m]['tech-subclass']) == len(tech_subclass):
-                        
+
                         for msc in models_dict[m]['tech-subclass']:
                             if msc not in tech_subclass:
                                break
                         else:
                             include = True
-                    
+
                     if include:
                         models_placement[m] += 1
                         matches.append(m)
-                            
-                    
+
                 if matches:
                     matches.sort(lambda x, y: sort_product(x, y))
-                    
+
                     for p in matches:
-                        
+
                         if verbose:
                             log.info("(%s) Adding section for model: %s" % (basename, p))
-                        
+
                         drv_in_file_f.write("%s{\n" % indent)
+
+                        model_name = models_dict[p]['norm_model'] + " hpijs"
+                        orig_model_name = model_name
                         
-                        drv_in_file_f.write('%sModelName "%s Foomatic/hpijs"\n' % 
-                            (indent2, models_dict[p]['norm_model']))
+                        while True:
+                            if len(model_name) > 31:
+                                for k in SHORTENING_REPLACEMENTS:
+                                    if k in model_name.lower():
+                                        model_name = utils.ireplace(model_name, k, SHORTENING_REPLACEMENTS[k])
+                                        model_name = model_name.replace('  ', ' ')
+                                        
+                                        if len(model_name) < 32:
+                                            warns.append('len("%s")>31, shortened to len("%s")=%d using sub-brand shortening replacements.' % (orig_model_name, model_name, len(model_name)))
+                                            break
+                                
+                                if len(model_name) < 32:
+                                    break
+                                
+                                if "series" in model_name.lower():
+                                    model_name = utils.ireplace(model_name, "series", "Ser.")
+                                    model_name = model_name.replace('  ', ' ')
+                                    
+                                    if len(model_name) < 32:
+                                        warns.append('len("%s")>31, shortened to len("%s")=%d using "series" to "ser." replacement.' % (orig_model_name, model_name, len(model_name)))
+                                        break
+                                    
+                                if "ser." in model_name.lower():
+                                    model_name = utils.ireplace(model_name, "ser.", "")
+                                    model_name = model_name.replace('  ', ' ')
+                                    
+                                    if len(model_name) < 32:
+                                        warns.append('len("%s")>31, shortened to len("%s")=%d using "ser." removal.' % (orig_model_name, model_name, len(model_name)))
+                                        break
+                                
+                                if len(model_name) > 31:
+                                    model_name = model_name[:31]
+                                    errors.append('len("%s")>31 chars, could not shorten to <32. Truncating to 31 chars (%s).' % (orig_model_name, model_name))
+                                    
+                            
+                            break
                         
+                        drv_in_file_f.write('%sModelName "%s"\n' %
+                            (indent2, model_name))
+
                         if 'apollo' in p.lower():
                             devid = "MFG:APOLLO;MDL:%s;DES:%s;" % (p, p)
-                        
+
                         else:
                             devid = "MFG:HP;MDL:%s;DES:%s;" % (p, p)
-                        
+
                         drv_in_file_f.write('%sAttribute "1284DeviceID" "" "%s"\n' % (indent2, devid))
 
                         if len(models_dict[p]['tech-class']) > 1: # and 'Postscript' not in models_dict[p]['tech-class']:
-                            drv_in_file_f.write('%sPCFileName "%s-hpijs-%s.ppd"\n' % 
+                            drv_in_file_f.write('%sPCFileName "%s-hpijs-%s.ppd"\n' %
                                 (indent2, fixFileName(p), models.TECH_CLASS_PDLS[tech_class]))
-                        
+
                         elif tech_class != 'Postscript':
                             drv_in_file_f.write('%sPCFileName "%s-hpijs.ppd"\n' % (indent2, fixFileName(p)))
-                        
+
                         else:
                             drv_in_file_f.write('%sPCFileName "%s-ps.ppd"\n' % (indent2, fixFileName(p)))
-                            
+
                         for c in models_dict[p]['case_models']:
-                            drv_in_file_f.write('%sAttribute "Product" "" "%s"\n' % (indent2, c))
+                            drv_in_file_f.write('%sAttribute "Product" "" "(%s)"\n' % (indent2, c))
 
                         drv_in_file_f.write("%s}\n" % indent)
-                        
+
                 else:
                     errors.append("(%s:line %d) No models matched the specified classes on line: %s" % (basename, line, x.strip()))
-                        
+
             else:
                 match = pat_template2.match(x)
                 if match is not None:
                     errors.append("(%s:line %d) Malformed line: %s (missing initial //)" % (basename, line, x.strip()))
-                
+
 
         template_file_f.close()
         drv_in_file_f.close()
         tui.cleanup_spinner()
-      
+
         for tc in models.TECH_CLASSES:
             if tc.lower() in ('undefined', 'postscript', 'unsupported'):
                 continue
-                
+
             if tc not in template_classes:
-                errors.append("(%s) Section <%%%s:...%%> not found." % (basename, tc))
-        
-            
+                warns.append("(%s) Section <%%%s:...%%> not found." % (basename, tc))
+
+
         # OUTPUT XML FILES
-        
+
         if not os.path.exists(output_path):
             os.makedirs(output_path)
-            
+
         if os.path.exists(driver_path):
             os.remove(driver_path)
 
         files_to_delete = []
         for f in utils.walkFiles(output_path, recurse=True, abs_paths=True, return_folders=False, pattern='*'):
             files_to_delete.append(f)
-            
+
         for f in files_to_delete:
             os.remove(f)
-        
+
         driver_f = file(driver_path, 'w')
 
         driver_doc = XMLDocument("driver", id="driver/%s" % basename)
@@ -554,109 +606,109 @@ def main(args):
         comments_node = driver_doc.add("comments")
         comments_en_node = comments_node.add("en")
         comments_en_node.addText("")
-        
+
         printers_node = driver_doc.add("printers")
-        
+
         for m in models_dict:
             if 'apollo' in m.lower():
                 make = 'APOLLO'
             else:
                 make = 'HP'
-                
+
             if 'apollo' in m.lower():
                 ieee1284 = "MFG:APOLLO;MDL:%s;DES:%s;" % (m, m)
-            
+
             else:
                 ieee1284 = "MFG:HP;MDL:%s;DES:%s;" % (m, m)
-                
+
             postscriptppd = ''
             if 'Postscript' in models_dict[m]['tech-class']:
                 postscriptppd = "%s-ps.ppd" % fixFileName(m)
-                
+
             fixed_model = m.replace(' ', '_')
-            
+
             if fixed_model.startswith('hp_'):
                 fixed_model = fixed_model.replace('hp_', 'hp-')
-            
+
             elif fixed_model.startswith('apollo_'):
                 fixed_model = fixed_model.replace('apollo_', 'apollo-')
-                
+
             else:
                 fixed_model = 'hp-' + fixed_model
-                
+
             stripped_model = m
             if stripped_model.startswith('hp '):
                 stripped_model = stripped_model.replace('hp ', '')
-            
-            
+
+
             # Output to the per-model XML file
             outputModel(m, fixed_model, stripped_model, make, postscriptppd, ieee1284, output_path, verbose)
-            
+
             # Output to driver master XML file
             outputDriver(m, fixed_model, stripped_model, make, printers_node, verbose)
-            
-        
+
+
         driver_f.write(str(driver_doc))
-        driver_f.close()         
-        
+        driver_f.close()
+
         # Make sure all models ended up in drv.in file
         log.info("Checking for errors...")
         tui.update_spinner()
-        
+
         for m in models_dict:
             tui.update_spinner()
             tc = models_dict[m]['tech-class']
             st = models_dict[m]['support-type']
-            
+
             if not tc or 'Undefined' in tc:
                 if st:
                     errors.append('(%s) Invalid tech-class for model %s ("Undefined" or missing)' % (basename, m))
-                else:
-                    warns.append('(%s) Invalid tech-class for unsupported model %s ("Undefined" or missing)' % (basename, m))
-        
+                #else:
+                #    warns.append('(%s) Invalid tech-class for unsupported model %s ("Undefined" or missing)' % (basename, m))
+
             else:
                 if not models_placement[m] and st and \
                     len(tc) == 1 and 'Postscript' not in tc:
-                    
+
                     sects = []
                     for tc in models_dict[m]['tech-class']:
                         for sc in models_dict[m]['tech-subclass']:
                             sects.append(sc)
-                            
-                    errors.append("(%s) Model '%s' did not have a matching section. Needed section: <%%%s:%s%%>" % 
+
+                    errors.append("(%s) Model '%s' did not have a matching section. Needed section: <%%%s:%s%%>" %
                         (basename, m, tc, ':'.join(sects)))
-                            
+
                 if len(tc) == 1 and 'Postscript' in tc:
                     notes.append("(%s) Postscript-only model %s was not included in DRV file." % (basename, m))
-                    
+
         tui.cleanup_spinner()
-    
-        # end for 
-    
+
+        # end for
+
     if not quiet or verbose:
         if notes:
             tui.header("NOTES")
             for n in notes:
                 log.note(n)
-                
+
         if warns:
             tui.header("WARNINGS")
             for w in warns:
                 log.warn(w)
-                
+
         if errors:
             tui.header("ERRORS")
             for e in errors:
                 log.error(e)
-                
+
     else:
         if warns:
             log.warn("%d warnings" % len(warns))
-            
+
         if errors:
             log.error("%d errors" % len(errors))
-            
-            
+
+
 def parseDeviceID(device_id):
     d= {}
     x = [y.strip() for y in device_id.strip().split(';') if y]
@@ -687,37 +739,37 @@ def parseDeviceID(device_id):
         d['SN'] = ''
 
     return d
-    
-    
+
+
 def outputModel(model, fixed_model, stripped_model, make, postscriptppd, ieee1284, output_path, verbose=False):
     global errors
     global count
-    
+
     count += 1
-    
+
 ##    fixed_model = model.replace(' ', '_')
-##    
+##
 ##    if fixed_model.startswith('hp_'):
 ##        fixed_model = fixed_model.replace('hp_', 'hp-')
-##    
+##
 ##    elif fixed_model.startswith('apollo_'):
 ##        fixed_model = fixed_model.replace('apollo_', 'apollo-')
-##        
+##
 ##    else:
 ##        fixed_model = 'hp-' + fixed_model
-##        
+##
 ##    stripped_model = model
 ##    if stripped_model.startswith('hp '):
 ##        stripped_model = stripped_model.replace('hp ', '')
-        
-    
+
+
     output_filename = os.path.join(output_path, fixed_model+".xml")
-    
+
     if verbose:
         log.info("\n\n%s:" % output_filename)
-    
+
     output_f = file(output_filename, 'w')
-    
+
     doc = XMLDocument("printer", id="printer/%s" % fixed_model)
     make_node = doc.add("make")
     make_node.addText(make)
@@ -725,10 +777,10 @@ def outputModel(model, fixed_model, stripped_model, make, postscriptppd, ieee128
     model_node.addText(stripped_model)
     url_node = doc.add("url")
     url_node.addText("http://www.hp.com")
-    
+
     lang_node = doc.add("lang")
     lang_node.add("pcl", level="3")
-        
+
     if postscriptppd:
         # Postscript
         ps_node = lang_node.add("postscript", level="2")
@@ -737,41 +789,41 @@ def outputModel(model, fixed_model, stripped_model, make, postscriptppd, ieee128
         ppd_node.addText(postscriptppd)
         charset_node = lang_node.add("charset")
         charset_node.addText("us-ascii")
-    
+
     autodetect_node = doc.add("autodetect")
     general_node = autodetect_node.add("general")
-    
+
     if 1:
         ieee1284_node = general_node.add("ieee1284")
         ieee1284_node.addText(ieee1284)
-        
+
         device_id = parseDeviceID(ieee1284)
-        
+
         mfg_node = general_node.add("manufacturer")
         mfg_node.addText(device_id['MFG'])
-        
+
         model_node = general_node.add("model")
         model_node.addText(device_id['MDL'])
-        
+
         desc_node = general_node.add("description")
         desc_node.addText(device_id['DES'])
-        
+
         #cmdset_node = general_node.add("commandset")
         #cmdset_node.addText("???")
-        
+
     driver_node = autodetect_node.add("driver")
-    
+
     if postscriptppd:
         driver_node.addText("Postscript")
     else:
         driver_node.addText("hpijs")
-    
+
     if verbose:
         log.info(str(doc))
-    
+
     output_f.write(str(doc))
-    
-    output_f.close()    
+
+    output_f.close()
 
 
 def outputDriver(m, fixed_model, stripped_model, make, printers_node, verbose):
@@ -780,13 +832,13 @@ def outputDriver(m, fixed_model, stripped_model, make, printers_node, verbose):
     printer_node = printers_node.add("printer")
     id_node = printer_node.add("id")
     id_node.addText("printer/%s" % fixed_model)
-    
+
 ##    margins_node = printer_node.add("margins")
 ##    general_margins_node = margins_node.add("general")
-    
+
 ##    unit_node = general_margins_node.add("unit")
 ##    unit_node.addText("in")
-##    
+##
 ##    for tc in tech_classes:
 ##        if tc not in ('Undefined', 'Unsupported', 'PostScript'):
 ##            try:
@@ -796,7 +848,7 @@ def outputDriver(m, fixed_model, stripped_model, make, printers_node, verbose):
 ##            else:
 ##                print margins_data
 ##                break
-    
+
 ##<printer>
 ##   <id>printer/HP-DeskJet_350C</id><!-- HP DeskJet 350C -->
 ##   <functionality>
@@ -820,9 +872,9 @@ def outputDriver(m, fixed_model, stripped_model, make, printers_node, verbose):
 ##     <right>0.135</right>
 ##    </exception>
 ##   </margins>
-##  </printer>    
-    
-    
+##  </printer>
+
+
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))

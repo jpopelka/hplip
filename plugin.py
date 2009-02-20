@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -98,7 +98,7 @@ for o, a in opts:
             log.warn("--optional switch ignored.")
 
 
-version = '.'.join(sys_cfg.hplip.version.split('.')[:3])
+version = prop.installed_version
 plugin_filename = 'hplip-%s-plugin.run' % version
 
 if plugin_path is not None:
@@ -126,11 +126,11 @@ if plugin_path is not None:
 if mode == GUI_MODE:
     if ui_toolkit == 'qt3':
         if not utils.canEnterGUIMode():
-            log.error("%s requires GUI support (try running with --qt4). Try using non-interactive (-n) mode." % __mod__)
+            log.error("%s requires GUI support (try running with --qt4). Try using interactive (-i) mode." % __mod__)
             sys.exit(1)
     else:
         if not utils.canEnterGUIMode4():
-            log.error("%s requires GUI support (try running with --qt3). Try using non-interactive (-n) mode." % __mod__)
+            log.error("%s requires GUI support (try running with --qt3). Try using interactive (-i) mode." % __mod__)
             sys.exit(1)
 
 
@@ -141,13 +141,13 @@ if mode == GUI_MODE:
             from ui import pluginform2
         except ImportError:
             log.error("Unable to load Qt3 support. Is it installed?")
-            sys.exit(1)  
-            
+            sys.exit(1)
+
         app = QApplication(sys.argv)
         QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
 
         if loc is None:
-            loc = user_cfg.ui.get("loc", "system")
+            loc = user_conf.get('ui', 'loc', 'system')
             if loc.lower() == 'system':
                 loc = str(QTextCodec.locale())
                 log.debug("Using system locale: %s" % loc)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 __version__ = '2.0'
 __mod__ = 'hp-timedate'
 __title__ = 'Time/Date Utility'
-__doc__ = "Set the time and date on an HP Officejet."
+__doc__ = "Set the time and date on an HP Officejet all-in-one device using the PC time and date."
 
 # Std Lib
 import sys
@@ -63,13 +63,13 @@ PML_ERROR_CODES = {
 try:
     mod = module.Module(__mod__, __title__, __version__, __doc__, None,
                         (INTERACTIVE_MODE,))
-                        
-    mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS) 
+
+    mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS)
 
     opts, device_uri, printer_name, mode, ui_toolkit, lang = \
         mod.parseStdOpts()
 
-    device_uri = mod.getDeviceUri(device_uri, printer_name, 
+    device_uri = mod.getDeviceUri(device_uri, printer_name,
         filter={'fax-type': (operator.gt, 0)},
         back_end_filter=['hpfax'])
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 __version__ = '4.0'
 __title__ = 'Print Utility'
 __mod__ = 'hp-print'
-__doc__ = "A simple front end to 'lp'. Provides a print UI from the Device Manager if kprinter, gtklp, or xpp are not installed."
+__doc__ = "A simple print UI front-end to lp/lpr."
 
 # Std Lib
 import sys
@@ -43,13 +43,13 @@ printdlg = None
 
 mod = module.Module(__mod__, __title__, __version__, __doc__, None,
                     (GUI_MODE,), (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4))
-                    
+
 mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS | module.USAGE_FLAG_FILE_ARGS,
              see_also_list=['hp-printsettings'])
 
 opts, device_uri, printer_name, mode, ui_toolkit, loc = \
     mod.parseStdOpts()
-    
+
 printer_name, device_uri = mod.getPrinterName(printer_name, device_uri)
 
 if ui_toolkit == 'qt3':
@@ -67,13 +67,13 @@ if ui_toolkit == 'qt3':
         from ui.printerform import PrinterForm
     except ImportError:
         log.error("Unable to load Qt3 support. Is it installed?")
-        sys.exit(1)          
+        sys.exit(1)
 
     # create the main application object
     app = QApplication(sys.argv)
 
     if loc is None:
-        loc = user_cfg.ui.get("loc", "system")
+        loc = user_conf.get('ui', 'loc', 'system')
         if loc.lower() == 'system':
             loc = str(QTextCodec.locale())
             log.debug("Using system locale: %s" % loc)
@@ -128,19 +128,19 @@ else: # qt4
         from ui4.printdialog import PrintDialog
     except ImportError:
         log.error("Unable to load Qt4 support. Is it installed?")
-        sys.exit(1)        
-    
+        sys.exit(1)
+
     if 1:
         app = QApplication(sys.argv)
-        
-        dlg = PrintDialog(None, printer_name, mod.args) 
+
+        dlg = PrintDialog(None, printer_name, mod.args)
         dlg.show()
         try:
             log.debug("Starting GUI loop...")
             app.exec_()
         except KeyboardInterrupt:
             sys.exit(0)
-        
+
 
 sys.exit(0)
 

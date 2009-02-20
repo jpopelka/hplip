@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ except ImportError:
 TRAY_MESSAGE_DELAY = 10000
 HIDE_INACTIVE_DELAY = 5000
 BLIP_DELAY = 2000
-SET_MENU_DELAY = 500
+SET_MENU_DELAY = 1000
 MAX_MENU_EVENTS = 10
 
 ERROR_STATE_TO_ICON = {
@@ -80,6 +80,41 @@ ERROR_STATE_TO_ICON = {
 }
 
 devices = {} # { <device_uri> : HistoryDevice(), ... }
+
+
+class DeviceMenu(QMenu):
+    def __init__(self, title, parent, device_uri, device_hist, index):
+        QMenu.__init__(self, title, parent)
+        self.device_uri = device_uri
+        self.device_hist = device_hist
+        self.index = index
+
+
+    def update(self):
+        self.clear()
+
+        if self.device_hist:
+            first = True
+            for e in self.device_hist:
+                error_state = STATUS_TO_ERROR_STATE_MAP.get(e.event_code, ERROR_STATE_CLEAR)
+                ess = device.queryString(e.event_code, 0)
+
+                a = QAction(QIcon(getStatusListIcon(error_state)[self.index]),
+                                    QString("%1 %2").arg(ess).arg(getTimeDeltaDesc(e.timedate)), self)
+
+                if first:
+                    f = a.font()
+                    f.setBold(True)
+                    a.setFont(f)
+                    self.setIcon(QIcon(getStatusListIcon(error_state)[self.index]))
+                    first = False
+
+                self.addAction(a)
+
+        else:
+            self.addAction(QIcon(load_pixmap("warning", "16x16")),
+                QApplication.translate("SystemTray", "(No events)", None, QApplication.UnicodeUTF8))
+
 
 
 class HistoryDevice(QObject):
@@ -133,6 +168,7 @@ class HistoryDevice(QObject):
 
     def __tr(self, s, c=None):
         return QApplication.translate("SystemTray", s, c, QApplication.UnicodeUTF8)
+
 
 
 
@@ -210,6 +246,7 @@ class SystemTrayApp(QApplication):
     def __init__(self, args, read_pipe):
         QApplication.__init__(self, args)
 
+        self.menu = None
         self.read_pipe = read_pipe
         self.fmt = "64s64sI32sI64sf"
         self.fmt_size = struct.calcsize(self.fmt)
@@ -254,7 +291,17 @@ class SystemTrayApp(QApplication):
         else:
             QTimer.singleShot(HIDE_INACTIVE_DELAY, self.timeoutHideWhenInactive) # show icon for awhile @ startup
 
-        QTimer.singleShot(SET_MENU_DELAY, self.setMenu)
+        self.tray_icon.setIcon(self.prop_active_icon)
+        self.active_icon = True
+
+        QTimer.singleShot(SET_MENU_DELAY, self.initDone)
+
+
+    def initDone(self):
+        self.tray_icon.setIcon(self.prop_icon)
+        self.active_icon = False
+
+        self.setMenu()
 
 
     def addDevice(self, device_uri):
@@ -266,11 +313,12 @@ class SystemTrayApp(QApplication):
             devices[device_uri].needs_update = True
 
 
+
     def setMenu(self):
         self.menu = QMenu()
 
         title = QWidgetAction(self.menu)
-        title.setDisabled(True)
+        #title.setDisabled(True)
 
         hbox = QFrame(self.menu)
         layout = QHBoxLayout(hbox)
@@ -313,31 +361,10 @@ class SystemTrayApp(QApplication):
                 for d in devices:
                     devices[d].getHistory(self.service)
 
-                    menu = QMenu(devices[d].menu_text, self.menu)
-                    first = True
-
-                    if devices[d].history:
-                        for e in devices[d].history:
-                            #print str(e)
-                            error_state = STATUS_TO_ERROR_STATE_MAP.get(e.event_code, ERROR_STATE_CLEAR)
-                            ess = device.queryString(e.event_code, 0)
-
-                            if first:
-                                menu.addAction(QIcon(getStatusListIcon(error_state)[devices[d].index]),
-                                               #QString("%1 (%2)").arg(ess).arg(e.event_code))
-                                               self.__tr("%1 (most recent)").arg(ess))
-                            else:
-                                menu.addAction(QIcon(getStatusListIcon(error_state)[devices[d].index]),
-                                               QString("%1 %2").arg(ess).arg(getTimeDeltaDesc(e.timedate)))
-                                               #EQString(ess))
-
-                            if first:
-                                menu.setIcon(QIcon(getStatusListIcon(error_state)[devices[d].index]))
-                                first = False
-                    else:
-                        menu.addAction(self.__tr("(No events)"))
-
+                    menu = DeviceMenu(devices[d].menu_text, self.menu, d, devices[d].history, devices[d].index)
                     self.menu.addMenu(menu)
+                    menu.update()
+
 
         self.menu.addSeparator()
         self.menu.addAction(self.__tr("HP Device Manager..."), self.toolboxTriggered)
@@ -355,6 +382,9 @@ class SystemTrayApp(QApplication):
 
 
     def settingsTriggered(self):
+        if self.menu is None:
+            return
+
         self.sendMessage('', '', EVENT_DEVICE_STOP_POLLING)
         try:
             dlg = SystraySettingsDialog(self.menu, self.user_settings.systray_visible,
@@ -363,19 +393,6 @@ class SystemTrayApp(QApplication):
 
             if dlg.exec_() == QDialog.Accepted:
                 self.user_settings.systray_visible = dlg.systray_visible
-
-                self.user_settings.polling_interval = dlg.polling_interval
-                self.polling_timer.setInterval(self.user_settings.polling_interval * 1000)
-
-                self.user_settings.polling_device_list = dlg.device_list
-
-                self.user_settings.polling = dlg.polling
-
-                if self.user_settings.polling and not self.polling_timer.isActive():
-                    self.polling_timer.start()
-
-                elif not self.user_settings.polling and self.polling_timer.isActive():
-                    self.polling_timer.stop()
 
                 self.user_settings.save()
 
@@ -400,10 +417,21 @@ class SystemTrayApp(QApplication):
             log.debug("Hidden")
 
 
+    def updateMenu(self):
+        if self.menu is None:
+            return
+        for a in self.menu.actions():
+            try:
+                a.menu().update()
+            except AttributeError:
+                continue
+
+
+
     def trayActivated(self, reason):
         if reason == QSystemTrayIcon.Context:
-            #print "context menu"
-            pass
+            self.updateMenu()
+
 
         elif reason == QSystemTrayIcon.DoubleClick:
             #print "double click"
@@ -470,7 +498,11 @@ class SystemTrayApp(QApplication):
     def notifierActivated(self, s):
         m = ''
         while True:
-            r, w, e = select.select([self.read_pipe], [], [self.read_pipe], 1.0)
+            try:
+                r, w, e = select.select([self.read_pipe], [], [self.read_pipe], 1.0)
+            except select.error:
+                log.debug("Error in select()")
+                break
 
             if e:
                 log.error("Pipe error: %s" % e)
@@ -486,6 +518,11 @@ class SystemTrayApp(QApplication):
                     if event.event_code == EVENT_USER_CONFIGURATION_CHANGED:
                         log.debug("Re-reading configuration (EVENT_USER_CONFIGURATION_CHANGED)")
                         self.user_settings.load()
+                        self.user_settings.debug()
+
+                    elif event.event_code == EVENT_SYSTEMTRAY_EXIT:
+                        self.quit()
+                        return
 
                     if self.user_settings.systray_visible in \
                         (SYSTRAY_VISIBLE_SHOW_ALWAYS, SYSTRAY_VISIBLE_HIDE_WHEN_INACTIVE):
@@ -512,7 +549,7 @@ class SystemTrayApp(QApplication):
                                 QTimer.singleShot(BLIP_DELAY, self.blipTimeout)
                             continue
 
-                    if self.user_settings.systray_visible == SYSTRAY_VISIBLE_HIDE_WHEN_INACTIVE:
+                    if self.user_settings.systray_visible in (SYSTRAY_VISIBLE_HIDE_WHEN_INACTIVE, SYSTRAY_VISIBLE_HIDE_ALWAYS):
                         log.debug("Waiting to hide...")
                         QTimer.singleShot(HIDE_INACTIVE_DELAY, self.timeoutHideWhenInactive)
 
@@ -568,6 +605,13 @@ def run(read_pipe):
 
     app = SystemTrayApp(sys.argv, read_pipe)
     app.setQuitOnLastWindowClosed(False) # If not set, settings dlg closes app
+
+    i = 0
+    while i < 10:
+        if QSystemTrayIcon.isSystemTrayAvailable():
+            break
+        time.sleep(1.0)
+        i += 1
 
     if not QSystemTrayIcon.isSystemTrayAvailable():
         FailureUI(None,

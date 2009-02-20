@@ -97,7 +97,7 @@ Printer::Printer
     // Allocate memory for my send buffer
     pSendBuffer = NULL;
 #ifdef APDK_BUFFER_SEND
-    pSendBuffer = pSS->AllocMem(iBuffSize);
+    pSendBuffer = pSS->AllocMem(iBuffSize+2);
     CNEWCHECK(pSendBuffer);
 #endif
 

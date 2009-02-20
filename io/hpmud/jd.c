@@ -444,6 +444,20 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) jd_s_channel_open(mud_
             goto bugout;  
          }
          break; 
+      case HPMUD_MARVELL_SCAN_CHANNEL:
+         port = 8290;  /* same as ScanPort1[1] */
+         pin.sin_port = htons(port);
+         if ((pc->socket = socket(AF_INET, SOCK_STREAM, 0)) == -1) 
+         {  
+            BUG("unable to open marvell-scan port %d: %m %s\n", port, pd->uri);  
+            goto bugout;  
+         }  
+         if (connect(pc->socket, (struct sockaddr *)&pin, sizeof(pin)) == -1) 
+         {  
+            BUG("unable to connect to marvell-scan port %d: %m %s\n", port, pd->uri);  
+            goto bugout;  
+         }
+         break; 
       case HPMUD_PML_CHANNEL:
          /* Do nothing here, use GetPml/SetPml instead of ReadData/WriteData. */
          break;

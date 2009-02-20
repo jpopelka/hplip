@@ -172,7 +172,7 @@ class ScrollPrintSettingsView(ScrollView):
                     log.debug("Option: outputorder")
                     log.debug("Current value: %s" % current)
 
-                    current = int(utils.to_bool(current_options.get('Collate', '0')))
+                    current = utils.to_bool(current_options.get('Collate', '0'))
 
                     self.addItem("basic", "Collate",
                         self.__tr("Collate (Group together multiple copies)"),
@@ -286,9 +286,9 @@ class ScrollPrintSettingsView(ScrollView):
 
                 self.addItem("nup", "number-up", self.__tr("Pages per Sheet"),
                     cups.PPD_UI_PICKONE, current,
-                    [('1', self.__tr('1 sheet per page')),
-                     ('2', self.__tr('2 sheets per page')),
-                     ('4', self.__tr('4 sheets per page'))], '1')
+                    [('1', self.__tr('1 page per sheet')),
+                     ('2', self.__tr('2 pages per sheet')),
+                     ('4', self.__tr('4 pages per sheet'))], '1')
 
                 log.debug("  Option: number-up")
                 log.debug("  Current value: %s" % current)
@@ -393,7 +393,7 @@ class ScrollPrintSettingsView(ScrollView):
 
                 self.addGroupHeading("image", self.__tr("Image Printing"))
 
-                current = current_options.get('fitplot', 'false')
+                current = utils.to_bool(current_options.get('fitplot', 'false'))
 
                 self.addItem("image", "fitplot",
                     self.__tr("Fit to Page"),
@@ -463,7 +463,7 @@ class ScrollPrintSettingsView(ScrollView):
 
                 log.debug("Group: Misc")
 
-                current = int(utils.to_bool(current_options.get('prettyprint', '0')))
+                current = utils.to_bool(current_options.get('prettyprint', '0'))
 
                 self.addItem("misc", "prettyprint",
                     self.__tr('"Pretty Print" Text Documents (Add headers and formatting)'),
@@ -499,7 +499,7 @@ class ScrollPrintSettingsView(ScrollView):
                     log.debug("  Option: job-sheets")
                     log.debug("  Current value: %s,%s" % (start, end))
 
-                current = int(utils.to_bool(current_options.get('mirror', '0')))
+                current = utils.to_bool(current_options.get('mirror', '0'))
 
                 self.addItem("misc", "mirror", self.__tr('Mirror Printing'),
                     cups.PPD_UI_BOOLEAN, current, [], 0)
