@@ -21,7 +21,7 @@
 #
 
 
-__version__ = '8.0'
+__version__ = '9.0'
 __title__ = 'Printer/Fax Setup Utility'
 __mod__ = 'hp-setup'
 __doc__ = "Installs HPLIP printers and faxes in the CUPS spooler. Tries to automatically determine the correct PPD file to use. Allows the printing of a testpage. Performs basic fax parameter setup."
@@ -68,6 +68,7 @@ USAGE = [ (__doc__, "", "name", True),
           ("To specify a CUPS fax queue name:", "-f<fax> or --fax=<fax> (-i mode only)", "option", False),
           ("Type of queue(s) to install:", "-t<typelist> or --type=<typelist>. <typelist>: print*, fax\* (\*default) (-i mode only)", "option", False),
           ("To specify the device URI to install:", "-d<device> or --device=<device> (--qt4 mode only)", "option", False),
+          ("Remove printers or faxes instead of setting-up:", "-r or --rm or --remove (-u only)", "option", False),
           utils.USAGE_LANGUAGE,
           utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
           utils.USAGE_HELP,
@@ -105,6 +106,17 @@ USAGE = [ (__doc__, "", "name", True),
           ("hp-probe", "", "seealso", False),
         ]
 
+
+def showPasswordUI(prompt):
+    import getpass
+    print ""
+    print log.bold(prompt)
+    username = raw_input("Username: ")
+    password = getpass.getpass("Password: ")
+
+    return (username, password)
+
+
 def restart_cups():
     if os.path.exists('/etc/init.d/cups'):
         return '/etc/init.d/cups restart'
@@ -122,11 +134,11 @@ mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
                     run_as_root_ok=True)
 
 opts, device_uri, printer_name, mode, ui_toolkit, loc = \
-    mod.parseStdOpts('axp:P:f:t:b:d:',
+    mod.parseStdOpts('axp:P:f:t:b:d:r',
                      ['ttl=', 'filter=', 'search=', 'find=',
                       'method=', 'time-out=', 'timeout=',
                       'printer=', 'fax=', 'type=', 'port=',
-                       'auto', 'device='],
+                       'auto', 'device=', 'rm', 'remove'],
                       handle_device_printer=False)
 
 
@@ -139,6 +151,7 @@ makeuri = None
 auto = False
 testpage_in_auto_mode = True
 jd_port = 1
+remove = False
 
 for o, a in opts:
     if o == '-x':
@@ -184,6 +197,9 @@ for o, a in opts:
     elif o in ('-a', '--auto'):
         auto = True
 
+    elif o in ('-r', '--rm', '--remove'):
+        remove = True
+
 
 try:
     param = mod.args[0]
@@ -211,6 +227,9 @@ if mode == GUI_MODE:
         except ImportError:
             log.error("Unable to load Qt3 support. Is it installed?")
             sys.exit(1)
+
+        if remove:
+            log.warn("-r/--rm/--remove not supported in qt3 mode.")
 
         app = QApplication(sys.argv)
         QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
@@ -253,18 +272,6 @@ if mode == GUI_MODE:
             except locale.Error:
                 pass
 
-        if not os.geteuid() == 0:
-            log.error("You must be root to run this utility.")
-
-            QMessageBox.critical(None,
-                                 "HP Device Manager - Printer Setup Wizard",
-                                 "You must be root to run hp-setup.",
-                                  QMessageBox.Ok,
-                                  QMessageBox.NoButton,
-                                  QMessageBox.NoButton)
-
-            sys.exit(1)
-
         try:
             w = setupform.SetupForm(bus, param, jd_port)
         except Error:
@@ -286,20 +293,7 @@ if mode == GUI_MODE:
 
         app = QApplication(sys.argv)
 
-        if not os.geteuid() == 0:
-            log.error("You must be root to run this utility.")
-
-            QMessageBox.critical(None,
-                                 "HP Device Manager - Printer Setup Wizard",
-                                 "You must be root to run hp-setup.",
-                                  QMessageBox.Ok,
-                                  QMessageBox.NoButton,
-                                  QMessageBox.NoButton)
-
-            sys.exit(1)
-
-
-        dlg = SetupDialog(None, param, jd_port, device_uri)
+        dlg = SetupDialog(None, param, jd_port, device_uri, remove)
         dlg.show()
         try:
             log.debug("Starting GUI loop...")
@@ -310,8 +304,11 @@ if mode == GUI_MODE:
 
 else: # INTERACTIVE_MODE
     try:
-        if not os.geteuid() == 0:
-            log.error("You must be root to run this utility.")
+
+        cups.setPasswordCallback(showPasswordUI)
+
+        if remove:
+            log.error("-r/--rm/--remove not supported in -i mode.")
             sys.exit(1)
 
         if not auto:
@@ -450,7 +447,7 @@ else: # INTERACTIVE_MODE
                                     break
 
                         for c in printer_name:
-                            if c in (' ', '#', '/', '%'):
+                            if c in cups.INVALID_PRINTER_NAME_CHARS:
                                 log.error("Invalid character '%s' in printer name. Please enter a name that does not contain this character." % c)
                                 name_ok = False
 
@@ -568,6 +565,7 @@ else: # INTERACTIVE_MODE
             status, output = utils.run(restart_cups())
             log.debug("Restart CUPS returned: exit=%d output=%s" % (status, output))
 
+            cups.setPasswordPrompt("You do not have permission to add a printer.")
             if not os.path.exists(print_ppd): # assume foomatic: or some such
                 status, status_str = cups.addPrinter(printer_name.encode('utf8'), print_uri,
                     location, '', print_ppd, info)
@@ -675,10 +673,16 @@ else: # INTERACTIVE_MODE
 
             fax_type = mq.get('fax-type', FAX_TYPE_NONE)
 
-            if fax_type == FAX_TYPE_SOAP:
-                fax_ppd_name = 'HP-Fax2-hplip'
-            else:
-                fax_ppd_name = 'HP-Fax-hplip'
+            if prop.hpcups_build:
+                if fax_type == FAX_TYPE_SOAP:
+                    fax_ppd_name = 'HP-Fax2-hpcups'
+                else:
+                    fax_ppd_name = 'HP-Fax-hpcups'
+            else: # hpijs
+                if fax_type == FAX_TYPE_SOAP:
+                    fax_ppd_name = 'HP-Fax2-hpijs'
+                else:
+                    fax_ppd_name = 'HP-Fax-hpijs'
 
             for f in ppds:
                 if f.find(fax_ppd_name) >= 0:
@@ -719,6 +723,7 @@ else: # INTERACTIVE_MODE
             log.info("Location: %s" % location)
             log.info("Information: %s" % info)
 
+            cups.setPasswordPrompt("You do not have permission to add a fax device.")
             if not os.path.exists(fax_ppd): # assume foomatic: or some such
                 status, status_str = cups.addPrinter(fax_name.encode('utf8'), fax_uri,
                     location, '', fax_ppd, info)

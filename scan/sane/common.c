@@ -44,8 +44,8 @@ int __attribute__ ((visibility ("hidden"))) bug(const char *fmt, ...)
    va_start(args, fmt);
    if ((n = vsnprintf(buf, 256, fmt, args)) == -1)
       buf[255] = 0;     /* output was truncated */
-   syslog(LOG_WARNING, buf);
-   DBG(2, buf);
+   syslog(LOG_WARNING, "%s", buf);
+   DBG(2, "%s", buf);
    va_end(args);
    return n;
 }

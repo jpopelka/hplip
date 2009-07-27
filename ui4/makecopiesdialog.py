@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-#  
+#
 # Authors: Don Welch
 #
 
@@ -55,12 +55,12 @@ class MakeCopiesDialog(QDialog, Ui_Dialog):
         self.DeviceComboBox.setFilter({'copy-type': (operator.gt, 0)})
 
         # Application icon
-        self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
-        
+        self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))
+
         if self.device_uri:
             self.DeviceComboBox.setInitialDevice(self.device_uri)
 
-    
+
     def updateUi(self):
         self.DeviceComboBox.updateUi()
 
@@ -68,22 +68,22 @@ class MakeCopiesDialog(QDialog, Ui_Dialog):
     def DeviceUriComboBox_currentChanged(self, device_uri):
         self.device_uri = device_uri
         # Update
-        
-        
+
+
     def DeviceUriComboBox_noDevices(self):
         FailureUI(self, self.__tr("<b>No devices that support PC initiated copy found.</b><p>Click <i>OK</i> to exit.</p>"))
         self.close()
-    
+
     def CancelButton_clicked(self):
         self.close()
-        
-        
+
+
     def CopyButton_clicked(self):
         pass
 
     #
     # Misc
-    # 
+    #
 
     def __tr(self,s,c = None):
         return qApp.translate("MakeCopiesDialog",s,c)

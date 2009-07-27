@@ -62,7 +62,7 @@ static int bb_load(struct soap_session *ps, const char *so)
    int stat=1;
 
    /* Load hpmud manually with symbols exported. Otherwise the plugin will not find it. */ 
-   if ((ps->hpmud_handle = dlopen("libhpmud.so", RTLD_LAZY|RTLD_GLOBAL)) == NULL)
+   if ((ps->hpmud_handle = dlopen("libhpmud.so.0", RTLD_LAZY|RTLD_GLOBAL)) == NULL)
    {
       BUG("unable to load restricted library: %s\n", dlerror());
       goto bugout;

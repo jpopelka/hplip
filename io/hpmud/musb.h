@@ -43,6 +43,7 @@ enum FD_ID
    FD_ff_3_1,        /* HP Soap Fax interface */
    FD_ff_ff_ff,        /* HP dot4 interface */
    FD_ff_d4_0,        /* HP dot4 interface */
+   FD_ff_cc_0,        /* orblite scan / rest scan interface */
    MAX_FD
 };
 

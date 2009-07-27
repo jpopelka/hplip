@@ -46,7 +46,8 @@ ColorMatcher::ColorMatcher
     cmap(cm)
 {
     constructor_error = NO_ERROR;
-    ASSERT(cmap.ulMap1 != NULL && cmap.ulMap3 != NULL);
+    ASSERT(cmap.ulMap1 != NULL || cmap.ulMap3 != NULL);
+
     StartPlane = K;       // most common case
 
     if (ColorPlaneCount == 3)     // CMY pen

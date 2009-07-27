@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = '14.1'
+__version__ = '14.3'
 __title__ = 'Dependency/Version Check Utility'
 __mod__ = 'hp-check'
 __doc__ = """Check the existence and versions of HPLIP dependencies. (Run as 'python ./check.py' from the HPLIP tarball before installation.)"""
@@ -208,13 +208,13 @@ try:
     log.info(log.bold("Distribution:"))
     log.info("%s %s" % (core.distro_name, core.distro_version))
 
-    log.info(log.bold("\nHPOJ running?"))
+    #log.info(log.bold("\nHPOJ running?"))
 
-    if core.hpoj_present:
-        log.error("Yes, HPOJ is running. HPLIP is not compatible with HPOJ. To run HPLIP, please remove HPOJ.")
-        num_errors += 1
-    else:
-        log.info("No, HPOJ is not running (OK).")
+    #if core.hpoj_present:
+        #log.error("Yes, HPOJ is running. HPLIP is not compatible with HPOJ. To run HPLIP, please remove HPOJ.")
+        #num_errors += 1
+    #else:
+        #log.info("No, HPOJ is not running (OK).")
 
 
     log.info()
@@ -232,9 +232,8 @@ try:
             log.error("Version %d.%d.%d installed. Please update to Python >= 2.1" % ver[:3])
             sys.exit(1)
 
-
-    if core.ui_toolkit == 'qt3':
-
+    ui_toolkit = sys_conf.get('ui_toolkit', 'qt4')
+    if  ui_toolkit == 'qt3':
         log.info()
         log.info(log.bold("Checking PyQt 3.x version..."))
 
@@ -405,8 +404,8 @@ try:
     dd = core.dependencies.keys()
     dd.sort()
     for d in dd:
-        if (d == 'pyqt' and core.ui_toolkit != 'qt3') or \
-           (d == 'pyqt4' and core.ui_toolkit != 'qt4'):
+        if (d == 'pyqt' and ui_toolkit != 'qt3') or \
+           (d == 'pyqt4' and ui_toolkit != 'qt4'):
             continue
 
         log.debug("***")
@@ -485,6 +484,15 @@ try:
                 log.info(output)
 
             log.info()
+            log.info(log.bold("Current contents of '/var/lib/hp/hplip.state' file:"))
+            try:
+                output = file(os.path.expanduser('/var/lib/hp/hplip.state'), 'r').read()
+            except (IOError, OSError), e:
+                log.error("Could not access file: %s" % e.strerror)
+            else:
+                log.info(output)
+
+            log.info()
             log.info(log.bold("Current contents of '~/.hplip/hplip.conf' file:"))
             try:
                 output = file(os.path.expanduser('~/.hplip/hplip.conf'), 'r').read()
@@ -498,25 +506,25 @@ try:
 
 
         if device_avail:
-            if prop.par_build:
-                tui.header("DISCOVERED PARALLEL DEVICES")
+            #if prop.par_build:
+                #tui.header("DISCOVERED PARALLEL DEVICES")
 
-                devices = device.probeDevices(['par'])
+                #devices = device.probeDevices(['par'])
 
-                if devices:
-                    f = tui.Formatter()
-                    f.header = ("Device URI", "Model")
+                #if devices:
+                    #f = tui.Formatter()
+                    #f.header = ("Device URI", "Model")
 
-                    for d, dd in devices.items():
-                        f.add((d, dd[0]))
+                    #for d, dd in devices.items():
+                        #f.add((d, dd[0]))
 
-                    f.output()
+                    #f.output()
 
-                else:
-                    log.info("No devices found.")
+                #else:
+                    #log.info("No devices found.")
 
-                    if not core.have_dependencies['ppdev']:
-                        log.error("'ppdev' kernel module not loaded.")
+                    #if not core.have_dependencies['ppdev']:
+                        #log.error("'ppdev' kernel module not loaded.")
 
             if prop.usb_build:
                 tui.header("DISCOVERED USB DEVICES")
@@ -538,8 +546,7 @@ try:
 
         tui.header("INSTALLED CUPS PRINTER QUEUES")
 
-        lpstat_pat = re.compile(r"""^device for (.*): (.*)""", re.IGNORECASE)
-
+        lpstat_pat = re.compile(r"""(\S*): (.*)""", re.IGNORECASE)
         status, output = utils.run('lpstat -v')
         log.info()
 
@@ -556,15 +563,22 @@ try:
         log.debug(cups_printers)
 
         if cups_printers:
-            non_hp = False
+            #non_hp = False
             for p in cups_printers:
                 printer_name, device_uri = p
+
+                if device_uri.startswith("cups-pdf:/") or \
+                    device_uri.startswith('ipp://'):
+                    continue
+
                 try:
                     back_end, is_hp, bus, model, serial, dev_file, host, port = \
                         parseDeviceURI(device_uri)
                 except Error:
                     back_end, is_hp, bus, model, serial, dev_file, host, port = \
                         '', False, '', '', '', '', '', 1
+
+                #print back_end, is_hp, bus, model, serial, dev_file, host, port
 
                 log.info(log.bold(printer_name))
                 log.info(log.bold('-'*len(printer_name)))
@@ -577,13 +591,13 @@ try:
 
                 log.info("Type: %s" % x)
 
-                if is_hp:
-                    x = 'Yes, using the %s: CUPS backend.' % back_end
-                else:
-                    x = 'No, not using the hp: or hpfax: CUPS backend.'
-                    non_hp = True
+                #if is_hp:
+                #    x = 'Yes, using the %s: CUPS backend.' % back_end
+                #else:
+                #    x = 'No, not using the hp: or hpfax: CUPS backend.'
+                #    non_hp = True
 
-                log.info("Installed in HPLIP?: %s" % x)
+                #log.info("Installed in HPLIP?: %s" % x)
                 log.info("Device URI: %s" % device_uri)
 
                 ppd = os.path.join('/etc/cups/ppd', printer_name + '.ppd')
@@ -652,8 +666,10 @@ try:
                                 deviceid = d.getDeviceID()
                                 log.debug(deviceid)
 
+                            #print deviceid
                             if not deviceid:
-                                #log.error("Communication status: Failed")
+                                log.error("Communication status: Failed")
+                                #error_code = pml.ERROR_COMMAND_EXECUTION
                                 num_errors += 1
                             else:
                                 log.info("Communication status: Good")
@@ -663,10 +679,12 @@ try:
                                 error_code, deviceid = d.getPML(pml.OID_DEVICE_ID)
                             except Error:
                                 #log.error("Communication with device failed.")
-                                error_code = pml.ERROR_COMMAND_EXECUTION
+                                #error_code = pml.ERROR_COMMAND_EXECUTION
+                                pass
 
-                            if error_code > pml.ERROR_MAX_OK:
-                                #log.error("Communication status: Failed")
+                            #print error_code
+                            if not deviceid:
+                                log.error("Communication status: Failed")
                                 num_errors += 1
                             else:
                                 log.info("Communication status: Good")
@@ -675,7 +693,7 @@ try:
                         if d is not None:
                             d.close()
 
-                    log.info()
+                log.info()
 
 
 
@@ -756,54 +774,75 @@ try:
 
                 log.info()
 
-        tui.header("USB I/O SETUP")
 
         if hpmudext_avail:
             lsusb = utils.which('lsusb')
             if lsusb:
                 log.info()
-                log.info(log.bold("Checking for permissions of USB attached printers..."))
+
                 lsusb = os.path.join(lsusb, 'lsusb')
                 status, output = utils.run("%s -d03f0:" % lsusb)
 
-                lsusb_pat = re.compile("""^Bus\s([0-9a-fA-F]{3,3})\sDevice\s([0-9a-fA-F]{3,3}):\sID\s([0-9a-fA-F]{4,4}):([0-9a-fA-F]{4,4})(.*)""", re.IGNORECASE)
-                log.debug(output)
+                if output:
+                    tui.header("USB I/O SETUP")
+                    log.info(log.bold("Checking for permissions of USB attached printers..."))
 
-                for o in output.splitlines():
-                    ok = True
-                    match = lsusb_pat.search(o)
+                    lsusb_pat = re.compile("""^Bus\s([0-9a-fA-F]{3,3})\sDevice\s([0-9a-fA-F]{3,3}):\sID\s([0-9a-fA-F]{4,4}):([0-9a-fA-F]{4,4})(.*)""", re.IGNORECASE)
+                    log.debug(output)
 
-                    if match is not None:
-                        bus, device, vid, pid, mfg = match.groups()
-                        log.info("\nHP Device 0x%x at %s:%s: " % (int(pid, 16), bus, device))
-                        result_code, deviceuri = hpmudext.make_usb_uri(bus, device)
+                    for o in output.splitlines():
+                        ok = True
+                        match = lsusb_pat.search(o)
 
-                        if result_code == hpmudext.HPMUD_R_OK:
-                            log.info("    Device URI: %s" %  deviceuri)
-                        else:
-                            log.warn("    Device URI: (Makeuri FAILED)")
+                        if match is not None:
+                            bus, dev, vid, pid, mfg = match.groups()
+                            log.info("\nHP Device 0x%x at %s:%s: " % (int(pid, 16), bus, dev))
+                            result_code, deviceuri = hpmudext.make_usb_uri(bus, dev)
 
-                        devnode = os.path.join("/", "dev", "bus", "usb", bus, device)
+                            if result_code == hpmudext.HPMUD_R_OK:
+                                log.info("    Device URI: %s" %  deviceuri)
+                                d = None
+                                try:
+                                    d = device.Device(deviceuri)
+                                except Error:
+                                    continue
+                                if not d.supported:
+                                    continue
+                            else:
+                                log.warn("    Device URI: (Makeuri FAILED)")
+                                continue
 
-                        if not os.path.exists(devnode):
-                            devnode = os.path.join("/", "proc", "bus", "usb", bus, device)
+                            devnode = os.path.join("/", "dev", "bus", "usb", bus, dev)
 
-                        if os.path.exists(devnode):
-                            log.info("    Device node: %s" % devnode)
+                            if not os.path.exists(devnode):
+                                devnode = os.path.join("/", "proc", "bus", "usb", bus, dev)
 
-                            st_mode, st_ino, st_dev, st_nlink, st_uid, st_gid, \
-                                st_size, st_atime, st_mtime, st_ctime = \
-                                os.stat(devnode)
+                            if os.path.exists(devnode):
+                                log.info("    Device node: %s" % devnode)
 
-                            log.info("    Mode: 0%o" % (st_mode & 0777))
+                                st_mode, st_ino, st_dev, st_nlink, st_uid, st_gid, \
+                                    st_size, st_atime, st_mtime, st_ctime = \
+                                    os.stat(devnode)
 
-                            getfacl = utils.which('getfacl')
-                            if getfacl:
-                                getfacl = os.path.join(getfacl, "getfacl")
+                                log.info("    Mode: 0%o" % (st_mode & 0777))
 
-                                status, output = utils.run("%s %s" % (getfacl, devnode))
+                                getfacl = utils.which('getfacl')
+                                if getfacl:
+                                    getfacl = os.path.join(getfacl, "getfacl")
 
-                                log.info(output)
+                                    status, output = utils.run("%s %s" % (getfacl, devnode))
+
+                                    log.info(output)
+
+    tui.header("USER GROUPS")
+
+    groups = utils.which('groups')
+    if groups:
+        groups = os.path.join(groups, 'groups')
+        status, output = utils.run(groups)
+
+        if status == 0:
+            log.info(output)
 
 
     tui.header("SUMMARY")

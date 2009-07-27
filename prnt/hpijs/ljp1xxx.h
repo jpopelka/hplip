@@ -98,6 +98,7 @@ public:
         "HP LaserJet P1006\0"
         "HP LaserJet P1007\0"
         "HP LaserJet P1008\0"
+        "HP LaserJet P1009\0"
     ) {m_iPrinterType = eLJP1XXX;}
     inline Printer* CreatePrinter(SystemServices* pSS) const { return new LJP1XXX(pSS); }
     inline PRINTER_TYPE GetPrinterType() const { return eLJP1XXX;}

@@ -317,6 +317,7 @@ class PrintSettingsToolbox(QToolBox):
 
 
     def updateUi(self, cur_device, cur_printer):
+        #print "updateUi(%s, %s)" % (cur_device, cur_printer)
         self.cur_device = cur_device
         self.cur_printer = cur_printer
 
@@ -911,15 +912,13 @@ class PrintSettingsToolbox(QToolBox):
 
             if value == default:
                 DefaultButton.setEnabled(False)
-
             self.connect(DefaultButton, SIGNAL("clicked()"), self.DefaultButton_clicked)
-            self.connect(OnRadioButton, SIGNAL("toggled(bool)"), self.BoolRadioButtons_clicked)
-
 
             if value:
                 OnRadioButton.setChecked(True)
             else:
                 OffRadioButton.setChecked(True)
+            self.connect(OnRadioButton, SIGNAL("toggled(bool)"), self.BoolRadioButtons_clicked)
 
             if read_only:
                 OnRadioButton.setEnabled(False)

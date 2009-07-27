@@ -154,6 +154,7 @@ class ScrollFaxView(ScrollView):
             "application/x-perl" : (self.__tr("Perl Script"), '.pl'),
             "application/x-python" : (self.__tr("Python Program"), '.py'),
             "application/x-shell" : (self.__tr("Shell Script"), '.sh'),
+            "application/x-sh" : (self.__tr("Shell Script"), '.sh'),
             "text/plain" : (self.__tr("Plain Text"), '.txt, .log, etc'),
             "text/html" : (self.__tr("HTML Dcoument"), '.htm, .html'),
             "image/gif" : (self.__tr("GIF Image"), '.gif'),
@@ -1104,9 +1105,6 @@ class ScrollFaxView(ScrollView):
 
 
     def quickAddPushButton_clicked(self):
-
-        # TODO: Check for duplicate already in FAB
-
         name =  unicode(self.quickAddNameLineEdit.text())
         self.db.set(name, u'', u'', u'', unicode(self.quickAddFaxLineEdit.text()), [], self.__tr('Added with Quick Add'))
         self.db.save()
@@ -1115,11 +1113,41 @@ class ScrollFaxView(ScrollView):
         self.quickAddNameLineEdit.setText("")
         self.quickAddFaxLineEdit.setText("")
 
-    def quickAddNameLineEdit_textChanged(self, s):
-        self.quickAddPushButton.setEnabled(len(s) and len(self.quickAddFaxLineEdit.text()))
 
-    def quickAddFaxLineEdit_textChanged(self, s):
-        self.quickAddPushButton.setEnabled(len(self.quickAddNameLineEdit.text()) and len(s))
+    def enableQuickAddButton(self, name=None, fax=None):
+        if name is None:
+            name = unicode(self.quickAddNameLineEdit.text())
+        if fax is None:
+            fax = unicode(self.quickAddFaxLineEdit.text())
+
+        existing_name = False
+        if name:
+            existing_name = name in self.db.get_all_names()
+
+        if existing_name:
+            try:
+                self.quickAddNameLineEdit.setPaletteBackgroundColor(QColor("yellow"))
+            except AttributeError:
+                pass
+        else:
+            try:
+                self.quickAddNameLineEdit.setPaletteBackgroundColor(QColor("white"))
+            except AttributeError:
+                pass
+
+        if name and not existing_name and fax:
+            self.quickAddPushButton.setEnabled(True)
+        else:
+            self.quickAddPushButton.setEnabled(False)
+
+
+    def quickAddNameLineEdit_textChanged(self, name):
+        self.enableQuickAddButton(unicode(name))
+
+
+    def quickAddFaxLineEdit_textChanged(self, fax):
+        self.enableQuickAddButton(None, unicode(fax))
+
 
     def checkSendFaxButton(self):
         self.faxButton.setEnabled(len(self.file_list) and len(self.recipient_list))
@@ -1254,9 +1282,12 @@ class ScrollFaxView(ScrollView):
                     self.waitdlg.close()
                     self.waitdlg = None
 
-                if status  == fax.STATUS_ERROR:
+                if status == fax.STATUS_ERROR:
                     result_code, error_state = self.dev.getPML(pml.OID_FAX_DOWNLOAD_ERROR)
-                    self.form.FailureUI(self.__tr("<b>Fax send error (%s).</b><p>" % pml.DN_ERROR_STR.get(error_state, "Unknown error")))
+                    if error_state == pml.DN_ERROR_NONE:
+                        self.form.FailureUI(self.__tr("<b>Fax send error (Possible cause: No answer or dialtone)"))
+                    else:
+                        self.form.FailureUI(self.__tr("<b>Fax send error (%s).</b><p>" % pml.DN_ERROR_STR.get(error_state, "Unknown error")))
                     self.dev.sendEvent(EVENT_FAX_JOB_FAIL, self.cur_printer, 0, '')
 
                 elif status == fax.STATUS_BUSY:

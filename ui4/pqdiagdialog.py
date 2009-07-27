@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-#  
+#
 # Authors: Don Welch
 #
 
@@ -56,7 +56,7 @@ class PQDiagDialog(QDialog, Ui_Dialog):
         self.DeviceComboBox.setFilter({'pq-diag-type': (operator.gt, 0)})
 
         # Application icon
-        self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
+        self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))
 
         if self.device_uri:
             self.DeviceComboBox.setInitialDevice(self.device_uri)
@@ -84,7 +84,7 @@ class PQDiagDialog(QDialog, Ui_Dialog):
     def RunButton_clicked(self):
         d = None
 
-        try:    
+        try:
             try:
                 d = device.Device(self.device_uri)
             except Error:
@@ -116,7 +116,7 @@ class PQDiagDialog(QDialog, Ui_Dialog):
 
     #
     # Misc
-    # 
+    #
 
     def __tr(self,s,c = None):
         return qApp.translate("PQDiagDialog",s,c)

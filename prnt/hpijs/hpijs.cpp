@@ -43,28 +43,14 @@
 #include "hpijs.h"
 #include "services.h"
 
-#define EVENT_PRINT_FAILED_MISSING_PLUGIN 502
-#if defined(HAVE_LIBHPIP) && defined(HAVE_DBUS) 
-#include <dbus/dbus.h>
-#define DBUS_INTERFACE "com.hplip.StatusService"
-#define DBUS_PATH "/"
-static DBusError dbus_err;
-static DBusConnection *dbus_conn;
-void InitDbus (void);
-static void SendDbusMessage (const char *dev, const char *printer, int code, 
+extern void SendDbusMessage (const char *dev, const char *printer, int code, 
                              const char *username, const int jobid, const char *title);
-#else
-static void SendDbusMessage (const char *dev, const char *printer, int code, 
-                             const char *username, const int jobid, const char *title)
-{
-}
-#endif
 
 #ifdef HAVE_LIBHPIP
 extern  int hpijsFaxServer (int argc, char **argv);
 #endif
 
-
+#if 0
 int bug(const char *fmt, ...)
 {
    char buf[256];
@@ -83,6 +69,42 @@ int bug(const char *fmt, ...)
    va_end(args);
    return n;
 }
+#endif
+
+void setLogLevel(UXServices *pSS)
+{
+    FILE    *fp;
+    char    str[258];
+    char    *p;
+    fp = fopen ("/etc/cups/cupsd.conf", "r");
+    if (fp == NULL)
+        return;
+    while (!feof (fp))
+    {
+        if (!fgets (str, 256, fp))
+	{
+	    break;
+	}
+	if ((p = strstr (str, "hpLogLevel")))
+	{
+	    p += strlen ("hpLogLevel") + 1;
+	    pSS->m_iLogLevel = atoi (p);
+	    break;
+	}
+    }
+    fclose (fp);
+
+    if (pSS->m_iLogLevel & SAVE_PCL_FILE)
+    {
+        char    szFileName[32];
+	sprintf (szFileName, "/tmp/hpijs_%d.out", getpid());
+	pSS->outfp = fopen (szFileName, "w");
+	if (pSS->outfp)
+	{
+	    chmod (szFileName, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	}
+    }
+}
 
 /* Set Print Context. */
 int hpijs_set_context(UXServices *pSS)
@@ -92,15 +114,15 @@ int hpijs_set_context(UXServices *pSS)
    if (pSS->PenSet != DUMMY_PEN)
    {
      if ((r = pSS->pPC->SetPenSet((PEN_TYPE)pSS->PenSet)) != NO_ERROR)
-        bug("unable to SetPenSet set=%d, err=%d\n", pSS->PenSet, r);
+        BUG("unable to SetPenSet set=%d, err=%d\n", pSS->PenSet, r);
    }
 
    if ((r = pSS->pPC->SelectPrintMode((QUALITY_MODE)pSS->Quality, (MEDIATYPE)pSS->MediaType, (COLORMODE)pSS->ColorMode)) !=  NO_ERROR)
    {
       BOOL        bDevText;
-      bug("unable to set Quality=%d, ColorMode=%d, MediaType=%d, err=%d\n", pSS->Quality, pSS->ColorMode, pSS->MediaType, r);
+      BUG("unable to set Quality=%d, ColorMode=%d, MediaType=%d, err=%d\n", pSS->Quality, pSS->ColorMode, pSS->MediaType, r);
       pSS->pPC->GetPrintModeSettings((QUALITY_MODE &)pSS->Quality, (MEDIATYPE &)pSS->MediaType, (COLORMODE &)pSS->ColorMode, bDevText);
-      bug("following will be used Quality=%d, ColorMode=%d, MediaType=%d\n", pSS->Quality, pSS->ColorMode, pSS->MediaType);
+      BUG("following will be used Quality=%d, ColorMode=%d, MediaType=%d\n", pSS->Quality, pSS->ColorMode, pSS->MediaType);
    }
 
    /* Map ghostscript paper size to APDK paper size. */
@@ -110,12 +132,12 @@ int hpijs_set_context(UXServices *pSS)
    if (pSS->Duplex && !pSS->Tumble)
    {
       if (pSS->pPC->SelectDuplexPrinting(DUPLEXMODE_BOOK) != TRUE)
-         bug("unable to set duplex mode=book\n");
+         BUG("unable to set duplex mode=book\n");
    }
    else if (pSS->Duplex && pSS->Tumble)
    {
       if (pSS->pPC->SelectDuplexPrinting(DUPLEXMODE_TABLET) != TRUE)
-         bug("unable to set duplex mode=tablet\n");
+         BUG("unable to set duplex mode=tablet\n");
    }
    else
    {
@@ -125,7 +147,7 @@ int hpijs_set_context(UXServices *pSS)
    if (pSS->MediaPosition != sourceTrayAuto)
    {
       if (pSS->pPC->SetMediaSource((MediaSource)pSS->MediaPosition) != NO_ERROR)
-         bug("unable to set MediaPosition=%d\n", pSS->MediaPosition);
+         BUG("unable to set MediaPosition=%d\n", pSS->MediaPosition);
    }
 
    return 0;
@@ -177,7 +199,7 @@ int hpijs_enum_cb(void *enum_cb_data, IjsServerCtx *ctx, IjsJobId job_id,
       pSS->pPC->SelectDuplexPrinting(DUPLEXMODE_NONE);
    }
    else
-      bug("unable to enum key=%s\n", key);    
+      BUG("unable to enum key=%s\n", key);    
   return IJS_ERANGE;
 }
 
@@ -218,7 +240,7 @@ int hpijs_set_cb (void *set_cb_data, IjsServerCtx *ctx, IjsJobId job_id,
         if ((strncasecmp(svalue, "HEWLETT-PACKARD", 15) != 0) &&
             (strncasecmp(svalue, "APOLLO", 6) != 0) && (strncasecmp(svalue, "HP", 2) != 0))
         {
-            bug("unable to set DeviceManufacturer=%s\n", svalue);
+            BUG("unable to set DeviceManufacturer=%s\n", svalue);
             status = -1;
         }
     }
@@ -235,7 +257,7 @@ int hpijs_set_cb (void *set_cb_data, IjsServerCtx *ctx, IjsJobId job_id,
                 SendDbusMessage (getenv ("DEVICE_URI"), getenv("PRINTER"),
 	     	                 EVENT_PRINT_FAILED_MISSING_PLUGIN,
 				 user_name, job_id, title);
-                bug("unable to set device=%s, err=%d\n", svalue, r);
+                BUG("unable to set device=%s, err=%d\n", svalue, r);
                 status = -1;
 	    }
 	    else
@@ -256,7 +278,7 @@ int hpijs_set_cb (void *set_cb_data, IjsServerCtx *ctx, IjsJobId job_id,
         }
         else
         {
-            bug("unable to set device=%s, err=%d\n", svalue, r);
+            BUG("unable to set device=%s, err=%d\n", svalue, r);
             status = -1;
         }
     }
@@ -350,13 +372,13 @@ int hpijs_set_cb (void *set_cb_data, IjsServerCtx *ctx, IjsJobId job_id,
         iVal = strtol (svalue, &tail, 10);
         pSS->pPC->SetPrinterHint (MAX_FILE_SIZE_HINT, iVal);
     }  
-    else if (!strcmp (key, "Quality:SpeedMech"))
+    else if (!strcmp (key, "Quality:SpeedMech") && !pSS->Duplex)
     {
         pSS->pPC->SetPrinterHint (PAGES_IN_DOC_HINT, 512);
 	pSS->EnableSpeedMech (TRUE);
     }
     else
-        bug("unable to set key=%s, value=%s\n", key, svalue);    
+        BUG("unable to set key=%s, value=%s\n", key, svalue);    
 
     return status;
 }
@@ -486,7 +508,7 @@ int hpijs_get_cb(void *get_cb_data, IjsServerCtx *ctx, IjsJobId job_id, const ch
       return snprintf(value_buf, value_size, "%d", pSS->MediaPosition);
    }
    else
-      bug("unable to get key=%s\n", key);    
+      BUG("unable to get key=%s\n", key);    
 
    return IJS_EUNKPARAM;
 }
@@ -525,6 +547,8 @@ int main (int argc, char *argv[], char *evenp[])
    int status = EXIT_FAILURE;
    int ret, n, i, kn=0, width, k_width;
 
+   openlog("hpijs", LOG_PID,  LOG_DAEMON);
+
    if (argc > 1)
    {
       const char *arg = argv[1];
@@ -548,20 +572,22 @@ int main (int argc, char *argv[], char *evenp[])
    ctx = ijs_server_init();
    if (ctx == NULL)
    {
-      bug("unable to init hpijs server\n");
+      BUG("unable to init hpijs server\n");
       goto BUGOUT;
    }
 
    pSS = new UXServices();
    if (pSS->constructor_error != NO_ERROR)
    {
-      bug("unable to open Services object err=%d\n", pSS->constructor_error);
+      BUG("unable to open Services object err=%d\n", pSS->constructor_error);
       goto BUGOUT;
    }
 
+   setLogLevel(pSS);
+
 #ifdef CAPTURE
    if ((pSS->InitScript("/tmp/capout", TRUE)) != NO_ERROR)
-      bug("unable to init capture");
+      BUG("unable to init capture");
 #endif
 
    
@@ -570,7 +596,7 @@ int main (int argc, char *argv[], char *evenp[])
    /* Ignore JOB_CANCELED. This a bi-di hack that allows the job to continue even if bi-di communication failed. */
    if (pSS->pPC->constructor_error > 0 && pSS->DisplayStatus != DISPLAY_PRINTING_CANCELED)
    {
-      bug("unable to open PrintContext object err=%d\n", pSS->pPC->constructor_error);
+      BUG("unable to open PrintContext object err=%d\n", pSS->pPC->constructor_error);
       goto BUGOUT;
    }
 
@@ -582,7 +608,7 @@ int main (int argc, char *argv[], char *evenp[])
     if (pSS->pPC->constructor_error < 0 &&
         pSS->pPC->constructor_error != WARN_MODE_MISMATCH)
     {
-        bug ("WARNING: %s\n", pSS->GetDriverMessage (pSS->pPC->constructor_error));
+        BUG ("WARNING: %s\n", pSS->GetDriverMessage (pSS->pPC->constructor_error));
 		switch (pSS->pPC->constructor_error)
 		{
 			case WARN_LOW_INK_BOTH_PENS:
@@ -601,19 +627,19 @@ int main (int argc, char *argv[], char *evenp[])
 			case WARN_LOW_INK_YELLOW:
 			case WARN_LOW_INK_MULTIPLE_PENS:
                         {
-			   bug ("STATE: marker-supply-low-warning\n");
+			   BUG ("STATE: marker-supply-low-warning\n");
                            break;
                         }
 			default:
-			   bug ("STATE: -marker-supply-low-warning");
+			   BUG ("STATE: -marker-supply-low-warning");
 		}
     }
 
 #if 0
-   bug("device model=%s\n", pSS->pPC->PrinterModel());
-   bug("device class=%s\n",  pSS->pPC->PrintertypeToString(pSS->pPC->SelectedDevice()));
-   bug("default pen=%d\n",  pSS->pPC->GetDefaultPenSet());
-   bug("installed pen=%d\n",  pSS->pPC->GetInstalledPens());
+   BUG("device model=%s\n", pSS->pPC->PrinterModel());
+   BUG("device class=%s\n",  pSS->pPC->PrintertypeToString(pSS->pPC->SelectedDevice()));
+   BUG("default pen=%d\n",  pSS->pPC->GetDefaultPenSet());
+   BUG("installed pen=%d\n",  pSS->pPC->GetInstalledPens());
 #endif
 
    ijs_server_install_status_cb (ctx, hpijs_status_cb, pSS);
@@ -626,7 +652,7 @@ int main (int argc, char *argv[], char *evenp[])
    {
       if ((ret = ijs_server_get_page_header(ctx, &pSS->ph)) < 0)
       {
-         bug("unable to read client data err=%d\n", ret);
+         BUG("unable to read client data err=%d\n", ret);
          goto BUGOUT;
       }
 
@@ -658,7 +684,7 @@ int main (int argc, char *argv[], char *evenp[])
 
          if ((ret = pSS->pPC->SetPixelsPerRow(width, width)) != NO_ERROR)
          {
-            bug("unable to SetPixelsPerRow width=%d, err=%d\n", pSS->ph.width, ret);
+            BUG("unable to SetPixelsPerRow width=%d, err=%d\n", pSS->ph.width, ret);
          }
 
          /* Turn off any bi-di support. Allow bi-di for printer capabilities only. */
@@ -681,7 +707,7 @@ int main (int argc, char *argv[], char *evenp[])
          pSS->pJob = new Job(pSS->pPC);
          if (pSS->pJob->constructor_error != NO_ERROR)
          {
-            bug("unable to create Job object err=%d\n", pSS->pJob->constructor_error);
+            BUG("unable to create Job object err=%d\n", pSS->pJob->constructor_error);
             goto BUGOUT;
          }
 
@@ -697,18 +723,18 @@ int main (int argc, char *argv[], char *evenp[])
             pSS->KRGB=1;
          
 #if 0
-         bug("papersize=%d\n", pSS->pPC->GetPaperSize());
-         bug("width=%d, height=%d\n", pSS->ph.width, pSS->ph.height);
-         bug("EffResX=%d, EffResY=%d, InPixelsPerRow=%d, OutPixelsPerRow=%d\n", 
+         BUG("papersize=%d\n", pSS->pPC->GetPaperSize());
+         BUG("width=%d, height=%d\n", pSS->ph.width, pSS->ph.height);
+         BUG("EffResX=%d, EffResY=%d, InPixelsPerRow=%d, OutPixelsPerRow=%d\n", 
             pSS->pPC->EffectiveResolutionX(), pSS->pPC->EffectiveResolutionY(), 
             pSS->pPC->InputPixelsPerRow(), pSS->pPC->OutputPixelsPerRow());
-         bug("device=%s\n", pSS->pPC->PrinterModel());
+         BUG("device=%s\n", pSS->pPC->PrinterModel());
 #endif
       } // pSS->FirstRaster
 
       if ((raster = (char *)malloc(pSS->ph.width*3)) == NULL)
       {
-         bug("unable to allocate raster buffer size=%d: %m\n", pSS->ph.width*3);
+         BUG("unable to allocate raster buffer size=%d: %m\n", pSS->ph.width*3);
          goto BUGOUT;
       }
 
@@ -716,7 +742,7 @@ int main (int argc, char *argv[], char *evenp[])
 
       if ((k_raster = (char *)malloc(k_width)) == NULL)
       {
-         bug("unable to allocate black raster buffer size=%d: %m\n", k_width);
+         BUG("unable to allocate black raster buffer size=%d: %m\n", k_width);
          goto BUGOUT;
       }
       memset(k_raster, 0, k_width);
@@ -794,57 +820,4 @@ BUGOUT:
 
    exit(status);
 }
-
-#if defined(HAVE_LIBHPIP) && defined(HAVE_DBUS) 
-static void SendDbusMessage (const char *dev, const char *printer, int code, 
-                             const char *username, const int jobid, const char *title)
-{
-    DBusMessage * msg = NULL;
-
-    InitDbus ();
-    if (dbus_conn == NULL)
-        return;
-    msg = dbus_message_new_signal(DBUS_PATH, DBUS_INTERFACE, "Event");
-
-    if (NULL == msg)
-    {
-        bug("dbus message is NULL!\n");
-        return;
-    }
-
-    dbus_message_append_args(msg, 
-        DBUS_TYPE_STRING, &dev,
-        DBUS_TYPE_STRING, &printer,
-        DBUS_TYPE_UINT32, &code, 
-        DBUS_TYPE_STRING, &username, 
-        DBUS_TYPE_UINT32, &jobid,
-        DBUS_TYPE_STRING, &title, 
-        DBUS_TYPE_INVALID);
-
-    if (!dbus_connection_send(dbus_conn, msg, NULL))
-    {
-        bug("dbus message send failed!\n");
-        return;
-    }
-
-    dbus_connection_flush(dbus_conn);
-    dbus_message_unref(msg);
-
-    return;
-}
-
-void InitDbus (void)
-{
-   dbus_error_init (&dbus_err);
-   dbus_conn = dbus_bus_get (DBUS_BUS_SYSTEM, &dbus_err);
-    
-   if (dbus_error_is_set (&dbus_err))
-   { 
-      bug ("dBus Connection Error (%s)!\n", dbus_err.message); 
-      dbus_error_free (&dbus_err); 
-   }
-
-   return;
-}
-#endif  /* HAVE_DBUS */
 

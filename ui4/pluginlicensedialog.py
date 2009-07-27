@@ -43,7 +43,7 @@ class PluginLicenseDialog(QDialog, Ui_Dialog):
 
     def initUi(self):
         # Application icon
-        self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
+        self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))
 
         self.LicenseTextEdit.setText(self.license_txt)
 

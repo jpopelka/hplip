@@ -28,6 +28,7 @@ import os
 from base.g import *
 from base.codes import *
 from base import utils
+from prnt import cups
 
 # Qt
 from PyQt4.QtCore import *
@@ -93,10 +94,21 @@ def load_pixmap(name, subdir=None, resize_to=None):
 loadPixmap = load_pixmap
 
 
+def getPynotifyIcon(name, subdir='32x32'):
+    name = ''.join([os.path.splitext(name)[0], '.png'])
+    return "file://" + os.path.join(prop.image_dir, subdir, name)
+
+
+
 class UserSettings(QSettings):
     def __init__(self):
-        QSettings.__init__(self, os.path.join(prop.user_dir,  'hplip.conf'),  QSettings.IniFormat)
+        if prop.user_dir is None:
+            QSettings.__init__(self)
+        else:
+            QSettings.__init__(self, os.path.join(prop.user_dir,  'hplip.conf'),  QSettings.IniFormat)
+
         self.systray_visible = SYSTRAY_VISIBLE_SHOW_ALWAYS
+        self.systray_messages = SYSTRAY_MESSAGES_SHOW_ALL
         self.last_used_device_uri = ''
         self.last_used_printer = ''
         self.version = ''
@@ -107,6 +119,9 @@ class UserSettings(QSettings):
         self.polling_interval = 5
         self.polling = True
         self.device_list = []
+        self.working_dir = '.'
+        self.voice_phone = ''
+        self.email_address = ''
         self.loadDefaults()
 
 
@@ -118,6 +133,7 @@ class UserSettings(QSettings):
                 return ' '.join([os.path.join(path, basename), ' '.join(c.split()[1:])])
 
         return ''
+
 
     def loadDefaults(self):
         self.cmd_scan = self.__setup(['xsane -V %SANE_URI%', 'kooka', 'xscanimage'])
@@ -133,11 +149,16 @@ class UserSettings(QSettings):
         if ok:
             self.systray_visible = i
 
+        i, ok = self.value("systray_messages").toInt()
+        if ok:
+            self.systray_messages = i
+
         self.endGroup()
 
         self.beginGroup("last_used")
         self.last_used_device_uri = unicode(self.value("device_uri").toString()) or self.last_used_device_uri
-        self.last_used_printer = unicode(self.value("printer").toString()) or self.last_used_printer
+        self.last_used_printer = unicode(self.value("printer_name").toString()) or self.last_used_printer
+        self.working_dir = unicode(self.value("working_dir").toString()) or self.working_dir
         self.endGroup()
 
         self.beginGroup("commands")
@@ -161,18 +182,24 @@ class UserSettings(QSettings):
         self.polling_device_list = unicode(self.value("device_list").toString() or '').split(u',')
         self.endGroup()
 
+        self.beginGroup("fax")
+        self.voice_phone = unicode(self.value("voice_phone").toString())
+        self.email_address = unicode(self.value("email_address").toString())
+        self.endGroup()
+
 
     def save(self):
         log.debug("Saving user settings...")
 
         self.beginGroup("settings")
-        i = QVariant(self.systray_visible)
         self.setValue("systray_visible", QVariant(self.systray_visible))
+        self.setValue("systray_messages", QVariant(self.systray_messages))
         self.endGroup()
 
         self.beginGroup("last_used")
         self.setValue("device_uri",  QVariant(self.last_used_device_uri))
-        self.setValue("printer", QVariant(self.last_used_printer))
+        self.setValue("printer_name", QVariant(self.last_used_printer))
+        self.setValue("working_dir", QVariant(self.working_dir))
         self.endGroup()
 
         self.beginGroup("commands")
@@ -191,6 +218,11 @@ class UserSettings(QSettings):
         self.setValue("device_list", QVariant(u','.join(self.polling_device_list)))
         self.endGroup()
 
+        self.beginGroup("fax")
+        self.setValue("voice_phone", QVariant(self.voice_phone))
+        self.setValue("email_address", QVariant(self.email_address))
+        self.endGroup()
+
         self.sync()
 
 
@@ -201,24 +233,10 @@ class UserSettings(QSettings):
         log.debug("Auto refresh rate: %s" % self.auto_refresh_rate)
         log.debug("Auto refresh type: %s" % self.auto_refresh_type)
         log.debug("Systray visible: %d" % self.systray_visible)
+        log.debug("Systray messages: %d" % self.systray_messages)
         log.debug("Last used device URI: %s" % self.last_used_device_uri)
         log.debug("Last used printer: %s" % self.last_used_printer)
-
-
-def su_sudo():
-    su_sudo_str = None
-
-    if utils.which('kdesu'):
-        su_sudo_str = 'kdesu -- %s'
-
-    elif utils.which('gnomesu'):
-        su_sudo_str = 'gnomesu -c "%s"'
-
-    elif utils.which('gksu'):
-        su_sudo_str = 'gksu "%s"'
-
-    return su_sudo_str
-
+        log.debug("Working directory: %s" % self.working_dir)
 
 
 DEFAULT_TITLE =  __translate("HP Device Manager")
@@ -300,7 +318,7 @@ class PrinterNameValidator(QValidator):
         if not input:
             return QValidator.Acceptable, pos
 
-        if input[pos-1] in u"""~`!@#$%^&*()-=+[]{}()\\/,.<>?'\";:| """:
+        if input[pos-1] in cups.INVALID_PRINTER_NAME_CHARS:
             return QValidator.Invalid, pos
 
         # TODO: How to determine if unicode char is "printable" and acceptable
@@ -360,6 +378,7 @@ MIME_TYPES_DESC = \
     "application/x-perl" : (__translate("Perl Script"), '.pl'),
     "application/x-python" : (__translate("Python Program"), '.py'),
     "application/x-shell" : (__translate("Shell Script"), '.sh'),
+    "application/x-sh" : (__translate("Shell Script"), '.sh'),
     "text/plain" : (__translate("Plain Text"), '.txt, .log'),
     "text/html" : (__translate("HTML Dcoument"), '.htm, .html'),
     "image/gif" : (__translate("GIF Image"), '.gif'),

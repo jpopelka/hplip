@@ -85,6 +85,8 @@ public:
     int         m_iBytesPerSwing;
     int         m_iLdlVersion;
     int         m_iColorPenResolution;
+    int         m_iBlackPenResolution;
+    int         m_iNumBlackNozzles;
 
 protected:
     DISPLAY_STATUS m_dsCurrentStatus;

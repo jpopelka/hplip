@@ -70,12 +70,24 @@ DEPENDENCY_RUN_TIME = 1
 DEPENDENCY_COMPILE_TIME = 2
 DEPENDENCY_RUN_AND_COMPILE_TIME = 3
 
+# Plug-in download errors
+PLUGIN_INSTALL_ERROR_NONE = 0
+PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND = 1
+PLUGIN_INSTALL_ERROR_DIGITAL_SIG_NOT_FOUND = 2
+PLUGIN_INSTALL_ERROR_DIGITAL_SIG_BAD = 3
+PLUGIN_INSTALL_ERROR_PLUGIN_FILE_CHECKSUM_ERROR = 4
+PLUGIN_INSTALL_ERROR_NO_NETWORK = 5
+PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR = 6
+PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS = 7
+
+
 PING_TARGET = "www.google.com"
 HTTP_GET_TARGET = "http://www.google.com"
 
-PASSWORD_LIST = [
+EXPECT_WORD_LIST = [
     pexpect.EOF, # 0
     pexpect.TIMEOUT, # 1
+    "Continue?", # 2 (for zypper)
     "passwor[dt]", # en/de/it/ru
     "kennwort", # de?
     "password for", # en
@@ -87,16 +99,41 @@ PASSWORD_LIST = [
     "heslo", # czech
 ]
 
-PASSWORD_EXPECT_LIST = []
-for s in PASSWORD_LIST:
+# Mapping from patterns to probability contribution of pattern
+# Example code from David Mertz' Text Processing in Python.
+# Released in the Public Domain.
+err_pats = {r'(?is)<TITLE>.*?(404|403).*?ERROR.*?</TITLE>': 0.95,
+            r'(?is)<TITLE>.*?ERROR.*?(404|403).*?</TITLE>': 0.95,
+            r'(?is)<TITLE>ERROR</TITLE>': 0.30,
+            r'(?is)<TITLE>.*?ERROR.*?</TITLE>': 0.10,
+            r'(?is)<META .*?(404|403).*?ERROR.*?>': 0.80,
+            r'(?is)<META .*?ERROR.*?(404|403).*?>': 0.80,
+            r'(?is)<TITLE>.*?File Not Found.*?</TITLE>': 0.80,
+            r'(?is)<TITLE>.*?Not Found.*?</TITLE>': 0.40,
+            r'(?is)<BODY.*(404|403).*</BODY>': 0.10,
+            r'(?is)<H1>.*?(404|403).*?</H1>': 0.15,
+            r'(?is)<BODY.*not found.*</BODY>': 0.10,
+            r'(?is)<H1>.*?not found.*?</H1>': 0.15,
+            r'(?is)<BODY.*the requested URL.*</BODY>': 0.10,
+            r'(?is)<BODY.*the page you requested.*</BODY>': 0.10,
+            r'(?is)<BODY.*page.{1,50}unavailable.*</BODY>': 0.10,
+            r'(?is)<BODY.*request.{1,50}unavailable.*</BODY>': 0.10,
+            r'(?i)does not exist': 0.10,
+           }
+# end
+
+
+EXPECT_LIST = []
+for s in EXPECT_WORD_LIST:
     try:
         p = re.compile(s, re.I)
     except TypeError:
-        PASSWORD_EXPECT_LIST.append(s)
+        EXPECT_LIST.append(s)
     else:
-        PASSWORD_EXPECT_LIST.append(p)
+        EXPECT_LIST.append(p)
 
-OK_PROCESS_LIST = ['adpept-notifier',
+OK_PROCESS_LIST = ['adept-notifier',
+                   'adept_notifier',
                    'yum-updatesd',
                    ]
 
@@ -154,23 +191,20 @@ class CoreInstall(object):
         self.distro, self.distro_name, self.distro_version = DISTRO_UNKNOWN, '', DISTRO_VER_UNKNOWN
         self.distro_version_supported = False
         self.install_location = '/usr'
-        self.hpoj_present = False
         self.hplip_present = False
         self.have_dependencies = {}
-        self.cups11 = False
-        self.hpijs_build = False
+        self.native_cups = True
         self.ppd_dir = None
         self.drv_dir = None
         self.distros = {}
-        self.logoff_required = False
-        self.restart_required = False
         self.network_connected = False
         self.ui_toolkit = ui_toolkit
         self.enable = None
         self.disable = None
-        self.plugin_path = os.path.join(prop.home_dir, "data", "plugin")
+        self.plugin_path = "/tmp"
         self.plugin_version = '0.0.0'
         self.plugin_name = ''
+        self.reload_dbus = False
 
 
         self.FIELD_TYPES = {
@@ -200,7 +234,6 @@ class CoreInstall(object):
             'packages': TYPE_LIST,
             'commands': TYPE_LIST,
             'same_as_version' : TYPE_STRING,
-            'gui_supported' : TYPE_BOOL,
             'scan_supported' : TYPE_BOOL,
             'fax_supported' : TYPE_BOOL,
             'pcard_supported' : TYPE_BOOL,
@@ -209,16 +242,19 @@ class CoreInstall(object):
             'usb_supported' : TYPE_BOOL,
             'packaged_version': TYPE_STRING, # Version of HPLIP pre-packaged in distro
             'cups_path_with_bitness' : TYPE_BOOL,
-            'ui_toolkit' : TYPE_STRING,  # qt3 or qt4 [or gtk]
-
+            'ui_toolkit' : TYPE_STRING,  # qt3 or qt4 [or gtk] or none
+            'policykit' : TYPE_BOOL,
+            'native_cups' : TYPE_BOOL,
+            'package_available' : TYPE_BOOL,
+            'package_arch' : TYPE_LIST,
+            'add_user_to_group': TYPE_STRING,
         }
 
         # components
         # 'name': ('description', [<option list>])
         self.components = {
-            'hplip': ("HP Linux Imaging and Printing System", ['base', 'network', 'gui_qt3', 'gui_qt4',
-                                                               'fax', 'scan', 'parallel', 'docs']),
-            'hpijs': ("HP IJS Printer Driver", ['hpijs', 'hpijs-cups'])
+            'hplip': ("HP Linux Imaging and Printing System", ['base', 'network', 'gui_qt4',
+                                                               'fax', 'scan', 'docs']),
         }
 
         self.selected_component = 'hplip'
@@ -226,18 +262,13 @@ class CoreInstall(object):
         # options
         # name: (<required>, "<display_name>", [<dependency list>]), ...
         self.options = {
-            'base':     (True,  'Required HPLIP base components', []), # HPLIP
+            'base':     (True,  'Required HPLIP base components (including hpcups)', []), # HPLIP
             'network' : (False, 'Network/JetDirect I/O', []),
-            'gui_qt3' : (False, 'Graphical User Interfaces (Qt3)', []),
             'gui_qt4' : (False, 'Graphical User Interfaces (Qt4)', []),
             'fax' :     (False, 'PC Send Fax support', []),
             'scan':     (False, 'Scanning support', []),
-            'parallel': (False, 'Parallel I/O (LPT)', []),
             'docs':     (False, 'HPLIP documentation (HTML)', []),
-
-            # hpijs only
-            'hpijs':       (True,  'Required HPIJS base components', []),
-            'hpijs-cups' : (False, 'CUPS support for HPIJS', []),
+            'policykit': (False, 'Administrative policy framework', []),
         }
 
 
@@ -246,16 +277,12 @@ class CoreInstall(object):
         self.selected_options = {
             'base':        True,
             'network':     True,
-            'gui_qt3':     False,
             'gui_qt4':     True,
             'fax':         True,
             'scan':        True,
-            'parallel':    False,
             'docs':        True,
-
-            # hpijs only
-            'hpijs':       True,
-            'hpijs-cups' : True,
+            'policykit':   False,
+            'native_cups': False,
         }
 
         # dependencies
@@ -263,23 +290,23 @@ class CoreInstall(object):
         # Note: any change to the list of dependencies must be reflected in base/distros.py
         self.dependencies = {
             # Required base packages
-            'libjpeg':          (True,  ['base', 'hpijs'], "libjpeg - JPEG library", self.check_libjpeg, DEPENDENCY_RUN_AND_COMPILE_TIME),
+            'libjpeg':          (True,  ['base'], "libjpeg - JPEG library", self.check_libjpeg, DEPENDENCY_RUN_AND_COMPILE_TIME),
             'libtool':          (True,  ['base'], "libtool - Library building support services", self.check_libtool, DEPENDENCY_COMPILE_TIME),
-            'cups' :            (True,  ['base', 'hpijs-cups'], 'CUPS - Common Unix Printing System', self.check_cups, DEPENDENCY_RUN_TIME),
+            'cups' :            (True,  ['base'], 'CUPS - Common Unix Printing System', self.check_cups, DEPENDENCY_RUN_TIME),
             'cups-devel':       (True,  ['base'], 'CUPS devel- Common Unix Printing System development files', self.check_cups_devel, DEPENDENCY_COMPILE_TIME),
-            'gcc' :             (True,  ['base', 'hpijs'], 'gcc - GNU Project C and C++ Compiler', self.check_gcc, DEPENDENCY_COMPILE_TIME),
-            'make' :            (True,  ['base', 'hpijs'], "make - GNU make utility to maintain groups of programs", self.check_make, DEPENDENCY_COMPILE_TIME),
+            'cups-image':       (True,  ['base'], "CUPS image - CUPS image development files", self.check_cups_image, DEPENDENCY_COMPILE_TIME),
+            'gcc' :             (True,  ['base'], 'gcc - GNU Project C and C++ Compiler', self.check_gcc, DEPENDENCY_COMPILE_TIME),
+            'make' :            (True,  ['base'], "make - GNU make utility to maintain groups of programs", self.check_make, DEPENDENCY_COMPILE_TIME),
             'python-devel' :    (True,  ['base'], "Python devel - Python development files", self.check_python_devel, DEPENDENCY_COMPILE_TIME),
             'libpthread' :      (True,  ['base'], "libpthread - POSIX threads library", self.check_libpthread, DEPENDENCY_RUN_AND_COMPILE_TIME),
             'python2x':         (True,  ['base'], "Python 2.2 or greater - Python programming language", self.check_python2x, DEPENDENCY_RUN_AND_COMPILE_TIME),
-            'python-xml'  :     (True, ['base'], "Python XML libraries", self.check_python_xml, DEPENDENCY_RUN_TIME),
-            'gs':               (True,  ['base', 'hpijs'], "GhostScript - PostScript and PDF language interpreter and previewer", self.check_gs, DEPENDENCY_RUN_TIME),
+            'python-xml'  :     (True,  ['base'], "Python XML libraries", self.check_python_xml, DEPENDENCY_RUN_TIME),
+            'gs':               (True,  ['base'], "GhostScript - PostScript and PDF language interpreter and previewer", self.check_gs, DEPENDENCY_RUN_TIME),
             'libusb':           (True,  ['base'], "libusb - USB library", self.check_libusb, DEPENDENCY_RUN_AND_COMPILE_TIME),
-
-
 
             # Optional base packages
             'cups-ddk':          (False, ['base'], "CUPS DDK - CUPS driver development kit", self.check_cupsddk, DEPENDENCY_RUN_TIME), # req. for .drv PPD installs
+
 
             # Required scan packages
             'sane':             (True,  ['scan'], "SANE - Scanning library", self.check_sane, DEPENDENCY_RUN_TIME),
@@ -294,20 +321,15 @@ class CoreInstall(object):
             'python23':         (True,  ['fax'], "Python 2.3 or greater - Required for fax functionality", self.check_python23, DEPENDENCY_RUN_TIME),
             'dbus':             (True,  ['fax'], "DBus - Message bus system", self.check_dbus, DEPENDENCY_RUN_AND_COMPILE_TIME),
             'python-dbus':      (True,  ['fax'], "Python DBus - Python bindings for DBus", self.check_python_dbus, DEPENDENCY_RUN_TIME),
-            'python-ctypes':    (True,  ['fax', 'gui_qt3'], "Python ctypes - A foreign function library for Python", self.check_python_ctypes, DEPENDENCY_RUN_TIME),
 
             # Optional fax packages
             'reportlab':        (False, ['fax'], "Reportlab - PDF library for Python", self.check_reportlab, DEPENDENCY_RUN_TIME),
 
-            # Required parallel I/O packages
-            'ppdev':            (True,  ['parallel'], "ppdev - Parallel port support kernel module.", self.check_ppdev, DEPENDENCY_RUN_TIME),
-
-            # Required qt3 packages
-            'pyqt':             [True,  ['gui_qt3'], "PyQt 3- Qt interface for Python (for Qt version 3.x)", self.check_pyqt, DEPENDENCY_RUN_TIME], # PyQt 3.x
-
-            # Required qt4 packages
-            'pyqt4':            [True,  ['gui_qt4'], "PyQt 4- Qt interface for Python (for Qt version 4.x)", self.check_pyqt4, DEPENDENCY_RUN_TIME], # PyQt 4.x )
-            'pyqt4-dbus' :      [True,  ['gui_qt4'], "PyQt 4 DBus - DBus Support for PyQt4", self.check_pyqt4_dbus, DEPENDENCY_RUN_TIME],
+            # Required and optional qt4 GUI packages
+            'pyqt4':            (True,  ['gui_qt4'], "PyQt 4- Qt interface for Python (for Qt version 4.x)", self.check_pyqt4, DEPENDENCY_RUN_TIME), # PyQt 4.x )
+            'pyqt4-dbus' :      (True,  ['gui_qt4'], "PyQt 4 DBus - DBus Support for PyQt4", self.check_pyqt4_dbus, DEPENDENCY_RUN_TIME),
+            'policykit':        (False, ['gui_qt4'], "PolicyKit - Administrative policy framework", self.check_policykit, DEPENDENCY_RUN_TIME), # optional for non-sudo behavior of plugins (only optional for Qt4 option)
+            'python-notify' :   (False, ['gui_qt4'], "Python libnotify - Python bindings for the libnotify Desktop notifications", self.check_pynotify, DEPENDENCY_RUN_TIME), # Optional for libnotify style popups from hp-systray
 
             # Required network I/O packages
             'libnetsnmp-devel': (True,  ['network'], "libnetsnmp-devel - SNMP networking library development files", self.check_libnetsnmp, DEPENDENCY_RUN_AND_COMPILE_TIME),
@@ -390,9 +412,6 @@ class CoreInstall(object):
             (self.distro, self.distro_name, self.distros[self.distro_name]['display_name'],
              self.distro_version, self.distro_version_supported))
 
-        self.hpoj_present = self.check_hpoj()
-        log.debug("HPOJ = %s" % self.hpoj_present)
-
         update_spinner()
 
         self.hplip_present = self.check_hplip()
@@ -402,14 +421,14 @@ class CoreInstall(object):
         self.cups_ver = output.strip()
         log.debug("CUPS version = %s" % self.cups_ver)
 
-        self.cups11 = output.startswith('1.1')
-        log.debug("Is CUPS 1.1.x? %s" % self.cups11)
+        if self.distro_name == "ubuntu":
+            self.reload_dbus = True
+
+        log.debug("DBUS configuration reload possible? %s" % self.reload_dbus)
 
         status, self.sys_uname_info = self.run('uname -a')
         self.sys_uname_info = self.sys_uname_info.replace('\n', '')
         log.debug(self.sys_uname_info)
-
-        #self.distro_changed()
 
         # Record the installation time/date and version.
         # Also has the effect of making the .hplip.conf file user r/w
@@ -471,7 +490,7 @@ class CoreInstall(object):
             return ''
 
 
-    def run(self, cmd, callback=None, timeout=300):
+    def run(self, cmd, callback=None, timeout=300): # ==> status, output
         if cmd is None:
             return 1, ''
         output = cStringIO.StringIO()
@@ -491,7 +510,7 @@ class CoreInstall(object):
                 while True:
                     update_spinner()
 
-                    i = child.expect_list(PASSWORD_EXPECT_LIST)
+                    i = child.expect_list(EXPECT_LIST)
 
                     cb = child.before
                     if cb:
@@ -525,6 +544,9 @@ class CoreInstall(object):
 
                     elif i == 1: # TIMEOUT
                         continue
+
+                    elif i == 2: # zypper "Continue?"
+                        child.sendline("YES")
 
                     else: # password
                         child.sendline(self.password)
@@ -626,17 +648,11 @@ class CoreInstall(object):
         if ppd_install not in ('ppd', 'drv'):
             log.warning("Invalid ppd_install value: %s" % ppd_install)
 
-        if self.cups11:
-            self.enable_ppds = True
-        else:
-            self.enable_ppds = (ppd_install == 'ppd')
+        self.enable_ppds = (ppd_install == 'ppd')
 
         log.debug("Enable PPD install: %s (False=drv)" % self.enable_ppds)
 
         self.ppd_dir = self.get_distro_ver_data('ppd_dir')
-
-        #if not self.ppd_dir:
-        #    log.warning("Invalid ppd_dir value: %s" % self.ppd_dir)
 
         self.drv_dir = self.get_distro_ver_data('drv_dir')
         if not self.enable_ppds and not self.drv_dir:
@@ -646,45 +662,29 @@ class CoreInstall(object):
         self.selected_options['fax'] = self.get_distro_ver_data('fax_supported', True)
         self.selected_options['network'] = self.get_distro_ver_data('network_supported', True)
         self.selected_options['scan'] = self.get_distro_ver_data('scan_supported', True)
-        self.selected_options['parallel'] = self.get_distro_ver_data('parallel_supported', False)
+        self.selected_options['policykit'] = self.get_distro_ver_data('policykit', False)
+        self.native_cups = self.get_distro_ver_data('native_cups', False)
 
-        gui_supported = self.get_distro_ver_data('gui_supported', True)
+        # Adjust required flag based on the distro ver ui_toolkit value
+        ui_toolkit = self.get_distro_ver_data('ui_toolkit',  'qt4').lower()
 
-        if gui_supported:
-            # Adjust required flag based on the distro ver ui_toolkit value
-            ui_toolkit = self.get_distro_ver_data('ui_toolkit',  'qt4').lower()
+        if ui_toolkit == 'qt4':
+            log.debug("Default UI toolkit: Qt4")
+            self.ui_toolkit = 'qt4'
+            self.selected_options['gui_qt4'] = True
 
-            if ui_toolkit == 'qt4':
-                log.debug("Default UI toolkit: Qt4")
-                self.ui_toolkit = 'qt4'
-                self.selected_options['gui_qt4'] = True
-                self.selected_options['gui_qt3'] = False
-
-            elif ui_toolkit == 'qt3':
-                log.debug("Default UI toolkit: Qt3")
-                self.ui_toolkit = 'qt3'
-                self.selected_options['gui_qt4'] = False
-                self.selected_options['gui_qt3'] = True
-            # todo: gtk
+        # todo: gtk
         else:
-                self.selected_options['gui_qt3'] = False
-                self.selected_options['gui_qt4'] = False
+            self.selected_options['gui_qt4'] = False
 
-        # Override with --qt3 or --qt4 command args
+        # Override with --qt4 command args
         if self.enable is not None:
-            if 'qt3' in self.enable:
-                log.debug("User selected UI toolkit: Qt3")
-                self.ui_toolkit = 'qt3'
-                self.selected_options['gui_qt3'] = True
             if 'qt4' in self.enable:
                 log.debug("User selected UI toolkit: Qt4")
                 self.ui_toolkit = 'qt4'
                 self.selected_options['gui_qt4'] = True
 
         if self.disable is not None:
-            if 'qt3' in self.disable:
-                log.debug("User deselected UI toolkit: Qt3")
-                self.selected_options['gui_qt3'] = False
             if 'qt4' in self.disable:
                 log.debug("User deselected UI toolkit: Qt4")
                 self.selected_options['gui_qt4'] = False
@@ -766,7 +766,7 @@ class CoreInstall(object):
                 self.distros[distro]['versions'][ver] = v
                 self.distros[distro]['versions'][ver]['dependency_cmds'] = {}
 
-                if same_as_version or not supported:
+                if same_as_version: # or not supported:
                     continue
 
                 for dep in self.dependencies:
@@ -909,61 +909,8 @@ class CoreInstall(object):
         return check_tool('scanimage --version', 1.0)
 
 
-    def check_ppdev(self):
-        return check_lsmod('ppdev')
-
-
     def check_gs(self):
         return check_tool('gs -v', 7.05)
-
-
-    def check_pyqt(self):
-        if self.ui_toolkit == 'qt3':
-            try:
-                import qt
-                pyqtVersion = None
-                try:
-                    pyqtVersion = qt.PYQT_VERSION_STR
-                    log.debug("PYQT_VERSION_STR = %s" % pyqtVersion)
-                except AttributeError:
-                    try:
-                        pyqtVersion = qt.PYQT_VERSION
-                        log.debug("PYQT_VERSION = %s" % pyqtVersion)
-                    except AttributeError:
-                        pass
-
-                if pyqtVersion is not None:
-                    while pyqtVersion.count('.') < 2:
-                        pyqtVersion += '.0'
-
-                    (maj_ver, min_ver, pat_ver) = pyqtVersion.split('.')
-
-                    if pyqtVersion.find('snapshot') >= 0:
-                        log.debug("A non-stable snapshot version of PyQt is installed.")
-                        pass
-                    else:
-                        try:
-                            maj_ver = int(maj_ver)
-                            min_ver = int(min_ver)
-                            pat_ver = int(pat_ver)
-                        except ValueError:
-                            maj_ver, min_ver, pat_ver = 0, 0, 0
-                        else:
-                            log.debug("Version %d.%d.%d installed." % (maj_ver, min_ver, pat_ver))
-
-                        if maj_ver < MINIMUM_PYQT_MAJOR_VER or \
-                            (maj_ver == MINIMUM_PYQT_MAJOR_VER and min_ver < MINIMUM_PYQT_MINOR_VER):
-                            log.debug("HPLIP may not function properly with the version of PyQt that is installed (%d.%d.%d)." % (maj_ver, min_ver, pat_ver))
-                            log.debug("Incorrect version of PyQt installed. Ver. %d.%d or greater required." % (MINIMUM_PYQT_MAJOR_VER, MINIMUM_PYQT_MINOR_VER))
-                            return True
-                        else:
-                            return True
-
-            except (ImportError, TypeError): # Note: IGOS 1.0 produces a TypeError when importing Qt3
-                return False
-
-        else:
-            return False
 
 
     def check_pyqt4(self):
@@ -993,6 +940,15 @@ class CoreInstall(object):
 
     def check_python_devel(self):
         return check_file('Python.h')
+
+
+    def check_pynotify(self):
+        try:
+            import pynotify
+        except ImportError:
+            return False
+
+        return True
 
 
     def check_python_dbus(self):
@@ -1032,17 +988,6 @@ class CoreInstall(object):
         return check_ps(['dbus-daemon'])  and \
             len(locate_file_contains("dbus-message.h", '/usr/include', 'dbus_message_new_signal'))
 
-        #try:
-            #from dbus import lowlevel, SystemBus, SessionBus
-            #import dbus.service
-            #from dbus.mainloop.glib import DBusGMainLoop
-            #from gobject import MainLoop
-            #python_dbus = True
-        #except ImportError:
-            #python_dbus = False
-
-        #return dbus_running and python_dbus
-
 
     def check_cups_devel(self):
         return check_file('cups.h') and bool(utils.which('lpr'))
@@ -1058,10 +1003,8 @@ class CoreInstall(object):
             return True
 
 
-    def check_hpoj(self):
-        log.debug("Checking for 'HPOJ'...")
-        return check_ps(['ptal-mlcd', 'ptal-printd', 'ptal-photod']) or \
-            bool(utils.which("ptal-init"))
+    def check_cups_image(self):
+      return check_file("raster.h", "/usr/include/cups")
 
 
     def check_hplip(self):
@@ -1096,6 +1039,11 @@ class CoreInstall(object):
             check_file('media.defs', "/usr/share/cupsddk/include")
 
 
+    def check_policykit(self):
+        log.debug("Checking for PolicyKit...")
+        return check_file('PolicyKit.conf', "/etc/PolicyKit") and check_file('org.gnome.PolicyKit.AuthorizationManager.service', "/usr/share/dbus-1/services")
+
+
     def check_pkg_mgr(self):
         """
             Check if any pkg mgr processes are running
@@ -1108,9 +1056,13 @@ class CoreInstall(object):
             for p in self.package_mgrs:
                 if p in cmdline:
                     for k in OK_PROCESS_LIST:
-                        if k not in cmdline:
-                            log.debug("Found: %s (%d)" % (cmdline, pid))
-                            return (pid, cmdline)
+                        #print k, cmdline
+                        if k in cmdline:
+                            break
+
+                    else:
+                        log.debug("Found: %s (%d)" % (cmdline, pid))
+                        return (pid, cmdline)
 
         log.debug("Not found")
         return (0, '')
@@ -1156,46 +1108,89 @@ class CoreInstall(object):
     def configure(self):
         configure_cmd = './configure'
         configuration = {}
-
         dbus_avail = self.have_dependencies['dbus'] and self.have_dependencies['python-dbus']
-
         configuration['network-build'] = self.selected_options['network']
-        configuration['pp-build'] = self.selected_options['parallel']
         configuration['fax-build'] = self.selected_options['fax'] and dbus_avail
         configuration['dbus-build'] = dbus_avail
-        configuration['qt3'] = self.selected_options['gui_qt3']
         configuration['qt4'] = self.selected_options['gui_qt4']
         configuration['scan-build'] = self.selected_options['scan']
         configuration['doc-build'] = self.selected_options['docs']
+        configuration['policykit'] = self.selected_options['policykit']
 
-        if self.enable_ppds: # Use ppd install if cups 1.1 or ppd_install=ppd
-            configuration['foomatic-ppd-install'] = True
+        # Setup printer driver configure flags based on distro data...
+        if self.native_cups: # hpcups
+            configuration['hpcups-install'] = True
+            configuration['hpijs-install'] = False
+            configuration['foomatic-ppd-install'] = False
             configuration['foomatic-drv-install'] = False
 
-        else: # otherwise, use drv if cups ddk is avail, otherwise fall back to .ppds
-            if self.have_dependencies['cups-ddk']:
+            if self.enable_ppds:
+                configuration['cups-ppd-install'] = True
+                configuration['cups-drv-install'] = False
+            else:
+                configuration['cups-ppd-install'] = False
+                configuration['cups-drv-install'] = True
+
+        else: # HPIJS/foomatic
+            configuration['hpcups-install'] = False
+            configuration['hpijs-install'] = True
+            configuration['cups-ppd-install'] = False
+            configuration['cups-drv-install'] = False
+
+            if self.enable_ppds:
+                configuration['foomatic-ppd-install'] = True
+                configuration['foomatic-drv-install'] = False
+            else:
                 configuration['foomatic-ppd-install'] = False
                 configuration['foomatic-drv-install'] = True
 
-                if self.drv_dir is not None:
-                    configure_cmd += ' --with-drvdir=%s' % self.drv_dir
 
-            else:
-                configuration['foomatic-ppd-install'] = True
-                configuration['foomatic-drv-install'] = False
+        # ... and then override and adjust for consistency with passed in parameters
+        if self.enable is not None:
+            for c in self.enable:
+                if c == 'hpcups-install':
+                    configuration['hpijs-install'] = False
+                    configuration['foomatic-ppd-install'] = False
+                    configuration['foomatic-drv-install'] = False
+                elif c == 'hpijs-install':
+                    configuration['hpcups-install'] = False
+                    configuration['cups-ppd-install'] = False
+                    configuration['cups-drv-install'] = False
+                elif c == 'foomatic-ppd-install':
+                    configuration['foomatic-drv-install'] = False
+                elif c == 'foomatic-drv-install':
+                    configuration['foomatic-ppd-install'] = False
+                elif c == 'cups-ppd-install':
+                    configuration['cups-drv-install'] = False
+                elif c == 'cups-drv-install':
+                    configuration['cups-ppd-install'] = False
+
+        if self.disable is not None:
+            for c in self.disable:
+                if c == 'hpcups-install':
+                    configuration['hpijs-install'] = True
+                    configuration['cups-ppd-install'] = False
+                    configuration['cups-drv-install'] = False
+                elif c == 'hpijs-install':
+                    configuration['hpcups-install'] = True
+                    configuration['foomatic-ppd-install'] = False
+                    configuration['foomatic-drv-install'] = False
+                elif c == 'foomatic-ppd-install':
+                    configuration['foomatic-drv-install'] = True
+                elif c == 'foomatic-drv-install':
+                    configuration['foomatic-ppd-install'] = True
+                elif c == 'cups-ppd-install':
+                    configuration['cups-drv-install'] = True
+                elif c == 'cups-drv-install':
+                    configuration['cups-ppd-install'] = True
 
         if self.ppd_dir is not None:
             configure_cmd += ' --with-hpppddir=%s' % self.ppd_dir
-
-        configuration['hpijs-only-build'] = self.hpijs_build
 
         if self.bitness == 64:
             configure_cmd += ' --libdir=/usr/lib64'
 
         configure_cmd += ' --prefix=%s' % self.install_location
-
-        if self.cups11:
-            configuration['cups11-build'] = True
 
         if self.get_distro_ver_data('cups_path_with_bitness', False) and self.bitness == 64:
             configure_cmd += ' --with-cupsbackenddir=/usr/lib64/cups/backend --with-cupsfilterdir=/usr/lib64/cups/filter'
@@ -1430,7 +1425,7 @@ class CoreInstall(object):
         wget = utils.which("wget")
         if wget:
             wget = os.path.join(wget, "wget")
-            cmd = "%s --timeout=10 %s" % (wget, HTTP_GET_TARGET)
+            cmd = "%s --timeout=10 --output-document=- %s" % (wget, HTTP_GET_TARGET)
             log.debug(cmd)
             status, output = self.run(cmd)
             log.debug("wget returned: %d" % status)
@@ -1440,7 +1435,7 @@ class CoreInstall(object):
             curl = utils.which("curl")
             if curl:
                 curl = os.path.join(curl, "curl")
-                cmd = "%s --connect-timeout 5 --max-time 10 %s" % (curl, HTTP_GET_TARGET)
+                cmd = "%s --output - --connect-timeout 5 --max-time 10 %s" % (curl, HTTP_GET_TARGET)
                 log.debug(cmd)
                 status, output = self.run(cmd)
                 log.debug("curl returned: %d" % status)
@@ -1543,21 +1538,25 @@ class CoreInstall(object):
 
     def post_build(self):
         cmds = []
-        self.logoff_required = False
-        self.restart_required = True
-        trigger_required = True
-
-        # Restart CUPS if necessary
-        if self.cups11:
-            cmds.append(self.restart_cups())
+        # Reload DBUS configuration if distro supports it and PolicyKit
+        # support installed
+        if self.reload_dbus and self.selected_options['policykit']:
+            cmds.append(self.su_sudo() % "sh /etc/init.d/dbus reload")
+            log.debug("Will reload DBUS configuration for PolicyKit support")
 
         # Kill any running hpssd.py instance from a previous install
         if self.check_hpssd():
             pid = get_ps_pid('hpssd')
             if pid:
                 kill = os.path.join(utils.which("kill"), "kill") + " %d" % pid
-
                 cmds.append(self.su_sudo() % kill)
+
+        # Add user to group if needed
+        # add_user_to_group=<usermod params> [TYPE_STRING] (leave empty for none) [ex. "-a -G sys" or "-G lp"]
+        add_user_to_group = self.get_distro_ver_data('add_user_to_group', '')
+        if add_user_to_group:
+            usermod = os.path.join(utils.which("usermod"), "usermod") + " %s %s" % (add_user_to_group, prop.username)
+            cmds.append(self.su_sudo() % usermod)
 
         return cmds
 
@@ -1593,11 +1592,10 @@ class CoreInstall(object):
         hpsetup = utils.which("hp-setup")
 
         if hpsetup:
-            c = 'hp-setup'
+            cmd = 'hp-setup'
         else:
-            c = './setup.py'
+            cmd = './setup.py'
 
-        cmd = self.su_sudo() % c
         log.debug(cmd)
         status, output = self.run(cmd)
         return status == 0
@@ -1633,23 +1631,6 @@ class CoreInstall(object):
 
             status, output = self.run(cmd)
 
-
-    def remove_hpoj(self, callback=None):
-        # TODO: Must stop PTAL?
-        hpoj_remove_cmd = self.get_distro_data('hpoj_remove_cmd')
-        if hpoj_remove_cmd:
-            if callback is not None:
-                callback(hpoj_remove_cmd, "Removing HPOJ")
-
-                status, output = self.run(hpoj_remove_cmd)
-
-            if status == 0:
-                self.hpoj_present = check_hpoj()
-
-                if not self.hpoj_present:
-                    failed = False
-
-        return failed
 
 
     def check_password(self, password_entry_callback, callback=None):
@@ -1772,34 +1753,94 @@ class CoreInstall(object):
         return True
 
 
+    def isErrorPage(self, page):
+        """
+        Example code from David Mertz' Text Processing in Python.
+        Released in the Public Domain.
+        """
+        err_score = 0.0
+
+        for pat, prob in err_pats.items():
+            if err_score > 0.9: break
+            if re.search(pat, page):
+                err_score += prob
+
+        log.debug("File error page score: %f" % (err_score))
+
+        return err_score > 0.50
+
+
     def download_plugin(self, url, size, checksum, timestamp, callback=None):
-        log.debug("Downloading %s plug-in from %s to %s" % (self.plugin_version, url, self.plugin_path))
+        log.debug("Downloading %s plug-in file from '%s' to '%s'..." % (self.plugin_version, url, self.plugin_path))
 
         if not self.create_plugin_dir():
-            return False, "Failed to create plug-in directory: %s" % self.plugin_path
+            return PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR, self.plugin_path
 
         plugin_file = os.path.join(self.plugin_path, self.plugin_name)
 
         try:
             filename, headers = urllib.urlretrieve(url, plugin_file, callback)
         except IOError, e:
-            log.error("Plug-in download failed: %s" % e.strerror)
-            return False, e.strerror
+            #log.error("Plug-in download failed: %s" % e.strerror)
+            return PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND, e.strerror
+
+        if self.isErrorPage(file(plugin_file, 'r').read(1024)):
+            log.debug(file(plugin_file, 'r').read(1024))
+            os.remove(plugin_file)
+            return PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND, -1
 
         calc_checksum = get_checksum(file(plugin_file, 'r').read())
         log.debug("D/L file checksum=%s" % calc_checksum)
 
-        return True, plugin_file
+        # Try to download and check the GPG digital signature
+        digsig_url = url + '.asc'
+        digsig_file = plugin_file + '.asc'
+
+        log.debug("Downloading %s plug-in digital signature file from '%s' to '%s'..." % (self.plugin_version, digsig_url, digsig_file))
+
+        try:
+            filename, headers = urllib.urlretrieve(digsig_url, digsig_file, callback)
+        except IOError, e:
+            #log.error("Plug-in GPG file download failed: %s" % e.strerror)
+            return PLUGIN_INSTALL_ERROR_DIGITAL_SIG_NOT_FOUND, e.strerror
+
+        if self.isErrorPage(file(digsig_file, 'r').read(1024)):
+            log.debug(file(digsig_file, 'r').read())
+            os.remove(digsig_file)
+            return PLUGIN_INSTALL_ERROR_DIGITAL_SIG_NOT_FOUND, -1
+
+        gpg = utils.which('gpg')
+        if gpg:
+            gpg = os.path.join(gpg, 'gpg')
+            cmd = '%s --no-permission-warning --keyserver pgp.mit.edu --recv-keys 0x9013c005' % gpg
+            log.info("Receiving digital keys: %s" % cmd)
+            status, output = self.run(cmd)
+            #log.debug(output)
+
+            if status != 0:
+                return PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS, status
+
+            cmd = '%s --no-permission-warning --verify %s %s' % (gpg, digsig_file, plugin_file)
+            log.debug("Verifying plugin with digital keys: %s" % cmd)
+            status, output = self.run(cmd)
+            log.debug(output)
+            log.debug("%s status: %d" % (gpg, status))
+
+            if status != 0:
+                return PLUGIN_INSTALL_ERROR_DIGITAL_SIG_BAD, status
+
+
+        return PLUGIN_INSTALL_ERROR_NONE, plugin_file
 
 
     def check_for_plugin(self):
-        if not self.plugin_name:
-            self.plugin_name = 'hplip-%s-plugin.run' % self.plugin_version
-
-        plugin = os.path.join(self.plugin_path, self.plugin_name)
-        log.debug("Checking for plugin: %s" % plugin)
-        return os.path.exists(plugin) and \
-            utils.to_bool(sys_state.get('plugin', 'installed', '0'))
+        sys_state.read()
+        is_installed = utils.to_bool(sys_state.get('plugin', 'installed', '0'))
+        if is_installed:
+            log.debug("plugin is installed")
+        else:
+            log.debug("plugin is not installed")
+        return is_installed
 
 
     def run_plugin(self, mode=GUI_MODE, callback=None):
@@ -1814,5 +1855,11 @@ class CoreInstall(object):
             return os.system("sh %s -- -i" % plugin_file) == 0
 
 
+    def delete_plugin(self):
+        plugin_file = os.path.join(self.plugin_path, self.plugin_name)
+        digsig_file = plugin_file + ".asc"
 
-
+        if os.path.exists(plugin_file):
+            os.unlink(plugin_file)
+        if os.path.exists(digsig_file):
+            os.unlink(digsig_file)

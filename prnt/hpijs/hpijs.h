@@ -40,12 +40,6 @@
 #include "hpiom.h"
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-extern int bug(const char *fmt, ...);
-#ifdef __cplusplus
-}
-#endif
+#include "bug.h"
 
 #endif        /* hpijs_INCLUDED */

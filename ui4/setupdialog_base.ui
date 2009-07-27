@@ -65,13 +65,20 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0" >
+          <item row="3" column="0" >
            <widget class="QRadioButton" name="ParallelRadioButton" >
             <property name="enabled" >
              <bool>true</bool>
             </property>
             <property name="text" >
              <string>Parallel Port (LPT)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" >
+           <widget class="QRadioButton" name="WirelessButton" >
+            <property name="text" >
+             <string>Wireless/802.11 (requires a temporary USB connection and is only available for select devices)</string>
             </property>
            </widget>
           </item>
@@ -101,7 +108,7 @@
        <item row="4" column="0" colspan="2" >
         <widget class="QStackedWidget" name="AdvancedStackedWidget" >
          <property name="currentIndex" >
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="page" >
           <layout class="QGridLayout" >
@@ -128,7 +135,7 @@
               <item row="0" column="1" colspan="2" >
                <layout class="QHBoxLayout" >
                 <item>
-                 <widget class="QLabel" name="label_14" >
+                 <widget class="QLabel" name="DeviceTypeLabel" >
                   <property name="text" >
                    <string>Type:</string>
                   </property>
@@ -552,7 +559,46 @@
           <string>Send test page to printer</string>
          </property>
          <property name="checked" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_5" >
+      <layout class="QGridLayout" >
+       <item row="0" column="0" >
+        <widget class="QLabel" name="label_15" >
+         <property name="font" >
+          <font>
+           <pointsize>16</pointsize>
+          </font>
+         </property>
+         <property name="text" >
+          <string>Select Printer/Fax Queues to Remove</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <widget class="Line" name="line_4" >
+         <property name="orientation" >
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" >
+        <widget class="QTableWidget" name="RemoveDevicesTableWidget" >
+         <property name="alternatingRowColors" >
           <bool>true</bool>
+         </property>
+         <property name="selectionMode" >
+          <enum>QAbstractItemView::SingleSelection</enum>
+         </property>
+         <property name="selectionBehavior" >
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="sortingEnabled" >
+          <bool>false</bool>
          </property>
         </widget>
        </item>

@@ -63,7 +63,7 @@ class PrintTestPageDialog(QDialog, Ui_Dialog):
             self.PrinterNameCombo.setInitialPrinter(self.printer_name)
 
         # Application icon
-        self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
+        self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))
 
 
     def updateUi(self):
@@ -147,6 +147,8 @@ class PrintTestPageDialog(QDialog, Ui_Dialog):
 
         else:
             FailureUI(self, self.__tr("<b>A error occured sending the test page to printer %1.</b><p>Please check the printer and try again.").arg(self.printer_name))
+
+        d.close()
 
 
     def __tr(self, s, c=None):

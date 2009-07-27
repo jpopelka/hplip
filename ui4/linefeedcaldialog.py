@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-#  
+#
 # Authors: Don Welch
 #
 
@@ -54,10 +54,10 @@ class LineFeedCalDialog(QDialog, Ui_Dialog):
         self.connect(self.DeviceComboBox, SIGNAL("DeviceUriComboBox_noDevices"), self.DeviceUriComboBox_noDevices)
         self.connect(self.DeviceComboBox, SIGNAL("DeviceUriComboBox_currentChanged"), self.DeviceUriComboBox_currentChanged)
         self.DeviceComboBox.setFilter({'linefeed-cal-type': (operator.gt, 0)})
-    
+
         # Application icon
-        self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
-        
+        self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))
+
         if self.device_uri:
             self.DeviceComboBox.setInitialDevice(self.device_uri)
 
@@ -66,13 +66,13 @@ class LineFeedCalDialog(QDialog, Ui_Dialog):
         self.DeviceComboBox.updateUi()
         self.LoadPaper.setButtonName(self.__tr("Calibrate"))
         self.LoadPaper.updateUi()
-        
-        
+
+
     def DeviceUriComboBox_currentChanged(self, device_uri):
         self.device_uri = device_uri
-        # Update        
-    
-    
+        # Update
+
+
     def DeviceUriComboBox_noDevices(self):
         FailureUI(self, self.__tr("""<b>No devices that support line feed calibration found.</b><p>Click <i>OK</i> to exit.</p>"""))
         self.close()
@@ -80,20 +80,20 @@ class LineFeedCalDialog(QDialog, Ui_Dialog):
 
     def CancelButton_clicked(self):
         self.close()
-        
-        
+
+
     def CalibrateButton_clicked(self):
         d = None
-        
-        try:    
+
+        try:
             try:
                 d = device.Device(self.device_uri)
             except Error:
                 CheckDeviceUI(self)
                 return
-                
+
             linefeed_type = d.linefeed_cal_type
-            
+
             try:
                 d.open()
             except Error:
@@ -112,12 +112,12 @@ class LineFeedCalDialog(QDialog, Ui_Dialog):
         finally:
             if d is not None:
                 d.close()
-            
+
         self.close()
 
     #
     # Misc
-    # 
+    #
 
     def __tr(self,s,c = None):
         return qApp.translate("LineFeedCalDialog",s,c)

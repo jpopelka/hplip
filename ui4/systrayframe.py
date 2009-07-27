@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,127 +32,134 @@ from PyQt4.QtGui import *
 class SystrayFrame(QFrame):
     def __init__(self, parent):
         QFrame.__init__(self, parent)
-#        self.systray_visible = 0
-#        self.polling = polling
-#        self.polling_interval = polling_interval
-#        self.device_list = device_list
-        #self.initUi()
-        
 
-    def initUi(self, systray_visible, polling, polling_interval, device_list):
+
+    def initUi(self, systray_visible, polling, polling_interval, device_list, systray_messages):
         self.systray_visible = systray_visible
         self.polling = polling
         self.polling_interval = polling_interval
         self.device_list = device_list
-        
-        self.GridLayout = QGridLayout(self)
-        self.GridLayout.setObjectName("GridLayout")
+        self.systray_messages = systray_messages
 
-        self.GroupBox2 = QGroupBox(self)
-        self.GroupBox2.setObjectName("GroupBox2")
+        self.gridlayout = QGridLayout(self)
 
-        self.GridLayout2 = QGridLayout(self.GroupBox2)
-        self.GridLayout2.setObjectName("GridLayout2")
+        self.frame = QFrame(self)
+        self.frame.setFrameShape(QFrame.StyledPanel)
+        self.frame.setFrameShadow(QFrame.Raised)
 
-        self.ShowAlwaysRadioButton = QRadioButton(self.GroupBox2)
-        self.ShowAlwaysRadioButton.setObjectName("ShowAlwaysRadioButton")
-        self.GridLayout2.addWidget(self.ShowAlwaysRadioButton,0,0,1,1)
+        self.gridlayout1 = QGridLayout(self.frame)
 
-        self.HideWhenInactiveRadioButton = QRadioButton(self.GroupBox2)
-        self.HideWhenInactiveRadioButton.setObjectName("HideWhenInactiveRadioButton")
-        self.GridLayout2.addWidget(self.HideWhenInactiveRadioButton,1,0,1,1)
+        self.groupBox_2 = QGroupBox(self.frame)
 
-        self.HideAlwaysRadioButton = QRadioButton(self.GroupBox2)
-        self.HideAlwaysRadioButton.setObjectName("HideAlwaysRadioButton")
-        self.GridLayout2.addWidget(self.HideAlwaysRadioButton,2,0,1,1)
-        
-        self.GridLayout.addWidget(self.GroupBox2,0,0,1,1)
+        self.gridlayout2 = QGridLayout(self.groupBox_2)
 
-        self.GroupBox = QGroupBox(self)
-        self.GroupBox.setCheckable(True)
-        self.GroupBox.setObjectName("GroupBox")
+        self.ShowAlwaysRadioButton = QRadioButton(self.groupBox_2)
+        self.gridlayout2.addWidget(self.ShowAlwaysRadioButton,0,0,1,1)
 
-        self.GridLayout3 = QGridLayout(self.GroupBox)
-        self.GridLayout3.setObjectName("GridLayout3")
+        self.HideWhenInactiveRadioButton = QRadioButton(self.groupBox_2)
+        self.gridlayout2.addWidget(self.HideWhenInactiveRadioButton,1,0,1,1)
 
-        self.label = QLabel(self.GroupBox)
-        self.label.setObjectName("label")
-        self.GridLayout3.addWidget(self.label,0,0,1,1)
+        self.HideAlwaysRadioButton = QRadioButton(self.groupBox_2)
+        self.gridlayout2.addWidget(self.HideAlwaysRadioButton,2,0,1,1)
 
-        self.DevicesListWidget = QListWidget(self.GroupBox)
-        self.DevicesListWidget.setObjectName("DevicesListWidget")
-        self.GridLayout3.addWidget(self.DevicesListWidget,1,0,1,1)
-        
-        self.GridLayout.addWidget(self.GroupBox,1,0,1,1)
-        
-        self.GroupBox2.setTitle(self.__tr("System tray icon visibility"))
-        self.ShowAlwaysRadioButton.setText(self.__tr("Always show"))
-        self.HideWhenInactiveRadioButton.setText(self.__tr("Hide when inactive"))
-        self.HideAlwaysRadioButton.setText(self.__tr("Always hide"))
-        self.GroupBox.setTitle(self.__tr("Monitor button presses on devices"))
-        self.label.setText(self.__tr("Devices to Monitor:"))
-        
+        self.gridlayout1.addWidget(self.groupBox_2,0,0,1,1)
+
+        self.groupBox_3 = QGroupBox(self.frame)
+
+        self.gridlayout3 = QGridLayout(self.groupBox_3)
+
+        self.label_2 = QLabel(self.groupBox_3)
+        self.gridlayout3.addWidget(self.label_2,0,0,1,1)
+
+        self.MessageShowComboBox = QComboBox(self.groupBox_3)
+        self.gridlayout3.addWidget(self.MessageShowComboBox,1,0,1,1)
+
+        self.MessageShowComboBox.addItem(self.__tr("All"), QVariant(SYSTRAY_MESSAGES_SHOW_ALL))
+        self.MessageShowComboBox.addItem(self.__tr("Errors and Warnings"), QVariant(SYSTRAY_MESSAGES_SHOW_ERRORS_AND_WARNINGS))
+        self.MessageShowComboBox.addItem(self.__tr("Errors Only"), QVariant(SYSTRAY_MESSAGES_SHOW_ERRORS_ONLY))
+        self.MessageShowComboBox.addItem(self.__tr("None"), QVariant(SYSTRAY_MESSAGES_SHOW_NONE))
+
+        spacerItem = QSpacerItem(20,40,QSizePolicy.Minimum,QSizePolicy.Minimum)
+        self.gridlayout3.addItem(spacerItem,2,0,1,1)
+        self.gridlayout1.addWidget(self.groupBox_3,0,1,1,1)
+
+        self.MonitorGroupBox = QGroupBox(self.frame)
+        self.MonitorGroupBox.setCheckable(True)
+
+        self.MonitorGroupBox.setEnabled(False)
+
+        self.gridlayout4 = QGridLayout(self.MonitorGroupBox)
+
+        self.label = QLabel(self.MonitorGroupBox)
+        self.gridlayout4.addWidget(self.label,0,0,1,1)
+
+        self.listWidget = QListWidget(self.MonitorGroupBox)
+        self.gridlayout4.addWidget(self.listWidget,1,0,1,1)
+        self.gridlayout1.addWidget(self.MonitorGroupBox,1,0,1,2)
+        self.gridlayout.addWidget(self.frame,0,0,1,1)
+
+        self.setWindowTitle(QApplication.translate("self", "self", None, QApplication.UnicodeUTF8))
+        self.groupBox_2.setTitle(QApplication.translate("self", "System tray icon visibility", None, QApplication.UnicodeUTF8))
+        self.ShowAlwaysRadioButton.setText(QApplication.translate("self", "Always show", None, QApplication.UnicodeUTF8))
+        self.HideWhenInactiveRadioButton.setText(QApplication.translate("self", "Hide when inactive", None, QApplication.UnicodeUTF8))
+        self.HideAlwaysRadioButton.setText(QApplication.translate("self", "Always hide", None, QApplication.UnicodeUTF8))
+        self.groupBox_3.setTitle(QApplication.translate("self", "System tray icon messages", None, QApplication.UnicodeUTF8))
+        self.label_2.setText(QApplication.translate("self", "Messages to show:", None, QApplication.UnicodeUTF8))
+        self.MonitorGroupBox.setTitle(QApplication.translate("self", "Monitor button presses on devices", None, QApplication.UnicodeUTF8))
+        self.label.setText(QApplication.translate("self", "Devices to monitor:", None, QApplication.UnicodeUTF8))
+
         self.connect(self.ShowAlwaysRadioButton, SIGNAL("clicked(bool)"), self.ShowAlwaysRadioButton_clicked)
         self.connect(self.HideWhenInactiveRadioButton, SIGNAL("clicked(bool)"), self.HideWhenInactiveRadioButton_clicked)
         self.connect(self.HideAlwaysRadioButton, SIGNAL("clicked(bool)"), self.HideAlwaysRadioButton_clicked)
-        
-        self.GroupBox.setEnabled(False) # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        self.connect(self.MessageShowComboBox, SIGNAL("activated(int)"), self.MessageShowComboBox_activated)
 
 
     def updateUi(self):
         self.updateVisibility()
+        self.updateMessages()
         self.updateDeviceList()
-        
-        
+
+
     def updateVisibility(self):
         if self.systray_visible == SYSTRAY_VISIBLE_SHOW_ALWAYS:
             self.ShowAlwaysRadioButton.setChecked(True)
-            
+
         elif self.systray_visible == SYSTRAY_VISIBLE_HIDE_WHEN_INACTIVE:
             self.HideWhenInactiveRadioButton.setChecked(True)
-            
+
         else: # SYSTRAY_VISIBLE_HIDE_ALWAYS
             self.HideAlwaysRadioButton.setChecked(True)
-            
-    
+
+
     def ShowAlwaysRadioButton_clicked(self, b):
         if b: self.systray_visible = SYSTRAY_VISIBLE_SHOW_ALWAYS
-        
-        
+
+
     def HideWhenInactiveRadioButton_clicked(self, b):
         if b: self.systray_visible = SYSTRAY_VISIBLE_HIDE_WHEN_INACTIVE
-        
-        
+
+
     def HideAlwaysRadioButton_clicked(self, b):
         if b: self.systray_visible = SYSTRAY_VISIBLE_HIDE_ALWAYS
-    
-    
-    def updateDeviceList(self):    
+
+
+    def updateMessages(self):
+        i = self.MessageShowComboBox.findData(QVariant(self.systray_messages))
+        if i != -1:
+            self.MessageShowComboBox.setCurrentIndex(i)
+
+
+    def MessageShowComboBox_activated(self, i):
+        sender = self.sender()
+        mode, ok = sender.itemData(i).toInt()
+        if ok:
+            self.systray_messages = mode
+
+
+    def updateDeviceList(self):
         pass
-        
-        
-#    def saveSettings(self):
-##        print self.ShowAlwaysRadioButton.isChecked()
-##        print self.HideWhenInactiveRadioButton.isChecked()
-##        print self.HideAlwaysRadioButton.isChecked()
-#        
-#        if self.ShowAlwaysRadioButton.isChecked():
-#            print "show always"
-#            self.user_settings.systray_visible = SYSTRAY_VISIBLE_SHOW_ALWAYS
-#            
-#        elif self.HideWhenInactiveRadioButton.isChecked():
-#            print "hide when inactive"
-#            self.user_settings.systray_visible = SYSTRAY_VISIBLE_HIDE_WHEN_INACTIVE
-#            
-#        else: # HideAlwaysRadioButton.isChecked()
-#            print "hide always"
-#            self.user_settings.systray_visible = SYSTRAY_VISIBLE_HIDE_ALWAYS
-#            
-#        self.systray_visible = self.user_settings.systray_visible
-#        self.user_settings.save()
-            
-            
+
+
     def __tr(self, s, c=None):
-        #return qApp.translate("SystrayFrame", s, c)
         return QApplication.translate("SystrayFrame", s, c, QApplication.UnicodeUTF8)
-        
+

@@ -571,18 +571,24 @@ bugout:
 /* Get value for specified section and key from hplip.conf. */
 enum HPMUD_RESULT hpmud_get_conf(const char *section, const char *key, char *value, int value_size)
 {
+   return hpmud_get_key_value(CONFDIR "/hplip.conf", section, key, value, value_size);
+}
+
+/* Get value for specified section and key from specified file. */
+enum HPMUD_RESULT hpmud_get_key_value(const char *file, const char *section, const char *key, char *value, int value_size)
+{
    char new_key[HPMUD_LINE_SIZE];
    char new_value[HPMUD_LINE_SIZE];
    char rcbuf[255];
    char new_section[32];
    char *tail;
-   FILE *inFile = NULL;
+   FILE *inFile;
    enum HPMUD_RESULT stat = HPMUD_R_DATFILE_ERROR;
    int i,j;
 
-   if((inFile = fopen(CONFDIR "/hplip.conf", "r")) == NULL) 
+   if((inFile = fopen(file, "r")) == NULL) 
    {
-      BUG("unable to open %s: %m\n", CONFDIR "/hplip.conf");
+      BUG("unable to open %s: %m\n", file);
       goto bugout;
    } 
 

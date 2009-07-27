@@ -111,18 +111,19 @@ def start(language, auto=True, test_depends=False,
         # HPLIP vs. HPIJS INSTALLATION
         #
 
-        if not auto:
-            tui.title("INSTALL TYPE")
-            log.info("For most users, it is recommended to install HPLIP with full support (scanning, faxing, toolbox, etc).")
-            log.info("For servers or minimal installations, you can also install print support only (HPIJS only).")
+        #if not auto:
+            #tui.title("INSTALL TYPE")
+            #log.info("For most users, it is recommended to install HPLIP with full support (scanning, faxing, toolbox, etc).")
+            #log.info("For servers or minimal installations, you can also install print support only (HPIJS only).")
 
-            ok, choice = tui.enter_choice("\nInstall full hplip support (recommended) or print-only support (f=full hplip support*, p=printing only support, q=quit) ?",
-                ['f', 'p'], 'f')
-            if not ok: sys.exit(0)
-            if choice  == 'p':
-                core.selected_component = 'hpijs'
+            #ok, choice = tui.enter_choice("\nInstall full hplip support (recommended) or print-only support (f=full hplip support*, p=printing only support, q=quit) ?",
+                #['f', 'p'], 'f')
+            #if not ok: sys.exit(0)
+            #if choice  == 'p':
+                #core.selected_component = 'hpijs'
 
-        log.debug(core.selected_component)
+        #log.debug(core.selected_component)
+        core.selected_component = 'hplip'
 
         #
         # INTRODUCTION
@@ -132,10 +133,10 @@ def start(language, auto=True, test_depends=False,
 
         if core.selected_component == 'hplip':
             log.info("This installer will install HPLIP version %s on your computer." % core.version_public)
-            core.hpijs_build = False
-        else:
-            log.info("This installer will install HPIJS version %s on your computer." % core.version_public)
-            core.hpijs_build = True
+            #core.hpijs_build = False
+        #else:
+            #log.info("This installer will install HPIJS version %s on your computer." % core.version_public)
+            #core.hpijs_build = True
 
         log.info("Please close any running package management systems now (YaST, Adept, Synaptic, Up2date, etc).")
 
@@ -313,25 +314,28 @@ def start(language, auto=True, test_depends=False,
         # SELECT OPTIONS TO INSTALL
         #
 
-        tui.title("SELECT HPLIP OPTIONS")
+
 
         if not auto:
+            tui.title("SELECT HPLIP OPTIONS")
             log.info("You can select which HPLIP options to enable. Some options require extra dependencies.")
             log.info("")
             num_opt_missing = core.select_options(option_question_callback)
 
-        else: # auto
-            ok, enable_par = tui.enter_yes_no("Would you like to enable support for parallel (LPT:) connected printers?", 'n')
-            if not ok: sys.exit(0)
+        #else: # auto
+            #ok, enable_par = tui.enter_yes_no("Would you like to enable support for parallel (LPT:) connected printers?", 'n')
+            #if not ok: sys.exit(0)
 
-            core.selected_options['parallel'] = enable_par
+            #core.selected_options['parallel'] = enable_par
 
-            if enable_par:
-                log.info("Parallel support enabled.")
+            #if enable_par:
+                #log.info("Parallel support enabled.")
+        else:
+            enable_par = False
+            core.selected_options['parallel'] = False
 
-
-        log.debug("Req missing=%d Opt missing=%d HPOJ=%s HPLIP=%s Component=%s" % \
-            (num_req_missing, num_opt_missing, core.hpoj_present, core.hplip_present, core.selected_component))
+        log.debug("Req missing=%d Opt missing=%d HPLIP=%s Component=%s" % \
+            (num_req_missing, num_opt_missing, core.hplip_present, core.selected_component))
 
 
         #
@@ -375,6 +379,7 @@ def start(language, auto=True, test_depends=False,
         if core.run_pre_install(progress_callback): # some cmds were run...
             num_req_missing = core.count_num_required_missing_dependencies()
             num_opt_missing = core.count_num_optional_missing_dependencies()
+        log.info("OK")
 
         #
         # REQUIRED DEPENDENCIES INSTALL
@@ -474,8 +479,8 @@ def start(language, auto=True, test_depends=False,
         log.debug("Dependencies to install: %s" % depends_to_install)
 
         if core.distro_version_supported and \
-            (depends_to_install or ((core.hplip_present or core.hpoj_present) and \
-            core.selected_component == 'hplip')):
+            (depends_to_install or core.hplip_present) and \
+            core.selected_component == 'hplip':
 
             #
             # CHECK FOR RUNNING PACKAGE MANAGER
@@ -527,6 +532,7 @@ def start(language, auto=True, test_depends=False,
 
             tui.title("RUNNING PRE-PACKAGE COMMANDS")
             core.run_pre_depend(progress_callback)
+            log.info("OK")
 
             #
             # INSTALL PACKAGES AND RUN COMMANDS
@@ -635,36 +641,36 @@ def start(language, auto=True, test_depends=False,
                         sys.exit(1)
 
 
-            #
-            # HPOJ REMOVAL
-            #
+            ##
+            ## HPOJ REMOVAL
+            ##
 
-            if core.hpoj_present and core.selected_component == 'hplip' and core.distro_version_supported:
-                log.error("HPOJ is installed and/or running. HPLIP is not compatible with HPOJ.")
-                failed = True
-                hpoj_remove_cmd = core.get_distro_data('hpoj_remove_cmd')
+            #if core.hpoj_present and core.selected_component == 'hplip' and core.distro_version_supported:
+                #log.error("HPOJ is installed and/or running. HPLIP is not compatible with HPOJ.")
+                #failed = True
+                #hpoj_remove_cmd = core.get_distro_data('hpoj_remove_cmd')
 
-                if hpoj_remove_cmd:
-                    if auto:
-                        answer = True
-                    else:
-                        ok, answer = tui.enter_yes_no("\nWould you like to have this installer attempt to uninstall HPOJ")
+                #if hpoj_remove_cmd:
+                    #if auto:
+                        #answer = True
+                    #else:
+                        #ok, answer = tui.enter_yes_no("\nWould you like to have this installer attempt to uninstall HPOJ")
 
-                    if not ok: sys.exit(0)
+                    #if not ok: sys.exit(0)
 
-                    if answer:
-                        failed = core.remove_hpoj(progress_callback)
+                    #if answer:
+                        #failed = core.remove_hpoj(progress_callback)
 
-                        if failed:
-                            log.error("HPOJ removal failed. Please manually stop/remove/uninstall HPOJ and then re-run this installer.")
-                            sys.exit(1)
-                    else:
-                        log.error("Please stop/remove/uninstall HPOJ and then re-run this installer.")
-                        sys.exit(1)
+                        #if failed:
+                            #log.error("HPOJ removal failed. Please manually stop/remove/uninstall HPOJ and then re-run this installer.")
+                            #sys.exit(1)
+                    #else:
+                        #log.error("Please stop/remove/uninstall HPOJ and then re-run this installer.")
+                        #sys.exit(1)
 
-                else:
-                    log.error("Please stop/remove/uninstall HPOJ and then re-run this installer.")
-                    sys.exit(1)
+                #else:
+                    #log.error("Please stop/remove/uninstall HPOJ and then re-run this installer.")
+                    #sys.exit(1)
 
 
             #
@@ -702,6 +708,7 @@ def start(language, auto=True, test_depends=False,
 
             tui.title("RUNNING POST-PACKAGE COMMANDS")
             core.run_post_depend(progress_callback)
+            log.info("OK")
 
 
             #
@@ -756,6 +763,7 @@ def start(language, auto=True, test_depends=False,
 
         tui.title("PRE-BUILD COMMANDS")
         core.run_pre_build(progress_callback)
+        log.info("OK")
 
         tui.title("BUILD AND INSTALL")
 
@@ -795,17 +803,20 @@ def start(language, auto=True, test_depends=False,
                 #log.error("Unable to load DBus")
                 pass
             else:
-                args = ['', '', EVENT_SYSTEMTRAY_EXIT, prop.username, 0, '', '']
-                msg = lowlevel.SignalMessage('/', 'com.hplip.StatusService', 'Event')
-                msg.append(signature='ssisiss', *args)
-                log.info("Sending close message to hp-systray...")
-                SessionBus().send_message(msg)
-
+                try:
+                    args = ['', '', EVENT_SYSTEMTRAY_EXIT, prop.username, 0, '', '']
+                    msg = lowlevel.SignalMessage('/', 'com.hplip.StatusService', 'Event')
+                    msg.append(signature='ssisiss', *args)
+                    tui.title("CLOSE HP_SYSTRAY")
+                    log.info("Sending close message to hp-systray (if it is currently running)...")
+                    SessionBus().send_message(msg)
+                except:
+                    pass
 
         # Restart or re-plugin if necessary (always True in 2.7.9+)
-        if core.restart_required and core.selected_component != 'hpijs':
+        if core.selected_component == 'hplip':
             tui.title("RESTART OR RE-PLUG IS REQUIRED")
-            cmd = core.su_sudo() % "hp-setup"
+            cmd = "hp-setup"
             paragraph = """If you are installing a USB connected printer, and the printer was plugged in when you started this installer, you will need to either restart your PC or unplug and re-plug in your printer (USB cable only). If you choose to restart, run this command after restarting: %s  (Note: If you are using a parallel connection, you will have to restart your PC. If you are using network/wireless, you can ignore and continue).""" % cmd
 
             for p in tui.format_paragraph(paragraph):
@@ -838,7 +849,7 @@ def start(language, auto=True, test_depends=False,
         #
         # SETUP PRINTER
         #
-        if core.selected_component != 'hpijs':
+        if core.selected_component == 'hplip':
             tui.title("PRINTER SETUP")
 
             if auto:

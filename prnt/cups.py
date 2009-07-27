@@ -33,6 +33,8 @@ import glob
 from base.g import *
 from base import utils, models
 
+INVALID_PRINTER_NAME_CHARS = """~`!@#$%^&*()=+[]{}()\\/,.<>?'\";:| """
+
 # Handle case where cups.py (via device.py) is loaded
 # and cupsext doesn't exist yet. This happens in the
 # installer and in a fresh sandbox if the Python extensions
@@ -178,7 +180,7 @@ CUPS_ERROR_BAD_PARAMETERS = 0x0f01
 
 nickname_pat = re.compile(r'''\*NickName:\s*\"(.*)"''', re.MULTILINE)
 pat_cups_error_log = re.compile("""^loglevel\s?(debug|debug2|warn|info|error|none)""", re.I)
-ppd_pat = re.compile(r'''.*hp-(.*?)(-.*)+\.ppd.*''', re.I)
+ppd_pat = re.compile(r'''.*hp-(.*?)(-.*)*\.ppd.*''', re.I)
 
 
 
@@ -281,7 +283,6 @@ def getSystemPPDs():
                 ppd_dict[ppd]['ppd-make'] == 'HP':
 
                 desc = ppd_dict[ppd]['ppd-make-and-model']
-                #print ppd, desc
 
                 if not ('foo2' in desc.lower() or
                         'gutenprint' in desc.lower() or
@@ -344,11 +345,10 @@ def levenshtein_distance(a,b):
 
 number_pat = re.compile(r""".*?(\d+)""", re.IGNORECASE)
 
-
 STRIP_STRINGS2 = ['foomatic:', 'hp-', 'hp_', 'hp ', '.gz', '.ppd',
-                 '-hpijs', 'drv:', '-pcl', '-pcl3', '-jetready',
+                  'drv:', '-pcl', '-pcl3', '-jetready',
                  '-zxs', '-zjs', '-ps', '-postscript',
-                 '-jr', '-lidl', '-lidil', '-ldl']
+                 '-jr', '-lidl', '-lidil', '-ldl', '-hpijs']
 
 
 for p in models.TECH_CLASS_PDLS.values():
@@ -460,6 +460,7 @@ def getPPDFile2(stripped_model, ppds): # New PPD find
     # This routine is for the new PPD naming scheme begun in 2.8.10
     # and beginning with implementation in 2.8.12 (Qt4 hp-setup)
     # hp-<model name from models.dat w/o beginning hp_>[-<pdl>][-<pdl>][...].ppd[.gz]
+    # 3.9.6: Added handling for hpijs vs. hpcups PPDs/DRVs
     log.debug("Matching PPD list to model %s..." % stripped_model)
     matches = []
     for f in ppds:
@@ -467,15 +468,37 @@ def getPPDFile2(stripped_model, ppds): # New PPD find
         if match is not None:
             if match.group(1) == stripped_model:
                 log.debug("Found match: %s" % f)
-                pdls = match.group(2).split('-')
-                matches.append((f, [p for p in pdls if p and p != 'hpijs']))
+                try:
+                    pdls = match.group(2).split('-')
+                except AttributeError:
+                    pdls = []
+
+                if (prop.hpcups_build and 'hpijs' not in f) or \
+                    ((prop.hpijs_build and 'hpijs' in pdls) or (prop.hpcups_build and 'hpijs' not in pdls)):
+                    matches.append((f, [p for p in pdls if p and p != 'hpijs']))
 
     log.debug(matches)
     num_matches = len(matches)
 
     if num_matches == 0:
-        log.error("No PPD found for model %s. Trying old algorithm..." % stripped_model)
-        matches = getPPDFile(stripModel(stripped_model), ppds).items()
+        log.error("No PPD found for model %s using new algorithm. Trying old algorithm..." % stripped_model)
+        matches2 = getPPDFile(stripModel(stripped_model), ppds).items()
+        log.debug(matches2)
+        num_matches2 = len(matches2)
+        if num_matches2:
+            for f, d in matches2:
+                match = ppd_pat.match(f)
+                if match is not None:
+                    log.debug("Found match: %s" % f)
+                    try:
+                        pdls = match.group(2).split('-')
+                    except AttributeError:
+                        pdls = []
+
+                    if (prop.hpcups_build and 'hpijs' not in f) and \
+                       ((prop.hpijs_build and 'hpijs' in pdls) or (prop.hpcups_build and 'hpijs' not in pdls)):
+                        matches.append((f, [p for p in pdls if p and p != 'hpijs']))
+
         log.debug(matches)
         num_matches = len(matches)
 
@@ -490,15 +513,14 @@ def getPPDFile2(stripped_model, ppds): # New PPD find
     # > 1
     log.debug("%d matches found. Selecting based on PDL: Host > PS > PCL/Other" % num_matches)
     for p in [models.PDL_TYPE_HOST, models.PDL_TYPE_PS, models.PDL_TYPE_PCL]:
-        for m in matches:
-            for x in m[1]:
+        for f, pdl_list in matches:
+            for x in pdl_list:
                 # default to HOST-based PDLs, as newly supported PDLs will most likely be of this type
                 if models.PDL_TYPES.get(x, models.PDL_TYPE_HOST) == p:
-                    log.debug("Selecting '-%s' PPD: %s" % (x, m[0]))
-                    return (m[0], '')
+                    log.debug("Selecting '-%s' PPD: %s" % (x, f))
+                    return (f, '')
 
     # No specific PDL found, so just return 1st found PPD file
-    # (e.g., files only have -hpijs, no PDL indicators)
     log.debug("No specific PDL located. Defaulting to first found PPD file.")
     return (matches[0][0], '')
 
@@ -578,21 +600,27 @@ def getDefaultPrinter():
     return r
 
 def setDefaultPrinter(printer_name):
+    setPasswordPrompt("You do not have permission to set the default printer.")
     return cupsext.setDefaultPrinter(printer_name)
 
 def accept(printer_name):
+    setPasswordPrompt("You do not have permission to accept jobs on a printer queue.")
     return controlPrinter(printer_name, CUPS_ACCEPT_JOBS)
 
 def reject(printer_name):
+    setPasswordPrompt("You do not have permission to reject jobs on a printer queue.")
     return controlPrinter(printer_name, CUPS_REJECT_JOBS)
 
 def start(printer_name):
+    setPasswordPrompt("You do not have permission to start a printer queue.")
     return controlPrinter(printer_name, IPP_RESUME_PRINTER)
 
 def stop(printer_name):
+    setPasswordPrompt("You do not have permission to stop a printer queue.")
     return controlPrinter(printer_name, IPP_PAUSE_PRINTER)
 
 def purge(printer_name):
+    setPasswordPrompt("You do not have permission to purge jobs.")
     return controlPrinter(printer_name, IPP_PURGE_JOBS)
 
 def controlPrinter(printer_name, cups_op):
@@ -653,6 +681,7 @@ def getServer():
     return cupsext.getServer()
 
 def cancelJob(jobid, dest=None):
+    setPasswordPrompt("You do not have permission to cancel a job.")
     if dest is not None:
         return cupsext.cancelJob(dest, jobid)
     else:
@@ -689,6 +718,7 @@ def addPrinter(printer_name, device_uri, location, ppd_file, model, info):
     return cupsext.addPrinter(printer_name, device_uri, location, ppd_file, model, info)
 
 def delPrinter(printer_name):
+    setPasswordPrompt("You do not have permission to delete a printer.")
     return cupsext.delPrinter(printer_name)
 
 def getGroupList():
@@ -718,3 +748,5 @@ def removeOption(option):
 def setPasswordCallback(func):
     return cupsext.setPasswordCallback(func)
 
+def setPasswordPrompt(prompt):
+    return cupsext.setPasswordPrompt(prompt)

@@ -46,7 +46,7 @@ class PrinterForm(QMainWindow):
 
         self.statusBar()
 
-        self.setIcon(load_pixmap('prog', '48x48'))
+        self.setIcon(load_pixmap('hp_logo', '128x128'))
 
         if not name:
             self.setName("PrinterForm")

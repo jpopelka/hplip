@@ -342,7 +342,7 @@ class FaxAddrBookForm(FaxAddrBookForm_base):
     def __init__(self,parent = None,name = None,modal = 0,fl = 0):
         FaxAddrBookForm_base.__init__(self,parent,name,modal,fl)
 
-        self.setIcon(load_pixmap('prog', '48x48'))
+        self.setIcon(load_pixmap('hp_logo', '128x128'))
 
         global db
         db =  fax.FaxAddressBook()

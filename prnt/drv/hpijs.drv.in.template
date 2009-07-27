@@ -59,6 +59,8 @@
 #include <font.defs>
 #include <media.defs>
 
+#define VERSION "@VERSION@"
+
 // Copyright for all drivers...
 Copyright "(c) 2004-2008 Copyright Hewlett-Packard Development Company, LP"
 
@@ -66,7 +68,7 @@ Copyright "(c) 2004-2008 Copyright Hewlett-Packard Development Company, LP"
 Manufacturer "HP"
 
 // Driver version
-Version "hpijs @VERSION@"
+Version "hpijs $VERSION"
 
 // Custom driver
 DriverType ps
@@ -1754,7 +1756,11 @@ aleK"
   Attribute "FoomaticRIPOptionSetting" "PrintoutMode=High" "Quality=600ColorCMYK"
   Attribute "FoomaticRIPOptionSetting" "PrintoutMode=High.Gray" "Quality=600Grayscal&&
 eK"
-  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Photo" "Quality=1200PhotoCMYK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Photo" "Quality=600PhotoCMYK"
+
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=PhotoBest" "Quality=1200PhotoCMYK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=PhotoNormal" "Quality=600PhotoNormalCMYK"
+
   Attribute "FoomaticRIPOption" "InputSlot" "enum CmdLine C"
   Attribute "FoomaticRIPOptionSetting" "InputSlot=Default" ",PS:MediaPosition=7"
   Attribute "FoomaticRIPOptionSetting" "InputSlot=PhotoTray" ",PS:MediaPosition=6"
@@ -2495,7 +2501,16 @@ ty:PenSet=2,Quality:FullBleed=1"
   CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
-  // <%DJ4100:Normal%>
+  {
+    Attribute "FoomaticRIPOptionSetting" "Model=HP-DeskJet_D4100" " -sDeviceManufactur&&
+er=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;Deskjet D4100&quot;"
+    // <%DJ4100:Normal%>
+  }
+  {
+    Attribute "FoomaticRIPOptionSetting" "Model=HP-DeskJet_D2600" " -sDeviceManufactur&&
+er=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;Deskjet D2600&quot;"
+    // <%DJD2600:Normal%>
+  }
 }
 
 //////////////////// PSP100 4x6, three-sided fullbleed
@@ -5562,7 +5577,6 @@ Transparency"
       *Choice "FromPrintoutMode/Controlled by 'Printout Mode'" "%% FoomaticRIPOptionSetting: Quality=@PrintoutMode"
       Choice "600DraftGrayscaleK/600 dpi, Draft, Grayscale, Black Toner" "%% FoomaticRIPOptionSetting: Quality=600DraftGrayscaleK"
       Choice "600GrayscaleK/600 dpi, Normal, Grayscale, Black Toner" "%% FoomaticRIPOptionSetting: Quality=600GrayscaleK"
-      Choice "600BestGrayscaleK/600 dpi, Best, Grayscale, Black Toner" "%% FoomaticRIPOptionSetting: Quality=600BestGrayscaleK"
   *CustomMedia "Letter/Letter" 612.00 792.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Letter" "%% FoomaticRIPOptionSetting: PageSize=Letter"
   CustomMedia "A4/A4" 595.00 842.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=A4" "%% FoomaticRIPOptionSetting: PageSize=A4"
   CustomMedia "Photo/Photo/4x6 inch index card" 288.00 432.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Photo" "%% FoomaticRIPOptionSetting: PageSize=Photo"
@@ -5818,7 +5832,6 @@ Transparency"
       *Choice "FromPrintoutMode/Controlled by 'Printout Mode'" "%% FoomaticRIPOptionSetting: Quality=@PrintoutMode"
       Choice "600DraftGrayscaleK/600 dpi, Draft, Grayscale, Black Toner" "%% FoomaticRIPOptionSetting: Quality=600DraftGrayscaleK"
       Choice "600GrayscaleK/600 dpi, Normal, Grayscale, Black Toner" "%% FoomaticRIPOptionSetting: Quality=600GrayscaleK"
-      Choice "600BestGrayscaleK/600 dpi, Best, Grayscale, Black Toner" "%% FoomaticRIPOptionSetting: Quality=600BestGrayscaleK"
   *CustomMedia "Letter/Letter" 612.00 792.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Letter" "%% FoomaticRIPOptionSetting: PageSize=Letter"
   CustomMedia "A4/A4" 595.00 842.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=A4" "%% FoomaticRIPOptionSetting: PageSize=A4"
   CustomMedia "Photo/Photo/4x6 inch index card" 288.00 432.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Photo" "%% FoomaticRIPOptionSetting: PageSize=Photo"

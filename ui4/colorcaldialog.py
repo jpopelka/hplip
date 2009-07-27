@@ -94,7 +94,7 @@ class ColorCalDialog(QDialog, Ui_Dialog):
                                 (self.endFrontPanelPage, None),
                                 (self.close, None),
                                     ],
-                    
+
                     COLOR_CAL_TYPE_DESKJET_450 : [ # 1
                                 (self.colorCalType1PenCheck, None),
                                 (self.showLoadPaperPage, None),
@@ -193,7 +193,7 @@ class ColorCalDialog(QDialog, Ui_Dialog):
             self.DeviceComboBox.setInitialDevice(self.device_uri)
 
         # Application icon
-        self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
+        self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))
         self.updateStepText()
 
 
@@ -350,6 +350,8 @@ class ColorCalDialog(QDialog, Ui_Dialog):
         for x in range(6):
             self.ConneryColorNumberComboBox.addItem(QString("%1").arg(x+1))
 
+        self.displayPage(PAGE_CONNERY)
+
 
     def endConneryPage(self):
         if self.ConneryUseFactoryDefaultsCheckBox.checkState() == Qt.Checked:
@@ -359,16 +361,17 @@ class ColorCalDialog(QDialog, Ui_Dialog):
             self.values = [
                 (ord(str(self.ConneryGrayLetterComboBox.currentText())) - ord('A')),
                 int(str(self.ConneryGrayNumberComboBox.currentText())),
-                (ord(str(self.ConneryColorLetterComboBox.currentText())) - ord('A')),
+                (ord(str(self.ConneryColorLetterComboBox.currentText())) - ord('P')),
                 int(str(self.ConneryColorNumberComboBox.currentText()))
             ]
+
 
     def showFrontPanelPage(self):
         self.BackButton.setEnabled(False)
         self.setColorCalButton(BUTTON_FINISH)
         self.displayPage(PAGE_FRONT_PANEL)
-        
-        
+
+
     def endFrontPanelPage(self):
         pass
 

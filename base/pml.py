@@ -130,7 +130,7 @@ def buildPMLSetPacket(oid, value, data_type): # String dotted notation
 
     return p
 
-def ConvertToPMLDataFormat(value, data_type): 
+def ConvertToPMLDataFormat(value, data_type):
     if data_type in (TYPE_ENUMERATION, TYPE_SIGNED_INTEGER, TYPE_COLLECTION):
         data = struct.pack(">i", int(value))
 
@@ -528,7 +528,7 @@ OID_POWER_SETTINGS_NEVER = 999
 #
 
 OID_DEV_DOWNLOAD_TIMEOUT = ('1.1.1.17', TYPE_SIGNED_INTEGER)
-DEFAULT_DOWNLOAD_TIMEOUT = 60
+DEFAULT_DOWNLOAD_TIMEOUT = 600
 
 OID_FAX_DOWNLOAD_ERROR = ('1.3.7.2.6', TYPE_SIGNED_INTEGER)
 
@@ -765,7 +765,7 @@ COPIER_MEDIA_TYPE_PHOTO_GLOSSY        = 10
 COPIER_MEDIA_TYPE_MATTE_PAPER         = 11
 COPIER_MEDIA_TYPE_EVERYDAY_PHOTO      = 12
 COPIER_MEDIA_TYPE_PHOTO_QUAL_INKJET   = 13
-COPIER_MEDIA_TYPE_PHOTO               = 14 
+COPIER_MEDIA_TYPE_PHOTO               = 14
 COPIER_MEDIA_TYPE_AUTOMATIC           = 15
 COPIER_MEDIA_TYPE_ADVANCED_PHOTO      = 16
 COPIER_MEDIA_TYPE_IRON_ON_MIRRORED    = 17

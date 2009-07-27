@@ -37,9 +37,13 @@
 #include "hpmudi.h"
 
 #ifdef HAVE_LIBNETSNMP
+#ifdef HAVE_UCDSNMP
+#include <ucd-snmp/ucd-snmp-config.h>
+#include <ucd-snmp/ucd-snmp-includes.h>
+#else
 #include <net-snmp/net-snmp-config.h>
 #include <net-snmp/net-snmp-includes.h>
-#include <net-snmp/types.h>
+#endif
 static const char *SnmpPort[] = { "","public.1","public.2","public.3" };
 #endif
 

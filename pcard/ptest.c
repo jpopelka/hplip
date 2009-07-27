@@ -78,8 +78,8 @@ int bug(const char *fmt, ...)
    if ((n = vsnprintf(buf, 256, fmt, args)) == -1)
       buf[255] = 0;     /* output was truncated */
 
-   fprintf(stderr, buf);
-   syslog(LOG_WARNING, buf);
+   fprintf(stderr, "%s", buf);
+   syslog(LOG_WARNING, "%s", buf);
 
    fflush(stderr);
    va_end(args);

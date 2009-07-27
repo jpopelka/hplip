@@ -52,7 +52,42 @@
         </layout>
        </widget>
       </item>
-      <item row="1" column="0" >
+      <item row="0" column="1" >
+       <widget class="QGroupBox" name="groupBox_3" >
+        <property name="title" >
+         <string>System tray icon messages</string>
+        </property>
+        <layout class="QGridLayout" >
+         <item row="0" column="0" >
+          <widget class="QLabel" name="label_2" >
+           <property name="text" >
+            <string>Which messages to show:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" >
+          <widget class="QComboBox" name="MessageShowComboBox" />
+         </item>
+         <item row="2" column="0" >
+          <spacer>
+           <property name="orientation" >
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType" >
+            <enum>QSizePolicy::Minimum</enum>
+           </property>
+           <property name="sizeHint" >
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2" >
        <widget class="QGroupBox" name="groupBox" >
         <property name="title" >
          <string>Monitor button presses on devices</string>
@@ -64,7 +99,7 @@
          <item row="0" column="0" >
           <widget class="QLabel" name="label" >
            <property name="text" >
-            <string>Devices to Monitor:</string>
+            <string>Devices to monitor:</string>
            </property>
           </widget>
          </item>

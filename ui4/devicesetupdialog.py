@@ -62,7 +62,7 @@ class DeviceSetupDialog(QDialog, Ui_Dialog):
         self.DeviceComboBox.setFilter({'power-settings': (operator.gt, 0)})
 
         # Application icon
-        self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
+        self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))
 
         if self.device_uri:
             self.DeviceComboBox.setInitialDevice(self.device_uri)

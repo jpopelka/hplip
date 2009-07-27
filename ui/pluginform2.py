@@ -20,8 +20,16 @@
 #
 
 from base.g import *
-from installer import core_install
 from base import device
+from installer import core_install
+from installer.core_install import  PLUGIN_INSTALL_ERROR_NONE, \
+                                    PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND, \
+                                    PLUGIN_INSTALL_ERROR_DIGITAL_SIG_NOT_FOUND, \
+                                    PLUGIN_INSTALL_ERROR_DIGITAL_SIG_BAD, \
+                                    PLUGIN_INSTALL_ERROR_PLUGIN_FILE_CHECKSUM_ERROR, \
+                                    PLUGIN_INSTALL_ERROR_NO_NETWORK, \
+                                    PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR, \
+                                    PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS
 
 from qt import *
 from pluginform2_base import PluginForm2_base
@@ -134,6 +142,9 @@ class PluginForm2(PluginForm2_base):
             self.path, size, checksum, timestamp, ok = core.get_plugin_info(plugin_conf_url,
                 self.plugin_download_callback)
 
+            log.debug("path=%s, size=%d, checksum=%s, timestamp=%f, ok=%s" %
+                    (self.path, size, checksum, timestamp, ok))
+
             if not self.path.startswith('http://') and not self.path.startswith('file://'):
                 self.path = 'file://' + self.path
 
@@ -160,17 +171,41 @@ class PluginForm2(PluginForm2_base):
 
         log.info("Downloading plug-in from: %s" % self.path)
 
-        ok, local_plugin = core.download_plugin(self.path, size, checksum, timestamp,
+        status, ret = core.download_plugin(self.path, size, checksum, timestamp,
             self.plugin_download_callback)
 
-        if not ok:
-            log.error("Plug-in download failed: %s" % local_plugin)
-            self.FailureUI(self.__tr("Plug-in download failed."))
-            #sys.exit(1)
+        if status != PLUGIN_INSTALL_ERROR_NONE:
+
+            if status == PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND:
+                desc = self.__tr("<b>ERROR: Plug-in file not found (server returned 404 or similar error).</b><p>Error code: %1</p>").arg(str(ret))
+
+            elif status == PLUGIN_INSTALL_ERROR_DIGITAL_SIG_NOT_FOUND:
+                desc = self.__tr("<b>ERROR: Plug-in digital signature file not found (server returned 404 or similar error).</b><p>Error code: %1</p>").arg(str(ret))
+
+            elif status == PLUGIN_INSTALL_ERROR_DIGITAL_SIG_BAD:
+                desc = self.__tr("<b>ERROR: Plug-in file does not match its digital signature.</b><p>File may have been corrupted or altered.</p><p>Error code: %1</p>").arg(str(ret))
+
+            elif status == PLUGIN_INSTALL_ERROR_PLUGIN_FILE_CHECKSUM_ERROR:
+                desc = self.__tr("<b>ERROR: Plug-in file does not match its checksum. File may have been corrupted or altered.")
+
+            elif status == PLUGIN_INSTALL_ERROR_NO_NETWORK:
+                desc = self.__tr("<b>ERROR: Unable to connect to network to download the plug-in.</b><p>Please check your network connection and try again.</p>")
+
+            elif status == PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR:
+                desc = self.__tr("<b>ERROR: Unable to create the plug-in directory.</b><p>Please check your permissions and try again.</p>")
+
+            elif status == PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS:
+                desc = self.__tr("<b>ERROR: Unable to download the public HPLIP keys from the keyserver.</b><p>Error code: %1</p>").arg(str(ret))
+
+            core.delete_plugin()
+            self.FailureUI(desc)
             self.close()
             return
 
+        local_plugin = ret
+
         if not core.run_plugin(GUI_MODE, self.plugin_install_callback):
+            core.delete_plugin()
             self.FailureUI(self.__tr("Plug-in install failed."))
             self.close()
             return
@@ -196,6 +231,7 @@ class PluginForm2(PluginForm2_base):
                 d.close()
 
 
+        core.delete_plugin()
         self.SuccessUI("Plug-in install successful.")
         self.close()
 

@@ -1,4 +1,4 @@
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 #
 # ****************************************
 #
-# [TYPE_BOOL] : True | False | 0 | 1 (not case sensitive)
+# [TYPE_BOOL] : T | F | 0 | 1 (not case sensitive)
 # [TYPE_INT] : integer value
 # [TYPE_LIST]: <string>,... (no spaces between values/commas)
 # [TYPE_STRING]: string value (commas are not significant)
@@ -26,53 +26,60 @@
 # distros=<list of distro names> [TYPE_LIST]
 #
 # [<distro name>]
-# index=<n> # index must match DISTRO_ value in distros.py [TYPE_INT]
+# index=<n> # Must be unique [TYPE_INT]
 # versions=<list of version names> [TYPE_LIST]
 # display_name=<human readable display name> [TYPE_STRING]
 # alt_names=<alternate names to search for in /etc/issue> [TYPE_LIST]
-# display=True|False [TYPE_BOOL]
+# display=1|0 [TYPE_BOOL]
 # notes=<distro notes> [TYPE_STRING]
 # package_mgrs=<package managers to search for in ps> [TYPE_LIST]
 # package_mgr_cmd=<command to install packages, list replaced in $packages_to_install> [TYPE_STRING]
 # pre_install_cmd=<commands to run before installer checks dependencies (comma sep. list)> [TYPE_LIST]
 # pre_depend_cmd=<commands to run before packages are installed (comma sep. list)> [TYPE_LIST]
 # post_depend_cmd=<commands to run after packages are installed (comma sep. list)> [TYPE_LIST]
-# hpoj_remove_cmd=<command to remove/disable hpoj> [TYPE_LIST]
 # hplip_remove_cmd=<command to remove package version of hplip> [TYPE_LIST]
 # su_sudo=su|sudo  [TYPE_STRING] # su is default
 # ppd_install=ppd|drv  [TYPE_STRING] # ppd is default
-# udev_mode_fix=True|False [TYPE_BOOL]
+# udev_mode_fix=1|0 [TYPE_BOOL]
 # ppd_dir=<ppd dir> [TYPE_STRING] # Used for BOTH ppd and drv install types
 # drv_dir=<drv dir> [TYPE_STRING] # Used for only drv installs
-# fix_ppd_symlink=True|False [TYPE_BOOL]
-# usermod_params=<params for usermod command, w/o user name(s). e.g. '-Glp' (default)>
-# ui_toolkit=Qt3|Qt4|GTK [TYPE_STRING]
+# fix_ppd_symlink=1|0 [TYPE_BOOL]
+# ui_toolkit=qt3|qt4|gtk|none [TYPE_STRING] # gtk not supported. qt3 not supported by installer.
+# policykit=1|0 [TYPE_BOOL]
+# native_cups=1|0 [TYPE_BOOL]
+# package_available=1|0 [TYPE_BOOL]
+# package_arch=<list of processor architectures> [TYPE_LIST]
+# add_user_to_group=<usermod params> [TYPE_STRING] (leave empty for none) [ex. "-a -G sys" or "-G lp"]
 #
 # # Version data overrides distro data if present.
 # # <version name> must be present in [<distro name>] section's versions= list.
 # [<distro name>:<version name>]
 # code_name=<code name> [TYPE_STRING]
-# supported=True|False [TYPE_BOOL]
+# supported=1|0 [TYPE_BOOL]
 # release_date=<human readable date YYYY-MM-DD> [TYPE_STRING]
 # notes=<version notes> [TYPE_STRING]
 # ppd_install=ppd|drv [TYPE_STRING] # ppd is default
-# udev_mode_fix=True|False [TYPE_BOOL]
+# udev_mode_fix=1|0 [TYPE_BOOL]
 # ppd_dir=<ppd dir> [TYPE_STRING] # Used for BOTH ppd and drv install types
 # drv_dir=<drv dir> [TYPE_STRING] # Used for only drv installs
-# fix_ppd_symlink=True|False [TYPE_BOOL]
-# usermod_params=<params for usermod command, w/o user name(s). e.g. '-Glp' (default)>
-# gui_supported=True|False [TYPE_BOOL]
-# scan_supported=True|False [TYPE_BOOL]
-# fax_supported=True|False [TYPE_BOOL]
-# pcard_supported=True|False [TYPE_BOOL]
-# network_supported=True|False [TYPE_BOOL]
-# parallel_supported=True|False [TYPE_BOOL]
-# usb_supported=True|False [TYPE_BOOL]
-# packaged_version=<hplip version major.year.month> [TYPE_STRING] (version of HPLIP pre-packaged in distro, e.g. "2.8.2")
-# cups_path_with_bitness=True|False [TYPE_BOOL] (False is defult)
-# ui_toolkit=qt3|qt4|gtk [TYPE_STRING]
+# fix_ppd_symlink=1|0 [TYPE_BOOL]
+# scan_supported=1|0 [TYPE_BOOL]
+# fax_supported=1|0 [TYPE_BOOL]
+# pcard_supported=1|0 [TYPE_BOOL]
+# network_supported=1|0 [TYPE_BOOL]
+# parallel_supported=1|0 [TYPE_BOOL]
+# usb_supported=1|0 [TYPE_BOOL]
+# packaged_version=<hplip version major.year.month> [TYPE_STRING] (version of HPLIP pre-packaged in distro, e.g. "2.8.12")
+# cups_path_with_bitness=1|0 [TYPE_BOOL] (False is default)
+# ui_toolkit=qt3|qt4|gtk|none [TYPE_STRING]
+# foomatic_rip_hplip=1|0 [TYPE_BOOL] (False is default)
+# policykit=1|0 [TYPE_BOOL]
+# native_cups=1|0 [TYPE_BOOL]
+# package_available=1|0 [TYPE_BOOL]
+# package_arch=<list of processor architectures> [TYPE_LIST]
+# add_user_to_group=<usermod params> [TYPE_STRING] (leave empty for none) [ex. "-a -G sys" or "-G lp"]
 #
-# # Only include these sections if supported==True for this <distro name>:<version name>.
+# # Only include these sections if supported==1 for this <distro name>:<version name>.
 # [<distro name>:<version name>:<dependency name>]
 # packages=<package list to satisfy dependency (comma sep. list)> [TYPE_LIST]
 # commands=<command list to satisfy dependency (comma sep. list)> [TYPE_LIST]
@@ -80,7 +87,7 @@
 # ****************************************
 
 [distros]
-distros=unknown,mepis,debian,suse,mandriva,fedora,redhat,rhel,slackware,gentoo,redflag,ubuntu,xandros,freebsd,linspire,ark,pclinuxos,centos,igos,linuxmint,linpus,gos
+distros=unknown,mepis,debian,suse,mandriva,fedora,redhat,rhel,slackware,gentoo,redflag,ubuntu,xandros,freebsd,linspire,ark,pclinuxos,centos,igos,linuxmint,linpus,gos,boss,lfs
 
 # ****************************************
 
@@ -88,42 +95,39 @@ distros=unknown,mepis,debian,suse,mandriva,fedora,redhat,rhel,slackware,gentoo,r
 index=0
 display_name=Unknown
 versions=0
-display=False
+display=0
 package_mgrs=
 su_sudo=
 drv_dir=
 
 [unknown:0]
-supported=False
+supported=0
 
 # ****************************************
 
 [suse]
 index=3
-versions=9.0,9.1,9.2,9.3,10,10.0,10.1,10.2,10.3,11.0,11.1
+versions=9.0,9.1,9.2,9.3,10,10.0,10.1,10.2,10.3,11,11.0,11.1,11.2
 display_name=SUSE Linux
 alt_names=
-display=True
+display=1
 notes=
-package_mgrs=yast,yast2,opensuse-updater
-package_mgr_cmd=xterm -e su -c "yast --install $packages_to_install"
+package_mgrs=yast,yast2,opensuse-updater,zypper
+package_mgr_cmd=su -c "zypper --non-interactive --no-gpg-checks in --auto-agree-with-licenses $packages_to_install"
 pre_depend_cmd=
 post_depend_cmd=
-hpoj_remove_cmd=su -c "yast --remove hpoj"
-hplip_remove_cmd=su -c "yast --remove hplip"
+hplip_remove_cmd=su -c "zypper --non-interactive rm hplip"
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/manufacturer-PPDs/hp
-fix_ppd_symlink=False
-usermod_params=-Glp
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [suse:9.0]
 code_name=
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -133,14 +137,13 @@ usb_supported=1
 packaged_version=
 release_date=2003-11-15
 notes=
-drv_dir=/usr/share/cups/drv/hp/
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ********************
 [suse:9.1]
 code_name=
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -150,14 +153,13 @@ usb_supported=1
 packaged_version=
 release_date=2004-4-23
 notes=
-drv_dir=/usr/share/cups/drv/hp/
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ********************
 [suse:9.2]
 code_name=
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -167,14 +169,13 @@ usb_supported=1
 packaged_version=
 release_date=2004-10-25
 notes=
-drv_dir=/usr/share/cups/drv/hp/
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ********************
 [suse:9.3]
 code_name=
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -184,14 +185,13 @@ usb_supported=1
 packaged_version=
 release_date=2005-4-16
 notes=
-drv_dir=/usr/share/cups/drv/hp/
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ********************
 [suse:10.0]
 code_name=
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -202,10 +202,10 @@ packaged_version=0.9.4
 release_date=2005-5-10
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 [suse:10.0:cups]
@@ -293,14 +293,16 @@ packages=
 [suse:10.0:python-xml]
 packages=python-xml
 
+[suse:10.0:cups-image]
+packages=cups-devel
+
 [suse:10]
 same_as_version= 10.0
 
 # ********************
 [suse:10.1]
 code_name=
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -311,10 +313,10 @@ packaged_version=1.7.1
 release_date=2006-5-11
 notes=After the installation is completed please go to http://hplip.sourceforge.net/install/manual/distros/novell.html and complete the Step 7 post installation steps.
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 [suse:10.1:cups]
@@ -402,11 +404,13 @@ packages=
 [suse:10.1:python-xml]
 packages=python-xml
 
+[suse:10.1:cups-image]
+packages=cups-devel
+
 # ********************
 [suse:10.2]
 code_name=
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -417,10 +421,10 @@ packaged_version=0.9.7
 release_date=2006-7-12
 notes=After the installation is completed please go to http://hplip.sourceforge.net/install/manual/distros/novell.html and complete the Step 7 post installation steps.
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 [suse:10.2:cups]
@@ -508,11 +512,13 @@ packages=
 [suse:10.2:python-xml]
 packages=python-xml
 
+[suse:10.2:cups-image]
+packages=cups-devel
+
 # ********************
 [suse:10.3]
 code_name=
-supported=True
-gui_supported=1
+supported=1
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -521,14 +527,17 @@ parallel_supported=1
 usb_supported=1
 packaged_version=2.7.7
 release_date=2007-10-04
-notes=Please be sure to disable the CD repositories in YaST.
-ppd_install=drv
-udev_mode_fix=True
+notes=Please be sure to disable the CD repositories in YaST.  During the install process you will be added to the lp group, please quit the installer before the setup stage, log out, log back in, and run hp-setup to complete the install.
+ppd_install=ppd
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
-cups_path_with_bitness=True
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+cups_path_with_bitness=1
 ui_toolkit=qt4
+foomatic_rip_hplip=1
+native_cups=1
+add_user_to_group=-Alp
 
 [suse:10.3:cups]
 packages=cups,cups-client
@@ -618,11 +627,16 @@ packages=python-ctypes
 [suse:10.3:python-xml]
 packages=python-xml
 
+[suse:10.3:cups-image]
+packages=cups-devel
+
+[suse:10.3:python-notify]
+packages=
+
 # ********************
 [suse:11.0]
 code_name=
-supported=True
-gui_supported=1
+supported=1
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -633,12 +647,13 @@ packaged_version=2.8.7
 release_date=2008-06-19
 notes=Please be sure to disable the CD repositories in YaST.
 ppd_install=drv
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
-cups_path_with_bitness=True
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+cups_path_with_bitness=1
 ui_toolkit=qt4
+native_cups=1
 
 [suse:11.0:cups]
 packages=cups,cups-client
@@ -690,7 +705,7 @@ packages=python-devel,python-xml
 packages=python-qt4
 
 [suse:11.0:pyqt4-dbus]
-packages=
+packages=dbus-1-python-devel,dbus-1-python
 
 [suse:11.0:python23]
 packages=python
@@ -728,11 +743,21 @@ packages=python-ctypes
 [suse:11.0:python-xml]
 packages=python-xml
 
+[suse:11.0:cups-image]
+packages=cups-devel
+
+[suse:11.0:python-notify]
+packages=
+
+# ********************
+
+[suse:11]
+same_as_version=11.0
+
 # ********************
 [suse:11.1]
 code_name=
-supported=True
-gui_supported=1
+supported=1
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -743,12 +768,13 @@ packaged_version=2.8.7
 release_date=2008-06-19
 notes=Please be sure to disable the CD repositories in YaST.
 ppd_install=drv
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
-cups_path_with_bitness=True
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+cups_path_with_bitness=1
 ui_toolkit=qt4
+native_cups=1
 
 [suse:11.1:cups]
 packages=cups,cups-client
@@ -797,7 +823,7 @@ packages=python-qt
 packages=python-qt4
 
 [suse:11.1:pyqt4-dbus]
-packages=
+packages=dbus-1-python-devel,dbus-1-python
 
 [suse:11.1:python-devel]
 packages=python-devel,python-xml
@@ -838,34 +864,153 @@ packages=python-ctypes
 [suse:11.1:python-xml]
 packages=python-xml
 
+[suse:11.1:cups-image]
+packages=cups-devel
+
+[suse:11.1:python-notify]
+packages=
+
+# ********************
+[suse:11.2]
+code_name=
+supported=0
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=
+release_date=
+notes=Please be sure to disable the CD repositories in YaST.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+cups_path_with_bitness=1
+ui_toolkit=qt4
+native_cups=1
+
+[suse:11.2:cups]
+packages=cups,cups-client
+
+[suse:11.2:cups-devel]
+packages=cups-devel
+
+[suse:11.2:gcc]
+packages=gcc-c++
+
+[suse:11.2:gs]
+packages=ghostscript-library
+
+[suse:11.2:libcrypto]
+packages=openssl
+
+[suse:11.2:libjpeg]
+packages=libjpeg-devel
+
+[suse:11.2:libnetsnmp-devel]
+packages=net-snmp-devel
+
+[suse:11.2:libpthread]
+packages=glibc
+
+[suse:11.2:libtool]
+packages=libtool,libgphoto2-devel
+
+[suse:11.2:libusb]
+packages=libusb-devel,libusb-1_0-0
+
+[suse:11.2:make]
+packages=make
+
+[suse:11.2:pil]
+packages=python-imaging
+
+[suse:11.2:ppdev]
+packages=
+commands=su -c "modprobe ppdev"
+
+[suse:11.2:pyqt]
+packages=python-qt
+
+[suse:11.2:pyqt4]
+packages=python-qt4
+
+[suse:11.2:pyqt4-dbus]
+packages=dbus-1-python-devel,dbus-1-python
+
+[suse:11.2:python-devel]
+packages=python-devel,python-xml
+
+[suse:11.2:python23]
+packages=python
+
+[suse:11.2:python2x]
+packages=python
+
+[suse:11.2:reportlab]
+packages=
+
+[suse:11.2:sane]
+packages=sane
+
+[suse:11.2:sane-devel]
+packages=sane-backends
+
+[suse:11.2:scanimage]
+packages=sane-backends
+
+[suse:11.2:xsane]
+packages=xsane,sane-frontends
+
+[suse:11.2:cups-ddk]
+packages=cupsddk
+
+[suse:11.2:python-dbus]
+packages=dbus-1-python
+
+[suse:11.2:dbus]
+packages=dbus-1-devel,python-gobject2
+
+[suse:11.2:python-ctypes]
+packages=python-ctypes
+
+[suse:11.2:python-xml]
+packages=python-xml
+
+[suse:11.2:cups-image]
+packages=cups-devel
+
+[suse:11.2:python-notify]
+packages=
+
 # ****************************************
 [redhat]
 index=6
 versions=8.0,9.0
 display_name=Red Hat
 alt_names=
-display=True
+display=1
 notes=
 package_mgrs=yum,rpm,up2date
 package_mgr_cmd=rpm install $packages_to_install
 pre_depend_cmd=
 post_depend_cmd=
-hpoj_remove_cmd=
 hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=
-fix_ppd_symlink=False
-usermod_params=
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ********************
 [redhat:8.0]
 code_name=Psyche
-supported=False
-gui_supported=0
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -874,14 +1019,13 @@ parallel_supported=1
 usb_supported=1
 packaged_version=
 release_date=2002-9-1
-drv_dir=/usr/share/cups/drv/hp/
-ui_toolkit=qt3
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=none
 
 # ********************
 [redhat:9.0]
 code_name=Shrike
-supported=False
-gui_supported=0
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -890,8 +1034,8 @@ parallel_supported=1
 usb_supported=1
 packaged_version=
 release_date=2003-3-1
-drv_dir=/usr/share/cups/drv/hp/
-ui_toolkit=qt3
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=none
 
 # ****************************************
 [turbolinux]
@@ -899,28 +1043,25 @@ index=10
 versions=any
 display_name=Turbolinux
 alt_names=
-display=False
+display=0
 notes=
 package_mgrs=
 package_mgr_cmd=
 pre_depend_cmd=
 post_depend_cmd=
-hpoj_remove_cmd=
 hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=
-fix_ppd_symlink=False
-usermod_params=
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ********************
 [turbolinux:any]
 code_name=
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -930,7 +1071,7 @@ usb_supported=1
 packaged_version=
 release_date=
 notes=
-drv_dir=/usr/share/cups/drv/hp/
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ****************************************
@@ -939,28 +1080,25 @@ index=11
 versions=any
 display_name=Red Flag Linux
 alt_names=
-display=False
+display=0
 notes=
 package_mgrs=
 package_mgr_cmd=
 pre_depend_cmd=
 post_depend_cmd=
-hpoj_remove_cmd=
 hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=
-fix_ppd_symlink=False
-usermod_params=
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ********************
 [redflag:any]
 code_name=
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -970,7 +1108,7 @@ usb_supported=1
 packaged_version=
 release_date=
 notes=
-drv_dir=/usr/share/cups/drv/hp/
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ****************************************
@@ -979,28 +1117,25 @@ index=16
 versions=any
 display_name=Ark Linux
 alt_names=
-display=False
+display=0
 notes=
 package_mgrs=
 package_mgr_cmd=
 pre_depend_cmd=
 post_depend_cmd=
-hpoj_remove_cmd=
 hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=
-fix_ppd_symlink=False
-usermod_params=
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ********************
 [ark:any]
 code_name=
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -1009,7 +1144,7 @@ parallel_supported=1
 usb_supported=1
 packaged_version=
 release_date=
-drv_dir=/usr/share/cups/drv/hp/
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ****************************************
@@ -1018,28 +1153,25 @@ index=20
 versions=any
 display_name=Sun Wah RAYS LX
 alt_names=
-display=False
+display=0
 notes=
 package_mgrs=
 package_mgr_cmd=
 pre_depend_cmd=
 post_depend_cmd=
-hpoj_remove_cmd=
 hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=
-fix_ppd_symlink=False
-usermod_params=
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ********************
 [sunwah:any]
 code_name=
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -1048,36 +1180,33 @@ parallel_supported=1
 usb_supported=1
 packaged_version=
 release_date=
-drv_dir=/usr/share/cups/drv/hp/
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ****************************************
 [fedora]
 index=5
-versions=1.0,2.0,3.0,4.0,5,5.0,5.92,6,6.0,7,7.0,8,8.0,9,9.0,10,10.0
+versions=1.0,2.0,3.0,4.0,5,5.0,5.92,6,6.0,7,7.0,8,8.0,9,9.0,10,10.0,11,11.0
 display_name=Fedora
 alt_names=Fedora Core
-display=True
+display=1
 notes=SELinux must be disabled for HPLIP to function properly. Please disable SELinux before continuing.
 package_mgrs=yum,rpm,up2date
 package_mgr_cmd=su -c "yum -y -d 10 -e 1 install $packages_to_install"
 pre_depend_cmd=su -c "yum clean all"
 post_depend_cmd=
-hpoj_remove_cmd=su -c "yum -y -d 10 -e 1 remove hplip hpijs"
-hplip_remove_cmd=su -c "yum -y -d 10 -e 1 remove hplip hpijs"
+hplip_remove_cmd=su -c "yum -y -d 10 -e 1 remove hplip"
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-usermod_params=-Glp
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [fedora:1.0]
 code_name=Yarrow
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -1088,17 +1217,16 @@ packaged_version=
 release_date=2003-11-5
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ********************
 [fedora:2.0]
 code_name=Tettnang
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -1109,17 +1237,16 @@ packaged_version=
 release_date=2004-5-18
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ********************
 [fedora:3.0]
 code_name=Heidelberg
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -1130,10 +1257,10 @@ packaged_version=
 release_date=2004-11-8
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 [fedora:3.0:cups]
@@ -1213,16 +1340,18 @@ packages=xsane
 packages=
 
 [fedora:3.0:python-dbus]
-# packages=dbus-python,dbus-devel
+# packages=dbus-python,dbus-devel,python-gobject
 
 [fedora:3.0:python-ctypes]
 # packages=python-ctypes
 
+[fedora:3.0:cups-image]
+packages=cups-devel
+
 # ********************
 [fedora:4.0]
 code_name=Stentz
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -1233,10 +1362,10 @@ packaged_version=0.9.7
 release_date=2005-6-13
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 [fedora:4.0:cups]
@@ -1316,16 +1445,18 @@ packages=xsane
 packages=
 
 [fedora:4.0:python-dbus]
-# packages=dbus-python,dbus-devel
+# packages=dbus-python,dbus-devel,python-gobject
 
 [fedora:4.0:python-ctypes]
 # packages=python-ctypes
 
+[fedora:4.0:cups-image]
+packages=cups-devel
+
 # ********************
 [fedora:5]
 code_name=Bordeaux
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -1336,10 +1467,10 @@ packaged_version=0.9.11
 release_date=2006-3-20
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 [fedora:5:cups]
@@ -1419,10 +1550,13 @@ packages=xsane
 # packages=cupsddk,cupsddk-drivers,cupsddk-devel
 
 [fedora:5:python-dbus]
-# packages=dbus-python,dbus-devel
+# packages=dbus-python,dbus-devel,python-gobject
 
 [fedora:5:python-ctypes]
 # packages=python-ctypes
+
+[fedora:5:cups-image]
+packages=cups-devel
 
 # ********************
 [fedora:5.0]
@@ -1431,8 +1565,7 @@ same_as_version=5
 # ********************
 [fedora:5.92]
 code_name=RC3
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -1443,10 +1576,10 @@ packaged_version=0.9.11
 release_date=2006-10-24
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 [fedora:5.92:cups]
@@ -1526,16 +1659,18 @@ packages=xsane
 packages=
 
 [fedora:5.92:python-dbus]
-# packages=dbus-python,dbus-devel
+# packages=dbus-python,dbus-devel,python-gobject
 
 [fedora:5.92:python-ctypes]
 # packages=python-ctypes
 
+[fedora:5.92:cups-image]
+packages=cups-devel
+
 # ********************
 [fedora:6]
 code_name=
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -1546,10 +1681,10 @@ packaged_version=1.7.2
 release_date=2006-10-24
 notes=
 ppd_install=drv
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 [fedora:6:cups]
@@ -1629,10 +1764,13 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers,cupsddk-devel
 
 [fedora:6::python-dbus]
-# packages=dbus-python,dbus-devel
+# packages=dbus-python,dbus-devel,python-gobject
 
 [fedora:6:python-ctypes]
 # packages=python-ctypes
+
+[fedora:6:cups-image]
+packages=cups-devel
 
 # ********************
 [fedora:6.0]
@@ -1641,8 +1779,7 @@ same_as_version= 6
 # ********************
 [fedora:7]
 code_name=
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -1653,10 +1790,10 @@ packaged_version=1.7.4a
 release_date=2007-5-31
 notes=
 ppd_install=drv
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 [fedora:7:cups]
@@ -1736,13 +1873,16 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers,cupsddk-devel
 
 [fedora:7:python-dbus]
-packages=dbus-python
+packages=dbus-python,python-gobject
 
 [fedora:7:dbus]
 packages=dbus-devel
 
 [fedora:7:python-ctypes]
 packages=python-ctypes
+
+[fedora:7:cups-image]
+packages=cups-devel
 
 # ********************
 [fedora:7.0]
@@ -1751,8 +1891,7 @@ same_as_version= 7
 # ********************
 [fedora:8]
 code_name=
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -1763,10 +1902,10 @@ packaged_version=2.8.2
 release_date=2007-11-8
 notes=
 ppd_install=drv
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 [fedora:8:cups]
@@ -1849,10 +1988,13 @@ packages=cupsddk,cupsddk-drivers,cupsddk-devel
 packages=dbus-python
 
 [fedora:8:dbus]
-packages=dbus-devel
+packages=dbus-devel,python-gobject
 
 [fedora:8:python-ctypes]
 packages=python-ctypes
+
+[fedora:8:cups-image]
+packages=cups-devel
 
 # ********************
 [fedora:8.0]
@@ -1861,8 +2003,7 @@ same_as_version= 8
 # ********************
 [fedora:9]
 code_name=sulphur
-supported=True
-gui_supported=1
+supported=1
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -1873,11 +2014,12 @@ packaged_version=2.8.6
 release_date=2008-05-13
 notes=
 ppd_install=drv
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+native_cups=1
 
 [fedora:9:cups]
 packages=cups
@@ -1956,13 +2098,19 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers,cupsddk-devel
 
 [fedora:9:python-dbus]
-packages=dbus-python
+packages=dbus-python,python-gobject
 
 [fedora:9:dbus]
 packages=dbus-devel
 
 [fedora:9:python-ctypes]
 packages=python-ctypes
+
+[fedora:9:cups-image]
+packages=cups-devel
+
+[fedora:9:python-notify]
+packages=notify-python
 
 # ********************
 [fedora:9.0]
@@ -1971,8 +2119,7 @@ same_as_version= 9
 # ********************
 [fedora:10]
 code_name=sulphur
-supported=True
-gui_supported=1
+supported=1
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -1981,13 +2128,16 @@ parallel_supported=1
 usb_supported=1
 packaged_version=2.8.7
 release_date=2009-11-25
-notes=
+notes=To complete the install in Fedora 10 you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
 ppd_install=drv
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+policykit=1
+native_cups=1
+add_user_to_group=-a -Gsys,lp
 
 [fedora:10:cups]
 packages=cups
@@ -2066,13 +2216,22 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers,cupsddk-devel
 
 [fedora:10:python-dbus]
-packages=dbus-python
+packages=dbus-python,python-gobject
 
 [fedora:10:dbus]
 packages=dbus-devel
 
 [fedora:10:python-ctypes]
 packages=python-ctypes
+
+[fedora:10:cups-image]
+packages=cups-devel
+
+[fedora:10:policykit]
+packages=PolicyKit,PolicyKit-gnome
+
+[fedora:10:python-notify]
+packages=notify-python
 
 # ********************
 [fedora:10.0]
@@ -2081,8 +2240,7 @@ same_as_version= 10
 # ********************
 [fedora:11]
 code_name=
-supported=True
-gui_supported=1
+supported=1
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -2091,13 +2249,16 @@ parallel_supported=1
 usb_supported=1
 packaged_version=
 release_date=
-notes=
+notes=To complete the install in Fedora 11 you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
 ppd_install=drv
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+policykit=1
+native_cups=1
+add_user_to_group=-a -Gsys,lp
 
 [fedora:11:cups]
 packages=cups
@@ -2176,13 +2337,22 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers,cupsddk-devel
 
 [fedora:11:python-dbus]
-packages=dbus-python
+packages=dbus-python,python-gobject
 
 [fedora:11:dbus]
 packages=dbus-devel
 
 [fedora:11:python-ctypes]
 packages=python-ctypes
+
+[fedora:11:cups-image]
+packages=cups-devel
+
+[fedora:11:policykit]
+packages=PolicyKit,PolicyKit-gnome
+
+[fedora:11:python-notify]
+packages=notify-python
 
 # ********************
 [fedora:11.0]
@@ -2194,27 +2364,24 @@ index=15
 versions=5.0
 display_name=Linspire
 alt_names=
-display=False
+display=0
 notes=The installer will uncomment out several Debian repositories to complete the installation.  This may pull in packages that are incompatible with Linspire and may cause CNR to stop working.
 package_mgrs=apt-get
 package_mgr_cmd=su -c "apt-get install --yes $packages_to_install"
 pre_depend_cmd=su -c "cp -f /etc/apt/sources.list /etc/apt/sources.hplip,echo deb ftp://mirrors.kernel.org/debian/ sid main contrib non-free | sudo tee -a /etc/apt/sources.list,echo deb-src ftp://mirrors.kernel.org/debian/ sid main contrib non-free | sudo tee -a /etc/apt/sources.list,su -c "apt-get update"
 post_depend_cmd=
-hpoj_remove_cmd=su -c "apt-get remove hpoj"
 hplip_remove_cmd=su -c "apt-get remove hplip hpijs"
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-usermod_params=
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [linspire:5.0]
 code_name=Linspire
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -2225,10 +2392,10 @@ packaged_version=
 release_date=
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ****************************************
@@ -2237,27 +2404,24 @@ index=7
 versions=3.0,4.0,5.0
 display_name=Red Hat Enterprise Linux
 alt_names=red hat enterprise linux
-display=True
+display=1
 notes=
 package_mgrs=yum,rpm,up2date
 package_mgr_cmd=rpm install $packages_to_install
 pre_depend_cmd=
 post_depend_cmd=
-hpoj_remove_cmd=
 hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-usermod_params=
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [rhel:3.0]
 code_name=Taroon
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -2268,17 +2432,16 @@ packaged_version=
 release_date=2003-10-22
 notes=
 ppd_install=
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ********************
 [rhel:4.0]
 code_name=Nahant
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -2289,17 +2452,16 @@ packaged_version=
 release_date=2005-2-15
 notes=
 ppd_install=
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ********************
 [rhel:5.0]
 code_name=
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -2310,11 +2472,13 @@ packaged_version=1.6.7
 release_date=
 notes=
 ppd_install=
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
+package_available=1
+package_arch=i386
 
 # ****************************************
 [slackware]
@@ -2322,27 +2486,24 @@ index=8
 versions=9.0,9.1,10.0,10.1,10.2,11,12,12.1
 display_name=Slackware Linux
 alt_names=
-display=False
+display=0
 notes=
 package_mgrs=
 package_mgr_cmd=
 pre_depend_cmd=
 post_depend_cmd=
-hpoj_remove_cmd=
 hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-usermod_params=
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [slackware:9.0]
 code_name=
-supported=False
-gui_supported=0
+supported=0
 scan_supported=0
 fax_supported=0
 pcard_supported=0
@@ -2353,17 +2514,16 @@ packaged_version=
 release_date=2003-3-19
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
-ui_toolkit=qt3
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=none
 
 # ********************
 [slackware:9.1]
 code_name=
-supported=False
-gui_supported=0
+supported=0
 scan_supported=0
 fax_supported=0
 pcard_supported=0
@@ -2374,17 +2534,16 @@ packaged_version=
 release_date=2003-9-26
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
-ui_toolkit=qt3
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=none
 
 # ********************
 [slackware:10.0]
 code_name=
-supported=False
-gui_supported=0
+supported=0
 scan_supported=0
 fax_supported=0
 pcard_supported=0
@@ -2395,17 +2554,16 @@ packaged_version=
 release_date=2004-6-23
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
-ui_toolkit=qt3
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=none
 
 # ********************
 [slackware:10.1]
 code_name=
-supported=False
-gui_supported=0
+supported=0
 scan_supported=0
 fax_supported=0
 pcard_supported=0
@@ -2416,17 +2574,16 @@ packaged_version=
 release_date=2005-2-2
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
-ui_toolkit=qt3
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=none
 
 # ********************
 [slackware:10.2]
 code_name=
-supported=False
-gui_supported=0
+supported=0
 scan_supported=0
 fax_supported=0
 pcard_supported=0
@@ -2437,17 +2594,16 @@ packaged_version=
 release_date=2005-9-14
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
-ui_toolkit=qt3
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=none
 
 # ********************
 [slackware:11]
 code_name=
-supported=False
-gui_supported=0
+supported=0
 scan_supported=0
 fax_supported=0
 pcard_supported=0
@@ -2458,17 +2614,16 @@ packaged_version=1.6.9
 release_date=
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
-ui_toolkit=qt3
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=none
 
 # ********************
 [slackware:12]
 code_name=
-supported=False
-gui_supported=0
+supported=0
 scan_supported=0
 fax_supported=0
 pcard_supported=0
@@ -2479,17 +2634,16 @@ packaged_version=1.7.4a
 release_date=
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
-ui_toolkit=qt3
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=none
 
 # ********************
 [slackware:12.1]
 code_name=
-supported=False
-gui_supported=0
+supported=0
 scan_supported=0
 fax_supported=0
 pcard_supported=0
@@ -2500,11 +2654,11 @@ packaged_version=2.8.4
 release_date=
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
-ui_toolkit=qt3
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=none
 
 # ****************************************
 [centos]
@@ -2512,27 +2666,24 @@ index=23
 versions=any
 display_name=CentOS
 alt_names=
-display=False
+display=0
 notes=
 package_mgrs=
 package_mgr_cmd=
 pre_depend_cmd=
 post_depend_cmd=
-hpoj_remove_cmd=
 hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-usermod_params=
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [centos:any]
 code_name=
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -2543,10 +2694,10 @@ packaged_version=
 release_date=
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 [centos:any:cups]
@@ -2599,7 +2750,7 @@ packages=
 packages=python-qt4
 
 [centos:any:pyqt4-dbus]
-packages=python-qt4-dbus
+packages=python-qt4-dbus,python-gobject
 
 [centos:any:python23]
 packages=
@@ -2637,27 +2788,24 @@ index=9
 versions=any
 display_name=Gentoo Linux
 alt_names=
-display=False
+display=0
 notes=
 package_mgrs=
 package_mgr_cmd=
 pre_depend_cmd=
 post_depend_cmd=
-hpoj_remove_cmd=
 hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=
-fix_ppd_symlink=False
-usermod_params=
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [gentoo:any]
 code_name=
-supported=False
-gui_supported=0
+supported=0
 scan_supported=0
 fax_supported=0
 pcard_supported=0
@@ -2668,40 +2816,37 @@ packaged_version=
 release_date=
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
-ui_toolkit=qt3
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=none
 
 # ****************************************
 [pclinuxos]
 index=17
-versions=2006.0,2006,2007.0,2007,2008.0,2008
+versions=2006.0,2006,2007.0,2007,2008.0,2008,2009,2009.0
 display_name=PCLinuxOS
 alt_names=
-display=True
+display=1
 notes=Please enable all the available repositories before continuing or the install will fail.
 package_mgrs=apt-get,synaptic
 package_mgr_cmd=su -c "apt-get install --yes $packages_to_install"
 pre_install_cmd=su - -c "/etc/init.d/cups restart",su -c "touch /etc/security/console.perms.d/60-hplip.perms && echo '<usb>=/dev/usb/dabusb* /dev/usb/mdc800* /dev/usb/rio500 /dev/ttyUSB*' | tee /etc/security/console.perms.d/60-hplip.perms"
 pre_depend_cmd=su -c "apt-get update"
 post_depend_cmd=
-hpoj_remove_cmd=su -c "apt-get remove --yes hpoj"
 hplip_remove_cmd=su -c "apt-get remove --yes hplip hpijs"
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-usermod_params=
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [pclinuxos:2006.0]
 code_name=Texstar
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -2712,10 +2857,10 @@ packaged_version=
 release_date=
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 
 [pclinuxos:2006.0:cups]
@@ -2795,10 +2940,13 @@ packages=xsane
 packages=
 
 [pclinuxos:2006.0:python-dbus]
-# packages=dbus-python,libdbus-1_3-devel
+# packages=dbus-python,libdbus-1_3-devel,python-gobject
 
 [pclinuxos:2006.0:python-ctypes]
 # packages=python-ctypes
+
+[pclinuxos:2006.0:cups-image]
+packages=libcups2-devel
 
 # ********************
 [pclinuxos:2006]
@@ -2807,8 +2955,7 @@ same_as_version=2006.0
 # ********************
 [pclinuxos:2007.0]
 code_name=
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -2819,10 +2966,10 @@ packaged_version=2.7.10
 release_date=
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 
 [pclinuxos:2007.0:cups]
@@ -2902,13 +3049,16 @@ packages=xsane
 # packages=cupsddk,cupsddk-drivers
 
 [pclinuxos:2007.0:python-dbus]
-packages=dbus-python
+packages=dbus-python,python-gobject
 
 [pclinuxos:2007.0:dbus]
 packages=libdbus-1_3-devel
 
 [pclinuxos:2007.0:python-ctypes]
 packages=python-ctypes
+
+[pclinuxos:2007.0:cups-image]
+packages=libcups2-devel
 
 # ********************
 [pclinuxos:2007]
@@ -2917,8 +3067,7 @@ same_as_version=2007.0
 # ********************
 [pclinuxos:2008.0]
 code_name=
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -2929,10 +3078,10 @@ packaged_version=2.7.10
 release_date=
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 
 [pclinuxos:2008.0:cups]
@@ -3012,7 +3161,7 @@ packages=xsane
 # packages=cupsddk,cupsddk-drivers
 
 [pclinuxos:2008.0:python-dbus]
-packages=dbus-python
+packages=dbus-python,python-gobject
 
 [pclinuxos:2008.0:dbus]
 packages=libdbus-1_3-devel
@@ -3020,9 +3169,232 @@ packages=libdbus-1_3-devel
 [pclinuxos:2008.0:python-ctypes]
 packages=python-ctypes
 
+[pclinuxos:2008.0:cups-image]
+packages=libcups2-devel
+
 # ********************
 [pclinuxos:2008]
 same_as_version=2008.0
+
+# ********************
+[pclinuxos:2009.0]
+code_name=
+supported=0
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=
+release_date=
+notes=
+ppd_install=ppd
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+
+[pclinuxos:2009.0:cups]
+packages=libcups2
+
+[pclinuxos:2009.0:cups-devel]
+packages=libcups2-devel
+
+[pclinuxos:2009.0:gcc]
+packages=gcc-c++
+
+[pclinuxos:2009.0:gs]
+packages=ghostscript
+
+[pclinuxos:2009.0:libcrypto]
+packages=openssl
+
+[pclinuxos:2009.0:libjpeg]
+packages=libjpeg62-devel
+
+[pclinuxos:2009.0:libnetsnmp-devel]
+packages=libnet-snmp10-devel
+
+[pclinuxos:2009.0:libpthread]
+packages=glibc
+
+[pclinuxos:2009.0:libtool]
+packages=libtool
+
+[pclinuxos:2009.0:libusb]
+packages=libusb-devel
+
+[pclinuxos:2009.0:make]
+packages=make
+
+[pclinuxos:2009.0:pil]
+packages=python-imaging
+
+[pclinuxos:2009.0:ppdev]
+packages=
+commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
+
+[pclinuxos:2009.0:pyqt]
+packages=pyqt
+
+[pclinuxos:2009.0:python-devel]
+packages=libpython2.4-devel
+
+[pclinuxos:2009.0:pyqt4]
+packages=PyQt4
+
+[pclinuxos:2009.0:pyqt4-dbus]
+packages=dbus-python
+
+[pclinuxos:2009.0:python23]
+packages=python
+
+[pclinuxos:2009.0:python2x]
+packages=python
+
+[pclinuxos:2009.0:reportlab]
+packages=python-reportlab
+
+[pclinuxos:2009.0:sane]
+packages=sane-frontends
+
+[pclinuxos:2009.0:sane-devel]
+packages=libsane1-devel
+
+[pclinuxos:2009.0:scanimage]
+packages=sane-frontends
+
+[pclinuxos:2009.0:xsane]
+packages=xsane
+
+[pclinuxos:2009.0:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
+
+[pclinuxos:2009.0:python-dbus]
+packages=dbus-python,python-gobject
+
+[pclinuxos:2009.0:dbus]
+packages=libdbus-1_3-devel
+
+[pclinuxos:2009.0:python-ctypes]
+packages=python-ctypes
+
+[pclinuxos:2009.0:cups-image]
+packages=libcups2-devel
+
+# ********************
+[pclinuxos:2009]
+same_as_version=2009.0
+
+# ********************
+[pclinuxos:2009.1]
+code_name=
+supported=0
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=
+release_date=
+notes=
+ppd_install=ppd
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+
+[pclinuxos:2009.1:cups]
+packages=libcups2
+
+[pclinuxos:2009.1:cups-devel]
+packages=libcups2-devel
+
+[pclinuxos:2009.1:gcc]
+packages=gcc-c++
+
+[pclinuxos:2009.1:gs]
+packages=ghostscript
+
+[pclinuxos:2009.1:libcrypto]
+packages=openssl
+
+[pclinuxos:2009.1:libjpeg]
+packages=libjpeg62-devel
+
+[pclinuxos:2009.1:libnetsnmp-devel]
+packages=libnet-snmp10-devel
+
+[pclinuxos:2009.1:libpthread]
+packages=glibc
+
+[pclinuxos:2009.1:libtool]
+packages=libtool
+
+[pclinuxos:2009.1:libusb]
+packages=libusb-devel
+
+[pclinuxos:2009.1:make]
+packages=make
+
+[pclinuxos:2009.1:pil]
+packages=python-imaging
+
+[pclinuxos:2009.1:ppdev]
+packages=
+commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
+
+[pclinuxos:2009.1:pyqt]
+packages=pyqt
+
+[pclinuxos:2009.1:python-devel]
+packages=libpython2.4-devel
+
+[pclinuxos:2009.1:pyqt4]
+packages=PyQt4
+
+[pclinuxos:2009.1:pyqt4-dbus]
+packages=dbus-python
+
+[pclinuxos:2009.1:python23]
+packages=python
+
+[pclinuxos:2009.1:python2x]
+packages=python
+
+[pclinuxos:2009.1:reportlab]
+packages=python-reportlab
+
+[pclinuxos:2009.1:sane]
+packages=sane-frontends
+
+[pclinuxos:2009.1:sane-devel]
+packages=libsane1-devel
+
+[pclinuxos:2009.1:scanimage]
+packages=sane-frontends
+
+[pclinuxos:2009.1:xsane]
+packages=xsane
+
+[pclinuxos:2009.1:cups-ddk]
+# packages=cupsddk,cupsddk-drivers
+
+[pclinuxos:2009.1:python-dbus]
+packages=dbus-python,python-gobject
+
+[pclinuxos:2009.1:dbus]
+packages=libdbus-1_3-devel
+
+[pclinuxos:2009.1:python-ctypes]
+packages=python-ctypes
+
+[pclinuxos:2009.1:cups-image]
+packages=libcups2-devel
 
 # ****************************************
 [igos]
@@ -3030,27 +3402,24 @@ index=32
 versions=1.0
 display_name=IGOS
 alt_names=IGOS
-display=True
+display=1
 notes=SELinux must be disabled for HPLIP to function properly. Please disable SELinux before continuing.
 package_mgrs=yum,rpm,up2date
 package_mgr_cmd=su -c "yum -y -d 10 -e 1 install $packages_to_install"
 pre_depend_cmd=su -c "yum clean all"
 post_depend_cmd=
-hpoj_remove_cmd=su -c "yum -y -d 10 -e 1 remove hplip hpijs"
 hplip_remove_cmd=su -c "yum -y -d 10 -e 1 remove hplip hpijs"
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=
-fix_ppd_symlink=False
-usermod_params=
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [igos:1.0]
 code_name=Nusantara
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -3061,10 +3430,10 @@ packaged_version=
 release_date=
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 [igos:1.0:cups]
@@ -3144,38 +3513,38 @@ packages=xsane
 # packages=cupsddk,cupsddk-drivers
 
 [igos:1.0:python-dbus]
-# packages=dbus-python
+# packages=dbus-python,python-gobject
 
 [igos:1.0:python-ctypes]
 # packages=python-ctypes
 
+[igos:1.0:cups-image]
+packages=
+
 # ****************************************
 [ubuntu]
 index=12
-versions=5.04,5.1,6.06,6.10,7.04,7.10,8.04,8.04.1,8.04.2,8.10,9.04
+versions=5.04,5.1,6.06,6.10,7.04,7.10,8.04,8.04.1,8.04.2,8.10,9.04,9.10
 display_name=Ubuntu
 alt_names=kubuntu,edubuntu,xubuntu
-display=True
+display=1
 notes=
 package_mgrs=dpkg,apt-get,synaptic,update-manager,adept,aptitude,adept-updater
 package_mgr_cmd=sudo aptitude install --assume-yes $packages_to_install
 pre_depend_cmd=sudo dpkg --configure -a,sudo apt-get install --yes --force-yes -f,sudo aptitude update
 post_depend_cmd=
-hpoj_remove_cmd=sudo aptitude remove --assume-yes hpoj
-hplip_remove_cmd=sudo aptitude remove --assume-yes hplip hpijs
+hplip_remove_cmd=sudo apt-get remove --assume-yes hplip hpijs foomatic-db-hpijs
 su_sudo=sudo
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=
-fix_ppd_symlink=False
-usermod_params=-a -Glp
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [ubuntu:5.04]
 code_name=Hoary Hedgehog
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -3186,10 +3555,10 @@ packaged_version=
 release_date=2004-5-1
 notes=Enable the universe/multiverse repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 [ubuntu:5.04:cups]
@@ -3269,16 +3638,18 @@ packages=xsane
 # packages=cupsddk,cupsddk-drivers
 
 [ubuntu:5.04:python-dbus]
-# packages=
+# packages=python-gobject
 
 [ubuntu:5.04:python-ctypes]
 # packages=
 
+[ubuntu:5.04:cups-image]
+packages=libcupsys-dev,cupsys-bsd
+
 # ********************
 [ubuntu:5.1]
 code_name=Breezy Badger
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -3289,10 +3660,10 @@ packaged_version=
 release_date=2005-10-1
 notes=Enable the universe/multiverse repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=True
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=1
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 [ubuntu:5.1:cups]
@@ -3372,16 +3743,18 @@ packages=xsane
 # packages=cupsddk,cupsddk-drivers
 
 [ubuntu:5.1:python-dbus]
-# packages=
+# packages=python-gobject
 
 [ubuntu:5.1:python-ctypes]
 # packages=
 
+[ubuntu:5.1:cups-image]
+packages=libcupsys-dev,cupsys-bsd
+
 # ********************
 [ubuntu:6.06]
 code_name=Dapper Duck
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -3392,10 +3765,10 @@ packaged_version=0.9.7
 release_date=2006-6-1
 notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
 ppd_install=ppd
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=True
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=1
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 
 [ubuntu:6.06:cups]
@@ -3475,16 +3848,18 @@ packages=xsane
 # packages=cupsddk,cupsddk-drivers
 
 [ubuntu:6.06:python-dbus]
-# packages=
+# packages=python-gobject
 
 [ubuntu:6.06:python-ctypes]
 # packages=
 
+[ubuntu:6.06:cups-image]
+packages=libcupsys-dev,cupsys-bsd
+
 # ********************
 [ubuntu:6.10]
 code_name=Edgy Eft
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -3495,10 +3870,10 @@ packaged_version=1.6.9
 release_date=2006-10-1
 notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
 ppd_install=ppd
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=True
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=1
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 
 [ubuntu:6.10:cups]
@@ -3578,16 +3953,18 @@ packages=xsane
 packages=
 
 [ubuntu:6.10:python-dbus]
-# packages=python-dbus,libdbus-1-dev
+# packages=python-dbus,libdbus-1-dev,python-gobject
 
 [ubuntu:6.10:python-ctypes]
 # packages=python-ctypes
 
+[ubuntu:6.10:cups-image]
+packages=libcupsys-dev,cupsys-bsd
+
 # ********************
 [ubuntu:7.04]
 code_name=Feisty Fawn
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -3598,10 +3975,10 @@ packaged_version=1.7.3
 release_date=2007-4-1
 notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
 ppd_install=ppd
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=True
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=1
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 
 [ubuntu:7.04:cups]
@@ -3681,7 +4058,7 @@ packages=xsane
 packages=
 
 [ubuntu:7.04:python-dbus]
-packages=python-dbus
+packages=python-dbus,python-gobject
 
 [ubuntu:7.04:dbus]
 packages=libdbus-1-dev
@@ -3689,11 +4066,13 @@ packages=libdbus-1-dev
 [ubuntu:7.04:python-ctypes]
 packages=python-ctypes
 
+[ubuntu:7.04:cups-image]
+packages=libcupsys-dev,cupsys-bsd
+
 # ********************
 [ubuntu:7.10]
 code_name=Gutsy Gibbon
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -3704,10 +4083,10 @@ packaged_version=2.7.7
 release_date=2007-10-1
 notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
 ppd_install=drv
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 
 [ubuntu:7.10:cups]
@@ -3787,7 +4166,7 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers
 
 [ubuntu:7.10:python-dbus]
-packages=python-dbus
+packages=python-dbus,python-gobject
 
 [ubuntu:7.10:dbus]
 packages=libdbus-1-dev
@@ -3795,11 +4174,13 @@ packages=libdbus-1-dev
 [ubuntu:7.10:python-ctypes]
 packages=python-ctypes
 
+[ubuntu:7.10:cups-image]
+packages=libcupsys-dev,cupsys-bsd
+
 # ********************
 [ubuntu:8.04]
 code_name=Hardy Heron
-supported=True
-gui_supported=1
+supported=1
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -3809,12 +4190,14 @@ usb_supported=1
 packaged_version=2.8.2
 release_date=2008
 notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
-ppd_install=drv
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+ppd_install=ppd
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+policykit=1
+native_cups=1
 
 [ubuntu:8.04:cups]
 packages=libcupsys2
@@ -3893,7 +4276,7 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers
 
 [ubuntu:8.04:python-dbus]
-packages=python-dbus
+packages=python-dbus,python-gobject
 
 [ubuntu:8.04:dbus]
 packages=libdbus-1-dev
@@ -3901,11 +4284,20 @@ packages=libdbus-1-dev
 [ubuntu:8.04:python-ctypes]
 packages=python-ctypes
 
+[ubuntu:8.04:cups-image]
+packages=libcupsimage2-dev
+
+[ubuntu:8.04:policykit]
+packages=policykit,policykit-gnome
+
+[ubuntu:8.04:python-notify]
+packages=python-notify
+
+
 # ********************
 [ubuntu:8.04.1]
 code_name=Hardy Heron
-supported=True
-gui_supported=1
+supported=1
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -3915,12 +4307,14 @@ usb_supported=1
 packaged_version=2.8.2
 release_date=2008
 notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
-ppd_install=drv
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+ppd_install=ppd
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+policykit=1
+native_cups=1
 
 [ubuntu:8.04.1:cups]
 packages=libcupsys2
@@ -3999,7 +4393,7 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers
 
 [ubuntu:8.04.1:python-dbus]
-packages=python-dbus
+packages=python-dbus,python-gobject
 
 [ubuntu:8.04.1:dbus]
 packages=libdbus-1-dev
@@ -4007,11 +4401,19 @@ packages=libdbus-1-dev
 [ubuntu:8.04.1:python-ctypes]
 packages=python-ctypes
 
+[ubuntu:8.04.1:cups-image]
+packages=libcupsimage2-dev
+
+[ubuntu:8.04.1:policykit]
+packages=policykit,policykit-gnome
+
+[ubuntu:8.04.1:python-notify]
+packages=python-notify
+
 # ********************
 [ubuntu:8.04.2]
 code_name=Hardy Heron
-supported=True
-gui_supported=1
+supported=1
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -4021,12 +4423,14 @@ usb_supported=1
 packaged_version=2.8.2
 release_date=2009
 notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
-ppd_install=drv
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+ppd_install=ppd
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+policykit=1
+native_cups=1
 
 [ubuntu:8.04.2:cups]
 packages=libcupsys2
@@ -4105,7 +4509,7 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers
 
 [ubuntu:8.04.2:python-dbus]
-packages=python-dbus
+packages=python-dbus,python-gobject
 
 [ubuntu:8.04.2:dbus]
 packages=libdbus-1-dev
@@ -4113,11 +4517,19 @@ packages=libdbus-1-dev
 [ubuntu:8.04.2:python-ctypes]
 packages=python-ctypes
 
+[ubuntu:8.04.2:cups-image]
+packages=libcupsimage2-dev
+
+[ubuntu:8.04.2:policykit]
+packages=policykit,policykit-gnome
+
+[ubuntu:8.04.2:python-notify]
+packages=python-notify
+
 # ********************
 [ubuntu:8.10]
 code_name=Intrepid Ibex
-supported=True
-gui_supported=1
+supported=1
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -4128,11 +4540,13 @@ packaged_version=2.8.7
 release_date=2008
 notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
 ppd_install=drv
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+policykit=1
+native_cups=1
 
 [ubuntu:8.10:cups]
 packages=libcupsys2
@@ -4211,7 +4625,7 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers
 
 [ubuntu:8.10:python-dbus]
-packages=python-dbus
+packages=python-dbus,python-gobject
 
 [ubuntu:8.10:dbus]
 packages=libdbus-1-dev
@@ -4219,26 +4633,39 @@ packages=libdbus-1-dev
 [ubuntu:8.10:python-ctypes]
 packages=python-ctypes
 
+[ubuntu:8.10:cups-image]
+packages=libcupsimage2-dev
+
+[ubuntu:8.10:cups-image]
+packages=libcupsimage2-dev
+
+[ubuntu:8.10:policykit]
+packages=policykit,policykit-gnome
+
+[ubuntu:8.10:python-notify]
+packages=python-notify
+
 # ********************
 [ubuntu:9.04]
 code_name=Jaunty
-supported=True
-gui_supported=1
+supported=1
 scan_supported=1
 fax_supported=1
 pcard_supported=1
 network_supported=1
 parallel_supported=1
 usb_supported=1
-packaged_version=2.8.7
+packaged_version=3.9.2
 release_date=2008
 notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
 ppd_install=drv
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+policykit=1
+native_cups=1
 
 [ubuntu:9.04:cups]
 packages=libcupsys2
@@ -4284,7 +4711,7 @@ commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppd
 packages=python-qt3
 
 [ubuntu:9.04:python-devel]
-packages=python2.5-dev
+packages=python-dev
 
 [ubuntu:9.04:pyqt4]
 packages=python-qt4
@@ -4317,7 +4744,7 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers
 
 [ubuntu:9.04:python-dbus]
-packages=python-dbus
+packages=python-dbus,python-gobject
 
 [ubuntu:9.04:dbus]
 packages=libdbus-1-dev
@@ -4325,33 +4752,155 @@ packages=libdbus-1-dev
 [ubuntu:9.04:python-ctypes]
 packages=python-ctypes
 
+[ubuntu:9.04:cups-image]
+packages=libcupsimage2-dev
+
+[ubuntu:9.04:policykit]
+packages=policykit,policykit-gnome
+
+[ubuntu:9.04:python-notify]
+packages=python-notify
+
+# ********************
+[ubuntu:9.10]
+code_name=
+supported=0
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=3.9.2
+release_date=2009
+notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+policykit=1
+native_cups=1
+
+[ubuntu:9.10:cups]
+packages=libcupsys2
+
+[ubuntu:9.10:cups-devel]
+packages=libcupsys2-dev,cupsys-bsd
+
+[ubuntu:9.10:gcc]
+packages=build-essential
+
+[ubuntu:9.10:gs]
+packages=gs-esp
+
+[ubuntu:9.10:libcrypto]
+packages=openssl
+
+[ubuntu:9.10:libjpeg]
+packages=libjpeg62-dev
+
+[ubuntu:9.10:libnetsnmp-devel]
+packages=libsnmp-dev
+
+[ubuntu:9.10:libpthread]
+packages=build-essential
+
+[ubuntu:9.10:libtool]
+packages=libtool
+
+[ubuntu:9.10:libusb]
+packages=libusb-dev
+
+[ubuntu:9.10:make]
+packages=build-essential
+
+[ubuntu:9.10:pil]
+packages=python-imaging
+
+[ubuntu:9.10:ppdev]
+packages=
+commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppdev | sudo tee -a /etc/modules
+
+[ubuntu:9.10:pyqt]
+packages=python-qt3
+
+[ubuntu:9.10:python-devel]
+packages=python-dev
+
+[ubuntu:9.10:pyqt4]
+packages=python-qt4
+
+[ubuntu:9.10:pyqt4-dbus]
+packages=python-qt4-dbus
+
+[ubuntu:9.10:python23]
+packages=python
+
+[ubuntu:9.10:python2x]
+packages=python
+
+[ubuntu:9.10:reportlab]
+packages=python-reportlab
+
+[ubuntu:9.10:sane]
+packages=libsane
+
+[ubuntu:9.10:sane-devel]
+packages=libsane-dev
+
+[ubuntu:9.10:scanimage]
+packages=sane-utils
+
+[ubuntu:9.10:xsane]
+packages=xsane
+
+[ubuntu:9.10:cups-ddk]
+packages=cupsddk,cupsddk-drivers
+
+[ubuntu:9.10:python-dbus]
+packages=python-dbus,python-gobject
+
+[ubuntu:9.10:dbus]
+packages=libdbus-1-dev
+
+[ubuntu:9.10:python-ctypes]
+packages=python-ctypes
+
+[ubuntu:9.10:cups-image]
+packages=libcupsimage2-dev
+
+[ubuntu:9.10:policykit]
+packages=policykit,policykit-gnome
+
+[ubuntu:9.10:python-notify]
+packages=python-notify
+
 # ****************************************
 [debian]
 index=2
-versions=2.2,3.0,3.1,4.0,4.0r0,4.0r1,5.0,stable,lenny/sid,testing,lenny
+versions=2.2,3.0,3.1,4.0,4.0r0,4.0r1,5.0,5.0.1,stable,lenny/sid,testing,lenny
 display_name=Debian
 alt_names=
-display=True
+display=1
 notes=
 package_mgrs=dpkg,apt-get,synaptic,update-manager,adept,aptitude
 package_mgr_cmd=su -c "apt-get install --force-yes -y $packages_to_install"
 pre_depend_cmd=su -c "dpkg --configure -a",su -c "apt-get install -f",su -c "apt-get update",gnome-terminal -x su -c "apt-get install --yes cupsys-bsd"
 post_depend_cmd=
-hpoj_remove_cmd=su -c "apt-get remove --yes hpoj"
 hplip_remove_cmd=su -c "apt-get remove --yes hplip hpijs"
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-usermod_params=-a -Glp
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [debian:2.2]
 code_name=Potato
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -4362,10 +4911,10 @@ packaged_version=
 release_date=2000-8-15
 notes=
 ppd_install=ppd
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 [debian:2.2:cups]
@@ -4445,16 +4994,18 @@ packages=sane
 packages=
 
 [debian:2.2:python-dbus]
-# packages=
+# packages=python-gobject
 
 [debian:2.2:python-ctypes]
 # packages=
 
+[debian:2.2:cups-image]
+packages=libcupsys-dev,cupsys-bsd
+
 # ********************
 [debian:3.0]
 code_name=Woody
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -4465,10 +5016,10 @@ packaged_version=
 release_date=2002-7-19
 notes=
 ppd_install=ppd
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 [debian:3.0:cups]
@@ -4548,16 +5099,18 @@ packages=sane
 packages=
 
 [debian:3.0:python-dbus]
-# packages=python2.3-dbus,dbus-1-dev
+# packages=python2.3-dbus,dbus-1-dev,python-gobject
 
 [debian:3.0:python-ctypes]
 # packages=python-ctypes
 
+[debian:3.0:cups-image]
+packages=libcupsys-dev,cupsys-bsd
+
 # ********************
 [debian:3.1]
 code_name=Sarge
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -4568,10 +5121,10 @@ packaged_version=0.9.2
 release_date=2005-6-6
 notes=
 ppd_install=ppd
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 
 [debian:3.1:cups]
@@ -4651,16 +5204,18 @@ packages=sane
 # packages=cupsddk,cupsddk-drivers
 
 [debian:3.1:python-dbus]
-# packages=python2.3-dbus,dbus-1-dev
+# packages=python2.3-dbus,dbus-1-dev,python-gobject
 
 [debian:3.1:python-ctypes]
 # packages=python-ctypes
 
+[debian:3.1:cups-image]
+packages=libcupsys-dev,cupsys-bsd
+
 # ********************
 [debian:4.0]
 code_name=Etch
-supported=True
-gui_supported=1
+supported=1
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -4671,11 +5226,12 @@ packaged_version=1.6.10
 release_date=2007-4-8
 notes=Be sure to disable the CD-ROM repositories and also ensure that the main/security repositories are enabled.
 ppd_install=ppd
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+native_cups=1
 
 [debian:4.0:cups]
 packages=cupsys,cupsys-client
@@ -4754,16 +5310,21 @@ packages=xsane
 packages=
 
 [debian:4.0:python-dbus]
-# packages=python-dbus,libdbus-1-dev
+# packages=python-dbus,libdbus-1-dev,python-gobject
 
 [debian:4.0:python-ctypes]
 # packages=python-ctypes
 
+[debian:4.0:cups-image]
+packages=libcupsys-dev,cupsys-bsd
+
+[debian:4.0:python-notify]
+packages=python-notify
+
 # ********************
 [debian:4.0r0]
 code_name=Etch
-supported=True
-gui_supported=1
+supported=1
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -4774,11 +5335,12 @@ packaged_version=1.6.10
 release_date=2007-4-8
 notes=Be sure to disable the CD-ROM repositories and also ensure that the main/security repositories are enabled.
 ppd_install=ppd
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+native_cups=1
 
 [debian:4.0r0:cups]
 packages=cupsys,cupsys-client
@@ -4857,16 +5419,21 @@ packages=xsane
 packages=
 
 [debian:4.0r0:python-dbus]
-# packages=python-dbus,libdbus-1-dev
+# packages=python-dbus,libdbus-1-dev,python-gobject
 
 [debian:4.0r0:python-ctypes]
 # packages=python-ctypes
 
+[debian:4.0r0:cups-image]
+packages=libcupsys-dev,cupsys-bsd
+
+[debian:4.0r0:python-notify]
+packages=python-notify
+
 # ********************
 [debian:4.0r1]
 code_name=Etch
-supported=True
-gui_supported=1
+supported=1
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -4877,11 +5444,12 @@ packaged_version=1.6.10
 release_date=2007-4-8
 notes=Be sure to disable the CD-ROM repositories and also ensure that the main/security repositories are enabled.
 ppd_install=ppd
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+native_cups=1
 
 [debian:4.0r1:cups]
 packages=cupsys,cupsys-client
@@ -4960,16 +5528,21 @@ packages=xsane
 packages=
 
 [debian:4.0r1:python-dbus]
-# packages=python-dbus,libdbus-1-dev
+# packages=python-dbus,libdbus-1-dev,python-gobject
 
 [debian:4.0r1:python-ctypes]
 # packages=python-ctypes
 
+[debian:4.0r1:cups-image]
+packages=libcupsys-dev,cupsys-bsd
+
+[debian:4.0r1:python-notify]
+packages=python-notify
+
 # ********************
 [debian:5.0]
 code_name=Lenny
-supported=True
-gui_supported=1
+supported=1
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -4980,14 +5553,15 @@ packaged_version=2.8.6
 release_date=
 notes=NOTE: Disable the CD Sources in your apt sources.list or the install will fail and hang.
 ppd_install=drv
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+native_cups=1
 
 [debian:5.0:cups]
-packages=cupsys,cupsys-client
+packages=cupsys,cupsys-client,libcupsys2-dev
 
 [debian:5.0:cups-devel]
 packages=libcupsys2-dev,cupsys-bsd
@@ -5063,7 +5637,7 @@ packages=sane
 packages=
 
 [debian:5.0:python-dbus]
-packages=python-dbus
+packages=python-dbus,python-gobject
 
 [debian:5.0:dbus]
 packages=libdbus-1-dev
@@ -5071,11 +5645,19 @@ packages=libdbus-1-dev
 [debian:5.0:python-ctypes]
 packages=python-ctypes
 
+[debian:5.0:cups-image]
+packages=libcupsimage2,libcupsimage2-dev
+
+[debian:5.0:python-notify]
+packages=python-notify
+
+[debian:5.0.1]
+same_as_version= 5.0
+
 # ********************
 [debian:stable]
 code_name=Etch
-supported=True
-gui_supported=1
+supported=1
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -5086,11 +5668,12 @@ packaged_version=2.8.6
 release_date=2007-4-8
 notes=Be sure to disable the CD-ROM repositories and also ensure that the main/security repositories are enabled.
 ppd_install=ppd
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+native_cups=1
 
 [debian:stable:cups]
 packages=cupsys,cupsys-client
@@ -5169,7 +5752,7 @@ packages=xsane
 packages=
 
 [debian:stable:python-dbus]
-packages=python-dbus
+packages=python-dbus,python-gobject
 
 [debian:stable:dbus]
 packages=libdbus-1-dev
@@ -5177,11 +5760,16 @@ packages=libdbus-1-dev
 [debian:stable:python-ctypes]
 packages=python-ctypes
 
+[debian:stable:cups-image]
+packages=libcupsys2-dev,cupsys-bsd
+
+[debian:stable:python-notify]
+packages=python-notify
+
 # ********************
 [debian:testing]
 code_name=sid
-supported=True
-gui_supported=1
+supported=1
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -5192,11 +5780,12 @@ packaged_version=2.8.6
 release_date=
 notes=NOTE: Disable the CD Sources in your apt sources.list or the install will fail and hang. Also make sure all the lenny repositories are enabled or the install will fail.
 ppd_install=ppd
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+native_cups=1
 
 [debian:testing:cups]
 packages=cupsys,cupsys-client
@@ -5275,7 +5864,7 @@ packages=sane
 packages=
 
 [debian:testing:python-dbus]
-packages=python-dbus
+packages=python-dbus,python-gobject
 
 [debian:testing:dbus]
 packages=libdbus-1-dev
@@ -5283,11 +5872,16 @@ packages=libdbus-1-dev
 [debian:testing:python-ctypes]
 packages=python-ctypes
 
+[debian:testing:cups-image]
+packages=libcupsys2-dev,cupsys-bsd
+
+[debian:testing:python-notify]
+packages=python-notify
+
 # ********************
 [debian:lenny/sid]
 code_name=sid
-supported=True
-gui_supported=1
+supported=1
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -5298,11 +5892,12 @@ packaged_version=2.8.6
 release_date=
 notes=NOTE: Disable the CD Sources in your apt sources.list or the install will fail and hang. Also make sure all the lenny repositories are enabled or the install will fail.
 ppd_install=ppd
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+native_cups=1
 
 [debian:lenny/sid:cups]
 packages=cupsys,cupsys-client
@@ -5381,7 +5976,7 @@ packages=sane
 packages=
 
 [debian:lenny/sid:python-dbus]
-packages=python-dbus
+packages=python-dbus,python-gobject
 
 [debian:lenny/sid:dbus]
 packages=libdbus-1-dev
@@ -5389,11 +5984,16 @@ packages=libdbus-1-dev
 [debian:lenny/sid:python-ctypes]
 packages=python-ctypes
 
+[debian:lenny/sid:cups-image]
+packages=libcupsys2-dev,cupsys-bsd
+
+[debian:lenny/sid:python-notify]
+packages=python-notify
+
 # ********************
 [debian:lenny]
 code_name=sid
-supported=True
-gui_supported=1
+supported=1
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -5404,11 +6004,12 @@ packaged_version=2.8.6
 release_date=
 notes=NOTE: Disable the CD Sources in your apt sources.list or the install will fail and hang. Also make sure all the lenny repositories are enabled or the install will fail.
 ppd_install=ppd
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+native_cups=1
 
 [debian:lenny:cups]
 packages=cupsys,cupsys-client
@@ -5487,7 +6088,7 @@ packages=sane
 packages=
 
 [debian:lenny:python-dbus]
-packages=python-dbus
+packages=python-dbus,python-gobject
 
 [debian:lenny:dbus]
 packages=libdbus-1-dev
@@ -5495,33 +6096,36 @@ packages=libdbus-1-dev
 [debian:lenny:python-ctypes]
 packages=python-ctypes
 
+[debian:lenny:cups-image]
+packages=libcupsys2-dev,cupsys-bsd
+
+[debian:lenny:python-notify]
+packages=python-notify
+
 # ****************************************
 [xandros]
 index=13
 versions=any
 display_name=Xandros
 alt_names=
-display=False
+display=0
 notes=
 package_mgrs=
 package_mgr_cmd=
 pre_depend_cmd=
 post_depend_cmd=
-hpoj_remove_cmd=
 hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-usermod_params=
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [xandros:any]
 code_name=
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -5532,10 +6136,10 @@ packaged_version=
 release_date=
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ****************************************
@@ -5544,27 +6148,24 @@ index=19
 versions=any
 display_name=PC-BSD
 alt_names=
-display=False
+display=0
 notes=
 package_mgrs=
 package_mgr_cmd=
 pre_depend_cmd=
 post_depend_cmd=
-hpoj_remove_cmd=
 hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-usermod_params=
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [pcbsd:any]
 code_name=
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -5575,10 +6176,10 @@ packaged_version=
 release_date=
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ****************************************
@@ -5587,27 +6188,24 @@ index=21
 versions=any
 display_name=Miracle Linux
 alt_names=
-display=False
+display=0
 notes=
 package_mgrs=
 package_mgr_cmd=
 pre_depend_cmd=
 post_depend_cmd=
-hpoj_remove_cmd=
 hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-usermod_params=
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [miracle:any]
 code_name=
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -5618,10 +6216,10 @@ packaged_version=
 release_date=
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ****************************************
@@ -5630,27 +6228,24 @@ index=18
 versions=any
 display_name=AsianUX
 alt_names=
-display=False
+display=0
 notes=
 package_mgrs=
 package_mgr_cmd=
 pre_depend_cmd=
 post_depend_cmd=
-hpoj_remove_cmd=
 hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-usermod_params=
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [asianux:any]
 code_name=
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -5661,10 +6256,10 @@ packaged_version=
 release_date=
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ****************************************
@@ -5673,27 +6268,24 @@ index=14
 versions=any
 display_name=FreeBSD
 alt_names=
-display=False
+display=0
 notes=
 package_mgrs=
 package_mgr_cmd=
 pre_depend_cmd=
 post_depend_cmd=
-hpoj_remove_cmd=
 hplip_remove_cmd=
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-usermod_params=
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [freebsd:any]
 code_name=
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -5704,39 +6296,36 @@ packaged_version=
 release_date=
 notes=
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ****************************************
 [mepis]
 index=1
-versions=6.0,6.5,7.0
+versions=6.0,6.5,7.0,8.0
 display_name=Mepis
 alt_names=
-display=True
+display=1
 notes=
 package_mgrs=dpkg,apt-get,synaptic,update-manager,adept,aptitude
 package_mgr_cmd=su -c "apt-get install --yes $packages_to_install"
 pre_depend_cmd=su -c "dpkg --configure -a",su -c "apt-get update"
 post_depend_cmd=
-hpoj_remove_cmd=su -c "apt-get remove --yes hpoj"
 hplip_remove_cmd=su -c "apt-get remove --yes hplip hpijs"
 su_sudo=su
 ppd_install=ppd
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-usermod_params=
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [mepis:6.0]
 code_name=
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -5746,11 +6335,11 @@ usb_supported=1
 packaged_version=0.9.7
 release_date=2006-07-22
 notes=Before proceeding please enable the universe/multiverse repositories in Synaptic or Apt.
-udev_mode_fix=True
-fix_ppd_symlink=False
+udev_mode_fix=1
+fix_ppd_symlink=0
 ppd_install=ppd
-ppd_dir=/usr/share/ppd/hpijs/HP
-drv_dir=/usr/share/cups/drv/hp/
+ppd_dir=/usr/share/ppd/HP
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 
 [mepis:6.0:cups]
@@ -5830,16 +6419,18 @@ packages=xsane
 packages=
 
 [mepis:6.0:python-dbus]
-# packages=python2.4-dbus,libdbus-1-dev
+# packages=python2.4-dbus,libdbus-1-dev,python-gobject
 
 [mepis:6.0:python-ctypes]
 # packages=python-ctypes
 
+[mepis:6.0:cups-image]
+packages=libcupsys2-dev
+
 # ********************
 [mepis:6.5]
 code_name=
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -5849,11 +6440,11 @@ usb_supported=1
 packaged_version=1.7.3
 release_date=2006-4-4
 notes=Before proceeding please enable the universe/multiverse repositories in Synaptic or Apt.
-udev_mode_fix=True
-fix_ppd_symlink=False
+udev_mode_fix=1
+fix_ppd_symlink=0
 ppd_install=ppd
-ppd_dir=/usr/share/ppd/hpijs/HP
-drv_dir=/usr/share/cups/drv/hp/
+ppd_dir=/usr/share/ppd/HP
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 
 [mepis:6.5:cups]
@@ -5933,16 +6524,18 @@ packages=xsane
 packages=
 
 [mepis:6.5:python-dbus]
-# packages=python2.4-dbus,libdbus-1-dev
+# packages=python2.4-dbus,libdbus-1-dev,python-gobject
 
 [mepis:6.5:python-ctypes]
 # packages=python-ctypes
 
+[mepis:6.5:cups-image]
+packages=libcupsys2-dev
+
 # ********************
 [mepis:7.0]
 code_name=
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -5952,11 +6545,11 @@ usb_supported=1
 packaged_version=2.7.10
 release_date=
 notes=Before proceeding please enable the universe/multiverse repositories in Synaptic or Apt.
-udev_mode_fix=True
-fix_ppd_symlink=False
+udev_mode_fix=1
+fix_ppd_symlink=0
 ppd_install=ppd
-ppd_dir=/usr/share/ppd/hpijs/HP
-drv_dir=/usr/share/cups/drv/hp/
+ppd_dir=/usr/share/ppd/HP
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 
 [mepis:7.0:cups]
@@ -6036,10 +6629,118 @@ packages=xsane
 packages=
 
 [mepis:7.0:python-dbus]
-packages=python-dbus,libdbus-1-dev
+packages=python-dbus,libdbus-1-dev,python-gobject
 
 [mepis:7.0:python-ctypes]
 packages=python-ctypes
+
+[mepis:7.0:cups-image]
+packages=libcupsys2-dev
+
+# ********************
+[mepis:8.0]
+code_name=
+supported=0
+scan_supported=1
+fax_supported=0
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=
+release_date=
+notes=Before proceeding please enable the universe/multiverse repositories in Synaptic or Apt.
+udev_mode_fix=1
+fix_ppd_symlink=0
+ppd_install=ppd
+ppd_dir=/usr/share/ppd/HP
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+
+[mepis:8.0:cups]
+packages=libcupsys2
+
+[mepis:8.0:cups-devel]
+packages=libcupsys2-dev
+
+[mepis:8.0:gcc]
+packages=build-essential
+
+[mepis:8.0:gs]
+packages=gs-esp
+
+[mepis:8.0:libcrypto]
+packages=openssl
+
+[mepis:8.0:libjpeg]
+packages=libjpeg62-dev
+
+[mepis:8.0:libnetsnmp-devel]
+packages=libsnmp9-dev
+
+[mepis:8.0:libpthread]
+packages=build-essential
+
+[mepis:8.0:libtool]
+packages=libtool
+
+[mepis:8.0:libusb]
+packages=libusb-dev
+
+[mepis:8.0:make]
+packages=build-essential
+
+[mepis:8.0:pil]
+packages=python-imaging
+
+[mepis:8.0:ppdev]
+packages=
+commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
+
+[mepis:8.0:pyqt]
+packages=python-qt3
+
+[mepis:8.0:python-devel]
+packages=python-dev
+
+[mepis:8.0:pyqt4]
+packages=python-qt4
+
+[mepis:8.0:pyqt4-dbus]
+packages=python-qt4-dbus
+
+[mepis:8.0:python23]
+packages=python
+
+[mepis:8.0:python2x]
+packages=python
+
+[mepis:8.0:reportlab]
+packages=python-reportlab
+
+[mepis:8.0:sane]
+packages=sane,libsane-dev
+
+[mepis:8.0:sane-devel]
+packages=libsane-dev
+
+[mepis:8.0:scanimage]
+packages=sane-utils
+
+[mepis:8.0:xsane]
+packages=xsane
+
+[mepis:8.0:cups-ddk]
+packages=
+
+[mepis:8.0:python-dbus]
+packages=python-dbus,libdbus-1-dev,python-gobject
+
+[mepis:8.0:python-ctypes]
+packages=python-ctypes
+
+[mepis:8.0:cups-image]
+packages=libcupsys2-dev
 
 # ****************************************
 [mandriva]
@@ -6047,28 +6748,25 @@ index=4
 versions=9.1,9.2,10.0,10.1,10.2,2006.0,2007.0,2007.1,2008.0,2008.1,2009,2009.0
 display_name=Mandriva Linux
 alt_names=Mandrakelinux,Mandrake Linux
-display=True
+display=1
 notes=
 package_mgrs=urpmi
 package_mgr_cmd=su - -c "urpmi --allow-force --force --auto $packages_to_install"
 pre_install_cmd=su - -c "/etc/init.d/cups restart",su - -c "touch /etc/security/console.perms.d/60-hplip.perms && echo '<usb>=/dev/usb/dabusb* /dev/usb/mdc800* /dev/usb/rio500 /dev/ttyUSB*' | tee /etc/security/console.perms.d/60-hplip.perms"
 pre_depend_cmd=su - -c "rm /etc/hp/hplip.conf"
 post_depend_cmd=su - -c "/etc/init.d/cups restart", su - -c "chmod 700 /usr/lib/cups/backend/hp"
-hpoj_remove_cmd=
 hplip_remove_cmd=su - -c "urpme hplip task-printing-hp"
 su_sudo=su
 ppd_install=drv
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-usermod_params=
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [mandriva:9.1]
 code_name=Bamboo
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -6079,17 +6777,16 @@ packaged_version=
 release_date=2003-3-25
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration.  Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
 ppd_install=drv
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ********************
 [mandriva:9.2]
 code_name=Fivestar
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -6100,17 +6797,16 @@ packaged_version=
 release_date=2003-10-14
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration.  Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
 ppd_install=drv
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ********************
 [mandriva:10.0]
 code_name=Community and official
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -6121,17 +6817,16 @@ packaged_version=0.9.1
 release_date=2004-3-4
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
 ppd_install=drv
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 # ********************
 [mandriva:10.1]
 code_name=Official
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -6142,10 +6837,10 @@ packaged_version=0.9.1
 release_date=2004-9-16
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also be sure to disable the cdrom1-12 media sources. *Important* After the install run: su -c "/usr/sbin/usermod -G lp <your.username> Then logout and log back in.
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 
 [mandriva:10.1:cups]
@@ -6178,7 +6873,7 @@ packages=libtool
 [mandriva:10.1:libusb]
 packages=libusb0.1_4-devel
 
-[mandriva:10.1:make]usermod_cmd
+[mandriva:10.1:make]
 packages=make
 
 [mandriva:10.1:pil]
@@ -6225,16 +6920,18 @@ packages=xsane
 # packages=cupsddk,cupsddk-drivers
 
 [mandriva:10.1:python-dbus]
-# packages=dbus-python,libdbus-1_0-devel
+# packages=dbus-python,libdbus-1_0-devel,python-gobject
 
 [mandriva:10.1:python-ctypes]
 # packages=python-ctypes
 
+[mandriva:10.1:cups-image]
+packages=cups-devel
+
 # ********************
 [mandriva:10.2]
 code_name=Limited edition 2005
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -6245,10 +6942,10 @@ packaged_version=0.9.1
 release_date=2005-4-14
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also be sure to disable the cdrom1-12 media sources.
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 
 [mandriva:10.2:cups]
@@ -6281,7 +6978,7 @@ packages=libtool
 [mandriva:10.2:libusb]
 packages=libusb0.1_4-devel
 
-[mandriva:10.2:make]usermod_cmd
+[mandriva:10.2:make]
 packages=make
 
 [mandriva:10.2:pil]
@@ -6328,16 +7025,18 @@ packages=xsane
 # packages=cupsddk,cupsddk-drivers
 
 [mandriva:10.2:python-dbus]
-# packages=dbus-python,libdbus-1_0-devel
+# packages=dbus-python,libdbus-1_0-devel,python-gobject
 
 [mandriva:10.2:python-ctypes]
 # packages=python-ctypes
 
+[mandriva:10.2:cups-image]
+packages=cups-devel
+
 # ********************
 [mandriva:2006.0]
 code_name=2k6
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -6348,10 +7047,10 @@ packaged_version=0.9.8
 release_date=2005-4-14
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
 ppd_install=drv
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 
 [mandriva:2006.0:cups]
@@ -6384,7 +7083,7 @@ packages=libtool
 [mandriva:2006.0:libusb]
 packages=libusb0.1_4-devel
 
-[mandriva:2006.0:make]usermod_cmd
+[mandriva:2006.0:make]
 packages=make
 
 [mandriva:2006.0:pil]
@@ -6431,16 +7130,18 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers
 
 [mandriva:2006.0:python-dbus]
-# packages=dbus-python,libdbus-1_0-devel
+# packages=dbus-python,libdbus-1_0-devel,python-gobject
 
 [mandriva:2006.0:python-ctypes]
 # packages=python-ctypes
 
+[mandriva:2006.0:cups-image]
+packages=cups-devel
+
 # ********************
 [mandriva:2007.0]
 code_name=2k7
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -6451,10 +7152,10 @@ packaged_version=2.7.7
 release_date=2006-10-3
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
 ppd_install=drv
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 
 [mandriva:2007.0:cups]
@@ -6534,16 +7235,18 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers
 
 [mandriva:2007.0:python-dbus]
-# packages=dbus-python,libdbus-1_3-devel
+# packages=dbus-python,libdbus-1_3-devel,python-gobject
 
 [mandriva:2007.0:python-ctypes]
 # packages=python-ctypes
 
+[mandriva:2007.0:cups-image]
+packages=cups-devel
+
 # ********************
 [mandriva:2007.1]
 code_name=2k7
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -6554,10 +7257,10 @@ packaged_version=2.7.7
 release_date=2007-4-17
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
 ppd_install=drv
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 
 [mandriva:2007.1:cups]
@@ -6637,7 +7340,7 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers
 
 [mandriva:2007.1:python-dbus]
-packages=dbus-python
+packages=dbus-python,python-gobject
 
 [mandriva:2007.1:dbus]
 packages=libdbus-1_3-devel
@@ -6645,11 +7348,13 @@ packages=libdbus-1_3-devel
 [mandriva:2007.1:python-ctypes]
 packages=python-ctypes
 
+[mandriva:2007.1:cups-image]
+packages=cups-devel
+
 # ********************
 [mandriva:2008.0]
 code_name=2k7
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -6660,11 +7365,12 @@ packaged_version=2.7.12
 release_date=2007-4-17
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
 ppd_install=drv
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+foomatic_rip_hplip=1
 
 [mandriva:2008.0:cups]
 packages=cups
@@ -6743,7 +7449,7 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers
 
 [mandriva:2008.0:python-dbus]
-packages=python-dbus
+packages=python-dbus,python-gobject
 
 [mandriva:2008.0:dbus]
 packages=libdbus-1_3-devel
@@ -6751,11 +7457,13 @@ packages=libdbus-1_3-devel
 [mandriva:2008.0:python-ctypes]
 packages=python-ctypes
 
+[mandriva:2008.0:cups-image]
+packages=cups-devel
+
 # ********************
 [mandriva:2008.1]
 code_name=
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -6766,10 +7474,10 @@ packaged_version=2.7.12
 release_date=2007-4-17
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
 ppd_install=drv
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 
 [mandriva:2008.1:cups]
@@ -6849,7 +7557,7 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers
 
 [mandriva:2008.1:python-dbus]
-packages=python-dbus
+packages=python-dbus,python-gobject
 
 [mandriva:2008.1:dbus]
 packages=libdbus-1_3-devel
@@ -6857,11 +7565,13 @@ packages=libdbus-1_3-devel
 [mandriva:2008.1:python-ctypes]
 packages=python-ctypes
 
+[mandriva:2008.1:cups-image]
+packages=cups-devel
+
 # ********************
 [mandriva:2009]
 code_name=
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -6872,11 +7582,12 @@ packaged_version=2.8.7
 release_date=2007-4-17
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
 ppd_install=drv
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+policykit=1
 
 [mandriva:2009:cups]
 packages=cups
@@ -6955,19 +7666,24 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers
 
 [mandriva:2009:python-dbus]
-packages=python-dbus
+packages=python-dbus,python-gobject
 
 [mandriva:2009:dbus]
-packages=libdbus-1_3-devel
+packages=libdbus-1_3-devel,python-gobject
 
 [mandriva:2009:python-ctypes]
 packages=python-ctypes
 
+[mandriva:2009:cups-image]
+packages=cups-devel
+
+[mandriva:2009:policykit]
+packages=policykit,policykit-gnome
+
 # ********************
 [mandriva:2009.0]
 code_name=
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -6978,11 +7694,12 @@ packaged_version=2.8.7
 release_date=2007-4-17
 notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also you may wish to turn off the cdrom1-12 media sources to speed up the process.
 ppd_install=drv
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+policykit=1
 
 [mandriva:2009.0:cups]
 packages=cups
@@ -7061,7 +7778,7 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers
 
 [mandriva:2009.0:python-dbus]
-packages=python-dbus
+packages=python-dbus,python-gobject
 
 [mandriva:2009.0:dbus]
 packages=libdbus-1-devel
@@ -7069,33 +7786,36 @@ packages=libdbus-1-devel
 [mandriva:2009.0:python-ctypes]
 packages=python-ctypes
 
+[mandriva:2009.0:cups-image]
+packages=cups-devel
+
+[mandriva:2009.0:policykit]
+packages=policykit,policykit-gnome
+
 # ****************************************
 [linuxmint]
 index=22
 versions=5,6
 display_name=Linux Mint
 alt_names=mint, mint linux
-display=True
+display=1
 notes=
 package_mgrs=dpkg,apt-get,synaptic,update-manager,adept,aptitude,adept-updater
 package_mgr_cmd=sudo aptitude install --assume-yes $packages_to_install
 pre_depend_cmd=sudo dpkg --configure -a,sudo apt-get install --yes --force-yes -f,sudo aptitude update
 post_depend_cmd=
-hpoj_remove_cmd=sudo aptitude remove --assume-yes hpoj
 hplip_remove_cmd=sudo aptitude remove --assume-yes hplip hpijs
 su_sudo=sudo
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=
-fix_ppd_symlink=False
-usermod_params=-a -Glp
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [linuxmint:5]
 code_name=Elyssa
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -7106,10 +7826,10 @@ packaged_version=2.8.2
 release_date=2008
 notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubunbtu installation media inserted in the drive.
 ppd_install=drv
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 
 [linuxmint:5:cups]
@@ -7189,7 +7909,7 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers
 
 [linuxmint:5:python-dbus]
-packages=python-dbus
+packages=python-dbus,python-gobject
 
 [linuxmint:5:dbus]
 packages=libdbus-1-dev
@@ -7197,11 +7917,13 @@ packages=libdbus-1-dev
 [linuxmint:5:python-ctypes]
 packages=python-ctypes
 
+[linuxmint:5:cups-image]
+packages=libcupsys2-dev,cupsys-bsd
+
 # ********************
 [linuxmint:6]
 code_name=
-supported=False
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -7212,10 +7934,10 @@ packaged_version=2.8.7
 release_date=2008
 notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubunbtu installation media inserted in the drive.
 ppd_install=drv
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 
 [linuxmint:6:cups]
@@ -7295,7 +8017,7 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers
 
 [linuxmint:6:python-dbus]
-packages=python-dbus
+packages=python-dbus,python-gobject
 
 [linuxmint:6:dbus]
 packages=libdbus-1-dev
@@ -7303,33 +8025,33 @@ packages=libdbus-1-dev
 [linuxmint:6:python-ctypes]
 packages=python-ctypes
 
+[linuxmint:6:cups-image]
+packages=libcupsys2-dev,cupsys-bsd
+
 # ****************************************
 [linpus]
 index=25
 versions=9.4,9.5
 display_name=Linpus Linux
 alt_names=Linpus, Linpus Lite, Linpus Linux
-display=False
+display=1
 notes=
 package_mgrs=dpkg,apt-get,synaptic,update-manager,adept,aptitude,adept-updater,rpm
 package_mgr_cmd=sudo apt-get install --assume-yes $packages_to_install
 pre_depend_cmd=sudo apt-get install --yes --force-yes -f,sudo apt-get update
 post_depend_cmd=
-hpoj_remove_cmd=sudo apt-get remove --assume-yes hpoj
 hplip_remove_cmd=sudo apt-get remove --assume-yes hplip hpijs
 su_sudo=sudo
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=
-fix_ppd_symlink=False
-usermod_params=
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [linpus:9.5]
 code_name=Linpus
-supported=False
-gui_supported=0
+supported=0
 scan_supported=0
 fax_supported=0
 pcard_supported=0
@@ -7340,11 +8062,13 @@ packaged_version=
 release_date=
 notes=Add to the file /etc/apt/sources.list the following lines (each on a seperate line should start with the "rpm": rpm http://update.linpus.com/LinpusUpdate/ 9.5 main desktop rpm http://update.linpus.com/LinpusUpdate/ 9.5-Critical main desktop rpm http://update.linpus.com/LinpusUpdate/ 9.5-DevDr main desktop rpm http://update.linpus.com/LinpusUpdate/ 9.5-SoftApp main desktop
 ppd_install=drv
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
-ui_toolkit=qt3
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=none
+package_available=1
+package_arch=i386
 
 [linpus:9.5:cups]
 packages=cups
@@ -7423,7 +8147,7 @@ packages=
 packages=
 
 [linpus:9.5:python-dbus]
-packages=dbus-python
+packages=dbus-python,python-gobject
 
 [linpus:9.5:dbus]
 packages=dbus
@@ -7431,11 +8155,13 @@ packages=dbus
 [linpus:9.5:python-ctypes]
 packages=
 
+[linpus:9.5:cups-image]
+packages=
+
 # ********************
 [linpus:9.4]
 code_name=Linpus
-supported=False
-gui_supported=0
+supported=0
 scan_supported=0
 fax_supported=0
 pcard_supported=0
@@ -7446,11 +8172,13 @@ packaged_version=
 release_date=
 notes=Add to the file /etc/apt/sources.list the following lines (each on a seperate line should start with the "rpm": rpm http://update.linpus.com/LinpusUpdate/ 9.4 main desktop rpm http://update.linpus.com/LinpusUpdate/ 9.4-Critical main desktop rpm http://update.linpus.com/LinpusUpdate/ 9.4-DevDr main desktop rpm http://update.linpus.com/LinpusUpdate/ 9.4-SoftApp main desktop
 ppd_install=drv
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
-ui_toolkit=qt3
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=none
+package_available=1
+package_arch=i386
 
 [linpus:9.4:cups]
 packages=cups
@@ -7529,12 +8257,15 @@ packages=
 packages=
 
 [linpus:9.4:python-dbus]
-packages=dbus-python
+packages=dbus-python,python-gobject
 
 [linpus:9.4:dbus]
 packages=dbus
 
 [linpus:9.4:python-ctypes]
+packages=
+
+[linpus:9.4:cups-image]
 packages=
 
 # ****************************************
@@ -7543,27 +8274,24 @@ index=24
 versions=8.04.1
 display_name=gOS
 alt_names=gos, gOS
-display=True
+display=1
 notes=
 package_mgrs=dpkg,apt-get,synaptic,update-manager,adept,aptitude,adept-updater
 package_mgr_cmd=sudo aptitude install --assume-yes $packages_to_install
 pre_depend_cmd=sudo dpkg --configure -a,sudo apt-get install --yes --force-yes -f,sudo aptitude update
 post_depend_cmd=
-hpoj_remove_cmd=sudo aptitude remove --assume-yes hpoj
 hplip_remove_cmd=sudo aptitude remove --assume-yes hplip hpijs
 su_sudo=sudo
 ppd_install=ppd
-udev_mode_fix=True
+udev_mode_fix=1
 ppd_dir=
-fix_ppd_symlink=False
-usermod_params=-a -Glp
-drv_dir=/usr/share/cups/drv/hp/
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 
 # ********************
 [gos:8.04.1]
 code_name=Elyssa
-supported=True
-gui_supported=1
+supported=0
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -7574,10 +8302,10 @@ packaged_version=2.8.2
 release_date=2008
 notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubunbtu installation media inserted in the drive.
 ppd_install=drv
-udev_mode_fix=True
-ppd_dir=/usr/share/ppd/hpijs/HP
-fix_ppd_symlink=False
-drv_dir=/usr/share/cups/drv/hp/
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 
 [gos:8.04.1:cups]
@@ -7657,10 +8385,275 @@ packages=xsane
 packages=cupsddk,cupsddk-drivers
 
 [gos:8.04.1:python-dbus]
-packages=python-dbus
+packages=python-dbus,python-gobject
 
 [gos:8.04.1:dbus]
 packages=libdbus-1-dev
 
 [gos:8.04.1:python-ctypes]
 packages=python-ctypes
+
+[gos:8.04.1:cups-image]
+packages=libcupsys2-dev,cupsys-bsd
+
+# ****************************************
+[boss]
+index=34
+versions=3.0
+display_name=Boss
+alt_names=
+display=1
+notes=
+package_mgrs=dpkg,apt-get,synaptic,update-manager,adept,aptitude
+package_mgr_cmd=su -c "apt-get install --force-yes -y $packages_to_install"
+pre_depend_cmd=su -c "dpkg --configure -a",su -c "apt-get install -f",su -c "apt-get update",gnome-terminal -x su -c "apt-get install --yes cupsys-bsd"
+post_depend_cmd=
+hplip_remove_cmd=su -c "apt-get remove --yes hplip hpijs"
+su_sudo=su
+ppd_install=ppd
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+
+[boss:3.0]
+code_name=tejas
+supported=0
+scan_supported=1
+fax_supported=0
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=3.9.2
+release_date=2008-09-04
+notes=Be sure to disable the CD-ROM repositories and also ensure that the main/security repositories are enabled.
+ppd_install=ppd
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+foomatic_rip_hplip=1
+
+[boss:3.0:cups]
+packages=cupsys,cupsys-client
+
+[boss:3.0:cups-devel]
+packages=libcupsys2-dev,cupsys-bsd
+
+[boss:3.0:gcc]
+packages=gcc,g++
+
+[boss:3.0:gs]
+packages=gs-esp
+
+[boss:3.0:libcrypto]
+packages=libssl-dev
+
+[boss:3.0:libjpeg]
+packages=libjpeg-dev
+
+[boss:3.0:libnetsnmp-devel]
+packages=libsnmp9-dev
+
+[boss:3.0:libpthread]
+packages=libc6
+
+[boss:3.0:libtool]
+packages=libtool
+
+[boss:3.0:libusb]
+packages=libusb-dev
+
+[boss:3.0:make]
+packages=make
+
+[boss:3.0:pil]
+packages=python-imaging
+
+[boss:3.0:ppdev]
+packages=
+commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
+
+[boss:3.0:pyqt]
+packages=python-qt3
+
+[boss:3.0:python-devel]
+packages=python-dev
+
+[boss:3.0:pyqt4]
+packages=python-qt4
+
+[boss:3.0:pyqt4-dbus]
+packages=python-qt4-dbus
+
+[boss:3.0:python23]
+packages=python
+
+[boss:3.0:python2x]
+packages=python
+
+[boss:3.0:reportlab]
+packages=python-reportlab
+
+[boss:3.0:sane]
+packages=sane
+
+[boss:3.0:sane-devel]
+packages=libsane-dev
+
+[boss:3.0:scanimage]
+packages=sane-utils
+
+[boss:3.0:xsane]
+packages=xsane
+
+[boss:3.0:cups-ddk]
+packages=
+
+[boss:3.0:python-dbus]
+packages=python-dbus,libdbus-1-dev,python-gobject
+
+[boss:3.0:dbus]
+packages=libdbus-1-dev
+
+[boss:3.0:python-ctypes]
+packages=python-ctypes
+
+[boss:3.0:cups-image]
+packages=libcupsimage2-dev
+
+# ****************************************
+[lfs]
+index=50
+versions=6
+display_name=Linux From Scratch
+alt_names=
+display=1
+notes=
+package_mgrs=
+package_mgr_cmd=$packages_to_install
+pre_depend_cmd=
+post_depend_cmd=
+hplip_remove_cmd=
+su_sudo=su
+ppd_install=ppd
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+
+[lfs:6]
+code_name=LFS
+supported=0
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=0
+usb_supported=1
+packaged_version=
+release_date=
+notes=
+ppd_install=ppd
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+foomatic_rip_hplip=1
+
+[lfs:6:cups]
+packages=cupsys,cupsys-client
+
+[lfs:6:cups-devel]
+packages=libcupsys2-dev,cupsys-bsd
+
+[lfs:6:gcc]
+packages=gcc,g++
+
+[lfs:6:gs]
+packages=gs-esp
+
+[lfs:6:libcrypto]
+packages=libssl-dev
+
+[lfs:6:libjpeg]
+packages=libjpeg-dev
+
+[lfs:6:libnetsnmp-devel]
+packages=libsnmp9-dev
+
+[lfs:6:libpthread]
+packages=libc6
+
+[lfs:6:libtool]
+packages=libtool
+
+[lfs:6:libusb]
+packages=libusb-dev
+
+[lfs:6:make]
+packages=make
+
+[lfs:6:pil]
+packages=python-imaging
+
+[lfs:6:ppdev]
+packages=
+commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
+
+[lfs:6:pyqt]
+packages=python-qt3
+
+[lfs:6:python-devel]
+packages=python-dev
+
+[lfs:6:pyqt4]
+packages=python-qt4
+
+[lfs:6:pyqt4-dbus]
+packages=python-qt4-dbus
+
+[lfs:6:python23]
+packages=python
+
+[lfs:6:python2x]
+packages=python
+
+[lfs:6:reportlab]
+packages=python-reportlab
+
+[lfs:6:sane]
+packages=sane
+
+[lfs:6:sane-devel]
+packages=libsane-dev
+
+[lfs:6:scanimage]
+packages=sane-utils
+
+[lfs:6:xsane]
+packages=xsane
+
+[lfs:6:cups-ddk]
+packages=cupsddk,cupsddk-drivers
+
+[lfs:6:python-dbus]
+packages=python-dbus,libdbus-1-dev,python-gobject
+
+[lfs:6:dbus]
+packages=libdbus-1-dev
+
+[lfs:6:python-ctypes]
+packages=python-ctypes
+
+[lfs:6:cups-image]
+packages=libcupsimage2-dev
+
+[lfs:6:policykit]
+packages=policykit
+
+[lfs:6:python-notify]
+packages=python-notify

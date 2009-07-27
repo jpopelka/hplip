@@ -36,15 +36,7 @@
 
 #define IJS_MAX_PARAM 256
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-extern int bug(const char *fmt, ...);
-
-#ifdef __cplusplus
-}
-#endif
+#include "bug.h"
 
 /*
  * Raster data encoding methods

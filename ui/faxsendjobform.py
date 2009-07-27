@@ -60,7 +60,7 @@ class FaxSendJobForm(QMainWindow):
 
         QMainWindow.__init__(self,parent,name,fl)
 
-        self.setIcon(load_pixmap('prog', '48x48'))
+        self.setIcon(load_pixmap('hp_logo', '128x128'))
 
         self.init_failed = False
         self.device_uri = device_uri

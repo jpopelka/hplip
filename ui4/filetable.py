@@ -49,13 +49,20 @@ class FileTable(QWidget):
     def __init__(self, parent):
         QWidget.__init__(self, parent)
         self.parent = parent
-        self.working_dir = user_conf.workingDirectory()
+
         self.initUi()
         self.file_list = []
         self.typ = FILETABLE_TYPE_PRINT
         self.selected_filename = None
         self.fax_add_callback = None
         self.allowable_mime_types = cups.getAllowableMIMETypes()
+
+        self.user_settings = UserSettings()
+        self.user_settings.load()
+        self.user_settings.debug()
+
+        self.working_dir = self.user_settings.working_dir #user_conf.workingDirectory()
+
 
 
     def initUi(self):
@@ -113,7 +120,9 @@ class FileTable(QWidget):
     def getWorkingDir(self):
         if self.file_list:
             self.working_dir = os.path.pathname(self.file_list[0][0])
-            user_conf.setWorkingDirectory(self.working_dir)
+            #user_conf.setWorkingDirectory(self.working_dir)
+            self.user_settings.working_dir = self.working_dir
+            self.user_settings.save()
 
         return self.working_dir
 
@@ -269,10 +278,7 @@ class FileTable(QWidget):
 
     def addFileList(self, file_list):
         for f in file_list:
-            if self.typ == FILETABLE_TYPE_PRINT:
-                self.addFileFromUI(f)
-            else:
-                self.fax_add_callback(f)
+            self.addFileFromUI(f)
 
 
     def addFileFromUI(self, f, title='', num_pages=0):
@@ -294,7 +300,10 @@ class FileTable(QWidget):
                     FailureUI(self, self.__tr("<b>You are trying to add a file '%1' that cannot be directly faxed with this utility.</b><p>To fax this file, use the print command in the application that created it (using the appropriate fax print queue).<p>Note: Click <i>Show Valid Types...</i> to view a list of compatible file types that can be directly added to the fax file list in this utility.").arg(f),
                         self.__tr("HP Device Manager"))
             else:
-                self.addFile(f, mime_type, mime_type_desc, title, num_pages)
+                if self.typ == FILETABLE_TYPE_PRINT:
+                    self.addFile(f, mime_type, mime_type_desc, title, num_pages)
+                else:
+                    self.fax_add_callback(f)
         else:
             FailureUI(self, self.__tr("<b>Unable to add file '%1' to file list (file not found or insufficient permissions).</b><p>Check the file name and try again.").arg(f),
                 self.__tr("HP Device Manager"))

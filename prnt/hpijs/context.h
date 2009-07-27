@@ -32,6 +32,22 @@
 #ifndef APDK_PRINTCONTEXT_H
 #define APDK_PRINTCONTEXT_H
 
+#define MEDIASIZE_PCL 0
+typedef struct
+{
+    int      pcl_id;
+    float    fPhysicalWidth;
+    float    fPhysicalHeight;
+    float    fPrintableWidth;
+    float    fPrintableHeight;
+    float    fPrintableStartX;
+    float    fPrintableStartY;
+} MediaAttributes;
+typedef struct
+{
+    MediaAttributes    media_attributes;
+} JobAttributes;
+
 #include "printerfactory.h"
 
 APDK_BEGIN_NAMESPACE
@@ -280,10 +296,7 @@ public:
     DRIVER_ERROR    SetPrinterHint (PRINTER_HINT eHint, int iValue);
 
     //! Returns TRUE if borderless printing is enabled, FALSE otherwise
-    BOOL    IsBorderless ()
-    {
-        return bDoFullBleed;
-    }
+    BOOL    IsBorderless () { return bDoFullBleed; }
 
     //! SetMediaType
     /*! Typically, media type is bound to a print mode and is set when a printmode is
@@ -295,6 +308,8 @@ public:
 	*****************************************************************************
 	*/
     DRIVER_ERROR    SetMediaType (MEDIATYPE eMediaType);
+    int             GetJobAttributes (int getWhat);
+    void            SetJobAttributes (JobAttributes *pJA);
 
 private:
 
@@ -362,6 +377,8 @@ private:
 #endif
 
     MediaSource m_MediaSource;
+
+    JobAttributes    *m_job_attributes;
 
 #ifdef APDK_CAPTURE
     void Capture_PrintContext(unsigned int InputPixelsPerRow, unsigned int OutputPixelsPerRow,

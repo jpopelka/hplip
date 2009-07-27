@@ -25,11 +25,12 @@ import operator
 
 # Local
 from base.g import *
-from base import device, utils,  models
+from base import device, utils, models, pkit
 from prnt import cups
 from base.codes import *
 from ui_utils import *
 #from installer import core_install
+from installer.core_install import CoreInstall
 
 # Qt
 from PyQt4.QtCore import *
@@ -38,6 +39,7 @@ from PyQt4.QtGui import *
 # Ui
 from setupdialog_base import Ui_Dialog
 from plugindialog import PluginDialog
+from wifisetupdialog import WifiSetupDialog, SUCCESS_CONNECTED
 
 # Fax
 try:
@@ -52,11 +54,13 @@ except ImportError:
 PAGE_DISCOVERY = 0
 PAGE_DEVICES = 1
 PAGE_ADD_PRINTER = 2
-PAGE_MAX = 2
+PAGE_REMOVE = 3
+
 
 BUTTON_NEXT = 0
 BUTTON_FINISH = 1
 BUTTON_ADD_PRINTER = 2
+BUTTON_REMOVE = 3
 
 ADVANCED_SHOW = 0
 ADVANCED_HIDE = 1
@@ -64,6 +68,80 @@ ADVANCED_HIDE = 1
 DEVICE_DESC_ALL = 0
 DEVICE_DESC_SINGLE_FUNC = 1
 DEVICE_DESC_MULTI_FUNC = 2
+
+
+
+
+
+class PasswordDialog(QDialog):
+    def __init__(self, prompt, parent=None, name=None, modal=0, fl=0):
+        QDialog.__init__(self, parent)
+        self.prompt = prompt
+
+        Layout= QGridLayout(self)
+        Layout.setMargin(11)
+        Layout.setSpacing(6)
+
+        self.PromptTextLabel = QLabel(self)
+        Layout.addWidget(self.PromptTextLabel,0,0,1,3)
+
+        self.UsernameTextLabel = QLabel(self)
+        Layout.addWidget(self.UsernameTextLabel,1,0)
+
+        self.UsernameLineEdit = QLineEdit(self)
+        self.UsernameLineEdit.setEchoMode(QLineEdit.Normal)
+        Layout.addWidget(self.UsernameLineEdit,1,1,1,2)
+
+        self.PasswordTextLabel = QLabel(self)
+        Layout.addWidget(self.PasswordTextLabel,2,0)
+
+        self.PasswordLineEdit = QLineEdit(self)
+        self.PasswordLineEdit.setEchoMode(QLineEdit.Password)
+        Layout.addWidget(self.PasswordLineEdit,2,1,1,2)
+
+        self.OkPushButton = QPushButton(self)
+        Layout.addWidget(self.OkPushButton,3,2)
+
+        self.languageChange()
+
+        self.resize(QSize(420,163).expandedTo(self.minimumSizeHint()))
+
+        self.connect(self.OkPushButton, SIGNAL("clicked()"), self.accept)
+        self.connect(self.PasswordLineEdit, SIGNAL("returnPressed()"), self.accept)
+
+
+    def getUsername(self):
+        return unicode(self.UsernameLineEdit.text())
+
+
+    def getPassword(self):
+        return unicode(self.PasswordLineEdit.text())
+
+
+    def languageChange(self):
+        self.setWindowTitle(self.__tr("HP Device Manager - Enter Username/Password"))
+        self.PromptTextLabel.setText(self.__tr(self.prompt))
+        self.UsernameTextLabel.setText(self.__tr("Username:"))
+        self.PasswordTextLabel.setText(self.__tr("Password:"))
+        self.OkPushButton.setText(self.__tr("OK"))
+
+
+    def __tr(self,s,c = None):
+        return qApp.translate("SetupDialog",s,c)
+
+
+
+def showPasswordUI(prompt):
+    try:
+        dlg = PasswordDialog(prompt, None)
+
+        if dlg.exec_() == QDialog.Accepted:
+            return (dlg.getUsername(), dlg.getPassword())
+
+    finally:
+        pass
+
+    return ("", "")
 
 
 
@@ -75,30 +153,37 @@ class DeviceTableWidgetItem(QTableWidgetItem):
 
 
 class SetupDialog(QDialog, Ui_Dialog):
-    def __init__(self, parent, param, jd_port, device_uri=None):
+    def __init__(self, parent, param, jd_port, device_uri=None, remove=False):
         QDialog.__init__(self, parent)
         self.setupUi(self)
 
         self.param = param
         self.jd_port = jd_port
         self.device_uri = device_uri
+        self.remove = remove
 
         if device_uri:
             log.info("Using device: %s" % device_uri)
 
         self.initUi()
 
-        if self.skip_discovery:
-            QTimer.singleShot(0, self.showDevicesPage)
+        if self.remove:
+            QTimer.singleShot(0, self.showRemovePage)
         else:
-            QTimer.singleShot(0, self.showDiscoveryPage)
+            if self.skip_discovery:
+                QTimer.singleShot(0, self.showDevicesPage)
+            else:
+                QTimer.singleShot(0, self.showDiscoveryPage)
+
+        cups.setPasswordCallback(showPasswordUI)
+
 
     #
     # INIT
     #
 
     def initUi(self):
-        self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
+        self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))
 
         # connect signals/slots
         self.connect(self.CancelButton, SIGNAL("clicked()"), self.CancelButton_clicked)
@@ -106,9 +191,14 @@ class SetupDialog(QDialog, Ui_Dialog):
         self.connect(self.NextButton, SIGNAL("clicked()"), self.NextButton_clicked)
         self.connect(self.ManualGroupBox,  SIGNAL("clicked(bool)"),  self.ManualGroupBox_clicked)
 
-        self.initDiscoveryPage()
-        self.initDevicesPage()
-        self.initAddPrinterPage()
+        if self.remove:
+            self.initRemovePage()
+            self.max_page = 1
+        else:
+            self.initDiscoveryPage()
+            self.initDevicesPage()
+            self.initAddPrinterPage()
+            self.max_page = PAGE_ADD_PRINTER
 
     #
     #  DISCOVERY PAGE
@@ -123,6 +213,7 @@ class SetupDialog(QDialog, Ui_Dialog):
         self.manual = False
         self.skip_discovery = False
         self.NetworkRadioButton.setEnabled(prop.net_build)
+        self.WirelessButton.setEnabled(prop.net_build)
         self.ParallelRadioButton.setEnabled(prop.par_build)
         self.devices = {}
         self.bus = 'usb'
@@ -204,6 +295,7 @@ class SetupDialog(QDialog, Ui_Dialog):
         self.connect(self.AdvancedButton, SIGNAL("clicked()"), self.AdvancedButton_clicked)
         self.connect(self.UsbRadioButton, SIGNAL("toggled(bool)"), self.UsbRadioButton_toggled)
         self.connect(self.NetworkRadioButton, SIGNAL("toggled(bool)"), self.NetworkRadioButton_toggled)
+        self.connect(self.WirelessButton, SIGNAL("toggled(bool)"), self.WirelessButton_toggled)
         self.connect(self.ParallelRadioButton, SIGNAL("toggled(bool)"), self.ParallelRadioButton_toggled)
         self.connect(self.NetworkTTLSpinBox,  SIGNAL("valueChanged(int)"), self.NetworkTTLSpinBox_valueChanged)
         self.connect(self.NetworkTimeoutSpinBox,  SIGNAL("valueChanged(int)"),
@@ -293,6 +385,16 @@ class SetupDialog(QDialog, Ui_Dialog):
         self.NetworkTTLSpinBox.setEnabled(enabled)
 
 
+    def setSearchOptions(self, enabled):
+        self.SearchLineEdit.setEnabled(enabled)
+        self.DeviceTypeComboBox.setEnabled(enabled)
+        self.DeviceTypeLabel.setEnabled(enabled)
+
+
+    def setManualDiscovery(self, enabled):
+        self.ManualGroupBox.setEnabled(enabled)
+
+
     def setNetworkDiscovery(self, enabled):
         self.NetworkDiscoveryMethodLabel.setEnabled(enabled and self.manual)
         self.NetworkDiscoveryMethodComboBox.setEnabled(enabled and self.manual)
@@ -306,6 +408,8 @@ class SetupDialog(QDialog, Ui_Dialog):
         self.setNetworkDiscovery(not checked)
         self.setJetDirect(not checked)
         self.setNetworkOptions(not checked)
+        self.setSearchOptions(checked)
+        self.setManualDiscovery(checked)
 
         if checked:
             self.ManualParamLabel.setText(self.__tr("USB bus ID:device ID (bbb:ddd):"))
@@ -321,11 +425,30 @@ class SetupDialog(QDialog, Ui_Dialog):
         self.setNetworkDiscovery(checked)
         self.setJetDirect(checked)
         self.setNetworkOptions(checked)
+        self.setSearchOptions(checked)
+        self.setManualDiscovery(checked)
+
 
         if checked:
             self.ManualParamLabel.setText(self.__tr("IP Address or network name:"))
             self.bus = 'net'
             # TODO: Reset validator
+
+    def WirelessButton_toggled(self, radio_enabled):
+        self.setWirelessButton(radio_enabled)
+
+
+    def setWirelessButton(self, checked):
+        self.setNetworkDiscovery(not checked)
+        self.setJetDirect(not checked)
+        self.setNetworkOptions(not checked)
+        self.setSearchOptions(not checked)
+        self.setManualDiscovery(not checked)
+
+
+        if checked:
+            self.ManualParamLabel.setText(self.__tr("IP Address or network name:"))
+            self.bus = 'net'
 
 
     def ParallelRadioButton_toggled(self, radio_enabled):
@@ -336,6 +459,9 @@ class SetupDialog(QDialog, Ui_Dialog):
         self.setNetworkDiscovery(not checked)
         self.setJetDirect(not checked)
         self.setNetworkOptions(not checked)
+        self.setSearchOptions(not checked)
+        self.setManualDiscovery(not checked)
+
 
         if checked:
             self.ManualParamLabel.setText(self.__tr("Device node (/dev/...):"))
@@ -496,18 +622,26 @@ class SetupDialog(QDialog, Ui_Dialog):
 
 
     def showAddPrinterPage(self):
-       # Install the plugin if needed...
+        # Install the plugin if needed...
+        core = CoreInstall()
         plugin = self.mq.get('plugin', PLUGIN_NONE)
+        plugin_reason = self.mq.get('plugin-reason', PLUGIN_REASON_NONE)
         if plugin > PLUGIN_NONE:
-            form = PluginDialog(self, plugin)
-            if not form.isPluginInstalled():
-                form.exec_()
 
-                if not form.result and plugin == PLUGIN_REQUIRED:
-                    FailureUI(self, self.__tr("<b>The printer you are trying to setup requires a binary driver plug-in and it failed to install.</b><p>Please check you internet connection and try again.</p></p>Visit <u>http://hplipopensource.com</u> for more infomation.</p>"))
+            if not core.check_for_plugin():
+                ok, sudo_ok = pkit.run_plugin_command(plugin == PLUGIN_REQUIRED, plugin_reason)
+                if not sudo_ok:
+                    FailureUI(self, self.__tr("<b>Unable to find an appropriate su/sudo utiltity to run hp-plugin.</b><p>Install kdesu, gnomesu, or gksu.</p>"))
                     return
+                if not ok or not core.check_for_plugin():
+                    if plugin == PLUGIN_REQUIRED:
+                        FailureUI(self, self.__tr("<b>The printer you are trying to setup requires a binary driver plug-in and it failed to install.</b><p>Please check your internet connection and try again.</p><p>Visit <u>http://hplipopensource.com</u> for more infomation.</p>"))
+                        return
+                    else:
+                        WarningUI(self, self.__tr("Either you have chosen to skip the installation of the optional plug-in or that installation has failed.  Your printer may not function at optimal performance."))
 
         self.setNextButton(BUTTON_ADD_PRINTER)
+
         if not self.printer_name:
             self.setDefaultPrinterName()
 
@@ -588,12 +722,21 @@ class SetupDialog(QDialog, Ui_Dialog):
         try:
             log.debug("Searching for fax PPD for model %s" % self.model)
 
-            if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_SOAP:
-                fax_ppd_name = "HP-Fax2-hplip" # Fixed width (2528 pixels) and 300dpi rendering
-                nick = "HP Fax 2"
-            else:
-                fax_ppd_name = "HP-Fax-hplip" # Standard
-                nick = "HP Fax"
+            if prop.hpcups_build:
+                if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_SOAP:
+                    fax_ppd_name = "HP-Fax2-hpcups" # Fixed width (2528 pixels) and 300dpi rendering
+                    nick = "HP Fax2 hpcups"
+                else:
+                    fax_ppd_name = "HP-Fax-hpcups" # Standard
+                    nick = "HP Fax hpcups"
+
+            else: # hpijs
+                if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_SOAP:
+                    fax_ppd_name = "HP-Fax2-hpijs" # Fixed width (2528 pixels) and 300dpi rendering
+                    nick = "HP Fax2 hpijs"
+                else:
+                    fax_ppd_name = "HP-Fax-hpijs" # Standard
+                    nick = "HP Fax hpijs"
 
             ppds = []
 
@@ -609,6 +752,10 @@ class SetupDialog(QDialog, Ui_Dialog):
             else:
                 self.fax_ppd = None
                 self.fax_setup_ok = False
+                FailureUI(self, self.__tr("<b>Unable to locate the HPLIP Fax PPD file:</b><p>%1.ppd.gz</p><p>Fax setup has been disabled.").arg(fax_ppd_name))
+                self.fax_setup = False
+                self.SetupFaxGroupBox.setChecked(False)
+                self.SetupFaxGroupBox.setEnabled(False)
 
         finally:
             QApplication.restoreOverrideCursor()
@@ -761,8 +908,8 @@ class SetupDialog(QDialog, Ui_Dialog):
 
 
     def setAddPrinterButton(self):
-        self.NextButton.setEnabled(self.printer_name_ok and self.fax_name_ok and
-                                   self.print_ppd is not None and self.fax_setup_ok)
+        self.NextButton.setEnabled((self.printer_name_ok and self.print_ppd is not None) and
+                                   ((self.fax_setup and self.fax_name_ok) or not self.fax_setup))
 
 
     #
@@ -790,6 +937,7 @@ class SetupDialog(QDialog, Ui_Dialog):
     def setupPrinter(self):
         QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
         try:
+            cups.setPasswordPrompt("You do not have permission to add a printer.")
             if not os.path.exists(self.print_ppd[0]): # assume foomatic: or some such
                 status, status_str = cups.addPrinter(self.printer_name.encode('utf8'), self.device_uri,
                     self.print_location, '', self.print_ppd[0], self.print_desc)
@@ -819,6 +967,7 @@ class SetupDialog(QDialog, Ui_Dialog):
     def setupFax(self):
         QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
         try:
+            cups.setPasswordPrompt("You do not have permission to add a fax device.")
             if not os.path.exists(self.fax_ppd):
                 status, status_str = cups.addPrinter(self.fax_name.encode('utf8'),
                     self.fax_uri, self.fax_location, '', self.fax_ppd,  self.fax_desc)
@@ -944,6 +1093,84 @@ class SetupDialog(QDialog, Ui_Dialog):
                     d.close()
 
     #
+    # Remove Page
+    #
+
+    def initRemovePage(self):
+        pass
+
+
+    def showRemovePage(self):
+        self.displayPage(PAGE_REMOVE)
+        self.StepText.setText(self.__tr("Step 1 of 1"))
+        self.setNextButton(BUTTON_REMOVE)
+        self.BackButton.setEnabled(False)
+        self.NextButton.setEnabled(False)
+
+        self.RemoveDevicesTableWidget.verticalHeader().hide()
+
+        self.installed_printers = device.getSupportedCUPSPrinters(['hp', 'hpfax'])
+        log.debug(self.installed_printers)
+
+        if not self.installed_printers:
+            FailureUI(self, self.__tr("<b>No printers or faxes found to remove.</b><p>You must setup a least one printer or fax before you can remove it."))
+            self.close()
+            return
+
+        self.RemoveDevicesTableWidget.setRowCount(len(self.installed_printers))
+
+        headers = [self.__tr("Select"), self.__tr('Printer (Queue) Name'), self.__tr('Type'), self.__tr('Device URI')]
+
+        self.RemoveDevicesTableWidget.setColumnCount(len(headers))
+        self.RemoveDevicesTableWidget.setHorizontalHeaderLabels(headers)
+        flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
+
+        row = 0
+        for p in self.installed_printers:
+            widget = QCheckBox(self.RemoveDevicesTableWidget)
+            self.connect(widget, SIGNAL("stateChanged(int)"), self.CheckBox_stateChanged)
+            self.RemoveDevicesTableWidget.setCellWidget(row, 0, widget)
+
+            back_end, is_hp, bus, model, serial, dev_file, host, port = \
+                device.parseDeviceURI(p.device_uri)
+
+            if self.device_uri is not None and self.device_uri == p.device_uri:
+                widget.setCheckState(Qt.Checked)
+
+            i = QTableWidgetItem(QString(p.name))
+            i.setFlags(flags)
+            i.setData(Qt.UserRole, QVariant(p.name))
+            self.RemoveDevicesTableWidget.setItem(row, 1, i)
+
+            if back_end == 'hpfax':
+                typ = self.__tr("Fax")
+            else:
+                typ = self.__tr("Printer")
+
+            i = QTableWidgetItem(typ)
+            i.setFlags(flags)
+            self.RemoveDevicesTableWidget.setItem(row, 2, i)
+
+            i = QTableWidgetItem(QString(p.device_uri))
+            i.setFlags(flags)
+            self.RemoveDevicesTableWidget.setItem(row, 3, i)
+
+            row += 1
+
+        self.RemoveDevicesTableWidget.resizeColumnsToContents()
+
+
+    def CheckBox_stateChanged(self, i):
+        for row in xrange(self.RemoveDevicesTableWidget.rowCount()):
+            widget = self.RemoveDevicesTableWidget.cellWidget(row, 0)
+            if widget.checkState() == Qt.Checked:
+                self.NextButton.setEnabled(True)
+                break
+        else:
+            self.NextButton.setEnabled(False)
+
+
+    #
     # Misc
     #
 
@@ -955,6 +1182,16 @@ class SetupDialog(QDialog, Ui_Dialog):
             self.jd_port = self.JetDirectSpinBox.value()
             self.search = unicode(self.SearchLineEdit.text())
             self.device_desc = int(self.DeviceTypeComboBox.itemData(self.DeviceTypeComboBox.currentIndex()).toInt()[0])
+
+            if self.WirelessButton.isChecked():
+                dlg = WifiSetupDialog(self, device_uri=None, standalone=False)
+                dlg.exec_()
+
+                if dlg.success == SUCCESS_CONNECTED:
+                    self.manual = True
+                    self.param = dlg.ip
+                    self.bus = 'net'
+
             self.showDevicesPage()
 
         elif p == PAGE_DEVICES:
@@ -963,15 +1200,6 @@ class SetupDialog(QDialog, Ui_Dialog):
             self.mq = device.queryModelByURI(self.device_uri)
             back_end, is_hp, bus, model, serial, dev_file, host, port = device.parseDeviceURI(self.device_uri)
             self.model = models.normalizeModelName(model).lower()
-
-#            core = core_install.CoreInstall()
-#            core.set_plugin_version()
-#
-#            plugin = self.mq.get('plugin', PLUGIN_NONE)
-#            if plugin > PLUGIN_NONE and not core.check_for_plugin():
-#                form = PluginDialog(self, plugin)
-#                form.exec_()
-
             self.showAddPrinterPage()
 
         elif p == PAGE_ADD_PRINTER:
@@ -984,6 +1212,17 @@ class SetupDialog(QDialog, Ui_Dialog):
             self.fax_name_company = unicode(self.NameCompanyLineEdit.text()).encode('utf8')
             self.fax_number = unicode(self.FaxNumberLineEdit.text()).encode('utf8')
             self.addPrinter()
+
+        elif p == PAGE_REMOVE:
+            for row in xrange(self.RemoveDevicesTableWidget.rowCount()):
+                widget = self.RemoveDevicesTableWidget.cellWidget(row, 0)
+                if widget.checkState() == Qt.Checked:
+                    item = self.RemoveDevicesTableWidget.item(row, 1)
+                    printer = unicode(item.data(Qt.UserRole).toString()).encode('utf-8')
+                    log.debug("Removing printer: %s" % printer)
+                    cups.delPrinter(printer)
+
+            self.close()
 
         else:
             log.error("Invalid page!") # shouldn't happen!
@@ -1007,8 +1246,8 @@ class SetupDialog(QDialog, Ui_Dialog):
 
 
     def displayPage(self, page):
-        self.updateStepText(page)
         self.StackedWidget.setCurrentIndex(page)
+        self.updateStepText(page)
 
 
     def setNextButton(self, typ=BUTTON_FINISH):
@@ -1018,10 +1257,12 @@ class SetupDialog(QDialog, Ui_Dialog):
             self.NextButton.setText(self.__tr("Next >"))
         elif typ == BUTTON_FINISH:
             self.NextButton.setText(self.__tr("Finish"))
+        elif typ == BUTTON_REMOVE:
+            self.NextButton.setText(self.__tr("Remove"))
 
 
     def updateStepText(self, p):
-        self.StepText.setText(self.__tr("Step %1 of %2").arg(p+1).arg(PAGE_MAX+1))
+        self.StepText.setText(self.__tr("Step %1 of %2").arg(p+1).arg(self.max_page+1))
 
 
     def __tr(self,s,c = None):

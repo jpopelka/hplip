@@ -234,6 +234,10 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) service_to_channel(mud
    {
       *index = HPMUD_DEVMGMT_CHANNEL;
    }
+   else if (strncasecmp(sn, "hp-wificonfig", 13) == 0)
+   {
+      *index = HPMUD_WIFI_CHANNEL;
+   }
    else
    {
       BUG("invalid service=%s %s\n", sn, pd->uri);

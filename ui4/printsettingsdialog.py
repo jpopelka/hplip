@@ -57,27 +57,27 @@ class PrintSettingsDialog(QDialog, Ui_Dialog):
 
     def initUi(self, printer_name=None):
         self.OptionsToolBox.include_print_options = False
-        
+
         if self.printer_name:
             self.PrinterName.setInitialPrinter(self.printer_name)
-        
+
         if self.fax_mode:
             self.PrinterName.setType(PRINTERNAMECOMBOBOX_TYPE_FAX_ONLY)
             self.TitleLabel.setText(self.__tr("Fax Settings"))
         else:
             self.PrinterName.setType(PRINTERNAMECOMBOBOX_TYPE_PRINTER_AND_FAX)
-        
+
         self.connect(self.CloseButton, SIGNAL("clicked()"), self.CloseButton_clicked)
 
-        self.connect(self.PrinterName, SIGNAL("PrinterNameComboBox_currentChanged"), 
+        self.connect(self.PrinterName, SIGNAL("PrinterNameComboBox_currentChanged"),
             self.PrinterNameComboBox_currentChanged)
 
-        self.connect(self.PrinterName, SIGNAL("PrinterNameComboBox_noPrinters"), 
+        self.connect(self.PrinterName, SIGNAL("PrinterNameComboBox_noPrinters"),
             self.PrinterNameComboBox_noPrinters)
-            
+
         # Application icon
-        self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
-            
+        self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))
+
 
 
     def updateUi(self):
@@ -101,7 +101,7 @@ class PrintSettingsDialog(QDialog, Ui_Dialog):
 
 
     #
-    # Misc    
+    # Misc
     #
 
     def CloseButton_clicked(self):

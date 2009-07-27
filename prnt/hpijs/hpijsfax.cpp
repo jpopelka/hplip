@@ -281,7 +281,7 @@ int hpijsFaxServer (int argc, char **argv)
 
 	if (pFaxStruct == NULL)
 	{
-	    bug ("unable to allocate HPIJSFax\n");
+	    BUG ("unable to allocate HPIJSFax\n");
 		exit (0);
 	}
 
@@ -290,7 +290,7 @@ int hpijsFaxServer (int argc, char **argv)
 	ctx = ijs_server_init ();
 	if (ctx == NULL)
 	{
-        bug ("unable to init hpijs server\n");
+        BUG ("unable to init hpijs server\n");
         goto BUGOUT;
     }
 
@@ -304,7 +304,7 @@ int hpijsFaxServer (int argc, char **argv)
 	{
 		if ((ret = ijs_server_get_page_header(ctx, &pFaxStruct->ph)) < 0)
 		{
-			bug("unable to read client data err=%d\n", ret);
+			BUG("unable to read client data err=%d\n", ret);
 			goto BUGOUT;
 		}
 
@@ -316,7 +316,7 @@ int hpijsFaxServer (int argc, char **argv)
 				fdFax = mkstemp (hpFileName);
 				if (fdFax < 0)
 				{
-					bug ("Unable to open Fax output file - %s for writing\n", hpFileName);
+					BUG ("Unable to open Fax output file - %s for writing\n", hpFileName);
 					goto BUGOUT;
 				}
 
@@ -358,7 +358,7 @@ int hpijsFaxServer (int argc, char **argv)
 
 		if ((pThisScanLine = (LPBYTE) malloc (width * 3)) == NULL)
 		{
-			bug ("unable to allocate pThisScanLine buffer size = %d: %m\n", width * 3);
+			BUG ("unable to allocate pThisScanLine buffer size = %d: %m\n", width * 3);
 			goto BUGOUT;
 		}
 
@@ -373,7 +373,7 @@ int hpijsFaxServer (int argc, char **argv)
 		pInputBuf = (LPBYTE) malloc (iInputBufSize);
 		if (pInputBuf == NULL)
 		{
-			bug ("Unable to allocate pInputBuf, size = %d\n", iInputBufSize);
+			BUG ("Unable to allocate pInputBuf, size = %d\n", iInputBufSize);
 			goto BUGOUT;
 		}
 		memset (pInputBuf, 0xFF, iInputBufSize);
@@ -382,7 +382,7 @@ int hpijsFaxServer (int argc, char **argv)
 		{
 			if ((n = ijs_server_get_data (ctx, (char *) pThisScanLine, pFaxStruct->ph.width * 3)) < 0)
 			{
-				bug ("ijs_server_get_data failed\n");
+				BUG ("ijs_server_get_data failed\n");
 				break;    /* error */
 			}
 			if (pFaxStruct->GetColorMode () == HPLIPFAX_MONO)
@@ -404,7 +404,7 @@ int hpijsFaxServer (int argc, char **argv)
 		pbOutputBuf = (LPBYTE) malloc (iInputBufSize);
 		if (pbOutputBuf == NULL)
 		{
-			bug ("unable to allocate pbOutputBuf,  buffer size = %d\n", iInputBufSize);
+			BUG ("unable to allocate pbOutputBuf,  buffer size = %d\n", iInputBufSize);
 		    goto BUGOUT;
 		}
 		memset (pbOutputBuf, 0xFF, iInputBufSize);
@@ -454,7 +454,7 @@ int hpijsFaxServer (int argc, char **argv)
 
 		if (wResult != IP_DONE)
 		{
-			bug ("ipOpen failed: wResult = %x\n", wResult);
+			BUG ("ipOpen failed: wResult = %x\n", wResult);
 			goto BUGOUT;
 		}
 		traits.iBitsPerPixel = 8;
@@ -468,7 +468,7 @@ int hpijsFaxServer (int argc, char **argv)
 		wResult = ipSetDefaultInputTraits (hJob, &traits);
 		if (wResult != IP_DONE)
 		{
-			bug ("ipSetDefaultInputTraits failed: wResult = %x\n", wResult);
+			BUG ("ipSetDefaultInputTraits failed: wResult = %x\n", wResult);
 			wResult = ipClose (hJob);
 			goto BUGOUT;
 		}
@@ -481,11 +481,11 @@ int hpijsFaxServer (int argc, char **argv)
 
 		if (wResult == IP_FATAL_ERROR)
 		{
-		    bug ("ipConvert failed, wResult = %d\n", wResult);
+		    BUG ("ipConvert failed, wResult = %d\n", wResult);
             goto BUGOUT;
 		}
 #if 0
-		bug ("dwInputAvail = %d dwInputUsed = %d dwOutputUsed = %d\n",
+		BUG ("dwInputAvail = %d dwInputUsed = %d dwOutputUsed = %d\n",
 		     dwInputAvail, dwInputUsed, dwOutputUsed);
 #endif
 		wResult = ipClose (hJob);

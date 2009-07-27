@@ -46,6 +46,11 @@ class PrinterNameComboBox(QWidget):
         self.initial_printer = None
         self.updating = False
         self.typ = PRINTERNAMECOMBOBOX_TYPE_PRINTER_ONLY
+
+        self.user_settings = UserSettings()
+        self.user_settings.load()
+        self.user_settings.debug()
+
         self.initUi()
 
 
@@ -108,7 +113,8 @@ class PrinterNameComboBox(QWidget):
 
         if self.printers:
             if self.initial_printer is None:
-                self.initial_printer = user_conf.get('last_used', 'printer_name')
+                #user_conf.get('last_used', 'printer_name')
+                self.initial_printer = self.user_settings.last_used_printer
 
             self.updating = True
             try:
@@ -138,7 +144,10 @@ class PrinterNameComboBox(QWidget):
             return
 
         self.device_uri = self.printer_index[self.printer_name]
-        user_conf.set('last_used', 'printer_name', self.printer_name)
+        #user_conf.set('last_used', 'printer_name', self.printer_name)
+        self.user_settings.last_used_printer = self.printer_name
+        self.user_settings.save()
+
         self.emit(SIGNAL("PrinterNameComboBox_currentChanged"), self.device_uri, self.printer_name)
 
 

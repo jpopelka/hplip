@@ -47,7 +47,12 @@ except ImportError:
     if not os.getenv("HPLIP_BUILD"):
         log.error("HPMUDEXT could not be loaded. Please check HPLIP installation.")
         sys.exit(1)
-
+else:
+    # Workaround for build machine
+    try:
+        MAX_BUFFER = hpmudext.HPMUD_BUFFER_SIZE
+    except AttributeError:
+        MAX_BUFFER = 8192
 
 dbus_avail = False
 dbus_disabled = False
@@ -57,6 +62,11 @@ try:
     dbus_avail = True
 except ImportError:
     log.warn("python-dbus not installed.")
+
+import warnings
+# Ignore: .../dbus/connection.py:242: DeprecationWarning: object.__init__() takes no parameters
+# (occurring on Python 2.6/dBus 0.83/Ubuntu 9.04)
+warnings.simplefilter("ignore", DeprecationWarning)
 
 
 DEFAULT_PROBE_BUS = ['usb', 'par', 'cups']
@@ -73,8 +83,6 @@ direct_pat = re.compile(r'direct (.*?) "(.*?)" "(.*?)" "(.*?)"', re.IGNORECASE)
 # Pattern to check for ; at end of CTR fields
 # Note: If ; not present, CTR value is invalid
 pat_dynamic_ctr = re.compile(r"""CTR:\d*\s.*;""", re.IGNORECASE)
-
-MAX_BUFFER = 8192
 
 # Cache for model data
 model_dat = models.ModelData()
@@ -1080,18 +1088,7 @@ class Device(object):
         self.device_state = DEVICE_STATE_NOT_FOUND
         self.status_code = EVENT_ERROR_DEVICE_NOT_FOUND
 
-        for p in printers:
-            if self.device_uri == p.device_uri:
-                self.cups_printers.append(p.name)
-                self.state = p.state # ?
-
-                if self.io_state == IO_STATE_NON_HP:
-                    self.model = p.makemodel.split(',')[0]
-
-        try:
-            self.first_cups_printer = self.cups_printers[0]
-        except IndexError:
-            self.first_cups_printer = ''
+        self.updateCUPSPrinters()
 
         if self.mq.get('fax-type', FAX_TYPE_NONE) != FAX_TYPE_NONE:
             self.dq.update({ 'fax-uri' : self.device_uri.replace('hp:/', 'hpfax:/').replace('hpaio:/', 'hpfax:/')})
@@ -1106,7 +1103,7 @@ class Device(object):
             'dev-file'         : self.dev_file,
             'host'             : self.host,
             'port'             : self.port,
-            'cups-printer'     : ','.join(self.cups_printers),
+            'cups-printers'    : ','.join(self.cups_printers),
             'status-code'      : self.status_code,
             'status-desc'      : '',
             'deviceid'         : '',
@@ -1161,10 +1158,6 @@ class Device(object):
 
 
     def open(self, open_for_printing=False):
-#       print "open()"
-#       raise Error(ERROR_DEVICE_NOT_FOUND)
-#       return
-
         if self.supported and self.io_state in (IO_STATE_HP_READY, IO_STATE_HP_NOT_AVAIL):
             prev_device_state = self.device_state
             self.io_state = IO_STATE_HP_NOT_AVAIL
@@ -1294,6 +1287,9 @@ class Device(object):
     def openPML(self):
         return self.__openChannel(hpmudext.HPMUD_S_PML_CHANNEL)
 
+    def openWifiConfig(self):
+        return self.__openChannel(hpmudext.HPMUD_S_WIFI_CHANNEL)
+
     def closePML(self):
         return self.__closeChannel(hpmudext.HPMUD_S_PML_CHANNEL)
 
@@ -1317,6 +1313,9 @@ class Device(object):
 
     def closeSoapFax(self):
         return self.__closeChannel(hpmudext.HPMUD_S_SOAP_FAX)
+
+    def closeWifiConfig(self):
+        return self.__closeChannel(hpmudext.HPMUD_S_WIFI_CHANNEL)
 
     def __closeChannel(self, service_name):
         #if not self.mq['io-mode'] == IO_MODE_UNI and \
@@ -1486,10 +1485,6 @@ class Device(object):
 
 
     def __queryFax(self, quick=False, reread_cups_printers=False):
-#       print "__queryFax()"
-#       raise Error(ERROR_DEVICE_IO_ERROR)
-#       return
-
         io_mode = self.mq.get('io-mode', IO_MODE_UNI)
         self.status_code = STATUS_PRINTER_IDLE
 
@@ -1508,11 +1503,9 @@ class Device(object):
 
                 status_desc = self.queryString(self.status_code)
 
-                #print self.status_code
-
                 self.dq.update({
                     'serial'           : self.serial,
-                    'cups-printer'     : ','.join(self.cups_printers),
+                    'cups-printers'    : ','.join(self.cups_printers),
                     'status-code'      : self.status_code,
                     'status-desc'      : status_desc,
                     'deviceid'         : self.raw_deviceID,
@@ -1533,13 +1526,9 @@ class Device(object):
             elif rx_active:
                 self.status_code = STATUS_FAX_RX_ACTIVE
 
-            #print self.status_code
-
             self.error_state = STATUS_TO_ERROR_STATE_MAP.get(self.status_code, ERROR_STATE_CLEAR)
             self.error_code = self.status_code
             self.sendEvent(self.error_code)
-
-            #print "Error state=", self.error_state, self.device_uri
 
             try:
                 self.dq.update({'status-desc' : self.queryString(self.status_code),
@@ -1571,45 +1560,40 @@ class Device(object):
                                   'panel-line2': line2,})
 
             if not quick and reread_cups_printers:
-                self.cups_printers = []
-                log.debug("Re-reading CUPS printer queue information.")
-                printers = cups.getPrinters()
-                for p in printers:
-                    if self.device_uri == p.device_uri:
-                        self.cups_printers.append(p.name)
-                        self.state = p.state # ?
-
-                        if self.io_state == IO_STATE_NON_HP:
-                            self.model = p.makemodel.split(',')[0]
-
-                self.dq.update({'cups-printer' : ','.join(self.cups_printers)})
-
-                try:
-                    self.first_cups_printer = self.cups_printers[0]
-                except IndexError:
-                    self.first_cups_printer = ''
-
+                self.updateCUPSPrinters()
 
         for d in self.dq:
             self.__dict__[d.replace('-','_')] = self.dq[d]
 
         self.last_event = Event(self.device_uri, '', self.status_code, prop.username, 0, '', time.time())
-        #print self.last_event
 
         log.debug(self.dq)
 
-        #import pprint
 
-        #pprint.pprint(self.dq)
+
+    def updateCUPSPrinters(self):
+        self.cups_printers = []
+        log.debug("Re-reading CUPS printer queue information.")
+        printers = cups.getPrinters()
+        for p in printers:
+            if self.device_uri == p.device_uri:
+                self.cups_printers.append(p.name)
+                self.state = p.state # ?
+
+                if self.io_state == IO_STATE_NON_HP:
+                    self.model = p.makemodel.split(',')[0]
+
+        self.dq.update({'cups-printers' : ','.join(self.cups_printers)})
+
+        try:
+            self.first_cups_printer = self.cups_printers[0]
+        except IndexError:
+            self.first_cups_printer = ''
 
 
 
 
     def queryDevice(self, quick=False, reread_cups_printers=False):
-#       print "queryDevice()"
-#       raise Error(ERROR_DEVICE_IO_ERROR)
-#       return
-
         if not self.supported:
             self.dq = {}
 
@@ -1651,7 +1635,7 @@ class Device(object):
 
             self.dq.update({
                 'serial'           : self.serial,
-                'cups-printer'     : ','.join(self.cups_printers),
+                'cups-printers'    : ','.join(self.cups_printers),
                 'status-code'      : self.status_code,
                 'status-desc'      : status_desc,
                 'deviceid'         : self.raw_deviceID,
@@ -1726,8 +1710,6 @@ class Device(object):
             self.error_code = status_code
             self.sendEvent(self.error_code)
 
-            #print "Error state=", self.error_state, self.device_uri
-
             try:
                 self.dq.update({'status-desc' : self.queryString(status_code),
                                 'error-state' : self.error_state,
@@ -1773,23 +1755,7 @@ class Device(object):
                               })
 
             if not quick and reread_cups_printers:
-                self.cups_printers = []
-                log.debug("Re-reading CUPS printer queue information.")
-                printers = cups.getPrinters()
-                for p in printers:
-                    if self.device_uri == p.device_uri:
-                        self.cups_printers.append(p.name)
-                        self.state = p.state # ?
-
-                        if self.io_state == IO_STATE_NON_HP:
-                            self.model = p.makemodel.split(',')[0]
-
-                self.dq.update({'cups-printer' : ','.join(self.cups_printers)})
-
-                try:
-                    self.first_cups_printer = self.cups_printers[0]
-                except IndexError:
-                    self.first_cups_printer = ''
+                self.updateCUPSPrinters()
 
             if not quick:
                 # Make sure there is some valid agent data for this r_value
@@ -2108,15 +2074,16 @@ class Device(object):
     def readSoapFax(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=True):
         return self.__readChannel(self.openSoapFax, bytes_to_read, stream, timeout, allow_short_read)
 
+    def readWifiConfig(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=True):
+        return self.__readChannel(self.openWifiConfig, bytes_to_read, stream, timeout, allow_short_read)
+
     def __readChannel(self, opener, bytes_to_read, stream=None,
                       timeout=prop.read_timeout, allow_short_read=False):
-#       print "__readChannel()"
-#       raise Error(ERROR_DEVICE_IO_ERROR)
-#       return 0
 
         channel_id = opener()
 
-        log.debug("Reading channel %d..." % channel_id)
+        log.debug("Reading channel %d (device-id=%d, bytes_to_read=%d, allow_short=%s, timeout=%d)..." %
+            (channel_id, self.device_id, bytes_to_read, allow_short_read, timeout))
 
         num_bytes = 0
 
@@ -2126,6 +2093,8 @@ class Device(object):
         while True:
             result_code, data = \
                 hpmudext.read_channel(self.device_id, channel_id, bytes_to_read, timeout)
+
+            log.debug("Result code=%d" % result_code)
 
             l = len(data)
 
@@ -2185,21 +2154,21 @@ class Device(object):
     def writeSoapFax(self, data):
         return self.__writeChannel(self.openSoapFax, data)
 
+    def writeWifiConfig(self, data):
+        return self.__writeChannel(self.openWifiConfig, data)
 
     def __writeChannel(self, opener, data):
-#       print "__writeChannel()"
-#       raise Error(ERROR_DEVICE_IO_ERROR)
-#       return 0
-
         channel_id = opener()
-
         buffer, bytes_out, total_bytes_to_write = data, 0, len(data)
-        log.debug("Writing %d bytes to channel %d..." % (total_bytes_to_write,channel_id))
+
+        log.debug("Writing %d bytes to channel %d (device-id=%d)..." % (total_bytes_to_write, channel_id, self.device_id))
 
         while len(buffer) > 0:
             result_code, bytes_written = \
                 hpmudext.write_channel(self.device_id, channel_id,
                     buffer[:prop.max_message_len])
+
+            log.debug("Result code=%d" % result_code)
 
             if result_code != hpmudext.HPMUD_R_OK:
                 log.error("Channel write error")
@@ -2287,9 +2256,9 @@ class Device(object):
         is_gzip = os.path.splitext(file_name)[-1].lower() == '.gz'
 
         if printer_name is None:
-            try:
-                printer_name = self.cups_printers[0]
-            except IndexError:
+            printer_name = self.first_cups_printer
+
+            if not printer_name:
                 raise Error(ERROR_NO_CUPS_QUEUE_FOUND_FOR_DEVICE)
 
         log.debug("Printing file '%s' to queue '%s' (gzip=%s, direct=%s, raw=%s, remove=%s)" %

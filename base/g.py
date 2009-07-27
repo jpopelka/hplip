@@ -193,7 +193,7 @@ sys_conf = SysConfig()
 # System State File: System-wide runtime settings
 sys_state = State()
 
-# Per-user Settings File:
+# Per-user Settings File: (Note: For Qt4 code, limit the use of this to non-GUI apps. only)
 user_conf = UserConfig()
 
 
@@ -205,7 +205,7 @@ except ValueError:
     prop.encoding = 'UTF8'
 
 prop.version = sys_conf.get('hplip', 'version', '0.0.0') # e.g., 3.9.2b.10
-_p, _x = re.compile(r'(\d*)', re.I), []
+_p, _x = re.compile(r'(\d\w*)', re.I), []
 for _y in prop.version.split('.')[:3]:
     _z = _p.match(_y)
     if _z is not None:
@@ -249,6 +249,8 @@ prop.fax_build = to_bool(sys_conf.get('configure', 'fax-build', '0'))
 prop.doc_build = to_bool(sys_conf.get('configure', 'doc-build', '0'))
 prop.foomatic_xml_install = to_bool(sys_conf.get('configure', 'foomatic-xml-install', '0'))
 prop.foomatic_ppd_install = to_bool(sys_conf.get('configure', 'foomatic-ppd-install', '0'))
+prop.hpcups_build = to_bool(sys_conf.get('configure', 'hpcups-install', '0'))
+prop.hpijs_build = to_bool(sys_conf.get('configure', 'hpijs-install', '0'))
 
 # Spinner, ala Gentoo Portage
 spinner = "\|/-\|/-"

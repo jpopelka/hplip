@@ -33,7 +33,7 @@ import Queue
 
 # Local
 from base.g import *
-from base import device, utils, pml, maint
+from base import device, utils, pml, maint, pkit
 from prnt import cups
 from base.codes import *
 from ui_utils import load_pixmap
@@ -154,28 +154,32 @@ class SuppliesListViewItem(QListViewItem):
 class PasswordDialog(QDialog):
     def __init__(self,prompt, parent=None, name=None, modal=0, fl=0):
         QDialog.__init__(self,parent,name,modal,fl)
+        self.prompt = prompt
 
         if not name:
             self.setName("PasswordDialog")
 
         passwordDlg_baseLayout = QGridLayout(self,1,1,11,6,"passwordDlg_baseLayout")
 
+        self.promptTextLabel = QLabel(self,"promptTextLabel")
+        passwordDlg_baseLayout.addMultiCellWidget(self.promptTextLabel,0,0,0,1)
+
+        self.usernameTextLabel = QLabel(self,"usernameTextLabel")
+        passwordDlg_baseLayout.addMultiCellWidget(self.usernameTextLabel,1,1,0,1)
+
+        self.usernameLineEdit = QLineEdit(self,"usernameLineEdit")
+        self.usernameLineEdit.setEchoMode(QLineEdit.Normal)
+        passwordDlg_baseLayout.addMultiCellWidget(self.usernameLineEdit,1,1,1,2)
+
+        self.passwordTextLabel = QLabel(self,"passwordTextLabel")
+        passwordDlg_baseLayout.addMultiCellWidget(self.passwordTextLabel,2,2,0,1)
+
         self.passwordLineEdit = QLineEdit(self,"passwordLineEdit")
         self.passwordLineEdit.setEchoMode(QLineEdit.Password)
-
-        passwordDlg_baseLayout.addMultiCellWidget(self.passwordLineEdit,1,1,0,1)
-
-        self.promptTextLabel = QLabel(self,"promptTextLabel")
-
-        passwordDlg_baseLayout.addMultiCellWidget(self.promptTextLabel,0,0,0,1)
-        spacer1 = QSpacerItem(20,61,QSizePolicy.Minimum,QSizePolicy.Expanding)
-        passwordDlg_baseLayout.addItem(spacer1,2,0)
-        spacer2 = QSpacerItem(321,20,QSizePolicy.Expanding,QSizePolicy.Minimum)
-        passwordDlg_baseLayout.addItem(spacer2,3,0)
+        passwordDlg_baseLayout.addMultiCellWidget(self.passwordLineEdit,2,2,1,2)
 
         self.okPushButton = QPushButton(self,"okPushButton")
-
-        passwordDlg_baseLayout.addWidget(self.okPushButton,3,1)
+        passwordDlg_baseLayout.addWidget(self.okPushButton,3,2)
 
         self.languageChange()
 
@@ -184,13 +188,17 @@ class PasswordDialog(QDialog):
 
         self.connect(self.okPushButton,SIGNAL("clicked()"),self.accept)
         self.connect(self.passwordLineEdit,SIGNAL("returnPressed()"),self.accept)
-        self.promptTextLabel.setText(prompt)
+    def getUsername(self):
+        return unicode(self.usernameLineEdit.text())
 
     def getPassword(self):
         return unicode(self.passwordLineEdit.text())
 
     def languageChange(self):
-        self.setCaption(self.__tr("HP Device Manager - Enter Password"))
+        self.setCaption(self.__tr("HP Device Manager - Enter Username/Password"))
+        self.promptTextLabel.setText(self.__tr(self.prompt))
+        self.usernameTextLabel.setText(self.__tr("Username"))
+        self.passwordTextLabel.setText(self.__tr("Password"))
         self.okPushButton.setText(self.__tr("OK"))
 
     def __tr(self,s,c = None):
@@ -244,12 +252,12 @@ def showPasswordUI(prompt):
         dlg = PasswordDialog(prompt, None)
 
         if dlg.exec_loop() == QDialog.Accepted:
-            return dlg.getPassword()
+            return (dlg.getUsername(), dlg.getPassword())
 
     finally:
         pass
 
-    return ""
+    return ("", "")
 
 
 class StatusListViewItem(QListViewItem):
@@ -443,7 +451,7 @@ class DevMgr4(DevMgr4_base):
             QObject.connect(self.notifier, SIGNAL("activated(int)"), self.notifier_activated)
 
         # Application icon
-        self.setIcon(load_pixmap('prog', '48x48'))
+        self.setIcon(load_pixmap('hp_logo', '128x128'))
 
         # User settings
         self.user_settings = utils.UserSettings()
@@ -1348,7 +1356,7 @@ class DevMgr4(DevMgr4_base):
 
                 (lambda : True,
                 self.__tr("Visit HPLIP Website"),
-                "support2",
+                "hp_logo",
                 self.__tr("Visit HPLIP website."),
                 self.viewSupport),
 
@@ -1357,15 +1365,12 @@ class DevMgr4(DevMgr4_base):
                 "help",
                 self.__tr("View HPLIP help."),
                 self.viewHelp),
-
             ]
 
             if not self.func_icons_cached:
                 for filter, text, icon, tooltip, cmd in self.ICONS:
                     self.func_icons[icon] = load_pixmap(icon, '32x32')
                 self.func_icons_cached = True
-
-
 
             for filter, text, icon, tooltip, cmd in self.ICONS:
                 if filter is not None:
@@ -1379,35 +1384,15 @@ class DevMgr4(DevMgr4_base):
 
 
     def downloadPlugin(self):
-        su_sudo = None
-
-        if utils.which('kdesu'):
-            su_sudo = 'kdesu -- %s'
-
-        elif utils.which('gnomesu'):
-            su_sudo = 'gnomesu -c "%s"'
-
-        elif utils.which('gksu'):
-            su_sudo = 'gksu "%s"'
-
-        if su_sudo is None:
+        ok, sudo_ok = pkit.run_plugin_command(self.cur_device.plugin == PLUGIN_REQUIRED, self.cur_device.mq['plugin-reason'])
+        if not sudo_ok:
             QMessageBox.critical(self,
                 self.caption(),
-                self.__tr("<b>Unable to find an appropriate su/sudo utility to run hp-plugin.</b>"),
+                self.__tr("<b>Unable to find an appropriate su/sudo utility to run hp-plugin.</b><p>Install kdesu, gnomesu, or gksu.</p>"),
                 QMessageBox.Ok,
                 QMessageBox.NoButton,
                 QMessageBox.NoButton)
-
         else:
-            if utils.which('hp-plugin'):
-                cmd = su_sudo % 'hp-plugin -u'
-            else:
-                cmd = su_sudo % 'python ./plugin.py -u'
-
-            log.debug(cmd)
-            utils.run(cmd, log_output=True, password_func=None, timeout=1)
-            #print os.system(cmd)
-
             self.UpdateFuncsTab()
 
 
@@ -2152,20 +2137,20 @@ class DevMgr4(DevMgr4_base):
                     try:
                         agent_type = int(self.cur_device.dq['agent%d-type' % a])
                         agent_kind = int(self.cur_device.dq['agent%d-kind' % a])
+                        agent_sku = self.cur_device.dq['agent%d-sku' % a]
                     except KeyError:
                         break
                     else:
-                        self.cur_device.sorted_supplies.append((a, agent_kind, agent_type))
+                        self.cur_device.sorted_supplies.append((a, agent_kind, agent_type, agent_sku))
 
                     a += 1
 
-                self.cur_device.sorted_supplies.sort(lambda x, y: cmp(x[2], y[2]) or cmp(x[1], y[1]))
+                self.cur_device.sorted_supplies.sort(lambda x, y: cmp(x[1], y[1]) or cmp(x[3], y[3]), reverse=True)
 
 
             for x in self.cur_device.sorted_supplies:
-                a, agent_kind, agent_type = x
+                a, agent_kind, agent_type, agent_sku = x
                 agent_level = int(self.cur_device.dq['agent%d-level' % a])
-                agent_sku = str(self.cur_device.dq['agent%d-sku' % a])
                 agent_desc = self.cur_device.dq['agent%d-desc' % a]
                 agent_health_desc = self.cur_device.dq['agent%d-health-desc' % a]
 
@@ -2761,34 +2746,14 @@ class DevMgr4(DevMgr4_base):
     # ***********************************************************************************
 
     def deviceInstallAction_activated(self):
-        su_sudo = None
-
-        if utils.which('kdesu'):
-            su_sudo = 'kdesu -- %s'
-
-        elif utils.which('gnomesu'):
-            su_sudo = 'gnomesu -c "%s"'
-
-        elif utils.which('gksu'):
-            su_sudo = 'gksu "%s"'
-
-        if su_sudo is None:
-            QMessageBox.critical(self,
-                self.caption(),
-                self.__tr("<b>Unable to find an appropriate su/sudo utility to run hp-setup.</b>"),
-                QMessageBox.Ok,
-                QMessageBox.NoButton,
-                QMessageBox.NoButton)
-
+        if utils.which('hp-setup'):
+            cmd = 'hp-setup -u'
         else:
-            if utils.which('hp-setup'):
-                cmd = su_sudo % 'hp-setup -u'
-            else:
-                cmd = su_sudo % 'python ./setup.py -u'
+            cmd = 'python ./setup.py --gui'
 
-            log.debug(cmd)
-            utils.run(cmd, log_output=True, password_func=None, timeout=1)
-            self.RescanDevices()
+        log.debug(cmd)
+        utils.run(cmd, log_output=True, password_func=None, timeout=1)
+        self.RescanDevices()
 
 
     def deviceRemoveAction_activated(self):

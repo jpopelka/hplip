@@ -106,9 +106,9 @@ class SettingsDialog(SettingsDialog_base):
 ##        self.user_settings.email_to_addresses = unicode(self.EmailAddress.text())
 ##        self.user_settings.email_from_address = unicode(self.senderLineEdit.text())
 
-        self.user_settings.auto_refresh = bool(self.autoRefreshCheckBox.isChecked())
-        self.user_settings.auto_refresh_type = self.refreshScopeButtonGroup.selectedId()
-        self.user_settings.auto_refresh_rate = self.AutoRefreshRate.value()
+        self.user_settings.auto_refresh = str(self.autoRefreshCheckBox.isChecked())
+        self.user_settings.auto_refresh_type = str(self.refreshScopeButtonGroup.selectedId())
+        self.user_settings.auto_refresh_rate = str(self.AutoRefreshRate.value())
 
 ##    def PrintCmdChangeButton_clicked(self):
 ##        pass

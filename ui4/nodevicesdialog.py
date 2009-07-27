@@ -49,38 +49,19 @@ class NoDevicesDialog(QDialog, Ui_NoDevicesDialog_base):
 
     def SetupButton_clicked(self):
         self.close()
-        su_sudo = None
 
-        if utils.which('kdesu'):
-            su_sudo = 'kdesu -- %s'
-
-        elif utils.which('gnomesu'):
-            su_sudo = 'gnomesu -c "%s"'
-
-        elif utils.which('gksu'):
-            su_sudo = 'gksu "%s"'
-
-        if su_sudo is None:
-            QMessageBox.critical(self,
-                                self.windowTitle(),
-                                self.__tr("<b>Unable to find an appropriate su/sudo utility to run hp-setup.</b>"),
-                                QMessageBox.Ok,
-                                QMessageBox.NoButton,
-                                QMessageBox.NoButton)
-
+        if utils.which('hp-setup'):
+            cmd = 'hp-setup -u'
         else:
-            if utils.which('hp-setup'):
-                cmd = su_sudo % 'hp-setup -u'
-            else:
-                cmd = su_sudo % 'python ./setup.py -u'
+            cmd = 'python ./setup.py -u'
 
-            log.debug(cmd)
-            utils.run(cmd, log_output=True, password_func=None, timeout=1)
+        log.debug(cmd)
+        utils.run(cmd, log_output=True, password_func=None, timeout=1)
 
-            try:
-                self.parent().rescanDevices()
-            except Error:
-                QMessageBox.critical(self,
+        try:
+            self.parent().rescanDevices()
+        except Error:
+            QMessageBox.critical(self,
                                     self.windowTitle(),
                                     self.__tr("<b>An error occurred.</b><p>Please re-start the Device Manager and try again."),
                                     QMessageBox.Ok,

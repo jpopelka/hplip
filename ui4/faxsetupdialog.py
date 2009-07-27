@@ -58,6 +58,11 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
         self.device_uri = device_uri
         self.initUi()
         self.dev = None
+
+        self.user_settings = UserSettings()
+        self.user_settings.load()
+        self.user_settings.debug()
+
         QTimer.singleShot(0, self.updateUi)
 
 
@@ -69,7 +74,7 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
         self.FaxComboBox.setType(DEVICEURICOMBOBOX_TYPE_FAX_ONLY)
 
         # Application icon
-        self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
+        self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))
 
         if self.device_uri:
             self.FaxComboBox.setInitialDevice(self.device_uri)
@@ -204,7 +209,9 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
     def saveVoiceNumber(self, s):
         log.debug("Saving voice number (%s) to ~/.hplip/hplip.conf" % s)
         self.voice_number_dirty = False
-        user_conf.set('fax', 'voice_phone', s)
+        #user_conf.set('fax', 'voice_phone', s)
+        self.user_settings.voice_phone = s
+        self.user_settings.save()
 
     #
     # EMail (for coverpage) (stored in ~/.hplip/hplip.conf)
@@ -221,7 +228,9 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
     def saveEmail(self, s):
         log.debug("Saving email address (%s) to ~/.hplip/hplip.conf" % s)
         self.email_dirty = False
-        user_conf.set('fax', 'email_address', s)
+        #user_conf.set('fax', 'email_address', s)
+        self.user_settings.email_address = s
+        self.user_settings.save()
 
     #
     #
@@ -236,9 +245,10 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
         try:
             try:
                 name_company = self.dev.getStationName()
+                log.debug("name_company = '%s'" % name_company)
                 self.NameCompanyLineEdit.setText(name_company)
-
                 fax_number = self.dev.getPhoneNum()
+                log.debug("fax_number = '%s'" % fax_number)
                 self.FaxNumberLineEdit.setText(fax_number)
             except Error:
                 CheckDeviceUI()
@@ -247,8 +257,14 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
 
 
     def updateCoverpageTab(self):
-        self.VoiceNumberLineEdit.setText(user_conf.get('fax', 'voice_phone'))
-        self.EmailLineEdit.setText(user_conf.get('fax', 'email_address'))
+        #voice_phone = user_conf.get('fax', 'voice_phone')
+        voice_phone = self.user_settings.voice_phone
+        log.debug("voice_phone = '%s'" % voice_phone)
+        self.VoiceNumberLineEdit.setText(voice_phone)
+        #email_address = user_conf.get('fax', 'email_address')
+        email_address = self.user_settings.email_address
+        log.debug("email_address = '%s'" % email_address)
+        self.EmailLineEdit.setText(email_address)
 
 
     def closeEvent(self, e):
@@ -260,6 +276,7 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
             self.EmailLineEdit.emit(SIGNAL("editingFinished()"))
         if self.fax_number_dirty:
             self.FaxNumberLineEdit.emit(SIGNAL("editingFinished()"))
+        self.dev.close()
         e.accept()
 
     #

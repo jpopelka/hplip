@@ -474,7 +474,6 @@ PyObject * addPrinter( PyObject * self, PyObject * args )
     char * name, * device_uri, *location, *ppd_file, * info, * model;
     const char * status_str = "successful-ok";
 
-
     if ( !PyArg_ParseTuple( args, "zzzzzz",
                             &name,             // name of printer
                             &device_uri,       // DeviceURI (e.g., hp:/usb/PSC_2200_Series?serial=0000000010)
@@ -599,6 +598,9 @@ PyObject * delPrinter( PyObject * self, PyObject * args )
     char * name;
     http_t *http = NULL;     /* HTTP object */
     int r = 0;
+    const char *username = NULL;
+
+    username = cupsUser();
 
     if ( !PyArg_ParseTuple( args, "z",
                             &name ) )         // name of printer
@@ -653,6 +655,9 @@ PyObject * delPrinter( PyObject * self, PyObject * args )
     }
 
 abort:
+    if (username)
+        cupsSetUser(username);
+
     if ( http != NULL )
         httpClose( http );
 
@@ -677,6 +682,9 @@ PyObject * setDefaultPrinter( PyObject * self, PyObject * args )
     char * name;
     http_t *http = NULL;     /* HTTP object */
     int r = 0;
+    const char *username = NULL;
+
+    username = cupsUser();
 
     if ( !PyArg_ParseTuple( args, "z",
                             &name ) )         // name of printer
@@ -740,6 +748,8 @@ PyObject * setDefaultPrinter( PyObject * self, PyObject * args )
     }
 
 abort:
+    if (username)
+        cupsSetUser(username);
 
     if ( http != NULL )
         httpClose( http );
@@ -764,6 +774,9 @@ PyObject * controlPrinter( PyObject * self, PyObject * args )
     int r = 0;
     char uri[ HTTP_MAX_URI ];        /* URI for printer/class */
     cups_lang_t *language;
+    const char *username = NULL;
+
+    username = cupsUser();
 
     if ( !PyArg_ParseTuple( args, "zi", &name, &op) )
     {
@@ -774,6 +787,7 @@ PyObject * controlPrinter( PyObject * self, PyObject * args )
     {
         goto abort;
     }
+
     /* Connect to the HTTP server */
     if ( ( http = httpConnectEncrypt( cupsServer(), ippPort(), cupsEncryption() ) ) == NULL )
     {
@@ -813,6 +827,9 @@ PyObject * controlPrinter( PyObject * self, PyObject * args )
     }
 
 abort:
+    if (username)
+        cupsSetUser(username);
+
     if ( http != NULL )
         httpClose( http );
 
@@ -1700,29 +1717,66 @@ PyObject * printFileWithOptions( PyObject * self, PyObject * args )
 // ***************************************************************************************************
 
 static PyObject * passwordFunc = NULL;
+static char *passwordPrompt = NULL;
 
 const char * password_callback(const char * prompt)
 {
-    PyObject * result;
-    char * result_str = NULL;
 
-    if ( passwordFunc != NULL )
-    {
-        result = PyObject_CallFunction( passwordFunc, "s", prompt );
+    PyObject *result = NULL;
+    PyObject *usernameObj = NULL;
+    PyObject *passwordObj = NULL;
+    char *username = NULL;
+    char *password = NULL;
 
-        if( result )
-        {
-            result_str = PyString_AsString( result );
+    if (passwordFunc != NULL)  {
 
-            if ( result_str != NULL )
-            {
-                return result_str;
-            }
-        }
+        if (passwordPrompt)
+	    prompt = passwordPrompt;
+
+        result = PyObject_CallFunction(passwordFunc, "s", prompt);
+        if (!result)
+	    return "";
+
+        usernameObj = PyTuple_GetItem(result, 0);
+        if (!usernameObj)
+            return "";
+        username = PyString_AsString(usernameObj);
+/*      printf("usernameObj=%p, username='%s'\n", usernameObj, username); */
+        if (!username)
+	    return "";
+
+        passwordObj = PyTuple_GetItem(result, 1);
+        if (!passwordObj)
+	    return "";
+        password = PyString_AsString(passwordObj);
+/*      printf("passwordObj=%p, password='%s'\n", passwordObj, password); */
+        if (!password)
+	    return "";
+
+        cupsSetUser(username);
+        return password;
 
     }
 
     return "";
+
+}
+
+PyObject *setPasswordPrompt(PyObject *self, PyObject *args)
+{
+
+    char *userPrompt = NULL;
+
+    if (!PyArg_ParseTuple(args, "z", &userPrompt))
+        return Py_BuildValue("");
+
+    if (strlen(userPrompt) != 0)
+        passwordPrompt = userPrompt;
+    else
+        passwordPrompt = NULL;
+
+    return Py_BuildValue("");
+
 }
 
 PyObject * setPasswordCallback( PyObject * self, PyObject * args )
@@ -1801,6 +1855,7 @@ static PyMethodDef cupsext_methods[] =
         { "getChoice", ( PyCFunction ) getChoice, METH_VARARGS },
         { "setOptions", ( PyCFunction ) setOptions, METH_VARARGS },
         { "getOptions", ( PyCFunction ) getOptions, METH_VARARGS },
+        { "setPasswordPrompt", (PyCFunction) setPasswordPrompt, METH_VARARGS },
         { "setPasswordCallback", ( PyCFunction ) setPasswordCallback, METH_VARARGS },
         { "getPassword", ( PyCFunction ) getPassword, METH_VARARGS },
         { NULL, NULL }

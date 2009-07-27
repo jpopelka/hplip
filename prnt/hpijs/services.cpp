@@ -43,6 +43,22 @@
 #include "hpijs.h"
 #include "services.h"
 
+#if defined(HAVE_LIBHPIP) && defined(HAVE_DBUS) 
+#include <dbus/dbus.h>
+#define DBUS_INTERFACE "com.hplip.StatusService"
+#define DBUS_PATH "/"
+static DBusError dbus_err;
+static DBusConnection *dbus_conn;
+void InitDbus (void);
+void SendDbusMessage (const char *dev, const char *printer, int code, 
+                      const char *username, const int jobid, const char *title);
+#else
+void SendDbusMessage (const char *dev, const char *printer, int code, 
+                      const char *username, const int jobid, const char *title)
+{
+}
+#endif
+
 int UXServices::InitDuplexBuffer()
 {
     /* Free buffer if new page size in middle of print job. */
@@ -121,7 +137,7 @@ int UXServices::ProcessRaster(char *raster, char *k_raster)
 
         BYTE   *new_raster;
         int    new_raster_size;
-        int    i,w,last_bit;
+        int    i,w;
 
         if (raster == NULL)
         {
@@ -133,7 +149,7 @@ int UXServices::ProcessRaster(char *raster, char *k_raster)
            new_raster = new BYTE[new_raster_size];
            if (new_raster == 0)
            {
-               bug("unable to create duplex buffer, size=%d: %m\n", new_raster_size);
+               BUG("unable to create duplex buffer, size=%d: %m\n", new_raster_size);
                return -1;
            }
            memset(new_raster, 0xFF, new_raster_size);
@@ -156,18 +172,21 @@ int UXServices::ProcessRaster(char *raster, char *k_raster)
            new_raster = new BYTE[new_raster_size];
            if (new_raster == 0)
            {
-               bug("unable to create black duplex buffer, size=%d: %m\n", new_raster_size);
+               BUG("unable to create black duplex buffer, size=%d: %m\n", new_raster_size);
                return -1;
            }
            memset(new_raster, 0, new_raster_size);
            KRastersOnPage[CurrentRaster] = new_raster;
            w = pPC->InputPixelsPerRow();
-           last_bit = w & 7;
            for (i=0; i<w; i++)
            {
                if (k_raster[i>>3] & xmask[i&7])
-                  new_raster[(w-(last_bit+i))>>3] |= xmask[(w-(last_bit+i))&7];  /* rotate k image */
+                  new_raster[(w-i)>>3] |= xmask[(w-i)&7];  /* rotate k image */
            }
+	   int    k = ((w + 7) / 8) * 8 - w;
+	   BYTE   c = 0xff << k;
+	   if (k != 0)
+	       new_raster[0] = c & k_raster[new_raster_size-1];
         }
 
         CurrentRaster--;
@@ -270,7 +289,7 @@ UXServices::UXServices():SystemServices()
                 InitDeviceComm();            /* lets try bi-di support */
             }
             if(IOMode.bDevID == FALSE)
-               bug("unable to set bi-di for hp backend\n");
+               BUG("unable to set bi-di for hp backend\n");
          }
       }
    }
@@ -282,7 +301,7 @@ UXServices::UXServices():SystemServices()
        InitDeviceComm ();
        if (IOMode.bDevID == FALSE)
        {
-           bug ("Unable to set bi-di for hp backend\n");
+           BUG ("Unable to set bi-di for hp backend\n");
        }
    }
 
@@ -305,6 +324,8 @@ UXServices::UXServices():SystemServices()
    VertAlign = -1;
    DisplayStatus = NODISPLAYSTATUS;
    OutputPath = -1;
+   outfp = NULL;
+   m_iLogLevel = 0;
 
    m_pbyPclBuffer      = NULL;
    m_iPclBufferSize    = BUFFER_CHUNK_SIZE;
@@ -328,6 +349,10 @@ UXServices::~UXServices()
    if (hpFD >= 0)
       hpmud_close_device(hpFD);  
 #endif
+    if (outfp)
+    {
+        fclose (outfp);
+    }
 }
 
 DRIVER_ERROR UXServices::ToDevice(const BYTE * pBuffer, DWORD * Count)
@@ -346,12 +371,20 @@ DRIVER_ERROR UXServices::ToDevice(const BYTE * pBuffer, DWORD * Count)
        }
    }
 
+    if (outfp)
+    {
+        fwrite (pBuffer, 1, *Count, outfp);
+	*Count = 0;
+	if (!(m_iLogLevel & SEND_TO_PRINTER))
+	    return NO_ERROR;
+    }
+
    /* Write must be not-buffered, don't use streams */
    if (write(OutputPath, pBuffer, *Count) != (ssize_t)*Count) 
    {
       static int cnt=0;
       if (cnt++ < 5)
-         bug("unable to write to output, fd=%d, count=%d: %m\n", OutputPath, *Count);
+         BUG("unable to write to output, fd=%d, count=%d: %m\n", OutputPath, *Count);
       return IO_ERROR;
    }
 
@@ -419,7 +452,7 @@ DRIVER_ERROR UXServices::BusyWait (DWORD msec)
       case DISPLAY_NO_COLOR_PEN:
       case DISPLAY_NO_BLACK_PEN:
       case DISPLAY_NO_PENS:
-         bug("WARNING: printer bi-di error=%d\n", DisplayStatus);
+         BUG("WARNING: printer bi-di error=%d\n", DisplayStatus);
          DisplayStatus = DISPLAY_PRINTING_CANCELED;
          return JOB_CANCELED;   /* bail-out otherwise APDK will wait forever */
       default:
@@ -503,7 +536,7 @@ const char * UXServices::GetDriverMessage (DRIVER_ERROR err)
          break;
       default:
          p = "driver error";
-         bug("driver error=%d\n", err);
+         BUG("driver error=%d\n", err);
          break;
    }
    return p;
@@ -539,10 +572,13 @@ int UXServices::MapPaperSize (float width, float height)
     if ((r = pPC->SetPaperSize ((PAPER_SIZE)size, FullBleed)) != NO_ERROR)
     {
         if (r > 0)
-            bug("unable to set paper size=%d, err=%d\n", size, r);
+        {
+            BUG("unable to set paper size=%d, err=%d, width=%0.5g, height=%0.5g\n", size, r, width, height);
+        }
         else 
-            bug("warning setting paper size=%d, err=%d\n", size, r);
-
+        {
+            BUG("warning setting paper size=%d, err=%d, width=%0.5g, height=%0.5g\n", size, r, width, height);
+        }
 /*
  *      Call failed, reset our PaperWidth and PaperHeight values.
  *      This ensures that we return correct values when gs queries for printable area.
@@ -664,5 +700,58 @@ void UXServices::SendLastPage ()
     ToDevice (m_pbyPclBuffer, (DWORD *) &m_iCurPclBufferPos);
     delete [] m_pbyPclBuffer;
 }
+
+#if defined(HAVE_LIBHPIP) && defined(HAVE_DBUS) 
+void SendDbusMessage (const char *dev, const char *printer, int code, 
+                      const char *username, const int jobid, const char *title)
+{
+    DBusMessage * msg = NULL;
+
+    InitDbus ();
+    if (dbus_conn == NULL)
+        return;
+    msg = dbus_message_new_signal(DBUS_PATH, DBUS_INTERFACE, "Event");
+
+    if (NULL == msg)
+    {
+        BUG("dbus message is NULL!\n");
+        return;
+    }
+
+    dbus_message_append_args(msg, 
+        DBUS_TYPE_STRING, &dev,
+        DBUS_TYPE_STRING, &printer,
+        DBUS_TYPE_UINT32, &code, 
+        DBUS_TYPE_STRING, &username, 
+        DBUS_TYPE_UINT32, &jobid,
+        DBUS_TYPE_STRING, &title, 
+        DBUS_TYPE_INVALID);
+
+    if (!dbus_connection_send(dbus_conn, msg, NULL))
+    {
+        BUG("dbus message send failed!\n");
+        return;
+    }
+
+    dbus_connection_flush(dbus_conn);
+    dbus_message_unref(msg);
+
+    return;
+}
+
+void InitDbus (void)
+{
+   dbus_error_init (&dbus_err);
+   dbus_conn = dbus_bus_get (DBUS_BUS_SYSTEM, &dbus_err);
+    
+   if (dbus_error_is_set (&dbus_err))
+   { 
+      BUG ("dBus Connection Error (%s)!\n", dbus_err.message); 
+      dbus_error_free (&dbus_err); 
+   }
+
+   return;
+}
+#endif  /* HAVE_DBUS */
 
 

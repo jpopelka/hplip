@@ -73,6 +73,8 @@ DJ3320::DJ3320 (SystemServices* pSS, BOOL proto)
     m_iBytesPerSwing = 2;
     m_iLdlVersion = 1;
     m_iColorPenResolution = 300;
+    m_iBlackPenResolution = 1200;
+    m_iNumBlackNozzles    = 400;
 
     if (IOMode.bDevID)
     {
@@ -429,7 +431,7 @@ DISPLAY_STATUS DJ3320::ParseError (BYTE byStatusReg)
             pLDLEncap->bNewStatus = FALSE;
 
             // First 10 bytes of m_pbyReadBuff are packet header.  Status query from printer has $S:
-            if ((pcStr = strstr((const char*)pLDLEncap->byStatusBuff + 10, "$S:")) == NULL)
+            if ((pcStr = (char *) strstr((const char*)pLDLEncap->byStatusBuff + 10, "$S:")) == NULL)
             {
                 m_dsCurrentStatus = DISPLAY_COMM_PROBLEM;
                 return DISPLAY_COMM_PROBLEM;
@@ -1626,10 +1628,12 @@ void LDLEncap::AllocateSwathBuffer (unsigned int RasterSize)
 	 *  This swath buffer cannot be greater than the number of nozzles - 400 for black
 	 *  and 100 for color - we can use.
 	 */
+
+    int    iAdjHeight = (pPrinterXBow->m_iNumBlackNozzles / 32) * 8;
     if (pPrinterXBow->ePen == BLACK_PEN)
     {
         m_sSwathHeight = m_sSwathHeight * 4;
-        if (m_sSwathHeight * 1200 / m_iYResolution > 400)
+        if (m_sSwathHeight * 1200 / m_iYResolution > pPrinterXBow->m_iNumBlackNozzles)
             m_sSwathHeight = m_iYResolution / 3;
     }
     else if (m_cPrintQuality != QUALITY_DRAFT && m_iYResolution > 300 && m_iNumColors > 1 && m_iBitDepth == 1) // Collie change
@@ -1640,10 +1644,10 @@ void LDLEncap::AllocateSwathBuffer (unsigned int RasterSize)
     }
 
     else if (m_iBitDepth == 2)
-        m_sSwathHeight = 96 * 4;
+        m_sSwathHeight = iAdjHeight * 4;
 
     if (m_cPrintQuality == QUALITY_NORMAL)
-        m_sSwathHeight = 96 * 2;
+        m_sSwathHeight = iAdjHeight * 2;
 
     if (m_cPrintQuality == QUALITY_DRAFT && pPrinterXBow->ePen != BLACK_PEN)
     {
@@ -2729,7 +2733,7 @@ DRIVER_ERROR LDLEncap::PrintSweep (UInt32 SweepSize,
             if ((i == 0 && pPrinterXBow->m_iLdlVersion == 1) || (BlackPresent && pPrinterXBow->m_iLdlVersion == 2))
             {
                 iDataRes = 600;
-                iPrintRes = 1200;
+                iPrintRes = pPrinterXBow->m_iBlackPenResolution;
             }
             else
             {

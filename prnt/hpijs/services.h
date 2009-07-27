@@ -35,6 +35,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#define EVENT_PRINT_FAILED_MISSING_PLUGIN 502
+
 #include "global_types.h"
 
 APDK_USING_NAMESPACE
@@ -158,6 +160,8 @@ public:
 
   PrintContext *pPC;
   Job *pJob;
+  FILE    *outfp;
+  int     m_iLogLevel;
 
 protected:
   

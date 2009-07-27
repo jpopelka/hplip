@@ -145,7 +145,7 @@ class CleanDialog(QDialog, Ui_Dialog):
             self.DeviceComboBox.setInitialDevice(self.device_uri)
 
         # Application icon
-        self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
+        self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))
 
 
     def NextButton_clicked(self):

@@ -171,13 +171,14 @@ class Module(object):
             content.append(utils.USAGE_DEVICE)
             content.append(utils.USAGE_PRINTER)
 
-        if self.avail_modes is not None and self.num_valid_modes > 1 and self.num_installed_ui_toolkits > 1:
+        if self.avail_modes is not None and self.num_valid_modes > 1:
             summary.append('[MODE]')
             content.append(utils.USAGE_SPACE)
             content.append(utils.USAGE_MODE)
 
-            if GUI_MODE in self.avail_modes and prop.gui_build:
-                content.append(utils.USAGE_GUI_MODE)
+            if self.num_installed_ui_toolkits > 0:
+                if GUI_MODE in self.avail_modes and prop.gui_build:
+                    content.append(utils.USAGE_GUI_MODE)
 
             if INTERACTIVE_MODE in self.avail_modes:
                 content.append(utils.USAGE_INTERACTIVE_MODE)
@@ -191,8 +192,8 @@ class Module(object):
         content.append(utils.USAGE_OPTIONS)
 
         if self.avail_modes is not None and GUI_MODE in self.avail_modes and \
-            self.supported_ui_toolkits is not None and self.num_supported_ui_toolkits > 1 and \
-            prop.gui_build and self.num_installed_ui_toolkits > 1:
+            self.supported_ui_toolkits is not None and self.num_supported_ui_toolkits > 0 and \
+            prop.gui_build and self.num_installed_ui_toolkits > 0:
 
             if UI_TOOLKIT_QT3 in self.supported_ui_toolkits and UI_TOOLKIT_QT3 in self.installed_ui_toolkits:
                 content.append(utils.USAGE_USE_QT3)

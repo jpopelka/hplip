@@ -23,7 +23,7 @@ from __future__ import division
 
 # Std Lib
 import struct
-import cStringIO 
+import cStringIO
 import xml.parsers.expat as expat
 import re
 
@@ -127,96 +127,111 @@ STATUS_POS = {STATUS_REV_00 : 14,
                STATUS_REV_04 : 20}
 
 def parseSStatus(s, z=''):
+    revision = ''
+    pens = []
+    top_door = TOP_DOOR_NOT_PRESENT
+    stat = STATUS_UNKNOWN
+    supply_door = SUPPLY_DOOR_NOT_PRESENT
+    duplexer = DUPLEXER_NOT_PRESENT
+    photo_tray = PHOTO_TRAY_NOT_PRESENT
+    in_tray1 = IN_TRAY_NOT_PRESENT
+    in_tray2 = IN_TRAY_NOT_PRESENT
+    media_path = MEDIA_PATH_NOT_PRESENT
     Z_SIZE = 6
 
-    z1 = []
-    if len(z) > 0:
-        z_fields = z.split(',')
+    try:
+        z1 = []
+        if len(z) > 0:
+            z_fields = z.split(',')
 
-        for z_field in z_fields:
+            for z_field in z_fields:
 
-            if len(z_field) > 2 and z_field[:2] == '05':
-                z1s = z_field[2:]
-                z1 = [int(x, 16) for x in z1s]
+                if len(z_field) > 2 and z_field[:2] == '05':
+                    z1s = z_field[2:]
+                    z1 = [int(x, 16) for x in z1s]
 
-    s1 = [int(x, 16) for x in s]
+        s1 = [int(x, 16) for x in s]
 
-    revision = s1[1]
+        revision = s1[1]
 
-    assert STATUS_REV_00 <= revision <= STATUS_REV_04
+        assert STATUS_REV_00 <= revision <= STATUS_REV_04
 
-    top_door = bool(s1[2] & 0x8L) + s1[2] & 0x1L
-    supply_door = bool(s1[3] & 0x8L) + s1[3] & 0x1L
-    duplexer = bool(s1[4] & 0xcL) +  s1[4] & 0x1L
-    photo_tray = bool(s1[5] & 0x8L) + s1[5] & 0x1L
+        top_door = bool(s1[2] & 0x8L) + s1[2] & 0x1L
+        supply_door = bool(s1[3] & 0x8L) + s1[3] & 0x1L
+        duplexer = bool(s1[4] & 0xcL) +  s1[4] & 0x1L
+        photo_tray = bool(s1[5] & 0x8L) + s1[5] & 0x1L
 
-    if revision == STATUS_REV_02:
-        in_tray1 = bool(s1[6] & 0x8L) + s1[6] & 0x1L
-        in_tray2 = bool(s1[7] & 0x8L) + s1[7] & 0x1L
-    else:
-        in_tray1 = bool(s1[6] & 0x8L)
-        in_tray2 = bool(s1[7] & 0x8L)
-
-    media_path = bool(s1[8] & 0x8L) + (s1[8] & 0x1L) + ((bool(s1[18] & 0x2L))<<1)
-    status_pos = STATUS_POS[revision]
-    status_byte = (s1[status_pos]<<4) + s1[status_pos + 1]
-    stat = status_byte + STATUS_PRINTER_BASE
-
-    pens, pen, c, d = [], {}, NUM_PEN_POS[revision]+1, 0
-    num_pens = s1[NUM_PEN_POS[revision]]
-    log.debug("Num pens=%d" % num_pens)
-    index = 0
-    pen_data_size = PEN_DATA_SIZE[revision]
-
-    for p in range(num_pens):
-        info = long(s[c : c + pen_data_size], 16)
-
-        pen['index'] = index
-
-        if pen_data_size == 4:
-            pen['type'] = REVISION_2_TYPE_MAP.get(int((info & 0xf000L) >> 12L), 0)
-
-            if index < (num_pens / 2):
-                pen['kind'] = AGENT_KIND_HEAD
-            else:
-                pen['kind'] = AGENT_KIND_SUPPLY
-
-            pen['level-trigger'] = int ((info & 0x0e00L) >> 9L)
-            pen['health'] = int((info & 0x0180L) >> 7L)
-            pen['level'] = int(info & 0x007fL)
-            pen['id'] = 0x1f
-
-        elif pen_data_size == 8:
-            pen['kind'] = bool(info & 0x80000000L) + ((bool(info & 0x40000000L))<<1L)
-            pen['type'] = int((info & 0x3f000000L) >> 24L)
-            pen['id'] = int((info & 0xf80000) >> 19L)
-            pen['level-trigger'] = int((info & 0x70000L) >> 16L)
-            pen['health'] = int((info & 0xc000L) >> 14L)
-            pen['level'] = int(info & 0xffL)
-
+        if revision == STATUS_REV_02:
+            in_tray1 = bool(s1[6] & 0x8L) + s1[6] & 0x1L
+            in_tray2 = bool(s1[7] & 0x8L) + s1[7] & 0x1L
         else:
-            log.error("Pen data size error")
+            in_tray1 = bool(s1[6] & 0x8L)
+            in_tray2 = bool(s1[7] & 0x8L)
 
-        if len(z1) > 0:
-            # TODO: Determine cause of IndexError for C6100 (defect #1111)
-            try:
-                pen['dvc'] = long(z1s[d+1:d+5], 16)
-                pen['virgin'] = bool(z1[d+5] & 0x8L)
-                pen['hp-ink'] = bool(z1[d+5] & 0x4L)
-                pen['known'] = bool(z1[d+5] & 0x2L)
-                pen['ack'] = bool(z1[d+5] & 0x1L)
-            except IndexError:
-                pen['dvc'] = 0
-                pen['virgin'] = 0
-                pen['hp-ink'] = 0
-                pen['known'] = 0
-                pen['ack'] = 0
+        media_path = bool(s1[8] & 0x8L) + (s1[8] & 0x1L) + ((bool(s1[18] & 0x2L))<<1)
+        status_pos = STATUS_POS[revision]
+        status_byte = (s1[status_pos]<<4) + s1[status_pos + 1]
+        stat = status_byte + STATUS_PRINTER_BASE
 
-        index += 1
-        pens.append(pen)
-        pen = {}
-        c += pen_data_size
-        d += Z_SIZE
+        pen, c, d = {}, NUM_PEN_POS[revision]+1, 0
+        num_pens = s1[NUM_PEN_POS[revision]]
+        log.debug("Num pens=%d" % num_pens)
+        index = 0
+        pen_data_size = PEN_DATA_SIZE[revision]
+
+        for p in range(num_pens):
+            info = long(s[c : c + pen_data_size], 16)
+
+            pen['index'] = index
+
+            if pen_data_size == 4:
+                pen['type'] = REVISION_2_TYPE_MAP.get(int((info & 0xf000L) >> 12L), 0)
+
+                if index < (num_pens / 2):
+                    pen['kind'] = AGENT_KIND_HEAD
+                else:
+                    pen['kind'] = AGENT_KIND_SUPPLY
+
+                pen['level-trigger'] = int ((info & 0x0e00L) >> 9L)
+                pen['health'] = int((info & 0x0180L) >> 7L)
+                pen['level'] = int(info & 0x007fL)
+                pen['id'] = 0x1f
+
+            elif pen_data_size == 8:
+                pen['kind'] = bool(info & 0x80000000L) + ((bool(info & 0x40000000L))<<1L)
+                pen['type'] = int((info & 0x3f000000L) >> 24L)
+                pen['id'] = int((info & 0xf80000) >> 19L)
+                pen['level-trigger'] = int((info & 0x70000L) >> 16L)
+                pen['health'] = int((info & 0xc000L) >> 14L)
+                pen['level'] = int(info & 0xffL)
+
+            else:
+                log.error("Pen data size error")
+
+            if len(z1) > 0:
+                # TODO: Determine cause of IndexError for C6100 (defect #1111)
+                try:
+                    pen['dvc'] = long(z1s[d+1:d+5], 16)
+                    pen['virgin'] = bool(z1[d+5] & 0x8L)
+                    pen['hp-ink'] = bool(z1[d+5] & 0x4L)
+                    pen['known'] = bool(z1[d+5] & 0x2L)
+                    pen['ack'] = bool(z1[d+5] & 0x1L)
+                except IndexError:
+                    pen['dvc'] = 0
+                    pen['virgin'] = 0
+                    pen['hp-ink'] = 0
+                    pen['known'] = 0
+                    pen['ack'] = 0
+
+            index += 1
+            pens.append(pen)
+            log.debug("Pen %d: %s" % (p, pen))
+            pen = {}
+            c += pen_data_size
+            d += Z_SIZE
+
+    except (IndexError, ValueError, TypeError), e:
+        log.warn("Status parsing error: %s" % str(e))
 
     return {'revision' :    revision,
              'agents' :      pens,
@@ -288,7 +303,7 @@ def parseVStatus(s):
 
     try:
         fields[2]
-    except IndexError: 
+    except IndexError:
         top_lid = 1 # something went wrong!
     else:
         if fields[2] == 'DN':
@@ -303,16 +318,16 @@ def parseVStatus(s):
 
     return {'revision' :   STATUS_REV_V,
              'agents' :     pens,
-             'top-lid' :    top_lid,
+             'top-door' :   top_lid,
              'status-code': stat,
-             'supply-lid' : SUPPLY_DOOR_NOT_PRESENT,
+             'supply-door': SUPPLY_DOOR_NOT_PRESENT,
              'duplexer' :   DUPLEXER_NOT_PRESENT,
              'photo-tray' : PHOTO_TRAY_NOT_PRESENT,
              'in-tray1' :   IN_TRAY_NOT_PRESENT,
              'in-tray2' :   IN_TRAY_NOT_PRESENT,
              'media-path' : MEDIA_PATH_CUT_SHEET, # ?
            }
-           
+
 
 def parseStatus(DeviceID):
     if 'VSTATUS' in DeviceID:
@@ -653,9 +668,9 @@ setup_panel_translator()
 
 def PanelCheck(dev):
     line1, line2 = '', ''
-    
+
     if dev.io_mode not in (IO_MODE_RAW, IO_MODE_UNI):
-    
+
         try:
             dev.openPML()
         except Error:
@@ -725,7 +740,7 @@ def BatteryCheck(dev, status_block, battery_check):
         else:
             if battery_check == STATUS_BATTERY_CHECK_PML:
                 result, battery_level = dev.getPML(pml.OID_BATTERY_LEVEL_2)
-                
+
                 if result > pml.ERROR_MAX_OK:
                     status_block['agents'].append({
                         'kind'   : AGENT_KIND_INT_BATTERY,
@@ -735,7 +750,7 @@ def BatteryCheck(dev, status_block, battery_check):
                         'level-trigger' : AGENT_LEVEL_TRIGGER_SUFFICIENT_0,
                         })
                     return
-                
+
                 else:
                     status_block['agents'].append({
                         'kind'   : AGENT_KIND_INT_BATTERY,
@@ -745,7 +760,7 @@ def BatteryCheck(dev, status_block, battery_check):
                         'level-trigger' : AGENT_LEVEL_TRIGGER_SUFFICIENT_0,
                         })
                     return
-            
+
             else: # STATUS_BATTERY_CHECK_STD
                 result, battery_level = dev.getPML(pml.OID_BATTERY_LEVEL)
                 result, power_mode =  dev.getPML(pml.OID_POWER_MODE)
@@ -778,7 +793,7 @@ def BatteryCheck(dev, status_block, battery_check):
                             'level-trigger' : battery_trigger_level,
                             })
                         return
-                        
+
                     else:
                         status_block['agents'].append({
                             'kind'   : AGENT_KIND_INT_BATTERY,
@@ -795,7 +810,7 @@ def BatteryCheck(dev, status_block, battery_check):
     finally:
         dev.closePML()
 
-    
+
     if battery_check == STATUS_BATTERY_CHECK_STD and \
         try_dynamic_counters:
 
@@ -822,7 +837,7 @@ def BatteryCheck(dev, status_block, battery_check):
                     })
         finally:
             dev.closePrint()
-            
+
     else:
         status_block['agents'].append({
             'kind'   : AGENT_KIND_INT_BATTERY,
@@ -831,7 +846,7 @@ def BatteryCheck(dev, status_block, battery_check):
             'level'  : 0,
             'level-trigger' : AGENT_LEVEL_TRIGGER_SUFFICIENT_0,
             })
-        
+
 
 
 # this works for 2 pen products that allow 1 or 2 pens inserted
@@ -875,7 +890,7 @@ def getPenConfiguration(s): # s=status dict from parsed device ID
 
 def getFaxStatus(dev):
     tx_active, rx_active = False, False
-    
+
     if dev.io_mode not in (IO_MODE_UNI, IO_MODE_RAW):
         try:
             dev.openPML()
@@ -896,8 +911,8 @@ def getFaxStatus(dev):
             dev.closePML()
 
     return tx_active, rx_active
-    
-  
+
+
 
 
 TYPE6_STATUS_CODE_MAP = {
@@ -917,7 +932,7 @@ TYPE6_STATUS_CODE_MAP = {
     -19730: STATUS_PRINTER_OUT_OF_PAPER,
     -19729: STATUS_PRINTER_OUT_OF_PAPER,
     -19933: STATUS_PRINTER_HARD_ERROR, # out of memory
-    -17984: STATUS_PRINTER_DOOR_OPEN, 
+    -17984: STATUS_PRINTER_DOOR_OPEN,
     -19694: STATUS_PRINTER_DOOR_OPEN,
     -18992: STATUS_PRINTER_MANUAL_FEED_BLOCKED, # ?
     -19690: STATUS_PRINTER_MEDIA_JAM, # tray 1
@@ -1021,7 +1036,7 @@ TYPE6_STATUS_CODE_MAP = {
     -13848: STATUS_PRINTER_BUSY, #</DevStatusFaxMemoryFullReceive>
     -13849: STATUS_PRINTER_BUSY, #</DevStatusFaxReceiveError>
 
-}    
+}
 
 def StatusType6(dev): #  LaserJet Status (XML)
     info_device_status = cStringIO.StringIO()
@@ -1054,7 +1069,7 @@ def StatusType6(dev): #  LaserJet Status (XML)
             ssp = utils.XMLToDictParser().parseXML(info_ssp)
             log.debug(ssp)
         except expat.ExpatError:
-            log.error("SSP XML parse error")            
+            log.error("SSP XML parse error")
             ssp = {}
 
     status_code = device_status.get('devicestatuspage-devicestatus-statuslist-status-code-0', 0)
@@ -1108,7 +1123,7 @@ def StatusType6(dev): #  LaserJet Status (XML)
              'in-tray2' :    1,
              'media-path' :  1,
              'status-code' : TYPE6_STATUS_CODE_MAP.get(status_code, STATUS_PRINTER_IDLE),
-           }     
+           }
 
 # PJL status codes
 PJL_STATUS_MAP = {
@@ -1219,7 +1234,7 @@ def MapPJLErrorCode(error_code, str_code=None):
 
     if str_code is None:
         str_code = str(error_code)
-        
+
     if len(str_code) < 5:
         return STATUS_PRINTER_BUSY
 
@@ -1340,18 +1355,18 @@ def StatusType8(dev): #  LaserJet PJL (B&W only)
                 dev.closePrint()
             except Error:
                 pass
-    
+
     agents = []
 
     # TODO: Only handles mono lasers...
     if status_code in (STATUS_PRINTER_LOW_TONER, STATUS_PRINTER_LOW_BLACK_TONER):
         health = AGENT_HEALTH_OK
-        level_trigger = AGENT_LEVEL_TRIGGER_ALMOST_DEFINITELY_OUT
+        level_trigger = AGENT_LEVEL_TRIGGER_MAY_BE_LOW
         level = 0
 
     elif status_code == STATUS_PRINTER_NO_TONER:
         health = AGENT_HEALTH_MISINSTALLED
-        level_trigger = AGENT_LEVEL_TRIGGER_ALMOST_DEFINITELY_OUT
+        level_trigger = AGENT_LEVEL_TRIGGER_MAY_BE_LOW
         level = 0
 
     else:
@@ -1361,13 +1376,58 @@ def StatusType8(dev): #  LaserJet PJL (B&W only)
 
     log.debug("Agent: health=%d, level=%d, trigger=%d" % (health, level, level_trigger))
 
-
     agents.append({  'kind' : AGENT_KIND_TONER_CARTRIDGE,
                      'type' : AGENT_TYPE_BLACK,
                      'health' : health,
                      'level' : level,
                      'level-trigger' : level_trigger,
                   })
+
+    if dev.tech_type == TECH_TYPE_COLOR_LASER:
+        level = 100
+        level_trigger = AGENT_LEVEL_TRIGGER_SUFFICIENT_0
+        if status_code == STATUS_PRINTER_LOW_CYAN_TONER:
+            level = 0
+            level_trigger = AGENT_LEVEL_TRIGGER_MAY_BE_LOW
+
+        log.debug("Agent: health=%d, level=%d, trigger=%d" % (health, level, level_trigger))
+
+        agents.append({  'kind' : AGENT_KIND_TONER_CARTRIDGE,
+                         'type' : AGENT_TYPE_CYAN,
+                         'health' : AGENT_HEALTH_OK,
+                         'level' : level,
+                         'level-trigger' : level_trigger,
+                      })
+
+        level = 100
+        level_trigger = AGENT_LEVEL_TRIGGER_SUFFICIENT_0
+        if status_code == STATUS_PRINTER_LOW_MAGENTA_TONER:
+            level = 0
+            level_trigger = AGENT_LEVEL_TRIGGER_MAY_BE_LOW
+
+        log.debug("Agent: health=%d, level=%d, trigger=%d" % (health, level, level_trigger))
+
+        agents.append({  'kind' : AGENT_KIND_TONER_CARTRIDGE,
+                         'type' : AGENT_TYPE_MAGENTA,
+                         'health' : AGENT_HEALTH_OK,
+                         'level' : level,
+                         'level-trigger' : level_trigger,
+                      })
+
+        level = 100
+        level_trigger = AGENT_LEVEL_TRIGGER_SUFFICIENT_0
+        if status_code == STATUS_PRINTER_LOW_YELLOW_TONER:
+            level = 0
+            level_trigger = AGENT_LEVEL_TRIGGER_MAY_BE_LOW
+
+        log.debug("Agent: health=%d, level=%d, trigger=%d" % (health, level, level_trigger))
+
+        agents.append({  'kind' : AGENT_KIND_TONER_CARTRIDGE,
+                         'type' : AGENT_TYPE_YELLOW,
+                         'health' : AGENT_HEALTH_OK,
+                         'level' : level,
+                         'level-trigger' : level_trigger,
+                      })
 
     if status_code == 40021:
         top_door = 0
@@ -1386,7 +1446,7 @@ def StatusType8(dev): #  LaserJet PJL (B&W only)
              'in-tray2' :    1,
              'media-path' :  1,
              'status-code' : status_code,
-           }     
+           }
 
 
 

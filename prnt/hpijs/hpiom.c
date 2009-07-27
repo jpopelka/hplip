@@ -173,7 +173,7 @@ int EncodeCommand
    {            
       if ((*dPacketSize + wDataLength) > wBufferSize)
       {
-          bug("unable to fill data buffer EncodeCommand size=%d\n", wDataLength);
+          BUG("unable to fill data buffer EncodeCommand size=%d\n", wDataLength);
           return 1;
       }   
 
@@ -474,31 +474,31 @@ int ReadHPVertAlign(int hd)
 
    if (hpmud_open_channel(hd, "PRINT", &channel) != HPMUD_R_OK)
    {
-      bug("unable to open print channel ReadHPVertAlign\n");
+      BUG("unable to open print channel ReadHPVertAlign\n");
       goto bugout;
    }
 
    if (Synch(hd, channel)==0)
    {  
-      bug("unable to write sync ReadHPVertAlign\n");  
+      BUG("unable to write sync ReadHPVertAlign\n");  
       goto bugout;  
    }  
 
    if (SynchComplete(hd, channel)==0)
    {  
-      bug("unable to write sync complete ReadHPVertAlign\n");  
+      BUG("unable to write sync complete ReadHPVertAlign\n");  
       goto bugout;  
    }  
 
    if (Reset(hd, channel)==0)
    {  
-      bug("unable to write reset ReadHPVertAlign\n");  
+      BUG("unable to write reset ReadHPVertAlign\n");  
       goto bugout;  
    }  
 
    if ((ver = RetrieveVersion(hd, channel))==0)
    {  
-      bug("unable to read version ReadHPVertAlign\n");  
+      BUG("unable to read version ReadHPVertAlign\n");  
       goto bugout;  
    }  
 
@@ -515,7 +515,7 @@ int ReadHPVertAlign(int hd)
       if (ga.pen[i].color == 0 || ga.pen[i].color == 2)
       {
          x2colorVert = ga.pen[i].vert;  /* (black | photo) to color offset */
-         bug("%s alignment: vert=%d horz=%d bi=%d x2c=%d\n", (ga.pen[i].color==0) ? "black" : "photo", ga.pen[i].vert, ga.pen[i].horz, ga.pen[i].bi, x2colorVert);
+         BUG("%s alignment: vert=%d horz=%d bi=%d x2c=%d\n", (ga.pen[i].color==0) ? "black" : "photo", ga.pen[i].vert, ga.pen[i].horz, ga.pen[i].bi, x2colorVert);
       }
    }
 

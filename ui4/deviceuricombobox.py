@@ -45,6 +45,11 @@ class DeviceUriComboBox(QWidget):
         self.typ = DEVICEURICOMBOBOX_TYPE_PRINTER_ONLY
         self.filter = None
         self.devices = None
+
+        self.user_settings = UserSettings()
+        self.user_settings.load()
+        self.user_settings.debug()
+
         self.initUi()
 
 
@@ -115,7 +120,8 @@ class DeviceUriComboBox(QWidget):
 
         if self.devices:
             if self.initial_device is None:
-                self.initial_device = user_conf.get('last_used', 'device_uri')
+                #self.initial_device = user_conf.get('last_used', 'device_uri')
+                self.initial_device = self.user_settings.last_used_device_uri
 
             self.updating = True
             try:
@@ -146,7 +152,10 @@ class DeviceUriComboBox(QWidget):
 
         self.device_uri = unicode(t)
         if self.device_uri:
-            user_conf.set('last_used', 'device_uri', self.device_uri)
+            #user_conf.set('last_used', 'device_uri', self.device_uri)
+            self.user_settings.last_used_device_uri = self.device_uri
+            self.user_settings.save()
+
             self.emit(SIGNAL("DeviceUriComboBox_currentChanged"), self.device_uri)
 
 

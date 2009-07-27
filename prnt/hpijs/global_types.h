@@ -175,6 +175,7 @@ enum MediaSource
     sourceTray2 = 4,
 	sourceDuplexerNHagakiFeed = 5,
     sourceOptionalEnv = 6,
+    sourceTrayPhoto = 6,
     sourceTrayAuto = 7,
     sourceTrayCDDVD = 14,
     sourceTrayMax = 50
@@ -525,8 +526,8 @@ enum DUPLEXMODE
 
 typedef enum
 {
-    PAGES_IN_DOC_HINT,
     SPEED_MECH_HINT,
+    PAGES_IN_DOC_HINT,
     EXTRA_DRYTIME_HINT,
     MAX_FILE_SIZE_HINT,
     RED_EYE_REMOVAL_HINT,

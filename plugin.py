@@ -76,12 +76,13 @@ mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
                     (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4), True)
 
 opts, device_uri, printer_name, mode, ui_toolkit, loc = \
-    mod.parseStdOpts('p:', ['path=', 'plugin=', 'plug-in=',
+    mod.parseStdOpts('p:', ['path=', 'plugin=', 'plug-in=', 'reason=',
                             'generic', 'optional', 'required'],
                      handle_device_printer=False)
 
 plugin_path = None
 install_mode = PLUGIN_NONE # reuse plugin types for mode (PLUGIN_NONE = generic)
+plugin_reason = PLUGIN_REASON_NONE
 
 for o, a in opts:
     if o in ('-p', '--path', '--plugin', '--plug-in'):
@@ -96,6 +97,9 @@ for o, a in opts:
         install_mode = PLUGIN_OPTIONAL
         if ui_toolkit == 'qt3':
             log.warn("--optional switch ignored.")
+
+    elif o == '--reason':
+        plugin_reason = int(a)
 
 
 version = prop.installed_version
@@ -132,6 +136,23 @@ if mode == GUI_MODE:
         if not utils.canEnterGUIMode4():
             log.error("%s requires GUI support (try running with --qt3). Try using interactive (-i) mode." % __mod__)
             sys.exit(1)
+
+
+PKIT = utils.to_bool(sys_conf.get('configure', 'policy-kit'))
+if PKIT:
+    try:
+        from base.pkit import *
+        try:
+            pkit = PolicyKit()
+            pkit_installed = True
+        except dbus.DBusException, ex:
+            log.error("PolicyKit support requires DBUS or PolicyKit support files missing")
+            pkit_installed = False
+    except:
+        log.error("Unable to load pkit...is HPLIP installed?")
+        pkit_installed = False
+else:
+    pkit_installed = False
 
 
 if mode == GUI_MODE:
@@ -184,7 +205,7 @@ if mode == GUI_MODE:
             except locale.Error:
                 pass
 
-        if not os.geteuid() == 0:
+        if not pkit_installed and not os.geteuid() == 0:
             log.error("You must be root to run this utility.")
 
             QMessageBox.critical(None,
@@ -212,7 +233,7 @@ if mode == GUI_MODE:
 
         app = QApplication(sys.argv)
 
-        if not os.geteuid() == 0:
+        if not pkit_installed and not os.geteuid() == 0:
             log.error("You must be root to run this utility.")
 
             QMessageBox.critical(None,
@@ -225,7 +246,7 @@ if mode == GUI_MODE:
             sys.exit(1)
 
 
-        dialog = PluginDialog(None, install_mode)
+        dialog = PluginDialog(None, install_mode, plugin_reason)
         dialog.show()
         try:
             log.debug("Starting GUI loop...")
@@ -351,12 +372,37 @@ else: # INTERACTIVE_MODE
         log.info("Downloading plug-in from: %s" % plugin_path)
         pm = tui.ProgressMeter("Downloading plug-in:")
 
-        ok, local_plugin = core.download_plugin(plugin_path, size, checksum, timestamp, plugin_download_callback)
+        status, ret = core.download_plugin(plugin_path, size, checksum, timestamp, plugin_download_callback)
         print
 
-        if not ok:
-            log.error("Plug-in download failed: %s" % local_plugin)
+        if status in (core_install.PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS, core_install.PLUGIN_INSTALL_ERROR_DIGITAL_SIG_NOT_FOUND):
+            log.error("Digital signature file download failed. Without this file, it is not possible to authenticate and validate the plug-in prior to installation.")
+            cont, ans = tui.enter_yes_no("Do you still want to install the plug-in?", 'n')
+
+            if not cont or not ans:
+                sys.exit(0)
+
+        elif status != core_install.PLUGIN_INSTALL_ERROR_NONE:
+
+            if status == core_install.PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND:
+                desc = "Plug-in file not found (server returned 404 or similar error). Error code: %s" % str(ret)
+
+            elif status == core_install.PLUGIN_INSTALL_ERROR_DIGITAL_SIG_BAD:
+                desc = "Plug-in file does not match its digital signature. File may have been corrupted or altered. Error code: %s" % str(ret)
+
+            elif status == core_install.PLUGIN_INSTALL_ERROR_PLUGIN_FILE_CHECKSUM_ERROR:
+                desc = "Plug-in file does not match its checksum. File may have been corrupted or altered."
+
+            elif status == core_install.PLUGIN_INSTALL_ERROR_NO_NETWORK:
+                desc = "Unable to connect to network to download the plug-in. Please check your network connection and try again."
+
+            elif status == core_install.PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR:
+                desc = "Unable to create the plug-in directory. Please check your permissions and try again."
+
+            core.delete_plugin()
+            log.error(desc)
             sys.exit(1)
+
 
         tui.header("INSTALLING PLUG-IN")
 

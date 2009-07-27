@@ -750,7 +750,14 @@ class PMLFaxSendThread(FaxSendThread):
                                 data = page.read(RASTER_DATA_SIZE)
                                 total_read += RASTER_DATA_SIZE
 
-                                self.getFaxDownloadState()
+                                dl_state = self.getFaxDownloadState()
+                                if dl_state == pml.UPDN_STATE_ERRORABORT:
+                                    fax_send_state = FAX_SEND_STATE_ERROR
+                                    break
+
+                                if self.check_for_cancel():
+                                    fax_send_state = FAX_SEND_STATE_ABORT
+                                    break
 
                                 if data == '':
                                     self.create_eop_record(rpp)
@@ -771,7 +778,7 @@ class PMLFaxSendThread(FaxSendThread):
                                         break
 
                                 status = self.getFaxJobTxStatus()
-                                while status  == pml.FAXJOB_TX_STATUS_DIALING:
+                                while status == pml.FAXJOB_TX_STATUS_DIALING:
                                     self.write_queue((STATUS_DIALING, 0, recipient['fax']))
                                     time.sleep(1.0)
 
@@ -788,7 +795,7 @@ class PMLFaxSendThread(FaxSendThread):
 
                                 if fax_send_state not in (FAX_SEND_STATE_ABORT, FAX_SEND_STATE_ERROR):
 
-                                    while status  == pml.FAXJOB_TX_STATUS_CONNECTING:
+                                    while status == pml.FAXJOB_TX_STATUS_CONNECTING:
                                         self.write_queue((STATUS_CONNECTING, 0, recipient['fax']))
                                         time.sleep(1.0)
 
@@ -858,8 +865,8 @@ class PMLFaxSendThread(FaxSendThread):
 
 
                     elif fax_send_state == FAX_SEND_STATE_RESET_TOKEN: # -------------- Release fax token (110, 160, 0)
-                        self.write_queue((STATUS_CLEANUP, 0, ''))
                         log.debug("%s State: Release fax token" % ("*"*20))
+                        self.write_queue((STATUS_CLEANUP, 0, ''))
 
                         try:
                             self.dev.setPML(pml.OID_FAX_TOKEN, '\x00'*16)
@@ -1017,10 +1024,3 @@ class PMLFaxSendThread(FaxSendThread):
         self.dev.writeFax(self.stream.getvalue())
         self.stream.truncate(0)
         self.stream.seek(0)
-
-
-
-
-
-
-

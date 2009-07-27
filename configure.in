@@ -25,9 +25,10 @@
 #   103 = no jpeg-devel
 #   104 = no libdl
 
-AC_PREREQ(2.59)
-AC_INIT([HP Linux Imaging and Printing], [3.9.2], [3.9.2.49], [hplip])
-AM_INIT_AUTOMAKE([1.9 foreign])
+#AC_PREREQ(2.59)
+AC_INIT([HP Linux Imaging and Printing], [3.9.6b], [3.9.6b.4], [hplip])
+#AM_INIT_AUTOMAKE([1.9 foreign])
+AM_INIT_AUTOMAKE
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
 
@@ -116,6 +117,45 @@ else
 fi
 AM_CONDITIONAL(HPLIP_BUILD, test x$hpijs_only_build = xno)
 
+AC_MSG_CHECKING([for lite build])
+AC_ARG_ENABLE(lite_build,
+  [  --enable-lite-build     enable lite build, print & scan only (default=no)],
+  lite_build=$enableval, lite_build=no)
+if test "$lite_build" = "yes"; then
+   AC_MSG_RESULT(yes)
+   epm_full=\#
+   epm_lite=
+else
+   AC_MSG_RESULT(no)
+   epm_full=
+   epm_lite=\#
+fi
+AM_CONDITIONAL(FULL_BUILD, test x$lite_build = xno)
+
+AC_MSG_CHECKING([for hpijs install])
+AC_ARG_ENABLE(hpijs_install,
+  [  --enable-hpijs-install     enable hpijs install (default=no)],
+  hpijs_install=$enableval, hpijs_install=no)
+if test "$hpijs_install" = "yes"; then
+   AC_MSG_RESULT(yes)
+   epm_hpijs_install=yes
+else
+   AC_MSG_RESULT(no)
+fi
+AM_CONDITIONAL(HPIJS_INSTALL, test x$hpijs_install = xyes)
+
+AC_MSG_CHECKING([for hpcups install])
+AC_ARG_ENABLE(hpcups_install,
+  [  --enable-hpcups-install     enable hpcups install (default=yes)],
+  hpcups_install=$enableval, hpcups_install=yes)
+if test "$hpcups_install" = "yes"; then
+   AC_MSG_RESULT(yes)
+   epm_hpcups_install=yes
+else
+   AC_MSG_RESULT(no)
+fi
+AM_CONDITIONAL(HPCUPS_INSTALL, test x$hpcups_install = xyes)
+
 AC_MSG_CHECKING([for network build])
 AC_ARG_ENABLE(network_build,
   [  --enable-network-build    enable network build (default=yes)],
@@ -129,8 +169,8 @@ AM_CONDITIONAL(NETWORK_BUILD, test x$network_build = xyes)
 
 AC_MSG_CHECKING([for parallel port build])
 AC_ARG_ENABLE(pp_build,
-  [  --enable-pp-build    enable parallel port build (default=yes)],
-  pp_build=$enableval, pp_build=yes)
+  [  --enable-pp-build    enable parallel port build (default=no)],
+  pp_build=$enableval, pp_build=no)
 if test "$pp_build" = "yes"; then
    AC_MSG_RESULT(yes)
    AC_DEFINE(HAVE_PPORT) 
@@ -144,8 +184,10 @@ AC_ARG_ENABLE(scan_build,
   scan_build=$enableval, scan_build=yes)
 if test "$scan_build" = "yes"; then
    AC_MSG_RESULT(yes)
+   epm_scan=
 else
    AC_MSG_RESULT(no)
+   epm_scan=\#
 fi
 AM_CONDITIONAL(SCAN_BUILD, test x$scan_build = xyes)
 
@@ -177,7 +219,6 @@ AC_ARG_ENABLE(dbus_build,
   dbus_build=$enableval, dbus_build=yes)
 if test "$dbus_build" = "yes"; then
    AC_MSG_RESULT(yes)
-   AC_DEFINE(HAVE_DBUS) 
 else
    AC_MSG_RESULT(no)
 fi
@@ -239,14 +280,39 @@ AC_ARG_WITH(drvdir, AC_HELP_STRING([--with-drvdir=DIR], [set cups drv install di
 
 AC_MSG_CHECKING([for foomatic drv install])
 AC_ARG_ENABLE(foomatic_drv_install,
-  [  --enable-foomatic-drv-install    enable foomatic dynamic ppd install (default=yes), uses drvdir and hpppddir],
-  foomatic_drv_install=$enableval, foomatic_drv_install=yes)
+  [  --enable-foomatic-drv-install    enable foomatic dynamic ppd install (default=no), uses drvdir and hpppddir],
+  foomatic_drv_install=$enableval, foomatic_drv_install=no)
 if test $foomatic_drv_install = yes; then
    AC_MSG_RESULT(yes)
+   epm_foomatic_drv_install=yes
 else
    AC_MSG_RESULT(no)
 fi
 AM_CONDITIONAL(FOOMATIC_DRV_INSTALL, test x$foomatic_drv_install = xyes)
+
+AC_MSG_CHECKING([for cups drv install])
+AC_ARG_ENABLE(cups_drv_install,
+  [  --enable-cups-drv-install    enable cups dynamic ppd install (default=yes), uses drvdir and hpppddir],
+  cups_drv_install=$enableval, cups_drv_install=yes)
+if test $cups_drv_install = yes; then
+   AC_MSG_RESULT(yes)
+   epm_cups_drv_install=yes
+else
+   AC_MSG_RESULT(no)
+fi
+AM_CONDITIONAL(CUPS_DRV_INSTALL, test x$cups_drv_install = xyes)
+
+AC_MSG_CHECKING([for cups ppd install])
+AC_ARG_ENABLE(cups_ppd_install,
+  [  --enable-cups-ppd-install    enable cups static ppd install (default=no), uses hpppddir],
+  cups_ppd_install=$enableval, cups_ppd_install=no)
+if test $cups_ppd_install = yes; then
+   AC_MSG_RESULT(yes)
+   epm_cups_ppd_install=yes
+else
+   AC_MSG_RESULT(no)
+fi
+AM_CONDITIONAL(CUPS_PPD_INSTALL, test x$cups_ppd_install = xyes)
 
 AC_MSG_CHECKING([for foomatic-rip-hplip install])
 AC_ARG_ENABLE(foomatic_rip_hplip_install,
@@ -264,8 +330,8 @@ AM_CONDITIONAL(RIP_INSTALL, test x$foomatic_rip_hplip_install = xyes)
 
 AC_MSG_CHECKING([for qt4])
 AC_ARG_ENABLE(qt4,
-  [  --enable-qt4    (DO NOT USE) enable qt4 (default=no)],
-  qt4=$enableval, qt4=no)
+  [  --enable-qt4    enable qt4 (default=yes)],
+  qt4=$enableval, qt4=yes)
 if test "$qt4" = "yes"; then
    AC_MSG_RESULT(yes)
 else
@@ -275,8 +341,8 @@ AM_CONDITIONAL(QT4_INSTALL, test x$qt4 = xyes)
 
 AC_MSG_CHECKING([for qt3])
 AC_ARG_ENABLE(qt3,
-  [  --enable-qt3    enable qt3 (default=yes)],
-  qt3=$enableval, qt3=yes)
+  [  --enable-qt3    enable qt3 (default=no)],
+  qt3=$enableval, qt3=no)
 if test "$qt3" = "yes"; then
    AC_MSG_RESULT(yes)
 else
@@ -289,14 +355,28 @@ if test "$gui_build" = "no"; then
    qt4=no
 fi
 
+epm_qt3=\#
+epm_qt4=\#
 if test "$qt3" = "yes" && test "$qt4" = "no"; then
    ui_toolkit=qt3
+   epm_qt3=
 elif test "$qt4" = "yes"; then
    ui_toolkit=qt4
-   epm_qt4_install=yes
+   epm_qt4=
 else
    ui_toolkit=no
 fi
+
+AC_MSG_CHECKING([for policykit])
+AC_ARG_ENABLE(policykit,
+  [  --enable-policykit    enable PolicyKit (default=no)],
+  policykit=$enableval, policykit=no)
+if test "$policykit" = "yes"; then
+   AC_MSG_RESULT(yes)
+else
+   AC_MSG_RESULT(no)
+fi
+AM_CONDITIONAL(POLICYKIT_INSTALL, test x$policykit = xyes)
 
 AC_MSG_CHECKING(for host machine platform)
 machine=`uname -m`
@@ -314,9 +394,20 @@ AC_MSG_RESULT($platform)
 # Check conditional packages.
 
 if test "$hpijs_only_build" = "no" && test "$network_build" = "yes"; then
-   AC_CHECK_LIB([crypto], [CRYPTO_free], [LIBS="$LIBS"], [AC_MSG_ERROR([cannot find net-snmp support (or --disable-network-build)], 4)])
-   AC_CHECK_LIB([netsnmp], [snmp_timeout], [LIBS="$LIBS" AC_DEFINE([HAVE_LIBNETSNMP])], [AC_MSG_ERROR([cannot find net-snmp support (or --disable-network-build)], 4)])
+#   AC_CHECK_LIB([crypto], [CRYPTO_free], [LIBS="$LIBS"], [AC_MSG_ERROR([cannot find net-snmp support (or --disable-network-build)], 4)])
+#   AC_CHECK_LIB([netsnmp], [snmp_timeout], [LIBS="$LIBS" AC_DEFINE([HAVE_LIBNETSNMP])], [AC_MSG_ERROR([cannot find net-snmp support (or --disable-network-build)], 4)])
+#   AC_CHECK_HEADERS(net-snmp/net-snmp-config.h,, [AC_MSG_ERROR([cannot find net-snmp-devel support (or --disable-network-build)], 5)])
+
+   old_LIBS="$LIBS"
+   AC_CHECK_LIB([crypto], [CRYPTO_free],, [AC_MSG_ERROR([cannot find net-snmp support (or --disable-network-build)], 4)])
+   AC_CHECK_LIB([netsnmp], [snmp_timeout], [LIBS="$old_LIBS" AC_DEFINE([HAVE_LIBNETSNMP]) SNMPLIB="netsnmp"], check_ucd=yes)
+if test "$check_ucd" = "yes"; then
+   AC_CHECK_LIB([snmp], [snmp_timeout], [LIBS="$old_LIBS" AC_DEFINE([HAVE_LIBNETSNMP]) AC_DEFINE([HAVE_UCDSNMP]) SNMPLIB="snmp"], 
+          [AC_MSG_ERROR([cannot find net/ucd-snmp support (or --disable-network-build)], 4)])
+   AC_CHECK_HEADERS(ucd-snmp/ucd-snmp-config.h,, [AC_MSG_ERROR([cannot find ucd-snmp-devel support (or --disable-network-build)], 5)])
+else
    AC_CHECK_HEADERS(net-snmp/net-snmp-config.h,, [AC_MSG_ERROR([cannot find net-snmp-devel support (or --disable-network-build)], 5)])
+fi
 fi
 
 if test "$hpijs_only_build" = "no" && test "$pp_build" = "yes"; then
@@ -328,6 +419,9 @@ if test "$hpijs_only_build" = "no"; then
    AC_CHECK_HEADERS(cups/cups.h, ,[AC_MSG_ERROR([cannot find cups-devel support], 3)])
    AC_CHECK_LIB([usb], [usb_init], [LIBS="$LIBS"], [AC_MSG_ERROR([cannot find libusb support], 2)])
    AC_CHECK_HEADERS(usb.h, ,[AC_MSG_ERROR([cannot find libusb-devel support], 11)])
+fi
+
+if test "$hpijs_only_build" = "no" && test "$lite_build" = "no"; then
    AC_ARG_VAR([PYTHON], [Python interpreter/compiler command])
    AM_PATH_PYTHON([2.2])
    AC_MSG_CHECKING([for path to Python.h])
@@ -341,13 +435,15 @@ if test "$hpijs_only_build" = "no" && test "$scan_build" = "yes"; then
    AC_CHECK_LIB([sane], [sane_open], [LIBS="$LIBS"], [AC_MSG_ERROR([cannot find sane-backends-devel support (or --disable-scan-build)], 12)])
 fi
 
-if test "$hpijs_only_build" = "no" && test "$dbus_build" = "yes"; then
+# The PKG_CHECK_MODULES macro requires the pkgconfig package (pkg-config). Otherwise you get a strange shell script error
+# "syntax error near upexpected token: DBUS".
+if test "$hpijs_only_build" = "no" && test "$lite_build" = "no" && test "$dbus_build" = "yes"; then
 #   PKG_CHECK_MODULES(DBUS, [dbus-1 >= 1.0.0, dbus-glib-1 >= 0.61],,[AC_MSG_ERROR([cannot find dbus-devel support: $DBUS_PKG_ERRORS], 14)])
    PKG_CHECK_MODULES([DBUS], [dbus-1 >= 1.0.0],,[AC_MSG_ERROR([cannot find dbus-devel support: $DBUS_PKG_ERRORS], 14)])
-   AC_CHECK_LIB([dbus-1], [dbus_connection_open], [LIBS="$LIBS"], [AC_MSG_ERROR([cannot find libdbus support], 13)])
+   AC_CHECK_LIB([dbus-1], [dbus_connection_open], [LIBS="$LIBS" AC_DEFINE([HAVE_DBUS])], [AC_MSG_ERROR([cannot find libdbus support], 13)])
 fi
 
-if test "$hpijs_only_build" = "no" && test "$fax_build" = "yes" && test "$dbus_build" = "no"; then
+if test "$hpijs_only_build" = "no" && test "$lite_build" = "no" && test "$fax_build" = "yes" && test "$dbus_build" = "no"; then
    AC_MSG_ERROR([fax requires dbus support], 15)
 fi
 
@@ -403,6 +499,10 @@ AC_SUBST(foomatic_drv_install)
 AC_SUBST(foomatic_ppd_install)
 AC_SUBST(foomatic_rip_hplip_install)
 AC_SUBST(foomatic_filter)
+AC_SUBST(cups_ppd_install)
+AC_SUBST(cups_drv_install)
+AC_SUBST(hpijs_install)
+AC_SUBST(hpcups_install)
 AC_SUBST(doc_build)
 AC_SUBST(shadow_build)
 AC_SUBST(APDK_ENDIAN_FLAG)
@@ -413,7 +513,21 @@ AC_SUBST(qt3)
 AC_SUBST(qt4)
 AC_SUBST(epm_foomatic_rip_hplip_install)
 AC_SUBST(epm_foomatic_ppd_install)
-AC_SUBST(epm_qt4_install)
+AC_SUBST(epm_cups_ppd_install)
+AC_SUBST(epm_foomatic_drv_install)
+AC_SUBST(epm_cups_drv_install)
+AC_SUBST(epm_hpijs_install)
+AC_SUBST(epm_hpcups_install)
+AC_SUBST(epm_qt4)
+AC_SUBST(epm_qt3)
+AC_SUBST(epm_full)
+AC_SUBST(epm_lite)
+AC_SUBST(epm_scan)
+AC_SUBST(policykit)
+AC_SUBST(hpijs_only_build)
+AC_SUBST(lite_build)
+AC_SUBST(SNMPLIB)
+AC_SUBST(prefix)
 
-AC_CONFIG_FILES(Makefile hplip.conf hplip.desktop hplip-systray.desktop prnt/drv/hpijs.drv hplip.list)
+AC_CONFIG_FILES(Makefile hplip.conf hplip.desktop hplip-systray.desktop prnt/drv/hpijs.drv prnt/drv/hpcups.drv hplip.list data/policykit/com.hp.hplip.service)
 AC_OUTPUT

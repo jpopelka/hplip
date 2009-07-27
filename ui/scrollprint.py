@@ -83,6 +83,7 @@ class ScrollPrintView(ScrollView):
             "application/x-perl" : (self.__tr("Perl Script"), '.pl'),
             "application/x-python" : (self.__tr("Python Program"), '.py'),
             "application/x-shell" : (self.__tr("Shell Script"), '.sh'),
+            "application/x-sh" : (self.__tr("Shell Script"), '.sh'),
             "text/plain" : (self.__tr("Plain Text"), '.txt, .log, etc'),
             "text/html" : (self.__tr("HTML Dcoument"), '.htm, .html'),
             "image/gif" : (self.__tr("GIF Image"), '.gif'),

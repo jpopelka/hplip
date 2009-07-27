@@ -56,7 +56,7 @@ class InfoDialog(QDialog, Ui_Dialog):
         self.connect(self.DeviceComboBox, SIGNAL("DeviceUriComboBox_currentChanged"), self.DeviceUriComboBox_currentChanged)
 
         # Application icon
-        self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
+        self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))
 
         if self.device_uri:
             self.DeviceComboBox.setInitialDevice(self.device_uri)
@@ -240,7 +240,7 @@ class InfoDialog(QDialog, Ui_Dialog):
                 try:
                     f = file(os.path.expanduser('~/.cups/lpoptions'))
                 except IOError, e:
-                    log.error(str(e))
+                    log.debug(str(e))
                     current_options['lpoptions_file_data'] = QString("(%1)").arg(str(e))
                 else:
                     text = f.read()

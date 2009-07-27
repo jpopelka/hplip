@@ -57,6 +57,12 @@ except ImportError:
     sys.exit(1)
 
 
+# pynotify (optional)
+have_pynotify = True
+try:
+    import pynotify
+except ImportError:
+    have_pynotify = False
 
 
 TrayIcon_Warning = 0
@@ -345,9 +351,14 @@ class SystrayIcon(QLabel):
 
 
     def showMessage(self, title, msg, icon, msecs):
-        g = self.mapToGlobal(QPoint(0, 0))
-        showBalloon(icon, msg, title, self,
-            QPoint(g.x() + self.width()/2, g.y() + self.height()/2), msecs)
+        if have_pynotify and pynotify.init("hplip"):
+            n = pynotify.Notification(title, msg, icon)
+            n.set_timeout(msecs)
+            s.show()
+        else:
+            g = self.mapToGlobal(QPoint(0, 0))
+            showBalloon(icon, msg, title, self,
+                QPoint(g.x() + self.width()/2, g.y() + self.height()/2), msecs)
 
 
 
@@ -382,10 +393,10 @@ class SystemTrayApp(QApplication):
         self.fmt = "64s64sI32sI64sf"
         self.fmt_size = struct.calcsize(self.fmt)
 
-        self.tray_icon = SystrayIcon(load_pixmap("prog", "48x48", (22, 22)))
+        self.tray_icon = SystrayIcon(load_pixmap("hp_logo", "32x32", (22, 22)))
         self.menu = QPopupMenu()
 
-        title_item = TitleItem(load_pixmap('prog', '48x48', (16, 16)), "HP Status Service")
+        title_item = TitleItem(load_pixmap('hp_logo', '16x16', (16, 16)), "HP Status Service")
         i = self.menu.insertItem(title_item)
         self.menu.setItemEnabled(i, False)
 

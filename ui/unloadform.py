@@ -45,7 +45,7 @@ class UnloadForm(QMainWindow):
         self.printer_name = printer_name
         self.init_failed = False
 
-        self.setIcon(load_pixmap('prog', '48x48'))
+        self.setIcon(load_pixmap('hp_logo', '128x128'))
 
         self.setCentralWidget(QWidget(self,"qt_central_widget"))
         self.FormLayout = QGridLayout(self.centralWidget(),1,1,11,6,"FormLayout")

@@ -44,7 +44,8 @@ class SettingsDialog(QDialog, Ui_SettingsDialog_base):
         self.SystemTraySettings.initUi(self.user_settings.systray_visible,
                                        self.user_settings.polling,
                                        self.user_settings.polling_interval,
-                                       self.user_settings.device_list)
+                                       self.user_settings.device_list,
+                                       self.user_settings.systray_messages)
 
         self.updateControls()
 
@@ -55,15 +56,17 @@ class SettingsDialog(QDialog, Ui_SettingsDialog_base):
         if self.user_settings.auto_refresh_type == 1:
             self.RefreshCurrentRadioButton.setChecked(True)
         else:
-            RefreshAllRadioButton.setChecked(True)
+            self.RefreshAllRadioButton.setChecked(True)
 
         self.ScanCommandLineEdit.setText(self.user_settings.cmd_scan)
         self.SystemTraySettings.systray_visible = self.user_settings.systray_visible
+        self.SystemTraySettings.systray_messages = self.user_settings.systray_messages
         self.SystemTraySettings.updateUi()
 
 
     def updateData(self):
         self.user_settings.systray_visible = self.SystemTraySettings.systray_visible
+        self.user_settings.systray_messages = self.SystemTraySettings.systray_messages
         self.user_settings.cmd_scan = unicode(self.ScanCommandLineEdit.text())
         self.user_settings.auto_refresh = bool(self.AutoRefreshCheckBox.isChecked())
 

@@ -29,7 +29,7 @@ import operator
 
 # Local
 from base.g import *
-from base import device, utils, models
+from base import device, utils, models, pkit
 from prnt import cups
 from installer import core_install
 from ui_utils import load_pixmap
@@ -151,7 +151,7 @@ class SetupForm(SetupForm_base):
             else:
                 self.FailureUI(self.__tr("<b>Device not found.</b> <p>Please make sure your printer is properly connected and powered-on."))
 
-        self.setIcon(load_pixmap('prog', '48x48'))
+        self.setIcon(load_pixmap('hp_logo', '128x128'))
 
         self.connectionTypeButtonGroup.setButton(0)
         self.device_uri = ''
@@ -193,6 +193,8 @@ class SetupForm(SetupForm_base):
         QToolTip.add(self.searchFiltersPushButton2,
             self.__tr('Current: Filter: [%2]  Search: "%3"  TTL: %4  Timeout: %5s').arg(','.join(self.filter)).arg(self.search or '').arg(self.ttl).arg(self.timeout))
 
+        cups.setPasswordCallback(showPasswordUI)
+
 
     def showPage(self, page):
         orig_page = page
@@ -233,32 +235,19 @@ class SetupForm(SetupForm_base):
 
             core = core_install.CoreInstall()
             core.set_plugin_version()
-
             plugin = self.mq.get('plugin', PLUGIN_NONE)
+            plugin_reason = self.mq.get('plugin-reason', PLUGIN_REASON_NONE)
             if plugin > PLUGIN_NONE and not core.check_for_plugin():
-                # need to install plugin
-
-                from pluginform2 import PluginForm2
-
-                form = PluginForm2()
-                form.exec_loop()
-
-                #plugin_lib = self.mq.get("plugin-library")
-                #fw_download = self.mq.get("fw-download")
-
-                #self.core = core_install.CoreInstall()
-                #if not self.core.check_for_plugin(norm_model):
-                #if 1:
-                    #from pluginform import PluginForm
-                    #plugin_form = PluginForm(self.core, norm_model, plugin, self.device_uri, plugin_lib, fw_download)
-                    # TODO:
-                #    ok = plugin_form.exec_loop()
-                #    if not ok:
-                #        self.reject()
-                #        return
-
-                #else:
-                #    log.debug("Plugin support already installed")
+                ok, sudo_ok = pkit.run_plugin_command(plugin == PLUGIN_REQUIRED, plugin_reason)
+                if not sudo_ok:
+                    self.FailureUI(self.__tr("<b>Unable to find an appropriate su/sudo utility to run hp-plugin.</b><p>Install kdesu, gnomesu, or gksu.</p>"))
+                    return
+                if not ok or not core.check_for_plugin():
+                    if plugin == PLUGIN_REQUIRED:
+                        self.FailureUI(self.__tr("<b>The printer you are trying to setup requires a binary driver plug-in and it failed to install.</b><p>Please check your internet connection and try again.</p><p>Visit <u>http://hplipopensource.com</u> for more information.</p>"))
+                        return
+                    else:
+                        self.WarningUI(self.__tr("Either you have chosen to skip the installation of the optional plug-in or that installation has failed.  Your printer may not function at optimal performance."))
 
             self.updatePPDPage()
 
@@ -864,6 +853,7 @@ class SetupForm(SetupForm_base):
     def setupPrinter(self):
         QApplication.setOverrideCursor(QApplication.waitCursor)
 
+        cups.setPasswordPrompt("You do not have permission to add a printer.")
         #if self.ppd_file.startswith("foomatic:"):
         if not os.path.exists(self.ppd_file): # assume foomatic: or some such
             status, status_str = cups.addPrinter(self.printer_name.encode('utf8'), self.device_uri,
@@ -943,6 +933,7 @@ class SetupForm(SetupForm_base):
             else: # Quit
                 return
 
+        cups.setPasswordPrompt("You do not have permission to add a fax device.")
         if not os.path.exists(fax_ppd):
             status, status_str = cups.addPrinter(self.fax_name.encode('utf8'),
                 self.fax_uri, self.fax_location, '', fax_ppd,  self.fax_desc)
@@ -1009,5 +1000,82 @@ class SetupForm(SetupForm_base):
                               QMessageBox.NoButton,
                               QMessageBox.NoButton)
 
+    def WarningUI(self, error_text):
+        QMessageBox.warning(self,
+                             self.caption(),
+                             error_text,
+                              QMessageBox.Ok,
+                              QMessageBox.NoButton,
+                              QMessageBox.NoButton)
+
     def __tr(self, s, c=None):
         return qApp.translate("SetupForm", s, c)
+
+
+
+class PasswordDialog(QDialog):
+    def __init__(self,prompt, parent=None, name=None, modal=0, fl=0):
+        QDialog.__init__(self,parent,name,modal,fl)
+        self.prompt = prompt
+
+        if not name:
+            self.setName("PasswordDialog")
+
+        passwordDlg_baseLayout = QGridLayout(self,1,1,11,6,"passwordDlg_baseLayout")
+
+        self.promptTextLabel = QLabel(self,"promptTextLabel")
+        passwordDlg_baseLayout.addMultiCellWidget(self.promptTextLabel,0,0,0,1)
+
+        self.usernameTextLabel = QLabel(self,"usernameTextLabel")
+        passwordDlg_baseLayout.addMultiCellWidget(self.usernameTextLabel,1,1,0,1)
+
+        self.usernameLineEdit = QLineEdit(self,"usernameLineEdit")
+        self.usernameLineEdit.setEchoMode(QLineEdit.Normal)
+        passwordDlg_baseLayout.addMultiCellWidget(self.usernameLineEdit,1,1,1,2)
+
+        self.passwordTextLabel = QLabel(self,"passwordTextLabel")
+        passwordDlg_baseLayout.addMultiCellWidget(self.passwordTextLabel,2,2,0,1)
+
+        self.passwordLineEdit = QLineEdit(self,"passwordLineEdit")
+        self.passwordLineEdit.setEchoMode(QLineEdit.Password)
+        passwordDlg_baseLayout.addMultiCellWidget(self.passwordLineEdit,2,2,1,2)
+
+        self.okPushButton = QPushButton(self,"okPushButton")
+        passwordDlg_baseLayout.addWidget(self.okPushButton,3,2)
+
+        self.languageChange()
+
+        self.resize(QSize(420,163).expandedTo(self.minimumSizeHint()))
+        self.clearWState(Qt.WState_Polished)
+
+        self.connect(self.okPushButton,SIGNAL("clicked()"),self.accept)
+        self.connect(self.passwordLineEdit,SIGNAL("returnPressed()"),self.accept)
+    def getUsername(self):
+        return unicode(self.usernameLineEdit.text())
+
+    def getPassword(self):
+        return unicode(self.passwordLineEdit.text())
+
+    def languageChange(self):
+        self.setCaption(self.__tr("HP Device Manager - Enter Username/Password"))
+        self.promptTextLabel.setText(self.__tr(self.prompt))
+        self.usernameTextLabel.setText(self.__tr("Username"))
+        self.passwordTextLabel.setText(self.__tr("Password"))
+        self.okPushButton.setText(self.__tr("OK"))
+
+    def __tr(self,s,c = None):
+        return qApp.translate("PasswordDialog",s,c)
+
+
+
+def showPasswordUI(prompt):
+    try:
+        dlg = PasswordDialog(prompt, None)
+
+        if dlg.exec_loop() == QDialog.Accepted:
+            return (dlg.getUsername(), dlg.getPassword())
+
+    finally:
+        pass
+
+    return ("", "")

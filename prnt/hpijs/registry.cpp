@@ -45,6 +45,7 @@
 #ifdef APDK_DJ3600
 #include "dj3600.h"
 #include "dj4100.h"
+#include "djd2600.h"
 #endif
 #endif
 #include "dj400.h"
@@ -192,6 +193,7 @@ DJ350Proxy DeviceRegistry::s_DJ350Proxy;
 #if defined(APDK_DJ3600) && defined (APDK_DJ3320)
 DJ3600Proxy DeviceRegistry::s_DJ3600Proxy;
 DJ4100Proxy DeviceRegistry::s_DJ4100Proxy;
+DJD2600Proxy DeviceRegistry::s_DJD2600Proxy;
 #endif
 
 #if defined (APDK_DJ3320)
@@ -287,15 +289,27 @@ DRIVER_ERROR DeviceRegistry::SelectDevice(char* model, int *pVIPVersion, char* p
 
         err = pSS->GetDeviceID(DevIDBuffer, DevIDBuffSize, FALSE);
         ERRCHECK;   // should be either NO_ERROR or BAD_DEVICE_ID
+
+		char	*cmdStr = (char *) strstr ((const char *) DevIDBuffer+2, "CMD:");
+        char    *cmdStrEnd;
         if ((strstr((const char *) DevIDBuffer+2,"CMD:LDL")))
         {
             device = eDJ3320;
             match = TRUE;
         }
-		char	*cmdStr = strstr ((const char *) DevIDBuffer+2, "CMD:");
-		if (!cmdStr)
+        if (!match && cmdStr && (cmdStrEnd = (char *) strstr (cmdStr, ";")))
+        {
+            *cmdStrEnd = '\0';
+            if (strstr (cmdStr, "LDL"))
+            {
+                match = TRUE;
+                device = eDJ4100;
+            }
+            *cmdStrEnd = ';';
+        }
+		if (!match && !cmdStr)
 		{
-			cmdStr = strstr ((const char *) DevIDBuffer+2, "COMMAND SET:");
+			cmdStr = (char *) strstr ((const char *) DevIDBuffer+2, "COMMAND SET:");
 		}
 		if (!match && cmdStr && (strstr ((const char *) cmdStr+4, "POSTSCRIPT") || 
 			                     strstr ((const char *) cmdStr+4, "PostScript") || 

@@ -89,6 +89,7 @@ TECH_CLASSES = [
     "DJ55xx",
     "OJProKx50",
     'LJP1XXX',
+    'DJD2600',
 ]
 
 TECH_CLASSES.sort()
@@ -256,6 +257,7 @@ class ModelData:
             'io-mfp-mode' : TYPE_INT,
             'io-mode' : TYPE_INT,
             'io-support' : TYPE_BITFIELD,
+            'job-storage' : TYPE_INT,
             'monitor-type' : TYPE_INT,
             'linefeed-cal-type' : TYPE_INT,
             'panel-check-type' : TYPE_INT,
@@ -279,8 +281,10 @@ class ModelData:
             'tech-type' : TYPE_INT,
             'usb-pid' : TYPE_HEX,
             'usb-vid' : TYPE_HEX,
-            'job-storage' : TYPE_INT,
+            'wifi-config': TYPE_INT,
+            }
 
+        self.FIELD_TYPES_DYN = {
             # Dynamic model data (from device query)
             'dev-file' : TYPE_STR,
             'fax-uri' : TYPE_STR,
@@ -288,7 +292,7 @@ class ModelData:
             'is-hp' : TYPE_BOOL,
             'host' : TYPE_STR,
             'status-desc' : TYPE_STR,
-            'cups-printer' : TYPE_STR,
+            'cups-printers' : TYPE_STR,
             'serial' : TYPE_STR,
             'error-state' : TYPE_INT,
             'device-state' : TYPE_INT,
@@ -332,7 +336,7 @@ class ModelData:
             re.compile('^agent(\d+)-sku', re.IGNORECASE) : TYPE_STR,
             re.compile('^in-tray(\d+)', re.IGNORECASE) : TYPE_BOOL,
             re.compile('^out-tray(\d+)', re.IGNORECASE) : TYPE_BOOL,
-            re.compile('model(\d+)', re.IGNORECASE) : TYPE_STR,
+            re.compile('^model(\d+)', re.IGNORECASE) : TYPE_STR,
             }
 
         self.TYPE_CACHE = {}
@@ -476,16 +480,19 @@ class ModelData:
             return self.FIELD_TYPES[key]
         except KeyError:
             try:
-                return self.TYPE_CACHE[key]
+                return self.FIELD_TYPES_DYN[key]
             except KeyError:
-                for pat, typ in self.RE_FIELD_TYPES.items():
-                    match = pat.match(key)
-                    if match is not None:
-                        self.TYPE_CACHE[key] = typ
-                        return typ
+                try:
+                    return self.TYPE_CACHE[key]
+                except KeyError:
+                    for pat, typ in self.RE_FIELD_TYPES.items():
+                        match = pat.match(key)
+                        if match is not None:
+                            self.TYPE_CACHE[key] = typ
+                            return typ
 
-        log.warn("get_data_type(): Defaulted to TYPE_STR for key %s" % key)
-        return TYPE_STR
+        log.error("get_data_type(): Field type lookup failed for key %s" % key)
+        return None
 
 
     def convert_data(self, key, value, typ=None):

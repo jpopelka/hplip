@@ -34,7 +34,8 @@ class SetupSettings(SetupSettings_base):
         self.ttl = ttl
         self.timeout = timeout
 
-        if 'none' in filter:
+        log.error("filter is %s" % filter)
+        if not filter:
             self.filterButtonGroup.setButton(0)
         else:
             self.filterButtonGroup.setButton(1)

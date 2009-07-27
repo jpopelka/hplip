@@ -890,8 +890,12 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) pp_get_device_id(mud_d
          }
       }
    }
-   memcpy(buf, pd->id, *len > size ? size : *len); 
-   stat = HPMUD_R_OK;
+
+   if (*len)
+   {
+      memcpy(buf, pd->id, *len > size ? size : *len); 
+      stat = HPMUD_R_OK;
+   }
 
 bugout:
    pthread_mutex_unlock(&pd->mutex);

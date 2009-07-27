@@ -85,11 +85,19 @@ def run(read_pipe2=None,  # pipe from hpssd
                 r, w, e = select.select([r2], [], [r2], 1.0)
             except KeyboardInterrupt:
                 break
+            except select.error, e:
+                if e[0] == errno.EINTR:
+                    continue
+                else:
+                    break
 
             if not r: continue
             if e: break
 
             m = ''.join([m, os.read(r2, fmt_size)])
+
+            if not m:
+                break
 
             while len(m) >= fmt_size:
                 response.clear()

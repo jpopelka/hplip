@@ -118,7 +118,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                                 (self.endFronPanelPage, None),
                                 (self.close, None),
                             ],
-            
+
 #            ALIGN_TYPE_NONE : [ # 0
 #                               (self.close, None)
 #                            ],
@@ -126,6 +126,7 @@ class AlignDialog(QDialog, Ui_Dialog):
             ALIGN_TYPE_AUTO : [ # 1
                                (self.showLoadPaperPage, None),
                                (maint.AlignType1PML, (lambda : self.dev, lambda: true)),
+                               (self.closeAll, None),
                                (self.close, None),
                             ],
 
@@ -354,7 +355,7 @@ class AlignDialog(QDialog, Ui_Dialog):
         self.DeviceComboBox.setFilter({'align-type': (operator.gt, 0)})
 
         # Application icon
-        self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
+        self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))
 
         if self.device_uri:
             self.DeviceComboBox.setInitialDevice(self.device_uri)
@@ -420,7 +421,7 @@ class AlignDialog(QDialog, Ui_Dialog):
 
 
     def showStartPage(self):
-        self.BackButton.setEnabled(False)
+#       self.BackButton.setEnabled(False)
         num_devices = self.DeviceComboBox.setDevices()
 
         if num_devices == 1:
@@ -599,11 +600,11 @@ class AlignDialog(QDialog, Ui_Dialog):
 
 
     def showFrontPanelPage(self):
-        self.BackButton.setEnabled(False)
+#       self.BackButton.setEnabled(False)
         self.setAlignButton(BUTTON_FINISH)
         self.displayPage(PAGE_FRONT_PANEL)
-        
-        
+
+
     def endFronPanelPage(self):
         pass
 
@@ -675,6 +676,11 @@ class AlignDialog(QDialog, Ui_Dialog):
 
     def setPenConfig(self):
         self.dev.pen_config = status.getPenConfiguration(self.dev.getStatusFromDeviceID())
+
+
+    def closeAll(self):
+        if self.dev is not None:
+            self.dev.close()
 
 
     def __tr(self,s,c = None):

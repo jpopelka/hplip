@@ -20,7 +20,7 @@
 # Author: Don Welch
 #
 
-__version__ = "3.0"
+__version__ = "3.3"
 __title__ = 'DAT to DRV.IN converter. Also creates Foomatic XML files.'
 __doc__ = "Create DRV.IN file and Foomatic XML files from MODELS.DAT data. Processes all *.in.template files in prnt/drv directory."
 
@@ -234,6 +234,17 @@ def categorize2(m):
 
     elif "apollo" in m:
         i = MODEL_TYPE2_APOLLO
+
+    elif "designjet" in m or \
+         "plotter" in m or \
+         "draft" in m or \
+         "eagle" in m or \
+         "electrostatic" in m or \
+         m.startswith('hp_2') or \
+         m.startswith('hp_7') or \
+         m.startswith('hp_9'):
+
+        i = MODEL_TYPE2_DESIGNJET
 
     else: # Other
         i = MODEL_TYPE2_OTHER
@@ -471,63 +482,81 @@ def main(args):
 
                         drv_in_file_f.write("%s{\n" % indent)
 
-                        model_name = models_dict[p]['norm_model'] + " hpijs"
+                        if basename == 'hpcups':
+                            model_name = models_dict[p]['norm_model']
+                        else:
+                            model_name = models_dict[p]['norm_model'] + " %s" % basename
+
                         orig_model_name = model_name
-                        
+
                         while True:
                             if len(model_name) > 31:
                                 for k in SHORTENING_REPLACEMENTS:
                                     if k in model_name.lower():
                                         model_name = utils.ireplace(model_name, k, SHORTENING_REPLACEMENTS[k])
                                         model_name = model_name.replace('  ', ' ')
-                                        
+
                                         if len(model_name) < 32:
                                             warns.append('len("%s")>31, shortened to len("%s")=%d using sub-brand shortening replacements.' % (orig_model_name, model_name, len(model_name)))
                                             break
-                                
+
                                 if len(model_name) < 32:
                                     break
-                                
+
                                 if "series" in model_name.lower():
                                     model_name = utils.ireplace(model_name, "series", "Ser.")
                                     model_name = model_name.replace('  ', ' ')
-                                    
+
                                     if len(model_name) < 32:
                                         warns.append('len("%s")>31, shortened to len("%s")=%d using "series" to "ser." replacement.' % (orig_model_name, model_name, len(model_name)))
                                         break
-                                    
+
                                 if "ser." in model_name.lower():
                                     model_name = utils.ireplace(model_name, "ser.", "")
                                     model_name = model_name.replace('  ', ' ')
-                                    
+
                                     if len(model_name) < 32:
                                         warns.append('len("%s")>31, shortened to len("%s")=%d using "ser." removal.' % (orig_model_name, model_name, len(model_name)))
                                         break
-                                
+
                                 if len(model_name) > 31:
                                     model_name = model_name[:31]
                                     errors.append('len("%s")>31 chars, could not shorten to <32. Truncating to 31 chars (%s).' % (orig_model_name, model_name))
-                                    
-                            
+
                             break
-                        
-                        drv_in_file_f.write('%sModelName "%s"\n' %
-                            (indent2, model_name))
 
-                        if 'apollo' in p.lower():
-                            devid = "MFG:APOLLO;MDL:%s;DES:%s;" % (p, p)
+                        drv_in_file_f.write('%sModelName "%s"\n' % (indent2, orig_model_name))
 
+                        if len(models_dict[p]['tech-class']) > 1:
+                            drv_in_file_f.write('%sAttribute "NickName" "" "%s %s, $Version"\n' %
+                                (indent2, orig_model_name, models.TECH_CLASS_PDLS[tech_class]))
                         else:
-                            devid = "MFG:HP;MDL:%s;DES:%s;" % (p, p)
+                            drv_in_file_f.write('%sAttribute "NickName" "" "%s, $Version"\n' %
+                                (indent2, orig_model_name))
+
+                        drv_in_file_f.write('%sAttribute "ShortNickName" "" "%s"\n' % (indent2, model_name))
+
+                        pp = p.replace('_', ' ')
+                        if 'apollo' in p.lower():
+                            devid = "MFG:APOLLO;MDL:%s;DES:%s;" % (pp, pp)
+                        else:
+                            devid = "MFG:HP;MDL:%s;DES:%s;" % (pp, pp)
 
                         drv_in_file_f.write('%sAttribute "1284DeviceID" "" "%s"\n' % (indent2, devid))
 
-                        if len(models_dict[p]['tech-class']) > 1: # and 'Postscript' not in models_dict[p]['tech-class']:
-                            drv_in_file_f.write('%sPCFileName "%s-hpijs-%s.ppd"\n' %
-                                (indent2, fixFileName(p), models.TECH_CLASS_PDLS[tech_class]))
+                        if len(models_dict[p]['tech-class']) > 1:
+                            if basename == 'hpcups':
+                                drv_in_file_f.write('%sPCFileName "%s-%s.ppd"\n' %
+                                    (indent2, fixFileName(p), models.TECH_CLASS_PDLS[tech_class]))
+                            else:
+                                drv_in_file_f.write('%sPCFileName "%s-%s-%s.ppd"\n' %
+                                    (indent2, fixFileName(p), basename, models.TECH_CLASS_PDLS[tech_class]))
 
                         elif tech_class != 'Postscript':
-                            drv_in_file_f.write('%sPCFileName "%s-hpijs.ppd"\n' % (indent2, fixFileName(p)))
+                            if basename == 'hpcups':
+                                drv_in_file_f.write('%sPCFileName "%s.ppd"\n' % (indent2, fixFileName(p)))
+                            else:
+                                drv_in_file_f.write('%sPCFileName "%s-%s.ppd"\n' % (indent2, fixFileName(p), basename))
 
                         else:
                             drv_in_file_f.write('%sPCFileName "%s-ps.ppd"\n' % (indent2, fixFileName(p)))

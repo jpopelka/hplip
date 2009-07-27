@@ -40,7 +40,7 @@ class MakeCopiesForm(QMainWindow):
 
         QMainWindow.__init__(self,parent,name,fl)
 
-        self.setIcon(load_pixmap('prog', '48x48'))
+        self.setIcon(load_pixmap('hp_logo', '128x128'))
 
         self.cur_device_uri = device_uri
         self.printer_name = printer_name

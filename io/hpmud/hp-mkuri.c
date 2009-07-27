@@ -94,7 +94,7 @@ static int set_x_environment(void)
    FILE *file=NULL;
    struct dirent *entry;
    char path[32], line[256], cookie[128], *p;
-   int len, i, c, stat=1;
+   int i, c, stat=1;
 
    if ((dir = opendir("/proc"))==NULL)
    {
@@ -111,7 +111,7 @@ static int set_x_environment(void)
       snprintf(path, sizeof(path), "/proc/%s/cmdline", entry->d_name);
       if ((file = fopen(path, "r")) == NULL)
          continue;
-      for (i=0; ((c = getc(file)) != EOF) && (i < (sizeof(line)-len-1)); i++)
+      for (i=0; ((c = getc(file)) != EOF) && (i < (sizeof(line)-1)); i++)
       {
          if (c == 0)
             c = ' ';

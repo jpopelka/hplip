@@ -42,7 +42,7 @@ DEFAULT_BAR_GRAPH_SIZE = 8*(tui.ttysize()[1])/10
 
 def logBarGraph(agent_level, agent_type, size=DEFAULT_BAR_GRAPH_SIZE, use_colors=True, bar_char='/'):
     #print agent_level, agent_type, size, use_colors, bar_char
-    
+
     adj = 100.0/size
     if adj==0.0: adj=100.0
     bar = int(agent_level/adj)
@@ -74,7 +74,7 @@ def logBarGraph(agent_level, agent_type, size=DEFAULT_BAR_GRAPH_SIZE, use_colors
         if agent_type in (AGENT_TYPE_CMY, AGENT_TYPE_KCM):
             color = log.codes['yellow']
 
-    log.info("%s%s%s%s (approx. %d%%)%s" % ("|", bar_char*bar, 
+    log.info("%s%s%s%s (approx. %d%%)%s" % ("|", bar_char*bar,
              " "*(size-bar-2), "|", agent_level, color))
 
     color = ''
@@ -90,19 +90,19 @@ log.set_module('hp-levels')
 try:
     mod = module.Module(__mod__, __title__, __version__, __doc__, None,
                         (INTERACTIVE_MODE,))
-                        
+
     mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS,
         extra_options=[
-        ("Bar graph size:", "-s<size> or --size=<size> (current default=%d)" % DEFAULT_BAR_GRAPH_SIZE, "option", False), 
-        ("Use colored bar graphs:", "-c or --color (default is colorized)", "option", False), 
+        ("Bar graph size:", "-s<size> or --size=<size> (current default=%d)" % DEFAULT_BAR_GRAPH_SIZE, "option", False),
+        ("Use colored bar graphs:", "-c or --color (default is colorized)", "option", False),
         ("Bar graph character:", "-a<char> or --char=<char> (default is '/')", "option", False)])
-                                                                                
-    
+
+
     opts, device_uri, printer_name, mode, ui_toolkit, lang = \
         mod.parseStdOpts('s:ca:', ['size=', 'color', 'char='])
 
     device_uri = mod.getDeviceUri(device_uri, printer_name)
-    
+
     size = DEFAULT_BAR_GRAPH_SIZE
     color = True
     bar_char = '/'
@@ -152,20 +152,20 @@ try:
                 try:
                     agent_type = int(d.dq['agent%d-type' % a])
                     agent_kind = int(d.dq['agent%d-kind' % a])
+                    agent_sku = d.dq['agent%d-sku' % a]
+                    log.debug("%d: agent_type %d agent_kind %d agent_sku '%s'" % (a, agent_type, agent_kind, agent_sku))
                 except KeyError:
                     break
                 else:
-                    sorted_supplies.append((a, agent_kind, agent_type))
-
+                    sorted_supplies.append((a, agent_kind, agent_type, agent_sku))
                 a += 1
 
-            sorted_supplies.sort(lambda x, y: cmp(x[2], y[2]) or cmp(x[1], y[1]))
+            sorted_supplies.sort(lambda x, y: cmp(x[1], y[1]) or cmp(x[3], y[3]))
 
             for x in sorted_supplies:
-                a, agent_kind, agent_type = x
+                a, agent_kind, agent_type, agent_sku = x
                 agent_health = d.dq['agent%d-health' % a]
                 agent_level = d.dq['agent%d-level' % a]
-                agent_sku = str(d.dq['agent%d-sku' % a])
                 agent_desc = d.dq['agent%d-desc' % a]
                 agent_health_desc = d.dq['agent%d-health-desc' % a]
 
@@ -196,10 +196,10 @@ try:
             sys.exit(1)
     finally:
         d.close()
-        
+
 except KeyboardInterrupt:
     log.error("User exit")
-    
+
 log.info("")
 log.info("Done.")
 

@@ -87,21 +87,22 @@ static char *fd_name[MAX_FD] =
    "ff/3/1",
    "ff/ff/ff",
    "ff/d4/0",
+   "ff/cc/0",
 };
 
 static int fd_class[MAX_FD] =
 {
-   0,0x7,0x7,0xff,0xff,0xff,0xff,0xff,
+   0,0x7,0x7,0xff,0xff,0xff,0xff,0xff,0xff,
 };
 
 static int fd_subclass[MAX_FD] =
 {
-   0,0x1,0x1,0x1,0x2,0x3,0xff,0xd4,
+   0,0x1,0x1,0x1,0x2,0x3,0xff,0xd4,0xcc,
 };
 
 static int fd_protocol[MAX_FD] =
 {
-   0,0x2,0x3,0x1,0x1,0x1,0xff,0,
+   0,0x2,0x3,0x1,0x1,0x1,0xff,0,0,
 };
 
 static const unsigned char venice_power_on[] = {0x1b, '%','P','u','i','f','p','.','p','o','w','e','r',' ','1',';',
@@ -563,20 +564,19 @@ static int release_interface(file_descriptor *pfd)
 /* Claim any open interface which is valid for device_id and device status. */
 static int claim_id_interface(struct usb_device *dev)
 {
-   int fd[] = {FD_7_1_2, FD_7_1_3, FD_ff_ff_ff, FD_ff_d4_0, FD_ff_1_1, FD_ff_2_1, FD_NA};
-   int i;
+   enum FD_ID i;
 
-   for (i=0; fd[i]!=FD_NA; i++)
+   for (i=FD_7_1_2; i!=MAX_FD; i++)
    {
-      if (get_interface(dev, fd[i], &fd_table[fd[i]]) == 0)
+      if (get_interface(dev, i, &fd_table[i]) == 0)
       {
-         if (claim_interface(libusb_device, &fd_table[fd[i]]))
+         if (claim_interface(libusb_device, &fd_table[i]))
             continue;  /* interface is busy, try next interface */
          break;  /* done */
       }
    }
 
-   return fd[i];
+   return i;
 }
 
 /* See if this usb device and URI match. */
@@ -1111,7 +1111,7 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_open(mud_device *
    {
       /* First client. */
 
-      if ((fd = claim_id_interface(libusb_device)) == FD_NA)
+      if ((fd = claim_id_interface(libusb_device)) == MAX_FD)
       {
          stat = HPMUD_R_DEVICE_BUSY;
          goto blackout;
@@ -1186,7 +1186,7 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_get_device_id(mud
       if (fd == FD_NA)
       {
          /* Device not in use. Claim interface, but release for other processes. */
-         if ((fd = claim_id_interface(libusb_device)) != FD_NA)
+         if ((fd = claim_id_interface(libusb_device)) != MAX_FD)
          {
             *len = device_id(fd, pd->id, sizeof(pd->id));  /* get new copy and cache it  */ 
             release_interface(&fd_table[fd]);
@@ -1204,8 +1204,11 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_get_device_id(mud
       }
    }
 
-   memcpy(buf, pd->id, *len > size ? size : *len); 
-   stat = HPMUD_R_OK;
+   if (*len)
+   {
+      memcpy(buf, pd->id, *len > size ? size : *len); 
+      stat = HPMUD_R_OK;
+   }
 
    pthread_mutex_unlock(&pd->mutex);
    return stat;
@@ -1236,7 +1239,7 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_get_device_status
       if (fd == FD_NA)
       {
          /* Device not in use. Claim interface, but release for other processes. */
-         if ((fd = claim_id_interface(libusb_device)) != FD_NA)
+         if ((fd = claim_id_interface(libusb_device)) != MAX_FD)
          {
             r = device_status(fd, status);
             release_interface(&fd_table[fd]);
@@ -1338,6 +1341,8 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_raw_channel_open(
 {
    int fd = FD_7_1_2;
    enum HPMUD_RESULT stat = HPMUD_R_DEVICE_BUSY;
+
+   get_interface(libusb_device, fd, &fd_table[fd]);
 
    if (claim_interface(libusb_device, &fd_table[fd]))
       goto bugout;
@@ -1494,17 +1499,15 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_mlc_channel_open(
    /* Initialize MLC transport if this is the first MLC channel. */
    if (pd->channel_cnt==1)
    {
-      /* If 7/1/3 (MLC/1284.4) protocol is available use it. */
-      if (get_interface(libusb_device, FD_7_1_3, &fd_table[FD_7_1_3]) == 0)
+      if (get_interface(libusb_device, FD_7_1_3, &fd_table[FD_7_1_3]) == 0 && claim_interface(libusb_device, &fd_table[FD_7_1_3]) == 0)
          fd = FD_7_1_3;    /* mlc, dot4 */
-      else if (get_interface(libusb_device, FD_ff_ff_ff, &fd_table[FD_ff_ff_ff]) == 0)
+      else if (get_interface(libusb_device, FD_ff_ff_ff, &fd_table[FD_ff_ff_ff]) == 0 && claim_interface(libusb_device, &fd_table[FD_ff_ff_ff]) == 0)
          fd = FD_ff_ff_ff;   /* mlc, dot4 */
-      else if (get_interface(libusb_device, FD_ff_d4_0, &fd_table[FD_ff_d4_0]) == 0)
+      else if (get_interface(libusb_device, FD_ff_d4_0, &fd_table[FD_ff_d4_0]) == 0 && claim_interface(libusb_device, &fd_table[FD_ff_d4_0]) == 0)
          fd = FD_ff_d4_0;   /* mlc, dot4 */
-      else 
+      else if (get_interface(libusb_device, FD_7_1_2, &fd_table[FD_7_1_2]) == 0 && claim_interface(libusb_device, &fd_table[FD_7_1_2]) == 0)
          fd = FD_7_1_2;    /* raw, mlc, dot4 */
-
-      if (claim_interface(libusb_device, &fd_table[fd]))
+      else
       {
          stat = HPMUD_R_DEVICE_BUSY;
          goto bugout;
@@ -1716,22 +1719,20 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_dot4_channel_open
    /* Initialize MLC transport if this is the first MLC channel. */
    if (pd->channel_cnt==1)
    {
-      /* If 7/1/3 (MLC/1284.4) protocol is available use it. */
-      if (get_interface(libusb_device, FD_7_1_3, &fd_table[FD_7_1_3]) == 0)
+      if (get_interface(libusb_device, FD_7_1_3, &fd_table[FD_7_1_3]) == 0 && claim_interface(libusb_device, &fd_table[FD_7_1_3]) == 0)
          fd = FD_7_1_3;    /* mlc, dot4 */
-      else if (get_interface(libusb_device, FD_ff_ff_ff, &fd_table[FD_ff_ff_ff]) == 0)
+      else if (get_interface(libusb_device, FD_ff_ff_ff, &fd_table[FD_ff_ff_ff]) == 0 && claim_interface(libusb_device, &fd_table[FD_ff_ff_ff]) == 0)
          fd = FD_ff_ff_ff;   /* mlc, dot4 */
-      else if (get_interface(libusb_device, FD_ff_d4_0, &fd_table[FD_ff_d4_0]) == 0)
+      else if (get_interface(libusb_device, FD_ff_d4_0, &fd_table[FD_ff_d4_0]) == 0 && claim_interface(libusb_device, &fd_table[FD_ff_d4_0]) == 0)
          fd = FD_ff_d4_0;   /* mlc, dot4 */
-      else 
+      else if (get_interface(libusb_device, FD_7_1_2, &fd_table[FD_7_1_2]) == 0 && claim_interface(libusb_device, &fd_table[FD_7_1_2]) == 0)
          fd = FD_7_1_2;    /* raw, mlc, dot4 */
-
-      if (claim_interface(libusb_device, &fd_table[fd]))
+      else
       {
          stat = HPMUD_R_DEVICE_BUSY;
          goto bugout;
       }
-
+         
       if (fd == FD_7_1_2)
       { 
          if (pd->io_mode == HPMUD_DOT4_BRIDGE_MODE)

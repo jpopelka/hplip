@@ -215,9 +215,12 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) jd_get_device_id(mud_d
    pthread_mutex_lock(&pd->mutex);
 
    *len = device_id(pd->ip, pd->port, pd->id, sizeof(pd->id));  /* get new copy and cache it  */ 
-   memcpy(buf, pd->id, *len > size ? size : *len); 
 
-   stat = HPMUD_R_OK;
+   if (*len)
+   {
+      memcpy(buf, pd->id, *len > size ? size : *len); 
+      stat = HPMUD_R_OK;
+   }
 
    pthread_mutex_unlock(&pd->mutex);
    return stat;

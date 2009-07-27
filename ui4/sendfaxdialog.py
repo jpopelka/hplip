@@ -143,7 +143,7 @@ class SendFaxDialog(QDialog, Ui_Dialog):
         self.initSendFaxPage()
 
         # Application icon
-        self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
+        self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))
 
 
     def lockAndLoad(self):
@@ -191,6 +191,7 @@ class SendFaxDialog(QDialog, Ui_Dialog):
             return
 
         self.FaxComboBox.updateUi()
+        self.displayPage(PAGE_SELECT_FAX)
 
 
     def FaxComboBox_currentChanged(self, device_uri, printer_name):
@@ -359,11 +360,13 @@ class SendFaxDialog(QDialog, Ui_Dialog):
 
 
     def FilesTable_isEmpty(self):
-        self.NextButton.setEnabled(False)
+        if self.StackedWidget.currentIndex() == PAGE_FILES:
+            self.NextButton.setEnabled(False)
 
 
     def FilesTable_isNotEmpty(self):
-        self.NextButton.setEnabled(True)
+        if self.StackedWidget.currentIndex() == PAGE_FILES:
+            self.NextButton.setEnabled(True)
 
 
     def FilesTable_fileListChanged(self):
@@ -470,8 +473,10 @@ class SendFaxDialog(QDialog, Ui_Dialog):
         names.sort()
         for n in names:
             if n not in self.recipient_list:
-                self.AddIndividualComboBox.addItem(n)
-                i += 1
+                data = self.db.get(n)
+                if data['fax']:
+                    self.AddIndividualComboBox.addItem(n)
+                    i += 1
 
         if i:
             self.AddIndividualButton.setEnabled(True)
@@ -761,7 +766,7 @@ class SendFaxDialog(QDialog, Ui_Dialog):
         if self.dev.error_state > ERROR_STATE_MAX_OK and \
             self.dev.error_state not in (ERROR_STATE_LOW_SUPPLIES, ERROR_STATE_LOW_PAPER):
 
-            FailureUI(self, self.__tr("<b>Device is busy or in an error state (code=%1)</b><p>Please wait for the device to become idle or clear the error and try again.").arg(self.cur_device.status_code))
+            FailureUI(self, self.__tr("<b>Device is busy or in an error state (code=%1)</b><p>Please wait for the device to become idle or clear the error and try again.").arg(self.dev.status_code))
             self.NextButton.setEnabled(True)
             return
 
@@ -862,10 +867,13 @@ class SendFaxDialog(QDialog, Ui_Dialog):
                 self.setCancelCloseButton()
                 self.SendFaxTimer.stop()
 
-                if status  == fax.STATUS_ERROR:
+                if status == fax.STATUS_ERROR:
                     result_code, error_state = self.dev.getPML(pml.OID_FAX_DOWNLOAD_ERROR)
                     #FailureUI(self, self.__tr("<b>Fax send error (%s).</b><p>" % pml.DN_ERROR_STR.get(error_state, "Unknown error")))
-                    self.addStatusMessage(self.__tr("Fax send error (%1)").arg(pml.DN_ERROR_STR.get(error_state, "Unknown error")), self.error_icon)
+                    if error_state == pml.DN_ERROR_NONE:
+                        self.addStatusMessage(self.__tr("Fax send error (Possible cause: No answer or dialtone)"), self.error_icon)
+                    else:
+                        self.addStatusMessage(self.__tr("Fax send error (%1)").arg(pml.DN_ERROR_STR.get(error_state, "Unknown error")), self.error_icon)
                     self.dev.sendEvent(EVENT_FAX_JOB_FAIL, self.printer_name, 0, '')
 
                 elif status == fax.STATUS_BUSY:
@@ -899,11 +907,9 @@ class SendFaxDialog(QDialog, Ui_Dialog):
         beginWaitCursor()
         try:
             self.last_job_id = cups.printFile(self.printer_name, f, os.path.basename(f))
-
         finally:
             self.busy = False
-            #endWaitCursor()
-            #pass
+            endWaitCursor()
 
 
     def CheckTimer_timeout(self):
@@ -922,10 +928,11 @@ class SendFaxDialog(QDialog, Ui_Dialog):
         self.busy = True
         #beginWaitCursor()
         try:
-            num_pages, hort_dpi, vert_dpi, page_size, resolution, encoding = \
+            ok, num_pages, hort_dpi, vert_dpi, page_size, resolution, encoding = \
                 self.getFileInfo(fax_file)
+            if ok:
+                self.FilesTable.addFile(fax_file, 'application/hplip-fax', 'HPLIP Fax', title, num_pages)
 
-            self.FilesTable.addFile(fax_file, 'application/hplip-fax', 'HPLIP Fax', title, num_pages)
         finally:
             self.busy = False
             endWaitCursor()
@@ -938,7 +945,7 @@ class SendFaxDialog(QDialog, Ui_Dialog):
 
         if len(header) != fax.FILE_HEADER_SIZE:
             log.error("Invalid fax file! (truncated header or no data)")
-            return (0, 0, 0, 0, 0, 0)
+            return (False, 0, 0, 0, 0, 0, 0)
 
         mg, version, num_pages, hort_dpi, vert_dpi, page_size, \
             resolution, encoding, reserved1, reserved2 = \
@@ -947,7 +954,7 @@ class SendFaxDialog(QDialog, Ui_Dialog):
         log.debug("Magic=%s Ver=%d Pages=%d hDPI=%d vDPI=%d Size=%d Res=%d Enc=%d" %
                   (mg, version, num_pages, hort_dpi, vert_dpi, page_size, resolution, encoding))
 
-        return (num_pages, hort_dpi, vert_dpi, page_size, resolution, encoding)
+        return (True, num_pages, hort_dpi, vert_dpi, page_size, resolution, encoding)
 
 
     #

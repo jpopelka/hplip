@@ -78,7 +78,7 @@ class PrintDialog(QDialog, Ui_Dialog):
         self.initOptionsPage()
 
         # Application icon
-        self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
+        self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))
 
         if self.printer_name:
             self.PrinterName.setInitialPrinter(self.printer_name)
@@ -92,7 +92,8 @@ class PrintDialog(QDialog, Ui_Dialog):
 
     def initFilePage(self):
         self.Files.setType(FILETABLE_TYPE_PRINT)
-        self.Files.setWorkingDir(user_conf.workingDirectory())
+        #self.Files.setWorkingDir(user_conf.workingDirectory())
+        self.Files.setWorkingDir(self.user_settings.working_dir)
         self.connect(self.Files, SIGNAL("isEmpty"), self.Files_isEmpty)
         self.connect(self.Files, SIGNAL("isNotEmpty"), self.Files_isNotEmpty)
 

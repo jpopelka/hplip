@@ -51,6 +51,10 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
         self.updating_group = False
         self.updating_name = False
 
+        self.user_settings = UserSettings()
+        self.user_settings.load()
+        self.user_settings.debug()
+
         self.initDB()
         self.initUi()
 
@@ -72,7 +76,7 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
 
     def initUi(self):
         # Application icon
-        self.setWindowIcon(QIcon(load_pixmap('prog', '48x48')))
+        self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))
 
         self.NewGroupAction.setIcon(QIcon(load_pixmap('new_group', '24x24')))
         self.NewGroupFromSelectionAction.setIcon(QIcon(load_pixmap('new_group_from_selection', '24x24')))
@@ -502,12 +506,16 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
     def ImportAction_triggered(self):
         result = unicode(QFileDialog.getOpenFileName(self,
                          self.__tr("Import fax addresses from LDIF or vCard"),
-                         user_conf.workingDirectory(), "vCard (*.vcf);;LDIF (*.ldif *.ldi)"))
+                         #user_conf.workingDirectory(),
+                         self.user_settings.working_dir,
+                         "vCard (*.vcf);;LDIF (*.ldif *.ldi)"))
 
         if result:
             working_directory = unicode(os.path.dirname(result))
             log.debug("result: %s" % result)
-            user_conf.setWorkingDirectory(working_directory)
+            #user_conf.setWorkingDirectory(working_directory)
+            self.user_settings.working_dir = working_directory
+            self.user_settings.save()
 
             if result:
                 if result.endswith('.vcf'):
