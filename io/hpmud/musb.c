@@ -1970,6 +1970,7 @@ int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int ls
    char rserial[128];
    char model[128];
    char serial[128];
+   char mfg[128];
    char sz[HPMUD_LINE_SIZE];
    int r, size=0;
 
@@ -1987,7 +1988,7 @@ int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int ls
             continue;
          }
 
-         model[0] = serial[0] = rmodel[0] = rserial[0] = sz[0] = 0;
+         model[0] = serial[0] = rmodel[0] = rserial[0] = sz[0] = mfg[0] = 0;
 
          if (dev->descriptor.idVendor == 0x3f0 && is_interface(dev, 7))
          {
@@ -2001,6 +2002,11 @@ int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int ls
                BUG("invalid serial id string ret=%d\n", r);
             else
                generalize_serial(rserial, serial, sizeof(serial));
+
+            if ((r=get_string_descriptor(hd, dev->descriptor.iManufacturer, sz, sizeof(sz))) < 0)
+               BUG("invalid manufacturer string ret=%d\n", r);
+            else
+               generalize_serial(sz, mfg, sizeof(serial));
 
             if (!serial[0])
                strcpy(serial, "0"); /* no serial number, make it zero */
@@ -2022,11 +2028,11 @@ int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int ls
                 * This will allow us to do discovery and not disable other CUPS backend(s) who use /dev/usb/lpx instead of libusb.
                 */
                if (strncasecmp(rmodel, "hp ", 3) == 0)
-                  size += snprintf(lst+size, lst_size-size, "direct %s \"HP %s\" \"HP %s USB %s HPLIP\" \"MFG:HP;MDL:%s;CLS:PRINTER;DES:%s;SN:%s;\"\n", 
-                                                      sz, &rmodel[3], &rmodel[3], serial, rmodel, rmodel, rserial);
+                  size += snprintf(lst+size, lst_size-size, "direct %s \"HP %s\" \"HP %s USB %s HPLIP\" \"MFG:%s;MDL:%s;CLS:PRINTER;DES:%s;SN:%s;\"\n", 
+                                   sz, &rmodel[3], &rmodel[3], serial, mfg, rmodel, rmodel, rserial);
                else
-                  size += snprintf(lst+size, lst_size-size, "direct %s \"HP %s\" \"HP %s USB %s HPLIP\" \"MFG:HP;MDL:%s;CLS:PRINTER;DES:%s;SN:%s;\"\n", 
-                                                   sz, rmodel, rmodel, serial, rmodel, rmodel, rserial);
+                  size += snprintf(lst+size, lst_size-size, "direct %s \"HP %s\" \"HP %s USB %s HPLIP\" \"MFG:%s;MDL:%s;CLS:PRINTER;DES:%s;SN:%s;\"\n", 
+                                   sz, rmodel, rmodel, serial, mfg, rmodel, rmodel, rserial);
 
                *cnt+=1;
             }
@@ -2130,7 +2136,7 @@ enum HPMUD_RESULT hpmud_make_usb_serial_uri(const char *sn, char *uri, int uri_s
 
    for (bus=usb_busses; bus && !found_dev; bus=bus->next)
       for (dev=bus->devices; dev && !found_dev; dev=dev->next)
-	if (is_serial(dev, sn, model, sizeof(model)))
+        if (is_serial(dev, sn, model, sizeof(model)))
             found_dev = dev;  /* found usb device that matches serial number */
 
    if (found_dev == NULL)

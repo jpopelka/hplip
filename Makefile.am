@@ -55,7 +55,7 @@ else
 libsane_hpaio_la_LDFLAGS = -version-info 1:0:0
 endif
 # The following is a interlibrary dependency that must be compiled first.
-libsane_hpaio_la_LIBADD = libhpip.la libhpmud.la $(DBUS_LIBS) -lcups -ldl
+libsane_hpaio_la_LIBADD = libhpip.la libhpmud.la $(DBUS_LIBS) -lcups -ldl -lsane
 #libsane_hpaio_la_CFLAGS = -DWITH_NONAMESPACES -DSOAP_DEBUG
 libsane_hpaio_la_CFLAGS = $(DBUS_CFLAGS)
 endif # SCAN_BUILD
@@ -67,9 +67,9 @@ libhpmud_la_SOURCES = io/hpmud/hpmud.c io/hpmud/mlc.c io/hpmud/model.c io/hpmud/
 	  io/hpmud/hpmud.h io/hpmud/hpmudi.h io/hpmud/list.h io/hpmud/mlc.h io/hpmud/musb.h io/hpmud/pml.h io/hpmud/dot4.c \
 	  io/hpmud/dot4.h io/hpmud/jd.c io/hpmud/jd.h io/hpmud/pp.c io/hpmud/pp.h
 if NETWORK_BUILD
-libhpmud_la_LDFLAGS = -version-info 0:5:0 -lusb -lpthread -l$(SNMPLIB) -lcrypto
+libhpmud_la_LDFLAGS = -version-info 0:6:0 -lusb -lpthread -l$(SNMPLIB) -lcrypto
 else
-libhpmud_la_LDFLAGS = -version-info 0:5:0 -lusb -lpthread
+libhpmud_la_LDFLAGS = -version-info 0:6:0 -lusb -lpthread
 endif
 libhpmud_la_CFLAGS = -DMUDNAME=\"$(MUDNAME)\" -DCONFDIR=\"$(hplip_confdir)\"
 
@@ -90,7 +90,12 @@ hp_mkuri_LDADD = -ldl libhpmud.la
 
 # hpmud.rules
 rulesdir = /etc/udev/rules.d
-dist_rules_DATA = data/rules/55-hpmud.rules data/rules/56-hpmud_support.rules
+dist_rules_DATA = data/rules/56-hpmud_support.rules
+if UDEV_ACL_RULES
+dist_rules_DATA += data/rules/40-hplip.rules
+else
+dist_rules_DATA += data/rules/55-hpmud.rules
+endif
 halpredir = /usr/share/hal/fdi/preprobe/10osvendor
 dist_halpre_DATA = data/rules/20-hplip-devices.fdi
 
@@ -106,7 +111,7 @@ if FULL_BUILD
 
 dist_hplip_SCRIPTS = hpssd.py __init__.py hpdio.py
 dist_noinst_DATA += scan/sane/hpaio.desc prnt/drv/hpijs.drv.in.template
-dist_noinst_SCRIPTS += dat2drv.py install.py hplip-install
+dist_noinst_SCRIPTS += dat2drv.py install.py hplip-install init-suse-firewall init-iptables-firewall
 
 cmddir = $(hplipdir)
 dist_cmd_SCRIPTS = align.py info.py print.py toolbox.py clean.py colorcal.py unload.py testpage.py makeuri.py check.py fab.py levels.py \
@@ -400,12 +405,35 @@ endif # HPIJS_INSTALL
 
 if HPCUPS_INSTALL
 # hpcups
+if NEW_HPCUPS
+#hpcupsdir = $(cupsfilterdir)
+#hpcups_PROGRAMS = hpcups
+#hpcups_SOURCES = prnt/hpcups/HPCupsFilter.cpp prnt/hpcups/HPCupsFilter.h prnt/hpcups/Compressor.cpp prnt/hpcups/Compressor.h \
+	prnt/hpcups/Mode2.cpp prnt/hpcups/Mode2.h prnt/hpcups/Mode3.cpp prnt/hpcups/Mode3.h \
+	prnt/hpcups/Mode9.cpp prnt/hpcups/Mode9.h prnt/hpcups/Mode10.cpp prnt/hpcups/Mode10.h \
+	prnt/hpcups/ModeDeltaPlus.cpp prnt/hpcups/ModeDeltaPlus.h prnt/hpcups/ModeJbig.cpp prnt/hpcups/ModeJbig.h \
+	prnt/hpcups/ErnieFilter.cpp prnt/hpcups/ErnieFilter.h prnt/hpcups/EncapsulatorFactory.cpp prnt/hpcups/EncapsulatorFactory.h \
+	prnt/hpcups/Encapsulator.cpp prnt/hpcups/Encapsulator.h prnt/hpcups/Pcl3.cpp prnt/hpcups/Pcl3.h \
+	prnt/hpcups/Pcl3Gui.cpp prnt/hpcups/Pcl3Gui.h prnt/hpcups/Pcl3Gui2.cpp prnt/hpcups/Pcl3Gui2.h \
+	prnt/hpcups/LJMono.cpp prnt/hpcups/LJMono.h prnt/hpcups/LJColor.cpp prnt/hpcups/LJColor.h \
+	prnt/hpcups/LJFastRaster.cpp prnt/hpcups/LJFastRaster.h prnt/hpcups/LJZjStream.cpp prnt/hpcups/LJZjStream.h \
+	prnt/hpcups/LJZxStream.cpp prnt/hpcups/LJZxStream.h prnt/hpcups/Job.cpp prnt/hpcups/Job.h \
+	prnt/hpcups/Pipeline.cpp prnt/hpcups/Pipeline.h prnt/hpcups/Processor.cpp prnt/hpcups/Processor.h \
+	prnt/hpcups/RasterSender.cpp prnt/hpcups/RasterSender.h prnt/hpcups/ColorMatcher.cpp prnt/hpcups/ColorMatcher.h \
+	prnt/hpcups/Halftoner.cpp prnt/hpcups/Halftoner.h prnt/hpcups/Scaler.cpp prnt/hpcups/Scaler.h prnt/hpcups/resources.h \
+	prnt/hpcups/dj400ColorMaps.cpp prnt/hpcups/dj600ColorMaps.cpp prnt/hpcups/dj970ColorMaps.cpp prnt/hpcups/dj8xxColorMaps.cpp \
+	prnt/hpcups/BreakTables.cpp prnt/hpcups/PrinterCommands.h prnt/hpcups/Utils.cpp prnt/hpcups/Utils.h \
+	prnt/hpcups/SystemServices.cpp prnt/hpcups/SystemServices.h
+#hpcups_CXXFLAGS = $(APDK_ENDIAN_FLAG)
+#hpcups_LDADD = -ljpeg -ldl libhpip.la libhpmud.la -lcups -lcupsimage
+else
 hpcupsdir = $(cupsfilterdir)
 hpcups_PROGRAMS = hpcups
 hpcups_SOURCES = prnt/hpijs/hpcups.cpp prnt/hpijs/hpcups.h prnt/hpijs/services.cpp prnt/hpijs/services.h prnt/hpijs/hpiom.c prnt/hpijs/hpiom.h prnt/hpijs/bug.h prnt/hpijs/hpimage.cpp prnt/hpijs/hpimage.h
 hpcups_CXXFLAGS = $(libapdk_la_CXXFLAGS)
 hpcups_CFLAGS = $(libapdk_la_CFLAGS)
 hpcups_LDADD = libapdk.la -ljpeg -ldl libhpip.la libhpmud.la $(DBUS_LIBS) -lcups -lcupsimage
+endif # NEW_HPCUPS
 if FAX_BUILD
 # hpcupsfax
 hpcupsfaxdir = $(cupsfilterdir)

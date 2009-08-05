@@ -32,6 +32,8 @@
 #ifndef APDK_PSCRIPT_H
 #define APDK_PSCRIPT_H
 
+#ifdef APDK_PSCRIPT
+
 extern "C"
 {
 #include "jpeglib.h"
@@ -163,4 +165,5 @@ public:
 
 APDK_END_NAMESPACE
 
+#endif // APDK_PSCRIPT
 #endif //APDK_PSCRIPT_H

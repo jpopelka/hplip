@@ -347,11 +347,11 @@ int HPCups::initContext (char **argv)
 	    case WARN_LOW_INK_YELLOW:
 	    case WARN_LOW_INK_MULTIPLE_PENS:
 	    {
-	       BUG ("STATE: marker-supply-low-warning\n");
+	       BUG ("STATE: +marker-supply-low-warning\n");
 	       break;
 	    }
 	    default:
-	       BUG ("STATE: -marker-supply-low-warning");
+	       BUG ("STATE: -marker-supply-low-warning\n");
 	}
     }
 
@@ -372,8 +372,16 @@ int HPCups::initContext (char **argv)
     err = m_pSys->pPC->SelectDevice (attr->value);
     if (err == PLUGIN_LIBRARY_MISSING)
     {
+        const char *device_uri = getenv ("DEVICE_URI");
+        const char *printer = getenv ("PRINTER");
+
+        if (device_uri == NULL)
+            device_uri = "";
+        if (printer == NULL)
+            printer = "";
+
         // call dbus here
-	SendDbusMessage (getenv ("DEVICE_URI"), getenv ("PRINTER"),
+	SendDbusMessage (device_uri, printer,
 	                 EVENT_PRINT_FAILED_MISSING_PLUGIN,
 			 argv[2], atoi (argv[1]), argv[3]);
 	BUG ("ERROR: unable to set device = %s, err = %d\n", attr->value, err);

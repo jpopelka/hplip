@@ -45,6 +45,7 @@ enum HPMUD_RESULT
    HPMUD_R_INVALID_TIMEOUT = 47,
    HPMUD_R_DATFILE_ERROR = 48,
    HPMUD_R_IO_TIMEOUT = 49,
+   HPMUD_R_INVALID_MDNS = 50,
 };
 
 enum HPMUD_IO_MODE
@@ -524,6 +525,37 @@ enum HPMUD_RESULT hpmud_get_conf(const char *section, const char *key, char *val
  *  return value - see enum definition
  */
 enum HPMUD_RESULT hpmud_get_key_value(const char *file, const char *section, const char *key, char *value, int value_size);
+
+/* 
+ * hpmud_mdns_lookup - lookup IP for MDNS host name
+ *  
+ * This function is a stateless hpmud helper function.
+ *
+ * inputs:
+ *  host_name - zero terminated string (ie: "npi7c8a3e")
+ *  sec_timeout - in seconds
+ * 
+ * outputs:
+ *  ip - zero terminated string 
+ *  return value - see enum definition
+ */
+enum HPMUD_RESULT hpmud_mdns_lookup(const char *host_name, int sec_timeout, char *ip);
+
+/*
+ * hpmud_make_mdns_uri - make a network uri from host name
+ *
+ * This function is a stateless hpmud helper function. Requires UDP port 5353 to be open.
+ *
+ * inputs:
+ *  host - zero terminated string (ie: "npi7c8a3e")
+ *  uri_size - size of uri buffer in bytes
+ * 
+ * outputs:
+ *  uri - zero terminated string
+ *  bytes_read - size of uri 
+ *  return value - see enum definition
+ */
+enum HPMUD_RESULT hpmud_make_mdns_uri(const char *host, int port, char *uri, int uri_size, int *bytes_read);
 
 #ifdef __cplusplus
 }

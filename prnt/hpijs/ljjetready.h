@@ -32,6 +32,8 @@
 #ifndef APDK_LJJETREADY_H
 #define APDK_LJJETREADY_H
 
+#ifdef APDK_LJJETREADY
+
 #include <setjmp.h>
 
 extern "C"
@@ -246,4 +248,5 @@ public:
 
 APDK_END_NAMESPACE
 
+#endif // APDK_LJJETREADY
 #endif //APDK_LJJETREADY_H

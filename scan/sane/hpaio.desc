@@ -103,6 +103,18 @@
 :model "HP Officejet d155xi All-in-one Printer"
 :status :good
 
+:model "HP Deskjet Ink Advantage k209a All-in-one Printer"
+:status :good
+
+:model "HP Photosmart Plus All-in-one Printer - b209a"
+:status :good
+
+:model "HP Photosmart Plus All-in-one Printer - b209b"
+:status :good
+
+:model "HP Photosmart Plus All-in-one Printer - b209c"
+:status :good
+
 :model "HP Printer Scanner Copier 300"
 :status :good
 
@@ -1493,6 +1505,36 @@
 :status :good
 
 :model "HP Color LaserJet 4730xm Multifunction Printer"
+:status :good
+
+:model "HP Photosmart c4740 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4750 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4780 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4783 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4785 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4788 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4793 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4795 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4798 All-in-one Printer"
+:status :good
+
+:model "HP Photosmart c4799 All-in-one Printer"
 :status :good
 
 :model "HP LaserJet m5035 Multifunction Printer"

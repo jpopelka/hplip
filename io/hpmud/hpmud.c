@@ -144,7 +144,7 @@ int __attribute__ ((visibility ("hidden"))) generalize_serial(const char *sz, ch
       buf[j++] = pMd[i];
    }
 
-   for (i--; buf[i] == '_' && i > 0; i--);  /* eat trailing white space */
+   for (i--; buf[i] == ' ' && i > 0; i--);  /* eat trailing white space */
 
    buf[++i] = 0;
 
@@ -423,7 +423,9 @@ int hpmud_get_uri_model(const char *uri, char *buf, int buf_size)
 int hpmud_get_uri_datalink(const char *uri, char *buf, int buf_size)
 {
    char *p;
+   char ip[HPMUD_LINE_SIZE];
    int i;
+   int zc=0;
 
    buf[0] = 0;
 
@@ -431,11 +433,29 @@ int hpmud_get_uri_datalink(const char *uri, char *buf, int buf_size)
       p+=7;
    else if ((p = strcasestr(uri, "ip=")) != NULL)
       p+=3;
+   else if ((p = strcasestr(uri, "zc=")) != NULL)
+   {
+      p+=3;
+      zc=1;
+   }
    else
       return 0;
 
-   for (i=0; (p[i] != 0) && (p[i] != '&') && (i < buf_size); i++)
-      buf[i] = p[i];
+   if (zc)
+   {
+#ifdef HAVE_LIBNETSNMP
+      if (hpmud_mdns_lookup(p, HPMUD_MDNS_TIMEOUT, ip) != HPMUD_R_OK)
+	 return 0;
+      for (i=0; (ip[i] != 0) && (i < buf_size); i++)
+         buf[i] = ip[i];
+#else
+      return 0;
+#endif
+   }
+   else {
+      for (i=0; (p[i] != 0) && (p[i] != '&') && (i < buf_size); i++)
+         buf[i] = p[i];
+   }
 
    buf[i] = 0;
 

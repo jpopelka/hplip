@@ -149,7 +149,7 @@ if len( args ) == 0:
     good_devices = 0
     for uri in probed_devices:
         try:
-            back_end, is_hp, bus, model, serial, dev_file, host, port = \
+            back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
                 device.parseDeviceURI(uri)
         except Error:
             continue

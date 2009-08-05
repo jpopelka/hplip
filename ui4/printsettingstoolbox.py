@@ -358,9 +358,9 @@ class PrintSettingsToolbox(QToolBox):
                     current = current_options.get('pageset', '')
                     self.addControlRow("pageset", self.__tr("Page Set"),
                         cups.PPD_UI_PICKONE, current,
-                        [('', self.__tr("All pages")),
+                        [('all', self.__tr("All pages")),
                          ('even', self.__tr("Even pages")),
-                         ('odd', self.__tr("Odd pages"))], '', job_option=True)
+                         ('odd', self.__tr("Odd pages"))], 'all', job_option=True)
 
                     self.job_options['pageset'] = current
 #                    if current == u'even':
@@ -944,7 +944,7 @@ class PrintSettingsToolbox(QToolBox):
 
             HBoxLayout.addWidget(ComboBox)
 
-            DefaultButton = DefaultPushButton(self.widget,"DefaultButton", self.group, option,
+            DefaultButton = DefaultPushButton(self.widget, "DefaultButton", self.group, option,
                 choices, default, ComboBox, typ, job_option)
 
             ComboBox.setDefaultPushbutton(DefaultButton)
@@ -1568,8 +1568,8 @@ class PrintSettingsToolbox(QToolBox):
             if choice is not None:
                 if not sender.job_option:
                     self.removePrinterOption(sender.option)
-                    index = sender.control.findText(text)
-                    sender.control.setCurrentIndex(index)
+                index = sender.control.findText(text)
+                sender.control.setCurrentIndex(index)
 
                 #self.linkPrintoutModeAndQuality(sender.option, choice) # TODO:
                 sender.control.setFocus(Qt.OtherFocusReason)

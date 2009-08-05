@@ -97,7 +97,7 @@ try:
 
     if device_uri:
         try:
-            back_end, is_hp, bus, norm_model, serial, dev_file, host, port = \
+            back_end, is_hp, bus, norm_model, serial, dev_file, host, zc, port = \
                 device.parseDeviceURI(device_uri)
         except Error:
             log.stderr("error: Invalid device URI: %s" % device_uri)

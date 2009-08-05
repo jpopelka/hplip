@@ -55,16 +55,17 @@
 #include "pp.h"
 #endif
 
-//#define HPMUD_DEBUG
+// #define HPMUD_DEBUG
 
 #define _STRINGIZE(x) #x
 #define STRINGIZE(x) _STRINGIZE(x)
 
 #define BUG(args...) syslog(LOG_ERR, __FILE__ " " STRINGIZE(__LINE__) ": " args)
+//#define BUG(args...) fprintf(stderr, __FILE__ " " STRINGIZE(__LINE__) ": " args)
 
 #ifdef HPMUD_DEBUG
    #define DBG(args...) syslog(LOG_INFO, __FILE__ " " STRINGIZE(__LINE__) ": " args)
-//   #define DBG(args...) fprintf(stderr, __FILE__ " " STRINGIZE(__LINE__) ": " args)
+// #define DBG(args...) fprintf(stderr, __FILE__ " " STRINGIZE(__LINE__) ": " args)
    #define DBG_DUMP(data, size) sysdump((data), (size))
    #define DBG_SZ(args...) syslog(LOG_INFO, args)
 #else
@@ -82,6 +83,7 @@
 
 #define HPMUD_EXCEPTION_TIMEOUT 45000000  /* microseconds */
 #define HPMUD_EXCEPTION_SEC_TIMEOUT 45  /* seconds */
+#define HPMUD_MDNS_TIMEOUT 10  /* seconds */
 
 #define NFAULT_BIT  0x08
 #define PERROR_BIT  0x20

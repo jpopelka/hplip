@@ -152,7 +152,7 @@ class HistoryDevice(QObject):
         self.needs_update = needs_update
         self.device_uri = device_uri
 
-        back_end, is_hp, bus, model, serial, dev_file, host, port = \
+        back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
                 device.parseDeviceURI(device_uri)
 
         if bus == 'usb':
@@ -614,7 +614,7 @@ class SystemTrayApp(QApplication):
                             if event.printer_name:
                                 d = QString(event.printer_name)
                             else:
-                                back_end, is_hp, bus, model, serial, dev_file, host, port = \
+                                back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
                                                 device.parseDeviceURI(event.device_uri)
 
                                 if bus == 'usb':

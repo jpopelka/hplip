@@ -48,9 +48,11 @@ static void usage()
    fprintf(stdout, "HPLIP Make URI %s\n", VERSION);
    fprintf(stdout, "(c) 2008 Copyright Hewlett-Packard Development Company, LP\n");
    fprintf(stdout, "usage: hp-mkuri -i ip [-p port]\n");
+   fprintf(stdout, "usage: hp-mkuri -z hostname\n");
    fprintf(stdout, "usage: hp-mkuri -b busnum -d devnum\n");
    fprintf(stdout, "usage: hp-mkuri -s serialnum\n");
    fprintf(stdout, "usage: hp-mkuri -l /dev/parportx\n");
+   fprintf(stdout, "usage: hp-mkuri -m hostname [-p port]\n");
    fprintf(stdout, "usage: hp-mkuri -o (probe)\n");
    fprintf(stdout, "usage: hp-mkuri -c (check support)\n");
    fprintf(stdout, "   returns: 0=yes, 1=no, 2=plugin_required, 3=plugin_optional\n");
@@ -286,18 +288,22 @@ int main(int argc, char *argv[])
    char sn[HPMUD_LINE_SIZE];  /* usb serial number */
    char pp[HPMUD_LINE_SIZE];  /* parallel port device */
    char uri[HPMUD_LINE_SIZE];
+   char host[HPMUD_LINE_SIZE];
    int i, port=1, ret=1, probe=0, support=0;
    enum HPMUD_RESULT stat;
    char buf[HPMUD_LINE_SIZE*64];
    int cnt, bytes_read;
 
-   ip[0] = bn[0] = dn[0] = pp[0] = uri[0] = sn[0] = 0;
-   while ((i = getopt(argc, argv, "vhoci:p:b:d:l:s:")) != -1)
+   ip[0] = bn[0] = dn[0] = pp[0] = uri[0] = sn[0] = host[0] = 0;
+   while ((i = getopt(argc, argv, "vhoci:p:b:d:l:s:z:")) != -1)
    {
       switch (i)
       {
       case 'i':
          strncpy(ip, optarg, sizeof(ip));
+         break;
+      case 'z':
+         strncpy(host, optarg, sizeof(host));
          break;
       case 'p':
          port = strtol(optarg, NULL, 10);
@@ -335,7 +341,7 @@ int main(int argc, char *argv[])
       }
    }
 
-   if (ip[0]==0 && (!(bn[0] && dn[0])) && pp[0]==0 && probe==0 && sn[0]==0 && support==0)
+   if (ip[0]==0 && (!(bn[0] && dn[0])) && pp[0]==0 && probe==0 && sn[0]==0 && support==0 && host[0]==0)
    {
       fprintf(stderr, "invalid command parameter(s)\n");
       usage();
@@ -353,6 +359,15 @@ int main(int argc, char *argv[])
    if (ip[0])
    {
       stat = hpmud_make_net_uri(ip, port, uri, sizeof(uri), &bytes_read);
+      if (stat == HPMUD_R_OK)
+      {
+         fprintf(stdout, "%s\n", uri);
+         fprintf(stdout, "hpaio%s\n", &uri[2]);
+      }
+   }
+   if (host[0])
+   {
+      stat = hpmud_make_mdns_uri(host, port, uri, sizeof(uri), &bytes_read);
       if (stat == HPMUD_R_OK)
       {
          fprintf(stdout, "%s\n", uri);

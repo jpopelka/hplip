@@ -112,6 +112,7 @@ class Logger(object):
         self.fmt = True
         self.set_level(level)
 
+
     def set_level(self, level):
         if isinstance(level, str):
             level = level.lower()
@@ -133,12 +134,15 @@ class Logger(object):
         else:
             return False
 
+
     def set_module(self, module):
         self.module = module
         self.pid = os.getpid()
 
+
     def no_formatting(self):
         self.fmt = False
+
 
     def set_logfile(self, log_file):
         self._log_file = log_file
@@ -149,36 +153,46 @@ class Logger(object):
             self._log_file_f = None
             self._where = Logger.LOG_TO_SCREEN
 
+
     def get_logfile(self):
         return self._log_file
+
 
     def set_where(self, where):
         self._where = where
 
+
     def get_level(self):
         return self._level
+
 
     def is_debug(self):
         return self._level <= Logger.LOG_LEVEL_DEBUG3
 
     level = property(get_level, set_level)
 
-    def log(self, message, level):
-        if self._where in (Logger.LOG_TO_CONSOLE, Logger.LOG_TO_CONSOLE_AND_FILE):
-            try:
-                self._lock.acquire()
-                if level >= Logger.LOG_LEVEL_WARN:
-                    out = sys.stderr
-                else:
-                    out = sys.stdout
-                try:
-                    out.write(message)
-                except UnicodeEncodeError:
-                    out.write(message.encode("utf-8"))
 
-                out.write('\n')
-            finally:
-                self._lock.release()
+    def log(self, message, level, newline=True):
+        if self._level <= level:
+            if self._where in (Logger.LOG_TO_CONSOLE, Logger.LOG_TO_CONSOLE_AND_FILE):
+                try:
+                    self._lock.acquire()
+                    if level >= Logger.LOG_LEVEL_WARN:
+                        out = sys.stderr
+                    else:
+                        out = sys.stdout
+
+                    try:
+                        out.write(message)
+                    except UnicodeEncodeError:
+                        out.write(message.encode("utf-8"))
+
+                    if newline:
+                        out.write('\n')
+
+                finally:
+                    self._lock.release()
+
 
     def log_to_file(self, message):
         if self._log_file_f is not None:
@@ -190,12 +204,14 @@ class Logger(object):
             finally:
                 self._lock.release()
 
+
     def stderr(self, message):
         try:
             self._lock.acquire()
             sys.stderr.write("%s: %s\n" % (self.module, message))
         finally:
             self._lock.release()
+
 
     def debug(self, message):
         if self._level <= Logger.LOG_LEVEL_DEBUG:
@@ -261,6 +277,7 @@ class Logger(object):
                 self.log(self.color("%s[%d]: debug: %s" % (self.module,  self.pid, "0000: (no data)"), 'blue'),
                         Logger.LOG_LEVEL_DEBUG)
 
+
     def info(self, message=''):
         if self._level <= Logger.LOG_LEVEL_INFO:
             self.log(message, Logger.LOG_LEVEL_INFO)
@@ -270,6 +287,7 @@ class Logger(object):
                 self.log_to_file("%s[%d]: info: :%s" % (self.module, self.pid, message))
 
     information = info
+
 
     def warn(self, message):
         if self._level <= Logger.LOG_LEVEL_WARN:
@@ -284,6 +302,7 @@ class Logger(object):
 
     warning = warn
 
+
     def note(self, message):
         if self._level <= Logger.LOG_LEVEL_WARN:
             txt = "note: %s" % message
@@ -294,6 +313,7 @@ class Logger(object):
                 self.log_to_file(txt)
 
     notice = note
+
 
     def error(self, message):
         if self._level <= Logger.LOG_LEVEL_ERROR:
@@ -332,23 +352,30 @@ class Logger(object):
             return ''.join([Logger.codes.get(color, 'bold'), text, Logger.codes['reset']])
         return text
 
+
     def bold(self, text):
         return self.color(text, 'bold')
+
 
     def red(self, text):
         return self.color(text, 'red')
 
+
     def green(self, text):
         return self.color(text, 'green')
+
 
     def purple(self, text):
         return self.color(text, 'purple')
 
+
     def yellow(self, text):
         return self.color(text, 'yellow')
 
+
     def darkgreen(self, text):
         return self.color(text, 'darkgreen')
+
 
     def blue(self, text):
         return self.color(text, 'blue')
@@ -385,7 +412,7 @@ class Logger(object):
     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE."""
 
-    def _pprint_line(self, indent_level, line, width=100, output=sys.stdout):
+    def _pprint_line(self, indent_level, line, width=100, level=LOG_LEVEL_DEBUG):
         if line.strip():
             start = ""
             number_chars = 0
@@ -397,32 +424,48 @@ class Logger(object):
                 elem_finished = re.findall("([?|\]\]]*\>)", line)[0]
                 #should not have *
                 attrs = re.findall("(\S*?\=\".*?\")", line)
-                output.write(start + elem_start)
+                #output.write(start + elem_start)
+                self.log(start+elem_start, level, False)
                 number_chars = len(start + elem_start)
                 for attr in attrs:
                     if (attrs.index(attr) + 1) == len(attrs):
                         number_chars = number_chars + len(elem_finished)
+
                     if (number_chars + len(attr) + 1) > width:
-                        output.write("\n")
-                        for i in range(len(start + elem_start) + 1):
-                            output.write(" ")
+                        #output.write("\n")
+                        self.log("\n", level, False)
+                        #for i in range(len(start + elem_start) + 1):
+                            ##output.write(" ")
+                            #self.log(" ", level, False)
+                        self.log(" "*(len(start + elem_start) + 1), level, False)
                         number_chars = len(start + elem_start) + 1
+
                     else:
-                        output.write(" ")
+                        #output.write(" ")
+                        self.log(" ", level, False)
                         number_chars = number_chars + 1
-                    output.write(attr)
+                    #output.write(attr)
+                    self.log(attr, level, False)
                     number_chars = number_chars + len(attr)
-                output.write(elem_finished + "\n")
+                #output.write(elem_finished + "\n")
+                self.log(elem_finished + "\n", level, False)
+
             except IndexError:
                 #give up pretty print this line
-                output.write(start + line + "\n")
+                #output.write(start + line + "\n")
+                self.log(start + line + "\n", level, False)
 
 
-    def _pprint_elem_content(self, indent_level, line, output=sys.stdout):
+    def _pprint_elem_content(self, indent_level, line, level=LOG_LEVEL_DEBUG):
         if line.strip():
-            for l in range(indent_level):
-                output.write(" ")
-            output.write(line + "\n")
+            #for l in range(indent_level):
+                ##output.write(" ")
+                #self.log(" ", level, False)
+            self.log(" "*indent_level, level, False)
+
+            #output.write(line + "\n")
+            self.log(line + "\n", level, False)
+
 
     def _get_next_elem(self, data):
         start_pos = data.find("<")
@@ -431,6 +474,7 @@ class Logger(object):
         stopper = retval.rfind("/")
         if stopper < retval.rfind("\""):
             stopper = -1
+
         single = (stopper > -1 and ((retval.find(">") - stopper) < (stopper - retval.find("<"))))
 
         ignore_excl = retval.find("<!") > -1
@@ -445,6 +489,7 @@ class Logger(object):
 
         elif ignore_question:
             end_pos = data.find("?>") + len("?>")
+
         ignore = ignore_excl or ignore_question
 
         no_indent = ignore or single
@@ -455,23 +500,23 @@ class Logger(object):
             stopper > -1, \
             no_indent
 
-    def xml(self, xml, output=sys.stdout, indent=4, width=80):
+
+    def xml(self, xml, level=LOG_LEVEL_DEBUG, indent=4, width=80):
         """Pretty print xml.
-        Use output to select output stream. Default is sys.stdout
         Use indent to select indentation level. Default is 4   """
         data = xml
         indent_level = 0
         start_pos, end_pos, is_stop, no_indent  = self._get_next_elem(data)
         while ((start_pos > -1 and end_pos > -1)):
-            self._pprint_elem_content(indent_level, data[:start_pos].strip(),
-                                output=output)
+            self._pprint_elem_content(indent_level, data[:start_pos].strip(), level=level)
             data = data[start_pos:]
             if is_stop and not no_indent:
                 indent_level = indent_level - indent
+
             self._pprint_line(indent_level,
                         data[:end_pos - start_pos],
-                        width=width,
-                        output=output)
+                        width=width, level=level)
+
             data = data[end_pos - start_pos:]
             if not is_stop and not no_indent :
                 indent_level = indent_level + indent

@@ -435,7 +435,7 @@ def alignType10Phase3(dev):
     dev.closePrint()
 
 
-def align10and11Controls(pattern, align_type):
+def align10and11and14Controls(pattern, align_type):
     if align_type == ALIGN_TYPE_LIDIL_0_5_4:
         if pattern == 1:
             controls = { 'A' : (True, 23),
@@ -464,7 +464,33 @@ def align10and11Controls(pattern, align_type):
                          'E' : (True, 9),
                          'F' : (True, 9),
                          'G' : (True, 9),
-                         'H' : (True, 9),}    
+                         'H' : (True, 9),}
+
+    elif align_type == ALIGN_TYPE_LIDIL_DJ_D1600:
+        if pattern == 1:
+            controls = { 'A' : (True, 23),
+                         'B' : (True, 9),}
+        elif pattern == 2: # K + color (ii)
+            controls = { 'A' : (True, 23),
+                         'B' : (True, 11),
+                         'C' : (True, 23),
+                         'D' : (True, 23),
+                         'E' : (True, 11),
+                         'F' : (True, 11),
+                         'G' : (True, 11),
+                         'H' : (True, 9),
+                         'I' : (True, 9),}
+
+        elif pattern == 3: # color + photo (iii)
+            controls = { 'A' : (True, 9),
+                         'B' : (True, 23),
+                         'C' : (True, 23),
+                         'D' : (True, 23),
+                         'E' : (True, 9),
+                         'F' : (True, 9),
+                         'G' : (True, 9),
+                         'H' : (True, 9),
+                         'I' : (True, 9),}    
 
     else:
         if pattern == 1:
@@ -562,7 +588,7 @@ def alignType11Phase2(dev, values, pattern, pen_config):
         values = values[:3]
 
     elif pen_config == AGENT_CONFIG_COLOR_ONLY:
-        active_colors = COMMAND_SET_PEN_ALIGNMENT_3_COLOR
+        active_colors = ldl.COMMAND_SET_PEN_ALIGNMENT_3_COLOR
         values = values[:3]
 
     elif pen_config == AGENT_CONFIG_COLOR_AND_BLACK:
@@ -574,6 +600,11 @@ def alignType11Phase2(dev, values, pattern, pen_config):
     log.debug("Active colors=0x%x Values=%s" % (active_colors, values))
 
     dev.printData(ldl.buildSetPenAlignment3Packet(active_colors, values))
+    dev.closePrint()
+
+def alignType11Phase3(dev):
+    dev.printData(ldl.buildResetPacket())
+    dev.printData(ldl.buildReportPagePacket(ldl.COMMAND_REPORT_PAGE_PEN_CALIBRATION_VERIFY))
     dev.closePrint()
 
 
@@ -589,10 +620,89 @@ def alignType13Phase1(dev):
     dev.setPML(pml.OID_AUTO_ALIGNMENT, pml.AUTO_ALIGNMENT)
     dev.closePML()
 
-def alignType11Phase3(dev):
+
+def AlignType14(dev, loadpaper_ui, align_ui, invalidpen_ui):
+    pattern = alignType14SetPattern(dev)
+    if pattern is None:
+        invalidpen_ui()
+        return
+        
+    state = 0
+    while state != -1:
+        if state == 0:
+            state = -1
+            ok = loadpaper_ui()
+            if ok:
+                alignType14Phase1(dev)
+                state = 1
+
+        elif state == 1:
+            values = align_ui(pattern, ALIGN_TYPE_LIDIL_DJ_D1600)
+            log.debug(values)
+            alignType14Phase2(dev, values, pattern, dev.pen_config)
+            state = 2
+
+        elif state == 2:
+            state = -1
+            ok = loadpaper_ui()
+            if ok:
+                alignType14Phase3(dev)
+
+
+def alignType14SetPattern(dev):
+    pattern = None
+    dev.pen_config = status.getPenConfiguration(dev.getStatusFromDeviceID())
+    log.debug("Pen config=%d" % dev.pen_config)
+
+    if dev.pen_config in (AGENT_CONFIG_BLACK_ONLY, AGENT_CONFIG_COLOR_ONLY): # (i)
+        pattern = 1
+
+    if dev.pen_config == AGENT_CONFIG_COLOR_AND_BLACK: # (ii)
+        pattern = 2
+
+    elif dev.pen_config == AGENT_CONFIG_COLOR_AND_PHOTO: # (iii)
+        pattern = 3
+
+    elif dev.pen_config == AGENT_CONFIG_PHOTO_ONLY:
+        return None
+
+    log.debug("Pattern=%d" % pattern) 
+    return pattern
+    
+
+def alignType14Phase1(dev):
+    dev.printData(ldl.buildResetPacket())
+    dev.printData(ldl.buildReportPagePacket(ldl.COMMAND_REPORT_PAGE_PEN_CALIBRATION))
+    dev.closePrint()
+
+
+def alignType14Phase2(dev, values, pattern, pen_config):
+    active_colors = 0
+
+    if pen_config == AGENT_CONFIG_BLACK_ONLY:
+        active_colors = ldl.COMMAND_SET_PEN_ALIGNMENT_3_K
+        values = values[:2]
+
+    elif pen_config == AGENT_CONFIG_COLOR_ONLY:
+        active_colors = ldl.COMMAND_SET_PEN_ALIGNMENT_3_COLOR
+        values = values[:2]
+
+    elif pen_config == AGENT_CONFIG_COLOR_AND_BLACK:
+        active_colors = ldl.COMMAND_SET_PEN_ALIGNMENT_3_K | ldl.COMMAND_SET_PEN_ALIGNMENT_3_COLOR
+
+    elif pen_config == AGENT_CONFIG_COLOR_AND_PHOTO:
+        active_colors = ldl.COMMAND_SET_PEN_ALIGNMENT_3_COLOR | ldl.COMMAND_SET_PEN_ALIGNMENT_3_PHOTO
+
+    log.debug("Active colors=0x%x Values=%s" % (active_colors, values))
+
+    dev.printData(ldl.buildSetPenAlignment3Packet(active_colors, values))
+    dev.closePrint()
+
+def alignType14Phase3(dev):
     dev.printData(ldl.buildResetPacket())
     dev.printData(ldl.buildReportPagePacket(ldl.COMMAND_REPORT_PAGE_PEN_CALIBRATION_VERIFY))
     dev.closePrint()
+
 
 def alignType2Phase1(dev): # Type 2 (8xx)
     dev.writeEmbeddedPML(pml.OID_AGENT2_VERTICAL_ALIGNMENT, 0)

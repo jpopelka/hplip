@@ -137,7 +137,7 @@ def create_outgoing_packets(answers):
             packet.write(struct.pack("!B", 0x00))
 
             # QTYPE/QCLASS
-            packet.write(struct.pack("!HH", QTYPE_PTR, QCLASS_IN)) 
+            packet.write(struct.pack("!HH", QTYPE_PTR, QCLASS_IN))
 
         first_record = True
         for d in answers[index:index+MAX_ANSWERS_PER_PACKET]:
@@ -153,7 +153,7 @@ def create_outgoing_packets(answers):
                 answer_record.write(struct.pack("!H", 0xc00c)) # Pointer
 
             # TYPE/CLASS
-            answer_record.write(struct.pack("!HH", QTYPE_PTR, QCLASS_IN)) 
+            answer_record.write(struct.pack("!HH", QTYPE_PTR, QCLASS_IN))
 
             # TTL
             answer_record.write(struct.pack("!I", 0xffff))
@@ -186,23 +186,26 @@ def create_outgoing_packets(answers):
 
 
 
-def detectNetworkDevices(ttl=4, timeout=10): 
+def detectNetworkDevices(ttl=4, timeout=10):
     mcast_addr, mcast_port ='224.0.0.251', 5353
     found_devices = {}
     answers = []
 
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        x = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        x.connect(('1.2.3.4', 56))
+        intf = x.getsockname()[0]
+        x.close()
 
-    x = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    x.connect(('1.2.3.4', 56))
-    intf = x.getsockname()[0]
-    x.close()
-
-    s.setblocking(0)
-    ttl = struct.pack('B', ttl) 
+        s.setblocking(0)
+        ttl = struct.pack('B', ttl)
+    except socket.error:
+        log.error("Network error")
+        return {}
 
     try:
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) 
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
     except (AttributeError, socket.error):
         pass
@@ -243,14 +246,14 @@ def detectNetworkDevices(ttl=4, timeout=10):
 
         r, w, e = select.select([s], [], [s], 0.5)
 
-        if not r: 
+        if not r:
             continue
 
         data, addr = s.recvfrom(16384)
 
         if data:
             update_spinner()
-            y = {'num_devices' : 1, 'num_ports': 1, 'product_id' : '', 'mac': '', 
+            y = {'num_devices' : 1, 'num_ports': 1, 'product_id' : '', 'mac': '',
                  'status_code': 0, 'device2': '0', 'device3': '0', 'note': ''}
 
             log.debug("Incoming: (%d)" % len(data))
@@ -260,7 +263,8 @@ def detectNetworkDevices(ttl=4, timeout=10):
             offset, (id, flags, num_questions, num_answers, num_authorities, num_additionals) = \
                 read_data_unpack(offset, data, "!HHHHHH")
 
-            log.debug("Response: ID=%d FLAGS=0x%x Q=%d A=%d AUTH=%d ADD=%d" % (id, flags, num_questions, num_answers, num_authorities, num_additionals))
+            log.debug("Response: ID=%d FLAGS=0x%x Q=%d A=%d AUTH=%d ADD=%d" %
+                (id, flags, num_questions, num_answers, num_authorities, num_additionals))
 
             for question in range(num_questions):
                 update_spinner()
@@ -286,7 +290,7 @@ def detectNetworkDevices(ttl=4, timeout=10):
                     y['mdns'] = name
                     answers.append(name.replace("._pdl-datastream._tcp.local.", ""))
 
-                elif info[0] == QTYPE_TXT: 
+                elif info[0] == QTYPE_TXT:
                     offset, name = read_data(offset, data, info[3])
                     txt, off = {}, 0
 
@@ -309,7 +313,7 @@ def detectNetworkDevices(ttl=4, timeout=10):
                     if 'note' in txt:
                         y['note'] = txt['note']
 
-                elif info[0] == QTYPE_SRV: 
+                elif info[0] == QTYPE_SRV:
                     offset, (priority, weight, port) = read_data_unpack(offset, data, "!HHH")
                     ttl = info[3]
                     offset, server = read_name(offset, data)
@@ -325,7 +329,6 @@ def detectNetworkDevices(ttl=4, timeout=10):
                     break
 
         found_devices[y['ip']] = y
-
 
     log.debug("Found %d devices" % len(found_devices))
 

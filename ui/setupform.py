@@ -225,7 +225,7 @@ class SetupForm(SetupForm_base):
                 if device_uri:
                     self.device_uri = device_uri
 
-            back_end, is_hp, bus, model, serial, dev_file, host, port = \
+            back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
                 device.parseDeviceURI(self.device_uri)
 
             self.bus = bus
@@ -415,13 +415,17 @@ class SetupForm(SetupForm_base):
                           }
 
             filter_dict = {}
-            for f in self.filter:
-                if f in FILTER_MAP:
-                    filter_dict[FILTER_MAP[f]] = (operator.gt, 0)
-                else:
-                    filter_dict[f] = (operator.gt, 0)
 
-            devices = device.probeDevices([self.bus], self.timeout, self.ttl, filter_dict, self.search)
+            if prop.fax_build and prop.scan_build:
+                for f in self.filter:
+                    if f in FILTER_MAP:
+                        filter_dict[FILTER_MAP[f]] = (operator.gt, 0)
+                    else:
+                        filter_dict[f] = (operator.gt, 0)
+            else:
+                filter_dict['scan-type'] = (operator.le, SCAN_TYPE_NONE)
+
+            devices = device.probeDevices([self.bus], self.timeout, self.ttl, filter_dict, self.search, net_search='slp')
 
             self.probeHeadingTextLabel.setText(self.__tr("%1 device(s) found on the %1:").arg(len(devices)).arg(io_str))
 
@@ -440,7 +444,7 @@ class SetupForm(SetupForm_base):
         if devices:
             row = 0
             for d in devices:
-                back_end, is_hp, bus, model, serial, dev_file, host, port = device.parseDeviceURI(d)
+                back_end, is_hp, bus, model, serial, dev_file, host, zc, port = device.parseDeviceURI(d)
 
                 mq = {}
                 model_ui = models.normalizeModelUIName(model)
@@ -502,7 +506,7 @@ class SetupForm(SetupForm_base):
             cups_uri, sane_uri, fax_uri = device.makeURI(dlg.param)
 
             if cups_uri:
-                back_end, is_hp, bus, model, serial, dev_file, host, port = device.parseDeviceURI(cups_uri)
+                back_end, is_hp, bus, model, serial, dev_file, host, zc, port = device.parseDeviceURI(cups_uri)
                 name = ''
                 if self.bus == 'net':
                     try:
@@ -523,7 +527,7 @@ class SetupForm(SetupForm_base):
     def updatePPDPage(self, ppds=None):
         QApplication.setOverrideCursor(QApplication.waitCursor)
         try:
-            back_end, is_hp, bus, model, serial, dev_file, host, port = device.parseDeviceURI(self.device_uri)
+            back_end, is_hp, bus, model, serial, dev_file, host, zc, port = device.parseDeviceURI(self.device_uri)
         except Error:
             self.FailureUI(self.__tr("<b>Device not found or invalid HPLIP device.</b><p>If you specified a USB ID, IP address, or other parameter, please re-check it and try again."))
             self.close()
@@ -587,7 +591,7 @@ class SetupForm(SetupForm_base):
 
         self.installed_queues = [p.name for p in cups.getPrinters()]
 
-        back_end, is_hp, bus, model, serial, dev_file, host, port = device.parseDeviceURI(self.device_uri)
+        back_end, is_hp, bus, model, serial, dev_file, host, zc, port = device.parseDeviceURI(self.device_uri)
         default_model = utils.xstrip(model.replace('series', '').replace('Series', ''), '_')
 
         printer_name = default_model
@@ -695,7 +699,7 @@ class SetupForm(SetupForm_base):
 
         self.fax_uri = self.device_uri.replace('hp:', 'hpfax:')
 
-        back_end, is_hp, bus, model, serial, dev_file, host, port = device.parseDeviceURI(self.fax_uri)
+        back_end, is_hp, bus, model, serial, dev_file, host, zc, port = device.parseDeviceURI(self.fax_uri)
         default_model = utils.xstrip(model.replace('series', '').replace('Series', ''), '_')
 
         fax_name = default_model + "_fax"

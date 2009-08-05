@@ -35,6 +35,7 @@ from base import device, utils, pml, maint, models, pkit
 from prnt import cups
 from base.codes import *
 from ui_utils import *
+import hpmudext
 
 # Qt
 from PyQt4.QtCore import *
@@ -981,7 +982,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                 opt_plugin = d.plugin == PLUGIN_OPTIONAL
 
                 try:
-                    back_end, is_hp, bus, model, serial, dev_file, host, port = \
+                    back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
                         device.parseDeviceURI(self.cur_device_uri)
                 except Error:
                     return
@@ -1149,7 +1150,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                      self.__tr("Open printer's web page in a browser"),
                      "ews",
                      self.__tr("The printer's web page has supply, status, and other information."),
-                     "http://%s" % host),
+                     openEWS(host, zc)),
 
                     # HELP/WEBSITE
 
@@ -1190,7 +1191,6 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
             self.click_lock = item
 
             if item.cmd and callable(item.cmd):
-
                 dlg = item.cmd()
                 self.sendMessage('', '', EVENT_DEVICE_STOP_POLLING)
                 try:
@@ -2178,3 +2178,13 @@ def showPasswordUI(prompt):
         pass
 
     return ("", "")
+
+
+def openEWS(host, zc):
+    if zc:
+        status, ip = hpmudext.get_zc_ip_address(zc)
+        if status != hpmudext.HPMUD_R_OK:
+            ip = "hplipopensource.com"
+    else:
+        ip = host
+    return "http://%s" % ip

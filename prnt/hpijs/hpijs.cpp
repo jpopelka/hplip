@@ -253,8 +253,16 @@ int hpijs_set_cb (void *set_cb_data, IjsServerCtx *ctx, IjsJobId job_id,
 		// call dbus here
 		const char    *user_name = " ";
 		const char    *title     = " ";
+                const char *device_uri = getenv ("DEVICE_URI");
+                const char *printer = getenv ("PRINTER");
 		int     job_id = 0;
-                SendDbusMessage (getenv ("DEVICE_URI"), getenv("PRINTER"),
+
+                if (device_uri == NULL)
+                    device_uri = "";
+                if (printer == NULL)
+                    printer = "";
+
+                SendDbusMessage (device_uri, printer,
 	     	                 EVENT_PRINT_FAILED_MISSING_PLUGIN,
 				 user_name, job_id, title);
                 BUG("unable to set device=%s, err=%d\n", svalue, r);
@@ -627,11 +635,11 @@ int main (int argc, char *argv[], char *evenp[])
 			case WARN_LOW_INK_YELLOW:
 			case WARN_LOW_INK_MULTIPLE_PENS:
                         {
-			   BUG ("STATE: marker-supply-low-warning\n");
+			   BUG ("STATE: +marker-supply-low-warning\n");
                            break;
                         }
 			default:
-			   BUG ("STATE: -marker-supply-low-warning");
+			   BUG ("STATE: -marker-supply-low-warning\n");
 		}
     }
 

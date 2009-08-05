@@ -61,7 +61,7 @@ class ChoosePrinterDlg(QDialog):
         self.printer_index, x = {}, 0
         for p in printers:
             try:
-                back_end, is_hp, bus, model, serial, dev_file, host, port = \
+                back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
                     device.parseDeviceURI(p.device_uri)
 
             except Error:

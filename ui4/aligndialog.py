@@ -85,7 +85,7 @@ class AlignDialog(QDialog, Ui_Dialog):
             ALIGN_TYPE_UNSUPPORTED : 1,
             ALIGN_TYPE_AUTO : 2,
             ALIGN_TYPE_9XX : 7,
-            ALIGN_TYPE_8XX : 6,
+            ALIGN_TYPE_8XX : 7,
             ALIGN_TYPE_LIDIL_0_3_8 : 0,
             ALIGN_TYPE_LIDIL_0_4_3 : 0,
             ALIGN_TYPE_LIDIL_AIO : 3,
@@ -97,6 +97,7 @@ class AlignDialog(QDialog, Ui_Dialog):
             ALIGN_TYPE_OJ_PRO : 0,
             ALIGN_TYPE_TEST : 0,
             ALIGN_TYPE_AIO : 3,
+            ALIGN_TYPE_LIDIL_DJ_D1600: 0,
             }
 
         self.seq = { # (func|method, tuple of params|None)
@@ -140,10 +141,10 @@ class AlignDialog(QDialog, Ui_Dialog):
                                 (self.endAlignmentNumberPage, ('B',)),
                                 (self.showAlignmentNumberPage, ('C', 'v', 'kc', 2, 5)),
                                 (self.endAlignmentNumberPage, ('C',)),
-                                (self.setAlignButton, (BUTTON_ALIGN,)),
                                 (self.showAlignmentNumberPage, ('D', 'v', 'c', 2, 5)),
                                 (self.endAlignmentNumberPage, ('D',)),
-                                (self.showLoadPaperPage, None),
+                                (self.setAlignButton, (BUTTON_ALIGN,)),
+                                (self.showLoadPaperPage, (lambda: True,)),
                                 (maint.alignType2Phase2, (lambda: self.dev, lambda: self.a, lambda: self.b,
                                                           lambda: self.c, lambda: self.d)),
                                 (self.close, None),
@@ -303,7 +304,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                                (maint.alignType10Phase2, (lambda: self.dev, lambda: self.values,
                                                           lambda: self.pattern)),
                                (self.setAlignButton, (BUTTON_FINISH,)),
-                               (self.showLoadPaperPage, None),
+                               (self.showLoadPaperPage, (lambda: True,)),
                                (maint.alignType10Phase3, (lambda: self.dev,)),
                                (self.close, None),
                             ],
@@ -315,9 +316,9 @@ class AlignDialog(QDialog, Ui_Dialog):
                                (self.showLBowPage, (lambda: self.pattern,)),
                                (self.endLBowPage, None), # sets values
                                (maint.alignType11Phase2, (lambda: self.dev, lambda: self.values,
-                                                          lambda: self.pattern)),
+                                                          lambda: self.pattern, lambda: self.dev.pen_config)),
                                (self.setAlignButton, (BUTTON_FINISH,)),
-                               (self.showLoadPaperPage, None),
+                               (self.showLoadPaperPage, (lambda: True,)),
                                (maint.alignType11Phase3, (lambda: self.dev,)),
                                (self.close, None),
                             ],
@@ -336,6 +337,19 @@ class AlignDialog(QDialog, Ui_Dialog):
                               (self.close, None),
                             ],
 
+            ALIGN_TYPE_LIDIL_DJ_D1600 : [ # 14
+                               (self.showLoadPaperPage, None),
+                               (maint.alignType14Phase1, (lambda: self.dev,)),
+                               (self.setAlignButton, (BUTTON_ALIGN,)),
+                               (self.showLBowPage, (lambda: self.pattern,)),
+                               (self.endLBowPage, None), # sets values
+                               (maint.alignType14Phase2, (lambda: self.dev, lambda: self.values,
+                                                          lambda: self.pattern, lambda: self.dev.pen_config)),
+                               (self.setAlignButton, (BUTTON_FINISH,)),
+                               (self.showLoadPaperPage, (lambda: True,)),
+                               (maint.alignType14Phase3, (lambda: self.dev,)),
+                               (self.close, None),
+                            ],
 
             }
 
@@ -449,7 +463,9 @@ class AlignDialog(QDialog, Ui_Dialog):
             return
 
 
-    def showLoadPaperPage(self):
+    def showLoadPaperPage(self, finish=False):
+        if finish:
+            self.LoadPaper.button_name = self.__tr("Finish >")
         self.LoadPaper.updateUi()
         self.displayPage(PAGE_LOAD_PAPER)
 
@@ -520,6 +536,9 @@ class AlignDialog(QDialog, Ui_Dialog):
         if self.align_type == ALIGN_TYPE_LBOW:
             pattern = maint.alignType10SetPattern(self.dev)
 
+        elif self.align_type == ALIGN_TYPE_LIDIL_DJ_D1600:
+            pattern = maint.alignType14SetPattern(self.dev)
+
         else: # ALIGN_TYPE_LIDIL_0_5_4
             pattern = maint.alignType11SetPattern(self.dev)
 
@@ -527,10 +546,11 @@ class AlignDialog(QDialog, Ui_Dialog):
             log.error("Invalid pattern!")
             # TODO: ...
 
-        self.controls = maint.align10and11Controls(pattern, self.align_type)
-
+        self.controls = maint.align10and11and14Controls(pattern, self.align_type)
+        keys = self.controls.keys()
+        keys.sort()
         max_line = 'A'
-        for line in self.controls:
+        for line in keys:
             if self.controls[line][0]:
                 max_line = line
             else:
@@ -540,7 +560,7 @@ class AlignDialog(QDialog, Ui_Dialog):
 
         for line in self.controls:
             if not self.controls[line][0]:
-                eval('self.%sComboBox%s.setEnabled(False)' % line.lower())
+                eval('self.%sComboBox.setEnabled(False)' % line.lower())
             else:
                 for x in range(self.controls[line][1]):
                     eval('self.%sComboBox.addItem("%s%d")' % (line.lower(), line, x + 1))
@@ -556,7 +576,7 @@ class AlignDialog(QDialog, Ui_Dialog):
 
         for line in controls:
             if not self.controls[line][0]:
-                ret.append(0)
+                self.values.append(0)
             else:
                 exec('selected = unicode(self.%sComboBox.currentText())' % line.lower())
                 try:

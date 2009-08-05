@@ -248,6 +248,7 @@ class CoreInstall(object):
             'package_available' : TYPE_BOOL,
             'package_arch' : TYPE_LIST,
             'add_user_to_group': TYPE_STRING,
+            'open_mdns_port' : TYPE_LIST, # command to use to open mdns multicast port 5353
         }
 
         # components
@@ -1303,7 +1304,9 @@ class CoreInstall(object):
                 pkgs, cmds = self.get_dependency_data(d)
 
                 if pkgs:
-                    packages_to_install.extend(pkgs)
+                    for p in pkgs:
+                        if not p in packages_to_install:
+                            packages_to_install.append(p)
 
                 if cmds:
                     commands_to_run.extend(cmds)
@@ -1476,6 +1479,7 @@ class CoreInstall(object):
         else:
             return False
 
+
     def run_pre_depend(self, callback=None):
         pre_cmd = self.get_distro_ver_data('pre_depend_cmd')
         log.debug(pre_cmd)
@@ -1491,6 +1495,7 @@ class CoreInstall(object):
                     callback(cmd, "Pre-depend step %d" % x)
 
                 x += 1
+
 
     def run_post_depend(self, callback=None):
         post_cmd = self.get_distro_ver_data('post_depend_cmd')
@@ -1509,12 +1514,32 @@ class CoreInstall(object):
                 x += 1
 
 
+    def run_open_mdns_port(self, callback=None):
+        open_mdns_port_cmd = self.get_distro_ver_data('open_mdns_port')
+        log.debug(open_mdns_port_cmd)
+        if open_mdns_port_cmd:
+            x = 1
+            for cmd in open_mdns_port_cmd:
+                cmd = self.su_sudo() % cmd
+                status, output = self.run(cmd)
+
+                if status != 0:
+                    log.warn("An error occurred running '%s'" % cmd)
+                    log.warn(output)
+
+                if callback is not None:
+                    callback(cmd, "Open mDNS/Bonjour step %d" % x)
+
+                x += 1
+
+
     def pre_build(self):
         cmds = []
         if self.get_distro_ver_data('fix_ppd_symlink', False):
             cmds.append(self.su_sudo() % 'python ./installer/fix_symlink.py')
 
         return cmds
+
 
     def run_pre_build(self, callback=None):
         x = 1
@@ -1850,9 +1875,9 @@ class CoreInstall(object):
             return False
 
         if mode == GUI_MODE:
-            return os.system("sh %s -- -u" % plugin_file) == 0
+            return os.system("sh %s --nox11 -- -u" % plugin_file) == 0
         else:
-            return os.system("sh %s -- -i" % plugin_file) == 0
+            return os.system("sh %s --nox11 -- -i" % plugin_file) == 0
 
 
     def delete_plugin(self):

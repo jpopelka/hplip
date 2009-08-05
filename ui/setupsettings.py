@@ -34,15 +34,18 @@ class SetupSettings(SetupSettings_base):
         self.ttl = ttl
         self.timeout = timeout
 
-        log.error("filter is %s" % filter)
-        if not filter:
-            self.filterButtonGroup.setButton(0)
+        log.debug("filter is %s" % filter)
+        if prop.fax_build and prop.scan_build:
+            if not filter:
+                self.filterButtonGroup.setButton(0)
+            else:
+                self.filterButtonGroup.setButton(1)
+                self.faxCheckBox.setChecked('fax' in filter)
+                self.scanCheckBox.setChecked('scan' in filter)
+                self.pcardCheckBox.setChecked('pcard' in filter)
+                self.copyCheckBox.setChecked('copy' in filter)
         else:
-            self.filterButtonGroup.setButton(1)
-            self.faxCheckBox.setChecked('fax' in filter)
-            self.scanCheckBox.setChecked('scan' in filter)
-            self.pcardCheckBox.setChecked('pcard' in filter)
-            self.copyCheckBox.setChecked('copy' in filter)
+            self.filterButtonGroup.setEnabled(False)
 
         self.searchTermLineEdit.setText(self.search)
 

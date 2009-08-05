@@ -787,8 +787,36 @@ def start(language, auto=True, test_depends=False,
 
         log.info("\nBuild complete.")
 
+        #
+        # POST BUILD
+        #
+
         tui.title("POST-BUILD COMMANDS")
         core.run_post_build(progress_callback)
+
+        #
+        # OPEN MDNS MULTICAST PORT
+        #
+
+        if core.selected_options['network']:
+            open_mdns_port = core.get_distro_ver_data('open_mdns_port')
+            if open_mdns_port:
+                tui.title("OPEN MDNS/BONJOUR FIREWALL PORT (MULTICAST PORT 5353)")
+
+                paragraph = "In order to setup your printer on the network using mDNS/Bonjour, it is required that your internet firewall allows connections on port 5353. If this port is blocked by the firewall, connection to network printers using mDNS/Bonjour will not be possible."
+
+                for p in tui.format_paragraph(paragraph):
+                    log.info(p)
+                log.info("")
+
+                ok, ans = tui.enter_yes_no("Do you wish to open this port on your internet firewall")
+                if not ok: sys.exit(0)
+
+                if ans:
+                    core.run_open_mdns_port()
+                else:
+                    log.warn("Skipping firewall setup. If this port is blocked on your firewall when setting up network printers, use SLP discovery and device URIs with ?ip=x.x.x.x. When using hp-setup, choose 'SLP' discovery under 'Advanced'.")
+
 
         #
         # Try to close running hp-systray (3.9.2 or later)

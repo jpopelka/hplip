@@ -101,13 +101,13 @@ f 0644 root root $ppd/HP ppd/hpcups/*.ppd.gz
 f 0644 root root $ppd/HP prnt/ps/*.ppd.gz
 
 %system darwin
-f 0755 root root $libdir/libhpmud.0.0.5.dylib .libs/libhpmud.0.0.5.dylib
-l 0755 root root $libdir/libhpmud.dylib libhpmud.0.0.5.dylib
+f 0755 root root $libdir/libhpmud.0.0.6.dylib .libs/libhpmud.0.0.6.dylib
+l 0755 root root $libdir/libhpmud.dylib libhpmud.0.0.6.dylib
 f 0755 root root $libdir/libhpip.0.0.1.dylib .libs/libhpip.0.0.1.dylib
 l 0755 root root $libdir/libhpip.dylib libhpip.0.0.1.dylib
 %system !darwin
-f 0755 root root $libdir/libhpmud.so.0.0.5 .libs/libhpmud.so.0.0.5
-l 0755 root root $libdir/libhpmud.so libhpmud.so.0.0.5
+f 0755 root root $libdir/libhpmud.so.0.0.6 .libs/libhpmud.so.0.0.6
+l 0755 root root $libdir/libhpmud.so libhpmud.so.0.0.6
 f 0755 root root $libdir/libhpip.so.0.0.1 .libs/libhpip.so.0.0.1
 l 0755 root root $libdir/libhpip.so libhpip.so.0.0.1
 # Ugly fix for inconsistent libcrypto soname
@@ -142,12 +142,12 @@ l 0755 root root $libdir/libhpip.so libhpip.so.0.0.1
 @epm_full@f 0755 root root $pyexecdir/cupsext.dylib .libs/cupsext.dylib
 @epm_full@f 0755 root root $pyexecdir/hpmudext.dylib .libs/hpmudext.dylib
 @epm_full@f 0755 root root $pyexecdir/pcardext.dylib .libs/pcardext.dylib
-@epm_full@f 0755 root root $pyexecdir/scanext.dylib .libs/scanext.dylib
+@epm_scan@@epm_full@f 0755 root root $pyexecdir/scanext.dylib .libs/scanext.dylib
 @epm_full@%system !darwin
 @epm_full@f 0755 root root $pyexecdir/cupsext.so .libs/cupsext.so
 @epm_full@f 0755 root root $pyexecdir/hpmudext.so .libs/hpmudext.so
 @epm_full@f 0755 root root $pyexecdir/pcardext.so .libs/pcardext.so
-@epm_full@f 0755 root root $pyexecdir/scanext.so .libs/scanext.so
+@epm_scan@@epm_full@f 0755 root root $pyexecdir/scanext.so .libs/scanext.so
 @epm_full@%system all
 @epm_full@f 644 root root $icondir/hplip.desktop hplip.desktop
 @epm_full@f 644 root root $systraydir/hplip-systray.desktop hplip-systray.desktop

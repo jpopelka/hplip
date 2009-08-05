@@ -74,7 +74,8 @@ def usage(typ='text'):
 
 build_str = "HPLIP will not build, install, and/or function properly without this dependency."
 
-pat_deviceuri = re.compile(r"""(.*):/(.*?)/(\S*?)\?(?:serial=(\S*)|device=(\S*)|ip=(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}[^&]*))(?:&port=(\d))?""", re.I)
+pat_deviceuri = re.compile(r"""(.*):/(.*?)/(\S*?)\?(?:serial=(\S*)|device=(\S*)|ip=(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}[^&]*)|zc=(\S+))(?:&port=(\d))?""", re.I)
+#pat_deviceuri = re.compile(r"""(.*):/(.*?)/(\S*?)\?(?:serial=(\S*)|device=(\S*)|ip=(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}[^&]*))(?:&port=(\d))?""", re.I)
 
 pat_cups_error_log = re.compile("""^loglevel\s?(debug|debug2|warn|info|error|none)""", re.I)
 
@@ -96,7 +97,10 @@ def parseDeviceURI(device_uri):
     serial = m.group(4) or ''
     dev_file = m.group(5) or ''
     host = m.group(6) or ''
-    port = m.group(7) or 1
+    zc = ''
+    if not host:
+        zc = host = m.group(7) or ''
+    port = m.group(8) or 1
 
     if bus == 'net':
         try:
@@ -107,7 +111,10 @@ def parseDeviceURI(device_uri):
         if port == 0:
             port = 1
 
-    return back_end, is_hp, bus, model, serial, dev_file, host, port
+#   log.debug("%s: back_end '%s' is_hp '%s' bus '%s' model '%s' serial '%s' dev_file '%s' host '%s' zc '%s' port '%s' " %
+#       (device_uri, back_end, is_hp, bus, model, serial, dev_file, host, zc, port))
+
+    return back_end, is_hp, bus, model, serial, dev_file, host, zc, port
 
 num_errors = 0
 fmt = True
@@ -572,13 +579,13 @@ try:
                     continue
 
                 try:
-                    back_end, is_hp, bus, model, serial, dev_file, host, port = \
+                    back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
                         parseDeviceURI(device_uri)
                 except Error:
-                    back_end, is_hp, bus, model, serial, dev_file, host, port = \
-                        '', False, '', '', '', '', '', 1
+                    back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
+                        '', False, '', '', '', '', '', '', 1
 
-                #print back_end, is_hp, bus, model, serial, dev_file, host, port
+                #print back_end, is_hp, bus, model, serial, dev_file, host, zc, port
 
                 log.info(log.bold(printer_name))
                 log.info(log.bold('-'*len(printer_name)))

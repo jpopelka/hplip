@@ -30,7 +30,10 @@ from base import device, utils
 
 MAX_NETWORKS = 100
 MAX_RETRIES = 20
-
+NS = "http://www.hp.com/schemas/imaging/cnc/dcsl/2006/05/WifiConfig"
+PREAMBLE = """<?xml version="1.0" encoding="utf-8"?>
+<WiFiConfig xmlns="%s">
+""" % NS
 
 def _readWriteWifiConfig(dev, request):
     if not request:
@@ -106,9 +109,7 @@ def _readWriteWifiConfig(dev, request):
 
 def getDeviceCapabilities(dev):
     ret = {}
-    request = """<?xml version="1.0" encoding="utf-8"?>
-<WiFiConfig xmlns="http://schemas.hp.com/2006/05/WirelessConfig">
-<GetDeviceCapabilitiesRequest>
+    request = PREAMBLE + """<GetDeviceCapabilitiesRequest>
 </GetDeviceCapabilitiesRequest>
 </WiFiConfig>"""
 
@@ -140,9 +141,7 @@ def getDeviceCapabilities(dev):
 
 def getAdaptorList(dev):
     ret = {}
-    request = """<?xml version="1.0" encoding="utf-8"?>
-<WiFiConfig xmlns="http://schemas.hp.com/2006/05/WirelessConfig">
-<GetAdaptorListRequest>
+    request = PREAMBLE + """<GetAdaptorListRequest>
 </GetAdaptorListRequest>
 </WiFiConfig>"""
 
@@ -172,7 +171,6 @@ def getAdaptorList(dev):
             ret['adaptorpresence-0'] = params['wificonfig-getadaptorlistresponse-adaptorlist-adaptorinfo-adaptorpresence']
             ret['adaptorstate-0'] = params['wificonfig-getadaptorlistresponse-adaptorlist-adaptorinfo-adaptorstate']
             ret['adaptortype-0'] = params['wificonfig-getadaptorlistresponse-adaptorlist-adaptorinfo-adaptortype']
-            ret['adaptormac-0'] = params['wificonfig-getadaptorlistresponse-adaptorlist-adaptorinfo-macaddress']
         except KeyError, e:
             log.debug("Missing response key: %s" % e)
     else:
@@ -183,7 +181,6 @@ def getAdaptorList(dev):
                 ret['adaptorpresence-%d' % a] = params['wificonfig-getadaptorlistresponse-adaptorlist-adaptorinfo-adaptorpresence-%d' % a]
                 ret['adaptorstate-%d' % a] = params['wificonfig-getadaptorlistresponse-adaptorlist-adaptorinfo-adaptorstate-%d' % a]
                 ret['adaptortype-%d' % a] = params['wificonfig-getadaptorlistresponse-adaptorlist-adaptorinfo-adaptortype-%d' % a]
-                ret['adaptormac-%d' % a] = params['wificonfig-getadaptorlistresponse-adaptorlist-adaptorinfo-macaddress-%d' % a]
             except KeyError, e:
                 log.debug("Missing response key: %s" % e)
 
@@ -191,11 +188,9 @@ def getAdaptorList(dev):
 
 # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-
 def getWifiAdaptorID(dev):
-    # ret: n, adaptor_id, name, state, presence, mac
+    # ret: adaptor_id, name, state, presence
     ret = getAdaptorList(dev)
-    #log.pprint(ret)
 
     try:
         num_adaptors = ret['adaptorlistlength']
@@ -208,31 +203,31 @@ def getWifiAdaptorID(dev):
         except KeyError:
             name = ''
 
-        if name.lower() == 'wifiembedded':
-            params = ['adaptorname', 'adaptorstate',
-                      'adaptorpresence', 'adaptormac']
+        if name.lower() in ('wifiembedded', 'wifiaccessory'):
+            params = ['adaptorid', 'adaptorname', 'adaptorstate', 'adaptorpresence']
 
-            r = [n]
+            r = []
             for p in params:
                 try:
                     x = ret[''.join([p, '-', str(n)])]
                 except KeyError:
-                    x = 'Unknown'
+                    if p == 'adaptorid':
+                        x = -1
+                    else:
+                        x = 'Unknown'
 
                 r.append(x)
 
             return r
 
-    return -1, 'Unknown', 'Unknown', 'Unknown', 'Unknown', 'Unknown'
+    return -1, 'Unknown', 'Unknown', 'Unknown'
 
 # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 
 def setAdaptorPower(dev, adaptor_id=0, power_state='PowerOn'):
     ret = {}
-    request = """<?xml version="1.0" encoding="utf-8"?>
-<WiFiConfig xmlns="http://schemas.hp.com/2006/05/WirelessConfig">
-<SetAdaptorPowerRequest>
+    request = PREAMBLE + """<SetAdaptorPowerRequest>
 <AdaptorID>%s</AdaptorID>
 <PowerState>%s</PowerState>
 </SetAdaptorPowerRequest>
@@ -257,9 +252,7 @@ def performScan(dev, ssid=None):
 
     while True:
         if ssid is None: # Undirected
-            request = """<?xml version="1.0" encoding="utf-8"?>
-<WiFiConfig xmlns="http://schemas.hp.com/2006/05/WirelessConfig">
-<UndirectedScanRequest>
+            request = PREAMBLE + """<UndirectedScanRequest>
 <ScanState>%s</ScanState>
 </UndirectedScanRequest>
 </WiFiConfig>""" % scan_state
@@ -268,9 +261,7 @@ def performScan(dev, ssid=None):
             rsp = 'undirectedscanresponse'
 
         else: # Directed
-            request = """<?xml version="1.0" encoding="utf-8"?>
-<WiFiConfig xmlns="http://schemas.hp.com/2006/05/WirelessConfig">
-<DirectedScanRequest>
+            request = PREAMBLE + """<DirectedScanRequest>
 <SSID>%s</SSID>
 <ScanState>%s</ScanState>
 </DirectedScanRequest>
@@ -362,9 +353,7 @@ def performScan(dev, ssid=None):
 
 def associate(dev, ssid, communication_mode, encryption_type, key):
     ret = {}
-    request = """<?xml version="1.0" encoding="utf-8"?>
-<WiFiConfig xmlns="http://schemas.hp.com/2006/05/WirelessConfig">
-<AssociateRequest>
+    request = PREAMBLE + """<AssociateRequest>
 <SSID>%s</SSID>
 <CommunicationMode>%s</CommunicationMode>
 <EncryptionType>%s</EncryptionType>
@@ -391,9 +380,7 @@ def associate(dev, ssid, communication_mode, encryption_type, key):
 
 def getVSACodes(dev):
     ret = []
-    request = """<?xml version="1.0" encoding="utf-8"?>
-<WiFiConfig xmlns="http://schemas.hp.com/2006/05/WirelessConfig">
-<GetVSACodesRequest>
+    request = PREAMBLE + """<GetVSACodesRequest>
 </GetVSACodesRequest>
 </WiFiConfig>"""
 
@@ -429,9 +416,7 @@ def getVSACodes(dev):
 
 def __getIPConfiguration(dev, adaptor_id=0):
     ret = {}
-    request = """<?xml version="1.0" encoding="utf-8"?>
-<WiFiConfig xmlns="http://schemas.hp.com/2006/05/WirelessConfig">
-<GetIPConfigurationRequest>
+    request = PREAMBLE + """<GetIPConfigurationRequest>
 <AdaptorID>%d</AdaptorID>
 </GetIPConfigurationRequest>
 </WiFiConfig>""" % adaptor_id
@@ -487,9 +472,7 @@ def getIPConfiguration(dev, adaptor_id=0):
 
 def __getSignalStrength(dev, adaptor_id=0):
     ret = {}
-    request = """<?xml version="1.0" encoding="utf-8"?>
-<WiFiConfig xmlns="http://schemas.hp.com/2006/05/WirelessConfig">
-<GetSignalStrengthRequest>
+    request = PREAMBLE + """<GetSignalStrengthRequest>
 <AdaptorID>%d</AdaptorID>
 </GetSignalStrengthRequest>
 </WiFiConfig>""" % adaptor_id
@@ -539,9 +522,7 @@ def getSignalStrength(dev, adaptor_id=0):
 
 def __getCryptoSuite(dev):
     ret = {}
-    request = """<?xml version="1.0" encoding="utf-8"?>
-<WiFiConfig xmlns="http://schemas.hp.com/2006/05/WirelessConfig">
-<GetCryptoSuiteRequest>
+    request = PREAMBLE + """<GetCryptoSuiteRequest>
 </GetCryptoSuiteRequest>
 </WiFiConfig>"""
 
@@ -583,6 +564,29 @@ def getCryptoSuite(dev):
             log.debug("Missing response key: %s" % str(e))
 
     return  alg, mode, secretid
+
+# XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+def getHostname(dev):
+    ret = ''
+    request = PREAMBLE + """<GetHostnameRequest>
+</GetHostnameRequest>
+</WiFiConfig>"""
+
+    errorreturn, params = _readWriteWifiConfig(dev, request)
+    if not params:
+        return ret
+
+    if errorreturn != 'ok':
+        log.error("GetHostname returned an error: %s" % errorreturn)
+        return ret
+
+    try:
+        ret = params['wificonfig-gethostnameresponse-hostname']
+    except KeyError:
+        log.debug("Missing response key: hostname")
+
+    return ret
 
 # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 

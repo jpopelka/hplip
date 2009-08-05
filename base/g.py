@@ -111,6 +111,11 @@ class ConfigBase(object):
 
     def read(self):
         if self.filename is not None:
+            filename = self.filename
+            if filename.startswith("/root/"):
+                # Don't try opening a file in root's home directory.
+                log.error("attempted to read from '%s'" % self.filename)
+                return
             try:
                 fp = open(self.filename, "r")
                 self.conf.readfp(fp)
@@ -120,6 +125,14 @@ class ConfigBase(object):
 
     def write(self):
         if self.filename is not None:
+            filename = self.filename
+            if filename.startswith("/root/") or filename.startswith("/etc/"):
+                # Don't try writing a file in root's home directory or
+                # the system-wide config file.
+                # See bug #479178.
+                log.error("attempted to write to '%s'" % self.filename)
+                return
+
             try:
                 fp = open(self.filename, "w")
                 self.conf.write(fp)

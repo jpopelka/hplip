@@ -97,8 +97,8 @@ def aioUI1():
     return choice == 'y'
 
 
-def type10and11Align(pattern, align_type):
-    controls = maint.align10and11Controls(pattern, align_type)
+def type10and11and14Align(pattern, align_type):
+    controls = maint.align10and11and14Controls(pattern, align_type)
     values = []
     s_controls = controls.keys()
     s_controls.sort()
@@ -195,13 +195,16 @@ try:
                                      invalidPen, colorAdj)
 
                 elif align_type  == ALIGN_TYPE_LBOW:
-                    maint.AlignType10(d, tui.load_paper_prompt, type10and11Align)
+                    maint.AlignType10(d, tui.load_paper_prompt, type10and11and14Align)
 
                 elif align_type == ALIGN_TYPE_LIDIL_0_5_4:
-                    maint.AlignType11(d, tui.load_paper_prompt, type10and11Align, invalidPen2)
+                    maint.AlignType11(d, tui.load_paper_prompt, type10and11and14Align, invalidPen2)
 
                 elif align_type == ALIGN_TYPE_OJ_PRO:
                     maint.AlignType12(d, tui.load_paper_prompt)
+
+                elif align_type == ALIGN_TYPE_LIDIL_DJ_D1600:
+                    maint.AlignType14(d, tui.load_paper_prompt, type10and11and14Align, invalidPen2)
 
                 else:
                     log.error("Invalid alignment type.")

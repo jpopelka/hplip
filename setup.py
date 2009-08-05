@@ -343,7 +343,7 @@ else: # INTERACTIVE_MODE
         fax_uri = device_uri.replace("hp:", "hpfax:")
 
         back_end, is_hp, bus, model, \
-            serial, dev_file, host, port = \
+            serial, dev_file, host, zc, port = \
             device.parseDeviceURI(device_uri)
 
         log.debug("Model=%s" % model)

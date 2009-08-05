@@ -76,7 +76,7 @@ DEFAULT_FILTER = None
 VALID_FILTERS = ('print', 'scan', 'fax', 'pcard', 'copy')
 DEFAULT_BE_FILTER = ('hp',)
 
-pat_deviceuri = re.compile(r"""(.*):/(.*?)/(\S*?)\?(?:serial=(\S*)|device=(\S*)|ip=(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}[^&]*))(?:&port=(\d))?""", re.IGNORECASE)
+pat_deviceuri = re.compile(r"""(.*):/(.*?)/(\S*?)\?(?:serial=(\S*)|device=(\S*)|ip=(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}[^&]*)|zc=(\S+))(?:&port=(\d))?""", re.IGNORECASE)
 http_pat_url = re.compile(r"""/(.*?)/(\S*?)\?(?:serial=(\S*)|device=(\S*))&loc=(\S*)""", re.IGNORECASE)
 direct_pat = re.compile(r'direct (.*?) "(.*?)" "(.*?)" "(.*?)"', re.IGNORECASE)
 
@@ -88,7 +88,6 @@ pat_dynamic_ctr = re.compile(r"""CTR:\d*\s.*;""", re.IGNORECASE)
 model_dat = models.ModelData()
 
 ip_pat = re.compile(r"""\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b""", re.IGNORECASE)
-
 dev_pat = re.compile(r"""/dev/.+""", re.IGNORECASE)
 usb_pat = re.compile(r"""(\d+):(\d+)""", re.IGNORECASE)
 
@@ -305,12 +304,6 @@ def makeURI(param, port=1):
     cups_uri, sane_uri, fax_uri = '', '', ''
     found = False
 
-    # see if the param represents a hostname
-    try:
-        param = socket.gethostbyname(param)
-    except socket.gaierror:
-        log.debug("Gethostbyname() failed. Trying other patterns...")
-
     if dev_pat.search(param) is not None: # parallel
         log.debug("Trying parallel with %s" % param)
 
@@ -350,7 +343,19 @@ def makeURI(param, port=1):
         else:
             log.debug("Not found.")
 
-    else: # serial
+    else: # Try Zeroconf hostname
+        log.debug("Trying ZC hostname %s" % param)
+
+        result_code, uri = hpmudext.make_zc_uri(param, port)
+
+        if result_code == hpmudext.HPMUD_R_OK and uri:
+            log.debug("Found: %s" % uri)
+            found = True
+            cups_uri = uri
+        else:
+            log.debug("Not found.")
+
+    if not found:
         log.debug("Trying serial number %s" % param)
         devices = probeDevices(bus=['usb', 'par'])
 
@@ -359,7 +364,7 @@ def makeURI(param, port=1):
 
             # usb has serial in URI...
             try:
-                back_end, is_hp, bus, model, serial, dev_file, host, port = \
+                back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
                     parseDeviceURI(d)
             except Error:
                 continue
@@ -421,7 +426,7 @@ def queryModelByModel(model):
 def queryModelByURI(device_uri):
     try:
         back_end, is_hp, bus, model, \
-            serial, dev_file, host, port = \
+            serial, dev_file, host, zc, port = \
             parseDeviceURI(device_uri)
     except Error:
         raise Error(ERROR_INVALID_DEVICE_URI)
@@ -434,7 +439,7 @@ def queryModelByURI(device_uri):
 #
 
 def probeDevices(bus=DEFAULT_PROBE_BUS, timeout=10,
-                 ttl=4, filter=DEFAULT_FILTER,  search='', net_search='slp',
+                 ttl=4, filter=DEFAULT_FILTER,  search='', net_search='mdns',
                  back_end_filter=('hp',)):
 
     num_devices, ret_devices = 0, {}
@@ -481,9 +486,15 @@ def probeDevices(bus=DEFAULT_PROBE_BUS, timeout=10,
                             model = models.normalizeModelName(device_id.get('MDL', '?UNKNOWN?'))
 
                             if num_ports_on_jd == 1:
-                                device_uri = 'hp:/net/%s?ip=%s' % (model, ip)
+                                if net_search == 'slp':
+                                    device_uri = 'hp:/net/%s?ip=%s' % (model, ip)
+                                else:
+                                    device_uri = 'hp:/net/%s?zc=%s' % (model, hn)
                             else:
-                                device_uri = 'hp:/net/%s?ip=%s&port=%d' % (model, ip, (port+1))
+                                if net_search == 'slp':
+                                    device_uri = 'hp:/net/%s?ip=%s&port=%d' % (model, ip, (port + 1))
+                                else:
+                                    device_uri = 'hp:/net/%s?zc=%s&port=%d' % (model, hn, (port + 1))
 
                             include = True
                             mq = queryModelByModel(model)
@@ -522,7 +533,7 @@ def probeDevices(bus=DEFAULT_PROBE_BUS, timeout=10,
                     log.debug(uri)
 
                     try:
-                        back_end, is_hp, bb, model, serial, dev_file, host, port = \
+                        back_end, is_hp, bb, model, serial, dev_file, host, zc, port = \
                             parseDeviceURI(uri)
                     except Error:
                         continue
@@ -556,7 +567,7 @@ def probeDevices(bus=DEFAULT_PROBE_BUS, timeout=10,
 
                 if device_uri != '':
                     try:
-                        back_end, is_hp, bs, model, serial, dev_file, host, port = \
+                        back_end, is_hp, bs, model, serial, dev_file, host, zc, port = \
                             parseDeviceURI(device_uri)
                     except Error:
                         log.debug("Unrecognized URI: %s" % device_uri)
@@ -611,7 +622,7 @@ def getSupportedCUPSDevices(back_end_filter=['hp'], filter=DEFAULT_FILTER):
 
     for p in printers:
         try:
-            back_end, is_hp, bus, model, serial, dev_file, host, port = \
+            back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
                 parseDeviceURI(p.device_uri)
 
         except Error:
@@ -657,7 +668,7 @@ def getSupportedCUPSPrinters(back_end_filter=['hp'], filter=DEFAULT_FILTER):
 
     for p in printers:
         try:
-            back_end, is_hp, bus, model, serial, dev_file, host, port = \
+            back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
                 parseDeviceURI(p.device_uri)
 
         except Error:
@@ -700,7 +711,7 @@ def getDeviceURIByPrinterName(printer_name, scan_uri_flag=False):
 
     for p in printers:
         try:
-            back_end, is_hp, bus, model, serial, dev_file, host, port = \
+            back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
                 parseDeviceURI(p.device_uri)
 
         except Error:
@@ -793,7 +804,10 @@ def parseDeviceURI(device_uri):
     serial = m.group(4) or ''
     dev_file = m.group(5) or ''
     host = m.group(6) or ''
-    port = m.group(7) or 1
+    zc = ''
+    if not host:
+        zc = host = m.group(7) or ''
+    port = m.group(8) or 1
 
     if bus == 'net':
         try:
@@ -804,7 +818,10 @@ def parseDeviceURI(device_uri):
         if port == 0:
             port = 1
 
-    return back_end, is_hp, bus, model, serial, dev_file, host, port
+    log.debug("%s: back_end:%s is_hp:%s bus:%s model:%s serial:%s dev_file:%s host:%s zc:%s port:%s" %
+        (device_uri, back_end, is_hp, bus, model, serial, dev_file, host, zc, port))
+
+    return back_end, is_hp, bus, model, serial, dev_file, host, zc, port
 
 
 def isLocal(bus):
@@ -1040,7 +1057,7 @@ class Device(object):
 
         try:
             self.back_end, self.is_hp, self.bus, self.model, \
-                self.serial, self.dev_file, self.host, self.port = \
+                self.serial, self.dev_file, self.host, self.zc, self.port = \
                 parseDeviceURI(self.device_uri)
         except Error:
             self.io_state = IO_STATE_NON_HP
@@ -2370,6 +2387,10 @@ class Device(object):
                 data = self
             else:
                 url2 = "http://%s%s" % (self.host, url)
+                if self.zc:
+                    status, ip = hpmudext.get_zc_ip_address(self.zc)
+                    if status == hpmudext.HPMUD_R_OK:
+                        url2 = "http://%s%s" % (ip, url)
                 data = None
 
             log.debug("Opening: %s" % url2)

@@ -502,6 +502,9 @@ static int device_event(const char *dev, const char *printer, int code,
     DBusMessage * msg = NULL;
     int id = atoi(jobid);
 
+    if (dbus_conn == NULL)
+      return 0;
+
     msg = dbus_message_new_signal(DBUS_PATH, DBUS_INTERFACE, "Event");
 
     if (NULL == msg)
@@ -826,7 +829,7 @@ int main(int argc, char *argv[])
 
       hpmud_write_channel(hd, cd, pjl_ustatus_off_cmd, sizeof(pjl_ustatus_off_cmd)-1, 5, &len);
    }
-   else if ((ma.prt_mode != HPMUD_UNI_MODE) && (ma.statustype == HPMUD_STATUSTYPE_VSTATUS || ma.statustype == HPMUD_STATUSTYPE_SFIELD))
+   else if ((ma.prt_mode != HPMUD_UNI_MODE) && (ma.statustype == HPMUD_STATUSTYPE_SFIELD))
    {
       /* Wait for printer to receive all data before closing print channel. Otherwise data can be truncated. */
       status = get_printer_status(hd, cd, &pa);
@@ -844,7 +847,7 @@ int main(int argc, char *argv[])
    }
    else
    {
-      /* Just use fixed delay for uni-di and laserjets without pjl. */
+      /* Just use fixed delay for uni-di, VSTATUS devices and laserjets without pjl. */
       sleep(8);
    }
       

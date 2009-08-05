@@ -50,6 +50,7 @@
 # package_available=1|0 [TYPE_BOOL]
 # package_arch=<list of processor architectures> [TYPE_LIST]
 # add_user_to_group=<usermod params> [TYPE_STRING] (leave empty for none) [ex. "-a -G sys" or "-G lp"]
+# open_mdns_port=<command(s) to use to open the mdns multicast port 5353> [TYPE_LIST]
 #
 # # Version data overrides distro data if present.
 # # <version name> must be present in [<distro name>] section's versions= list.
@@ -78,6 +79,7 @@
 # package_available=1|0 [TYPE_BOOL]
 # package_arch=<list of processor architectures> [TYPE_LIST]
 # add_user_to_group=<usermod params> [TYPE_STRING] (leave empty for none) [ex. "-a -G sys" or "-G lp"]
+# open_mdns_port=<command(s) to use to open the mdns multicast port 5353> [TYPE_LIST]
 #
 # # Only include these sections if supported==1 for this <distro name>:<version name>.
 # [<distro name>:<version name>:<dependency name>]
@@ -654,6 +656,7 @@ drv_dir=/usr/share/cups/drv/HP
 cups_path_with_bitness=1
 ui_toolkit=qt4
 native_cups=1
+open_mdns_port=/bin/bash ./init-suse-firewall
 
 [suse:11.0:cups]
 packages=cups,cups-client
@@ -775,6 +778,7 @@ drv_dir=/usr/share/cups/drv/HP
 cups_path_with_bitness=1
 ui_toolkit=qt4
 native_cups=1
+open_mdns_port=/bin/bash ./init-suse-firewall
 
 [suse:11.1:cups]
 packages=cups,cups-client
@@ -891,6 +895,7 @@ drv_dir=/usr/share/cups/drv/HP
 cups_path_with_bitness=1
 ui_toolkit=qt4
 native_cups=1
+open_mdns_port=/bin/bash ./init-suse-firewall
 
 [suse:11.2:cups]
 packages=cups,cups-client
@@ -2138,6 +2143,7 @@ ui_toolkit=qt4
 policykit=1
 native_cups=1
 add_user_to_group=-a -Gsys,lp
+open_mdns_port=/bin/bash ./init-iptables-firewall
 
 [fedora:10:cups]
 packages=cups
@@ -2259,6 +2265,7 @@ ui_toolkit=qt4
 policykit=1
 native_cups=1
 add_user_to_group=-a -Gsys,lp
+open_mdns_port=/bin/bash ./init-iptables-firewall
 
 [fedora:11:cups]
 packages=cups
@@ -4589,7 +4596,7 @@ packages=
 commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppdev | sudo tee -a /etc/modules
 
 [ubuntu:8.10:pyqt]
-packages=python-qt3
+packages=sip4,python-qt3
 
 [ubuntu:8.10:python-devel]
 packages=python2.5-dev

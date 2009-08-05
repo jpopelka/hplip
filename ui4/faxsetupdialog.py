@@ -270,13 +270,19 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
     def closeEvent(self, e):
         if self.voice_number_dirty:
             self.VoiceNumberLineEdit.emit(SIGNAL("editingFinished()"))
+
         if self.name_company_dirty:
             self.NameCompanyLineEdit.emit(SIGNAL("editingFinished()"))
+
         if self.email_dirty:
             self.EmailLineEdit.emit(SIGNAL("editingFinished()"))
+
         if self.fax_number_dirty:
             self.FaxNumberLineEdit.emit(SIGNAL("editingFinished()"))
-        self.dev.close()
+
+        if self.dev is not None:
+            self.dev.close()
+
         e.accept()
 
     #

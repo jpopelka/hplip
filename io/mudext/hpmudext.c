@@ -26,6 +26,7 @@ Authors: Don Welch, David Suffield
 
 #include <Python.h>
 #include "hpmud.h"
+#include "hpmudi.h"
 
 /* Ref: PEP 353 (Python 2.5) */
 #if PY_VERSION_HEX < 0x02050000
@@ -60,6 +61,10 @@ result_code, data, pml_result_code = get_pml(dd, cd, oid, type)
 result_code, uri = make_usb_uri(busnum, devnum)
 
 result_code, uri = make_net_uri(ip, port)
+
+result_code, uri = make_zc_uri(ip, port)
+
+result_code, ip_address = get_zc_ip_address(hostname)
 
 result_code, uri = make_par_uri(devnode)
 
@@ -296,6 +301,54 @@ static PyObject *make_net_uri(PyObject *self, PyObject *args)
 }
 #endif /* HAVE_LIBSNMP */
 
+#ifdef HAVE_LIBNETSNMP
+static PyObject *make_zc_uri(PyObject *self, PyObject *args)
+{
+    char *hn;
+    int port;
+    char uri[HPMUD_BUFFER_SIZE];
+    enum HPMUD_RESULT result = HPMUD_R_OK;
+    int bytes_read = 0;
+
+    if (!PyArg_ParseTuple(args, "si", &hn, &port))
+            return NULL;
+
+    Py_BEGIN_ALLOW_THREADS
+    result = hpmud_make_mdns_uri(hn, port, uri, HPMUD_BUFFER_SIZE, &bytes_read);
+    Py_END_ALLOW_THREADS
+
+    return Py_BuildValue("(is#)", result, uri, bytes_read);
+}
+#else
+static PyObject *make_zc_uri(PyObject *self, PyObject *args)
+{
+    return Py_BuildValue("(is#)", HPMUD_R_INVALID_URI, "", 0);
+}
+#endif /* HAVE_LIBSNMP */
+
+#ifdef HAVE_LIBNETSNMP
+static PyObject *get_zc_ip_address(PyObject *self, PyObject *args)
+{
+    char *hn;
+    char ip[HPMUD_BUFFER_SIZE];
+    enum HPMUD_RESULT result = HPMUD_R_OK;
+
+    if (!PyArg_ParseTuple(args, "s", &hn))
+            return NULL;
+
+    Py_BEGIN_ALLOW_THREADS
+    result = hpmud_mdns_lookup(hn, HPMUD_MDNS_TIMEOUT, ip);
+    Py_END_ALLOW_THREADS
+
+    return Py_BuildValue("(is)", result, ip);
+}
+#else
+static PyObject *get_zc_ip_address(PyObject *self, PyObject *args)
+{
+    return Py_BuildValue("(is)", HPMUD_R_INVALID_URI, "");
+}
+#endif /* HAVE_LIBSNMP */
+
 #ifdef HAVE_PPORT
 static PyObject *make_par_uri(PyObject *self, PyObject *args)
 {
@@ -344,6 +397,8 @@ static PyMethodDef mudext_functions[] =
     {"get_pml",              (PyCFunction)get_pml,  METH_VARARGS },
     {"make_usb_uri",        (PyCFunction)make_usb_uri,  METH_VARARGS },
     {"make_net_uri",        (PyCFunction)make_net_uri,  METH_VARARGS },
+    {"make_zc_uri",         (PyCFunction)make_zc_uri,  METH_VARARGS },
+    {"get_zc_ip_address",   (PyCFunction)get_zc_ip_address, METH_VARARGS },
     {"make_par_uri",        (PyCFunction)make_par_uri,  METH_VARARGS },
     { NULL, NULL }
 };

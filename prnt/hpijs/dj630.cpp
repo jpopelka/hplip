@@ -257,7 +257,7 @@ Mode630BestGrayK::Mode630BestGrayK()
    pmQuality = QUALITY_BEST;
    BaseResX = 600;
    ResolutionX[0] = 600;
-#ifdef APDK_LINUX
+#ifdef APDK_HIGH_RES_MODES
    BaseResY = 600;
    ResolutionY[0] = 600;
 #else

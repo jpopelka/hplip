@@ -175,6 +175,8 @@ TECH_SUBCLASSES = [
     "4x6FullBleed",
     "300dpiOnly",  # LaserJet 4L
     "GrayscaleOnly", # DJ540
+    "NoAutoTray", # PS Pro 8850
+    "NoEvenDuplex", # PS C8100
 ]
 
 TECH_SUBCLASSES.sort()

@@ -22,7 +22,7 @@
 
 from __future__ import division
 
-__version__ = '2.1'
+__version__ = '2.2'
 __mod__ = 'hp-scan'
 __title__ = 'Scan Utility'
 __doc__ = "SANE-based scan utility for HPLIP supported all-in-one/mfp devices (EXPERIMENTAL)."
@@ -196,7 +196,7 @@ try:
         see_also_list=[])
 
     opts, device_uri, printer_name, mode, ui_toolkit, lang = \
-        mod.parseStdOpts('s:m:r:c:t:a:b:o:v:f:c:x:',
+        mod.parseStdOpts('s:m:r:c:t:a:b:o:v:f:c:x:e:',
                          ['dest=', 'mode=', 'res=', 'resolution=',
                           'resize=', 'contrast=', 'adf', 'unit=',
                           'units=', 'area=', 'box=', 'tlx=',
@@ -210,6 +210,7 @@ try:
                           'greyscale', 'email-subject=',
                           'subject=', 'to=', 'from=', 'jpg',
                           'grey-scale', 'gray-scale', 'about=',
+                          'editor='
                          ])
 
 
@@ -465,6 +466,10 @@ try:
                 if 'viewer' not in dest:
                     dest.append('viewer')
 
+        elif o in ('--fax'):
+            if 'fax' not in dest:
+                dest.append('fax')
+
         elif o in ('-e', '--editor'):
             a = a.strip()
             b = utils.which(a)
@@ -536,7 +541,7 @@ try:
         dest.append('printer')
 
     if 'fax' in dest and 'file' not in dest:
-        log.error("Fax destination not implemented. Adding 'file' destination. Use output file to fax.")
+        log.error("Fax destination not implemented. Adding 'file' destination. Use resulting output file to fax.")
         dest.append('file')
 
     if not dest:

@@ -260,14 +260,14 @@ class SetupDialog(QDialog, Ui_Dialog):
         elif self.device_uri: # If device URI specified on the command line, skip discovery
                               # if the device URI is well-formed (but not necessarily valid)
             try:
-                back_end, is_hp, self.bus, model, serial, dev_file, host, port = \
+                back_end, is_hp, self.bus, model, serial, dev_file, host, zc, port = \
                 device.parseDeviceURI(self.device_uri)
 
             except Error:
                 log.error("Invalid device URI specified: %s" % self.device_uri)
 
             else:
-                name = ''
+                name = host
                 if self.bus == 'net':
                     try:
                         log.debug("Trying to get hostname for device...")
@@ -287,10 +287,12 @@ class SetupDialog(QDialog, Ui_Dialog):
             self.UsbRadioButton.setChecked(True)
             self.setUsbRadioButton(True)
 
-
-        self.DeviceTypeComboBox.addItem("All devices/printers", QVariant(DEVICE_DESC_ALL))
-        self.DeviceTypeComboBox.addItem("Single function printers only", QVariant(DEVICE_DESC_SINGLE_FUNC))
-        self.DeviceTypeComboBox.addItem("All-in-one/MFP devices only", QVariant(DEVICE_DESC_MULTI_FUNC))
+        if prop.fax_build and prop.scan_build:
+            self.DeviceTypeComboBox.addItem("All devices/printers", QVariant(DEVICE_DESC_ALL))
+            self.DeviceTypeComboBox.addItem("Single function printers only", QVariant(DEVICE_DESC_SINGLE_FUNC))
+            self.DeviceTypeComboBox.addItem("All-in-one/MFP devices only", QVariant(DEVICE_DESC_MULTI_FUNC))
+        else:
+            self.DeviceTypeComboBox.setEnabled(False)
 
         self.connect(self.AdvancedButton, SIGNAL("clicked()"), self.AdvancedButton_clicked)
         self.connect(self.UsbRadioButton, SIGNAL("toggled(bool)"), self.UsbRadioButton_toggled)
@@ -315,14 +317,14 @@ class SetupDialog(QDialog, Ui_Dialog):
         device_uri, sane_uri, fax_uri = device.makeURI(self.param, self.jd_port)
 
         if device_uri:
-            back_end, is_hp, bus, model, serial, dev_file, host, port = \
+            back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
                 device.parseDeviceURI(device_uri)
 
-            name = ''
+            name = host
             if bus == 'net':
                 try:
                     name = socket.gethostbyaddr(host)[0]
-                except socket.herror:
+                except (socket.herror, socket.gaierror):
                     pass
 
             self.devices = {device_uri : (model, model, name)}
@@ -396,8 +398,9 @@ class SetupDialog(QDialog, Ui_Dialog):
 
 
     def setNetworkDiscovery(self, enabled):
-        self.NetworkDiscoveryMethodLabel.setEnabled(enabled and self.manual)
-        self.NetworkDiscoveryMethodComboBox.setEnabled(enabled and self.manual)
+        self.NetworkDiscoveryMethodLabel.setEnabled(enabled)
+        self.NetworkDiscoveryMethodComboBox.setEnabled(enabled)
+        self.NetworkDiscoveryMethodComboBox.setCurrentIndex(1)
 
 
     def UsbRadioButton_toggled(self, radio_enabled):
@@ -487,6 +490,7 @@ class SetupDialog(QDialog, Ui_Dialog):
     def showDevicesPage(self):
         self.BackButton.setEnabled(True)
         self.setNextButton(BUTTON_NEXT)
+        search = ""
 
         QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
         try:
@@ -495,12 +499,19 @@ class SetupDialog(QDialog, Ui_Dialog):
                     self.manualDiscovery()
 
                 else: # probe
+                    net_search_type = ''
+
                     if self.bus == 'net':
-                        log.info("Searching... (bus=%s, timeout=%d, ttl=%d, search=%s desc=%d)" %
+                        if self.discovery_method == 0:
+                            net_search_type = "slp"
+                        else:
+                            net_search_type = "mdns"
+
+                        log.info("Searching... (bus=%s, timeout=%d, ttl=%d, search=%s desc=%d, method=%s)" %
                                  (self.bus,  self.timeout, self.ttl, self.search or "(None)",
-                                  self.device_desc))
+                                  self.device_desc, net_search_type))
                     else:
-                        log.info("Searching... (bus=%s, search=%s desc=%d)" %
+                        log.info("Searching... (bus=%s, search=%s, desc=%d)" %
                                  (self.bus,  self.search or "(None)", self.device_desc))
 
                     if self.device_desc == DEVICE_DESC_SINGLE_FUNC:
@@ -513,11 +524,10 @@ class SetupDialog(QDialog, Ui_Dialog):
                         filter_dict = {}
 
                     self.devices = device.probeDevices([self.bus], self.timeout, self.ttl,
-                                                       filter_dict, self.search)
+                                                       filter_dict, self.search, net_search=net_search_type)
         finally:
             QApplication.restoreOverrideCursor()
 
-        #print self.devices
         self.clearDevicesTable()
 
         if self.devices:
@@ -544,8 +554,12 @@ class SetupDialog(QDialog, Ui_Dialog):
         self.DevicesTableWidget.setRowCount(len(self.devices))
 
         if self.bus == 'net':
-            headers = [self.__tr('Model'), self.__tr('IP Address'), self.__tr('Host Name'), self.__tr('Device URI')]
-            device_uri_col = 3
+            if self.discovery_method == 0:
+                headers = [self.__tr('Model'), self.__tr('IP Address'), self.__tr('Host Name'), self.__tr('Device URI')]
+                device_uri_col = 3
+            else:
+                headers = [self.__tr('Model'), self.__tr('Host Name'), self.__tr('Device URI')]
+                device_uri_col = 2
         else:
             headers = [self.__tr('Model'), self.__tr('Device URI')]
             device_uri_col = 1
@@ -555,7 +569,7 @@ class SetupDialog(QDialog, Ui_Dialog):
         flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
 
         for row, d in enumerate(self.devices):
-            back_end, is_hp, bus, model, serial, dev_file, host, port = device.parseDeviceURI(d)
+            back_end, is_hp, bus, model, serial, dev_file, host, zc, port = device.parseDeviceURI(d)
             model_ui = models.normalizeModelUIName(model)
 
             i = DeviceTableWidgetItem(QString(model_ui), d)
@@ -571,9 +585,10 @@ class SetupDialog(QDialog, Ui_Dialog):
                 i.setFlags(flags)
                 self.DevicesTableWidget.setItem(row, 1, i)
 
-                i = QTableWidgetItem(QString(self.devices[d][2]))
-                i.setFlags(flags)
-                self.DevicesTableWidget.setItem(row, 2, i)
+                if self.discovery_method == 0:
+                    i = QTableWidgetItem(QString(self.devices[d][2]))
+                    i.setFlags(flags)
+                    self.DevicesTableWidget.setItem(row, 2, i)
 
         self.DevicesTableWidget.resizeColumnsToContents()
         self.DevicesTableWidget.selectRow(0)
@@ -747,7 +762,7 @@ class SetupDialog(QDialog, Ui_Dialog):
                 if f.find(fax_ppd_name) >= 0 and cups.getPPDDescription(f) == nick:
                     self.fax_ppd = f
                     self.fax_setup_ok = True
-                    print "Found fax PPD:", f
+                    log.debug("Found fax PPD: %s" % f)
                     break
             else:
                 self.fax_ppd = None
@@ -768,7 +783,7 @@ class SetupDialog(QDialog, Ui_Dialog):
 
         self.installed_queues = [p.name for p in cups.getPrinters()]
 
-        back_end, is_hp, bus, model, serial, dev_file, host, port = device.parseDeviceURI(self.device_uri)
+        back_end, is_hp, bus, model, serial, dev_file, host, zc, port = device.parseDeviceURI(self.device_uri)
         default_model = utils.xstrip(model.replace('series', '').replace('Series', ''), '_')
 
         printer_name = default_model
@@ -796,7 +811,7 @@ class SetupDialog(QDialog, Ui_Dialog):
 
         self.fax_uri = self.device_uri.replace('hp:', 'hpfax:')
 
-        back_end, is_hp, bus, model, serial, dev_file, host, port = device.parseDeviceURI(self.fax_uri)
+        back_end, is_hp, bus, model, serial, dev_file, host, zc, port = device.parseDeviceURI(self.fax_uri)
         default_model = utils.xstrip(model.replace('series', '').replace('Series', ''), '_')
 
         fax_name = default_model + "_fax"
@@ -1131,7 +1146,7 @@ class SetupDialog(QDialog, Ui_Dialog):
             self.connect(widget, SIGNAL("stateChanged(int)"), self.CheckBox_stateChanged)
             self.RemoveDevicesTableWidget.setCellWidget(row, 0, widget)
 
-            back_end, is_hp, bus, model, serial, dev_file, host, port = \
+            back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
                 device.parseDeviceURI(p.device_uri)
 
             if self.device_uri is not None and self.device_uri == p.device_uri:
@@ -1182,6 +1197,7 @@ class SetupDialog(QDialog, Ui_Dialog):
             self.jd_port = self.JetDirectSpinBox.value()
             self.search = unicode(self.SearchLineEdit.text())
             self.device_desc = int(self.DeviceTypeComboBox.itemData(self.DeviceTypeComboBox.currentIndex()).toInt()[0])
+            self.discovery_method = self.NetworkDiscoveryMethodComboBox.currentIndex()
 
             if self.WirelessButton.isChecked():
                 dlg = WifiSetupDialog(self, device_uri=None, standalone=False)
@@ -1189,7 +1205,7 @@ class SetupDialog(QDialog, Ui_Dialog):
 
                 if dlg.success == SUCCESS_CONNECTED:
                     self.manual = True
-                    self.param = dlg.ip
+                    self.param = dlg.hn
                     self.bus = 'net'
 
             self.showDevicesPage()
@@ -1198,7 +1214,7 @@ class SetupDialog(QDialog, Ui_Dialog):
             row = self.DevicesTableWidget.currentRow()
             self.device_uri = self.DevicesTableWidget.item(row, 0).device_uri
             self.mq = device.queryModelByURI(self.device_uri)
-            back_end, is_hp, bus, model, serial, dev_file, host, port = device.parseDeviceURI(self.device_uri)
+            back_end, is_hp, bus, model, serial, dev_file, host, zc, port = device.parseDeviceURI(self.device_uri)
             self.model = models.normalizeModelName(model).lower()
             self.showAddPrinterPage()
 

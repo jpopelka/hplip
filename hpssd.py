@@ -220,7 +220,7 @@ def check_device(device_uri):
     except KeyError:
         log.debug("New device: %s" % device_uri)
         try:
-            back_end, is_hp, bus, model, serial, dev_file, host, port = \
+            back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
                 device.parseDeviceURI(device_uri)
         except Error:
             log.debug("Invalid device URI: %s" % device_uri)

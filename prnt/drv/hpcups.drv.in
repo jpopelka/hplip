@@ -140,10 +140,6 @@ Manufacturer "HP"
     Choice "Manual/Manual Feeder" "<</MediaPosition 2>>setpagedevice"
     Choice "MPTray/Multi Purpose Tray" "<</MediaPosition 1>>setpagedevice"
 
-  Option "ColorModel/Output Mode" PickOne AnySetup 10.0
-    Choice "Gray/Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1>>setpagedevice"
-    *Choice "RGB/Color" "<</cupsColorSpace 1]/cupsBitsPerColor 8/cupsRowStep 0>>setpagedevice"
-
   // cupsMediaType values map to MEDIATYPE from global_types.h
   Option "MediaType/Media Type" PickOne AnySetup 10.0
     *Choice "Plain/Plain Paper" "<</MediaType(Plain)/cupsMediaType 0>>setpagedevice"
@@ -151,10 +147,13 @@ Manufacturer "HP"
 
   // cupsCompression values map to QUALITY_MODE from global_types.h
   Option "OutputMode/Print Quality" PickOne AnySetup 10.0
-    *Choice "Normal/Normal" "<</cupsCompression 0/HWResolution[300 300]>>setpagedevice"
-    Choice "Draft/Draft" "<</cupsCompression 1/HWResolution[300 300]>>setpagedevice"
-    Choice "Best/Best" "<</cupsCompression 2/HWResolution[600 600]>>setpagedevice"
-    Choice "Photo/High-Resolution Photo" "<</cupsCompression 3/HWResolution[1200 1200]>>setpagedevice"
+    *Choice "NormalRGB/Normal Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0/cupsCompression 0/HWResolution[300 300]>>setpagedevice"
+    Choice "NormalGray/Normal Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1/cupsCompression 0/HWResolution[600 600]>>setpagedevice"
+    Choice "DraftRGB/Draft Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0/cupsCompression 1/HWResolution[300 300]>>setpagedevice"
+    Choice "DraftGray/Draft Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1/cupsCompression 1/HWResolution[300 300]>>setpagedevice"
+    Choice "BestRGB/Best Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0/cupsCompression 2/HWResolution[600 600]>>setpagedevice"
+    Choice "BestGray/Best Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1/cupsCompression 2/HWResolution[600 600]>>setpagedevice"
+    Choice "Photo/High-Resolution Photo" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0/cupsCompression 3/HWResolution[1200 1200]>>setpagedevice"
 
   // cupsRowCount values map to PEN_TYPE + 1 from global_types.h
   Option "hpInkSet/Installed Inks" PickOne AnySetup 10.0
@@ -168,10 +167,17 @@ Manufacturer "HP"
 
   // Constraints
   UIConstraints "*Duplex *OptionDuplex False"
-  UIConstraints "*ColorModel Gray *hpInkSet Color"
-  UIConstraints "*ColorModel Gray *hpInkSet Photo"
-  UIConstraints "*ColorModel RGB *hpInkSet Black"
-  UIConstraints "*MediaType Glossy *OutputMode Draft"
+  UIConstraints "*hpInkSet Color *OutputMode NormalGray"
+  UIConstraints "*hpInkSet Color *OutputMode DraftGray"
+  UIConstraints "*hpInkSet Color *OutputMode BestGray"
+  UIConstraints "*hpInkSet Photo *OutputMode NormalGray"
+  UIConstraints "*hpInkSet Photo *OutputMode DraftGray"
+  UIConstraints "*hpInkSet Photo *OutputMode BestGray"
+  UIConstraints "*hpInkSet Black *OutputMode NormalRGB"
+  UIConstraints "*hpInkSet Black *OutputMode DraftRGB"
+  UIConstraints "*hpInkSet Black *OutputMode BestRGB"
+  UIConstraints "*hpInkSet Black *OutputMode Photo"
+  UIConstraints "*MediaType Glossy *OutputMode DraftGray"
   UIConstraints "*MediaType Plain *OutputMode Photo"
   UIConstraints "*PageSize Letter *Duplex"
   UIConstraints "*PageSize A4 *Duplex"
@@ -198,12 +204,6 @@ Manufacturer "HP"
   UIConstraints "*PageSize EnvChou3 *Duplex"
   UIConstraints "*PageSize EnvChou4 *Duplex"
   UIConstraints "*PageSize EnvMonarch *Duplex"
-  // Large format
-  UIConstraints "*PageSize A3 *Duplex"
-  UIConstraints "*PageSize B4 *Duplex"
-  UIConstraints "*PageSize Ledger *Duplex"
-  UIConstraints "*PageSize SuperB *Duplex"
-  UIConstraints "*PageSize 8k *Duplex"
 
   Attribute "cupsModelName" "" "DESKJET 930"     // APDK device class 
 
@@ -268,7 +268,7 @@ Manufacturer "HP"
 // Duplex 4x6
   CustomMedia "Card4x6Duplex/Index Card AutoDuplex 4x6in" 288 423 9 27 9 36 "<</PageSize[288 423]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 74/PageSize[288 423]/ImagingBBox null>>setpagedevice"
-  CustomMedia "Hagaki/Hagaki 100x148mm" 284 411 9 27 9 36 "<</PageSize[284 411]/ImagingBBox null>>setpagedevice"
+  CustomMedia "HagakiDuplex/Hagaki AutoDuplex 100x148mm" 284 411 9 27 9 36 "<</PageSize[284 411]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 71/PageSize[284 411]/ImagingBBox null>>setpagedevice"
 
 // Duplex 5x7
@@ -744,6 +744,13 @@ Manufacturer "HP"
   } // End Supported media sizes.
 
   { 
+// Large format
+  UIConstraints "*PageSize A3 *Duplex"
+  UIConstraints "*PageSize B4 *Duplex"
+  UIConstraints "*PageSize Ledger *Duplex"
+  UIConstraints "*PageSize SuperB *Duplex"
+  UIConstraints "*PageSize 8k *Duplex"
+
 // Large
   CustomMedia "A3/A3 297x420mm" 842 1190 18 36 18 9 "<</PageSize[842 1190]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 27/PageSize[842 1190]/ImagingBBox null>>setpagedevice"
@@ -825,19 +832,18 @@ Manufacturer "HP"
     Choice "Manual/Manual Feeder" "<</MediaPosition 2>>setpagedevice"
     Choice "MPTray/Multi Purpose Tray" "<</MediaPosition 1>>setpagedevice"
 
-  Option "ColorModel/Output Mode" PickOne AnySetup 10.0
-    Choice "Gray/Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1>>setpagedevice"
-    *Choice "RGB/Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0>>setpagedevice"
-
   // cupsMediaType values map to MEDIATYPE from global_types.h
   Option "MediaType/Media Type" PickOne AnySetup 10.0
     *Choice "Plain/Plain Paper" "<</MediaType(Plain)/cupsMediaType 0>>setpagedevice"
 
   // cupsCompression values map to QUALITY_MODE from global_types.h
   Option "OutputMode/Print Quality" PickOne AnySetup 10.0
-    *Choice "Normal/Normal" "<</cupsCompression 0/HWResolution[300 300]>>setpagedevice"
-    Choice "Draft/Draft" "<</cupsCompression 1/HWResolution[300 300]>>setpagedevice"
-    Choice "Best/Best" "<</cupsCompression 2/HWResolution[600 600]>>setpagedevice"
+    *Choice "NormalRGB/Normal Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0/cupsCompression 0/HWResolution[300 300]>>setpagedevice"
+    Choice "NormalGray/Normal Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1/cupsCompression 0/HWResolution[600 600]>>setpagedevice"
+    Choice "DraftRGB/Draft Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0/cupsCompression 1/HWResolution[300 300]>>setpagedevice"
+    Choice "DraftGray/Draft Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1/cupsCompression 1/HWResolution[300 300]>>setpagedevice"
+    Choice "BestRGB/Best Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0/cupsCompression 2/HWResolution[600 600]>>setpagedevice"
+    Choice "BestGray/Best Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1/cupsCompression 2/HWResolution[600 600]>>setpagedevice"
 
   // cupsRowCount values map to PEN_TYPE + 1 from global_types.h
   Option "hpInkSet/Installed Inks" PickOne AnySetup 10.0
@@ -850,8 +856,12 @@ Manufacturer "HP"
 
   // Constraints
   UIConstraints "*Duplex *OptionDuplex False"
-  UIConstraints "*ColorModel Gray *hpInkSet Color"
-  UIConstraints "*ColorModel RGB *hpInkSet Black"
+  UIConstraints "*hpInkSet Color *OutputMode NormalGray"
+  UIConstraints "*hpInkSet Color *OutputMode DraftGray"
+  UIConstraints "*hpInkSet Color *OutputMode BestGray"
+  UIConstraints "*hpInkSet Black *OutputMode NormalRGB"
+  UIConstraints "*hpInkSet Black *OutputMode DraftRGB"
+  UIConstraints "*hpInkSet Black *OutputMode BestRGB"
   UIConstraints "*PageSize Letter *Duplex"
   UIConstraints "*PageSize A4 *Duplex"
   UIConstraints "*PageSize Legal *Duplex"
@@ -877,12 +887,6 @@ Manufacturer "HP"
   UIConstraints "*PageSize EnvChou3 *Duplex"
   UIConstraints "*PageSize EnvChou4 *Duplex"
   UIConstraints "*PageSize EnvMonarch *Duplex"
-  // Large format
-  UIConstraints "*PageSize A3 *Duplex"
-  UIConstraints "*PageSize B4 *Duplex"
-  UIConstraints "*PageSize Ledger *Duplex"
-  UIConstraints "*PageSize SuperB *Duplex"
-  UIConstraints "*PageSize 8k *Duplex"
 
   Attribute "cupsModelName" "" "DESKJET 930"     // APDK device class 
 
@@ -947,7 +951,7 @@ Manufacturer "HP"
 // Duplex 4x6
   CustomMedia "Card4x6Duplex/Index Card AutoDuplex 4x6in" 288 423 9 27 9 36 "<</PageSize[288 423]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 74/PageSize[288 423]/ImagingBBox null>>setpagedevice"
-  CustomMedia "Hagaki/Hagaki 100x148mm" 284 411 9 27 9 36 "<</PageSize[284 411]/ImagingBBox null>>setpagedevice"
+  CustomMedia "HagakiDuplex/Hagaki AutoDuplex 100x148mm" 284 411 9 27 9 36 "<</PageSize[284 411]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 71/PageSize[284 411]/ImagingBBox null>>setpagedevice"
 
 // Duplex 5x7
@@ -996,6 +1000,13 @@ Manufacturer "HP"
   } // End Supported media sizes.
 
   { 
+  // Large format
+  UIConstraints "*PageSize A3 *Duplex"
+  UIConstraints "*PageSize B4 *Duplex"
+  UIConstraints "*PageSize Ledger *Duplex"
+  UIConstraints "*PageSize SuperB *Duplex"
+  UIConstraints "*PageSize 8k *Duplex"
+
 // Large
   CustomMedia "A3/A3 297x420mm" 842 1190 18 36 18 9 "<</PageSize[842 1190]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 27/PageSize[842 1190]/ImagingBBox null>>setpagedevice"
@@ -1062,19 +1073,18 @@ Manufacturer "HP"
     Choice "Manual/Manual Feeder" "<</MediaPosition 2>>setpagedevice"
     Choice "MPTray/Multi Purpose Tray" "<</MediaPosition 1>>setpagedevice"
 
-  Option "ColorModel/Output Mode" PickOne AnySetup 10.0
-    Choice "Gray/Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1>>setpagedevice"
-    *Choice "RGB/Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0>>setpagedevice"
-
   // cupsMediaType values map to MEDIATYPE from global_types.h
   Option "MediaType/Media Type" PickOne AnySetup 10.0
     *Choice "Plain/Plain Paper" "<</MediaType(Plain)/cupsMediaType 0>>setpagedevice"
 
   // cupsCompression values map to QUALITY_MODE from global_types.h
   Option "OutputMode/Print Quality" PickOne AnySetup 10.0
-    *Choice "Normal/Normal" "<</cupsCompression 0/HWResolution[300 300]>>setpagedevice"
-    Choice "Draft/Draft" "<</cupsCompression 1/HWResolution[300 300]>>setpagedevice"
-    Choice "Best/Best" "<</cupsCompression 2/HWResolution[600 600]>>setpagedevice"
+    *Choice "NormalRGB/Normal Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0/cupsCompression 0/HWResolution[300 300]>>setpagedevice"
+    Choice "NormalGray/Normal Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1/cupsCompression 0/HWResolution[600 600]>>setpagedevice"
+    Choice "DraftRGB/Draft Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0/cupsCompression 1/HWResolution[300 300]>>setpagedevice"
+    Choice "DraftGray/Draft Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1/cupsCompression 1/HWResolution[300 300]>>setpagedevice"
+    Choice "BestRGB/Best Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0/cupsCompression 2/HWResolution[600 600]>>setpagedevice"
+    Choice "BestGray/Best Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1/cupsCompression 2/HWResolution[600 600]>>setpagedevice"
 
   // cupsRowCount values map to PEN_TYPE + 1 from global_types.h
   Option "hpInkSet/Installed Inks" PickOne AnySetup 10.0
@@ -1087,8 +1097,12 @@ Manufacturer "HP"
 
   // Constraints
   UIConstraints "*Duplex *OptionDuplex False"
-  UIConstraints "*ColorModel Gray *hpInkSet Color"
-  UIConstraints "*ColorModel RGB *hpInkSet Black"
+  UIConstraints "*hpInkSet Color *OutputMode NormalGray"
+  UIConstraints "*hpInkSet Color *OutputMode DraftGray"
+  UIConstraints "*hpInkSet Color *OutputMode BestGray"
+  UIConstraints "*hpInkSet Black *OutputMode NormalRGB"
+  UIConstraints "*hpInkSet Black *OutputMode DraftRGB"
+  UIConstraints "*hpInkSet Black *OutputMode BestRGB"
   UIConstraints "*PageSize Letter *Duplex"
   UIConstraints "*PageSize A4 *Duplex"
   UIConstraints "*PageSize Legal *Duplex"
@@ -1114,6 +1128,7 @@ Manufacturer "HP"
   UIConstraints "*PageSize EnvChou3 *Duplex"
   UIConstraints "*PageSize EnvChou4 *Duplex"
   UIConstraints "*PageSize EnvMonarch *Duplex"
+
   // Large format
   UIConstraints "*PageSize A3 *Duplex"
   UIConstraints "*PageSize B4 *Duplex"
@@ -1185,7 +1200,7 @@ Manufacturer "HP"
 // Duplex 4x6
   CustomMedia "Card4x6Duplex/Index Card AutoDuplex 4x6in" 288 423 9 27 9 36 "<</PageSize[288 423]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 74/PageSize[288 423]/ImagingBBox null>>setpagedevice"
-  CustomMedia "Hagaki/Hagaki 100x148mm" 284 411 9 27 9 36 "<</PageSize[284 411]/ImagingBBox null>>setpagedevice"
+  CustomMedia "HagakiDuplex/Hagaki AutoDuplex 100x148mm" 284 411 9 27 9 36 "<</PageSize[284 411]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 71/PageSize[284 411]/ImagingBBox null>>setpagedevice"
 
 // Duplex 5x7
@@ -1296,7 +1311,7 @@ Manufacturer "HP"
 
   // cupsCompression values map to QUALITY_MODE from global_types.h
   Option "OutputMode/Print Quality" PickOne AnySetup 10.0
-    *Choice "Normal/Normal" "<</cupsCompression 0/HWResolution[300 300]>>setpagedevice"
+    *Choice "Normal/Normal" "<</cupsCompression 0/HWResolution[600 600]>>setpagedevice"
     Choice "Draft/Draft" "<</cupsCompression 1/HWResolution[300 300]>>setpagedevice"
     Choice "Best/Best" "<</cupsCompression 2/HWResolution[600 600]>>setpagedevice"
     Choice "Photo/High-Resolution Photo" "<</cupsCompression 3/HWResolution[1200 1200]>>setpagedevice"
@@ -1316,6 +1331,7 @@ Manufacturer "HP"
   UIConstraints "*ColorModel Gray *hpInkSet Color"
   UIConstraints "*ColorModel Gray *hpInkSet Photo"
   UIConstraints "*ColorModel RGB *hpInkSet Black"
+  UIConstraints "*ColorModel Gray *OutputMode Photo"
   UIConstraints "*MediaType Glossy *OutputMode Draft"
   UIConstraints "*MediaType Plain *OutputMode Photo"
   UIConstraints "*PageSize Letter *Duplex"
@@ -1343,12 +1359,6 @@ Manufacturer "HP"
   UIConstraints "*PageSize EnvChou3 *Duplex"
   UIConstraints "*PageSize EnvChou4 *Duplex"
   UIConstraints "*PageSize EnvMonarch *Duplex"
-  // Large format
-  UIConstraints "*PageSize A3 *Duplex"
-  UIConstraints "*PageSize B4 *Duplex"
-  UIConstraints "*PageSize Ledger *Duplex"
-  UIConstraints "*PageSize SuperB *Duplex"
-  UIConstraints "*PageSize 8k *Duplex"
 
   Attribute "cupsModelName" "" "DESKJET 990"     // APDK device class 
 
@@ -1414,7 +1424,7 @@ Manufacturer "HP"
 // Duplex 4x6
   CustomMedia "Card4x6Duplex/Index Card AutoDuplex 4x6in" 288 423 9 27 9 36 "<</PageSize[288 423]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 74/PageSize[288 423]/ImagingBBox null>>setpagedevice"
-  CustomMedia "Hagaki/Hagaki 100x148mm" 284 411 9 27 9 36 "<</PageSize[284 411]/ImagingBBox null>>setpagedevice"
+  CustomMedia "HagakiDuplex/Hagaki AutoDuplex 100x148mm" 284 411 9 27 9 36 "<</PageSize[284 411]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 71/PageSize[284 411]/ImagingBBox null>>setpagedevice"
 
 // Duplex 5x7
@@ -1639,6 +1649,13 @@ Manufacturer "HP"
   } // End Supported media sizes.
 
   { 
+  // Large format
+  UIConstraints "*PageSize A3 *Duplex"
+  UIConstraints "*PageSize B4 *Duplex"
+  UIConstraints "*PageSize Ledger *Duplex"
+  UIConstraints "*PageSize SuperB *Duplex"
+  UIConstraints "*PageSize 8k *Duplex"
+
 // Large
   CustomMedia "A3/A3 297x420mm" 842 1190 18 36 18 9 "<</PageSize[842 1190]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 27/PageSize[842 1190]/ImagingBBox null>>setpagedevice"
@@ -1713,7 +1730,7 @@ Manufacturer "HP"
 
   // cupsCompression values map to QUALITY_MODE from global_types.h
   Option "OutputMode/Print Quality" PickOne AnySetup 10.0
-    *Choice "Normal/Normal" "<</cupsCompression 0/HWResolution[300 300]>>setpagedevice"
+    *Choice "Normal/Normal" "<</cupsCompression 0/HWResolution[600 600]>>setpagedevice"
     Choice "Draft/Draft" "<</cupsCompression 1/HWResolution[300 300]>>setpagedevice"
     Choice "Best/Best" "<</cupsCompression 2/HWResolution[600 600]>>setpagedevice"
     Choice "Photo/Photo" "<</cupsCompression 3/HWResolution[600 600]>>setpagedevice"
@@ -1825,7 +1842,7 @@ Manufacturer "HP"
 // Duplex 4x6
   CustomMedia "Card4x6Duplex/Index Card AutoDuplex 4x6in" 288 423 9 27 9 36 "<</PageSize[288 423]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 74/PageSize[288 423]/ImagingBBox null>>setpagedevice"
-  CustomMedia "Hagaki/Hagaki 100x148mm" 284 411 9 27 9 36 "<</PageSize[284 411]/ImagingBBox null>>setpagedevice"
+  CustomMedia "HagakiDuplex/Hagaki AutoDuplex 100x148mm" 284 411 9 27 9 36 "<</PageSize[284 411]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 71/PageSize[284 411]/ImagingBBox null>>setpagedevice"
 
 // Duplex 5x7
@@ -1958,6 +1975,7 @@ Manufacturer "HP"
   UIConstraints "*ColorModel Gray *hpInkSet Color"
   UIConstraints "*ColorModel Gray *hpInkSet Photo"
   UIConstraints "*ColorModel RGB *hpInkSet Black"
+  UIConstraints "*ColorModel Gray *OutputMode Photo"
   UIConstraints "*MediaType Automatic *OutputMode FastDraft"
   UIConstraints "*MediaType Glossy *OutputMode FastDraft"
   UIConstraints "*MediaType Glossy *OutputMode Draft"
@@ -2057,7 +2075,7 @@ Manufacturer "HP"
 // Duplex 4x6
   CustomMedia "Card4x6Duplex/Index Card AutoDuplex 4x6in" 288 423 9 27 9 36 "<</PageSize[288 423]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 74/PageSize[288 423]/ImagingBBox null>>setpagedevice"
-  CustomMedia "Hagaki/Hagaki 100x148mm" 284 411 9 27 9 36 "<</PageSize[284 411]/ImagingBBox null>>setpagedevice"
+  CustomMedia "HagakiDuplex/Hagaki AutoDuplex 100x148mm" 284 411 9 27 9 36 "<</PageSize[284 411]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 71/PageSize[284 411]/ImagingBBox null>>setpagedevice"
 
 // Duplex 5x7
@@ -2200,6 +2218,7 @@ Manufacturer "HP"
   UIConstraints "*ColorModel Gray *hpInkSet Color"
   UIConstraints "*ColorModel Gray *hpInkSet Photo"
   UIConstraints "*ColorModel RGB *hpInkSet Black"
+  UIConstraints "*ColorModel Gray *OutputMode Photo"
   UIConstraints "*MediaType Automatic *OutputMode FastDraft"
   UIConstraints "*MediaType Glossy *OutputMode FastDraft"
   UIConstraints "*MediaType Glossy *OutputMode Draft"
@@ -2234,12 +2253,6 @@ Manufacturer "HP"
   UIConstraints "*PageSize EnvChou3 *Duplex"
   UIConstraints "*PageSize EnvChou4 *Duplex"
   UIConstraints "*PageSize EnvMonarch *Duplex"
-  // Large format
-  UIConstraints "*PageSize A3 *Duplex"
-  UIConstraints "*PageSize B4 *Duplex"
-  UIConstraints "*PageSize Ledger *Duplex"
-  UIConstraints "*PageSize SuperB *Duplex"
-  UIConstraints "*PageSize 8k *Duplex"
 
   Attribute "cupsModelName" "" "deskjet 5600"     // APDK device class
 
@@ -2304,7 +2317,7 @@ Manufacturer "HP"
 // Duplex 4x6
   CustomMedia "Card4x6Duplex/Index Card AutoDuplex 4x6in" 288 423 9 27 9 36 "<</PageSize[288 423]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 74/PageSize[288 423]/ImagingBBox null>>setpagedevice"
-  CustomMedia "Hagaki/Hagaki 100x148mm" 284 411 9 27 9 36 "<</PageSize[284 411]/ImagingBBox null>>setpagedevice"
+  CustomMedia "HagakiDuplex/Hagaki AutoDuplex 100x148mm" 284 411 9 27 9 36 "<</PageSize[284 411]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 71/PageSize[284 411]/ImagingBBox null>>setpagedevice"
 
 // Duplex 5x7
@@ -2371,6 +2384,24 @@ Manufacturer "HP"
     MaxSize 8.5in 14in
 
     // <%DJGenericVIP:Normal%>
+    {
+      ModelName "HP Photosmart Plus b209a-m"
+      Attribute "NickName" "" "HP Photosmart Plus b209a-m, $Version"
+      Attribute "ShortNickName" "" "HP Photosmart Plus b209a-m"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart plus b209a-m;DES:photosmart plus b209a-m;"
+      PCFileName "hp-photosmart_plus_b209a-m.ppd"
+      Attribute "Product" "" "(HP Photosmart Plus All-in-one Printer - b209a)"
+      Attribute "Product" "" "(HP Photosmart Plus All-in-one Printer - b209b)"
+      Attribute "Product" "" "(HP Photosmart Plus All-in-one Printer - b209c)"
+    }
+    {
+      ModelName "HP Deskjet Ink Advant k209a-z"
+      Attribute "NickName" "" "HP Deskjet Ink Advant k209a-z, $Version"
+      Attribute "ShortNickName" "" "HP Deskjet Ink Advant k209a-z"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet ink advant k209a-z;DES:deskjet ink advant k209a-z;"
+      PCFileName "hp-deskjet_ink_advant_k209a-z.ppd"
+      Attribute "Product" "" "(HP Deskjet Ink Advantage k209a All-in-one Printer)"
+    }
     {
       ModelName "HP Photosmart c309a Series"
       Attribute "NickName" "" "HP Photosmart c309a Series, $Version"
@@ -2844,6 +2875,23 @@ Manufacturer "HP"
       Attribute "Product" "" "(HP Officejet j4680 All-in-one Printer)"
     }
     {
+      ModelName "HP Photosmart c4700 Series"
+      Attribute "NickName" "" "HP Photosmart c4700 Series, $Version"
+      Attribute "ShortNickName" "" "HP Photosmart c4700 Series"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart c4700 series;DES:photosmart c4700 series;"
+      PCFileName "hp-photosmart_c4700_series.ppd"
+      Attribute "Product" "" "(HP Photosmart c4740 All-in-one Printer)"
+      Attribute "Product" "" "(HP Photosmart c4750 All-in-one Printer)"
+      Attribute "Product" "" "(HP Photosmart c4780 All-in-one Printer)"
+      Attribute "Product" "" "(HP Photosmart c4783 All-in-one Printer)"
+      Attribute "Product" "" "(HP Photosmart c4785 All-in-one Printer)"
+      Attribute "Product" "" "(HP Photosmart c4788 All-in-one Printer)"
+      Attribute "Product" "" "(HP Photosmart c4793 All-in-one Printer)"
+      Attribute "Product" "" "(HP Photosmart c4795 All-in-one Printer)"
+      Attribute "Product" "" "(HP Photosmart c4798 All-in-one Printer)"
+      Attribute "Product" "" "(HP Photosmart c4799 All-in-one Printer)"
+    }
+    {
       ModelName "HP Photosmart d5060 Series"
       Attribute "NickName" "" "HP Photosmart d5060 Series, $Version"
       Attribute "ShortNickName" "" "HP Photosmart d5060 Series"
@@ -2965,6 +3013,17 @@ Manufacturer "HP"
       Attribute "Product" "" "(HP Deskjet 5440xi Photo Printer)"
       Attribute "Product" "" "(HP Deskjet 5442 Photo Printer)"
       Attribute "Product" "" "(HP Deskjet 5443 Photo Printer)"
+    }
+    {
+      ModelName "HP Deskjet d5500 Series"
+      Attribute "NickName" "" "HP Deskjet d5500 Series, $Version"
+      Attribute "ShortNickName" "" "HP Deskjet d5500 Series"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet d5500 series;DES:deskjet d5500 series;"
+      PCFileName "hp-deskjet_d5500_series.ppd"
+      Attribute "Product" "" "(HP Deskjet d5545 Printer)"
+      Attribute "Product" "" "(HP Deskjet d5560 Printer)"
+      Attribute "Product" "" "(HP Deskjet d5563 Printer)"
+      Attribute "Product" "" "(HP Deskjet d5568 Printer)"
     }
     {
       ModelName "HP Photosmart c5500 Series"
@@ -3569,17 +3628,6 @@ Manufacturer "HP"
       Attribute "Product" "" "(HP Photosmart 8053 Printer)"
     }
     {
-      ModelName "HP Photosmart c8100 Series"
-      Attribute "NickName" "" "HP Photosmart c8100 Series, $Version"
-      Attribute "ShortNickName" "" "HP Photosmart c8100 Series"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart c8100 series;DES:photosmart c8100 series;"
-      PCFileName "hp-photosmart_c8100_series.ppd"
-      Attribute "Product" "" "(HP Photosmart c8150 All-in-one Printer)"
-      Attribute "Product" "" "(HP Photosmart c8180 All-in-one Printer)"
-      Attribute "Product" "" "(HP Photosmart c8183 All-in-one Printer)"
-      Attribute "Product" "" "(HP Photosmart c8188 All-in-one Printer)"
-    }
-    {
       ModelName "HP Photosmart 8100 Series"
       Attribute "NickName" "" "HP Photosmart 8100 Series, $Version"
       Attribute "ShortNickName" "" "HP Photosmart 8100 Series"
@@ -3644,6 +3692,13 @@ Manufacturer "HP"
   } // End Supported media sizes with full bleed.
 
   { 
+  // Large format
+  UIConstraints "*PageSize A3 *Duplex"
+  UIConstraints "*PageSize B4 *Duplex"
+  UIConstraints "*PageSize Ledger *Duplex"
+  UIConstraints "*PageSize SuperB *Duplex"
+  UIConstraints "*PageSize 8k *Duplex"
+
 // Large
   CustomMedia "A3/A3 297x420mm" 842 1190 9 36 9 9 "<</PageSize[842 1190]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 27/PageSize[842 1190]/ImagingBBox null>>setpagedevice"
@@ -3669,6 +3724,14 @@ Manufacturer "HP"
     MaxSize 936 1368
 
     // <%DJGenericVIP:LargeFormatSuperB%>
+    {
+      ModelName "HP Officejet 7000 e809a"
+      Attribute "NickName" "" "HP Officejet 7000 e809a, $Version"
+      Attribute "ShortNickName" "" "HP Officejet 7000 e809a"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 7000 e809a;DES:officejet 7000 e809a;"
+      PCFileName "hp-officejet_7000_e809a.ppd"
+      Attribute "Product" "" "(HP Officejet 7000 Wide Format Printer -- e809a)"
+    }
     {
       ModelName "HP Officejet k7100"
       Attribute "NickName" "" "HP Officejet k7100, $Version"
@@ -3699,18 +3762,6 @@ Manufacturer "HP"
       Attribute "Product" "" "(HP Photosmart b8550 Photo Printer)"
       Attribute "Product" "" "(HP Photosmart b8553 Photo Printer)"
       Attribute "Product" "" "(HP Photosmart b8558 Photo Printer)"
-    }
-    {
-      ModelName "HP Photosmart 8700 Series"
-      Attribute "NickName" "" "HP Photosmart 8700 Series, $Version"
-      Attribute "ShortNickName" "" "HP Photosmart 8700 Series"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart 8700 series;DES:photosmart 8700 series;"
-      PCFileName "hp-photosmart_8700_series.ppd"
-      Attribute "Product" "" "(HP Photosmart 8750 Professional Photo Printer)"
-      Attribute "Product" "" "(HP Photosmart 8750xi Professional Photo Printer)"
-      Attribute "Product" "" "(HP Photosmart 8750gp Professional Photo Printer)"
-      Attribute "Product" "" "(HP Photosmart 8753 Professional Photo Printer)"
-      Attribute "Product" "" "(HP Photosmart 8758 Professional Photo Printer)"
     }
     {
       ModelName "HP Photosmart Pro b8800 Series"
@@ -3750,6 +3801,521 @@ Manufacturer "HP"
   }  // End Large format media sizes with full bleed.
 
 } // End DJGenericVIP
+
+//////// DJGenericVIP with NoAutoTray
+{
+  Attribute "cupsEvenDuplex" "" "True"
+  Attribute "cupsBackSide" "" "Rotated"
+  Attribute "cupsFlipDuplex" "" "True"
+
+  Group "General/General"
+
+  Option "Duplex/Double-Sided Printing" PickOne PageSetup 10.0
+    Choice "DuplexNoTumble/Long Edge (Standard)" "<</Duplex true/Tumble false>>setpagedevice"
+    Choice "DuplexTumble/Short Edge (Flip)" "<</Duplex true/Tumble true>>setpagedevice"
+    *Choice "None/Off" "<</Duplex false/Tumble false>>setpagedevice"
+
+  // MediaPosition values map to MediaSource enumeration in global_types.h
+  Option "InputSlot/Media Source" PickOne AnySetup 10.0
+    Choice "PhotoTray/Photo Tray" "<</MediaPosition 6>>setpagedevice"
+    *Choice "Upper/Upper Tray" "<</MediaPosition 1>>setpagedevice"
+    Choice "Lower/Lower Tray" "<</MediaPosition 4>>setpagedevice"
+    Choice "Envelope/Envelope Feeder" "<</MediaPosition 3>>setpagedevice"
+    Choice "LargeCapacity/Large Capacity Tray" "<</MediaPosition 5>>setpagedevice"
+    Choice "Manual/Manual Feeder" "<</MediaPosition 2>>setpagedevice"
+    Choice "MPTray/Multi Purpose Tray" "<</MediaPosition 1>>setpagedevice"
+    Choice "CDDVDTray/CD or DVD Tray" "<</MediaPosition 14>>setpagedevice"
+
+  Option "ColorModel/Output Mode" PickOne AnySetup 10.0
+    Choice "Gray/Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1>>setpagedevice"
+    *Choice "RGB/Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0>>setpagedevice"
+
+  // cupsMediaType values map to MEDIATYPE from global_types.h
+  Option "MediaType/Media Type" PickOne AnySetup 10.0
+    *Choice "Automatic/Automatic" "<</MediaType(Automatic)/cupsMediaType 5>>setpagedevice"
+    Choice "Plain/Plain Paper" "<</MediaType(Plain)/cupsMediaType 0>>setpagedevice"
+    Choice "Glossy/Photo Paper" "<</MediaType(Glossy)/cupsMediaType 2>>setpagedevice"
+    Choice "TransparencyFilm/Transparency Film" "<</MediaType(TransparencyFilm)/cupsMediaType 4>>setpagedevice"
+    Choice "CDDVDMedia/CD or DVD Media" "<</MediaType(CDDVDMedia)/cupsMediaType 7>>setpagedevice"
+
+  // cupsCompression values map to QUALITY_MODE from global_types.h
+  Option "OutputMode/Print Quality" PickOne AnySetup 10.0
+    *Choice "Normal/Normal" "<</cupsCompression 0/HWResolution[600 600]>>setpagedevice"
+    Choice "Draft/Draft" "<</cupsCompression 1/HWResolution[300 300]>>setpagedevice"
+    Choice "Best/Best" "<</cupsCompression 2/HWResolution[600 600]>>setpagedevice"
+    Choice "Photo/High-Resolution Photo" "<</cupsCompression 3/HWResolution[1200 1200]>>setpagedevice"
+    Choice "FastDraft/Fast Draft" "<</cupsCompression 4/HWResolution[300 300]>>setpagedevice"
+
+  // cupsRowCount values map to PEN_TYPE + 1 from global_types.h
+  Option "hpInkSet/Installed Inks" PickOne AnySetup 10.0
+    *Choice "Standard/Black + Color" "<</cupsRowCount 3>>setpagedevice"
+    Choice "Black/Black Only" "<</cupsRowCount 1>>setpagedevice"
+    Choice "Color/Color Only" "<</cupsRowCount 2>>setpagedevice"
+    Choice "Photo/Photo + Color" "<</cupsRowCount 5>>setpagedevice"
+
+  // Duplexer is optional...
+  Installable "OptionDuplex/Duplexer Installed"
+
+  // Constraints
+  UIConstraints "*Duplex *OptionDuplex False"
+  UIConstraints "*ColorModel Gray *hpInkSet Color"
+  UIConstraints "*ColorModel Gray *hpInkSet Photo"
+  UIConstraints "*ColorModel RGB *hpInkSet Black"
+  UIConstraints "*ColorModel Gray *OutputMode Photo"
+  UIConstraints "*MediaType Automatic *OutputMode FastDraft"
+  UIConstraints "*MediaType Glossy *OutputMode FastDraft"
+  UIConstraints "*MediaType Glossy *OutputMode Draft"
+  UIConstraints "*MediaType TransparencyFilm *OutputMode FastDraft"
+  UIConstraints "*MediaType Plain *OutputMode Photo"
+  UIConstraints "*InputSlot CDDVDTray *MediaType Automatic"
+  UIConstraints "*InputSlot CDDVDTray *MediaType Plain"
+  UIConstraints "*InputSlot CDDVDTray *MediaType Glossy"
+  UIConstraints "*InputSlot CDDVDTray *MediaType TransparencyFilm"
+  UIConstraints "*PageSize Letter *Duplex"
+  UIConstraints "*PageSize A4 *Duplex"
+  UIConstraints "*PageSize Legal *Duplex"
+  UIConstraints "*PageSize Photo *Duplex"
+  UIConstraints "*PageSize Photo5x7 *Duplex"
+  UIConstraints "*PageSize A5 *Duplex"
+  UIConstraints "*PageSize A6 *Duplex"
+  UIConstraints "*PageSize B5 *Duplex"
+  UIConstraints "*PageSize Oufuku *Duplex"
+  UIConstraints "*PageSize Hagaki *Duplex"
+  UIConstraints "*PageSize Executive *Duplex"
+  UIConstraints "*PageSize FLSA *Duplex"
+  UIConstraints "*PageSize ExecutiveJIS *Duplex"
+  UIConstraints "*PageSize 16k *Duplex"
+  UIConstraints "*PageSize Card3x5 *Duplex"
+  UIConstraints "*PageSize Card5x8 *Duplex"
+  UIConstraints "*PageSize Env10 *Duplex"
+  UIConstraints "*PageSize EnvA2 *Duplex"
+  UIConstraints "*PageSize EnvC6 *Duplex"
+  UIConstraints "*PageSize EnvDL *Duplex"
+  UIConstraints "*PageSize EnvC5 *Duplex"
+  UIConstraints "*PageSize EnvB5 *Duplex"
+  UIConstraints "*PageSize EnvChou3 *Duplex"
+  UIConstraints "*PageSize EnvChou4 *Duplex"
+  UIConstraints "*PageSize EnvMonarch *Duplex"
+
+  Attribute "cupsModelName" "" "deskjet 5600"     // APDK device class
+
+// 4x6 or smaller
+  CustomMedia "Photo/Photo 4x6in" 288 432 9 9 9 9 "<</PageSize[288 432]/ImagingBBox null>>setpagedevice" 
+         "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+  CustomMedia "A6/A6 105x148mm" 297.36 419.76 9 9 9 9 "<</PageSize[297.36 419.76]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 73/PageSize[297.36 419.76]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Hagaki/Hagaki 100x148mm" 284 411 9 9 9 9 "<</PageSize[284 411]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 71/PageSize[284 411]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Card3x5/Index Card 3x5in" 216 360 9 9 9 9 "<</PageSize [216 360]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 78/PageSize[216 360]/ImagingBBox null>>setpagedevice"
+  CustomMedia "EnvChou4/#4 Japanese Envelope 90x205mm" 254.88 581.04 9 41 8 9 "<</PageSize[254.88 581.04]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 111/PageSize[254.88 581.04]/ImagingBBox null>>setpagedevice"
+  CustomMedia "EnvMonarch/Monarch Envelope 3.875x7.5in" 279 540 9 41 9 9 "<</PageSize[279 540]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 80/PageSize[279 540]/ImagingBBox null>>setpagedevice"
+
+// 5x7
+  CustomMedia "Photo5x7/Photo 5x7in" 360 504 9 9 9 9 "<</PageSize[360 504]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 122/PageSize[360 504]/ImagingBBox null>>setpagedevice"
+  CustomMedia "A5/A5 148x210mm" 419.76 595.44 9 9 9 9 "<</PageSize[419.76 595.44]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 25/PageSize[419.76 595.44]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Card5x8/Index Card 5x8in" 360 576 9 9 9 9 "<</PageSize[360 576]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 75/PageSize[360 576]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Oufuku/Oufuku-Hagaki 148x200mm" 420 558 9 9 9 9 "<</PageSize[420 558]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 72/PageSize[420 558]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Env10/#10 Envelope 4.12x9.5in" 297 684 9 41 9 9 "<</PageSize[297 684]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 81/PageSize[297 684]/ImagingBBox null>>setpagedevice"
+  CustomMedia "EnvA2/A2 Envelope 4.37x5.75in" 314.64 414 9 42 9 9 "<</PageSize[314.64 414]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 109/PageSize[314.64 414]/ImagingBBox null>>setpagedevice"
+  CustomMedia "EnvC6/C6 Envelope 114x162mm" 323.28 459.36 9 39 9 9 "<</PageSize[323.28 459.36]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 92/PageSize[323.28 459.36]/ImagingBBox null>>setpagedevice"
+  CustomMedia "EnvDL/DL Envelope 110x220mm" 311.76 623.52 9 41 9 9 "<</PageSize[311.76 623.52]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 90/PageSize[311.76 623.52]/ImagingBBox null>>setpagedevice"
+  CustomMedia "EnvChou3/#3 Japanese Envelope 120x235mm" 339.84 666  9 41 9 9 "<</PageSize[339.84 666]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 110/PageSize[339.84 666]/ImagingBBox null>>setpagedevice"
+
+// Standard
+  *CustomMedia "Letter/Letter 8.5x11in" 612 792 9 9 9 9 "<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 2/PageSize[612 792]/ImagingBBox null>>setpagedevice"
+  CustomMedia "A4/A4 210x297mm" 595.44 841.68 9 9 9 9 "<</PageSize[595.44 841.68]/ImagingBBox null>>setpagedevice" 
+         "<</cupsInteger0 26/PageSize[595.44 841.68]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Legal/Legal 8.5x14in" 612 1008 9 9 9 9 "<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 3/PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+  CustomMedia "B5/B5 176x250mm" 498.96 708.48 9 9 9 9 "<</PageSize[498.96 708.48]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 65/PageSize[498.96 708.48]/ImagingBBox null>>setpagedevice"
+  CustomMedia "JB5/JB5 182x257mm" 516.24 728.64 9 9 9 9 "<</PageSize[516.24 728.64]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 45/PageSize [516.24 728.64]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Executive/Executive 7.25x10.5in" 522 756 9 9 9 9 "<</PageSize[522 756]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 1/PageSize[522 756]/ImagingBBox null>>setpagedevice"
+  CustomMedia "FLSA/American Foolscap 8.5x13in" 612 936 9 9 9 9 "<</PageSize[612 936]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 10/PageSize[612 936]/ImagingBBox null>>setpagedevice"
+  CustomMedia "ExecutiveJIS/Executive (JIS) 8.5x12.986in" 612 936 9 9 9 9 "<</PageSize[612 936]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 10/PageSize[612 936]/ImagingBBox null>>setpagedevice"
+  CustomMedia "16k/16k 7.75x10.75in" 558 774 9 9 9 9 "<</PageSize[558 774]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 101/PageSize[558 774]/ImagingBBox null>>setpagedevice"   // custom
+  CustomMedia "EnvC5/C5 Envelope 162x229mm" 459 649 9 41 9 9 "<</PageSize[459 649]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 91/PageSize[459 649]/ImagingBBox null>>setpagedevice"
+  CustomMedia "EnvB5/B5 Envelope 176x250mm" 499 709 9 41 9 9 "<</PageSize[499 709]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 100/PageSize[499 709]/ImagingBBox null>>setpagedevice"
+
+// Duplex 4x6
+  CustomMedia "Card4x6Duplex/Index Card AutoDuplex 4x6in" 288 423 9 27 9 36 "<</PageSize[288 423]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 74/PageSize[288 423]/ImagingBBox null>>setpagedevice"
+  CustomMedia "HagakiDuplex/Hagaki AutoDuplex 100x148mm" 284 411 9 27 9 36 "<</PageSize[284 411]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 71/PageSize[284 411]/ImagingBBox null>>setpagedevice"
+
+// Duplex 5x7
+  CustomMedia "Card5x8Duplex/Index Card AutoDuplex 5x8in" 360 567 9 27 9 36 "<</PageSize[360 567]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 75/PageSize[360 567]/ImagingBBox null>>setpagedevice"
+  CustomMedia "OufukuDuplex/Oufuku-Hagaki AutoDuplex 148x200mm" 420 558 9 27 9 36 "<</PageSize[420 558]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 72/PageSize[420 558]/ImagingBBox null>>setpagedevice"
+
+// Duplex Standard
+  CustomMedia "LetterDuplex/Letter AutoDuplex 8.5x11in" 612 783 9 27 9 36 "<</PageSize[612 783]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 2/PageSize[612 783]/ImagingBBox null>>setpagedevice"
+  CustomMedia "A4Duplex/A4 AutoDuplex 210x297mm)" 595 833 9 27 9 36 "<</PageSize[595 833]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 26/PageSize[595 833]/ImagingBBox null>>setpagedevice"
+  CustomMedia "LegalDuplex/Legal AutoDuplex 8.5x14in)" 612 999 9 27 9 36 "<</PageSize[612 999]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 3/PageSize[612 999]/ImagingBBox null>>setpagedevice"
+  CustomMedia "A6Duplex/A6 AutoDuplex 105x148mm)" 297 411 9 27 9 36 "<</PageSize[297 411]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 73/PageSize[297 411]/ImagingBBox null>>setpagedevice"
+  CustomMedia "A5Duplex/A5 AutoDuplex 148x210mm" 420 586 9 27 9 36 "<</PageSize[420 586]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 25/PageSize[420 586]/ImagingBBox null>>setpagedevice"
+  CustomMedia "B5Duplex/B5 AutoDuplex 176x250mm" 499 699 9 27 9 36 "<</PageSize[499 699]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 65/PageSize[499 699]/ImagingBBox null>>setpagedevice"
+  CustomMedia "JB5Duplex/JB5 AutoDuplex 182x257mm" 516 720 9 27 9 36 "<</PageSize[516 720]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 45/PageSize [516 720]/ImagingBBox null>>setpagedevice"
+  CustomMedia "ExecutiveDuplex/Executive AutoDuplex 7.25x10.5in" 522 747 9 27 9 36 "<</PageSize[522 747]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 1/PageSize[522 747]/ImagingBBox null>>setpagedevice"
+
+// Full Bleed 4x6
+  CustomMedia "PhotoFB/Photo Borderless 4x6 in" 298 442 0 0 0 0 "<</PageSize[298 442]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 74/PageSize[298 442]/ImagingBBox null>>setpagedevice"
+  CustomMedia "A6FB/A6 Borderless 105x148mm" 307 430 0 0 0 0 "<</PageSize[307 430]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 73/PageSize[307 430]/ImagingBBox null>>setpagedevice"
+  CustomMedia "HagakiFB/Hagaki Borderless 100x148mm" 294 430 0 0 0 0 "<</PageSize[294 430]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 71/PageSize[294 430]/ImagingBBox null>>setpagedevice"
+
+// Full Bleed 5x7
+  CustomMedia "Photo5x7FB/Photo Borderless 5x7in" 370 514 0 0 0 0 "<</PageSize[370 514]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 122/PageSize[370 514]/ImagingBBox null>>setpagedevice"
+  CustomMedia "OufukuFB/Oufuku-Hagaki Borderless 148x200mm" 430 577 0 0 0 0 "<</PageSize[430 577]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 72/PageSize[430 577]/ImagingBBox null>>setpagedevice"
+  CustomMedia "A5FB/A5 Borderless 148x210mm" 430 605 0 0 0 0 "<</PageSize[430 605]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 25/PageSize[430 605]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Card3x5FB/Index Card Borderless 3x5in" 262 370 0 0 0 0 "<</PageSize [262 370]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 78/PageSize[262 370]/ImagingBBox null>>setpagedevice"
+
+// Full Bleed Standard
+  CustomMedia "LetterFB/Letter Borderless 8.5x11in" 622 802 0 0 0 0 "<</PageSize[622 802]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 2/PageSize[622 802]/ImagingBBox null>>setpagedevice"
+  CustomMedia "A4FB/A4 Borderless 210x297mm" 605 852 0 0 0 0 "<</PageSize[605 852]/ImagingBBox null>>setpagedevice" 
+         "<</cupsInteger0 26/PageSize[605 852]/ImagingBBox null>>setpagedevice"
+  CustomMedia "JB5FB/JB5 Borderless 182x257mm" 526 739 0 0 0 0 "<</PageSize[526 739]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 45/PageSize [526 739]/ImagingBBox null>>setpagedevice"
+
+// CDDVD
+  CustomMedia "CDDVD80/CD DVD 80mm" 238 238 4 4 4 4 "<</PageSize[238 238]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 98/PageSize[238 238]/ImagingBBox null>>setpagedevice"
+  CustomMedia "CDDVD120/CD DVD 120mm" 360 360 4 4 4 4 "<</PageSize[360 360]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 99/PageSize[360 360]/ImagingBBox null>>setpagedevice"
+
+  {
+    // Custom page sizes from 1x4in to Legal
+    HWMargins 18 36 18 36
+    VariablePaperSize Yes
+    MinSize 1in 4in
+    MaxSize 8.5in 14in
+
+  } // End Supported media sizes with full bleed.
+
+  { 
+  // Large format
+  UIConstraints "*PageSize A3 *Duplex"
+  UIConstraints "*PageSize B4 *Duplex"
+  UIConstraints "*PageSize Ledger *Duplex"
+  UIConstraints "*PageSize SuperB *Duplex"
+  UIConstraints "*PageSize 8k *Duplex"
+
+// Large
+  CustomMedia "A3/A3 297x420mm" 842 1190 9 36 9 9 "<</PageSize[842 1190]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 27/PageSize[842 1190]/ImagingBBox null>>setpagedevice"
+  CustomMedia "B4/B4 257x364mm" 729 1033 9 36 9 9 "<</PageSize[729 1033]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 46/PageSize[729 1033]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Ledger/Ledger 17x11in" 1224 792 9 36 9 9 "<</PageSize[1224 792]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 6/PageSize[1224 792]/ImagingBBox null>>setpagedevice"
+  CustomMedia "SuperB/SuperB 13x19in" 936 1368 9 36 9 9 "<</PageSize[936 1368]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 16/PageSize[936 1368]/ImagingBBox null>>setpagedevice"
+  CustomMedia "8k/8k 10.75x15.5in" 774 1116 9 36 9 9 "<</PageSize[774 1116]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 101/PageSize[774 1116]/ImagingBBox null>>setpagedevice"          // custom
+
+// Duplex Large
+  CustomMedia "A3Duplex/A3 AutoDuplex 297x420mm" 842 1181 9 27 9 36 "<</PageSize[842 1181]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 1/PageSize[842 1181]/ImagingBBox null>>setpagedevice"
+  CustomMedia "B4Duplex/B4 AutoDuplex 257x364mm" 729 1024 9 27 9 36 "<</PageSize[729 1024]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 1/PageSize[729 1024]/ImagingBBox null>>setpagedevice"
+
+    // Custom page sizes from 1x4in to SuperB
+    HWMargins 18 36 18 36
+    VariablePaperSize Yes
+    MinSize 1in 4in 
+    MaxSize 936 1368
+
+    // <%DJGenericVIP:LargeFormatSuperB:NoAutoTray%>
+    {
+      ModelName "HP Photosmart 8700 Series"
+      Attribute "NickName" "" "HP Photosmart 8700 Series, $Version"
+      Attribute "ShortNickName" "" "HP Photosmart 8700 Series"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart 8700 series;DES:photosmart 8700 series;"
+      PCFileName "hp-photosmart_8700_series.ppd"
+      Attribute "Product" "" "(HP Photosmart 8750 Professional Photo Printer)"
+      Attribute "Product" "" "(HP Photosmart 8750xi Professional Photo Printer)"
+      Attribute "Product" "" "(HP Photosmart 8750gp Professional Photo Printer)"
+      Attribute "Product" "" "(HP Photosmart 8753 Professional Photo Printer)"
+      Attribute "Product" "" "(HP Photosmart 8758 Professional Photo Printer)"
+    }
+
+  }  // End Large format media sizes with full bleed.
+
+} // End DJGenericVIP with NoAutoTray
+
+//////// DJGenericVIP with NoEvenDuplex (ie: cupsEvenDuplex = False)
+{
+  Attribute "cupsBackSide" "" "Rotated"
+  Attribute "cupsFlipDuplex" "" "True"
+
+  Group "General/General"
+
+  Option "Duplex/Double-Sided Printing" PickOne PageSetup 10.0
+    Choice "DuplexNoTumble/Long Edge (Standard)" "<</Duplex true/Tumble false>>setpagedevice"
+    Choice "DuplexTumble/Short Edge (Flip)" "<</Duplex true/Tumble true>>setpagedevice"
+    *Choice "None/Off" "<</Duplex false/Tumble false>>setpagedevice"
+
+  // MediaPosition values map to MediaSource enumeration in global_types.h
+  Option "InputSlot/Media Source" PickOne AnySetup 10.0
+    *Choice "Auto/Auto-Select" "<</MediaPosition 7>>setpagedevice"
+    Choice "PhotoTray/Photo Tray" "<</MediaPosition 6>>setpagedevice"
+    Choice "Upper/Upper Tray" "<</MediaPosition 1>>setpagedevice"
+    Choice "Lower/Lower Tray" "<</MediaPosition 4>>setpagedevice"
+    Choice "Envelope/Envelope Feeder" "<</MediaPosition 3>>setpagedevice"
+    Choice "LargeCapacity/Large Capacity Tray" "<</MediaPosition 5>>setpagedevice"
+    Choice "Manual/Manual Feeder" "<</MediaPosition 2>>setpagedevice"
+    Choice "MPTray/Multi Purpose Tray" "<</MediaPosition 1>>setpagedevice"
+    Choice "CDDVDTray/CD or DVD Tray" "<</MediaPosition 14>>setpagedevice"
+
+  Option "ColorModel/Output Mode" PickOne AnySetup 10.0
+    Choice "Gray/Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1>>setpagedevice"
+    *Choice "RGB/Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0>>setpagedevice"
+
+  // cupsMediaType values map to MEDIATYPE from global_types.h
+  Option "MediaType/Media Type" PickOne AnySetup 10.0
+    *Choice "Automatic/Automatic" "<</MediaType(Automatic)/cupsMediaType 5>>setpagedevice"
+    Choice "Plain/Plain Paper" "<</MediaType(Plain)/cupsMediaType 0>>setpagedevice"
+    Choice "Glossy/Photo Paper" "<</MediaType(Glossy)/cupsMediaType 2>>setpagedevice"
+    Choice "TransparencyFilm/Transparency Film" "<</MediaType(TransparencyFilm)/cupsMediaType 4>>setpagedevice"
+    Choice "CDDVDMedia/CD or DVD Media" "<</MediaType(CDDVDMedia)/cupsMediaType 7>>setpagedevice"
+
+  // cupsCompression values map to QUALITY_MODE from global_types.h
+  Option "OutputMode/Print Quality" PickOne AnySetup 10.0
+    *Choice "Normal/Normal" "<</cupsCompression 0/HWResolution[600 600]>>setpagedevice"
+    Choice "Draft/Draft" "<</cupsCompression 1/HWResolution[300 300]>>setpagedevice"
+    Choice "Best/Best" "<</cupsCompression 2/HWResolution[600 600]>>setpagedevice"
+    Choice "Photo/High-Resolution Photo" "<</cupsCompression 3/HWResolution[1200 1200]>>setpagedevice"
+    Choice "FastDraft/Fast Draft" "<</cupsCompression 4/HWResolution[300 300]>>setpagedevice"
+
+  // cupsRowCount values map to PEN_TYPE + 1 from global_types.h
+  Option "hpInkSet/Installed Inks" PickOne AnySetup 10.0
+    *Choice "Standard/Black + Color" "<</cupsRowCount 3>>setpagedevice"
+    Choice "Black/Black Only" "<</cupsRowCount 1>>setpagedevice"
+    Choice "Color/Color Only" "<</cupsRowCount 2>>setpagedevice"
+    Choice "Photo/Photo + Color" "<</cupsRowCount 5>>setpagedevice"
+
+  // Duplexer is optional...
+  Installable "OptionDuplex/Duplexer Installed"
+
+  // Constraints
+  UIConstraints "*Duplex *OptionDuplex False"
+  UIConstraints "*ColorModel Gray *hpInkSet Color"
+  UIConstraints "*ColorModel Gray *hpInkSet Photo"
+  UIConstraints "*ColorModel RGB *hpInkSet Black"
+  UIConstraints "*ColorModel Gray *OutputMode Photo"
+  UIConstraints "*MediaType Automatic *OutputMode FastDraft"
+  UIConstraints "*MediaType Glossy *OutputMode FastDraft"
+  UIConstraints "*MediaType Glossy *OutputMode Draft"
+  UIConstraints "*MediaType TransparencyFilm *OutputMode FastDraft"
+  UIConstraints "*MediaType Plain *OutputMode Photo"
+  UIConstraints "*InputSlot CDDVDTray *MediaType Automatic"
+  UIConstraints "*InputSlot CDDVDTray *MediaType Plain"
+  UIConstraints "*InputSlot CDDVDTray *MediaType Glossy"
+  UIConstraints "*InputSlot CDDVDTray *MediaType TransparencyFilm"
+  UIConstraints "*PageSize Letter *Duplex"
+  UIConstraints "*PageSize A4 *Duplex"
+  UIConstraints "*PageSize Legal *Duplex"
+  UIConstraints "*PageSize Photo *Duplex"
+  UIConstraints "*PageSize Photo5x7 *Duplex"
+  UIConstraints "*PageSize A5 *Duplex"
+  UIConstraints "*PageSize A6 *Duplex"
+  UIConstraints "*PageSize B5 *Duplex"
+  UIConstraints "*PageSize Oufuku *Duplex"
+  UIConstraints "*PageSize Hagaki *Duplex"
+  UIConstraints "*PageSize Executive *Duplex"
+  UIConstraints "*PageSize FLSA *Duplex"
+  UIConstraints "*PageSize ExecutiveJIS *Duplex"
+  UIConstraints "*PageSize 16k *Duplex"
+  UIConstraints "*PageSize Card3x5 *Duplex"
+  UIConstraints "*PageSize Card5x8 *Duplex"
+  UIConstraints "*PageSize Env10 *Duplex"
+  UIConstraints "*PageSize EnvA2 *Duplex"
+  UIConstraints "*PageSize EnvC6 *Duplex"
+  UIConstraints "*PageSize EnvDL *Duplex"
+  UIConstraints "*PageSize EnvC5 *Duplex"
+  UIConstraints "*PageSize EnvB5 *Duplex"
+  UIConstraints "*PageSize EnvChou3 *Duplex"
+  UIConstraints "*PageSize EnvChou4 *Duplex"
+  UIConstraints "*PageSize EnvMonarch *Duplex"
+
+  Attribute "cupsModelName" "" "deskjet 5600"     // APDK device class
+
+// 4x6 or smaller
+  CustomMedia "Photo/Photo 4x6in" 288 432 9 9 9 9 "<</PageSize[288 432]/ImagingBBox null>>setpagedevice" 
+         "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+  CustomMedia "A6/A6 105x148mm" 297.36 419.76 9 9 9 9 "<</PageSize[297.36 419.76]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 73/PageSize[297.36 419.76]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Hagaki/Hagaki 100x148mm" 284 411 9 9 9 9 "<</PageSize[284 411]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 71/PageSize[284 411]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Card3x5/Index Card 3x5in" 216 360 9 9 9 9 "<</PageSize [216 360]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 78/PageSize[216 360]/ImagingBBox null>>setpagedevice"
+  CustomMedia "EnvChou4/#4 Japanese Envelope 90x205mm" 254.88 581.04 9 41 8 9 "<</PageSize[254.88 581.04]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 111/PageSize[254.88 581.04]/ImagingBBox null>>setpagedevice"
+  CustomMedia "EnvMonarch/Monarch Envelope 3.875x7.5in" 279 540 9 41 9 9 "<</PageSize[279 540]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 80/PageSize[279 540]/ImagingBBox null>>setpagedevice"
+
+// 5x7
+  CustomMedia "Photo5x7/Photo 5x7in" 360 504 9 9 9 9 "<</PageSize[360 504]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 122/PageSize[360 504]/ImagingBBox null>>setpagedevice"
+  CustomMedia "A5/A5 148x210mm" 419.76 595.44 9 9 9 9 "<</PageSize[419.76 595.44]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 25/PageSize[419.76 595.44]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Card5x8/Index Card 5x8in" 360 576 9 9 9 9 "<</PageSize[360 576]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 75/PageSize[360 576]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Oufuku/Oufuku-Hagaki 148x200mm" 420 558 9 9 9 9 "<</PageSize[420 558]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 72/PageSize[420 558]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Env10/#10 Envelope 4.12x9.5in" 297 684 9 41 9 9 "<</PageSize[297 684]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 81/PageSize[297 684]/ImagingBBox null>>setpagedevice"
+  CustomMedia "EnvA2/A2 Envelope 4.37x5.75in" 314.64 414 9 42 9 9 "<</PageSize[314.64 414]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 109/PageSize[314.64 414]/ImagingBBox null>>setpagedevice"
+  CustomMedia "EnvC6/C6 Envelope 114x162mm" 323.28 459.36 9 39 9 9 "<</PageSize[323.28 459.36]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 92/PageSize[323.28 459.36]/ImagingBBox null>>setpagedevice"
+  CustomMedia "EnvDL/DL Envelope 110x220mm" 311.76 623.52 9 41 9 9 "<</PageSize[311.76 623.52]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 90/PageSize[311.76 623.52]/ImagingBBox null>>setpagedevice"
+  CustomMedia "EnvChou3/#3 Japanese Envelope 120x235mm" 339.84 666  9 41 9 9 "<</PageSize[339.84 666]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 110/PageSize[339.84 666]/ImagingBBox null>>setpagedevice"
+
+// Standard
+  *CustomMedia "Letter/Letter 8.5x11in" 612 792 9 9 9 9 "<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 2/PageSize[612 792]/ImagingBBox null>>setpagedevice"
+  CustomMedia "A4/A4 210x297mm" 595.44 841.68 9 9 9 9 "<</PageSize[595.44 841.68]/ImagingBBox null>>setpagedevice" 
+         "<</cupsInteger0 26/PageSize[595.44 841.68]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Legal/Legal 8.5x14in" 612 1008 9 9 9 9 "<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 3/PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+  CustomMedia "B5/B5 176x250mm" 498.96 708.48 9 9 9 9 "<</PageSize[498.96 708.48]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 65/PageSize[498.96 708.48]/ImagingBBox null>>setpagedevice"
+  CustomMedia "JB5/JB5 182x257mm" 516.24 728.64 9 9 9 9 "<</PageSize[516.24 728.64]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 45/PageSize [516.24 728.64]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Executive/Executive 7.25x10.5in" 522 756 9 9 9 9 "<</PageSize[522 756]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 1/PageSize[522 756]/ImagingBBox null>>setpagedevice"
+  CustomMedia "FLSA/American Foolscap 8.5x13in" 612 936 9 9 9 9 "<</PageSize[612 936]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 10/PageSize[612 936]/ImagingBBox null>>setpagedevice"
+  CustomMedia "ExecutiveJIS/Executive (JIS) 8.5x12.986in" 612 936 9 9 9 9 "<</PageSize[612 936]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 10/PageSize[612 936]/ImagingBBox null>>setpagedevice"
+  CustomMedia "16k/16k 7.75x10.75in" 558 774 9 9 9 9 "<</PageSize[558 774]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 101/PageSize[558 774]/ImagingBBox null>>setpagedevice"   // custom
+  CustomMedia "EnvC5/C5 Envelope 162x229mm" 459 649 9 41 9 9 "<</PageSize[459 649]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 91/PageSize[459 649]/ImagingBBox null>>setpagedevice"
+  CustomMedia "EnvB5/B5 Envelope 176x250mm" 499 709 9 41 9 9 "<</PageSize[499 709]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 100/PageSize[499 709]/ImagingBBox null>>setpagedevice"
+
+// Duplex 4x6
+  CustomMedia "Card4x6Duplex/Index Card AutoDuplex 4x6in" 288 423 9 27 9 36 "<</PageSize[288 423]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 74/PageSize[288 423]/ImagingBBox null>>setpagedevice"
+  CustomMedia "HagakiDuplex/Hagaki AutoDuplex 100x148mm" 284 411 9 27 9 36 "<</PageSize[284 411]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 71/PageSize[284 411]/ImagingBBox null>>setpagedevice"
+
+// Duplex 5x7
+  CustomMedia "Card5x8Duplex/Index Card AutoDuplex 5x8in" 360 567 9 27 9 36 "<</PageSize[360 567]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 75/PageSize[360 567]/ImagingBBox null>>setpagedevice"
+  CustomMedia "OufukuDuplex/Oufuku-Hagaki AutoDuplex 148x200mm" 420 558 9 27 9 36 "<</PageSize[420 558]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 72/PageSize[420 558]/ImagingBBox null>>setpagedevice"
+
+// Duplex Standard
+  CustomMedia "LetterDuplex/Letter AutoDuplex 8.5x11in" 612 783 9 27 9 36 "<</PageSize[612 783]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 2/PageSize[612 783]/ImagingBBox null>>setpagedevice"
+  CustomMedia "A4Duplex/A4 AutoDuplex 210x297mm)" 595 833 9 27 9 36 "<</PageSize[595 833]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 26/PageSize[595 833]/ImagingBBox null>>setpagedevice"
+  CustomMedia "LegalDuplex/Legal AutoDuplex 8.5x14in)" 612 999 9 27 9 36 "<</PageSize[612 999]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 3/PageSize[612 999]/ImagingBBox null>>setpagedevice"
+  CustomMedia "A6Duplex/A6 AutoDuplex 105x148mm)" 297 411 9 27 9 36 "<</PageSize[297 411]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 73/PageSize[297 411]/ImagingBBox null>>setpagedevice"
+  CustomMedia "A5Duplex/A5 AutoDuplex 148x210mm" 420 586 9 27 9 36 "<</PageSize[420 586]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 25/PageSize[420 586]/ImagingBBox null>>setpagedevice"
+  CustomMedia "B5Duplex/B5 AutoDuplex 176x250mm" 499 699 9 27 9 36 "<</PageSize[499 699]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 65/PageSize[499 699]/ImagingBBox null>>setpagedevice"
+  CustomMedia "JB5Duplex/JB5 AutoDuplex 182x257mm" 516 720 9 27 9 36 "<</PageSize[516 720]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 45/PageSize [516 720]/ImagingBBox null>>setpagedevice"
+  CustomMedia "ExecutiveDuplex/Executive AutoDuplex 7.25x10.5in" 522 747 9 27 9 36 "<</PageSize[522 747]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 1/PageSize[522 747]/ImagingBBox null>>setpagedevice"
+
+// Full Bleed 4x6
+  CustomMedia "PhotoFB/Photo Borderless 4x6 in" 298 442 0 0 0 0 "<</PageSize[298 442]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 74/PageSize[298 442]/ImagingBBox null>>setpagedevice"
+  CustomMedia "A6FB/A6 Borderless 105x148mm" 307 430 0 0 0 0 "<</PageSize[307 430]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 73/PageSize[307 430]/ImagingBBox null>>setpagedevice"
+  CustomMedia "HagakiFB/Hagaki Borderless 100x148mm" 294 430 0 0 0 0 "<</PageSize[294 430]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 71/PageSize[294 430]/ImagingBBox null>>setpagedevice"
+
+// Full Bleed 5x7
+  CustomMedia "Photo5x7FB/Photo Borderless 5x7in" 370 514 0 0 0 0 "<</PageSize[370 514]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 122/PageSize[370 514]/ImagingBBox null>>setpagedevice"
+  CustomMedia "OufukuFB/Oufuku-Hagaki Borderless 148x200mm" 430 577 0 0 0 0 "<</PageSize[430 577]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 72/PageSize[430 577]/ImagingBBox null>>setpagedevice"
+  CustomMedia "A5FB/A5 Borderless 148x210mm" 430 605 0 0 0 0 "<</PageSize[430 605]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 25/PageSize[430 605]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Card3x5FB/Index Card Borderless 3x5in" 262 370 0 0 0 0 "<</PageSize [262 370]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 78/PageSize[262 370]/ImagingBBox null>>setpagedevice"
+
+// Full Bleed Standard
+  CustomMedia "LetterFB/Letter Borderless 8.5x11in" 622 802 0 0 0 0 "<</PageSize[622 802]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 2/PageSize[622 802]/ImagingBBox null>>setpagedevice"
+  CustomMedia "A4FB/A4 Borderless 210x297mm" 605 852 0 0 0 0 "<</PageSize[605 852]/ImagingBBox null>>setpagedevice" 
+         "<</cupsInteger0 26/PageSize[605 852]/ImagingBBox null>>setpagedevice"
+  CustomMedia "JB5FB/JB5 Borderless 182x257mm" 526 739 0 0 0 0 "<</PageSize[526 739]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 45/PageSize [526 739]/ImagingBBox null>>setpagedevice"
+
+// CDDVD
+  CustomMedia "CDDVD80/CD DVD 80mm" 238 238 4 4 4 4 "<</PageSize[238 238]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 98/PageSize[238 238]/ImagingBBox null>>setpagedevice"
+  CustomMedia "CDDVD120/CD DVD 120mm" 360 360 4 4 4 4 "<</PageSize[360 360]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 99/PageSize[360 360]/ImagingBBox null>>setpagedevice"
+
+  {
+    // Custom page sizes from 1x4in to Legal
+    HWMargins 18 36 18 36
+    VariablePaperSize Yes
+    MinSize 1in 4in
+    MaxSize 8.5in 14in
+
+    // <%DJGenericVIP:NoEvenDuplex%>
+    {
+      ModelName "HP Photosmart c8100 Series"
+      Attribute "NickName" "" "HP Photosmart c8100 Series, $Version"
+      Attribute "ShortNickName" "" "HP Photosmart c8100 Series"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart c8100 series;DES:photosmart c8100 series;"
+      PCFileName "hp-photosmart_c8100_series.ppd"
+      Attribute "Product" "" "(HP Photosmart c8150 All-in-one Printer)"
+      Attribute "Product" "" "(HP Photosmart c8180 All-in-one Printer)"
+      Attribute "Product" "" "(HP Photosmart c8183 All-in-one Printer)"
+      Attribute "Product" "" "(HP Photosmart c8188 All-in-one Printer)"
+    }
+  } // End Supported media sizes with full bleed.
+} // End DJGenericVIP with NoEvenDuplex
 
 //////// OJProKx50 and DJGenericVIP with no fullbleed
 {
@@ -3811,6 +4377,7 @@ Manufacturer "HP"
   UIConstraints "*ColorModel Gray *hpInkSet Color"
   UIConstraints "*ColorModel Gray *hpInkSet Photo"
   UIConstraints "*ColorModel RGB *hpInkSet Black"
+  UIConstraints "*ColorModel Gray *OutputMode Photo"
   UIConstraints "*MediaType Automatic *OutputMode FastDraft"
   UIConstraints "*MediaType Glossy *OutputMode FastDraft"
   UIConstraints "*MediaType Glossy *OutputMode Draft"
@@ -3845,12 +4412,6 @@ Manufacturer "HP"
   UIConstraints "*PageSize EnvChou3 *Duplex"
   UIConstraints "*PageSize EnvChou4 *Duplex"
   UIConstraints "*PageSize EnvMonarch *Duplex"
-  // Large format
-  UIConstraints "*PageSize A3 *Duplex"
-  UIConstraints "*PageSize B4 *Duplex"
-  UIConstraints "*PageSize Ledger *Duplex"
-  UIConstraints "*PageSize SuperB *Duplex"
-  UIConstraints "*PageSize 8k *Duplex"
 
   Attribute "cupsModelName" "" "Officejet Pro K5400"     // APDK device class 
 
@@ -3916,7 +4477,7 @@ Manufacturer "HP"
 // Duplex 4x6
   CustomMedia "Card4x6Duplex/Index Card AutoDuplex 4x6in" 288 423 9 27 9 36 "<</PageSize[288 423]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 74/PageSize[288 423]/ImagingBBox null>>setpagedevice"
-  CustomMedia "Hagaki/Hagaki 100x148mm" 284 411 9 27 9 36 "<</PageSize[284 411]/ImagingBBox null>>setpagedevice"
+  CustomMedia "HagakiDuplex/Hagaki AutoDuplex 100x148mm" 284 411 9 27 9 36 "<</PageSize[284 411]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 71/PageSize[284 411]/ImagingBBox null>>setpagedevice"
 
 // Duplex 5x7
@@ -4083,6 +4644,13 @@ Manufacturer "HP"
   } // End Supported media sizes with no full bleed.
 
   { 
+  // Large format
+  UIConstraints "*PageSize A3 *Duplex"
+  UIConstraints "*PageSize B4 *Duplex"
+  UIConstraints "*PageSize Ledger *Duplex"
+  UIConstraints "*PageSize SuperB *Duplex"
+  UIConstraints "*PageSize 8k *Duplex"
+
     // Large format media sizes with no full bleed.
 // Large
   CustomMedia "A3/A3 297x420mm" 842 1190 9 36 9 9 "<</PageSize[842 1190]/ImagingBBox null>>setpagedevice"
@@ -5136,6 +5704,27 @@ Manufacturer "HP"
     {
       Attribute "cupsModelName" "" "Deskjet D2600"     // APDK device class 
       // <%DJD2600:Normal%>
+      {
+        ModelName "HP Deskjet Ink Advant k109a-z"
+        Attribute "NickName" "" "HP Deskjet Ink Advant k109a-z, $Version"
+        Attribute "ShortNickName" "" "HP Deskjet Ink Advant k109a-z"
+        Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet ink advant k109a-z;DES:deskjet ink advant k109a-z;"
+        PCFileName "hp-deskjet_ink_advant_k109a-z.ppd"
+        Attribute "Product" "" "(HP Deskjet Ink Advantage k109a Printer)"
+      }
+      {
+        ModelName "HP Deskjet d1600 Series"
+        Attribute "NickName" "" "HP Deskjet d1600 Series, $Version"
+        Attribute "ShortNickName" "" "HP Deskjet d1600 Series"
+        Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet d1600 series;DES:deskjet d1600 series;"
+        PCFileName "hp-deskjet_d1600_series.ppd"
+        Attribute "Product" "" "(HP Deskjet d1620 Printer)"
+        Attribute "Product" "" "(HP Deskjet d1630 Printer)"
+        Attribute "Product" "" "(HP Deskjet d1650 Printer)"
+        Attribute "Product" "" "(HP Deskjet d1658 Printer)"
+        Attribute "Product" "" "(HP Deskjet d1660 Printer)"
+        Attribute "Product" "" "(HP Deskjet d1663 Printer)"
+      }
       {
         ModelName "HP Deskjet d2600 Series"
         Attribute "NickName" "" "HP Deskjet d2600 Series, $Version"
@@ -6412,10 +7001,10 @@ Manufacturer "HP"
     }
     {
       ModelName "HP LaserJet p3010 Series"
-      Attribute "NickName" "" "HP LaserJet p3010 Series, $Version"
+      Attribute "NickName" "" "HP LaserJet p3010 Series pcl3, $Version"
       Attribute "ShortNickName" "" "HP LaserJet p3010 Series"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p3010 series;DES:hp laserjet p3010 series;"
-      PCFileName "hp-laserjet_p3010_series.ppd"
+      PCFileName "hp-laserjet_p3010_series-pcl3.ppd"
       Attribute "Product" "" "(HP LaserJet p3015 Printer)"
       Attribute "Product" "" "(HP LaserJet p3011 Printer)"
     }
@@ -7164,7 +7753,7 @@ Manufacturer "HP"
   // cupsRowCount values map to PEN_TYPE + 1 from global_types.h
   Option "ColorModel/Output Mode" PickOne AnySetup 10.0
     Choice "Gray/Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowCount 3/cupsRowStep 1>>setpagedevice"
-    *Choice "RGB/Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowCount 3/cupsRowStep 0>>setpagedevice"
+    *Choice "RGB/Color" "<</cupsColorSpace 17/cupsBitsPerColor 8/cupsRowCount 3/cupsRowStep 0>>setpagedevice"
 
   // cupsMediaType values map to MEDIATYPE from global_types.h
   Option "MediaType/Media Type" PickOne AnySetup 10.0
@@ -7977,9 +8566,7 @@ Manufacturer "HP"
     Choice "Color/Color Only" "<</cupsRowCount 2>>setpagedevice"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*ColorModel Gray *hpInkSet Color"
-  UIConstraints "*ColorModel Gray *hpInkSet Photo"
   UIConstraints "*ColorModel RGB *hpInkSet Black"
   UIConstraints "*ColorModel RGB *OutputMode Best"
 
@@ -8777,6 +9364,14 @@ Manufacturer "HP"
         Attribute "Product" "" "(HP Deskjet 670tv Printer)"
       }
       {
+        ModelName "HP Deskjet 670c"
+        Attribute "NickName" "" "HP Deskjet 670c, $Version"
+        Attribute "ShortNickName" "" "HP Deskjet 670c"
+        Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 670c;DES:deskjet 670c;"
+        PCFileName "hp-deskjet_670c.ppd"
+        Attribute "Product" "" "(HP Deskjet 670c)"
+      }
+      {
         ModelName "HP Deskjet 672c"
         Attribute "NickName" "" "HP Deskjet 672c, $Version"
         Attribute "ShortNickName" "" "HP Deskjet 672c"
@@ -9082,10 +9677,6 @@ Manufacturer "HP"
     Choice "Manual/Manual Feeder" "<</MediaPosition 2>>setpagedevice"
     Choice "MPTray/Multi Purpose Tray" "<</MediaPosition 1>>setpagedevice"
 
-  Option "ColorModel/Output Mode" PickOne AnySetup 10.0
-    Choice "Gray/Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1>>setpagedevice"
-    *Choice "RGB/Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0>>setpagedevice"
-
   // cupsMediaType values map to MEDIATYPE from global_types.h
   Option "MediaType/Media Type" PickOne AnySetup 10.0
     *Choice "Plain/Plain Paper" "<</MediaType(Plain)/cupsMediaType 0>>setpagedevice"
@@ -9093,10 +9684,12 @@ Manufacturer "HP"
 
   // cupsCompression values map to QUALITY_MODE from global_types.h
   Option "OutputMode/Print Quality" PickOne AnySetup 10.0
-    *Choice "Normal/Normal" "<</cupsCompression 0/HWResolution[300 300]>>setpagedevice"
-    Choice "Draft/Draft" "<</cupsCompression 1/HWResolution[300 300]>>setpagedevice"
-    Choice "Best/Best" "<</cupsCompression 2/HWResolution[600 600]>>setpagedevice"         // black only
-    Choice "Photo/High-Resolution Photo" "<</cupsCompression 3/HWResolution[600 600]>>setpagedevice"
+    *Choice "NormalRGB/Normal Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0/cupsCompression 0/HWResolution[300 300]>>setpagedevice"
+    Choice "NormalGray/Normal Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1/cupsCompression 0/HWResolution[600 600]>>setpagedevice"
+    Choice "DraftRGB/Draft Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0/cupsCompression 1/HWResolution[300 300]>>setpagedevice"
+    Choice "DraftGray/Draft Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1/cupsCompression 1/HWResolution[300 300]>>setpagedevice"
+    Choice "BestGray/Best Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1/cupsCompression 2/HWResolution[600 600]>>setpagedevice"  // black only
+    Choice "Photo/High-Resolution Photo" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0/cupsCompression 3/HWResolution[600 600]>>setpagedevice"
 
   // cupsRowCount values map to PEN_TYPE + 1 from global_types.h
   Option "hpInkSet/Installed Inks" PickOne AnySetup 10.0
@@ -9106,11 +9699,17 @@ Manufacturer "HP"
     Choice "Photo/Photo + Color" "<</cupsRowCount 5>>setpagedevice"
 
   // Constraints
-  UIConstraints "*ColorModel Gray *hpInkSet Color"
-  UIConstraints "*ColorModel Gray *hpInkSet Photo"
-  UIConstraints "*ColorModel RGB *hpInkSet Black"
-  UIConstraints "*ColorModel RGB *OutputMode Best"
-  UIConstraints "*MediaType Glossy *OutputMode Draft"
+  UIConstraints "*hpInkSet Color *OutputMode NormalGray"
+  UIConstraints "*hpInkSet Color *OutputMode DraftGray"
+  UIConstraints "*hpInkSet Color *OutputMode BestGray"
+  UIConstraints "*hpInkSet Photo *OutputMode NormalGray"
+  UIConstraints "*hpInkSet Photo *OutputMode DraftGray"
+  UIConstraints "*hpInkSet Photo *OutputMode BestGray"
+  UIConstraints "*hpInkSet Black *OutputMode NormalRGB"
+  UIConstraints "*hpInkSet Black *OutputMode DraftRGB"
+  UIConstraints "*hpInkSet Black *OutputMode Photo"
+  UIConstraints "*MediaType Glossy *OutputMode DraftGray"
+  UIConstraints "*MediaType Glossy *OutputMode DraftRGB"
   UIConstraints "*MediaType Plain *OutputMode Photo"
 
   Attribute "cupsModelName" "" "DESKJET 810"     // APDK device class 
@@ -9383,10 +9982,6 @@ Manufacturer "HP"
     Choice "Manual/Manual Feeder" "<</MediaPosition 2>>setpagedevice"
     Choice "MPTray/Multi Purpose Tray" "<</MediaPosition 1>>setpagedevice"
 
-  Option "ColorModel/Output Mode" PickOne AnySetup 10.0
-    Choice "Gray/Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1>>setpagedevice"
-    *Choice "RGB/Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0>>setpagedevice"
-
   // cupsMediaType values map to MEDIATYPE from global_types.h
   Option "MediaType/Media Type" PickOne AnySetup 10.0
     *Choice "Plain/Plain Paper" "<</MediaType(Plain)/cupsMediaType 0>>setpagedevice"
@@ -9394,10 +9989,12 @@ Manufacturer "HP"
 
   // cupsCompression values map to QUALITY_MODE from global_types.h
   Option "OutputMode/Print Quality" PickOne AnySetup 10.0
-    *Choice "Normal/Normal" "<</cupsCompression 0/HWResolution[300 300]>>setpagedevice"
-    Choice "Draft/Draft" "<</cupsCompression 1/HWResolution[300 300]>>setpagedevice"
-    Choice "Best/Best" "<</cupsCompression 2/HWResolution[600 600]>>setpagedevice"         // black only
-    Choice "Photo/High-Resolution Photo" "<</cupsCompression 3/HWResolution[600 600]>>setpagedevice"
+    *Choice "NormalRGB/Normal Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0/cupsCompression 0/HWResolution[300 300]>>setpagedevice"
+    Choice "NormalGray/Normal Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1/cupsCompression 0/HWResolution[600 600]>>setpagedevice"
+    Choice "DraftRGB/Draft Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0/cupsCompression 1/HWResolution[300 300]>>setpagedevice"
+    Choice "DraftGray/Draft Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1/cupsCompression 1/HWResolution[300 300]>>setpagedevice"
+    Choice "BestGray/Best Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowStep 1/cupsCompression 2/HWResolution[600 600]>>setpagedevice"  // black only
+    Choice "Photo/High-Resolution Photo" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0/cupsCompression 3/HWResolution[600 600]>>setpagedevice"
 
   // cupsRowCount values map to PEN_TYPE + 1 from global_types.h
   Option "hpInkSet/Installed Inks" PickOne AnySetup 10.0
@@ -9407,11 +10004,17 @@ Manufacturer "HP"
     Choice "Photo/Photo + Color" "<</cupsRowCount 5>>setpagedevice"
 
   // Constraints
-  UIConstraints "*ColorModel Gray *hpInkSet Color"
-  UIConstraints "*ColorModel Gray *hpInkSet Photo"
-  UIConstraints "*ColorModel RGB *hpInkSet Black"
-  UIConstraints "*ColorModel RGB *OutputMode Best"
-  UIConstraints "*MediaType Glossy *OutputMode Draft"
+  UIConstraints "*hpInkSet Color *OutputMode NormalGray"
+  UIConstraints "*hpInkSet Color *OutputMode DraftGray"
+  UIConstraints "*hpInkSet Color *OutputMode BestGray"
+  UIConstraints "*hpInkSet Photo *OutputMode NormalGray"
+  UIConstraints "*hpInkSet Photo *OutputMode DraftGray"
+  UIConstraints "*hpInkSet Photo *OutputMode BestGray"
+  UIConstraints "*hpInkSet Black *OutputMode NormalRGB"
+  UIConstraints "*hpInkSet Black *OutputMode DraftRGB"
+  UIConstraints "*hpInkSet Black *OutputMode Photo"
+  UIConstraints "*MediaType Glossy *OutputMode DraftGray"
+  UIConstraints "*MediaType Glossy *OutputMode DraftRGB"
   UIConstraints "*MediaType Plain *OutputMode Photo"
 
   Attribute "cupsModelName" "" "DESKJET 825"     // APDK device class 
@@ -9915,7 +10518,7 @@ Manufacturer "HP"
   // cupsRowCount values map to PEN_TYPE + 1 from global_types.h
   Option "ColorModel/Output Mode" PickOne AnySetup 10.0
     Choice "Gray/Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowCount 3/cupsRowStep 1>>setpagedevice"
-    *Choice "RGB/Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowCount 3/cupsRowStep 0>>setpagedevice"
+    *Choice "RGB/Color" "<</cupsColorSpace 17/cupsBitsPerColor 8/cupsRowCount 3/cupsRowStep 0>>setpagedevice"
 
   // cupsMediaType values map to MEDIATYPE from global_types.h
   Option "MediaType/Media Type" PickOne AnySetup 10.0
@@ -10051,7 +10654,7 @@ Manufacturer "HP"
   // cupsRowCount values map to PEN_TYPE + 1 from global_types.h
   Option "ColorModel/Output Mode" PickOne AnySetup 10.0
     Choice "Gray/Grayscale" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowCount 3/cupsRowStep 1>>setpagedevice"
-    *Choice "RGB/Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowCount 3/cupsRowStep 0>>setpagedevice"
+    *Choice "RGB/Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowCount 3/cupsRowStep 0>>setpagedevice"     /* no RGBW */
 
   // cupsMediaType values map to MEDIATYPE from global_types.h
   Option "MediaType/Media Type" PickOne AnySetup 10.0
