@@ -26,12 +26,18 @@ import struct
 import cStringIO
 import xml.parsers.expat as expat
 import re
+import urllib
+try:
+    from xml.etree import ElementTree
+    etree_loaded = True
+except ImportError:
+    etree_loaded = False
 
 # Local
 from g import *
 from codes import *
 import pml, utils
-
+import hpmudext
 
 """
 status dict structure:
@@ -175,10 +181,10 @@ def parseSStatus(s, z=''):
 
         pen, c, d = {}, NUM_PEN_POS[revision]+1, 0
         num_pens = s1[NUM_PEN_POS[revision]]
-        log.debug("Num pens=%d" % num_pens)
         index = 0
         pen_data_size = PEN_DATA_SIZE[revision]
 
+        log.debug("num_pens = %d" % num_pens)
         for p in range(num_pens):
             info = long(s[c : c + pen_data_size], 16)
 
@@ -223,9 +229,10 @@ def parseSStatus(s, z=''):
                     pen['known'] = 0
                     pen['ack'] = 0
 
+            log.debug("pen %d %s" % (index, pen))
+
             index += 1
             pens.append(pen)
-            log.debug("Pen %d: %s" % (p, pen))
             pen = {}
             c += pen_data_size
             d += Z_SIZE
@@ -1449,5 +1456,178 @@ def StatusType8(dev): #  LaserJet PJL (B&W only)
            }
 
 
+element_type10_xlate = { 'ink' : AGENT_KIND_SUPPLY,
+                         'printhead' : AGENT_KIND_HEAD,
+                       }
+
+pen_type10_xlate = { 'pK' : AGENT_TYPE_PG,
+                     'M' : AGENT_TYPE_MAGENTA,
+                     'C' : AGENT_TYPE_CYAN,
+                     'Y' : AGENT_TYPE_YELLOW,
+                     'K' : AGENT_TYPE_BLACK,
+                   }
+
+pen_level10_xlate = { 'ok' : AGENT_LEVEL_TRIGGER_SUFFICIENT_0,
+                      'low' : AGENT_LEVEL_TRIGGER_MAY_BE_LOW,
+                      'out' : AGENT_LEVEL_TRIGGER_ALMOST_DEFINITELY_OUT,
+                      'empty' : AGENT_LEVEL_TRIGGER_ALMOST_DEFINITELY_OUT,
+                      'missing' : AGENT_LEVEL_TRIGGER_ALMOST_DEFINITELY_OUT,
+                    }
+
+pen_health10_xlate = { 'ok' : AGENT_HEALTH_OK,
+                       'misinstalled' : AGENT_HEALTH_MISINSTALLED,
+                       'missing' : AGENT_HEALTH_MISINSTALLED,
+                     }
+
+def StatusType10FetchUrl(dev, url):
+    if dev.is_local:
+#       data_fp = cStringIO.StringIO()
+#       dev.getEWSUrl(url, data_fp)
+#       data = data_fp.getvalue()
+        data = parseStatus(dev.deviceID)
+        log.error("status %s" % data)
+
+    else:
+        if dev.zc:
+            status, ip = hpmudext.get_zc_ip_address(dev.zc)
+            if status != hpmudext.HPMUD_R_OK:
+                log.error("unable to get IP address of mDNS configured device")
+                return None
+        else:
+            ip = dev.host
+
+        # Get the agent status XML
+        addr = "http://%s:8080%s" % (ip, url)
+        feed = urllib.urlopen(addr)
+        data = feed.read()
+        feed.close()
+
+    return data
 
 
+def StatusType10(dev): # Low End Data Model
+    status_block = { 'revision' :    STATUS_REV_UNKNOWN,
+                     'agents' :      [],
+                     'top-door' :    TOP_DOOR_NOT_PRESENT,
+                     'supply-door' : TOP_DOOR_NOT_PRESENT,
+                     'duplexer' :    DUPLEXER_NOT_PRESENT,
+                     'photo-tray' :  PHOTO_TRAY_NOT_PRESENT,
+                     'in-tray1' :    IN_TRAY_NOT_PRESENT,
+                     'in-tray2' :    IN_TRAY_NOT_PRESENT,
+                     'media-path' :  MEDIA_PATH_NOT_PRESENT,
+                     'status-code' : STATUS_PRINTER_IDLE,
+                   }
+
+    if not etree_loaded:
+        log.error("cannot get status for printer...please load ElementTree module")
+        return status_block
+
+    # Get the dynamic consumables configuration
+    data = StatusType10FetchUrl(dev, "/DevMgmt/ConsumableConfigDyn.xml")
+    if not data:
+        log.error("unable to fetch pen status")
+        return status_block
+    data = data.replace("ccdyn:", "").replace("dd:", "")
+
+    # Parse the agent status XML
+    agents = []
+    tree = ElementTree.XML(data)
+    elements = tree.findall("ConsumableInfo")
+    for e in elements:
+#       ElementTree.dump(e)
+        health = AGENT_HEALTH_OK
+        ink_level = 0
+        type = e.find("ConsumableTypeEnum").text
+        state = e.find("ConsumableLifeState/ConsumableState").text
+
+        # level
+        if type == "ink":
+            ink_type = e.find("ConsumableLabelCode").text
+            if state != "missing":
+                try:
+                   ink_level = int(e.find("ConsumablePercentageLevelRemaining").text)
+                except:
+                   ink_level = 0
+        else:
+            ink_type = ''
+            if state == "ok":
+                ink_level = 100
+
+        log.debug("type '%s' state '%s' ink_type '%s' ink_level %d" % (type, state, ink_type, ink_level))
+
+        entry = { 'kind' : element_type10_xlate.get(type, AGENT_KIND_NONE),
+                  'type' : pen_type10_xlate.get(ink_type, AGENT_TYPE_NONE),
+                  'health' : pen_health10_xlate.get(state, AGENT_HEALTH_OK),
+                  'level' : int(ink_level),
+                  'level-trigger' : pen_level10_xlate.get(state, AGENT_LEVEL_TRIGGER_SUFFICIENT_0)
+                }
+
+        log.debug("%s" % entry)
+        agents.append(entry)
+
+    status_block['agents'] = agents
+
+    # Get the media handling configuration
+    data = StatusType10FetchUrl(dev, "/DevMgmt/MediaHandlingDyn.xml")
+    if not data:
+        log.error("unable to fetch media handling status")
+        return status_block
+    data = data.replace("mhdyn:", "").replace("dd:", "")
+
+    # Parse the media handling XML
+    tree = ElementTree.XML(data)
+    elements = tree.findall("InputTray")
+    for e in elements:
+#       ElementTree.dump(e)
+        bin_name = e.find("InputBin").text
+        if bin_name == "Tray1":
+            status_block['in-tray1'] = IN_TRAY_PRESENT
+        elif bin_name == "Tray2":
+            status_block['in-tray2'] = IN_TRAY_PRESENT
+        elif bin_name == "PhotoTray":
+            status_block['photo-tray'] = PHOTO_TRAY_ENGAGED
+        else:
+            log.error("found invalid bin name '%s'" % bin_name)
+
+    elements = tree.findall("Accessories/MediaHandlingDeviceFunctionType")
+    for e in elements:
+#       ElementTree.dump(e)
+        if e.text == "autoDuplexor":
+            status_block['duplexer'] = DUPLEXER_DOOR_CLOSED
+        else:
+            log.error("found invalid media accessory '%s'" % e.text)
+
+    # Get the product status
+    data = StatusType10FetchUrl(dev, "/DevMgmt/ProductStatusDyn.xml")
+    if not data:
+        log.error("unable to fetch product status")
+        return status_block
+    data = data.replace("psdyn:", "").replace("locid:", "")
+    data = data.replace("pscat:", "").replace("dd:", "").replace("ad:", "")
+
+    # Parse the product status XML
+    tree = ElementTree.XML(data)
+    elements = tree.findall("Status/StatusCategory")
+    for e in elements:
+#       ElementTree.dump(e)
+        if e.text == "closeDoorOrCover":
+            status_block['top-door'] = TOP_DOOR_OPEN
+            status_block['supply-door'] = TOP_DOOR_OPEN
+        elif e.text == "shuttingDown":
+            status_block['status-code'] = STATUS_PRINTER_TURNING_OFF
+        elif e.text == "cancelJob":
+            status_block['status-code'] = STATUS_PRINTER_CANCELING
+        elif e.text == "trayEmptyOrOpen":
+            status_block['status-code'] = STATUS_PRINTER_OUT_OF_PAPER
+        elif e.text == "jamInPrinter":
+            status_block['status-code'] = STATUS_PRINTER_MEDIA_JAM
+        elif e.text == "hardError":
+            status_block['status-code'] = STATUS_PRINTER_HARD_ERROR
+        elif e.text == "outputBinFull":
+            status_block['status-code'] = STATUS_PRINTER_OUTPUT_BIN_FULL
+        elif e.text == "unexpectedSizeInTray":
+            status_block['status-code'] = STATUS_PRINTER_MEDIA_SIZE_MISMATCH
+        elif e.text == "insertOrCloseTray2":
+            status_block['status-code'] = STATUS_PRINTER_TRAY_2_MISSING
+
+    return status_block

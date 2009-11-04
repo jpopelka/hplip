@@ -398,7 +398,6 @@ DRIVER_ERROR    QuickConnect::Flush (int iBufferSize)
         err = AddExifHeader ();
         ERRCHECK;
 
-        err = Send ((const BYTE *) m_pbyJpegBuffer, m_iJpegBufferPos);
         memset (m_pbyInputBuffer, 0xFF, m_iInputBufferSize);
 
 //      Send the END JOB PJL command

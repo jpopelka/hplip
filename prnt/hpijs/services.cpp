@@ -375,7 +375,10 @@ DRIVER_ERROR UXServices::ToDevice(const BYTE * pBuffer, DWORD * Count)
     {
         fwrite (pBuffer, 1, *Count, outfp);
 	if (!(m_iLogLevel & SEND_TO_PRINTER))
+	{
+	    *Count = 0;
 	    return NO_ERROR;
+	}
     }
 
    /* Write must be not-buffered, don't use streams */

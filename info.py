@@ -64,7 +64,7 @@ try:
             restrict = False
 
     if devid_mode:
-        mode = INTERACTIVE_MODE
+        mode = NON_INTERACTIVE_MODE
 
     if mode == GUI_MODE:
         if not utils.canEnterGUIMode4():
@@ -76,7 +76,7 @@ try:
 
     device_uri = mod.getDeviceUri(device_uri, printer_name, restrict_to_installed_devices=restrict)
 
-    if mode == INTERACTIVE_MODE:
+    if mode in (INTERACTIVE_MODE, NON_INTERACTIVE_MODE):
         try:
             d = device.Device(device_uri, printer_name)
         except Error:

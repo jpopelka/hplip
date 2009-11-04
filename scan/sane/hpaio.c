@@ -856,7 +856,7 @@ static SANE_Status hpaioSetDefaultValue( hpaioScanner_t hpaio, int option )
                 hpaio->currentAdfMode = ADF_MODE_AUTO;
             }
             break;
-#if 0
+#if 1
         case OPTION_DUPLEX:
             hpaio->currentDuplex = SANE_FALSE;
             break;
@@ -1070,7 +1070,7 @@ static int hpaioUpdateDescriptors( hpaioScanner_t hpaio, int option )
         reload |= SANE_INFO_RELOAD_OPTIONS;
     }
 
-#if 0
+#if 1
     /* OPTION_DUPLEX: */
     if( initValues ||
         ( ( hpaio->supportsDuplex &&
@@ -1302,18 +1302,21 @@ static void hpaioSetupOptions( hpaioScanner_t hpaio )
                                          SANE_CAP_ADVANCED;
     hpaio->option[OPTION_ADF_MODE].constraint_type = SANE_CONSTRAINT_STRING_LIST;
     hpaio->option[OPTION_ADF_MODE].constraint.string_list = hpaio->adfModeList;
-#if 0
-    hpaio->option[OPTION_DUPLEX].name = STR_NAME_DUPLEX;
-    hpaio->option[OPTION_DUPLEX].title = STR_TITLE_DUPLEX;
-    hpaio->option[OPTION_DUPLEX].desc = STR_DESC_DUPLEX;
-    hpaio->option[OPTION_DUPLEX].type = SANE_TYPE_BOOL;
-    hpaio->option[OPTION_DUPLEX].unit = SANE_UNIT_NONE;
-    hpaio->option[OPTION_DUPLEX].size = sizeof( SANE_Bool );
-    hpaio->option[OPTION_DUPLEX].cap = SANE_CAP_SOFT_SELECT |
+
+    // Duplex scanning is supported
+    if (hpaio->supportsDuplex  == 1)
+    {
+       hpaio->option[OPTION_DUPLEX].name = STR_NAME_DUPLEX;
+       hpaio->option[OPTION_DUPLEX].title = STR_TITLE_DUPLEX;
+       hpaio->option[OPTION_DUPLEX].desc = STR_DESC_DUPLEX;
+       hpaio->option[OPTION_DUPLEX].type = SANE_TYPE_BOOL;
+       hpaio->option[OPTION_DUPLEX].unit = SANE_UNIT_NONE;
+       hpaio->option[OPTION_DUPLEX].size = sizeof( SANE_Bool );
+       hpaio->option[OPTION_DUPLEX].cap = SANE_CAP_SOFT_SELECT |
                                        SANE_CAP_SOFT_DETECT |
                                        SANE_CAP_ADVANCED;
-    hpaio->option[OPTION_DUPLEX].constraint_type = SANE_CONSTRAINT_NONE;
-#endif
+       hpaio->option[OPTION_DUPLEX].constraint_type = SANE_CONSTRAINT_NONE;
+    }
     hpaio->option[GROUP_GEOMETRY].title = STR_TITLE_GEOMETRY;
     hpaio->option[GROUP_GEOMETRY].type = SANE_TYPE_GROUP;
     hpaio->option[GROUP_GEOMETRY].cap = SANE_CAP_ADVANCED;
@@ -1532,7 +1535,7 @@ static SANE_Status hpaioAdvanceDocument(hpaioScanner_t hpaio)
         retcode = SclInquire(hpaio->deviceid, hpaio->scan_channelid, SCL_CMD_INQUIRE_DEVICE_PARAMETER,
                               SCL_INQ_ADF_DOCUMENT_LOADED, &documentLoaded, 0, 0);
                               
-        if (retcode != SANE_STATUS_GOOD)
+	if (retcode != SANE_STATUS_GOOD)
             goto bugout;
     }
 
@@ -1548,8 +1551,25 @@ static SANE_Status hpaioAdvanceDocument(hpaioScanner_t hpaio)
        goto bugout;    /* no paper loaded, use flatbed */
     
     /* Assume ADF mode. */
-    if (documentLoaded)
-       retcode = hpaioSclSendCommandCheckError(hpaio, SCL_CMD_CHANGE_DOCUMENT, SCL_CHANGE_DOC_SIMPLEX);
+    if (documentLoaded || (hpaio->currentSideNumber == 2) ) 
+    {
+        if (hpaio->currentDuplex)
+        {
+            /* Duplex change document. */
+            if(hpaio->currentSideNumber == 2)
+               hpaio->currentSideNumber = 1;
+            else
+               hpaio->currentSideNumber = 2;
+
+            retcode=hpaioSclSendCommandCheckError(hpaio, SCL_CMD_CHANGE_DOCUMENT, SCL_CHANGE_DOC_DUPLEX); 
+        }
+        else 
+        {
+             /* Simplex change document. */
+             retcode = hpaioSclSendCommandCheckError(hpaio, SCL_CMD_CHANGE_DOCUMENT, SCL_CHANGE_DOC_SIMPLEX);
+        }
+        hpaio->currentPageNumber++;
+    }
     else
        retcode = SANE_STATUS_NO_DOCS;
 
@@ -1559,7 +1579,6 @@ bugout:
 
     return retcode;
 }
-
 
 /******************************************************* SANE API *******************************************************/
 
@@ -1662,6 +1681,12 @@ extern SANE_Status sane_hpaio_open(SANE_String_Const devicename, SANE_Handle * p
     hpaio->scan_channelid = -1;
     hpaio->cmd_channelid = -1;
 
+    // Set the duplex type supported
+    if (ma.scantype == HPMUD_SCANTYPE_SCL_DUPLEX) 
+      hpaio->supportsDuplex = 1;
+    else
+      hpaio->supportsDuplex = 0;
+
     /* Get the device ID string and initialize the SANE_Device structure. */
     memset(deviceIDString, 0, sizeof(deviceIDString));
     
@@ -1686,6 +1711,8 @@ extern SANE_Status sane_hpaio_open(SANE_String_Const devicename, SANE_Handle * p
 
     /* Initialize option descriptors. */
     hpaioSetupOptions( hpaio ); 
+    hpaio->currentSideNumber = 1;
+
 
 //BREAKPOINT;
     
@@ -2453,7 +2480,7 @@ extern SANE_Status sane_hpaio_control_option(SANE_Handle handle, SANE_Int option
                             break;
                     }
                     break;
-#if 0
+#if 1
                 case OPTION_DUPLEX:
                     *pIntValue = hpaio->currentDuplex;
                     break;
@@ -2628,7 +2655,7 @@ extern SANE_Status sane_hpaio_control_option(SANE_Handle handle, SANE_Int option
                         break;
                     }
                     return SANE_STATUS_INVAL;
-#if 0
+#if 1
                 case OPTION_DUPLEX:
                     if( *pIntValue != SANE_FALSE && *pIntValue != SANE_TRUE )
                     {
@@ -2784,7 +2811,7 @@ extern SANE_Status sane_hpaio_start(SANE_Handle handle)
     if (hpaio->scannerType==SCANNER_TYPE_PML)
         return pml_start(hpaio);
 
-    /* TODO: convert to scl_start. des */
+      /* TODO: convert to scl_start. des */
 
     /* If we just scanned the last page of a batch scan, then return the obligatory SANE_STATUS_NO_DOCS condition. */
     if( hpaio->noDocsConditionPending )
@@ -2793,7 +2820,6 @@ extern SANE_Status sane_hpaio_start(SANE_Handle handle)
         retcode = SANE_STATUS_NO_DOCS;
         goto abort;
     }
-
     /* Open scanner command channel. */
     retcode = hpaioConnPrepareScan( hpaio );
     
@@ -2801,7 +2827,6 @@ extern SANE_Status sane_hpaio_start(SANE_Handle handle)
     {
         goto abort;
     }
-
     /* Change document if needed. */
     hpaio->beforeScan = 1;
     retcode = hpaioAdvanceDocument( hpaio );

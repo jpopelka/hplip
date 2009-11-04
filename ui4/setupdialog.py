@@ -212,6 +212,7 @@ class SetupDialog(QDialog, Ui_Dialog):
         self.advanced = False
         self.manual = False
         self.skip_discovery = False
+        self.discovery_method = 0
         self.NetworkRadioButton.setEnabled(prop.net_build)
         self.WirelessButton.setEnabled(prop.net_build)
         self.ParallelRadioButton.setEnabled(prop.par_build)
@@ -312,11 +313,11 @@ class SetupDialog(QDialog, Ui_Dialog):
 
 
     def manualDiscovery(self):
-        ret = False
         # Validate param...
         device_uri, sane_uri, fax_uri = device.makeURI(self.param, self.jd_port)
 
         if device_uri:
+            log.info("Found device: %s" % device_uri)
             back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
                 device.parseDeviceURI(device_uri)
 
@@ -341,9 +342,10 @@ class SetupDialog(QDialog, Ui_Dialog):
                 self.ParallelRadioButton.setChecked(True)
                 self.setParallelRadioButton(True)
 
-            ret = True
+            return True
 
-        return ret
+
+        return False
 
 
     def ManualGroupBox_clicked(self, checked):

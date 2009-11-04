@@ -423,9 +423,11 @@ int hpmud_get_uri_model(const char *uri, char *buf, int buf_size)
 int hpmud_get_uri_datalink(const char *uri, char *buf, int buf_size)
 {
    char *p;
-   char ip[HPMUD_LINE_SIZE];
    int i;
    int zc=0;
+#ifdef HAVE_LIBNETSNMP
+   char ip[HPMUD_LINE_SIZE];
+#endif
 
    buf[0] = 0;
 

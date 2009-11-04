@@ -945,6 +945,7 @@ def queryString(string_id, typ=0):
 
 AGENT_types = { AGENT_TYPE_NONE        : 'invalid',
                 AGENT_TYPE_BLACK       : 'black',
+                AGENT_TYPE_BLACK_B8800 : 'black',
                 AGENT_TYPE_CMY         : 'cmy',
                 AGENT_TYPE_KCM         : 'kcm',
                 AGENT_TYPE_CYAN        : 'cyan',
@@ -1120,7 +1121,7 @@ class Device(object):
             'dev-file'         : self.dev_file,
             'host'             : self.host,
             'port'             : self.port,
-            'cups-printers'    : ','.join(self.cups_printers),
+            'cups-printers'    : self.cups_printers,
             'status-code'      : self.status_code,
             'status-desc'      : '',
             'deviceid'         : '',
@@ -1522,7 +1523,7 @@ class Device(object):
 
                 self.dq.update({
                     'serial'           : self.serial,
-                    'cups-printers'    : ','.join(self.cups_printers),
+                    'cups-printers'    : self.cups_printers,
                     'status-code'      : self.status_code,
                     'status-desc'      : status_desc,
                     'deviceid'         : self.raw_deviceID,
@@ -1600,7 +1601,7 @@ class Device(object):
                 if self.io_state == IO_STATE_NON_HP:
                     self.model = p.makemodel.split(',')[0]
 
-        self.dq.update({'cups-printers' : ','.join(self.cups_printers)})
+        self.dq.update({'cups-printers' : self.cups_printers})
 
         try:
             self.first_cups_printer = self.cups_printers[0]
@@ -1652,7 +1653,7 @@ class Device(object):
 
             self.dq.update({
                 'serial'           : self.serial,
-                'cups-printers'    : ','.join(self.cups_printers),
+                'cups-printers'    : self.cups_printers,
                 'status-code'      : self.status_code,
                 'status-desc'      : status_desc,
                 'deviceid'         : self.raw_deviceID,
@@ -1684,6 +1685,10 @@ class Device(object):
             elif status_type == STATUS_TYPE_PJL:
                 log.debug("Type 8: LJ PJL")
                 status_block = status.StatusType8(self)
+
+            elif status_type == STATUS_TYPE_LEDM:
+                log.debug("Type 10: LEDM")
+                status_block = status.StatusType10(self)
 
             else:
                 log.error("Unimplemented status type: %d" % status_type)

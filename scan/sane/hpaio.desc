@@ -85,6 +85,27 @@
 :model "HP Officejet g95 All-in-one Printer"
 :status :good
 
+:model "HP Photosmart All-in-one Printer - b109d"
+:status :good
+
+:model "HP Photosmart All-in-one Printer - b109e"
+:status :good
+
+:model "HP Photosmart All-in-one Printer - b109c"
+:status :good
+
+:model "HP Photosmart All-in-one Printer - b109a"
+:status :good
+
+:model "HP Photosmart Wireless All-in-one Printer - b109q"
+:status :good
+
+:model "HP Photosmart Wireless All-in-one Printer - b109n"
+:status :good
+
+:model "HP Photosmart Wireless All-in-one Printer - b109q=r"
+:status :good
+
 :model "HP Officejet d125xi All-in-one Printer"
 :status :good
 
@@ -118,7 +139,19 @@
 :model "HP Printer Scanner Copier 300"
 :status :good
 
+:model "HP Photosmart Premium All-in-one Printer Series - c309h"
+:status :good
+
+:model "HP Photosmart Premium All-in-one Printer Series - c309g"
+:status :good
+
 :model "HP Photosmart Premium Fax All-in-one Printer - c309a"
+:status :good
+
+:model "HP Photosmart Premium Fax All-in-one Printer Series -c309c"
+:status :good
+
+:model "HP Photosmart Premium Fax All-in-one Printer Series -c309a"
 :status :good
 
 :model "HP Deskjet f310 All-in-one Printer"
@@ -322,10 +355,10 @@
 :model "HP PSC 1209 All-in-one Printer"
 :status :good
 
-:model "HP PSC 1210v All-in-one Printer"
+:model "HP PSC 1210xi All-in-one Printer"
 :status :good
 
-:model "HP PSC 1210xi All-in-one Printer"
+:model "HP PSC 1210v All-in-one Printer"
 :status :good
 
 :model "HP PSC 1210 All-in-one Printer"
@@ -685,13 +718,49 @@
 :model "HP PSC 2410xi Photosmart All-in-one Printer"
 :status :good
 
+:model "HP Deskjet f2410 All-in-one Printer"
+:status :good
+
 :model "HP PSC 2410 Photosmart All-in-one Printer"
+:status :good
+
+:model "HP Deskjet f2418 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet f2420 All-in-one Printer"
 :status :good
 
 :model "HP PSC 2420 Photosmart All-in-one Printer"
 :status :good
 
+:model "HP Deskjet f2423 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet f2430 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet f2440 All-in-one Printer"
+:status :good
+
 :model "HP PSC 2450 Photosmart All-in-one Printer"
+:status :good
+
+:model "HP Deskjet f2476 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet f2480 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet f2483 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet f2488 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet f2492 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet f2493 All-in-one Printer"
 :status :good
 
 :model "HP PSC 2500 Photosmart All-in-one Printer"
@@ -944,12 +1013,6 @@
 :status :good
 
 :model "HP LaserJet 3392 All-in-one Printer"
-:status :good
-
-:model "HP Officejet j3500 Series All-in-one Printer"
-:status :good
-
-:model "HP Officejet j3508 All-in-one Printer"
 :status :good
 
 :model "HP Officejet j3608 All-in-one Printer"
@@ -1379,6 +1442,9 @@
 :status :good
 
 :model "HP Photosmart c4494 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet f4500 All-in-one Printer Series"
 :status :good
 
 :model "HP Designjet 4520mfp"

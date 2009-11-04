@@ -80,6 +80,13 @@ Scaler::Scaler(SystemServices* pSys,unsigned int inputwidth,
         constructor_error=ALLOCMEM_ERROR;
         return;
     }
+
+//  Initialize RGB buffer to white
+    if (vip)
+    {
+        memset(pOutputBuffer[COLORTYPE_COLOR], 0xFF, RSBuffSize);
+    }
+
 	int BlackBuffSize= (int)(((float)(iOutputWidth)) * ScaleBound );
     pOutputBuffer[COLORTYPE_BLACK]=(BYTE*)pSS->AllocMem(BlackBuffSize);
     if (pOutputBuffer[COLORTYPE_BLACK] == NULL)

@@ -1,24 +1,24 @@
 /*****************************************************************************\
 
-  hpmud.h - public definitions for multi-point transport driver 
- 
+  hpmud.h - public definitions for multi-point transport driver
+
   (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy 
-  of this software and associated documentation files (the "Software"), to deal 
-  in the Software without restriction, including without limitation the rights 
-  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
-  of the Software, and to permit persons to whom the Software is furnished to do 
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+  of the Software, and to permit persons to whom the Software is furnished to do
   so, subject to the following conditions:
 
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
 
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
-  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
-  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 \*****************************************************************************/
@@ -75,6 +75,7 @@ enum HPMUD_SCANTYPE
    HPMUD_SCANTYPE_SOAP = 3,    /* Wookie (ie:ljcm1017) */
    HPMUD_SCANTYPE_MARVELL = 4,     /* (ie: ljm1005) */
    HPMUD_SCANTYPE_SOAPHT = 5,   /* HorseThief (ie: ljm1522) */
+   HPMUD_SCANTYPE_SCL_DUPLEX = 6
 };
 
 enum HPMUD_STATUSTYPE
@@ -98,8 +99,8 @@ enum HPMUD_SUPPORT_TYPE
 enum HPMUD_PLUGIN_TYPE
 {
    HPMUD_PLUGIN_TYPE_NONE = 0,
-   HPMUD_PLUGIN_TYPE_REQUIRED = 1,  
-   HPMUD_PLUGIN_TYPE_OPTIONAL = 2,   
+   HPMUD_PLUGIN_TYPE_REQUIRED = 1,
+   HPMUD_PLUGIN_TYPE_OPTIONAL = 2,
 };
 
 #define HPMUD_S_PRINT_CHANNEL "PRINT"
@@ -129,7 +130,7 @@ struct hpmud_dstat
 {
    char uri[HPMUD_LINE_SIZE];
    int client_cnt;                  /* number of clients that have this device opend */
-   enum HPMUD_IO_MODE io_mode;   
+   enum HPMUD_IO_MODE io_mode;
    int channel_cnt;                 /* number of open channels */
    int mlc_up;                      /* 0 = MLC/1284.4 transport up, 1 = MLD/1284.4 transport down */
 };
@@ -150,15 +151,15 @@ extern "C" {
 #endif
 
 /*
- * hpmud_device_open - open specified device, call normally does not block 
+ * hpmud_device_open - open specified device, call normally does not block
  *
  * inputs:
  *  uri - specifies device to open
  *  io_mode - see enum definition
- *  
+ *
  * outputs:
  *  dd - device descriptor
- *  return value - see enum definition 
+ *  return value - see enum definition
  */
 enum HPMUD_RESULT hpmud_open_device(const char *uri, enum HPMUD_IO_MODE io_mode, HPMUD_DEVICE *dd);
 
@@ -167,25 +168,25 @@ enum HPMUD_RESULT hpmud_open_device(const char *uri, enum HPMUD_IO_MODE io_mode,
  *
  * inputs:
  *  dd - device descriptor
- *  
+ *
  * outputs:
- *  return value - see enum definition 
+ *  return value - see enum definition
  */
 enum HPMUD_RESULT hpmud_close_device(HPMUD_DEVICE dd);
 
 /*
- * hpmud_get_device_id - read IEEE 1284 device ID string, call normally does not block 
+ * hpmud_get_device_id - read IEEE 1284 device ID string, call normally does not block
  *
  * If the device is busy, a cached copy may be returned.
  *
  * inputs:
  *  dd - device descriptor
  *  buf_size - maximum size of buf
- *  
+ *
  * outputs:
  *  buf - zero terminated device ID string
  *  bytes_read - size of device ID string, does not include zero termination
- *  return value - see enum definition 
+ *  return value - see enum definition
  */
 enum HPMUD_RESULT hpmud_get_device_id(HPMUD_DEVICE dd, char *buf, int buf_size, int *bytes_read);
 
@@ -194,10 +195,10 @@ enum HPMUD_RESULT hpmud_get_device_id(HPMUD_DEVICE dd, char *buf, int buf_size, 
  *
  * inputs:
  *  dd - device descriptor
- *  
+ *
  * outputs:
  *  status - 3-bit status, supported by inkjets only
- *  return value - see enum definition 
+ *  return value - see enum definition
  */
 enum HPMUD_RESULT hpmud_get_device_status(HPMUD_DEVICE dd, unsigned int *status);
 
@@ -207,12 +208,12 @@ enum HPMUD_RESULT hpmud_get_device_status(HPMUD_DEVICE dd, unsigned int *status)
  * inputs:
  *  bus - see enum definiton
  *  buf_size - size of read buffer
- *  
+ *
  * outputs:
  *  buf - zero terminated CUPS backend formatted data
  *  cnt - number of HP devices found
  *  bytes_read - number of bytes actually read
- *  return value - see enum definition 
+ *  return value - see enum definition
  */
 enum HPMUD_RESULT hpmud_probe_devices(enum HPMUD_BUS_ID bus, char *buf, int buf_size, int *cnt, int *bytes_read);
 
@@ -224,7 +225,7 @@ enum HPMUD_RESULT hpmud_probe_devices(enum HPMUD_BUS_ID bus, char *buf, int buf_
  * inputs:
  *  dd - device descriptor
  *  channel_name - requested service name
- * 
+ *
  * outputs:
  *  cd - channel descriptor
  *  return value - see enum definition
@@ -237,7 +238,7 @@ enum HPMUD_RESULT hpmud_open_channel(HPMUD_DEVICE dd, const char *channel_name, 
  * inputs:
  *  dd - device descriptor
  *  cd - channel descriptor
- * 
+ *
  * outputs:
  *  return value - see enum definition
  */
@@ -246,7 +247,7 @@ enum HPMUD_RESULT hpmud_close_channel(HPMUD_DEVICE dd, HPMUD_CHANNEL cd);
 /*
  * hpmud_channel_write - write data to specified channel, call will block
  *
- * May return with partial bytes written (ie: bytes_wrote < size) with or with-out a timeout. 
+ * May return with partial bytes written (ie: bytes_wrote < size) with or with-out a timeout.
  *
  * inputs:
  *  dd - device descriptor
@@ -254,7 +255,7 @@ enum HPMUD_RESULT hpmud_close_channel(HPMUD_DEVICE dd, HPMUD_CHANNEL cd);
  *  buf - data to write
  *  size - number of bytes to write
  *  timeout - in seconds
- * 
+ *
  * outputs:
  *  bytes_wrote - number of bytes actually wrote
  *  return value - see enum definition
@@ -264,14 +265,14 @@ enum HPMUD_RESULT hpmud_write_channel(HPMUD_DEVICE dd, HPMUD_CHANNEL cd, const v
 /*
  * hpmud_channel_read - read data from specified channel, call will block
  *
- * May return with partial bytes read (ie: bytes_read < size) or zero if timeout occured. 
+ * May return with partial bytes read (ie: bytes_read < size) or zero if timeout occured.
  *
  * inputs:
  *  dd - device descriptor
  *  cd - channel descriptor
  *  size - number of bytes to read
  *  timeout - in seconds
- * 
+ *
  * outputs:
  *  buf - read data buffer
  *  bytes_read - number of bytes actually read
@@ -284,7 +285,7 @@ enum HPMUD_RESULT hpmud_read_channel(HPMUD_DEVICE dd, HPMUD_CHANNEL cd, void *bu
  *
  * inputs:
  *  dd - device descriptor
- * 
+ *
  * outputs:
  *  ds - see dstat definition
  *  return value - see enum definition
@@ -303,9 +304,9 @@ enum HPMUD_RESULT hpmud_get_dstat(HPMUD_DEVICE dd, struct hpmud_dstat *ds);
  *  cc - channel descriptor
  *  snmp_oid - snmp encoded pml oid
  *  type - oid data type
- *  data - data payload 
+ *  data - data payload
  *  data_size - number of bytes to write
- * 
+ *
  * outputs:
  *  pml_result
  *  return value - see enum definition
@@ -324,9 +325,9 @@ enum HPMUD_RESULT hpmud_set_pml(HPMUD_DEVICE device, HPMUD_CHANNEL channel, cons
  *  cc - channel descriptor
  *  snmp_oid - snmp encoded pml oid
  *  data_size - data buffer size in bytes
- * 
+ *
  * outputs:
- *  data - data payload 
+ *  data - data payload
  *  type - pml data type
  *  pml_result
  *  return value - see enum definition
@@ -341,7 +342,7 @@ enum HPMUD_RESULT hpmud_get_pml(HPMUD_DEVICE device, HPMUD_CHANNEL channel, cons
  * inputs:
  *  id - IEEE 1284 device id string
  *  buf_size - size of buf in bytes
- * 
+ *
  * outputs:
  *  buf - device model string (generalized)
  *  return value - length of string in bytes, does not include zero termination
@@ -356,7 +357,7 @@ int hpmud_get_model(const char *id, char *buf, int buf_size);
  * inputs:
  *  id - IEEE 1284 device id string
  *  buf_size - size of buf in bytes
- * 
+ *
  * outputs:
  *  buf - device model string (raw)
  *  return value - length of string in bytes, does not include zero termination
@@ -371,9 +372,9 @@ int hpmud_get_raw_model(char *id, char *raw, int rawSize);
  * inputs:
  *  uri
  *  buf_size - size of buf in bytes
- * 
+ *
  * outputs:
- *  buf - device model string 
+ *  buf - device model string
  *  return value - length of string in bytes, does not include zero termination
  */
 int hpmud_get_uri_model(const char *uri, char *buf, int buf_size);
@@ -386,9 +387,9 @@ int hpmud_get_uri_model(const char *uri, char *buf, int buf_size);
  * inputs:
  *  uri
  *  buf_size - size of buf in bytes
- * 
+ *
  * outputs:
- *  buf - device model string 
+ *  buf - device model string
  *  return value - length of string in bytes, does not include zero termination
  */
 int hpmud_get_uri_datalink(const char *uri, char *buf, int buf_size);
@@ -396,13 +397,13 @@ int hpmud_get_uri_datalink(const char *uri, char *buf, int buf_size);
 /*
  * hpmud_get_model_attributes - get all model attributes for specified device
  *
- * Reads device model attributes from models.dat file. This function is a 
- * stateless hpmud helper function. 
+ * Reads device model attributes from models.dat file. This function is a
+ * stateless hpmud helper function.
  *
  * inputs:
  *  uri - specifies device
  *  buf_size - size of buf in bytes
- * 
+ *
  * outputs:
  *  buf - buffer for all model attributes, key/value pair, one per line
  *  bytes_read - number of bytes actually read
@@ -413,12 +414,12 @@ enum HPMUD_RESULT hpmud_get_model_attributes(char *uri, char *attr, int attrSize
 /*
  * hpmud_model_query - get model attributes structure for specified device
  *
- * Reads device model attributes from models.dat file. This function is a 
- * stateless hpmud helper function. 
+ * Reads device model attributes from models.dat file. This function is a
+ * stateless hpmud helper function.
  *
  * inputs:
  *  uri - specifies device
- * 
+ *
  * outputs:
  *  ma - see structure definition
  *  return value - see enum definition
@@ -435,10 +436,10 @@ enum HPMUD_RESULT hpmud_query_model(char *uri, struct hpmud_model_attributes *ma
  *  busnum - specifies usbfs bus number
  *  devnum - specifies usbfs device number
  *  uri_size - size of uri buffer in bytes
- * 
+ *
  * outputs:
  *  uri - zero terminated string
- *  bytes_read - size of uri 
+ *  bytes_read - size of uri
  *  return value - see enum definition
  */
 enum HPMUD_RESULT hpmud_make_usb_uri(const char *busnum, const char *devnum, char *uri, int uri_size, int *bytes_read);
@@ -452,10 +453,10 @@ enum HPMUD_RESULT hpmud_make_usb_uri(const char *busnum, const char *devnum, cha
  * inputs:
  *  sn - specifies product serial number
  *  uri_size - size of uri buffer in bytes
- * 
+ *
  * outputs:
  *  uri - zero terminated string
- *  bytes_read - size of uri 
+ *  bytes_read - size of uri
  *  return value - see enum definition
  */
 enum HPMUD_RESULT hpmud_make_usb_serial_uri(const char *sn, char *uri, int uri_size, int *bytes_read);
@@ -469,9 +470,9 @@ enum HPMUD_RESULT hpmud_make_usb_serial_uri(const char *sn, char *uri, int uri_s
  *  ip - internet address
  *  port - 1-4
  *  uri_size - size of uri buffer in bytes
- * 
+ *
  * outputs:
- *  uri - zero terminated string 
+ *  uri - zero terminated string
  *  bytes_read - size of uri
  *  return value - see enum definition
  */
@@ -485,9 +486,9 @@ enum HPMUD_RESULT hpmud_make_net_uri(const char *ip, int port, char *uri, int ur
  * inputs:
  *  dnode - device node
  *  uri_size - size of uri buffer in bytes
- * 
+ *
  * outputs:
- *  uri - zero terminated string 
+ *  uri - zero terminated string
  *  bytes_read - size of uri
  *  return value - see enum definition
  */
@@ -502,9 +503,9 @@ enum HPMUD_RESULT hpmud_make_par_uri(const char *dnode, char *uri, int uri_size,
  *  section - zero terminated string (ie: "[dirs]")
  *  key - zero terminated string (ie: "home")
  *  value_size - size of value buffer in bytes
- * 
+ *
  * outputs:
- *  value - zero terminated string 
+ *  value - zero terminated string
  *  return value - see enum definition
  */
 enum HPMUD_RESULT hpmud_get_conf(const char *section, const char *key, char *value, int value_size);
@@ -519,24 +520,24 @@ enum HPMUD_RESULT hpmud_get_conf(const char *section, const char *key, char *val
  *  section - zero terminated string (ie: "[dirs]")
  *  key - zero terminated string (ie: "home")
  *  value_size - size of value buffer in bytes
- * 
+ *
  * outputs:
- *  value - zero terminated string 
+ *  value - zero terminated string
  *  return value - see enum definition
  */
 enum HPMUD_RESULT hpmud_get_key_value(const char *file, const char *section, const char *key, char *value, int value_size);
 
-/* 
+/*
  * hpmud_mdns_lookup - lookup IP for MDNS host name
- *  
+ *
  * This function is a stateless hpmud helper function.
  *
  * inputs:
  *  host_name - zero terminated string (ie: "npi7c8a3e")
  *  sec_timeout - in seconds
- * 
+ *
  * outputs:
- *  ip - zero terminated string 
+ *  ip - zero terminated string
  *  return value - see enum definition
  */
 enum HPMUD_RESULT hpmud_mdns_lookup(const char *host_name, int sec_timeout, char *ip);
@@ -549,10 +550,10 @@ enum HPMUD_RESULT hpmud_mdns_lookup(const char *host_name, int sec_timeout, char
  * inputs:
  *  host - zero terminated string (ie: "npi7c8a3e")
  *  uri_size - size of uri buffer in bytes
- * 
+ *
  * outputs:
  *  uri - zero terminated string
- *  bytes_read - size of uri 
+ *  bytes_read - size of uri
  *  return value - see enum definition
  */
 enum HPMUD_RESULT hpmud_make_mdns_uri(const char *host, int port, char *uri, int uri_size, int *bytes_read);

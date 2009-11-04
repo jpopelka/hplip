@@ -4,7 +4,7 @@
 #  (c) 2004-2007 Copyright Hewlett-Packard Development Company, LP
 #
 
-INCLUDES = -Iip -Iio/hpmud -Iscan/sane
+INCLUDES = -Iip -Iio/hpmud -Iscan/sane -Iprnt/hpijs
 
 hplipdir = $(datadir)/hplip
 
@@ -55,7 +55,7 @@ else
 libsane_hpaio_la_LDFLAGS = -version-info 1:0:0
 endif
 # The following is a interlibrary dependency that must be compiled first.
-libsane_hpaio_la_LIBADD = libhpip.la libhpmud.la $(DBUS_LIBS) -lcups -ldl -lsane
+libsane_hpaio_la_LIBADD = libhpip.la libhpmud.la $(DBUS_LIBS) -lcups -ldl
 #libsane_hpaio_la_CFLAGS = -DWITH_NONAMESPACES -DSOAP_DEBUG
 libsane_hpaio_la_CFLAGS = $(DBUS_CFLAGS)
 endif # SCAN_BUILD
@@ -87,6 +87,7 @@ hp_mkuridir = $(bindir)
 hp_mkuri_PROGRAMS = hp-mkuri
 hp_mkuri_SOURCES = io/hpmud/hp-mkuri.c
 hp_mkuri_LDADD = -ldl libhpmud.la
+hp_mkuri_CFLAGS = -DCONFDIR=\"$(hplip_confdir)\"
 
 # hpmud.rules
 rulesdir = /etc/udev/rules.d
@@ -121,7 +122,7 @@ dist_cmd_SCRIPTS = align.py info.py print.py toolbox.py clean.py colorcal.py unl
 # base
 basedir = $(hplipdir)/base
 
-dist_base_SCRIPTS = base/maint.py base/codes.py base/g.py base/pml.py base/status.py  \
+dist_base_DATA = base/maint.py base/codes.py base/g.py base/pml.py base/status.py  \
 	base/__init__.py base/mfpdtf.py base/utils.py base/wifi.py \
 	base/device.py base/logger.py base/slp.py base/exif.py base/strings.py base/magic.py \
 	base/imagesize.py base/pexpect.py base/models.py base/mdns.py base/tui.py base/dime.py \
@@ -129,17 +130,17 @@ dist_base_SCRIPTS = base/maint.py base/codes.py base/g.py base/pml.py base/statu
 
 # installer
 installdir = $(hplipdir)/installer
-dist_install_SCRIPTS = installer/__init__.py installer/dcheck.py installer/distros.dat installer/core_install.py
-dist_noinst_SCRIPTS += installer/text_install.py
+dist_install_DATA = installer/__init__.py installer/dcheck.py installer/distros.dat installer/core_install.py
+dist_noinst_DATA += installer/text_install.py
 
 # makecopies
 copierdir = $(hplipdir)/copier
-dist_copier_SCRIPTS = copier/copier.py copier/__init__.py
+dist_copier_DATA = copier/copier.py copier/__init__.py
 
 # fax
 if FAX_BUILD
 faxdir = $(hplipdir)/fax
-dist_fax_SCRIPTS = fax/fax.py fax/__init__.py fax/coverpages.py fax/pmlfax.py fax/soapfax.py fax/faxdevice.py
+dist_fax_DATA = fax/fax.py fax/__init__.py fax/coverpages.py fax/pmlfax.py fax/soapfax.py fax/faxdevice.py
 hpfaxdir = $(cupsbackenddir)
 dist_hpfax_SCRIPTS = fax/backend/hpfax.py
 hpijsfaxppddir = $(hpppddir)
@@ -198,7 +199,7 @@ dist_noinst_DATA += data/localization/hplip_de.ts data/localization/hplip_es.ts 
 
 # pcard
 pcarddir = $(hplipdir)/pcard
-dist_pcard_SCRIPTS = pcard/__init__.py pcard/photocard.py
+dist_pcard_DATA = pcard/__init__.py pcard/photocard.py
 
 # pcardext
 pcardextdir = $(pyexecdir)
@@ -209,7 +210,7 @@ pcardext_la_CFLAGS = -I$(PYTHONINCLUDEDIR)
 
 # prnt
 prntdir = $(hplipdir)/prnt
-dist_prnt_SCRIPTS = prnt/cups.py prnt/__init__.py prnt/ldl.py prnt/pcl.py prnt/colorcal.py
+dist_prnt_DATA = prnt/cups.py prnt/__init__.py prnt/ldl.py prnt/pcl.py prnt/colorcal.py
 
 # cupsext
 cupsextdir = $(pyexecdir)
@@ -222,7 +223,7 @@ cupsext_la_LIBADD = -lcups
 if SCAN_BUILD
 # scan
 scandir = $(hplipdir)/scan
-dist_scan_SCRIPTS = scan/__init__.py scan/sane.py
+dist_scan_DATA = scan/__init__.py scan/sane.py
 
 # scanext
 scanextdir = $(pyexecdir)
@@ -244,7 +245,7 @@ hpmudext_la_CFLAGS = -I$(PYTHONINCLUDEDIR)
 if GUI_BUILD
 if QT3_INSTALL
 uidir = $(hplipdir)/ui
-dist_ui_SCRIPTS = ui/alignform.py \
+dist_ui_DATA = ui/alignform.py \
 	ui/colorcalform_base.py ui/colorcalform.py ui/coloradjform_base.py ui/coloradjform.py ui/devmgr4_base.py ui/devmgr4.py \
 	ui/__init__.py ui/loadpaperform_base.py ui/loadpaperform.py \
 	ui/paperedgealignform_base.py ui/paperedgealignform.py ui/ui_utils.py \
@@ -285,7 +286,7 @@ ui4dir=$(hplipdir)/ui4
 #	ui4/settingsdialog_base.py ui4/settingsdialog.py ui4/printsettingstoolbox.py ui4/printdialog_base.py \
 #	ui4/printdialog.py
 #dist_noinst_DATA += ui4/devmgr5_base.ui ui4/settingsdialog_base.ui ui4/printdialog_base.ui
-dist_ui4_SCRIPTS = ui4/*.py
+dist_ui4_DATA = ui4/*.py
 dist_noinst_DATA += ui4/*.ui
 endif
 endif
@@ -294,7 +295,7 @@ endif
 if GUI_BUILD
 if QT3_INSTALL
 pluginsdir = $(hplipdir)/plugins
-dist_plugins_SCRIPTS = plugins/dj450.py plugins/__init__.py plugins/powersettings.py plugins/powersettingsdialog.py \
+dist_plugins_DATA = plugins/dj450.py plugins/__init__.py plugins/powersettings.py plugins/powersettingsdialog.py \
 	plugins/powersettingsdialog_base.py plugins/Deskjet_460.py plugins/Officejet_H470.py plugins/powersettings2.py
 endif
 endif
@@ -313,7 +314,7 @@ policykit_dbus_etcdir = /etc/dbus-1/system.d
 dist_policykit_dbus_etc_DATA = data/policykit/com.hp.hplip.conf
 policykit_dbus_sharedir = /usr/share/dbus-1/system-services
 dist_policykit_dbus_share_DATA = data/policykit/com.hp.hplip.service
-policykit_policydir = /usr/share/PolicyKit/policy
+policykit_policydir = $(policykit_dir)
 dist_policykit_policy_DATA = data/policykit/com.hp.hplip.policy
 endif
 
@@ -405,10 +406,10 @@ endif # HPIJS_INSTALL
 
 if HPCUPS_INSTALL
 # hpcups
-if NEW_HPCUPS
-#hpcupsdir = $(cupsfilterdir)
-#hpcups_PROGRAMS = hpcups
-#hpcups_SOURCES = prnt/hpcups/HPCupsFilter.cpp prnt/hpcups/HPCupsFilter.h prnt/hpcups/Compressor.cpp prnt/hpcups/Compressor.h \
+#if NEW_HPCUPS
+hpcupsdir = $(cupsfilterdir)
+hpcups_PROGRAMS = hpcups
+hpcups_SOURCES = prnt/hpcups/HPCupsFilter.cpp prnt/hpcups/HPCupsFilter.h prnt/hpcups/Compressor.cpp prnt/hpcups/Compressor.h \
 	prnt/hpcups/Mode2.cpp prnt/hpcups/Mode2.h prnt/hpcups/Mode3.cpp prnt/hpcups/Mode3.h \
 	prnt/hpcups/Mode9.cpp prnt/hpcups/Mode9.h prnt/hpcups/Mode10.cpp prnt/hpcups/Mode10.h \
 	prnt/hpcups/ModeDeltaPlus.cpp prnt/hpcups/ModeDeltaPlus.h prnt/hpcups/ModeJbig.cpp prnt/hpcups/ModeJbig.h \
@@ -416,24 +417,45 @@ if NEW_HPCUPS
 	prnt/hpcups/Encapsulator.cpp prnt/hpcups/Encapsulator.h prnt/hpcups/Pcl3.cpp prnt/hpcups/Pcl3.h \
 	prnt/hpcups/Pcl3Gui.cpp prnt/hpcups/Pcl3Gui.h prnt/hpcups/Pcl3Gui2.cpp prnt/hpcups/Pcl3Gui2.h \
 	prnt/hpcups/LJMono.cpp prnt/hpcups/LJMono.h prnt/hpcups/LJColor.cpp prnt/hpcups/LJColor.h \
-	prnt/hpcups/LJFastRaster.cpp prnt/hpcups/LJFastRaster.h prnt/hpcups/LJZjStream.cpp prnt/hpcups/LJZjStream.h \
+	prnt/hpcups/LJFastRaster.cpp prnt/hpcups/LJFastRaster.h prnt/hpcups/LJJetReady.cpp prnt/hpcups/LJJetReady.h \
+prnt/hpcups/LJZjStream.cpp prnt/hpcups/LJZjStream.h \
 	prnt/hpcups/LJZxStream.cpp prnt/hpcups/LJZxStream.h prnt/hpcups/Job.cpp prnt/hpcups/Job.h \
 	prnt/hpcups/Pipeline.cpp prnt/hpcups/Pipeline.h prnt/hpcups/Processor.cpp prnt/hpcups/Processor.h \
 	prnt/hpcups/RasterSender.cpp prnt/hpcups/RasterSender.h prnt/hpcups/ColorMatcher.cpp prnt/hpcups/ColorMatcher.h \
 	prnt/hpcups/Halftoner.cpp prnt/hpcups/Halftoner.h prnt/hpcups/Scaler.cpp prnt/hpcups/Scaler.h prnt/hpcups/resources.h \
 	prnt/hpcups/dj400ColorMaps.cpp prnt/hpcups/dj600ColorMaps.cpp prnt/hpcups/dj970ColorMaps.cpp prnt/hpcups/dj8xxColorMaps.cpp \
+	prnt/hpcups/dj4100ColorMaps.cpp \
 	prnt/hpcups/BreakTables.cpp prnt/hpcups/PrinterCommands.h prnt/hpcups/Utils.cpp prnt/hpcups/Utils.h \
-	prnt/hpcups/SystemServices.cpp prnt/hpcups/SystemServices.h
-#hpcups_CXXFLAGS = $(APDK_ENDIAN_FLAG)
-#hpcups_LDADD = -ljpeg -ldl libhpip.la libhpmud.la -lcups -lcupsimage
-else
-hpcupsdir = $(cupsfilterdir)
-hpcups_PROGRAMS = hpcups
-hpcups_SOURCES = prnt/hpijs/hpcups.cpp prnt/hpijs/hpcups.h prnt/hpijs/services.cpp prnt/hpijs/services.h prnt/hpijs/hpiom.c prnt/hpijs/hpiom.h prnt/hpijs/bug.h prnt/hpijs/hpimage.cpp prnt/hpijs/hpimage.h
-hpcups_CXXFLAGS = $(libapdk_la_CXXFLAGS)
-hpcups_CFLAGS = $(libapdk_la_CFLAGS)
-hpcups_LDADD = libapdk.la -ljpeg -ldl libhpip.la libhpmud.la $(DBUS_LIBS) -lcups -lcupsimage
-endif # NEW_HPCUPS
+	prnt/hpcups/SystemServices.cpp prnt/hpcups/SystemServices.h prnt/hpcups/CommonDefinitions.h prnt/hpcups/hpjbig_wrapper.h \
+        prnt/hpcups/apPrintModes.h prnt/hpcups/dj400PrintModes.h prnt/hpcups/dj540PrintModes.h prnt/hpcups/dj600PrintModes.h \
+        prnt/hpcups/dj630PrintModes.h prnt/hpcups/dj690PrintModes.h prnt/hpcups/dj850PrintModes.h prnt/hpcups/dj890PrintModes.h \
+        prnt/hpcups/dj895PrintModes.h prnt/hpcups/dj8x5PrintModes.h prnt/hpcups/dj970PrintModes.h prnt/hpcups/Pcl3GuiPrintModes.h \
+        prnt/hpcups/Pcl3PrintModes.h prnt/hpcups/ColorMaps.h \
+        prnt/hpcups/QuickConnect.cpp prnt/hpcups/QuickConnect.h \
+        prnt/hpcups/ModeJpeg.cpp prnt/hpcups/ModeJpeg.h \
+        prnt/hpcups/jccolor.c prnt/hpcups/jinclude.h \
+        prnt/hpcups/jdatadbf.c prnt/hpcups/jinclude.h \
+        prnt/hpcups/Lidil.cpp prnt/hpcups/Lidil.h \
+        prnt/hpcups/LidilCompress.cpp prnt/hpcups/LidilCompress.h \
+        prnt/hpcups/LidilPrintModes.h prnt/hpcups/dj3320ColorMaps.cpp \
+        prnt/hpcups/dj3600ColorMaps.cpp prnt/hpcups/dj3320PrintModes.h \
+        prnt/hpcups/dj4100PrintModes.h
+
+hpcups_CXXFLAGS = $(APDK_ENDIAN_FLAG)
+hpcups_LDADD = -ljpeg -ldl -lcups -lcupsimage
+#else
+#hpcupsdir = $(cupsfilterdir)
+#hpcups_PROGRAMS = hpcups
+#hpcups_SOURCES = prnt/hpijs/hpcups.cpp prnt/hpijs/hpcups.h prnt/hpijs/services.cpp prnt/hpijs/services.h prnt/hpijs/hpiom.c prnt/hpijs/hpiom.h prnt/hpijs/bug.h prnt/hpijs/hpimage.cpp prnt/hpijs/hpimage.h
+#hpcups_CXXFLAGS = $(libapdk_la_CXXFLAGS)
+#hpcups_CFLAGS = $(libapdk_la_CFLAGS)
+#if HPCUPS_ONLY_BUILD
+#hpcups_LDADD = libapdk.la -ljpeg -ldl -lcups -lcupsimage
+#else
+#hpcups_LDADD = libapdk.la -ljpeg -ldl libhpip.la libhpmud.la $(DBUS_LIBS) -lcups -lcupsimage
+#endif #HPCUPS_ONLY_BUILD
+#endif # NEW_HPCUPS
+if !HPCUPS_ONLY_BUILD
 if FAX_BUILD
 # hpcupsfax
 hpcupsfaxdir = $(cupsfilterdir)
@@ -441,6 +463,7 @@ hpcupsfax_PROGRAMS = hpcupsfax
 hpcupsfax_SOURCES = prnt/hpijs/hpcupsfax.cpp prnt/hpijs/hpcupsfax.h
 hpcupsfax_LDADD = libhpip.la -lcups -lcupsimage
 endif # FAX_BUILD
+endif # HPCUPS ONLY
 endif # HPCUPS_INSTALL
 
 # PPDs
@@ -510,13 +533,27 @@ endif
 rpm:
 if FULL_BUILD
 	epm -f rpm hplipfull hplip.list
-else
+endif
+if LITE_BUILD
 	epm -f rpm hpliplite hplip.list
+endif
+if HPCUPS_ONLY_BUILD
+	epm -f rpm hpliphpcupsonly hplip.list
+endif
+if HPIJS_ONLY_BUILD
+	epm -f rpm hpliphpijsonly hplip.list
 endif
 
 deb:
 if FULL_BUILD
 	epm -f deb hplipfull hplip.list
-else
+endif
+if LITE_BUILD
 	epm -f deb hpliplite hplip.list
+endif
+if HPCUPS_ONLY_BUILD
+	epm -f deb hpliphpcupsonly hplip.list
+endif
+if HPIJS_ONLY_BUILD
+	epm -f deb hpliphpijsonly hplip.list
 endif

@@ -249,6 +249,7 @@ class CoreInstall(object):
             'package_arch' : TYPE_LIST,
             'add_user_to_group': TYPE_STRING,
             'open_mdns_port' : TYPE_LIST, # command to use to open mdns multicast port 5353
+            'acl_rules' : TYPE_BOOL, # Use ACL uDEV rules (Ubuntu 9.10+)
         }
 
         # components
@@ -1195,6 +1196,9 @@ class CoreInstall(object):
 
         if self.get_distro_ver_data('cups_path_with_bitness', False) and self.bitness == 64:
             configure_cmd += ' --with-cupsbackenddir=/usr/lib64/cups/backend --with-cupsfilterdir=/usr/lib64/cups/filter'
+
+        if self.get_distro_ver_data('acl_rules', False):
+            configure_cmd += ' --enable-udev-acl-rules'
 
         if self.enable is not None:
             for c in self.enable:

@@ -1059,7 +1059,7 @@ DRIVER_ERROR DJ9xxVIP::ParsePenInfo(PEN_TYPE& ePen, BOOL QueryPrinter)
             return UNSUPPORTED_PEN;
         }
 
-        if ((penInfoBits[0] & 0x80) != 0x80)         // if Bit 31 is 0, this is not a pen
+        if ((penInfoBits[0] & 0x40) != 0x40)         // if Bit 31 is 1, this is not a pen
         {
             continue;
         }
@@ -2296,7 +2296,7 @@ DRIVER_ERROR DJ9xxVIP::CheckInkLevel()
     {
         AsciiHexToBinary (penInfoBits, pStr, 8);
 
-        if ((penInfoBits[0] & 0x80) != 0x80)        // if Bit 31 is 0, this is not a pen
+        if ((penInfoBits[0] & 0x40) != 0x40)        // if Bit 31 is 1, this is not a pen
         {
             continue;
         }

@@ -51,6 +51,7 @@
 # package_arch=<list of processor architectures> [TYPE_LIST]
 # add_user_to_group=<usermod params> [TYPE_STRING] (leave empty for none) [ex. "-a -G sys" or "-G lp"]
 # open_mdns_port=<command(s) to use to open the mdns multicast port 5353> [TYPE_LIST]
+# acl_rules=1|0 [TYPE_BOOL] # For Karmic+
 #
 # # Version data overrides distro data if present.
 # # <version name> must be present in [<distro name>] section's versions= list.
@@ -80,7 +81,8 @@
 # package_arch=<list of processor architectures> [TYPE_LIST]
 # add_user_to_group=<usermod params> [TYPE_STRING] (leave empty for none) [ex. "-a -G sys" or "-G lp"]
 # open_mdns_port=<command(s) to use to open the mdns multicast port 5353> [TYPE_LIST]
-#
+# acl_rules=1|0 [TYPE_BOOL] # For Karmic+
+
 # # Only include these sections if supported==1 for this <distro name>:<version name>.
 # [<distro name>:<version name>:<dependency name>]
 # packages=<package list to satisfy dependency (comma sep. list)> [TYPE_LIST]
@@ -647,7 +649,7 @@ parallel_supported=1
 usb_supported=1
 packaged_version=2.8.7
 release_date=2008-06-19
-notes=Please be sure to disable the CD repositories in YaST.
+notes=Please be sure to disable the CD repositories in YaST and after installation you must log out and back in to become a member of the lp group to enable printing.
 ppd_install=drv
 udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
@@ -656,6 +658,7 @@ drv_dir=/usr/share/cups/drv/HP
 cups_path_with_bitness=1
 ui_toolkit=qt4
 native_cups=1
+add_user_to_group=-Alp
 open_mdns_port=/bin/bash ./init-suse-firewall
 
 [suse:11.0:cups]
@@ -769,7 +772,7 @@ parallel_supported=1
 usb_supported=1
 packaged_version=2.8.7
 release_date=2008-06-19
-notes=Please be sure to disable the CD repositories in YaST.
+notes=Please be sure to disable the CD repositories in YaST and after installation you must log out and back in to become a member of the lp group to enable printing.
 ppd_install=drv
 udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
@@ -778,6 +781,7 @@ drv_dir=/usr/share/cups/drv/HP
 cups_path_with_bitness=1
 ui_toolkit=qt4
 native_cups=1
+add_user_to_group=-Alp
 open_mdns_port=/bin/bash ./init-suse-firewall
 
 [suse:11.1:cups]
@@ -895,6 +899,7 @@ drv_dir=/usr/share/cups/drv/HP
 cups_path_with_bitness=1
 ui_toolkit=qt4
 native_cups=1
+add_user_to_group=-Alp
 open_mdns_port=/bin/bash ./init-suse-firewall
 
 [suse:11.2:cups]
@@ -2485,7 +2490,7 @@ fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 package_available=1
-package_arch=i386
+package_arch=i386,x86_64
 
 # ****************************************
 [slackware]
@@ -4553,7 +4558,7 @@ fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 policykit=1
-native_cups=1
+native_cups=0
 
 [ubuntu:8.10:cups]
 packages=libcupsys2
@@ -4770,8 +4775,8 @@ packages=python-notify
 
 # ********************
 [ubuntu:9.10]
-code_name=
-supported=0
+code_name=Karmic
+supported=1
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -4789,6 +4794,7 @@ drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 policykit=1
 native_cups=1
+acl_rules=1
 
 [ubuntu:9.10:cups]
 packages=libcupsys2
@@ -4887,14 +4893,14 @@ packages=python-notify
 # ****************************************
 [debian]
 index=2
-versions=2.2,3.0,3.1,4.0,4.0r0,4.0r1,5.0,5.0.1,stable,lenny/sid,testing,lenny
+versions=2.2,3.0,3.1,4.0,4.0r0,4.0r1,5.0,5.0.1,5.0.2,stable,lenny/sid,testing,lenny
 display_name=Debian
 alt_names=
 display=1
 notes=
 package_mgrs=dpkg,apt-get,synaptic,update-manager,adept,aptitude
 package_mgr_cmd=su -c "apt-get install --force-yes -y $packages_to_install"
-pre_depend_cmd=su -c "dpkg --configure -a",su -c "apt-get install -f",su -c "apt-get update",gnome-terminal -x su -c "apt-get install --yes cupsys-bsd"
+pre_depend_cmd=su -c "dpkg --configure -a",su -c "apt-get install -f",su -c "apt-get update",gnome-terminal su -c "apt-get install --yes cupsys-bsd"
 post_depend_cmd=
 hplip_remove_cmd=su -c "apt-get remove --yes hplip hpijs"
 su_sudo=su
@@ -5661,6 +5667,8 @@ packages=python-notify
 [debian:5.0.1]
 same_as_version= 5.0
 
+[debian:5.0.2]
+same_as_version= 5.0
 # ********************
 [debian:stable]
 code_name=Etch

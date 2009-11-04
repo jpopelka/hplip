@@ -48,6 +48,15 @@
 
 //#define HP_DEBUG
 
+enum BACKEND_RESULT
+{
+  BACKEND_OK = 0,
+  BACKEND_FAILED = 1,           /* use error-policy */
+  BACKEND_HOLD = 3,             /* hold job */
+  BACKEND_STOP = 4,             /* stop queue */
+  BACKEND_CANCEL = 5            /* cancel job */
+};
+
 struct pjl_attributes
 {
    int pjl_device;   /* 0=disabled, 1=enabled */
@@ -96,6 +105,12 @@ struct pjl_attributes
 #define HEX2INT(x, i) if (x >= '0' && x <= '9')      i |= x - '0'; \
                        else if (x >= 'A' && x <= 'F') i |= 0xA + x - 'A'; \
                        else if (x >= 'a' && x <= 'f') i |= 0xA + x - 'a'
+
+/* Definitions for hpLogLevel in cupsd.conf. */
+#define BASIC_LOG          1
+#define SAVE_PCL_FILE      2
+#define SAVE_INPUT_RASTERS 4
+#define SEND_TO_PRINTER_ALSO    8
 
 /* Actual vstatus codes are mapped to 1000+vstatus for DeviceError messages. */ 
 typedef enum
@@ -607,7 +622,7 @@ static int loop_test(HPMUD_DEVICE dd, HPMUD_CHANNEL cd, struct pjl_attributes *p
       {
          /* Display error. */
          device_event(dev, printer, status, username, jobid, title);
-         BUG("ERROR: %d device communication error!\n", status, RETRY_TIMEOUT);
+         BUG("ERROR: %d device communication error!\n", status);
          stat = 1;
       }
       else
@@ -623,7 +638,7 @@ int main(int argc, char *argv[])
 {
    int fd;
    int copies;
-   int len, status, cnt, exit_stat=1;
+   int len, status, cnt, exit_stat=BACKEND_FAILED;
    char buf[HPMUD_BUFFER_SIZE];
    struct hpmud_model_attributes ma;
    struct pjl_attributes pa;
@@ -715,16 +730,26 @@ int main(int argc, char *argv[])
                /* Open hp device. */
                while ((stat = hpmud_open_device(argv[0], ma.prt_mode, &hd)) != HPMUD_R_OK)
                {
+                  if (getenv("CLASS") != NULL)
+                  {
+                     /* The job was submitted to a class and not a specific queue. Abort to
+                      * give another class member a chance to print the job.
+                      */
+                     BUG("INFO: open device failed stat=%d: %s; trying next printer in class...\n", stat, argv[0]);
+                     sleep (5); /* Prevent job requeuing too quickly. */
+                     goto bugout;
+                  }
+
                   if (stat != HPMUD_R_DEVICE_BUSY)
                   {
-                     BUG("ERROR: cannot open device stat=%d: %s\n", stat, argv[0]);
+                     BUG("ERROR: open device failed stat=%d: %s\n", stat, argv[0]);
                      goto bugout;
                   }
 
                   /* Display user error. */
                   device_event(argv[0], printer, 5000+stat, argv[2], argv[1], argv[3]);
 
-                  BUG("INFO: open device failed stat=%d; will retry in %d seconds...\n", stat, RETRY_TIMEOUT);
+                  BUG("INFO: open device failed stat=%d: %s; will retry in %d seconds...\n", stat, argv[0], RETRY_TIMEOUT);
                   sleep(RETRY_TIMEOUT);
                   retry = 1;
                }
@@ -768,7 +793,12 @@ int main(int argc, char *argv[])
                   pthread_cond_init(&pa.done_cond, NULL);
                   pthread_create(&pa.tid, NULL, (void *(*)(void*))pjl_read_thread, (void *)&pa);
                }
-            }
+
+               /* Clear any errors left over from a previous job. */
+               fprintf(stderr, "STATE: -%s\n", "media-empty-error,media-jam-error,hplip.plugin-error,"
+                   "cover-open-error,toner-empty-error,other");
+
+            } /* if (hd <= 0) */
 
             stat = hpmud_write_channel(hd, cd, buf+total, size, EXCEPTION_TIMEOUT, &n);
 
@@ -776,7 +806,10 @@ int main(int argc, char *argv[])
             {
                /* IO error, get printer status. */
                if (loop_test(hd, cd, &pa, argv[0], printer, argv[2], argv[1], argv[3]))
+               {
+                  exit_stat = BACKEND_STOP;  /* stop queue */
                   goto bugout;
+               }
             }
             else
             {
@@ -785,7 +818,10 @@ int main(int argc, char *argv[])
                {
                   /* Laserjets have a large data buffer, so manually check for operator intervention condition. */
                   if (loop_test(hd, cd, &pa, argv[0], printer, argv[2], argv[1], argv[3]))
+                  {
+                     exit_stat = BACKEND_STOP; /* stop queue */
                      goto bugout;
+                  }
                }
             }
             total+=n;
@@ -799,6 +835,7 @@ int main(int argc, char *argv[])
    /* Note read() could return zero bytes. Check for bogus null print job. */
    if (total==0)
    {
+      exit_stat = BACKEND_OK; /* leave queue up */
       BUG("ERROR: null print job total=%d\n", total);
       goto bugout;
    }
@@ -814,7 +851,10 @@ int main(int argc, char *argv[])
       for (cnt=0; cnt<10; cnt++)
       {
          if (loop_test(hd, cd, &pa, argv[0], printer, argv[2], argv[1], argv[3]))
-            goto bugout;         
+         {
+            exit_stat = BACKEND_OK; /* leave queue up */
+            goto bugout;
+         }         
          pthread_mutex_lock(&pa.mutex);
          pages = pa.eoj_pages;
          pthread_mutex_unlock(&pa.mutex);
@@ -850,8 +890,8 @@ int main(int argc, char *argv[])
       /* Just use fixed delay for uni-di, VSTATUS devices and laserjets without pjl. */
       sleep(8);
    }
-      
-   exit_stat = 0;
+    
+   exit_stat = BACKEND_OK;
    fputs("INFO: ready to print\n", stderr);
 
 bugout:

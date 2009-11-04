@@ -721,6 +721,7 @@ static int device_id(int fd, char *buffer, int size)
 
    if (rlen < 0)
    {
+#if 0  /* Removed this PS A420 hack so a valid error is returned after USB reset. DES 10/1/09 */
       /* Following retry is necessary for a firmware problem with PS A420 products. DES 4/17/07 */
       BUG("invalid deviceid wIndex=%x, retrying wIndex=%x: %m\n", interface, interface << 8);
       rlen = usb_control_msg(hd, 
@@ -734,6 +735,9 @@ static int device_id(int fd, char *buffer, int size)
          BUG("invalid deviceid retry ret=%d: %m\n", rlen);
          goto bugout;
       }
+#endif
+      BUG("invalid deviceid ret=%d: %m\n", rlen);
+      goto bugout;
    }
 
    len = ntohs(*(short *)buffer);

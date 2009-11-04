@@ -511,6 +511,7 @@ AGENT_TYPE_LG_PK = 16 # light grey and photo black
 AGENT_TYPE_LG = 17 # light grey
 AGENT_TYPE_G = 18 # medium grey
 AGENT_TYPE_PG = 19 # photo grey
+AGENT_TYPE_BLACK_B8800 = 39 # For PS B8800
 AGENT_TYPE_WHITE = 0x20 # For ISO 10180 compatibility
 AGENT_TYPE_RED = 0x21 # For ISO 10180 compatibility
 AGENT_TYPE_UNSPECIFIED = 0x3e # (62) Used for kind = 5, 6, 7, 8, or 9
@@ -643,6 +644,7 @@ SCAN_TYPE_PML = 2
 SCAN_TYPE_SOAP = 3
 SCAN_TYPE_MARVEL = 4
 SCAN_TYPE_SOAP2 = 5
+SCAN_TYPE_SCL_DUPLEX = 6
 
 # scan-styles
 SCAN_STYLE_NONE = 0

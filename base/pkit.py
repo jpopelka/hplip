@@ -130,9 +130,9 @@ class PolicyKitAuthentication(object):
 
 
 class PolicyKitService(dbus.service.Object):
-    def check_permission(self, sender, action=POLICY_KIT_ACTION):
+    def check_permission_v0(self, sender, action=POLICY_KIT_ACTION):
         if not sender:
-            log.syslog("Session not authorized by PolicyKit")
+            log.error("Session not authorized by PolicyKit")
             raise AccessDeniedException('Session not authorized by PolicyKit')
 
         try:
@@ -146,14 +146,14 @@ class PolicyKitService(dbus.service.Object):
 
             granted = policy_auth.is_authorized(action, pid)
             if not granted:
-                log.syslog("Process not authorized by PolicyKit")
+                log.error("Process not authorized by PolicyKit")
                 raise AccessDeniedException('Process not authorized by PolicyKit')
 
             granted = policy_auth.policy_kit.IsSystemBusNameAuthorized(action,
                                                                        sender,
                                                                        False)
             if granted != 'yes':
-                log.syslog("Session not authorized by PolicyKit")
+                log.error("Session not authorized by PolicyKit version 0")
                 raise AccessDeniedException('Session not authorized by PolicyKit')
 
         except AccessDeniedException:
@@ -165,68 +165,136 @@ class PolicyKitService(dbus.service.Object):
             raise AccessDeniedException(ex.message)
 
 
+    def check_permission_v1(self, sender, connection, action=POLICY_KIT_ACTION):
+        if not sender or not connection:
+            log.error("Session not authorized by PolicyKit")
+            raise AccessDeniedException('Session not authorized by PolicyKit')
 
-class BackendService(PolicyKitService):
-    INTERFACE_NAME = 'com.hp.hplip'
-    SERVICE_NAME   = 'com.hp.hplip'
-    IDLE_TIMEOUT   =  30
+        system_bus = dbus.SystemBus()
+        obj = system_bus.get_object("org.freedesktop.PolicyKit1",
+                                    "/org/freedesktop/PolicyKit1/Authority",
+                                    "org.freedesktop.PolicyKit1.Authority")
+        policy_kit = dbus.Interface(obj, "org.freedesktop.PolicyKit1.Authority")
+        info = dbus.Interface(connection.get_object("org.freedesktop.DBus",
+                                                    "/org/freedesktop/DBus/Bus",
+                                                    False),
+                              "org.freedesktop.DBus")
+        pid = info.GetConnectionUnixProcessID(sender)
+        
+        subject = (
+            'unix-process',
+            { 'pid' : dbus.UInt32(pid, variant_level = 1) }
+        )
+        details = { '' : '' }
+        flags = dbus.UInt32(1)         # AllowUserInteraction = 0x00000001
+        cancel_id = ''
 
-    def __init__(self, connection=None, path='/'):
-        if connection is None:
-            connection = get_service_bus()
+        (ok, notused, details) = \
+            policy_kit.CheckAuthorization(subject,
+                                          action,
+                                          details,
+                                          flags,
+                                          cancel_id)
+        if not ok:
+            log.error("Session not authorized by PolicyKit version 1")
 
-        super(BackendService, self).__init__(connection, path)
-
-        self.name = dbus.service.BusName(self.SERVICE_NAME, connection)
-        self.loop = gobject.MainLoop()
-
-
-    def run(self):
-        log.debug("Starting back-end service loop")
-#       self.start_idle_timeout()
-        self.loop.run()
-
-    @dbus.service.method(dbus_interface=INTERFACE_NAME,
-                            in_signature='s', out_signature='b',
-                            sender_keyword='sender')
-    def installPlugin(self, src_dir, sender=None):
-        try:
-            self.check_permission(sender, INSTALL_PLUGIN_ACTION)
-        except AccessDeniedException, e:
-            return False
-
-        log.debug("installPlugin: received '%s'" % src_dir)
-
-        if not copyPluginFiles(src_dir):
-            log.syslog("Plugin installation failed")
-            return False
-
-        return True
+        return ok
 
 
-    @dbus.service.method(dbus_interface=INTERFACE_NAME,
-                            in_signature='', out_signature='b',
-                            sender_keyword='sender')
-    def shutdown(self, sender=None):
-        log.debug("Stopping backend service")
-        self.loop.quit()
+if utils.to_bool(sys_conf.get('configure', 'policy-kit')):
+    class BackendService(PolicyKitService):
+        INTERFACE_NAME = 'com.hp.hplip'
+        SERVICE_NAME   = 'com.hp.hplip'
+        LOGFILE_NAME   = '/tmp/hp-pkservice.log'
 
-        return True
+        def __init__(self, connection=None, path='/', logfile=LOGFILE_NAME):
+            if connection is None:
+                connection = get_service_bus()
+
+            super(BackendService, self).__init__(connection, path)
+
+            self.name = dbus.service.BusName(self.SERVICE_NAME, connection)
+            self.loop = gobject.MainLoop()
+            self.version = 0
+
+            log.set_logfile("%s.%d" % (logfile, os.getpid()))
+            log.set_level("debug")
+
+        def run(self, version=None):
+            if version is None:
+                version = policykit_version()
+                if version is None:
+                    log.error("Unable to determine installed PolicyKit version")
+                    return
+
+            self.version = version
+            log.set_where(Logger.LOG_TO_CONSOLE_AND_FILE)
+            log.debug("Starting back-end service loop (version %d)" % version)
+
+            self.loop.run()
+
+
+        @dbus.service.method(dbus_interface=INTERFACE_NAME,
+                                in_signature='s', out_signature='b',
+                                sender_keyword='sender',
+                                connection_keyword='connection')
+        def installPlugin(self, src_dir, sender=None, connection=None):
+            if self.version == 0:
+                try:
+                    self.check_permission_v0(sender, INSTALL_PLUGIN_ACTION)
+                except AccessDeniedException, e:
+                    return False
+
+            elif self.version == 1:
+                if not self.check_permission_v1(sender,
+                                                connection,
+                                                INSTALL_PLUGIN_ACTION):
+                    return False
+
+            else:
+                log.error("installPlugin: invalid PolicyKit version %d" % self.version)
+                return False
+
+            log.debug("installPlugin: installing from '%s'" % src_dir)
+
+            if not copyPluginFiles(src_dir):
+                log.error("Plugin installation failed")
+                return False
+
+            return True
+
+
+        @dbus.service.method(dbus_interface=INTERFACE_NAME,
+                                in_signature='s', out_signature='b',
+                                sender_keyword='sender',
+                                connection_keyword='connection')
+        def shutdown(self, arg, sender=None, connection=None):
+            log.debug("Stopping backend service")
+            self.loop.quit()
+
+            return True
 
 
 
 class PolicyKit(object):
-    def __init__(self):
+    def __init__(self, version=None):
+        if version is None:
+            version = policykit_version()
+            if version is None:
+                log.debug("Unable to determine installed PolicyKit version")
+                return
+
         self.bus = dbus.SystemBus()
         self.obj = self.bus.get_object(POLICY_KIT_ACTION, "/")
         self.iface = dbus.Interface(self.obj, dbus_interface=POLICY_KIT_ACTION)
-
+        self.version = version
 
     def installPlugin(self, src_dir):
-        auth = PolicyKitAuthentication()
-        if not auth.is_authorized(INSTALL_PLUGIN_ACTION):
-            if not auth.obtain_authorization(INSTALL_PLUGIN_ACTION):
-                return None
+        if self.version == 0:
+            auth = PolicyKitAuthentication()
+            if not auth.is_authorized(INSTALL_PLUGIN_ACTION):
+                if not auth.obtain_authorization(INSTALL_PLUGIN_ACTION):
+                    return None
 
         try:
             ok = self.iface.installPlugin(src_dir)
@@ -237,13 +305,14 @@ class PolicyKit(object):
 
 
     def shutdown(self):
-        auth = PolicyKitAuthentication()
-        if not auth.is_authorized(INSTALL_PLUGIN_ACTION):
-            if not auth.obtain_authorization(INSTALL_PLUGIN_ACTION):
-                return None
+        if self.version == 0:
+            auth = PolicyKitAuthentication()
+            if not auth.is_authorized(INSTALL_PLUGIN_ACTION):
+                if not auth.obtain_authorization(INSTALL_PLUGIN_ACTION):
+                    return None
 
         try:
-            ok = self.iface.shutdown()
+            ok = self.iface.shutdown("")
             return ok
         except dbus.DBusException, e:
             log.debug("shutdown: %s" % str(e))
@@ -287,7 +356,7 @@ def copyPluginFiles(src_dir):
         for s in plugin_spec.get("products", PRODUCT).split(','):
 
             if not plugin_spec.has_section(s):
-                log.syslog("Missing section [%s]" % s)
+                log.error("Missing section [%s]" % s)
                 return False
 
             src = plugin_spec.get(s, 'src', '')
@@ -295,11 +364,11 @@ def copyPluginFiles(src_dir):
             link = plugin_spec.get(s, 'link', '')
 
             if not src:
-                log.syslog("Missing 'src=' value in section [%s]" % s)
+                log.error("Missing 'src=' value in section [%s]" % s)
                 return False
 
             if not trg:
-                log.syslog("Missing 'trg=' value in section [%s]" % s)
+                log.error("Missing 'trg=' value in section [%s]" % s)
                 return False
 
             src = os.path.basename(utils.cat(src))
@@ -332,18 +401,18 @@ def copyPluginFiles(src_dir):
             os.makedirs(trg_dir, 0755)
 
         if not os.path.isdir(trg_dir):
-            log.syslog("Target directory %s exists but is not a directory. Skipping." % trg_dir)
+            log.error("Target directory %s exists but is not a directory. Skipping." % trg_dir)
             continue
 
         try:
             shutil.copyfile(src, trg)
         except (IOError, OSError), e:
-            log.syslog("File copy failed: %s" % e.strerror)
+            log.error("File copy failed: %s" % e.strerror)
             continue
 
         else:
             if not os.path.exists(trg):
-                log.syslog("Target file %s does not exist. File copy failed." % trg)
+                log.error("Target file %s does not exist. File copy failed." % trg)
                 continue
             else:
                 os.chmod(trg, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH)
@@ -406,3 +475,12 @@ def run_plugin_command(required=True, plugin_reason=PLUGIN_REASON_NONE):
     status, output = utils.run(cmd, log_output=True, password_func=None, timeout=1)
 
     return (status == 0, True)
+
+
+def policykit_version():
+    if os.path.isdir("/usr/share/polkit-1"):
+        return 1
+    elif os.path.isdir("/usr/share/PolicyKit"):
+        return 0
+    else:
+        return None

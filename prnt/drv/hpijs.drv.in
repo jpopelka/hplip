@@ -170,8 +170,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -243,7 +243,7 @@ et=4"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
 
@@ -413,8 +413,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -516,7 +516,7 @@ et=2"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 9.00 36.00 9.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
 
@@ -1077,8 +1077,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -1176,7 +1176,7 @@ et=2"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 9.00 36.00 9.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJ9xx:NoPhotoMode%>
@@ -1294,8 +1294,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -1393,7 +1393,7 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 9.00 36.00 9.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
 
@@ -1513,8 +1513,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -1634,7 +1634,7 @@ et=2"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 9.00 36.00 9.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJ9xxVIP:Normal%>
@@ -1934,8 +1934,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -2024,7 +2024,7 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 9.00 36.00 9.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJ9xxVIP:No1200dpiNoSensor%>
@@ -2156,8 +2156,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -2282,7 +2282,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJ55xx:Normal%>
@@ -2330,7 +2330,7 @@ lity:PenSet=2,Quality:FullBleed=1"
 
 /////////////// DJGenericVIP
 {
-  Attribute "DefaultResolution" "" "1200dpi"
+  Attribute "DefaultResolution" "" "600dpi"
 
   // Custom page sizes from 1x4in to SuperB
   HWMargins 18 36 18 9
@@ -2358,7 +2358,7 @@ aleK"
   Attribute "FoomaticRIPOptionSetting" "PrintoutMode=High" "Quality=600ColorCMYK"
   Attribute "FoomaticRIPOptionSetting" "PrintoutMode=High.Gray" "Quality=600Grayscal&&
 eK"
-  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Photo" "Quality=1200PhotoCMYKFu&&
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Photo" "Quality=600PhotoCMYKFu&&
 llBleed"
   Attribute "FoomaticRIPOption" "InputSlot" "enum CmdLine C"
   Attribute "FoomaticRIPOptionSetting" "InputSlot=Default" ",PS:MediaPosition=7"
@@ -2418,8 +2418,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -2480,11 +2480,11 @@ ty:PenSet=2,Quality:FullBleed=1"
   Attribute "FoomaticRIPOptionSetting" "Quality=600GrayscaleK" " -r600 -sIjsParam&&
 s=Quality:Quality=0,Quality:ColorMode=0,Quality:MediaType=0,Quality:Pe&&
 nSet=2"
-  Attribute "FoomaticRIPOptionSetting" "Quality=1200PhotoCMYK" " -r1200 -sIjsParams=&&
-Quality:Quality=3,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenS&&
+  Attribute "FoomaticRIPOptionSetting" "Quality=600PhotoCMYK" " -r600 -sIjsParams=&&
+Quality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenS&&
 et=2"
-  Attribute "FoomaticRIPOptionSetting" "Quality=1200PhotoCMYKFullBleed" " -r1200 -sI&&
-jsParams=Quality:Quality=3,Quality:ColorMode=2,Quality:MediaType=2,Qua&&
+  Attribute "FoomaticRIPOptionSetting" "Quality=600PhotoCMYKFullBleed" " -r600 -sI&&
+jsParams=Quality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Qua&&
 lity:PenSet=2,Quality:FullBleed=1"
   Group "General/General"
     Option "PrintoutMode/Printout Mode" PickOne AnySetup 10.0
@@ -2530,8 +2530,8 @@ lity:PenSet=2,Quality:FullBleed=1"
       Choice "600ColorCMYK/600 dpi, Color, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=600ColorCMYK"
       Choice "600ColorCMYKFullBleed/600 dpi, Color, Full Bleed, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=600ColorCMYKFullBleed"
       Choice "600GrayscaleK/600 dpi, Grayscale, Black Cartr." "%% FoomaticRIPOptionSetting: Quality=600GrayscaleK"
-      Choice "1200PhotoCMYK/1200 dpi, Photo, Black + Color Cartr., Photo Paper" "%% FoomaticRIPOptionSetting: Quality=1200PhotoCMYK"
-      Choice "1200PhotoCMYKFullBleed/1200 dpi, Photo, Full Bleed, Black + Color Cartr., Photo Paper" "%% FoomaticRIPOptionSetting: Quality=1200PhotoCMYKFullBleed"
+      Choice "600PhotoCMYK/600 dpi, Photo, Black + Color Cartr., Photo Paper" "%% FoomaticRIPOptionSetting: Quality=600PhotoCMYK"
+      Choice "600PhotoCMYKFullBleed/600 dpi, Photo, Full Bleed, Black + Color Cartr., Photo Paper" "%% FoomaticRIPOptionSetting: Quality=600PhotoCMYKFullBleed"
   *CustomMedia "Letter/Letter" 612.00 792.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Letter" "%% FoomaticRIPOptionSetting: PageSize=Letter"
   CustomMedia "A4/A4" 595.00 842.00 9.72 36.00 9.72 9.00 "%% FoomaticRIPOptionSetting: PageSize=A4" "%% FoomaticRIPOptionSetting: PageSize=A4"
   CustomMedia "Photo/Photo or 4x6 inch index card" 288.00 432.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Photo" "%% FoomaticRIPOptionSetting: PageSize=Photo"
@@ -2555,10 +2555,31 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJGenericVIP:Normal%>
+  {
+    ModelName "HP Photosmart Wireless b109n-z hpijs"
+    Attribute "NickName" "" "HP Photosmart Wireless b109n-z hpijs, $Version"
+    Attribute "ShortNickName" "" "HP PS Wireless b109n-z hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart wireless b109n-z;DES:photosmart wireless b109n-z;"
+    PCFileName "hp-photosmart_wireless_b109n-z-hpijs.ppd"
+    Attribute "Product" "" "(HP Photosmart Wireless All-in-one Printer - b109n)"
+    Attribute "Product" "" "(HP Photosmart Wireless All-in-one Printer - b109q)"
+    Attribute "Product" "" "(HP Photosmart Wireless All-in-one Printer - b109q=r)"
+  }
+  {
+    ModelName "HP Photosmart b109a-m hpijs"
+    Attribute "NickName" "" "HP Photosmart b109a-m hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Photosmart b109a-m hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart b109a-m;DES:photosmart b109a-m;"
+    PCFileName "hp-photosmart_b109a-m-hpijs.ppd"
+    Attribute "Product" "" "(HP Photosmart All-in-one Printer - b109a)"
+    Attribute "Product" "" "(HP Photosmart All-in-one Printer - b109c)"
+    Attribute "Product" "" "(HP Photosmart All-in-one Printer - b109d)"
+    Attribute "Product" "" "(HP Photosmart All-in-one Printer - b109e)"
+  }
   {
     ModelName "HP Photosmart Plus b209a-m hpijs"
     Attribute "NickName" "" "HP Photosmart Plus b209a-m hpijs, $Version"
@@ -2584,6 +2605,24 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart c309a series;DES:photosmart c309a series;"
     PCFileName "hp-photosmart_c309a_series-hpijs.ppd"
     Attribute "Product" "" "(HP Photosmart Premium Fax All-in-one Printer - c309a)"
+  }
+  {
+    ModelName "HP Photosmart Prem-web c309n-s hpijs"
+    Attribute "NickName" "" "HP Photosmart Prem-web c309n-s hpijs, $Version"
+    Attribute "ShortNickName" "" "HP PS Prem-web c309n-s hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart prem-web c309n-s;DES:photosmart prem-web c309n-s;"
+    PCFileName "hp-photosmart_prem-web_c309n-s-hpijs.ppd"
+    Attribute "Product" "" "(HP Photosmart Premium Fax All-in-one Printer Series -c309a)"
+    Attribute "Product" "" "(HP Photosmart Premium Fax All-in-one Printer Series -c309c)"
+  }
+  {
+    ModelName "HP Photosmart Premium c309g-m hpijs"
+    Attribute "NickName" "" "HP Photosmart Premium c309g-m hpijs, $Version"
+    Attribute "ShortNickName" "" "HP PS Premium c309g-m hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart premium c309g-m;DES:photosmart premium c309g-m;"
+    PCFileName "hp-photosmart_premium_c309g-m-hpijs.ppd"
+    Attribute "Product" "" "(HP Photosmart Premium All-in-one Printer Series - c309g)"
+    Attribute "Product" "" "(HP Photosmart Premium All-in-one Printer Series - c309h)"
   }
   {
     ModelName "HP Deskjet d730 hpijs"
@@ -2708,6 +2747,25 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP PSC 2410 Photosmart All-in-one Printer)"
     Attribute "Product" "" "(HP PSC 2420 Photosmart All-in-one Printer)"
     Attribute "Product" "" "(HP PSC 2450 Photosmart All-in-one Printer)"
+  }
+  {
+    ModelName "HP Deskjet f2400 Series hpijs"
+    Attribute "NickName" "" "HP Deskjet f2400 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Deskjet f2400 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet f2400 series;DES:deskjet f2400 series;"
+    PCFileName "hp-deskjet_f2400_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Deskjet f2410 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2418 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2420 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2423 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2430 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2440 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2476 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2480 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2483 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2488 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2492 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2493 All-in-one Printer)"
   }
   {
     ModelName "HP Deskjet d2500 Series hpijs"
@@ -2979,6 +3037,14 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Photosmart c4494 All-in-one Printer)"
   }
   {
+    ModelName "HP Deskjet f4500 Series hpijs"
+    Attribute "NickName" "" "HP Deskjet f4500 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Deskjet f4500 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet f4500 series;DES:deskjet f4500 series;"
+    PCFileName "hp-deskjet_f4500_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Deskjet f4500 All-in-one Printer Series)"
+  }
+  {
     ModelName "HP Officejet j4500 Series hpijs"
     Attribute "NickName" "" "HP Officejet j4500 Series hpijs, $Version"
     Attribute "ShortNickName" "" "HP Officejet j4500 Series hpijs"
@@ -3095,19 +3161,6 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Photosmart c5194 All-in-one Printer)"
   }
   {
-    ModelName "HP Photosmart d5100 Series hpijs"
-    Attribute "NickName" "" "HP Photosmart d5100 Series hpijs, $Version"
-    Attribute "ShortNickName" "" "HP PS d5100 Series hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart d5100 series;DES:photosmart d5100 series;"
-    PCFileName "hp-photosmart_d5100_series-hpijs.ppd"
-    Attribute "Product" "" "(HP Photosmart d5145 Printer)"
-    Attribute "Product" "" "(HP Photosmart d5155 Printer)"
-    Attribute "Product" "" "(HP Photosmart d5156 Printer)"
-    Attribute "Product" "" "(HP Photosmart d5160 Printer)"
-    Attribute "Product" "" "(HP Photosmart d5163 Printer)"
-    Attribute "Product" "" "(HP Photosmart d5168 Printer)"
-  }
-  {
     ModelName "HP Deskjet 5100 hpijs"
     Attribute "NickName" "" "HP Deskjet 5100 hpijs, $Version"
     Attribute "ShortNickName" "" "HP Deskjet 5100 hpijs"
@@ -3121,6 +3174,19 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Deskjet 5151 Color Inkjet Printer)"
     Attribute "Product" "" "(HP Deskjet 5160 Color Inkjet Printer)"
     Attribute "Product" "" "(HP Deskjet 5168 Color Inkjet Printer)"
+  }
+  {
+    ModelName "HP Photosmart d5100 Series hpijs"
+    Attribute "NickName" "" "HP Photosmart d5100 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP PS d5100 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart d5100 series;DES:photosmart d5100 series;"
+    PCFileName "hp-photosmart_d5100_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Photosmart d5145 Printer)"
+    Attribute "Product" "" "(HP Photosmart d5155 Printer)"
+    Attribute "Product" "" "(HP Photosmart d5156 Printer)"
+    Attribute "Product" "" "(HP Photosmart d5160 Printer)"
+    Attribute "Product" "" "(HP Photosmart d5163 Printer)"
+    Attribute "Product" "" "(HP Photosmart d5168 Printer)"
   }
   {
     ModelName "HP Photosmart c5200 Series hpijs"
@@ -4050,8 +4116,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -4186,7 +4252,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
 
@@ -4307,8 +4373,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -4426,7 +4492,7 @@ et=2"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 9.00 36.00 9.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJGenericVIP:NoFullBleed%>
@@ -4660,8 +4726,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -4754,7 +4820,7 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 9.00 36.00 9.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJ3320:Normal%>
@@ -5129,8 +5195,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -5239,7 +5305,7 @@ ty:PenSet=2,Quality:FullBleed=1"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 9.00 36.00 9.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJ3600:Normal%>
@@ -5364,15 +5430,6 @@ ty:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Deskjet d2466 Printer)"
     Attribute "Product" "" "(HP Deskjet d2468 Printer)"
     Attribute "Product" "" "(HP Deskjet d4263 Printer)"
-  }
-  {
-    ModelName "HP Officejet j3500 Series hpijs"
-    Attribute "NickName" "" "HP Officejet j3500 Series hpijs, $Version"
-    Attribute "ShortNickName" "" "HP Officejet j3500 Series hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet j3500 series;DES:officejet j3500 series;"
-    PCFileName "hp-officejet_j3500_series-hpijs.ppd"
-    Attribute "Product" "" "(HP Officejet j3508 All-in-one Printer)"
-    Attribute "Product" "" "(HP Officejet j3500 Series All-in-one Printer)"
   }
   {
     ModelName "HP Officejet j3600 Series hpijs"
@@ -5598,8 +5655,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -5684,7 +5741,7 @@ ty:PenSet=2,Quality:FullBleed=1"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 9.00 36.00 9.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   {
@@ -6374,6 +6431,14 @@ Bleed=1"
     Attribute "Product" "" "(HP Photosmart a636 Compact Photo Printer)"
     Attribute "Product" "" "(HP Photosmart a637 Compact Photo Printer)"
   }
+  {
+    ModelName "HP Photosmart a640 Series hpijs"
+    Attribute "NickName" "" "HP Photosmart a640 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Photosmart a640 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart a640 series;DES:photosmart a640 series;"
+    PCFileName "hp-photosmart_a640_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Photosmart a640 Printer Series)"
+  }
 }  // end QuickConnect, 4-sided fullbleed
 
 ///////////////// LJMono
@@ -6454,8 +6519,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -6533,7 +6598,7 @@ t=0"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%LJMono:Normal%>
@@ -7819,8 +7884,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -7871,7 +7936,7 @@ PenSet=0"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%LJMono:300dpiOnly%>
@@ -7982,8 +8047,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -8092,7 +8157,7 @@ nSet=2"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%LJColor:Normal%>
@@ -8312,6 +8377,14 @@ nSet=2"
     Attribute "Product" "" "(HP Color LaserJet cp4005 Series Printer)"
   }
   {
+    ModelName "HP Color LaserJet cp4020 Series hpijs"
+    Attribute "NickName" "" "HP Color LaserJet cp4020 Series hpijs pcl3, $Version"
+    Attribute "ShortNickName" "" "HP Color LJ cp4020 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp4020 series;DES:hp color laserjet cp4020 series;"
+    PCFileName "hp-color_laserjet_cp4020_series-hpijs-pcl3.ppd"
+    Attribute "Product" "" "(HP Color LaserJet cp4020 Series Printer)"
+  }
+  {
     ModelName "HP Color LaserJet 4500 hpijs"
     Attribute "NickName" "" "HP Color LaserJet 4500 hpijs pcl3, $Version"
     Attribute "ShortNickName" "" "HP Color LaserJet 4500 hpijs"
@@ -8320,6 +8393,14 @@ nSet=2"
     Attribute "Product" "" "(HP Color LaserJet 4500 Printer)"
     Attribute "Product" "" "(HP Color LaserJet 4500dn Printer)"
     Attribute "Product" "" "(HP Color LaserJet 4500n Printer)"
+  }
+  {
+    ModelName "HP Color LaserJet cp4520 Series hpijs"
+    Attribute "NickName" "" "HP Color LaserJet cp4520 Series hpijs pcl3, $Version"
+    Attribute "ShortNickName" "" "HP Color LJ cp4520 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp4520 series;DES:hp color laserjet cp4520 series;"
+    PCFileName "hp-color_laserjet_cp4520_series-hpijs-pcl3.ppd"
+    Attribute "Product" "" "(HP Color LaserJet cp4520 Series Printer)"
   }
   {
     ModelName "HP Color LaserJet 4550 hpijs"
@@ -8685,8 +8766,8 @@ dDEVICEHEIGHTPOINTS=420"
 dDEVICEHEIGHTPOINTS=1224"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -8777,7 +8858,7 @@ nSet=2"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   {
@@ -8917,8 +8998,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -8981,7 +9062,7 @@ t=0"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%LJFastRaster:Normal%>
@@ -9081,8 +9162,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -9144,7 +9225,7 @@ nSet=2"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%LJJetReady:Normal%>
@@ -9270,8 +9351,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -9330,7 +9411,7 @@ uality:PenSet=0"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJ350:Normal%>
@@ -9423,8 +9504,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -9468,7 +9549,7 @@ t=0"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJ540:GrayscaleOnly%>
@@ -9615,8 +9696,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -9670,7 +9751,7 @@ t=0"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJ540:Normal%>
@@ -9810,8 +9891,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -9883,7 +9964,7 @@ uality:PenSet=0"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJ630:Normal%>
@@ -9988,8 +10069,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -10048,7 +10129,7 @@ nSet=2"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   {
@@ -10290,8 +10371,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -10355,7 +10436,7 @@ et=4"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 48.24 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJ6xxPhoto:Normal%>
@@ -10573,8 +10654,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -10642,7 +10723,7 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 9.00 36.00 9.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJ8xx:Normal%>
@@ -10908,8 +10989,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -10993,7 +11074,7 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 9.00 36.00 9.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJ8x5:Normal%>
@@ -11093,8 +11174,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -11153,7 +11234,7 @@ nSet=2"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 9.00 36.00 9.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   {
@@ -11298,8 +11379,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -11345,7 +11426,7 @@ Transparency"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%LJZjsMono:Normal%>
@@ -11526,8 +11607,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -11596,7 +11677,7 @@ nSet=2"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%LJJetReady:Normal%>
@@ -11715,8 +11796,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -11764,7 +11845,7 @@ Transparency"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%LJm1005:Normal%>
@@ -11880,8 +11961,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -11935,7 +12016,7 @@ Transparency"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%LJZjsColor:Normal%>
@@ -12034,8 +12115,8 @@ EVICEHEIGHTPOINTS=936"
 dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
 DEVICEHEIGHTPOINTS=1008"
-  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=420 -&&
-dDEVICEHEIGHTPOINTS=567"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
  -dDEVICEHEIGHTPOINTS=774"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
@@ -12083,7 +12164,7 @@ Transparency"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
   CustomMedia "Hagaki/Hagaki" 283.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
   CustomMedia "Legal/Legal" 612.00 1008.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
-  CustomMedia "Oufuku/Oufuku-Hagaki" 420.00 567.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%LJP1XXX:Normal%>

@@ -1225,6 +1225,7 @@ PyObject * openPPD( PyObject * self, PyObject * args )
 
     file = fopen( g_ppd_file, "r" );
     ppd = ppdOpen( file );
+    ppdLocalize( ppd );
     fclose( file );
 
     g_num_dests = cupsGetDests( &g_dests );

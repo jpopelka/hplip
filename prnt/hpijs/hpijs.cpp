@@ -501,7 +501,7 @@ int hpijs_get_cb(void *get_cb_data, IjsServerCtx *ctx, IjsJobId job_id, const ch
    }
    else if (!strcmp (key, "ColorSpace"))
    {
-      return snprintf(value_buf, value_size, pSS->ph.cs);
+      return snprintf(value_buf, value_size, "%s", pSS->ph.cs);
    }
    else if (!strcmp (key, "PageImageFormat"))
    {

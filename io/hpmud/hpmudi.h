@@ -55,7 +55,8 @@
 #include "pp.h"
 #endif
 
-// #define HPMUD_DEBUG
+// Don DO NOT commit with HPMUD_DEBUG enabled :( 
+//#define HPMUD_DEBUG
 
 #define _STRINGIZE(x) #x
 #define STRINGIZE(x) _STRINGIZE(x)

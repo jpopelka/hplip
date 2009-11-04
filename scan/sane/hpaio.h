@@ -61,7 +61,7 @@ enum hpaioOption_e {
                     OPTION_JPEG_COMPRESSION_FACTOR,
                     OPTION_BATCH_SCAN,
                     OPTION_ADF_MODE, 
-//                    OPTION_DUPLEX,
+                    OPTION_DUPLEX,
 
     GROUP_GEOMETRY,
                     OPTION_LENGTH_MEASUREMENT,

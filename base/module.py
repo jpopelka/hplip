@@ -523,7 +523,7 @@ class Module(object):
             device_uri_ret = devices.keys()[0]
             log.info("Using device: %s\n" % device_uri_ret)
 
-        if device_uri_ret is None and self.mode in (INTERACTIVE_MODE, NON_INTERACTIVE_MODE) and len(devices):
+        if device_uri_ret is None and self.mode == INTERACTIVE_MODE and len(devices):
             device_uri_ret = tui.device_table(devices, scan_uri_flag)
 
         if device_uri_ret is not None:

@@ -26,7 +26,7 @@
 #   104 = no libdl
 
 #AC_PREREQ(2.59)
-AC_INIT([HP Linux Imaging and Printing], [3.9.8], [3.9.8.36], [hplip])
+AC_INIT([HP Linux Imaging and Printing], [3.9.10], [3.9.10.68], [hplip])
 #AM_INIT_AUTOMAKE([1.9 foreign])
 AM_INIT_AUTOMAKE
 AC_DISABLE_STATIC
@@ -111,11 +111,17 @@ AC_ARG_ENABLE(hpijs_only_build,
   hpijs_only_build=$enableval, hpijs_only_build=no)
 if test "$hpijs_only_build" = "yes"; then
    AC_MSG_RESULT(yes)
+   epm_full=\#
+   epm_lite=\#
+   epm_hpcups_only=\#
+   epm_print_only_exclude=\#
+   epm_hpijs_only=
 else
    AC_MSG_RESULT(no)
+   epm_hpijs_only=\#
    AC_DEFINE(HAVE_LIBHPIP) 
 fi
-AM_CONDITIONAL(HPLIP_BUILD, test x$hpijs_only_build = xno)
+AM_CONDITIONAL(HPIJS_ONLY_BUILD, test x$hpijs_only_build = xyes)
 
 AC_MSG_CHECKING([for lite build])
 AC_ARG_ENABLE(lite_build,
@@ -124,13 +130,41 @@ AC_ARG_ENABLE(lite_build,
 if test "$lite_build" = "yes"; then
    AC_MSG_RESULT(yes)
    epm_full=\#
+   epm_hpcups_only=\#
+   epm_print_only_exclude=
    epm_lite=
 else
    AC_MSG_RESULT(no)
+fi
+AM_CONDITIONAL(LITE_BUILD, test x$lite_build = xyes)
+
+AC_MSG_CHECKING([for hpcups only build])
+AC_ARG_ENABLE(hpcups_only_build,
+  [  --enable-hpcups-only-build     enable hpcups only build, print only (default=no)],
+  hpcups_only_build=$enableval, hpcups_only_build=no)
+if test "$hpcups_only_build" = "yes"; then
+   AC_MSG_RESULT(yes)
+   epm_full=\#
+   epm_lite=\#
+   epm_hpcups_only=
+   epm_print_only_exclude=\#
+else
+   AC_MSG_RESULT(no)
+fi
+AM_CONDITIONAL(HPCUPS_ONLY_BUILD, test x$hpcups_only_build = xyes)
+
+AM_CONDITIONAL(HPLIP_BUILD, test x$hpcups_only_build = xno && test x$hpijs_only_build = xno)
+if test "$hpijs_only_build" = "no" && test "$hpcups_only_build" = "no"; then
+   AC_DEFINE(HAVE_LIBHPIP) 
+fi
+
+if test "$lite_build" = "no" && test "$hpcups_only_build" = "no" && test "$hpijs_only_build" = "no"; then
    epm_full=
    epm_lite=\#
+   epm_hpcups_only=\#
+   epm_print_only_exclude=
 fi
-AM_CONDITIONAL(FULL_BUILD, test x$lite_build = xno)
+AM_CONDITIONAL(FULL_BUILD, test x$hpcups_only_build = xno && test x$lite_build = xno && test x$hpijs_only_build = xno)
 
 AC_MSG_CHECKING([for hpijs install])
 AC_ARG_ENABLE(hpijs_install,
@@ -148,13 +182,13 @@ AC_MSG_CHECKING([for hpcups install])
 AC_ARG_ENABLE(hpcups_install,
   [  --enable-hpcups-install     enable hpcups install (default=yes)],
   hpcups_install=$enableval, hpcups_install=yes)
-if test "$hpcups_install" = "yes"; then
+if test "$hpcups_install" = "yes" && test "$hpijs_only_build" = "no"; then
    AC_MSG_RESULT(yes)
    epm_hpcups_install=yes
 else
    AC_MSG_RESULT(no)
 fi
-AM_CONDITIONAL(HPCUPS_INSTALL, test x$hpcups_install = xyes)
+AM_CONDITIONAL(HPCUPS_INSTALL, test x$hpcups_install = xyes && test x$hpijs_only_build = xno)
 
 AC_MSG_CHECKING([for new hpcups install])
 AC_ARG_ENABLE(new_hpcups,
@@ -316,25 +350,25 @@ AC_MSG_CHECKING([for cups drv install])
 AC_ARG_ENABLE(cups_drv_install,
   [  --enable-cups-drv-install    enable cups dynamic ppd install (default=yes), uses drvdir and hpppddir],
   cups_drv_install=$enableval, cups_drv_install=yes)
-if test $cups_drv_install = yes; then
+if test $cups_drv_install = yes && test $hpijs_only_build = no; then
    AC_MSG_RESULT(yes)
    epm_cups_drv_install=yes
 else
    AC_MSG_RESULT(no)
 fi
-AM_CONDITIONAL(CUPS_DRV_INSTALL, test x$cups_drv_install = xyes)
+AM_CONDITIONAL(CUPS_DRV_INSTALL, test x$cups_drv_install = xyes && test x$hpijs_only_build = xno)
 
 AC_MSG_CHECKING([for cups ppd install])
 AC_ARG_ENABLE(cups_ppd_install,
   [  --enable-cups-ppd-install    enable cups static ppd install (default=no), uses hpppddir],
   cups_ppd_install=$enableval, cups_ppd_install=no)
-if test $cups_ppd_install = yes; then
+if test $cups_ppd_install = yes && test $hpijs_only_build = no; then
    AC_MSG_RESULT(yes)
    epm_cups_ppd_install=yes
 else
    AC_MSG_RESULT(no)
 fi
-AM_CONDITIONAL(CUPS_PPD_INSTALL, test x$cups_ppd_install = xyes)
+AM_CONDITIONAL(CUPS_PPD_INSTALL, test x$cups_ppd_install = xyes && test x$hpijs_only_build = xno)
 
 AC_MSG_CHECKING([for foomatic-rip-hplip install])
 AC_ARG_ENABLE(foomatic_rip_hplip_install,
@@ -379,6 +413,7 @@ fi
 
 epm_qt3=\#
 epm_qt4=\#
+if test "$hpcups_only_build" = "no" && test "$hpijs_only_build" = "no"; then
 if test "$qt3" = "yes" && test "$qt4" = "no"; then
    ui_toolkit=qt3
    epm_qt3=
@@ -387,6 +422,7 @@ elif test "$qt4" = "yes"; then
    epm_qt4=
 else
    ui_toolkit=no
+fi
 fi
 
 AC_MSG_CHECKING([for policykit])
@@ -399,6 +435,19 @@ else
    AC_MSG_RESULT(no)
 fi
 AM_CONDITIONAL(POLICYKIT_INSTALL, test x$policykit = xyes)
+
+# Determine where the PolicyKit policy file goes
+if test "$policykit" = "yes"; then
+   if test -d /usr/share/polkit-1; then
+      policykit_dir=/usr/share/polkit-1/actions
+   elif test -d /usr/share/PolicyKit; then
+      policykit_dir=/usr/share/PolicyKit/policy
+   else
+      policykit_dir=/usr/share/PolicyKit/policy
+   fi
+else
+   policykit_dir=
+fi
 
 AC_MSG_CHECKING(for host machine platform)
 machine=`uname -m`
@@ -443,7 +492,7 @@ if test "$hpijs_only_build" = "no"; then
    AC_CHECK_HEADERS(usb.h, ,[AC_MSG_ERROR([cannot find libusb-devel support], 11)])
 fi
 
-if test "$hpijs_only_build" = "no" && test "$lite_build" = "no"; then
+if test "$hpijs_only_build" = "no" && test "$lite_build" = "no" && test "$hpcups_only_build" = "no"; then
    AC_ARG_VAR([PYTHON], [Python interpreter/compiler command])
    AM_PATH_PYTHON([2.2])
    AC_MSG_CHECKING([for path to Python.h])
@@ -453,19 +502,19 @@ if test "$hpijs_only_build" = "no" && test "$lite_build" = "no"; then
    AC_CHECK_HEADERS(python$PYTHON_VERSION/Python.h, ,[AC_MSG_ERROR([cannot find python-devel support], 6)])
 fi
 
-if test "$hpijs_only_build" = "no" && test "$scan_build" = "yes"; then
+if test "$hpijs_only_build" = "no" && test "$scan_build" = "yes" && test "$hpcups_only_build" = "no"; then
    AC_CHECK_LIB([sane], [sane_open], [LIBS="$LIBS"], [AC_MSG_ERROR([cannot find sane-backends-devel support (or --disable-scan-build)], 12)])
 fi
 
 # The PKG_CHECK_MODULES macro requires the pkgconfig package (pkg-config). Otherwise you get a strange shell script error
 # "syntax error near upexpected token: DBUS".
-if test "$hpijs_only_build" = "no" && test "$lite_build" = "no" && test "$dbus_build" = "yes"; then
+if test "$hpijs_only_build" = "no" && test "$lite_build" = "no" && test "$hpcups_only_build" = "no" && test "$dbus_build" = "yes"; then
 #   PKG_CHECK_MODULES(DBUS, [dbus-1 >= 1.0.0, dbus-glib-1 >= 0.61],,[AC_MSG_ERROR([cannot find dbus-devel support: $DBUS_PKG_ERRORS], 14)])
    PKG_CHECK_MODULES([DBUS], [dbus-1 >= 1.0.0],,[AC_MSG_ERROR([cannot find dbus-devel support: $DBUS_PKG_ERRORS], 14)])
    AC_CHECK_LIB([dbus-1], [dbus_connection_open], [LIBS="$LIBS" AC_DEFINE([HAVE_DBUS])], [AC_MSG_ERROR([cannot find libdbus support], 13)])
 fi
 
-if test "$hpijs_only_build" = "no" && test "$lite_build" = "no" && test "$fax_build" = "yes" && test "$dbus_build" = "no"; then
+if test "$hpijs_only_build" = "no" && test "$lite_build" = "no" && test "$hpcups_only_build" = "no" && test "$fax_build" = "yes" && test "$dbus_build" = "no"; then
    AC_MSG_ERROR([fax requires dbus support], 15)
 fi
 
@@ -544,10 +593,15 @@ AC_SUBST(epm_qt4)
 AC_SUBST(epm_qt3)
 AC_SUBST(epm_full)
 AC_SUBST(epm_lite)
+AC_SUBST(epm_hpcups_only)
+AC_SUBST(epm_hpijs_only)
+AC_SUBST(epm_print_only_exclude)
 AC_SUBST(epm_scan)
 AC_SUBST(policykit)
+AC_SUBST(policykit_dir)
 AC_SUBST(hpijs_only_build)
 AC_SUBST(lite_build)
+AC_SUBST(hpcups_only_build)
 AC_SUBST(SNMPLIB)
 AC_SUBST(prefix)
 AC_SUBST(udev_acl_rules)

@@ -57,7 +57,7 @@ def logBarGraph(agent_level, agent_type, size=DEFAULT_BAR_GRAPH_SIZE, use_colors
             log.info(log.codes['yellow'])
         elif agent_type == AGENT_TYPE_BLUE:
             log.info(log.codes['blue'])
-        elif agent_type == AGENT_TYPE_BLACK:
+        elif agent_type in (AGENT_TYPE_BLACK, AGENT_TYPE_BLACK_B8800):
             log.info(log.codes['bold'])
         elif agent_type in (AGENT_TYPE_LG, AGENT_TYPE_G, AGENT_TYPE_PG):
             pass

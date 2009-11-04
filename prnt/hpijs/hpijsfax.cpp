@@ -236,7 +236,7 @@ int hpijsfax_get_cb (void *get_cb_data, IjsServerCtx *ctx, IjsJobId job_id,
 	}
 	else if (!strcmp (key, "ColorSpace"))
 	{
-		return snprintf (value_buf, value_size, pFaxStruct->ph.cs);
+	  return snprintf (value_buf, value_size, "%s", pFaxStruct->ph.cs);
 	}
 	else if (!strcmp (key, "PageImageFormat"))
 	{

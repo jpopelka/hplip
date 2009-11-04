@@ -52,12 +52,34 @@ USAGE = [ (__doc__, "", "name", True),
 mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
                     (INTERACTIVE_MODE, ), run_as_root_ok=True)
 
-opts, device_uri, printer_name, mode, ui_toolkit, loc = mod.parseStdOpts()
+mod.setUsage(module.USAGE_FLAG_NONE,
+    extra_options=[utils.USAGE_SPACE,
+    ("[OPTIONS] (General)", "", "header", False),
+    ("PolicyKit version:", "-v<version> or --version=<version>", "option", False)])
+
+opts, device_uri, printer_name, mode, ui_toolkit, loc = \
+    mod.parseStdOpts('v:', ["version="])
+
+user_pkit_version = None
+
+for o, a in opts:
+    if o in ('-v', '--version'):
+        try:
+            user_pkit_version = int(a)
+        except:
+            log.error("-v or --version require an integer argument")
+            sys.exit(1)
+        if user_pkit_version < 0 or user_pkit_version > 1:
+            log.error("invalid PolicyKit version...use 0 or 1")
+            sys.exit(1)
 
 PKIT = utils.to_bool(sys_conf.get('configure', 'policy-kit'))
 if PKIT:
     try:
         from base.pkit import *
+        pkit_version = policykit_version()
+        if not user_pkit_version is None:
+            pkit_version = user_pkit_version
         try:
             from dbus.mainloop.glib import DBusGMainLoop
         except ImportError:
@@ -76,7 +98,9 @@ if not os.geteuid() == 0:
     log.error("You must be root to run this utility.")
     sys.exit(1)
 
+log.debug("using PolicyKit version %d" % pkit_version)
+
 try:
-    BackendService().run()
+    BackendService().run(pkit_version)
 except dbus.DBusException, ex:
-    log.error("Unable to start service...possible configuration file problem")
+    log.error("Unable to start service (%s)" % ex)

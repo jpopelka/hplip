@@ -42,6 +42,7 @@
 #define BUG(args...) syslog(LOG_ERR, __FILE__ " " STRINGIZE(__LINE__) ": " args)
 
 static int verbose;
+static char homedir[255] = "";
 
 static void usage()
 {
@@ -54,9 +55,112 @@ static void usage()
    fprintf(stdout, "usage: hp-mkuri -l /dev/parportx\n");
    fprintf(stdout, "usage: hp-mkuri -m hostname [-p port]\n");
    fprintf(stdout, "usage: hp-mkuri -o (probe)\n");
-   fprintf(stdout, "usage: hp-mkuri -c (check support)\n");
-   fprintf(stdout, "   returns: 0=yes, 1=no, 2=plugin_required, 3=plugin_optional\n");
+   fprintf(stdout, "usage: hp-mkuri -c [-n (no notifier)] (check support)\n");
+   fprintf(stdout, "\nSupport matrix:\n");
+   fprintf(stdout, "+--------------+---------+-----+-----------------+-----------------+\n");
+   fprintf(stdout, "| return value | printer | fax | plugin_required | plugin_optional |\n");
+   fprintf(stdout, "+--------------+---------+-----+-----------------+-----------------+\n");
+   fprintf(stdout, "|       0      |   yes   |     |                 |                 |\n");
+   fprintf(stdout, "+--------------+---------+-----+-----------------+-----------------+\n");
+   fprintf(stdout, "|       1      |    *    |  *  |        *        |        *        |\n");
+   fprintf(stdout, "+--------------+---------+-----+-----------------+-----------------+\n");
+   fprintf(stdout, "|       2      |   yes   |     |       yes       |                 |\n");
+   fprintf(stdout, "+--------------+---------+-----+-----------------+-----------------+\n");
+   fprintf(stdout, "|       3      |   yes   |     |                 |       yes       |\n");
+   fprintf(stdout, "+--------------+---------+-----+-----------------+-----------------+\n");
+   fprintf(stdout, "|       4      |   yes   | yes |                 |                 |\n");
+   fprintf(stdout, "+--------------+---------+-----+-----------------+-----------------+\n");
+   fprintf(stdout, "|       5      |   yes   | yes |       yes       |                 |\n");
+   fprintf(stdout, "+--------------+---------+-----+-----------------+-----------------+\n");
+   fprintf(stdout, "|       6      |   yes   | yes |                 |       yes       |\n");
+   fprintf(stdout, "+--------------+---------+-----+-----------------+-----------------+\n");
+   fprintf(stdout, "    * no support or error\n");
 } /* usage */
+
+static int GetPair(char *buf, int buf_len, char *key, char *value, char **tail)
+{
+   int i=0, j;
+
+   key[0] = 0;
+   value[0] = 0;
+
+   if (buf[i] == '#')
+   {
+      for (; buf[i] != '\n' && i < buf_len; i++);  /* eat comment line */
+      if (buf[i] == '\n')
+         i++;   /* bump past '\n' */
+   }
+
+   j = 0;
+   while ((buf[i] != '=') && (i < buf_len) && (j < HPMUD_LINE_SIZE))
+      key[j++] = buf[i++];
+   for (j--; key[j] == ' ' && j > 0; j--);  /* eat white space before = */
+   key[++j] = 0;
+
+   if (buf[i] == '=')
+      for (i++; buf[i] == ' ' && i < buf_len; i++);  /* eat white space after = */
+
+   j = 0;
+   while ((buf[i] != '\n') && (i < buf_len) && (j < HPMUD_LINE_SIZE))
+      value[j++] = buf[i++];
+   for (j--; value[j] == ' ' && j > 0; j--);  /* eat white space before \n */
+   value[++j] = 0;
+
+   if (buf[i] == '\n')
+     i++;   /* bump past '\n' */
+
+   if (tail != NULL)
+      *tail = buf + i;  /* tail points to next line */
+
+   return i;
+}
+
+static int ReadConfig()
+{
+   char key[HPMUD_LINE_SIZE];
+   char value[HPMUD_LINE_SIZE];
+   char rcbuf[255];
+   char section[32];
+   char *tail;
+   FILE *inFile = NULL;
+   int stat=1;
+
+   homedir[0] = 0;
+        
+   if((inFile = fopen(CONFDIR "/hplip.conf", "r")) == NULL) 
+   {
+      BUG("unable to open %s: %m\n", CONFDIR "/hplip.conf");
+      goto bugout;
+   } 
+
+   section[0] = 0;
+
+   /* Read the config file */
+   while ((fgets(rcbuf, sizeof(rcbuf), inFile) != NULL))
+   {
+      if (rcbuf[0] == '[')
+      {
+         strncpy(section, rcbuf, sizeof(section)); /* found new section */
+         continue;
+      }
+
+      GetPair(rcbuf, strlen(rcbuf), key, value, &tail);
+
+      if ((strncasecmp(section, "[dirs]", 6) == 0) && (strcasecmp(key, "home") == 0))
+      {
+         strncpy(homedir, value, sizeof(homedir));
+         break;  /* done */
+      }
+   }
+        
+   stat = 0;
+
+bugout:        
+   if (inFile != NULL)
+      fclose(inFile);
+         
+   return stat;
+}
 
 static int generalize_model(const char *sz, char *buf, int bufSize)
 {
@@ -204,15 +308,16 @@ bugout:
     return stat;
 } /* notify */
 
-static int check_support(void)
+static int check_support(int send_notify)
 {
-   struct hpmud_model_attributes ma;
    struct stat sb;
-   char uri[256];
    char model[256];
    int ret=1, plugin_installed=1;
    const char *pm;
    char m[256];
+   char datfile[256];
+   char value[32];
+   int support, plugin, fax;
 
    /* Get hp model from environment variables. */
    if ((pm = getenv("hp_model")))
@@ -231,50 +336,67 @@ static int check_support(void)
       BUG("invalid parameter(s)\n");
       usage();
       goto bugout;
-   }   
+   } 
 
    generalize_model(model, m, sizeof(m));
-   snprintf(uri, sizeof(uri), "hp:/usb/%s?serial=0", m);
+   snprintf(model, sizeof(model), "[%s]", m);
+
+   if (ReadConfig())
+      goto bugout;
+
+   snprintf(datfile, sizeof(datfile), "%s/data/models/models.dat", homedir);
+
+   if (hpmud_get_key_value(datfile, model, "support-type", value, sizeof(value)) != HPMUD_R_OK)
+      goto bugout;
+   support = strtol(value, NULL, 10);
+   if (hpmud_get_key_value(datfile, model, "plugin", value, sizeof(value)) != HPMUD_R_OK)
+      goto bugout;
+   plugin = strtol(value, NULL, 10);
+   if (hpmud_get_key_value(datfile, model, "fax-type", value, sizeof(value)) != HPMUD_R_OK)
+      goto bugout;
+   fax = strtol(value, NULL, 10);
 
    /* See if device is supported by hplip. */
-   hpmud_query_model(uri, &ma); 
-   if (ma.support != HPMUD_SUPPORT_TYPE_HPLIP)
+   if (support == HPMUD_SUPPORT_TYPE_NONE)
    {
-      BUG("%s is not supported by HPLIP %s\n", model, VERSION);
+      BUG("%s is not supported by HPLIP %s\n", pm, VERSION);
       goto bugout;
    }
 
    if (stat("/etc/udev/rules.d/86-hpmud-hp_laserjet_1018.rules", &sb) == -1) 
       plugin_installed=0;
 
-   /* See if device requires a Plugin. */
-   switch (ma.plugin)
+   if (send_notify && !plugin_installed)
    {
-      case HPMUD_PLUGIN_TYPE_REQUIRED:
-         if (plugin_installed)
-            ret = 0;
-         else
-         {
-            ret = 2;
-            BUG("%s requires a proprietary plugin\n", model);
-            notify(model, "requires a proprietary plugin, run hp-setup", 30000);
-         }
-         break;
-      case HPMUD_PLUGIN_TYPE_OPTIONAL:
-         if (plugin_installed)
-            ret = 0;
-         else
-         {
-            ret = 3;
-            BUG("%s has a optional proprietary plugin\n", model);
-            notify(model, "has a optional proprietary plugin, run hp-setup", 30000);
-         }
-         break;
-      case HPMUD_PLUGIN_TYPE_NONE:
-      default:
-         ret = 0;
-         break;
-   }         
+      /* See if device requires a Plugin. */
+      switch (plugin)
+      {
+         case HPMUD_PLUGIN_TYPE_REQUIRED:
+            BUG("%s requires a proprietary plugin\n", pm);
+            notify(pm, "requires a proprietary plugin, run hp-setup", 30000);
+            break;
+         case HPMUD_PLUGIN_TYPE_OPTIONAL:
+            BUG("%s has a optional proprietary plugin\n", pm);
+            notify(pm, "has a optional proprietary plugin, run hp-setup", 30000);
+            break;
+         default:
+            break;
+      }         
+   }
+
+   ret = 0;
+   if (plugin == HPMUD_PLUGIN_TYPE_REQUIRED)
+      ret = 2;
+   else if (plugin == HPMUD_PLUGIN_TYPE_OPTIONAL)
+      ret = 3;
+   if (fax > 0)
+   {
+      ret = 4;
+      if (plugin == HPMUD_PLUGIN_TYPE_REQUIRED)
+         ret = 5;
+      else if (plugin == HPMUD_PLUGIN_TYPE_OPTIONAL)
+         ret = 6;
+   }
 
 bugout:
    return ret;
@@ -289,13 +411,13 @@ int main(int argc, char *argv[])
    char pp[HPMUD_LINE_SIZE];  /* parallel port device */
    char uri[HPMUD_LINE_SIZE];
    char host[HPMUD_LINE_SIZE];
-   int i, port=1, ret=1, probe=0, support=0;
+   int i, port=1, ret=1, probe=0, support=0, send_notify=1;
    enum HPMUD_RESULT stat;
    char buf[HPMUD_LINE_SIZE*64];
    int cnt, bytes_read;
 
    ip[0] = bn[0] = dn[0] = pp[0] = uri[0] = sn[0] = host[0] = 0;
-   while ((i = getopt(argc, argv, "vhoci:p:b:d:l:s:z:")) != -1)
+   while ((i = getopt(argc, argv, "vhocni:p:b:d:l:s:z:")) != -1)
    {
       switch (i)
       {
@@ -328,6 +450,9 @@ int main(int argc, char *argv[])
          break;
       case 'v':
          verbose++;
+         break;
+      case 'n':
+         send_notify=0;
          break;
       case 'h':
          usage();
@@ -411,7 +536,7 @@ int main(int argc, char *argv[])
    ret = 0;
 
    if (support)
-      ret = check_support();
+      ret = check_support(send_notify);
 
 bugout:
    exit(ret);

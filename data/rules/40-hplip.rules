@@ -120,6 +120,8 @@ ATTRS{idVendor}=="03f0", ATTRS{idProduct}=="d002", GROUP="lp", ENV{ID_HPLIP}="1"
 ATTRS{idVendor}=="03f0", ATTRS{idProduct}=="bd02", GROUP="lp", ENV{ID_HPLIP}="1"
 # Photosmart_B8500_series
 ATTRS{idVendor}=="03f0", ATTRS{idProduct}=="d102", GROUP="lp", ENV{ID_HPLIP}="1"
+# Photosmart_A640_series
+ATTRS{idVendor}=="03f0", ATTRS{idProduct}=="7902", GROUP="lp", ENV{ID_HPLIP}="1"
 
 # Check for Business Inkjet products (0x03f0xx12).
 ATTRS{idVendor}=="03f0", ATTRS{idProduct}=="??12", GROUP="lp", ENV{ID_HPLIP}="1"

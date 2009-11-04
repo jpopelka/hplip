@@ -612,12 +612,14 @@ enum HPMUD_RESULT hpmud_get_key_value(const char *file, const char *section, con
       if ((strcasecmp(new_section, section) == 0) && (strcasecmp(new_key, key) == 0))
       {
          strncpy(value, new_value, value_size);
+         stat = HPMUD_R_OK;
          break;  /* done */
       }
    }
-        
-   stat = HPMUD_R_OK;
 
+   if (stat != HPMUD_R_OK)
+      BUG("unable to find %s %s in %s\n", section, key, file);
+        
 bugout:        
    if (inFile != NULL)
       fclose(inFile);
