@@ -146,6 +146,25 @@ DRIVER_ERROR LJColor::StartPage(JobAttributes *pJA)
     return NO_ERROR;
 }
 
+DRIVER_ERROR LJColor::FormFeed()
+{
+    DRIVER_ERROR    err;
+    err = Cleanup();
+    err = m_pSystemServices->Send((const BYTE *) "\x0C", 1);
+    return err;
+}
+
+DRIVER_ERROR LJColor::EndJob()
+{
+    DRIVER_ERROR    err = NO_ERROR;
+    err = Cleanup();
+    err = m_pSystemServices->Send((const BYTE *) "\x1B*rC", 4);
+    err = m_pSystemServices->Send(Reset, sizeof(Reset));
+    if (err == NO_ERROR)
+        err = m_pSystemServices->Send(UEL, sizeof(UEL));
+    return err;
+}
+
 DRIVER_ERROR LJColor::Encapsulate(RASTERDATA *InputRaster, bool bLastPlane)
 {
     DRIVER_ERROR    err = NO_ERROR;

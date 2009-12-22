@@ -57,6 +57,8 @@ Lidil::Lidil() : Encapsulator()
     m_lidil_version = 1;
     m_iBytesPerSwing = 2;
     m_iColorPenResolution = 300;
+    m_iBlackPenResolution = 1200;
+    m_iNumBlackNozzles    = 400;
     m_cPrintDirection = PRNDRN_LEFTTORIGHT;
     m_SwathData = NULL;
     m_sRefCount = 6;
@@ -69,6 +71,7 @@ Lidil::Lidil() : Encapsulator()
     m_cKtoCVertAlign = 12;
     m_cPtoCVertAlign = 6;
     m_pLidilCompress = NULL;
+    m_szCompressBuf  = NULL;
     Int16Bytes    val;
     val.int_value = 0x0102;
     if (val.char_val[0] == 0x01)
@@ -80,7 +83,7 @@ Lidil::Lidil() : Encapsulator()
 Lidil::~Lidil()
 {
     if (m_pLidilCompress)
-	    delete m_pLidilCompress;
+        delete m_pLidilCompress;
     if (m_SwathData)
         delete [] m_SwathData;
     if (m_szCompressBuf)
@@ -140,6 +143,14 @@ DRIVER_ERROR Lidil::StartJob(SystemServices *pSystemServices, JobAttributes *pJA
         m_lidil_version = 2;
         m_iBytesPerSwing = 4;
         m_iColorPenResolution = 600;
+    }
+    else if (!strcmp(m_pJA->printer_platform, "dj2600"))
+    {
+        m_lidil_version = 2;
+        m_iBytesPerSwing = 4;
+        m_iColorPenResolution = 600;
+        m_iBlackPenResolution = 600;
+        m_iNumBlackNozzles = 336;
     }
     if (m_pQA->print_quality == BEST_QUALITY && m_pQA->media_type == MEDIATYPE_PHOTO)
     {
@@ -523,7 +534,7 @@ void    Lidil::addInt32(Int32    iVal)
     if (m_bLittleEndian)
     {
         for (int i = 3; i > -1; i--)
-	    *cur_pcl_buffer_ptr++ = val.char_val[i];
+        *cur_pcl_buffer_ptr++ = val.char_val[i];
     }
     else
     {
@@ -539,7 +550,7 @@ void    Lidil::addInt16(Int16    iVal)
     if (m_bLittleEndian)
     {
         *cur_pcl_buffer_ptr++ = val.char_val[1];
-	*cur_pcl_buffer_ptr++ = val.char_val[0];
+    *cur_pcl_buffer_ptr++ = val.char_val[0];
     }
     else
     {
@@ -589,7 +600,7 @@ DRIVER_ERROR Lidil::loadSweepData (BYTE *imagedata, int imagesize)
     if (mem_needed < LDLPACKET_MINSIZE)
     {
         memset(pcl_buffer + mem_needed-1, 0xFF, LDLPACKET_MINSIZE - mem_needed);
-	mem_needed = LDLPACKET_MINSIZE;
+    mem_needed = LDLPACKET_MINSIZE;
     }
 
     BYTE    *compressed_dataptr = imagedata;
@@ -614,7 +625,7 @@ DRIVER_ERROR Lidil::loadSweepData (BYTE *imagedata, int imagesize)
 DRIVER_ERROR Lidil::printSweep (UInt32 SweepSize,
                                 bool ColorPresent,
                                 bool BlackPresent,
-			        bool PhotoPresent,
+                    bool PhotoPresent,
                                 Int32 VerticalPosition,
                                 Int32 LeftEdge,
                                 Int32 RightEdge,
@@ -717,124 +728,123 @@ DRIVER_ERROR Lidil::printSweep (UInt32 SweepSize,
     uiAffectedColors = offset;
     if (BlackPresent == true)
     {
-	uiAffectedColors = 0x1;
+    uiAffectedColors = 0x1;
     }
     if(BlackPresent == false && PhotoPresent == false)
     {
-	offset = eLDLCyan;
-	colormask=0x02;
-	uiAffectedColors |= 0x0000000e;
+    offset = eLDLCyan;
+    colormask=0x02;
+    uiAffectedColors |= 0x0000000e;
     }
     else if (BlackPresent == false && PhotoPresent == true)
     {
-		    if (ColorPresent == true)
-		    {
-			    offset = eLDLCyan;
-			    colormask=0x02;
-	    uiAffectedColors |= 0x0000007e;
-		    }
-		    else
-		    {
-			    offset = eLDLLoBlack;
-			    colormask=0x40;
-	    uiAffectedColors |= 0x00000070;
-		    }
+        if (ColorPresent == true)
+        {
+            offset = eLDLCyan;
+            colormask=0x02;
+            uiAffectedColors |= 0x0000007e;
+        }
+        else
+        {
+            offset = eLDLLoBlack;
+            colormask=0x40;
+            uiAffectedColors |= 0x00000070;
+        }
     }
 
     int actv_colr_index = cur_pcl_buffer_ptr - pcl_buffer;
     int iColorRes = 300;
     if (m_lidil_version == 1)
     {
-	cur_pcl_buffer_ptr += 2;
+        cur_pcl_buffer_ptr += 2;
     }
     else
     {
-	iColorRes = 600;
+        iColorRes = 600;
     }
     for(UInt16 i = offset; colr_found < colorcount && i < eLDLMaxColor; i++)
     {
-	colr_found++;
-	colrpresent = colrpresent | colormask;
+        colr_found++;
+        colrpresent = colrpresent | colormask;
 
-	if (m_lidil_version == 2)
-	{
-	    addInt32 (uiAffectedColors);
-	}
-	addInt32 (LeftEdge);
-	addInt32 (RightEdge);
-	addInt32 (LeftEdge);
-	addInt32 (RightEdge);
+        if (m_lidil_version == 2)
+        {
+            addInt32 (uiAffectedColors);
+        }
+        addInt32 (LeftEdge);
+        addInt32 (RightEdge);
+        addInt32 (LeftEdge);
+        addInt32 (RightEdge);
 
-	if ((i == 0 && m_lidil_version == 1) || (BlackPresent && m_lidil_version == 2))
-	{
-	    iDataRes = 600;
-	    iPrintRes = 1200;
-	}
-	else
-	{
-	    iDataRes  = iColorRes; // 300;
-	    iPrintRes = iColorRes; // 300;
-	}
-	addInt16 (iDataRes);         // Vertical Data Resolution
-	addInt16 (iPrintRes);        // Vertical Print Resolution
+        if ((i == 0 && m_lidil_version == 1) || (BlackPresent && m_lidil_version == 2))
+        {
+            iDataRes = 600;
+            iPrintRes = m_iBlackPenResolution;
+        }
+        else
+        {
+            iDataRes  = iColorRes; // 300;
+            iPrintRes = iColorRes; // 300;
+        }
+        addInt16 (iDataRes);         // Vertical Data Resolution
+        addInt16 (iPrintRes);        // Vertical Print Resolution
 
-	if (m_lidil_version == 2)
-	{
-	    addInt16 (m_pQA->horizontal_resolution * m_iBitDepth);   // Horizontal Data Resolution // Collie
-	}
-	else
-	{
-	    addInt16 (m_pQA->horizontal_resolution);
-	}
+        if (m_lidil_version == 2)
+        {
+            addInt16 (m_pQA->horizontal_resolution * m_iBitDepth);   // Horizontal Data Resolution // Collie
+        }
+        else
+        {
+            addInt16 (m_pQA->horizontal_resolution);
+        }
 
-		    if (m_pQA->horizontal_resolution == 300)
-		    {
-			    addInt16 (600);   // Force 2 drop for draft mode.
-		    }
-	else
-		    {
-	    if (m_lidil_version == 2)
-	    {
-				addInt16 (m_pQA->horizontal_resolution * m_iBitDepth);   // Horizontal Print Resolution // Collie
-	    }
-	    else
-	    {
-		addInt16 (m_pQA->horizontal_resolution);
-	    }
-		    }
-	addInt16 (sFirstNozzle);
-	if (sLastNozzle == 0)
-	{
-	    int     iTmp = m_iRasterCount / m_pPM->dyeCount;;
-	    if (m_lidil_version == 2)
-	    {
-		addInt16 (sFirstNozzle - 1 + ((iTmp * iPrintRes) / (m_pQA->vertical_resolution * m_iBitDepth))); // Collie
-	    }
-	    else
-	    {
-		addInt16 (sFirstNozzle - 1 + ((iTmp * iPrintRes) / (m_pQA->vertical_resolution)));
-	    }
-	}
-	else
-	{
-	    addInt16 (sLastNozzle);
-	}
+        if (m_pQA->horizontal_resolution == 300)
+        {
+            addInt16 (600);   // Force 2 drop for draft mode.
+        }
+        else
+        {
+            if (m_lidil_version == 2)
+            {
+                addInt16 (m_pQA->horizontal_resolution * m_iBitDepth);   // Horizontal Print Resolution // Collie
+            }
+            else
+            {
+            addInt16 (m_pQA->horizontal_resolution);
+            }
+        }
+        addInt16 (sFirstNozzle);
+        if (sLastNozzle == 0)
+        {
+            int     iTmp = m_iRasterCount / m_pPM->dyeCount;;
+            if (m_lidil_version == 2)
+            {
+                addInt16 (sFirstNozzle - 1 + ((iTmp * iPrintRes) / (m_pQA->vertical_resolution * m_iBitDepth))); // Collie
+            }
+            else
+            {
+                addInt16 (sFirstNozzle - 1 + ((iTmp * iPrintRes) / (m_pQA->vertical_resolution)));
+            }
+        }
+        else
+        {
+            addInt16 (sLastNozzle);
+        }
 
-	*cur_pcl_buffer_ptr++ = 0;    // Vertical Alignment
-	colormask = colormask << 1;
-	if (m_lidil_version == 2)
-	{
-	    break;
-	}
-
+        *cur_pcl_buffer_ptr++ = 0;    // Vertical Alignment
+        colormask = colormask << 1;
+        if (m_lidil_version == 2)
+        {
+            break;
+        }
     }
     // write the active color field
     if (m_lidil_version == 1)
     {
-	BYTE    *tmp = cur_pcl_buffer_ptr;
-	cur_pcl_buffer_ptr = pcl_buffer + actv_colr_index;
-	addInt16 (colrpresent);
-	cur_pcl_buffer_ptr = tmp;
+        BYTE    *tmp = cur_pcl_buffer_ptr;
+        cur_pcl_buffer_ptr = pcl_buffer + actv_colr_index;
+        addInt16 (colrpresent);
+        cur_pcl_buffer_ptr = tmp;
     }
 
     if (m_lidil_version == 2)
@@ -875,14 +885,16 @@ DRIVER_ERROR Lidil::allocateSwathBuffers()
 
     m_sSwathHeight = SWATH_HEIGHT;
 
-    /*
-     *  This swath buffer cannot be greater than the number of nozzles - 400 for black
-     *  and 100 for color - we can use.
-     */
+/*
+ *  This swath buffer cannot be greater than the number of nozzles - 400 for black
+ *  and 100 for color - we can use.
+ */
+
+    int    iAdjHeight = (m_iNumBlackNozzles / 32) * 8;
     if (m_pPM->dyeCount == 1)
     {
         m_sSwathHeight = m_sSwathHeight * 4;
-        if (m_sSwathHeight * 1200 / m_pQA->vertical_resolution > 400)
+        if ((int) (m_sSwathHeight * 1200 / m_pQA->vertical_resolution) > m_iNumBlackNozzles)
             m_sSwathHeight = m_pQA->vertical_resolution / 3;
     }
     else if (m_pQA->print_quality != DRAFT_QUALITY && m_pQA->vertical_resolution > 300 && m_pPM->dyeCount > 1 && m_iBitDepth == 1) // Collie change
@@ -892,10 +904,10 @@ DRIVER_ERROR Lidil::allocateSwathBuffers()
             m_sSwathHeight = 200;
     }
     else if (m_iBitDepth == 2)
-        m_sSwathHeight = 96 * 4;
+        m_sSwathHeight = iAdjHeight * 4;
 
     if (m_pQA->print_quality == NORMAL_QUALITY)
-        m_sSwathHeight = 96 * 2;
+        m_sSwathHeight = iAdjHeight * 2;
 
     if (m_pQA->print_quality == DRAFT_QUALITY && m_pPM->dyeCount != 1)
     {
@@ -1083,7 +1095,7 @@ DRIVER_ERROR Lidil::processSwath()
 
 DRIVER_ERROR Lidil::processPhotoSwath(bool    bPhotoPresent,
                                       bool    bColorPresent,
-									  BYTE    mask)
+                                      BYTE    mask)
 {
     if (!bPhotoPresent)
     {
@@ -1123,166 +1135,166 @@ DRIVER_ERROR Lidil::processPhotoSwath(bool    bPhotoPresent,
     if (size == 0)
         return NO_ERROR;
 
-	if (size % m_iBytesPerSwing)
-		size = ((size/m_iBytesPerSwing) + 1) * m_iBytesPerSwing;
-	if (m_lidil_version == 1)
-	{
-		RightEdge = LeftEdge + (size * 8 * 600 / m_pQA->horizontal_resolution - 1 * (600 / m_pQA->vertical_resolution)) *
-								(DEVUNITS_XBOW / 600);
-	}
-	else
-	{
-		RightEdge = LeftEdge + (size * 8 * 600 / m_pQA->horizontal_resolution - 1 * (600 / m_pQA->vertical_resolution)) *
-								(DEVUNITS_XBOW / (600 * m_iBitDepth));
-	}
-	Int16   sLastNozzle;
-	Int16   sFirstNozzle = 1;
-	unsigned int    uSweepSize;
-	int     jDelta = m_pQA->vertical_resolution / m_iColorPenResolution;
-	jDelta *= m_iBitDepth;
+    if (size % m_iBytesPerSwing)
+        size = ((size/m_iBytesPerSwing) + 1) * m_iBytesPerSwing;
+    if (m_lidil_version == 1)
+    {
+        RightEdge = LeftEdge + (size * 8 * 600 / m_pQA->horizontal_resolution - 1 * (600 / m_pQA->vertical_resolution)) *
+                                (DEVUNITS_XBOW / 600);
+    }
+    else
+    {
+        RightEdge = LeftEdge + (size * 8 * 600 / m_pQA->horizontal_resolution - 1 * (600 / m_pQA->vertical_resolution)) *
+                                (DEVUNITS_XBOW / (600 * m_iBitDepth));
+    }
+    Int16   sLastNozzle;
+    Int16   sFirstNozzle = 1;
+    unsigned int    uSweepSize;
+    int     jDelta = m_pQA->vertical_resolution / m_iColorPenResolution;
+    jDelta *= m_iBitDepth;
 
-	uiSwathSize = size * iColors * sCurSwathHeight / jDelta;
+    uiSwathSize = size * iColors * sCurSwathHeight / jDelta;
 
-	uSweepSize = sCurSwathHeight * m_iBytesPerSwing / jDelta;
-	n = LDL_MAX_IMAGE_SIZE / (uSweepSize);
-	count = 0;
+    uSweepSize = sCurSwathHeight * m_iBytesPerSwing / jDelta;
+    n = LDL_MAX_IMAGE_SIZE / (uSweepSize);
+    count = 0;
 
-	if (m_iBitDepth == 2)
-		iStartRaster = (4 - (iStartRaster+1)) % 4;
+    if (m_iBitDepth == 2)
+        iStartRaster = (4 - (iStartRaster+1)) % 4;
 
-	if (m_lidil_version == 2)
-	{
-		iStartRaster = 0;   // Collie - REVISIT
-	}
+    if (m_lidil_version == 2)
+    {
+        iStartRaster = 0;   // Collie - REVISIT
+    }
 
-	sLastNozzle = sFirstNozzle - 1 + sCurSwathHeight / jDelta;
+    sLastNozzle = sFirstNozzle - 1 + sCurSwathHeight / jDelta;
 
-	BYTE *cb = m_szCompressBuf + 16;    // load sweep command
-	memset (m_szCompressBuf, 0x0, LDL_MAX_IMAGE_SIZE * (m_iBytesPerSwing / 2));
+    BYTE *cb = m_szCompressBuf + 16;    // load sweep command
+    memset (m_szCompressBuf, 0x0, LDL_MAX_IMAGE_SIZE * (m_iBytesPerSwing / 2));
 
-	// 1200 dpi split into two
-	int    ib = 0;
+    // 1200 dpi split into two
+    int    ib = 0;
 
-	if (m_pQA->vertical_resolution > 300 && m_pQA->print_quality != DRAFT_QUALITY)
-	{
-		iOffset = (sCurSwathHeight / (4 * m_iBitDepth));
-		iOffset = iOffset + iOffset * ((m_cPassNumber) % (4 * m_iBitDepth));
-	}
+    if (m_pQA->vertical_resolution > 300 && m_pQA->print_quality != DRAFT_QUALITY)
+    {
+        iOffset = (sCurSwathHeight / (4 * m_iBitDepth));
+        iOffset = iOffset + iOffset * ((m_cPassNumber) % (4 * m_iBitDepth));
+    }
 
-	BYTE    cVertAlign = 0;
+    BYTE    cVertAlign = 0;
 
-	if (bColorPresent)
-	{
-		cVertAlign = m_cPtoCVertAlign;
-	}
+    if (bColorPresent)
+    {
+        cVertAlign = m_cPtoCVertAlign;
+    }
 
-	for (ib = 0; ib < (int) m_iBitDepth; ib++)
-	{
-		if (m_cPrintDirection == PRNDRN_RIGHTTOLEFT)
-		{
-			start = size - m_iBytesPerSwing;
-			delta = -m_iBytesPerSwing;
-		}
-		else
-		{
-			start = 0;
-			delta = m_iBytesPerSwing;
-		}
+    for (ib = 0; ib < (int) m_iBitDepth; ib++)
+    {
+        if (m_cPrintDirection == PRNDRN_RIGHTTOLEFT)
+        {
+            start = size - m_iBytesPerSwing;
+            delta = -m_iBytesPerSwing;
+        }
+        else
+        {
+            start = 0;
+            delta = m_iBytesPerSwing;
+        }
 
-		err = printSweep (uiSwathSize, bColorPresent, false, bPhotoPresent,
+        err = printSweep (uiSwathSize, bColorPresent, false, bPhotoPresent,
                                   m_iVertPosn+cVertAlign, LeftEdge, RightEdge, m_cPrintDirection,
                                   sFirstNozzle, sLastNozzle);
                 ERRCHECK;
 
-		i = start + ib * m_iImageWidth;     // 1200 dpi split into two
-		for (int l = 0; l < size; l += m_iBytesPerSwing)   // Collie
-		{
-			for (int k = StartColor+1; k < LastColor; k++)
-			{
-				mask = csavMask;
-				for (j = iOffset + iStartRaster; j < sCurSwathHeight; j += jDelta)
-				{
-					for (int is = 0; is < m_iBytesPerSwing; is++)
-					{
-						*cb++ = m_SwathData[k][j][i+is]   & mask;
-					}
-					mask = ~mask;
-				}
-				for (j = iStartRaster; j < iOffset; j += jDelta)
-				{
-					for (int is = 0; is < m_iBytesPerSwing; is++)
-					{
-						*cb++ = m_SwathData[k][j][i+is]   & mask;
-					}
-					mask = ~mask;
-				}
+        i = start + ib * m_iImageWidth;     // 1200 dpi split into two
+        for (int l = 0; l < size; l += m_iBytesPerSwing)   // Collie
+        {
+            for (int k = StartColor+1; k < LastColor; k++)
+            {
+                mask = csavMask;
+                for (j = iOffset + iStartRaster; j < sCurSwathHeight; j += jDelta)
+                {
+                    for (int is = 0; is < m_iBytesPerSwing; is++)
+                    {
+                        *cb++ = m_SwathData[k][j][i+is]   & mask;
+                    }
+                    mask = ~mask;
+                }
+                for (j = iStartRaster; j < iOffset; j += jDelta)
+                {
+                    for (int is = 0; is < m_iBytesPerSwing; is++)
+                    {
+                        *cb++ = m_SwathData[k][j][i+is]   & mask;
+                    }
+                    mask = ~mask;
+                }
 
-				count++;
-				if (count == n)
-				{
-					err = loadSweepData (m_szCompressBuf, (unsigned int) (cb - m_szCompressBuf-16));
-					memset (m_szCompressBuf, 0, LDL_MAX_IMAGE_SIZE * (m_iBytesPerSwing / 2));
-					cb = m_szCompressBuf+16;
-					count = 0;
-					ERRCHECK;
-				}
-			}
-			mask = csavMask;
-			for (j = iOffset + iStartRaster; j < sCurSwathHeight; j += jDelta)
-			{
-				for (int is = 0; is < m_iBytesPerSwing; is++)
-				{
-					*cb++ = m_SwathData[0][j][i + is]   & mask;
-				}
-				mask = ~mask;
-			}
-			for (j = iStartRaster; j < iOffset; j += jDelta)
-			{
-				for (int is = 0; is < m_iBytesPerSwing; is++)
-				{
-					*cb++ = m_SwathData[0][j][i + is]   & mask;
-				}
-				mask = ~mask;
-			}
+                count++;
+                if (count == n)
+                {
+                    err = loadSweepData (m_szCompressBuf, (unsigned int) (cb - m_szCompressBuf-16));
+                    memset (m_szCompressBuf, 0, LDL_MAX_IMAGE_SIZE * (m_iBytesPerSwing / 2));
+                    cb = m_szCompressBuf+16;
+                    count = 0;
+                    ERRCHECK;
+                }
+            }
+            mask = csavMask;
+            for (j = iOffset + iStartRaster; j < sCurSwathHeight; j += jDelta)
+            {
+                for (int is = 0; is < m_iBytesPerSwing; is++)
+                {
+                    *cb++ = m_SwathData[0][j][i + is]   & mask;
+                }
+                mask = ~mask;
+            }
+            for (j = iStartRaster; j < iOffset; j += jDelta)
+            {
+                for (int is = 0; is < m_iBytesPerSwing; is++)
+                {
+                    *cb++ = m_SwathData[0][j][i + is]   & mask;
+                }
+                mask = ~mask;
+            }
 
-			count++;
-			if (count == n)
-			{
-				err = loadSweepData (m_szCompressBuf, (unsigned int) (cb - m_szCompressBuf-16));
-				memset (m_szCompressBuf, 0, LDL_MAX_IMAGE_SIZE * (m_iBytesPerSwing / 2));
-				cb = m_szCompressBuf+16;
-				count = 0;
-				ERRCHECK;
-			}
-			i = i + delta;
-		}
-		if (count != 0)
-		{
-			err = loadSweepData (m_szCompressBuf, (unsigned int) (cb - m_szCompressBuf-16));
-			memset (m_szCompressBuf, 0, LDL_MAX_IMAGE_SIZE * (m_iBytesPerSwing / 2));
-			cb = m_szCompressBuf+16;
-			count = 0;
-			ERRCHECK;
-		}
+            count++;
+            if (count == n)
+            {
+                err = loadSweepData (m_szCompressBuf, (unsigned int) (cb - m_szCompressBuf-16));
+                memset (m_szCompressBuf, 0, LDL_MAX_IMAGE_SIZE * (m_iBytesPerSwing / 2));
+                cb = m_szCompressBuf+16;
+                count = 0;
+                ERRCHECK;
+            }
+            i = i + delta;
+        }
+        if (count != 0)
+        {
+            err = loadSweepData (m_szCompressBuf, (unsigned int) (cb - m_szCompressBuf-16));
+            memset (m_szCompressBuf, 0, LDL_MAX_IMAGE_SIZE * (m_iBytesPerSwing / 2));
+            cb = m_szCompressBuf+16;
+            count = 0;
+            ERRCHECK;
+        }
 
-		if (m_bBidirectionalPrintingOn)
-			m_cPrintDirection = (m_cPrintDirection + 1) % 2;
+        if (m_bBidirectionalPrintingOn)
+            m_cPrintDirection = (m_cPrintDirection + 1) % 2;
 
-		if (m_lidil_version == 2) // Collie
-		{
-			break;
-		}
-		LeftEdge += 2;
-		RightEdge += 2;
+        if (m_lidil_version == 2) // Collie
+        {
+            break;
+        }
+        LeftEdge += 2;
+        RightEdge += 2;
 
-	}   // 1200 dpi split into two - end of for ib = 0 loop
+    }   // 1200 dpi split into two - end of for ib = 0 loop
     return err;
 }
 
 DRIVER_ERROR Lidil::processColorSwath(bool    bPhotoPresent,
                                       bool    bColorPresent,
                                       bool    bBlackPresent,
-				      short   *sColorSize,
+                      short   *sColorSize,
                                       BYTE    mask)
 {
     BYTE            csavMask = mask;
@@ -1329,17 +1341,17 @@ DRIVER_ERROR Lidil::processColorSwath(bool    bPhotoPresent,
     }
 
     if (size % m_iBytesPerSwing)
-	size = ((size / m_iBytesPerSwing) + 1) * m_iBytesPerSwing;
+    size = ((size / m_iBytesPerSwing) + 1) * m_iBytesPerSwing;
 
     if (m_lidil_version == 1)
     {
-	RightEdge = LeftEdge + (size * 8 * 600 / m_pQA->horizontal_resolution - 1 * (600 / m_pQA->vertical_resolution)) *
-				(DEVUNITS_XBOW / 600);
+    RightEdge = LeftEdge + (size * 8 * 600 / m_pQA->horizontal_resolution - 1 * (600 / m_pQA->vertical_resolution)) *
+                (DEVUNITS_XBOW / 600);
     }
     else
     {
-	RightEdge = LeftEdge + (size * 8 * 600 / m_pQA->horizontal_resolution - 1 * (600 / m_pQA->vertical_resolution)) *
-				(DEVUNITS_XBOW / (600 * m_iBitDepth));
+    RightEdge = LeftEdge + (size * 8 * 600 / m_pQA->horizontal_resolution - 1 * (600 / m_pQA->vertical_resolution)) *
+                (DEVUNITS_XBOW / (600 * m_iBitDepth));
     }
     Int16   sLastNozzle;
     Int16   sFirstNozzle = 1;
@@ -1355,11 +1367,11 @@ DRIVER_ERROR Lidil::processColorSwath(bool    bPhotoPresent,
 
     if (m_iBitDepth == 2)
     {
-	iStartRaster = (4 - (iStartRaster+1)) % 4;
-	if (m_lidil_version == 2)
-	{
-	    iStartRaster = m_cPassNumber % (m_iBitDepth);
-	}
+    iStartRaster = (4 - (iStartRaster+1)) % 4;
+    if (m_lidil_version == 2)
+    {
+        iStartRaster = m_cPassNumber % (m_iBitDepth);
+    }
     }
 
     sLastNozzle = sFirstNozzle - 1 + sCurSwathHeight / jDelta;
@@ -1372,84 +1384,84 @@ DRIVER_ERROR Lidil::processColorSwath(bool    bPhotoPresent,
 
     if (m_pQA->vertical_resolution > 300 && m_pQA->print_quality != DRAFT_QUALITY)
     {
-	iOffset = (sCurSwathHeight / (4 * m_iBitDepth));
-	iOffset = iOffset + iOffset * ((m_cPassNumber) % (4 * m_iBitDepth));
+    iOffset = (sCurSwathHeight / (4 * m_iBitDepth));
+    iOffset = iOffset + iOffset * ((m_cPassNumber) % (4 * m_iBitDepth));
     }
 
     for (ib = 0; ib < (int) m_iBitDepth; ib++)
     {
-	if (m_cPrintDirection == PRNDRN_RIGHTTOLEFT)
-	{
-	    start = size - m_iBytesPerSwing;
-	    delta = -m_iBytesPerSwing;
-	}
-	else
-	{
-	    start = 0;
-	    delta = m_iBytesPerSwing;
-	}
-	err = printSweep (uiSwathSize, bColorPresent, false, false,
-			  m_iVertPosn, LeftEdge, RightEdge, m_cPrintDirection,
-			  sFirstNozzle, sLastNozzle);
-	ERRCHECK;
+    if (m_cPrintDirection == PRNDRN_RIGHTTOLEFT)
+    {
+        start = size - m_iBytesPerSwing;
+        delta = -m_iBytesPerSwing;
+    }
+    else
+    {
+        start = 0;
+        delta = m_iBytesPerSwing;
+    }
+    err = printSweep (uiSwathSize, bColorPresent, false, false,
+              m_iVertPosn, LeftEdge, RightEdge, m_cPrintDirection,
+              sFirstNozzle, sLastNozzle);
+    ERRCHECK;
 
-	i = start + ib * m_iImageWidth;     // 1200 dpi split into two
-	for (int l = 0; l < size; l += m_iBytesPerSwing)   // Collie
-	{
-	    for (int k = StartColor; k < LastColor; k++)
-	    {
-		mask = csavMask;
-		for (j = iOffset + iStartRaster; j < sCurSwathHeight; j += jDelta)
-		{
-		    for (int is = 0; is < m_iBytesPerSwing; is++)
-		    {
-			*cb++ = m_SwathData[k][j][i + is]   & mask;
-		    }
-		    mask = ~mask;
-		}
-		for (j = iStartRaster; j < iOffset; j += jDelta)
-		{
-		    for (int is = 0; is < m_iBytesPerSwing; is++)
-		    {
-			*cb++ = m_SwathData[k][j][i + is]   & mask;
-		    }
-		    mask = ~mask;
-		}
+    i = start + ib * m_iImageWidth;     // 1200 dpi split into two
+    for (int l = 0; l < size; l += m_iBytesPerSwing)   // Collie
+    {
+        for (int k = StartColor; k < LastColor; k++)
+        {
+        mask = csavMask;
+        for (j = iOffset + iStartRaster; j < sCurSwathHeight; j += jDelta)
+        {
+            for (int is = 0; is < m_iBytesPerSwing; is++)
+            {
+            *cb++ = m_SwathData[k][j][i + is]   & mask;
+            }
+            mask = ~mask;
+        }
+        for (j = iStartRaster; j < iOffset; j += jDelta)
+        {
+            for (int is = 0; is < m_iBytesPerSwing; is++)
+            {
+            *cb++ = m_SwathData[k][j][i + is]   & mask;
+            }
+            mask = ~mask;
+        }
 
-		count++;
-		if (count == n)
-		{
-		    err = loadSweepData (m_szCompressBuf, (unsigned int) (cb - m_szCompressBuf-16));
-		    memset (m_szCompressBuf, 0, LDL_MAX_IMAGE_SIZE * (m_iBytesPerSwing / 2));
+        count++;
+        if (count == n)
+        {
+            err = loadSweepData (m_szCompressBuf, (unsigned int) (cb - m_szCompressBuf-16));
+            memset (m_szCompressBuf, 0, LDL_MAX_IMAGE_SIZE * (m_iBytesPerSwing / 2));
 
-		    cb = m_szCompressBuf+16;
-		    count = 0;
-		    ERRCHECK;
-		}
+            cb = m_szCompressBuf+16;
+            count = 0;
+            ERRCHECK;
+        }
 
-	    }
-	    i = i + delta;
+        }
+        i = i + delta;
 
-	}
-	if (count != 0)
-	{
-	    err = loadSweepData (m_szCompressBuf, (unsigned int) (cb - m_szCompressBuf-16));
-	    memset (m_szCompressBuf, 0, LDL_MAX_IMAGE_SIZE * (m_iBytesPerSwing / 2));
+    }
+    if (count != 0)
+    {
+        err = loadSweepData (m_szCompressBuf, (unsigned int) (cb - m_szCompressBuf-16));
+        memset (m_szCompressBuf, 0, LDL_MAX_IMAGE_SIZE * (m_iBytesPerSwing / 2));
 
-	    cb = m_szCompressBuf+16;
-	    count = 0;
-	    ERRCHECK;
-	}
+        cb = m_szCompressBuf+16;
+        count = 0;
+        ERRCHECK;
+    }
 
-	LeftEdge += 2;
-	RightEdge += 2;
+    LeftEdge += 2;
+    RightEdge += 2;
 
-	if (m_bBidirectionalPrintingOn)
-	    m_cPrintDirection = (m_cPrintDirection + 1) % 2;
-	if (m_lidil_version == 2) // Collie
-	{
-	    break;
-	}
+    if (m_bBidirectionalPrintingOn)
+        m_cPrintDirection = (m_cPrintDirection + 1) % 2;
+    if (m_lidil_version == 2) // Collie
+    {
+        break;
+    }
 
     }   // 1200 dpi split into two - end of for ib = 0 loop
     return err;
@@ -1577,8 +1589,8 @@ size = ((size/m_iBytesPerSwing) + 1) * m_iBytesPerSwing;
             ERRCHECK;
         }
 
-		if (m_bBidirectionalPrintingOn)
-			m_cPrintDirection = (m_cPrintDirection + 1) % 2;
+        if (m_bBidirectionalPrintingOn)
+            m_cPrintDirection = (m_cPrintDirection + 1) % 2;
     }
     return err;
 }

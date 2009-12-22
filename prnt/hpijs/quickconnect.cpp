@@ -367,8 +367,8 @@ DRIVER_ERROR    QuickConnect::Flush (int iBufferSize)
         int     iPaperSize, iMediaType, iPrintQuality;
         char    szCopiesStr[64];
         char    szNullBytes[632];
-        char    *szPJLHeader = (char *) "\x1B\x45\x1B%-12345X@PJL ENTER LANGUAGE=PHOTOJPEG\012";
-        char    *szPJLEndJob = (char *) "\x1B\x45\x1B%-12345X";
+        static  const char    szPJLHeader[] = "\x1B\x45\x1B%-12345X@PJL ENTER LANGUAGE=PHOTOJPEG\012";
+        static  const char    szPJLEndJob[] = "\x1B\x45\x1B%-12345X";
 
         err = Compress ();
         ERRCHECK;
@@ -377,7 +377,7 @@ DRIVER_ERROR    QuickConnect::Flush (int iBufferSize)
         sprintf (szCopiesStr, "@PJL SET COPIES=%d\012@PJL SET JOBID=%d\012", m_pPC->GetCopyCount (), m_iJobId);
 
         Send ((const BYTE *) szNullBytes, 600);
-        Send ((const BYTE *) szPJLHeader, strlen (szPJLHeader));
+        Send ((const BYTE *) szPJLHeader, sizeof(szPJLHeader) - 1);
         Send ((const BYTE *) szCopiesStr, strlen (szCopiesStr));
 
         COLORMODE       eColorMode = COLOR;
@@ -402,7 +402,7 @@ DRIVER_ERROR    QuickConnect::Flush (int iBufferSize)
 
 //      Send the END JOB PJL command
 
-        Send ((const BYTE *) szPJLEndJob, (DWORD) strlen (szPJLEndJob)); 
+        Send ((const BYTE *) szPJLEndJob, sizeof(szPJLEndJob) - 1); 
 
         m_iRowNumber = 0;
     }
@@ -476,7 +476,7 @@ DRIVER_ERROR  QuickConnect::Compress ()
 {
 
 	BYTE	*p;
-    int     iQuality = 100;
+    int     volatile iQuality = 100;
 
 /*
  *  Convert the byte buffer to jpg, if converted size is greater than 2MB, delete it and
@@ -498,7 +498,6 @@ DRIVER_ERROR  QuickConnect::Compress ()
 
         m_iJpegBufferPos = 0;
         memset (m_pbyJpegBuffer, 0xFF, m_iMaxFileSize);
-        p = m_pbyInputBuffer;
 
         cinfo.err = jpeg_std_error (&jerr);
         jerr.error_exit = HPJpeg_error;
@@ -519,6 +518,7 @@ DRIVER_ERROR  QuickConnect::Compress ()
         jpeg_buffer_dest (&cinfo, (JOCTET *) this, (void *) (HPFlush_output_buffer_callback));
         jpeg_start_compress (&cinfo, TRUE);
         JSAMPROW    pRowArray[1];
+        p = m_pbyInputBuffer;
         for (int i = 0; i < m_iRowNumber; i++)
         {
             pRowArray[0] = (JSAMPROW) p;

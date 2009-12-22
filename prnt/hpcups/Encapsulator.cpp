@@ -181,7 +181,9 @@ DRIVER_ERROR Encapsulator::FormFeed()
 {
     DRIVER_ERROR    err;
     err = this->Send((const BYTE *) "\x1B*rC\x0C", 5);
-
+    if (err == NO_ERROR) {
+        return Cleanup();
+    }
     return err;
 }
 

@@ -43,6 +43,10 @@ Scaler::Scaler(SystemServices* pSys,unsigned int inputwidth,
     ASSERT(denominator > 0);
 
     constructor_error=NO_ERROR;
+    for (int i = COLORTYPE_COLOR; i < MAX_COLORTYPE; i++)
+    {
+        pOutputBuffer[i] = NULL;
+    }
 
     ScaleFactor= (float)numerator / (float)denominator;
     if (ScaleFactor > (float)MAX_OUTPUT_RASTERS)      //
@@ -55,9 +59,8 @@ Scaler::Scaler(SystemServices* pSys,unsigned int inputwidth,
     rem *= 1000;
     remainder = (int)rem;
 
-    iOutputWidth = (int)(
-                             ((float)iInputWidth / (float)denominator) *
-                                (float)numerator);
+    iOutputWidth = (int) (((float) iInputWidth / (float) denominator) *
+                          (float) numerator);
     iOutputWidth++;         // safety measure to protect against roundoff error
 
     if (numerator == denominator)

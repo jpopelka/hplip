@@ -409,6 +409,14 @@ try:
     log.info()
 
     dd = core.dependencies.keys()
+
+    status, output = utils.run('cups-config --version')
+    if status == 0:
+        import string
+        major, minor, release = string.split(output, '.', 3)
+        if major > 1 or (major == 1 and minor >= 4):
+            dd.remove('cups-ddk')
+
     dd.sort()
     for d in dd:
         if (d == 'pyqt' and ui_toolkit != 'qt3') or \

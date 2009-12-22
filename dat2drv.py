@@ -116,7 +116,7 @@ class XMLElement:
         self.el.removeAttribute(name)
 
     def __str__(self):
-        return _encode(self.doc.toprettyxml())
+        return _encode(self.doc.toxml())
 
     def toString(self):
         return _encode(self.doc.toxml())
@@ -528,17 +528,23 @@ def main(args):
                         drv_in_file_f.write('%sModelName "%s"\n' % (indent2, orig_model_name))
 
                         if len(models_dict[p]['tech-class']) > 1:
-                            drv_in_file_f.write('%sAttribute "NickName" "" "%s %s, $Version"\n' %
+                            drv_in_file_f.write('%sAttribute "NickName" "" "%s %s, $Version' %
                                 (indent2, orig_model_name, models.TECH_CLASS_PDLS[tech_class]))
                         else:
-                            drv_in_file_f.write('%sAttribute "NickName" "" "%s, $Version"\n' %
+                            drv_in_file_f.write('%sAttribute "NickName" "" "%s, $Version' %
                                 (indent2, orig_model_name))
+
+                        if models_dict[p]['plugin'] in (1, 2):
+                            if models_dict[p]['plugin-reason'] in (1, 2, 3, 4, 5, 6, 8, 9, 10, 12):
+                                drv_in_file_f.write(', requires proprietary plugin')
+
+                        drv_in_file_f.write('"\n')
 
                         drv_in_file_f.write('%sAttribute "ShortNickName" "" "%s"\n' % (indent2, model_name))
 
                         pp = p.replace('_', ' ')
                         if 'apollo' in p.lower():
-                            devid = "MFG:APOLLO;MDL:%s;DES:%s;" % (pp, pp)
+                            devid = "MFG:Apollo;MDL:%s;DES:%s;" % (pp, pp)
                         else:
                             devid = "MFG:HP;MDL:%s;DES:%s;" % (pp, pp)
 
@@ -604,11 +610,11 @@ def main(args):
 
         driver_f = file(driver_path, 'w')
 
-        driver_doc = XMLDocument("driver", id="driver/%s" % basename)
+        driver_doc = XMLDocument("driver", id="driver/hplip")
         name_node = driver_doc.add("name")
-        name_node.addText(basename)
+        name_node.addText("hplip")
         url_node = driver_doc.add("url")
-        url_node.addText("http://hplip.sourceforge.net/")
+        url_node.addText("http://hplipopensource.com")
         supplier_node = driver_doc.add("supplier")
         supplier_node.addText("Hewlett-Packard")
         mfg_node = driver_doc.add("manufacturersupplied")
@@ -620,7 +626,7 @@ def main(args):
         support_node.addText("HPLIP Support at Launchpad.net")
         shortdesc_node = driver_doc.add("shortdescription")
         shortdesc_en_node = shortdesc_node.add("en")
-        shortdesc_en_node.addText("HP's IJS driver for most of their non-PostScript printers")
+        shortdesc_en_node.addText("HP's driver suite for printers and multi-function devices")
         func_node = driver_doc.add("functionality")
         maxresx_node = func_node.add("maxresx")
         maxresx_node.addText("1200")
@@ -631,7 +637,7 @@ def main(args):
         exec_node.add("nopjl")
         exec_node.add("ijs")
         proto_node = exec_node.add("prototype")
-        proto_node.addText("gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPAUSE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFile=- -")
+        #proto_node.addText("gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPAUSE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFile=- -")
         comments_node = driver_doc.add("comments")
         comments_en_node = comments_node.add("en")
         comments_en_node.addText("")
@@ -639,13 +645,17 @@ def main(args):
         printers_node = driver_doc.add("printers")
 
         for m in models_dict:
+
+            if models_dict[m]['support-type'] == SUPPORT_TYPE_NONE:
+                continue
+
             if 'apollo' in m.lower():
-                make = 'APOLLO'
+                make = 'Apollo'
             else:
                 make = 'HP'
 
             if 'apollo' in m.lower():
-                ieee1284 = "MFG:APOLLO;MDL:%s;DES:%s;" % (m, m)
+                ieee1284 = "MFG:Apollo;MDL:%s;DES:%s;" % (m, m)
 
             else:
                 ieee1284 = "MFG:HP;MDL:%s;DES:%s;" % (m, m)
@@ -654,28 +664,21 @@ def main(args):
             if 'Postscript' in models_dict[m]['tech-class']:
                 postscriptppd = "%s-ps.ppd" % fixFileName(m)
 
-            fixed_model = m.replace(' ', '_')
-
-            if fixed_model.startswith('hp_'):
-                fixed_model = fixed_model.replace('hp_', 'hp-')
-
-            elif fixed_model.startswith('apollo_'):
-                fixed_model = fixed_model.replace('apollo_', 'apollo-')
-
-            else:
-                fixed_model = 'hp-' + fixed_model
-
             stripped_model = m
-            if stripped_model.startswith('hp '):
-                stripped_model = stripped_model.replace('hp ', '')
 
+            if stripped_model.startswith('hp_'):
+                stripped_model = stripped_model.replace('hp_', '').capitalize()
+
+            elif stripped_model.startswith('apollo_'):
+                stripped_model = stripped_model.replace('apollo_', '').capitalize()
+
+            fixed_model = stripped_model.replace('_', ' ').capitalize()
 
             # Output to the per-model XML file
             outputModel(m, fixed_model, stripped_model, make, postscriptppd, ieee1284, output_path, verbose)
 
             # Output to driver master XML file
             outputDriver(m, fixed_model, stripped_model, make, printers_node, verbose)
-
 
         driver_f.write(str(driver_doc))
         driver_f.close()
@@ -792,60 +795,69 @@ def outputModel(model, fixed_model, stripped_model, make, postscriptppd, ieee128
 ##        stripped_model = stripped_model.replace('hp ', '')
 
 
-    output_filename = os.path.join(output_path, fixed_model+".xml")
+    printerID = make + '-' + stripped_model
+
+    output_filename = os.path.join(output_path, printerID+".xml")
 
     if verbose:
         log.info("\n\n%s:" % output_filename)
 
     output_f = file(output_filename, 'w')
 
-    doc = XMLDocument("printer", id="printer/%s" % fixed_model)
+    doc = XMLDocument("printer", id="printer/%s" % printerID)
     make_node = doc.add("make")
     make_node.addText(make)
     model_node = doc.add("model")
-    model_node.addText(stripped_model)
+    model_node.addText(fixed_model)
     url_node = doc.add("url")
     url_node.addText("http://www.hp.com")
 
     lang_node = doc.add("lang")
     lang_node.add("pcl", level="3")
 
+    autodetect_node = doc.add("autodetect")
+    usb_node = autodetect_node.add("usb")
+
+    driver_node = doc.add("driver")
+    driver_node.addText('hplip')
+
+    drivers_node = doc.add("drivers")
+    driver_node = drivers_node.add("driver")
+    id_node = driver_node.add("id")
+    id_node.addText("hplip")
+
     if postscriptppd:
         # Postscript
-        ps_node = lang_node.add("postscript", level="2")
+        lang_node.add("postscript", level="2")
         lang_node.add("pjl")
-        ppd_node = ps_node.add("ppd")
-        ppd_node.addText(postscriptppd)
-        charset_node = lang_node.add("charset")
+        text_node = lang_node.add("text")
+        charset_node = text_node.add("charset")
         charset_node.addText("us-ascii")
-
-    autodetect_node = doc.add("autodetect")
-    general_node = autodetect_node.add("general")
+        #ppd_node = driver_node.add("ppd")
+        #ppd_node.addText(postscriptppd)
+    #else:
+    #    id_node.addText("hpijs")
 
     if 1:
-        ieee1284_node = general_node.add("ieee1284")
-        ieee1284_node.addText(ieee1284)
+        #ieee1284_node = usb_node.add("ieee1284")
+        #ieee1284_node.addText(ieee1284)
 
         device_id = parseDeviceID(ieee1284)
 
-        mfg_node = general_node.add("manufacturer")
-        mfg_node.addText(device_id['MFG'])
+        desc_node = usb_node.add("description")
+        #desc_node.addText(device_id['DES'])
+        desc_node.addText(make + ' ' + fixed_model)
 
-        model_node = general_node.add("model")
-        model_node.addText(device_id['MDL'])
+        mfg_node = usb_node.add("manufacturer")
+        #mfg_node.addText(device_id['MFG'])
+        mfg_node.addText("Hewlett-Packard")
 
-        desc_node = general_node.add("description")
-        desc_node.addText(device_id['DES'])
+        model_node = usb_node.add("model")
+        #model_node.addText(device_id['MDL'])
+        model_node.addText(make + ' ' + fixed_model)
 
-        #cmdset_node = general_node.add("commandset")
+        #cmdset_node = usb_node.add("commandset")
         #cmdset_node.addText("???")
-
-    driver_node = autodetect_node.add("driver")
-
-    if postscriptppd:
-        driver_node.addText("Postscript")
-    else:
-        driver_node.addText("hpijs")
 
     if verbose:
         log.info(str(doc))
@@ -856,11 +868,14 @@ def outputModel(model, fixed_model, stripped_model, make, postscriptppd, ieee128
 
 
 def outputDriver(m, fixed_model, stripped_model, make, printers_node, verbose):
+
+    printerID = make + '-' + stripped_model
+
     tech_classes = models_dict[m]['tech-class']
     #print tech_classes
     printer_node = printers_node.add("printer")
     id_node = printer_node.add("id")
-    id_node.addText("printer/%s" % fixed_model)
+    id_node.addText("printer/%s" % printerID)
 
 ##    margins_node = printer_node.add("margins")
 ##    general_margins_node = margins_node.add("general")

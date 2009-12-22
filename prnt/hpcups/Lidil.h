@@ -195,6 +195,8 @@ private:
     int          m_lidil_version;
     int          m_iBytesPerSwing;
     int          m_iColorPenResolution;
+    int          m_iBlackPenResolution;
+    int          m_iNumBlackNozzles;
     int          m_iNextColor;
     int          m_iLeftMargin;
     BYTE         *m_ldlCompressData;

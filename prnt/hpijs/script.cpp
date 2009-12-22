@@ -160,7 +160,7 @@ BOOL AsciiScripter::OpenDebugStreamR(const char* FileName)
     int x;
     char *str;
 
-    strcpy(ScriptFileName,FileName);
+    strncpy(ScriptFileName,FileName, sizeof(ScriptFileName)-1);
 
     ScriptFile = fopen(ScriptFileName, "ra");
 
@@ -205,7 +205,7 @@ BOOL AsciiScripter::CloseDebugStreamR()
 
 BOOL AsciiScripter::OpenDebugStreamW(const char* FileName)
 {
-    strcpy(ScriptFileName,FileName);
+    strncpy(ScriptFileName,FileName, sizeof(ScriptFileName)-1);
     ScriptFile = fopen(ScriptFileName, "wa");
 
     if (ScriptFile == NULL)
@@ -632,7 +632,7 @@ BOOL AsciiScripter::GetDebugStream(const unsigned int buffersize, BYTE*& buffer)
 /////////////////////////////////////////////////////////////////////
 BOOL BinaryScripter::OpenDebugStreamR(const char* FileName)
 {
-    strcpy(ScriptFileName,FileName);
+    strncpy(ScriptFileName,FileName, sizeof(ScriptFileName)-1);
 
     ScriptFile = fopen(ScriptFileName, "rb");
 
@@ -659,7 +659,7 @@ BOOL BinaryScripter::OpenDebugStreamR(const char* FileName)
 
 BOOL BinaryScripter::OpenDebugStreamW(const char* FileName)
 {
-    strcpy(ScriptFileName,FileName);
+    strncpy(ScriptFileName,FileName, sizeof(ScriptFileName)-1);
     ScriptFile = fopen(ScriptFileName, "wb");
 
     if (ScriptFile == NULL)

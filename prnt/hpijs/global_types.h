@@ -46,7 +46,7 @@ Definitions for global variables, types, and #defines
 #include "models.h"
 #include "modes.h"
 
-
+#define APDK_INVALID_VALUE -9999
 
 #if APDK_AUTO_INCLUDE
     #include "auto-include.h"
@@ -129,8 +129,9 @@ enum MediaType
     mediaSpecial = 2,
     mediaGlossy = 3,
     mediaTransparency = 4,
-    mediaHighresPhoto = 5,       // used by vip printers for 2400 mode
-    mediaCDDVD = 7
+    mediaHighresPhoto = 3,       // used by vip printers for 2400 mode
+    mediaCDDVD = 7,
+    mediaBrochure = 8
 };
 
 
@@ -383,11 +384,12 @@ typedef enum               // typedef'ed for C interface
     MEDIA_PLAIN,            //!< Plain paper
     MEDIA_PREMIUM,          //!< Premium paper - for use with 6xx series
     MEDIA_PHOTO,            //!< Photo paper - for use with photo quality printers
-    MEDIA_TRANSPARENCY,
-    MEDIA_HIGHRES_PHOTO,
-    MEDIA_AUTO,
-    MEDIA_ADVANCED_PHOTO,
-    MEDIA_CDDVD = 7,
+    MEDIA_TRANSPARENCY,     //!< Transparency film
+    MEDIA_HIGHRES_PHOTO,    //!< Premium photo paper
+    MEDIA_AUTO,             //!< Printer uses media sense to determine media type
+    MEDIA_ADVANCED_PHOTO,   //!< Advanced photo paper
+    MEDIA_CDDVD = 7,        //!< CD or DVD media
+    MEDIA_BROCHURE = 8,     //!< Glossy brochure paper
     MAX_MEDIATYPE
 } MEDIATYPE;
 
@@ -531,7 +533,11 @@ typedef enum
     EXTRA_DRYTIME_HINT,
     MAX_FILE_SIZE_HINT,
     RED_EYE_REMOVAL_HINT,
-    PHOTO_FIX_HINT
+    PHOTO_FIX_HINT,
+    LEFT_OVERSPRAY_HINT,
+    RIGHT_OVERSPRAY_HINT,
+    TOP_OVERSPRAY_HINT,
+    BOTTOM_OVERSPRAY_HINT
 } PRINTER_HINT;
 
 APDK_END_NAMESPACE

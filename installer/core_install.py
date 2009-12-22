@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 #
 # (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
@@ -1043,8 +1043,7 @@ class CoreInstall(object):
 
     def check_policykit(self):
         log.debug("Checking for PolicyKit...")
-        return check_file('PolicyKit.conf', "/etc/PolicyKit") and check_file('org.gnome.PolicyKit.AuthorizationManager.service', "/usr/share/dbus-1/services")
-
+        return (check_file('PolicyKit.conf', "/etc/PolicyKit") and check_file('org.gnome.PolicyKit.AuthorizationManager.service', "/usr/share/dbus-1/services")) or (check_file('50-localauthority.conf', "/etc/polkit-1/localauthority.conf.d") and check_file('org.freedesktop.PolicyKit1.service', "/usr/share/dbus-1/system-services"))
 
     def check_pkg_mgr(self):
         """
@@ -1216,6 +1215,43 @@ class CoreInstall(object):
 
         return configure_cmd
 
+    def configure_html(self):
+        configure_cmd = './configure'
+        configure_cmd += ' --prefix=/usr' 
+        configure_cmd += ' --with-hpppddir=%s' % self.ppd_dir
+
+        if self.bitness == 64:
+            configure_cmd += ' --libdir=/usr/lib64'
+
+        self.ui_toolkit =  self.get_distro_ver_data('ui_toolkit') 
+        if self.ui_toolkit is not None and self.ui_toolkit == 'qt3':
+            configure_cmd += ' --enable-qt3 --disable-qt4'
+        else:
+            configure_cmd += ' --enable-qt4'
+
+        self.native_cups =  self.get_distro_ver_data('native_cups')
+        if self.native_cups is not None and self.native_cups == 1:
+            configure_cmd += ' --enable-hpcups-install --enable-cups-ppd-install --enable-cups-drv-install' 
+        else:
+            configure_cmd += ' --enable-hpijs-install --disable-hpcups-install --enable-foomatic-ppd-install --enable-foomatic-drv-install --disable-cups-drv-install --enable-foomatic-rip-hplip-install' 
+
+        self.fax_supported =  self.get_distro_ver_data('fax_supported')
+        if self.fax_supported is None:
+            configure_cmd += ' --disable-fax-build --disable-dbus-build'
+
+        self.network_supported = self.get_distro_ver_data('network_supported')
+        if self.network_supported is None:
+            configure_cmd += ' --disable-network-build'     
+          
+        self.scan_supported = self.get_distro_ver_data('scan_supported')
+        if self.scan_supported is None:
+            configure_cmd += ' --disable-scan-build'
+  
+        self.policykit = self.get_distro_ver_data('policykit')
+        if self.policykit is not None and self.policykit == 1:
+            configure_cmd += ' --enable-policykit'
+
+        return configure_cmd
 
     def restart_cups(self):
         if os.path.exists('/etc/init.d/cups'):
@@ -1396,13 +1432,20 @@ class CoreInstall(object):
 
         # opt. deps in req. options
         for opt in self.components[self.selected_component][1]:
-              if self.options[opt][0]: # required options
-                  for d in self.options[opt][2]: # dependencies for option
-                      if not self.dependencies[d][0]: # optional dep
-                          if not self.have_dependencies[d]: # missing
-                              log.debug("Missing optional dependency: %s" % d)
-                              yield d, self.dependencies[d][2], self.dependencies[d][0], opt
-                              # depend, desc, option
+            if self.options[opt][0]: # required options
+                for d in self.options[opt][2]: # dependencies for option
+                    if d == 'cups-ddk':
+                        status, output = self.run('cups-config --version')
+                        if status == 0:
+  			    import string
+                            major, minor, release = string.split(output, '.', 3)
+                            if major > 1 or (major == 1 and minor >= 4):
+                                continue
+	            if not self.dependencies[d][0]: # optional dep
+                        if not self.have_dependencies[d]: # missing
+                            log.debug("Missing optional dependency: %s" % d)
+                            yield d, self.dependencies[d][2], self.dependencies[d][0], opt
+                            # depend, desc, option
 
 
     def select_options(self, answer_callback):
@@ -1810,7 +1853,7 @@ class CoreInstall(object):
         try:
             filename, headers = urllib.urlretrieve(url, plugin_file, callback)
         except IOError, e:
-            #log.error("Plug-in download failed: %s" % e.strerror)
+            log.error("Plug-in download failed: %s" % e.strerror)
             return PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND, e.strerror
 
         if self.isErrorPage(file(plugin_file, 'r').read(1024)):
@@ -1830,7 +1873,7 @@ class CoreInstall(object):
         try:
             filename, headers = urllib.urlretrieve(digsig_url, digsig_file, callback)
         except IOError, e:
-            #log.error("Plug-in GPG file download failed: %s" % e.strerror)
+            log.error("Plug-in GPG file download failed: %s" % e.strerror)
             return PLUGIN_INSTALL_ERROR_DIGITAL_SIG_NOT_FOUND, e.strerror
 
         if self.isErrorPage(file(digsig_file, 'r').read(1024)):
@@ -1841,10 +1884,10 @@ class CoreInstall(object):
         gpg = utils.which('gpg')
         if gpg:
             gpg = os.path.join(gpg, 'gpg')
-            cmd = '%s --no-permission-warning --keyserver pgp.mit.edu --recv-keys 0x9013c005' % gpg
+            cmd = '%s --no-permission-warning --keyserver pgp.mit.edu --recv-keys 0xA59047B9' % gpg
             log.info("Receiving digital keys: %s" % cmd)
             status, output = self.run(cmd)
-            #log.debug(output)
+            log.debug(output)
 
             if status != 0:
                 return PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS, status

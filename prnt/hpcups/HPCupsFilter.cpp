@@ -41,6 +41,12 @@ static HPCupsFilter    filter;
 int main (int  argc, char *argv[])
 {
     openlog("hpcups", LOG_PID,  LOG_DAEMON);
+
+    if (argc < 6 || argc > 7) {
+        dbglog("ERROR: %s job-id user title copies options [file]\n", *argv);
+        return JOB_CANCELED;
+    }
+
     return filter.StartPrintJob(argc, argv);
 }
 
@@ -231,6 +237,21 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
     int                 xoverspray = 120;
     int                 yoverspray = 60;
 
+/*
+ *  Check for invalid data
+ */
+    if (cups_header->HWResolution[0] == 100 && cups_header->HWResolution[1] == 100)
+    {
+
+/*
+ *      Something went wrong, cups is defaulting to 100 dpi.
+ *      Some inkjet printers do not support 100 dpi. Return error.
+ */
+
+        dbglog("ERROR: Unsupported resolution\n");
+        return JOB_CANCELED;
+    }
+
 //  XOverSpray and YOverSpray are entered as fractional value * 1000
 
     if (((attr = ppdFindAttr(m_ppd, "HPXOverSpray", NULL)) != NULL) &&
@@ -269,7 +290,6 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
             m_JA.quality_attributes.actual_vertical_resolution = y;
         }
     }
-    dbglog("DEBUG: actual_vertical_resolution = %d\n", m_JA.quality_attributes.actual_vertical_resolution);
     m_JA.color_mode = cups_header->cupsRowStep;
     m_JA.media_source = cups_header->MediaPosition;
 
@@ -309,21 +329,26 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
 
     m_JA.media_attributes.printable_start_x = (cups_header->Margins[0] * horz_res) / 72;
     m_JA.media_attributes.printable_start_y = ((cups_header->PageSize[1] - cups_header->ImagingBoundingBox[3]) * vert_res) / 72;
+
     m_JA.media_attributes.horizontal_overspray = (xoverspray * horz_res) / 1000;
     m_JA.media_attributes.vertical_overspray   = (yoverspray * vert_res) / 1000;
+
+    /* 
+     * Left and top overspray in dots. We haven't defined ovespray for all classes in the drv.
+     * Hence using default values in the case of older classes.
+     */
+    m_JA.media_attributes.left_overspray = cups_header->cupsReal[0] ? (cups_header->cupsReal[0] * horz_res) : m_JA.media_attributes.horizontal_overspray / 2;
+    m_JA.media_attributes.top_overspray  = cups_header->cupsReal[1] ? (cups_header->cupsReal[1] * vert_res) : m_JA.media_attributes.vertical_overspray / 2;
 
     if (((attr = ppdFindAttr(m_ppd, "HPMechOffset", NULL)) != NULL) &&
         (attr && attr->value != NULL)) {
         m_JA.mech_offset = atoi(attr->value);
     }
-    dbglog("HPCUPS: x_top = %d, y_top = %d, offset = %d\n",
-           m_JA.media_attributes.printable_start_x,
-           m_JA.media_attributes.printable_start_y, m_JA.mech_offset);
 
 //  Get printer platform name
     if (((attr = ppdFindAttr(m_ppd, "hpPrinterPlatform", NULL)) != NULL) &&
         (attr->value != NULL)) {
-        strcpy(m_JA.printer_platform, attr->value);
+        strncpy(m_JA.printer_platform, attr->value, sizeof(m_JA.printer_platform)-1);
         if (m_iLogLevel & BASIC_LOG) {
             dbglog("HPCUPS: found Printer Platform, it is - %s", attr->value);
         }
@@ -338,7 +363,7 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
             m_ppd = NULL;
             return SYSTEM_ERROR;
     }
-    strcpy(m_JA.printer_language, attr->value);
+    strncpy(m_JA.printer_language, attr->value, sizeof(m_JA.printer_language)-1);
     if (m_iLogLevel & BASIC_LOG) {
         dbglog("HPCUPS: found Printer Language, it is - %s", attr->value);
     }
@@ -356,7 +381,7 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
     while (i >= 0 && m_argv[0][i] != '/') {
         i--;
     }
-    sprintf(m_JA.driver_name, "%s; %s", &m_argv[0][i+1], HP_FILE_VERSION_STR);
+    snprintf(m_JA.driver_name, sizeof(m_JA.driver_name), "%s; %s", &m_argv[0][i+1], HP_FILE_VERSION_STR);
     char    *ptr = getenv("DEVICE_URI");
     i = 0;
     if (ptr) {
@@ -370,13 +395,16 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
     }
     ptr = strstr(m_argv[5], "job-uuid");
     if (ptr) {
-        strcpy(m_JA.uuid, ptr + strlen("job-uuid=urn:uuid:"));
+        strncpy(m_JA.uuid, ptr + strlen("job-uuid=urn:uuid:"), sizeof(m_JA.uuid)-1);
     }
 
     for (i = 0; i < 16; i++)
         m_JA.integer_values[i] = cups_header->cupsInteger[i];
 
-    strcpy(m_JA.quality_attributes.print_mode_name, &cups_header->cupsString[0][0]);
+    if (cups_header->cupsString[0]) {
+        strncpy(m_JA.quality_attributes.print_mode_name, &cups_header->cupsString[0][0],
+                sizeof(m_JA.quality_attributes.print_mode_name)-1);
+    }
     Encapsulator *encap_interface = EncapsulatorFactory::GetEncapsulator(attr->value);
     if ((err = m_Job.Init(m_pSys, &m_JA, encap_interface)) != NO_ERROR)
     {
@@ -410,15 +438,16 @@ int HPCupsFilter::StartPrintJob(int  argc, char *argv[])
     time(&long_time);
     t = localtime(&long_time);
     ftime(&tb);
-    strcpy(m_JA.job_start_time, asctime(t));    // returns Fri Jun  5 08:12:16 2009
-    sprintf(m_JA.job_start_time+19, ":%d %d", tb.millitm, t->tm_year + 1900); // add milliseconds
+    strncpy(m_JA.job_start_time, asctime(t), sizeof(m_JA.job_start_time)-1);    // returns Fri Jun  5 08:12:16 2009
+    snprintf(m_JA.job_start_time+19, sizeof(m_JA.job_start_time) - 20, ":%d %d", tb.millitm, t->tm_year + 1900); // add milliseconds
 
     getLogLevel();
     m_JA.job_id = atoi(argv[1]);
     FILE    *fp;
     char    dFileName[32];
+    memset(dFileName, 0, sizeof(dFileName));
     m_JA.job_id = atoi(argv[1]);
-    sprintf (dFileName, "/var/spool/cups/d%05d-001", m_JA.job_id);
+    snprintf (dFileName, sizeof(dFileName), "/var/spool/cups/d%05d-001", m_JA.job_id);
     if ((fp = fopen (dFileName, "r")))
     {
         char    line[258];
@@ -438,11 +467,6 @@ int HPCupsFilter::StartPrintJob(int  argc, char *argv[])
     if (m_ppd == NULL) {
         dbglog("DEBUG: ppdOpenFile failed for %s\n", getenv("PPD"));
         return SYSTEM_ERROR;
-    }
-
-    if (argc < 6 || argc > 7) {
-        dbglog("ERROR: %s job-id user title copies options [file]\n", *argv);
-        return JOB_CANCELED;
     }
 
     m_argv = argv;
@@ -490,7 +514,8 @@ int HPCupsFilter::StartPrintJob(int  argc, char *argv[])
         if (fd != 0) {
             close(fd);
         }
-        dbglog("HPCUPS: processRasterData returned %d, calling closeFilter()", err);
+        if (m_iLogLevel & BASIC_LOG)
+            dbglog("HPCUPS: processRasterData returned %d, calling closeFilter()", err);
         closeFilter();
         cupsRasterClose(cups_raster);
         return 1;
@@ -499,7 +524,8 @@ int HPCupsFilter::StartPrintJob(int  argc, char *argv[])
     if (fd != 0) {
         close(fd);
     }
-    dbglog("HPCUPS: StartPrintJob end of job, calling closeFilter()");
+    if (m_iLogLevel & BASIC_LOG)
+        dbglog("HPCUPS: StartPrintJob end of job, calling closeFilter()");
     closeFilter();
     cupsRasterClose(cups_raster);
     return 0;
@@ -575,7 +601,8 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
         if (m_iLogLevel & SAVE_INPUT_RASTERS)
         {
             char    szFileName[32];
-            sprintf (szFileName, "/tmp/hpcupsfilterc_%d.bmp", current_page_number);
+            memset(szFileName, 0, sizeof(szFileName));
+            snprintf (szFileName, sizeof(szFileName), "/tmp/hpcupsfilterc_%d.bmp", current_page_number);
             if (cups_header.cupsColorSpace == CUPS_CSPACE_RGBW ||
                 cups_header.cupsColorSpace == CUPS_CSPACE_RGB)
             {
@@ -593,6 +620,7 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
             WriteBMPHeader (kfp, cups_header.cupsWidth, cups_header.cupsHeight, BLACK_RASTER);
         }
 
+        fprintf(stderr, "PAGE: %d %s", current_page_number, m_argv[4]);
         // Iterating through the raster per page
         for (int y = 0; y < (int) cups_header.cupsHeight; y++) {
             cupsRasterReadPixels (cups_raster, m_pPrinterBuffer, cups_header.cupsBytesPerLine);
@@ -736,6 +764,8 @@ void HPCupsFilter::printCupsHeaderInfo(cups_page_header2_t *header)
     dbglog ("DEBUG: cupsInteger1 = %d\n", header->cupsInteger[1]); // Red eye removal
     dbglog ("DEBUG: cupsInteger2 = %d\n", header->cupsInteger[2]); // Photo fix (RLT)
     dbglog ("DEBUG: cupsString0 = %s\n", header->cupsString[0]);   // print_mode_name
+    dbglog ("DEBUG: cupsReal0 = %f\n", header->cupsReal[0]); // Left overspray
+    dbglog ("DEBUG: cupsReal1 = %f\n", header->cupsReal[1]); // Top overspray
 }
 
 void HPCupsFilter::getLogLevel ()

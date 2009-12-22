@@ -77,6 +77,14 @@ DJGenericVIP::DJGenericVIP (SystemServices* pSS, BOOL proto)
     pMode[ModeCount++] = new VIPFastPhotoMode ();        // Fast Photo
     pMode[ModeCount++] = new VIPCDDVDMode ();            // CD/DVD PrintMode
 
+#ifdef APDK_EXTENDED_MEDIASIZE
+    pMode[ModeCount++] = new VIPBrochureNormalMode ();   // Normal, Brochure media
+    pMode[ModeCount++] = new VIPPremiumNormalMode ();    // Normal, Premium paper
+    pMode[ModeCount++] = new VIPPlainBestMode ();        // Best, Plain media
+    pMode[ModeCount++] = new VIPBrochureBestMode ();     // Best, Brochure media
+    pMode[ModeCount++] = new VIPPremiumBestMode ();      // Best, Premium media     
+#endif
+
     for (int i = 0; i < (int) ModeCount; i++)
     {
         pMode[i]->bFontCapable = FALSE;
@@ -190,6 +198,117 @@ VIPCDDVDMode::VIPCDDVDMode () : PrintMode (NULL)
     pmMediaType = MEDIA_CDDVD;
 }
 
+VIPBrochureNormalMode::VIPBrochureNormalMode () : PrintMode (NULL)
+{
+    BaseResX =
+    BaseResY = 600;
+    ResolutionX[0] = 600;
+    ResolutionY[0] = 600;
+    bFontCapable = FALSE;
+#ifdef APDK_AUTODUPLEX
+    bDuplexCapable = TRUE;
+#endif
+#if defined(APDK_VIP_COLORFILTERING)
+    Config.bErnie = TRUE;
+#endif
+
+    Config.bColorImage = FALSE;
+
+    medium      = mediaBrochure;
+    theQuality  = qualityNormal;
+    pmQuality   = QUALITY_NORMAL;
+    pmMediaType = MEDIA_BROCHURE;
+} // Added by Lizzie
+
+VIPPremiumNormalMode::VIPPremiumNormalMode () : PrintMode (NULL)
+{
+    BaseResX =
+    BaseResY = 600;
+    ResolutionX[0] = 600;
+    ResolutionY[0] = 600;
+    bFontCapable = FALSE;
+#ifdef APDK_AUTODUPLEX
+    bDuplexCapable = TRUE;
+#endif
+#if defined(APDK_VIP_COLORFILTERING)
+    Config.bErnie = TRUE;
+#endif
+
+    Config.bColorImage = FALSE;
+
+    medium      = mediaSpecial;
+    theQuality  = qualityNormal;
+    pmQuality   = QUALITY_NORMAL;
+    pmMediaType = MEDIA_PREMIUM;
+} // Added by Lizzie
+
+VIPPlainBestMode::VIPPlainBestMode () : PrintMode (NULL)
+{
+    BaseResX =
+    BaseResY = 600;
+    ResolutionX[0] = 600;
+    ResolutionY[0] = 600;
+    bFontCapable = FALSE;
+#ifdef APDK_AUTODUPLEX
+    bDuplexCapable = TRUE;
+#endif
+#if defined(APDK_VIP_COLORFILTERING)
+    Config.bErnie = TRUE;
+#endif
+
+    Config.bColorImage = FALSE;
+
+    medium      = mediaPlain;
+    theQuality  = qualityPresentation;
+    pmQuality   = QUALITY_BEST;
+    pmMediaType = MEDIA_PLAIN;
+
+} // Added by Lizzie
+
+VIPBrochureBestMode::VIPBrochureBestMode () : PrintMode (NULL)
+{
+    BaseResX =
+    BaseResY = 600;
+    ResolutionX[0] = 600;
+    ResolutionY[0] = 600;
+    bFontCapable = FALSE;
+#ifdef APDK_AUTODUPLEX
+    bDuplexCapable = TRUE;
+#endif
+#if defined(APDK_VIP_COLORFILTERING)
+    Config.bErnie = TRUE;
+#endif
+
+    Config.bColorImage = FALSE;
+
+    medium      = mediaBrochure;
+    theQuality  = qualityPresentation;
+    pmQuality   = QUALITY_BEST;
+    pmMediaType = MEDIA_BROCHURE;
+} // Added by Lizzie
+
+VIPPremiumBestMode::VIPPremiumBestMode () : PrintMode (NULL)
+{
+    BaseResX =
+    BaseResY = 600;
+    ResolutionX[0] = 600;
+    ResolutionY[0] = 600;
+    bFontCapable = FALSE;
+#ifdef APDK_AUTODUPLEX
+    bDuplexCapable = TRUE;
+#endif
+#if defined(APDK_VIP_COLORFILTERING)
+    Config.bErnie = TRUE;
+#endif
+
+    Config.bColorImage = FALSE;
+
+    medium      = mediaSpecial;
+    theQuality  = qualityPresentation;
+    pmQuality   = QUALITY_BEST;
+    pmMediaType = MEDIA_PREMIUM;
+} // Added by Lizzie
+
 BOOL DJGenericVIP::UseGUIMode (PrintMode* pPrintMode)
 {
     return TRUE;
@@ -255,6 +374,28 @@ BOOL DJGenericVIP::FullBleedCapable (PAPER_SIZE ps, FullbleedType  *fbType, floa
     char    *pStr;
     sDevIdStr[0] = 0;
 
+	// if overspray is passed down and set
+	if (this->m_iTopOverspray && this->m_iLeftOverspray && this->m_iRightOverspray && this->m_iBottomOverspray)
+    {
+
+/*
+ *      This check is needed because of method override. 
+ *      Another caller would not pass down this parameter, 
+ *      and this is default to NULL
+ */
+		if (fTopOverSpray) 
+			*fTopOverSpray = (float) this->m_iTopOverspray / (float) 1000.0;
+		if (fLeftOverSpray)
+			*fLeftOverSpray = (float) this->m_iLeftOverspray / (float) 1000.0;
+		
+		*xOverSpray = (float) (this->m_iLeftOverspray + this->m_iRightOverspray) / (float) 1000.0;
+		*yOverSpray = (float) (this->m_iTopOverspray + this->m_iBottomOverspray) / (float) 1000.0;
+
+		*fbType = fullbleed4EdgeAllMedia;
+
+		return TRUE;
+	}
+
     if ((pSS->GetDeviceID (sDevIdStr, DevIDBuffSize, FALSE)) == NO_ERROR)
     {
         if ((pStr = strstr ((char *) sDevIdStr, ";S:")) && (pSS->GetVIPVersion ()) >= 3)
@@ -271,6 +412,7 @@ BOOL DJGenericVIP::FullBleedCapable (PAPER_SIZE ps, FullbleedType  *fbType, floa
 				case OUFUKU:
 				case HAGAKI:
 				case A6_WITH_TEAR_OFF_TAB:
+				case CUSTOM_SIZE:
 				{
 					*xOverSpray = (float) 0.12;
 					*yOverSpray = (float) 0.06;
@@ -338,6 +480,9 @@ BOOL DJGenericVIP::FullBleedCapable (PAPER_SIZE ps, FullbleedType  *fbType, floa
 		case OUFUKU:
 		case HAGAKI:
 		case A6_WITH_TEAR_OFF_TAB:
+		case LETTER:
+		case A4:
+		case CUSTOM_SIZE:
 		{
 			*xOverSpray = (float) 0.12;
 			*yOverSpray = (float) 0.06;
@@ -349,6 +494,16 @@ BOOL DJGenericVIP::FullBleedCapable (PAPER_SIZE ps, FullbleedType  *fbType, floa
 
 			if (ps == PHOTO_SIZE || ps == A6_WITH_TEAR_OFF_TAB)
 				*fbType = fullbleed4EdgeAllMedia;
+			else if (ps==LETTER||ps==A4||ps==CUSTOM_SIZE)
+			{
+				*fbType = fullbleed4EdgeAllMedia;								
+				*xOverSpray = (float) 0.1;
+				*yOverSpray = (float) 0.1;
+				if (fLeftOverSpray)
+					*fLeftOverSpray = (float) 0.05;
+				if (fTopOverSpray)
+					*fTopOverSpray  = (float) 0.05;
+			}
 			else
 				*fbType = fullbleed3EdgeAllMedia;
 
@@ -584,6 +739,16 @@ void DJGenericVIP::AdjustModeSettings (BOOL bDoFullBleed, MEDIATYPE ReqMedia,
         }
 
     }
+    // Added by Lizzie - plain and premium will default to Auto when PQ is not fast draft
+    // so fix the media type here
+    if( ReqMedia == MEDIA_PLAIN)
+        *medium = mediaPlain;
+
+    if( ReqMedia == MEDIA_PREMIUM)
+        *medium = mediaSpecial;
+
+    if( ReqMedia == MEDIA_BROCHURE)
+        *medium = mediaBrochure;
 
 } // AdjustModeSettings
 

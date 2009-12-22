@@ -90,6 +90,9 @@ TECH_CLASSES = [
     "OJProKx50",
     'LJP1XXX',
     'DJD2600',
+    "Stabler",
+    "ViperPlusVIP",
+    "ViperMinusVIP",
 ]
 
 TECH_CLASSES.sort()
@@ -132,6 +135,9 @@ TECH_CLASS_PDLS = {
     "DJ55xx"       : 'pcl3',
     "OJProKx50"    : 'pcl3',
     'LJP1XXX'      : 'zxs',
+    "Stabler"      : 'pcl3',
+    "ViperPlusVIP" : 'pcl3',
+    "ViperMinusVIP": 'pcl3',
 }
 
 PDL_TYPE_PCL = 0  # less preferred

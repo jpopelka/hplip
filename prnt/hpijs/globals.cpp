@@ -83,7 +83,7 @@ MediaSize PaperToMediaSize(PAPER_SIZE psize)
     case LEDGER:        return sizeLedger;      break;
     case SUPERB_SIZE:        return sizeSuperB;      break;
     case EXECUTIVE:     return sizeExecutive;   break;
-    case FLSA:          return sizeUSLegal;        break;
+    case FLSA:          return sizeFLSA;        break;
     case CUSTOM_SIZE:   return sizeCustom;      break;
 	case ENVELOPE_NO_10: return sizeNum10Env;    break;
 	case ENVELOPE_A2:    return sizeA2Env;       break;
@@ -153,6 +153,8 @@ MediaType MediaTypeToPcl (MEDIATYPE eMediaType)
 	        return mediaAuto;
 	    case MEDIA_CDDVD:
 	        return mediaCDDVD;
+        case MEDIA_BROCHURE:
+            return mediaBrochure;
 	    default:
 	        return mediaPlain;
     }
@@ -272,7 +274,8 @@ void *LoadPlugin (const char *szPluginName)
             p = szLine + 4;
             while (*p && *p != '/')
                 p++;
-            sprintf (p+strlen (p), "/prnt/plugins/%s", szPluginName);
+            i = sizeof(szLine) - (strlen (p) + (p - szLine));
+            snprintf (p+strlen (p), i, "/prnt/plugins/%s", szPluginName);
             ptemp = dlopen (p, RTLD_LAZY);
         }
     }

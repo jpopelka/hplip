@@ -544,6 +544,26 @@ DRIVER_ERROR Job::newpage()
     return NO_ERROR;
 } //newpage
 
+/*!
+This method forces the associated printer to flush the remaining buffered
+data and tells it that the job is ended.
+
+Calling this method is not mandatory, since the object destructor already
+performs this action. It may be required, however, if the destructor is not
+called for some reason (for instance, when the call depends on the execution
+of a "finalize" method of a Java wrapper.
+*/
+
+DRIVER_ERROR Job::Flush()
+{
+    if(thePrinter)
+    {
+        BYTE temp = 0;
+        thePrinter->EndJob = TRUE;  // the Job is done -
+        return thePrinter->Send(&temp,0);  // call Send to dump any buffered data
+    }//end if
+    return NO_PRINTER_SELECTED;
+}
 
 /*!
 Resets counters, flushes buffers, and sends a form feed to the printer.

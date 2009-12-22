@@ -297,6 +297,11 @@ public:
     BOOL replay;
 #endif
 
+    virtual int GetPJLHeaderBuffer (char **szPJLBuffer)
+    {
+        return 0;
+    }
+
 protected:
     virtual void AdjustIO(IO_MODE IM, const char* model = NULL);
 

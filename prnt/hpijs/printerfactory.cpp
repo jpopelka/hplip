@@ -502,7 +502,8 @@ null string if there is no printer registered.
 ******************************************************************************/
 const void PrinterFactory::GetModelString
 (
-	char* mresult
+	char* mresult,
+    int   mresult_length
 ) const
 {
 	assert(mresult);
@@ -510,10 +511,14 @@ const void PrinterFactory::GetModelString
 
     TRACE("PF::GetModelString\n");
     FAMILY_HANDLE myFamilyHandle = StartFamilyNameEnum();
-
+    int    i = 2;
+    const char   *p;
     while (nextFamily(myFamilyHandle))
     {
-		HP_strcat(mresult, getPrinterProxy(myFamilyHandle)->GetFamilyName());
+        p = getPrinterProxy(myFamilyHandle)->GetFamilyName();
+        i += strlen(p) + 1;
+        if (i > mresult_length) break;
+		HP_strcat(mresult, p);
 		HP_strcat(mresult, " ");
     }
 } //GetModelBits

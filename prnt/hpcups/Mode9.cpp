@@ -212,7 +212,7 @@ bool Mode9::Process(RASTERDATA* input)
         if (seeded)
         {
             /* find a difference between the seed row and this row. */
-            while ((*sptr++ == *nptr++) && (offset < size) )
+            while ((offset < size) && (*sptr++ == *nptr++))
             {
                 offset++;
             }

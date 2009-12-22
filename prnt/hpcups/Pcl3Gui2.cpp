@@ -187,20 +187,14 @@ DRIVER_ERROR Pcl3Gui2::StartPage(JobAttributes *pJA)
         BYTE LeftOverSpraySeq[] = {0x1b, 0x2A, 0x6F, 0x35, 0x57, 0x0E, 0x01, 0x00};
                                 // "Esc*o5W 0E 01 00 00 00" Left edge overspray for full-bleed printing
 
-/*
- *      The vertical and horizontal overspray here are sum of overspray
- *      for two opposite edges. The overspray values are assumed to be
- *      the same for the opposite edges.
- */
-
-        cBuf[1] = (m_pMA->vertical_overspray / 2) & 0xFF;
-        cBuf[0] = (m_pMA->vertical_overspray / 2) >> 8;
+        cBuf[1] = (m_pMA->top_overspray) & 0xFF;
+        cBuf[0] = (m_pMA->top_overspray) >> 8;
 
         addToHeader((const BYTE *) TopOverSpraySeq, sizeof(TopOverSpraySeq));
         addToHeader((const BYTE *) cBuf, 2);
 
-        cBuf[1] = (m_pMA->horizontal_overspray / 2) & 0xFF;
-        cBuf[0] = (m_pMA->horizontal_overspray / 2) >> 8;
+        cBuf[1] = (m_pMA->left_overspray) & 0xFF;
+        cBuf[0] = (m_pMA->left_overspray) >> 8;
 
         addToHeader((const BYTE *) LeftOverSpraySeq, sizeof(LeftOverSpraySeq));
         addToHeader((const BYTE *) cBuf, 2);

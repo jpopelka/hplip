@@ -138,6 +138,7 @@ DRIVER_ERROR LJMono::StartPage(JobAttributes *pJA)
 DRIVER_ERROR LJMono::FormFeed()
 {
     DRIVER_ERROR    err;
+    err = Cleanup();
     err = m_pSystemServices->Send((const BYTE *) "\x0C", 1);
     return err;
 }
@@ -145,12 +146,14 @@ DRIVER_ERROR LJMono::FormFeed()
 DRIVER_ERROR LJMono::EndJob()
 {
     DRIVER_ERROR    err = NO_ERROR;
+    err = Cleanup();
     err = m_pSystemServices->Send((const BYTE *) "\x1B*rC", 4);
     err = m_pSystemServices->Send(Reset, sizeof(Reset));
     if (err == NO_ERROR)
         err = m_pSystemServices->Send(UEL, sizeof(UEL));
     return err;
 }
+
 DRIVER_ERROR LJMono::Encapsulate(RASTERDATA *InputRaster, bool bLastPlane)
 {
     DRIVER_ERROR    err = NO_ERROR;

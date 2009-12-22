@@ -418,6 +418,15 @@ DRIVER_ERROR UXServices::ReadDeviceID (BYTE * strID, int iSize)
    return NO_ERROR;
 }
 
+#ifdef HP_PRINTVIEW
+const char *szPJLHeader = "@PJL SET JOBATTR=\"JobAcct7=HPPrintView.exe\"\012";
+int UXServices::GetPJLHeaderBuffer (char **szPJLBuffer)
+{
+    *szPJLBuffer = (char *) szPJLHeader;
+    return strlen (szPJLHeader);
+}
+#endif // HP_PRINTVIEW
+
 BOOL UXServices::GetVerticalAlignmentValue(BYTE* cVertAlignVal)
 {
    if (VertAlign == -1)

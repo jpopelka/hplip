@@ -174,7 +174,8 @@ public:
     QuickConnectProxy() : PrinterProxy (
         "QuickConnect",                     // family name
         "Photosmart A530\0"
-	"Photosmart A630\0"
+        "Photosmart A630\0"
+        "Photosmart A640\0"
     ) {m_iPrinterType = eQuickConnect;}
     inline Printer* CreatePrinter (SystemServices *pSS) const { return new QuickConnect (pSS); }
 	inline PRINTER_TYPE GetPrinterType () const { return eQuickConnect;}

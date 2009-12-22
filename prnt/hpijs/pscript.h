@@ -113,7 +113,7 @@ private:
     struct jpeg_error_mgr       m_jerr;
     jmp_buf                     m_setjmp_buffer;
 
-    int     m_iRowNumber;
+    unsigned int     m_iRowNumber;
     int     m_iRowWidth;
     int     m_iJpegBufferPos;
     int     m_iJpegBufferSize;

@@ -46,6 +46,8 @@ public:
     DRIVER_ERROR    Encapsulate (RASTERDATA *InputRaster, bool bLastPlane);
     DRIVER_ERROR    StartPage(JobAttributes *pJA);
     DRIVER_ERROR    Configure(Pipeline **pipeline);
+    DRIVER_ERROR    EndJob();
+    DRIVER_ERROR    FormFeed();
 protected:
     virtual DRIVER_ERROR addJobSettings();
     void    configureRasterData();

@@ -244,6 +244,19 @@ public:
 	*/
     MediaSource GetMediaSource() { return m_MediaSource; }
 
+    void            SetMediaSubtype (int iMediaSubtype)
+    {
+        m_iMediaSubtype = iMediaSubtype;
+    }
+    int             GetMediaSubtype ()
+    {
+        return m_iMediaSubtype;
+    }
+    void            SetMechOffset (int iMechOffset)
+    {
+        m_iMechOffset = iMechOffset;
+    }
+
     // needed for testing
 //    PEN_TYPE GetCompatiblePen(unsigned int num);    // get CompatiblePens of Printer
 
@@ -399,6 +412,8 @@ private:
 
     int m_iCopyCount;
 
+    int         m_iMediaSubtype;
+    int         m_iMechOffset;
 }; //PrintContext
 
 APDK_END_NAMESPACE

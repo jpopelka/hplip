@@ -42,6 +42,8 @@ const char sLetterGothic[]="LetterGothic";
 const char sUnivers[]="Univers";
 const char sBad[]="Bad";
 
+class PrintContext;
+
 //Font
 //! Base class for font support
 /*! \class Font font.h "hpprintapi.h"

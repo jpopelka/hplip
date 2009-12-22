@@ -92,6 +92,27 @@ public:
                 m_cExtraDryTime = (BYTE) (iValue & 0xFF);
                 break;
             }
+            case LEFT_OVERSPRAY_HINT:
+            {
+                m_iLeftOverspray = iValue;
+                break;
+            }
+            case RIGHT_OVERSPRAY_HINT:
+            {
+                m_iRightOverspray = iValue;
+                break;
+            }
+            case TOP_OVERSPRAY_HINT:
+            {
+                m_iTopOverspray = iValue;
+                break;
+            }
+            case BOTTOM_OVERSPRAY_HINT:
+            {
+                m_iBottomOverspray = iValue;
+                break;
+            }
+
             default:
                 break;
         }
@@ -105,6 +126,8 @@ public:
         }
         return 0;
     }
+
+    virtual DRIVER_ERROR AddPJLHeader ();
 protected:
 
 #ifdef APDK_HP_UX
@@ -117,6 +140,10 @@ protected:
     BOOL PCL3acceptsDriverware;
     virtual BYTE PhotoTrayStatus(BOOL bQueryPrinter);
 	int		iNumMissingPens;
+    int     m_iLeftOverspray;
+    int     m_iTopOverspray;
+    int     m_iRightOverspray;
+    int     m_iBottomOverspray;
 
 private:
     BOOL IsPCL3DriverwareAvailable();

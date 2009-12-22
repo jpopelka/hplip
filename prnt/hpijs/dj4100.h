@@ -93,10 +93,14 @@ class DJ4100Proxy : public PrinterProxy
 public:
     DJ4100Proxy() : PrinterProxy(
         "DJ4100",                               // family name
-		"Deskjet D4100\0"                        // DeskJet 4100
+        "Deskjet D4100\0"                       // DeskJet 4100
         "Deskjet D4160\0"
         "Deskjet D42\0"
         "Deskjet D43\0"
+        "Deskjet D16\0"
+        "Deskjet D26\0"
+        "Deskjet Ink Advant K109\0"
+        "Deskjet Ink Advant K209\0"
     ) {m_iPrinterType = eDJ4100;}
     inline Printer* CreatePrinter(SystemServices* pSS) const { return new DJ4100(pSS); }
 	inline PRINTER_TYPE GetPrinterType() const { return eDJ4100;}

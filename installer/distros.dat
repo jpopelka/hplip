@@ -665,7 +665,7 @@ open_mdns_port=/bin/bash ./init-suse-firewall
 packages=cups,cups-client
 
 [suse:11.0:cups-devel]
-packages=cups-devel
+packages=cups-devel,cupsddk
 
 [suse:11.0:gcc]
 packages=gcc-c++
@@ -788,7 +788,7 @@ open_mdns_port=/bin/bash ./init-suse-firewall
 packages=cups,cups-client
 
 [suse:11.1:cups-devel]
-packages=cups-devel
+packages=cups-devel,cupsddk
 
 [suse:11.1:gcc]
 packages=gcc-c++
@@ -881,16 +881,16 @@ packages=
 # ********************
 [suse:11.2]
 code_name=
-supported=0
+supported=1
 scan_supported=1
 fax_supported=1
 pcard_supported=1
 network_supported=1
 parallel_supported=1
 usb_supported=1
-packaged_version=
-release_date=
-notes=Please be sure to disable the CD repositories in YaST.
+packaged_version=3.9.8
+release_date=2009-11-12
+notes=Please be sure to disable the CD repositories in YaST and after installation you must log out and back in to become a member of the lp group to enable printing.
 ppd_install=drv
 udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
@@ -901,12 +901,13 @@ ui_toolkit=qt4
 native_cups=1
 add_user_to_group=-Alp
 open_mdns_port=/bin/bash ./init-suse-firewall
+pre_depend_cmd=su -c "zypper refresh"
 
 [suse:11.2:cups]
 packages=cups,cups-client
 
 [suse:11.2:cups-devel]
-packages=cups-devel
+packages=cups-devel,cupsddk
 
 [suse:11.2:gcc]
 packages=gcc-c++
@@ -930,7 +931,7 @@ packages=glibc
 packages=libtool,libgphoto2-devel
 
 [suse:11.2:libusb]
-packages=libusb-devel,libusb-1_0-0
+packages=libusb-1_0-devel,libusb-1_0-0
 
 [suse:11.2:make]
 packages=make
@@ -984,9 +985,6 @@ packages=dbus-1-python
 [suse:11.2:dbus]
 packages=dbus-1-devel,python-gobject2
 
-[suse:11.2:python-ctypes]
-packages=python-ctypes
-
 [suse:11.2:python-xml]
 packages=python-xml
 
@@ -994,7 +992,7 @@ packages=python-xml
 packages=cups-devel
 
 [suse:11.2:python-notify]
-packages=
+packages=python-notify
 
 # ****************************************
 [redhat]
@@ -1196,7 +1194,7 @@ ui_toolkit=qt3
 # ****************************************
 [fedora]
 index=5
-versions=1.0,2.0,3.0,4.0,5,5.0,5.92,6,6.0,7,7.0,8,8.0,9,9.0,10,10.0,11,11.0
+versions=1.0,2.0,3.0,4.0,5,5.0,5.92,6,6.0,7,7.0,8,8.0,9,9.0,10,10.0,11,11.0,12,12.0
 display_name=Fedora
 alt_names=Fedora Core
 display=1
@@ -2370,6 +2368,123 @@ packages=notify-python
 [fedora:11.0]
 same_as_version= 11
 
+# ********************
+[fedora:12]
+code_name=
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=
+release_date=
+notes=To complete the install in Fedora 12 you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+policykit=1
+native_cups=1
+add_user_to_group=-a -Gsys,lp
+open_mdns_port=/bin/bash ./init-iptables-firewall
+pre_depend_cmd=su -c "yum clean all"
+
+[fedora:12:cups]
+packages=cups
+
+[fedora:12:cups-devel]
+packages=cups-devel
+
+[fedora:12:gcc]
+packages=gcc-c++
+
+[fedora:12:gs]
+packages=ghostscript
+
+[fedora:12:libcrypto]
+packages=openssl-devel
+
+[fedora:12:libjpeg]
+packages=libjpeg-devel
+
+[fedora:12:libnetsnmp-devel]
+packages=net-snmp-devel
+
+[fedora:12:libpthread]
+packages=glibc-headers
+
+[fedora:12:libtool]
+packages=libtool
+
+[fedora:12:libusb]
+packages=libusb-devel
+
+[fedora:12:make]
+packages=make
+
+[fedora:12:pil]
+packages=python-imaging
+
+[fedora:12:ppdev]
+packages=
+commands=su -c "/sbin/modprobe ppdev"
+
+[fedora:12:pyqt]
+packages=PyQt
+
+[fedora:12:python-devel]
+packages=python-devel
+
+[fedora:12:pyqt4]
+packages=PyQt4
+
+[fedora:12:pyqt4-dbus]
+packages=dbus-python
+
+[fedora:12:python23]
+packages=python
+
+[fedora:12:python2x]
+packages=python
+
+[fedora:12:reportlab]
+packages=python-reportlab
+
+[fedora:12:sane]
+packages=sane-backends
+
+[fedora:12:sane-devel]
+packages=sane-backends-devel
+
+[fedora:12:scanimage]
+packages=sane-frontends
+
+[fedora:12:xsane]
+packages=xsane
+
+[fedora:12:python-dbus]
+packages=dbus-python,pygobject2
+
+[fedora:12:dbus]
+packages=dbus-devel
+
+[fedora:12:cups-image]
+packages=cups-devel
+
+[fedora:12:python-notify]
+packages=notify-python
+
+[fedora:12:policykit]
+packages=polkit,polkit-gnome
+
+# ********************
+[fedora:12.0]
+same_as_version= 12
+
 # ****************************************
 [linspire]
 index=15
@@ -2707,25 +2822,25 @@ release_date=
 notes=
 ppd_install=ppd
 udev_mode_fix=1
-ppd_dir=/usr/share/ppd/HP
+ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 
 [centos:any:cups]
-packages=
+packages=cups
 
 [centos:any:cups-devel]
 packages=cups-devel
 
 [centos:any:gcc]
-packages=
+packages=gcc-c++
 
 [centos:any:gs]
-packages=
+packages=ghostscript
 
 [centos:any:libcrypto]
-packages=
+packages=openssl-devel
 
 [centos:any:libjpeg]
 packages=libjpeg-devel
@@ -2734,53 +2849,53 @@ packages=libjpeg-devel
 packages=net-snmp-devel
 
 [centos:any:libpthread]
-packages=
+packages=glibc-headers
 
 [centos:any:libtool]
-packages=
+packages=libtool
 
 [centos:any:libusb]
-packages=
+packages=libusb-devel
 
 [centos:any:make]
-packages=
+packages=make
 
 [centos:any:pil]
-packages=
+packages=python-imaging,python-imaging-devel
 
 [centos:any:ppdev]
 packages=
 commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
 
 [centos:any:pyqt]
-packages=pyqt,pyqt-devel
+packages=PyQt,PyQt-devel
 
 [centos:any:python-devel]
-packages=
+packages=python-devel,PyXML
 
 [centos:any:pyqt4]
-packages=python-qt4
+packages=
 
 [centos:any:pyqt4-dbus]
-packages=python-qt4-dbus,python-gobject
+packages=pygobject2
 
 [centos:any:python23]
-packages=
+packages=python
 
 [centos:any:python2x]
-packages=
+packages=python
 
 [centos:any:reportlab]
 packages=
 
 [centos:any:sane]
-packages=
+packages=sane-backends
 
 [centos:any:sane-devel]
-packages=
+packages=sane-backends-devel
 
 [centos:any:scanimage]
-packages=
+packages=sane-frontends
 
 [centos:any:xsane]
 packages=xsane
@@ -2789,10 +2904,13 @@ packages=xsane
 packages=
 
 [centos:any:python-dbus]
-packages=
+packages=dbus-python,policycoreutils-gui
 
 [centos:any:python-ctypes]
 packages=
+
+[centos:any:python-notify]
+packages=notify-python
 
 # ****************************************
 [gentoo]
@@ -4785,7 +4903,7 @@ parallel_supported=1
 usb_supported=1
 packaged_version=3.9.2
 release_date=2009
-notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
+notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.  During the install process you will be added to the lp group, please quit the installer before the setup stage, log out, log back in, and run hp-setup to complete the install.
 ppd_install=drv
 udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
@@ -4795,6 +4913,7 @@ ui_toolkit=qt4
 policykit=1
 native_cups=1
 acl_rules=1
+add_user_to_group=-a -Glp
 
 [ubuntu:9.10:cups]
 packages=libcupsys2
@@ -4893,14 +5012,14 @@ packages=python-notify
 # ****************************************
 [debian]
 index=2
-versions=2.2,3.0,3.1,4.0,4.0r0,4.0r1,5.0,5.0.1,5.0.2,stable,lenny/sid,testing,lenny
+versions=2.2,3.0,3.1,4.0,4.0r0,4.0r1,5.0,5.0.1,5.0.2,5.0.3,stable,lenny/sid,testing,lenny
 display_name=Debian
 alt_names=
 display=1
 notes=
 package_mgrs=dpkg,apt-get,synaptic,update-manager,adept,aptitude
 package_mgr_cmd=su -c "apt-get install --force-yes -y $packages_to_install"
-pre_depend_cmd=su -c "dpkg --configure -a",su -c "apt-get install -f",su -c "apt-get update",gnome-terminal su -c "apt-get install --yes cupsys-bsd"
+pre_depend_cmd=su -c "dpkg --configure -a",su -c "apt-get install -f",su -c "apt-get update",su -c "apt-get install --yes cupsys-bsd"
 post_depend_cmd=
 hplip_remove_cmd=su -c "apt-get remove --yes hplip hpijs"
 su_sudo=su
@@ -5228,9 +5347,9 @@ packages=libcupsys-dev,cupsys-bsd
 # ********************
 [debian:4.0]
 code_name=Etch
-supported=1
+supported=0
 scan_supported=1
-fax_supported=0
+fax_supported=1
 pcard_supported=1
 network_supported=1
 parallel_supported=1
@@ -5243,7 +5362,7 @@ udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
+ui_toolkit=qt3
 native_cups=1
 
 [debian:4.0:cups]
@@ -5252,8 +5371,11 @@ packages=cupsys,cupsys-client
 [debian:4.0:cups-devel]
 packages=libcupsys2-dev,cupsys-bsd
 
+[debian:4.0:cups-image]
+packages=libcupsimage2-dev
+
 [debian:4.0:gcc]
-packages=gcc,g++
+packages=build-essential
 
 [debian:4.0:gs]
 packages=gs-esp
@@ -5286,20 +5408,11 @@ packages=python-imaging
 packages=
 commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
 
-[debian:4.0:pyqt]
+[debian:4.0:pyqt4]
 packages=python-qt3
 
 [debian:4.0:python-devel]
 packages=python-dev
-
-[debian:4.0:pyqt4]
-packages=python-qt4
-
-[debian:4.0:pyqt4-dbus]
-packages=python-qt4-dbus
-
-[debian:4.0:python23]
-packages=python
 
 [debian:4.0:python2x]
 packages=python
@@ -5319,238 +5432,18 @@ packages=sane-utils
 [debian:4.0:xsane]
 packages=xsane
 
-[debian:4.0:cups-ddk]
-packages=
-
 [debian:4.0:python-dbus]
-# packages=python-dbus,libdbus-1-dev,python-gobject
-
-[debian:4.0:python-ctypes]
-# packages=python-ctypes
-
-[debian:4.0:cups-image]
-packages=libcupsys-dev,cupsys-bsd
+packages=python-dbus,libdbus-1-dev
 
 [debian:4.0:python-notify]
 packages=python-notify
 
-# ********************
+# ************************************************
 [debian:4.0r0]
-code_name=Etch
-supported=1
-scan_supported=1
-fax_supported=0
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=1.6.10
-release_date=2007-4-8
-notes=Be sure to disable the CD-ROM repositories and also ensure that the main/security repositories are enabled.
-ppd_install=ppd
-udev_mode_fix=1
-ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
-native_cups=1
+same_as_version= 4.0
 
-[debian:4.0r0:cups]
-packages=cupsys,cupsys-client
-
-[debian:4.0r0:cups-devel]
-packages=libcupsys2-dev,cupsys-bsd
-
-[debian:4.0r0:gcc]
-packages=gcc,g++
-
-[debian:4.0r0:gs]
-packages=gs-esp
-
-[debian:4.0r0:libcrypto]
-packages=libssl-dev
-
-[debian:4.0r0:libjpeg]
-packages=libjpeg-dev
-
-[debian:4.0r0:libnetsnmp-devel]
-packages=libsnmp9-dev
-
-[debian:4.0r0:libpthread]
-packages=libc6
-
-[debian:4.0r0:libtool]
-packages=libtool
-
-[debian:4.0r0:libusb]
-packages=libusb-dev
-
-[debian:4.0r0:make]
-packages=make
-
-[debian:4.0r0:pil]
-packages=python-imaging
-
-[debian:4.0r0:ppdev]
-packages=
-commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
-
-[debian:4.0r0:pyqt]
-packages=python-qt3
-
-[debian:4.0r0:python-devel]
-packages=python-dev
-
-[debian:4.0r0:pyqt4]
-packages=python-qt4
-
-[debian:4.0r0:pyqt4-dbus]
-packages=python-qt4-dbus
-
-[debian:4.0r0:python23]
-packages=python
-
-[debian:4.0r0:python2x]
-packages=python
-
-[debian:4.0r0:reportlab]
-packages=python-reportlab
-
-[debian:4.0r0:sane]
-packages=sane
-
-[debian:4.0r0:sane-devel]
-packages=libsane-dev
-
-[debian:4.0r0:scanimage]
-packages=sane-utils
-
-[debian:4.0r0:xsane]
-packages=xsane
-
-[debian:4.0r0:cups-ddk]
-packages=
-
-[debian:4.0r0:python-dbus]
-# packages=python-dbus,libdbus-1-dev,python-gobject
-
-[debian:4.0r0:python-ctypes]
-# packages=python-ctypes
-
-[debian:4.0r0:cups-image]
-packages=libcupsys-dev,cupsys-bsd
-
-[debian:4.0r0:python-notify]
-packages=python-notify
-
-# ********************
 [debian:4.0r1]
-code_name=Etch
-supported=1
-scan_supported=1
-fax_supported=0
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=1.6.10
-release_date=2007-4-8
-notes=Be sure to disable the CD-ROM repositories and also ensure that the main/security repositories are enabled.
-ppd_install=ppd
-udev_mode_fix=1
-ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
-native_cups=1
-
-[debian:4.0r1:cups]
-packages=cupsys,cupsys-client
-
-[debian:4.0r1:cups-devel]
-packages=libcupsys2-dev,cupsys-bsd
-
-[debian:4.0r1:gcc]
-packages=gcc,g++
-
-[debian:4.0r1:gs]
-packages=gs-esp
-
-[debian:4.0r1:libcrypto]
-packages=libssl-dev
-
-[debian:4.0r1:libjpeg]
-packages=libjpeg-dev
-
-[debian:4.0r1:libnetsnmp-devel]
-packages=libsnmp9-dev
-
-[debian:4.0r1:libpthread]
-packages=libc6
-
-[debian:4.0r1:libtool]
-packages=libtool
-
-[debian:4.0r1:libusb]
-packages=libusb-dev
-
-[debian:4.0r1:make]
-packages=make
-
-[debian:4.0r1:pil]
-packages=python-imaging
-
-[debian:4.0r1:ppdev]
-packages=
-commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
-
-[debian:4.0r1:pyqt]
-packages=python-qt3
-
-[debian:4.0r1:python-devel]
-packages=python-dev
-
-[debian:4.0r1:pyqt4]
-packages=python-qt4
-
-[debian:4.0r1:pyqt4-dbus]
-packages=python-qt4-dbus
-
-[debian:4.0r1:python23]
-packages=python
-
-[debian:4.0r1:python2x]
-packages=python
-
-[debian:4.0r1:reportlab]
-packages=python-reportlab
-
-[debian:4.0r1:sane]
-packages=sane
-
-[debian:4.0r1:sane-devel]
-packages=libsane-dev
-
-[debian:4.0r1:scanimage]
-packages=sane-utils
-
-[debian:4.0r1:xsane]
-packages=xsane
-
-[debian:4.0r1:cups-ddk]
-packages=
-
-[debian:4.0r1:python-dbus]
-# packages=python-dbus,libdbus-1-dev,python-gobject
-
-[debian:4.0r1:python-ctypes]
-# packages=python-ctypes
-
-[debian:4.0r1:cups-image]
-packages=libcupsys-dev,cupsys-bsd
-
-[debian:4.0r1:python-notify]
-packages=python-notify
+same_as_version= 4.0
 
 # ********************
 [debian:5.0]
@@ -5572,6 +5465,8 @@ fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 native_cups=1
+policykit=1
+add_user_to_group=-a -G lp
 
 [debian:5.0:cups]
 packages=cupsys,cupsys-client,libcupsys2-dev
@@ -5661,6 +5556,9 @@ packages=python-ctypes
 [debian:5.0:cups-image]
 packages=libcupsimage2,libcupsimage2-dev
 
+[debian:5.0:policykit]
+packages=policykit,policykit-gnome
+
 [debian:5.0:python-notify]
 packages=python-notify
 
@@ -5669,6 +5567,10 @@ same_as_version= 5.0
 
 [debian:5.0.2]
 same_as_version= 5.0
+
+[debian:5.0.3]
+same_as_version= 5.0
+
 # ********************
 [debian:stable]
 code_name=Etch

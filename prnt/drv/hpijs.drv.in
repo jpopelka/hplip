@@ -255,7 +255,7 @@ et=4"
       ModelName "Apollo 2200 hpijs"
       Attribute "NickName" "" "Apollo 2200 hpijs, $Version"
       Attribute "ShortNickName" "" "Apollo 2200 hpijs"
-      Attribute "1284DeviceID" "" "MFG:APOLLO;MDL:apollo 2200;DES:apollo 2200;"
+      Attribute "1284DeviceID" "" "MFG:Apollo;MDL:apollo 2200;DES:apollo 2200;"
       PCFileName "apollo-2200-hpijs.ppd"
       Attribute "Product" "" "(Apollo 2200 Printer)"
     }
@@ -263,7 +263,7 @@ et=4"
       ModelName "Apollo p2250 hpijs"
       Attribute "NickName" "" "Apollo p2250 hpijs, $Version"
       Attribute "ShortNickName" "" "Apollo p2250 hpijs"
-      Attribute "1284DeviceID" "" "MFG:APOLLO;MDL:apollo p2250;DES:apollo p2250;"
+      Attribute "1284DeviceID" "" "MFG:Apollo;MDL:apollo p2250;DES:apollo p2250;"
       PCFileName "apollo-p2250-hpijs.ppd"
       Attribute "Product" "" "(Apollo p2250 Printer)"
     }
@@ -276,7 +276,7 @@ et=4"
       ModelName "Apollo p2000-u hpijs"
       Attribute "NickName" "" "Apollo p2000-u hpijs, $Version"
       Attribute "ShortNickName" "" "Apollo p2000-u hpijs"
-      Attribute "1284DeviceID" "" "MFG:APOLLO;MDL:apollo p2000-u;DES:apollo p2000-u;"
+      Attribute "1284DeviceID" "" "MFG:Apollo;MDL:apollo p2000-u;DES:apollo p2000-u;"
       PCFileName "apollo-p2000-u-hpijs.ppd"
       Attribute "Product" "" "(Apollo p2000-u Printer)"
     }
@@ -284,7 +284,7 @@ et=4"
       ModelName "Apollo 2100 hpijs"
       Attribute "NickName" "" "Apollo 2100 hpijs, $Version"
       Attribute "ShortNickName" "" "Apollo 2100 hpijs"
-      Attribute "1284DeviceID" "" "MFG:APOLLO;MDL:apollo 2100;DES:apollo 2100;"
+      Attribute "1284DeviceID" "" "MFG:Apollo;MDL:apollo 2100;DES:apollo 2100;"
       PCFileName "apollo-2100-hpijs.ppd"
       Attribute "Product" "" "(Apollo 2100 Printer)"
     }
@@ -292,7 +292,7 @@ et=4"
       ModelName "Apollo 2150 hpijs"
       Attribute "NickName" "" "Apollo 2150 hpijs, $Version"
       Attribute "ShortNickName" "" "Apollo 2150 hpijs"
-      Attribute "1284DeviceID" "" "MFG:APOLLO;MDL:apollo 2150;DES:apollo 2150;"
+      Attribute "1284DeviceID" "" "MFG:Apollo;MDL:apollo 2150;DES:apollo 2150;"
       PCFileName "apollo-2150-hpijs.ppd"
       Attribute "Product" "" "(Apollo 2150 Printer)"
     }
@@ -305,7 +305,7 @@ et=4"
       ModelName "Apollo 2500 hpijs"
       Attribute "NickName" "" "Apollo 2500 hpijs, $Version"
       Attribute "ShortNickName" "" "Apollo 2500 hpijs"
-      Attribute "1284DeviceID" "" "MFG:APOLLO;MDL:apollo 2500;DES:apollo 2500;"
+      Attribute "1284DeviceID" "" "MFG:Apollo;MDL:apollo 2500;DES:apollo 2500;"
       PCFileName "apollo-2500-hpijs.ppd"
       Attribute "Product" "" "(Apollo 2500 Printer)"
     }
@@ -313,7 +313,7 @@ et=4"
       ModelName "Apollo 2600 hpijs"
       Attribute "NickName" "" "Apollo 2600 hpijs, $Version"
       Attribute "ShortNickName" "" "Apollo 2600 hpijs"
-      Attribute "1284DeviceID" "" "MFG:APOLLO;MDL:apollo 2600;DES:apollo 2600;"
+      Attribute "1284DeviceID" "" "MFG:Apollo;MDL:apollo 2600;DES:apollo 2600;"
       PCFileName "apollo-2600-hpijs.ppd"
       Attribute "Product" "" "(Apollo 2600 Printer)"
     }
@@ -321,7 +321,7 @@ et=4"
       ModelName "Apollo 2650 hpijs"
       Attribute "NickName" "" "Apollo 2650 hpijs, $Version"
       Attribute "ShortNickName" "" "Apollo 2650 hpijs"
-      Attribute "1284DeviceID" "" "MFG:APOLLO;MDL:apollo 2650;DES:apollo 2650;"
+      Attribute "1284DeviceID" "" "MFG:Apollo;MDL:apollo 2650;DES:apollo 2650;"
       PCFileName "apollo-2650-hpijs.ppd"
       Attribute "Product" "" "(Apollo 2650 Printer)"
     }
@@ -2560,37 +2560,6 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJGenericVIP:Normal%>
   {
-    ModelName "HP Photosmart Wireless b109n-z hpijs"
-    Attribute "NickName" "" "HP Photosmart Wireless b109n-z hpijs, $Version"
-    Attribute "ShortNickName" "" "HP PS Wireless b109n-z hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart wireless b109n-z;DES:photosmart wireless b109n-z;"
-    PCFileName "hp-photosmart_wireless_b109n-z-hpijs.ppd"
-    Attribute "Product" "" "(HP Photosmart Wireless All-in-one Printer - b109n)"
-    Attribute "Product" "" "(HP Photosmart Wireless All-in-one Printer - b109q)"
-    Attribute "Product" "" "(HP Photosmart Wireless All-in-one Printer - b109q=r)"
-  }
-  {
-    ModelName "HP Photosmart b109a-m hpijs"
-    Attribute "NickName" "" "HP Photosmart b109a-m hpijs, $Version"
-    Attribute "ShortNickName" "" "HP Photosmart b109a-m hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart b109a-m;DES:photosmart b109a-m;"
-    PCFileName "hp-photosmart_b109a-m-hpijs.ppd"
-    Attribute "Product" "" "(HP Photosmart All-in-one Printer - b109a)"
-    Attribute "Product" "" "(HP Photosmart All-in-one Printer - b109c)"
-    Attribute "Product" "" "(HP Photosmart All-in-one Printer - b109d)"
-    Attribute "Product" "" "(HP Photosmart All-in-one Printer - b109e)"
-  }
-  {
-    ModelName "HP Photosmart Plus b209a-m hpijs"
-    Attribute "NickName" "" "HP Photosmart Plus b209a-m hpijs, $Version"
-    Attribute "ShortNickName" "" "HP PS Plus b209a-m hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart plus b209a-m;DES:photosmart plus b209a-m;"
-    PCFileName "hp-photosmart_plus_b209a-m-hpijs.ppd"
-    Attribute "Product" "" "(HP Photosmart Plus All-in-one Printer - b209a)"
-    Attribute "Product" "" "(HP Photosmart Plus All-in-one Printer - b209b)"
-    Attribute "Product" "" "(HP Photosmart Plus All-in-one Printer - b209c)"
-  }
-  {
     ModelName "HP Deskjet Ink Advant k209a-z hpijs"
     Attribute "NickName" "" "HP Deskjet Ink Advant k209a-z hpijs, $Version"
     Attribute "ShortNickName" "" "HP DJ Ink Advant k209a-z hpijs"
@@ -2747,25 +2716,6 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP PSC 2410 Photosmart All-in-one Printer)"
     Attribute "Product" "" "(HP PSC 2420 Photosmart All-in-one Printer)"
     Attribute "Product" "" "(HP PSC 2450 Photosmart All-in-one Printer)"
-  }
-  {
-    ModelName "HP Deskjet f2400 Series hpijs"
-    Attribute "NickName" "" "HP Deskjet f2400 Series hpijs, $Version"
-    Attribute "ShortNickName" "" "HP Deskjet f2400 Series hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet f2400 series;DES:deskjet f2400 series;"
-    PCFileName "hp-deskjet_f2400_series-hpijs.ppd"
-    Attribute "Product" "" "(HP Deskjet f2410 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet f2418 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet f2420 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet f2423 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet f2430 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet f2440 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet f2476 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet f2480 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet f2483 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet f2488 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet f2492 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet f2493 All-in-one Printer)"
   }
   {
     ModelName "HP Deskjet d2500 Series hpijs"
@@ -2997,23 +2947,6 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Photosmart c4388 All-in-one Printer)"
   }
   {
-    ModelName "HP Deskjet f4400 Series hpijs"
-    Attribute "NickName" "" "HP Deskjet f4400 Series hpijs, $Version"
-    Attribute "ShortNickName" "" "HP Deskjet f4400 Series hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet f4400 series;DES:deskjet f4400 series;"
-    PCFileName "hp-deskjet_f4400_series-hpijs.ppd"
-    Attribute "Product" "" "(HP Deskjet f4440 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet f4435 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet f4450 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet f4470 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet f4472 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet f4473 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet f4480 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet f4483 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet f4488 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet f4492 All-in-one Printer)"
-  }
-  {
     ModelName "HP Photosmart c4400 Series hpijs"
     Attribute "NickName" "" "HP Photosmart c4400 Series hpijs, $Version"
     Attribute "ShortNickName" "" "HP PS c4400 Series hpijs"
@@ -3035,14 +2968,6 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Photosmart c4490 All-in-one Printer)"
     Attribute "Product" "" "(HP Photosmart c4493 All-in-one Printer)"
     Attribute "Product" "" "(HP Photosmart c4494 All-in-one Printer)"
-  }
-  {
-    ModelName "HP Deskjet f4500 Series hpijs"
-    Attribute "NickName" "" "HP Deskjet f4500 Series hpijs, $Version"
-    Attribute "ShortNickName" "" "HP Deskjet f4500 Series hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet f4500 series;DES:deskjet f4500 series;"
-    PCFileName "hp-deskjet_f4500_series-hpijs.ppd"
-    Attribute "Product" "" "(HP Deskjet f4500 All-in-one Printer Series)"
   }
   {
     ModelName "HP Officejet j4500 Series hpijs"
@@ -3080,23 +3005,6 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Photosmart c4599 All-in-one Printer)"
   }
   {
-    ModelName "HP Photosmart c4600 Series hpijs"
-    Attribute "NickName" "" "HP Photosmart c4600 Series hpijs, $Version"
-    Attribute "ShortNickName" "" "HP PS c4600 Series hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart c4600 series;DES:photosmart c4600 series;"
-    PCFileName "hp-photosmart_c4600_series-hpijs.ppd"
-    Attribute "Product" "" "(HP Photosmart c4640 All-in-one Printer)"
-    Attribute "Product" "" "(HP Photosmart c4650 All-in-one Printer)"
-    Attribute "Product" "" "(HP Photosmart c4680 All-in-one Printer)"
-    Attribute "Product" "" "(HP Photosmart c4610 All-in-one Printer)"
-    Attribute "Product" "" "(HP Photosmart c4635 All-in-one Printer)"
-    Attribute "Product" "" "(HP Photosmart c4670 All-in-one Printer)"
-    Attribute "Product" "" "(HP Photosmart c4673 All-in-one Printer)"
-    Attribute "Product" "" "(HP Photosmart c4680 All-in-one Printer)"
-    Attribute "Product" "" "(HP Photosmart c4683 All-in-one Printer)"
-    Attribute "Product" "" "(HP Photosmart c4688 All-in-one Printer)"
-  }
-  {
     ModelName "HP Officejet j4660 Series hpijs"
     Attribute "NickName" "" "HP Officejet j4660 Series hpijs, $Version"
     Attribute "ShortNickName" "" "HP Officejet j4660 Series hpijs"
@@ -3114,23 +3022,6 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Deskjet f4280 All-in-one)"
     Attribute "Product" "" "(HP Officejet j4680c All-in-one Printer)"
     Attribute "Product" "" "(HP Officejet j4680 All-in-one Printer)"
-  }
-  {
-    ModelName "HP Photosmart c4700 Series hpijs"
-    Attribute "NickName" "" "HP Photosmart c4700 Series hpijs, $Version"
-    Attribute "ShortNickName" "" "HP PS c4700 Series hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart c4700 series;DES:photosmart c4700 series;"
-    PCFileName "hp-photosmart_c4700_series-hpijs.ppd"
-    Attribute "Product" "" "(HP Photosmart c4740 All-in-one Printer)"
-    Attribute "Product" "" "(HP Photosmart c4750 All-in-one Printer)"
-    Attribute "Product" "" "(HP Photosmart c4780 All-in-one Printer)"
-    Attribute "Product" "" "(HP Photosmart c4783 All-in-one Printer)"
-    Attribute "Product" "" "(HP Photosmart c4785 All-in-one Printer)"
-    Attribute "Product" "" "(HP Photosmart c4788 All-in-one Printer)"
-    Attribute "Product" "" "(HP Photosmart c4793 All-in-one Printer)"
-    Attribute "Product" "" "(HP Photosmart c4795 All-in-one Printer)"
-    Attribute "Product" "" "(HP Photosmart c4798 All-in-one Printer)"
-    Attribute "Product" "" "(HP Photosmart c4799 All-in-one Printer)"
   }
   {
     ModelName "HP Photosmart d5060 Series hpijs"
@@ -3254,17 +3145,6 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Deskjet 5440xi Photo Printer)"
     Attribute "Product" "" "(HP Deskjet 5442 Photo Printer)"
     Attribute "Product" "" "(HP Deskjet 5443 Photo Printer)"
-  }
-  {
-    ModelName "HP Deskjet d5500 Series hpijs"
-    Attribute "NickName" "" "HP Deskjet d5500 Series hpijs, $Version"
-    Attribute "ShortNickName" "" "HP Deskjet d5500 Series hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet d5500 series;DES:deskjet d5500 series;"
-    PCFileName "hp-deskjet_d5500_series-hpijs.ppd"
-    Attribute "Product" "" "(HP Deskjet d5545 Printer)"
-    Attribute "Product" "" "(HP Deskjet d5560 Printer)"
-    Attribute "Product" "" "(HP Deskjet d5563 Printer)"
-    Attribute "Product" "" "(HP Deskjet d5568 Printer)"
   }
   {
     ModelName "HP Photosmart c5500 Series hpijs"
@@ -3853,6 +3733,15 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Photosmart 7960v Photo Printer)"
     Attribute "Product" "" "(HP Photosmart 7960w Photo Printer)"
     Attribute "Product" "" "(HP Photosmart 7960gp Photo Printer)"
+  }
+  {
+    ModelName "HP Officejet Pro 8000 a809 hpijs"
+    Attribute "NickName" "" "HP Officejet Pro 8000 a809 hpijs, $Version"
+    Attribute "ShortNickName" "" "HP OJ Pro 8000 a809 hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet pro 8000 a809;DES:officejet pro 8000 a809;"
+    PCFileName "hp-officejet_pro_8000_a809-hpijs.ppd"
+    Attribute "Product" "" "(HP Officejet Pro 8000 Printer - a809a)"
+    Attribute "Product" "" "(HP Officejet Pro 8000 Wireless Printer - a809n)"
   }
   {
     ModelName "HP Photosmart 8000 Series hpijs"
@@ -4545,15 +4434,6 @@ et=2"
     Attribute "Product" "" "(HP Officejet Pro k5400n Printer)"
     Attribute "Product" "" "(HP Officejet Pro k5400 Printer)"
     Attribute "Product" "" "(HP Officejet Pro k5400z Printer)"
-  }
-  {
-    ModelName "HP Officejet Pro 8000 a809 hpijs"
-    Attribute "NickName" "" "HP Officejet Pro 8000 a809 hpijs, $Version"
-    Attribute "ShortNickName" "" "HP OJ Pro 8000 a809 hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet pro 8000 a809;DES:officejet pro 8000 a809;"
-    PCFileName "hp-officejet_pro_8000_a809-hpijs.ppd"
-    Attribute "Product" "" "(HP Officejet Pro 8000 Printer - a809a)"
-    Attribute "Product" "" "(HP Officejet Pro 8000 Wireless Printer - a809n)"
   }
   // <%OJProKx50:NoFullBleed%>
   {
@@ -5808,6 +5688,7 @@ er=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;Deskjet D2600&quot;"
       Attribute "Product" "" "(HP Deskjet d1658 Printer)"
       Attribute "Product" "" "(HP Deskjet d1660 Printer)"
       Attribute "Product" "" "(HP Deskjet d1663 Printer)"
+      Attribute "Product" "" "(HP Deskjet d1668 Printer)"
     }
     {
       ModelName "HP Deskjet d2600 Series hpijs"
@@ -6702,7 +6583,7 @@ t=0"
   }
   {
     ModelName "HP LaserJet 1022nw hpijs"
-    Attribute "NickName" "" "HP LaserJet 1022nw hpijs pcl3, $Version"
+    Attribute "NickName" "" "HP LaserJet 1022nw hpijs pcl3, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet 1022nw hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 1022nw;DES:hp laserjet 1022nw;"
     PCFileName "hp-laserjet_1022nw-hpijs-pcl3.ppd"
@@ -6710,7 +6591,7 @@ t=0"
   }
   {
     ModelName "HP LaserJet 1022n hpijs"
-    Attribute "NickName" "" "HP LaserJet 1022n hpijs pcl3, $Version"
+    Attribute "NickName" "" "HP LaserJet 1022n hpijs pcl3, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet 1022n hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 1022n;DES:hp laserjet 1022n;"
     PCFileName "hp-laserjet_1022n-hpijs-pcl3.ppd"
@@ -6719,7 +6600,7 @@ t=0"
   }
   {
     ModelName "HP LaserJet 1022 hpijs"
-    Attribute "NickName" "" "HP LaserJet 1022 hpijs pcl3, $Version"
+    Attribute "NickName" "" "HP LaserJet 1022 hpijs pcl3, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet 1022 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 1022;DES:hp laserjet 1022;"
     PCFileName "hp-laserjet_1022-hpijs-pcl3.ppd"
@@ -6878,7 +6759,7 @@ t=0"
   }
   {
     ModelName "HP LaserJet p1505n hpijs"
-    Attribute "NickName" "" "HP LaserJet p1505n hpijs pcl3, $Version"
+    Attribute "NickName" "" "HP LaserJet p1505n hpijs pcl3, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet p1505n hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p1505n;DES:hp laserjet p1505n;"
     PCFileName "hp-laserjet_p1505n-hpijs-pcl3.ppd"
@@ -6894,7 +6775,7 @@ t=0"
   }
   {
     ModelName "HP LaserJet p2014 hpijs"
-    Attribute "NickName" "" "HP LaserJet p2014 hpijs pcl3, $Version"
+    Attribute "NickName" "" "HP LaserJet p2014 hpijs pcl3, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet p2014 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p2014;DES:hp laserjet p2014;"
     PCFileName "hp-laserjet_p2014-hpijs-pcl3.ppd"
@@ -6902,7 +6783,7 @@ t=0"
   }
   {
     ModelName "HP LaserJet p2014n hpijs"
-    Attribute "NickName" "" "HP LaserJet p2014n hpijs pcl3, $Version"
+    Attribute "NickName" "" "HP LaserJet p2014n hpijs pcl3, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet p2014n hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p2014n;DES:hp laserjet p2014n;"
     PCFileName "hp-laserjet_p2014n-hpijs-pcl3.ppd"
@@ -6950,7 +6831,7 @@ t=0"
   }
   {
     ModelName "HP LaserJet p2035n hpijs"
-    Attribute "NickName" "" "HP LaserJet p2035n hpijs pcl3, $Version"
+    Attribute "NickName" "" "HP LaserJet p2035n hpijs pcl3, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet p2035n hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p2035n;DES:hp laserjet p2035n;"
     PCFileName "hp-laserjet_p2035n-hpijs-pcl3.ppd"
@@ -6958,7 +6839,7 @@ t=0"
   }
   {
     ModelName "HP LaserJet p2035 hpijs"
-    Attribute "NickName" "" "HP LaserJet p2035 hpijs pcl3, $Version"
+    Attribute "NickName" "" "HP LaserJet p2035 hpijs pcl3, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet p2035 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p2035;DES:hp laserjet p2035;"
     PCFileName "hp-laserjet_p2035-hpijs-pcl3.ppd"
@@ -7207,10 +7088,10 @@ t=0"
   }
   {
     ModelName "HP LaserJet 3200m hpijs"
-    Attribute "NickName" "" "HP LaserJet 3200m hpijs, $Version"
+    Attribute "NickName" "" "HP LaserJet 3200m hpijs pcl3, $Version"
     Attribute "ShortNickName" "" "HP LaserJet 3200m hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 3200m;DES:hp laserjet 3200m;"
-    PCFileName "hp-laserjet_3200m-hpijs.ppd"
+    PCFileName "hp-laserjet_3200m-hpijs-pcl3.ppd"
     Attribute "Product" "" "(HP LaserJet 3200m All-in-one Printer)"
   }
   {
@@ -7223,10 +7104,10 @@ t=0"
   }
   {
     ModelName "HP LaserJet 3200 hpijs"
-    Attribute "NickName" "" "HP LaserJet 3200 hpijs pcl3, $Version"
+    Attribute "NickName" "" "HP LaserJet 3200 hpijs, $Version"
     Attribute "ShortNickName" "" "HP LaserJet 3200 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 3200;DES:hp laserjet 3200;"
-    PCFileName "hp-laserjet_3200-hpijs-pcl3.ppd"
+    PCFileName "hp-laserjet_3200-hpijs.ppd"
     Attribute "Product" "" "(HP LaserJet 3200 All-in-one Printer)"
   }
   {
@@ -9231,7 +9112,7 @@ nSet=2"
   // <%LJJetReady:Normal%>
   {
     ModelName "HP Color LaserJet 3500n hpijs"
-    Attribute "NickName" "" "HP Color LaserJet 3500n hpijs, $Version"
+    Attribute "NickName" "" "HP Color LaserJet 3500n hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP Color LaserJet 3500n hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 3500n;DES:hp color laserjet 3500n;"
     PCFileName "hp-color_laserjet_3500n-hpijs.ppd"
@@ -9239,7 +9120,7 @@ nSet=2"
   }
   {
     ModelName "HP Color LaserJet 3500 hpijs"
-    Attribute "NickName" "" "HP Color LaserJet 3500 hpijs, $Version"
+    Attribute "NickName" "" "HP Color LaserJet 3500 hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP Color LaserJet 3500 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 3500;DES:hp color laserjet 3500;"
     PCFileName "hp-color_laserjet_3500-hpijs.ppd"
@@ -9249,7 +9130,7 @@ nSet=2"
   }
   {
     ModelName "HP Color LaserJet 3550 hpijs"
-    Attribute "NickName" "" "HP Color LaserJet 3550 hpijs, $Version"
+    Attribute "NickName" "" "HP Color LaserJet 3550 hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP Color LaserJet 3550 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 3550;DES:hp color laserjet 3550;"
     PCFileName "hp-color_laserjet_3550-hpijs.ppd"
@@ -9257,7 +9138,7 @@ nSet=2"
   }
   {
     ModelName "HP Color LaserJet 3550n hpijs"
-    Attribute "NickName" "" "HP Color LaserJet 3550n hpijs, $Version"
+    Attribute "NickName" "" "HP Color LaserJet 3550n hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP Color LaserJet 3550n hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 3550n;DES:hp color laserjet 3550n;"
     PCFileName "hp-color_laserjet_3550n-hpijs.ppd"
@@ -9265,7 +9146,7 @@ nSet=2"
   }
   {
     ModelName "HP Color LaserJet 3600 hpijs"
-    Attribute "NickName" "" "HP Color LaserJet 3600 hpijs, $Version"
+    Attribute "NickName" "" "HP Color LaserJet 3600 hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP Color LaserJet 3600 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 3600;DES:hp color laserjet 3600;"
     PCFileName "hp-color_laserjet_3600-hpijs.ppd"
@@ -11432,7 +11313,7 @@ Transparency"
   // <%LJZjsMono:Normal%>
   {
     ModelName "HP LaserJet 1000 hpijs"
-    Attribute "NickName" "" "HP LaserJet 1000 hpijs, $Version"
+    Attribute "NickName" "" "HP LaserJet 1000 hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet 1000 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 1000;DES:hp laserjet 1000;"
     PCFileName "hp-laserjet_1000-hpijs.ppd"
@@ -11440,7 +11321,7 @@ Transparency"
   }
   {
     ModelName "HP LaserJet 1005 Series hpijs"
-    Attribute "NickName" "" "HP LaserJet 1005 Series hpijs, $Version"
+    Attribute "NickName" "" "HP LaserJet 1005 Series hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet 1005 Series hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 1005 series;DES:hp laserjet 1005 series;"
     PCFileName "hp-laserjet_1005_series-hpijs.ppd"
@@ -11448,7 +11329,7 @@ Transparency"
   }
   {
     ModelName "HP LaserJet 1018 hpijs"
-    Attribute "NickName" "" "HP LaserJet 1018 hpijs, $Version"
+    Attribute "NickName" "" "HP LaserJet 1018 hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet 1018 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 1018;DES:hp laserjet 1018;"
     PCFileName "hp-laserjet_1018-hpijs.ppd"
@@ -11457,7 +11338,7 @@ Transparency"
   }
   {
     ModelName "HP LaserJet 1020 hpijs"
-    Attribute "NickName" "" "HP LaserJet 1020 hpijs, $Version"
+    Attribute "NickName" "" "HP LaserJet 1020 hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet 1020 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 1020;DES:hp laserjet 1020;"
     PCFileName "hp-laserjet_1020-hpijs.ppd"
@@ -11466,7 +11347,7 @@ Transparency"
   }
   {
     ModelName "HP LaserJet 1022nw hpijs"
-    Attribute "NickName" "" "HP LaserJet 1022nw hpijs zjs, $Version"
+    Attribute "NickName" "" "HP LaserJet 1022nw hpijs zjs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet 1022nw hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 1022nw;DES:hp laserjet 1022nw;"
     PCFileName "hp-laserjet_1022nw-hpijs-zjs.ppd"
@@ -11474,7 +11355,7 @@ Transparency"
   }
   {
     ModelName "HP LaserJet 1022n hpijs"
-    Attribute "NickName" "" "HP LaserJet 1022n hpijs zjs, $Version"
+    Attribute "NickName" "" "HP LaserJet 1022n hpijs zjs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet 1022n hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 1022n;DES:hp laserjet 1022n;"
     PCFileName "hp-laserjet_1022n-hpijs-zjs.ppd"
@@ -11483,7 +11364,7 @@ Transparency"
   }
   {
     ModelName "HP LaserJet 1022 hpijs"
-    Attribute "NickName" "" "HP LaserJet 1022 hpijs zjs, $Version"
+    Attribute "NickName" "" "HP LaserJet 1022 hpijs zjs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet 1022 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 1022;DES:hp laserjet 1022;"
     PCFileName "hp-laserjet_1022-hpijs-zjs.ppd"
@@ -11515,7 +11396,7 @@ Transparency"
   }
   {
     ModelName "HP LaserJet p2035n hpijs"
-    Attribute "NickName" "" "HP LaserJet p2035n hpijs zjs, $Version"
+    Attribute "NickName" "" "HP LaserJet p2035n hpijs zjs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet p2035n hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p2035n;DES:hp laserjet p2035n;"
     PCFileName "hp-laserjet_p2035n-hpijs-zjs.ppd"
@@ -11523,7 +11404,7 @@ Transparency"
   }
   {
     ModelName "HP LaserJet p2035 hpijs"
-    Attribute "NickName" "" "HP LaserJet p2035 hpijs zjs, $Version"
+    Attribute "NickName" "" "HP LaserJet p2035 hpijs zjs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet p2035 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p2035;DES:hp laserjet p2035;"
     PCFileName "hp-laserjet_p2035-hpijs-zjs.ppd"
@@ -11683,7 +11564,7 @@ nSet=2"
   // <%LJJetReady:Normal%>
   {
     ModelName "HP Color LaserJet 3500n hpijs"
-    Attribute "NickName" "" "HP Color LaserJet 3500n hpijs, $Version"
+    Attribute "NickName" "" "HP Color LaserJet 3500n hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP Color LaserJet 3500n hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 3500n;DES:hp color laserjet 3500n;"
     PCFileName "hp-color_laserjet_3500n-hpijs.ppd"
@@ -11691,7 +11572,7 @@ nSet=2"
   }
   {
     ModelName "HP Color LaserJet 3500 hpijs"
-    Attribute "NickName" "" "HP Color LaserJet 3500 hpijs, $Version"
+    Attribute "NickName" "" "HP Color LaserJet 3500 hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP Color LaserJet 3500 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 3500;DES:hp color laserjet 3500;"
     PCFileName "hp-color_laserjet_3500-hpijs.ppd"
@@ -11701,7 +11582,7 @@ nSet=2"
   }
   {
     ModelName "HP Color LaserJet 3550 hpijs"
-    Attribute "NickName" "" "HP Color LaserJet 3550 hpijs, $Version"
+    Attribute "NickName" "" "HP Color LaserJet 3550 hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP Color LaserJet 3550 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 3550;DES:hp color laserjet 3550;"
     PCFileName "hp-color_laserjet_3550-hpijs.ppd"
@@ -11709,7 +11590,7 @@ nSet=2"
   }
   {
     ModelName "HP Color LaserJet 3550n hpijs"
-    Attribute "NickName" "" "HP Color LaserJet 3550n hpijs, $Version"
+    Attribute "NickName" "" "HP Color LaserJet 3550n hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP Color LaserJet 3550n hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 3550n;DES:hp color laserjet 3550n;"
     PCFileName "hp-color_laserjet_3550n-hpijs.ppd"
@@ -11717,7 +11598,7 @@ nSet=2"
   }
   {
     ModelName "HP Color LaserJet 3600 hpijs"
-    Attribute "NickName" "" "HP Color LaserJet 3600 hpijs, $Version"
+    Attribute "NickName" "" "HP Color LaserJet 3600 hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP Color LaserJet 3600 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 3600;DES:hp color laserjet 3600;"
     PCFileName "hp-color_laserjet_3600-hpijs.ppd"
@@ -11859,7 +11740,7 @@ Transparency"
   }
   {
     ModelName "HP LaserJet p1505n hpijs"
-    Attribute "NickName" "" "HP LaserJet p1505n hpijs zxs, $Version"
+    Attribute "NickName" "" "HP LaserJet p1505n hpijs zxs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet p1505n hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p1505n;DES:hp laserjet p1505n;"
     PCFileName "hp-laserjet_p1505n-hpijs-zxs.ppd"
@@ -11867,7 +11748,7 @@ Transparency"
   }
   {
     ModelName "HP LaserJet p1505 hpijs"
-    Attribute "NickName" "" "HP LaserJet p1505 hpijs, $Version"
+    Attribute "NickName" "" "HP LaserJet p1505 hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet p1505 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p1505;DES:hp laserjet p1505;"
     PCFileName "hp-laserjet_p1505-hpijs.ppd"
@@ -11875,7 +11756,7 @@ Transparency"
   }
   {
     ModelName "HP LaserJet p2014 hpijs"
-    Attribute "NickName" "" "HP LaserJet p2014 hpijs zxs, $Version"
+    Attribute "NickName" "" "HP LaserJet p2014 hpijs zxs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet p2014 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p2014;DES:hp laserjet p2014;"
     PCFileName "hp-laserjet_p2014-hpijs-zxs.ppd"
@@ -11883,7 +11764,7 @@ Transparency"
   }
   {
     ModelName "HP LaserJet p2014n hpijs"
-    Attribute "NickName" "" "HP LaserJet p2014n hpijs zxs, $Version"
+    Attribute "NickName" "" "HP LaserJet p2014n hpijs zxs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet p2014n hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p2014n;DES:hp laserjet p2014n;"
     PCFileName "hp-laserjet_p2014n-hpijs-zxs.ppd"
@@ -12022,7 +11903,7 @@ Transparency"
   // <%LJZjsColor:Normal%>
   {
     ModelName "HP Color LaserJet cp1215 hpijs"
-    Attribute "NickName" "" "HP Color LaserJet cp1215 hpijs, $Version"
+    Attribute "NickName" "" "HP Color LaserJet cp1215 hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP Color LaserJet cp1215 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp1215;DES:hp color laserjet cp1215;"
     PCFileName "hp-color_laserjet_cp1215-hpijs.ppd"
@@ -12030,7 +11911,7 @@ Transparency"
   }
   {
     ModelName "HP Color LaserJet 1600 hpijs"
-    Attribute "NickName" "" "HP Color LaserJet 1600 hpijs, $Version"
+    Attribute "NickName" "" "HP Color LaserJet 1600 hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP Color LaserJet 1600 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 1600;DES:hp color laserjet 1600;"
     PCFileName "hp-color_laserjet_1600-hpijs.ppd"
@@ -12038,7 +11919,7 @@ Transparency"
   }
   {
     ModelName "HP Color LaserJet 2600n hpijs"
-    Attribute "NickName" "" "HP Color LaserJet 2600n hpijs, $Version"
+    Attribute "NickName" "" "HP Color LaserJet 2600n hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP Color LaserJet 2600n hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 2600n;DES:hp color laserjet 2600n;"
     PCFileName "hp-color_laserjet_2600n-hpijs.ppd"
@@ -12170,7 +12051,7 @@ Transparency"
   // <%LJP1XXX:Normal%>
   {
     ModelName "HP LaserJet p1005 hpijs"
-    Attribute "NickName" "" "HP LaserJet p1005 hpijs, $Version"
+    Attribute "NickName" "" "HP LaserJet p1005 hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet p1005 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p1005;DES:hp laserjet p1005;"
     PCFileName "hp-laserjet_p1005-hpijs.ppd"
@@ -12178,7 +12059,7 @@ Transparency"
   }
   {
     ModelName "HP LaserJet p1006 hpijs"
-    Attribute "NickName" "" "HP LaserJet p1006 hpijs, $Version"
+    Attribute "NickName" "" "HP LaserJet p1006 hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet p1006 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p1006;DES:hp laserjet p1006;"
     PCFileName "hp-laserjet_p1006-hpijs.ppd"
@@ -12186,7 +12067,7 @@ Transparency"
   }
   {
     ModelName "HP LaserJet p1007 hpijs"
-    Attribute "NickName" "" "HP LaserJet p1007 hpijs, $Version"
+    Attribute "NickName" "" "HP LaserJet p1007 hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet p1007 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p1007;DES:hp laserjet p1007;"
     PCFileName "hp-laserjet_p1007-hpijs.ppd"
@@ -12194,7 +12075,7 @@ Transparency"
   }
   {
     ModelName "HP LaserJet p1008 hpijs"
-    Attribute "NickName" "" "HP LaserJet p1008 hpijs, $Version"
+    Attribute "NickName" "" "HP LaserJet p1008 hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet p1008 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p1008;DES:hp laserjet p1008;"
     PCFileName "hp-laserjet_p1008-hpijs.ppd"
@@ -12202,13 +12083,832 @@ Transparency"
   }
   {
     ModelName "HP LaserJet p1009 hpijs"
-    Attribute "NickName" "" "HP LaserJet p1009 hpijs, $Version"
+    Attribute "NickName" "" "HP LaserJet p1009 hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet p1009 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p1009;DES:hp laserjet p1009;"
     PCFileName "hp-laserjet_p1009-hpijs.ppd"
     Attribute "Product" "" "(HP LaserJet p1009 Printer)"
   }
 } // end LJP1XXX (for proprietary plugin)
+
+/////////////// Stabler
+{
+  Attribute "DefaultResolution" "" "600dpi"
+
+  // Custom page sizes from 1x4in to SuperB
+  HWMargins 18 36 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 936 1368
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
+EVICEHEIGHTPOINTS=0"
+
+  Attribute "FoomaticIDs" "" "HP-DeskJet_5650 hpijs"
+  Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
+USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
+le=- -"
+  Attribute "FoomaticRIPOption" "Model" "enum CmdLine A 100"
+  Attribute "FoomaticRIPOptionSetting" "Model=HP-DeskJet_5650" " -sDeviceManufacture&&
+r=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5600&quot;"
+  Attribute "FoomaticRIPOption" "PrintoutMode" "enum Composite B"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Draft" "Quality=300FastDraftCol&&
+orCMYK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Draft.Gray" "Quality=300FastDra&&
+ftGrayscaleK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Normal" "Quality=300ColorCMYK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Normal.Gray" "Quality=300Graysc&&
+aleK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=High" "Quality=600ColorCMYK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=High.Gray" "Quality=600Grayscal&&
+eK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Photo" "Quality=600PhotoCMYKFu&&
+llBleed"
+  Attribute "FoomaticRIPOption" "InputSlot" "enum CmdLine C"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Default" ",PS:MediaPosition=7"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=PhotoTray" ",PS:MediaPosition=6"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Upper" ",PS:MediaPosition=1"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Lower" ",PS:MediaPosition=4"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=CDDVDTray" ",PS:MediaPosition=14"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Envelope" ",PS:MediaPosition=3"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=LargeCapacity" ",PS:MediaPosition=&&
+5"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Manual" ",PS:MediaPosition=2"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=MPTray" ",PS:MediaPosition=8"
+  Attribute "FoomaticRIPOption" "PageSize" "enum CmdLine A"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Letter" " -dDEVICEWIDTHPOINTS=612 -&&
+dDEVICEHEIGHTPOINTS=792"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A4" " -dDEVICEWIDTHPOINTS=595 -dDEV&&
+ICEHEIGHTPOINTS=842"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Photo" " -dDEVICEWIDTHPOINTS=288 -d&&
+DEVICEHEIGHTPOINTS=432"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Photo5x7" " -dDEVICEWIDTHPOINTS=360&&
+ -dDEVICEHEIGHTPOINTS=504"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=PhotoTearOff" " -dDEVICEWIDTHPOINTS&&
+=288 -dDEVICEHEIGHTPOINTS=432"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=3x5" " -dDEVICEWIDTHPOINTS=216 -dDE&&
+VICEHEIGHTPOINTS=360"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=5x8" " -dDEVICEWIDTHPOINTS=360 -dDE&&
+VICEHEIGHTPOINTS=576"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A5" " -dDEVICEWIDTHPOINTS=420 -dDEV&&
+ICEHEIGHTPOINTS=595"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A6" " -dDEVICEWIDTHPOINTS=297 -dDEV&&
+ICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A6TearOff" " -dDEVICEWIDTHPOINTS=29&&
+7 -dDEVICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=B5JIS" " -dDEVICEWIDTHPOINTS=516 -d&&
+DEVICEHEIGHTPOINTS=729"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=CDDVD80" " -dDEVICEWIDTHPOINTS=237 &&
+-dDEVICEHEIGHTPOINTS=237"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=CDDVD120" " -dDEVICEWIDTHPOINTS=360&&
+ -dDEVICEHEIGHTPOINTS=360"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Env10" " -dDEVICEWIDTHPOINTS=297 -d&&
+DEVICEHEIGHTPOINTS=684"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvC5" " -dDEVICEWIDTHPOINTS=459 -d&&
+DEVICEHEIGHTPOINTS=649"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvC6" " -dDEVICEWIDTHPOINTS=323 -d&&
+DEVICEHEIGHTPOINTS=459"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvDL" " -dDEVICEWIDTHPOINTS=312 -d&&
+DEVICEHEIGHTPOINTS=624"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvISOB5" " -dDEVICEWIDTHPOINTS=499&&
+ -dDEVICEHEIGHTPOINTS=709"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvMonarch" " -dDEVICEWIDTHPOINTS=2&&
+79 -dDEVICEHEIGHTPOINTS=540"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Executive" " -dDEVICEWIDTHPOINTS=52&&
+2 -dDEVICEHEIGHTPOINTS=756"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=FLSA" " -dDEVICEWIDTHPOINTS=612 -dD&&
+EVICEHEIGHTPOINTS=936"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Hagaki" " -dDEVICEWIDTHPOINTS=283 -&&
+dDEVICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
+DEVICEHEIGHTPOINTS=1008"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
+ -dDEVICEHEIGHTPOINTS=774"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
+ -dDEVICEHEIGHTPOINTS=935"
+  /////////// Large format paper support
+  Attribute "FoomaticRIPOptionSetting" "PageSize=B4JIS" " -dDEVICEWIDTHPOINTS=729 -d&&
+DEVICEHEIGHTPOINTS=1033"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Ledger" " -dDEVICEWIDTHPOINTS=792 -&&
+dDEVICEHEIGHTPOINTS=1224"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=SuperB" " -dDEVICEWIDTHPOINTS=936 -&&
+dDEVICEHEIGHTPOINTS=1368"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w774h1116" " -dDEVICEWIDTHPOINTS=77&&
+4 -dDEVICEHEIGHTPOINTS=1116"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A3" " -dDEVICEWIDTHPOINTS=842 -dDEV&&
+ICEHEIGHTPOINTS=1190"
+  Attribute "FoomaticRIPOption" "Duplex" "enum CmdLine A"
+  Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexNoTumble" " -dDuplex=true -dTum&&
+ble=false"
+  Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexTumble" " -dDuplex=true -dTumbl&&
+e=true"
+  Attribute "FoomaticRIPOptionSetting" "Duplex=None" " -dDuplex=false"
+  Attribute "FoomaticRIPOption" "DryTime" "enum CmdLine B"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Zero" ""
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Five" ",DryTime=5"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Ten" ",DryTime=10"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Fifteen" ",DryTime=15"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Twenty" ",DryTime=20"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=TwentyFive" ",DryTime=25"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Thirty" ",DryTime=30"
+  Attribute "FoomaticRIPOption" "Quality" "enum CmdLine B"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300ColorCMYK" " -r300 -sIjsParams=Qu&&
+ality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quality:PenSet&&
+=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300ColorCMYKFullBleed" " -r300 -sIjs&&
+Params=Quality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quali&&
+ty:PenSet=2,Quality:FullBleed=1"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300DraftColorCMYK" " -r300 -sIjsPara&&
+ms=Quality:Quality=1,Quality:ColorMode=2,Quality:MediaType=0,Quality:P&&
+enSet=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300DraftGrayscaleK" " -r300 -sIjs&&
+Params=Quality:Quality=1,Quality:ColorMode=0,Quality:MediaType=0,Quali&&
+ty:PenSet=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300FastDraftColorCMYK" " -r300 -sIjs&&
+Params=Quality:Quality=4,Quality:ColorMode=2,Quality:MediaType=0,Quali&&
+ty:PenSet=2,Quality:SpeedMech=1"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300FastDraftGrayscaleK" " -r300 -&&
+sIjsParams=Quality:Quality=4,Quality:ColorMode=0,Quality:MediaType=0,Q&&
+uality:PenSet=2,Quality:SpeedMech=1"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300GrayscaleK" " -r300 -sIjsParam&&
+s=Quality:Quality=0,Quality:ColorMode=0,Quality:MediaType=0,Quality:Pe&&
+nSet=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600ColorCMYK" " -r600 -sIjsParams=Qu&&
+ality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quality:PenSet&&
+=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600ColorCMYKFullBleed" " -r600 -sIjs&&
+Params=Quality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quali&&
+ty:PenSet=2,Quality:FullBleed=1"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600GrayscaleK" " -r600 -sIjsParam&&
+s=Quality:Quality=0,Quality:ColorMode=0,Quality:MediaType=0,Quality:Pe&&
+nSet=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600PhotoCMYK" " -r600 -sIjsParams=&&
+Quality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenS&&
+et=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600PhotoCMYKFullBleed" " -r600 -sI&&
+jsParams=Quality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Qua&&
+lity:PenSet=2,Quality:FullBleed=1"
+  Group "General/General"
+    Option "PrintoutMode/Printout Mode" PickOne AnySetup 10.0
+      Choice "Draft/Draft (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=Draft"
+      Choice "Draft.Gray/Draft Grayscale (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=Draft.Gray"
+      *Choice "Normal/Normal (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=Normal"
+      Choice "Normal.Gray/Normal Grayscale (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=Normal.Gray"
+      Choice "High/High Quality (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=High"
+      Choice "High.Gray/High Quality Grayscale (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=High.Gray"
+      Choice "Photo/Photo (on photo paper)" "%% FoomaticRIPOptionSetting: PrintoutMode=Photo"
+    Option "InputSlot/Media Source" PickOne AnySetup 100.0
+      *Choice "Default/Printer default" "%% FoomaticRIPOptionSetting: InputSlot=Default"
+      Choice "PhotoTray/Photo Tray" "%% FoomaticRIPOptionSetting: InputSlot=PhotoTray"
+      Choice "Upper/Upper Tray" "%% FoomaticRIPOptionSetting: InputSlot=Upper"
+      Choice "Lower/Lower Tray" "%% FoomaticRIPOptionSetting: InputSlot=Lower"
+      Choice "CDDVDTray/CD or DVD Tray" "%% FoomaticRIPOptionSetting: InputSlot=CDDVDTray"
+      Choice "Envelope/Envelope Feeder" "%% FoomaticRIPOptionSetting: InputSlot=Envelope"
+      Choice "LargeCapacity/Large Capacity Tray" "%% FoomaticRIPOptionSetting: InputSlot=LargeCapacity"
+      Choice "Manual/Manual Feeder" "%% FoomaticRIPOptionSetting: InputSlot=Manual"
+      Choice "MPTray/Multi Purpose Tray" "%% FoomaticRIPOptionSetting: InputSlot=MPTray"
+    Option "Duplex/Double-Sided Printing" PickOne AnySetup 120.0
+      Choice "DuplexNoTumble/Long Edge (Standard)" "%% FoomaticRIPOptionSetting: Duplex=DuplexNoTumble"
+      Choice "DuplexTumble/Short Edge (Flip)" "%% FoomaticRIPOptionSetting: Duplex=DuplexTumble"
+      *Choice "None/Off" "%% FoomaticRIPOptionSetting: Duplex=None"
+    Option "DryTime/Additional Dry Time" PickOne AnySetup 120.0
+      *Choice "Zero/Printer Default" "%% FoomaticRIPOptionSetting: DryTime=Zero"
+      Choice "Five/5 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Five"
+      Choice "Ten/10 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Ten"
+      Choice "Fifteen/15 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Fifteen"
+      Choice "Twenty/20 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Twenty"
+      Choice "TwentyFive/25 Seconds" "%% FoomaticRIPOptionSetting: DryTime=TwentyFive"
+      Choice "Thirty/30 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Thirty"
+  Group "PrintoutMode/Printout Mode"
+    Option "Quality/Resolution, Quality, Ink Type, Media Type" PickOne AnySetup 100.0
+      *Choice "FromPrintoutMode/Controlled by 'Printout Mode'" "%% FoomaticRIPOptionSetting: Quality=@PrintoutMode"
+      Choice "300ColorCMYK/300 dpi, Color, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=300ColorCMYK"
+      Choice "300ColorCMYKFullBleed/300 dpi, Color, Full Bleed, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=300ColorCMYKFullBleed"
+      Choice "300DraftColorCMYK/300 dpi, Draft, Color, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=300DraftColorCMYK"
+      Choice "300DraftGrayscaleK/300 dpi, Draft, Grayscale, Black Cartr." "%% FoomaticRIPOptionSetting: Quality=300DraftGrayscaleK"
+      Choice "300FastDraftColorCMYK/300 dpi, FastDraft, Color, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=300FastDraftColorCMYK"
+      Choice "300FastDraftGrayscaleK/300 dpi, FastDraft, Grayscale, Black Cartr." "%% FoomaticRIPOptionSetting: Quality=300FastDraftGrayscaleK"
+      Choice "300GrayscaleK/300 dpi, Grayscale, Black Cartr." "%% FoomaticRIPOptionSetting: Quality=300GrayscaleK"
+      Choice "600ColorCMYK/600 dpi, Color, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=600ColorCMYK"
+      Choice "600ColorCMYKFullBleed/600 dpi, Color, Full Bleed, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=600ColorCMYKFullBleed"
+      Choice "600GrayscaleK/600 dpi, Grayscale, Black Cartr." "%% FoomaticRIPOptionSetting: Quality=600GrayscaleK"
+      Choice "600PhotoCMYK/600 dpi, Photo, Black + Color Cartr., Photo Paper" "%% FoomaticRIPOptionSetting: Quality=600PhotoCMYK"
+      Choice "600PhotoCMYKFullBleed/600 dpi, Photo, Full Bleed, Black + Color Cartr., Photo Paper" "%% FoomaticRIPOptionSetting: Quality=600PhotoCMYKFullBleed"
+  *CustomMedia "Letter/Letter" 612.00 792.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Letter" "%% FoomaticRIPOptionSetting: PageSize=Letter"
+  CustomMedia "A4/A4" 595.00 842.00 9.72 36.00 9.72 9.00 "%% FoomaticRIPOptionSetting: PageSize=A4" "%% FoomaticRIPOptionSetting: PageSize=A4"
+  CustomMedia "Photo/Photo or 4x6 inch index card" 288.00 432.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Photo" "%% FoomaticRIPOptionSetting: PageSize=Photo"
+  CustomMedia "Photo5x7/Photo or 5x7 inch index card" 360.00 504.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Photo5x7" "%% FoomaticRIPOptionSetting: PageSize=Photo5x7"
+  CustomMedia "PhotoTearOff/Photo with tear-off tab" 288.00 432.00 0.00 0.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=PhotoTearOff" "%% FoomaticRIPOptionSetting: PageSize=PhotoTearOff"
+  CustomMedia "3x5/3x5 inch index card" 216.00 360.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=3x5" "%% FoomaticRIPOptionSetting: PageSize=3x5"
+  CustomMedia "5x8/5x8 inch index card" 360.00 576.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=5x8" "%% FoomaticRIPOptionSetting: PageSize=5x8"
+  CustomMedia "A5/A5" 420.00 595.00 9.00 36.00 9.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=A5" "%% FoomaticRIPOptionSetting: PageSize=A5"
+  CustomMedia "A6/A6" 297.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=A6" "%% FoomaticRIPOptionSetting: PageSize=A6"
+  CustomMedia "A6TearOff/A6 with tear-off tab" 297.00 420.00 0.00 0.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=A6TearOff" "%% FoomaticRIPOptionSetting: PageSize=A6TearOff"
+  CustomMedia "B5JIS/B5 (JIS)" 516.00 729.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=B5JIS" "%% FoomaticRIPOptionSetting: PageSize=B5JIS"
+  CustomMedia "CDDVD80/CD or DVD 80 mm" 237.00 237.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=CDDVD80" "%% FoomaticRIPOptionSetting: PageSize=CDDVD80"
+  CustomMedia "CDDVD120/CD or DVD 120 mm" 360.00 360.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=CDDVD120" "%% FoomaticRIPOptionSetting: PageSize=CDDVD120"
+  CustomMedia "Env10/Envelope #10" 297.00 684.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Env10" "%% FoomaticRIPOptionSetting: PageSize=Env10"
+  CustomMedia "EnvC5/Envelope C5" 459.00 649.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=EnvC5" "%% FoomaticRIPOptionSetting: PageSize=EnvC5"
+  CustomMedia "EnvC6/Envelope C6" 323.00 459.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=EnvC6" "%% FoomaticRIPOptionSetting: PageSize=EnvC6"
+  CustomMedia "EnvDL/Envelope DL" 312.00 624.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=EnvDL" "%% FoomaticRIPOptionSetting: PageSize=EnvDL"
+  CustomMedia "EnvISOB5/Envelope B5" 499.00 709.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5" "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5"
+  CustomMedia "EnvMonarch/Envelope Monarch" 279.00 540.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=EnvMonarch" "%% FoomaticRIPOptionSetting: PageSize=EnvMonarch"
+  CustomMedia "Executive/Executive" 522.00 756.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Executive" "%% FoomaticRIPOptionSetting: PageSize=Executive"
+  CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
+  CustomMedia "Hagaki/Hagaki" 283.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
+  CustomMedia "Legal/Legal" 612.00 1008.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
+  CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
+  // <%Stabler:Normal%>
+  {
+    ModelName "HP Photosmart Wireless b109n-z hpijs"
+    Attribute "NickName" "" "HP Photosmart Wireless b109n-z hpijs, $Version"
+    Attribute "ShortNickName" "" "HP PS Wireless b109n-z hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart wireless b109n-z;DES:photosmart wireless b109n-z;"
+    PCFileName "hp-photosmart_wireless_b109n-z-hpijs.ppd"
+    Attribute "Product" "" "(HP Photosmart Wireless All-in-one Printer - b109n)"
+    Attribute "Product" "" "(HP Photosmart Wireless All-in-one Printer - b109q)"
+    Attribute "Product" "" "(HP Photosmart Wireless All-in-one Printer - b109q=r)"
+  }
+  {
+    ModelName "HP Photosmart b109a-m hpijs"
+    Attribute "NickName" "" "HP Photosmart b109a-m hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Photosmart b109a-m hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart b109a-m;DES:photosmart b109a-m;"
+    PCFileName "hp-photosmart_b109a-m-hpijs.ppd"
+    Attribute "Product" "" "(HP Photosmart All-in-one Printer - b109a)"
+    Attribute "Product" "" "(HP Photosmart All-in-one Printer - b109c)"
+    Attribute "Product" "" "(HP Photosmart All-in-one Printer - b109d)"
+    Attribute "Product" "" "(HP Photosmart All-in-one Printer - b109e)"
+  }
+  {
+    ModelName "HP Photosmart Plus b209a-m hpijs"
+    Attribute "NickName" "" "HP Photosmart Plus b209a-m hpijs, $Version"
+    Attribute "ShortNickName" "" "HP PS Plus b209a-m hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart plus b209a-m;DES:photosmart plus b209a-m;"
+    PCFileName "hp-photosmart_plus_b209a-m-hpijs.ppd"
+    Attribute "Product" "" "(HP Photosmart Plus All-in-one Printer - b209a)"
+    Attribute "Product" "" "(HP Photosmart Plus All-in-one Printer - b209b)"
+    Attribute "Product" "" "(HP Photosmart Plus All-in-one Printer - b209c)"
+  }
+}  // end Stabler
+
+/////////////// ViperPlusVIP
+{
+  Attribute "DefaultResolution" "" "600dpi"
+
+  // Custom page sizes from 1x4in to SuperB
+  HWMargins 18 36 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 936 1368
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
+EVICEHEIGHTPOINTS=0"
+
+  Attribute "FoomaticIDs" "" "HP-DeskJet_5650 hpijs"
+  Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
+USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
+le=- -"
+  Attribute "FoomaticRIPOption" "Model" "enum CmdLine A 100"
+  Attribute "FoomaticRIPOptionSetting" "Model=HP-DeskJet_5650" " -sDeviceManufacture&&
+r=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5600&quot;"
+  Attribute "FoomaticRIPOption" "PrintoutMode" "enum Composite B"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Draft" "Quality=300FastDraftCol&&
+orCMYK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Draft.Gray" "Quality=300FastDra&&
+ftGrayscaleK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Normal" "Quality=300ColorCMYK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Normal.Gray" "Quality=300Graysc&&
+aleK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=High" "Quality=600ColorCMYK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=High.Gray" "Quality=600Grayscal&&
+eK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Photo" "Quality=600PhotoCMYKFu&&
+llBleed"
+  Attribute "FoomaticRIPOption" "InputSlot" "enum CmdLine C"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Default" ",PS:MediaPosition=7"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=PhotoTray" ",PS:MediaPosition=6"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Upper" ",PS:MediaPosition=1"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Lower" ",PS:MediaPosition=4"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=CDDVDTray" ",PS:MediaPosition=14"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Envelope" ",PS:MediaPosition=3"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=LargeCapacity" ",PS:MediaPosition=&&
+5"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Manual" ",PS:MediaPosition=2"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=MPTray" ",PS:MediaPosition=8"
+  Attribute "FoomaticRIPOption" "PageSize" "enum CmdLine A"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Letter" " -dDEVICEWIDTHPOINTS=612 -&&
+dDEVICEHEIGHTPOINTS=792"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A4" " -dDEVICEWIDTHPOINTS=595 -dDEV&&
+ICEHEIGHTPOINTS=842"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Photo" " -dDEVICEWIDTHPOINTS=288 -d&&
+DEVICEHEIGHTPOINTS=432"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Photo5x7" " -dDEVICEWIDTHPOINTS=360&&
+ -dDEVICEHEIGHTPOINTS=504"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=PhotoTearOff" " -dDEVICEWIDTHPOINTS&&
+=288 -dDEVICEHEIGHTPOINTS=432"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=3x5" " -dDEVICEWIDTHPOINTS=216 -dDE&&
+VICEHEIGHTPOINTS=360"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=5x8" " -dDEVICEWIDTHPOINTS=360 -dDE&&
+VICEHEIGHTPOINTS=576"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A5" " -dDEVICEWIDTHPOINTS=420 -dDEV&&
+ICEHEIGHTPOINTS=595"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A6" " -dDEVICEWIDTHPOINTS=297 -dDEV&&
+ICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A6TearOff" " -dDEVICEWIDTHPOINTS=29&&
+7 -dDEVICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=B5JIS" " -dDEVICEWIDTHPOINTS=516 -d&&
+DEVICEHEIGHTPOINTS=729"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=CDDVD80" " -dDEVICEWIDTHPOINTS=237 &&
+-dDEVICEHEIGHTPOINTS=237"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=CDDVD120" " -dDEVICEWIDTHPOINTS=360&&
+ -dDEVICEHEIGHTPOINTS=360"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Env10" " -dDEVICEWIDTHPOINTS=297 -d&&
+DEVICEHEIGHTPOINTS=684"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvC5" " -dDEVICEWIDTHPOINTS=459 -d&&
+DEVICEHEIGHTPOINTS=649"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvC6" " -dDEVICEWIDTHPOINTS=323 -d&&
+DEVICEHEIGHTPOINTS=459"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvDL" " -dDEVICEWIDTHPOINTS=312 -d&&
+DEVICEHEIGHTPOINTS=624"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvISOB5" " -dDEVICEWIDTHPOINTS=499&&
+ -dDEVICEHEIGHTPOINTS=709"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvMonarch" " -dDEVICEWIDTHPOINTS=2&&
+79 -dDEVICEHEIGHTPOINTS=540"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Executive" " -dDEVICEWIDTHPOINTS=52&&
+2 -dDEVICEHEIGHTPOINTS=756"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=FLSA" " -dDEVICEWIDTHPOINTS=612 -dD&&
+EVICEHEIGHTPOINTS=936"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Hagaki" " -dDEVICEWIDTHPOINTS=283 -&&
+dDEVICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
+DEVICEHEIGHTPOINTS=1008"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
+ -dDEVICEHEIGHTPOINTS=774"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
+ -dDEVICEHEIGHTPOINTS=935"
+  /////////// Large format paper support
+  Attribute "FoomaticRIPOptionSetting" "PageSize=B4JIS" " -dDEVICEWIDTHPOINTS=729 -d&&
+DEVICEHEIGHTPOINTS=1033"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Ledger" " -dDEVICEWIDTHPOINTS=792 -&&
+dDEVICEHEIGHTPOINTS=1224"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=SuperB" " -dDEVICEWIDTHPOINTS=936 -&&
+dDEVICEHEIGHTPOINTS=1368"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w774h1116" " -dDEVICEWIDTHPOINTS=77&&
+4 -dDEVICEHEIGHTPOINTS=1116"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A3" " -dDEVICEWIDTHPOINTS=842 -dDEV&&
+ICEHEIGHTPOINTS=1190"
+  Attribute "FoomaticRIPOption" "Duplex" "enum CmdLine A"
+  Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexNoTumble" " -dDuplex=true -dTum&&
+ble=false"
+  Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexTumble" " -dDuplex=true -dTumbl&&
+e=true"
+  Attribute "FoomaticRIPOptionSetting" "Duplex=None" " -dDuplex=false"
+  Attribute "FoomaticRIPOption" "DryTime" "enum CmdLine B"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Zero" ""
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Five" ",DryTime=5"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Ten" ",DryTime=10"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Fifteen" ",DryTime=15"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Twenty" ",DryTime=20"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=TwentyFive" ",DryTime=25"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Thirty" ",DryTime=30"
+  Attribute "FoomaticRIPOption" "Quality" "enum CmdLine B"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300ColorCMYK" " -r300 -sIjsParams=Qu&&
+ality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quality:PenSet&&
+=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300ColorCMYKFullBleed" " -r300 -sIjs&&
+Params=Quality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quali&&
+ty:PenSet=2,Quality:FullBleed=1"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300DraftColorCMYK" " -r300 -sIjsPara&&
+ms=Quality:Quality=1,Quality:ColorMode=2,Quality:MediaType=0,Quality:P&&
+enSet=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300DraftGrayscaleK" " -r300 -sIjs&&
+Params=Quality:Quality=1,Quality:ColorMode=0,Quality:MediaType=0,Quali&&
+ty:PenSet=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300FastDraftColorCMYK" " -r300 -sIjs&&
+Params=Quality:Quality=4,Quality:ColorMode=2,Quality:MediaType=0,Quali&&
+ty:PenSet=2,Quality:SpeedMech=1"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300FastDraftGrayscaleK" " -r300 -&&
+sIjsParams=Quality:Quality=4,Quality:ColorMode=0,Quality:MediaType=0,Q&&
+uality:PenSet=2,Quality:SpeedMech=1"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300GrayscaleK" " -r300 -sIjsParam&&
+s=Quality:Quality=0,Quality:ColorMode=0,Quality:MediaType=0,Quality:Pe&&
+nSet=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600ColorCMYK" " -r600 -sIjsParams=Qu&&
+ality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quality:PenSet&&
+=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600ColorCMYKFullBleed" " -r600 -sIjs&&
+Params=Quality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quali&&
+ty:PenSet=2,Quality:FullBleed=1"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600GrayscaleK" " -r600 -sIjsParam&&
+s=Quality:Quality=0,Quality:ColorMode=0,Quality:MediaType=0,Quality:Pe&&
+nSet=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600PhotoCMYK" " -r600 -sIjsParams=&&
+Quality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenS&&
+et=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600PhotoCMYKFullBleed" " -r600 -sI&&
+jsParams=Quality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Qua&&
+lity:PenSet=2,Quality:FullBleed=1"
+  Group "General/General"
+    Option "PrintoutMode/Printout Mode" PickOne AnySetup 10.0
+      Choice "Draft/Draft (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=Draft"
+      Choice "Draft.Gray/Draft Grayscale (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=Draft.Gray"
+      *Choice "Normal/Normal (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=Normal"
+      Choice "Normal.Gray/Normal Grayscale (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=Normal.Gray"
+      Choice "High/High Quality (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=High"
+      Choice "High.Gray/High Quality Grayscale (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=High.Gray"
+      Choice "Photo/Photo (on photo paper)" "%% FoomaticRIPOptionSetting: PrintoutMode=Photo"
+    Option "InputSlot/Media Source" PickOne AnySetup 100.0
+      *Choice "Default/Printer default" "%% FoomaticRIPOptionSetting: InputSlot=Default"
+      Choice "PhotoTray/Photo Tray" "%% FoomaticRIPOptionSetting: InputSlot=PhotoTray"
+      Choice "Upper/Upper Tray" "%% FoomaticRIPOptionSetting: InputSlot=Upper"
+      Choice "Lower/Lower Tray" "%% FoomaticRIPOptionSetting: InputSlot=Lower"
+      Choice "CDDVDTray/CD or DVD Tray" "%% FoomaticRIPOptionSetting: InputSlot=CDDVDTray"
+      Choice "Envelope/Envelope Feeder" "%% FoomaticRIPOptionSetting: InputSlot=Envelope"
+      Choice "LargeCapacity/Large Capacity Tray" "%% FoomaticRIPOptionSetting: InputSlot=LargeCapacity"
+      Choice "Manual/Manual Feeder" "%% FoomaticRIPOptionSetting: InputSlot=Manual"
+      Choice "MPTray/Multi Purpose Tray" "%% FoomaticRIPOptionSetting: InputSlot=MPTray"
+    Option "Duplex/Double-Sided Printing" PickOne AnySetup 120.0
+      Choice "DuplexNoTumble/Long Edge (Standard)" "%% FoomaticRIPOptionSetting: Duplex=DuplexNoTumble"
+      Choice "DuplexTumble/Short Edge (Flip)" "%% FoomaticRIPOptionSetting: Duplex=DuplexTumble"
+      *Choice "None/Off" "%% FoomaticRIPOptionSetting: Duplex=None"
+    Option "DryTime/Additional Dry Time" PickOne AnySetup 120.0
+      *Choice "Zero/Printer Default" "%% FoomaticRIPOptionSetting: DryTime=Zero"
+      Choice "Five/5 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Five"
+      Choice "Ten/10 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Ten"
+      Choice "Fifteen/15 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Fifteen"
+      Choice "Twenty/20 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Twenty"
+      Choice "TwentyFive/25 Seconds" "%% FoomaticRIPOptionSetting: DryTime=TwentyFive"
+      Choice "Thirty/30 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Thirty"
+  Group "PrintoutMode/Printout Mode"
+    Option "Quality/Resolution, Quality, Ink Type, Media Type" PickOne AnySetup 100.0
+      *Choice "FromPrintoutMode/Controlled by 'Printout Mode'" "%% FoomaticRIPOptionSetting: Quality=@PrintoutMode"
+      Choice "300ColorCMYK/300 dpi, Color, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=300ColorCMYK"
+      Choice "300ColorCMYKFullBleed/300 dpi, Color, Full Bleed, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=300ColorCMYKFullBleed"
+      Choice "300DraftColorCMYK/300 dpi, Draft, Color, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=300DraftColorCMYK"
+      Choice "300DraftGrayscaleK/300 dpi, Draft, Grayscale, Black Cartr." "%% FoomaticRIPOptionSetting: Quality=300DraftGrayscaleK"
+      Choice "300FastDraftColorCMYK/300 dpi, FastDraft, Color, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=300FastDraftColorCMYK"
+      Choice "300FastDraftGrayscaleK/300 dpi, FastDraft, Grayscale, Black Cartr." "%% FoomaticRIPOptionSetting: Quality=300FastDraftGrayscaleK"
+      Choice "300GrayscaleK/300 dpi, Grayscale, Black Cartr." "%% FoomaticRIPOptionSetting: Quality=300GrayscaleK"
+      Choice "600ColorCMYK/600 dpi, Color, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=600ColorCMYK"
+      Choice "600ColorCMYKFullBleed/600 dpi, Color, Full Bleed, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=600ColorCMYKFullBleed"
+      Choice "600GrayscaleK/600 dpi, Grayscale, Black Cartr." "%% FoomaticRIPOptionSetting: Quality=600GrayscaleK"
+      Choice "600PhotoCMYK/600 dpi, Photo, Black + Color Cartr., Photo Paper" "%% FoomaticRIPOptionSetting: Quality=600PhotoCMYK"
+      Choice "600PhotoCMYKFullBleed/600 dpi, Photo, Full Bleed, Black + Color Cartr., Photo Paper" "%% FoomaticRIPOptionSetting: Quality=600PhotoCMYKFullBleed"
+  *CustomMedia "Letter/Letter" 612.00 792.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Letter" "%% FoomaticRIPOptionSetting: PageSize=Letter"
+  CustomMedia "A4/A4" 595.00 842.00 9.72 36.00 9.72 9.00 "%% FoomaticRIPOptionSetting: PageSize=A4" "%% FoomaticRIPOptionSetting: PageSize=A4"
+  CustomMedia "Photo/Photo or 4x6 inch index card" 288.00 432.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Photo" "%% FoomaticRIPOptionSetting: PageSize=Photo"
+  CustomMedia "Photo5x7/Photo or 5x7 inch index card" 360.00 504.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Photo5x7" "%% FoomaticRIPOptionSetting: PageSize=Photo5x7"
+  CustomMedia "PhotoTearOff/Photo with tear-off tab" 288.00 432.00 0.00 0.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=PhotoTearOff" "%% FoomaticRIPOptionSetting: PageSize=PhotoTearOff"
+  CustomMedia "3x5/3x5 inch index card" 216.00 360.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=3x5" "%% FoomaticRIPOptionSetting: PageSize=3x5"
+  CustomMedia "5x8/5x8 inch index card" 360.00 576.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=5x8" "%% FoomaticRIPOptionSetting: PageSize=5x8"
+  CustomMedia "A5/A5" 420.00 595.00 9.00 36.00 9.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=A5" "%% FoomaticRIPOptionSetting: PageSize=A5"
+  CustomMedia "A6/A6" 297.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=A6" "%% FoomaticRIPOptionSetting: PageSize=A6"
+  CustomMedia "A6TearOff/A6 with tear-off tab" 297.00 420.00 0.00 0.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=A6TearOff" "%% FoomaticRIPOptionSetting: PageSize=A6TearOff"
+  CustomMedia "B5JIS/B5 (JIS)" 516.00 729.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=B5JIS" "%% FoomaticRIPOptionSetting: PageSize=B5JIS"
+  CustomMedia "CDDVD80/CD or DVD 80 mm" 237.00 237.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=CDDVD80" "%% FoomaticRIPOptionSetting: PageSize=CDDVD80"
+  CustomMedia "CDDVD120/CD or DVD 120 mm" 360.00 360.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=CDDVD120" "%% FoomaticRIPOptionSetting: PageSize=CDDVD120"
+  CustomMedia "Env10/Envelope #10" 297.00 684.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Env10" "%% FoomaticRIPOptionSetting: PageSize=Env10"
+  CustomMedia "EnvC5/Envelope C5" 459.00 649.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=EnvC5" "%% FoomaticRIPOptionSetting: PageSize=EnvC5"
+  CustomMedia "EnvC6/Envelope C6" 323.00 459.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=EnvC6" "%% FoomaticRIPOptionSetting: PageSize=EnvC6"
+  CustomMedia "EnvDL/Envelope DL" 312.00 624.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=EnvDL" "%% FoomaticRIPOptionSetting: PageSize=EnvDL"
+  CustomMedia "EnvISOB5/Envelope B5" 499.00 709.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5" "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5"
+  CustomMedia "EnvMonarch/Envelope Monarch" 279.00 540.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=EnvMonarch" "%% FoomaticRIPOptionSetting: PageSize=EnvMonarch"
+  CustomMedia "Executive/Executive" 522.00 756.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Executive" "%% FoomaticRIPOptionSetting: PageSize=Executive"
+  CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
+  CustomMedia "Hagaki/Hagaki" 283.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
+  CustomMedia "Legal/Legal" 612.00 1008.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
+  CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
+  // <%ViperPlusVIP:Normal%>
+  {
+    ModelName "HP Deskjet f4400 Series hpijs"
+    Attribute "NickName" "" "HP Deskjet f4400 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Deskjet f4400 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet f4400 series;DES:deskjet f4400 series;"
+    PCFileName "hp-deskjet_f4400_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Deskjet f4440 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f4435 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f4450 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f4470 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f4472 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f4473 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f4480 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f4483 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f4488 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f4492 All-in-one Printer)"
+  }
+  {
+    ModelName "HP Deskjet f4500 Series hpijs"
+    Attribute "NickName" "" "HP Deskjet f4500 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Deskjet f4500 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet f4500 series;DES:deskjet f4500 series;"
+    PCFileName "hp-deskjet_f4500_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Deskjet f4500 All-in-one Printer Series)"
+  }
+  {
+    ModelName "HP Photosmart c4600 Series hpijs"
+    Attribute "NickName" "" "HP Photosmart c4600 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP PS c4600 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart c4600 series;DES:photosmart c4600 series;"
+    PCFileName "hp-photosmart_c4600_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Photosmart c4640 All-in-one Printer)"
+    Attribute "Product" "" "(HP Photosmart c4650 All-in-one Printer)"
+    Attribute "Product" "" "(HP Photosmart c4680 All-in-one Printer)"
+    Attribute "Product" "" "(HP Photosmart c4610 All-in-one Printer)"
+    Attribute "Product" "" "(HP Photosmart c4635 All-in-one Printer)"
+    Attribute "Product" "" "(HP Photosmart c4670 All-in-one Printer)"
+    Attribute "Product" "" "(HP Photosmart c4673 All-in-one Printer)"
+    Attribute "Product" "" "(HP Photosmart c4680 All-in-one Printer)"
+    Attribute "Product" "" "(HP Photosmart c4683 All-in-one Printer)"
+    Attribute "Product" "" "(HP Photosmart c4688 All-in-one Printer)"
+  }
+  {
+    ModelName "HP Photosmart c4700 Series hpijs"
+    Attribute "NickName" "" "HP Photosmart c4700 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP PS c4700 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart c4700 series;DES:photosmart c4700 series;"
+    PCFileName "hp-photosmart_c4700_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Photosmart c4740 All-in-one Printer)"
+    Attribute "Product" "" "(HP Photosmart c4750 All-in-one Printer)"
+    Attribute "Product" "" "(HP Photosmart c4780 All-in-one Printer)"
+    Attribute "Product" "" "(HP Photosmart c4783 All-in-one Printer)"
+    Attribute "Product" "" "(HP Photosmart c4785 All-in-one Printer)"
+    Attribute "Product" "" "(HP Photosmart c4788 All-in-one Printer)"
+    Attribute "Product" "" "(HP Photosmart c4793 All-in-one Printer)"
+    Attribute "Product" "" "(HP Photosmart c4795 All-in-one Printer)"
+    Attribute "Product" "" "(HP Photosmart c4798 All-in-one Printer)"
+    Attribute "Product" "" "(HP Photosmart c4799 All-in-one Printer)"
+  }
+  {
+    ModelName "HP Deskjet d5500 Series hpijs"
+    Attribute "NickName" "" "HP Deskjet d5500 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Deskjet d5500 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet d5500 series;DES:deskjet d5500 series;"
+    PCFileName "hp-deskjet_d5500_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Deskjet d5545 Printer)"
+    Attribute "Product" "" "(HP Deskjet d5560 Printer)"
+    Attribute "Product" "" "(HP Deskjet d5563 Printer)"
+    Attribute "Product" "" "(HP Deskjet d5568 Printer)"
+  }
+}  // end ViperPlusVIP
+
+/////////////// ViperMinusVIP
+{
+  Attribute "DefaultResolution" "" "600dpi"
+
+  // Custom page sizes from 1x4in to SuperB
+  HWMargins 18 36 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 936 1368
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
+EVICEHEIGHTPOINTS=0"
+
+  Attribute "FoomaticIDs" "" "HP-DeskJet_5650 hpijs"
+  Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
+USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
+le=- -"
+  Attribute "FoomaticRIPOption" "Model" "enum CmdLine A 100"
+  Attribute "FoomaticRIPOptionSetting" "Model=HP-DeskJet_5650" " -sDeviceManufacture&&
+r=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5600&quot;"
+  Attribute "FoomaticRIPOption" "PrintoutMode" "enum Composite B"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Draft" "Quality=300FastDraftCol&&
+orCMYK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Draft.Gray" "Quality=300FastDra&&
+ftGrayscaleK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Normal" "Quality=300ColorCMYK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Normal.Gray" "Quality=300Graysc&&
+aleK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=High" "Quality=600ColorCMYK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=High.Gray" "Quality=600Grayscal&&
+eK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Photo" "Quality=600PhotoCMYKFu&&
+llBleed"
+  Attribute "FoomaticRIPOption" "InputSlot" "enum CmdLine C"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Default" ",PS:MediaPosition=7"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=PhotoTray" ",PS:MediaPosition=6"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Upper" ",PS:MediaPosition=1"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Lower" ",PS:MediaPosition=4"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=CDDVDTray" ",PS:MediaPosition=14"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Envelope" ",PS:MediaPosition=3"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=LargeCapacity" ",PS:MediaPosition=&&
+5"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Manual" ",PS:MediaPosition=2"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=MPTray" ",PS:MediaPosition=8"
+  Attribute "FoomaticRIPOption" "PageSize" "enum CmdLine A"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Letter" " -dDEVICEWIDTHPOINTS=612 -&&
+dDEVICEHEIGHTPOINTS=792"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A4" " -dDEVICEWIDTHPOINTS=595 -dDEV&&
+ICEHEIGHTPOINTS=842"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Photo" " -dDEVICEWIDTHPOINTS=288 -d&&
+DEVICEHEIGHTPOINTS=432"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Photo5x7" " -dDEVICEWIDTHPOINTS=360&&
+ -dDEVICEHEIGHTPOINTS=504"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=PhotoTearOff" " -dDEVICEWIDTHPOINTS&&
+=288 -dDEVICEHEIGHTPOINTS=432"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=3x5" " -dDEVICEWIDTHPOINTS=216 -dDE&&
+VICEHEIGHTPOINTS=360"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=5x8" " -dDEVICEWIDTHPOINTS=360 -dDE&&
+VICEHEIGHTPOINTS=576"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A5" " -dDEVICEWIDTHPOINTS=420 -dDEV&&
+ICEHEIGHTPOINTS=595"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A6" " -dDEVICEWIDTHPOINTS=297 -dDEV&&
+ICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A6TearOff" " -dDEVICEWIDTHPOINTS=29&&
+7 -dDEVICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=B5JIS" " -dDEVICEWIDTHPOINTS=516 -d&&
+DEVICEHEIGHTPOINTS=729"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=CDDVD80" " -dDEVICEWIDTHPOINTS=237 &&
+-dDEVICEHEIGHTPOINTS=237"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=CDDVD120" " -dDEVICEWIDTHPOINTS=360&&
+ -dDEVICEHEIGHTPOINTS=360"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Env10" " -dDEVICEWIDTHPOINTS=297 -d&&
+DEVICEHEIGHTPOINTS=684"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvC5" " -dDEVICEWIDTHPOINTS=459 -d&&
+DEVICEHEIGHTPOINTS=649"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvC6" " -dDEVICEWIDTHPOINTS=323 -d&&
+DEVICEHEIGHTPOINTS=459"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvDL" " -dDEVICEWIDTHPOINTS=312 -d&&
+DEVICEHEIGHTPOINTS=624"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvISOB5" " -dDEVICEWIDTHPOINTS=499&&
+ -dDEVICEHEIGHTPOINTS=709"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvMonarch" " -dDEVICEWIDTHPOINTS=2&&
+79 -dDEVICEHEIGHTPOINTS=540"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Executive" " -dDEVICEWIDTHPOINTS=52&&
+2 -dDEVICEHEIGHTPOINTS=756"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=FLSA" " -dDEVICEWIDTHPOINTS=612 -dD&&
+EVICEHEIGHTPOINTS=936"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Hagaki" " -dDEVICEWIDTHPOINTS=283 -&&
+dDEVICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
+DEVICEHEIGHTPOINTS=1008"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
+ -dDEVICEHEIGHTPOINTS=774"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
+ -dDEVICEHEIGHTPOINTS=935"
+  /////////// Large format paper support
+  Attribute "FoomaticRIPOptionSetting" "PageSize=B4JIS" " -dDEVICEWIDTHPOINTS=729 -d&&
+DEVICEHEIGHTPOINTS=1033"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Ledger" " -dDEVICEWIDTHPOINTS=792 -&&
+dDEVICEHEIGHTPOINTS=1224"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=SuperB" " -dDEVICEWIDTHPOINTS=936 -&&
+dDEVICEHEIGHTPOINTS=1368"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w774h1116" " -dDEVICEWIDTHPOINTS=77&&
+4 -dDEVICEHEIGHTPOINTS=1116"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A3" " -dDEVICEWIDTHPOINTS=842 -dDEV&&
+ICEHEIGHTPOINTS=1190"
+  Attribute "FoomaticRIPOption" "Duplex" "enum CmdLine A"
+  Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexNoTumble" " -dDuplex=true -dTum&&
+ble=false"
+  Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexTumble" " -dDuplex=true -dTumbl&&
+e=true"
+  Attribute "FoomaticRIPOptionSetting" "Duplex=None" " -dDuplex=false"
+  Attribute "FoomaticRIPOption" "DryTime" "enum CmdLine B"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Zero" ""
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Five" ",DryTime=5"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Ten" ",DryTime=10"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Fifteen" ",DryTime=15"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Twenty" ",DryTime=20"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=TwentyFive" ",DryTime=25"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Thirty" ",DryTime=30"
+  Attribute "FoomaticRIPOption" "Quality" "enum CmdLine B"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300ColorCMYK" " -r300 -sIjsParams=Qu&&
+ality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quality:PenSet&&
+=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300ColorCMYKFullBleed" " -r300 -sIjs&&
+Params=Quality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quali&&
+ty:PenSet=2,Quality:FullBleed=1"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300DraftColorCMYK" " -r300 -sIjsPara&&
+ms=Quality:Quality=1,Quality:ColorMode=2,Quality:MediaType=0,Quality:P&&
+enSet=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300DraftGrayscaleK" " -r300 -sIjs&&
+Params=Quality:Quality=1,Quality:ColorMode=0,Quality:MediaType=0,Quali&&
+ty:PenSet=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300FastDraftColorCMYK" " -r300 -sIjs&&
+Params=Quality:Quality=4,Quality:ColorMode=2,Quality:MediaType=0,Quali&&
+ty:PenSet=2,Quality:SpeedMech=1"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300FastDraftGrayscaleK" " -r300 -&&
+sIjsParams=Quality:Quality=4,Quality:ColorMode=0,Quality:MediaType=0,Q&&
+uality:PenSet=2,Quality:SpeedMech=1"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300GrayscaleK" " -r300 -sIjsParam&&
+s=Quality:Quality=0,Quality:ColorMode=0,Quality:MediaType=0,Quality:Pe&&
+nSet=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600ColorCMYK" " -r600 -sIjsParams=Qu&&
+ality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quality:PenSet&&
+=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600ColorCMYKFullBleed" " -r600 -sIjs&&
+Params=Quality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quali&&
+ty:PenSet=2,Quality:FullBleed=1"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600GrayscaleK" " -r600 -sIjsParam&&
+s=Quality:Quality=0,Quality:ColorMode=0,Quality:MediaType=0,Quality:Pe&&
+nSet=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600PhotoCMYK" " -r600 -sIjsParams=&&
+Quality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenS&&
+et=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600PhotoCMYKFullBleed" " -r600 -sI&&
+jsParams=Quality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Qua&&
+lity:PenSet=2,Quality:FullBleed=1"
+  Group "General/General"
+    Option "PrintoutMode/Printout Mode" PickOne AnySetup 10.0
+      Choice "Draft/Draft (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=Draft"
+      Choice "Draft.Gray/Draft Grayscale (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=Draft.Gray"
+      *Choice "Normal/Normal (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=Normal"
+      Choice "Normal.Gray/Normal Grayscale (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=Normal.Gray"
+      Choice "High/High Quality (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=High"
+      Choice "High.Gray/High Quality Grayscale (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=High.Gray"
+      Choice "Photo/Photo (on photo paper)" "%% FoomaticRIPOptionSetting: PrintoutMode=Photo"
+    Option "InputSlot/Media Source" PickOne AnySetup 100.0
+      *Choice "Default/Printer default" "%% FoomaticRIPOptionSetting: InputSlot=Default"
+      Choice "PhotoTray/Photo Tray" "%% FoomaticRIPOptionSetting: InputSlot=PhotoTray"
+      Choice "Upper/Upper Tray" "%% FoomaticRIPOptionSetting: InputSlot=Upper"
+      Choice "Lower/Lower Tray" "%% FoomaticRIPOptionSetting: InputSlot=Lower"
+      Choice "CDDVDTray/CD or DVD Tray" "%% FoomaticRIPOptionSetting: InputSlot=CDDVDTray"
+      Choice "Envelope/Envelope Feeder" "%% FoomaticRIPOptionSetting: InputSlot=Envelope"
+      Choice "LargeCapacity/Large Capacity Tray" "%% FoomaticRIPOptionSetting: InputSlot=LargeCapacity"
+      Choice "Manual/Manual Feeder" "%% FoomaticRIPOptionSetting: InputSlot=Manual"
+      Choice "MPTray/Multi Purpose Tray" "%% FoomaticRIPOptionSetting: InputSlot=MPTray"
+    Option "Duplex/Double-Sided Printing" PickOne AnySetup 120.0
+      Choice "DuplexNoTumble/Long Edge (Standard)" "%% FoomaticRIPOptionSetting: Duplex=DuplexNoTumble"
+      Choice "DuplexTumble/Short Edge (Flip)" "%% FoomaticRIPOptionSetting: Duplex=DuplexTumble"
+      *Choice "None/Off" "%% FoomaticRIPOptionSetting: Duplex=None"
+    Option "DryTime/Additional Dry Time" PickOne AnySetup 120.0
+      *Choice "Zero/Printer Default" "%% FoomaticRIPOptionSetting: DryTime=Zero"
+      Choice "Five/5 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Five"
+      Choice "Ten/10 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Ten"
+      Choice "Fifteen/15 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Fifteen"
+      Choice "Twenty/20 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Twenty"
+      Choice "TwentyFive/25 Seconds" "%% FoomaticRIPOptionSetting: DryTime=TwentyFive"
+      Choice "Thirty/30 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Thirty"
+  Group "PrintoutMode/Printout Mode"
+    Option "Quality/Resolution, Quality, Ink Type, Media Type" PickOne AnySetup 100.0
+      *Choice "FromPrintoutMode/Controlled by 'Printout Mode'" "%% FoomaticRIPOptionSetting: Quality=@PrintoutMode"
+      Choice "300ColorCMYK/300 dpi, Color, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=300ColorCMYK"
+      Choice "300ColorCMYKFullBleed/300 dpi, Color, Full Bleed, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=300ColorCMYKFullBleed"
+      Choice "300DraftColorCMYK/300 dpi, Draft, Color, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=300DraftColorCMYK"
+      Choice "300DraftGrayscaleK/300 dpi, Draft, Grayscale, Black Cartr." "%% FoomaticRIPOptionSetting: Quality=300DraftGrayscaleK"
+      Choice "300FastDraftColorCMYK/300 dpi, FastDraft, Color, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=300FastDraftColorCMYK"
+      Choice "300FastDraftGrayscaleK/300 dpi, FastDraft, Grayscale, Black Cartr." "%% FoomaticRIPOptionSetting: Quality=300FastDraftGrayscaleK"
+      Choice "300GrayscaleK/300 dpi, Grayscale, Black Cartr." "%% FoomaticRIPOptionSetting: Quality=300GrayscaleK"
+      Choice "600ColorCMYK/600 dpi, Color, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=600ColorCMYK"
+      Choice "600ColorCMYKFullBleed/600 dpi, Color, Full Bleed, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=600ColorCMYKFullBleed"
+      Choice "600GrayscaleK/600 dpi, Grayscale, Black Cartr." "%% FoomaticRIPOptionSetting: Quality=600GrayscaleK"
+      Choice "600PhotoCMYK/600 dpi, Photo, Black + Color Cartr., Photo Paper" "%% FoomaticRIPOptionSetting: Quality=600PhotoCMYK"
+      Choice "600PhotoCMYKFullBleed/600 dpi, Photo, Full Bleed, Black + Color Cartr., Photo Paper" "%% FoomaticRIPOptionSetting: Quality=600PhotoCMYKFullBleed"
+  *CustomMedia "Letter/Letter" 612.00 792.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Letter" "%% FoomaticRIPOptionSetting: PageSize=Letter"
+  CustomMedia "A4/A4" 595.00 842.00 9.72 36.00 9.72 9.00 "%% FoomaticRIPOptionSetting: PageSize=A4" "%% FoomaticRIPOptionSetting: PageSize=A4"
+  CustomMedia "Photo/Photo or 4x6 inch index card" 288.00 432.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Photo" "%% FoomaticRIPOptionSetting: PageSize=Photo"
+  CustomMedia "Photo5x7/Photo or 5x7 inch index card" 360.00 504.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Photo5x7" "%% FoomaticRIPOptionSetting: PageSize=Photo5x7"
+  CustomMedia "PhotoTearOff/Photo with tear-off tab" 288.00 432.00 0.00 0.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=PhotoTearOff" "%% FoomaticRIPOptionSetting: PageSize=PhotoTearOff"
+  CustomMedia "3x5/3x5 inch index card" 216.00 360.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=3x5" "%% FoomaticRIPOptionSetting: PageSize=3x5"
+  CustomMedia "5x8/5x8 inch index card" 360.00 576.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=5x8" "%% FoomaticRIPOptionSetting: PageSize=5x8"
+  CustomMedia "A5/A5" 420.00 595.00 9.00 36.00 9.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=A5" "%% FoomaticRIPOptionSetting: PageSize=A5"
+  CustomMedia "A6/A6" 297.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=A6" "%% FoomaticRIPOptionSetting: PageSize=A6"
+  CustomMedia "A6TearOff/A6 with tear-off tab" 297.00 420.00 0.00 0.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=A6TearOff" "%% FoomaticRIPOptionSetting: PageSize=A6TearOff"
+  CustomMedia "B5JIS/B5 (JIS)" 516.00 729.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=B5JIS" "%% FoomaticRIPOptionSetting: PageSize=B5JIS"
+  CustomMedia "CDDVD80/CD or DVD 80 mm" 237.00 237.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=CDDVD80" "%% FoomaticRIPOptionSetting: PageSize=CDDVD80"
+  CustomMedia "CDDVD120/CD or DVD 120 mm" 360.00 360.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=CDDVD120" "%% FoomaticRIPOptionSetting: PageSize=CDDVD120"
+  CustomMedia "Env10/Envelope #10" 297.00 684.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Env10" "%% FoomaticRIPOptionSetting: PageSize=Env10"
+  CustomMedia "EnvC5/Envelope C5" 459.00 649.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=EnvC5" "%% FoomaticRIPOptionSetting: PageSize=EnvC5"
+  CustomMedia "EnvC6/Envelope C6" 323.00 459.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=EnvC6" "%% FoomaticRIPOptionSetting: PageSize=EnvC6"
+  CustomMedia "EnvDL/Envelope DL" 312.00 624.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=EnvDL" "%% FoomaticRIPOptionSetting: PageSize=EnvDL"
+  CustomMedia "EnvISOB5/Envelope B5" 499.00 709.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5" "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5"
+  CustomMedia "EnvMonarch/Envelope Monarch" 279.00 540.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=EnvMonarch" "%% FoomaticRIPOptionSetting: PageSize=EnvMonarch"
+  CustomMedia "Executive/Executive" 522.00 756.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Executive" "%% FoomaticRIPOptionSetting: PageSize=Executive"
+  CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
+  CustomMedia "Hagaki/Hagaki" 283.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
+  CustomMedia "Legal/Legal" 612.00 1008.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
+  CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
+  // <%ViperMinusVIP:Normal%>
+  {
+    ModelName "HP Deskjet f2400 Series hpijs"
+    Attribute "NickName" "" "HP Deskjet f2400 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Deskjet f2400 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet f2400 series;DES:deskjet f2400 series;"
+    PCFileName "hp-deskjet_f2400_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Deskjet f2410 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2418 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2420 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2423 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2430 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2440 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2476 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2480 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2483 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2488 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2492 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet f2493 All-in-one Printer)"
+  }
+}  // end ViperMinusVIP
 
 } // end Manufacturer "HP"
 

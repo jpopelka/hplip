@@ -1,5 +1,5 @@
 #ifdef APDK_EXTENDED_MEDIASIZE
-#define MAX_PRINTMODES 14
+#define MAX_PRINTMODES 20
 #else
 #define MAX_PRINTMODES 10
 #endif

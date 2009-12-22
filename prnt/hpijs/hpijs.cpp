@@ -323,7 +323,7 @@ int hpijs_set_cb (void *set_cb_data, IjsServerCtx *ctx, IjsJobId job_id,
             dy = h > pSS->PaperHeight ? h - pSS->PaperHeight :  pSS->PaperHeight - h;
 
             /* Middle of print Job, ignore paper size if same. */
-            if ((dx > 0.03) || (dy > 0.03))
+            if ((dx > 0.25) || (dy > 0.25))
             {
                 pSS->FirstRaster = 1;  /* force new Job */
                 pSS->PaperWidth = w;   /* set new paper size */
@@ -384,6 +384,37 @@ int hpijs_set_cb (void *set_cb_data, IjsServerCtx *ctx, IjsJobId job_id,
     {
         pSS->pPC->SetPrinterHint (PAGES_IN_DOC_HINT, 512);
 	pSS->EnableSpeedMech (TRUE);
+    }
+    else if (!strcmp (key, "Quality:MediaSubtype"))
+    {
+        iVal = strtol (svalue, &tail, 10);
+        pSS->pPC->SetMediaSubtype (iVal);
+    }
+//  The next 5 values are passed in as inch * 1000
+    else if (!strcmp (key, "Margin:TopPadding"))
+    {
+        iVal = strtol (svalue, &tail, 10);
+        pSS->pPC->SetMechOffset (iVal);
+    }
+    else if (!strcmp (key, "Overspray:Left"))
+    {
+        iVal = strtol (svalue, &tail, 10);
+        pSS->pPC->SetPrinterHint (LEFT_OVERSPRAY_HINT, iVal);
+    }
+    else if (!strcmp (key, "Overspray:Top"))
+    {
+        iVal = strtol (svalue, &tail, 10);
+        pSS->pPC->SetPrinterHint (TOP_OVERSPRAY_HINT, iVal);
+    }
+    else if (!strcmp (key, "Overspray:Right"))
+    {
+        iVal = strtol (svalue, &tail, 10);
+        pSS->pPC->SetPrinterHint (RIGHT_OVERSPRAY_HINT, iVal);
+    }
+    else if (!strcmp (key, "Overspray:Bottom"))
+    {
+        iVal = strtol (svalue, &tail, 10);
+        pSS->pPC->SetPrinterHint (BOTTOM_OVERSPRAY_HINT, iVal);
     }
     else
         BUG("unable to set key=%s, value=%s\n", key, svalue);    

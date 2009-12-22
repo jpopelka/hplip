@@ -1154,8 +1154,6 @@ BOOL  ModeJPEG::Compress( HPLJBITMAP *pSrcBitmap,
 
     hp_rgb_ycc_setup (1);   // Use modified Mojave CSC table
 
-    int iColorsUsed = bGrayscaleSet ? 1 : 3;
-
     //----------------------------------------------------------------
     // Setup for compression 
     //----------------------------------------------------------------
@@ -1178,6 +1176,7 @@ BOOL  ModeJPEG::Compress( HPLJBITMAP *pSrcBitmap,
         jpeg_destroy_compress(&cinfo);
         return FALSE;
     }
+
     jpeg_create_compress( &cinfo );
    
     //----------------------------------------------------------------
@@ -1192,13 +1191,17 @@ BOOL  ModeJPEG::Compress( HPLJBITMAP *pSrcBitmap,
     // JPEG Lib Step 3: Set parameters for compression, including image size & colorspace
     //----------------------------------------------------------------
 
-    if(!bGrayscaleSet)
+    int iColorsUsed;
+
+    if(bGrayscaleSet)
     {
-        cinfo.in_color_space = JCS_RGB; // arbitrary guess 
+        cinfo.in_color_space = JCS_GRAYSCALE;
+        iColorsUsed = 1;
     }
     else
     {
-        cinfo.in_color_space = JCS_GRAYSCALE;
+        cinfo.in_color_space = JCS_RGB; // arbitrary guess
+        iColorsUsed = 3;
     }
     jpeg_set_defaults( &cinfo );
 

@@ -425,6 +425,8 @@ typedef struct MediaAttributes_s
     int        printable_start_y;
     int        horizontal_overspray;
     int        vertical_overspray;
+    int        left_overspray; 
+    int        top_overspray;
 } MediaAttributes;
 
 typedef struct JobAttributes_s

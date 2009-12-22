@@ -79,6 +79,7 @@ public:
     // return theTextManager->TextOut(pTextString,iLenString,font,iAbsX,iAbsY);
 #endif
 
+    DRIVER_ERROR Flush();
     DRIVER_ERROR NewPage();
 
 private:

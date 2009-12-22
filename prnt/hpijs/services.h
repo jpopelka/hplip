@@ -92,6 +92,10 @@ public:
     return NO_ERROR;
   }
 
+#ifdef HP_PRINTVIEW
+    int GetPJLHeaderBuffer (char **szPJLBuffer);
+#endif
+
   BOOL GetVerticalAlignmentValue(BYTE* cVertAlignVal);
   BOOL GetVertAlignFromDevice();
 

@@ -96,7 +96,11 @@ DJ9xxVIP::DJ9xxVIP
     pMode[ModeCount++] = new DJ990BestMode ();         // Photo Best
     pMode[ModeCount++] = new DJ990PhotoNormalMode ();  // Photo Normal
 
-    m_cExtraDryTime = 0;
+    m_cExtraDryTime    = 0;
+    m_iLeftOverspray   = 0;
+    m_iTopOverspray    = 0;
+    m_iRightOverspray  = 0;
+    m_iBottomOverspray = 0;
 }
 
 GrayModeDJ990::GrayModeDJ990
@@ -328,6 +332,17 @@ BOOL DJ9xxVIP::UseGUIMode
 	*/ 
 } //UseGUIMode
 
+DRIVER_ERROR DJ9xxVIP::AddPJLHeader ()
+{
+    char            *szPJLBuffer = NULL;
+    DRIVER_ERROR    err = NO_ERROR;
+    int             iPJLBufferSize;
+    if (((iPJLBufferSize = pSS->GetPJLHeaderBuffer (&szPJLBuffer)) > 0) && (szPJLBuffer != NULL))
+    {
+        err = Send ((const BYTE *) szPJLBuffer, iPJLBufferSize);
+    }
+    return err;
+}
 
 Mode10::Mode10
 (
@@ -502,18 +517,6 @@ DRIVER_ERROR HeaderDJ990::Send()
 
     thePrintContext->GetPrintModeSettings (eQualityMode, eMediaType, eColorMode, bDeviceText);
 
-#ifdef APDK_EXTENDED_MEDIASIZE
-/*
- *  A different media type may have been set via ppd that is different than
- *  what is initialized in the PrintMode constructor, for example, eMediaType
- *  set to 2, which maps to PCL mediatype of 3, rather than PCL mediatype 5
- *  for 1200 dpi mode for Officejet Pro K5400. Here, set the media type based
- *  on what was selected from ppd.
- */
-
-    SetMediaType (MediaTypeToPcl (eMediaType));
-#endif
-
     if (eMediaType == MEDIA_CDDVD)
     {
         thePrintContext->SetMediaSource (sourceTrayCDDVD);
@@ -686,6 +689,9 @@ DRIVER_ERROR HeaderDJ990::StartSend()
     err = thePrinter->Send((const BYTE*)UEL,sizeof(UEL));
     ERRCHECK;
 
+    err = thePrinter->AddPJLHeader ();
+    ERRCHECK;
+
     err = thePrinter->Send((const BYTE*)EnterLanguage,sizeof(EnterLanguage));
     ERRCHECK;
 
@@ -705,6 +711,17 @@ DRIVER_ERROR HeaderDJ990::StartSend()
 
     err = Modes ();            // Set media source, type, size and quality modes.
     ERRCHECK;
+
+//  Send media subtype if set
+    int    iMediaSubtype = thePrintContext->GetMediaSubtype ();
+    if (iMediaSubtype != APDK_INVALID_VALUE)
+    {
+        BYTE    szMediaSubtypeSeq[] = {0x1B, '*', 'o', '5', 'W', 0x0D, 0x03, 0x00, 0x00, 0x00};
+        szMediaSubtypeSeq[8] = (BYTE) ((iMediaSubtype & 0xFF00) >> 8);
+        szMediaSubtypeSeq[9] = (BYTE) (iMediaSubtype & 0x00FF);
+        err = thePrinter->Send ((const BYTE *) szMediaSubtypeSeq, sizeof(szMediaSubtypeSeq));
+        ERRCHECK;
+    }
 
     if (!thePrinter->UseGUIMode(thePrintContext->CurrentMode))
     {

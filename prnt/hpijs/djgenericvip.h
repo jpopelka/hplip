@@ -100,6 +100,36 @@ public:
     VIPCDDVDMode ();
 }; // VIPCDDVDMode
 
+class VIPBrochureNormalMode : public PrintMode
+{
+public:
+    VIPBrochureNormalMode ();
+}; // VIPBrochureNormalMode
+
+class VIPPremiumNormalMode : public PrintMode
+{
+public:
+    VIPPremiumNormalMode ();
+}; // VIPPremiumNormalMode
+
+class VIPPlainBestMode : public PrintMode
+{
+public:
+    VIPPlainBestMode ();
+}; // VIPPlainBestMode
+
+class VIPBrochureBestMode : public PrintMode
+{
+public:
+    VIPBrochureBestMode ();
+}; // VIPBrochureBestMode
+
+class VIPPremiumBestMode : public PrintMode
+{
+public:
+    VIPPremiumBestMode ();
+}; // VIPPremiumBestMode
+
 #if defined(APDK_DJGENERICVIP) && defined (APDK_DJ9xxVIP)
 //! DJGenericVIPProxy
 /*!
@@ -112,60 +142,65 @@ public:
         "deskjet 5100\0"
         "Deskjet 5400\0"
         "deskjet 5600\0"
-		"Deskjet 5700\0"
-		"deskjet 5800\0"
+        "Deskjet 5700\0"
+        "deskjet 5800\0"
         "Deskjet 5900\0"
-		"Deskjet 6500\0"
-		"Deskjet 6600\0"
-		"Deskjet 6800\0"
+        "Deskjet 6500\0"
+        "Deskjet 6600\0"
+        "Deskjet 6800\0"
         "Deskjet 6940\0"
         "Deskjet 6980\0"
         "Deskjet 6988\0"
-		"deskjet 9600\0"
-		"Deskjet 9800\0"
+        "deskjet 9600\0"
+        "Deskjet 9800\0"
         "Deskjet D25\0"
+        "Deskjet D55\0"
+        "Deskjet F24\0"
         "Deskjet F42\0"
         "Deskjet F44\0"
+        "Deskjet F45\0"
         "Business Inkjet 1000\0"
-		"hp business inkjet 1100\0"
-   		"HP Business Inkjet 1200\0"
+        "hp business inkjet 1100\0"
+        "HP Business Inkjet 1200\0"
         "Officejet Pro 8500\0"
         "photosmart 7150\0"
         "photosmart 7350\0"
-		"photosmart 7345\0"
+        "photosmart 7345\0"
         "photosmart 7550\0"
         "photosmart 7960\0"
         "photosmart 7760\0"
-		"photosmart 7660\0"
+        "photosmart 7660\0"
         "photosmart 7260\0"
-		"photosmart 7268\0"
-		"Photosmart 7400\0"
+        "photosmart 7268\0"
+        "Photosmart 7400\0"
         "Photosmart 7800\0"
         "Photosmart 8000\0"
-		"Photosmart 8100\0"
-		"Photosmart 8400\0"
-		"Photosmart 8700\0"
-		"Photosmart 8200\0"
-		"Photosmart 320\0"
-		"Photosmart 370\0"
-		"Photosmart 380\0"
-		"Photosmart 330\0"
+        "Photosmart 8100\0"
+        "Photosmart 8400\0"
+        "Photosmart 8700\0"
+        "Photosmart 8200\0"
+        "Photosmart 320\0"
+        "Photosmart 370\0"
+        "Photosmart 380\0"
+        "Photosmart 330\0"
         "Photosmart 420\0"
         "Photosmart A430\0"
         "Photosmart A510\0"
         "Photosmart A520\0"
-#ifdef APDK_MLC_PRINTER
-		"PSC 1500\0"
-		"PSC 1600\0"
+        "PSC 1500\0"
+        "PSC 1600\0"
         "psc 2300\0"
-		"PSC 2350\0"
+        "PSC 2350\0"
         "psc 2400\0"
         "psc 2500\0"
-		"Officejet 74\0"
-		"Officejet 73\0"
-		"Officejet 72\0"
+        "Officejet 6000 E609\0"
+        "Officejet 6500 E709\0"
+        "Officejet 7000 E809\0"
+        "Officejet 74\0"
+        "Officejet 73\0"
+        "Officejet 72\0"
         "Officejet 60\0"
-		"Officejet 62\0"
+        "Officejet 62\0"
         "Officejet 63\0"
         "Officejet J35\0"
         "Officejet J36\0"
@@ -174,7 +209,6 @@ public:
         "Officejet J57\0"
         "Officejet J64\0"
         "Officejet K71\0"
-
         "Officejet Pro K53\0"
         "Officejet Pro K54\0"
         "Officejet Pro K56\0"
@@ -183,18 +217,22 @@ public:
         "Officejet Pro L75\0"
         "Officejet Pro L76\0"
         "Officejet Pro L77\0"
-
+        "Officejet Pro L82\0"
+        "Officejet Pro L83\0"
+        "Officejet Pro L84\0"
         "Photosmart 2570\0"
-		"Photosmart 2600\0"
-		"Photosmart 2700\0"
+        "Photosmart 2600\0"
+        "Photosmart 2700\0"
         "Photosmart 3100\0"
         "Photosmart 3200\0"
         "Photosmart 3300\0"
-#endif
         "Photosmart A310\0"
         "Photosmart A320\0"
         "Photosmart A440\0"
         "Photosmart B85\0"
+        "Photosmart B109\0"
+        "Photosmart Plus B209\0"
+        "Photosmart Prem-Web C309\0"
         "Photosmart Pro B8300\0"
         "Photosmart Pro B88\0"
         "Photosmart C309\0"
@@ -205,6 +243,7 @@ public:
         "Photosmart C44\0"
         "Photosmart C45\0"
         "Photosmart C46\0"
+        "Photosmart C47\0"
         "Photosmart C51\0"
         "Photosmart C52\0"
         "Photosmart C53\0"
@@ -224,6 +263,7 @@ public:
         "Photosmart D73\0"
         "Photosmart D74\0"
         "Photosmart D73\0"
+        "Photosmart Wireless B109\0"
     ) {m_iPrinterType = eDJGenericVIP;}
     inline Printer* CreatePrinter(SystemServices* pSS) const { return new DJGenericVIP(pSS); }
 	inline PRINTER_TYPE GetPrinterType() const { return eDJGenericVIP;}

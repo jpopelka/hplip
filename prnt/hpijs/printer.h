@@ -360,6 +360,11 @@ public:
         return 0;
     }
 
+    virtual DRIVER_ERROR    AddPJLHeader ()
+    {
+        return NO_ERROR;
+    }
+
 protected:
     SystemServices* pSS;
 #if defined(APDK_FONTS_NEEDED)

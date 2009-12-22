@@ -85,7 +85,7 @@ public:
 	const PRINTER_TYPE GetFamilyType(const FAMILY_HANDLE theFamilyHandle) const;
 	const PRINTER_TYPE EnumDevices( FAMILY_HANDLE& theFamilyHandle) const;
 	const unsigned int GetModelBits() const;
-	const void GetModelString(char* modelstring) const;
+	const void GetModelString(char* modelstring, int modelstring_length) const;
 
     // get a handle to family based on device string
 //    const FAMILY_HANDLE FindModelMatch(const char* szModel) const;

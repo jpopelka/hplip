@@ -396,7 +396,7 @@ void SystemServices::AdjustIO(IO_MODE IM, const char* model)
     IOMode.bDevID =IM.bDevID  && IOMode.bDevID;
 
     if (model)
-        strcpy(strModel,model);
+        strncpy(strModel,model, sizeof(strModel));
 }
 
 APDK_END_NAMESPACE
