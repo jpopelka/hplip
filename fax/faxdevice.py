@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2010 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ from prnt import cups
 from base import device, codes
 from soapfax import SOAPFaxDevice
 from pmlfax import PMLFaxDevice
+from marvellfax import MarvellFaxDevice
 
 def FaxDevice(device_uri=None, printer_name=None,
               callback=None, 
@@ -53,6 +54,9 @@ def FaxDevice(device_uri=None, printer_name=None,
 
     elif fax_type == FAX_TYPE_SOAP:
         return SOAPFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
+
+    elif fax_type == FAX_TYPE_MARVELL:
+        return MarvellFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
 
     else:
         raise Error(ERROR_DEVICE_DOES_NOT_SUPPORT_OPERATION)

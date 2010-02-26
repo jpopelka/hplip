@@ -920,8 +920,6 @@ def getFaxStatus(dev):
     return tx_active, rx_active
 
 
-
-
 TYPE6_STATUS_CODE_MAP = {
      0    : STATUS_PRINTER_IDLE, #</DevStatusUnknown>
     -19928: STATUS_PRINTER_IDLE,

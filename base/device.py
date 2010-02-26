@@ -1329,8 +1329,14 @@ class Device(object):
     def openSoapFax(self):
         return self.__openChannel(hpmudext.HPMUD_S_SOAP_FAX)
 
+    def openMarvellFax(self):
+        return self.__openChannel(hpmudext.HPMUD_S_MARVELL_FAX_CHANNEL)
+
     def closeSoapFax(self):
         return self.__closeChannel(hpmudext.HPMUD_S_SOAP_FAX)
+
+    def closeMarvellFax(self):
+        return self.__closeChannel(hpmudext.HPMUD_S_MARVELL_FAX_CHANNEL)
 
     def closeWifiConfig(self):
         return self.__closeChannel(hpmudext.HPMUD_S_WIFI_CHANNEL)
@@ -2096,6 +2102,9 @@ class Device(object):
     def readSoapFax(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=True):
         return self.__readChannel(self.openSoapFax, bytes_to_read, stream, timeout, allow_short_read)
 
+    def readMarvellFax(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=True):
+        return self.__readChannel(self.openMarvellFax, bytes_to_read, stream, timeout, allow_short_read)
+
     def readWifiConfig(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=True):
         return self.__readChannel(self.openWifiConfig, bytes_to_read, stream, timeout, allow_short_read)
 
@@ -2175,6 +2184,9 @@ class Device(object):
 
     def writeSoapFax(self, data):
         return self.__writeChannel(self.openSoapFax, data)
+
+    def writeMarvellFax(self, data):
+        return self.__writeChannel(self.openMarvellFax, data)
 
     def writeWifiConfig(self, data):
         return self.__writeChannel(self.openWifiConfig, data)

@@ -1,7 +1,7 @@
 /*****************************************************************************\
     hpcupsfax.cpp : HP CUPS fax filter
 
-    Copyright (c) 2001 - 2004, Hewlett-Packard Co.
+    Copyright (c) 2001 - 2010, Hewlett-Packard Co.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -40,6 +40,7 @@
 #include <stdint.h>
 #include <time.h>
 #include <sys/time.h>
+#include <arpa/inet.h>
 #include <math.h>
 #include <cups/cups.h>
 #include <cups/raster.h>
@@ -53,7 +54,22 @@
 #include "hpcupsfax.h"
 #include "bug.h"
 
-static int iLogLevel = 0;
+int    fax_encoding = RASTER_MH;
+char   device_name[16];
+BYTE   szFileHeader[68];
+BYTE   szPageHeader[64];
+
+uint32_t (*convert_endian_l)(uint32_t);
+uint16_t (*convert_endian_s)(uint16_t);
+
+static int iLogLevel = 1;
+char hpFileName[] = "/tmp/hplipfaxXXXXXX";
+
+#define TIFF_HDR_SIZE 8
+#define LITTLE_ENDIAN_MODE I
+#define BIG_ENDIAN_MODE M
+
+#define DBG(args...) syslog(LOG_INFO, __FILE__ " " STRINGIZE(__LINE__) ": " args)
 
 // GrayLevel = (5/16)R + (9/16)G + (2/16)B
 #define RGB2BW(r, g, b) (BYTE) (((r << 2) + r + (g << 3) + g + (b << 1)) >> 4)
@@ -142,7 +158,7 @@ void PrintCupsHeader (cups_page_header2_t m_cupsHeader)
     BUG ("DEBUG: HPFAX - cupsPageSizeName = %s\n", m_cupsHeader.cupsPageSizeName);
 }
 
-int ProcessRasterData (cups_raster_t *cups_raster)
+int ProcessRasterData (cups_raster_t *cups_raster, int fdFax)
 {
     int                status = 0;
     unsigned int                i;
@@ -155,38 +171,14 @@ int ProcessRasterData (cups_raster_t *cups_raster)
     IP_IMAGE_TRAITS    traits;
     IP_HANDLE          hJob;
 
-    char                hpFileName[] = "/tmp/hplipfaxXXXXXX";
-    int                 fdFax = -1;
-    BYTE                szFileHeader[68];
-    BYTE                szPageHeader[64];
     BYTE                *p;
     cups_page_header2_t    cups_header;
     int                    iPageNum = 0;
-    char                   device_name[16];
     int                    color_mode;
-    int                    fax_encoding = RASTER_MH;
-    ppd_file_t             *ppd;
-    ppd_attr_t             *attr;
     char                   *pDev;
     unsigned    int     uiPageNum = 0;
 
-    ppd = ppdOpenFile (getenv ("PPD"));
-    if (ppd == NULL)
-    {
-        BUG ("ERROR: Unable to open ppd file %s\n", getenv ("PPD"));
-        return 1;
-    }
-    if ((attr = ppdFindAttr (ppd, "cupsModelName", NULL)) == NULL ||
-        (attr && attr->value == NULL))
-    {
-        ppdClose (ppd);
-        BUG ("ERROR: Required cupsModelName is missing in ppd file\n");
-        return 1;
-    }
-
-    memset (device_name, 0, sizeof (device_name));
-    strncpy (device_name, attr->value, 15);
-    ppdClose (ppd);
+    pDev = getenv ("DEVICE_URI");
 
     while (cupsRasterReadHeader2 (cups_raster, &cups_header))
     {
@@ -207,29 +199,20 @@ int ProcessRasterData (cups_raster_t *cups_raster)
                     fax_encoding = RASTER_MMR;
                 }
             }
-            if (fdFax == -1)
-            {
-                fdFax = mkstemp (hpFileName);
-                if (fdFax < 0)
-                {
-                    BUG ("Unable to open Fax output file - %s for writing\n", hpFileName);
-                    goto BUGOUT;
-                }
 
-                memset (szFileHeader, 0, sizeof (szFileHeader));
-                memcpy (szFileHeader, "hplip_g3", 8);
-                p = szFileHeader + 8;
-                *p++ = 1;                                    // Version Number
-                HPLIPPUTINT32 (p, 0); p += 4;                // Total number of pages in this job
-                HPLIPPUTINT16 (p, cups_header.HWResolution[0]); p += 2;
-                HPLIPPUTINT16 (p, cups_header.HWResolution[1]); p += 2;
-                *p++ = atoi (cups_header.cupsPageSizeName);  // Output paper size
-                *p++ = atoi (cups_header.OutputType);        // Output quality
-                *p++ = fax_encoding;                         // MH, MMR or JPEG
-                p += 4;                                      // Reserved 1
-                p += 4;                                      // Reserved 2
-                write (fdFax, szFileHeader, (p - szFileHeader));
-            }
+            memset (szFileHeader, 0, sizeof (szFileHeader));
+            memcpy (szFileHeader, "hplip_g3", 8);
+            p = szFileHeader + 8;
+            *p++ = 1;                                    // Version Number
+            HPLIPPUTINT32 (p, 0); p += 4;                // Total number of pages in this job
+            HPLIPPUTINT16 (p, cups_header.HWResolution[0]); p += 2;
+            HPLIPPUTINT16 (p, cups_header.HWResolution[1]); p += 2;
+            *p++ = atoi (cups_header.cupsPageSizeName);  // Output paper size
+            *p++ = atoi (cups_header.OutputType);        // Output quality
+            *p++ = fax_encoding;                         // MH, MMR or JPEG
+            p += 4;                                      // Reserved 1
+            p += 4;                                      // Reserved 2
+            write (fdFax, szFileHeader, (p - szFileHeader));
         }
 
         widthMMR = (((cups_header.cupsWidth + 7) >> 3)) << 3;
@@ -398,55 +381,7 @@ int ProcessRasterData (cups_raster_t *cups_raster)
     HPLIPPUTINT32 ((szFileHeader + 9), uiPageNum);
     write (fdFax, szFileHeader + 9, 4);
 
-    BYTE    *pTmp;
-    int     iSize;
-    pTmp = NULL;
-
-    iSize = lseek (fdFax, 0, SEEK_END);
-    lseek (fdFax, 0, SEEK_SET);
-
-    if (iSize > 0)
-    {
-        pTmp = (BYTE *) malloc (iSize);
-    }
-    if (pTmp == NULL)
-    {
-        iSize = 1024;
-        pTmp = (BYTE *) malloc  (iSize);
-        if (pTmp == NULL)
-        {
-            goto BUGOUT;
-        }
-    }
-
-    FILE    *fp;
-    fp = NULL;
-    if (iLogLevel & SAVE_PCL_FILE)
-    {
-        fp = fopen ("/tmp/hpcupsfax.out", "w");
-        system ("chmod 666 /tmp/hpcupsfax.out");
-    }
-    while ((i = read (fdFax, pTmp, iSize)) > 0)
-    {
-        write (STDOUT_FILENO, pTmp, i);
-        if (iLogLevel & SAVE_PCL_FILE && fp)
-        {
-            fwrite (pTmp, 1, i, fp);
-        }
-    }
-    free (pTmp);
-
-    if (fp)
-    {
-        fclose (fp);
-    }
-    status = 0;
-
 BUGOUT:
-    if (fdFax > 0)
-    {
-        close (fdFax);
-    }
     if (pbOutputBuf)
     {
         free (pbOutputBuf);
@@ -460,11 +395,251 @@ BUGOUT:
     return status;
 }
 
+/* 
+ * Return Zero if all the below are successful
+ * Reading from stdin into a temp file
+ * Getting the final file with HPLIP file and page headers
+ */
+int ProcessTiffData(int fromFD, int toFD)
+{
+    BYTE      *p;
+    int       fdTiff;
+    BYTE      pTmp[4096];
+    struct timeval tv;
+    fd_set fds;
+    int page_length;
+    unsigned int page_counter;
+    unsigned int current_ifd_start;
+    unsigned int *ifd_offset;
+    unsigned int next_ifd_offset;
+    unsigned short ifd_count;
+    bool big_endian = false;
+    int i, ret, len;
+    BYTE   szTiffHeader[TIFF_HDR_SIZE];
+    int bytes_written = 0;
+    int ret_status = 0;
+    int bytes_read = 0;
+    char hpTiffFileName[] = "/tmp/hpliptiffXXXXXX";
+    long input_file_size = 0;
+
+    fdTiff = mkstemp (hpTiffFileName);
+    if (fdTiff < 0)
+    {
+        BUG ("ERROR: Unable to open Fax output file - %s for writing\n", hpTiffFileName);
+        return 1;
+    }
+
+    memset (szFileHeader, 0, sizeof (szFileHeader));
+    memcpy (szFileHeader, "hplip_g3", 8);
+    p = szFileHeader + 8;
+    *p++ = 1;                                    // Version Number
+    HPLIPPUTINT32 (p, 0); p += 4;                // Total number of pages in this job
+    HPLIPPUTINT16 (p, 0); p += 2;  //HWResolution[0]
+    HPLIPPUTINT16 (p, 0); p += 2;  //HWResolution[0]
+    *p++ = atoi ("0");  // Output paper size (cupsPageSizeName)
+    *p++ = atoi ("0");        // Output quality (cups OutputType)
+    *p++ = fax_encoding;                         // MH, MMR or JPEG, TIFF
+    p += 4;                                      // Reserved 1
+    p += 4;                                      // Reserved 2
+    write (toFD, szFileHeader, (p - szFileHeader));
+
+    FD_ZERO(&fds);
+    FD_SET(fromFD, &fds);
+    tv.tv_sec = 0;
+    tv.tv_usec = 100 * 1000; //100 ms
+    i = 0;
+
+    
+    len = read (fromFD, pTmp, 4096);
+    if (len > 0) {
+       DBG("hpcupsfax: read %d bytes from stdin", len);
+       write (fdTiff, pTmp, len);
+       bytes_written += len;
+    } else {
+           DBG("hpcupsfax: No data was available...");
+    }
+
+    while (i++ < 10)
+    {
+        memset (pTmp, 0, 4096);
+        ret = select(fromFD+1, &fds, NULL, NULL, &tv);
+        if (ret < 0) {
+            DBG("hpcupsfax: Timed out, Continue...");
+            continue;
+        }
+
+        if (FD_ISSET(fromFD, &fds)) {
+           DBG("hpcupsfax: Data is available");
+           while(1) {
+              memset (pTmp, 0, 4096);
+              len = read (fromFD, pTmp, 4096);
+              DBG("hpcupsfax: read %d bytes from stdin", len);
+              if (len <= 0) {
+                  DBG("hpcupsfax: No data was available, Continue...");
+                  break; //break from inner while()
+              }
+              write (fdTiff, pTmp, len);
+              bytes_written += len;
+           }
+        }
+    }
+    DBG("hpcupsfax: total bytes written to fdTiff is  %d ", bytes_written);
+    input_file_size = bytes_written;
+
+    ret = lseek (fdTiff, 0, SEEK_SET);
+    memset (szTiffHeader, 0, sizeof (TIFF_HDR_SIZE));
+    ret = read (fdTiff, szTiffHeader, 8);
+    DBG("hpcupsfax: read %d bytes from fdTiff", ret);
+    ifd_offset = (unsigned int *) &(szTiffHeader[4]);
+    if (szTiffHeader[0] == 'M') {
+       DBG("hpcupsfax: it is big endian");
+       big_endian = true;
+       *ifd_offset = ntohl(*ifd_offset); 
+    }
+    DBG("hpcupsfax: ifd_offset is %d", *ifd_offset);
+ 
+    current_ifd_start = 0;
+    page_counter = 0;
+    bytes_written = 0;
+//WHILE
+    while(1) {
+        // Note down the number of tags 
+        ret = lseek (fdTiff, *ifd_offset, SEEK_SET);
+        ret = read (fdTiff, &ifd_count, 2);
+        if (big_endian) {
+            ifd_count = ntohs(ifd_count);
+        }
+        DBG("hpcupsfax: read %d bytes from fdTiff; ifd count is %d", ret, ifd_count);
+
+        // Read the end of IFD to check if there is another IFD following (for e.g., next page or image)
+        ret = lseek (fdTiff, (*ifd_offset+2+((ifd_count)*12)), SEEK_SET);
+        ret = read (fdTiff, &next_ifd_offset, 4);
+        if (big_endian) {
+            next_ifd_offset = ntohs(next_ifd_offset);
+        }
+        DBG("hpcupsfax: read %d bytes from fdTiff at %d; next ifd offset is %d", 
+                                  ret, (*ifd_offset+2+((ifd_count)*12)), next_ifd_offset);
+
+        // Increment the page counter
+        page_counter = page_counter + 1;
+        DBG("hpcupsfax: Current page_counter is %d", page_counter);
+
+       // Write Tiff data for the current page (IFD)
+       page_length = next_ifd_offset-current_ifd_start;
+       DBG("hpcupsfax: page_length is %d ", page_length);
+       if (page_length <= 0) {
+           len = lseek (fdTiff, 0, SEEK_END);
+           page_length = len - current_ifd_start;
+       }
+       DBG("hpcupsfax: current_ifd_start=%d next_ifd_offset=%d total bytes are %d", current_ifd_start, next_ifd_offset, page_length);
+
+       // Write HPLIP page header
+       p = szPageHeader;
+       HPLIPPUTINT32 (p, page_counter); p += 4;     // Current page number
+       HPLIPPUTINT32 (p, 0); p += 4;                // Num of pixels per row - It is ImageWidth for Tiff
+       HPLIPPUTINT32 (p, 0); p += 4;                // Num of rows in this page - It is ImageLength for Tiff
+       HPLIPPUTINT32 (p, page_length); p += 4;      // Size in bytes of encoded data
+       HPLIPPUTINT32 (p, 0); p += 4;                // Thumbnail data size
+       HPLIPPUTINT32 (p, 0); p += 4;                // Reserved for future use
+       ret = write (toFD, szPageHeader, (p - szPageHeader));
+
+       ret = lseek (fdTiff, current_ifd_start, SEEK_SET);
+       while (page_length > 0) {
+            if (page_length < 4096) {
+                len = page_length;
+            } else {
+                len = 4096;
+            } 
+            bytes_read = read (fdTiff, pTmp, len);
+            ret = write (toFD, pTmp, bytes_read);
+            page_length = page_length - ret;
+            bytes_written += ret;
+       }
+
+       // If there is no next IFD, break from the loop. Else, continue...
+       if (bytes_written > input_file_size) {
+            BUG("Error!! Bytes written to toFD is becoming more than input file size.");
+            ret_status = -1;
+            break; // while(1) for page counting
+       }
+
+       if (next_ifd_offset == 0) {
+            break; // while(1) for page counting
+       }
+       current_ifd_start = *ifd_offset = next_ifd_offset;
+    } // while(1) for page counting
+
+    lseek (toFD, 9, SEEK_SET);
+    HPLIPPUTINT32 ((szFileHeader + 9), page_counter);
+    write (toFD, szFileHeader + 9, 4);
+
+    return ret_status;
+}
+
+
+int send_data_to_stdout(int fromFD)
+{
+    int     iSize, i;
+    int     len;
+    BYTE    *pTmp = NULL;
+    FILE    *fp = NULL;
+
+    iSize = lseek (fromFD, 0, SEEK_END);
+    lseek (fromFD, 0, SEEK_SET);
+
+    DBG("hpcupsfax: lseek(fromFD) returned %d", iSize);
+    if (iSize > 0)
+    {
+        pTmp = (BYTE *) malloc (iSize);
+    }
+    if (pTmp == NULL)
+    {
+        iSize = 1024;
+        pTmp = (BYTE *) malloc  (iSize);
+        if (pTmp == NULL)
+        {
+          return 1;
+        }
+    }
+
+    fp = NULL;
+    if (iLogLevel & SAVE_PCL_FILE)
+    {
+        fp = fopen ("/tmp/hpcupsfax.out", "w");
+        system ("chmod 666 /tmp/hpcupsfax.out");
+    }
+    
+    while ((len = read (fromFD, pTmp, iSize)) > 0)
+    {
+        write (STDOUT_FILENO, pTmp, len);
+        if (iLogLevel & SAVE_PCL_FILE && fp)
+        {
+            fwrite (pTmp, 1, len, fp);
+        }
+    }
+    free (pTmp);
+
+    if (fp)
+    {
+        fclose (fp);
+    }
+
+    return 0;
+}
+
 int main (int argc, char **argv)
 {
     int                 status = 0;
     int                 fd = 0;
+    int                 fdFax = -1;
+    int i = 0;
+    FILE                *fdTiff;
     cups_raster_t       *cups_raster;
+    ppd_file_t          *ppd;
+    ppd_attr_t          *attr;
+    ppd_attr_t          *compression_attr;
+
+    /*********** PROLOGUE ***********/
 
     GetLogLevel();
     openlog("hpcupsfax", LOG_PID,  LOG_DAEMON);
@@ -484,22 +659,83 @@ int main (int argc, char **argv)
         }
     }
 
-    cups_raster = cupsRasterOpen (fd, CUPS_RASTER_READ);
-    if (cups_raster == NULL)
+    while (argv[i] != NULL) {
+         DBG("hpcupsfax: argv[%d] = %s\n", i, argv[i]);
+         i++;
+    }
+
+    fdFax = mkstemp (hpFileName);
+    if (fdFax < 0)
     {
-        BUG ("cupsRasterOpen failed, fd = %d\n", fd);
-        if (fd != 0)
-        {
-            close (fd);
-        }
+        BUG ("ERROR: Unable to open Fax output file - %s for writing\n", hpFileName);
         return 1;
     }
-    status = ProcessRasterData (cups_raster);
-    cupsRasterClose (cups_raster);
+
+    /*********** MAIN ***********/
+
+    ppd = ppdOpenFile (getenv ("PPD"));
+    if (ppd == NULL)
+    {
+        BUG ("ERROR: Unable to open ppd file %s\n", getenv ("PPD"));
+        return 1;
+    }
+    if ((attr = ppdFindAttr (ppd, "cupsModelName", NULL)) == NULL ||
+        (attr && attr->value == NULL))
+    {
+        ppdClose (ppd);
+        BUG ("ERROR: Required cupsModelName is missing in ppd file\n");
+        return 1;
+    }
+
+    memset (device_name, 0, sizeof (device_name));
+    strncpy (device_name, attr->value, 15);
+
+    if ((attr = ppdFindAttr (ppd, "DefaultEncoding", NULL)) == NULL ||
+        (attr && attr->value == NULL))
+    {
+        ppdClose (ppd);
+        BUG ("ERROR: Required DefaultEncoding is missing in ppd file\n");
+        return 1;
+    }
+    fax_encoding = atoi(attr->value);
+    if (fax_encoding < 0) {
+        BUG ("ERROR: Required DefaultEncoding is invalid in ppd file\n");
+        return 1;
+    }
+    DBG("hpcupsfax: main: fax_encoding from ppd = %d \n", fax_encoding);
+    ppdClose (ppd);
+
+    if (fax_encoding == RASTER_TIFF)
+    {
+        status = ProcessTiffData(fd, fdFax);
+    } else {
+       cups_raster = cupsRasterOpen (fd, CUPS_RASTER_READ);
+       if (cups_raster == NULL)
+       {
+           status = 1;
+           BUG ("cupsRasterOpen failed, fd = %d\n", fd);
+           goto EPILOGUE;
+       }
+
+       status = ProcessRasterData (cups_raster, fdFax);
+
+       cupsRasterClose (cups_raster);
+    }
+
+    DBG("hpcupsfax: Send data to stdout \n");
+    status = send_data_to_stdout(fdFax);
+
+    /*********** EPILOGUE ***********/
+EPILOGUE:
     if (fd != 0)
     {
         close (fd);
     }
+    if (fdFax > 0)
+    {
+        close (fdFax);
+    }
+
     return status;
 }
 

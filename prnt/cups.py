@@ -495,7 +495,7 @@ def getPPDFile2(stripped_model, ppds): # New PPD find
                     except AttributeError:
                         pdls = []
 
-                    if (prop.hpcups_build and 'hpijs' not in f) and \
+                    if (prop.hpcups_build and 'hpijs' not in f) or \
                        ((prop.hpijs_build and 'hpijs' in pdls) or (prop.hpcups_build and 'hpijs' not in pdls)):
                         matches.append((f, [p for p in pdls if p and p != 'hpijs']))
 

@@ -423,7 +423,7 @@ class SetupForm(SetupForm_base):
                     else:
                         filter_dict[f] = (operator.gt, 0)
             else:
-                filter_dict['scan-type'] = (operator.le, SCAN_TYPE_NONE)
+                filter_dict['scan-type'] = (operator.gt, SCAN_TYPE_NONE)
 
             devices = device.probeDevices([self.bus], self.timeout, self.ttl, filter_dict, self.search, net_search='slp')
 
@@ -885,6 +885,9 @@ class SetupForm(SetupForm_base):
     def setupFax(self):
         QApplication.setOverrideCursor(QApplication.waitCursor)
 
+        if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_MARVELL:
+            fax_ppd_name = "HP-Fax3-hplip" # Fixed width (2528 pixels) and 300dpi rendering
+            nick = "HP Fax 3"
         if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_SOAP:
             fax_ppd_name = "HP-Fax2-hplip" # Fixed width (2528 pixels) and 300dpi rendering
             nick = "HP Fax 2"

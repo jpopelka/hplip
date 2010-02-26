@@ -1,7 +1,7 @@
 /*****************************************************************************\
  hpmudext - Python extension for HP multi-point transport driver (HPMUD)
 
- (c) Copyright 2001-2007 Hewlett-Packard Development Company, L.P.
+ (c) Copyright 2010 Hewlett-Packard Development Company, L.P.
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -483,6 +483,7 @@ void inithpmudext(void)
     insstr(d, "HPMUD_S_SOAP_FAX", HPMUD_S_SOAP_FAX);
     insstr(d, "HPMUD_S_DEVMGMT_CHANNEL", HPMUD_S_DEVMGMT_CHANNEL);
     insstr(d, "HPMUD_S_WIFI_CHANNEL", HPMUD_S_WIFI_CHANNEL);
+    insstr(d, "HPMUD_S_MARVELL_FAX_CHANNEL", HPMUD_S_MARVELL_FAX_CHANNEL);
 
     // Max buffer size
     insint(d, "HPMUD_BUFFER_SIZE", HPMUD_BUFFER_SIZE);

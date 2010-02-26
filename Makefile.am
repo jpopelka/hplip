@@ -1,7 +1,7 @@
 #
 #  Makefile.am - hplip automake input file
 #
-#  (c) 2004-2007 Copyright Hewlett-Packard Development Company, LP
+#  (c) 2004-2010 Copyright Hewlett-Packard Development Company, LP
 #
 
 INCLUDES = -Iip -Iio/hpmud -Iscan/sane -Iprnt/hpijs
@@ -104,6 +104,10 @@ dist_halpre_DATA = data/rules/20-hplip-devices.fdi
 hplip_confdir = /etc/hp
 hplip_conf_DATA = hplip.conf
 
+#pstotiff filter
+pstotiffdir = $(cupsfilterdir)
+pstotiff_SCRIPTS = fax/filters/pstotiff
+
 # hplip.state
 hplip_statedir = /var/lib/hp
 dist_hplip_state_DATA = hplip.state
@@ -140,16 +144,19 @@ dist_copier_DATA = copier/copier.py copier/__init__.py
 # fax
 if FAX_BUILD
 faxdir = $(hplipdir)/fax
-dist_fax_DATA = fax/fax.py fax/__init__.py fax/coverpages.py fax/pmlfax.py fax/soapfax.py fax/faxdevice.py
+dist_fax_DATA = fax/fax.py fax/__init__.py fax/coverpages.py fax/pmlfax.py fax/soapfax.py fax/marvellfax.py \
+	fax/faxdevice.py fax/filters/pstotiff fax/filters/pstotiff.convs fax/filters/pstotiff.types
+fax_filtersdir = $(mimedir)
+dist_fax_filters_DATA = fax/filters/pstotiff.convs fax/filters/pstotiff.types
 hpfaxdir = $(cupsbackenddir)
 dist_hpfax_SCRIPTS = fax/backend/hpfax.py
 hpijsfaxppddir = $(hpppddir)
 hpcupsfaxppddir = $(hpppddir)
 if HPIJS_INSTALL
-dist_hpijsfaxppd_DATA = fax/ppd/HP-Fax-hpijs.ppd.gz fax/ppd/HP-Fax2-hpijs.ppd.gz
+dist_hpijsfaxppd_DATA = fax/ppd/HP-Fax-hpijs.ppd.gz fax/ppd/HP-Fax2-hpijs.ppd.gz fax/ppd/HP-Fax3-hpijs.ppd.gz
 endif # HPIJS_INSTALL
 if HPCUPS_INSTALL
-dist_hpcupsfaxppd_DATA = fax/ppd/HP-Fax-hpcups.ppd.gz fax/ppd/HP-Fax2-hpcups.ppd.gz
+dist_hpcupsfaxppd_DATA = fax/ppd/HP-Fax-hpcups.ppd.gz fax/ppd/HP-Fax2-hpcups.ppd.gz fax/ppd/HP-Fax3-hpcups.ppd.gz
 endif # HPCUPS_INSTALL
 endif # FAX_BUILD
 

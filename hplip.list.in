@@ -82,6 +82,9 @@ $print_only_exclude=@epm_print_only_exclude@
 f 0755 root root $cupsfilter/hpcups hpcups
 %endif
 f 0644 root root /etc/hp/hplip.conf hplip.conf
+f 0644 root root /etc/cups/pstotiff.convs fax/filters/pstotiff.convs
+f 0644 root root /etc/cups/pstotiff.types fax/filters/pstotiff.types
+f 0755 root root $cupsfilter/pstotiff fax/filters/pstotiff
 %if foomatic-drv-install
 f 0644 root root $drv/hpijs.drv prnt/drv/hpijs.drv
 %endif
@@ -169,6 +172,7 @@ f 0644 root root $ppd/HP prnt/ps/*.ppd.gz
 @epm_full@f 644 root root $home/fax/__init__.py fax/__init__.py
 @epm_full@f 644 root root $home/fax/pmlfax.py fax/pmlfax.py
 @epm_full@f 644 root root $home/fax/soapfax.py fax/soapfax.py
+@epm_full@f 644 root root $home/fax/marvellfax.py fax/marvellfax.py
 @epm_full@f 644 root root $home/fax/coverpages.py fax/coverpages.py
 @epm_full@f 644 root root $home/fax/fax.py fax/fax.py
 @epm_full@f 644 root root $home/fax/faxdevice.py fax/faxdevice.py
@@ -439,6 +443,8 @@ l 0755 root root $home/prnt/plugins/lj.so lj-${machine}.so
 @epm_print_only_exclude@l 0755 root root $home/scan/plugins/bb_soapht.so bb_soapht-${machine}.so
 @epm_print_only_exclude@f 0755 root root $home/scan/plugins/bb_soap-${machine}.so scan/sane/bb_soap-${machine}.so
 @epm_print_only_exclude@l 0755 root root $home/scan/plugins/bb_soap.so bb_soap-${machine}.so
+@epm_print_only_exclude@f 0755 root root $home/fax/plugins/fax_marvell-${machine}.so fax/plugins/fax_marvell-${machine}.so
+@epm_print_only_exclude@l 0755 root root $home/fax/plugins/fax_marvell.so fax_marvell-${machine}.so
 %system all
 %postinstall <<EOF
 ver=`echo $version | sed 's/\([0-9]*.[0-9]*.[0-9]*\).*/\1/'`

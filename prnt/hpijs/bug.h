@@ -51,4 +51,15 @@
 #define BUG(args...) {syslog(LOG_ERR, __FILE__ " " STRINGIZE(__LINE__) ": " args); \
 fprintf(stderr, __FILE__ " " STRINGIZE(__LINE__) ": " args);}
 
+#define DBG_DUMP(data, size) sysdump((data), (size))
+#if 1
+   #define DBG6(args...) DBG(6, __FILE__ " " STRINGIZE(__LINE__) ": " args)
+   #define DBG8(args...) DBG(8, __FILE__ " " STRINGIZE(__LINE__) ": " args)
+   #define DBG_SZ(args...) DBG(6, args)
+#else
+   #define DBG6(args...) syslog(LOG_INFO, __FILE__ " " STRINGIZE(__LINE__) ": " args)
+   #define DBG8(args...) syslog(LOG_INFO, __FILE__ " " STRINGIZE(__LINE__) ": " args)
+   #define DBG_SZ(args...) syslog(LOG_INFO, args)
+#endif
+
 #endif /* _BUG_H */

@@ -89,10 +89,15 @@ TECH_CLASSES = [
     "DJ55xx",
     "OJProKx50",
     'LJP1XXX',
-    'DJD2600',
+    #'DJD2600', not used. Reassigned all these to ViperPlusTrim and ViperMinusTrim Class
     "Stabler",
     "ViperPlusVIP",
     "ViperMinusVIP",
+    "ViperPlusTrim",
+    "ViperMinusTrim",
+    "Corbett",
+    "Python",
+    "OJ7000",
 ]
 
 TECH_CLASSES.sort()
@@ -138,6 +143,11 @@ TECH_CLASS_PDLS = {
     "Stabler"      : 'pcl3',
     "ViperPlusVIP" : 'pcl3',
     "ViperMinusVIP": 'pcl3',
+    "ViperPlusTrim" : 'lidil',
+    "ViperMinusTrim": 'lidil',
+    "Corbett"       : 'pcl3',
+    "Python"        : 'pcl3',
+    "OJ7000"        : 'pcl3',
 }
 
 PDL_TYPE_PCL = 0  # less preferred
@@ -183,6 +193,9 @@ TECH_SUBCLASSES = [
     "GrayscaleOnly", # DJ540
     "NoAutoTray", # PS Pro 8850
     "NoEvenDuplex", # PS C8100
+    "NoAutoDuplex",
+    "NoCDDVD",
+    "NoMaxDPI",
 ]
 
 TECH_SUBCLASSES.sort()

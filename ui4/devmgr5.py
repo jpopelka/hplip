@@ -2020,7 +2020,8 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         if dlg.exec_() == QDialog.Accepted:
             self.user_settings.load()
 
-            self.cur_device.sendEvent(EVENT_USER_CONFIGURATION_CHANGED, self.cur_printer)
+            if self.cur_device is not None:
+                self.cur_device.sendEvent(EVENT_USER_CONFIGURATION_CHANGED, self.cur_printer)
 
 
     # ***********************************************************************************

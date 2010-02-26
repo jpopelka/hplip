@@ -26,7 +26,7 @@
 #   104 = no libdl
 
 #AC_PREREQ(2.59)
-AC_INIT([HP Linux Imaging and Printing], [3.9.12], [3.9.12.29], [hplip])
+AC_INIT([HP Linux Imaging and Printing], [3.10.2], [3.10.2rc1.9], [hplip])
 #AM_INIT_AUTOMAKE([1.9 foreign])
 AM_INIT_AUTOMAKE
 AC_DISABLE_STATIC
@@ -316,6 +316,14 @@ AC_ARG_WITH(systraydir, AC_HELP_STRING([--with-systraydir=DIR], [set hplip-systr
 AC_ARG_WITH(hpppddir, AC_HELP_STRING([--with-hpppddir=DIR], [set hp ppd install directory [default=datadir/ppd/HP]]),
    hpppddir=$withval, hpppddir="$datadir/ppd/HP")
 
+if test -f "/usr/share/cups/mime/mime.types"; then 
+   abs_mimedir="/usr/share/cups/mime/"
+else
+   abs_mimedir="/etc/cups/"
+fi
+AC_ARG_WITH(mimedir, AC_HELP_STRING([--with-mimedir=DIR], [set cups mime.types location [default=abs_mimedir]]),
+   mimedir=$withval, mimedir="$abs_mimedir")
+
 AC_ARG_WITH(docdir, AC_HELP_STRING([--with-docdir=DIR], [set hplip documentation directory [default=datadir/doc]]),
    hpdocdir=$withval, hpdocdir="$datadir/doc/hplip-$VERSION")
 
@@ -552,6 +560,8 @@ AC_SUBST(abs_hpppddir)
 AC_SUBST(abs_docdir) 
 AC_SUBST(abs_ppddir) 
 AC_SUBST(abs_drvdir) 
+AC_SUBST(abs_mimedir) 
+AC_SUBST(mimedir) 
 AC_SUBST(icondir)
 AC_SUBST(systraydir)
 AC_SUBST(cupsbackenddir)

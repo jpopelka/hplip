@@ -2,7 +2,7 @@
 
   musb.h - USB support for multi-point transport driver
  
-  (c) 2004-2007 Copyright Hewlett-Packard Development Company, LP
+  (c) 2010 Copyright Hewlett-Packard Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy 
   of this software and associated documentation files (the "Software"), to deal 
@@ -44,6 +44,7 @@ enum FD_ID
    FD_ff_ff_ff,        /* HP dot4 interface */
    FD_ff_d4_0,        /* HP dot4 interface */
    FD_ff_cc_0,        /* orblite scan / rest scan interface */
+   FD_ff_1_0,        /* Marvell fax support*/
    MAX_FD
 };
 

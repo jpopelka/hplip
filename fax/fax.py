@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2010 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -520,6 +520,10 @@ def getFaxDevice(device_uri=None, printer_name=None,
         from soapfax import SOAPFaxDevice
         return SOAPFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
 
+    elif fax_type == FAX_TYPE_MARVELL:
+        from marvellfax import MarvellFaxDevice
+        return MarvellFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
+
     else:
         raise Error(ERROR_DEVICE_DOES_NOT_SUPPORT_OPERATION)
 
@@ -828,6 +832,10 @@ class FaxSendThread(threading.Thread):
 
     def next_recipient_gen(self):
         for a in self.phone_num_list:
+            yield a
+
+    def next_file_gen(self):
+        for a in self.recipient_file_list:
             yield a
 
 

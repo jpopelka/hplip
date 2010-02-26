@@ -1444,7 +1444,19 @@
 :model "HP Photosmart c4494 All-in-one Printer"
 :status :good
 
+:model "HP Officejet 4500 All-in-one Printer - g510g"
+:status :good
+
+:model "HP Officejet 4500 All-in-one Printer - g510h"
+:status :good
+
+:model "HP Officejet 4500 Desktop All-in-one Printer - g510a"
+:status :good
+
 :model "HP Deskjet f4500 All-in-one Printer Series"
+:status :good
+
+:model "HP Officejet 4500 All-in-one Desktop Printer - g510b"
 :status :good
 
 :model "HP Designjet 4520mfp"

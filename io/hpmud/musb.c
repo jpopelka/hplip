@@ -2,7 +2,7 @@
 
   musb.c - USB support for multi-point transport driver 
  
-  (c) 2004-2007 Copyright Hewlett-Packard Development Company, LP
+  (c) 2010 Copyright Hewlett-Packard Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy 
   of this software and associated documentation files (the "Software"), to deal 
@@ -88,21 +88,22 @@ static char *fd_name[MAX_FD] =
    "ff/ff/ff",
    "ff/d4/0",
    "ff/cc/0",
+   "ff/1/0",
 };
 
 static int fd_class[MAX_FD] =
 {
-   0,0x7,0x7,0xff,0xff,0xff,0xff,0xff,0xff,
+   0,0x7,0x7,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
 };
 
 static int fd_subclass[MAX_FD] =
 {
-   0,0x1,0x1,0x1,0x2,0x3,0xff,0xd4,0xcc,
+   0,0x1,0x1,0x1,0x2,0x3,0xff,0xd4,0xcc,0x1,
 };
 
 static int fd_protocol[MAX_FD] =
 {
-   0,0x2,0x3,0x1,0x1,0x1,0xff,0,0,
+   0,0x2,0x3,0x1,0x1,0x1,0xff,0,0,0,
 };
 
 static const unsigned char venice_power_on[] = {0x1b, '%','P','u','i','f','p','.','p','o','w','e','r',' ','1',';',
@@ -459,11 +460,14 @@ static int get_out_ep(struct usb_device *dev, int config, int interface, int alt
    {
       if (pi->endpoint == NULL)
          goto bugout;   
-      if (pi->endpoint[i].bmAttributes == type && !(pi->endpoint[i].bEndpointAddress & USB_ENDPOINT_DIR_MASK))
+      if (pi->endpoint[i].bmAttributes == type && !(pi->endpoint[i].bEndpointAddress & USB_ENDPOINT_DIR_MASK)) {
+         DBG("get_out_ep(type=%d): out=%d\n", type, pi->endpoint[i].bEndpointAddress);
          return pi->endpoint[i].bEndpointAddress;
+      }
    }
 
 bugout:
+   DBG("get_out_ep: ERROR! returning -1\n");
    return -1; /* no endpoint found */
 }
 
@@ -481,11 +485,14 @@ static int get_in_ep(struct usb_device *dev, int config, int interface, int alts
    {
       if (pi->endpoint == NULL)
          goto bugout;   
-      if (pi->endpoint[i].bmAttributes == type && (pi->endpoint[i].bEndpointAddress & USB_ENDPOINT_DIR_MASK))
+      if (pi->endpoint[i].bmAttributes == type && (pi->endpoint[i].bEndpointAddress & USB_ENDPOINT_DIR_MASK)) {
+         DBG("get_in_ep(type=%d): out=%d\n", type, pi->endpoint[i].bEndpointAddress);
          return pi->endpoint[i].bEndpointAddress;
+      }
    }
 
 bugout:
+   DBG("get_in_ep: ERROR! returning -1\n");
    return -1;  /* no endpoint found */
 }
 
@@ -893,14 +900,20 @@ static int new_channel(mud_device *pd, int index, const char *sn)
       goto bugout; 
    }
 
-   if (index == HPMUD_EWS_CHANNEL || index == HPMUD_SOAPSCAN_CHANNEL || index == HPMUD_SOAPFAX_CHANNEL || index == HPMUD_MARVELL_SCAN_CHANNEL)
+   if (index == HPMUD_EWS_CHANNEL || 
+       index == HPMUD_SOAPSCAN_CHANNEL || index == HPMUD_SOAPFAX_CHANNEL || 
+       index == HPMUD_MARVELL_SCAN_CHANNEL || index == HPMUD_MARVELL_FAX_CHANNEL) {
       pd->channel[index].vf = musb_comp_channel_vf;
-   else if (pd->io_mode == HPMUD_RAW_MODE || pd->io_mode == HPMUD_UNI_MODE)
+   } 
+   else if (pd->io_mode == HPMUD_RAW_MODE || pd->io_mode == HPMUD_UNI_MODE) {
       pd->channel[index].vf = musb_raw_channel_vf;
-   else if (pd->io_mode == HPMUD_MLC_GUSHER_MODE || pd->io_mode == HPMUD_MLC_MISER_MODE)
+   }
+   else if (pd->io_mode == HPMUD_MLC_GUSHER_MODE || pd->io_mode == HPMUD_MLC_MISER_MODE) {
       pd->channel[index].vf = musb_mlc_channel_vf;
-   else
+   }
+   else {
       pd->channel[index].vf = musb_dot4_channel_vf;
+   }
 
    pd->channel[index].index = index;
    pd->channel[index].client_cnt = 1;
@@ -1028,7 +1041,7 @@ int __attribute__ ((visibility ("hidden"))) musb_write(int fd, const void *buf, 
    }
 
    DBG("write fd=%d len=%d size=%d usec=%d\n", fd, len, size, usec);
-   DBG_DUMP(buf, len < 32 ? len : 32);
+   DBG_DUMP(buf, len < 512 ? len : 512);
 
 bugout:
    return len;
@@ -1464,6 +1477,9 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_comp_channel_open
          break;
       case HPMUD_MARVELL_SCAN_CHANNEL:
          fd = FD_ff_ff_ff;   
+         break;
+      case HPMUD_MARVELL_FAX_CHANNEL:  //using vendor specific C/S/P codes for fax too
+         fd = FD_ff_1_0;   
          break;
       default:
          stat = HPMUD_R_INVALID_SN;

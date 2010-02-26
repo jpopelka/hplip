@@ -331,7 +331,7 @@ typedef enum
 #define NEWCHECK(x) if (x==NULL) return ALLOCMEM_ERROR;
 #define CNEWCHECK(x) if (x==NULL) { constructor_error=ALLOCMEM_ERROR; return; }
 
-#define CUSTOM_MEDIA_SIZE 103
+#define CUSTOM_MEDIA_SIZE 101
 
 enum COLORTYPE
 {

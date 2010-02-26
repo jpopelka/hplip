@@ -46,6 +46,7 @@
 #define RASTER_JPEG        7
 #define RASTER_PCL         8
 #define RASTER_NOT         9
+#define RASTER_TIFF        10 
 #define RASTER_AUTO        99
 
 #define HPLIPFAX_MONO	1

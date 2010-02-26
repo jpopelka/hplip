@@ -156,7 +156,17 @@ if len( args ) == 0:
 
         mq = device.queryModelByModel(model)
 
-        if mq.get('fax-type', FAX_TYPE_NONE) in (FAX_TYPE_SOAP,):
+        if mq.get('fax-type', FAX_TYPE_NONE) in (FAX_TYPE_MARVELL,):
+            # HP Fax 3
+            if bus == 'usb':
+                print 'direct %s "HP Fax 3" "%s USB %s HP Fax HPLIP" "MFG:HP;MDL:Fax 3;DES:HP Fax 3;"' % \
+                    (uri.replace("hp:", "hpfax:"), model.replace('_', ' '), serial)
+
+            else: # par
+                print 'direct %s "HP Fax 3" "%s LPT HP Fax HPLIP" "MFG:HP;MDL:Fax 3;DES:HP Fax 3;"' % \
+                    (uri.replace("hp:", "hpfax:"), model.replace('_', ' '))
+
+        elif mq.get('fax-type', FAX_TYPE_NONE) in (FAX_TYPE_SOAP,):
             # HP Fax 2
             if bus == 'usb':
                 print 'direct %s "HP Fax 2" "%s USB %s HP Fax HPLIP" "MFG:HP;MDL:Fax 2;DES:HP Fax 2;"' % \

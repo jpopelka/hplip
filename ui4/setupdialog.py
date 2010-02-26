@@ -740,7 +740,10 @@ class SetupDialog(QDialog, Ui_Dialog):
             log.debug("Searching for fax PPD for model %s" % self.model)
 
             if prop.hpcups_build:
-                if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_SOAP:
+                if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_MARVELL:
+                    fax_ppd_name = "HP-Fax3-hpcups" # Fixed width (2528 pixels) and 300dpi rendering
+                    nick = "HP Fax3 hpcups"
+                elif self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_SOAP:
                     fax_ppd_name = "HP-Fax2-hpcups" # Fixed width (2528 pixels) and 300dpi rendering
                     nick = "HP Fax2 hpcups"
                 else:
@@ -748,6 +751,9 @@ class SetupDialog(QDialog, Ui_Dialog):
                     nick = "HP Fax hpcups"
 
             else: # hpijs
+                if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_MARVELL:
+                    fax_ppd_name = "HP-Fax3-hpijs" # Fixed width (2528 pixels) and 300dpi rendering
+                    nick = "HP Fax3 hpijs"
                 if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_SOAP:
                     fax_ppd_name = "HP-Fax2-hpijs" # Fixed width (2528 pixels) and 300dpi rendering
                     nick = "HP Fax2 hpijs"
