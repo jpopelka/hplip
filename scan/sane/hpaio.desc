@@ -106,6 +106,9 @@
 :model "HP Photosmart Wireless All-in-one Printer - b109q=r"
 :status :good
 
+:model "HP Photosmart d110 Series Printer"
+:status :good
+
 :model "HP Officejet d125xi All-in-one Printer"
 :status :good
 
@@ -119,6 +122,9 @@
 :status :good
 
 :model "HP Officejet d145 All-in-one Printer"
+:status :good
+
+:model "HP Officejet 150 Mobile l511 All-in-one Printer"
 :status :good
 
 :model "HP Officejet d155xi All-in-one Printer"
@@ -322,6 +328,9 @@
 :model "HP LaserJet m1120n Multifunction Printer"
 :status :good
 
+:model "HP LaserJet Professional m1132 Multifunction Printer"
+:status :good
+
 :model "HP Officejet Pro 1150c All-in-one Printer"
 :status :good
 
@@ -362,6 +371,9 @@
 :status :good
 
 :model "HP PSC 1210 All-in-one Printer"
+:status :good
+
+:model "HP LaserJet Professional m1212nf Multifunction Printer"
 :status :good
 
 :model "HP PSC 1213 All-in-one Printer"
@@ -685,10 +697,10 @@
 :model "HP PSC 2352 All-in-one Printer"
 :status :good
 
-:model "HP PSC 2353p All-in-one Printer"
+:model "HP PSC 2353 All-in-one Printer"
 :status :good
 
-:model "HP PSC 2353 All-in-one Printer"
+:model "HP PSC 2353p All-in-one Printer"
 :status :good
 
 :model "HP PSC 2355 All-in-one Printer"
@@ -1366,6 +1378,9 @@
 :model "HP Photosmart c4388 All-in-one Printer"
 :status :good
 
+:model "HP Officejet 4400 k410 All-in-one Printer"
+:status :good
+
 :model "HP Photosmart c4410 All-in-one Printer"
 :status :good
 
@@ -1622,6 +1637,9 @@
 :status :good
 
 :model "HP LaserJet m5035x Multifunction Printer"
+:status :good
+
+:model "HP LaserJet m5039 Multifunction Printer"
 :status :good
 
 :model "HP Officejet 5100 All-in-one Printer"

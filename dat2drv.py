@@ -70,6 +70,7 @@ SHORTENING_REPLACEMENTS = {
 'designjet' : 'DESIGNJ',
 'printer scanner copier' : 'PSC',
 'color lj' : 'CLJ',
+'professional' : 'Pro',
 }
 
 

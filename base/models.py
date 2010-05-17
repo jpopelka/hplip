@@ -290,6 +290,8 @@ class ModelData:
             'r-type' : TYPE_INT,
             'scan-style' : TYPE_INT,
             'scan-type' : TYPE_INT,
+            'scan-src' : TYPE_INT,
+            'scan-color' : TYPE_INT,
             #'scan-duplex' : TYPE_BOOL,
             'status-battery-check' : TYPE_INT,
             'status-dynamic-counters' : TYPE_INT,

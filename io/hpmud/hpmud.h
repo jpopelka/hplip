@@ -78,6 +78,21 @@ enum HPMUD_SCANTYPE
    HPMUD_SCANTYPE_SCL_DUPLEX = 6
 };
 
+enum HPMUD_SCANSRC
+{
+   HPMUD_SCANSRC_NA = 0,
+   HPMUD_SCANSRC_ADF= 1,
+   HPMUD_SCANSRC_FLATBED = 2,
+   HPMUD_SCANSRC_BOTH = 3
+};
+
+enum HPMUD_SCANCOLOR
+{
+   HPMUD_SCANCOLOR_NA = 0,
+   HPMUD_SCANCOLOR_MONO = 1,
+   HPMUD_SCANCOLOR_COLOR = 2
+};
+
 enum HPMUD_STATUSTYPE
 {
    HPMUD_STATUSTYPE_NA = 0,
@@ -145,6 +160,8 @@ struct hpmud_model_attributes
    enum HPMUD_SUPPORT_TYPE support;
    enum HPMUD_PLUGIN_TYPE plugin;
    enum HPMUD_SUPPORT_TYPE reserved[5];
+   enum HPMUD_SCANSRC scansrc;
+   enum HPMUD_SCANCOLOR scancolor;
 };
 
 #ifdef __cplusplus

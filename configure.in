@@ -26,16 +26,16 @@
 #   104 = no libdl
 
 #AC_PREREQ(2.59)
-AC_INIT([HP Linux Imaging and Printing], [3.10.2], [3.10.2rc1.9], [hplip])
+AC_INIT([HP Linux Imaging and Printing], [3.10.5], [3.10.4.16], [hplip])
 #AM_INIT_AUTOMAKE([1.9 foreign])
 AM_INIT_AUTOMAKE
 AC_DISABLE_STATIC
-AC_PROG_LIBTOOL
 
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_INSTALL
+AC_PROG_LIBTOOL
 
 # Checks for required libraries, don't set global -lpthread, -lm, -ljpeg, ... here, set in Makefile.
 AC_CHECK_LIB([pthread], [pthread_create], [LIBS="$LIBS"], [AC_MSG_ERROR([cannot find libpthread support], 7)])

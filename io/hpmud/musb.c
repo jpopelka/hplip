@@ -694,7 +694,8 @@ static struct usb_device *get_libusb_device(const char *uri)
 
    for (bus=usb_busses; bus; bus=bus->next)
       for (dev=bus->devices; dev; dev=dev->next)
-         if (is_uri(dev, uri))
+        if (dev->descriptor.idVendor == 0x3f0 && is_interface(dev, 7))
+          if (is_uri(dev, uri))
             return dev;  /* found usb device that matches uri */
 
    return NULL;
@@ -1133,6 +1134,23 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_open(mud_device *
          stat = HPMUD_R_DEVICE_BUSY;
          goto blackout;
       }
+      // For new Marvell device, USB interface was not getting released properly. And reading was failing
+      // this problem was observed with the SCAN, Print and also getting device communication error
+      // Adding hack: reset the USB
+      int productID = libusb_device->descriptor.idProduct;
+	  // Only for the new marvell devices
+      // Product ID with 042a, 052a
+	  if (productID == 1066 || productID == 1322){
+		  BUG("hpliphack temp msg need to remove: reset the device");        	  
+		  usb_reset(fd_table[fd].hd);
+		  fd_table[fd].hd = NULL;
+		  if ((fd = claim_id_interface(libusb_device)) == MAX_FD)
+		  {
+		     stat = HPMUD_R_DEVICE_BUSY;
+		     goto blackout;
+		  }
+	   }
+
       len = device_id(fd, pd->id, sizeof(pd->id));  /* get new copy and cache it  */ 
 
       if (len > 0 && is_hp(pd->id))
@@ -2002,17 +2020,17 @@ int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int ls
    {
       for (dev=bus->devices; dev; dev=dev->next)
       {
-         if ((hd = usb_open(dev)) == NULL)
-         {
-            BUG("invalid usb_open: %m\n");
-            continue;
-         }
 
          model[0] = serial[0] = rmodel[0] = rserial[0] = sz[0] = mfg[0] = 0;
 
          if (dev->descriptor.idVendor == 0x3f0 && is_interface(dev, 7))
          {
-            /* Found hp device. */
+            if((hd = usb_open(dev)) == NULL)
+            {
+                BUG("Invalid usb_open: %m\n");
+                continue;
+            }
+           /* Found hp device. */
             if ((r=get_string_descriptor(hd, dev->descriptor.iProduct, rmodel, sizeof(rmodel))) < 0)
                BUG("invalid product id string ret=%d\n", r);
             else
@@ -2056,8 +2074,8 @@ int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int ls
 
                *cnt+=1;
             }
+	    usb_close(hd);
          }
-         usb_close(hd);
       }
    }
 

@@ -45,7 +45,7 @@ from prnt import cups
 
 username = prop.username
 res = 300
-scan_mode = 'color'
+scan_mode = 'gray'
 tlx = None
 tly = None
 brx = None
@@ -132,7 +132,7 @@ try:
         ("Scan destinations:", "-s<dest_list> or --dest=<dest_list>", "option", False),
         ("", "where <dest_list> is a comma separated list containing one or more of: 'file'\*, ", "option", False),
         ("", "'viewer', 'editor', 'pdf', 'fax', or 'print'. Use only commas between values, no spaces.", "option", False),
-        ("Scan mode:", "-m<mode> or --mode=<mode>. Where <mode> is 'color'\*, 'gray' or 'lineart'.", "option", False),
+        ("Scan mode:", "-m<mode> or --mode=<mode>. Where <mode> is 'gray'\*, 'color' or 'lineart'.", "option", False),
         ("Scanning resolution:", "-r<resolution_in_dpi> or --res=<resolution_in_dpi> or --resolution=<resolution_in_dpi>", "option", False),
         ("", "where <resolution_in_dpi> is %s (300 is default)." % ', '.join([str(x) for x in valid_res]), "option", False),
         ("Image resize:", "--resize=<scale_in_%> (min=1%, max=400%, default=100%)", "option", False),
@@ -261,9 +261,9 @@ try:
                 scan_mode = 'gray'
 
             else:
-                log.error("Invalid mode. Using default of 'color'.")
+                log.error("Invalid mode. Using default of 'gray'.")
                 log.error("Valid modes are 'color', 'lineart', or 'gray'.")
-                scan_mode = 'color'
+                scan_mode = 'gray'
 
         elif o in ('--res', '--resolution', '-r'):
             try:

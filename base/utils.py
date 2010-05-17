@@ -1005,6 +1005,20 @@ def getEndian():
 def get_password():
     return getpass.getpass("Enter password: ")
 
+def get_password_ui():
+    fp = open("/etc/hp/hplip.conf", "r")
+    qt = "qt3"
+    for line in fp:
+        if string.find(line, "qt4") is not -1 and string.find(line, "yes") is not -1:
+            qt = "qt4"
+    fp.close()
+    if qt is "qt4":
+        from ui4.setupdialog import showPasswordUI
+        username, password = showPasswordUI("Your printer requires to install HP proprietary plugin\nPlease enter root/superuser password to continue")
+    if qt is "qt3":
+        from ui.setupform import showPasswordUI
+        username, password = showPasswordUI("Your priter requires to install HP proprietary plugin\nPlease enter root/superuser password to continue")
+    return password
 
 def run(cmd, log_output=True, password_func=get_password, timeout=1):
     output = cStringIO.StringIO()
@@ -1026,7 +1040,10 @@ def run(cmd, log_output=True, password_func=get_password, timeout=1):
 
             if i == 0: # Password:
                 if password_func is not None:
-                    child.sendline(password_func())
+                    if password_func == "get_password_ui":
+                        child.sendline(get_password_ui())
+                    else:
+                        child.sendline(password_func())
                 else:
                     child.sendline(get_password())
 
@@ -1578,6 +1595,9 @@ def su_sudo():
 
     elif which('gksu'):
         su_sudo_str = 'gksu "%s"'
+    
+    elif which('su'):
+        su_sudo_str = 'su'
 
     return su_sudo_str
 

@@ -74,7 +74,7 @@ def run(read_pipe2=None,  # pipe from hpssd
 
         r2, w3 = read_pipe2, write_pipe3
 
-        fmt = "64s64sI32sI64sf" # TODO: Move to Event class
+        fmt = "80s80sI32sI80sf" # TODO: Move to Event class
         fmt_size = struct.calcsize(fmt)
 
         response = {}

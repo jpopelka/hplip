@@ -282,7 +282,7 @@ class SystemTrayApp(QApplication):
 
         self.menu = None
         self.read_pipe = read_pipe
-        self.fmt = "64s64sI32sI64sf"
+        self.fmt = "80s80sI32sI80sf"
         self.fmt_size = struct.calcsize(self.fmt)
         self.timer_active = False
         self.active_icon = False
@@ -489,7 +489,7 @@ class SystemTrayApp(QApplication):
         log.debug("Exiting")
         self.sendMessage('', '', EVENT_SYSTEMTRAY_EXIT)
         self.quit()
-
+        del self.tray_icon
 
     def toolboxTriggered(self):
         try:

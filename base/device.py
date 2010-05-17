@@ -100,19 +100,19 @@ class Event(object):
                  username=prop.username, job_id=0, title='',
                  timedate=0):
 
-        self.device_uri = unicode(utils.xrstrip(device_uri, '\x00'))[:64].encode('utf-8')
-        self.printer_name = unicode(utils.xrstrip(printer_name, '\x00'))[:64].encode('utf-8')
+        self.device_uri = unicode(utils.xrstrip(device_uri, '\x00'))[:128].encode('utf-8')
+        self.printer_name = unicode(utils.xrstrip(printer_name, '\x00'))[:128].encode('utf-8')
         self.event_code = int(event_code)
         self.username = unicode(utils.xrstrip(username, '\x00'))[:32].encode('utf-8')
         self.job_id = int(job_id)
-        self.title = unicode(utils.xrstrip(title, '\x00'))[:64].encode('utf-8')
+        self.title = unicode(utils.xrstrip(title, '\x00'))[:128].encode('utf-8')
 
         if timedate:
             self.timedate = float(timedate)
         else:
             self.timedate = time.time()
 
-        self.pipe_fmt = "64s64sI32sI64sf"
+        self.pipe_fmt = "80s80sI32sI80sf"
         self.dbus_fmt = "ssisisd"
 
 
@@ -168,7 +168,7 @@ class FaxEvent(Event):
     def __init__(self, temp_file, event):
         Event.__init__(self, *event.as_tuple())
         self.temp_file = temp_file
-        self.pipe_fmt = "64s64sI32sI64sfs"
+        self.pipe_fmt = "80s80sI32sI80sfs"
         self.dbus_fmt = "ssisisfs"
 
 
@@ -193,7 +193,7 @@ class DeviceIOEvent(Event):
     def __init__(self, bytes_written, event):
         Event.__init__(self, *event.as_tuple())
         self.bytes_written = bytes_written
-        self.pipe_fmt = "64s64sI32sI64sfI"
+        self.pipe_fmt = "80s80sI32sI80sfI"
         self.dbus_fmt = "ssisisfi"
 
 

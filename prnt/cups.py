@@ -481,7 +481,7 @@ def getPPDFile2(stripped_model, ppds): # New PPD find
     num_matches = len(matches)
 
     if num_matches == 0:
-        log.error("No PPD found for model %s using new algorithm. Trying old algorithm..." % stripped_model)
+        log.warn("No PPD found for model %s using new algorithm. Trying old algorithm..." % stripped_model)
         matches2 = getPPDFile(stripModel(stripped_model), ppds).items()
         log.debug(matches2)
         num_matches2 = len(matches2)

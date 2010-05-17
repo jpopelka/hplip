@@ -42,6 +42,9 @@ def progress_callback(cmd="", desc="Working..."):
 def password_entry():
     return getpass.getpass(log.bold("Please enter the root/superuser password: "))
 
+def password_user_entry():
+    return getpass.getpass(log.bold("Please enter the user (%s)'s password: " % os.getenv('USER')))
+
 
 def option_question_callback(opt, desc, default='y'):
     ok, ans = tui.enter_yes_no("Do you wish to enable '%s'" % desc, default)
@@ -342,9 +345,13 @@ def start(language, auto=True, test_depends=False,
         # COLLECT SUPERUSER PASSWORD
         #
         if not core.running_as_root():
-            tui.title("ENTER ROOT/SUPERUSER PASSWORD")
-
-            ok = core.check_password(password_entry, progress_callback)
+            su_sudo = core.get_distro_data('su_sudo')
+            if su_sudo == "sudo":
+                tui.title("ENTER USER PASSWORD")
+                ok = core.check_password(password_user_entry, progress_callback)
+            else:
+                tui.title("ENTER ROOT/SUPERUSER PASSWORD")
+                ok = core.check_password(password_entry, progress_callback)
 
             if not ok:
                 log.error("3 incorrect attempts. Exiting.")

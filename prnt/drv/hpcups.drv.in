@@ -201,6 +201,9 @@
 //        Added new tech subclass NoMaxDPI for Python class.
 //        Python B-size: Added paper sizes: B7(ISO), B7(JIS), 10x20cm (tab), 4x10in, 4x11in, 4x12in, Double A4
 //
+//      05/07/10 adhir
+//        Added new class for LjZjsMono with NoAutoDuplex and no multiple trays.
+//
 // Include necessary files...
 #include <font.defs>
 //#include <media.defs>
@@ -2149,6 +2152,14 @@ Manufacturer "HP"
     MaxSize 8.5in 14in
 
     // <%DJ55xx:Normal%>
+    {
+      ModelName "HP Officejet 150 Mobile l511"
+      Attribute "NickName" "" "HP Officejet 150 Mobile l511, $Version"
+      Attribute "ShortNickName" "" "HP Officejet 150 Mobile l511"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 150 mobile l511;DES:officejet 150 mobile l511;"
+      PCFileName "hp-officejet_150_mobile_l511.ppd"
+      Attribute "Product" "" "(HP Officejet 150 Mobile l511 All-in-one Printer)"
+    }
     {
       ModelName "HP Deskjet 460"
       Attribute "NickName" "" "HP Deskjet 460, $Version"
@@ -4460,6 +4471,14 @@ Manufacturer "HP"
 
     // <%ViperPlusVIP:Normal%>
     {
+      ModelName "HP Photosmart d110 Series"
+      Attribute "NickName" "" "HP Photosmart d110 Series, $Version"
+      Attribute "ShortNickName" "" "HP Photosmart d110 Series"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart d110 series;DES:photosmart d110 series;"
+      PCFileName "hp-photosmart_d110_series.ppd"
+      Attribute "Product" "" "(HP Photosmart d110 Series Printer)"
+    }
+    {
       ModelName "HP Deskjet f4400 Series"
       Attribute "NickName" "" "HP Deskjet f4400 Series, $Version"
       Attribute "ShortNickName" "" "HP Deskjet f4400 Series"
@@ -4475,6 +4494,14 @@ Manufacturer "HP"
       Attribute "Product" "" "(HP Deskjet f4483 All-in-one Printer)"
       Attribute "Product" "" "(HP Deskjet f4488 All-in-one Printer)"
       Attribute "Product" "" "(HP Deskjet f4492 All-in-one Printer)"
+    }
+    {
+      ModelName "HP Officejet 4400 k410"
+      Attribute "NickName" "" "HP Officejet 4400 k410, $Version"
+      Attribute "ShortNickName" "" "HP Officejet 4400 k410"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 4400 k410;DES:officejet 4400 k410;"
+      PCFileName "hp-officejet_4400_k410.ppd"
+      Attribute "Product" "" "(HP Officejet 4400 k410 All-in-one Printer)"
     }
     {
       ModelName "HP Officejet 4500 g510a-f"
@@ -4871,6 +4898,14 @@ Manufacturer "HP"
       Attribute "Product" "" "(HP Deskjet d2666 Printer)"
       Attribute "Product" "" "(HP Deskjet d2668 Printer)"
       Attribute "Product" "" "(HP Deskjet d2680 Printer)"
+    }
+    {
+      ModelName "HP Officejet 4000 k210"
+      Attribute "NickName" "" "HP Officejet 4000 k210, $Version"
+      Attribute "ShortNickName" "" "HP Officejet 4000 k210"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 4000 k210;DES:officejet 4000 k210;"
+      PCFileName "hp-officejet_4000_k210.ppd"
+      Attribute "Product" "" "(HP Officejet 4000 k210 Printer)"
     }
   } // End Supported media sizes with full bleed.
 
@@ -9165,20 +9200,20 @@ Group "RLT/HP Real Life Technologies"
       Attribute "Product" "" "(HP LaserJet p2035 Printer)"
     }
     {
-      ModelName "HP LaserJet p2055"
-      Attribute "NickName" "" "HP LaserJet p2055 pcl3, $Version"
-      Attribute "ShortNickName" "" "HP LaserJet p2055"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p2055;DES:hp laserjet p2055;"
-      PCFileName "hp-laserjet_p2055-pcl3.ppd"
-      Attribute "Product" "" "(HP LaserJet p2055 Printer)"
-    }
-    {
       ModelName "HP LaserJet p2055dn"
       Attribute "NickName" "" "HP LaserJet p2055dn pcl3, $Version"
       Attribute "ShortNickName" "" "HP LaserJet p2055dn"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p2055dn;DES:hp laserjet p2055dn;"
       PCFileName "hp-laserjet_p2055dn-pcl3.ppd"
       Attribute "Product" "" "(HP LaserJet p2055dn Printer)"
+    }
+    {
+      ModelName "HP LaserJet p2055"
+      Attribute "NickName" "" "HP LaserJet p2055 pcl3, $Version"
+      Attribute "ShortNickName" "" "HP LaserJet p2055"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p2055;DES:hp laserjet p2055;"
+      PCFileName "hp-laserjet_p2055-pcl3.ppd"
+      Attribute "Product" "" "(HP LaserJet p2055 Printer)"
     }
     {
       ModelName "HP LaserJet p2055d"
@@ -9905,6 +9940,14 @@ Group "RLT/HP Real Life Technologies"
       Attribute "Product" "" "(HP LaserJet m5035 Multifunction Printer)"
       Attribute "Product" "" "(HP LaserJet m5035x Multifunction Printer)"
       Attribute "Product" "" "(HP LaserJet m5035xs Multifunction Printer)"
+    }
+    {
+      ModelName "HP LaserJet m5039 MFP"
+      Attribute "NickName" "" "HP LaserJet m5039 MFP pcl3, $Version"
+      Attribute "ShortNickName" "" "HP LaserJet m5039 MFP"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet m5039 mfp;DES:hp laserjet m5039 mfp;"
+      PCFileName "hp-laserjet_m5039_mfp-pcl3.ppd"
+      Attribute "Product" "" "(HP LaserJet m5039 Multifunction Printer)"
     }
     {
       ModelName "HP LaserJet 5100 Series"
@@ -12825,6 +12868,138 @@ Group "RLT/HP Real Life Technologies"
     }
   } // End Supported media sizes.
 } // End LJZjsMono (for proprietary plugin)
+
+///////////////// LJZjsMono with No Auto Duplex and No multiple Trays (for proprietary plugin)
+{
+  Attribute "hpPrinterLanguage" "" "ljzjstream"
+
+  Group "General/General"
+
+  Attribute "cupsIPPReason" "hplip.plugin-error/printer requires a binary plugin, run hp-setup" ""
+
+  // MediaPosition values map to MediaSource enumeration in global_types.h
+  Option "InputSlot/Media Source" PickOne AnySetup 10.0
+    *Choice "Auto/Auto-Select" "<</MediaPosition 7>>setpagedevice"
+    Choice "Manual/Manual Feeder" "<</MediaPosition 2>>setpagedevice"
+
+  // cupsRowCount values map to PEN_TYPE + 1 from global_types.h
+  Option "ColorModel/Output Mode" PickOne AnySetup 10.0
+    *Choice "Gray/Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowCount 1/cupsRowStep 2>>setpagedevice"
+
+  // cupsMediaType values map to MEDIATYPE from global_types.h
+  Option "MediaType/Media Type" PickOne AnySetup 10.0
+    *Choice "Plain/Plain Paper" "<</MediaType(Plain)/cupsMediaType 0>>setpagedevice"
+
+  // cupsCompression values map to QUALITY_MODE from global_types.h
+  Option "OutputMode/Print Quality" PickOne AnySetup 10.0
+    *Choice "Normal/Normal" "<</OutputType(0)/HWResolution[600 600]>>setpagedevice"
+    Choice "Draft/Draft" "<</OutputType(-1)/HWResolution[600 600]>>setpagedevice"
+
+
+  Attribute "cupsModelName" "" "HP LaserJet 1018"     // APDK device class 
+
+  {
+// 4x6 or smaller
+  CustomMedia "A6/A6 105x148mm" 298 420 12 12 12 12 "<</PageSize[298 420]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 24/PageSize[298 420]/ImagingBBox null>>setpagedevice"
+
+// 5x7
+  CustomMedia "A5/A5 148x210mm" 420 595 12 12 12 12 "<</PageSize[420 595]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 25/PageSize[420 595]/ImagingBBox null>>setpagedevice"
+
+// Standard
+  CustomMedia "Postcard/Postcard" 283 420 12 12 12 12 "<</PageSize[283 420]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 71/PageSize[283 420]/ImagingBBox null>>setpagedevice"
+  CustomMedia "DoublePostcard/Double Postcard" 420 567 12 12 12 12 "<</PageSize[420 567]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 72/PageSize[420 567]/ImagingBBox null>>setpagedevice"
+  CustomMedia "JB5/JB5 182x257mm" 516.24 728.64 18 15.5 18 15.5 "<</PageSize[516.24 728.64]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 96/PageSize [516.24 728.64]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Executive/Executive 7.25x10.5in" 522 756 12 12 12 12 "<</PageSize[522 756]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 1/PageSize[522 756]/ImagingBBox null>>setpagedevice"
+  CustomMedia "16k195x270/16k 195x270mm" 553 765 18 15.5 18 15.5 "<</PageSize[553 765]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 34/PageSize[553 765]/ImagingBBox null>>setpagedevice"
+  CustomMedia "16k184x260/16k 184x260mm" 522 737 12 12 12 12 "<</PageSize[522 737]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 89/PageSize[522 737]/ImagingBBox null>>setpagedevice"
+  CustomMedia "16k197x273/16k 197x273mm" 558 774 12 12 12 12 "<</PageSize[558 774]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 17/PageSize[558 774]/ImagingBBox null>>setpagedevice"
+  *CustomMedia "Letter/Letter 8.5x11in" 612 792 12 12 12 12 "<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 2/PageSize[612 792]/ImagingBBox null>>setpagedevice"
+  CustomMedia "A4/A4 210x297mm" 595.44 841.68 18 15.5 18 15.5 "<</PageSize[595.44 841.68]/ImagingBBox null>>setpagedevice" 
+         "<</cupsInteger0 9/PageSize[595.44 841.68]/ImagingBBox null>>setpagedevice"
+  CustomMedia "FLSA/American Foolscap 8.5x13in" 612 936 12 12 12 12 "<</PageSize[612 936]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 10/PageSize[612 936]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Legal/Legal 8.5x14in" 612 1008 12 12 12 12 "<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 3/PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+
+// Envelope
+  CustomMedia "EnvMonarch/Monarch Envelope 3.875x7.5in" 279 540 18 15.5 18 15.5 "<</PageSize[279 540]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 96/PageSize[279 540]/ImagingBBox null>>setpagedevice"
+  CustomMedia "EnvDL/DL Envelope 110x220mm" 311.76 623.52 18 15.5 18 15.5 "<</PageSize[311.76 623.52]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 27/PageSize[311.76 623.52]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Env10/#10 Envelope 4.12x9.5in" 297 684 12 12 12 12 "<</PageSize[297 684]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 81/PageSize[297 684]/ImagingBBox null>>setpagedevice"
+  CustomMedia "EnvC5/C5 Envelope 162x229mm" 459 649 12 12 12 12 "<</PageSize[459 649]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 91/PageSize[459 649]/ImagingBBox null>>setpagedevice"
+  CustomMedia "EnvB5/B5 Envelope 176x250mm" 499 709 12 12 12 12 "<</PageSize[499 709]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 100/PageSize[499 709]/ImagingBBox null>>setpagedevice"
+
+    // Custom page sizes
+    HWMargins 12 12 12 12
+    VariablePaperSize Yes
+    MinSize 3in 5in
+    MaxSize 17in 36in
+
+    // <%LJZjsMono:NoAutoDuplex%>
+    {
+      ModelName "HP LaserJet Professional p1102w"
+      Attribute "NickName" "" "HP LaserJet Professional p1102w, $Version, requires proprietary plugin"
+      Attribute "ShortNickName" "" "HP LaserJet Professional p1102w"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional p1102w;DES:hp laserjet professional p1102w;"
+      PCFileName "hp-laserjet_professional_p1102w.ppd"
+      Attribute "Product" "" "(HP LaserJet Professional p1102w Printer)"
+    }
+    {
+      ModelName "HP LaserJet Professional p1102"
+      Attribute "NickName" "" "HP LaserJet Professional p1102, $Version, requires proprietary plugin"
+      Attribute "ShortNickName" "" "HP LaserJet Professional p1102"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional p1102;DES:hp laserjet professional p1102;"
+      PCFileName "hp-laserjet_professional_p1102.ppd"
+      Attribute "Product" "" "(HP LaserJet Professional p1102 Printer)"
+    }
+    {
+      ModelName "HP LaserJet Professional m1132 MFP"
+      Attribute "NickName" "" "HP LaserJet Professional m1132 MFP, $Version"
+      Attribute "ShortNickName" "" "HP LJ Professional m1132 MFP"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional m1132 mfp;DES:hp laserjet professional m1132 mfp;"
+      PCFileName "hp-laserjet_professional_m1132_mfp.ppd"
+      Attribute "Product" "" "(HP LaserJet Professional m1132 Multifunction Printer)"
+    }
+    {
+      ModelName "HP LaserJet Professional m1212nf MFP"
+      Attribute "NickName" "" "HP LaserJet Professional m1212nf MFP, $Version"
+      Attribute "ShortNickName" "" "HP LJ Professional m1212nf MFP"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional m1212nf mfp;DES:hp laserjet professional m1212nf mfp;"
+      PCFileName "hp-laserjet_professional_m1212nf_mfp.ppd"
+      Attribute "Product" "" "(HP LaserJet Professional m1212nf Multifunction Printer)"
+    }
+    {
+      ModelName "HP LaserJet Professional p1566"
+      Attribute "NickName" "" "HP LaserJet Professional p1566, $Version, requires proprietary plugin"
+      Attribute "ShortNickName" "" "HP LaserJet Professional p1566"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional p1566;DES:hp laserjet professional p1566;"
+      PCFileName "hp-laserjet_professional_p1566.ppd"
+      Attribute "Product" "" "(HP LaserJet Professional p1566)"
+    }
+    {
+      ModelName "HP LaserJet Professional p1606dn"
+      Attribute "NickName" "" "HP LaserJet Professional p1606dn, $Version, requires proprietary plugin"
+      Attribute "ShortNickName" "" "HP LJ Professional p1606dn"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional p1606dn;DES:hp laserjet professional p1606dn;"
+      PCFileName "hp-laserjet_professional_p1606dn.ppd"
+      Attribute "Product" "" "(HP LaserJet Professional p1606dn Printer)"
+    }
+  } // End Supported media sizes.
+} // End LJZjsMono with No Auto Duplex and No multiple Tray (for proprietary plugin)
 
 ///////////////////// LJZjsColor (for proprietary plugin)
 {

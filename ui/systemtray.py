@@ -390,7 +390,7 @@ class SystemTrayApp(QApplication):
         QApplication.__init__(self, args)
 
         self.read_pipe = read_pipe
-        self.fmt = "64s64sI32sI64sf"
+        self.fmt = "80s80sI32sI80sf"
         self.fmt_size = struct.calcsize(self.fmt)
 
         self.tray_icon = SystrayIcon(load_pixmap("hp_logo", "32x32", (22, 22)))

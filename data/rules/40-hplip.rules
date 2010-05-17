@@ -129,6 +129,8 @@ ATTRS{idVendor}=="03f0", ATTRS{idProduct}=="??12", GROUP="lp", ENV{ID_HPLIP}="1"
 ATTRS{idVendor}=="03f0", ATTRS{idProduct}=="??04", GROUP="lp", ENV{ID_HPLIP}="1"
 # Check for LaserJet products (0x03f0xx17).
 ATTRS{idVendor}=="03f0", ATTRS{idProduct}=="??17", GROUP="lp", ENV{ID_HPLIP}="1"
+# Check for LaserJet products (0x03f0xx2a).
+ATTRS{idVendor}=="03f0", ATTRS{idProduct}=="??2a", GROUP="lp", ENV{ID_HPLIP}="1"
 
 LABEL="hpmud_rules_end"
 

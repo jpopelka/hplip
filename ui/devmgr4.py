@@ -442,7 +442,7 @@ class DevMgr4(DevMgr4_base):
         self.update_thread.start()
 
         # Pipe from toolbox/dbus setup
-        self.fmt = "64s64sI32sI64sf"
+        self.fmt = "80s80sI32sI80sf"
         self.fmt_size = struct.calcsize(self.fmt)
 
         if read_pipe is not None and not disable_dbus:

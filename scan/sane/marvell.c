@@ -392,6 +392,8 @@ SANE_Status marvell_open(SANE_String_Const device, SANE_Handle *handle)
    /* Get actual model attributes from models.dat. */
    hpmud_query_model(session->uri, &ma);
    session->scan_type = ma.scantype;
+   session->scansrc = ma.scansrc;
+   session->scancolor= ma.scancolor;      
 
    if (hpmud_open_device(session->uri, ma.mfp_mode, &session->dd) != HPMUD_R_OK)
    {
@@ -427,26 +429,70 @@ SANE_Status marvell_open(SANE_String_Const device, SANE_Handle *handle)
 
    /* Set supported Scan Modes and set sane option. */
    i=0;
-   session->scan_mode_list[i] = SANE_VALUE_SCAN_MODE_LINEART;
-   session->scan_mode_map[i++] = CE_BLACK_AND_WHITE1;
-   session->scan_mode_list[i] = SANE_VALUE_SCAN_MODE_GRAY;
-   session->scan_mode_map[i++] = CE_GRAY8;
-   session->scan_mode_list[i] = SANE_VALUE_SCAN_MODE_COLOR;
-   session->scan_mode_map[i++] = CE_RGB24;
+   
+   /* Tsunami doesnt support color scan, getting scan color option from the model file.*/
+   if ( session->scancolor == HPMUD_SCANCOLOR_MONO)
+   {
+       session->scan_mode_list[i] = SANE_VALUE_SCAN_MODE_LINEART;
+       session->scan_mode_map[i++] = CE_BLACK_AND_WHITE1;
+       session->scan_mode_list[i] = SANE_VALUE_SCAN_MODE_GRAY;
+       session->scan_mode_map[i++] = CE_GRAY8;        
+       DBG8("scan color  HPMUD_SCANCOLOR_MONO \n");        
+   }
+   /*  0 value set in the model file, set all the scan color option */
+   else
+   {   
+       session->scan_mode_list[i] = SANE_VALUE_SCAN_MODE_LINEART;
+       session->scan_mode_map[i++] = CE_BLACK_AND_WHITE1;
+       session->scan_mode_list[i] = SANE_VALUE_SCAN_MODE_GRAY;
+       session->scan_mode_map[i++] = CE_GRAY8;
+       session->scan_mode_list[i] = SANE_VALUE_SCAN_MODE_COLOR;
+       session->scan_mode_map[i++] = CE_RGB24;
+       DBG8("scan color  All \n");        
+   }
    marvell_control_option(session, MARVELL_OPTION_SCAN_MODE, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */
+
 
    /* Determine scan input source. */
    i=0;
-   if (session->bb_is_paper_in_adf(session) == 2) 
+   
+   /* Some of the marvell devices supports both flatbed and ADF, No command to get the src types supported */
+   /* Getting from the model file */
+   if ( session->scansrc == HPMUD_SCANSRC_BOTH)
+   {
+         session->input_source_list[i] = STR_ADF_MODE_ADF;
+         session->input_source_map[i++] = IS_ADF;
+         session->input_source_list[i] = STR_ADF_MODE_FLATBED;
+         session->input_source_map[i++] = IS_PLATEN;               
+         DBG8("scan src  HPMUD_SCANSRC_BOTH \n"); 
+   }
+   else if ( session->scansrc == HPMUD_SCANSRC_ADF)
+   {
+         session->input_source_list[i] = STR_ADF_MODE_ADF;
+         session->input_source_map[i++] = IS_ADF;
+         DBG8("scan src  HPMUD_SCANSRC_ADF \n"); 
+   }
+   else if ( session->scansrc == HPMUD_SCANSRC_FLATBED)
+   {
+         session->input_source_list[i] = STR_ADF_MODE_FLATBED;
+         session->input_source_map[i++] = IS_PLATEN;               
+         DBG8("scan src  HPMUD_SCANSRC_FLATBED \n"); 
+    }
+    /* Values if un specified in the, value is 0,  get ADF state from the printer */   
+  else if (session->bb_is_paper_in_adf(session) == 2) 
    {
       session->input_source_list[i] = STR_ADF_MODE_FLATBED;
       session->input_source_map[i++] = IS_PLATEN;
+      DBG8("scan src  b_is_paper_in_adf value  2 \n");       
    }
    else
    {
       session->input_source_list[i] = STR_ADF_MODE_ADF;
       session->input_source_map[i++] = IS_ADF;
+      DBG8("scan src  b_is_paper_in_adf value not 2 \n");             
    }
+
+      
    marvell_control_option(session, MARVELL_OPTION_INPUT_SOURCE, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */  
 
    /* Set supported resolutions. */
@@ -575,7 +621,8 @@ SANE_Status marvell_control_option(SANE_Handle handle, SANE_Int option, SANE_Act
          }
          else
          {  /* Set default. */
-            ps->current_scan_mode = CE_RGB24;
+            ps->current_scan_mode = ps->scan_mode_map[0];
+            ps->scan_mode_map[i];
             stat = SANE_STATUS_GOOD;
          }
          break;

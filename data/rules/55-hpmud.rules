@@ -139,6 +139,8 @@ SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="??12", OWNER="root", GROUP="lp", MOD
 SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="??04", OWNER="root", GROUP="lp", MODE="660"
 # Check for LaserJet products (0x03f0xx17).
 SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="??17", OWNER="root", GROUP="lp", MODE="660"
+# Check for LaserJet products (0x03f0xx2a).
+SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="??2a", OWNER="root", GROUP="lp", MODE="660"
 
 # Removed the following rule because FHS states that /etc should be reserved for static files only. This
 # functionality should be done in a deb/rpm post install script.  2/11/2009, D Suffield

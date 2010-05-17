@@ -118,6 +118,8 @@ struct marvell_session
    int (*bb_end_scan)(struct marvell_session *ps, int io_error);
 /* Add new elements here. */
    void *math_handle;         /* returned by dlopen */
+   enum HPMUD_SCANSRC scansrc;       /* 0=NA */
+   enum HPMUD_SCANCOLOR scancolor;       /* 0=NA*/
 };
 
 #endif  // _MARVELLI_H

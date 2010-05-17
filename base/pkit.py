@@ -456,11 +456,15 @@ def run_plugin_command(required=True, plugin_reason=PLUGIN_REASON_NONE):
         su_sudo = "%s"
         need_sudo = False
 
+    password_f = None
     if need_sudo:
         su_sudo = utils.su_sudo()
-        if su_sudo is None:
-            log.error("Unable to find a suitable sudo command to run 'hp-plugin'")
-            return (False, False)
+    if su_sudo is "su":
+        su_sudo = 'su -c "%s"'
+        password_f = "get_password_ui"    
+    if su_sudo is None:
+        log.error("Unable to find a suitable sudo command to run 'hp-plugin'")
+        return (False, False)
 
     req = '--required'
     if not required:
@@ -472,8 +476,10 @@ def run_plugin_command(required=True, plugin_reason=PLUGIN_REASON_NONE):
         cmd = su_sudo % ("python ./plugin.py -u %s --reason %s" % (req, plugin_reason))
 
     log.debug("%s" % cmd)
-    status, output = utils.run(cmd, log_output=True, password_func=None, timeout=1)
-
+    if password_f is not None:
+        status, output = utils.run(cmd, log_output=True, password_func=password_f, timeout=1)
+    else:
+        status, output = utils.run(cmd, log_output=True, password_func=None, timeout=1)
     return (status == 0, True)
 
 
