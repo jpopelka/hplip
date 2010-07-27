@@ -98,6 +98,7 @@ TECH_CLASSES = [
     "Corbett",
     "Python",
     "OJ7000",
+    "Pyramid",
 ]
 
 TECH_CLASSES.sort()
@@ -196,6 +197,9 @@ TECH_SUBCLASSES = [
     "NoAutoDuplex",
     "NoCDDVD",
     "NoMaxDPI",
+    "NoMaxDPI",
+    "SmallMargins",
+    "Trim",
 ]
 
 TECH_SUBCLASSES.sort()

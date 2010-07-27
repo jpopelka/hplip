@@ -1244,8 +1244,9 @@ class SetupDialog(QDialog, Ui_Dialog):
                     item = self.RemoveDevicesTableWidget.item(row, 1)
                     printer = unicode(item.data(Qt.UserRole).toString()).encode('utf-8')
                     log.debug("Removing printer: %s" % printer)
-                    cups.delPrinter(printer)
-
+                    r = cups.delPrinter(printer)
+                    if r == 0:
+                        FailureUI(self, self.__tr("<b>Unable to delete printer.</b><p>Try after adding user to \"lpadmin\" or \"sys\" or \"lp\" group."))
             self.close()
 
         else:

@@ -31,6 +31,11 @@ try:
     from xml.etree import ElementTree
     etree_loaded = True
 except ImportError:
+    try:
+        from elementtree.ElementTree import XML
+        elementtree_loaded = True
+    except ImportError:
+        elementtree_loaded = False
     etree_loaded = False
 
 # Local
@@ -343,8 +348,6 @@ def parseStatus(DeviceID):
         return parseSStatus(DeviceID['S'], DeviceID.get('Z', ''))
     else:
         return STATUS_BLOCK_UNKNOWN
-
-
 
 def LaserJetDeviceStatusToPrinterStatus(device_status, printer_status, detected_error_state):
     stat = STATUS_PRINTER_IDLE
@@ -1478,3 +1481,201 @@ pen_health10_xlate = { 'ok' : AGENT_HEALTH_OK,
                        'missing' : AGENT_HEALTH_MISINSTALLED,
                      }
 
+def StatusType10FetchUrl(dev, url):
+    if dev.is_local:
+       data_fp = cStringIO.StringIO()
+       dev.getEWSUrl_LEDM(url, data_fp)
+       data = data_fp.getvalue()
+
+    else:
+        if dev.zc:
+            status, ip = hpmudext.get_zc_ip_address(dev.zc)
+            if status != hpmudext.HPMUD_R_OK:
+                log.error("unable to get IP address of mDNS configured device")
+                return None
+        else:
+            ip = dev.host
+
+        # Get the agent status XML
+        addr = "http://%s:8080%s" % (ip, url)
+        feed = urllib.urlopen(addr)
+        data = feed.read()
+        feed.close()
+
+    return data
+
+
+def StatusType10(dev): # Low End Data Model
+    status_block = { 'revision' :    STATUS_REV_UNKNOWN,
+                     'agents' :      [],
+                     'top-door' :    TOP_DOOR_NOT_PRESENT,
+                     'supply-door' : TOP_DOOR_NOT_PRESENT,
+                     'duplexer' :    DUPLEXER_NOT_PRESENT,
+                     'photo-tray' :  PHOTO_TRAY_NOT_PRESENT,
+                     'in-tray1' :    IN_TRAY_NOT_PRESENT,
+                     'in-tray2' :    IN_TRAY_NOT_PRESENT,
+                     'media-path' :  MEDIA_PATH_NOT_PRESENT,
+                     'status-code' : STATUS_PRINTER_IDLE,
+                   }
+
+    if not etree_loaded and not elementtree_loaded:
+        log.error("cannot get status for printer. please load ElementTree module")
+        return status_block
+
+    # Get the dynamic consumables configuration
+    data = StatusType10FetchUrl(dev, "/DevMgmt/ConsumableConfigDyn.xml")
+    if not data:
+        return status_block
+    data = data.replace("ccdyn:", "").replace("dd:", "")
+
+    # Parse the agent status XML
+    agents = []
+    try:
+        if etree_loaded:
+            tree = ElementTree.XML(data)
+        if not etree_loaded and elementtree_loaded:
+            tree = XML(data)
+        elements = tree.findall("ConsumableInfo")
+        for e in elements:
+            health = AGENT_HEALTH_OK
+            ink_level = 0
+            type = e.find("ConsumableTypeEnum").text
+            state = e.find("ConsumableLifeState/ConsumableState").text
+
+            # level
+            if type == "ink" or type == "toner":
+                ink_type = e.find("ConsumableLabelCode").text
+                if state != "missing":
+                    try:
+                       ink_level = int(e.find("ConsumablePercentageLevelRemaining").text)
+                    except:
+                       ink_level = 0
+            else:
+                ink_type = ''
+                if state == "ok":
+                    ink_level = 100
+
+            log.debug("type '%s' state '%s' ink_type '%s' ink_level %d" % (type, state, ink_type, ink_level))
+    
+            entry = { 'kind' : element_type10_xlate.get(type, AGENT_KIND_NONE),
+                      'type' : pen_type10_xlate.get(ink_type, AGENT_TYPE_NONE),
+                      'health' : pen_health10_xlate.get(state, AGENT_HEALTH_OK),
+                      'level' : int(ink_level),
+                      'level-trigger' : pen_level10_xlate.get(state, AGENT_LEVEL_TRIGGER_SUFFICIENT_0)
+                    }
+
+            log.debug("%s" % entry)
+            agents.append(entry)
+    except (expat.ExpatError, UnboundLocalError):
+        agents = []
+    status_block['agents'] = agents
+
+    # Get the media handling configuration
+    data = StatusType10FetchUrl(dev, "/DevMgmt/MediaHandlingDyn.xml")
+    if not data:
+        return status_block
+    data = data.replace("mhdyn:", "").replace("dd:", "")
+
+    # Parse the media handling XML
+    try:
+        if etree_loaded:
+            tree = ElementTree.XML(data)
+        if not etree_loaded and elementtree_loaded:
+            tree = XML(data)
+        elements = tree.findall("InputTray")
+    except (expat.ExpatError, UnboundLocalError):
+        elements = []
+    for e in elements:
+        bin_name = e.find("InputBin").text
+        if bin_name == "Tray1":
+            status_block['in-tray1'] = IN_TRAY_PRESENT
+        elif bin_name == "Tray2":
+            status_block['in-tray2'] = IN_TRAY_PRESENT
+        elif bin_name == "PhotoTray":
+            status_block['photo-tray'] = PHOTO_TRAY_ENGAGED
+        else:
+            log.error("found invalid bin name '%s'" % bin_name)
+
+    try:
+        elements = tree.findall("Accessories/MediaHandlingDeviceFunctionType")
+    except UnboundLocalError:
+        elements = []
+    for e in elements:
+        if e.text == "autoDuplexor":
+            status_block['duplexer'] = DUPLEXER_DOOR_CLOSED
+
+    # Get the product status
+    data = StatusType10FetchUrl(dev, "/DevMgmt/ProductStatusDyn.xml")
+    if not data:
+        return status_block
+    data = data.replace("psdyn:", "").replace("locid:", "")
+    data = data.replace("pscat:", "").replace("dd:", "").replace("ad:", "")
+
+    # Parse the product status XML
+    try:
+        if etree_loaded:
+            tree = ElementTree.XML(data)
+        if not etree_loaded and elementtree_loaded:
+            tree = XML(data)
+        elements = tree.findall("Status/StatusCategory")
+    except (expat.ExpatError, UnboundLocalError):
+        elements = []
+    for e in elements:
+        if e.text == "closeDoorOrCover":
+            status_block['status-code'] = STATUS_PRINTER_DOOR_OPEN
+        elif e.text == "shuttingDown":
+            status_block['status-code'] = STATUS_PRINTER_TURNING_OFF
+        elif e.text == "cancelJob":
+            status_block['status-code'] = STATUS_PRINTER_CANCELING
+        elif e.text == "trayEmptyOrOpen":
+            status_block['status-code'] = STATUS_PRINTER_OUT_OF_PAPER
+        elif e.text == "jamInPrinter":
+            status_block['status-code'] = STATUS_PRINTER_MEDIA_JAM
+        elif e.text == "hardError":
+            status_block['status-code'] = STATUS_PRINTER_HARD_ERROR
+        elif e.text == "outputBinFull":
+            status_block['status-code'] = STATUS_PRINTER_OUTPUT_BIN_FULL
+        elif e.text == "unexpectedSizeInTray":
+            status_block['status-code'] = STATUS_PRINTER_MEDIA_SIZE_MISMATCH
+        elif e.text == "insertOrCloseTray2":
+            status_block['status-code'] = STATUS_PRINTER_TRAY_2_MISSING
+        elif e.text == "scannerError":
+            status_block['status-code'] = EVENT_SCANNER_FAIL
+        elif e.text == "scanProcessing":
+            status_block['status-code'] = EVENT_START_SCAN_JOB
+        elif e.text == "scannerAdfLoaded":
+            status_block['status-code'] = EVENT_SCAN_ADF_LOADED
+        elif e.text == "scanToDestinationNotSet":
+            status_block['status-code'] = EVENT_SCAN_TO_DESTINATION_NOTSET
+        elif e.text == "scanWaitingForPC":
+            status_block['status-code'] = EVENT_SCAN_WAITING_FOR_PC
+        elif e.text == "scannerAdfJam":
+            status_block['status-code'] = EVENT_SCAN_ADF_JAM
+        elif e.text == "scannerAdfDoorOpen":
+            status_block['status-code'] = EVENT_SCAN_ADF_DOOR_OPEN
+        elif e.text == "faxProcessing":
+            status_block['status-code'] = EVENT_START_FAX_JOB
+        elif e.text == "faxSending":
+            status_block['status-code'] = STATUS_FAX_TX_ACTIVE
+        elif e.text == "faxReceiving":
+            status_block['status-code'] = STATUS_FAX_RX_ACTIVE
+        elif e.text == "faxDialing":
+            status_block['status-code'] = EVENT_FAX_DIALING
+        elif e.text == "faxConnecting":
+            status_block['status-code'] = EVENT_FAX_CONNECTING
+        elif e.text == "faxSendError":
+            status_block['status-code'] = EVENT_FAX_SEND_ERROR
+        elif e.text == "faxErrorStorageFull":
+            status_block['status-code'] = EVENT_FAX_ERROR_STORAGE_FULL
+        elif e.text == "faxReceiveError":
+            status_block['status-code'] = EVENT_FAX_RECV_ERROR
+        elif e.text == "faxBlocking":
+            status_block['status-code'] = EVENT_FAX_BLOCKING
+        elif e.text == "inPowerSave":
+            status_block['status-code'] = STATUS_PRINTER_POWER_SAVE
+        elif e.text == "incorrectCartridge":
+            status_block['status-code'] = STATUS_PRINTER_CARTRIDGE_WRONG
+        elif e.text == "cartridgeMissing":
+            status_block['status-code'] = STATUS_PRINTER_CARTRIDGE_MISSING
+
+    return status_block

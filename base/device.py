@@ -1293,6 +1293,9 @@ class Device(object):
     def openEWS(self):
         return self.__openChannel(hpmudext.HPMUD_S_EWS_CHANNEL)
 
+    def openEWS_LEDM(self):
+        return self.__openChannel(hpmudext.HPMUD_S_EWS_LEDM_CHANNEL)
+
     def closePrint(self):
         return self.__closeChannel(hpmudext.HPMUD_S_PRINT_CHANNEL)
 
@@ -1313,6 +1316,9 @@ class Device(object):
 
     def closeEWS(self):
         return self.__closeChannel(hpmudext.HPMUD_S_EWS_CHANNEL)
+
+    def closeEWS_LEDM(self):
+        return self.__closeChannel(hpmudext.HPMUD_S_EWS_LEDM_CHANNEL)
 
     def openCfgUpload(self):
         return self.__openChannel(hpmudext.HPMUD_S_CONFIG_UPLOAD_CHANNEL)
@@ -2099,6 +2105,9 @@ class Device(object):
     def readEWS(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=True):
         return self.__readChannel(self.openEWS, bytes_to_read, stream, timeout, allow_short_read)
 
+    def readEWS_LEDM(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=True):
+        return self.__readChannel(self.openEWS_LEDM, bytes_to_read, stream, timeout, allow_short_read)
+
     def readSoapFax(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=True):
         return self.__readChannel(self.openSoapFax, bytes_to_read, stream, timeout, allow_short_read)
 
@@ -2178,6 +2187,9 @@ class Device(object):
 
     def writeEWS(self, data):
         return self.__writeChannel(self.openEWS, data)
+
+    def writeEWS_LEDM(self, data):
+        return self.__writeChannel(self.openEWS_LEDM, data)
 
     def writeCfgDownload(self, data):
         return self.__writeChannel(self.openCfgDownload, data)
@@ -2395,8 +2407,6 @@ class Device(object):
         self.hist = result
         return result
 
-
-
     def getEWSUrl(self, url, stream):
         try:
             if self.is_local:
@@ -2427,6 +2437,38 @@ class Device(object):
         finally:
             self.closeEWS()
 
+    def getEWSUrl_LEDM(self, url, stream):
+        try:
+            if self.is_local:
+                url2 = "%s&loc=%s" % (self.device_uri.replace('hpfax:', 'hp:'), url)
+                data = self
+            else:
+                url2 = "http://%s%s" % (self.host, url)
+                if self.zc:
+                    status, ip = hpmudext.get_zc_ip_address(self.zc)
+                    if status == hpmudext.HPMUD_R_OK:
+                        url2 = "http://%s%s" % (ip, url)
+                data = None
+
+            log.debug("Opening: %s" % url2)
+            opener = LocalOpener_LEDM({})
+            try:
+                f = opener.open(url2, data)
+            except Error:
+                log.error("Status read failed: %s" % url2)
+                stream.seek(0)
+                stream.truncate()
+            else:
+                try:
+                    stream.write(f.read())
+                except AttributeError:
+                    stream.write(" ") 
+
+                if f is not " ":
+                    f.close()
+
+        finally:
+            self.closeEWS_LEDM()
 
     def downloadFirmware(self, usb_bus_id=None, usb_device_id=None): # Note: IDs not currently used
         ok = False
@@ -2504,4 +2546,38 @@ class LocalOpener(urllib.URLopener):
         else:
             return response.fp
 
+# URLs: hp:/usb/HP_OfficeJet_7500?serial=00XXXXXXXXXX&loc=/hp/device/info_device_status.xml
+class LocalOpener_LEDM(urllib.URLopener):
+    def open_hp(self, url, dev):
+        log.debug("open_hp(%s)" % url)
+
+        match_obj = http_pat_url.search(url)
+        bus = match_obj.group(1) or ''
+        model = match_obj.group(2) or ''
+        serial = match_obj.group(3) or ''
+        device = match_obj.group(4) or ''
+        loc = match_obj.group(5) or ''
+
+        dev.openEWS_LEDM()
+        dev.writeEWS_LEDM("""GET %s HTTP/1.1\nContent-Length:0\nHost:localhost\nUser-Agent:hplip\n\n""" % loc)
+
+        reply = xStringIO()
+
+        while dev.readEWS_LEDM(8080, reply, timeout=1):
+            pass
+
+        reply.seek(0)
+        log.log_data(reply.getvalue())
+
+        response = httplib.HTTPResponse(reply)
+        try:
+            response.begin()
+        except httplib.BadStatusLine:
+            response.status = httplib.OK
+            response.fp = " "
+
+        if response.status != httplib.OK:
+            raise Error(ERROR_DEVICE_STATUS_NOT_AVAILABLE)
+        else:
+            return response.fp
 

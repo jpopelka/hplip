@@ -1476,10 +1476,12 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
 
                 for row, x in enumerate(self.cur_device.sorted_supplies):
                     a, agent_kind, agent_type, agent_sku = x
-                    agent_level = int(self.cur_device.dq['agent%d-level' % a])
-                    agent_desc = self.cur_device.dq['agent%d-desc' % a]
-                    agent_health_desc = self.cur_device.dq['agent%d-health-desc' % a]
-
+                    try:
+                        agent_level = int(self.cur_device.dq['agent%d-level' % a])
+                        agent_desc = self.cur_device.dq['agent%d-desc' % a]
+                        agent_health_desc = self.cur_device.dq['agent%d-health-desc' % a]
+                    except KeyError:
+                        break
                     # Bar graph level
                     level_pixmap = None
                     if agent_kind in (AGENT_KIND_SUPPLY,
@@ -1895,8 +1897,8 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                 self.updatePrintController()
                 self.cur_device.sendEvent(e, self.cur_printer)
             else:
-                log.error("Start/Stop printer operation failed")
-
+#                log.error("Start/Stop printer operation failed")
+                FailureUI(self, self.__tr("<b>Start/Stop printer queue operation fails.</b><p>Try after adding user to \"lpadmin\" or \"sys\" or \"lp\" group.</p>"))
         finally:
             endWaitCursor()
 
@@ -1925,8 +1927,8 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                 self.updatePrintController()
                 self.cur_device.sendEvent(e, self.cur_printer)
             else:
-                log.error("Reject/Accept jobs operation failed")
-
+#                log.error("Reject/Accept jobs operation failed")
+                FailureUI(self, self.__tr("<b>Accept/Reject printer queue operation fails.</b><p>Try after adding user to \"lpadmin\" or \"sys\" or \"lp\" group.</p>"))
 
         finally:
             endWaitCursor()
@@ -1938,7 +1940,8 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         try:
             result = cups.setDefaultPrinter(self.cur_printer.encode('utf8'))
             if not result:
-                log.error("Set default printer failed.")
+#                log.error("Set default printer failed.")
+                FailureUI(self, self.__tr("<b>Set printer queue as default operation fails.</b><p>Try after adding user to \"lpadmin\" or \"sys\" or \"lp\" group.</p>"))
             else:
                 self.updatePrintController()
                 if self.cur_device.device_type == DEVICE_TYPE_PRINTER:

@@ -10,6 +10,9 @@
 :devicetype :scanner                    ; start of a list of devices....
 :mfg "Hewlett-Packard"                  ; name a manufacturer
 :url "http://www.hp.com/united-states/consumer/gateway/printing_multifunction.html"
+:model "HP Photosmart All-in-one Printer - b010"
+:status :good
+
 :model "HP Officejet v30 All-in-one Printer"
 :status :good
 
@@ -104,6 +107,9 @@
 :status :good
 
 :model "HP Photosmart Wireless All-in-one Printer - b109q=r"
+:status :good
+
+:model "HP Photosmart Wireless All-in-one Printer - b110"
 :status :good
 
 :model "HP Photosmart d110 Series Printer"
@@ -295,6 +301,9 @@
 :model "HP Color LaserJet cm1017 Multifunction Printer"
 :status :good
 
+:model "HP Deskjet 1050 j410 All-in-one Printer"
+:status :good
+
 :model "HP LaserJet 1100a Xi All-in-one Printer"
 :status :good
 
@@ -329,6 +338,9 @@
 :status :good
 
 :model "HP LaserJet Professional m1132 Multifunction Printer"
+:status :good
+
+:model "HP LaserJet Professional m1136 Multifunction Printer"
 :status :good
 
 :model "HP Officejet Pro 1150c All-in-one Printer"
@@ -1027,6 +1039,9 @@
 :model "HP LaserJet 3392 All-in-one Printer"
 :status :good
 
+:model "HP Officejet j3508 All-in-one Printer"
+:status :good
+
 :model "HP Officejet j3608 All-in-one Printer"
 :status :good
 
@@ -1463,6 +1478,12 @@
 :status :good
 
 :model "HP Officejet 4500 All-in-one Printer - g510h"
+:status :good
+
+:model "HP Officejet 4500 g510n-z All-in-one Printer"
+:status :good
+
+:model "HP Officejet 4500 All-in-one Printer - k710"
 :status :good
 
 :model "HP Officejet 4500 Desktop All-in-one Printer - g510a"
@@ -2065,10 +2086,10 @@
 :model "HP Officejet 7115 All-in-one Printer"
 :status :good
 
-:model "HP Officejet 7130 All-in-one Printer"
+:model "HP Officejet 7130xi All-in-one Printer"
 :status :good
 
-:model "HP Officejet 7130xi All-in-one Printer"
+:model "HP Officejet 7130 All-in-one Printer"
 :status :good
 
 :model "HP Officejet 7135xi All-in-one Printer"
@@ -2168,6 +2189,9 @@
 :status :good
 
 :model "HP Officejet Pro l7500 Series All-in-one Printer"
+:status :good
+
+:model "HP Officejet 7500 e910"
 :status :good
 
 :model "HP Officejet Pro l7550 All-in-one Printer"

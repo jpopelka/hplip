@@ -339,9 +339,7 @@ try:
         if status == 0:
             log.info("Version: %s" % output.strip())
         else:
-            log.error("Version: (Not available. CUPS may not be installed or not running.)")
-            cups_ok = False
-            num_errors += 1
+            log.warn("Version: (cups-config) Not available. Unable to determine installed version of CUPS.)")
 
     if cups_ok:
         cups_conf = '/etc/cups/cupsd.conf'
@@ -411,10 +409,17 @@ try:
     dd = core.dependencies.keys()
 
     status, output = utils.run('cups-config --version')
-    if status == 0:
-        import string
-        major, minor, release = string.split(output, '.', 3)
-        if major > 1 or (major == 1 and minor >= 4):
+    import string
+    if status == 0 and (string.count(output, '.') == 1 or string.count(output, '.') == 2):
+        if string.count(output, '.') == 1:
+            major, minor = string.split(output, '.', 2)
+        if string.count(output, '.') == 2:
+            major, minor, release = string.split(output, '.', 3)
+        if len(minor) > 1 and minor[1] >= '0' and minor[1] <= '9':
+            minor = ((ord(minor[0]) - ord('0')) * 10) + (ord(minor[1]) - ord('0'))
+        else:
+            minor = ord(minor[0]) - ord('0')
+        if major > '1' or (major == '1' and minor >= 4):
             dd.remove('cups-ddk')
 
     dd.sort()

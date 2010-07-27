@@ -1484,7 +1484,6 @@ class CoreInstall(object):
                             yield d, self.dependencies[d][2], opt
                             # depend, desc, option
 
-
     def missing_optional_dependencies(self):
         # missing deps in opt. options
         for opt in self.components[self.selected_component][1]:
@@ -1502,17 +1501,23 @@ class CoreInstall(object):
                 for d in self.options[opt][2]: # dependencies for option
                     if d == 'cups-ddk':
                         status, output = self.run('cups-config --version')
-                        if status == 0:
-  			    import string
-                            major, minor, release = string.split(output, '.', 3)
-                            if major > 1 or (major == 1 and minor >= 4):
+                        import string
+                        if status == 0 and (string.count(output, '.') == 1 or string.count(output, '.') == 2):
+                            if string.count(output, '.') == 1:
+                                major, minor = string.split(output, '.', 2)
+                            if string.count(output, '.') == 2:
+                                major, minor, release = string.split(output, '.', 3)
+                            if len(minor) > 1 and minor[1] >= '0' and minor[1] <= '9':
+                                minor = ((ord(minor[0]) - ord('0')) * 10) + (ord(minor[1]) - ord('0'))
+                            else:
+                                minor = ord(minor[0]) - ord('0')
+                            if major > '1' or (major == '1' and minor >= 4):
                                 continue
 	            if not self.dependencies[d][0]: # optional dep
                         if not self.have_dependencies[d]: # missing
                             log.debug("Missing optional dependency: %s" % d)
                             yield d, self.dependencies[d][2], self.dependencies[d][0], opt
                             # depend, desc, option
-
 
     def select_options(self, answer_callback):
         num_opt_missing = 0
@@ -1990,7 +1995,11 @@ class CoreInstall(object):
         if mode == GUI_MODE:
             return os.system("sh %s --nox11 -- -u" % plugin_file) == 0
         else:
-            return os.system("sh %s --nox11 -- -i" % plugin_file) == 0
+            if os.system("sh %s --nox11 -- -i" % plugin_file) == 0:
+                return True
+            else:
+                log.error("Python gobject/dbus may be not installed")
+                return False
 
 
     def delete_plugin(self):

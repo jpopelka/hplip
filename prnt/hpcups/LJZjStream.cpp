@@ -58,21 +58,36 @@ LJZjStream::~LJZjStream()
 DRIVER_ERROR LJZjStream::addJobSettings()
 {
     BYTE    cItems[3] = {ZJI_DMCOLLATE, ZJI_PAGECOUNT, ZJI_DMDUPLEX};
-    addToHeader("%s", "\x1B\x25-12345X@PJL ENTER LANGUAGE=ZJS\x0AJZJZ");
+	int nItems = 0;
+    addToHeader("%s", "@PJL ENTER LANGUAGE=ZJS\x0AJZJZ");
     BYTE    *p = cur_pcl_buffer_ptr;
-    p[3] = 52;
-    p[7] = ZJT_START_DOC;
-    p[11] = 3;
-    p[13] = 36;
-    p[14] = 'Z';
+
+	if (m_pJA->e_duplex_mode == DUPLEXMODE_NONE)
+    {
+	    p[3] = 52;
+		p[7] = ZJT_START_DOC;	
+	    p[11] = 3;
+		p[13] = 36 ;
+		nItems = 3;		
+    }
+    else
+    {
+	    p[3] = 28;
+		p[7] = ZJT_START_DOC;	
+	    p[11] = 1;
+		p[13] = 12;
+		nItems = 1;
+    }
+	
+	p[14] = 'Z';
     p[15] = 'Z';
     int    i = 16;
-    for (int j = 0; j < 3; j++)
+    for (int j = 0; j < nItems; j++)
     {
         p[i + 3] = 12;
         p[i + 5] = cItems[j];
         p[i + 6] = ZJIT_UINT32;
-        p[i + 11] = j / 2;
+		p[i + 11] = j / 2;			
         i += 12;
     }
     cur_pcl_buffer_ptr += i;
@@ -164,13 +179,22 @@ DRIVER_ERROR LJZjStream::Configure(Pipeline **pipeline)
 DRIVER_ERROR LJZjStream::StartPage (JobAttributes *pJA)
 {
     DRIVER_ERROR        err = NO_ERROR;
-    DWORD               dwNumItems = 14;
-    BYTE                szStr[16 + 15 * 12];
+    DWORD               dwNumItems = 15;
+    BYTE                szStr[16 + 16 * 12];
     int                 i;
     int                 width;
 
     m_iPlaneNumber = 0;
     m_iCurRaster   = 0;
+	
+	if (m_pJA->e_duplex_mode == DUPLEXMODE_NONE)
+	{
+		dwNumItems = 14;		
+	}
+	else
+	{
+		dwNumItems = 15;				
+	}
 
     width = ((m_pMA->printable_width + 31) / 32) * 32;
     if (m_pJA->color_mode == 0)
@@ -183,10 +207,26 @@ DRIVER_ERROR LJZjStream::StartPage (JobAttributes *pJA)
         i += SendItem (szStr+i, ZJIT_UINT32, ZJI_PLANE, m_iPlanes);
     }
 
-    i += SendItem (szStr+i, ZJIT_UINT32, ZJI_DMPAPER, m_pMA->pcl_id);
     i += SendItem (szStr+i, ZJIT_UINT32, ZJI_DMCOPIES, 1);
-    i += SendItem (szStr+i, ZJIT_UINT32, ZJI_DMDEFAULTSOURCE, m_pJA->media_source);
-    i += SendItem (szStr+i, ZJIT_UINT32, ZJI_DMMEDIATYPE, m_pQA->media_type);
+	
+	// Job is duplex
+	if (m_pJA->e_duplex_mode != DUPLEXMODE_NONE)
+	{
+		// Long edge
+		if  (m_pJA->e_duplex_mode == DUPLEXMODE_BOOK)
+		{
+			i += SendItem (szStr+i, ZJIT_UINT32, ZJI_DMDUPLEX, 2);
+		}
+		// short edge
+		else
+		{
+			i += SendItem (szStr+i, ZJIT_UINT32, ZJI_DMDUPLEX, 3);			
+		}
+	}
+
+    i += SendItem (szStr+i, ZJIT_UINT32, ZJI_DMMEDIATYPE, m_pQA->media_type);	
+    i += SendItem (szStr+i, ZJIT_UINT32, ZJI_DMPAPER, m_pMA->pcl_id);	
+	i += SendItem (szStr+i, ZJIT_UINT32, ZJI_DMDEFAULTSOURCE, m_pJA->media_source);
     i += SendItem (szStr+i, ZJIT_UINT32, ZJI_NBIE, m_iPlanes);
     i += SendItem (szStr+i, ZJIT_UINT32, ZJI_RESOLUTION_X, m_pQA->horizontal_resolution);
     i += SendItem (szStr+i, ZJIT_UINT32, ZJI_RESOLUTION_Y, m_pQA->vertical_resolution);

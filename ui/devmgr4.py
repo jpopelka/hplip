@@ -2597,6 +2597,7 @@ class DevMgr4(DevMgr4_base):
                 self.cur_device.sendEvent(e, self.cur_printer)
             else:
                 log.error("Start/Stop printer operation failed")
+                self.FailureUI(self.__tr("<b>Start/Stop printer operation failed.</b><p>Try after add user to \"lp\" group."))
 
         finally:
             QApplication.restoreOverrideCursor()
@@ -2626,6 +2627,7 @@ class DevMgr4(DevMgr4_base):
                 self.cur_device.sendEvent(e, self.cur_printer)
             else:
                 log.error("Reject/Accept jobs operation failed")
+                self.FailureUI(self.__tr("<b>Accept/Reject printer operation failed.</b><p>Try after add user to \"lp\" group."))
 
         finally:
             QApplication.restoreOverrideCursor()
@@ -2637,6 +2639,7 @@ class DevMgr4(DevMgr4_base):
             result = cups.setDefaultPrinter(self.cur_printer.encode('utf8'))
             if not result:
                 log.error("Set default printer failed.")
+                self.FailureUI(self.__tr("<b>Set default printer operation failed.</b><p>Try after add user to \"lp\" group."))
             else:
                 self.UpdatePrintController()
                 if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
@@ -2778,7 +2781,9 @@ class DevMgr4(DevMgr4_base):
                     if d in (print_uri, fax_uri):
                         for p in self.cups_devices[d]:
                             log.debug("Removing %s" % p)
-                            cups.delPrinter(p)
+                            r = cups.delPrinter(p)
+                            if r == 0:
+                                self.FailureUI(self.__tr("<p><b>Delete printer queue fails.</b><p>Try after add user to \"lp\" group."))
 
                 self.cur_device = None
                 self.cur_device_uri = ''

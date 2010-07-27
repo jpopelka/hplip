@@ -666,11 +666,11 @@ int main (int argc, char *argv[], char *evenp[])
 			case WARN_LOW_INK_YELLOW:
 			case WARN_LOW_INK_MULTIPLE_PENS:
                         {
-			   BUG ("STATE: +marker-supply-low-warning\n");
+                           fputs("STATE: +marker-supply-low-warning\n", stderr);
                            break;
                         }
 			default:
-			   BUG ("STATE: -marker-supply-low-warning\n");
+                           fputs("STATE: +marker-supply-low-warning\n", stderr);
 		}
     }
 

@@ -183,6 +183,10 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) service_to_channel(mud
    {
       *index = HPMUD_PRINT_CHANNEL;
    }
+   else if (strncasecmp(sn, "hp-ews-ledm", 11) == 0)
+   {
+      *index = HPMUD_EWS_LEDM_CHANNEL;
+   }
    else if (strncasecmp(sn, "hp-ews", 6) == 0)
    {
       *index = HPMUD_EWS_CHANNEL;

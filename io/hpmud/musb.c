@@ -901,7 +901,7 @@ static int new_channel(mud_device *pd, int index, const char *sn)
       goto bugout; 
    }
 
-   if (index == HPMUD_EWS_CHANNEL || 
+   if (index == HPMUD_EWS_CHANNEL || index == HPMUD_EWS_LEDM_CHANNEL ||  
        index == HPMUD_SOAPSCAN_CHANNEL || index == HPMUD_SOAPFAX_CHANNEL || 
        index == HPMUD_MARVELL_SCAN_CHANNEL || index == HPMUD_MARVELL_FAX_CHANNEL) {
       pd->channel[index].vf = musb_comp_channel_vf;
@@ -1134,22 +1134,6 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_open(mud_device *
          stat = HPMUD_R_DEVICE_BUSY;
          goto blackout;
       }
-      // For new Marvell device, USB interface was not getting released properly. And reading was failing
-      // this problem was observed with the SCAN, Print and also getting device communication error
-      // Adding hack: reset the USB
-      int productID = libusb_device->descriptor.idProduct;
-	  // Only for the new marvell devices
-      // Product ID with 042a, 052a
-	  if (productID == 1066 || productID == 1322){
-		  BUG("hpliphack temp msg need to remove: reset the device");        	  
-		  usb_reset(fd_table[fd].hd);
-		  fd_table[fd].hd = NULL;
-		  if ((fd = claim_id_interface(libusb_device)) == MAX_FD)
-		  {
-		     stat = HPMUD_R_DEVICE_BUSY;
-		     goto blackout;
-		  }
-	   }
 
       len = device_id(fd, pd->id, sizeof(pd->id));  /* get new copy and cache it  */ 
 
@@ -1394,6 +1378,18 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_raw_channel_close
 {
    int fd = pc->fd;
 
+   // For New laserjet devices like Tsunami, end point was getting stall or halted, hence clearing it
+   int ep = -1;
+   if (( ep = get_in_ep(libusb_device, fd_table[fd].config, fd_table[fd].interface, fd_table[fd].alt_setting, USB_ENDPOINT_TYPE_BULK)) >= 0)
+   {
+       usb_clear_halt(fd_table[fd].hd,  ep);
+   }
+
+   if (( ep = get_out_ep(libusb_device, fd_table[fd].config, fd_table[fd].interface, fd_table[fd].alt_setting, USB_ENDPOINT_TYPE_BULK)) >= 0)
+   {
+       usb_clear_halt(fd_table[fd].hd,  ep);
+   }
+
    release_interface(&fd_table[fd]);
 
    pc->fd = 0;
@@ -1486,6 +1482,9 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_comp_channel_open
    {
       case HPMUD_EWS_CHANNEL:
          fd = FD_ff_1_1;   
+         break;
+      case HPMUD_EWS_LEDM_CHANNEL:
+         fd = FD_ff_cc_0;
          break;
       case HPMUD_SOAPSCAN_CHANNEL:
          fd = FD_ff_2_1;   
@@ -2189,5 +2188,3 @@ enum HPMUD_RESULT hpmud_make_usb_serial_uri(const char *sn, char *uri, int uri_s
 bugout:
    return stat;
 }
-
-
