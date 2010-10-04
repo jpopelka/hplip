@@ -22,6 +22,7 @@
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   Client/Server generic message format (see messaging-protocol.doc):
 
+  Author: Naga Samrat Chowdary Narla
 \*****************************************************************************/
 
 #include "hpmud.h"
@@ -87,23 +88,24 @@ static char *fd_name[MAX_FD] =
    "ff/3/1",
    "ff/ff/ff",
    "ff/d4/0",
-   "ff/cc/0",
+   "ff/4/1",
    "ff/1/0",
+   "ff/cc/0",
 };
 
 static int fd_class[MAX_FD] =
 {
-   0,0x7,0x7,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+   0,0x7,0x7,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
 };
 
 static int fd_subclass[MAX_FD] =
 {
-   0,0x1,0x1,0x1,0x2,0x3,0xff,0xd4,0xcc,0x1,
+   0,0x1,0x1,0x1,0x2,0x3,0xff,0xd4,0x4,0x1,0xcc,
 };
 
 static int fd_protocol[MAX_FD] =
 {
-   0,0x2,0x3,0x1,0x1,0x1,0xff,0,0,0,
+   0,0x2,0x3,0x1,0x1,0x1,0xff,0,0x1,0,0,
 };
 
 static const unsigned char venice_power_on[] = {0x1b, '%','P','u','i','f','p','.','p','o','w','e','r',' ','1',';',
@@ -901,9 +903,10 @@ static int new_channel(mud_device *pd, int index, const char *sn)
       goto bugout; 
    }
 
-   if (index == HPMUD_EWS_CHANNEL || index == HPMUD_EWS_LEDM_CHANNEL ||  
+   if (index == HPMUD_EWS_CHANNEL || index == HPMUD_EWS_LEDM_CHANNEL ||
        index == HPMUD_SOAPSCAN_CHANNEL || index == HPMUD_SOAPFAX_CHANNEL || 
-       index == HPMUD_MARVELL_SCAN_CHANNEL || index == HPMUD_MARVELL_FAX_CHANNEL) {
+       index == HPMUD_MARVELL_SCAN_CHANNEL || index == HPMUD_MARVELL_FAX_CHANNEL ||
+       index == HPMUD_LEDM_SCAN_CHANNEL) {
       pd->channel[index].vf = musb_comp_channel_vf;
    } 
    else if (pd->io_mode == HPMUD_RAW_MODE || pd->io_mode == HPMUD_UNI_MODE) {
@@ -1484,7 +1487,7 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_comp_channel_open
          fd = FD_ff_1_1;   
          break;
       case HPMUD_EWS_LEDM_CHANNEL:
-         fd = FD_ff_cc_0;
+         fd = FD_ff_4_1;
          break;
       case HPMUD_SOAPSCAN_CHANNEL:
          fd = FD_ff_2_1;   
@@ -1497,6 +1500,9 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_comp_channel_open
          break;
       case HPMUD_MARVELL_FAX_CHANNEL:  //using vendor specific C/S/P codes for fax too
          fd = FD_ff_1_0;   
+         break;
+      case HPMUD_LEDM_SCAN_CHANNEL:  //using vendor specific C/S/P codes for fax too
+        fd = FD_ff_cc_0;
          break;
       default:
          stat = HPMUD_R_INVALID_SN;

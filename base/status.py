@@ -181,7 +181,9 @@ def parseSStatus(s, z=''):
 
         media_path = bool(s1[8] & 0x8L) + (s1[8] & 0x1L) + ((bool(s1[18] & 0x2L))<<1)
         status_pos = STATUS_POS[revision]
-        status_byte = (s1[status_pos]<<4) + s1[status_pos + 1]
+        status_byte = s1[status_pos]<<4
+        if status_byte != 48:
+            status_byte = (s1[status_pos]<<4) + s1[status_pos + 1]
         stat = status_byte + STATUS_PRINTER_BASE
 
         pen, c, d = {}, NUM_PEN_POS[revision]+1, 0
@@ -1458,11 +1460,13 @@ def StatusType8(dev): #  LaserJet PJL (B&W only)
 
 
 element_type10_xlate = { 'ink' : AGENT_KIND_SUPPLY,
+                         'inkCartridge' : AGENT_KIND_HEAD_AND_SUPPLY,
                          'printhead' : AGENT_KIND_HEAD,
                          'toner' : AGENT_KIND_TONER_CARTRIDGE,
                        }
 
 pen_type10_xlate = { 'pK' : AGENT_TYPE_PG,
+                     'CMY' : AGENT_TYPE_CMY,
                      'M' : AGENT_TYPE_MAGENTA,
                      'C' : AGENT_TYPE_CYAN,
                      'Y' : AGENT_TYPE_YELLOW,
@@ -1543,7 +1547,7 @@ def StatusType10(dev): # Low End Data Model
             state = e.find("ConsumableLifeState/ConsumableState").text
 
             # level
-            if type == "ink" or type == "toner":
+            if type == "ink" or type == "inkCartridge" or type == "toner":
                 ink_type = e.find("ConsumableLabelCode").text
                 if state != "missing":
                     try:

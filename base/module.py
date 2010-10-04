@@ -277,7 +277,7 @@ class Module(object):
                 long_params.extend(['noninteractive', 'non-interactive', 'batch'])
 
         if self.supported_ui_toolkits is not None and \
-            self.num_supported_ui_toolkits > 1 and prop.gui_build and \
+            self.num_supported_ui_toolkits >= 1 and prop.gui_build and \
             self.avail_modes is not None and GUI_MODE in self.avail_modes:
 
             if UI_TOOLKIT_QT3 in self.supported_ui_toolkits and UI_TOOLKIT_QT3 in self.installed_ui_toolkits:
@@ -497,13 +497,20 @@ class Module(object):
                 device_uri_ok = True
 
         if printer_name is not None:
-            printers = device.getSupportedCUPSPrinterNames(back_end_filter, filter)
-            if printer_name in printers:
-                printer_name_ok = True
-                printer_name_device_uri = device.getDeviceURIByPrinterName(printer_name, scan_uri_flag)
-            else:
-                log.error("Invalid printer name: %s" % printer_name)
-                printer_name = None
+            #Find the printer_name in the models of devices
+            log.debug(devices)
+            for uri in devices:
+               log.debug(uri)
+               back_end, is_hp, bb, model, serial, dev_file, host, zc, port = \
+                            device.parseDeviceURI(uri)
+               log.debug("back_end=%s, is_hp=%s, bb=%s, model=%s, serial=%s, dev_file=%s, host=%s, zc=%s, port= %s" % (back_end, is_hp, bb, model, serial, dev_file, host, zc, port))
+               if printer_name.lower() == model.lower():
+                   printer_name_ok = True 
+                   printer_name_device_uri = device_uri = uri
+                   device_uri_ok = True
+            if printer_name_ok is not True: 
+               log.error("Invalid printer name: %s" % printer_name)
+               printer_name = None
 
         if device_uri is not None and printer_name is None and device_uri_ok: # Only device_uri specified
             device_uri_ret = device_uri

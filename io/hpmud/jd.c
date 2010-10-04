@@ -22,6 +22,7 @@
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   Client/Server generic message format (see messaging-protocol.doc):
 
+  Author: Naga Samrat Chowdary Narla
 \*****************************************************************************/
 
 #ifdef HAVE_LIBNETSNMP
@@ -463,7 +464,21 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) jd_s_channel_open(mud_
             BUG("unable to connect to marvell-scan port %d: %m %s\n", port, pd->uri);  
             goto bugout;  
          }
-         break; 
+         break;
+      case HPMUD_LEDM_SCAN_CHANNEL:
+         port = 8080;  
+         pin.sin_port = htons(port);
+         if ((pc->socket = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+         {
+            BUG("unable to open ledm-scan port %d: %m %s\n", port, pd->uri);
+            goto bugout;
+         }
+         if (connect(pc->socket, (struct sockaddr *)&pin, sizeof(pin)) == -1)
+         {
+            BUG("unable to connect to ledm-scan port %d: %m %s\n", port, pd->uri);
+            goto bugout;
+         }
+         break;
       case HPMUD_MARVELL_FAX_CHANNEL:
          port = 8290;  /* same as ScanPort1[1] */
          pin.sin_port = htons(port);

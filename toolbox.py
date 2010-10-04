@@ -71,7 +71,7 @@ mod.lockInstance()
 mod.setUsage(module.USAGE_FLAG_NONE,
              extra_options=[("Disable dbus (Qt3 only):", "-x or --disable-dbus", "option", False)],
              see_also_list = ['hp-align', 'hp-clean', 'hp-colorcal', 'hp-devicesettings',
-                              'hp-hp-faxsetup', 'hp-firmware', 'hp-info', 'hp-levels',
+                              'hp-faxsetup', 'hp-firmware', 'hp-info', 'hp-levels',
                               'hp-linefeedcal', 'hp-makecopies', 'hp-plugin',
                               'hp-pqdiag', 'hp-print', 'hp-printsettings', 'hp-scan',
                               'hp-sendfax', 'hp-testpage', 'hp-timedate', 'hp-unload'])

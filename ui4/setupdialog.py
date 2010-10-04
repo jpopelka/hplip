@@ -16,12 +16,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# Authors: Don Welch
+# Authors: Don Welch, Naga Samrat Chowdary Narla
 #
 
 # StdLib
 import socket
 import operator
+import commands
 
 # Local
 from base.g import *
@@ -977,7 +978,8 @@ class SetupDialog(QDialog, Ui_Dialog):
                 self.printer_name not in self.installed_print_devices[self.device_uri]:
 
                 QApplication.restoreOverrideCursor()
-                FailureUI(self, self.__tr("<b>Printer queue setup failed.</b><p>Please restart CUPS and try again."))
+                if os.geteuid!=0 and utils.addgroup()!=[]:
+                    FailureUI(self, self.__tr("<b>Printer queue setup failed.</b><p>Please add user to %s group(s)" %utils.list_to_string(utils.addgroup())))
             else:
                 # TODO:
                 #service.sendEvent(self.hpssd_sock, EVENT_CUPS_QUEUES_CHANGED, device_uri=self.device_uri)
@@ -1244,9 +1246,8 @@ class SetupDialog(QDialog, Ui_Dialog):
                     item = self.RemoveDevicesTableWidget.item(row, 1)
                     printer = unicode(item.data(Qt.UserRole).toString()).encode('utf-8')
                     log.debug("Removing printer: %s" % printer)
-                    r = cups.delPrinter(printer)
-                    if r == 0:
-                        FailureUI(self, self.__tr("<b>Unable to delete printer.</b><p>Try after adding user to \"lpadmin\" or \"sys\" or \"lp\" group."))
+                    if cups.delPrinter(printer) == 0 and os.geteuid!=0 and utils.addgroup()!=[]:
+                            FailureUI(self, self.__tr("<b>Unable to delete printer queue.</b><p>Please add user to %s group(s)" %utils.list_to_string(utils.addgroup())))
             self.close()
 
         else:

@@ -90,6 +90,12 @@ public:
         "HP LaserJet 1020\0"
         "HP LaserJet 1022\0"
         "HP LaserJet P2035\0"
+        "HP LaserJet P1102\0"
+		"HP LaserJet P1566\0"
+		"HP LaserJet P1606\0"
+        "HP LaserJet Professional M1136\0"
+        "HP LaserJet Professional M1132\0"
+        "HP LaserJet Professional M1212nf\0"
     ) {m_iPrinterType = eLJZjsMono;}
     inline Printer* CreatePrinter(SystemServices* pSS) const { return new LJZjsMono(pSS); }
 	inline PRINTER_TYPE GetPrinterType() const { return eLJZjsMono;}

@@ -536,7 +536,7 @@ def main(args):
                                 (indent2, orig_model_name))
 
                         if models_dict[p]['plugin'] in (1, 2):
-                            if models_dict[p]['plugin-reason'] in (1, 2, 3, 4, 5, 6, 8, 9, 10, 12):
+                            if (models_dict[p]['plugin-reason'] & 15 ) in (1, 2, 3, 4, 5, 6, 8, 9, 10, 12):
                                 drv_in_file_f.write(', requires proprietary plugin')
 
                         drv_in_file_f.write('"\n')

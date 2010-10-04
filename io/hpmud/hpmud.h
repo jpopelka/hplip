@@ -21,6 +21,7 @@
   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+  Author: Naga Samrat Chowdary Narla,
 \*****************************************************************************/
 
 #ifndef _HPMUD_H
@@ -75,7 +76,8 @@ enum HPMUD_SCANTYPE
    HPMUD_SCANTYPE_SOAP = 3,    /* Wookie (ie:ljcm1017) */
    HPMUD_SCANTYPE_MARVELL = 4,     /* (ie: ljm1005) */
    HPMUD_SCANTYPE_SOAPHT = 5,   /* HorseThief (ie: ljm1522) */
-   HPMUD_SCANTYPE_SCL_DUPLEX = 6
+   HPMUD_SCANTYPE_SCL_DUPLEX = 6,
+   HPMUD_SCANTYPE_LEDM = 7
 };
 
 enum HPMUD_SCANSRC
@@ -132,6 +134,7 @@ enum HPMUD_PLUGIN_TYPE
 #define HPMUD_S_DEVMGMT_CHANNEL "HP-DEVMGMT"
 #define HPMUD_S_MARVELL_SCAN_CHANNEL "HP-MARVELL-SCAN"
 #define HPMUD_S_MARVELL_FAX_CHANNEL "HP-MARVELL-FAX"
+#define HPMUD_S_LEDM_SCAN "HP-LEDM-SCAN"
 #define HPMUD_S_WIFI_CHANNEL "HP-WIFICONFIG"
 
 typedef int HPMUD_DEVICE;       /* usb, parallel or jetdirect */

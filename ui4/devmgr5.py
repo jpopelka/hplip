@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# Authors: Don Welch
+# Authors: Don Welch, Naga Samrat Chowdary Narla
 #
 
 #from __future__ import generators
@@ -1897,8 +1897,9 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                 self.updatePrintController()
                 self.cur_device.sendEvent(e, self.cur_printer)
             else:
-#                log.error("Start/Stop printer operation failed")
-                FailureUI(self, self.__tr("<b>Start/Stop printer queue operation fails.</b><p>Try after adding user to \"lpadmin\" or \"sys\" or \"lp\" group.</p>"))
+                if os.geteuid!=0 and utils.addgroup()!=[]:
+                    FailureUI(self, self.__tr("<b>Start/Stop printer queue operation fails.</b><p>Please add user to %s group(s)" %utils.list_to_string(utils.addgroup())))
+
         finally:
             endWaitCursor()
 
@@ -1926,9 +1927,9 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
             if result:
                 self.updatePrintController()
                 self.cur_device.sendEvent(e, self.cur_printer)
-            else:
-#                log.error("Reject/Accept jobs operation failed")
-                FailureUI(self, self.__tr("<b>Accept/Reject printer queue operation fails.</b><p>Try after adding user to \"lpadmin\" or \"sys\" or \"lp\" group.</p>"))
+            else:  
+                if os.geteuid!=0 and utils.addgroup()!=[]:
+                    FailureUI(self, self.__tr("<b>Accept/Reject printer queue operation fails.</b><p>Please add user to %s group(s)" %utils.list_to_string(utils.addgroup())))
 
         finally:
             endWaitCursor()
@@ -1940,8 +1941,8 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         try:
             result = cups.setDefaultPrinter(self.cur_printer.encode('utf8'))
             if not result:
-#                log.error("Set default printer failed.")
-                FailureUI(self, self.__tr("<b>Set printer queue as default operation fails.</b><p>Try after adding user to \"lpadmin\" or \"sys\" or \"lp\" group.</p>"))
+                if os.geteuid!=0 and utils.addgroup()!=[]:
+                    FailureUI(self, self.__tr("<b>Set printer queue as default operation fails.</b><p>Please add user to %s group(s)" %utils.list_to_string(utils.addgroup())))
             else:
                 self.updatePrintController()
                 if self.cur_device.device_type == DEVICE_TYPE_PRINTER:

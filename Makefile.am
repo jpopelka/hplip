@@ -2,7 +2,7 @@
 #  Makefile.am - hplip automake input file
 #
 #  (c) 2004-2010 Copyright Hewlett-Packard Development Company, LP
-#
+#  Author: David Suffield, Naga Samrat Chowdary Narla,
 
 INCLUDES = -Iip -Iio/hpmud -Iscan/sane -Iprnt/hpijs
 
@@ -48,7 +48,8 @@ libsane_hpaio_la_SOURCES = scan/sane/hpaio.c scan/sane/mfpdtf.c scan/sane/pml.c 
 	  scan/sane/pml.h scan/sane/saneopts.h scan/sane/io.h scan/sane/mfpdtf.h scan/sane/sane.h scan/sane/scl.h scan/sane/tables.h \
 	  scan/sane/common.c scan/sane/common.h scan/sane/soap.h scan/sane/soapht.h scan/sane/sanei_debug.h scan/sane/sanei.h \
 	  scan/sane/sanei_init_debug.c scan/sane/marvell.h scan/sane/marvelli.h scan/sane/marvell.c scan/sane/soapht.c scan/sane/soap.c \
-          scan/sane/soaphti.h scan/sane/soapi.h scan/sane/xml.c scan/sane/xml.h
+        scan/sane/soaphti.h scan/sane/soapi.h scan/sane/xml.c scan/sane/xml.h scan/sane/ledm.h scan/sane/ledmi.h scan/sane/ledm.c \
+        scan/sane/bb_ledm.c scan/sane/http.h scan/sane/http.c
 if DARWIN_BUILD
 libsane_hpaio_la_LDFLAGS = -module -framework CoreFoundation -version-info 1:0:0
 else

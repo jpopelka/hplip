@@ -82,7 +82,7 @@ protected:
 private:
     int GetOutputResolutionY ()
     {
-        return 400;
+        return 600;
     }
 }; // LJP1XXX
 

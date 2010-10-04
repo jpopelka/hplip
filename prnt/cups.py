@@ -202,12 +202,18 @@ def getPPDPath(addtional_paths=None):
 
 def getAllowableMIMETypes():
     """
-        Scan all /etc/cups/*.convs files for allowable file formats.
+        Scan all /etc/cups/*.convs and /usr/share/cups/mime 
+        files for allowable file formats.
     """
-    files = glob.glob("/etc/cups/*.convs")
-
+    paths = []
     allowable_mime_types = []
-
+    files = []
+    if os.path.exists("/etc/cups"):
+        paths.append("/etc/cups/*.convs")
+    if os.path.exists("/usr/share/cups/mime"):
+        paths.append("/usr/share/cups/mime/*.convs")
+    for path in paths:
+        files.extend(glob.glob(path))
     for f in files:
         #log.debug( "Capturing allowable MIME types from: %s" % f )
         conv_file = file(f, 'r')

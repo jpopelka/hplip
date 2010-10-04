@@ -6806,6 +6806,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%ViperPlusVIP:Normal%>
   // <%ViperPlusVIP:Trim%>
+  // <%Mimas:NoCDDVD%>
 }  // end ViperPlusVIP
 
 /////////////// ViperMinusVIP
@@ -7970,11 +7971,13 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
-  // <%Python:Normal%>
+  // <%Python:NoMaxDPI%>
   // <%Python:NoCDDVD%>
   // <%Python:NoCDDVD:NoMaxDPI%>
   // <%Python:NoAutoDuplex:NoCDDVD%>
   // <%Python:NoAutoDuplex:NoCDDVD:NoMaxDPI%>
+  // <%Python10:NoCDDVD:NoMaxDPI%>
+  // <%Python10:NoAutoTray%>
   { 
     // Large format SuperB paper support
     CustomMedia "B4JIS/B4 (JIS)" 729.00 1033.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=B4JIS" "%% FoomaticRIPOptionSetting: PageSize=B4JIS"

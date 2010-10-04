@@ -1299,6 +1299,10 @@ DRIVER_ERROR PrintContext::SelectDevice
     {
         return UNSUPPORTED_PRINTER;
     }
+	if(0 == strnlen((const char *)pSS->strDevID, DevIDBuffSize))
+	{
+		strncpy((char *)pSS->strDevID,szDeviceId,DevIDBuffSize);
+	}
     thePrinter = pPFI->CreatePrinter (pSS, familyHandle);
     if (thePrinter->constructor_error != NO_ERROR)
     {

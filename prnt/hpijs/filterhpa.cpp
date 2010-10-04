@@ -1490,7 +1490,7 @@ TErnieFilter::TErnieFilter(int rowWidthInPixels, pixelTypes pixelType, unsigned 
     // The least compressible image will be all raw pixels. Maximum compressed size is:
     // full size + a bloat of Cmd byte + 1 VLI byte per 255 pixels rounded up to nearest integer.
 
-    int maxCompressionBufSize = fRowWidthInBytes + 1 + ((int)ceil(MAX((rowWidthInPixels-2)/255, 0)));
+    int maxCompressionBufSize = fRowWidthInBytes + 1 + ((int)ceil((float)MAX((rowWidthInPixels-2)/255, 0)));
 
     fCompressionOutBuf = new unsigned char[maxCompressionBufSize];
     ASSERT(fCompressionOutBuf);

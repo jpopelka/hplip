@@ -99,6 +99,8 @@ TECH_CLASSES = [
     "Python",
     "OJ7000",
     "Pyramid",
+    "Python10",
+    "Mimas",
 ]
 
 TECH_CLASSES.sort()
@@ -149,6 +151,8 @@ TECH_CLASS_PDLS = {
     "Corbett"       : 'pcl3',
     "Python"        : 'pcl3',
     "OJ7000"        : 'pcl3',
+    "Python10"      : 'pcl3',
+    "Mimas"      : 'pcl3',
 }
 
 PDL_TYPE_PCL = 0  # less preferred
@@ -200,6 +204,7 @@ TECH_SUBCLASSES = [
     "NoMaxDPI",
     "SmallMargins",
     "Trim",
+    "4800x1200dpi",
 ]
 
 TECH_SUBCLASSES.sort()

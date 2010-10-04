@@ -20,7 +20,7 @@
 Requires:
 Python 2.2+
 
-Authors: Don Welch, David Suffield
+Authors: Don Welch, David Suffield, Naga Samrat Chowdary Narla
 
 \*****************************************************************************/
 
@@ -485,6 +485,7 @@ void inithpmudext(void)
     insstr(d, "HPMUD_S_DEVMGMT_CHANNEL", HPMUD_S_DEVMGMT_CHANNEL);
     insstr(d, "HPMUD_S_WIFI_CHANNEL", HPMUD_S_WIFI_CHANNEL);
     insstr(d, "HPMUD_S_MARVELL_FAX_CHANNEL", HPMUD_S_MARVELL_FAX_CHANNEL);
+    insstr(d, "HPMUD_S_LEDM_SCAN", HPMUD_S_LEDM_SCAN);
 
     // Max buffer size
     insint(d, "HPMUD_BUFFER_SIZE", HPMUD_BUFFER_SIZE);

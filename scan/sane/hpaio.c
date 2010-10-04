@@ -21,7 +21,7 @@
   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-  Contributing Authors: David Paschal, Don Welch, David Suffield 
+  Contributing Authors: David Paschal, Don Welch, David Suffield, Narla Naga Samrat Chowdary, 
 
 \************************************************************************************/
 
@@ -52,6 +52,7 @@
 #include "soapht.h"
 #include "marvell.h"
 #include "hpaio.h"
+# include "ledm.h"
 
 #define DEBUG_DECLARE_ONLY
 #include "sanei_debug.h"
@@ -1640,6 +1641,8 @@ extern SANE_Status sane_hpaio_open(SANE_String_Const devicename, SANE_Handle * p
        return soap_open(devicename, pHandle);
     if (ma.scantype == HPMUD_SCANTYPE_SOAPHT)
        return soapht_open(devicename, pHandle);
+    if (ma.scantype == HPMUD_SCANTYPE_LEDM)
+       return ledm_open(devicename, pHandle);
 
     DBG(8, "sane_hpaio_open(%s): %s %d\n", devicename, __FILE__, __LINE__);
 
@@ -2327,7 +2330,6 @@ abort:
 
 extern void sane_hpaio_close(SANE_Handle handle)
 {
-    
     hpaioScanner_t hpaio = (hpaioScanner_t) handle;
 
     if (strcmp(*((char **)handle), "MARVELL") == 0)
@@ -2336,6 +2338,8 @@ extern void sane_hpaio_close(SANE_Handle handle)
        return soap_close(handle);
     if (strcmp(*((char **)handle), "SOAPHT") == 0)
        return soapht_close(handle);
+    if (strcmp(*((char **)handle), "LEDM") == 0)
+       return ledm_close(handle);
 
     DBG(8, "sane_hpaio_close(): %s %d\n", __FILE__, __LINE__); 
 
@@ -2364,6 +2368,8 @@ extern const SANE_Option_Descriptor * sane_hpaio_get_option_descriptor(SANE_Hand
        return soap_get_option_descriptor(handle, option);
     if (strcmp(*((char **)handle), "SOAPHT") == 0)
        return soapht_get_option_descriptor(handle, option);
+    if (strcmp(*((char **)handle), "LEDM") == 0)
+       return ledm_get_option_descriptor(handle, option);
 
     DBG(8, "sane_hpaio_get_option_descriptor(option=%s): %s %d\n", hpaio->option[option].name, __FILE__, __LINE__);
 
@@ -2390,6 +2396,8 @@ extern SANE_Status sane_hpaio_control_option(SANE_Handle handle, SANE_Int option
        return soap_control_option(handle, option, action, pValue, pInfo);
     if (strcmp(*((char **)handle), "SOAPHT") == 0)
        return soapht_control_option(handle, option, action, pValue, pInfo);
+    if (strcmp(*((char **)handle), "LEDM") == 0)
+       return ledm_control_option(handle, option, action, pValue, pInfo);
 
     if( !pInfo )
     {
@@ -2771,6 +2779,8 @@ extern SANE_Status sane_hpaio_get_parameters(SANE_Handle handle, SANE_Parameters
        return soap_get_parameters(handle, pParams);
     if (strcmp(*((char **)handle), "SOAPHT") == 0)
        return soapht_get_parameters(handle, pParams);
+    if (strcmp(*((char **)handle), "LEDM") == 0)
+       return ledm_get_parameters(handle, pParams);
 
     if( !hpaio->hJob )
     {
@@ -2803,6 +2813,8 @@ extern SANE_Status sane_hpaio_start(SANE_Handle handle)
        return soap_start(handle);
     if (strcmp(*((char **)handle), "SOAPHT") == 0)
        return soapht_start(handle);
+    if (strcmp(*((char **)handle), "LEDM") == 0)
+       return ledm_start(handle);
 
     DBG(8, "sane_hpaio_start(): %s %d\n", __FILE__, __LINE__);
 
@@ -3136,10 +3148,13 @@ extern SANE_Status sane_hpaio_read(SANE_Handle handle, SANE_Byte *data, SANE_Int
     DWORD dwOutputUsed, dwOutputThisPos;
     WORD wResult;
 
+    if (strcmp(*((char **)handle), "LEDM") == 0)
+       return ledm_read(handle, data, maxLength, pLength);
+
     if (hpaio->user_cancel)  {
         bug("sane_hpaio_read(maxLength=%d): User cancelled!\n", maxLength);
         return SANE_STATUS_CANCELLED;
-    }
+    } 
 
     if (strcmp(*((char **)handle), "MARVELL") == 0)
        return marvell_read(handle, data, maxLength, pLength);
@@ -3314,6 +3329,8 @@ extern void sane_hpaio_cancel( SANE_Handle handle )
        return soap_cancel(handle);
     if (strcmp(*((char **)handle), "SOAPHT") == 0)
        return soapht_cancel(handle);
+    if (strcmp(*((char **)handle), "LEDM") == 0)
+       return ledm_cancel(handle);
 
     DBG(8, "sane_hpaio_cancel(): %s %d\n", __FILE__, __LINE__); 
 

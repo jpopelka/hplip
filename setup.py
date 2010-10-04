@@ -141,7 +141,7 @@ opts, device_uri, printer_name, mode, ui_toolkit, loc = \
                        'auto', 'device=', 'rm', 'remove'],
                       handle_device_printer=False)
 
-
+selected_device_name = None
 printer_name = None
 fax_name = None
 bus = None
@@ -208,8 +208,16 @@ except IndexError:
 
 log.debug("param=%s" % param)
 
+if printer_name is not None:
+   selected_device_name = printer_name
+else:
+   if fax_name is not None:
+      selected_device_name = fax_name
+log.debug("selected_device_name=%s" % selected_device_name)
 
 if mode == GUI_MODE:
+    if selected_device_name is not None: 
+        log.warning("-p or -f option is not supported")
     if ui_toolkit == 'qt3':
         if not utils.canEnterGUIMode():
             log.error("%s requires GUI support (try running with --qt4). Also, try using interactive (-i) mode." % __mod__)
@@ -292,7 +300,7 @@ if mode == GUI_MODE:
             sys.exit(1)
 
         app = QApplication(sys.argv)
-
+        log.debug("Sys.argv=%s printer_name=%s param=%s jd_port=%s device_uri=%s remove=%s" % (sys.argv, printer_name, param, jd_port, device_uri, remove))
         dlg = SetupDialog(None, param, jd_port, device_uri, remove)
         dlg.show()
         try:
@@ -333,7 +341,9 @@ else: # INTERACTIVE_MODE
         # ******************************* DEVICE CHOOSER
 
         if not device_uri:
-            device_uri = mod.getDeviceUri(device_uri, devices=device.probeDevices(bus))
+            log.debug("\nDEVICE CHOOSER setup_fax=%s, setup_print=%s" % (setup_fax, setup_print))
+            device_uri = mod.getDeviceUri(device_uri, selected_device_name, devices = device.probeDevices(bus))
+
 
         # ******************************* QUERY MODEL AND COLLECT PPDS
         log.info(log.bold("\nSetting up device: %s\n" % device_uri))

@@ -59,6 +59,8 @@ protected:
 private:
     virtual DRIVER_ERROR    EndPage ();
     virtual DRIVER_ERROR    SendPlaneData (int iPlaneNumber, HPLJZjsJbgEncSt *se, HPLJZjcBuff *pcBuff, BOOL bLastStride);
+	virtual DRIVER_ERROR    SendPlaneData_YODA (int iPlaneNumber, HPLJZjsJbgEncSt *se, HPLJZjcBuff *pcBuff, BOOL bLastStride);
+	virtual DRIVER_ERROR    SendPlaneData_SID (int iPlaneNumber, HPLJZjsJbgEncSt *se, HPLJZjcBuff *pcBuff, BOOL bLastStride);		
 
 }; // LJZjsColor
 
@@ -97,6 +99,7 @@ public:
         "HP Color LaserJet 1600\0"     // models with null at end of each
         "HP Color LaserJet 2600n\0"
         "HP Color LaserJet CP1215\0"
+		"HP LaserJet CP1025nw\0"
     ) {m_iPrinterType = eLJZjsColor;}
     inline Printer* CreatePrinter(SystemServices* pSS) const { return new LJZjsColor(pSS); }
 	inline PRINTER_TYPE GetPrinterType() const { return eLJZjsColor;}

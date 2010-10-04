@@ -132,6 +132,7 @@ class StringTable:
             '2006' : (self.__tr('Scanner is waiting for PC'), ''),
             '2007' : (self.__tr('Scanner automatic document feeder jam'), ''),
             '2008' : (self.__tr('Scanner automatic document feeder door opened'), ''),
+            '2009' : (self.__tr('Scan job cancelled'), ''),
             '3000' : (self.__tr('Fax job started'), ''),
             '3001' : (self.__tr('Fax job complete'), ''),
             '3002' : (self.__tr('Fax job failed'), '%try_again%'),

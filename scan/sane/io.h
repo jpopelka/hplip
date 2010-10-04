@@ -39,6 +39,7 @@ int __attribute__ ((visibility ("hidden"))) ReadChannelEx(int deviceid, int chan
 #define EVENT_END_SCAN_JOB 2001
 #define EVENT_SCANNER_FAIL 2002
 #define EVENT_PLUGIN_FAIL 2003
+#define EVENT_SCAN_CANCEL 2009
 
 #define DBUS_INTERFACE "com.hplip.StatusService"
 #define DBUS_PATH "/"

@@ -21,6 +21,7 @@
   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+  Author: Naga Samrat Chowdary Narla
 \*****************************************************************************/
 
 #ifndef _MUSB_H
@@ -43,8 +44,9 @@ enum FD_ID
    FD_ff_3_1,        /* HP Soap Fax interface */
    FD_ff_ff_ff,        /* HP dot4 interface */
    FD_ff_d4_0,        /* HP dot4 interface */
-   FD_ff_cc_0,        /* orblite scan / rest scan interface */
+   FD_ff_4_1,        /* orblite scan / rest scan interface */
    FD_ff_1_0,        /* Marvell fax support*/
+   FD_ff_cc_0,
    MAX_FD
 };
 

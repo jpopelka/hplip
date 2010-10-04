@@ -111,7 +111,7 @@ supported=0
 
 [suse]
 index=3
-versions=9.0,9.1,9.2,9.3,10,10.0,10.1,10.2,10.3,11,11.0,11.1,11.2
+versions=9.0,9.1,9.2,9.3,10,10.0,10.1,10.2,10.3,11,11.0,11.1,11.2,11.3
 display_name=SUSE Linux
 alt_names=
 display=1
@@ -522,7 +522,7 @@ packages=cups-devel
 # ********************
 [suse:10.3]
 code_name=
-supported=1
+supported=0
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -993,6 +993,122 @@ packages=python-xml
 packages=cups-devel
 
 [suse:11.2:python-notify]
+packages=python-notify
+
+# ********************
+[suse:11.3]
+code_name=Rousseau
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=3.10.2
+release_date=2010-15-7
+notes=Please be sure to disable the CD repositories in YaST and after installation you must log out and back in to become a member of the lp and sys group to enable printing.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+cups_path_with_bitness=1
+ui_toolkit=qt4
+native_cups=1
+add_user_to_group= -Gsys,lp
+open_mdns_port=/bin/bash ./init-suse-firewall
+pre_depend_cmd=su -c "zypper refresh"
+
+[suse:11.3:cups]
+packages=cups,cups-client
+
+[suse:11.3:cups-devel]
+packages=cups-devel,cups-ddk
+
+[suse:11.3:gcc]
+packages=gcc-c++
+
+[suse:11.3:gs]
+packages=ghostscript-library
+
+[suse:11.3:libcrypto]
+packages=openssl
+
+[suse:11.3:libjpeg]
+packages=libjpeg-devel
+
+[suse:11.3:libnetsnmp-devel]
+packages=net-snmp-devel
+
+[suse:11.3:libpthread]
+packages=glibc
+
+[suse:11.3:libtool]
+packages=libtool,libgphoto2-devel
+
+[suse:11.3:libusb]
+packages=libusb-1_0-devel,libusb-1_0-0
+
+[suse:11.3:make]
+packages=make
+
+[suse:11.3:pil]
+packages=python-imaging
+
+[suse:11.3:ppdev]
+packages=
+commands=su -c "modprobe ppdev"
+
+[suse:11.3:pyqt]
+packages=python-qt
+
+[suse:11.3:pyqt4]
+packages=python-qt4
+
+[suse:11.3:pyqt4-dbus]
+packages=dbus-1-python-devel,dbus-1-python
+
+[suse:11.3:python-devel]
+packages=python-devel,python-xml
+
+[suse:11.3:python23]
+packages=python
+
+[suse:11.3:python2x]
+packages=python
+
+[suse:11.3:reportlab]
+packages=
+
+[suse:11.3:sane]
+packages=xsane
+
+[suse:11.3:sane-devel]
+packages=sane-backends
+
+[suse:11.3:scanimage]
+packages=sane-backends
+
+[suse:11.3:xsane]
+packages=xsane
+
+[suse:11.3:cups-ddk]
+packages=cups-ddk
+
+[suse:11.3:python-dbus]
+packages=dbus-1-python
+
+[suse:11.3:dbus]
+packages=dbus-1-devel,python-gobject2
+
+[suse:11.3:python-xml]
+packages=python-xml
+
+[suse:11.3:cups-image]
+packages=cups-devel
+
+[suse:11.3:python-notify]
 packages=python-notify
 
 # ****************************************
@@ -5133,7 +5249,7 @@ packages=python-notify
 # ****************************************
 [debian]
 index=2
-versions=2.2,3.0,3.1,4.0,4.0r0,4.0r1,5.0,5.0.1,5.0.2,5.0.3,5.0.4,stable,lenny/sid,testing,lenny
+versions=2.2,3.0,3.1,4.0,4.0r0,4.0r1,5.0,5.0.1,5.0.2,5.0.3,5.0.4,5.0.5,stable,lenny/sid,testing,lenny
 display_name=Debian
 alt_names=
 display=1
@@ -5587,7 +5703,7 @@ drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 native_cups=1
 policykit=1
-add_user_to_group=-a -G lp
+add_user_to_group=-a -G lp,lpadmin
 
 [debian:5.0:cups]
 packages=cupsys,cupsys-client,libcupsys2-dev
@@ -5693,6 +5809,9 @@ same_as_version=5.0
 same_as_version=5.0
 
 [debian:5.0.4]
+same_as_version=5.0
+
+[debian:5.0.5]
 same_as_version=5.0
 
 # ********************

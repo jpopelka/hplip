@@ -21,6 +21,7 @@
   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+  Author: Naga Samrat Chowdary Narla,
 \*****************************************************************************/
 
 #ifndef _HPMUDI_H
@@ -104,6 +105,7 @@ enum HPMUD_CHANNEL_ID
    HPMUD_SOAPFAX_CHANNEL = 0x14,          /* Soap Fax interface ff/3/1, any unused socket id */
    HPMUD_MARVELL_SCAN_CHANNEL = 0x15,    /* Marvell scan interface ff/ff/ff, any unused socket id */
    HPMUD_MARVELL_FAX_CHANNEL = 0x16,    /* Marvell fax interface ff/ff/ff, any unused socket id */
+   HPMUD_LEDM_SCAN_CHANNEL = 0x18,  /* LEDM scan interface ff/4/1, any unused socket id */
    HPMUD_WIFI_CHANNEL = 0x2b,      /* WIFI config */
    HPMUD_DEVMGMT_CHANNEL = 0x2c,      /* decimal 44 */
    HPMUD_MAX_CHANNEL_ID

@@ -22,7 +22,7 @@
 
 __version__ = '4.0'
 __title__ = 'Printer Cartridge Cleaning Utility'
-__mod__ = 'hp-colorcal'
+__mod__ = 'hp-clean'
 __doc__ = "Cartridge cleaning utility for HPLIP supported inkjet printers."
 
 #Std Lib
@@ -95,7 +95,7 @@ try:
                         (INTERACTIVE_MODE, GUI_MODE), (UI_TOOLKIT_QT4,))
 
     mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS,
-                 see_also_list=['hp-align', 'hp-colorcal', 'hp-linefeedcal',
+                 see_also_list=['hp-align', 'hp-clean', 'hp-linefeedcal',
                                 'hp-pqdiag'])
 
     opts, device_uri, printer_name, mode, ui_toolkit, lang = \

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# Author: Don Welch
+# Author: Don Welch, Naga Samrat Chowdary Narla
 #
 # Thanks to Henrique M. Holschuh <hmh@debian.org> for various security patches
 #
@@ -26,6 +26,7 @@ from __future__ import generators
 # Std Lib
 import sys
 import os
+import grp
 import fnmatch
 import tempfile
 import socket
@@ -58,8 +59,35 @@ import pexpect
 BIG_ENDIAN = 0
 LITTLE_ENDIAN = 1
 
+def addgroup():
+    lis = []
+    try:
+        fp=open('/etc/cups/cupsd.conf')
+    except IOError:
+        try:
+            if "root" != grp.getgrgid(os.stat('/etc/cups/cupsd.conf').st_gid)[0]:
+                return grp.getgrgid(os.stat('/etc/cups/cupsd.conf').st_gid)[0]
+        except OSError:
+            return lis
 
+    try:
+        lis = ((re.findall('SystemGroup [\w* ]*',fp.read()))[0].replace('SystemGroup ','')).split(' ')
+    except IndexError:
+        return lis
 
+    if 'root' in lis:
+        lis.remove('root')
+    fp.close()
+    return lis
+
+def list_to_string(lis):
+    if len(lis) == 0:
+        return ""
+    if len(lis) == 1:
+        return str("\""+lis[0]+"\"")
+    if len(lis) >= 1:
+        return "\""+"\", \"".join(lis)+"\" and \""+str(lis.pop())+"\""
+        
 def lock(f):
     log.debug("Locking: %s" % f.name)
     try:
