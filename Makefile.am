@@ -145,7 +145,7 @@ dist_copier_DATA = copier/copier.py copier/__init__.py
 # fax
 if FAX_BUILD
 faxdir = $(hplipdir)/fax
-dist_fax_DATA = fax/fax.py fax/__init__.py fax/coverpages.py fax/pmlfax.py fax/soapfax.py fax/marvellfax.py \
+dist_fax_DATA = fax/fax.py fax/__init__.py fax/coverpages.py fax/pmlfax.py fax/ledmfax.py fax/soapfax.py fax/ledmsoapfax.py fax/marvellfax.py \
 	fax/faxdevice.py fax/filters/pstotiff fax/filters/pstotiff.convs fax/filters/pstotiff.types
 fax_filtersdir = $(mimedir)
 dist_fax_filters_DATA = fax/filters/pstotiff.convs fax/filters/pstotiff.types
@@ -154,10 +154,10 @@ dist_hpfax_SCRIPTS = fax/backend/hpfax.py
 hpijsfaxppddir = $(hpppddir)
 hpcupsfaxppddir = $(hpppddir)
 if HPIJS_INSTALL
-dist_hpijsfaxppd_DATA = fax/ppd/HP-Fax-hpijs.ppd.gz fax/ppd/HP-Fax2-hpijs.ppd.gz fax/ppd/HP-Fax3-hpijs.ppd.gz
+dist_hpijsfaxppd_DATA = fax/ppd/HP-Fax-hpijs.ppd.gz fax/ppd/HP-Fax2-hpijs.ppd.gz fax/ppd/HP-Fax3-hpijs.ppd.gz fax/ppd/HP-Fax4-hpijs.ppd.gz
 endif # HPIJS_INSTALL
 if HPCUPS_INSTALL
-dist_hpcupsfaxppd_DATA = fax/ppd/HP-Fax-hpcups.ppd.gz fax/ppd/HP-Fax2-hpcups.ppd.gz fax/ppd/HP-Fax3-hpcups.ppd.gz
+dist_hpcupsfaxppd_DATA = fax/ppd/HP-Fax-hpcups.ppd.gz fax/ppd/HP-Fax2-hpcups.ppd.gz fax/ppd/HP-Fax3-hpcups.ppd.gz fax/ppd/HP-Fax4-hpcups.ppd.gz
 endif # HPCUPS_INSTALL
 endif # FAX_BUILD
 
@@ -248,7 +248,6 @@ hpmudext_la_LDFLAGS = -module -avoid-version
 hpmudext_la_SOURCES = io/mudext/hpmudext.c
 hpmudext_la_LIBADD = libhpmud.la
 hpmudext_la_CFLAGS = -I$(PYTHONINCLUDEDIR)
-
 # ui (qt3)
 if GUI_BUILD
 if QT3_INSTALL

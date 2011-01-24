@@ -1024,7 +1024,7 @@ pre_depend_cmd=su -c "zypper refresh"
 packages=cups,cups-client
 
 [suse:11.3:cups-devel]
-packages=cups-devel,cups-ddk
+packages=cups-devel,cupsddk
 
 [suse:11.3:gcc]
 packages=gcc-c++
@@ -1094,7 +1094,7 @@ packages=sane-backends
 packages=xsane
 
 [suse:11.3:cups-ddk]
-packages=cups-ddk
+packages=cupsddk
 
 [suse:11.3:python-dbus]
 packages=dbus-1-python
@@ -1311,11 +1311,11 @@ ui_toolkit=qt3
 # ****************************************
 [fedora]
 index=5
-versions=1.0,2.0,3.0,4.0,5,5.0,5.92,6,6.0,7,7.0,8,8.0,9,9.0,10,10.0,11,11.0,12,12.0,13,13.0
+versions=1.0,2.0,3.0,4.0,5,5.0,5.92,6,6.0,7,7.0,8,8.0,9,9.0,10,10.0,11,11.0,12,12.0,13,13.0,14,14.0
 display_name=Fedora
 alt_names=Fedora Core
 display=1
-notes=SELinux must be disabled for HPLIP to function properly. Please disable SELinux before continuing.
+notes=SELinux must run in permissive mode or it must be disabled for HPLIP to function properly. Please run SELinux in permissive mode or disable it before continuing.
 package_mgrs=yum,rpm,up2date
 package_mgr_cmd=su -c "yum -y -d 10 -e 1 install $packages_to_install"
 pre_depend_cmd=su -c "yum clean all"
@@ -2129,7 +2129,7 @@ same_as_version= 8
 # ********************
 [fedora:9]
 code_name=sulphur
-supported=1
+supported=0
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -2245,7 +2245,7 @@ same_as_version= 9
 # ********************
 [fedora:10]
 code_name=sulphur
-supported=1
+supported=0
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -2366,7 +2366,7 @@ same_as_version= 10
 # ********************
 [fedora:11]
 code_name=
-supported=1
+supported=0
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -2497,7 +2497,7 @@ parallel_supported=1
 usb_supported=1
 packaged_version=
 release_date=
-notes=To complete the install in Fedora 12 or 13 you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
+notes=To complete the install in Fedora 12 or 13 or 14 you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
 ppd_install=drv
 udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
@@ -2606,6 +2606,12 @@ same_as_version=12
 same_as_version=12
 
 [fedora:13.0]
+same_as_version=12
+
+[fedora:14]
+same_as_version=12
+
+[fedora:14.0]
 same_as_version=12
 
 # ****************************************
@@ -3777,14 +3783,14 @@ packages=
 # ****************************************
 [ubuntu]
 index=12
-versions=5.04,5.1,6.06,6.10,7.04,7.10,8.04,8.04.1,8.04.2,8.10,9.04,9.10,10.04
+versions=5.04,5.1,6.06,6.10,7.04,7.10,8.04,8.04.1,8.04.2,8.10,9.04,9.10,10.04,10.10
 display_name=Ubuntu
 alt_names=kubuntu,edubuntu,xubuntu
 display=1
 notes=
 package_mgrs=dpkg,apt-get,synaptic,update-manager,adept,aptitude,adept-updater
-package_mgr_cmd=sudo aptitude install --assume-yes $packages_to_install
-pre_depend_cmd=sudo dpkg --configure -a,sudo apt-get install --yes --force-yes -f,sudo aptitude update
+package_mgr_cmd=sudo apt-get install --assume-yes $packages_to_install
+pre_depend_cmd=sudo dpkg --configure -a,sudo apt-get install --yes --force-yes -f,sudo apt-get update
 post_depend_cmd=
 hplip_remove_cmd=sudo apt-get remove --assume-yes hplip hpijs hplip-cups hplip-data libhpmud0 foomatic-db-hpijs
 su_sudo=sudo
@@ -5036,7 +5042,7 @@ ui_toolkit=qt4
 policykit=1
 native_cups=1
 acl_rules=1
-add_user_to_group=-a -Glp
+add_user_to_group=-a -Glp,lpadmin
 
 [ubuntu:9.10:cups]
 packages=libcupsys2
@@ -5153,7 +5159,7 @@ drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 native_cups=1
 acl_rules=1
-add_user_to_group=-a -Glp
+add_user_to_group=-a -Glp,lpadmin
 
 [ubuntu:10.04:cups]
 packages=libcups2
@@ -5246,10 +5252,124 @@ packages=policykit-1,policykit-1-gnome
 [ubuntu:10.04:python-notify]
 packages=python-notify
 
+# ************************************
+[ubuntu:10.10]
+code_name=Maverick
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=3.10.11
+release_date=2010
+notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.  During the install process you will be added to the lp and lpadmin group, please quit the installer before the setup stage, log out, log back in, and run hp-setup to complete the install.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+native_cups=1
+acl_rules=1
+add_user_to_group=-a -Glp,lpadmin
+
+[ubuntu:10.10:cups]
+packages=libcups2
+
+[ubuntu:10.10:cups-devel]
+packages=libcups2-dev,cups-bsd,cups-client
+
+[ubuntu:10.10:gcc]
+packages=build-essential
+
+[ubuntu:10.10:gs]
+packages=ghostscript
+
+[ubuntu:10.10:libcrypto]
+packages=openssl
+
+[ubuntu:10.10:libjpeg]
+packages=libjpeg62-dev
+
+[ubuntu:10.10:libnetsnmp-devel]
+packages=libsnmp-dev
+
+[ubuntu:10.10:libpthread]
+packages=build-essential
+
+[ubuntu:10.10:libtool]
+packages=libtool
+
+[ubuntu:10.10:libusb]
+packages=libusb-dev
+
+[ubuntu:10.10:make]
+packages=build-essential
+
+[ubuntu:10.10:pil]
+packages=python-imaging
+
+[ubuntu:10.10:ppdev]
+packages=
+commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppdev | sudo tee -a /etc/modules
+
+[ubuntu:10.10:pyqt]
+packages=python-qt4
+
+[ubuntu:10.10:python-devel]
+packages=python-dev
+
+[ubuntu:10.10:pyqt4]
+packages=python-qt4
+
+[ubuntu:10.10:pyqt4-dbus]
+packages=python-qt4-dbus
+
+#[ubuntu:10.10:python23]
+#packages=python
+
+[ubuntu:10.10:python2x]
+packages=python
+
+[ubuntu:10.10:reportlab]
+packages=python-reportlab
+
+[ubuntu:10.10:sane]
+packages=libsane
+
+[ubuntu:10.10:sane-devel]
+packages=libsane-dev
+
+[ubuntu:10.10:scanimage]
+packages=sane-utils
+
+[ubuntu:10.10:xsane]
+packages=xsane
+
+[ubuntu:10.10:python-dbus]
+packages=python-dbus,python-gobject
+
+[ubuntu:10.10:dbus]
+packages=libdbus-1-dev
+
+[ubuntu:10.10:cups-image]
+packages=libcupsimage2-dev
+
+[ubuntu:10.10:cups-ddk]
+packages=cups
+
+[ubuntu:10.10:policykit]
+packages=policykit-1,policykit-1-gnome
+
+[ubuntu:10.10:python-notify]
+packages=python-notify
+
 # ****************************************
 [debian]
 index=2
-versions=2.2,3.0,3.1,4.0,4.0r0,4.0r1,5.0,5.0.1,5.0.2,5.0.3,5.0.4,5.0.5,stable,lenny/sid,testing,lenny
+versions=2.2,3.0,3.1,4.0,4.0r0,4.0r1,5.0,5.0.1,5.0.2,5.0.3,5.0.4,5.0.5,5.0.6,5.0.7,stable,lenny/sid,testing,lenny
 display_name=Debian
 alt_names=
 display=1
@@ -5812,6 +5932,12 @@ same_as_version=5.0
 same_as_version=5.0
 
 [debian:5.0.5]
+same_as_version=5.0
+
+[debian:5.0.6]
+same_as_version=5.0
+
+[debian:5.0.7]
 same_as_version=5.0
 
 # ********************

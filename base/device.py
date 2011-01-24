@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# Author: Don Welch
+# Author: Don Welch, Naga Samrat Chowdary Narla
 #
 
 # Std Lib
@@ -27,8 +27,10 @@ import os.path
 import time
 import urllib # TODO: Replace with urllib2 (urllib is deprecated in Python 3.0)
 import StringIO
+import cStringIO
 import httplib
 import struct
+import string
 
 # Local
 from g import *
@@ -36,6 +38,7 @@ from codes import *
 import utils
 import status
 import pml
+import status
 from prnt import pcl, ldl, cups
 import models, mdns, slp
 from strings import StringTable
@@ -2437,39 +2440,30 @@ class Device(object):
         finally:
             self.closeEWS()
 
-    def getEWSUrl_LEDM(self, url, stream):
+    def getEWSUrl_LEDM(self, url, stream, footer=""):
         try:
-            if self.is_local:
-                url2 = "%s&loc=%s" % (self.device_uri.replace('hpfax:', 'hp:'), url)
-                data = self
-            else:
-                url2 = "http://%s%s" % (self.host, url)
-                if self.zc:
-                    status, ip = hpmudext.get_zc_ip_address(self.zc)
-                    if status == hpmudext.HPMUD_R_OK:
-                        url2 = "http://%s%s" % (ip, url)
-                data = None
-
-            log.debug("Opening: %s" % url2)
+            url2 = "%s&loc=%s" % (self.device_uri.replace('hpfax:', 'hp:'), url)
+            data = self
             opener = LocalOpener_LEDM({})
             try:
-                f = opener.open(url2, data)
+                if footer:
+                    return opener.open_hp(url2, data, footer)
+                else:
+                    return opener.open_hp(url2, data) 
             except Error:
-                log.error("Status read failed: %s" % url2)
-                stream.seek(0)
-                stream.truncate()
-            else:
-                try:
-                    stream.write(f.read())
-                except AttributeError:
-                    stream.write(" ") 
-
-                if f is not " ":
-                    f.close()
+                log.debug("Status read failed: %s" % url2)
 
         finally:
             self.closeEWS_LEDM()
-
+    def readAttributeFromXml(self,uri,attribute):
+        stream = cStringIO.StringIO()
+        data = status.StatusType10FetchUrl(self,uri)        
+        if not data:
+            log.error("Unable To read the XML data from device")
+            return ""
+        xmlDict = utils.XMLToDictParser().parseXML(data)  
+        return str(xmlDict[attribute])
+		
     def downloadFirmware(self, usb_bus_id=None, usb_device_id=None): # Note: IDs not currently used
         ok = False
         filename = os.path.join(prop.data_dir, "firmware", self.model.lower() + '.fw.gz')
@@ -2548,36 +2542,26 @@ class LocalOpener(urllib.URLopener):
 
 # URLs: hp:/usb/HP_OfficeJet_7500?serial=00XXXXXXXXXX&loc=/hp/device/info_device_status.xml
 class LocalOpener_LEDM(urllib.URLopener):
-    def open_hp(self, url, dev):
+    def open_hp(self, url, dev, foot=""):
         log.debug("open_hp(%s)" % url)
 
         match_obj = http_pat_url.search(url)
-        bus = match_obj.group(1) or ''
-        model = match_obj.group(2) or ''
-        serial = match_obj.group(3) or ''
-        device = match_obj.group(4) or ''
-        loc = match_obj.group(5) or ''
+        loc = url.split("=")[url.count("=")]
 
         dev.openEWS_LEDM()
-        dev.writeEWS_LEDM("""GET %s HTTP/1.1\nContent-Length:0\nHost:localhost\nUser-Agent:hplip\n\n""" % loc)
+        if foot:
+            if "PUT" in foot:
+                dev.writeEWS_LEDM("""%s""" % foot)
+            else:
+                dev.writeEWS_LEDM("""POST %s HTTP/1.1\r\nContent-Type:text/xml\r\nContent-Length:%s\r\nAccept-Encoding: UTF-8\r\nHost:localhost\r\nUser-Agent:hplip\r\n\r\n """ % (loc, len(foot)))
+                dev.writeEWS_LEDM("""%s""" % foot)
+        else:
+            dev.writeEWS_LEDM("""GET %s HTTP/1.1\r\nAccept: text/plain\r\nHost:localhost\r\nUser-Agent:hplip\r\n\r\n""" % loc)
 
         reply = xStringIO()
 
-        while dev.readEWS_LEDM(8080, reply, timeout=1):
+        while dev.readEWS_LEDM(8080, reply, timeout=3):
             pass
 
         reply.seek(0)
-        log.log_data(reply.getvalue())
-
-        response = httplib.HTTPResponse(reply)
-        try:
-            response.begin()
-        except httplib.BadStatusLine:
-            response.status = httplib.OK
-            response.fp = " "
-
-        if response.status != httplib.OK:
-            raise Error(ERROR_DEVICE_STATUS_NOT_AVAILABLE)
-        else:
-            return response.fp
-
+        return reply.getvalue()

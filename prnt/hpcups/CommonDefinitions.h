@@ -26,6 +26,8 @@
   ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+  Author: Naga Samrat Chowdary Narla,
 \*****************************************************************************/
 
 #ifndef COMMON_DEFINITIONS_H
@@ -455,6 +457,7 @@ typedef struct JobAttributes_s
     char               printer_platform[32];
     char               printer_language[32];
     int                integer_values[16];
+    int                printer_platform_version;
 } JobAttributes;
 
 #endif // COMMON_DEFINITIONS_H

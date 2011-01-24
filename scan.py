@@ -767,7 +767,7 @@ try:
 
         if not adf:
             try:
-                #device.setOption("source", "Auto")
+                device.setOption("source", "Flatbed")
                 device.setOption("batch-scan", False)
             except scanext.error:
                 log.debug("Error setting source or batch-scan option (this is probably OK).")

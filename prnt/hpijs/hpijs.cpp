@@ -433,7 +433,7 @@ int hpijs_get_cb(void *get_cb_data, IjsServerCtx *ctx, IjsJobId job_id, const ch
    {
        fY = pSS->pPC->PrintableHeight ();
       /* If duplexing, adjust printable height to 1/2 inch top/bottom margins, except laserjets. */
-      if ((pSS->pPC->QueryDuplexMode() != DUPLEXMODE_NONE) && pSS->pPC->RotateImageForBackPage())
+      if ((pSS->pPC->QueryDuplexMode() != DUPLEXMODE_NONE) && pSS->pPC->RotateImageForBackPage() && (FALSE == pSS->pPC->IsBorderless()))
       {
           // User has requested fullbleed printing and printer supports 4-sided fullbleed or
           // top and bottom margin are equal (0.125"), then
@@ -473,7 +473,7 @@ int hpijs_get_cb(void *get_cb_data, IjsServerCtx *ctx, IjsJobId job_id, const ch
    {
        fY = pSS->pPC->PrintableStartY (); 
       /* If duplexing, adjust printable top to 1/2 inch top margin, except laserjets. */
-      if ((pSS->pPC->QueryDuplexMode() != DUPLEXMODE_NONE) && pSS->pPC->RotateImageForBackPage())
+      if ((pSS->pPC->QueryDuplexMode() != DUPLEXMODE_NONE) && pSS->pPC->RotateImageForBackPage() && (FALSE == pSS->pPC->IsBorderless()))
       {
 #if 0
          if ((pSS->pPC->PrintableHeight () + 0.28) < pSS->pPC->PhysicalPageSizeY ())

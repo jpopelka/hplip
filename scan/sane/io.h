@@ -21,7 +21,7 @@
   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-  Contributing Author: Don Welch, David Suffield 
+  Contributing Author: Don Welch, David Suffield, Naga Samrat Chowdary Narla,
 
 \************************************************************************************/
 
@@ -40,6 +40,7 @@ int __attribute__ ((visibility ("hidden"))) ReadChannelEx(int deviceid, int chan
 #define EVENT_SCANNER_FAIL 2002
 #define EVENT_PLUGIN_FAIL 2003
 #define EVENT_SCAN_CANCEL 2009
+#define EVENT_SIZE_WARNING 2010
 
 #define DBUS_INTERFACE "com.hplip.StatusService"
 #define DBUS_PATH "/"

@@ -135,6 +135,13 @@ LJZjs::LJZjs (SystemServices* pSS, int numfonts, BOOL proto)
     {
         constructor_error = PLUGIN_LIBRARY_MISSING;
     }
+	//Issue: LJZJSMono class printers not printing in RHEL 
+	//Cause: Since start page is common for LJZJSMono and LJZJSColor class, the items of 
+	//LJZJSColor-2 format was used for LJZJSMono due to below variable not initialised 
+	//Fix: Added initialisation so that correct LJZJSMono items are used.  
+	//Variable is updated in LJZJSColor. 
+	m_bLJZjsColor2Printer = FALSE; 
+
 }
 
 LJZjs::~LJZjs ()
@@ -313,7 +320,7 @@ DRIVER_ERROR LJZjs::StartPage (DWORD dwWidth, DWORD dwHeight)
         return err;
     }
 
-	if(m_bSIDModel)
+	if(m_bLJZjsColor2Printer)
 	{
 		dwNumItems = 13;
 	}
@@ -341,7 +348,7 @@ DRIVER_ERROR LJZjs::StartPage (DWORD dwWidth, DWORD dwHeight)
     i += SendItem (szStr+i, ZJIT_UINT32, ZJI_VIDEO_BPP, m_iBPP);
     i += SendItem (szStr+i, ZJIT_UINT32, ZJI_VIDEO_X, dwWidth/m_iBPP);
     i += SendItem (szStr+i, ZJIT_UINT32, ZJI_VIDEO_Y, m_dwLastRaster);
-	if(!m_bSIDModel)
+	if(!m_bLJZjsColor2Printer)
 	{
 		i += SendItem (szStr+i, ZJIT_UINT32, ZJI_RET, RET_ON);
 		i += SendItem (szStr+i, ZJIT_UINT32, ZJI_TONER_SAVE, (cqm == QUALITY_DRAFT) ? 1 : 0);
@@ -502,10 +509,10 @@ DRIVER_ERROR LJZjs::JbigCompress ()
 }
 
 
-/*JBig Compress for SID
-Separate function written for SID since for SID, compression is done for whole plane data at a time
-whereas Yoda does compression for 100 lines of each plane*/
-DRIVER_ERROR LJZjs::JbigCompress_SID ()
+/*JBig Compress for LJZjsColor-2 Printers
+Separate function written for LJZjsColor-2 Printers, since for them, compression is done for whole plane data at a time
+whereas for other deiveces, compression is done for 100 lines of each plane*/
+DRIVER_ERROR LJZjs::JbigCompress_LJZjsColor2 ()
 {
     DRIVER_ERROR        err = NO_ERROR;
     HPLJZjcBuff         myBuffer;
@@ -539,7 +546,7 @@ DRIVER_ERROR LJZjs::JbigCompress_SID ()
 		memset (myBuffer.pszCompressedData, 0, m_dwWidth * m_dwLastRaster * m_iBPP);
 		myBuffer.dwTotalSize = 0;
 		
-		if(4 == iPlanes)/*If there are 4 planes follow SID order of 3 2 1 4*/
+		if(4 == iPlanes)/*If there are 4 planes follow LJZjsColor-2 order of 3 2 1 4*/
 		{
 			pbUnCompressedData = bitmaps[arrPlanesOrder[nPlaneCount]-1] ;
 		}

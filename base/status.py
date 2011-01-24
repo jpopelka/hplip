@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# Author: Don Welch
+# Author: Don Welch, Narla Naga Samrat Chowdary
 #
 
 from __future__ import division
@@ -1463,6 +1463,7 @@ element_type10_xlate = { 'ink' : AGENT_KIND_SUPPLY,
                          'inkCartridge' : AGENT_KIND_HEAD_AND_SUPPLY,
                          'printhead' : AGENT_KIND_HEAD,
                          'toner' : AGENT_KIND_TONER_CARTRIDGE,
+                         'tonerCartridge' : AGENT_KIND_TONER_CARTRIDGE,
                        }
 
 pen_type10_xlate = { 'pK' : AGENT_TYPE_PG,
@@ -1485,29 +1486,28 @@ pen_health10_xlate = { 'ok' : AGENT_HEALTH_OK,
                        'missing' : AGENT_HEALTH_MISINSTALLED,
                      }
 
-def StatusType10FetchUrl(dev, url):
-    if dev.is_local:
-       data_fp = cStringIO.StringIO()
-       dev.getEWSUrl_LEDM(url, data_fp)
-       data = data_fp.getvalue()
-
-    else:
-        if dev.zc:
-            status, ip = hpmudext.get_zc_ip_address(dev.zc)
-            if status != hpmudext.HPMUD_R_OK:
-                log.error("unable to get IP address of mDNS configured device")
-                return None
-        else:
-            ip = dev.host
-
-        # Get the agent status XML
-        addr = "http://%s:8080%s" % (ip, url)
-        feed = urllib.urlopen(addr)
-        data = feed.read()
-        feed.close()
-
+def clean(data):
+    if data[0] is not '<':
+        size = -1
+        temp = ""
+        while size: 
+            index = data.find('\r\n')
+            size = int(data[0:index+1], 16)
+            temp = temp + data[index+2:index+2+size]
+            data = data[index+2+size+2:len(data)]
+        data = temp
     return data
 
+def StatusType10FetchUrl(dev, url, footer=""):
+    data_fp = cStringIO.StringIO()
+    if footer:
+        data = dev.getEWSUrl_LEDM(url, data_fp, footer)
+    else:
+        data = dev.getEWSUrl_LEDM(url, data_fp)
+        if data:
+            data = data.split('\r\n\r\n', 1)[1]
+            data = clean(data)
+    return data
 
 def StatusType10(dev): # Low End Data Model
     status_block = { 'revision' :    STATUS_REV_UNKNOWN,
@@ -1543,33 +1543,36 @@ def StatusType10(dev): # Low End Data Model
         for e in elements:
             health = AGENT_HEALTH_OK
             ink_level = 0
-            type = e.find("ConsumableTypeEnum").text
-            state = e.find("ConsumableLifeState/ConsumableState").text
+            try:
+                type = e.find("ConsumableTypeEnum").text
+                state = e.find("ConsumableLifeState/ConsumableState").text
 
-            # level
-            if type == "ink" or type == "inkCartridge" or type == "toner":
-                ink_type = e.find("ConsumableLabelCode").text
-                if state != "missing":
-                    try:
-                       ink_level = int(e.find("ConsumablePercentageLevelRemaining").text)
-                    except:
-                       ink_level = 0
-            else:
-                ink_type = ''
-                if state == "ok":
-                    ink_level = 100
+                # level
+                if type == "ink" or type == "inkCartridge" or type == "toner" or type == "tonerCartridge":
+                    ink_type = e.find("ConsumableLabelCode").text
+                    if state != "missing":
+                        try:
+                           ink_level = int(e.find("ConsumablePercentageLevelRemaining").text)
+                        except:
+                           ink_level = 0
+                else:
+                    ink_type = ''
+                    if state == "ok":
+                        ink_level = 100
 
-            log.debug("type '%s' state '%s' ink_type '%s' ink_level %d" % (type, state, ink_type, ink_level))
+                log.debug("type '%s' state '%s' ink_type '%s' ink_level %d" % (type, state, ink_type, ink_level))
     
-            entry = { 'kind' : element_type10_xlate.get(type, AGENT_KIND_NONE),
-                      'type' : pen_type10_xlate.get(ink_type, AGENT_TYPE_NONE),
-                      'health' : pen_health10_xlate.get(state, AGENT_HEALTH_OK),
-                      'level' : int(ink_level),
-                      'level-trigger' : pen_level10_xlate.get(state, AGENT_LEVEL_TRIGGER_SUFFICIENT_0)
-                    }
+                entry = { 'kind' : element_type10_xlate.get(type, AGENT_KIND_NONE),
+                          'type' : pen_type10_xlate.get(ink_type, AGENT_TYPE_NONE),
+                          'health' : pen_health10_xlate.get(state, AGENT_HEALTH_OK),
+                          'level' : int(ink_level),
+                          'level-trigger' : pen_level10_xlate.get(state, AGENT_LEVEL_TRIGGER_SUFFICIENT_0)
+                        }
 
-            log.debug("%s" % entry)
-            agents.append(entry)
+                log.debug("%s" % entry)
+                agents.append(entry)
+            except AttributeError:
+                log.debug("no value found for attribute")
     except (expat.ExpatError, UnboundLocalError):
         agents = []
     status_block['agents'] = agents
@@ -1625,6 +1628,8 @@ def StatusType10(dev): # Low End Data Model
     except (expat.ExpatError, UnboundLocalError):
         elements = []
     for e in elements:
+        if e.text == "processing":
+            status_block['status-code'] = STATUS_PRINTER_PRINTING
         if e.text == "closeDoorOrCover":
             status_block['status-code'] = STATUS_PRINTER_DOOR_OPEN
         elif e.text == "shuttingDown":
@@ -1639,7 +1644,7 @@ def StatusType10(dev): # Low End Data Model
             status_block['status-code'] = STATUS_PRINTER_HARD_ERROR
         elif e.text == "outputBinFull":
             status_block['status-code'] = STATUS_PRINTER_OUTPUT_BIN_FULL
-        elif e.text == "unexpectedSizeInTray":
+        elif e.text == "unexpectedSizeInTray" or e.text == "sizeMismatchInTray":
             status_block['status-code'] = STATUS_PRINTER_MEDIA_SIZE_MISMATCH
         elif e.text == "insertOrCloseTray2":
             status_block['status-code'] = STATUS_PRINTER_TRAY_2_MISSING

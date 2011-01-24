@@ -65,8 +65,8 @@ def addgroup():
         fp=open('/etc/cups/cupsd.conf')
     except IOError:
         try:
-            if "root" != grp.getgrgid(os.stat('/etc/cups/cupsd.conf').st_gid)[0]:
-                return grp.getgrgid(os.stat('/etc/cups/cupsd.conf').st_gid)[0]
+            if "root" != grp.getgrgid(os.stat('/etc/cups/cupsd.conf').st_gid).gr_name:
+                return [grp.getgrgid(os.stat('/etc/cups/cupsd.conf').st_gid).gr_name]
         except OSError:
             return lis
 

@@ -744,9 +744,12 @@ class SetupDialog(QDialog, Ui_Dialog):
                 if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_MARVELL:
                     fax_ppd_name = "HP-Fax3-hpcups" # Fixed width (2528 pixels) and 300dpi rendering
                     nick = "HP Fax3 hpcups"
-                elif self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_SOAP:
+                elif self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_SOAP or self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_LEDMSOAP:
                     fax_ppd_name = "HP-Fax2-hpcups" # Fixed width (2528 pixels) and 300dpi rendering
                     nick = "HP Fax2 hpcups"
+                elif self.mq.get('fax-type', FAX_TYPE_LEDM) == FAX_TYPE_LEDM:
+                    fax_ppd_name = "HP-Fax4-hpcups"# Fixed width (2528 pixels) and 300dpi rendering
+                    nick = "HP Fax4 hpcups"
                 else:
                     fax_ppd_name = "HP-Fax-hpcups" # Standard
                     nick = "HP Fax hpcups"
@@ -755,9 +758,12 @@ class SetupDialog(QDialog, Ui_Dialog):
                 if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_MARVELL:
                     fax_ppd_name = "HP-Fax3-hpijs" # Fixed width (2528 pixels) and 300dpi rendering
                     nick = "HP Fax3 hpijs"
-                if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_SOAP:
+                if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_SOAP or self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_LEDMSOAP:
                     fax_ppd_name = "HP-Fax2-hpijs" # Fixed width (2528 pixels) and 300dpi rendering
                     nick = "HP Fax2 hpijs"
+                if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_LEDM:
+                    fax_ppd_name = "HP-Fax4-hpijs" # Fixed width (2528 pixels) and 300dpi rendering
+                    nick = "HP Fax4 hpijs"
                 else:
                     fax_ppd_name = "HP-Fax-hpijs" # Standard
                     nick = "HP Fax hpijs"
@@ -1217,9 +1223,9 @@ class SetupDialog(QDialog, Ui_Dialog):
                     self.manual = True
                     self.param = dlg.hn
                     self.bus = 'net'
-
-            self.showDevicesPage()
-
+            if not self.WirelessButton.isChecked():
+                self.showDevicesPage()
+           
         elif p == PAGE_DEVICES:
             row = self.DevicesTableWidget.currentRow()
             self.device_uri = self.DevicesTableWidget.item(row, 0).device_uri

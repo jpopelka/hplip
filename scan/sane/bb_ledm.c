@@ -191,7 +191,7 @@ Keep-Alive: 20\r\nProxy-Connection: keep-alive\r\nCookie: AccessCounter=new\r\n0
 <scan:ColorSpace>%s</scan:ColorSpace>\
 <scan:BitDepth>%d</scan:BitDepth>\
 <scan:InputSource>%s</scan:InputSource>\
-<scan:AdfOptions>DetectPaperLoaded</scan:AdfOptions>\
+<scan:AdfOptions>SelectSinglePage</scan:AdfOptions>\
 <scan:GrayRendering>NTSC</scan:GrayRendering>\
 <scan:ToneMap>\
 <scan:Gamma>0</scan:Gamma>\
@@ -305,6 +305,7 @@ static int parse_scan_elements(const char *payload, int size, struct wscn_scan_e
       get_tag(tail, size-(tail-payload), tag, sizeof(tag), &tail);
       get_tag(tail, size-(tail-payload), tag, sizeof(tag), &tail);
       i=1; 
+      elements->config.platen.platen_resolution_list[0]=0;
       while(strcmp(tag, "/SupportedResolutions"))
       {
         get_tag(tail, size-(tail-payload), tag, sizeof(tag), &tail);
@@ -312,7 +313,8 @@ static int parse_scan_elements(const char *payload, int size, struct wscn_scan_e
         {
           get_tag(tail, size-(tail-payload), tag, sizeof(tag), &tail);
           get_element(tail, size-(tail-payload), value, sizeof(value), &tail);
-          elements->config.platen.platen_resolution_list[i++]=strtol(value, NULL, 10);
+          if(strtol(value, NULL, 10) && elements->config.platen.platen_resolution_list[i-1] != strtol(value, NULL, 10))
+            elements->config.platen.platen_resolution_list[i++]=strtol(value, NULL, 10);
         }
       }
       elements->config.platen.platen_resolution_list[0]=i-1;
@@ -364,6 +366,7 @@ static int parse_scan_elements(const char *payload, int size, struct wscn_scan_e
       get_tag(tail, size-(tail-payload), tag, sizeof(tag), &tail);
       get_tag(tail, size-(tail-payload), tag, sizeof(tag), &tail);
       i=1; 
+      elements->config.adf.adf_resolution_list[0]=0;
       while(strcmp(tag, "/SupportedResolutions"))
       {
         get_tag(tail, size-(tail-payload), tag, sizeof(tag), &tail);
@@ -371,7 +374,8 @@ static int parse_scan_elements(const char *payload, int size, struct wscn_scan_e
         {
           get_tag(tail, size-(tail-payload), tag, sizeof(tag), &tail);
           get_element(tail, size-(tail-payload), value, sizeof(value), &tail);
-          elements->config.adf.adf_resolution_list[i++]=strtol(value, NULL, 10);
+          if(strtol(value, NULL, 10) && elements->config.adf.adf_resolution_list[i-1] != strtol(value, NULL, 10))
+            elements->config.adf.adf_resolution_list[i++]=strtol(value, NULL, 10);
         }
       }
     elements->config.adf.adf_resolution_list[0]=i-1;
@@ -624,6 +628,16 @@ int bb_open(struct ledm_session *ps)
   ps->adf_tlyRange.max = SANE_FIX(pbb->elements.config.adf.maximum_size.height/11.811023);
   ps->adf_bryRange.max = ps->adf_tlyRange.max;
 
+  i = pbb->elements.config.platen.platen_resolution_list[0] + 1;
+  while(i--)
+  {
+    ps->platen_resolutionList[i] = pbb->elements.config.platen.platen_resolution_list[i];
+    ps->resolutionList[i] = pbb->elements.config.platen.platen_resolution_list[i];
+  }
+
+  i = pbb->elements.config.adf.adf_resolution_list[0] + 1;
+  while(i--) ps->adf_resolutionList[i] = pbb->elements.config.adf.adf_resolution_list[i]; 
+
   stat = 0;
 
 bugout:
@@ -791,7 +805,7 @@ int bb_start_scan(struct ledm_session *ps)
     (int) (ps->currentBrx / 5548.7133),
     (int) (ps->currentBry / 5548.7133),
     "Jpeg",
-    (! strcmp(ce_element[ps->currentScanMode], "Color8")) ? "Color" : (! strcmp(ce_element[ps->currentScanMode], "Gray8")) ? "Gray" : "K",
+    (! strcmp(ce_element[ps->currentScanMode], "Color8")) ? "Color" : (! strcmp(ce_element[ps->currentScanMode], "Gray8")) ? "Gray" : "Gray",
     ((! strcmp(ce_element[ps->currentScanMode], "Color8")) || (! strcmp(ce_element[ps->currentScanMode], "Gray8"))) ? 8: 8,
     is_element[ps->currentInputSource]);
 
@@ -876,7 +890,7 @@ int get_size(struct ledm_session* ps)
   char buffer[7];
   int i=0, tmo=50, len;
 
-  if(ps->currentResolution == 1200) tmo *= 3;
+  if(ps->currentResolution >= 1200) tmo *= 5;
 
   while(1)
   {
@@ -895,7 +909,7 @@ int bb_get_image_data(struct ledm_session* ps, int maxLength)
   char buf_size[2];
   int len=0, tmo=50;
 
-  if(ps->currentResolution == 1200) tmo *= 3;
+  if(ps->currentResolution >= 1200) tmo *= 5;
 
   if (ps->cnt == 0)
   {
@@ -918,7 +932,7 @@ int bb_end_page(struct ledm_session *ps, int io_error)
 {
    struct bb_ledm_session *pbb = ps->bb_session;
 
-//   _DBG("bb_end_page(error=%d)\n", io_error);
+  _DBG("bb_end_page(error=%d)\n", io_error);
 
    if (pbb->http_handle)
    {
@@ -932,7 +946,7 @@ int bb_end_scan(struct ledm_session* ps, int io_error)
 {
   struct bb_ledm_session *pbb = ps->bb_session;
 
-//   _DBG("bb_end_scan(error=%d)\n", io_error);
+  _DBG("bb_end_scan(error=%d)\n", io_error);
 
   if (pbb->http_handle)
   {

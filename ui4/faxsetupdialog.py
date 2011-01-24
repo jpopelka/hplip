@@ -109,6 +109,8 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
 
         self.connect(self.EmailLineEdit, SIGNAL("textChanged(const QString &)"),
                      self.EmailLineEdit_textChanged)
+         
+        self.connect(self.tabWidget,SIGNAL("currentChanged(int)"),self.Tabs_currentChanged)
 
         self.name_company_dirty = False
         self.fax_number_dirty = False
@@ -123,6 +125,7 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
             return
 
         self.FaxComboBox.updateUi()
+        self.tabWidget.setCurrentIndex(0)
 
 
     def FaxComboBox_currentChanged(self, device_uri):
@@ -239,6 +242,15 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
     def CancelButton_clicked(self):
         self.close()
 
+    def Tabs_currentChanged(self, tab=0):
+        """ Called when the active tab changes.
+            Update newly displayed tab.
+        """        
+        if tab == 0:
+            self.updateHeaderTab()
+        elif tab ==1:    
+            self.updateCoverpageTab()
+            
 
     def updateHeaderTab(self):
         beginWaitCursor()

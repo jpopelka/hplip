@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# Author: Don Welch
+# Author: Don Welch, Naga Samrat Chowdary Narla,
 
 # Local
 from base.g import *
@@ -205,6 +205,7 @@ TECH_SUBCLASSES = [
     "SmallMargins",
     "Trim",
     "4800x1200dpi",
+    "Advanced",
 ]
 
 TECH_SUBCLASSES.sort()
@@ -300,7 +301,6 @@ class ModelData:
             'scan-style' : TYPE_INT,
             'scan-type' : TYPE_INT,
             'scan-src' : TYPE_INT,
-            'scan-color' : TYPE_INT,
             #'scan-duplex' : TYPE_BOOL,
             'status-battery-check' : TYPE_INT,
             'status-dynamic-counters' : TYPE_INT,

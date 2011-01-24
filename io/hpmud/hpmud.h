@@ -21,7 +21,7 @@
   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-  Author: Naga Samrat Chowdary Narla,
+  Author: Naga Samrat Chowdary Narla, Yashwant Sahu
 \*****************************************************************************/
 
 #ifndef _HPMUD_H
@@ -77,7 +77,8 @@ enum HPMUD_SCANTYPE
    HPMUD_SCANTYPE_MARVELL = 4,     /* (ie: ljm1005) */
    HPMUD_SCANTYPE_SOAPHT = 5,   /* HorseThief (ie: ljm1522) */
    HPMUD_SCANTYPE_SCL_DUPLEX = 6,
-   HPMUD_SCANTYPE_LEDM = 7
+   HPMUD_SCANTYPE_LEDM = 7,
+   HPMUD_SCANTYPE_MARVELL2 = 8,     /* (Tsunami lj 1212  and series) */
 };
 
 enum HPMUD_SCANSRC
@@ -86,13 +87,6 @@ enum HPMUD_SCANSRC
    HPMUD_SCANSRC_ADF= 1,
    HPMUD_SCANSRC_FLATBED = 2,
    HPMUD_SCANSRC_BOTH = 3
-};
-
-enum HPMUD_SCANCOLOR
-{
-   HPMUD_SCANCOLOR_NA = 0,
-   HPMUD_SCANCOLOR_MONO = 1,
-   HPMUD_SCANCOLOR_COLOR = 2
 };
 
 enum HPMUD_STATUSTYPE
@@ -165,7 +159,6 @@ struct hpmud_model_attributes
    enum HPMUD_PLUGIN_TYPE plugin;
    enum HPMUD_SUPPORT_TYPE reserved[5];
    enum HPMUD_SCANSRC scansrc;
-   enum HPMUD_SCANCOLOR scancolor;
 };
 
 #ifdef __cplusplus

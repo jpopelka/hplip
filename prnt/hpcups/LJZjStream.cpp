@@ -26,6 +26,8 @@
   ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+  Author: Naga Samrat Chowdary Narla,
 \*****************************************************************************/
 
 #include "CommonDefinitions.h"
@@ -169,11 +171,40 @@ DRIVER_ERROR LJZjStream::Configure(Pipeline **pipeline)
             m_iPlanes = 4;
         }
         height = ZJC_BAND_HEIGHT;
+
+    if(m_pJA->printer_platform_version == 2) 
+    {
+      height = m_pMA->printable_height;
+      ezj_platform = ZJCOLOR2; 
+    }
     }
     err = m_pModeJbig->Init(height, m_iPlanes, m_iBpp, ezj_platform);
 
     *pipeline = head;
     return err;
+}
+
+DRIVER_ERROR LJZjStream::StartPage_ljzjcolor2 (JobAttributes *pJA)
+{
+  DWORD               dwNumItems = 13;
+  BYTE                szStr[16 + 12 * 13];
+  int                 i=0;
+
+  i = SendChunkHeader (szStr, 16 + dwNumItems * 12, ZJT_START_PAGE, dwNumItems);
+  i += SendItem (szStr+i, ZJIT_UINT32, ZJI_PLANE, m_iPlanes);
+  i += SendItem (szStr+i, ZJIT_UINT32, ZJI_DMPAPER, m_pMA->pcl_id);
+  i += SendItem (szStr+i, ZJIT_UINT32, ZJI_DMCOPIES, 1);
+  i += SendItem (szStr+i, ZJIT_UINT32, ZJI_DMDEFAULTSOURCE, m_pJA->media_source);
+  i += SendItem (szStr+i, ZJIT_UINT32, ZJI_DMMEDIATYPE, m_pQA->media_type);	
+  i += SendItem (szStr+i, ZJIT_UINT32, ZJI_NBIE, m_iPlanes);
+  i += SendItem (szStr+i, ZJIT_UINT32, ZJI_RESOLUTION_X, m_pQA->horizontal_resolution);
+  i += SendItem (szStr+i, ZJIT_UINT32, ZJI_RESOLUTION_Y, m_pQA->vertical_resolution);
+  i += SendItem (szStr+i, ZJIT_UINT32, ZJI_RASTER_X, (((m_pMA->printable_width + 31) / 32) * 32) * m_iBpp);
+  i += SendItem (szStr+i, ZJIT_UINT32, ZJI_RASTER_Y, m_pMA->printable_height);
+  i += SendItem (szStr+i, ZJIT_UINT32, ZJI_VIDEO_BPP, m_iBpp);
+  i += SendItem (szStr+i, ZJIT_UINT32, ZJI_VIDEO_X, (((m_pMA->printable_width + 31) / 32) * 32));
+  i += SendItem (szStr+i, ZJIT_UINT32, ZJI_VIDEO_Y, m_pMA->printable_height);
+  return Send ((const BYTE *) szStr, i);
 }
 
 DRIVER_ERROR LJZjStream::StartPage (JobAttributes *pJA)
@@ -183,6 +214,11 @@ DRIVER_ERROR LJZjStream::StartPage (JobAttributes *pJA)
     BYTE                szStr[16 + 16 * 12];
     int                 i;
     int                 width;
+
+    if((strcmp(m_pJA->printer_platform, "ljzjscolor") == 0) && (m_pJA->printer_platform_version == 2))
+    {
+       return StartPage_ljzjcolor2(pJA);
+    }
 
     m_iPlaneNumber = 0;
     m_iCurRaster   = 0;
@@ -247,6 +283,10 @@ DRIVER_ERROR LJZjStream::sendBlankBands()
     if (strcmp(m_pJA->printer_platform, "ljzjscolor"))
     {
         return NO_ERROR;
+    }
+    if(m_pJA->printer_platform_version == 2)
+    {
+      return NO_ERROR;
     }
     DRIVER_ERROR    err = NO_ERROR;
     int    remaining_rasters = m_pMA->printable_height - m_iCurRaster;
@@ -318,7 +358,11 @@ DRIVER_ERROR LJZjStream::FormFeed ()
     if (err != NO_ERROR)
         return err;
 
-    SendChunkHeader (szStr, 16, ZJT_END_PAGE, 0);
+    if(((strcmp(m_pJA->printer_platform, "ljzjscolor") == 0) && (m_pJA->printer_platform_version == 2)) == 0)
+    {
+      SendChunkHeader (szStr, 16, ZJT_END_PAGE, 0);
+    }
+
     if (!strcmp(m_pJA->printer_platform, "ljzjscolor"))
     {
         int                 i = 0;
@@ -331,6 +375,10 @@ DRIVER_ERROR LJZjStream::FormFeed ()
             i += SendItem (szStr+i, ZJIT_UINT32, 0x8200+j, (j % 4 == 3) ? 1 : iCol);
         }
         size = 112;
+        if(m_pJA->printer_platform_version == 2)
+        {
+          return Send ((const BYTE *) szStr, size);
+        }
     }
 
     err = sendBuffer ((const BYTE *) szStr, size);
@@ -365,9 +413,7 @@ if (raster->rasterdata[COLORTYPE_COLOR] == NULL || raster->rastersize[COLORTYPE_
     int                 i = 0;
     int                 iTotalSize = raster->rastersize[COLORTYPE_COLOR];
 
-/*
- *  Send JBIG header info
- */
+    /* Send JBIG header info */
 
     i = SendChunkHeader (szStr, 36, ZJT_JBIG_BIH, 0);
 
@@ -412,6 +458,87 @@ if (raster->rasterdata[COLORTYPE_COLOR] == NULL || raster->rastersize[COLORTYPE_
     return err;
 }
 
+DRIVER_ERROR LJZjStream::encapsulateColor2 (RASTERDATA *raster)
+{
+    DRIVER_ERROR    err = NO_ERROR;
+    BYTE            szStr[256];
+    int             i = 0;
+    int plane[] = {3, 2, 1, 4};
+
+    if (m_pJA->color_mode == 0)
+    {
+      i = SendChunkHeader (szStr, 28, ZJT_START_PLANE, 1);
+      i += SendItem (szStr+i, ZJIT_UINT32, ZJI_PLANE, plane[m_iPlaneNumber]);
+      err = Send ((const BYTE *) szStr, i);
+    }
+
+    i=0;
+    i += SendChunkHeader (szStr+i, 36, ZJT_JBIG_BIH, 0);
+    err = Send ((const BYTE *) szStr, i);
+    err = Send ((const BYTE *) raster->rasterdata[COLORTYPE_COLOR], 20);
+
+    BYTE *p = raster->rasterdata[COLORTYPE_COLOR] + 20;
+
+    DWORD dwTotalSize = raster->rastersize[COLORTYPE_COLOR];
+    dwTotalSize -= 20;
+    int iPadCount = 0;
+
+    i = 0;
+    if (dwTotalSize % 4)
+    {
+        iPadCount = ((dwTotalSize / 4 + 1) * 4) - dwTotalSize;
+    }
+
+    DWORD dwMaxChunkSize = 0x10000;
+    DWORD dwCurrentChunkSize = 0;
+    bool bLastChunk = false; 
+
+    for(DWORD dwLoopCount = 0; dwLoopCount < dwTotalSize ; dwLoopCount +=dwMaxChunkSize)
+    {
+         memset (szStr, 0, sizeof(szStr));
+         dwCurrentChunkSize = dwMaxChunkSize;
+
+         if(dwLoopCount + dwCurrentChunkSize > dwTotalSize)
+         {
+              dwCurrentChunkSize = dwTotalSize - (dwLoopCount);
+              bLastChunk = true;
+         }
+         if (!bLastChunk)
+         {
+              i = SendChunkHeader (szStr, dwCurrentChunkSize + 16, ZJT_JBIG_HID, 0);
+         }
+         else 
+         {
+              i = SendChunkHeader (szStr, dwCurrentChunkSize + 16 + iPadCount, ZJT_JBIG_HID, 0);
+         }
+         err = Send ((const BYTE *) szStr, i);
+         err = Send ((const BYTE *) p, dwCurrentChunkSize);
+         p += dwCurrentChunkSize;
+    }
+    if(iPadCount != 0)
+    {
+        memset (szStr, 0, iPadCount);
+        err = Send ((const BYTE *) szStr, iPadCount);
+    }
+
+    i=0;
+    memset (szStr, 0, sizeof(szStr));
+    i = SendChunkHeader (szStr, 16, ZJT_END_JBIG, 0);
+    if (m_pJA->color_mode == 0)
+    {
+      i += SendChunkHeader (szStr+i, 28, ZJT_END_PLANE, 1);
+      i += SendItem (szStr+i, ZJIT_UINT32, ZJI_PLANE, plane[m_iPlaneNumber]);
+    }
+    err = Send ((const BYTE *) szStr, i);
+
+    if (m_pJA->color_mode == 0)
+    {
+        m_iPlaneNumber++;
+        if (m_iPlaneNumber == 4) m_iPlaneNumber = 0;
+    }
+    return err;
+}
+
 DRIVER_ERROR    LJZjStream::encapsulateColor (RASTERDATA *raster)
 {
     bool            bLastStride = true;
@@ -419,6 +546,11 @@ DRIVER_ERROR    LJZjStream::encapsulateColor (RASTERDATA *raster)
     DRIVER_ERROR    err = NO_ERROR;
     BYTE            szStr[256];
     int             i = 0;
+
+    if (m_pJA->printer_platform_version == 2)
+    {
+      return encapsulateColor2(raster);
+    }
 
     HPLJZjsJbgEncSt     *se = (HPLJZjsJbgEncSt *) (raster->rasterdata[COLORTYPE_COLOR] + raster->rastersize[COLORTYPE_COLOR]);
 

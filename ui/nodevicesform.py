@@ -43,7 +43,7 @@ class NoDevicesForm(NoDevicesForm_base):
 
     def CUPSButton_clicked(self):
         self.close()
-        utils.openURL("http://localhost:631/admin?op=add-printer")
+        utils.openURL("http://localhost:631/admin")
 
 
     def ExitButton_clicked(self):

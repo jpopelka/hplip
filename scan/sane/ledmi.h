@@ -85,16 +85,16 @@ enum COLOR_ENTRY
 
 enum SCAN_PARAM_OPTION
 {
-  SPO_BEST_GUESS = 0,   /* scan not started, return "best guess" scan parameters */
-  SPO_STARTED = 1,      /* scan started, return "job resonse" or "image processor" scan parameters */
-  SPO_STARTED_JR = 2,   /* scan started, but return "job response" scan parameters only */
+  SPO_BEST_GUESS = 0,             /* scan not started, return "best guess" scan parameters */
+  SPO_STARTED = 1,                /* scan started, return "job resonse" or "image processor" scan parameters */
+  SPO_STARTED_JR = 2,             /* scan started, but return "job response" scan parameters only */
 };
 
 struct ledm_session
 {
-  char *tag;                  /* handle identifier */
-  HPMUD_DEVICE dd;            /* hpiod device descriptor */
-  HPMUD_CHANNEL cd;           /* hpiod LEDM channel descriptor */
+  char *tag;                      /* handle identifier */
+  HPMUD_DEVICE dd;                /* hpiod device descriptor */
+  HPMUD_CHANNEL cd;               /* hpiod LEDM channel descriptor */
   char uri[HPMUD_LINE_SIZE];
   char model[HPMUD_LINE_SIZE];
   char url[256];
@@ -130,20 +130,20 @@ struct ledm_session
   SANE_Fixed currentTlx, currentTly, currentBrx, currentBry;
   SANE_Fixed effectiveTlx, effectiveTly, effectiveBrx, effectiveBry;
   SANE_Fixed min_width, min_height;
+  SANE_Int platen_resolutionList[MAX_LIST_SIZE];
 
   SANE_Fixed platen_min_width, platen_min_height;
   SANE_Range platen_tlxRange, platen_tlyRange, platen_brxRange, platen_bryRange;
   SANE_Fixed adf_min_width, adf_min_height;
   SANE_Range adf_tlxRange, adf_tlyRange, adf_brxRange, adf_bryRange;
+  SANE_Int adf_resolutionList[MAX_LIST_SIZE];
 
   IP_HANDLE ip_handle;
 
-  int index;                    /* image buffer index */
-  int cnt;                      /* image buffer count */
-  unsigned char buf[32768];     /* image chunk buffer */
+  int index;                      /* image buffer index */
+  int cnt;                        /* image buffer count */
+  unsigned char buf[32768];       /* image chunk buffer */
 
-  void *hpmud_handle;           /* returned by dlopen */
-  void *math_handle;            /* returned by dlopen */
   void *bb_session;
   /* Add new elements here. */
 };
@@ -151,7 +151,7 @@ struct ledm_session
 int bb_open(struct ledm_session*);
 int bb_close(struct ledm_session*);
 int bb_get_parameters(struct ledm_session*, SANE_Parameters*, int);
-int bb_is_paper_in_adf(); /* 0 = no paper in adf, 1 = paper in adf, -1 = error */
+int bb_is_paper_in_adf();         /* 0 = no paper in adf, 1 = paper in adf, -1 = error */
 int bb_start_scan(struct ledm_session*);
 int bb_get_image_data(struct ledm_session*, int); 
 int bb_end_page(struct ledm_session*, int);

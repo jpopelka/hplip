@@ -71,7 +71,7 @@ class NoDevicesDialog(QDialog, Ui_NoDevicesDialog_base):
 
     def CUPSButton_clicked(self):
         self.close()
-        utils.openURL("http://localhost:631/admin?op=add-printer")
+        utils.openURL("http://localhost:631/admin")
 
 
     def CloseButton_clicked(self):

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# Author: Don Welch
+# Author: Don Welch, Goutam Korra, Naga Samrat Chowdary Narla,
 
 # Std Lib
 import sys
@@ -423,7 +423,7 @@ class SetupForm(SetupForm_base):
                     else:
                         filter_dict[f] = (operator.gt, 0)
             else:
-                filter_dict['scan-type'] = (operator.gt, SCAN_TYPE_NONE)
+                filter_dict['scan-type'] = (operator.ge, SCAN_TYPE_NONE)
 
             devices = device.probeDevices([self.bus], self.timeout, self.ttl, filter_dict, self.search, net_search='slp')
 
@@ -888,9 +888,12 @@ class SetupForm(SetupForm_base):
         if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_MARVELL:
             fax_ppd_name = "HP-Fax3-hplip" # Fixed width (2528 pixels) and 300dpi rendering
             nick = "HP Fax 3"
-        if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_SOAP:
+        if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_SOAP or self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_LEDMSOAP:
             fax_ppd_name = "HP-Fax2-hplip" # Fixed width (2528 pixels) and 300dpi rendering
             nick = "HP Fax 2"
+        if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_LEDM:
+            fax_ppd_name = "HP-Fax4-hplip" # Fixed width (1728 pixels) and 200dpi rendering
+            nick = "HP Fax 4"
         else:
             fax_ppd_name = "HP-Fax-hplip" # Standard
             nick = "HP Fax"

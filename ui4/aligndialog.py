@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# Authors: Don Welch
+# Authors: Don Welch, Naga Samrat Chowdary Narla,
 #
 
 # StdLib
@@ -98,6 +98,8 @@ class AlignDialog(QDialog, Ui_Dialog):
             ALIGN_TYPE_TEST : 0,
             ALIGN_TYPE_AIO : 3,
             ALIGN_TYPE_LIDIL_DJ_D1600: 0,
+            ALIGN_TYPE_LEDM: 0,
+            ALIGN_TYPE_LEDM_MANUAL: 0,
             }
 
         self.seq = { # (func|method, tuple of params|None)
@@ -351,6 +353,40 @@ class AlignDialog(QDialog, Ui_Dialog):
                                (self.close, None),
                             ],
 
+            ALIGN_TYPE_LEDM : [ # 15
+                               (self.showLoadPaperPage, None),
+                               (maint.AlignType15Phase1, (lambda : self.dev, lambda: self.showAioPage)),
+                               (self.close, None),
+                            ],
+
+            ALIGN_TYPE_LEDM_MANUAL : [ # 16
+                               (self.showLoadPaperPage, None),
+                               (maint.AlignType15Phase1, (lambda : self.dev, lambda: true)),
+                               (self.showAlignmentNumberPage, ('A', 'v', 'kc', 3, 23)),
+                               (self.endAlignmentNumberPage, ('A',)), 
+                               (self.showAlignmentNumberPage, ('B', 'h', 'kc', 3, 11)),
+                               (self.endAlignmentNumberPage, ('B',)), 
+                               (self.showAlignmentNumberPage, ('C', 'v', 'k', 3, 23)),
+                               (self.endAlignmentNumberPage, ('C',)), 
+                               (self.showAlignmentNumberPage, ('D', 'v', 'c', 3, 23)),
+                               (self.endAlignmentNumberPage, ('D',)), 
+                               (self.showAlignmentNumberPage, ('E', 'h', 'k', 3, 11)),
+                               (self.endAlignmentNumberPage, ('E',)), 
+                               (self.showAlignmentNumberPage, ('F', 'h', 'k', 3, 11)),
+                               (self.endAlignmentNumberPage, ('F',)), 
+                               (self.showAlignmentNumberPage, ('G', 'h', 'k', 3, 11)),
+                               (self.endAlignmentNumberPage, ('G',)), 
+                               (self.showAlignmentNumberPage, ('H', 'v', 'k', 3, 9)),
+                               (self.endAlignmentNumberPage, ('H',)), 
+                               (self.showAlignmentNumberPage, ('I', 'v', 'c', 3, 9)),
+                               (self.endAlignmentNumberPage, ('I',)),
+                               (maint.AlignType16Phase1, (lambda: self.dev, lambda: self.a, lambda: self.b,
+                                                          lambda: self.c, lambda: self.d, lambda: self.e,
+                                                          lambda: self.f, lambda: self.g, lambda: self.h, 
+                                                          lambda: self.i)),
+                               (self.close, None),
+                            ],
+
             }
 
         self.setupUi(self)
@@ -480,7 +516,7 @@ class AlignDialog(QDialog, Ui_Dialog):
         # colors: 'k' or 'c' or 'kc'
         # line_count: 2 or 3
         # choice_count: 5, 7, 9, 11, etc. (odd)
-        self.AlignmentNumberTitle.setText(self.__tr("Choose the set of lines in group %1 where the line segments are <b>best</b> aligned.").arg(line_id))
+        self.AlignmentNumberTitle.setText(self.__tr("From the printed Alignment page, Choose the set of lines in group %1 where the line segments are <b>best</b> aligned.").arg(line_id))
         self.AlignmentNumberIcon.setPixmap(load_pixmap('%s-%s-%d' % (orientation, colors, line_count), 'other'))
         self.AlignmentNumberComboBox.clear()
 
@@ -488,6 +524,7 @@ class AlignDialog(QDialog, Ui_Dialog):
             self.AlignmentNumberComboBox.addItem(QString("%1%2").arg(line_id).arg(x+1))
 
         self.displayPage(PAGE_ALIGNMENT_NUMBER)
+        return
 
 
     def endAlignmentNumberPage(self, line_id):
@@ -509,6 +546,25 @@ class AlignDialog(QDialog, Ui_Dialog):
             self.d = v
             log.debug("D=%d" % v)
 
+        elif line_id == 'E':
+            self.e = v
+            log.debug("E=%d" % v)
+
+        elif line_id == 'F':
+            self.f = v
+            log.debug("F=%d" % v)
+
+        elif line_id == 'G':
+            self.g = v
+            log.debug("G=%d" % v)
+
+        elif line_id == 'H':
+            self.h = v
+            log.debug("H=%d" % v)
+
+        elif line_id == 'I':
+            self.i = v
+            log.debug("I=%d" % v)
 
     def showPageEdgePage(self, prefix=None, count=13):
         self.PageEdgeTitle.setText(self.__tr("Choose the <b>numbered arrow</b> that <b>best </b>marks the edge of the paper."))

@@ -232,6 +232,9 @@
 :model "HP Photosmart Estn c510 Series"
 :status :good
 
+:model "HP Photosmart Ink Adv k510"
+:status :good
+
 :model "HP Officejet 520 All-in-one Printer"
 :status :good
 
@@ -403,6 +406,9 @@
 :model "HP LaserJet Professional m1212nf Multifunction Printer"
 :status :good
 
+:model "HP LaserJet Professional m1213nf Multifunction Printer"
+:status :good
+
 :model "HP PSC 1213 All-in-one Printer"
 :status :good
 
@@ -511,10 +517,34 @@
 :model "HP PSC 1410xi All-in-one Printer"
 :status :good
 
+:model "HP LaserJet Professional cm1411fn"
+:status :good
+
+:model "HP LaserJet Professional cm1412fn"
+:status :good
+
+:model "HP LaserJet Professional cm1413fn"
+:status :good
+
 :model "HP PSC 1415 All-in-one Printer"
 :status :good
 
+:model "HP LaserJet Professional cm1415fnw"
+:status :good
+
+:model "HP LaserJet Professional cm1415fn"
+:status :good
+
+:model "HP LaserJet Professional cm1416fnw"
+:status :good
+
+:model "HP LaserJet Professional cm1417fnw"
+:status :good
+
 :model "HP PSC 1417 All-in-one Printer"
+:status :good
+
+:model "HP LaserJet Professional cm1418fnw"
 :status :good
 
 :model "HP PSC 1503 All-in-one Printer"
@@ -559,6 +589,18 @@
 :model "HP LaserJet m1522 Multifunction Printer"
 :status :good
 
+:model "HP LaserJet m1536dnf MFP"
+:status :good
+
+:model "HP LaserJet m1537dnf MFP"
+:status :good
+
+:model "HP LaserJet m1538dnf MFP"
+:status :good
+
+:model "HP LaserJet m1539dnf MFP"
+:status :good
+
 :model "HP PSC 1600 All-in-one Printer"
 :status :good
 
@@ -584,6 +626,12 @@
 :status :good
 
 :model "HP PSC 1615 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet 2050 j510 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Adv 2060 k110"
 :status :good
 
 :model "HP PSC 2105 All-in-one Printer"
@@ -829,10 +877,10 @@
 :model "HP Photosmart 2574 All-in-one Printer"
 :status :good
 
-:model "HP Photosmart 2575a All-in-one Printer"
+:model "HP Photosmart 2575v All-in-one Printer"
 :status :good
 
-:model "HP Photosmart 2575v All-in-one Printer"
+:model "HP Photosmart 2575a All-in-one Printer"
 :status :good
 
 :model "HP Photosmart 2575xi All-in-one Printer"
@@ -1210,10 +1258,10 @@
 :model "HP Deskjet f4230 All-in-one Printer"
 :status :good
 
-:model "HP Photosmart c4235 All-in-one Printer"
+:model "HP Deskjet f4235 All-in-one Printer"
 :status :good
 
-:model "HP Deskjet f4235 All-in-one Printer"
+:model "HP Photosmart c4235 All-in-one Printer"
 :status :good
 
 :model "HP Deskjet f4238 All-in-one Printer"
@@ -1297,10 +1345,10 @@
 :model "HP Deskjet f4292 All-in-one Printer"
 :status :good
 
-:model "HP Deskjet f4293 All-in-one Printer"
+:model "HP Photosmart c4293 All-in-one Printer"
 :status :good
 
-:model "HP Photosmart c4293 All-in-one Printer"
+:model "HP Deskjet f4293 All-in-one Printer"
 :status :good
 
 :model "HP Deskjet f4294 All-in-one Printer"
@@ -1529,6 +1577,9 @@
 :status :good
 
 :model "HP Officejet j4535 All-in-one Printer"
+:status :good
+
+:model "HP Color LaserJet cm4540 Multifunction Printer"
 :status :good
 
 :model "HP Photosmart c4540 All-in-one Printer"

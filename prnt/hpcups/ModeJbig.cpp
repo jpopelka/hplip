@@ -26,6 +26,8 @@
   ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+  Author: Naga Samrat Chowdary Narla,
 \*****************************************************************************/
 
 #include "CommonDefinitions.h"
@@ -151,6 +153,11 @@ DRIVER_ERROR ModeJbig::Init(int iLastRaster, int iPlanes, int iBPP, ZJPLATFORM z
         m_iP[1] = 0;
         m_iP[2] = 1;
         m_iP[3] = 2;
+        if(zj_platform == ZJCOLOR2)
+        {
+          m_iP[1] = 2;
+          m_iP[3] = 0;
+        } 
     }
 
     int    buffer_size = m_iWidth * m_iLastRaster * m_iPlanes * m_iBPP;
@@ -202,6 +209,7 @@ bool ModeJbig::Process (RASTERDATA* input)
             bResult = processZXStream(input);
             break;
         case ZJCOLOR:
+        case ZJCOLOR2:
             if (m_iPlanes == 1)
             {
                 bResult = processZXStream(input);

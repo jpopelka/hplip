@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
-# Author: Don Welch
+# Author: Don Welch, Naga Samrat Chowdary Narla,
 #
 
 # string_table := { 'string_id' : 'short', 'long' ), ... }
@@ -133,6 +133,7 @@ class StringTable:
             '2007' : (self.__tr('Scanner automatic document feeder jam'), ''),
             '2008' : (self.__tr('Scanner automatic document feeder door opened'), ''),
             '2009' : (self.__tr('Scan job cancelled'), ''),
+            '2010' : (self.__tr('Check scan image size requirements'), ''),
             '3000' : (self.__tr('Fax job started'), ''),
             '3001' : (self.__tr('Fax job complete'), ''),
             '3002' : (self.__tr('Fax job failed'), '%try_again%'),

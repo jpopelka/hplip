@@ -55,8 +55,16 @@ def FaxDevice(device_uri=None, printer_name=None,
     elif fax_type == FAX_TYPE_SOAP:
         return SOAPFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
 
+    elif fax_type == FAX_TYPE_LEDMSOAP:
+        return LEDMSOAPFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
+
     elif fax_type == FAX_TYPE_MARVELL:
         return MarvellFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
+        
+    elif fax_type == FAX_TYPE_LEDM:
+        from ledmfax import LEDMFaxDevice
+        return LEDMFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
+        
 
     else:
         raise Error(ERROR_DEVICE_DOES_NOT_SUPPORT_OPERATION)

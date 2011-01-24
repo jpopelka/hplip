@@ -84,7 +84,7 @@ protected:
 //private:
     int             MapPaperSize ();
     DRIVER_ERROR    JbigCompress ();
-	DRIVER_ERROR    JbigCompress_SID ();
+	DRIVER_ERROR    JbigCompress_LJZjsColor2 ();
     DRIVER_ERROR    SendItemData (BYTE ItemType, WORD Item, DWORD dwValue);
     DRIVER_ERROR    StartPage (DWORD dwWidth, DWORD dwHeight);
     virtual DRIVER_ERROR    EndPage ()
@@ -116,7 +116,7 @@ protected:
     int             m_iPlaneNumber;
     int             m_iBPP;
     int             m_iP[4];
-	BOOL			m_bSIDModel ; /*TRUE when the Color model is SID else FALSE(for Yoda)*/
+	BOOL			m_bLJZjsColor2Printer ; /*TRUE when the Printer model follows LJZjsColor-2 encapsulation format, else FALSE*/
 }; // LJZjs
 
 typedef enum

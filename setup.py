@@ -684,12 +684,12 @@ else: # INTERACTIVE_MODE
             fax_type = mq.get('fax-type', FAX_TYPE_NONE)
 
             if prop.hpcups_build:
-                if fax_type == FAX_TYPE_SOAP:
+                if fax_type == FAX_TYPE_SOAP or fax_type == FAX_TYPE_LEDMSOAP:
                     fax_ppd_name = 'HP-Fax2-hpcups'
                 else:
                     fax_ppd_name = 'HP-Fax-hpcups'
             else: # hpijs
-                if fax_type == FAX_TYPE_SOAP:
+                if fax_type == FAX_TYPE_SOAP or fax_type == FAX_TYPE_LEDMSOAP:
                     fax_ppd_name = 'HP-Fax2-hpijs'
                 else:
                     fax_ppd_name = 'HP-Fax-hpijs'

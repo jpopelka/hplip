@@ -21,6 +21,8 @@
   COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  
+  Author: David Suffield, Yashwant Sahu  
 
 \************************************************************************************/
 
@@ -66,6 +68,12 @@ enum INPUT_SOURCE
    IS_PLATEN = 1,
    IS_ADF,
    IS_MAX,
+};
+
+enum MARVELL_VERSION
+{
+    MARVELL_1 = 1,
+    MARVELL_2,
 };
 
 struct marvell_session
@@ -119,7 +127,7 @@ struct marvell_session
 /* Add new elements here. */
    void *math_handle;         /* returned by dlopen */
    enum HPMUD_SCANSRC scansrc;       /* 0=NA */
-   enum HPMUD_SCANCOLOR scancolor;       /* 0=NA*/
+   enum MARVELL_VERSION version;
 };
 
 #endif  // _MARVELLI_H

@@ -40,6 +40,8 @@
 
 APDK_BEGIN_NAMESPACE
 
+#define LJZJSCOLOR2DEVICESCOUNT 8
+
 extern uint32_t ulMapGRAY_K_6x6x1[9 * 9 * 9];
 
 extern uint32_t ulMapDJ600_CCM_K[9 * 9 * 9];
@@ -80,19 +82,8 @@ LJZjsColor::LJZjsColor (SystemServices* pSS, int numfonts, BOOL proto)
     m_bIamColor = TRUE;
     m_iPrinterType = eLJZjsColor;
 
-	/*Checking for SID*/
-	char szSIDModelName[] = "HP LaserJet CP1025nw\0";
-	BYTE strDeviceID[DevIDBuffSize];
-	DRIVER_ERROR err;
-
-	m_bSIDModel = FALSE;
-	err = pSS->GetDeviceID(strDeviceID,DevIDBuffSize,FALSE);
-	if( NO_ERROR == err &&
-		(strnlen((const char*)strDeviceID, DevIDBuffSize)< DevIDBuffSize) && 
-		(strstr((const char*)strDeviceID, (const char*)szSIDModelName)))
-	{
-		m_bSIDModel = TRUE;
-	}
+	/*Checking for LJZjsColor-2 format Printers*/
+	m_bLJZjsColor2Printer = IsLJZjsColor2Printer(pSS);
 }
 
 LJZjsColor::~LJZjsColor ()
@@ -248,9 +239,9 @@ DRIVER_ERROR LJZjsColor::Encapsulate (const RASTERDATA *pRasterData, BOOL bLastP
 
     if (m_dwCurrentRaster == m_dwLastRaster)
     {
-		if(TRUE == m_bSIDModel)
+		if(TRUE == m_bLJZjsColor2Printer)
 		{
-			err = JbigCompress_SID ();
+			err = JbigCompress_LJZjsColor2 ();
 		}
 		else
 		{
@@ -284,27 +275,27 @@ DRIVER_ERROR LJZjsColor::EndPage ()
 
 /*
 SendPlaneData
-Description: Call the appropriate SendPlaneData based on whether its SID or YODA
+Description: Call the appropriate SendPlaneData based on whether its LJZjsColor-2 printer or not
 Arguments:
-se: Not used for SID. For YODA used to send header for last stride
+se: Not used for LJZjsColor-2 printer. Otherwise used to send header for last stride
 pcBuff: Pointer to struct having Compressed Data and size
-bLastStride: Last scan line. Not used for SID. Used to send header in YODA
+bLastStride: Last scan line. Not used for LJZjsColor-2 printer. Used to send header otherwise.
 */
 DRIVER_ERROR LJZjsColor::SendPlaneData (int iPlaneNumber, HPLJZjsJbgEncSt *se, HPLJZjcBuff *pcBuff, BOOL bLastStride)
 {
 	DRIVER_ERROR        err = NO_ERROR;
-	if(TRUE == m_bSIDModel)
+	if(TRUE == m_bLJZjsColor2Printer)
 	{
-		err = SendPlaneData_SID (iPlaneNumber,se, pcBuff,bLastStride);
+		err = SendPlaneData_LJZjsColor2 (iPlaneNumber,se, pcBuff,bLastStride);
 	}
 	else
 	{
-		err = SendPlaneData_YODA (iPlaneNumber, se, pcBuff, bLastStride);
+		err = SendPlaneData_LJZjsColor (iPlaneNumber, se, pcBuff, bLastStride);
 	}
 	return err;
 }
 
-DRIVER_ERROR LJZjsColor::SendPlaneData_YODA (int iPlaneNumber, HPLJZjsJbgEncSt *se, HPLJZjcBuff *pcBuff, BOOL bLastStride)
+DRIVER_ERROR LJZjsColor::SendPlaneData_LJZjsColor (int iPlaneNumber, HPLJZjsJbgEncSt *se, HPLJZjcBuff *pcBuff, BOOL bLastStride)
 {
     DRIVER_ERROR        err = NO_ERROR;
     BYTE                szStr[256];
@@ -400,15 +391,15 @@ DRIVER_ERROR LJZjsColor::SendPlaneData_YODA (int iPlaneNumber, HPLJZjsJbgEncSt *
 
 
 
-/*SendPlaneData for SID
+/*SendPlaneData for LJZjsColor-2 printer
 Description: Send the compressed data for the particular plane. Data sent in chunks of max size 64k
 or 0x10000
 Arguments:
-se: Not used for SID
+se: Not used for LJZjsColor-2 printer
 pcBuff: Pointer to struct having Compressed Data and size
-bLastStride: Last scan line. Not used for SID.
+bLastStride: Last scan line. Not used for LJZjsColor-2 printer.
 */
-DRIVER_ERROR LJZjsColor::SendPlaneData_SID (int iPlaneNumber, HPLJZjsJbgEncSt *se, HPLJZjcBuff *pcBuff, BOOL bLastStride)
+DRIVER_ERROR LJZjsColor::SendPlaneData_LJZjsColor2 (int iPlaneNumber, HPLJZjsJbgEncSt *se, HPLJZjcBuff *pcBuff, BOOL bLastStride)
 {
     DRIVER_ERROR	err = NO_ERROR;
     BYTE			szStr[256];			/*Buffer to send commands*/
@@ -510,6 +501,39 @@ DRIVER_ERROR LJZjsColor::ParsePenInfo (PEN_TYPE& ePen, BOOL QueryPrinter)
     ePen = BOTH_PENS;
 
     return NO_ERROR;
+}
+
+bool LJZjsColor::IsLJZjsColor2Printer(SystemServices* pSS)
+{
+	if (pSS == NULL)
+		return false;
+	char szLJZjsColor2ModelNames[LJZJSCOLOR2DEVICESCOUNT][25] = {
+		"HP LaserJet CP1025\0",
+		"HP LaserJet CP1021\0",
+		"HP LaserJet CP1022\0",
+		"HP LaserJet CP1023\0",
+		"HP LaserJet CP1025nw\0",
+		"HP LaserJet CP1026nw\0",
+		"HP LaserJet CP1027nw\0",
+		"HP LaserJet CP1028nw\0"
+	};	//Device models that follow LJZjsColor-2 encapsulation format
+
+	BYTE strDeviceID[DevIDBuffSize];
+	DRIVER_ERROR err;
+	bool bLJZjsColor2Printer = FALSE;
+	err = pSS->GetDeviceID(strDeviceID,DevIDBuffSize,FALSE);
+
+	for(int i=0; i< LJZJSCOLOR2DEVICESCOUNT; i++)
+	{
+		if( NO_ERROR == err &&
+			(strnlen((const char*)strDeviceID, DevIDBuffSize)< DevIDBuffSize) && 
+			(strstr((const char*)strDeviceID, (const char*)szLJZjsColor2ModelNames[i])))
+		{
+			bLJZjsColor2Printer = TRUE;
+			break;
+		}
+	}
+	return bLJZjsColor2Printer;
 }
 
 APDK_END_NAMESPACE

@@ -22,6 +22,7 @@
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
   Contributing Authors: David Paschal, Don Welch, David Suffield, Narla Naga Samrat Chowdary, 
+                        Yashwant Sahu 
 
 \************************************************************************************/
 
@@ -1635,7 +1636,7 @@ extern SANE_Status sane_hpaio_open(SANE_String_Const devicename, SANE_Handle * p
     /* Get device attributes and determine what backend to call. */
     snprintf(devname, sizeof(devname)-1, "hp:%s", devicename);   /* prepend "hp:" */
     hpmud_query_model(devname, &ma);
-    if (ma.scantype == HPMUD_SCANTYPE_MARVELL)
+    if ((ma.scantype == HPMUD_SCANTYPE_MARVELL) || (ma.scantype == HPMUD_SCANTYPE_MARVELL2))
        return marvell_open(devicename, pHandle);
     if (ma.scantype == HPMUD_SCANTYPE_SOAP)
        return soap_open(devicename, pHandle);

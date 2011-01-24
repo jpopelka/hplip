@@ -26,6 +26,8 @@
   ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+  Author: Naga Samrat Chowdary Narla,
 \*****************************************************************************/
 
 #include "HPCupsFilter.h"
@@ -352,6 +354,11 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
         if (m_iLogLevel & BASIC_LOG) {
             dbglog("HPCUPS: found Printer Platform, it is - %s", attr->value);
         }
+      if(strcmp(m_JA.printer_platform, "ljzjscolor") == 0)
+      {
+        if(((attr = ppdFindAttr(m_ppd, "hpLJZjsColorVersion", NULL)) != NULL) && (attr->value != NULL))
+          m_JA.printer_platform_version = atoi(attr->value);
+      }
     }
 
 // Get the encapsulation technology from ppd

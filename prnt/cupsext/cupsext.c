@@ -1221,9 +1221,18 @@ PyObject * openPPD( PyObject * self, PyObject * args )
         return Py_BuildValue( "" ); // None
     }
 
-    g_ppd_file = cupsGetPPD( ( const char * ) printer );
+    if ( ( g_ppd_file = cupsGetPPD( ( const char * ) printer ) ) == NULL )
+    {
+        goto bailout;
+    }
 
-    file = fopen( g_ppd_file, "r" );
+    if ( ( file = fopen( g_ppd_file, "r" )) == NULL )
+    {
+      unlink(g_ppd_file);
+      g_ppd_file = NULL;
+      goto bailout;
+    }
+
     ppd = ppdOpen( file );
     ppdLocalize( ppd );
     fclose( file );

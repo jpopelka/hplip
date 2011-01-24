@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# Authors: Don Welch, Pete Parks
+# Authors: Don Welch, Pete Parks, Naga Samrat Chowdary Narla,
 #
 
 from __future__ import generators
@@ -1695,6 +1695,12 @@ class DevMgr4(DevMgr4_base):
 
                     elif align_type == ALIGN_TYPE_AIO:
                         maint.AlignType13(d, self.LoadPaperUI, self.Align13UI)
+
+                    elif align_type == ALIGN_TYPE_LEDM:
+                        maint.AlignType15(d, self.LoadPaperUI, self.Align13UI)
+
+                    elif align_type == ALIGN_TYPE_LEDM_MANUAL:
+                        maint.AlignType16(d, self.LoadPaperUI, self.AlignmentNumberUI)
 
                 else:
                     self.CheckDeviceUI()

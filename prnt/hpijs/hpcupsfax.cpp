@@ -44,6 +44,7 @@
 #include <math.h>
 #include <cups/cups.h>
 #include <cups/raster.h>
+#include <string>
 #ifdef FALSE
 #undef FALSE
 #endif
@@ -53,8 +54,9 @@
 #include "hpip.h"
 #include "hpcupsfax.h"
 #include "bug.h"
+using namespace std;
 
-int    fax_encoding = RASTER_MH;
+int    fax_encoding = RASTER_MMR;
 char   device_name[16];
 BYTE   szFileHeader[68];
 BYTE   szPageHeader[64];
@@ -191,15 +193,6 @@ int ProcessRasterData (cups_raster_t *cups_raster, int fdFax)
             {
                 fax_encoding = RASTER_JPEG;
             }
-            else if (cups_header.cupsCompression == RASTER_AUTO)
-            {
-                pDev = getenv ("DEVICE_URI");
-                if ((strstr (pDev, "Laser") || strstr (pDev, "laser")))
-                {
-                    fax_encoding = RASTER_MMR;
-                }
-            }
-
             memset (szFileHeader, 0, sizeof (szFileHeader));
             memcpy (szFileHeader, "hplip_g3", 8);
             p = szFileHeader + 8;
@@ -216,17 +209,20 @@ int ProcessRasterData (cups_raster_t *cups_raster, int fdFax)
         }
 
         widthMMR = (((cups_header.cupsWidth + 7) >> 3)) << 3;
-
+        
 /*
  *      Devices in the HPFax2 category require fixed width of 2528 pixels.
  *      Example: LaserJet 2727 MFP
  */
-
-        if (!strcmp (device_name, "HPFax2"))
+       
+        if (strcmp (device_name, "HPFax4") ==0)
+        {
+            widthMMR = 1728;                      
+        }
+        else if (!strcmp (device_name, "HPFax2"))
         {
             widthMMR = 2528;
-        }
-
+        }              
         iInputBufSize = widthMMR * cups_header.cupsHeight;
 
         pInputBuf = (LPBYTE) malloc (iInputBufSize);
@@ -696,13 +692,42 @@ int main (int argc, char **argv)
         ppdClose (ppd);
         BUG ("ERROR: Required DefaultEncoding is missing in ppd file\n");
         return 1;
+    }     
+    if (strstr(argv[5],"Encoding=MMR"))
+    {
+       fax_encoding = RASTER_MMR;
+    }   
+    else if(strstr(argv[5],"Encoding=MH"))
+    {
+       fax_encoding = RASTER_MH; 
+    }       
+    else if (strstr(argv[5],"Encoding=Auto"))
+    { 
+       BUG ("WARNING: AUTO is selected for Fax Encoding! Ensure this type is correct for the device");                 
+       fax_encoding = RASTER_AUTO;
+    }    
+    else if (strstr(argv[5],"Encoding=TIFF"))
+    {
+       fax_encoding = RASTER_TIFF;
     }
-    fax_encoding = atoi(attr->value);
+    else
+    {
+       if(strcmp(attr->value,"MH") == 0) {
+          fax_encoding = RASTER_MH;
+       } else if(strcmp(attr->value,"MMR") == 0){
+          fax_encoding = RASTER_MMR;
+       }else if(strcmp(attr->value,"TIFF") ==0){
+          fax_encoding = RASTER_TIFF;               
+       }else if(strcmp(attr->value,"Auto") ==0){
+          BUG ("WARNING: AUTO is selected for Fax Encoding! Ensure this type is correct for the device");                 
+          fax_encoding = RASTER_AUTO;
+       }
+    }
     if (fax_encoding < 0) {
         BUG ("ERROR: Required DefaultEncoding is invalid in ppd file\n");
         return 1;
     }
-    DBG("hpcupsfax: main: fax_encoding from ppd = %d \n", fax_encoding);
+    DBG("hpcupsfax: main: fax_encoding = %d \n", fax_encoding);
     ppdClose (ppd);
 
     if (fax_encoding == RASTER_TIFF)

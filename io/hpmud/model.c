@@ -485,10 +485,6 @@ static int parse_key_value_pair(char *buf, int len, struct hpmud_model_attribute
       {
          ma->scansrc = strtol(value, &tail2, 10);
       }
-      else if(strcasecmp(key, "scan-color") == 0)
-      {
-         ma->scancolor = strtol(value, &tail2, 10);
-      }
       else if(strcasecmp(key, "status-type") == 0)
       {
          ma->statustype = strtol(value, &tail2, 10);

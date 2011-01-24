@@ -57,10 +57,11 @@ protected:
 #endif
 
 private:
+	bool IsLJZjsColor2Printer(SystemServices* pSS);
     virtual DRIVER_ERROR    EndPage ();
     virtual DRIVER_ERROR    SendPlaneData (int iPlaneNumber, HPLJZjsJbgEncSt *se, HPLJZjcBuff *pcBuff, BOOL bLastStride);
-	virtual DRIVER_ERROR    SendPlaneData_YODA (int iPlaneNumber, HPLJZjsJbgEncSt *se, HPLJZjcBuff *pcBuff, BOOL bLastStride);
-	virtual DRIVER_ERROR    SendPlaneData_SID (int iPlaneNumber, HPLJZjsJbgEncSt *se, HPLJZjcBuff *pcBuff, BOOL bLastStride);		
+	virtual DRIVER_ERROR    SendPlaneData_LJZjsColor (int iPlaneNumber, HPLJZjsJbgEncSt *se, HPLJZjcBuff *pcBuff, BOOL bLastStride);
+	virtual DRIVER_ERROR    SendPlaneData_LJZjsColor2 (int iPlaneNumber, HPLJZjsJbgEncSt *se, HPLJZjcBuff *pcBuff, BOOL bLastStride);		
 
 }; // LJZjsColor
 
@@ -99,7 +100,14 @@ public:
         "HP Color LaserJet 1600\0"     // models with null at end of each
         "HP Color LaserJet 2600n\0"
         "HP Color LaserJet CP1215\0"
+		"Hp LaserJet CP1025\0"
+		"HP LaserJet CP1021\0"
+		"HP LaserJet CP1022\0"
+		"HP LaserJet CP1023\0"
 		"HP LaserJet CP1025nw\0"
+		"HP LaserJet CP1026nw\0"
+		"HP LaserJet CP1027nw\0"
+		"HP LaserJet CP1028nw\0"
     ) {m_iPrinterType = eLJZjsColor;}
     inline Printer* CreatePrinter(SystemServices* pSS) const { return new LJZjsColor(pSS); }
 	inline PRINTER_TYPE GetPrinterType() const { return eLJZjsColor;}

@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# Author: Don Welch
+# Author: Don Welch, Naga Samrat Chowdary Narla,
 #
 
 __version__ = '5.0'
@@ -39,7 +39,7 @@ from prnt import cups
 
 
 def enterAlignmentNumber(letter, hortvert, colors, line_count, maximum):
-    ok, value = tui.enter_range("Enter the best aligned value for line %s (1-%d): " %
+    ok, value = tui.enter_range("From the printed Alignment page, Enter the best aligned value for line %s (1-%d): " %
                         (letter, maximum),
                         1,
                         maximum)
@@ -205,6 +205,12 @@ try:
 
                 elif align_type == ALIGN_TYPE_LIDIL_DJ_D1600:
                     maint.AlignType14(d, tui.load_paper_prompt, type10and11and14Align, invalidPen2)
+                
+                elif align_type == ALIGN_TYPE_LEDM:
+                    maint.AlignType15(d, tui.load_paper_prompt, aioUI2)
+
+                elif align_type == ALIGN_TYPE_LEDM_MANUAL:
+                    maint.AlignType16(d, tui.load_paper_prompt, enterAlignmentNumber)
 
                 else:
                     log.error("Invalid alignment type.")

@@ -65,6 +65,10 @@ STATUS_CREATING_COVER_PAGE = 7
 STATUS_ERROR = 8
 STATUS_BUSY = 9
 STATUS_CLEANUP = 10
+STATUS_ERROR_IN_CONNECTING = 11
+STATUS_ERROR_IN_TRANSMITTING = 12
+STATUS_ERROR_PROBLEM_IN_FAXLINE = 13
+STATUS_JOB_CANCEL = 14 
 
 # Event queue values (UI ==> Send thread)
 EVENT_FAX_SEND_CANCELED = 1
@@ -132,7 +136,6 @@ RESOLUTION_300DPI = 3
 
 FILE_HEADER_SIZE = 28
 PAGE_HEADER_SIZE = 24
-
 # **************************************************************************** #
 
 ##skip_dn = ["uid=foo,ou=People,dc=example,dc=com",
@@ -520,14 +523,24 @@ def getFaxDevice(device_uri=None, printer_name=None,
         from soapfax import SOAPFaxDevice
         return SOAPFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
 
+    elif fax_type == FAX_TYPE_LEDMSOAP:
+        from ledmsoapfax import LEDMSOAPFaxDevice
+        return LEDMSOAPFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
+
     elif fax_type == FAX_TYPE_MARVELL:
         from marvellfax import MarvellFaxDevice
         return MarvellFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
+
+    elif fax_type == FAX_TYPE_LEDM:
+        from ledmfax import LEDMFaxDevice
+        return LEDMFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
 
     else:
         raise Error(ERROR_DEVICE_DOES_NOT_SUPPORT_OPERATION)
 
 # **************************************************************************** #
+
+
 
 
 # TODO: Define these in only 1 place!

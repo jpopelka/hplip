@@ -43,6 +43,9 @@
 # include "saneopts.h"
 # include "io.h"
 
+# define DEBUG_DECLARE_ONLY
+# include "sanei_debug.h"
+
 static struct ledm_session *session = NULL;
 
 /* Verify current x/y extents and set effective extents. */ 
@@ -123,8 +126,8 @@ static int get_ip_data(struct ledm_session *ps, SANE_Byte *data, SANE_Int maxLen
   ip_ret = ipConvert(ps->ip_handle, inputAvail, input, &inputUsed, &inputNextPos, outputAvail, output, &outputUsed, &outputThisPos);
 
 
-//   DBG6("cnt=%d index=%d input=%p inputAvail=%d inputUsed=%d inputNextPos=%d output=%p outputAvail=%d outputUsed=%d outputThisPos=%d\n", ps->cnt, ps->index, input, 
-//         inputAvail, inputUsed, inputNextPos, output, outputAvail, outputUsed, outputThisPos);
+  DBG6("cnt=%d index=%d input=%p inputAvail=%d inputUsed=%d inputNextPos=%d output=%p outputAvail=%d outputUsed=%d outputThisPos=%d\n", ps->cnt, ps->index, input, 
+    inputAvail, inputUsed, inputNextPos, output, outputAvail, outputUsed, outputThisPos);
 
   if (input != NULL)
    {
@@ -383,18 +386,10 @@ SANE_Status __attribute__ ((visibility ("hidden"))) ledm_open(SANE_String_Const 
   /* Set supported Scan Modes as determined by bb_open. */
    ledm_control_option(session, LEDM_OPTION_SCAN_MODE, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */
 
-/* Set scan input sources as determined by bb_open. */
+  /* Set scan input sources as determined by bb_open. */
    ledm_control_option(session, LEDM_OPTION_INPUT_SOURCE, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */
 
   /* Set supported resolutions. */
-   int i=1;
-  session->resolutionList[i++] = 75;
-  session->resolutionList[i++] = 100;
-  session->resolutionList[i++] = 200;
-  session->resolutionList[i++] = 300;
-  session->resolutionList[i++] = 600;
-  session->resolutionList[i++] = 1200;
-  session->resolutionList[0] = i-1;    /* length of word_list */
   ledm_control_option(session, LEDM_OPTION_SCAN_RESOLUTION, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */
 
   /* Set supported contrast. */
@@ -416,20 +411,19 @@ SANE_Status __attribute__ ((visibility ("hidden"))) ledm_open(SANE_String_Const 
 
   stat = SANE_STATUS_GOOD;
 
-  //bb_unload(session);
 return stat;
 }
 
 const SANE_Option_Descriptor *ledm_get_option_descriptor(SANE_Handle handle, SANE_Int option)
 {
-   struct ledm_session *ps = (struct ledm_session *)handle;
+  struct ledm_session *ps = (struct ledm_session *)handle;
 
-//   DBG8("sane_hpaio_get_option_descriptor(option=%s)\n", ps->option[option].name);
+  DBG8("sane_hpaio_get_option_descriptor(option=%s)\n", ps->option[option].name);
 
-   if (option < 0 || option >= LEDM_OPTION_MAX)
-      return NULL;
+  if (option < 0 || option >= LEDM_OPTION_MAX)
+    return NULL;
 
-   return &ps->option[option];
+  return &ps->option[option];
 } /* ledm_get_option_descriptor */
 
 SANE_Status ledm_control_option(SANE_Handle handle, SANE_Int option, SANE_Action action, void *value, SANE_Int *set_result)
@@ -502,6 +496,17 @@ SANE_Status ledm_control_option(SANE_Handle handle, SANE_Int option, SANE_Action
              {
                ps->currentInputSource = ps->inputSourceMap[i];
                set_input_source_side_effects(ps, ps->currentInputSource);
+               if(ps->currentInputSource == IS_PLATEN) 
+               {
+                 i = session->platen_resolutionList[0] + 1;
+                 while(i--) session->resolutionList[i] = session->platen_resolutionList[i];
+               }
+               else
+               {
+                 i = session->adf_resolutionList[0] + 1;
+                 while(i--) session->resolutionList[i] = session->adf_resolutionList[i];
+               }
+               mset_result |= SANE_INFO_RELOAD_PARAMS | SANE_INFO_RELOAD_OPTIONS;
                stat = SANE_STATUS_GOOD;
                break;
              }
@@ -511,6 +516,7 @@ SANE_Status ledm_control_option(SANE_Handle handle, SANE_Int option, SANE_Action
          {  /* Set default. */
            ps->currentInputSource = IS_PLATEN;
            set_input_source_side_effects(ps, ps->currentInputSource);
+           mset_result |= SANE_INFO_RELOAD_PARAMS | SANE_INFO_RELOAD_OPTIONS;
            stat = SANE_STATUS_GOOD;
          }
          break;
@@ -527,6 +533,7 @@ SANE_Status ledm_control_option(SANE_Handle handle, SANE_Int option, SANE_Action
                if (ps->resolutionList[i] == *int_value)
                {
                   ps->currentResolution = *int_value;
+	          if(ps->currentResolution == 4800) SendScanEvent(ps->uri, EVENT_SIZE_WARNING);
                   mset_result |= SANE_INFO_RELOAD_PARAMS;
                   stat = SANE_STATUS_GOOD;
                   break;
@@ -708,12 +715,10 @@ SANE_Status ledm_control_option(SANE_Handle handle, SANE_Int option, SANE_Action
    if (set_result)
       *set_result = mset_result;
 
-   if (stat != SANE_STATUS_GOOD)
-   {
-//      BUG("control_option failed: option=%s action=%s\n", ps->option[option].name, 
-//                  action==SANE_ACTION_GET_VALUE ? "get" : action==SANE_ACTION_SET_VALUE ? "set" : "auto");
-   }
-
+  if (stat != SANE_STATUS_GOOD)
+  {
+     BUG("control_option failed: option=%s action=%s\n", ps->option[option].name, action==SANE_ACTION_GET_VALUE ? "get" : action==SANE_ACTION_SET_VALUE ? "set" : "auto");
+  }
 
    return stat;
 } /* ledm_control_option */
@@ -727,10 +732,10 @@ SANE_Status ledm_get_parameters(SANE_Handle handle, SANE_Parameters *params)
   /* Get scan parameters for sane client. */
   bb_get_parameters(ps, params, ps->ip_handle ? SPO_STARTED : SPO_BEST_GUESS);
 
-//   DBG8("sane_hpaio_get_parameters(): format=%d, last_frame=%d, lines=%d, depth=%d, pixels_per_line=%d, bytes_per_line=%d\n",
-//                    params->format, params->last_frame, params->lines, params->depth, params->pixels_per_line, params->bytes_per_line);
+  DBG8("sane_hpaio_get_parameters(): format=%d, last_frame=%d, lines=%d, depth=%d, pixels_per_line=%d, bytes_per_line=%d\n",
+    params->format, params->last_frame, params->lines, params->depth, params->pixels_per_line, params->bytes_per_line);
 
-   return SANE_STATUS_GOOD;
+  return SANE_STATUS_GOOD;
 } /* ledm_get_parameters */
 
 SANE_Status ledm_start(SANE_Handle handle)
@@ -741,7 +746,7 @@ SANE_Status ledm_start(SANE_Handle handle)
   IP_XFORM_SPEC xforms[IP_MAX_XFORMS], *pXform=xforms;
   int stat, ret;
 
-//  DBG8("sane_hpaio_start()\n");
+  DBG8("sane_hpaio_start()\n");
 
   ps -> user_cancel = 0;
   ps -> cnt = 0;
@@ -759,7 +764,7 @@ SANE_Status ledm_start(SANE_Handle handle)
     ret = bb_is_paper_in_adf(ps);   /* 0 = no paper in adf, 1 = paper in adf, -1 = error */
     if (ret == 0)
     {
-      stat = SANE_STATUS_NO_DOCS;     /* done scanning */
+      stat = SANE_STATUS_NO_DOCS;   /* done scanning */
       goto bugout;
     }
     else if (ret < 0)
@@ -846,13 +851,13 @@ SANE_Status ledm_start(SANE_Handle handle)
   traits.iPixelsPerRow = pp.pixels_per_line;
   switch(ps->currentScanMode)
   {
-    case CE_K1:         /* lineart (let IP create Mono from Gray8) */
+    case CE_K1:                      /* lineart (let IP create Mono from Gray8) */
     case CE_GRAY8:
       traits.iBitsPerPixel = 8;     /* grayscale */
       break;
     case CE_COLOR8:
     default:
-      traits.iBitsPerPixel = 24;      /* color */
+      traits.iBitsPerPixel = 24;    /* color */
       break;
   }
   traits.lHorizDPI = ps->currentResolution << 16;
@@ -943,7 +948,7 @@ bugout:
     bb_end_page(ps, 0);
   }
 
-//   DBG8("-sane_hpaio_read() output=%p bytes_read=%d maxLength=%d status=%d\n", data, *length, maxLength, stat);
+  DBG8("-sane_hpaio_read() output=%p bytes_read=%d maxLength=%d status=%d\n", data, *length, maxLength, stat);
 
   return stat;
 } /* ledm_read */
@@ -952,7 +957,7 @@ void ledm_cancel(SANE_Handle handle)
 {
   struct ledm_session *ps = (struct ledm_session *)handle;
 
-//   DBG8("sane_hpaio_cancel()\n"); 
+  DBG8("sane_hpaio_cancel()\n"); 
 
   ps -> user_cancel = 1;
   /* Sane_cancel is always called at the end of the scan job. 

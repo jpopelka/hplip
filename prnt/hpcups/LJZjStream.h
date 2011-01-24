@@ -26,6 +26,8 @@
   ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+  Author: Naga Samrat Chowdary Narla,
 \*****************************************************************************/
 
 
@@ -41,6 +43,7 @@ public:
     ~LJZjStream ();
     DRIVER_ERROR    Encapsulate (RASTERDATA *InputRaster, bool bLastPlane);
     DRIVER_ERROR    StartPage(JobAttributes *pJA);
+    DRIVER_ERROR    StartPage_ljzjcolor2(JobAttributes *pJA);
     DRIVER_ERROR    Configure(Pipeline **pipeline);
     DRIVER_ERROR    FormFeed();
     DRIVER_ERROR    EndJob();
@@ -52,6 +55,7 @@ protected:
     virtual DRIVER_ERROR addJobSettings();
 private:
     DRIVER_ERROR    encapsulateColor(RASTERDATA *input);
+    DRIVER_ERROR    encapsulateColor2(RASTERDATA *input);
     DRIVER_ERROR    EndPage ();
     DRIVER_ERROR    sendBlankBands();
     PrintMode    m_PM;

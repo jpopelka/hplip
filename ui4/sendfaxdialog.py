@@ -861,7 +861,8 @@ class SendFaxDialog(QDialog, Ui_Dialog):
             elif status == fax.STATUS_CLEANUP:
                 self.addStatusMessage(self.__tr("Cleaning up..."), self.busy_icon)
 
-            elif status in (fax.STATUS_ERROR, fax.STATUS_BUSY, fax.STATUS_COMPLETED):
+            elif status in (fax.STATUS_ERROR, fax.STATUS_BUSY, fax.STATUS_COMPLETED, fax.STATUS_ERROR_IN_CONNECTING, 
+                fax.STATUS_ERROR_IN_TRANSMITTING, fax.STATUS_ERROR_PROBLEM_IN_FAXLINE, fax.STATUS_JOB_CANCEL ):
                 self.busy = False
                 self.send_fax_active = False
                 self.setCancelCloseButton()
@@ -875,6 +876,22 @@ class SendFaxDialog(QDialog, Ui_Dialog):
                     else:
                         self.addStatusMessage(self.__tr("Fax send error (%1)").arg(pml.DN_ERROR_STR.get(error_state, "Unknown error")), self.error_icon)
                     self.dev.sendEvent(EVENT_FAX_JOB_FAIL, self.printer_name, 0, '')
+
+                elif status == fax.STATUS_ERROR_IN_CONNECTING:
+                    self.addStatusMessage(self.__tr("Fax send error (Error in connecting)"), self.error_icon)
+                    self.dev.sendEvent(EVENT_FAX_JOB_FAIL, self.printer_name, 0, '')
+
+                elif status == fax.STATUS_ERROR_IN_TRANSMITTING:
+                    self.addStatusMessage(self.__tr("Fax send error (Error in transmitting)"), self.error_icon)
+                    self.dev.sendEvent(EVENT_FAX_JOB_FAIL, self.printer_name, 0, '')
+
+                elif status == fax.STATUS_ERROR_PROBLEM_IN_FAXLINE:
+                    self.addStatusMessage(self.__tr("Fax send error (Problem with the fax line)"), self.error_icon)
+                    self.dev.sendEvent(EVENT_FAX_JOB_FAIL, self.printer_name, 0, '')
+
+                elif status == fax.STATUS_JOB_CANCEL:
+                    self.addStatusMessage(self.__tr("(Fax Job Cancelled)"), self.error_icon)
+                    self.dev.sendEvent(EVENT_FAX_JOB_FAIL, self.printer_name, 0, '')  
 
                 elif status == fax.STATUS_BUSY:
                     #FailureUI(self, self.__tr("<b>Fax device is busy.</b><p>Please try again later."))
