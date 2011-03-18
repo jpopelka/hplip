@@ -69,6 +69,7 @@ Python 2.2+
 
 Author:
 Don Welch
+Yashwant Kumar Sahu
 
 */
 
@@ -1325,6 +1326,35 @@ PyObject * getPPDOption( PyObject * self, PyObject * args )
     }
 }
 
+PyObject * findPPDAttribute( PyObject * self, PyObject * args )
+{
+	if ( ppd != NULL )
+	{
+		char * name;
+		char * spec;
+
+		if ( !PyArg_ParseTuple( args, "zz", &name, &spec ) )
+		{
+			return Py_BuildValue( "" ); // None
+		}
+		
+		ppd_attr_t * ppd_attr;
+		ppd_attr = ppdFindAttr(ppd, name, spec );
+		if ( ppd_attr == NULL )
+		{
+			return Py_BuildValue( "" ); // None
+		}
+		else
+		{
+			return Py_BuildValue( "s", ppd_attr->value );
+		}
+	}
+	else
+	{
+		return Py_BuildValue( "" ); // None
+	}
+}
+
 PyObject * getPPDPageSize( PyObject * self, PyObject * args )
 {
     //char buf[1024];
@@ -1868,7 +1898,8 @@ static PyMethodDef cupsext_methods[] =
         { "setPasswordPrompt", (PyCFunction) setPasswordPrompt, METH_VARARGS },
         { "setPasswordCallback", ( PyCFunction ) setPasswordCallback, METH_VARARGS },
         { "getPassword", ( PyCFunction ) getPassword, METH_VARARGS },
-        { NULL, NULL }
+		{ "findPPDAttribute", ( PyCFunction ) findPPDAttribute, METH_VARARGS },
+		{ NULL, NULL }
     };
 
 

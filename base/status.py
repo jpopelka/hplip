@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# Author: Don Welch, Narla Naga Samrat Chowdary
+# Author: Don Welch, Narla Naga Samrat Chowdary, Yashwant Kumar Sahu
 #
 
 from __future__ import division
@@ -1506,7 +1506,8 @@ def StatusType10FetchUrl(dev, url, footer=""):
         data = dev.getEWSUrl_LEDM(url, data_fp)
         if data:
             data = data.split('\r\n\r\n', 1)[1]
-            data = clean(data)
+            if data:
+                data = clean(data)
     return data
 
 def StatusType10(dev): # Low End Data Model
@@ -1686,5 +1687,7 @@ def StatusType10(dev): # Low End Data Model
             status_block['status-code'] = STATUS_PRINTER_CARTRIDGE_WRONG
         elif e.text == "cartridgeMissing":
             status_block['status-code'] = STATUS_PRINTER_CARTRIDGE_MISSING
+        elif e.text == "missingPrintHead":
+            status_block['status-code'] = STATUS_PRINTER_PRINTHEAD_MISSING
 
     return status_block

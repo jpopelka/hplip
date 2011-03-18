@@ -729,8 +729,18 @@ class SetupDialog(QDialog, Ui_Dialog):
         try:
             self.print_ppd = None
             self.ppds = cups.getSystemPPDs()
-            model = cups.stripModel2(self.model)
-            self.print_ppd = cups.getPPDFile2(model, self.ppds)
+            
+            #Check if common ppd name is already given in models.dat(This is needed because in case of devices having more than one derivatives
+            #will have diffrent model name strings in device ID, because of which we don't get the common ppd name for search)
+
+            ppd_name = self.mq.get('ppd-name',0)
+    
+            if ppd_name == 0:    #Means ppd-name is not provided So follow earlier path of getting name from device ID.
+            	model = cups.stripModel2(self.model)
+            	self.print_ppd = cups.getPPDFile2(model, self.ppds)
+            else:
+            	self.print_ppd = cups.getPPDFile2(ppd_name, self.ppds)
+            
         finally:
             QApplication.restoreOverrideCursor()
 
@@ -985,7 +995,7 @@ class SetupDialog(QDialog, Ui_Dialog):
 
                 QApplication.restoreOverrideCursor()
                 if os.geteuid!=0 and utils.addgroup()!=[]:
-                    FailureUI(self, self.__tr("<b>Printer queue setup failed.</b><p>Please add user to %s group(s)" %utils.list_to_string(utils.addgroup())))
+                    FailureUI(self, self.__tr("<b>Printer queue setup failed. Could not connect to CUPS Server</b><p>Is user added to %s group(s)" %utils.list_to_string(utils.addgroup())))
             else:
                 # TODO:
                 #service.sendEvent(self.hpssd_sock, EVENT_CUPS_QUEUES_CHANGED, device_uri=self.device_uri)
@@ -1253,7 +1263,7 @@ class SetupDialog(QDialog, Ui_Dialog):
                     printer = unicode(item.data(Qt.UserRole).toString()).encode('utf-8')
                     log.debug("Removing printer: %s" % printer)
                     if cups.delPrinter(printer) == 0 and os.geteuid!=0 and utils.addgroup()!=[]:
-                            FailureUI(self, self.__tr("<b>Unable to delete printer queue.</b><p>Please add user to %s group(s)" %utils.list_to_string(utils.addgroup())))
+                            FailureUI(self, self.__tr("<b>Unable to delete printer queue. Could not connect to CUPS Server</b><p>Is user added to %s group(s)" %utils.list_to_string(utils.addgroup())))
             self.close()
 
         else:

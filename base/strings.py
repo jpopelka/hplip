@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
-# Author: Don Welch, Naga Samrat Chowdary Narla,
+# Author: Don Welch, Naga Samrat Chowdary Narla, Yashwant Kumar Sahu
 #
 
 # string_table := { 'string_id' : 'short', 'long' ), ... }
@@ -99,6 +99,7 @@ class StringTable:
             '1046' : (self.__tr('In power save mode'), ''),
             '1047' : (self.__tr('Incorrect cartridge'), ''),
             '1048' : (self.__tr('Missing cartridge'), ''),
+            '1049' : (self.__tr('Printhead(s): Missing or Damaged'), ''),            
             '1501' : (self.__tr('Black cartridge is low on ink'), ''),
             '1502' : (self.__tr('Tri-color cartridge is low on ink'), ''),
             '1503' : (self.__tr('Photo cartridge is low on ink'), ''),

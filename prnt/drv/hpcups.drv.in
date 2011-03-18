@@ -222,6 +222,14 @@
 //        Added new class mimas for slimfast.
 //
 
+//      21 February 2011 Goutam
+//        Added new class StingrayOJ for Alpha
+//      
+//      10 March 2011 Goutam
+//         Corrected the Overspray values for borderless paper sizes in StingrayOJ class
+//         replaced names PhotoL.FB with L.FB and Photo3.5x5.FB with PhotoL.FB
+    
+
 // Include necessary files...
 #include <font.defs>
 //#include <media.defs>
@@ -1992,21 +2000,9 @@ Manufacturer "HP"
   Group "General/General"
 
   Option "Duplex/Double-Sided Printing" PickOne AnySetup 10.0
-    Choice "DuplexNoTumble/Long Edge (Standard)" "<</Duplex true/Tumble false>>setpagedevice"
-    Choice "DuplexTumble/Short Edge (Flip)" "<</Duplex true/Tumble true>>setpagedevice"
-    *Choice "None/Off" "<</Duplex false/Tumble false>>setpagedevice"
-
-  // MediaPosition values map to MediaSource enumeration in global_types.h
-  Option "InputSlot/Media Source" PickOne AnySetup 10.0
-    *Choice "Auto/Auto-Select" "<</MediaPosition 7>>setpagedevice"
-    Choice "PhotoTray/Photo Tray" "<</MediaPosition 6>>setpagedevice"
-    Choice "Upper/Upper Tray" "<</MediaPosition 1>>setpagedevice"
-    Choice "Lower/Lower Tray" "<</MediaPosition 4>>setpagedevice"
-    Choice "Envelope/Envelope Feeder" "<</MediaPosition 3>>setpagedevice"
-    Choice "LargeCapacity/Large Capacity Tray" "<</MediaPosition 5>>setpagedevice"
-    Choice "Manual/Manual Feeder" "<</MediaPosition 2>>setpagedevice"
-    Choice "MPTray/Multi Purpose Tray" "<</MediaPosition 1>>setpagedevice"
-    Choice "CDDVDTray/CD or DVD Tray" "<</MediaPosition 14>>setpagedevice"
+       Choice "DuplexNoTumble/Long Edge (Standard)" "<</Duplex true/Tumble false>>setpagedevice"
+       Choice "DuplexTumble/Short Edge (Flip)" "<</Duplex true/Tumble true>>setpagedevice"
+      *Choice "None/Off" "<</Duplex false/Tumble false>>setpagedevice"
 
   Option "ColorModel/Output Mode" PickOne AnySetup 10.0
     Choice "CMYGray/High Quality Grayscale" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 1>>setpagedevice"
@@ -2029,53 +2025,69 @@ Manufacturer "HP"
     Choice "Photo/High-Resolution Photo" "<</OutputType(2)/HWResolution[1200 1200]>>setpagedevice"
     Choice "FastDraft/Fast Draft" "<</OutputType(-2)/HWResolution[300 300]>>setpagedevice"
 
-  // Duplexer is optional...
-  Installable "OptionDuplex/Duplexer Installed"
+   // MediaPosition values map to MediaSource enumeration in global_types.h
+     Option "InputSlot/Media Source" PickOne AnySetup 10.0
+     *Choice "Auto/Auto-Select" "<</MediaPosition 7>>setpagedevice"
+      Choice "PhotoTray/Photo Tray" "<</MediaPosition 6>>setpagedevice"
+      Choice "Upper/Upper Tray" "<</MediaPosition 1>>setpagedevice"
+      Choice "Lower/Lower Tray" "<</MediaPosition 4>>setpagedevice"
+      Choice "Envelope/Envelope Feeder" "<</MediaPosition 3>>setpagedevice"
+      Choice "LargeCapacity/Large Capacity Tray" "<</MediaPosition 5>>setpagedevice"
+      Choice "Manual/Manual Feeder" "<</MediaPosition 2>>setpagedevice"
+      Choice "MPTray/Multi Purpose Tray" "<</MediaPosition 1>>setpagedevice"
+      Choice "CDDVDTray/CD or DVD Tray" "<</MediaPosition 14>>setpagedevice"
 
-  // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
-  UIConstraints "*ColorModel KGray *OutputMode Photo"
-  UIConstraints "*ColorModel CMYGray *OutputMode Photo"
-  UIConstraints "*MediaType Automatic *OutputMode FastDraft"
-  UIConstraints "*MediaType Automatic *PageSize Oufuku.Duplex"
-  UIConstraints "*MediaType Glossy *OutputMode FastDraft"
-  UIConstraints "*MediaType Glossy *OutputMode Draft"
-  UIConstraints "*MediaType TransparencyFilm *OutputMode FastDraft"
-  UIConstraints "*MediaType Plain *OutputMode Photo"
-  UIConstraints "*InputSlot CDDVDTray *MediaType Automatic"
-  UIConstraints "*InputSlot CDDVDTray *MediaType Plain"
-  UIConstraints "*InputSlot CDDVDTray *MediaType Glossy"
-  UIConstraints "*InputSlot CDDVDTray *MediaType TransparencyFilm"
-  UIConstraints "*PageSize Letter *Duplex"
-  UIConstraints "*PageSize A4 *Duplex"
-  UIConstraints "*PageSize Legal *Duplex"
-  UIConstraints "*PageSize Photo4x6 *Duplex"
-  UIConstraints "*PageSize Photo5x7 *Duplex"
-  UIConstraints "*PageSize A5 *Duplex"
-  UIConstraints "*PageSize A6 *Duplex"
-  UIConstraints "*PageSize B5 *Duplex"
-  UIConstraints "*PageSize Oufuku *Duplex"
-  UIConstraints "*PageSize Hagaki *Duplex"
-  UIConstraints "*PageSize Executive *Duplex"
-  UIConstraints "*PageSize FLSA *Duplex"
-  UIConstraints "*PageSize ExecutiveJIS *Duplex"
-  UIConstraints "*PageSize 16k *Duplex"
-  UIConstraints "*PageSize Card3x5 *Duplex"
-  UIConstraints "*PageSize Card5x8 *Duplex"
-  UIConstraints "*PageSize Env10 *Duplex"
-  UIConstraints "*PageSize EnvA2 *Duplex"
-  UIConstraints "*PageSize EnvC6 *Duplex"
-  UIConstraints "*PageSize EnvDL *Duplex"
-  UIConstraints "*PageSize EnvC5 *Duplex"
-  UIConstraints "*PageSize EnvB5 *Duplex"
-  UIConstraints "*PageSize EnvChou3 *Duplex"
-  UIConstraints "*PageSize EnvChou4 *Duplex"
-  UIConstraints "*PageSize EnvMonarch *Duplex"
+     // Duplexer is optional...
+     Installable "OptionDuplex/Duplexer Installed"
+ 
+     // Constraints
+     UIConstraints "*Duplex *OptionDuplex False"
+     UIConstraints "*ColorModel KGray *OutputMode Photo"
+     UIConstraints "*ColorModel CMYGray *OutputMode Photo"
+     UIConstraints "*MediaType Automatic *OutputMode FastDraft"
+  
+     UIConstraints "*MediaType Glossy *OutputMode FastDraft"
+     UIConstraints "*MediaType Glossy *OutputMode Draft"
+     UIConstraints "*MediaType TransparencyFilm *OutputMode FastDraft"
+     UIConstraints "*MediaType Plain *OutputMode Photo"
 
-  Attribute "cupsModelName" "" "deskjet 5550"     // APDK device class 
+     UIConstraints "*InputSlot CDDVDTray *MediaType Automatic"
+     UIConstraints "*InputSlot CDDVDTray *MediaType Plain"
+     UIConstraints "*InputSlot CDDVDTray *MediaType Glossy"
+     UIConstraints "*InputSlot CDDVDTray *MediaType TransparencyFilm"
+     UIConstraints "*MediaType Automatic *PageSize Oufuku.Duplex"
+     UIConstraints "*PageSize Oufuku *Duplex"
+     UIConstraints "*PageSize Hagaki *Duplex"
+     UIConstraints "*PageSize FLSA *Duplex"
+     UIConstraints "*PageSize ExecutiveJIS *Duplex"
+     UIConstraints "*PageSize 16k *Duplex"
+     UIConstraints "*PageSize Card5x8 *Duplex"
+     UIConstraints "*PageSize EnvB5 *Duplex"
+     UIConstraints "*PageSize B5 *Duplex"
+     UIConstraints "*PageSize Letter *Duplex"
+     UIConstraints "*PageSize A4 *Duplex"
+     UIConstraints "*PageSize Legal *Duplex"
+     UIConstraints "*PageSize Photo4x6 *Duplex"
+     UIConstraints "*PageSize Photo5x7 *Duplex"
+     UIConstraints "*PageSize A5 *Duplex"
+     UIConstraints "*PageSize A6 *Duplex"
+     UIConstraints "*PageSize Executive *Duplex"
+     UIConstraints "*PageSize Card3x5 *Duplex"
+     UIConstraints "*PageSize Env10 *Duplex"
+     UIConstraints "*PageSize EnvA2 *Duplex"
+     UIConstraints "*PageSize EnvC6 *Duplex"
+     UIConstraints "*PageSize EnvDL *Duplex"
+     UIConstraints "*PageSize EnvC5 *Duplex"
+     UIConstraints "*PageSize EnvChou3 *Duplex"
+     UIConstraints "*PageSize EnvChou4 *Duplex"
+     UIConstraints "*PageSize EnvMonarch *Duplex"  
+      
 
   {
-// 4x6 or smaller
+    // APDK device class 
+    Attribute "cupsModelName" "" "deskjet 5550"
+
+    // 4x6 or smaller
   CustomMedia "Card3x5/Index Card 3x5in" 216 360 9 27 9 9 "<</PageSize [216 360]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 78/PageSize[216 360]/ImagingBBox null>>setpagedevice"
   CustomMedia "Hagaki/Hagaki 100x148mm" 284 420 9 27 9 9 "<</PageSize[284 420]/ImagingBBox null>>setpagedevice"
@@ -2088,7 +2100,7 @@ Manufacturer "HP"
          "<</cupsInteger0 73/PageSize[297.36 419.76]/ImagingBBox null>>setpagedevice"
   CustomMedia "A6.Duplex/A6 AutoDuplex 105x148mm)" 297 411 9 27 9 36 "<</PageSize[297 411]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 73/PageSize[297 411]/ImagingBBox null>>setpagedevice"
-
+  
 // 5x7
   CustomMedia "Photo5x7/Photo 5x7in" 360 504 9 27 9 9 "<</PageSize[360 504]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 122/PageSize[360 504]/ImagingBBox null>>setpagedevice"
@@ -2144,23 +2156,23 @@ Manufacturer "HP"
          "<</cupsInteger0 99/PageSize[360 360]/ImagingBBox null>>setpagedevice"
 
 // Envelope
-  CustomMedia "EnvA2/A2 Envelope 4.37x5.75in" 314.64 414 18.00 36.00 18.00 9.00 "<</PageSize[314.64 414]/ImagingBBox null>>setpagedevice"
+   CustomMedia "EnvA2/A2 Envelope 4.37x5.75in" 314.64 414 18.00 36.00 18.00 9.00 "<</PageSize[314.64 414]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 109/PageSize[314.64 414]/ImagingBBox null>>setpagedevice"
-  CustomMedia "EnvC6/C6 Envelope 114x162mm" 323.28 459.36 18.00 36.00 18.00 9.00 "<</PageSize[323.28 459.36]/ImagingBBox null>>setpagedevice"
+   CustomMedia "EnvC6/C6 Envelope 114x162mm" 323.28 459.36 18.00 36.00 18.00 9.00 "<</PageSize[323.28 459.36]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 92/PageSize[323.28 459.36]/ImagingBBox null>>setpagedevice"
-  CustomMedia "EnvChou4/#4 Japanese Envelope 90x205mm" 254.88 581.04 18.00 36.00 18.00 9.00 "<</PageSize[254.88 581.04]/ImagingBBox null>>setpagedevice"
+   CustomMedia "EnvChou4/#4 Japanese Envelope 90x205mm" 254.88 581.04 18.00 36.00 18.00 9.00 "<</PageSize[254.88 581.04]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 111/PageSize[254.88 581.04]/ImagingBBox null>>setpagedevice"
-  CustomMedia "EnvMonarch/Monarch Envelope 3.875x7.5in" 279 540 18.00 36.00 18.00 9.00 "<</PageSize[279 540]/ImagingBBox null>>setpagedevice"
+   CustomMedia "EnvMonarch/Monarch Envelope 3.875x7.5in" 279 540 18.00 36.00 18.00 9.00 "<</PageSize[279 540]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 80/PageSize[279 540]/ImagingBBox null>>setpagedevice"
-  CustomMedia "EnvDL/DL Envelope 110x220mm" 311.76 623.52 18.00 36.00 18.00 9.00 "<</PageSize[311.76 623.52]/ImagingBBox null>>setpagedevice"
+   CustomMedia "EnvDL/DL Envelope 110x220mm" 311.76 623.52 18.00 36.00 18.00 9.00 "<</PageSize[311.76 623.52]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 90/PageSize[311.76 623.52]/ImagingBBox null>>setpagedevice"
-  CustomMedia "Env10/#10 Envelope 4.12x9.5in" 297 684 18.00 36.00 18.00 9.00 "<</PageSize[297 684]/ImagingBBox null>>setpagedevice"
+   CustomMedia "Env10/#10 Envelope 4.12x9.5in" 297 684 18.00 36.00 18.00 9.00 "<</PageSize[297 684]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 81/PageSize[297 684]/ImagingBBox null>>setpagedevice"
-  CustomMedia "EnvChou3/#3 Japanese Envelope 120x235mm" 339.84 666  18.00 36.00 18.00 9.00 "<</PageSize[339.84 666]/ImagingBBox null>>setpagedevice"
+   CustomMedia "EnvChou3/#3 Japanese Envelope 120x235mm" 339.84 666  18.00 36.00 18.00 9.00 "<</PageSize[339.84 666]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 110/PageSize[339.84 666]/ImagingBBox null>>setpagedevice"
-  CustomMedia "EnvC5/C5 Envelope 162x229mm" 459 649 18.00 36.00 18.00 9.00 "<</PageSize[459 649]/ImagingBBox null>>setpagedevice"
+   CustomMedia "EnvC5/C5 Envelope 162x229mm" 459 649 18.00 36.00 18.00 9.00 "<</PageSize[459 649]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 91/PageSize[459 649]/ImagingBBox null>>setpagedevice"
-  CustomMedia "EnvB5/B5 Envelope 176x250mm" 499 709 18.00 36.00 18.00 9.00 "<</PageSize[499 709]/ImagingBBox null>>setpagedevice"
+   CustomMedia "EnvB5/B5 Envelope 176x250mm" 499 709 18.00 36.00 18.00 9.00 "<</PageSize[499 709]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 100/PageSize[499 709]/ImagingBBox null>>setpagedevice"
 
     // Custom page sizes from 1x4in to legal
@@ -2219,6 +2231,8 @@ Manufacturer "HP"
       Attribute "Product" "" "(HP Deskjet 5551 Color Inkjet Printer)"
     }
   } // End Supported media sizes.
+  
+
 } // End DJ55xx
 
 //////// DJGenericVIP
@@ -4346,6 +4360,196 @@ Manufacturer "HP"
   } // End Supported media sizes with full bleed.
 
 } // End Stabler
+
+//////// StingrayOJ
+{
+  
+    Attribute "hpPrinterLanguage" "" "pcl3gui2"
+    Attribute "HPMechOffset" "" "70"
+
+    Group "General/General"
+
+    Option "ColorModel/Output Mode" PickOne AnySetup 10.0
+      Choice "CMYGray/High Quality Grayscale" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 1>>setpagedevice"
+      Choice "KGray/Black Only Grayscale" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 2>>setpagedevice"
+     *Choice "RGB/Color" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 0>>setpagedevice"
+  
+    // cupsMediaType values map to MEDIATYPE from global_types.h
+    Option "MediaType/Media Type" PickOne AnySetup 10.0
+     *Choice "Automatic/Automatic" "<</MediaType(Automatic)/cupsMediaType -1>>setpagedevice"
+     Choice "Plain/Plain Paper" "<</MediaType(Plain)/cupsMediaType 0>>setpagedevice"
+     Choice "Glossy/Photo Paper" "<</MediaType(Glossy)/cupsMediaType 3>>setpagedevice"
+     
+    
+     // cupsCompression values map to QUALITY_MODE from global_types.h
+    Option "OutputMode/Print Quality" PickOne AnySetup 10.0
+    *Choice "Normal/Normal" "<</OutputType(0)/HWResolution[600 600]>>setpagedevice"
+     Choice "FastDraft/Fast Draft" "<</OutputType(-2)/HWResolution[300 300]>>setpagedevice"
+     Choice "Best/Best" "<</OutputType(1)/HWResolution[600 600]>>setpagedevice"
+     Choice "Photo/High-Resolution Photo" "<</OutputType(2)/HWResolution[1200 1200]>>setpagedevice"
+      
+    Option "InputSlot/Media Source" PickOne AnySetup 10.0
+       *Choice "Tray1/Tray 1" "<</MediaPosition 1>>setpagedevice"
+
+     //Constraints
+     //MediaType & OutputMode
+     UIConstraints "*MediaType Plain *OutputMode Photo"
+     UIConstraints "*MediaType Glossy *OutputMode FastDraft"
+     UIConstraints "*MediaType Glossy *OutputMode Photo"
+  
+     //PaperSizes & MediaTypes
+     UIConstraints "*PageSize PhotoL.FB *MediaType Plain"
+     UIConstraints "*PageSize Photo3.5x5.FB *MediaType Plain"
+     UIConstraints "*PageSize Photo4x6.FB *MediaType Plain"
+     UIConstraints "*PageSize Photo4x6tab.FB *MediaType Plain"
+     UIConstraints "*PageSize Photo10x15.FB *MediaType Plain"
+     UIConstraints "*PageSize Photo10x15tab.FB *MediaType Plain"
+     UIConstraints "*PageSize Photo10x15tab.FB *MediaType Plain"
+     UIConstraints "*PageSize Photo3x5 *MediaType Plain"
+     UIConstraints "*PageSize PhotoL *MediaType Plain"
+     UIConstraints "*PageSize Photo3.5x5 *MediaType Plain"
+     UIConstraints "*PageSize Photo10x15 *MediaType Plain"
+     UIConstraints "*PageSize Photo4x6 *MediaType Plain"
+     UIConstraints "*PageSize Photo4x6tab *MediaType Plain"
+     UIConstraints "*PageSize Photo10x15tab *MediaType Plain"
+     UIConstraints "*PageSize Photo2L *MediaType Plain"
+     UIConstraints "*PageSize Photo13x18 *MediaType Plain"
+     UIConstraints "*PageSize Photo5x7 *MediaType Plain"
+     UIConstraints "*PageSize Photo8x10 *MediaType Plain"
+      
+     UIConstraints "*PageSize Statement *MediaType Glossy"
+     UIConstraints "*PageSize A5 *MediaType Glossy"
+     UIConstraints "*PageSize JB5 *MediaType Glossy"
+     UIConstraints "*PageSize Executive *MediaType Glossy"  
+     UIConstraints "*PageSize A4 *MediaType Glossy"
+     UIConstraints "*PageSize Letter *MediaType Glossy"
+     UIConstraints "*PageSize Legal *MediaType Glossy"
+     UIConstraints "*PageSize A6 *MediaType Glossy"
+     UIConstraints "*PageSize EnvChou4 *MediaType Glossy"
+     UIConstraints "*PageSize EnvMonarch *MediaType Glossy"
+     UIConstraints "*PageSize Env10 *MediaType Glossy"
+     UIConstraints "*PageSize EnvDL *MediaType Glossy"
+     UIConstraints "*PageSize EnvA2 *MediaType Glossy"
+     UIConstraints "*PageSize EnvC6 *MediaType Glossy"
+     UIConstraints "*PageSize EnvChou3 *MediaType Glossy"
+     UIConstraints "*PageSize EnvC5 *MediaType Glossy"
+     UIConstraints "*PageSize EnvC5 *MediaType Glossy"
+     UIConstraints "*PageSize Card3x5 *MediaType Glossy"
+     UIConstraints "*PageSize Card4x6 *MediaType Glossy"
+     UIConstraints "*PageSize Card5x8 *MediaType Glossy"
+     UIConstraints "*PageSize 8.5x13 *MediaType Glossy"
+
+
+
+
+
+    // 4x6 or smaller
+      CustomMedia "Card3x5/Index Card 3x5in" 216 360 5.76 33.84 5.76 8.64 "<</cupsInteger0 78/PageSize [216 360]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 78/PageSize[216 360]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Card4x6/Index Card 4x6in" 288 432 5.76 33.84 5.76 8.64 "<</cupsInteger0 74/PageSize [288 432]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+      CustomMedia "PhotoL/Photo L 89x127mm" 252 360 5.76 33.84 5.76 8.64 "<</cupsInteger0 121/PageSize[252 360]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 121/PageSize[252 360]/ImagingBBox null>>setpagedevice"
+      CustomMedia "L.FB/Borderless Photo L 89x127mm" 269 382.38 0 0 0 0 "<</cupsInteger0 121/cupsReal0 .118/cupsReal1 .051/PageSize [269 382.38]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 121/cupsReal0 .118/cupsReal1 .051/PageSize[269 382.38]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo3.5x5/Photo 3.5x5in" 252 360 5.76 33.84 5.76 8.64 "<</cupsInteger0 121/PageSize[252 360]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 121/PageSize[252 360]/ImagingBBox null>>setpagedevice"
+      CustomMedia "PhotoL.FB/Borderless Photo 3.5x5in" 269 382.38 0 0 0 0 "<</cupsInteger0 121/cupsReal0 .118/cupsReal1 .051/PageSize[269 382.38]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 121/cupsReal0 .118/cupsReal1 .051/PageSize[269 382.38]/ImagingBBox null>>setpagedevice"
+     //CustomMedia "Photo3.5x5.FB/Borderless Photo 3.5x5in" 269 382.38 0 0 0 0 "<</cupsInteger0 74/PageSize[269 382.38]/ImagingBBox null>>setpagedevice" 
+         //"<</cupsInteger0 74/cupsReal0 .118/cupsReal1 .051/PageSize[269 382.38]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo3x5/Photo 3x5in" 216 360 5.76 33.84 5.76 8.64 "<</cupsInteger0 78/PageSize [216 360]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 78/PageSize[216 360]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo4x6/Photo 4x6in" 288 432 5.76 33.84 5.76 8.64 "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice" 
+         "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo4x6.FB/Borderless Photo 4x6in" 298.22 455.23 0 0 0 0 "<</cupsInteger0 74/cupsReal0 .091/cupsReal1 .051/PageSize[298.22 455.23]/ImagingBBox null>>setpagedevice" 
+         "<</cupsInteger0 74/cupsReal0 .091/cupsReal1 .051/PageSize[298.22 455.23]/ImagingBBox null>>setpagedevice"
+      CustomMedia "A6/A6 105x148mm" 297.36 419.76 5.76 33.84 5.76 8.64 "<</cupsInteger0 73/PageSize[297.36 419.76]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 73/PageSize[297.36 419.76]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo4x6tab/Photo 4x6in (tab)" 288 432 5.76 33.84 5.76 8.64 "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice" 
+         "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo4x6tab.FB/Borderless Photo 4x6in (tab)" 298.22 455.23 0 0 0 0 "<</cupsInteger0 74/cupsReal0 .091/cupsReal1 .051/PageSize[298.22 455.23]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 74/cupsReal0 .091/cupsReal1 .051/PageSize[298.22 455.23]/ImagingBBox null>>setpagedevice"
+
+      // 5x7
+      CustomMedia "Photo5x7/Photo 5x7in" 360 504 5.76 33.84 5.76 8.64 "<</cupsInteger0 122/PageSize[360 504]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 122/PageSize[360 504]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Card5x8/Index Card 5x8in" 360 576 5.76 33.84 5.76 8.64 "<</cupsInteger0 75/PageSize[360 576]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 75/PageSize[360 576]/ImagingBBox null>>setpagedevice"
+      CustomMedia "A5/A5 148x210mm" 419.76 595.44 9.36 33.84 9.36 8.64 "<</cupsInteger0 25/PageSize[419.76 595.44]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 25/PageSize[419.76 595.44]/ImagingBBox null>>setpagedevice"
+     
+      
+      // Standard
+      CustomMedia "JB5/JB5 182x257mm" 516.24 728.64 9.36 33.84 9.36 8.64 "<</cupsInteger0 45/PageSize[516.24 728.64]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 45/PageSize [516.24 728.64]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Executive/Executive 7.25x10.5in" 522 756 9.36 33.84 9.36 8.64 "<</cupsInteger0 1/PageSize[522 756]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 1/PageSize[522 756]/ImagingBBox null>>setpagedevice"
+      *CustomMedia "Letter/Letter 8.5x11in" 612 792 18 33.84 18 8.64 "<</cupsInteger0 2/PageSize[612 792]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 2/PageSize[612 792]/ImagingBBox null>>setpagedevice"
+      CustomMedia "A4/A4 210x297mm" 595.44 841.68 9.36 33.84 9.36 8.64 "<</cupsInteger0 26/PageSize[595.44 841.68]/ImagingBBox null>>setpagedevice" 
+         "<</cupsInteger0 26/PageSize[595.44 841.68]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Legal/Legal 8.5x14in" 612 1008 18 33.84 18 8.64 "<</cupsInteger0 3/PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 3/PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Statement/Statement 5.5x8.5in" 396 612 9.36 33.84 9.36 8.64 "<</cupsInteger0 15/PageSize[396 612]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 15/PageSize[396 612]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo10x15/Photo 10x15cm" 288 432 5.76 33.84 5.76 8.64 "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+     CustomMedia "Photo10x15.FB/Borderless Photo 10x15cm" 298.22 455.23 0 0 0 0 "<</cupsInteger0 74/cupsReal0 .091/cupsReal1 .051/PageSize[298.22 455.23]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 74/cupsReal0 .091/cupsReal1 .051/PageSize[298.22 455.23]/ImagingBBox null>>setpagedevice"
+     CustomMedia "Photo10x15tab/Photo 10x15cm (tab)" 288 432 5.76 33.84 5.76 8.64 "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo10x15tab.FB/ Borderless Photo 10x15cm (tab)" 298.22 455.23 0 0 0 0 "<</cupsInteger0 74/cupsReal0 .091/cupsReal1 .051/PageSize[298.22 455.23]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 74/cupsReal0 .091/cupsReal1 .051/PageSize[298.22 455.23]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo2L/Photo 2L 127x178mm" 360 504 5.76 33.84 5.76 8.64 "<</cupsInteger0 122/PageSize[360 504]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 122/PageSize[360 504]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo13x18/Photo 13x18cm" 360 504 5.76 33.84 5.76 8.64 "<</cupsInteger0 122/PageSize[360 504]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 122/PageSize[360 504]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo8x10/Photo 8x10in" 576 720 5.76 33.84 5.76 8.64 "<</cupsInteger0 7/PageSize[576 720]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 7/PageSize[576 720]/ImagingBBox null>>setpagedevice"
+      CustomMedia "8.5x13/8.5x13in" 612 936 18 33.84 18 8.64 "<</cupsInteger0 10/PageSize[612 936]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 10/PageSize[612 936]/ImagingBBox null>>setpagedevice"
+
+
+
+     // Envelope
+      CustomMedia "EnvA2/A2 Envelope 4.37x5.75in" 314.64 414 9.36 40.32 9.36 40.32 "<</cupsInteger0 109/PageSize[314.64 414]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 109/PageSize[314.64 414]/ImagingBBox null>>setpagedevice"
+      CustomMedia "EnvC6/C6 Envelope 114x162mm" 323.28 459.36 9.36 40.32 9.36 40.32 "<</cupsInteger0 92/PageSize[323.28 459.36]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 92/PageSize[323.28 459.36]/ImagingBBox null>>setpagedevice"
+      CustomMedia "EnvChou4/#4 Japanese Envelope 90x205mm" 254.88 581.04 9.36 40.32 9.36 40.32 "<</cupsInteger0 111/PageSize[254.88 581.04]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 111/PageSize[254.88 581.04]/ImagingBBox null>>setpagedevice"
+      CustomMedia "EnvMonarch/Monarch Envelope 3.875x7.5in" 279 540 9.36 40.32 9.36 40.32 "<</cupsInteger0 80/PageSize[279 540]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 80/PageSize[279 540]/ImagingBBox null>>setpagedevice"
+      CustomMedia "EnvDL/DL Envelope 110x220mm" 311.76 623.52 9.36 40.32 9.36 40.32 "<</cupsInteger0 90/PageSize[311.76 623.52]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 90/PageSize[311.76 623.52]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Env10/#10 Envelope 4.12x9.5in" 297 684 9.36 40.32 9.36 40.32 "<</cupsInteger0 81/PageSize[297 684]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 81/PageSize[297 684]/ImagingBBox null>>setpagedevice"
+      CustomMedia "EnvChou3/#3 Japanese Envelope 120x235mm" 339.84 666  9.36 40.32 9.36 40.32 "<</cupsInteger0 110/PageSize[339.84 666]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 110/PageSize[339.84 666]/ImagingBBox null>>setpagedevice"
+      CustomMedia "EnvC5/C5 Envelope 162x229mm" 459 649 9.36 40.32 9.36 40.32 "<</cupsInteger0 91/PageSize[459 649]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 91/PageSize[459 649]/ImagingBBox null>>setpagedevice"
+
+      
+
+     // Custom page sizes from 1x4in to legal
+      HWMargins 18 40.32 18 8.64
+      VariablePaperSize Yes
+      MinSize 3in 4in
+      MaxSize 8.5in 14in
+
+    // <%StingrayOJ:Normal%>
+    {
+      ModelName "HP Officejet 100 Mobile l411"
+      Attribute "NickName" "" "HP Officejet 100 Mobile l411, $Version"
+      Attribute "ShortNickName" "" "HP Officejet 100 Mobile l411"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 100 mobile l411;DES:officejet 100 mobile l411;"
+      PCFileName "hp-officejet_100_mobile_l411.ppd"
+      Attribute "Product" "" "(HP Officejet 100 Mobile l411)"
+    }
+   // End Supported media sizes with full bleed.
+
+} // End StingrayOJ
 
 //////// ViperPlusVIP
 {
@@ -10035,9 +10239,6 @@ Group "RLT/HP Real Life Technologies"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet m1536dnf mfp;DES:hp laserjet m1536dnf mfp;"
       PCFileName "hp-laserjet_m1536dnf_mfp-pcl3.ppd"
       Attribute "Product" "" "(HP LaserJet m1536dnf MFP)"
-      Attribute "Product" "" "(HP LaserJet m1537dnf MFP)"
-      Attribute "Product" "" "(HP LaserJet m1538dnf MFP)"
-      Attribute "Product" "" "(HP LaserJet m1539dnf MFP)"
     }
     {
       ModelName "HP LaserJet m1537dnf MFP"
@@ -10045,10 +10246,7 @@ Group "RLT/HP Real Life Technologies"
       Attribute "ShortNickName" "" "HP LaserJet m1537dnf MFP"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet m1537dnf mfp;DES:hp laserjet m1537dnf mfp;"
       PCFileName "hp-laserjet_m1537dnf_mfp-pcl3.ppd"
-      Attribute "Product" "" "(HP LaserJet m1536dnf MFP)"
       Attribute "Product" "" "(HP LaserJet m1537dnf MFP)"
-      Attribute "Product" "" "(HP LaserJet m1538dnf MFP)"
-      Attribute "Product" "" "(HP LaserJet m1539dnf MFP)"
     }
     {
       ModelName "HP LaserJet m1538dnf MFP"
@@ -10056,10 +10254,7 @@ Group "RLT/HP Real Life Technologies"
       Attribute "ShortNickName" "" "HP LaserJet m1538dnf MFP"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet m1538dnf mfp;DES:hp laserjet m1538dnf mfp;"
       PCFileName "hp-laserjet_m1538dnf_mfp-pcl3.ppd"
-      Attribute "Product" "" "(HP LaserJet m1536dnf MFP)"
-      Attribute "Product" "" "(HP LaserJet m1537dnf MFP)"
       Attribute "Product" "" "(HP LaserJet m1538dnf MFP)"
-      Attribute "Product" "" "(HP LaserJet m1539dnf MFP)"
     }
     {
       ModelName "HP LaserJet m1539dnf MFP"
@@ -10067,9 +10262,6 @@ Group "RLT/HP Real Life Technologies"
       Attribute "ShortNickName" "" "HP LaserJet m1539dnf MFP"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet m1539dnf mfp;DES:hp laserjet m1539dnf mfp;"
       PCFileName "hp-laserjet_m1539dnf_mfp-pcl3.ppd"
-      Attribute "Product" "" "(HP LaserJet m1536dnf MFP)"
-      Attribute "Product" "" "(HP LaserJet m1537dnf MFP)"
-      Attribute "Product" "" "(HP LaserJet m1538dnf MFP)"
       Attribute "Product" "" "(HP LaserJet m1539dnf MFP)"
     }
     {
@@ -10542,6 +10734,15 @@ Group "RLT/HP Real Life Technologies"
       Attribute "Product" "" "(HP LaserJet 4050tn Printer)"
     }
     {
+      ModelName "HP LaserJet 4100 MFP"
+      Attribute "NickName" "" "HP LaserJet 4100 MFP pcl3, $Version"
+      Attribute "ShortNickName" "" "HP LaserJet 4100 MFP"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 4100 mfp;DES:hp laserjet 4100 mfp;"
+      PCFileName "hp-laserjet_4100_mfp-pcl3.ppd"
+      Attribute "Product" "" "(HP LaserJet 4100 Multifunction Printer)"
+      Attribute "Product" "" "(HP LaserJet 4101 Multifunction Printer)"
+    }
+    {
       ModelName "HP LaserJet 4100 Series"
       Attribute "NickName" "" "HP LaserJet 4100 Series pcl3, $Version"
       Attribute "ShortNickName" "" "HP LaserJet 4100 Series"
@@ -10551,15 +10752,6 @@ Group "RLT/HP Real Life Technologies"
       Attribute "Product" "" "(HP LaserJet 4100tn Printer)"
       Attribute "Product" "" "(HP LaserJet 4100n Printer)"
       Attribute "Product" "" "(HP LaserJet 4100 Printer)"
-    }
-    {
-      ModelName "HP LaserJet 4100 MFP"
-      Attribute "NickName" "" "HP LaserJet 4100 MFP pcl3, $Version"
-      Attribute "ShortNickName" "" "HP LaserJet 4100 MFP"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 4100 mfp;DES:hp laserjet 4100 mfp;"
-      PCFileName "hp-laserjet_4100_mfp-pcl3.ppd"
-      Attribute "Product" "" "(HP LaserJet 4100 Multifunction Printer)"
-      Attribute "Product" "" "(HP LaserJet 4101 Multifunction Printer)"
     }
     {
       ModelName "HP LaserJet 4150 Series"

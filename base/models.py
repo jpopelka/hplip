@@ -101,6 +101,7 @@ TECH_CLASSES = [
     "Pyramid",
     "Python10",
     "Mimas",
+    "StingrayOJ",
 ]
 
 TECH_CLASSES.sort()
@@ -153,6 +154,7 @@ TECH_CLASS_PDLS = {
     "OJ7000"        : 'pcl3',
     "Python10"      : 'pcl3',
     "Mimas"      : 'pcl3',
+    "StingrayOJ"   : 'pcl3',
 }
 
 PDL_TYPE_PCL = 0  # less preferred
@@ -315,6 +317,7 @@ class ModelData:
             'usb-pid' : TYPE_HEX,
             'usb-vid' : TYPE_HEX,
             'wifi-config': TYPE_INT,
+            'ppd-name' : TYPE_STR,
             }
 
         self.FIELD_TYPES_DYN = {

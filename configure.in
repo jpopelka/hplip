@@ -26,7 +26,7 @@
 #   104 = no libdl
 
 #AC_PREREQ(2.59)
-AC_INIT([HP Linux Imaging and Printing], [3.11.1], [3.11.1.19], [hplip])
+AC_INIT([HP Linux Imaging and Printing], [3.11.3], [3.11.3.26], [hplip])
 #AM_INIT_AUTOMAKE([1.9 foreign])
 AM_INIT_AUTOMAKE
 AC_DISABLE_STATIC

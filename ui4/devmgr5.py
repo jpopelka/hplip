@@ -1898,7 +1898,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                 self.cur_device.sendEvent(e, self.cur_printer)
             else:
                 if os.geteuid!=0 and utils.addgroup()!=[]:
-                    FailureUI(self, self.__tr("<b>Start/Stop printer queue operation fails.</b><p>Please add user to %s group(s)" %utils.list_to_string(utils.addgroup())))
+                    FailureUI(self, self.__tr("<b>Start/Stop printer queue operation fails. Could not connect to CUPS Server</b><p>Is user added to %s group(s)" %utils.list_to_string(utils.addgroup())))
 
         finally:
             endWaitCursor()
@@ -1929,7 +1929,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                 self.cur_device.sendEvent(e, self.cur_printer)
             else:  
                 if os.geteuid!=0 and utils.addgroup()!=[]:
-                    FailureUI(self, self.__tr("<b>Accept/Reject printer queue operation fails.</b><p>Please add user to %s group(s)" %utils.list_to_string(utils.addgroup())))
+                    FailureUI(self, self.__tr("<b>Accept/Reject printer queue operation fails. Could not connect to CUPS Server</b><p>Is user added to %s group(s)" %utils.list_to_string(utils.addgroup())))
 
         finally:
             endWaitCursor()
@@ -1942,7 +1942,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
             result = cups.setDefaultPrinter(self.cur_printer.encode('utf8'))
             if not result:
                 if os.geteuid!=0 and utils.addgroup()!=[]:
-                    FailureUI(self, self.__tr("<b>Set printer queue as default operation fails.</b><p>Please add user to %s group(s)" %utils.list_to_string(utils.addgroup())))
+                    FailureUI(self, self.__tr("<b>Set printer queue as default operation fails. Could not connect to CUPS Server</b><p>Is user added to %s group(s)" %utils.list_to_string(utils.addgroup())))
             else:
                 self.updatePrintController()
                 if self.cur_device.device_type == DEVICE_TYPE_PRINTER:

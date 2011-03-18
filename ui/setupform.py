@@ -540,8 +540,18 @@ class SetupForm(SetupForm_base):
 
         default_model = utils.xstrip(model.replace('series', '').replace('Series', ''), '_')
         stripped_model = cups.stripModel2(models.normalizeModelName(model).lower())
-
-        self.ppd = cups.getPPDFile2(stripped_model, ppds)
+        
+        
+        #Check if common ppd name is already given in models.dat(This is needed because in case of devices having more than one derivatives
+        #will have diffrent model name strings in device ID, because of which we don't get the common ppd name for search)
+       
+        ppd_name = self.mq.get('ppd-name',0)
+        
+        if ppd_name == 0:
+        	self.ppd = cups.getPPDFile2(stripped_model, ppds)
+        else:
+            self.ppd = cups.getPPDFile2(ppd_name, ppds)
+        
         log.debug(self.ppd)
         self.ppdListView.clear()
 

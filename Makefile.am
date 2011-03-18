@@ -345,6 +345,12 @@ hplipjsdir = $(cupsfilterdir)
 hplipjs_PROGRAMS = hplipjs
 hplipjs_SOURCES = prnt/filters/hplipjs.c
 
+# hpps (CUPS filter)
+hppsdir = $(cupsfilterdir)
+hpps_PROGRAMS = hpps
+hpps_SOURCES = prnt/hpps/hppsfilter.c
+hpps_LDADD = -lcups
+
 # hpcac (CUPS filter, Color Access Control, ie: CLJ 4700)
 cacdir = $(cupsfilterdir)
 dist_cac_SCRIPTS = prnt/filters/hpcac

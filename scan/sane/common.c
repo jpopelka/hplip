@@ -1,4 +1,4 @@
-/************************************************************************************\
+/********************************************************************************************\
 
   common.c - common code for scl, pml, and soap backends
 
@@ -21,9 +21,9 @@
   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-  Contributing Authors: David Paschal, Don Welch, David Suffield 
+  Contributing Authors: David Paschal, Don Welch, David Suffield, Naga Samrat Chowdary Narla
 
-\************************************************************************************/
+\********************************************************************************************/
 
 #include <stdio.h>
 #include <stdarg.h>

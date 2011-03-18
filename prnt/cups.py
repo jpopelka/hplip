@@ -100,6 +100,7 @@ UI_JOB_STORAGE_USERNAME = 106  # Radios w/text entry
 UI_JOB_STORAGE_ID = 107        # Radios w/text entry
 UI_JOB_STORAGE_ID_EXISTS = 108 # Combo
 
+UI_INFO = 109        # Information field, required Information name and Value
 
 # ipp_op_t
 IPP_PAUSE_PRINTER = 0x0010
@@ -480,7 +481,8 @@ def getPPDFile2(stripped_model, ppds): # New PPD find
                     pdls = []
 
                 if (prop.hpcups_build and 'hpijs' not in f) or \
-                    ((prop.hpijs_build and 'hpijs' in pdls) or (prop.hpcups_build and 'hpijs' not in pdls)):
+                    ((prop.hpijs_build and 'hpijs' in pdls) or (prop.hpcups_build and 'hpijs' not in pdls)) or \
+                    ('ps' in pdls):
                     matches.append((f, [p for p in pdls if p and p != 'hpijs']))
 
     log.debug(matches)
@@ -502,7 +504,8 @@ def getPPDFile2(stripped_model, ppds): # New PPD find
                         pdls = []
 
                     if (prop.hpcups_build and 'hpijs' not in f) or \
-                       ((prop.hpijs_build and 'hpijs' in pdls) or (prop.hpcups_build and 'hpijs' not in pdls)):
+                       ((prop.hpijs_build and 'hpijs' in pdls) or (prop.hpcups_build and 'hpijs' not in pdls)) or \
+                       ('ps' in pdls):
                         matches.append((f, [p for p in pdls if p and p != 'hpijs']))
 
         log.debug(matches)
@@ -756,3 +759,6 @@ def setPasswordCallback(func):
 
 def setPasswordPrompt(prompt):
     return cupsext.setPasswordPrompt(prompt)
+
+def findPPDAttribute(name, spec):
+    return cupsext.findPPDAttribute(name, spec)

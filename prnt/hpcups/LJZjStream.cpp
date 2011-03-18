@@ -215,22 +215,22 @@ DRIVER_ERROR LJZjStream::StartPage (JobAttributes *pJA)
     int                 i;
     int                 width;
 
+    m_iPlaneNumber = 0;
+    m_iCurRaster   = 0;
     if((strcmp(m_pJA->printer_platform, "ljzjscolor") == 0) && (m_pJA->printer_platform_version == 2))
     {
        return StartPage_ljzjcolor2(pJA);
     }
 
-    m_iPlaneNumber = 0;
-    m_iCurRaster   = 0;
 	
-	if (m_pJA->e_duplex_mode == DUPLEXMODE_NONE)
-	{
-		dwNumItems = 14;		
-	}
-	else
-	{
-		dwNumItems = 15;				
-	}
+    if (m_pJA->e_duplex_mode == DUPLEXMODE_NONE)
+    {
+        dwNumItems = 14;		
+    }
+    else
+    {
+        dwNumItems = 15;				
+    }
 
     width = ((m_pMA->printable_width + 31) / 32) * 32;
     if (m_pJA->color_mode == 0)

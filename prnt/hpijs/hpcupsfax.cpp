@@ -160,7 +160,30 @@ void PrintCupsHeader (cups_page_header2_t m_cupsHeader)
     BUG ("DEBUG: HPFAX - cupsPageSizeName = %s\n", m_cupsHeader.cupsPageSizeName);
 }
 
-int ProcessRasterData (cups_raster_t *cups_raster, int fdFax)
+int GetPageSizeFromString(char *string)
+{
+   int iPageSize = atoi(string);
+   if(iPageSize == 0)
+   {
+      if(strcmp(string,"Letter") ==0){
+         iPageSize = 1;
+      }
+      else if(strcmp(string,"A4") ==0){
+         iPageSize = 2;
+      }
+      else if(strcmp(string,"Legal") ==0){
+         iPageSize = 3;
+      }
+      else{
+         DBG("hpcupsfax: GetPageSizeFromString:Default Page Size is taken,ensure it is ok.\n");
+         iPageSize = 1;
+      }
+   }
+   DBG("hpcupsfax: GetPageSizeFromString: PageSize = %d\n",iPageSize);
+   return iPageSize;
+}     
+
+int  ProcessRasterData (cups_raster_t *cups_raster, int fdFax)
 {
     int                status = 0;
     unsigned int                i;
@@ -200,7 +223,8 @@ int ProcessRasterData (cups_raster_t *cups_raster, int fdFax)
             HPLIPPUTINT32 (p, 0); p += 4;                // Total number of pages in this job
             HPLIPPUTINT16 (p, cups_header.HWResolution[0]); p += 2;
             HPLIPPUTINT16 (p, cups_header.HWResolution[1]); p += 2;
-            *p++ = atoi (cups_header.cupsPageSizeName);  // Output paper size
+            BUG("ATOI Value  = %d",atoi (cups_header.cupsPageSizeName));
+            *p++ = GetPageSizeFromString(cups_header.cupsPageSizeName);  // Output paper size
             *p++ = atoi (cups_header.OutputType);        // Output quality
             *p++ = fax_encoding;                         // MH, MMR or JPEG
             p += 4;                                      // Reserved 1

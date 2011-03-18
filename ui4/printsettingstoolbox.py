@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# Authors: Don Welch
+# Authors: Don Welch, Yashwant Kumar Sahu
 #
 
 # Std Lib
@@ -320,13 +320,14 @@ class PrintSettingsToolbox(QToolBox):
         #print "updateUi(%s, %s)" % (cur_device, cur_printer)
         self.cur_device = cur_device
         self.cur_printer = cur_printer
-
+        
         while self.count():
             self.removeItem(0)
 
         self.loading = True
         cups.resetOptions()
         cups.openPPD(self.cur_printer)
+        cur_outputmode = ""
 
         try:
             if 1:
@@ -515,6 +516,12 @@ class PrintSettingsToolbox(QToolBox):
                                 value = c
 
                             choice_data.append((c, choice_text))
+
+                        if o.lower() == 'outputmode':
+                            if value is not None:
+                                cur_outputmode = value
+                            else:
+                                cur_outputmode = defchoice                                
 
                         self.addControlRow(o, option_text, ui, value, choice_data, defchoice, read_only)
 
@@ -769,6 +776,23 @@ class PrintSettingsToolbox(QToolBox):
                 log.debug("  Current value: %s" % current)
 
                 self.endControlGroup()
+                
+                #Summary
+                    #color input
+                    #quality
+                quality_attr_name = "OutputModeDPI"
+                cur_outputmode_dpi = cups.findPPDAttribute(quality_attr_name, cur_outputmode)
+                if cur_outputmode_dpi is not None:
+                    log.debug("Adding Group: Summary outputmode is : %s" % cur_outputmode)
+                    log.debug("Adding Group: Summary outputmode dpi is : %s" % unicode (cur_outputmode_dpi))                                    
+                    self.beginControlGroup("sumry", self.__tr("Summary"))
+                    self.addControlRow("colorinput", self.__tr('Color Input / Black Render'),
+                        cups.UI_INFO, unicode (cur_outputmode_dpi), [], read_only)
+                    self.addControlRow("quality", self.__tr('Print Quality'),
+                        cups.UI_INFO, cur_outputmode, [], read_only)
+                    self.endControlGroup()
+                    log.debug("End adding Group: Summary")
+                   
 
                 self.job_storage_enable = self.cur_device.mq.get('job-storage', JOB_STORAGE_DISABLE) == JOB_STORAGE_ENABLE
 
@@ -985,6 +1009,7 @@ class PrintSettingsToolbox(QToolBox):
 #
 
             self.connect(DefaultButton, SIGNAL("clicked()"), self.DefaultButton_clicked)
+            self.connect(ComboBox, SIGNAL("currentIndexChanged(const QString &)"), self.ComboBox_indexChanged)            
             self.connect(ComboBox, SIGNAL("highlighted(const QString &)"), self.ComboBox_highlighted)
 
             control = ComboBox
@@ -1394,6 +1419,36 @@ class PrintSettingsToolbox(QToolBox):
 
             self.connect(self.JobStorageExistingDefaultButton, SIGNAL("clicked()"),
                         self.JobStorageExistingDefaultButton_clicked)
+                        
+        elif typ == cups.UI_INFO:
+            HBoxLayout = QHBoxLayout()
+            HBoxLayout.setObjectName("HBoxLayout")
+
+            OptionName = QLabel(self.widget)
+            OptionName.setObjectName("OptionLabel")
+            HBoxLayout.addWidget(OptionName)
+            OptionName.setText(text)
+
+            SpacerItem = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+            HBoxLayout.addItem(SpacerItem)
+            
+            if text == 'Print Quality':
+                self.PQValueLabel = QLabel(self.widget)
+                self.PQValueLabel.setObjectName("PQValueLabel")
+                HBoxLayout.addWidget(self.PQValueLabel)
+                self.PQValueLabel.setText(value)
+            elif text == 'Color Input / Black Render':
+                self.PQColorInputLabel = QLabel(self.widget)
+                self.PQColorInputLabel.setObjectName("PQColorInputLabel")
+                HBoxLayout.addWidget(self.PQColorInputLabel)
+                self.PQColorInputLabel.setText(value)
+            else:
+                OptionValue = QLabel(self.widget)
+                OptionValue.setObjectName("OptionValue")
+                HBoxLayout.addWidget(OptionValue)
+                OptionValue.setText(value)
+                
+            self.gridlayout.addLayout(HBoxLayout, self.row, 0, 1, 1)
 
         else:
             log.error("Invalid UI value: %s/%s" % (self.group, option))
@@ -1539,6 +1594,27 @@ class PrintSettingsToolbox(QToolBox):
             else:
                 self.setPrinterOption(sender.option, "false")
 
+    def ComboBox_indexChanged(self, currentItem):
+        sender = self.sender()
+        currentItem = unicode(currentItem)
+        # Checking for summary control
+        labelPQValaue = getattr(self, 'PQValueLabel', None)
+        labelPQColorInput = getattr(self, 'PQColorInputLabel', None)
+        # When output mode combo item is changed, we need to update the summary information      
+        if currentItem is not None and sender.option == 'OutputMode' and labelPQValaue is not None and labelPQColorInput is not None:
+            # Setting output mode
+            self.PQValueLabel.setText(currentItem)
+            
+            # Getting DPI custom attributefrom the PPD
+            # Setting color input
+            quality_attr_name = "OutputModeDPI"
+            cups.openPPD(self.cur_printer)
+            outputmode_dpi = cups.findPPDAttribute(quality_attr_name, currentItem)
+            log.debug("Outputmode changed, setting outputmode_dpi: %s" % outputmode_dpi)
+            cups.closePPD()            
+            self.PQColorInputLabel.setText(outputmode_dpi)
+            
+            log.debug("Outputmode changed, setting value outputmode: %s" % currentItem)            
 
     def DefaultButton_clicked(self):
         sender = self.sender()
@@ -1942,3 +2018,4 @@ class PrintSettingsToolbox(QToolBox):
 
     def __tr(self,s,c = None):
         return qApp.translate("PrintSettingsToolbox",s,c)
+

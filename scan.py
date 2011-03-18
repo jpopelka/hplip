@@ -57,7 +57,6 @@ email_from = ''
 email_to = []
 email_subject = 'hp-scan from %s' % socket.gethostname()
 email_note = ''
-fax = ''
 resize = 100
 contrast = 0
 brightness = 0
@@ -131,7 +130,7 @@ try:
         ("[OPTIONS] (General)", "", "header", False),
         ("Scan destinations:", "-s<dest_list> or --dest=<dest_list>", "option", False),
         ("", "where <dest_list> is a comma separated list containing one or more of: 'file'\*, ", "option", False),
-        ("", "'viewer', 'editor', 'pdf', 'fax', or 'print'. Use only commas between values, no spaces.", "option", False),
+        ("", "'viewer', 'editor', 'pdf', or 'print'. Use only commas between values, no spaces.", "option", False),
         ("Scan mode:", "-m<mode> or --mode=<mode>. Where <mode> is 'gray'\*, 'color' or 'lineart'.", "option", False),
         ("Scanning resolution:", "-r<resolution_in_dpi> or --res=<resolution_in_dpi> or --resolution=<resolution_in_dpi>", "option", False),
         ("", "where <resolution_in_dpi> is %s (300 is default)." % ', '.join([str(x) for x in valid_res]), "option", False),
@@ -185,9 +184,6 @@ try:
         ("Note or message for the 'email' dest:", '--email-msg="<msg>" or --email-note="<note>"', "option", False),
         ("", 'Use double quotes (") around the note/message if it contains space characters.', "option", False),
         utils.USAGE_SPACE,
-        ("[OPTIONS] ('fax' dest)", "", "header", False),
-        ("Fax queue/printer:", "--fax=<fax_printer_name>", "option", False),
-        utils.USAGE_SPACE,
         ("[OPTIONS] ('printer' dest)", "", "header", False),
         ("Printer queue/printer:", "--printer=<printer_name>", "option", False),
         utils.USAGE_SPACE,
@@ -203,7 +199,7 @@ try:
                           'tly=', 'brx=', 'bry=', 'size=',
                           'file=', 'output=', 'pdf=', 'viewer=',
                           'email-from=', 'from=', 'email-to=',
-                          'to=', 'email-msg=', 'msg=', 'fax=',
+                          'to=', 'email-msg=', 'msg=',
                           'printer=', 'compression=' , 'raw',
                           'jpeg', 'color', 'lineart', 'colour',
                           'bw', 'gray', 'grayscale', 'grey',
@@ -451,7 +447,7 @@ try:
             a = a.strip().lower().split(',')
             for aa in a:
                 aa = aa.strip()
-                if aa in ('file', 'fax', 'viewer', 'editor', 'printer', 'print', 'email', 'pdf') \
+                if aa in ('file', 'viewer', 'editor', 'printer', 'print', 'email', 'pdf') \
                     and aa not in dest:
                     if aa == 'print': aa = 'printer'
                     dest.append(aa)
@@ -465,10 +461,6 @@ try:
                 viewer = os.path.join(b, a)
                 if 'viewer' not in dest:
                     dest.append('viewer')
-
-        elif o in ('--fax'):
-            if 'fax' not in dest:
-                dest.append('fax')
 
         elif o in ('-e', '--editor'):
             a = a.strip()
@@ -539,10 +531,6 @@ try:
         'printer' not in dest:
 
         dest.append('printer')
-
-    if 'fax' in dest and 'file' not in dest:
-        log.error("Fax destination not implemented. Adding 'file' destination. Use resulting output file to fax.")
-        dest.append('file')
 
     if not dest:
         log.warn("No destinations specified. Adding 'file' destination by default.")
@@ -1046,10 +1034,7 @@ try:
         for d in dest:
             log.info("\nSending to destination '%s':" % d)
 
-            if d == 'fax':
-                log.error("fax: Not implemented yet.")
-
-            elif d == 'pdf':
+            if d == 'pdf':
                 try:
                     from reportlab.pdfgen import canvas
                 except ImportError:
