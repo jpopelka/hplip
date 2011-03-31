@@ -436,7 +436,6 @@ cups_ppd_printers = \
    ppd/hpcups/hp-mopier_240-pcl3.ppd.gz \
    ppd/hpcups/hp-mopier_320-pcl3.ppd.gz \
    ppd/hpcups/hp-officejet_100_mobile_l411.ppd.gz \
-   ppd/hpcups/hp-officejet_150_mobile_l511.ppd.gz \
    ppd/hpcups/hp-officejet_4000_k210.ppd.gz \
    ppd/hpcups/hp-officejet_4100_series.ppd.gz \
    ppd/hpcups/hp-officejet_4105.ppd.gz \

@@ -148,7 +148,6 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-laserjet_9040-hpijs-pcl3.ppd.gz \
     ppd/hpijs/hp-deskjet_9800-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_3810-hpijs.ppd.gz \
-    ppd/hpijs/hp-officejet_150_mobile_l511-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_1200c-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_3500-hpijs.ppd.gz \
     ppd/hpijs/hp-photosmart_c6200_series-hpijs.ppd.gz \

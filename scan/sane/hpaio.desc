@@ -133,9 +133,6 @@
 :model "HP Officejet d145 All-in-one Printer"
 :status :good
 
-:model "HP Officejet 150 Mobile l511 All-in-one Printer"
-:status :good
-
 :model "HP Officejet d155xi All-in-one Printer"
 :status :good
 
@@ -394,10 +391,10 @@
 :model "HP PSC 1209 All-in-one Printer"
 :status :good
 
-:model "HP PSC 1210xi All-in-one Printer"
+:model "HP PSC 1210v All-in-one Printer"
 :status :good
 
-:model "HP PSC 1210v All-in-one Printer"
+:model "HP PSC 1210xi All-in-one Printer"
 :status :good
 
 :model "HP PSC 1210 All-in-one Printer"

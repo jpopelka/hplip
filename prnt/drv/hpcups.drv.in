@@ -2183,14 +2183,6 @@ Manufacturer "HP"
 
     // <%DJ55xx:Normal%>
     {
-      ModelName "HP Officejet 150 Mobile l511"
-      Attribute "NickName" "" "HP Officejet 150 Mobile l511, $Version"
-      Attribute "ShortNickName" "" "HP Officejet 150 Mobile l511"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 150 mobile l511;DES:officejet 150 mobile l511;"
-      PCFileName "hp-officejet_150_mobile_l511.ppd"
-      Attribute "Product" "" "(HP Officejet 150 Mobile l511 All-in-one Printer)"
-    }
-    {
       ModelName "HP Deskjet 460"
       Attribute "NickName" "" "HP Deskjet 460, $Version"
       Attribute "ShortNickName" "" "HP Deskjet 460"

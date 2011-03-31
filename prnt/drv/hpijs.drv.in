@@ -2288,14 +2288,6 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJ55xx:Normal%>   
   {
-    ModelName "HP Officejet 150 Mobile l511 hpijs"
-    Attribute "NickName" "" "HP Officejet 150 Mobile l511 hpijs, $Version"
-    Attribute "ShortNickName" "" "HP OJ 150 Mobile l511 hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 150 mobile l511;DES:officejet 150 mobile l511;"
-    PCFileName "hp-officejet_150_mobile_l511-hpijs.ppd"
-    Attribute "Product" "" "(HP Officejet 150 Mobile l511 All-in-one Printer)"
-  }
-  {
     ModelName "HP Deskjet 460 hpijs"
     Attribute "NickName" "" "HP Deskjet 460 hpijs, $Version"
     Attribute "ShortNickName" "" "HP Deskjet 460 hpijs"
