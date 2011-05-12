@@ -3,6 +3,7 @@
   (c) 2010 Copyright Hewlett-Packard Development Company, LP
 
   Primary Author: Naga Samrat Chowdary, Narla
+  Contributing Authors: Yashwant Kumar Sahu
 \************************************************************************************/
 
 # ifndef _GNU_SOURCE
@@ -322,7 +323,7 @@ static int parse_scan_elements(const char *payload, int size, struct wscn_scan_e
 
     if(strncmp(tag, "Adf", 3) == 0 && strlen(tag) == 3)
     {
-      elements->config.adf.supported = 0;
+      elements->config.adf.supported = 1;
       get_tag(tail, size-(tail-payload), tag, sizeof(tag), &tail);
       get_tag(tail, size-(tail-payload), tag, sizeof(tag), &tail);
       get_element(tail, size-(tail-payload), value, sizeof(value), &tail);
@@ -534,6 +535,9 @@ static int cancel_job(struct ledm_session *ps)
   if (read_http_payload(ps, buf, sizeof(buf), tmo, &bytes_read))
     goto bugout;
 
+  ps->job_id = 0;
+  ps->page_id = 0;
+
   stat=0;
 
 bugout:
@@ -708,7 +712,7 @@ int bb_get_parameters(struct ledm_session *ps, SANE_Parameters *pp, int option)
     case SPO_BEST_GUESS:  /* called by xsane & sane_start */
       /* Set scan parameters based on best guess. */
       pp->lines = (int)(SANE_UNFIX(ps->effectiveBry - ps->effectiveTly)/MM_PER_INCH*ps->currentResolution);
-      pp->pixels_per_line = floor(SANE_UNFIX(ps->effectiveBrx - ps->effectiveTlx)/MM_PER_INCH*ps->currentResolution);
+      pp->pixels_per_line = floor(SANE_UNFIX(ps->effectiveBrx -ps->effectiveTlx)/MM_PER_INCH*ps->currentResolution);
       pp->bytes_per_line = BYTES_PER_LINE(pp->pixels_per_line, pp->depth * factor);
     default:
       break;
@@ -767,97 +771,112 @@ char* itoa(int value, char* str, int radix)
 
 int bb_start_scan(struct ledm_session *ps)
 {
-  char buf[4096];
+  char buf[4096] = {0};
+
   int len, stat=1, bytes_read;
 
   ps->bb_session = create_session();
   struct bb_ledm_session *pbb = ps->bb_session;
-  
-  if(http_open(ps->dd, HPMUD_S_LEDM_SCAN, &pbb->http_handle) != HTTP_R_OK)
-  {
-    // goto bugout;
-  }
+  char szPage_ID[5] = {0};
+  char szJob_ID[5] = {0};
 
-  while(1)
+  if (ps->job_id == 0)
   {
-    if (http_write(pbb->http_handle, GET_SCANNER_STATUS, sizeof(GET_SCANNER_STATUS)-1, 120) != HTTP_R_OK)
+	if(http_open(ps->dd, HPMUD_S_LEDM_SCAN, &pbb->http_handle) != HTTP_R_OK)
+  	{
+    		// goto bugout;
+  	}
+
+  	while(1)
+  	{
+	  if (http_write(pbb->http_handle, GET_SCANNER_STATUS, sizeof(GET_SCANNER_STATUS)-1, 120) != HTTP_R_OK)
+	  {
+        //goto bugout;
+      }
+		  
+      read_http_payload(ps, buf, sizeof(buf), EXCEPTION_TIMEOUT, &bytes_read);
+
+      if(strstr(buf, "Idle")) break;
+  	}
+    http_close(pbb->http_handle);   /* error, close http connection */
+  	pbb->http_handle = 0;
+
+    if(http_open(ps->dd, HPMUD_S_LEDM_SCAN, &pbb->http_handle) != HTTP_R_OK)
     {
-      //goto bugout;
     }
 
-    read_http_payload(ps, buf, sizeof(buf), EXCEPTION_TIMEOUT, &bytes_read);
+    len = snprintf(buf, sizeof(buf), CREATE_SCAN_JOB_REQUEST,
+  		ps->currentResolution,
+  		ps->currentResolution,
+    	(int) (ps->currentTlx / 5548.7133 ),
+    	(int) (ps->currentTly / 5548.7133),
+    	(int) (ps->currentBrx / 5548.7133),
+    	(int) (ps->currentBry / 5548.7133),
+    	"Jpeg",
+    	(! strcmp(ce_element[ps->currentScanMode], "Color8")) ? "Color" : (! strcmp(ce_element[ps->currentScanMode], "Gray8")) ? "Gray" : "Gray",
+    	((! strcmp(ce_element[ps->currentScanMode], "Color8")) || (! strcmp(ce_element[ps->currentScanMode], "Gray8"))) ? 8: 8,
+    	is_element[ps->currentInputSource]);
 
-    if(strstr(buf, "Idle")) break;
+
+    /* Write the http post header. Note do not send null termination byte. */
+  	if (http_write(pbb->http_handle, POST_HEADER, sizeof(POST_HEADER)-1, 120) != HTTP_R_OK)
+ 	{
+    	//goto bugout;
+  	}
+
+  	if (http_write(pbb->http_handle, buf, strlen(buf), 1) != HTTP_R_OK)
+  	{
+    	//goto bugout;
+  	}
+
+  	/* Write zero footer. */
+  	if (http_write(pbb->http_handle, ZERO_FOOTER, sizeof(ZERO_FOOTER)-1, 1) != HTTP_R_OK)
+  	{
+    	//goto bugout;
+  	}
+
+  	/* Read response. */
+  	if (read_http_payload(ps, buf, sizeof(buf), EXCEPTION_TIMEOUT, &bytes_read))
+    	goto bugout;
+
+  	http_close(pbb->http_handle);
+  	pbb->http_handle = 0;
+
+  	char joblist[64];
+  	char* jl=strstr(buf, "Location:");
+  	jl=jl+10;
+	
+  	int i=0;
+  	while(*jl != '\r')
+  	{ 
+  	joblist[i]=*jl; 
+  	jl=jl+1; i++;
+  	} 
+  	joblist[i]='\0';
+	
+  	strcpy(ps->url, joblist);
+  	char *c=ps->url;
+  	c=strstr(c, "JobList");
+  	c=c+8;
+  	int job_id=strtol(c, NULL, 10);
+  	itoa(job_id, szJob_ID,10);
+        itoa(1, szPage_ID,10);
+        ps->page_id = 1;
+  	ps->job_id = job_id;
   }
-
-  http_close(pbb->http_handle);   /* error, close http connection */
-  pbb->http_handle = 0;
-
-  if(http_open(ps->dd, HPMUD_S_LEDM_SCAN, &pbb->http_handle) != HTTP_R_OK)
+  else
   {
+  	ps->page_id++;
+    itoa(ps->job_id,szJob_ID,10);
+    itoa(ps->page_id, szPage_ID,10);
   }
-
-  len = snprintf(buf, sizeof(buf), CREATE_SCAN_JOB_REQUEST,
-    ps->currentResolution,
-    ps->currentResolution,
-    (int) (ps->currentTlx / 5548.7133 ),
-    (int) (ps->currentTly / 5548.7133),
-    (int) (ps->currentBrx / 5548.7133),
-    (int) (ps->currentBry / 5548.7133),
-    "Jpeg",
-    (! strcmp(ce_element[ps->currentScanMode], "Color8")) ? "Color" : (! strcmp(ce_element[ps->currentScanMode], "Gray8")) ? "Gray" : "Gray",
-    ((! strcmp(ce_element[ps->currentScanMode], "Color8")) || (! strcmp(ce_element[ps->currentScanMode], "Gray8"))) ? 8: 8,
-    is_element[ps->currentInputSource]);
-
-
-  /* Write the http post header. Note do not send null termination byte. */
-  if (http_write(pbb->http_handle, POST_HEADER, sizeof(POST_HEADER)-1, 120) != HTTP_R_OK)
-  {
-    //goto bugout;
-  }
-
-  if (http_write(pbb->http_handle, buf, strlen(buf), 1) != HTTP_R_OK)
-  {
-    //goto bugout;
-  }
-
-  /* Write zero footer. */
-  if (http_write(pbb->http_handle, ZERO_FOOTER, sizeof(ZERO_FOOTER)-1, 1) != HTTP_R_OK)
-  {
-    //goto bugout;
-  }
-
-  /* Read response. */
-  if (read_http_payload(ps, buf, sizeof(buf), EXCEPTION_TIMEOUT, &bytes_read))
-    goto bugout;
-
-  http_close(pbb->http_handle);
-  pbb->http_handle = 0;
-
-  char joblist[64];
-  char* jl=strstr(buf, "Location:");
-  jl=jl+10;
-
-  int i=0;
-  while(*jl != '\r')
-  { 
-    joblist[i]=*jl; 
-    jl=jl+1; i++;
-  } 
-  joblist[i]='\0';
-
-  strcpy(ps->url, joblist);
-  char *c=ps->url;
-  char pg[5];
-  c=strstr(c, "JobList");
-  c=c+8;
-  int page=strtol(c, NULL, 10);
-
-  itoa(page,pg,10);
 
   strcpy(buf, "GET /Scan/Jobs/");
-  strcat(buf, pg);
-  strcat(buf, "/Pages/1");
+  strcat(buf, szJob_ID);
+  strcat(buf, "/Pages/");
+  strcat(buf, szPage_ID);
+
+
   strcat(buf, " HTTP/1.1\r\nHost: localhost\r\nUser-Agent: hplip\r\nAccept: text/plain\r\nAccept-Language: en-us,en\r\nAccept-Charset:utf-8\r\nX-Requested-With: XMLHttpRequest\r\nKeep-Alive: 300\r\nProxy-Connection: keep-alive\r\nCookie: AccessCounter=new\r\n0\r\n\r\n");
 
   if(http_open(ps->dd, HPMUD_S_LEDM_SCAN, &pbb->http_handle) != HTTP_R_OK)
@@ -954,5 +973,7 @@ int bb_end_scan(struct ledm_session* ps, int io_error)
     pbb->http_handle = 0;
   }
   cancel_job(ps);
+  ps->job_id = 0;
+  ps->page_id = 0;
   return 0;
 }

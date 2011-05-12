@@ -48,7 +48,7 @@ if fax_enabled:
         fax_enabled = False
 
 if not fax_enabled:
-    log.error("Fax disabled.")
+    log.warn("Fax disabled.")
 
 
 class FaxSetupDialog(QDialog, Ui_Dialog):

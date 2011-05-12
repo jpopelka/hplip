@@ -67,7 +67,7 @@ if fax_enabled:
         fax_enabled = False
 
 if not fax_enabled:
-    log.error("Fax disabled.")
+    log.warn("Fax disabled.")
 
 coverpages_enabled = False
 if fax_enabled:

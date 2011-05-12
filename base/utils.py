@@ -1629,6 +1629,28 @@ def su_sudo():
 
     return su_sudo_str
 
+# This function returns the distro name and distro version. 
+#This is provided to check on Fedora 14 in pkit.py file for Plugin-installation.  
+def os_release():
+    os_name = None;
+    os_version = None;
+    if which('lsb_release'):
+       name = os.popen('lsb_release -i | cut -f 2')
+       os_name = name.read().strip()
+       name.close()
+       version = os.popen('lsb_release -r | cut -f 2')
+       os_version=version.read().strip()
+       version.close()
+    else:
+       name = os.popen('cat /etc/issue | cut -c 1-7 | head -n 1')
+       os_name = name.read().strip()
+       name.close()
+       version=os.popen('cat /etc/issue | cut -c 16-17 | head -n 1')
+       os_version=version.read().strip()
+       version.close()
+
+    return os_name,os_version 
+    
 
 #
 # Removes HTML or XML character references and entities from a text string.

@@ -1546,7 +1546,7 @@ class CoreInstall(object):
         wget = utils.which("wget")
         if wget:
             wget = os.path.join(wget, "wget")
-            cmd = "%s --timeout=10 --output-document=- %s" % (wget, HTTP_GET_TARGET)
+            cmd = "%s --timeout=60 --output-document=- %s" % (wget, HTTP_GET_TARGET)
             log.debug(cmd)
             status, output = self.run(cmd)
             log.debug("wget returned: %d" % status)

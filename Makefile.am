@@ -128,7 +128,7 @@ dist_cmd_SCRIPTS = align.py info.py print.py toolbox.py clean.py colorcal.py unl
 basedir = $(hplipdir)/base
 
 dist_base_DATA = base/maint.py base/codes.py base/g.py base/pml.py base/status.py  \
-	base/__init__.py base/mfpdtf.py base/utils.py base/wifi.py \
+	base/__init__.py base/mfpdtf.py base/utils.py base/wifi.py base/LedmWifi.py \
 	base/device.py base/logger.py base/slp.py base/exif.py base/strings.py base/magic.py \
 	base/imagesize.py base/pexpect.py base/models.py base/mdns.py base/tui.py base/dime.py \
 	base/ldif.py base/vcard.py base/module.py base/pkit.py
@@ -271,7 +271,8 @@ dist_ui_DATA = ui/alignform.py \
 	ui/scrollprintsettings.py ui/scrollprint.py ui/scrollfax.py \
 	ui/scrollunload.py ui/scrollcopy.py ui/pluginform2.py ui/pluginform2_base.py ui/systemtray.py \
 	ui/ui_utils.py ui/jobstoragemixin.py ui/pluginlicenseform_base.py ui/pluginlicenseform.py \
-	ui/align13form_base.py ui/align13form.py
+	ui/align13form_base.py ui/align13form.py ui/firmwaredialog_base.py ui/firmwaredialog.py \
+	ui/deviceuricombobox.py
 
 dist_noinst_DATA += ui/colorcalform2_base.ui ui/settingsdialog_base.ui ui/aligntype6form1_base.ui \
 	ui/aboutdlg_base.ui ui/imagepropertiesdlg_base.ui ui/paperedgealignform_base.ui ui/aligntype6form2_base.ui \
@@ -281,7 +282,7 @@ dist_noinst_DATA += ui/colorcalform2_base.ui ui/settingsdialog_base.ui ui/alignt
 	ui/align10form_base.ui  ui/pluginform2_base.ui \
 	plugins/powersettingsdialog_base.ui ui/faxsettingsform_base.ui ui/coverpageform_base.ui \
 	ui/allowabletypesdlg_base.ui ui/setupform_base.ui ui/setupmanualfind_base.ui \
-	ui/setupsettings_base.ui ui/pluginlicenseform_base.ui ui/align13form_base.ui
+	ui/setupsettings_base.ui ui/pluginlicenseform_base.ui ui/align13form_base.ui ui/firmwaredialog_base.ui 
 endif
 endif
 

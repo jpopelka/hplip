@@ -131,7 +131,6 @@ DRIVER_ERROR Lidil::Configure(Pipeline **pipeline)
 DRIVER_ERROR Lidil::StartJob(SystemServices *pSystemServices, JobAttributes *pJA)
 {
     DRIVER_ERROR    err = NO_ERROR;
-
     m_pSystemServices = pSystemServices;
 
     m_pJA = pJA;
@@ -170,10 +169,16 @@ DRIVER_ERROR Lidil::StartJob(SystemServices *pSystemServices, JobAttributes *pJA
         dbglog("selectPrintMode failed, PrintMode name = %s", m_pQA->print_mode_name);
         return UNSUPPORTED_PRINTMODE;
     }
+    
+    
     if (m_pPM->BaseResX != m_pQA->horizontal_resolution ||
         m_pPM->BaseResY != m_pQA->vertical_resolution)
     {
-        dbglog("Requested resolution not supported with requested printmode");
+        dbglog("Requested resolution not supported with requested printmode");        
+		dbglog(" m_pPM->BaseResX = %d\n",m_pPM->BaseResX);
+		dbglog(" m_pPM->BaseResY = %d\n",m_pPM->BaseResY);
+		dbglog(" m_pQA->horizontal_resolution = %d\n",m_pQA->horizontal_resolution);
+		dbglog(" m_pQA->vertical_resolution = %d\n",m_pQA->vertical_resolution);    
         return UNSUPPORTED_PRINTMODE;
     }
 
@@ -559,19 +564,62 @@ void    Lidil::addInt16(Int16    iVal)
     }
 }
 
+
 bool Lidil::selectPrintMode(int index)
 {
     PrintMode    *p = lidil_print_modes_table[index].print_modes;
+    int iPMIndex = 0; 
+    
+    if (!strcmp(m_pJA->printer_platform, "dj4100") || (!strcmp(m_pJA->printer_platform, "dj2600")))
+    { 
+    	//Encapsulator for Viper Trim class products is not written properly, hence mapping the Index to
+    	//old values.   
+    	iPMIndex = PQ_Cartridge_Map_ViperTrim[m_pJA->integer_values[2]][m_pJA->integer_values[1]];      
+    }
+    else
+    {
+    	iPMIndex = PQ_Cartridge_Map[m_pJA->integer_values[2]][m_pJA->integer_values[1]];
+    									//m_pJA->integer_values[1] is basically cupsInteger1 value given in PPD.
+    									//m_pJA->integer_values[2] is basically cupsInteger2 value given in PPD.    
+    }
+
+    dbglog("CupeInteger1 = [%d]\n",m_pJA->integer_values[1]); 
+    dbglog("CupeInteger2 = [%d]\n",m_pJA->integer_values[2]); 
+    dbglog("PrintMode Index = [%d]\n",iPMIndex); 
+    
+    if( -1 == iPMIndex)
+    {
+    	dbglog("Unsupported Cartridge and Print Quality combination..\n");
+    	return false;
+    }
+            
     for (int i = 0; i < lidil_print_modes_table[index].count; i++, p++)
     {
-        if (!strcmp(m_pJA->quality_attributes.print_mode_name, p->name))
+        if (i == iPMIndex)
         {
+            dbglog("Print Mode = [%s]\n",p->name); 
             m_pPM = p;
             return true;
         }
     }
     return false;
 }
+
+/*
+bool Lidil::selectPrintMode(int index)
+{
+    PrintMode    *p = lidil_print_modes_table[index].print_modes;    
+    for (int i = 0; i < lidil_print_modes_table[index].count; i++, p++)
+    {
+        if (!strcmp(m_pJA->quality_attributes.print_mode_name, p->name))
+        {        
+            m_pPM = p;
+            return true;
+        }
+    }
+    return false;
+}*/
+
 
 bool Lidil::selectPrintMode()
 {

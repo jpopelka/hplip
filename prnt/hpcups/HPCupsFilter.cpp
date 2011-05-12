@@ -295,8 +295,6 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
     m_JA.color_mode = cups_header->cupsRowStep;
     m_JA.media_source = cups_header->MediaPosition;
 
-    m_JA.color_mode = cups_header->cupsRowStep;
-    m_JA.media_source = cups_header->MediaPosition;
     m_JA.print_borderless = (cups_header->ImagingBoundingBox[0] == 0) ? true : false;
     if (cups_header->Duplex) {
         m_JA.e_duplex_mode  = (cups_header->Tumble == 0) ? DUPLEXMODE_BOOK : DUPLEXMODE_TABLET;
@@ -428,6 +426,7 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
     }
 
     m_pPrinterBuffer = new BYTE[cups_header->cupsWidth * 4 + 32];
+    
 
     return NO_ERROR;
 }
@@ -561,6 +560,7 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
     DRIVER_ERROR           err;
     int                    ret_status = 0;
 
+       
     while (cupsRasterReadHeader2(cups_raster, &cups_header))
     {
         current_page_number++;
@@ -589,6 +589,7 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
             rgbRaster = NULL;
         }
         else if (cups_header.cupsColorSpace != CUPS_CSPACE_RGBW) {
+            dbglog("5......\n");
             rgbRaster = m_pPrinterBuffer;
             kRaster = NULL;
         }
@@ -604,7 +605,7 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
             ret_status = JOB_CANCELED;
             break;
         }
-
+        
         if (m_iLogLevel & SAVE_INPUT_RASTERS)
         {
             char    szFileName[32];
@@ -623,8 +624,10 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
                 kfp = fopen (szFileName, "w");
                 chmod (szFileName, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
             }
+            dbglog("9......\n");
             WriteBMPHeader (cfp, cups_header.cupsWidth, cups_header.cupsHeight, COLOR_RASTER);
             WriteBMPHeader (kfp, cups_header.cupsWidth, cups_header.cupsHeight, BLACK_RASTER);
+            dbglog("10......\n");
         }
 
         fprintf(stderr, "PAGE: %d %s", current_page_number, m_argv[4]);
@@ -635,6 +638,7 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
             black_raster = kRaster;
 
             if (this->isBlankRaster((BYTE *) m_pPrinterBuffer, (int) cups_header.cupsBytesPerLine)) {
+            
                 color_raster = NULL;
                 black_raster = NULL;
             }
@@ -695,10 +699,18 @@ static BYTE pixel_value[8] = {
             if (b != 0 && b != 0xFF) {
 
 #ifdef __linux
-                rgb[0] -= (255 - b);
-                rgb[1] -= (255 - b);
-                rgb[2] -= (255 - b);
-                
+              //  rgb[0] -= (255 - b);
+              //  rgb[1] -= (255 - b);
+              //  rgb[2] -= (255 - b);
+              int cr,cg,cb;
+              cr = rgb[0] - (int)(255 - b);
+              rgb[0] = cr >= 0 ? cr : 0;
+
+              cg = rgb[1] - (int)(255 - b);
+              rgb[1] = cg >= 0 ? cg : 0;
+
+              cb = rgb[2] - (int)(255 - b);
+              rgb[2] = cb >= 0 ? cb : 0;  
 #else  // This alternate path is for Mac....
 
                 rgb[0] &= b;
@@ -708,6 +720,8 @@ static BYTE pixel_value[8] = {
             }
             else
                 kVal |= (b == 0) ? pixel_value[k] : 0;
+           // else if (rgb[0] == rgb[1] && rgb[1] ==rgb[2])
+              //  kVal |= (rgb[0] == 0) ? pixel_value[k] : 0;
             rgb += 3;
             if (k == 7) {
                 *black++ = kVal;

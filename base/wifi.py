@@ -225,7 +225,7 @@ def getWifiAdaptorID(dev):
 # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 
-def setAdaptorPower(dev, adaptor_id=0, power_state='PowerOn'):
+def setAdaptorPower(dev, adapterName, adaptor_id=0, power_state='PowerOn'):
     ret = {}
     request = PREAMBLE + """<SetAdaptorPowerRequest>
 <AdaptorID>%s</AdaptorID>
@@ -247,7 +247,7 @@ def setAdaptorPower(dev, adaptor_id=0, power_state='PowerOn'):
 # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 
-def performScan(dev, ssid=None):
+def performScan(dev, adapterName, ssid=None):
     ret, i, scan_state = {}, 0, "NewScan"
 
     while True:
@@ -351,7 +351,7 @@ def performScan(dev, ssid=None):
 # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 
-def associate(dev, ssid, communication_mode, encryption_type, key):
+def associate(dev, adapterName,ssid, communication_mode, encryption_type, key):
     ret = {}
     request = PREAMBLE + """<AssociateRequest>
 <SSID>%s</SSID>
@@ -378,7 +378,7 @@ def associate(dev, ssid, communication_mode, encryption_type, key):
 # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 
-def getVSACodes(dev):
+def getVSACodes(dev,adapterName):
     ret = []
     request = PREAMBLE + """<GetVSACodesRequest>
 </GetVSACodesRequest>
@@ -449,7 +449,7 @@ def __getIPConfiguration(dev, adaptor_id=0):
     return ret
 
 
-def getIPConfiguration(dev, adaptor_id=0):
+def getIPConfiguration(dev, adapterName, adaptor_id=0):
     ip, hostname, addressmode, subnetmask, gateway, pridns, sec_dns = \
         '0.0.0.0', 'Unknown', 'Unknown', '0.0.0.0', '0.0.0.0', '0.0.0.0', '0.0.0.0'
     ret = __getIPConfiguration(dev, adaptor_id)
@@ -502,7 +502,7 @@ def __getSignalStrength(dev, adaptor_id=0):
     return ret
 
 
-def getSignalStrength(dev, adaptor_id=0):
+def getSignalStrength(dev, adapterName, ssid, adaptor_id=0):
     ss_max, ss_min, ss_val, ss_dbm = 5, 0, 0, -200
     ret = __getSignalStrength(dev, adaptor_id)
 
@@ -551,7 +551,7 @@ def __getCryptoSuite(dev):
     return ret
 
 
-def getCryptoSuite(dev):
+def getCryptoSuite(dev, adapterName):
     alg, mode, secretid = '', '', ''
     ret = __getCryptoSuite(dev)
 

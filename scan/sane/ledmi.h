@@ -22,6 +22,7 @@
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
   Primary Author: Naga Samrat Chowdary, Narla
+  Contributing Authors: Yashwant Kumar Sahu
 
 \************************************************************************************/
 
@@ -146,6 +147,8 @@ struct ledm_session
 
   void *bb_session;
   /* Add new elements here. */
+  int job_id;
+  int page_id;
 };
 
 int bb_open(struct ledm_session*);

@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# Author: Don Welch
+# Author: Don Welch, Sarbeswar Meher
 #
 
 __version__ = '2.4'
@@ -42,7 +42,7 @@ from prnt import cups
 try:
     mod = module.Module(__mod__, __title__, __version__, __doc__, None,
                         (INTERACTIVE_MODE, GUI_MODE, NON_INTERACTIVE_MODE),
-                        (UI_TOOLKIT_QT4,), True, True)
+                        (UI_TOOLKIT_QT4, UI_TOOLKIT_QT3), True, True)
 
     mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS,
         extra_options=[
@@ -89,20 +89,34 @@ try:
             mode = NON_INTERACTIVE_MODE
 
 
-    if mode == GUI_MODE:
+    if ui_toolkit == 'qt4':
         if not utils.canEnterGUIMode4():
             log.error("%s -u/--gui requires Qt4 GUI support. Entering interactive mode." % __mod__)
+            mode = INTERACTIVE_MODE
+
+    elif ui_toolkit == 'qt3':
+       if not utils.canEnterGUIMode():
+            log.error("%s -u/--gui requires Qt3 GUI support. Entering interactive mode." % __mod__)
             mode = INTERACTIVE_MODE
 
     if mode in (GUI_MODE, INTERACTIVE_MODE):
         mod.quiet = False
 
     if mode == GUI_MODE:
-        try:
+        if ui_toolkit == 'qt4':
+           try:
             from PyQt4.QtGui import QApplication
             from ui4.firmwaredialog import FirmwareDialog
-        except ImportError:
+           except ImportError:
             log.error("Unable to load Qt4 support. Is it installed?")
+            sys.exit(1)
+
+        if ui_toolkit == 'qt3':
+           try:
+            from qt import *
+            from ui.firmwaredialog import FirmwareDialog
+           except ImportError:
+            log.error("Unable to load Qt3 support. Is it installed?")
             sys.exit(1)
 
 
@@ -118,7 +132,10 @@ try:
             dialog.show()
             try:
                 log.debug("Starting GUI loop...")
-                app.exec_()
+                if ui_toolkit == 'qt4':
+                   app.exec_()
+                elif ui_toolkit == 'qt3':
+                   dialog.exec_loop()
             except KeyboardInterrupt:
                 sys.exit(0)
 

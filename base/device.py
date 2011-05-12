@@ -1298,6 +1298,9 @@ class Device(object):
 
     def openEWS_LEDM(self):
         return self.__openChannel(hpmudext.HPMUD_S_EWS_LEDM_CHANNEL)
+    
+    def openLEDM(self):
+        return self.__openChannel(hpmudext.HPMUD_S_LEDM_SCAN)
 
     def closePrint(self):
         return self.__closeChannel(hpmudext.HPMUD_S_PRINT_CHANNEL)
@@ -1322,6 +1325,9 @@ class Device(object):
 
     def closeEWS_LEDM(self):
         return self.__closeChannel(hpmudext.HPMUD_S_EWS_LEDM_CHANNEL)
+    
+    def closeLEDM(self):
+        return self.__closeChannel(hpmudext.HPMUD_S_LEDM_SCAN)
 
     def openCfgUpload(self):
         return self.__openChannel(hpmudext.HPMUD_S_CONFIG_UPLOAD_CHANNEL)
@@ -2111,6 +2117,9 @@ class Device(object):
     def readEWS_LEDM(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=True):
         return self.__readChannel(self.openEWS_LEDM, bytes_to_read, stream, timeout, allow_short_read)
 
+    def readLEDM(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=True):
+        return self.__readChannel(self.openLEDM, bytes_to_read, stream, timeout, allow_short_read)
+
     def readSoapFax(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=True):
         return self.__readChannel(self.openSoapFax, bytes_to_read, stream, timeout, allow_short_read)
 
@@ -2193,6 +2202,9 @@ class Device(object):
 
     def writeEWS_LEDM(self, data):
         return self.__writeChannel(self.openEWS_LEDM, data)
+
+    def writeLEDM(self, data):
+        return self.__writeChannel(self.openLEDM, data)
 
     def writeCfgDownload(self, data):
         return self.__writeChannel(self.openCfgDownload, data)
@@ -2444,6 +2456,21 @@ class Device(object):
         try:
             url2 = "%s&loc=%s" % (self.device_uri.replace('hpfax:', 'hp:'), url)
             data = self
+            opener = LocalOpenerEWS_LEDM({})
+            try:
+                if footer:
+                    return opener.open_hp(url2, data, footer)
+                else:
+                    return opener.open_hp(url2, data) 
+            except Error:
+                log.debug("Status read failed: %s" % url2)
+        finally:
+            self.closeEWS_LEDM()
+    
+    def getUrl_LEDM(self, url, stream, footer=""):
+        try:
+            url2 = "%s&loc=%s" % (self.device_uri.replace('hpfax:', 'hp:'), url)
+            data = self
             opener = LocalOpener_LEDM({})
             try:
                 if footer:
@@ -2454,10 +2481,23 @@ class Device(object):
                 log.debug("Status read failed: %s" % url2)
 
         finally:
-            self.closeEWS_LEDM()
+            self.closeLEDM()
+
+    def FetchLEDMUrl(self, url, footer=""):
+        data_fp = cStringIO.StringIO()
+        if footer:
+            data = self.getUrl_LEDM(url, data_fp, footer)
+        else:
+            data = self.getUrl_LEDM(url, data_fp)
+        if data:
+            data = data.split('\r\n\r\n', 1)[1]
+            if data:
+                data = status.clean(data)
+        return data
+ 
     def readAttributeFromXml(self,uri,attribute):
         stream = cStringIO.StringIO()
-        data = status.StatusType10FetchUrl(self,uri)        
+        data = self.FetchLEDMUrl(uri)        
         if not data:
             log.error("Unable To read the XML data from device")
             return ""
@@ -2541,7 +2581,7 @@ class LocalOpener(urllib.URLopener):
             return response.fp
 
 # URLs: hp:/usb/HP_OfficeJet_7500?serial=00XXXXXXXXXX&loc=/hp/device/info_device_status.xml
-class LocalOpener_LEDM(urllib.URLopener):
+class LocalOpenerEWS_LEDM(urllib.URLopener):
     def open_hp(self, url, dev, foot=""):
         log.debug("open_hp(%s)" % url)
 
@@ -2561,6 +2601,32 @@ class LocalOpener_LEDM(urllib.URLopener):
         reply = xStringIO()
 
         while dev.readEWS_LEDM(8080, reply, timeout=3):
+            pass
+
+        reply.seek(0)
+        return reply.getvalue()
+
+# URLs: hp:/usb/HP_OfficeJet_7500?serial=00XXXXXXXXXX&loc=/hp/device/info_device_status.xml
+class LocalOpener_LEDM(urllib.URLopener):
+    def open_hp(self, url, dev, foot=""):
+        log.debug("open_hp(%s)" % url)
+
+        match_obj = http_pat_url.search(url)
+        loc = url.split("=")[url.count("=")]
+
+        dev.openLEDM()
+        if foot:
+            if "PUT" in foot:
+                dev.writeLEDM("""%s""" % foot)
+            else:
+                dev.writeLEDM("""POST %s HTTP/1.1\r\nContent-Type:text/xml\r\nContent-Length:%s\r\nAccept-Encoding: UTF-8\r\nHost:localhost\r\nUser-Agent:hplip\r\n\r\n """ % (loc, len(foot)))
+                dev.writeLEDM("""%s""" % foot)
+        else:
+            dev.writeLEDM("""GET %s HTTP/1.1\r\nAccept: text/plain\r\nHost:localhost\r\nUser-Agent:hplip\r\n\r\n""" % loc)
+
+        reply = xStringIO()
+
+        while dev.readLEDM(8080, reply, timeout=3):
             pass
 
         reply.seek(0)

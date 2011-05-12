@@ -88,6 +88,9 @@
 :model "HP Officejet g95 All-in-one Printer"
 :status :good
 
+:model "HP LaserJet 100 Color MFP m175nw"
+:status :good
+
 :model "HP Envy 100 d410 Series"
 :status :good
 
@@ -391,10 +394,10 @@
 :model "HP PSC 1209 All-in-one Printer"
 :status :good
 
-:model "HP PSC 1210v All-in-one Printer"
+:model "HP PSC 1210xi All-in-one Printer"
 :status :good
 
-:model "HP PSC 1210xi All-in-one Printer"
+:model "HP PSC 1210v All-in-one Printer"
 :status :good
 
 :model "HP PSC 1210 All-in-one Printer"
@@ -407,6 +410,9 @@
 :status :good
 
 :model "HP PSC 1213 All-in-one Printer"
+:status :good
+
+:model "HP LaserJet Professional m1214nfh Multifunction Printer"
 :status :good
 
 :model "HP PSC 1215 All-in-one Printer"
@@ -442,13 +448,13 @@
 :model "HP PSC 1311 All-in-one Printer"
 :status :good
 
-:model "HP Color LaserJet cm1312 Multifunction Printer"
-:status :good
-
 :model "HP Color LaserJet cm1312nfi Multifunction Printer"
 :status :good
 
 :model "HP PSC 1312 All-in-one Printer"
+:status :good
+
+:model "HP Color LaserJet cm1312 Multifunction Printer"
 :status :good
 
 :model "HP PSC 1315v All-in-one Printer"
@@ -1576,9 +1582,6 @@
 :model "HP Officejet j4535 All-in-one Printer"
 :status :good
 
-:model "HP Color LaserJet cm4540 Multifunction Printer"
-:status :good
-
 :model "HP Photosmart c4540 All-in-one Printer"
 :status :good
 
@@ -1589,6 +1592,9 @@
 :status :good
 
 :model "HP Officejet j4550 All-in-one Printer"
+:status :good
+
+:model "HP LaserJet m4555 MFP"
 :status :good
 
 :model "HP Officejet j4560 All-in-one Printer"

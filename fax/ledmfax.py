@@ -93,15 +93,15 @@ Content-length: %d\r
 \r
 %s""" % (url, self.http_host, len(post), post)
         log.log_data(data)
-        self.writeEWS_LEDM(data)
+        self.writeLEDM(data)
         response = cStringIO.StringIO()
 
-        while self.readEWS_LEDM(4096, response, timeout=5):
+        while self.readLEDM(4096, response, timeout=5):
             pass
 
         response = response.getvalue()
         log.log_data(response)
-        self.closeEWS_LEDM()        
+        self.closeLEDM()        
         
         match = http_result_pat.match(response)
         if match is None: return HTTP_OK
@@ -385,17 +385,17 @@ class LEDMFaxSendThread(FaxSendThread):
                         data = self.format_http_post("/FaxPCSend/Job",len(createJob),createJob)
                         log.log_data(data)                        
 
-                        self.dev.openEWS_LEDM()
-                        self.dev.writeEWS_LEDM(data)
+                        self.dev.openLEDM()
+                        self.dev.writeLEDM(data)
                         response = cStringIO.StringIO()
                         try:
-                            while self.dev.readEWS_LEDM(1000, response, timeout=5):
+                            while self.dev.readLEDM(1000, response, timeout=5):
                                 pass
                         except Error:
                             fax_send_state = FAX_SEND_STATE_ERROR
-                            self.dev.closeEWS_LEDM() 
+                            self.dev.closeLEDM() 
                             break
-                        self.dev.closeEWS_LEDM()
+                        self.dev.closeLEDM()
 
                         response = response.getvalue()
                         log.log_data(response)                         
@@ -463,24 +463,24 @@ class LEDMFaxSendThread(FaxSendThread):
                             xmldata = self.format_http_post(pageConfigURI,len(pageConfig),pageConfig)
                             log.log_data(xmldata) 
                            
-                            self.dev.openEWS_LEDM()
+                            self.dev.openLEDM()
                             try:
-                                self.dev.writeEWS_LEDM(xmldata)
+                                self.dev.writeLEDM(xmldata)
                             except Error:
                                 fax_send_state = FAX_SEND_STATE_ERROR
-                                self.dev.closeEWS_LEDM() 
+                                self.dev.closeLEDM() 
                                 break
 
                             response = cStringIO.StringIO()
                             try:
-                                while self.dev.readEWS_LEDM(1000, response, timeout=5):
+                                while self.dev.readLEDM(1000, response, timeout=5):
                             	    pass
                             except Error:
                                 fax_send_state = FAX_SEND_STATE_ERROR
-                                self.dev.closeEWS_LEDM()
+                                self.dev.closeLEDM()
                                 break
 
-                            self.dev.closeEWS_LEDM()
+                            self.dev.closeLEDM()
                             response = (response.getvalue())
                             log.log_data(response)
                             if self.get_error_code(response) != HTTP_ACCEPTED:
@@ -511,26 +511,26 @@ class LEDMFaxSendThread(FaxSendThread):
                             
                             xmldata = self.format_http_post(pageImageURI,len(data),"","application/octet-stream")
                             log.debug("Sending Page Image XML Data [%s] to the device" %str(xmldata))                           
-                            self.dev.openEWS_LEDM()
-                            self.dev.writeEWS_LEDM(xmldata)
+                            self.dev.openLEDM()
+                            self.dev.writeLEDM(xmldata)
                             log.debug("Sending Raw Data to printer............")
                             try:
-                                self.dev.writeEWS_LEDM(data)
+                                self.dev.writeLEDM(data)
                             except Error:
                                 fax_send_state = FAX_SEND_STATE_ERROR
-                                self.dev.closeEWS_LEDM() 
+                                self.dev.closeLEDM() 
                                 break  
                               
                             response = cStringIO.StringIO()
                             try:
-                                while self.dev.readEWS_LEDM(1000, response, timeout=10):
+                                while self.dev.readLEDM(1000, response, timeout=10):
                             	    pass
                             except Error:
                                 fax_send_state = FAX_SEND_STATE_ERROR
-                                self.dev.closeEWS_LEDM()
+                                self.dev.closeLEDM()
                                 break
                             
-                            self.dev.closeEWS_LEDM()
+                            self.dev.closeLEDM()
                             response = response.getvalue()
                             log.log_data(response)
     
@@ -557,18 +557,18 @@ class LEDMFaxSendThread(FaxSendThread):
                         data = self.format_http_put(jobListURI,len(xmldata),xmldata)
                         log.log_data(data)
                         
-                        self.dev.openEWS_LEDM()
-                        self.dev.writeEWS_LEDM(data)
+                        self.dev.openLEDM()
+                        self.dev.writeLEDM(data)
                         
                         response = cStringIO.StringIO()
                         try:
-                            while self.dev.readEWS_LEDM(1000, response, timeout=10):
+                            while self.dev.readLEDM(1000, response, timeout=10):
                                 pass
                         except Error:
                             fax_send_state = FAX_SEND_STATE_ERROR
-                            self.dev.closeEWS_LEDM()
+                            self.dev.closeLEDM()
                             break
-                        self.dev.closeEWS_LEDM()
+                        self.dev.closeLEDM()
                         response = response.getvalue()
                         log.log_data(response)        		
 
@@ -590,7 +590,7 @@ class LEDMFaxSendThread(FaxSendThread):
 
                         #time.sleep(1)
 
-                        self.dev.closeEWS_LEDM()
+                        self.dev.closeLEDM()
                         self.dev.close()
 
                         fax_send_state = FAX_SEND_STATE_DONE # Exit inner state machine
@@ -623,7 +623,7 @@ class LEDMFaxSendThread(FaxSendThread):
         
     def checkForError(self,uri):
         stream = cStringIO.StringIO()
-        data = status.StatusType10FetchUrl(self.dev,uri)        
+        data = self.dev.FetchLEDMUrl(uri)
         if not data:
             log.error("Unable To read the XML data from device")
             return ""

@@ -24,7 +24,7 @@ import operator
 
 # Local
 from base.g import *
-from base import device, utils, models, wifi
+from base import device, utils, models, wifi, LedmWifi
 from base.codes import *
 from ui_utils import *
 
@@ -83,6 +83,8 @@ class WifiSetupDialog(QDialog, Ui_Dialog):
         self.hn = ''
         self.standalone = standalone
         self.initUi()
+        self.adapterName = 'Wifi0'
+        self.wifiObj = wifi
 
         if self.device_uri is None:
             QTimer.singleShot(0, self.showIntroPage)
@@ -251,13 +253,13 @@ class WifiSetupDialog(QDialog, Ui_Dialog):
         self.num_networks = 0
 
         try:
-            self.adaptor_id, name, state, presence = wifi.getWifiAdaptorID(self.dev)
+            self.adaptor_id, self.adapterName, state, presence = self.wifiObj.getWifiAdaptorID(self.dev)           
         except Error, e:
             self.showIOError(e)
             return
 
         log.debug("Adaptor ID: %s" % self.adaptor_id)
-        log.debug("Adaptor name: %s" % name)
+        log.debug("Adaptor name: %s" % self.adapterName)
         log.debug("Adaptor state: %s" % state)
         log.debug("Adaptor presence: %s" % presence)
 
@@ -269,8 +271,8 @@ class WifiSetupDialog(QDialog, Ui_Dialog):
             self.close()
 
         log.debug("Turning on wireless radio...")
-        try:
-            wifi.setAdaptorPower(self.dev, self.adaptor_id)
+        try:            
+            self.wifiObj.setAdaptorPower(self.dev, self.adapterName, self.adaptor_id)
         except Error, e:
             self.showIOError(e)
             return
@@ -286,14 +288,14 @@ class WifiSetupDialog(QDialog, Ui_Dialog):
         try:
             self.ssid = unicode(self.SSIDLineEdit.text())
             if self.directed and self.ssid:
-                try:
-                    self.networks = wifi.performScan(self.dev, self.ssid)
+                try:                    
+                    self.networks = self.wifiObj.performScan(self.dev, self.adapterName, self.ssid)                     
                 except Error, e:
                     self.showIOError(e)
                     return
             else:
-                try:
-                    self.networks = wifi.performScan(self.dev)
+                try:                    
+                    self.networks = self.wifiObj.performScan(self.dev, self.adapterName)                     
                 except Error, e:
                     self.showIOError(e)
                     return
@@ -543,11 +545,11 @@ class WifiSetupDialog(QDialog, Ui_Dialog):
 
         beginWaitCursor()
         try:
-            try:
-                self.ip, _, addressmode, subnetmask, gateway, pridns, sec_dns = wifi.getIPConfiguration(self.dev, self.adaptor_id)
-                vsa_codes = wifi.getVSACodes(self.dev)
-                ss_max, ss_min, ss_val, ss_dbm = wifi.getSignalStrength(self.dev, self.adaptor_id)
-                self.hn = wifi.getHostname(self.dev)
+            try:                
+                self.ip,_,addressmode, subnetmask, gateway, pridns, sec_dns= self.wifiObj.getIPConfiguration(self.dev, self.adapterName)
+                vsa_codes = self.wifiObj.getVSACodes(self.dev, self.adapterName)
+                ss_max, ss_min, ss_val, ss_dbm = self.wifiObj.getSignalStrength(self.dev, self.adapterName,self.network, self.adaptor_id)                 
+                self.hn = self.wifiObj.getHostname(self.dev) 
             except Error, e:
                 self.showIOError(e)
                 return
@@ -647,8 +649,8 @@ class WifiSetupDialog(QDialog, Ui_Dialog):
     def associate(self, key=u''):
         beginWaitCursor()
         try:
-            try:
-                alg, mode, secretid = wifi.getCryptoSuite(self.dev)
+            try:                
+                alg, mode, secretid = self.wifiObj.getCryptoSuite(self.dev, self.adapterName)
             except Error, e:
                 self.showIOError(e)
                 return
@@ -661,7 +663,7 @@ class WifiSetupDialog(QDialog, Ui_Dialog):
         beginWaitCursor()
         try:
             try:
-                ret = wifi.associate(self.dev, self.network, self.mode, self.security, key)
+                ret = self.wifiObj.associate(self.dev, self.adapterName, self.network, self.mode, self.security, key) 
             except Error, e:
                 self.showIOError(e)
                 return
@@ -683,6 +685,7 @@ class WifiSetupDialog(QDialog, Ui_Dialog):
             if row != -1:
                 self.device_uri = self.DevicesTableWidget.item(row, 0).device_uri
                 self.mq = device.queryModelByURI(self.device_uri)
+                self.getWifiObject(self.mq['wifi-config'])               
                 back_end, is_hp, bus, model, serial, dev_file, host, zc, port = device.parseDeviceURI(self.device_uri)
                 self.model = models.normalizeModelName(model).lower()
 
@@ -820,5 +823,14 @@ class WifiSetupDialog(QDialog, Ui_Dialog):
 
     def __tr(self,s,c = None):
         return qApp.translate("WifiSetupDialog",s,c)
+
+    # The Wifi object here is not actual object, Dynamically relevant modules are selected based on 
+    # wifi-config value in the models file.
+    def getWifiObject(self,wifiConfVal):
+        if wifiConfVal == WIFI_CONFIG_LEDM:                    
+            self.wifiObj = LedmWifi
+        else:                    
+            self.wifiObj = wifi
+        
 
 

@@ -11491,6 +11491,14 @@ Transparency"
     Attribute "Product" "" "(HP LaserJet Professional p1102 Printer)"
   }
   {
+    ModelName "HP LaserJet Professional P 1102w hpijs"
+    Attribute "NickName" "" "HP LaserJet Professional P 1102w hpijs, $Version, requires proprietary plugin"
+    Attribute "ShortNickName" "" "HP LJ Pro P 1102w hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional p 1102w;DES:hp laserjet professional p 1102w;"
+    PCFileName "hp-laserjet_professional_p_1102w-hpijs.ppd"
+    Attribute "Product" "" "(HP LaserJet Professional P 1102w Printer)"
+  }
+  {
     ModelName "HP LaserJet Professional m1132 MFP hpijs"
     Attribute "NickName" "" "HP LaserJet Professional m1132 MFP hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LJ Pro m1132 MFP hpijs"
@@ -11521,6 +11529,14 @@ Transparency"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional m1213nf mfp;DES:hp laserjet professional m1213nf mfp;"
     PCFileName "hp-laserjet_professional_m1213nf_mfp-hpijs.ppd"
     Attribute "Product" "" "(HP LaserJet Professional m1213nf Multifunction Printer)"
+  }
+  {
+    ModelName "HP LaserJet Professional m1214nfh MFP hpijs"
+    Attribute "NickName" "" "HP LaserJet Professional m1214nfh MFP hpijs, $Version, requires proprietary plugin"
+    Attribute "ShortNickName" "" "HP LJ Pro m1214nfh MFP hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional m1214nfh mfp;DES:hp laserjet professional m1214nfh mfp;"
+    PCFileName "hp-laserjet_professional_m1214nfh_mfp-hpijs.ppd"
+    Attribute "Product" "" "(HP LaserJet Professional m1214nfh Multifunction Printer)"
   }
   {
     ModelName "HP LaserJet Professional m1217nfw MFP hpijs"

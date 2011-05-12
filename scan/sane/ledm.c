@@ -21,6 +21,7 @@
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
   Primary Author: Naga Samrat Chowary, Narla 
+  Contributing Authors: Yashwant Kumar Sahu
 
 *************************************************************************************/
 
@@ -90,6 +91,8 @@ static struct ledm_session *create_session()
   ps->tag = "LEDM";
   ps->dd = -1;
   ps->cd = -1;
+  ps->job_id = 0;
+  ps->page_id = 0;
   return ps;
 }
 

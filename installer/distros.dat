@@ -111,7 +111,7 @@ supported=0
 
 [suse]
 index=3
-versions=11.1,11.2,11.3
+versions=11.1,11.2,11.3,11.4
 display_name=SUSE Linux
 alt_names=
 display=1
@@ -476,6 +476,122 @@ packages=python-xml
 packages=cups-devel
 
 [suse:11.3:python-notify]
+packages=python-notify
+
+# ********************
+[suse:11.4]
+code_name=Celadon
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=3.11.3
+release_date=2011-10-03
+notes=Please be sure to disable the CD repositories in YaST and after installation you must log out and back in to become a member of the lp and sys group to enable printing.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+cups_path_with_bitness=1
+ui_toolkit=qt4
+native_cups=1
+add_user_to_group= -Gsys,lp
+open_mdns_port=/bin/bash ./init-suse-firewall
+pre_depend_cmd=su -c "zypper refresh"
+
+[suse:11.4:cups]
+packages=cups,cups-client
+
+[suse:11.4:cups-devel]
+packages=cups-devel,cupsddk
+
+[suse:11.4:gcc]
+packages=gcc-c++
+
+[suse:11.4:gs]
+packages=ghostscript-library
+
+[suse:11.4:libcrypto]
+packages=openssl
+
+[suse:11.4:libjpeg]
+packages=libjpeg-devel
+
+[suse:11.4:libnetsnmp-devel]
+packages=net-snmp-devel
+
+[suse:11.4:libpthread]
+packages=glibc
+
+[suse:11.4:libtool]
+packages=libtool,libgphoto2-devel
+
+[suse:11.4:libusb]
+packages=libusb-1_0-devel,libusb-1_0-0
+
+[suse:11.4:make]
+packages=make
+
+[suse:11.4:pil]
+packages=python-imaging
+
+[suse:11.4:ppdev]
+packages=
+commands=su -c "modprobe ppdev"
+
+[suse:11.4:pyqt]
+packages=python-qt
+
+[suse:11.4:pyqt4]
+packages=python-qt4
+
+[suse:11.4:pyqt4-dbus]
+packages=dbus-1-python-devel,dbus-1-python
+
+[suse:11.4:python-devel]
+packages=python-devel,python-xml
+
+[suse:11.4:python23]
+packages=python
+
+[suse:11.4:python2x]
+packages=python
+
+[suse:11.4:reportlab]
+packages=
+
+[suse:11.4:sane]
+packages=xsane
+
+[suse:11.4:sane-devel]
+packages=sane-backends-devel
+
+[suse:11.4:scanimage]
+packages=sane-backends
+
+[suse:11.4:xsane]
+packages=xsane
+
+[suse:11.4:cups-ddk]
+packages=cupsddk
+
+[suse:11.4:python-dbus]
+packages=dbus-1-python
+
+[suse:11.4:dbus]
+packages=dbus-1-devel,python-gobject2
+
+[suse:11.4:python-xml]
+packages=python-xml
+
+[suse:11.4:cups-image]
+packages=cups-devel
+
+[suse:11.4:python-notify]
 packages=python-notify
 
 # ****************************************
@@ -2024,7 +2140,7 @@ ui_toolkit=qt3
 # ****************************************
 [rhel]
 index=7
-versions=3.0,4.0,5.0
+versions=5.0
 display_name=Red Hat Enterprise Linux
 alt_names=red hat enterprise linux
 display=1
@@ -2040,46 +2156,6 @@ udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
-
-# ********************
-[rhel:3.0]
-code_name=Taroon
-supported=0
-scan_supported=1
-fax_supported=0
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=
-release_date=2003-10-22
-notes=
-ppd_install=
-udev_mode_fix=1
-ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt3
-
-# ********************
-[rhel:4.0]
-code_name=Nahant
-supported=0
-scan_supported=1
-fax_supported=0
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=
-release_date=2005-2-15
-notes=
-ppd_install=
-udev_mode_fix=1
-ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt3
 
 # ********************
 [rhel:5.0]
@@ -2102,6 +2178,28 @@ drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 package_available=1
 package_arch=i386,x86_64
+
+# ********************
+[rhel:6.0]
+code_name=Santiago
+supported=0
+scan_supported=1
+fax_supported=0
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=1.6.7
+release_date=
+notes=
+ppd_install=
+udev_mode_fix=1
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+package_available=1
+package_arch=i686,x86_64
 
 # ****************************************
 [slackware]
@@ -3150,7 +3248,7 @@ packages=
 # ****************************************
 [ubuntu]
 index=12
-versions=6.06,8.04,8.04.1,8.04.2,9.10,10.04,10.10
+versions=6.06,8.04,8.04.1,8.04.2,9.10,10.04,10.10,11.04
 display_name=Ubuntu
 alt_names=kubuntu,edubuntu,xubuntu
 display=1
@@ -3990,9 +4088,123 @@ packages=policykit-1,policykit-1-gnome
 packages=python-notify
 
 # ****************************************
+[ubuntu:11.04]
+code_name=natty
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=3.11.5
+release_date=28/04/2010
+notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.  During the install process you will be added to the lp and lpadmin group, please quit the installer before the setup stage, log out, log back in, and run hp-setup to complete the install.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+native_cups=1
+acl_rules=1
+add_user_to_group=-a -Glp,lpadmin
+
+[ubuntu:11.04:cups]
+packages=libcups2
+
+[ubuntu:11.04:cups-devel]
+packages=libcups2-dev,cups-bsd,cups-client
+
+[ubuntu:11.04:gcc]
+packages=build-essential
+
+[ubuntu:11.04:gs]
+packages=ghostscript
+
+[ubuntu:11.04:libcrypto]
+packages=openssl
+
+[ubuntu:11.04:libjpeg]
+packages=libjpeg62-dev
+
+[ubuntu:11.04:libnetsnmp-devel]
+packages=libsnmp-dev
+
+[ubuntu:11.04:libpthread]
+packages=build-essential
+
+[ubuntu:11.04:libtool]
+packages=libtool
+
+[ubuntu:11.04:libusb]
+packages=libusb-dev
+
+[ubuntu:11.04:make]
+packages=build-essential
+
+[ubuntu:11.04:pil]
+packages=python-imaging
+
+[ubuntu:11.04:ppdev]
+packages=
+commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppdev | sudo tee -a /etc/modules
+
+[ubuntu:11.04:pyqt]
+packages=python-qt4
+
+[ubuntu:11.04:python-devel]
+packages=python-dev
+
+[ubuntu:11.04:pyqt4]
+packages=python-qt4
+
+[ubuntu:11.04:pyqt4-dbus]
+packages=python-qt4-dbus
+
+#[ubuntu:11.04:python23]
+#packages=python
+
+[ubuntu:11.04:python2x]
+packages=python
+
+[ubuntu:11.04:reportlab]
+packages=python-reportlab
+
+[ubuntu:11.04:sane]
+packages=libsane
+
+[ubuntu:11.04:sane-devel]
+packages=libsane-dev
+
+[ubuntu:11.04:scanimage]
+packages=sane-utils
+
+[ubuntu:11.04:xsane]
+packages=xsane
+
+[ubuntu:11.04:python-dbus]
+packages=python-dbus,python-gobject
+
+[ubuntu:11.04:dbus]
+packages=libdbus-1-dev
+
+[ubuntu:11.04:cups-image]
+packages=libcupsimage2-dev
+
+[ubuntu:11.04:cups-ddk]
+packages=cups
+
+[ubuntu:11.04:policykit]
+packages=policykit-1,policykit-1-gnome
+
+[ubuntu:11.04:python-notify]
+packages=python-notify
+
+# ****************************************
 [debian]
 index=2
-versions=2.2,3.0,3.1,4.0,4.0r0,4.0r1,5.0,5.0.1,5.0.2,5.0.3,5.0.4,5.0.5,5.0.6,5.0.7,5.0.8,stable,lenny/sid,testing,lenny
+versions=2.2,3.0,3.1,4.0,4.0r0,4.0r1,5.0,5.0.1,5.0.2,5.0.3,5.0.4,5.0.5,5.0.6,5.0.7,5.0.8,stable,lenny/sid,testing,lenny,6.0,6.0.1
 display_name=Debian
 alt_names=
 display=1
@@ -4700,16 +4912,16 @@ ui_toolkit=qt4
 native_cups=1
 
 [debian:testing:cups]
-packages=cupsys,cupsys-client
+packages=libcups2
 
 [debian:testing:cups-devel]
-packages=libcupsys2-dev,cupsys-bsd
+packages=libcups2-dev,cups-bsd,cups-client
 
 [debian:testing:gcc]
 packages=g++
 
 [debian:testing:gs]
-packages=gs-esp
+packages=ghostscript,ghostscript-cups,ghostscript-x
 
 [debian:testing:libcrypto]
 packages=libssl-dev
@@ -4785,7 +4997,7 @@ packages=libdbus-1-dev
 packages=python-ctypes
 
 [debian:testing:cups-image]
-packages=libcupsys2-dev,cupsys-bsd
+packages=libcupsimage2,libcupsimage2-dev
 
 [debian:testing:python-notify]
 packages=python-notify
@@ -5013,6 +5225,127 @@ packages=libcupsys2-dev,cupsys-bsd
 
 [debian:lenny:python-notify]
 packages=python-notify
+
+# ********************
+[debian:6.0]
+code_name=Squeeze
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=2.8.6
+release_date=
+notes=NOTE: Disable the CD Sources in your apt sources.list or the install will fail and hang.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+native_cups=1
+policykit=0
+add_user_to_group=-a -G lp,lpadmin
+
+[debian:6.0:cups]
+packages=libcups2
+
+[debian:6.0:cups-devel]
+packages=libcups2-dev,cups-bsd,cups-client
+
+[debian:6.0:gcc]
+packages=g++
+
+[debian:6.0:gs]
+packages=gs-esp
+
+[debian:6.0:libcrypto]
+packages=libssl-dev
+
+[debian:6.0:libjpeg]
+packages=libjpeg62-dev
+
+[debian:6.0:libnetsnmp-devel]
+packages=libsnmp-dev
+
+[debian:6.0:libpthread]
+packages=libc6
+
+[debian:6.0:libtool]
+packages=libtool
+
+[debian:6.0:libusb]
+packages=libusb-dev
+
+[debian:6.0:make]
+packages=make
+
+[debian:6.0:pil]
+packages=python-imaging
+
+[debian:6.0:ppdev]
+packages=
+commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
+
+[debian:6.0:pyqt]
+packages=python-qt3
+
+[debian:6.0:python-devel]
+packages=python-dev
+
+[debian:6.0:pyqt4]
+packages=python-qt4
+
+[debian:6.0:pyqt4-dbus]
+packages=python-qt4-dbus
+
+[debian:6.0:python23]
+packages=python
+
+[debian:6.0:python2x]
+packages=python
+
+[debian:6.0:reportlab]
+packages=python-reportlab
+
+[debian:6.0:sane]
+packages=sane
+
+[debian:6.0:sane-devel]
+packages=libsane-dev
+
+[debian:6.0:scanimage]
+packages=sane-utils
+
+[debian:6.0:xsane]
+packages=xsane
+
+[debian:6.0:cups-ddk]
+packages=
+
+[debian:6.0:python-dbus]
+packages=python-dbus,python-gobject
+
+[debian:6.0:dbus]
+packages=libdbus-1-dev
+
+[debian:6.0:python-ctypes]
+packages=python-ctypes
+
+[debian:6.0:cups-image]
+packages=libcupsimage2,libcupsimage2-dev
+
+[debian:6.0:policykit]
+packages=policykit-1,policykit-1-gnome
+
+[debian:6.0:python-notify]
+packages=python-notify
+
+[debian:6.0.1]
+same_as_version=6.0
+
 
 # ****************************************
 [xandros]

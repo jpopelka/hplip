@@ -70,7 +70,7 @@ from waitform import WaitForm
 from faxsettingsform import FaxSettingsForm
 from nodevicesform import NoDevicesForm
 from settingsdialog import SettingsDialog
-from aboutdlg import AboutDlg
+from firmwaredialog import FirmwareDialog
 
 # all in seconds
 MIN_AUTO_REFRESH_RATE = 5
@@ -1336,7 +1336,7 @@ class DevMgr4(DevMgr4_base):
                 self.__tr("Download Firmware"),
                 "firmware",
                 self.__tr("Download firmware to your printer <br>(required on some devices after each power-up)."),
-                self.downloadFirmware),
+                self.ShowFirmwareDlg),
 
                 # PLUGIN
 
@@ -1899,6 +1899,10 @@ class DevMgr4(DevMgr4_base):
         self.RunCommand(self.cmd_fab)
 
 
+    def ShowFirmwareDlg(self):
+        dlg = FirmwareDialog(self, self.cur_device_uri)
+        dlg.show()
+        return dlg.exec_loop() == QDialog.Accepted
 
     # ***********************************************************************************
     #

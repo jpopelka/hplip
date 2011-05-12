@@ -166,7 +166,7 @@
             <property name="text">
                 <string>&lt;b&gt;Authors and Contributors:&lt;/b&gt;
 David Suffield, Don Welch, Shiyun Yie, Raghothama Cauligi, John Oleinik, Cory Meisch, Foster Nuffer, Pete Parks, Jacqueline Pitter, David Paschal, 
-Steve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter, Linus Araque, Mark Crawford, Charlie Moore</string>
+Steve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter, Linus Araque, Mark Crawford, Charlie Moore, Naga Samrat Choudary, Suma Byrappa, Parul Singh, Srikant Lokare, Yashwant Sahu, Sanjay Kumar, Sarbeswar Meher, Goutam Kodu, Gaurav Sood</string>
             </property>
         </widget>
         <widget class="QLabel" row="4" column="0">

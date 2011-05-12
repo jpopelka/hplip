@@ -356,12 +356,12 @@ class PrintSettingsToolbox(QToolBox):
                     self.job_options['pagerange'] = current
 
                     # page set (COMBO/PICKONE)
-                    current = current_options.get('pageset', '')
+                    current = current_options.get('pageset', 'all')
                     self.addControlRow("pageset", self.__tr("Page Set"),
                         cups.PPD_UI_PICKONE, current,
-                        [('all', self.__tr("All pages")),
-                         ('even', self.__tr("Even pages")),
-                         ('odd', self.__tr("Odd pages"))], 'all', job_option=True)
+                        [('all', self.__tr("AllPages")),
+                         ('even', self.__tr("Even")),
+                         ('odd', self.__tr("Odd"))], 'all', job_option=True)
 
                     self.job_options['pageset'] = current
 #                    if current == u'even':

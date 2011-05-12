@@ -442,6 +442,8 @@ def copyPluginFiles(src_dir):
 def run_plugin_command(required=True, plugin_reason=PLUGIN_REASON_NONE):
     su_sudo = None
     need_sudo = True
+    name = None
+    version = None
 
     if utils.to_bool(sys_conf.get('configure', 'policy-kit')):
         try:
@@ -460,7 +462,14 @@ def run_plugin_command(required=True, plugin_reason=PLUGIN_REASON_NONE):
     if need_sudo:
         su_sudo = utils.su_sudo()
     if su_sudo is "su":
-        su_sudo = 'su -c "%s"'
+        name,version = utils.os_release()
+        log.debug("name = %s version = %s" %(name,version))
+        if ( name == 'Fedora' and version >= '14'):
+           #using su opening GUI apps fail in Fedora 14. 
+           #To run GUI apps as root, you need a root login shell (su -) in Fedora 14   
+           su_sudo = 'su - -c "%s"'
+        else:
+           su_sudo = 'su -c "%s"'
         password_f = "get_password_ui"    
     if su_sudo is None:
         log.error("Unable to find a suitable sudo command to run 'hp-plugin'")
