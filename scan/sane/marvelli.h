@@ -84,7 +84,7 @@ struct marvell_session
    char uri[HPMUD_LINE_SIZE];
    char model[HPMUD_LINE_SIZE];
    int scan_type;
-
+   int is_user_cancel;
    IP_IMAGE_TRAITS image_traits;   /* specified by image processor */      
 
    SANE_Option_Descriptor option[MARVELL_OPTION_MAX];

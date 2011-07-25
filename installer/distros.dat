@@ -111,7 +111,7 @@ supported=0
 
 [suse]
 index=3
-versions=11.1,11.2,11.3,11.4
+versions=11.2,11.3,11.4
 display_name=SUSE Linux
 alt_names=
 display=1
@@ -794,7 +794,7 @@ ui_toolkit=qt3
 # ****************************************
 [fedora]
 index=5
-versions=1.0,2.0,3.0,4.0,5,5.0,5.92,6,6.0,7,7.0,8,8.0,9,9.0,10,10.0,11,11.0,12,12.0,13,13.0,14,14.0
+versions=13,14,15
 display_name=Fedora
 alt_names=Fedora Core
 display=1
@@ -1969,7 +1969,7 @@ packages=notify-python
 same_as_version= 11
 
 # ********************
-[fedora:12]
+[fedora:13]
 code_name=
 supported=1
 scan_supported=1
@@ -1980,7 +1980,7 @@ parallel_supported=1
 usb_supported=1
 packaged_version=
 release_date=
-notes=To complete the install in Fedora 12 or 13 or 14 you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
+notes=To complete the install in Fedora 13 or 14 you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
 ppd_install=drv
 udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
@@ -1993,105 +1993,326 @@ add_user_to_group=-a -Gsys,lp
 open_mdns_port=/bin/bash ./init-iptables-firewall
 pre_depend_cmd=su -c "yum clean all"
 
-[fedora:12:cups]
+[fedora:13:cups]
 packages=cups
 
-[fedora:12:cups-devel]
+[fedora:13:cups-devel]
 packages=cups-devel
 
-[fedora:12:gcc]
+[fedora:13:gcc]
 packages=gcc-c++
 
-[fedora:12:gs]
+[fedora:13:gs]
 packages=ghostscript
 
-[fedora:12:libcrypto]
+[fedora:13:libcrypto]
 packages=openssl-devel
 
-[fedora:12:libjpeg]
+[fedora:13:libjpeg]
 packages=libjpeg-devel
 
-[fedora:12:libnetsnmp-devel]
+[fedora:13:libnetsnmp-devel]
 packages=net-snmp-devel
 
-[fedora:12:libpthread]
+[fedora:13:libpthread]
 packages=glibc-headers
 
-[fedora:12:libtool]
+[fedora:13:libtool]
 packages=libtool
 
-[fedora:12:libusb]
+[fedora:13:libusb]
 packages=libusb-devel
 
-[fedora:12:make]
+[fedora:13:make]
 packages=make
 
-[fedora:12:pil]
+[fedora:13:pil]
 packages=python-imaging
 
-[fedora:12:ppdev]
+[fedora:13:ppdev]
 packages=
 commands=su -c "/sbin/modprobe ppdev"
 
-[fedora:12:pyqt]
+[fedora:13:pyqt]
 packages=PyQt
 
-[fedora:12:python-devel]
+[fedora:13:python-devel]
 packages=python-devel
 
-[fedora:12:pyqt4]
+[fedora:13:pyqt4]
 packages=PyQt4
 
-[fedora:12:pyqt4-dbus]
+[fedora:13:pyqt4-dbus]
 packages=dbus-python
 
-[fedora:12:python23]
+[fedora:13:python23]
 packages=python
 
-[fedora:12:python2x]
+[fedora:13:python2x]
 packages=python
 
-[fedora:12:reportlab]
+[fedora:13:reportlab]
 packages=python-reportlab
 
-[fedora:12:sane]
+[fedora:13:sane]
 packages=sane-backends
 
-[fedora:12:sane-devel]
+[fedora:13:sane-devel]
 packages=sane-backends-devel
 
-[fedora:12:scanimage]
+[fedora:13:scanimage]
 packages=sane-frontends
 
-[fedora:12:xsane]
+[fedora:13:xsane]
 packages=xsane
 
-[fedora:12:python-dbus]
+[fedora:13:python-dbus]
 packages=dbus-python,pygobject2
 
-[fedora:12:dbus]
+[fedora:13:dbus]
 packages=dbus-devel
 
-[fedora:12:cups-image]
+[fedora:13:cups-image]
 packages=cups-devel
 
-[fedora:12:python-notify]
+[fedora:13:python-notify]
 packages=notify-python
 
-[fedora:12:policykit]
+[fedora:13:policykit]
+packages=polkit,polkit-gnome
+
+# ********************
+[fedora:14]
+code_name=
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=
+release_date=
+notes=To complete the install in Fedora 13 or 14 you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+policykit=0
+native_cups=1
+add_user_to_group=-a -Gsys,lp
+open_mdns_port=/bin/bash ./init-iptables-firewall
+pre_depend_cmd=su -c "yum clean all"
+
+[fedora:14:cups]
+packages=cups
+
+[fedora:14:cups-devel]
+packages=cups-devel
+
+[fedora:14:gcc]
+packages=gcc-c++
+
+[fedora:14:gs]
+packages=ghostscript
+
+[fedora:14:libcrypto]
+packages=openssl-devel
+
+[fedora:14:libjpeg]
+packages=libjpeg-devel
+
+[fedora:14:libnetsnmp-devel]
+packages=net-snmp-devel
+
+[fedora:14:libpthread]
+packages=glibc-headers
+
+[fedora:14:libtool]
+packages=libtool
+
+[fedora:14:libusb]
+packages=libusb-devel
+
+[fedora:14:make]
+packages=make
+
+[fedora:14:pil]
+packages=python-imaging
+
+[fedora:14:ppdev]
+packages=
+commands=su -c "/sbin/modprobe ppdev"
+
+[fedora:14:pyqt]
+packages=PyQt
+
+[fedora:14:python-devel]
+packages=python-devel
+
+[fedora:14:pyqt4]
+packages=PyQt4
+
+[fedora:14:pyqt4-dbus]
+packages=dbus-python
+
+[fedora:14:python23]
+packages=python
+
+[fedora:14:python2x]
+packages=python
+
+[fedora:14:reportlab]
+packages=python-reportlab
+
+[fedora:14:sane]
+packages=sane-backends
+
+[fedora:14:sane-devel]
+packages=sane-backends-devel
+
+[fedora:14:scanimage]
+packages=sane-frontends
+
+[fedora:14:xsane]
+packages=xsane
+
+[fedora:14:python-dbus]
+packages=dbus-python,pygobject2
+
+[fedora:14:dbus]
+packages=dbus-devel
+
+[fedora:14:cups-image]
+packages=cups-devel
+
+[fedora:14:python-notify]
+packages=notify-python
+
+[fedora:14:policykit]
+packages=polkit,polkit-gnome
+
+# ********************
+[fedora:15]
+code_name=Lovelock
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=3.11.3a
+release_date=24/05/2011
+notes=To complete the install in Fedora 15 you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+policykit=0
+native_cups=1
+add_user_to_group=-a -Gsys,lp
+open_mdns_port=/bin/bash ./init-iptables-firewall
+pre_depend_cmd=su -c "yum clean all"
+
+[fedora:15:cups]
+packages=cups
+
+[fedora:15:cups-devel]
+packages=cups-devel
+
+[fedora:15:gcc]
+packages=gcc-c++
+
+[fedora:15:gs]
+packages=ghostscript
+
+[fedora:15:libcrypto]
+packages=openssl-devel
+
+[fedora:15:libjpeg]
+packages=libjpeg-devel
+
+[fedora:15:libnetsnmp-devel]
+packages=net-snmp-devel
+
+[fedora:15:libpthread]
+packages=glibc-headers
+
+[fedora:15:libtool]
+packages=libtool
+
+[fedora:15:libusb]
+packages=libusb-devel
+
+[fedora:15:make]
+packages=make
+
+[fedora:15:pil]
+packages=python-imaging
+
+[fedora:15:ppdev]
+packages=
+commands=su -c "/sbin/modprobe ppdev"
+
+[fedora:15:pyqt]
+packages=PyQt
+
+[fedora:15:python-devel]
+packages=python-devel
+
+[fedora:15:pyqt4]
+packages=PyQt4
+
+[fedora:15:pyqt4-dbus]
+packages=dbus-python
+
+[fedora:15:python23]
+packages=python
+
+[fedora:15:python2x]
+packages=python
+
+[fedora:15:reportlab]
+packages=python-reportlab
+
+[fedora:15:sane]
+packages=sane-backends
+
+[fedora:15:sane-devel]
+packages=sane-backends-devel
+
+[fedora:15:scanimage]
+packages=sane-frontends
+
+[fedora:15:xsane]
+packages=xsane
+
+[fedora:15:python-dbus]
+packages=dbus-python,pygobject2
+
+[fedora:15:dbus]
+packages=dbus-devel
+
+[fedora:15:cups-image]
+packages=cups-devel
+
+[fedora:15:python-notify]
+packages=notify-python
+
+[fedora:15:policykit]
 packages=polkit,polkit-gnome
 
 # ********************
 [fedora:12.0]
 same_as_version=12
 
-[fedora:13]
-same_as_version=12
 
 [fedora:13.0]
-same_as_version=12
-
-[fedora:14]
 same_as_version=12
 
 [fedora:14.0]
@@ -2140,7 +2361,7 @@ ui_toolkit=qt3
 # ****************************************
 [rhel]
 index=7
-versions=5.0
+versions=5.0,6.0
 display_name=Red Hat Enterprise Linux
 alt_names=red hat enterprise linux
 display=1
@@ -3248,7 +3469,7 @@ packages=
 # ****************************************
 [ubuntu]
 index=12
-versions=6.06,8.04,8.04.1,8.04.2,9.10,10.04,10.10,11.04
+versions=8.04,10.04,10.10,11.04
 display_name=Ubuntu
 alt_names=kubuntu,edubuntu,xubuntu
 display=1
@@ -4204,7 +4425,7 @@ packages=python-notify
 # ****************************************
 [debian]
 index=2
-versions=2.2,3.0,3.1,4.0,4.0r0,4.0r1,5.0,5.0.1,5.0.2,5.0.3,5.0.4,5.0.5,5.0.6,5.0.7,5.0.8,stable,lenny/sid,testing,lenny,6.0,6.0.1
+versions=5.0,5.0.1,5.0.2,5.0.3,5.0.4,5.0.5,5.0.6,5.0.7,5.0.8,6.0,6.0.1
 display_name=Debian
 alt_names=
 display=1
@@ -5990,7 +6211,7 @@ packages=libcupsys2-dev
 # ****************************************
 [mandriva]
 index=4
-versions=9.1,9.2,10.0,10.1,10.2,2006.0,2007.0,2007.1,2008.0,2008.1,2009,2009.0,2010.0
+versions=2006.0,2007.0,2007.1,2008.0,2008.1,2009,2009.0,2010.0
 display_name=Mandriva Linux
 alt_names=Mandrakelinux,Mandrake Linux
 display=1

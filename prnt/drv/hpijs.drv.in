@@ -8009,14 +8009,6 @@ nSet=2"
     Attribute "Product" "" "(HP Color LaserJet cp1518ni Printer)"
   }
   {
-    ModelName "HP Color LaserJet cp2025 hpijs"
-    Attribute "NickName" "" "HP Color LaserJet cp2025 hpijs pcl3, $Version"
-    Attribute "ShortNickName" "" "HP Color LaserJet cp2025 hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp2025;DES:hp color laserjet cp2025;"
-    PCFileName "hp-color_laserjet_cp2025-hpijs-pcl3.ppd"
-    Attribute "Product" "" "(HP Color LaserJet cp2025 Printer)"
-  }
-  {
     ModelName "HP Color LaserJet cp2025dn hpijs"
     Attribute "NickName" "" "HP Color LaserJet cp2025dn hpijs pcl3, $Version"
     Attribute "ShortNickName" "" "HP Color LJ cp2025dn hpijs"
@@ -8025,12 +8017,12 @@ nSet=2"
     Attribute "Product" "" "(HP Color LaserJet cp2025dn Printer)"
   }
   {
-    ModelName "HP Color LaserJet cp2025x hpijs"
-    Attribute "NickName" "" "HP Color LaserJet cp2025x hpijs pcl3, $Version"
-    Attribute "ShortNickName" "" "HP Color LaserJet cp2025x hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp2025x;DES:hp color laserjet cp2025x;"
-    PCFileName "hp-color_laserjet_cp2025x-hpijs-pcl3.ppd"
-    Attribute "Product" "" "(HP Color LaserJet cp2025x Printer)"
+    ModelName "HP Color LaserJet cp2025 hpijs"
+    Attribute "NickName" "" "HP Color LaserJet cp2025 hpijs pcl3, $Version"
+    Attribute "ShortNickName" "" "HP Color LaserJet cp2025 hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp2025;DES:hp color laserjet cp2025;"
+    PCFileName "hp-color_laserjet_cp2025-hpijs-pcl3.ppd"
+    Attribute "Product" "" "(HP Color LaserJet cp2025 Printer)"
   }
   {
     ModelName "HP Color LaserJet cp2025n hpijs"
@@ -8039,6 +8031,14 @@ nSet=2"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp2025n;DES:hp color laserjet cp2025n;"
     PCFileName "hp-color_laserjet_cp2025n-hpijs-pcl3.ppd"
     Attribute "Product" "" "(HP Color LaserJet cp2025n Printer)"
+  }
+  {
+    ModelName "HP Color LaserJet cp2025x hpijs"
+    Attribute "NickName" "" "HP Color LaserJet cp2025x hpijs pcl3, $Version"
+    Attribute "ShortNickName" "" "HP Color LaserJet cp2025x hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp2025x;DES:hp color laserjet cp2025x;"
+    PCFileName "hp-color_laserjet_cp2025x-hpijs-pcl3.ppd"
+    Attribute "Product" "" "(HP Color LaserJet cp2025x Printer)"
   }
   {
     ModelName "HP Business Inkjet 2300 hpijs"
@@ -11539,12 +11539,28 @@ Transparency"
     Attribute "Product" "" "(HP LaserJet Professional m1214nfh Multifunction Printer)"
   }
   {
+    ModelName "HP LaserJet Professional m1216nfh MFP hpijs"
+    Attribute "NickName" "" "HP LaserJet Professional m1216nfh MFP hpijs, $Version, requires proprietary plugin"
+    Attribute "ShortNickName" "" "HP LJ Pro m1216nfh MFP hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional m1216nfh mfp;DES:hp laserjet professional m1216nfh mfp;"
+    PCFileName "hp-laserjet_professional_m1216nfh_mfp-hpijs.ppd"
+    Attribute "Product" "" "(HP LaserJet Professional m1216nfh MFP)"
+  }
+  {
     ModelName "HP LaserJet Professional m1217nfw MFP hpijs"
     Attribute "NickName" "" "HP LaserJet Professional m1217nfw MFP hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LJ Pro m1217nfw MFP hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional m1217nfw mfp;DES:hp laserjet professional m1217nfw mfp;"
     PCFileName "hp-laserjet_professional_m1217nfw_mfp-hpijs.ppd"
     Attribute "Product" "" "(HP LaserJet Professional m1217nfw Multifunction Printer)"
+  }
+  {
+    ModelName "HP LaserJet Professional m1219nf MFP hpijs"
+    Attribute "NickName" "" "HP LaserJet Professional m1219nf MFP hpijs, $Version, requires proprietary plugin"
+    Attribute "ShortNickName" "" "HP LJ Pro m1219nf MFP hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional m1219nf mfp;DES:hp laserjet professional m1219nf mfp;"
+    PCFileName "hp-laserjet_professional_m1219nf_mfp-hpijs.ppd"
+    Attribute "Product" "" "(HP LaserJet Professional m1219nf MFP)"
   }
   {
     ModelName "HP LaserJet Professional p1566 hpijs"
@@ -12244,14 +12260,6 @@ Transparency"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet cp1025;DES:hp laserjet cp1025;"
       PCFileName "hp-laserjet_cp1025-hpijs.ppd"
       Attribute "Product" "" "(HP LaserJet cp1025)"
-    }
-    {
-      ModelName "HP LaserJet cp1026nw hpijs"
-      Attribute "NickName" "" "HP LaserJet cp1026nw hpijs, $Version, requires proprietary plugin"
-      Attribute "ShortNickName" "" "HP LaserJet cp1026nw hpijs"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet cp1026nw;DES:hp laserjet cp1026nw;"
-      PCFileName "hp-laserjet_cp1026nw-hpijs.ppd"
-      Attribute "Product" "" "(HP LaserJet cp1026nw)"
     }
     {
       ModelName "HP LaserJet cp1027nw hpijs"
@@ -12964,7 +12972,6 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Officejet 100 Mobile l411)"
   }
 } // end StingrayOJ
-
 
 /////////////// ViperPlusVIP
 {
@@ -14899,12 +14906,6 @@ dDEVICEHEIGHTPOINTS=1368"
 4 -dDEVICEHEIGHTPOINTS=1116"
   Attribute "FoomaticRIPOptionSetting" "PageSize=A3" " -dDEVICEWIDTHPOINTS=842 -dDEV&&
 ICEHEIGHTPOINTS=1190"
-  Attribute "FoomaticRIPOption" "Duplex" "enum CmdLine A"
-  Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexNoTumble" " -dDuplex=true -dTum&&
-ble=false"
-  Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexTumble" " -dDuplex=true -dTumbl&&
-e=true"
-  Attribute "FoomaticRIPOptionSetting" "Duplex=None" " -dDuplex=false"
   Attribute "FoomaticRIPOption" "DryTime" "enum CmdLine B"
   Attribute "FoomaticRIPOptionSetting" "DryTime=Zero" ""
   Attribute "FoomaticRIPOptionSetting" "DryTime=Five" ",DryTime=5"
@@ -14969,10 +14970,6 @@ lity:PenSet=2,Quality:FullBleed=1"
       Choice "LargeCapacity/Large Capacity Tray" "%% FoomaticRIPOptionSetting: InputSlot=LargeCapacity"
       Choice "Manual/Manual Feeder" "%% FoomaticRIPOptionSetting: InputSlot=Manual"
       Choice "MPTray/Multi Purpose Tray" "%% FoomaticRIPOptionSetting: InputSlot=MPTray"
-    Option "Duplex/Double-Sided Printing" PickOne AnySetup 120.0
-      Choice "DuplexNoTumble/Long Edge (Standard)" "%% FoomaticRIPOptionSetting: Duplex=DuplexNoTumble"
-      Choice "DuplexTumble/Short Edge (Flip)" "%% FoomaticRIPOptionSetting: Duplex=DuplexTumble"
-      *Choice "None/Off" "%% FoomaticRIPOptionSetting: Duplex=None"
     Option "DryTime/Additional Dry Time" PickOne AnySetup 120.0
       *Choice "Zero/Printer Default" "%% FoomaticRIPOptionSetting: DryTime=Zero"
       Choice "Five/5 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Five"
@@ -15088,6 +15085,14 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 3050 j610 series;DES:deskjet 3050 j610 series;"
     PCFileName "hp-deskjet_3050_j610_series-hpijs.ppd"
     Attribute "Product" "" "(HP Deskjet 3050 j610 Series)"
+  }
+  {
+    ModelName "HP Deskjet 3050a j611 Series hpijs"
+    Attribute "NickName" "" "HP Deskjet 3050a j611 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP DJ 3050a j611 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 3050a j611 series;DES:deskjet 3050a j611 series;"
+    PCFileName "hp-deskjet_3050a_j611_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Deskjet 3050a j611 Series)"
   }
 
 

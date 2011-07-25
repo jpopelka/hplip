@@ -367,7 +367,7 @@ def readXmlDataFromURI(dev,URI,xmlRootNode,xmlChildNode,timeout=5):
     dev.writeLEDM(data)
     response = cStringIO.StringIO()
     try:
-        while dev.readLEDM(1000, response, timeout):
+        while dev.readLEDM(1024, response, timeout):
             pass
     except Error:
         dev.closeLEDM()

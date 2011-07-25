@@ -98,6 +98,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-deskjet_2000_j210_series.ppd.gz \
    ppd/hpcups/hp-deskjet_2050_j510_series.ppd.gz \
    ppd/hpcups/hp-deskjet_3000_j310_series.ppd.gz \
+   ppd/hpcups/hp-deskjet_3050a_j611_series.ppd.gz \
    ppd/hpcups/hp-deskjet_3050_j610_series.ppd.gz \
    ppd/hpcups/hp-deskjet_3320.ppd.gz \
    ppd/hpcups/hp-deskjet_3325.ppd.gz \
@@ -360,7 +361,6 @@ cups_ppd_printers = \
    ppd/hpcups/hp-laserjet_cp1023.ppd.gz \
    ppd/hpcups/hp-laserjet_cp1025nw.ppd.gz \
    ppd/hpcups/hp-laserjet_cp1025.ppd.gz \
-   ppd/hpcups/hp-laserjet_cp1026nw.ppd.gz \
    ppd/hpcups/hp-laserjet_cp1027nw.ppd.gz \
    ppd/hpcups/hp-laserjet_cp1028nw.ppd.gz \
    ppd/hpcups/hp-laserjet_m1005.ppd.gz \
@@ -429,7 +429,9 @@ cups_ppd_printers = \
    ppd/hpcups/hp-laserjet_professional_m1212nf_mfp.ppd.gz \
    ppd/hpcups/hp-laserjet_professional_m1213nf_mfp.ppd.gz \
    ppd/hpcups/hp-laserjet_professional_m1214nfh_mfp.ppd.gz \
+   ppd/hpcups/hp-laserjet_professional_m1216nfh_mfp.ppd.gz \
    ppd/hpcups/hp-laserjet_professional_m1217nfw_mfp.ppd.gz \
+   ppd/hpcups/hp-laserjet_professional_m1219nf_mfp.ppd.gz \
    ppd/hpcups/hp-laserjet_professional_p1102.ppd.gz \
    ppd/hpcups/hp-laserjet_professional_p_1102w.ppd.gz \
    ppd/hpcups/hp-laserjet_professional_p1102w.ppd.gz \

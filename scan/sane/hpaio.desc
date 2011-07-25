@@ -88,7 +88,7 @@
 :model "HP Officejet g95 All-in-one Printer"
 :status :good
 
-:model "HP LaserJet 100 Color MFP m175nw"
+:model "HP LaserJet 100 Color MFP m175"
 :status :good
 
 :model "HP Envy 100 d410 Series"
@@ -421,6 +421,9 @@
 :model "HP PSC 1216 All-in-one Printer"
 :status :good
 
+:model "HP LaserJet Professional m1216nfh MFP"
+:status :good
+
 :model "HP PSC 1217 All-in-one Printer"
 :status :good
 
@@ -428,6 +431,9 @@
 :status :good
 
 :model "HP PSC 1218 All-in-one Printer"
+:status :good
+
+:model "HP LaserJet Professional m1219nf MFP"
 :status :good
 
 :model "HP PSC 1219 All-in-one Printer"
@@ -965,6 +971,9 @@
 :status :good
 
 :model "HP LaserJet 3050z All-in-one Printer"
+:status :good
+
+:model "HP Deskjet 3050a j611 Series"
 :status :good
 
 :model "HP LaserJet 3050 All-in-one Printer"

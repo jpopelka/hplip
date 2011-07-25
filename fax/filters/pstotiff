@@ -17,7 +17,7 @@ if (len(sys.argv) > 6):
 temp_out_handle, temp_out_fname = tempfile.mkstemp()
 
 font = "-I/usr/share/cups/fonts"
-device = "-sDEVICE=tiffg4 -dMaxStripSize=0 -dNOPAUSE -dBATCH -dSAFER -dPARANOIDSAFER -dSHORTERRORS -dWRITESYSTEMDICT -dGHOSTSCRIPT -sstdout=%stderr -sOutputFile=" + temp_out_fname + " " + temp_in_file
+device = "-sDEVICE=tiffg4 -dMaxStripSize=0 -r204x196 -dNOPAUSE -dBATCH -dSAFER -dPARANOIDSAFER -dSHORTERRORS -dWRITESYSTEMDICT -dGHOSTSCRIPT -sstdout=%stderr -sOutputFile=" + temp_out_fname + " " + temp_in_file
 
 gs_command = "/usr/bin/gs" + " " + font + " " + device
 

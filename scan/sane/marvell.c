@@ -831,7 +831,8 @@ SANE_Status marvell_start(SANE_Handle handle)
 //   int tmo=EXCEPTION_TIMEOUT*2;
 
    DBG8("sane_hpaio_start()\n");
-
+   ps->is_user_cancel = 0;
+   
    if (set_extents(ps))
    {
       BUG("invalid extents: tlx=%d brx=%d tly=%d bry=%d minwidth=%d minheight%d maxwidth=%d maxheight=%d\n",
@@ -968,7 +969,15 @@ bugout:
          ipClose(ps->ip_handle);  
          ps->ip_handle = 0;
       } 
-      ps->bb_end_page(ps, stat == SANE_STATUS_IO_ERROR ? 1: 0);
+       //If user has cancelled scan from device
+      if (ps->is_user_cancel)
+      {
+          //Don't do anything. sane_hpaio_cancel() will be invoked automatically
+       }
+       else 
+	   {
+	       ps->bb_end_page(ps, stat == SANE_STATUS_IO_ERROR ? 1: 0);
+	   }
    }
 
    DBG8("-sane_hpaio_read() output=%p bytes_read=%d maxLength=%d status=%d\n", data, *length, maxLength, stat);
@@ -986,7 +995,8 @@ void marvell_cancel(SANE_Handle handle)
     * Sane_cancel is always called at the end of the scan job. Note that on a multiple page scan job 
     * sane_cancel is called only once.
     */
-
+   ps->is_user_cancel = 1 ;
+   
    if (ps->ip_handle)
    {
       ipClose(ps->ip_handle); 

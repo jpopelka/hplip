@@ -537,14 +537,24 @@ int HPCupsFilter::StartPrintJob(int  argc, char *argv[])
     return 0;
 }
 
-bool HPCupsFilter::isBlankRaster(BYTE *input_raster, int length_in_bytes)
-{
+bool HPCupsFilter::isBlankRaster(BYTE *input_raster, cups_page_header2_t *header)
+{   
+    int length_in_bytes = (int)header->cupsBytesPerLine;
     if (input_raster == NULL) {
         return true;
     }
-    if (*input_raster == 0xFF &&
-        !(memcmp(input_raster + 1, input_raster, length_in_bytes - 1))) {
-    return true;
+
+    if(header->cupsColorSpace == CUPS_CSPACE_K){
+	if (*input_raster == 0x00 &&
+            !(memcmp(input_raster + 1, input_raster, length_in_bytes - 1))) {
+        return true;
+        }
+    }
+    else{
+        if (*input_raster == 0xFF &&
+              !(memcmp(input_raster + 1, input_raster, length_in_bytes - 1))) {
+        return true;
+        }
     }
     return false;
 }
@@ -637,7 +647,7 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
             color_raster = rgbRaster;
             black_raster = kRaster;
 
-            if (this->isBlankRaster((BYTE *) m_pPrinterBuffer, (int) cups_header.cupsBytesPerLine)) {
+            if (this->isBlankRaster((BYTE *) m_pPrinterBuffer, &cups_header)) {
             
                 color_raster = NULL;
                 black_raster = NULL;

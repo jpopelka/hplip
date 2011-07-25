@@ -228,7 +228,8 @@
 //      10 March 2011 Goutam
 //         Corrected the Overspray values for borderless paper sizes in StingrayOJ class
 //         replaced names PhotoL.FB with L.FB and Photo3.5x5.FB with PhotoL.FB
-    
+
+  
 
 // Include necessary files...
 #include <font.defs>
@@ -7690,6 +7691,14 @@ Manufacturer "HP"
     PCFileName "hp-deskjet_3050_j610_series.ppd"
     Attribute "Product" "" "(HP Deskjet 3050 j610 Series)"
   }
+  {
+    ModelName "HP Deskjet 3050a j611 Series"
+    Attribute "NickName" "" "HP Deskjet 3050a j611 Series, $Version"
+    Attribute "ShortNickName" "" "HP Deskjet 3050a j611 Series"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 3050a j611 series;DES:deskjet 3050a j611 series;"
+    PCFileName "hp-deskjet_3050a_j611_series.ppd"
+    Attribute "Product" "" "(HP Deskjet 3050a j611 Series)"
+  }
   
 
 } // End Pyramid without AutoDuplex and CD-DVD
@@ -11492,14 +11501,6 @@ Group "RLT/HP Real Life Technologies"
       Attribute "Product" "" "(HP Color LaserJet cp1518ni Printer)"
     }
     {
-      ModelName "HP Color LaserJet cp2025"
-      Attribute "NickName" "" "HP Color LaserJet cp2025 pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cp2025"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp2025;DES:hp color laserjet cp2025;"
-      PCFileName "hp-color_laserjet_cp2025-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cp2025 Printer)"
-    }
-    {
       ModelName "HP Color LaserJet cp2025dn"
       Attribute "NickName" "" "HP Color LaserJet cp2025dn pcl3, $Version"
       Attribute "ShortNickName" "" "HP Color LaserJet cp2025dn"
@@ -11508,12 +11509,12 @@ Group "RLT/HP Real Life Technologies"
       Attribute "Product" "" "(HP Color LaserJet cp2025dn Printer)"
     }
     {
-      ModelName "HP Color LaserJet cp2025x"
-      Attribute "NickName" "" "HP Color LaserJet cp2025x pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cp2025x"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp2025x;DES:hp color laserjet cp2025x;"
-      PCFileName "hp-color_laserjet_cp2025x-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cp2025x Printer)"
+      ModelName "HP Color LaserJet cp2025"
+      Attribute "NickName" "" "HP Color LaserJet cp2025 pcl3, $Version"
+      Attribute "ShortNickName" "" "HP Color LaserJet cp2025"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp2025;DES:hp color laserjet cp2025;"
+      PCFileName "hp-color_laserjet_cp2025-pcl3.ppd"
+      Attribute "Product" "" "(HP Color LaserJet cp2025 Printer)"
     }
     {
       ModelName "HP Color LaserJet cp2025n"
@@ -11522,6 +11523,14 @@ Group "RLT/HP Real Life Technologies"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp2025n;DES:hp color laserjet cp2025n;"
       PCFileName "hp-color_laserjet_cp2025n-pcl3.ppd"
       Attribute "Product" "" "(HP Color LaserJet cp2025n Printer)"
+    }
+    {
+      ModelName "HP Color LaserJet cp2025x"
+      Attribute "NickName" "" "HP Color LaserJet cp2025x pcl3, $Version"
+      Attribute "ShortNickName" "" "HP Color LaserJet cp2025x"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp2025x;DES:hp color laserjet cp2025x;"
+      PCFileName "hp-color_laserjet_cp2025x-pcl3.ppd"
+      Attribute "Product" "" "(HP Color LaserJet cp2025x Printer)"
     }
     {
       ModelName "HP Business Inkjet 2300"
@@ -14277,12 +14286,28 @@ Group "RLT/HP Real Life Technologies"
       Attribute "Product" "" "(HP LaserJet Professional m1214nfh Multifunction Printer)"
     }
     {
+      ModelName "HP LaserJet Professional m1216nfh MFP"
+      Attribute "NickName" "" "HP LaserJet Professional m1216nfh MFP, $Version, requires proprietary plugin"
+      Attribute "ShortNickName" "" "HP LJ Professional m1216nfh MFP"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional m1216nfh mfp;DES:hp laserjet professional m1216nfh mfp;"
+      PCFileName "hp-laserjet_professional_m1216nfh_mfp.ppd"
+      Attribute "Product" "" "(HP LaserJet Professional m1216nfh MFP)"
+    }
+    {
       ModelName "HP LaserJet Professional m1217nfw MFP"
       Attribute "NickName" "" "HP LaserJet Professional m1217nfw MFP, $Version, requires proprietary plugin"
       Attribute "ShortNickName" "" "HP LJ Professional m1217nfw MFP"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional m1217nfw mfp;DES:hp laserjet professional m1217nfw mfp;"
       PCFileName "hp-laserjet_professional_m1217nfw_mfp.ppd"
       Attribute "Product" "" "(HP LaserJet Professional m1217nfw Multifunction Printer)"
+    }
+    {
+      ModelName "HP LaserJet Professional m1219nf MFP"
+      Attribute "NickName" "" "HP LaserJet Professional m1219nf MFP, $Version, requires proprietary plugin"
+      Attribute "ShortNickName" "" "HP LJ Professional m1219nf MFP"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional m1219nf mfp;DES:hp laserjet professional m1219nf mfp;"
+      PCFileName "hp-laserjet_professional_m1219nf_mfp.ppd"
+      Attribute "Product" "" "(HP LaserJet Professional m1219nf MFP)"
     }
     {
       ModelName "HP LaserJet Professional p1566"
@@ -14612,14 +14637,6 @@ Group "RLT/HP Real Life Technologies"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet cp1025;DES:hp laserjet cp1025;"
       PCFileName "hp-laserjet_cp1025.ppd"
       Attribute "Product" "" "(HP LaserJet cp1025)"
-    }
-    {
-      ModelName "HP LaserJet cp1026nw"
-      Attribute "NickName" "" "HP LaserJet cp1026nw, $Version, requires proprietary plugin"
-      Attribute "ShortNickName" "" "HP LaserJet cp1026nw"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet cp1026nw;DES:hp laserjet cp1026nw;"
-      PCFileName "hp-laserjet_cp1026nw.ppd"
-      Attribute "Product" "" "(HP LaserJet cp1026nw)"
     }
     {
       ModelName "HP LaserJet cp1027nw"

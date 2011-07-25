@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2011 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
 # Author: Don Welch
+# Contributors: Sarbeswar Meher
 #
 
 from __future__ import division
@@ -25,7 +26,7 @@ from __future__ import division
 __version__ = '2.2'
 __mod__ = 'hp-scan'
 __title__ = 'Scan Utility'
-__doc__ = "SANE-based scan utility for HPLIP supported all-in-one/mfp devices (EXPERIMENTAL)."
+__doc__ = "SANE-based scan utility for HPLIP supported all-in-one/mfp devices."
 
 # Std Lib
 import sys
@@ -60,11 +61,9 @@ email_note = ''
 resize = 100
 contrast = 0
 brightness = 0
-#printer = ''
 page_size = ''
 size_desc = ''
 page_units = 'mm'
-valid_res = (75, 150, 300, 600, 1200, 2400, 4800)
 default_res = 300
 scanner_compression = 'JPEG'
 adf = False
@@ -123,7 +122,7 @@ try:
             break
 
     mod = module.Module(__mod__, __title__, __version__, __doc__, None,
-                        (NON_INTERACTIVE_MODE,))
+                        (INTERACTIVE_MODE,))
 
     mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS,
         extra_options=[utils.USAGE_SPACE,
@@ -133,10 +132,10 @@ try:
         ("", "'viewer', 'editor', 'pdf', or 'print'. Use only commas between values, no spaces.", "option", False),
         ("Scan mode:", "-m<mode> or --mode=<mode>. Where <mode> is 'gray'\*, 'color' or 'lineart'.", "option", False),
         ("Scanning resolution:", "-r<resolution_in_dpi> or --res=<resolution_in_dpi> or --resolution=<resolution_in_dpi>", "option", False),
-        ("", "where <resolution_in_dpi> is %s (300 is default)." % ', '.join([str(x) for x in valid_res]), "option", False),
+        ("", "where 300 is default.", "option", False),
         ("Image resize:", "--resize=<scale_in_%> (min=1%, max=400%, default=100%)", "option", False),
         ("Image contrast:", "--contrast=<contrast>", "option", False),
-        ("ADF mode (EXPERIMENTAL):", "--adf (Note, only PDF output is supported when using the ADF)", "option", False),
+        ("ADF mode:", "--adf (Note, only PDF output is supported when using the ADF)", "option", False),
         utils.USAGE_SPACE,
         ("[OPTIONS] (Scan area)", "", "header", False),
         ("Specify the units for area/box measurements:", "-t<units> or --units=<units>", "option", False),
@@ -265,22 +264,10 @@ try:
             try:
                 r = int(a.strip())
             except ValueError:
-                log.error("Invalid resolution. Using default of %s dpi." % default_res)
-                log.error("Valid resolutions are %s dpi." % ', '.join([str(x) for x in valid_res]))
+                log.error("Invalid value for resolution.")
                 res = default_res
             else:
-                if r in valid_res:
-                    res = r
-                else:
-                    res = valid_res[0]
-                    min_dist = sys.maxint
-                    for x in valid_res:
-                        if abs(r-x) < min_dist:
-                            min_dist = abs(r-x)
-                            res = x
-
-                    log.warn("Invalid resolution. Using closest valid resolution of %d dpi" % res)
-                    log.error("Valid resolutions are %s dpi." % ', '.join([str(x) for x in valid_res]))
+                res = r
 
         elif o in ('-t', '--units', '--unit'):
             a = a.strip().lower()
@@ -536,41 +523,6 @@ try:
         log.warn("No destinations specified. Adding 'file' destination by default.")
         dest.append('file')
 
-    if 'file' in dest and not output:
-        log.warn("File destination enabled with no output file specified.")
-
-        if adf:
-            log.info("Setting output format to PDF for ADF mode.")
-            output = utils.createSequencedFilename("hpscan", ".pdf")
-            output_type = 'pdf'
-        else:
-            if scan_mode == 'gray':
-                log.info("Setting output format to PNG for greyscale mode.")
-                output = utils.createSequencedFilename("hpscan", ".png")
-                output_type = 'png'
-            else:
-                log.info("Setting output format to JPEG for color/lineart mode.")
-                output = utils.createSequencedFilename("hpscan", ".jpg")
-                output_type = 'jpeg'
-
-        log.warn("Defaulting to '%s'." % output)
-
-    else:
-        try:
-            output_type = os.path.splitext(output)[1].lower()[1:]
-            if output_type == 'jpg':
-                output_type = 'jpeg'
-        except IndexError:
-            output_type = ''
-
-    if output_type and output_type not in ('jpeg', 'png', 'pdf'):
-        log.error("Invalid output file format. File formats must be 'jpeg', 'png', or 'pdf'.")
-        sys.exit(1)
-
-    if adf and output_type and output_type != 'pdf':
-        log.error("ADF scans must be saved in PDF file format.")
-        sys.exit(1)
-
     if 'email' in dest and (not email_from or not email_to):
         log.error("Email specified, but email to and/or email from address(es) were not specified.")
         log.error("Disabling 'email' destination.")
@@ -617,12 +569,11 @@ try:
         sys.exit(1)
 
     if mode == GUI_MODE:
-        log.error("GUI mode is not implemented yet. Please use -n. Refer to 'hp-scan -h' for help.")
+        log.error("GUI mode is not implemented yet. Refer to 'hp-scan -h' for help.")
         sys.exit(1)
 
 
-    if 1:
-        #else: # NON_INTERACTIVE_MODE
+    else: # INTERACTIVE_MODE
         import Queue
         from scan import sane
         import scanext
@@ -667,7 +618,21 @@ try:
 
         scan_area = (brx - tlx) * (bry - tly) # mm^2
         scan_px = scan_area * res * res / 645.16 # res is in DPI
+        
+        valid_res = device.getOptionObj('resolution').constraint
+        log.debug("Device supported resolutions %s" % valid_res)
+        if res not in valid_res:
+            log.warn("Invalid resolution. Using closest valid resolution of %d dpi" % res)
+            log.warn("Valid resolutions are %s dpi." % ', '.join([str(x) for x in valid_res]))
+            res = valid_res[0]
+            min_dist = sys.maxint
+            for x in valid_res:
+                  if abs(r-x) < min_dist:
+                        min_dist = abs(r-x)
+                        res = x
 
+        res = device.getOptionObj('resolution').limitAndSet(res)
+        
         if scan_mode == 'color':
             scan_size = scan_px * 3 # 3 bytes/px
         else:
@@ -681,9 +646,7 @@ try:
 
             log.warn("This can cause the scan to take a long time to complete and may cause your system to slow down.")
             log.warn("Approx. number of bytes to read from scanner: %s" % utils.format_bytes(scan_size, True))
-
-        res = device.getOptionObj('resolution').limitAndSet(res)
-
+       
         device.setOption('compression', scanner_compression)
 
         if brx - tlx <= 0.0 or bry - tly <= 0.0:
@@ -745,20 +708,71 @@ try:
         device.setOption("mode", scan_mode)
         device.setOption("resolution", res)
 
+        source_option = device.getOptionObj("source").constraint
+        log.debug("Supported source Options: %s size=%d" % (source_option,len(source_option)))
+        if source_option is None:
+             log.error("Device doesn't have scanner.")
+             sys.exit(1)
+
+        #check if device has only ADF
+        if len(source_option) == 1 and 'ADF'  in source_option:
+             log.debug("Device has only ADF support")
+             adf = True
+
         if adf:
             try:
-                device.setOption("source", "ADF")
-                device.setOption("batch-scan", True)
+                if 'ADF' not in source_option:
+                     log.error("Failed to set ADF mode. This device doesn't support ADF.")
+                     sys.exit(1)
+                else:
+                     device.setOption("source", "ADF")
+                     device.setOption("batch-scan", True)
             except scanext.error:
-                log.error("Failed to set ADF mode. Does this device support ADF? Disabling ADF mode.")
-                adf = False
+                log.error("Error in setting ADF mode.")
+                sys.exit(1)
 
-        if not adf:
+        else:
             try:
                 device.setOption("source", "Flatbed")
                 device.setOption("batch-scan", False)
             except scanext.error:
                 log.debug("Error setting source or batch-scan option (this is probably OK).")
+
+
+        if 'file' in dest and not output:
+            log.warn("File destination enabled with no output file specified.")
+
+            if adf:
+               log.info("Setting output format to PDF for ADF mode.")
+               output = utils.createSequencedFilename("hpscan", ".pdf")
+               output_type = 'pdf'
+            else:
+               if scan_mode == 'gray':
+                  log.info("Setting output format to PNG for greyscale mode.")
+                  output = utils.createSequencedFilename("hpscan", ".png")
+                  output_type = 'png'
+               else:
+                  log.info("Setting output format to JPEG for color/lineart mode.")
+                  output = utils.createSequencedFilename("hpscan", ".jpg")
+                  output_type = 'jpeg'
+
+            log.warn("Defaulting to '%s'." % output)
+
+        else:
+            try:
+               output_type = os.path.splitext(output)[1].lower()[1:]
+               if output_type == 'jpg':
+                  output_type = 'jpeg'
+            except IndexError:
+               output_type = ''
+
+        if output_type and output_type not in ('jpeg', 'png', 'pdf'):
+            log.error("Invalid output file format. File formats must be 'jpeg', 'png', or 'pdf'.")
+            sys.exit(1)
+
+        if adf and output_type and output_type != 'pdf':
+            log.error("ADF scans must be saved in PDF file format.")
+            sys.exit(1)
 
         log.info("\nWarming up...")
 
@@ -785,7 +799,6 @@ try:
                         # Note: On some scanners (Marvell) expected_bytes will be < 0 (if lines == -1)
                         log.debug("expected_bytes = %d" % expected_bytes)
                     except scanext.error, e:
-                        #log.error(e)
                         sane.reportError(e)
                         sys.exit(1)
                     except KeyboardInterrupt:
@@ -817,7 +830,6 @@ try:
                             try:
                                 status, bytes_read = update_queue.get(0)
 
-                                #if log.get_level() >= log.LOG_LEVEL_INFO:
                                 if not log.is_debug():
                                     if expected_bytes > 0:
                                         pm.update(int(100*bytes_read/expected_bytes),
@@ -826,16 +838,8 @@ try:
                                         pm.update(0,
                                             utils.format_bytes(bytes_read))
 
-
-    ##                            if status == scanext.SANE_STATUS_EOF:
-    ##                                log.debug("EOF")
-    ##                            elif status == scanext.SANE_STATUS_NO_DOCS:
-    ##                                log.debug("NO DOCS")
-    ##                                no_docs = True
-                                #elif status != scanext.SANE_STATUS_GOOD:
                                 if status != scanext.SANE_STATUS_GOOD:
                                     sane.reportError(e)
-                                    #log.error("SANE error %d during readScan()" % status)
                                     sys.exit(1)
 
                             except Queue.Empty:
@@ -861,16 +865,6 @@ try:
                             pm.update(0,
                                 utils.format_bytes(bytes_read))
 
-    ##                if status == scanext.SANE_STATUS_EOF:
-    ##                    log.debug("EOF")
-    ##                elif status == scanext.SANE_STATUS_NO_DOCS:
-    ##                    log.debug("NO DOCS")
-    ##                    no_docs = True
-
-#                    if status != scanext.SANE_STATUS_GOOD:
-#                        log.error("SANE error %d during queue clear" % status)
-#                        sys.exit(1)
-
                 log.info("")
 
                 if bytes_read:
@@ -882,7 +876,8 @@ try:
                     log.debug("PPL=%d lines=%d depth=%d BPL=%d pad=%d total=%d" %
                         (pixels_per_line, lines, depth, bytes_per_line, pad_bytes, total_read))
 
-                    if lines == -1:
+                    #For Marvell devices, expected bytes is not same as total_read
+                    if lines == -1 or total_read != expected_bytes:
                         lines = int(total_read / bytes_per_line)
 
                     if scan_mode in ('color', 'gray'):
@@ -892,11 +887,6 @@ try:
                         except ValueError:
                             log.error("Did not read enough data from scanner (I/O Error?)")
                             sys.exit(1)
-
-    ##                elif scan_mode == 'gray':
-    ##                    im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(),
-    ##                        'raw', 'RGBA', 0, 1).convert('P')
-
                     elif scan_mode == 'lineart':
                         try:
                             im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(),
@@ -910,7 +900,6 @@ try:
                         adf_page_files.append(temp_output)
                         im.save(temp_output)
                         log.debug("Saved page %d to file %s" % (page, temp_output))
-                        #adf_pages.append(im)
                 else:
                     log.error("No data read.")
                     sys.exit(1)
@@ -923,45 +912,25 @@ try:
         finally:
             log.info("Closing device.")
             device.cancelScan()
-            #print "0"
-            #device.freeScan()
-            #sane.deInit()
 
-        #if no_docs:
-        #    sys.exit(0)
-
-        #print "1"
         if adf:
             try:
                 from reportlab.pdfgen import canvas
             except ImportError:
                 log.error("PDF output requires ReportLab.")
                 sys.exit(1)
-            #print "2"
-            #print canvas
-            #print canvas.Canvas
-
-            tlx_max = device.getOptionObj('tl-x').constraint[1]
-            bry_max = device.getOptionObj('br-y').constraint[1]
 
             if not output:
                 output = utils.createSequencedFilename("hpscan", ".pdf")
 
-            c = canvas.Canvas(output, (tlx_max/0.3528, bry_max/0.3528))
-            #print c
+            c = canvas.Canvas(output, (brx/0.3528, bry/0.3528)) 
 
-            #for p in adf_page_files:
             for p in adf_page_files:
                 log.info("Processing page %s..." % p)
-
                 image = Image.open(p)
-                #print image
 
                 try:
-                    c.drawInlineImage(image, (tlx/0.3528), ((bry_max/0.3528)-(bry/0.3528)),
-
-                    #c.drawInlineImage(image, 0, bry/0.3528,
-                        width=None,height=None)
+                    c.drawInlineImage(image, (tlx/0.3528), (tly/0.3528), ((brx-tlx)/0.3528),((bry-tly)/0.3528))
                 except NameError:
                     log.error("A problem has occurred with PDF generation. This is a known bug in ReportLab. Please update your install of ReportLab to version 2.0 or greater.")
                     sys.exit(1)
@@ -972,7 +941,6 @@ try:
             c.save()
             log.info("Viewing PDF file in %s" % pdf_viewer)
             os.system("%s %s &" % (pdf_viewer, output))
-
 
             sys.exit(0)
 
@@ -1041,15 +1009,11 @@ try:
                     log.error("PDF output requires ReportLab.")
                     continue
 
-                tlx_max = device.getOptionObj('tl-x').constraint[1]
-                bry_max = device.getOptionObj('br-y').constraint[1]
-
                 pdf_output = utils.createSequencedFilename("hpscan", ".pdf")
-                c = canvas.Canvas(pdf_output, (tlx_max/0.3528, bry_max/0.3528))
+                c = canvas.Canvas(pdf_output, (brx/0.3528, bry/0.3528)) 
 
                 try:
-                    c.drawInlineImage(im, (tlx/0.3528), ((bry_max/0.3528)-(bry/0.3528)),
-                        width=None,height=None)
+                    c.drawInlineImage(im, (tlx/0.3528), (tly/0.3528), ((brx-tlx)/0.3528),((bry-tly)/0.3528))
                 except NameError:
                     log.error("A problem has occurred with PDF generation. This is a known bug in ReportLab. Please update your install of ReportLab to version 2.0 or greater.")
                     continue
@@ -1059,6 +1023,8 @@ try:
                 c.save()
                 log.info("Viewing PDF file in %s" % pdf_viewer)
                 os.system("%s %s &" % (pdf_viewer, pdf_output))
+                
+                sys.exit(0)
 
             elif d == 'printer':
                 hp_print = utils.which("hp-print")

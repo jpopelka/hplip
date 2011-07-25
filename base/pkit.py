@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# Author: Stan Dolson
+# Author: Stan Dolson , Goutam Kodu
 #
 
 # Std Lib
@@ -462,9 +462,9 @@ def run_plugin_command(required=True, plugin_reason=PLUGIN_REASON_NONE):
     if need_sudo:
         su_sudo = utils.su_sudo()
     if su_sudo is "su":
-        name,version = utils.os_release()
-        log.debug("name = %s version = %s" %(name,version))
-        if ( name == 'Fedora' and version >= '14'):
+        name,version,is_su = utils.os_release()
+        log.debug("name = %s version = %s is_su = %s" %(name,version,is_su))
+        if ( name == 'Fedora' and version >= '14' and is_su == True):
            #using su opening GUI apps fail in Fedora 14. 
            #To run GUI apps as root, you need a root login shell (su -) in Fedora 14   
            su_sudo = 'su - -c "%s"'

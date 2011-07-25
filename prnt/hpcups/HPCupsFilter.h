@@ -102,7 +102,7 @@ private:
     void            extractBlackPixels(cups_page_header2_t *cups_header,
                                        BYTE *kRaster, BYTE *rgbRaster);
     void            printCupsHeaderInfo(cups_page_header2_t *header);
-    bool            isBlankRaster(BYTE *input_raster, int length_in_bytes);
+    bool            isBlankRaster(BYTE *input_raster, cups_page_header2_t *header);
 	int             m_iLogLevel;
 
     void CreateBMPHeader(int width, int height, int planes, int bpp);

@@ -6803,7 +6803,6 @@ lity:PenSet=2,Quality:FullBleed=1"
   // <%StingrayOJ:Normal%>   
 } // end StingrayOJ
 
-
 /////////////// ViperPlusVIP
 {
   Attribute "DefaultResolution" "" "600dpi"
@@ -8328,12 +8327,6 @@ dDEVICEHEIGHTPOINTS=1368"
 4 -dDEVICEHEIGHTPOINTS=1116"
   Attribute "FoomaticRIPOptionSetting" "PageSize=A3" " -dDEVICEWIDTHPOINTS=842 -dDEV&&
 ICEHEIGHTPOINTS=1190"
-  Attribute "FoomaticRIPOption" "Duplex" "enum CmdLine A"
-  Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexNoTumble" " -dDuplex=true -dTum&&
-ble=false"
-  Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexTumble" " -dDuplex=true -dTumbl&&
-e=true"
-  Attribute "FoomaticRIPOptionSetting" "Duplex=None" " -dDuplex=false"
   Attribute "FoomaticRIPOption" "DryTime" "enum CmdLine B"
   Attribute "FoomaticRIPOptionSetting" "DryTime=Zero" ""
   Attribute "FoomaticRIPOptionSetting" "DryTime=Five" ",DryTime=5"
@@ -8398,10 +8391,6 @@ lity:PenSet=2,Quality:FullBleed=1"
       Choice "LargeCapacity/Large Capacity Tray" "%% FoomaticRIPOptionSetting: InputSlot=LargeCapacity"
       Choice "Manual/Manual Feeder" "%% FoomaticRIPOptionSetting: InputSlot=Manual"
       Choice "MPTray/Multi Purpose Tray" "%% FoomaticRIPOptionSetting: InputSlot=MPTray"
-    Option "Duplex/Double-Sided Printing" PickOne AnySetup 120.0
-      Choice "DuplexNoTumble/Long Edge (Standard)" "%% FoomaticRIPOptionSetting: Duplex=DuplexNoTumble"
-      Choice "DuplexTumble/Short Edge (Flip)" "%% FoomaticRIPOptionSetting: Duplex=DuplexTumble"
-      *Choice "None/Off" "%% FoomaticRIPOptionSetting: Duplex=None"
     Option "DryTime/Additional Dry Time" PickOne AnySetup 120.0
       *Choice "Zero/Printer Default" "%% FoomaticRIPOptionSetting: DryTime=Zero"
       Choice "Five/5 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Five"

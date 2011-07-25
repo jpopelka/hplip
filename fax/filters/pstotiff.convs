@@ -24,4 +24,4 @@
 application/postscript  image/tiff      80       pstotiff
 application/pdf image/tiff      80       pstotiff
 application/vnd.cups-pdf image/tiff 80 pstotiff
-
+application/vnd.cups-postscript image/tiff 80 pstotiff

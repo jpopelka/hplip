@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# Author: Don Welch, Naga Samrat Chowdary Narla
+# Author: Don Welch, Naga Samrat Chowdary Narla, Goutam Kodu
 #
 # Thanks to Henrique M. Holschuh <hmh@debian.org> for various security patches
 #
@@ -1630,10 +1630,12 @@ def su_sudo():
     return su_sudo_str
 
 # This function returns the distro name and distro version. 
-#This is provided to check on Fedora 14 in pkit.py file for Plugin-installation.  
+#This is provided to check on Fedora 14 in pkit.py file for Plugin-installation. 
+#is_su variable is used to provide a check on Fedora 8 
 def os_release():
     os_name = None;
     os_version = None;
+    is_su = None;
     if which('lsb_release'):
        name = os.popen('lsb_release -i | cut -f 2')
        os_name = name.read().strip()
@@ -1641,15 +1643,24 @@ def os_release():
        version = os.popen('lsb_release -r | cut -f 2')
        os_version=version.read().strip()
        version.close()
+       is_su = True
     else:
-       name = os.popen('cat /etc/issue | cut -c 1-7 | head -n 1')
+       name = os.popen('cat /etc/issue | cut -c 1-6 | head -n 1')
        os_name = name.read().strip()
        name.close()
-       version=os.popen('cat /etc/issue | cut -c 16-17 | head -n 1')
+       version1=os.popen('cat /etc/issue | cut -c 16 | head -n 1')
+       version2=version1.read().strip()
+       version1.close()
+       if (version2 == '1'):
+           version=os.popen('cat /etc/issue | cut -c 16-17 | head -n 1')
+           is_su = True
+       else: 
+           version=os.popen('cat /etc/issue | cut -c 16 | head -n 1')
+           is_su = False
        os_version=version.read().strip()
        version.close()
 
-    return os_name,os_version 
+    return os_name,os_version,is_su 
     
 
 #
