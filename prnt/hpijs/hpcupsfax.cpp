@@ -65,7 +65,7 @@ uint32_t (*convert_endian_l)(uint32_t);
 uint16_t (*convert_endian_s)(uint16_t);
 
 static int iLogLevel = 1;
-char hpFileName[] = "/tmp/hplipfaxXXXXXX";
+char hpFileName[] = "/tmp/hplipfaxLog_XXXXXX";
 
 #define TIFF_HDR_SIZE 8
 #define LITTLE_ENDIAN_MODE I
@@ -602,7 +602,6 @@ int send_data_to_stdout(int fromFD)
     int     iSize, i;
     int     len;
     BYTE    *pTmp = NULL;
-    FILE    *fp = NULL;
 
     iSize = lseek (fromFD, 0, SEEK_END);
     lseek (fromFD, 0, SEEK_SET);
@@ -622,27 +621,11 @@ int send_data_to_stdout(int fromFD)
         }
     }
 
-    fp = NULL;
-    if (iLogLevel & SAVE_PCL_FILE)
-    {
-        fp = fopen ("/tmp/hpcupsfax.out", "w");
-        system ("chmod 666 /tmp/hpcupsfax.out");
-    }
-    
     while ((len = read (fromFD, pTmp, iSize)) > 0)
     {
         write (STDOUT_FILENO, pTmp, len);
-        if (iLogLevel & SAVE_PCL_FILE && fp)
-        {
-            fwrite (pTmp, 1, len, fp);
-        }
     }
     free (pTmp);
-
-    if (fp)
-    {
-        fclose (fp);
-    }
 
     return 0;
 }
@@ -780,9 +763,15 @@ EPILOGUE:
     {
         close (fd);
     }
+
     if (fdFax > 0)
     {
         close (fdFax);
+	if (!(iLogLevel & SAVE_PCL_FILE))
+	{
+             //Retain the intermediate file only if it is needed for debugging purpose.
+             unlink(hpFileName);
+	}
     }
 
     return status;

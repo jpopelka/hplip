@@ -117,7 +117,7 @@ class MarvellFaxDevice(FaxDevice):
         buf = buffer(i_buf)
         log.log_data(buf, 32)
         self.writeMarvellFax(buf)
-        self.closeMarvellFax()
+#        self.closeMarvellFax()
 
         return result
 
@@ -131,7 +131,7 @@ class MarvellFaxDevice(FaxDevice):
                             pass
 
         ret_buf = ret_buf.getvalue()
-        self.closeMarvellFax()
+        #self.closeMarvellFax()
 
         log.debug("response_for_message (%d): response packet is\n" % msg_type)
         log.log_data(ret_buf, 32)
@@ -197,7 +197,7 @@ class MarvellFaxDevice(FaxDevice):
 
         buf = buffer(i_buf)
         self.writeMarvellFax(buf)
-        self.closeMarvellFax()
+        #self.closeMarvellFax()
         ret_buf = cStringIO.StringIO()
         while self.readMarvellFax(512, ret_buf, timeout=10):
                             pass
@@ -282,7 +282,7 @@ class MarvellFaxDevice(FaxDevice):
 
         buf = buffer(i_buf)
         self.writeMarvellFax(buf)
-        self.closeMarvellFax()
+        #self.closeMarvellFax()
 
         ret_buf = cStringIO.StringIO()
         while self.readMarvellFax(512, ret_buf, timeout=10):
@@ -710,7 +710,7 @@ class MarvellFaxSendThread(FaxSendThread):
                         set_buf = set_buf.getvalue()
 
                         self.dev.writeMarvellFax(set_buf)
-                        self.dev.closeMarvellFax()
+                        #self.dev.closeMarvellFax()
 
 
                     elif fax_send_state == FAX_SEND_STATE_SEND_FAX_HEADER: # -------------- Fax header 
@@ -781,7 +781,7 @@ class MarvellFaxSendThread(FaxSendThread):
                                       log.debug("Successfully sent fax-data-block request")
 
                                    self.dev.writeMarvellFax(data)
-                                   self.dev.closeMarvellFax()
+                                   #self.dev.closeMarvellFax()
                                except Error:
                                    log.error("Channel write error.")
                                    current_state = FAILURE

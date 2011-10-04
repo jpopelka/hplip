@@ -3,7 +3,7 @@
   (c) 2010 Copyright Hewlett-Packard Development Company, LP
 
   Primary Author: Naga Samrat Chowdary, Narla
-  Contributing Authors: Yashwant Kumar Sahu
+  Contributing Authors: Yashwant Kumar Sahu, Sarbeswar Meher
 \************************************************************************************/
 
 # ifndef _GNU_SOURCE
@@ -215,7 +215,19 @@ xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" \
 xsi:schemaLocation=\"http://www.hp.com/schemas/imaging/con/ledm/jobs/2009/04/30 ../schemas/Jobs.xsd\">\
 <j:JobState>Canceled</j:JobState></j:Job>"
 
+# define GET_SCAN_JOB_URL "GET %s HTTP/1.1\r\nHost: localhost\r\nUser-Agent: hplip\r\n\
+Accept: text/plain\r\nAccept-Language: en-us,en\r\nAccept-Charset:utf-8\r\nX-Requested-With: XMLHttpRequest\r\n\
+Keep-Alive: 300\r\nProxy-Connection: keep-alive\r\nCookie: AccessCounter=new\r\n0\r\n\r\n"
+
 # define ZERO_FOOTER "\r\n0\r\n\r\n"
+
+# define READY_TO_UPLOAD "<PageState>ReadyToUpload</PageState>"
+# define CANCELED_BY_DEVICE "<PageState>CanceledByDevice</PageState>"
+# define CANCELED_BY_CLIENT "<PageState>CanceledByClient</PageState>"
+# define ADF_LOADED "<AdfState>Loaded</AdfState>"
+# define ADF_EMPTY "<AdfState>Empty</AdfState>"
+# define SCANNER_IDLE "<ScannerState>Idle</ScannerState>"
+# define SCANNER_BUSY_WITH_SCAN_JOB "<ScannerState>BusyWithScanJob</ScannerState>"
 
 static int parse_scan_elements(const char *payload, int size, struct wscn_scan_elements *elements)
 {
@@ -412,69 +424,85 @@ static int read_http_payload(struct ledm_session *ps, char *payload, int max_siz
   if(http_read_header(pbb->http_handle, payload, max_size, tmo, &len) != HTTP_R_OK)
       goto bugout;
 
+  _DBG("read_http_payload len=%d %s\n",len,payload);
+  temp = strstr(payload, "HTTP/1.1 201 Created");
+  if (temp)
+  {
+		*bytes_read = total = len;
+		stat=0;
+		return stat ;
+  }
+  
   temp=strstr(payload, "Content-Length:");
-  temp=strtok(temp, "\r\n");
-  temp=temp+16;
-  payload_length=strtol(temp, NULL, 10);
-
+  if (temp)
+  {
+		temp=temp+16;
+		temp=strtok(temp, "\r\n");
+		payload_length=strtol(temp, NULL, 10);
+		if (payload_length == 0)
+	  	{
+			*bytes_read = total = len;
+			stat=0;
+			return stat ;
+		}
+  }
   memset(payload, ' ', len);
-  len=payload_length;
-
   if(payload_length==-1)
   {
-    len=1000;
     int i=10;
-    while(i){
-    ret = http_read(pbb->http_handle, payload+total, max_size-total, tmo, &len);
-    i--;}
-  }
-  else{
-    while (total < payload_length) {
-      ret = http_read(pbb->http_handle, payload+total, max_size-total, tmo, &len);
-     if (ret == HTTP_R_EOF)
-         break;    /* done */
+    while(i)
+    {
+		len = 0;
+		ret = http_read(pbb->http_handle, payload+total, max_size-total, tmo, &len);
+		total+=len;
+      	tmo=1;
+    	i--;
+		if (ret == HTTP_R_EOF)
+        {
+         _DBG("read_http_payload1 DONE......\n");
+          break;    /* done */
+        }
 
-      if (!(ret == HTTP_R_OK || ret == HTTP_R_EOF))
-         goto bugout;
-      total+=len;
-      tmo=1;
-}
-*bytes_read = total;
-stat=0;
-}
+    	if (!(ret == HTTP_R_OK || ret == HTTP_R_EOF))
+        {
+        	_DBG("read_http_payload1 ERROR......\n");
+        	goto bugout;
+        }
+    }//end while(i)
+  }//end if(payload_length==-1)
+  else
+  {
+	  len=payload_length;
+	  while (total < payload_length) 
+	  {
+		  ret = http_read(pbb->http_handle, payload+total, max_size-total, tmo, &len);
+		  total+=len;
+		  tmo=1;
+		  if (ret == HTTP_R_EOF)
+		  {
+		     _DBG("read_http_payload2 DONE......\n");
+		     break;    /* done */
+		  } 
+
+		  if (!(ret == HTTP_R_OK || ret == HTTP_R_EOF))
+		  {
+        	  _DBG("read_http_payload2 ERROR......\n");
+        	  goto bugout;
+           }
+        }//end while()
+  }//end else
+
+ *bytes_read = total;
+  stat=0;
+
 bugout:
    return stat;
 } /* read_http_payload */
 
-void parser(char *buffer)
-{
-  char *temp=buffer;
-  char *p=buffer;
-  int b=2;
-
-  while(b)
-  {
-    if(*p == '>') b--;
-    p++; 
-  }
-
-  while(*p) 
-  {
-    if(*p == '\r' || *p == '\n' || *p == '\t') p++;
-    else 
-    { 
-      *temp = *p;
-      temp ++;
-      p++; 
-    }
-  }
-  *temp='\0';
-}
-
 static int get_scanner_elements(struct ledm_session *ps, struct wscn_scan_elements *elements)
 {
   struct bb_ledm_session *pbb = ps->bb_session;
-  int bytes_read;
+  int bytes_read = 0;
   int stat=1, tmo=EXCEPTION_TIMEOUT;
   char buf[8192];
 
@@ -495,10 +523,12 @@ static int get_scanner_elements(struct ledm_session *ps, struct wscn_scan_elemen
   if (read_http_payload(ps, buf, sizeof(buf), tmo, &bytes_read))
     goto bugout;
 
-  parser(buf);
+  _DBG("get_scanner_elements bytes_read=%d len=%d buf=%s\n", bytes_read, strlen(buf), buf);
 
-  bytes_read=strlen(buf)+1;
-
+   http_unchunk_data(buf);
+   bytes_read=strlen(buf);
+  
+  _DBG("get_scanner_elements buf=%s\n", buf);
   parse_scan_elements(buf, bytes_read, elements);
   stat=0;
 
@@ -514,7 +544,7 @@ bugout:
 static int cancel_job(struct ledm_session *ps)
 {
   struct bb_ledm_session *pbb = ps->bb_session;
-  int len, stat=1, tmo=EXCEPTION_TIMEOUT;
+  int len, stat=1, tmo=1/*EXCEPTION_TIMEOUT*/;
   char buf[2048];
   int bytes_read;
 
@@ -691,14 +721,16 @@ int bb_get_parameters(struct ledm_session *ps, SANE_Parameters *pp, int option)
       if (ps->currentCompression == SF_RAW && ps->currentScanMode != CE_GRAY8)
       {
          /* Set scan parameters based on scan job response values */
-        pp->lines = pbb->job.lines;
+        //pp->lines = pbb->job.lines;
+        pp->lines = (int)(SANE_UNFIX(ps->effectiveBry - ps->effectiveTly)/MM_PER_INCH*ps->currentResolution);
         pp->pixels_per_line = pbb->job.pixels_per_line;
         pp->bytes_per_line = pbb->job.bytes_per_line;
       }
       else  /* Must be SF_JFIF or ScanMode==CE_BLACK_AND_WHITE1. */
       {
         /* Set scan parameters based on IP. Note for Linart, use IP for hpraw and jpeg. */
-        pp->lines = ps->image_traits.lNumRows;
+        //pp->lines = ps->image_traits.lNumRows;
+        pp->lines = (int)(SANE_UNFIX(ps->effectiveBry - ps->effectiveTly)/MM_PER_INCH*ps->currentResolution);
         pp->pixels_per_line = ps->image_traits.iPixelsPerRow;
         pp->bytes_per_line = BYTES_PER_LINE(pp->pixels_per_line, pp->depth * factor);
       }
@@ -720,7 +752,7 @@ int bb_get_parameters(struct ledm_session *ps, SANE_Parameters *pp, int option)
 return 0;
 }
 
-int bb_is_paper_in_adf(struct ledm_session *ps) /* 0 = no paper in adf, 1 = paper in adf, -1 = error */
+int bb_is_paper_in_adf(struct ledm_session *ps) /* 0 = no paper in adf, 1 = paper in adf, 2 = busy with scan job, -1 = error */
 {
   char buf[512];
   int bytes_read;
@@ -738,7 +770,8 @@ int bb_is_paper_in_adf(struct ledm_session *ps) /* 0 = no paper in adf, 1 = pape
   http_close(pbb->http_handle);   /* error, close http connection */
   pbb->http_handle = 0;
   
-  if(strstr(buf, "<AdfState>Loaded</AdfState>")) return 1;
+  if(strstr(buf, ADF_LOADED)) return 1;
+  if(strstr(buf, ADF_EMPTY) && strstr(buf, SCANNER_BUSY_WITH_SCAN_JOB)) return 2;
   else return 0;
 }
 
@@ -774,30 +807,33 @@ int bb_start_scan(struct ledm_session *ps)
   char buf[4096] = {0};
 
   int len, stat=1, bytes_read;
+  int i, timeout = EXCEPTION_TIMEOUT ;
 
-  ps->bb_session = create_session();
   struct bb_ledm_session *pbb = ps->bb_session;
   char szPage_ID[5] = {0};
   char szJob_ID[5] = {0};
 
+  ps->user_cancel = 0;
+  
   if (ps->job_id == 0)
   {
 	if(http_open(ps->dd, HPMUD_S_LEDM_SCAN, &pbb->http_handle) != HTTP_R_OK)
   	{
-    		// goto bugout;
+    	// goto bugout;
   	}
 
   	while(1)
   	{
-	  if (http_write(pbb->http_handle, GET_SCANNER_STATUS, sizeof(GET_SCANNER_STATUS)-1, 120) != HTTP_R_OK)
+	  if (http_write(pbb->http_handle, GET_SCANNER_STATUS, sizeof(GET_SCANNER_STATUS)-1, timeout) != HTTP_R_OK)
 	  {
         //goto bugout;
       }
 		  
-      read_http_payload(ps, buf, sizeof(buf), EXCEPTION_TIMEOUT, &bytes_read);
+      read_http_payload(ps, buf, sizeof(buf), timeout, &bytes_read);
 
-      if(strstr(buf, "Idle")) break;
+      if(strstr(buf, SCANNER_IDLE)) break;
   	}
+
     http_close(pbb->http_handle);   /* error, close http connection */
   	pbb->http_handle = 0;
 
@@ -808,10 +844,10 @@ int bb_start_scan(struct ledm_session *ps)
     len = snprintf(buf, sizeof(buf), CREATE_SCAN_JOB_REQUEST,
   		ps->currentResolution,
   		ps->currentResolution,
-    	(int) (ps->currentTlx / 5548.7133 ),
+    	(int) (ps->currentTlx / 5548.7133),
     	(int) (ps->currentTly / 5548.7133),
-    	(int) (ps->currentBrx / 5548.7133),
-    	(int) (ps->currentBry / 5548.7133),
+    	(int) ((ps->currentBrx / 5548.7133) - (ps->currentTlx / 5548.7133)),
+    	(int) ((ps->currentBry / 5548.7133) - (ps->currentTly / 5548.7133)),
     	"Jpeg",
     	(! strcmp(ce_element[ps->currentScanMode], "Color8")) ? "Color" : (! strcmp(ce_element[ps->currentScanMode], "Gray8")) ? "Gray" : "Gray",
     	((! strcmp(ce_element[ps->currentScanMode], "Color8")) || (! strcmp(ce_element[ps->currentScanMode], "Gray8"))) ? 8: 8,
@@ -819,7 +855,7 @@ int bb_start_scan(struct ledm_session *ps)
 
 
     /* Write the http post header. Note do not send null termination byte. */
-  	if (http_write(pbb->http_handle, POST_HEADER, sizeof(POST_HEADER)-1, 120) != HTTP_R_OK)
+  	if (http_write(pbb->http_handle, POST_HEADER, sizeof(POST_HEADER)-1, timeout) != HTTP_R_OK)
  	{
     	//goto bugout;
   	}
@@ -836,7 +872,7 @@ int bb_start_scan(struct ledm_session *ps)
   	}
 
   	/* Read response. */
-  	if (read_http_payload(ps, buf, sizeof(buf), EXCEPTION_TIMEOUT, &bytes_read))
+  	if (read_http_payload(ps, buf, sizeof(buf), timeout, &bytes_read))
     	goto bugout;
 
   	http_close(pbb->http_handle);
@@ -844,7 +880,8 @@ int bb_start_scan(struct ledm_session *ps)
 
   	char joblist[64];
   	char* jl=strstr(buf, "Location:");
-  	jl=jl+10;
+	if (!jl) goto bugout;
+	jl=jl+10;
 	
   	int i=0;
   	while(*jl != '\r')
@@ -856,42 +893,79 @@ int bb_start_scan(struct ledm_session *ps)
 	
   	strcpy(ps->url, joblist);
   	char *c=ps->url;
-  	c=strstr(c, "JobList");
-  	c=c+8;
-  	int job_id=strtol(c, NULL, 10);
-  	itoa(job_id, szJob_ID,10);
-        itoa(1, szPage_ID,10);
-        ps->page_id = 1;
-  	ps->job_id = job_id;
+  	c=strstr(c, "JobList"); 
+  	if (c)
+  	{
+  	    c=c+8;
+  	    int job_id=strtol(c, NULL, 10);
+  	    itoa(job_id, szJob_ID,10);
+  	    itoa(1, szPage_ID,10);
+  	    ps->page_id = 1;
+  	    ps->job_id = job_id;
+  	}
   }
   else
   {
-  	ps->page_id++;
+    ps->page_id++;
     itoa(ps->job_id,szJob_ID,10);
     itoa(ps->page_id, szPage_ID,10);
   }
 
-  strcpy(buf, "GET /Scan/Jobs/");
-  strcat(buf, szJob_ID);
-  strcat(buf, "/Pages/");
-  strcat(buf, szPage_ID);
-
-
-  strcat(buf, " HTTP/1.1\r\nHost: localhost\r\nUser-Agent: hplip\r\nAccept: text/plain\r\nAccept-Language: en-us,en\r\nAccept-Charset:utf-8\r\nX-Requested-With: XMLHttpRequest\r\nKeep-Alive: 300\r\nProxy-Connection: keep-alive\r\nCookie: AccessCounter=new\r\n0\r\n\r\n");
+  memset(buf, 0, sizeof(buf)-1);
 
   if(http_open(ps->dd, HPMUD_S_LEDM_SCAN, &pbb->http_handle) != HTTP_R_OK)
   {
   }
-
-  if (http_write(pbb->http_handle, buf, strlen(buf), 1) != HTTP_R_OK)
+  while(strstr(buf, READY_TO_UPLOAD) == NULL)
   {
-    //goto bugout;
+	 //_DBG("bb_start_scan() ENTERING....buf=%s\n", buf);
+     len = snprintf(buf, sizeof(buf), GET_SCAN_JOB_URL, ps->url);
+
+	 if (http_write(pbb->http_handle, buf, strlen(buf), 1) != HTTP_R_OK)
+	 {
+		//goto bugout;
+		break ;
+	 }
+	 if (read_http_payload (ps, buf, sizeof(buf), 5, &len) != HTTP_R_OK)
+	 {
+	     //goto bugout
+	     break;
+	 }
+	 if (strstr(buf, CANCELED_BY_DEVICE) || strstr(buf, CANCELED_BY_CLIENT))
+	 {
+	  	//_DBG("bb_start_scan() SCAN CANCELLED\n");
+	  	stat=0;
+	  	ps->user_cancel = 1;
+	  	goto bugout;
+	 }
+	 usleep(500000);//0.5 sec delay
+  }//end while()
+
+  char *c = strstr(buf, "<BinaryURL>");
+  if (!c) goto bugout;
+  c +=11;
+  char BinaryURL[30];
+  i = 0;
+  while(*c != '<')
+  {
+     BinaryURL[i++] = *c ;
+     c++;
+  }
+  BinaryURL[i] = '\0';
+  //_DBG("bb_start_scan() BinaryURL=%s\n", BinaryURL);
+  len = snprintf(buf, sizeof(buf), GET_SCAN_JOB_URL, BinaryURL);
+ 
+  if (http_write(pbb->http_handle, buf, strlen(buf), timeout) != HTTP_R_OK)
+  {
+ 	//goto bugout;
+  }
+ 
+  if (http_read_header(pbb->http_handle, buf, sizeof(buf), timeout, &len) != HTTP_R_OK)
+  {
+	 //goto bugout;
   }
 
-  if (http_read_header(pbb->http_handle, buf, sizeof(buf), 50, &len) != HTTP_R_OK)
-    goto bugout;
-
-  if(strstr(buf, "HTTP/1.1 400 Bad Request")) http_read_header(pbb->http_handle, buf, sizeof(buf), 50, &len);
+  if(strstr(buf, "HTTP/1.1 400 Bad Request")) http_read_header(pbb->http_handle, buf, sizeof(buf), timeout, &len);
   
   stat=0;
 bugout:

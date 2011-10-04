@@ -190,6 +190,7 @@ class Logger(object):
                     if newline:
                         out.write('\n')
 
+		    out.flush()
                 finally:
                     self._lock.release()
 

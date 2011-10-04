@@ -22,7 +22,7 @@
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
   Primary Author: Naga Samrat Chowdary, Narla
-
+  Contributing Author: Sarbeswar Meher
 \************************************************************************************/
 
 #ifndef _HTTP_H
@@ -38,6 +38,8 @@ enum HTTP_RESULT
    HTTP_R_INVALID_BUF_SIZE,
 };
 
+# define ZERO_FOOTER "\r\n0\r\n\r\n"
+
 typedef void * HTTP_HANDLE;
 
 enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_open(HPMUD_DEVICE dd, const char *hpmud_channel, HTTP_HANDLE *handle);
@@ -47,7 +49,7 @@ enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_read_payload(HTTP_
 enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_read(HTTP_HANDLE handle, void *data, int max_size, int sec_timout, int *bytes_read);
 enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_read_size(HTTP_HANDLE handle, void *data, int max_size, int sec_timout, int *bytes_read);
 enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_write(HTTP_HANDLE handle, void *data, int data_size, int sec_timout);
-
+void __attribute__ ((visibility ("hidden"))) http_unchunk_data(char *buffer);
 #endif  // _HTTP_H
 
 

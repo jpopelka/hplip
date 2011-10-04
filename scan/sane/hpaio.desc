@@ -118,6 +118,9 @@
 :model "HP Photosmart Wireless All-in-one Printer - b110"
 :status :good
 
+:model "HP Envy 110 E-all-in-one"
+:status :good
+
 :model "HP Photosmart d110 Series Printer"
 :status :good
 
@@ -983,6 +986,9 @@
 :status :good
 
 :model "HP LaserJet 3055 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet 3070 b611 Series"
 :status :good
 
 :model "HP LaserJet 3100xi All-in-one Printer"
@@ -1861,6 +1867,9 @@
 :model "HP Officejet j5510v All-in-one Printer"
 :status :good
 
+:model "HP Photosmart 5510 E-all-in-one"
+:status :good
+
 :model "HP Officejet 5510v All-in-one Printer"
 :status :good
 
@@ -2167,6 +2176,9 @@
 :model "HP Officejet 6500 All-in-one Printer - e709a"
 :status :good
 
+:model "HP Photosmart 6510 E-all-in-one"
+:status :good
+
 :model "HP Officejet 7100 All-in-one Printer"
 :status :good
 
@@ -2287,6 +2299,9 @@
 :model "HP Officejet 7500 e910"
 :status :good
 
+:model "HP Photosmart 7510 E-all-in-one"
+:status :good
+
 :model "HP Officejet Pro l7550 All-in-one Printer"
 :status :good
 
@@ -2329,6 +2344,9 @@
 :model "HP cm8060 Color Multifunction Printer With Edgeline Technology"
 :status :good
 
+:model "HP Officejet Pro 8100"
+:status :good
+
 :model "HP LaserJet 8100 Multifunction Printer"
 :status :good
 
@@ -2357,6 +2375,9 @@
 :status :good
 
 :model "HP Officejet Pro 8500 All-in-one Printer - a909a"
+:status :good
+
+:model "HP Officejet Pro 8600"
 :status :good
 
 :model "HP LaserJet 9000 Multifunction Printer"

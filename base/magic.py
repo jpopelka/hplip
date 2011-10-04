@@ -1236,6 +1236,10 @@ def whatis(data):
         if ord(c) == 0:
             return 'data'
 
+    # its ASCII, now do C/CPP tests
+    if data.find('#include', 0, 256) > -1 or data.find('/***', 0, 256) > -1:
+        return 'text/cpp'
+
     # its ASCII, now do text tests
     if data.find('!/usr/bin/env python', 0, 256) > -1 or data.find('def ', 0, 8192) > -1:
         return 'application/x-python'

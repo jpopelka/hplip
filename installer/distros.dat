@@ -111,7 +111,7 @@ supported=0
 
 [suse]
 index=3
-versions=11.2,11.3,11.4
+versions=11.3,11.4
 display_name=SUSE Linux
 alt_names=
 display=1
@@ -380,7 +380,7 @@ udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
-cups_path_with_bitness=1
+cups_path_with_bitness=0
 ui_toolkit=qt4
 native_cups=1
 add_user_to_group= -Gsys,lp
@@ -496,7 +496,7 @@ udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
-cups_path_with_bitness=1
+cups_path_with_bitness=0
 ui_toolkit=qt4
 native_cups=1
 add_user_to_group= -Gsys,lp
@@ -794,7 +794,7 @@ ui_toolkit=qt3
 # ****************************************
 [fedora]
 index=5
-versions=13,14,15
+versions=14,15
 display_name=Fedora
 alt_names=Fedora Core
 display=1
@@ -3469,7 +3469,7 @@ packages=
 # ****************************************
 [ubuntu]
 index=12
-versions=8.04,10.04,10.10,11.04
+versions=8.04,10.04,10.10,11.04,11.10
 display_name=Ubuntu
 alt_names=kubuntu,edubuntu,xubuntu
 display=1
@@ -4422,10 +4422,14 @@ packages=policykit-1,policykit-1-gnome
 [ubuntu:11.04:python-notify]
 packages=python-notify
 
+# ********************
+[ubuntu:11.10]
+same_as_version=11.04
+
 # ****************************************
 [debian]
 index=2
-versions=5.0,5.0.1,5.0.2,5.0.3,5.0.4,5.0.5,5.0.6,5.0.7,5.0.8,6.0,6.0.1
+versions=5.0,5.0.1,5.0.2,5.0.3,5.0.4,5.0.5,5.0.6,5.0.7,5.0.8,6.0,6.0.1,6.0.2
 display_name=Debian
 alt_names=
 display=1
@@ -5565,6 +5569,9 @@ packages=policykit-1,policykit-1-gnome
 packages=python-notify
 
 [debian:6.0.1]
+same_as_version=6.0
+
+[debian:6.0.2]
 same_as_version=6.0
 
 

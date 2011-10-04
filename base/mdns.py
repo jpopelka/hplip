@@ -303,12 +303,15 @@ def detectNetworkDevices(ttl=4, timeout=10):
                             key, value = result.split('=')
                             txt[key] = value
                         except ValueError:
-                            pas
+                            pass
 
                         off += l
 
                     log.debug("TXT: %s" % repr(txt))
-                    y['device1'] = "MFG:Hewlett-Packard;MDL:%s;CLS:PRINTER;" % txt['ty']
+                    try:
+                        y['device1'] = "MFG:Hewlett-Packard;MDL:%s;CLS:PRINTER;" % txt['ty']
+                    except KeyError:
+                        log.debug("NO ty Key in txt: %s" % repr(txt))
 
                     if 'note' in txt:
                         y['note'] = txt['note']

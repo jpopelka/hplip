@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# Authors: Don Welch, Yashwant Kumar Sahu
+# Authors: Don Welch, Yashwant Kumar Sahu, Sanjay Kumar Sharma
 #
 
 # Std Lib
@@ -1704,11 +1704,16 @@ class PrintSettingsToolbox(QToolBox):
 
 
     def PageRangeEdit_editingFinished(self):
-        sender, x = self.sender(), []
-        t, ok = unicode(sender.text()), True
+        sender = self.sender()
+        t, ok, x = self.job_options['pagerange'], True, []
+
+        #[Sanjay]Start Range Validation here as the editing is finished
         try:
-            x = utils.expand_range(t)
+            x = utils.expand_range(t)   
         except ValueError:
+            ok = False
+
+        if t == '':
             ok = False
 
         if ok:
@@ -1721,12 +1726,7 @@ class PrintSettingsToolbox(QToolBox):
                         ok = False
                         break
 
-        if ok:
-            t = utils.collapse_range(x)
-            sender.setText(QString(t))
-            self.job_options['pagerange'] = t
-
-        else:
+        if not ok:
             self.job_options['pagerange'] = ''
             log.error("Invalid page range: %s" % t)
             FailureUI(self, self.__tr("<b>Invalid page range.</b><p>Please enter a range using page numbers (1-999), dashes, and commas. For example: 1-2,3,5-7</p>"))
@@ -1734,15 +1734,7 @@ class PrintSettingsToolbox(QToolBox):
 
 
     def PageRangeEdit_textChanged(self, t):
-        sender, x, t = self.sender(), [], unicode(t)
-        try:
-            x = utils.expand_range(t)
-        except ValueError:
-            self.job_options['pagerange'] = ''
-            log.error("Invalid page range: %s" % t)
-        else:
-            self.job_options['pagerange'] = t
-
+        self.job_options['pagerange'] = unicode(t) # Do range validation only in PageRangeEdit_editingFinished method
 
     #
     # Job Storage

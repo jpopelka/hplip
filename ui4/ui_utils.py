@@ -374,7 +374,7 @@ MIME_TYPES_DESC = \
     "application/vnd.hp-HPGL" : (__translate("HP Graphics Language File"), '.hgl, .hpg, .plt, .prn'),
     "application/x-cshell" : (__translate("C Shell Script"), '.csh, .sh'),
     "application/x-csource" : (__translate("C Source Code"), '.c'),
-    "text/cpp": (__translate("C++ Source Code"), '.cpp, .cxx'),
+    "text/cpp": (__translate("C/C++ Source Code"), '.c, .cpp, .cxx'),
     "application/x-perl" : (__translate("Perl Script"), '.pl'),
     "application/x-python" : (__translate("Python Program"), '.py'),
     "application/x-shell" : (__translate("Shell Script"), '.sh'),

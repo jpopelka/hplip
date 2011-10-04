@@ -86,7 +86,7 @@ f 0644 root root /etc/hp/hplip.conf hplip.conf
 f 0644 root root /etc/cups/pstotiff.convs fax/filters/pstotiff.convs
 f 0644 root root /etc/cups/pstotiff.types fax/filters/pstotiff.types
 f 0755 root root $cupsfilter/pstotiff fax/filters/pstotiff
-f 0755 root root $cupsfilter/hpcupsfax ./libs/hpcupsfax
+f 0755 root root $cupsfilter/hpcupsfax .libs/hpcupsfax
 %if foomatic-drv-install
 f 0644 root root $drv/hpijs.drv prnt/drv/hpijs.drv
 %endif

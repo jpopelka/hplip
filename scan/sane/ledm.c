@@ -21,7 +21,7 @@
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
   Primary Author: Naga Samrat Chowary, Narla 
-  Contributing Authors: Yashwant Kumar Sahu
+  Contributing Authors: Yashwant Kumar Sahu,Sarbeswar Meher
 
 *************************************************************************************/
 
@@ -784,6 +784,12 @@ SANE_Status ledm_start(SANE_Handle handle)
     goto bugout;
   }
 
+  if(ps->user_cancel)
+  {
+    stat = SANE_STATUS_GOOD ;
+    goto bugout;
+  }
+   
   SendScanEvent(ps->uri, EVENT_START_SCAN_JOB);
 
   memset(xforms, 0, sizeof(xforms));
@@ -976,7 +982,6 @@ void ledm_cancel(SANE_Handle handle)
 
 void ledm_close(SANE_Handle handle)
 {
-  struct hpmud_model_attributes ma;
   struct ledm_session *ps = (struct ledm_session *)handle;
 
   if (ps == NULL || ps != session)

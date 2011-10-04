@@ -2806,8 +2806,6 @@ extern SANE_Status sane_hpaio_start(SANE_Handle handle)
     IP_XFORM_SPEC xforms[IP_MAX_XFORMS], * pXform = xforms;
     WORD wResult;
         
-    hpaio->user_cancel = FALSE;
-
     if (strcmp(*((char **)handle), "MARVELL") == 0)
        return marvell_start(handle);
     if (strcmp(*((char **)handle), "SOAP") == 0)
@@ -2816,6 +2814,8 @@ extern SANE_Status sane_hpaio_start(SANE_Handle handle)
        return soapht_start(handle);
     if (strcmp(*((char **)handle), "LEDM") == 0)
        return ledm_start(handle);
+
+    hpaio->user_cancel = FALSE;
 
     DBG(8, "sane_hpaio_start(): %s %d\n", __FILE__, __LINE__);
 
@@ -3151,18 +3151,17 @@ extern SANE_Status sane_hpaio_read(SANE_Handle handle, SANE_Byte *data, SANE_Int
 
     if (strcmp(*((char **)handle), "LEDM") == 0)
        return ledm_read(handle, data, maxLength, pLength);
-
-    if (hpaio->user_cancel)  {
-        bug("sane_hpaio_read(maxLength=%d): User cancelled!\n", maxLength);
-        return SANE_STATUS_CANCELLED;
-    } 
-
     if (strcmp(*((char **)handle), "MARVELL") == 0)
        return marvell_read(handle, data, maxLength, pLength);
     if (strcmp(*((char **)handle), "SOAP") == 0)
        return soap_read(handle, data, maxLength, pLength);
     if (strcmp(*((char **)handle), "SOAPHT") == 0)
        return soapht_read(handle, data, maxLength, pLength);
+
+    if (hpaio->user_cancel)  {
+        bug("sane_hpaio_read(maxLength=%d): User cancelled!\n", maxLength);
+        return SANE_STATUS_CANCELLED;
+    } 
 
     *pLength = 0;
 
@@ -3319,11 +3318,6 @@ extern void sane_hpaio_cancel( SANE_Handle handle )
 {
     hpaioScanner_t hpaio = ( hpaioScanner_t ) handle;
 
-    if (hpaio->user_cancel)  {
-        bug("sane_hpaio_cancel: already cancelled!\n");
-    }
-    hpaio->user_cancel = TRUE;
-
     if (strcmp(*((char **)handle), "MARVELL") == 0)
        return marvell_cancel(handle);
     if (strcmp(*((char **)handle), "SOAP") == 0)
@@ -3333,6 +3327,10 @@ extern void sane_hpaio_cancel( SANE_Handle handle )
     if (strcmp(*((char **)handle), "LEDM") == 0)
        return ledm_cancel(handle);
 
+    if (hpaio->user_cancel)  {
+        bug("sane_hpaio_cancel: already cancelled!\n");
+    }
+    hpaio->user_cancel = TRUE;
     DBG(8, "sane_hpaio_cancel(): %s %d\n", __FILE__, __LINE__); 
 
     if (hpaio->scannerType==SCANNER_TYPE_PML)

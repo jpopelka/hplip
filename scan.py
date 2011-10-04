@@ -45,7 +45,7 @@ from prnt import cups
 
 
 username = prop.username
-res = 300
+r = res = 300
 scan_mode = 'gray'
 tlx = None
 tly = None
@@ -620,8 +620,17 @@ try:
         scan_px = scan_area * res * res / 645.16 # res is in DPI
         
         valid_res = device.getOptionObj('resolution').constraint
-        log.debug("Device supported resolutions %s" % valid_res)
-        if res not in valid_res:
+        log.debug("Device supported resolutions %s" % (valid_res,))
+        if 0 in valid_res: #min-max range in tuple
+           if res < valid_res[0] or res > valid_res[1]:
+             log.warn("Invalid resolution. Using closest valid resolution of %d dpi" % res)
+           if res < valid_res[0]:
+              res = valid_res[0]
+           elif res > valid_res[1]:
+              res = valid_res[1] 
+
+        else:
+          if res not in valid_res:
             log.warn("Invalid resolution. Using closest valid resolution of %d dpi" % res)
             log.warn("Valid resolutions are %s dpi." % ', '.join([str(x) for x in valid_res]))
             res = valid_res[0]
@@ -839,7 +848,7 @@ try:
                                             utils.format_bytes(bytes_read))
 
                                 if status != scanext.SANE_STATUS_GOOD:
-                                    sane.reportError(e)
+                                    log.error("Error in reading data. Status=%d bytes_read=%d." % (status, bytes_read))
                                     sys.exit(1)
 
                             except Queue.Empty:

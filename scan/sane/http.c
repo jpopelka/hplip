@@ -24,6 +24,7 @@
   must start with http_open and end with http_close. 
 
   Author: Naga Samrat Chowdary, Narla
+  Contributing Author: Sarbeswar Meher
 \************************************************************************************/
 
 #ifndef _GNU_SOURCE
@@ -350,14 +351,15 @@ enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_read_header(HTTP_H
    }
 
    /* Read rest of header. Look for blank line. */
-   total = len;
+   *bytes_read = total = len;
    while (len > 2)
    {
       if (read_line(ps, data+total, max_size-total, tmo, &len))
          goto bugout;
       total += len;
+     *bytes_read += len;
+        DBG("http_read_header data=%s len=%d total=%d\n", (char*)data+total, len, total);
    }
-
    stat = HTTP_R_OK;
 
    DBG("-http_read_header() handle=%p data=%p bytes_read=%d size=%d status=%d\n", handle, data, *bytes_read, max_size, stat);
@@ -445,32 +447,57 @@ bugout:
 enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_read(HTTP_HANDLE handle, void *data, int max_size, int sec_timeout, int *bytes_read)
 {
    struct http_session *ps = (struct http_session *)handle;
-   char line[128];
-   int len;
+   char line[128] ={0,};
+   int len = 0, ret;
    int tmo=sec_timeout;   /* set initial timeout */
    enum HTTP_RESULT stat = HTTP_R_IO_ERROR;
    int total_payload_length=*bytes_read;
 
-   DBG("http_read() handle=%p data=%p size=%d sectime=%d\n", handle, data, max_size, sec_timeout);
+   DBG("http_read() handle=%p data=%p size=%d sectime=%d total_payload_length=%d\n", handle, data, max_size, sec_timeout, total_payload_length);
 
    ps->footer=total_payload_length;
 
    *bytes_read = 0;
 
-         /* Read new footer. */
+      /* Read new footer. */
+      if (ps->footer) //Payload length is known
+      {
          while(ps->footer)
          {
-          if (read_line(ps, line, sizeof(line), tmo, &len)){
-         *bytes_read = (ps->footer) * (-1) + 12;
-            goto bugout; }
-         strcpy(data, line);
-         data=data+len;
-         ps->footer -= len;
-
-         }	
-
-            stat = HTTP_R_OK;
-            if(ps->footer == 0) stat=HTTP_R_EOF;
+              if (read_line(ps, line, sizeof(line), tmo, &len))
+		       {
+				 *bytes_read = (ps->footer) * (-1) + 12;
+				    goto bugout; 
+			   }
+		     strcpy(data, line);
+		     data=data+len;
+		     ps->footer -= len;
+         }
+      }	
+      else
+      {
+         while(1)
+         {
+            ret = read_line (ps, line, sizeof(line), tmo, &len);
+            *bytes_read += len;
+            if(ret) //failed to read line 
+		    {
+		            ps->footer = 0;
+		            break;
+		    }
+            strcpy(data, line);
+            data = data + len;
+            DBG("http_read len=%d datalen=%d data=%s\n", len, strlen((char*)data), (char*)data);
+            //Check for the footer
+            if (strncmp(data-7, ZERO_FOOTER, sizeof(ZERO_FOOTER)-1) == 0)
+            {
+               ps->footer = 0;
+               break;
+            }
+         }//end while(1)
+      }//end else
+      stat = HTTP_R_OK;
+      if(ps->footer == 0) stat=HTTP_R_EOF;
 
    DBG("-http_read() handle=%p data=%p bytes_read=%d size=%d status=%d\n", handle, data, *bytes_read, max_size, stat);
 
@@ -522,8 +549,67 @@ enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_write(HTTP_HANDLE 
 
 bugout:
    return stat;
-};
+}
 
+void __attribute__ ((visibility ("hidden"))) http_unchunk_data(char *buffer)
+{
+  char *temp=buffer;
+  char *p=buffer;
+  int chunklen = 0;
+
+  //Here buffer starts like "<?xml....". There is no chunklen, only buffer
+  if (*p == '<')
+  {
+      while(*p)
+      {
+        if (!(*p == '\n' || *p == '\r' || *p =='\t'))
+        {
+         *temp = *p;
+         temp++;
+        }
+        p++;
+	  }
+	  *temp = '\0';
+	  return;
+  }
+  /*Here buffer looks like "chunklen data chunklen data 0"
+  e.g "FE3 <?xml....  8E8 ... 0"*/
+  while(1)
+  {
+    while(*p != '\n' && *p != '\r') 
+    {
+	 chunklen = chunklen << 4 ; //Multiply 16
+	 if ('0' <= *p &&  *p<='9')
+	   chunklen += *p - '0';
+	 else if ('A' <= *p && *p <= 'F')
+	    chunklen += 10  - 'A' + *p;
+	 else if ('a' <= *p && *p <= 'f')
+	    chunklen += 10 + *p - 'a';
+	 else
+	 {
+	    chunklen = chunklen >> 4;
+		break;
+	 }
+	 p++;
+    }//end while()
+    if (chunklen == 0)
+       break ;
+    while(*p == '\n' || *p == '\r' || *p =='\t') p++;
+    //copy the data till chunklen
+    while(chunklen > 0)
+    {
+	   if (!(*p == '\n' || *p == '\r' || *p =='\t'))
+       {
+        *temp = *p ;
+        temp++;
+       }
+       p++;
+       chunklen--;
+    }
+    while(*p == '\n' || *p == '\r' || *p =='\t') p++;
+  }//end while(1)
+  *temp = '\0';
+}
 
 
 

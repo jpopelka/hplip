@@ -38,6 +38,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <cups/cups.h>
+#include <cups/ppd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 

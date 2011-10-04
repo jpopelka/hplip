@@ -102,6 +102,9 @@ TECH_CLASSES = [
     "Python10",
     "Mimas",
     "StingrayOJ",
+    "Copperhead",
+    "Ampere",
+    "Python11",
 ]
 
 TECH_CLASSES.sort()
@@ -155,6 +158,8 @@ TECH_CLASS_PDLS = {
     "Python10"      : 'pcl3',
     "Mimas"      : 'pcl3',
     "StingrayOJ"   : 'pcl3',
+    "Copperhead"   : 'pcl3',
+    "Ampere"	   : 'pcl3'
 
 }
 
@@ -209,6 +214,7 @@ TECH_SUBCLASSES = [
     "Trim",
     "4800x1200dpi",
     "Advanced",
+    "AutoDuplex"
 ]
 
 TECH_SUBCLASSES.sort()

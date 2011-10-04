@@ -481,7 +481,7 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) jd_s_channel_open(mud_
          }
          break;            
       case HPMUD_MARVELL_FAX_CHANNEL:
-         port = 8290;  /* same as ScanPort1[1] */
+         port = 8285;  
          pin.sin_port = htons(port);
          if ((pc->socket = socket(AF_INET, SOCK_STREAM, 0)) == -1) 
          {  

@@ -731,7 +731,10 @@ try:
             else:
                 found = False
                 for line in f:
-                    if 'hpaio' in line:
+		    lineNoSpace = re.sub(r'\s', '', line) 
+		    hpaiomatched=re.match('hpaio',lineNoSpace)
+#                   if 'hpaio' in line:
+                    if hpaiomatched:
                         found = True
 
                 if found:

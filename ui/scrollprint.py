@@ -79,7 +79,7 @@ class ScrollPrintView(ScrollView):
             "application/vnd.hp-HPGL" : (self.__tr("HP Graphics Language File"), '.hgl, .hpg, .plt, .prn'),
             "application/x-cshell" : (self.__tr("C Shell Script"), '.csh, .sh'),
             "application/x-csource" : (self.__tr("C Source Code"), '.c'),
-            "text/cpp": (self.__tr("C++ Source Code"), '.cpp, .cxx'),
+            "text/cpp": (self.__tr("C/C++ Source Code"), '.c, .cpp, .cxx'),
             "application/x-perl" : (self.__tr("Perl Script"), '.pl'),
             "application/x-python" : (self.__tr("Python Program"), '.py'),
             "application/x-shell" : (self.__tr("Shell Script"), '.sh'),

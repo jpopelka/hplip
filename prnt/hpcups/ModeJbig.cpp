@@ -99,6 +99,8 @@ const BYTE ModeJbig::szByte2[256] =
 
 ModeJbig::ModeJbig (unsigned int RasterSize) : Compressor (RasterSize, false)
 {
+    m_hHPLibHandle = 0;
+    m_pszInputRasterData = 0;
     m_iWidth = ((RasterSize + 31) / 32) * 4;
     m_iPlaneNumber  = 0;
     m_iCurrentPlane = 0;

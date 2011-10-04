@@ -83,6 +83,7 @@ PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS = 7
 
 PING_TARGET = "www.google.com"
 HTTP_GET_TARGET = "http://www.google.com"
+PLUGIN_FALLBACK_LOCATION = 'http://hplipopensource.com/hplip-web/plugin/'
 
 EXPECT_WORD_LIST = [
     pexpect.EOF, # 0
@@ -1931,7 +1932,21 @@ class CoreInstall(object):
 
         plugin_file = os.path.join(self.plugin_path, self.plugin_name)
 
+
+	#Check whether plugin is accessible in Openprinting.org website otherwise dowload plugin from alternate location.
+        wget = utils.which("wget")
+        if wget:
+            wget = os.path.join(wget, "wget")
+            cmd = "%s %s" % (wget, url)
+            log.debug(cmd)
+            status, output = self.run(cmd)
+            log.debug("wget returned: %d" % status)
+
         try:
+            if (status != 0):
+                url = os.path.join(PLUGIN_FALLBACK_LOCATION, self.plugin_name)
+                log.info("Plugin is not accessible. Trying to download it from fallback location: [%s]" % url)
+
             filename, headers = urllib.urlretrieve(url, plugin_file, callback)
         except IOError, e:
             log.error("Plug-in download failed: %s" % e.strerror)
@@ -1954,7 +1969,7 @@ class CoreInstall(object):
         try:
             filename, headers = urllib.urlretrieve(digsig_url, digsig_file, callback)
         except IOError, e:
-            log.error("Plug-in GPG file download failed: %s" % e.strerror)
+            log.error("Plug-in GPG file [%s] download failed: %s" % (digsig_url,e.strerror))
             return PLUGIN_INSTALL_ERROR_DIGITAL_SIG_NOT_FOUND, e.strerror
 
         if self.isErrorPage(file(digsig_file, 'r').read(1024)):
