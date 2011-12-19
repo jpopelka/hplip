@@ -48,6 +48,7 @@ public:
     DRIVER_ERROR    FormFeed();
     DRIVER_ERROR    EndJob();
     DRIVER_ERROR    SendCAPy(int iOffset) {return NO_ERROR;}
+    DRIVER_ERROR    preProcessRasterData(cups_raster_t **cups_raster, cups_page_header2_t* firstpage_cups_header, char* pSwapedPagesFileName);
     bool            CanSkipRasters() {return false;}
 
 protected:

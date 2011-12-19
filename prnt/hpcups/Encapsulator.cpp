@@ -274,3 +274,10 @@ void Encapsulator::sendJobHeader()
     return;
 }
 
+
+DRIVER_ERROR Encapsulator::preProcessRasterData(cups_raster_t **cups_raster, cups_page_header2_t* firstpage_cups_header, char* pSwapedPagesFileName)
+{
+	dbglog ("DEBUG: Encapsulator::preProcessRasterData.............. \n");
+	return NO_ERROR;
+}
+

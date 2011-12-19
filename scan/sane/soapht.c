@@ -520,7 +520,7 @@ SANE_Status soapht_open(SANE_String_Const device, SANE_Handle *handle)
    session->resolutionList[i++] = 200;
    session->resolutionList[i++] = 300;
    session->resolutionList[i++] = 600;
-   session->resolutionList[i++] = 1200;
+   //session->resolutionList[i++] = 1200;
    session->resolutionList[0] = i-1;    /* length of word_list */
    soapht_control_option(session, SOAP_OPTION_SCAN_RESOLUTION, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */
 

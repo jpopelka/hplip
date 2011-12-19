@@ -335,6 +335,7 @@ typedef enum
 
 #define CUSTOM_MEDIA_SIZE 101
 
+#define EVENT_PRINT_FAILED_MISSING_PLUGIN 502
 enum COLORTYPE
 {
     COLORTYPE_COLOR,       // 0
@@ -458,6 +459,7 @@ typedef struct JobAttributes_s
     char               printer_language[32];
     int                integer_values[16];
     int                printer_platform_version;
+    int                pre_process_raster;
 } JobAttributes;
 
 #endif // COMMON_DEFINITIONS_H

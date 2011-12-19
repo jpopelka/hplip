@@ -49,6 +49,7 @@ public:
     DRIVER_ERROR SendRasters(BYTE* BlackImageData=(BYTE*)NULL, BYTE* ColorImageData=(BYTE*)NULL);
     DRIVER_ERROR NewPage();
     DRIVER_ERROR StartPage(JobAttributes *job_attrs);
+    DRIVER_ERROR preProcessRasterData(cups_raster_t **cups_raster, cups_page_header2_t* firstpage_cups_header, char* pPreProcessedRasterFile);   
     void         CancelJob();
 private:
 

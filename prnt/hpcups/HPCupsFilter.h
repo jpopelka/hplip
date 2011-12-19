@@ -36,6 +36,8 @@
 #include "Compressor.h"
 #include "Job.h"
 
+#include "dbuscomm.h"
+
 #define		DBITMAPFILEHEADER		14
 #define		DBITMAPINFOHEADER		40
 
@@ -91,7 +93,8 @@ private:
     char            **m_argv;
     JobAttributes   m_JA;
     ppd_file_t      *m_ppd;
-
+    DBusCommunicator m_DBusComm;
+	
 private:
 
     void            closeFilter();

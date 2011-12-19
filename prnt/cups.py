@@ -712,7 +712,11 @@ def getOptions():
 
 def printFile(printer, filename, title):
     if os.path.exists(filename):
+	printer = printer.encode('utf-8')
+	filename = filename.encode('utf-8')
+	title = title.encode('utf-8')
         return cupsext.printFileWithOptions(printer, filename, title)
+	
     else:
         return -1
 

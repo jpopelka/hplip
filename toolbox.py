@@ -100,8 +100,11 @@ if ui_toolkit == 'qt3':
     try:
         from dbus import SessionBus
         import dbus.service
-        from dbus.mainloop.glib import DBusGMainLoop
+        from dbus.mainloop.glib import DBusGMainLoop, threads_init
         from gobject import MainLoop
+        import glib
+        glib.threads_init()
+        dbus.mainloop.glib.threads_init()
     except ImportError:
         log.error("Unable to load dbus - Automatic status updates in HPLIP Device Manager will be disabled.")
         disable_dbus = True

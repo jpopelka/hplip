@@ -206,17 +206,18 @@ class FaxAddressBook(object): # Pickle based address book
         self.load()
 
     def load(self):
-        self._fab = os.path.join(prop.user_dir, "fab.pickle")
-        #old_fab = os.path.join(prop.user_dir, "fab.db")
+        self._fab = "/dev/null"
+        if prop.user_dir != None:
+            self._fab = os.path.join(prop.user_dir, "fab.pickle")
+            #old_fab = os.path.join(prop.user_dir, "fab.db")
 
-        # Load the existing pickle if present
-        if os.path.exists(self._fab):
-            pickle_file = open(self._fab, "r")
-            self._data = cPickle.load(pickle_file)
-            pickle_file.close()
-
-        else:
-            self.save() # save the empty file to create the file
+            # Load the existing pickle if present
+            if os.path.exists(self._fab):
+               pickle_file = open(self._fab, "r")
+               self._data = cPickle.load(pickle_file)
+               pickle_file.close()
+            else:
+               self.save() # save the empty file to create the file
 
 
     def set(self, name, title, firstname, lastname, fax, groups, notes):

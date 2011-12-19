@@ -578,7 +578,7 @@ def getHostname(dev):
         return ret
 
     if errorreturn != 'ok':
-        log.error("GetHostname returned an error: %s" % errorreturn)
+       # log.error("GetHostname returned an error: %s" % errorreturn)
         return ret
 
     try:

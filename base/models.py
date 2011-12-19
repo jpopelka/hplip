@@ -160,7 +160,6 @@ TECH_CLASS_PDLS = {
     "StingrayOJ"   : 'pcl3',
     "Copperhead"   : 'pcl3',
     "Ampere"	   : 'pcl3'
-
 }
 
 PDL_TYPE_PCL = 0  # less preferred

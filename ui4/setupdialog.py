@@ -77,6 +77,8 @@ DEVICE_DESC_MULTI_FUNC = 2
 class PasswordDialog(QDialog):
     def __init__(self, prompt, parent=None, name=None, modal=0, fl=0):
         QDialog.__init__(self, parent)
+        # Application icon
+        self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))
         self.prompt = prompt
 
         Layout= QGridLayout(self)
@@ -110,7 +112,12 @@ class PasswordDialog(QDialog):
         self.connect(self.OkPushButton, SIGNAL("clicked()"), self.accept)
         self.connect(self.PasswordLineEdit, SIGNAL("returnPressed()"), self.accept)
 
-
+    def setDefaultUsername(self, defUser, allowUsernameEdit = True):
+        self.UsernameLineEdit.setText(defUser)
+        if not allowUsernameEdit:
+            self.UsernameLineEdit.setReadOnly(True)
+            self.UsernameLineEdit.setStyleSheet("QLineEdit {background-color: lightgray}")
+    
     def getUsername(self):
         return unicode(self.UsernameLineEdit.text())
 
@@ -132,9 +139,12 @@ class PasswordDialog(QDialog):
 
 
 
-def showPasswordUI(prompt):
-    try:
+def showPasswordUI(prompt, userName=None, allowUsernameEdit=True):
+    try:	
         dlg = PasswordDialog(prompt, None)
+
+        if userName != None:
+            dlg.setDefaultUsername(userName, allowUsernameEdit)
 
         if dlg.exec_() == QDialog.Accepted:
             return (dlg.getUsername(), dlg.getPassword())
@@ -882,8 +892,8 @@ class SetupDialog(QDialog, Ui_Dialog):
                 self.printer_fax_names_same = False
                 self.printer_name_ok = True
 
-                self.FaxNameLineEdit.emit(SIGNAL("textChanged(const QString &)"),
-                            (self.FaxNameLineEdit.text(),))
+                self.FaxNameLineEdit.emit(SIGNAL("textEdited(const QString &)"),
+                            self.FaxNameLineEdit.text())
 
         self.setIndicators()
         self.setAddPrinterButton()
@@ -914,8 +924,8 @@ class SetupDialog(QDialog, Ui_Dialog):
                 self.printer_fax_names_same = False
                 self.fax_name_ok = True
 
-                self.PrinterNameLineEdit.emit(SIGNAL("textChanged(const QString&)"),
-                            (self.PrinterNameLineEdit.text(),))
+                self.PrinterNameLineEdit.emit(SIGNAL("textEdited(const QString&)"),
+                            self.PrinterNameLineEdit.text())
 
         self.setIndicators()
         self.setAddPrinterButton()

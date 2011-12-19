@@ -236,7 +236,8 @@
 //        Added new tech class Ampere
 
 //      13 September 2011 Goutam
-//         Added AutoDuplex PaperSizes in Copperhead techclass 
+//         Added AutoDuplex PaperSizes in Copperhead techclass
+ 
 
 // Include necessary files...
 #include <font.defs>
@@ -4786,6 +4787,14 @@ Manufacturer "HP"
          "<</cupsInteger0 72/PageSize[566.64 410.76]/ImagingBBox null>>setpagedevice"
        // <%Copperhead:AutoDuplex%>
        {
+         ModelName "HP Photosmart 5510d Series"
+         Attribute "NickName" "" "HP Photosmart 5510d Series, $Version"
+         Attribute "ShortNickName" "" "HP Photosmart 5510d Series"
+         Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart 5510d series;DES:photosmart 5510d series;"
+         PCFileName "hp-photosmart_5510d_series.ppd"
+         Attribute "Product" "" "(HP Photosmart 5510d E-all-in-one)"
+       }
+       {
          ModelName "HP Photosmart 6510 Series"
          Attribute "NickName" "" "HP Photosmart 6510 Series, $Version"
          Attribute "ShortNickName" "" "HP Photosmart 6510 Series"
@@ -4796,7 +4805,7 @@ Manufacturer "HP"
      }
 } // End Copperhead
 
-
+//Added by Goutam Kodu
 //////// Python11
 {
   Attribute "cupsEvenDuplex" "" "True"
@@ -6085,7 +6094,9 @@ Manufacturer "HP"
       Attribute "ShortNickName" "" "HP Officejet Pro 8500 a910"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet pro 8500 a910;DES:officejet pro 8500 a910;"
       PCFileName "hp-officejet_pro_8500_a910.ppd"
-      Attribute "Product" "" "(HP Officejet Pro 8500 a910a)"
+      Attribute "Product" "" "(HP Officejet Pro 8500a E-aio Printer a910a)"
+      Attribute "Product" "" "(HP Officejet Pro 8500a E-aio Printer a910g)"
+      Attribute "Product" "" "(HP Officejet Pro 8500a E-aio Printer a910n)"
     }
   } // End Supported media sizes with full bleed.
 
@@ -7684,14 +7695,24 @@ Manufacturer "HP"
       Attribute "Product" "" "(HP Photosmart b8553 Photo Printer)"
       Attribute "Product" "" "(HP Photosmart b8558 Photo Printer)"
     }
+
+    //Adding Speciality Media Tray Support (LP#105443)
     {
-      ModelName "HP Photosmart Pro b8800 Series"
-      Attribute "NickName" "" "HP Photosmart Pro b8800 Series, $Version"
-      Attribute "ShortNickName" "" "HP Photosmart Pro b8800 Series"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart pro b8800 series;DES:photosmart pro b8800 series;"
-      PCFileName "hp-photosmart_pro_b8800_series.ppd"
-      Attribute "Product" "" "(HP Photosmart Pro b8850 Printer)"
+        Option "InputSlot/Media Source" PickOne AnySetup 10.0
+            Choice "MediaTray/Speciality Media Tray" "<</MediaPosition 2>>setpagedevice"
+        // <%Python:LargeFormatA3:NoAutoDuplex:Advanced%>
+        {
+          ModelName "HP Photosmart Pro b8800 Series"
+          Attribute "NickName" "" "HP Photosmart Pro b8800 Series, $Version"
+          Attribute "ShortNickName" "" "HP Photosmart Pro b8800 Series"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart pro b8800 series;DES:photosmart pro b8800 series;"
+          PCFileName "hp-photosmart_pro_b8800_series.ppd"
+          Attribute "Product" "" "(HP Photosmart Pro b8850 Printer)"
+        }
     }
+
+
+
   } // End Large format media sizes with full bleed
 
 } // End Python B-size
@@ -10767,14 +10788,6 @@ Group "RLT/HP Real Life Technologies"
       Attribute "Product" "" "(HP LaserJet 4si Mx Printer)"
     }
     {
-      ModelName "HP LaserJet 5mp"
-      Attribute "NickName" "" "HP LaserJet 5mp pcl3, $Version"
-      Attribute "ShortNickName" "" "HP LaserJet 5mp"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 5mp;DES:hp laserjet 5mp;"
-      PCFileName "hp-laserjet_5mp-pcl3.ppd"
-      Attribute "Product" "" "(HP LaserJet 5mp Printer)"
-    }
-    {
       ModelName "HP LaserJet 5l"
       Attribute "NickName" "" "HP LaserJet 5l, $Version"
       Attribute "ShortNickName" "" "HP LaserJet 5l"
@@ -10783,6 +10796,14 @@ Group "RLT/HP Real Life Technologies"
       Attribute "Product" "" "(HP LaserJet 5l Printer)"
       Attribute "Product" "" "(HP LaserJet 5l-fs Printer)"
       Attribute "Product" "" "(HP LaserJet 5l Xtra Printer)"
+    }
+    {
+      ModelName "HP LaserJet 5mp"
+      Attribute "NickName" "" "HP LaserJet 5mp pcl3, $Version"
+      Attribute "ShortNickName" "" "HP LaserJet 5mp"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 5mp;DES:hp laserjet 5mp;"
+      PCFileName "hp-laserjet_5mp-pcl3.ppd"
+      Attribute "Product" "" "(HP LaserJet 5mp Printer)"
     }
     {
       ModelName "HP LaserJet 5p"
@@ -12029,17 +12050,6 @@ Group "RLT/HP Real Life Technologies"
     Choice "DuplexTumble/Short Edge (Flip)" "<</Duplex true/Tumble true>>setpagedevice"
     *Choice "None/Off" "<</Duplex false/Tumble false>>setpagedevice"
 
-  // MediaPosition values map to MediaSource enumeration in global_types.h
-  Option "InputSlot/Media Source" PickOne AnySetup 10.0
-    *Choice "Auto/Auto-Select" "<</MediaPosition 7>>setpagedevice"
-    Choice "PhotoTray/Photo Tray" "<</MediaPosition 1>>setpagedevice"
-    Choice "Upper/Upper Tray" "<</MediaPosition 1>>setpagedevice"
-    Choice "Lower/Lower Tray" "<</MediaPosition 4>>setpagedevice"
-    Choice "Envelope/Envelope Feeder" "<</MediaPosition 3>>setpagedevice"
-    Choice "LargeCapacity/Large Capacity Tray" "<</MediaPosition 5>>setpagedevice"
-    Choice "Manual/Manual Feeder" "<</MediaPosition 2>>setpagedevice"
-    Choice "MPTray/Multi Purpose Tray" "<</MediaPosition 1>>setpagedevice"
-
   // cupsRowCount values map to PEN_TYPE + 1 from global_types.h
   Option "ColorModel/Output Mode" PickOne AnySetup 10.0
     Choice "Gray/Grayscale" "<</cupsColorSpace 3/cupsBitsPerColor 1/cupsRowCount 3/cupsRowStep 2>>setpagedevice"
@@ -12130,449 +12140,470 @@ Group "RLT/HP Real Life Technologies"
     VariablePaperSize Yes
     MinSize 1in 4in
     MaxSize 8.5in 14in
+    {        
+      // MediaPosition values map to MediaSource enumeration in global_types.h
+      Option "InputSlot/Media Source" PickOne AnySetup 10.0
+        *Choice "Auto/Auto-Select" "<</MediaPosition 7>>setpagedevice"
+        Choice "PhotoTray/Photo Tray" "<</MediaPosition 1>>setpagedevice"
+        Choice "Upper/Upper Tray" "<</MediaPosition 1>>setpagedevice"
+        Choice "Lower/Lower Tray" "<</MediaPosition 4>>setpagedevice"
+        Choice "Envelope/Envelope Feeder" "<</MediaPosition 3>>setpagedevice"
+        Choice "LargeCapacity/Large Capacity Tray" "<</MediaPosition 5>>setpagedevice"
+        Choice "Manual/Manual Feeder" "<</MediaPosition 2>>setpagedevice"
+        Choice "MPTray/Multi Purpose Tray" "<</MediaPosition 1>>setpagedevice"
+        // <%LJColor:Normal%>
+        {
+          ModelName "HP Color LaserJet cm1312nfi MFP"
+          Attribute "NickName" "" "HP Color LaserJet cm1312nfi MFP pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cm1312nfi MFP"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm1312nfi mfp;DES:hp color laserjet cm1312nfi mfp;"
+          PCFileName "hp-color_laserjet_cm1312nfi_mfp-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cm1312nfi Multifunction Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet cm1312 MFP"
+          Attribute "NickName" "" "HP Color LaserJet cm1312 MFP pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cm1312 MFP"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm1312 mfp;DES:hp color laserjet cm1312 mfp;"
+          PCFileName "hp-color_laserjet_cm1312_mfp-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cm1312 Multifunction Printer)"
+        }
+        {
+          ModelName "HP LaserJet cm1411fn"
+          Attribute "NickName" "" "HP LaserJet cm1411fn pcl3, $Version"
+          Attribute "ShortNickName" "" "HP LaserJet cm1411fn"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet cm1411fn;DES:hp laserjet cm1411fn;"
+          PCFileName "hp-laserjet_cm1411fn-pcl3.ppd"
+          Attribute "Product" "" "(HP LaserJet Professional cm1411fn)"
+        }
+        {
+          ModelName "HP LaserJet cm1412fn"
+          Attribute "NickName" "" "HP LaserJet cm1412fn pcl3, $Version"
+          Attribute "ShortNickName" "" "HP LaserJet cm1412fn"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet cm1412fn;DES:hp laserjet cm1412fn;"
+          PCFileName "hp-laserjet_cm1412fn-pcl3.ppd"
+          Attribute "Product" "" "(HP LaserJet Professional cm1412fn)"
+        }
+        {
+          ModelName "HP LaserJet cm1413fn"
+          Attribute "NickName" "" "HP LaserJet cm1413fn pcl3, $Version"
+          Attribute "ShortNickName" "" "HP LaserJet cm1413fn"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet cm1413fn;DES:hp laserjet cm1413fn;"
+          PCFileName "hp-laserjet_cm1413fn-pcl3.ppd"
+          Attribute "Product" "" "(HP LaserJet Professional cm1413fn)"
+        }
+        {
+          ModelName "HP LaserJet cm1415fnw"
+          Attribute "NickName" "" "HP LaserJet cm1415fnw pcl3, $Version"
+          Attribute "ShortNickName" "" "HP LaserJet cm1415fnw"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet cm1415fnw;DES:hp laserjet cm1415fnw;"
+          PCFileName "hp-laserjet_cm1415fnw-pcl3.ppd"
+          Attribute "Product" "" "(HP LaserJet Professional cm1415fnw)"
+        }
+        {
+          ModelName "HP LaserJet cm1415fn"
+          Attribute "NickName" "" "HP LaserJet cm1415fn pcl3, $Version"
+          Attribute "ShortNickName" "" "HP LaserJet cm1415fn"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet cm1415fn;DES:hp laserjet cm1415fn;"
+          PCFileName "hp-laserjet_cm1415fn-pcl3.ppd"
+          Attribute "Product" "" "(HP LaserJet Professional cm1415fn)"
+        }
+        {
+          ModelName "HP LaserJet cm1416fnw"
+          Attribute "NickName" "" "HP LaserJet cm1416fnw pcl3, $Version"
+          Attribute "ShortNickName" "" "HP LaserJet cm1416fnw"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet cm1416fnw;DES:hp laserjet cm1416fnw;"
+          PCFileName "hp-laserjet_cm1416fnw-pcl3.ppd"
+          Attribute "Product" "" "(HP LaserJet Professional cm1416fnw)"
+        }
+        {
+          ModelName "HP LaserJet cm1417fnw"
+          Attribute "NickName" "" "HP LaserJet cm1417fnw pcl3, $Version"
+          Attribute "ShortNickName" "" "HP LaserJet cm1417fnw"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet cm1417fnw;DES:hp laserjet cm1417fnw;"
+          PCFileName "hp-laserjet_cm1417fnw-pcl3.ppd"
+          Attribute "Product" "" "(HP LaserJet Professional cm1417fnw)"
+        }
+        {
+          ModelName "HP LaserJet cm1418fnw"
+          Attribute "NickName" "" "HP LaserJet cm1418fnw pcl3, $Version"
+          Attribute "ShortNickName" "" "HP LaserJet cm1418fnw"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet cm1418fnw;DES:hp laserjet cm1418fnw;"
+          PCFileName "hp-laserjet_cm1418fnw-pcl3.ppd"
+          Attribute "Product" "" "(HP LaserJet Professional cm1418fnw)"
+        }
+        {
+          ModelName "HP Color LaserJet cp1514n"
+          Attribute "NickName" "" "HP Color LaserJet cp1514n pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cp1514n"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp1514n;DES:hp color laserjet cp1514n;"
+          PCFileName "hp-color_laserjet_cp1514n-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cp1514n Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet cp1515n"
+          Attribute "NickName" "" "HP Color LaserJet cp1515n pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cp1515n"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp1515n;DES:hp color laserjet cp1515n;"
+          PCFileName "hp-color_laserjet_cp1515n-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cp1515n Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet cp1518ni"
+          Attribute "NickName" "" "HP Color LaserJet cp1518ni pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cp1518ni"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp1518ni;DES:hp color laserjet cp1518ni;"
+          PCFileName "hp-color_laserjet_cp1518ni-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cp1518ni Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet cp2025dn"
+          Attribute "NickName" "" "HP Color LaserJet cp2025dn pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cp2025dn"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp2025dn;DES:hp color laserjet cp2025dn;"
+          PCFileName "hp-color_laserjet_cp2025dn-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cp2025dn Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet cp2025"
+          Attribute "NickName" "" "HP Color LaserJet cp2025 pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cp2025"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp2025;DES:hp color laserjet cp2025;"
+          PCFileName "hp-color_laserjet_cp2025-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cp2025 Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet cp2025n"
+          Attribute "NickName" "" "HP Color LaserJet cp2025n pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cp2025n"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp2025n;DES:hp color laserjet cp2025n;"
+          PCFileName "hp-color_laserjet_cp2025n-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cp2025n Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet cp2025x"
+          Attribute "NickName" "" "HP Color LaserJet cp2025x pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cp2025x"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp2025x;DES:hp color laserjet cp2025x;"
+          PCFileName "hp-color_laserjet_cp2025x-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cp2025x Printer)"
+        }
+        {
+          ModelName "HP Business Inkjet 2300"
+          Attribute "NickName" "" "HP Business Inkjet 2300 pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Business Inkjet 2300"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp business inkjet 2300;DES:hp business inkjet 2300;"
+          PCFileName "hp-business_inkjet_2300-pcl3.ppd"
+          Attribute "Product" "" "(HP Business Inkjet 2300 Printer)"
+          Attribute "Product" "" "(HP Business Inkjet 2300n Printer)"
+          Attribute "Product" "" "(HP Business Inkjet 2300dtn Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet 2500"
+          Attribute "NickName" "" "HP Color LaserJet 2500 pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet 2500"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 2500;DES:hp color laserjet 2500;"
+          PCFileName "hp-color_laserjet_2500-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet 2500 Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet 2500 Series"
+          Attribute "NickName" "" "HP Color LaserJet 2500 Series, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet 2500 Series"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 2500 series;DES:hp color laserjet 2500 series;"
+          PCFileName "hp-color_laserjet_2500_series.ppd"
+          Attribute "Product" "" "(HP Color LaserJet 2500l Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 2500lse Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 2500n Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 2500tn Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet 3000"
+          Attribute "NickName" "" "HP Color LaserJet 3000 pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet 3000"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 3000;DES:hp color laserjet 3000;"
+          PCFileName "hp-color_laserjet_3000-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet 3000 Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 3000n Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 3000dn Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 3000dtn Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet cp3505"
+          Attribute "NickName" "" "HP Color LaserJet cp3505 pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cp3505"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp3505;DES:hp color laserjet cp3505;"
+          PCFileName "hp-color_laserjet_cp3505-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cp3505n Printer)"
+          Attribute "Product" "" "(HP Color LaserJet cp3505dn Printer)"
+          Attribute "Product" "" "(HP Color LaserJet cp3505x Printer)"
+          Attribute "Product" "" "(HP Color LaserJet cp3505 Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet cp3525"
+          Attribute "NickName" "" "HP Color LaserJet cp3525 pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cp3525"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp3525;DES:hp color laserjet cp3525;"
+          PCFileName "hp-color_laserjet_cp3525-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cp3525 Printer)"
+          Attribute "Product" "" "(HP Color LaserJet cp3525n Printer)"
+          Attribute "Product" "" "(HP Color LaserJet cp3525dn Printer)"
+          Attribute "Product" "" "(HP Color LaserJet cp3525x Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet cm3530 MFP"
+          Attribute "NickName" "" "HP Color LaserJet cm3530 MFP pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cm3530 MFP"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm3530 mfp;DES:hp color laserjet cm3530 mfp;"
+          PCFileName "hp-color_laserjet_cm3530_mfp-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cm3530 Multifunction Printer)"
+          Attribute "Product" "" "(HP Color LaserJet cm3530fs Multifunction Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet 3700"
+          Attribute "NickName" "" "HP Color LaserJet 3700 pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet 3700"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 3700;DES:hp color laserjet 3700;"
+          PCFileName "hp-color_laserjet_3700-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet 3700 Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet 3700n"
+          Attribute "NickName" "" "HP Color LaserJet 3700n, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet 3700n"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 3700n;DES:hp color laserjet 3700n;"
+          PCFileName "hp-color_laserjet_3700n.ppd"
+          Attribute "Product" "" "(HP Color LaserJet 3700n Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 3700dtn Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 3700dn Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 3700d Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet 3800"
+          Attribute "NickName" "" "HP Color LaserJet 3800 pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet 3800"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 3800;DES:hp color laserjet 3800;"
+          PCFileName "hp-color_laserjet_3800-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet 3800 Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 3800n Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 3800dn Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 3800dtn Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet cp4005"
+          Attribute "NickName" "" "HP Color LaserJet cp4005 pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cp4005"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp4005;DES:hp color laserjet cp4005;"
+          PCFileName "hp-color_laserjet_cp4005-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cp4005n Printer)"
+          Attribute "Product" "" "(HP Color LaserJet cp4005dn Printer)"
+          Attribute "Product" "" "(HP Color LaserJet cp4005 Series Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet cp4020 Series"
+          Attribute "NickName" "" "HP Color LaserJet cp4020 Series pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cp4020 Series"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp4020 series;DES:hp color laserjet cp4020 series;"
+          PCFileName "hp-color_laserjet_cp4020_series-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cp4020 Series Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet 4500"
+          Attribute "NickName" "" "HP Color LaserJet 4500 pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet 4500"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 4500;DES:hp color laserjet 4500;"
+          PCFileName "hp-color_laserjet_4500-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet 4500 Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4500dn Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4500n Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet cp4520 Series"
+          Attribute "NickName" "" "HP Color LaserJet cp4520 Series pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cp4520 Series"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp4520 series;DES:hp color laserjet cp4520 series;"
+          PCFileName "hp-color_laserjet_cp4520_series-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cp4520 Series Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet cm4540 MFP"
+          Attribute "NickName" "" "HP Color LaserJet cm4540 MFP pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cm4540 MFP"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm4540 mfp;DES:hp color laserjet cm4540 mfp;"
+          PCFileName "hp-color_laserjet_cm4540_mfp-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cm4540 Multifunction Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet 4550"
+          Attribute "NickName" "" "HP Color LaserJet 4550 pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet 4550"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 4550;DES:hp color laserjet 4550;"
+          PCFileName "hp-color_laserjet_4550-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet 4550 Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4550n Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4550dn Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4550hdn Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4550n Plus Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4550hdn Plus Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet 4600 Series"
+          Attribute "NickName" "" "HP Color LaserJet 4600 Series, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet 4600 Series"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 4600 series;DES:hp color laserjet 4600 series;"
+          PCFileName "hp-color_laserjet_4600_series.ppd"
+          Attribute "Product" "" "(HP Color LaserJet 4600 Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4600dn Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4600dtn Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4600hdn Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4600n Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet 4600"
+          Attribute "NickName" "" "HP Color LaserJet 4600 pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet 4600"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 4600;DES:hp color laserjet 4600;"
+          PCFileName "hp-color_laserjet_4600-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet 4600 Series Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet 4610"
+          Attribute "NickName" "" "HP Color LaserJet 4610 pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet 4610"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 4610;DES:hp color laserjet 4610;"
+          PCFileName "hp-color_laserjet_4610-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet 4610n Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet 4650"
+          Attribute "NickName" "" "HP Color LaserJet 4650 pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet 4650"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 4650;DES:hp color laserjet 4650;"
+          PCFileName "hp-color_laserjet_4650-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet 4650 Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4650n Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4650dn Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4650dtn Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4650hdn Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet 4700"
+          Attribute "NickName" "" "HP Color LaserJet 4700 pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet 4700"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 4700;DES:hp color laserjet 4700;"
+          PCFileName "hp-color_laserjet_4700-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet 4700 Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4700dn Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4700dtn Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4700n Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4700ph+ Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet cm4730 MFP"
+          Attribute "NickName" "" "HP Color LaserJet cm4730 MFP pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cm4730 MFP"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm4730 mfp;DES:hp color laserjet cm4730 mfp;"
+          PCFileName "hp-color_laserjet_cm4730_mfp-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cm4730 Multifunction Printer)"
+          Attribute "Product" "" "(HP Color LaserJet cm4730f Multifunction Printer)"
+          Attribute "Product" "" "(HP Color LaserJet cm4730fm Multifunction Printer)"
+          Attribute "Product" "" "(HP Color LaserJet cm4730fsk Multifunction Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet 4730mfp"
+          Attribute "NickName" "" "HP Color LaserJet 4730mfp pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet 4730mfp"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 4730mfp;DES:hp color laserjet 4730mfp;"
+          PCFileName "hp-color_laserjet_4730mfp-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet 4730xs Multifunction Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4730xm Multifunction Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4730x Multifunction Printer)"
+          Attribute "Product" "" "(HP Color LaserJet 4730 Multifunction Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet cp5225"
+          Attribute "NickName" "" "HP Color LaserJet cp5225 pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cp5225"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp5225;DES:hp color laserjet cp5225;"
+          PCFileName "hp-color_laserjet_cp5225-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cp5225)"
+        }
+        {
+          ModelName "HP Color LaserJet cp5225n"
+          Attribute "NickName" "" "HP Color LaserJet cp5225n pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cp5225n"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp5225n;DES:hp color laserjet cp5225n;"
+          PCFileName "hp-color_laserjet_cp5225n-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cp5225n)"
+        }
+        {
+          ModelName "HP Color LaserJet cp5225dn"
+          Attribute "NickName" "" "HP Color LaserJet cp5225dn pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cp5225dn"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp5225dn;DES:hp color laserjet cp5225dn;"
+          PCFileName "hp-color_laserjet_cp5225dn-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cp5225dn)"
+        }
+        {
+          ModelName "HP Color LaserJet cp5520 Series"
+          Attribute "NickName" "" "HP Color LaserJet cp5520 Series pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cp5520 Series"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp5520 series;DES:hp color laserjet cp5520 series;"
+          PCFileName "hp-color_laserjet_cp5520_series-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cp5520 Series Printer)"
+        }
+        {
+          ModelName "HP Officejet 9100 Series"
+          Attribute "NickName" "" "HP Officejet 9100 Series pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Officejet 9100 Series"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 9100 series;DES:officejet 9100 series;"
+          PCFileName "hp-officejet_9100_series-pcl3.ppd"
+          Attribute "Product" "" "(HP Officejet 9110 All-in-one Printer)"
+          Attribute "Product" "" "(HP Officejet 9120 All-in-one Printer)"
+          Attribute "Product" "" "(HP Officejet 9130 All-in-one Printer)"
+        }
+    }
 
-    // <%LJColor:Normal%>
     {
-      ModelName "HP Color LaserJet cm1312 MFP"
-      Attribute "NickName" "" "HP Color LaserJet cm1312 MFP pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cm1312 MFP"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm1312 mfp;DES:hp color laserjet cm1312 mfp;"
-      PCFileName "hp-color_laserjet_cm1312_mfp-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cm1312 Multifunction Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet cm1312nfi MFP"
-      Attribute "NickName" "" "HP Color LaserJet cm1312nfi MFP pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cm1312nfi MFP"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm1312nfi mfp;DES:hp color laserjet cm1312nfi mfp;"
-      PCFileName "hp-color_laserjet_cm1312nfi_mfp-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cm1312nfi Multifunction Printer)"
-    }
-    {
-      ModelName "HP LaserJet cm1411fn"
-      Attribute "NickName" "" "HP LaserJet cm1411fn pcl3, $Version"
-      Attribute "ShortNickName" "" "HP LaserJet cm1411fn"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet cm1411fn;DES:hp laserjet cm1411fn;"
-      PCFileName "hp-laserjet_cm1411fn-pcl3.ppd"
-      Attribute "Product" "" "(HP LaserJet Professional cm1411fn)"
-    }
-    {
-      ModelName "HP LaserJet cm1412fn"
-      Attribute "NickName" "" "HP LaserJet cm1412fn pcl3, $Version"
-      Attribute "ShortNickName" "" "HP LaserJet cm1412fn"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet cm1412fn;DES:hp laserjet cm1412fn;"
-      PCFileName "hp-laserjet_cm1412fn-pcl3.ppd"
-      Attribute "Product" "" "(HP LaserJet Professional cm1412fn)"
-    }
-    {
-      ModelName "HP LaserJet cm1413fn"
-      Attribute "NickName" "" "HP LaserJet cm1413fn pcl3, $Version"
-      Attribute "ShortNickName" "" "HP LaserJet cm1413fn"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet cm1413fn;DES:hp laserjet cm1413fn;"
-      PCFileName "hp-laserjet_cm1413fn-pcl3.ppd"
-      Attribute "Product" "" "(HP LaserJet Professional cm1413fn)"
-    }
-    {
-      ModelName "HP LaserJet cm1415fnw"
-      Attribute "NickName" "" "HP LaserJet cm1415fnw pcl3, $Version"
-      Attribute "ShortNickName" "" "HP LaserJet cm1415fnw"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet cm1415fnw;DES:hp laserjet cm1415fnw;"
-      PCFileName "hp-laserjet_cm1415fnw-pcl3.ppd"
-      Attribute "Product" "" "(HP LaserJet Professional cm1415fnw)"
-    }
-    {
-      ModelName "HP LaserJet cm1415fn"
-      Attribute "NickName" "" "HP LaserJet cm1415fn pcl3, $Version"
-      Attribute "ShortNickName" "" "HP LaserJet cm1415fn"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet cm1415fn;DES:hp laserjet cm1415fn;"
-      PCFileName "hp-laserjet_cm1415fn-pcl3.ppd"
-      Attribute "Product" "" "(HP LaserJet Professional cm1415fn)"
-    }
-    {
-      ModelName "HP LaserJet cm1416fnw"
-      Attribute "NickName" "" "HP LaserJet cm1416fnw pcl3, $Version"
-      Attribute "ShortNickName" "" "HP LaserJet cm1416fnw"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet cm1416fnw;DES:hp laserjet cm1416fnw;"
-      PCFileName "hp-laserjet_cm1416fnw-pcl3.ppd"
-      Attribute "Product" "" "(HP LaserJet Professional cm1416fnw)"
-    }
-    {
-      ModelName "HP LaserJet cm1417fnw"
-      Attribute "NickName" "" "HP LaserJet cm1417fnw pcl3, $Version"
-      Attribute "ShortNickName" "" "HP LaserJet cm1417fnw"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet cm1417fnw;DES:hp laserjet cm1417fnw;"
-      PCFileName "hp-laserjet_cm1417fnw-pcl3.ppd"
-      Attribute "Product" "" "(HP LaserJet Professional cm1417fnw)"
-    }
-    {
-      ModelName "HP LaserJet cm1418fnw"
-      Attribute "NickName" "" "HP LaserJet cm1418fnw pcl3, $Version"
-      Attribute "ShortNickName" "" "HP LaserJet cm1418fnw"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet cm1418fnw;DES:hp laserjet cm1418fnw;"
-      PCFileName "hp-laserjet_cm1418fnw-pcl3.ppd"
-      Attribute "Product" "" "(HP LaserJet Professional cm1418fnw)"
-    }
-    {
-      ModelName "HP Color LaserJet cp1514n"
-      Attribute "NickName" "" "HP Color LaserJet cp1514n pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cp1514n"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp1514n;DES:hp color laserjet cp1514n;"
-      PCFileName "hp-color_laserjet_cp1514n-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cp1514n Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet cp1515n"
-      Attribute "NickName" "" "HP Color LaserJet cp1515n pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cp1515n"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp1515n;DES:hp color laserjet cp1515n;"
-      PCFileName "hp-color_laserjet_cp1515n-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cp1515n Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet cp1518ni"
-      Attribute "NickName" "" "HP Color LaserJet cp1518ni pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cp1518ni"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp1518ni;DES:hp color laserjet cp1518ni;"
-      PCFileName "hp-color_laserjet_cp1518ni-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cp1518ni Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet cp2025dn"
-      Attribute "NickName" "" "HP Color LaserJet cp2025dn pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cp2025dn"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp2025dn;DES:hp color laserjet cp2025dn;"
-      PCFileName "hp-color_laserjet_cp2025dn-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cp2025dn Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet cp2025"
-      Attribute "NickName" "" "HP Color LaserJet cp2025 pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cp2025"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp2025;DES:hp color laserjet cp2025;"
-      PCFileName "hp-color_laserjet_cp2025-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cp2025 Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet cp2025n"
-      Attribute "NickName" "" "HP Color LaserJet cp2025n pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cp2025n"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp2025n;DES:hp color laserjet cp2025n;"
-      PCFileName "hp-color_laserjet_cp2025n-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cp2025n Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet cp2025x"
-      Attribute "NickName" "" "HP Color LaserJet cp2025x pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cp2025x"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp2025x;DES:hp color laserjet cp2025x;"
-      PCFileName "hp-color_laserjet_cp2025x-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cp2025x Printer)"
-    }
-    {
-      ModelName "HP Business Inkjet 2300"
-      Attribute "NickName" "" "HP Business Inkjet 2300 pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Business Inkjet 2300"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp business inkjet 2300;DES:hp business inkjet 2300;"
-      PCFileName "hp-business_inkjet_2300-pcl3.ppd"
-      Attribute "Product" "" "(HP Business Inkjet 2300 Printer)"
-      Attribute "Product" "" "(HP Business Inkjet 2300n Printer)"
-      Attribute "Product" "" "(HP Business Inkjet 2300dtn Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet cm2320 MFP"
-      Attribute "NickName" "" "HP Color LaserJet cm2320 MFP pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cm2320 MFP"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm2320 mfp;DES:hp color laserjet cm2320 mfp;"
-      PCFileName "hp-color_laserjet_cm2320_mfp-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cm2320 Multifuntion Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet cm2320fxi MFP"
-      Attribute "NickName" "" "HP Color LaserJet cm2320fxi MFP pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cm2320fxi MFP"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm2320fxi mfp;DES:hp color laserjet cm2320fxi mfp;"
-      PCFileName "hp-color_laserjet_cm2320fxi_mfp-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cm2320fxi Multifunction Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet cm2320n MFP"
-      Attribute "NickName" "" "HP Color LaserJet cm2320n MFP pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cm2320n MFP"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm2320n mfp;DES:hp color laserjet cm2320n mfp;"
-      PCFileName "hp-color_laserjet_cm2320n_mfp-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cm2320n Multifunction Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet cm2320nf MFP"
-      Attribute "NickName" "" "HP Color LaserJet cm2320nf MFP pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cm2320nf MFP"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm2320nf mfp;DES:hp color laserjet cm2320nf mfp;"
-      PCFileName "hp-color_laserjet_cm2320nf_mfp-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cm2320nf Multifunction Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet 2500"
-      Attribute "NickName" "" "HP Color LaserJet 2500 pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet 2500"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 2500;DES:hp color laserjet 2500;"
-      PCFileName "hp-color_laserjet_2500-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet 2500 Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet 2500 Series"
-      Attribute "NickName" "" "HP Color LaserJet 2500 Series, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet 2500 Series"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 2500 series;DES:hp color laserjet 2500 series;"
-      PCFileName "hp-color_laserjet_2500_series.ppd"
-      Attribute "Product" "" "(HP Color LaserJet 2500l Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 2500lse Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 2500n Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 2500tn Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet 3000"
-      Attribute "NickName" "" "HP Color LaserJet 3000 pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet 3000"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 3000;DES:hp color laserjet 3000;"
-      PCFileName "hp-color_laserjet_3000-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet 3000 Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 3000n Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 3000dn Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 3000dtn Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet cp3505"
-      Attribute "NickName" "" "HP Color LaserJet cp3505 pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cp3505"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp3505;DES:hp color laserjet cp3505;"
-      PCFileName "hp-color_laserjet_cp3505-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cp3505n Printer)"
-      Attribute "Product" "" "(HP Color LaserJet cp3505dn Printer)"
-      Attribute "Product" "" "(HP Color LaserJet cp3505x Printer)"
-      Attribute "Product" "" "(HP Color LaserJet cp3505 Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet cp3525"
-      Attribute "NickName" "" "HP Color LaserJet cp3525 pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cp3525"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp3525;DES:hp color laserjet cp3525;"
-      PCFileName "hp-color_laserjet_cp3525-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cp3525 Printer)"
-      Attribute "Product" "" "(HP Color LaserJet cp3525n Printer)"
-      Attribute "Product" "" "(HP Color LaserJet cp3525dn Printer)"
-      Attribute "Product" "" "(HP Color LaserJet cp3525x Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet cm3530 MFP"
-      Attribute "NickName" "" "HP Color LaserJet cm3530 MFP pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cm3530 MFP"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm3530 mfp;DES:hp color laserjet cm3530 mfp;"
-      PCFileName "hp-color_laserjet_cm3530_mfp-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cm3530 Multifunction Printer)"
-      Attribute "Product" "" "(HP Color LaserJet cm3530fs Multifunction Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet 3700"
-      Attribute "NickName" "" "HP Color LaserJet 3700 pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet 3700"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 3700;DES:hp color laserjet 3700;"
-      PCFileName "hp-color_laserjet_3700-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet 3700 Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet 3700n"
-      Attribute "NickName" "" "HP Color LaserJet 3700n, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet 3700n"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 3700n;DES:hp color laserjet 3700n;"
-      PCFileName "hp-color_laserjet_3700n.ppd"
-      Attribute "Product" "" "(HP Color LaserJet 3700n Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 3700dtn Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 3700dn Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 3700d Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet 3800"
-      Attribute "NickName" "" "HP Color LaserJet 3800 pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet 3800"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 3800;DES:hp color laserjet 3800;"
-      PCFileName "hp-color_laserjet_3800-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet 3800 Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 3800n Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 3800dn Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 3800dtn Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet cp4005"
-      Attribute "NickName" "" "HP Color LaserJet cp4005 pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cp4005"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp4005;DES:hp color laserjet cp4005;"
-      PCFileName "hp-color_laserjet_cp4005-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cp4005n Printer)"
-      Attribute "Product" "" "(HP Color LaserJet cp4005dn Printer)"
-      Attribute "Product" "" "(HP Color LaserJet cp4005 Series Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet cp4020 Series"
-      Attribute "NickName" "" "HP Color LaserJet cp4020 Series pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cp4020 Series"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp4020 series;DES:hp color laserjet cp4020 series;"
-      PCFileName "hp-color_laserjet_cp4020_series-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cp4020 Series Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet 4500"
-      Attribute "NickName" "" "HP Color LaserJet 4500 pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet 4500"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 4500;DES:hp color laserjet 4500;"
-      PCFileName "hp-color_laserjet_4500-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet 4500 Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4500dn Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4500n Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet cp4520 Series"
-      Attribute "NickName" "" "HP Color LaserJet cp4520 Series pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cp4520 Series"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp4520 series;DES:hp color laserjet cp4520 series;"
-      PCFileName "hp-color_laserjet_cp4520_series-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cp4520 Series Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet cm4540 MFP"
-      Attribute "NickName" "" "HP Color LaserJet cm4540 MFP pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cm4540 MFP"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm4540 mfp;DES:hp color laserjet cm4540 mfp;"
-      PCFileName "hp-color_laserjet_cm4540_mfp-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cm4540 Multifunction Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet 4550"
-      Attribute "NickName" "" "HP Color LaserJet 4550 pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet 4550"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 4550;DES:hp color laserjet 4550;"
-      PCFileName "hp-color_laserjet_4550-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet 4550 Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4550n Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4550dn Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4550hdn Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4550n Plus Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4550hdn Plus Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet 4600 Series"
-      Attribute "NickName" "" "HP Color LaserJet 4600 Series, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet 4600 Series"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 4600 series;DES:hp color laserjet 4600 series;"
-      PCFileName "hp-color_laserjet_4600_series.ppd"
-      Attribute "Product" "" "(HP Color LaserJet 4600 Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4600dn Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4600dtn Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4600hdn Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4600n Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet 4600"
-      Attribute "NickName" "" "HP Color LaserJet 4600 pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet 4600"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 4600;DES:hp color laserjet 4600;"
-      PCFileName "hp-color_laserjet_4600-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet 4600 Series Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet 4610"
-      Attribute "NickName" "" "HP Color LaserJet 4610 pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet 4610"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 4610;DES:hp color laserjet 4610;"
-      PCFileName "hp-color_laserjet_4610-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet 4610n Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet 4650"
-      Attribute "NickName" "" "HP Color LaserJet 4650 pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet 4650"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 4650;DES:hp color laserjet 4650;"
-      PCFileName "hp-color_laserjet_4650-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet 4650 Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4650n Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4650dn Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4650dtn Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4650hdn Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet 4700"
-      Attribute "NickName" "" "HP Color LaserJet 4700 pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet 4700"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 4700;DES:hp color laserjet 4700;"
-      PCFileName "hp-color_laserjet_4700-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet 4700 Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4700dn Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4700dtn Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4700n Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4700ph+ Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet cm4730 MFP"
-      Attribute "NickName" "" "HP Color LaserJet cm4730 MFP pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cm4730 MFP"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm4730 mfp;DES:hp color laserjet cm4730 mfp;"
-      PCFileName "hp-color_laserjet_cm4730_mfp-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cm4730 Multifunction Printer)"
-      Attribute "Product" "" "(HP Color LaserJet cm4730f Multifunction Printer)"
-      Attribute "Product" "" "(HP Color LaserJet cm4730fm Multifunction Printer)"
-      Attribute "Product" "" "(HP Color LaserJet cm4730fsk Multifunction Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet 4730mfp"
-      Attribute "NickName" "" "HP Color LaserJet 4730mfp pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet 4730mfp"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet 4730mfp;DES:hp color laserjet 4730mfp;"
-      PCFileName "hp-color_laserjet_4730mfp-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet 4730xs Multifunction Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4730xm Multifunction Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4730x Multifunction Printer)"
-      Attribute "Product" "" "(HP Color LaserJet 4730 Multifunction Printer)"
-    }
-    {
-      ModelName "HP Color LaserJet cp5225"
-      Attribute "NickName" "" "HP Color LaserJet cp5225 pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cp5225"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp5225;DES:hp color laserjet cp5225;"
-      PCFileName "hp-color_laserjet_cp5225-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cp5225)"
-    }
-    {
-      ModelName "HP Color LaserJet cp5225n"
-      Attribute "NickName" "" "HP Color LaserJet cp5225n pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cp5225n"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp5225n;DES:hp color laserjet cp5225n;"
-      PCFileName "hp-color_laserjet_cp5225n-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cp5225n)"
-    }
-    {
-      ModelName "HP Color LaserJet cp5225dn"
-      Attribute "NickName" "" "HP Color LaserJet cp5225dn pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cp5225dn"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp5225dn;DES:hp color laserjet cp5225dn;"
-      PCFileName "hp-color_laserjet_cp5225dn-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cp5225dn)"
-    }
-    {
-      ModelName "HP Color LaserJet cp5520 Series"
-      Attribute "NickName" "" "HP Color LaserJet cp5520 Series pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Color LaserJet cp5520 Series"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp5520 series;DES:hp color laserjet cp5520 series;"
-      PCFileName "hp-color_laserjet_cp5520_series-pcl3.ppd"
-      Attribute "Product" "" "(HP Color LaserJet cp5520 Series Printer)"
-    }
-    {
-      ModelName "HP Officejet 9100 Series"
-      Attribute "NickName" "" "HP Officejet 9100 Series pcl3, $Version"
-      Attribute "ShortNickName" "" "HP Officejet 9100 Series"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 9100 series;DES:officejet 9100 series;"
-      PCFileName "hp-officejet_9100_series-pcl3.ppd"
-      Attribute "Product" "" "(HP Officejet 9110 All-in-one Printer)"
-      Attribute "Product" "" "(HP Officejet 9120 All-in-one Printer)"
-      Attribute "Product" "" "(HP Officejet 9130 All-in-one Printer)"
+      // MediaPosition values map to MediaSource enumeration in global_types.h
+      Option "InputSlot/Media Source" PickOne AnySetup 10.0
+        *Choice "Auto/Auto-Select" "<</MediaPosition 7>>setpagedevice"
+        Choice "Tray1_Man/Tray 1 (Manual)" "<</MediaPosition 3>>setpagedevice"
+        Choice "Tray2/Tray 2" "<</MediaPosition 0>>setpagedevice"
+        Choice "Tray3/Tray 3" "<</MediaPosition 1>>setpagedevice"
+        // <%LJColor:Normal:Advanced%>
+        {
+          ModelName "HP Color LaserJet cm2320 MFP"
+          Attribute "NickName" "" "HP Color LaserJet cm2320 MFP pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cm2320 MFP"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm2320 mfp;DES:hp color laserjet cm2320 mfp;"
+          PCFileName "hp-color_laserjet_cm2320_mfp-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cm2320 Multifuntion Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet cm2320fxi MFP"
+          Attribute "NickName" "" "HP Color LaserJet cm2320fxi MFP pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cm2320fxi MFP"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm2320fxi mfp;DES:hp color laserjet cm2320fxi mfp;"
+          PCFileName "hp-color_laserjet_cm2320fxi_mfp-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cm2320fxi Multifunction Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet cm2320n MFP"
+          Attribute "NickName" "" "HP Color LaserJet cm2320n MFP pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cm2320n MFP"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm2320n mfp;DES:hp color laserjet cm2320n mfp;"
+          PCFileName "hp-color_laserjet_cm2320n_mfp-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cm2320n Multifunction Printer)"
+        }
+        {
+          ModelName "HP Color LaserJet cm2320nf MFP"
+          Attribute "NickName" "" "HP Color LaserJet cm2320nf MFP pcl3, $Version"
+          Attribute "ShortNickName" "" "HP Color LaserJet cm2320nf MFP"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm2320nf mfp;DES:hp color laserjet cm2320nf mfp;"
+          PCFileName "hp-color_laserjet_cm2320nf_mfp-pcl3.ppd"
+          Attribute "Product" "" "(HP Color LaserJet cm2320nf Multifunction Printer)"
+        }
     }
   } // End supported media sizes.
 
@@ -14671,7 +14702,7 @@ Group "RLT/HP Real Life Technologies"
 
   Group "General/General"
 
-  Attribute "cupsIPPReason" "hplip.plugin-error/printer requires a binary plugin, run hp-setup" ""
+  Attribute "cupsIPPReason" "hplip.plugin-error/HP Device requires a proprietary binary Plug-in, run hp-plugin" ""
 
   Option "Duplex/Double-Sided Printing" PickOne AnySetup 10.0
     Choice "DuplexNoTumble/Long Edge (Standard)" "<</Duplex true/Tumble false>>setpagedevice"
@@ -14882,7 +14913,7 @@ Group "RLT/HP Real Life Technologies"
 
   Group "General/General"
 
-  Attribute "cupsIPPReason" "hplip.plugin-error/printer requires a binary plugin, run hp-setup" ""
+  Attribute "cupsIPPReason" "hplip.plugin-error/HP Device requires a proprietary binary Plug-in, run hp-plugin" ""
 
   // MediaPosition values map to MediaSource enumeration in global_types.h
   Option "InputSlot/Media Source" PickOne AnySetup 10.0
@@ -15062,10 +15093,12 @@ Group "RLT/HP Real Life Technologies"
   Attribute "cupsBackSide" "" "Rotated"
   Attribute "cupsFlipDuplex" "" "True"
   Attribute "hpPrinterLanguage" "" "ljzjstream"
+  Attribute "hpPrinterPlatform" "" "ljzjsmono"
+  Attribute "hpReverseRasterPages" "" "1"
 
   Group "General/General"
 
-  Attribute "cupsIPPReason" "hplip.plugin-error/printer requires a binary plugin, run hp-setup" ""
+  Attribute "cupsIPPReason" "hplip.plugin-error/HP Device requires a proprietary binary Plug-in, run hp-plugin" ""
 
   Option "Duplex/Double-Sided Printing" PickOne AnySetup 10.0
     Choice "DuplexNoTumble/Long Edge (Standard)" "<</Duplex true/Tumble false>>setpagedevice"

@@ -49,7 +49,9 @@ def plugin_download_callback(c, s, t):
 def plugin_install_callback(s):
     print s
 
-
+def clean_exit(code=0):
+    mod.unlockInstance()
+    sys.exit(code)
 
 USAGE = [ (__doc__, "", "name", True),
           ("Usage: %s [MODE] [OPTIONS]" % __mod__, "", "summary", True),
@@ -105,21 +107,26 @@ for o, a in opts:
 version = prop.installed_version
 plugin_filename = 'hplip-%s-plugin.run' % version
 
+ok= mod.lockInstance()
+if ok is False:
+    log.error("Plug-in lock acquire failed. check if hp-plugin is already running")
+    sys.exit(1)
+
 if plugin_path is not None:
     if not os.path.exists(plugin_path):
         log.error("Plug-in path '%s' not found." % plugin_path)
-        sys.exit(1)
+        clean_exit(1)
 
     if os.path.isdir(plugin_path):
         plugin_path = os.path.join(plugin_path, 'hplip-%s-plugin.run' % version)
 
         if not os.path.exists(plugin_path):
             log.error("Plug-in path '%s' not found." % plugin_path)
-            sys.exit(1)
+            clean_exit(1)
 
     if os.path.basename(plugin_path) != plugin_filename:
         log.error("Plug-in filename must be '%s'." % plugin_filename)
-        sys.exit(1)
+        clean_exit(1)
 
 
     size, checksum, timestamp = os.stat(plugin_path)[6], '', 0.0
@@ -131,11 +138,11 @@ if mode == GUI_MODE:
     if ui_toolkit == 'qt3':
         if not utils.canEnterGUIMode():
             log.error("%s requires GUI support (try running with --qt4). Try using interactive (-i) mode." % __mod__)
-            sys.exit(1)
+            clean_exit(1)
     else:
         if not utils.canEnterGUIMode4():
             log.error("%s requires GUI support (try running with --qt3). Try using interactive (-i) mode." % __mod__)
-            sys.exit(1)
+            clean_exit(1)
 
 
 PKIT = utils.to_bool(sys_conf.get('configure', 'policy-kit'))
@@ -162,7 +169,7 @@ if mode == GUI_MODE:
             from ui import pluginform2
         except ImportError:
             log.error("Unable to load Qt3 support. Is it installed?")
-            sys.exit(1)
+            clean_exit(1)
 
         app = QApplication(sys.argv)
         QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
@@ -215,7 +222,7 @@ if mode == GUI_MODE:
                                   QMessageBox.NoButton,
                                   QMessageBox.NoButton)
 
-            sys.exit(1)
+            clean_exit(1)
 
         w = pluginform2.PluginForm2()
         app.setMainWidget(w)
@@ -229,7 +236,7 @@ if mode == GUI_MODE:
             from ui4.plugindialog import PluginDialog
         except ImportError:
             log.error("Unable to load Qt4 support. Is it installed?")
-            sys.exit(1)
+            clean_exit(1)
 
         app = QApplication(sys.argv)
 
@@ -243,7 +250,7 @@ if mode == GUI_MODE:
                                   QMessageBox.NoButton,
                                   QMessageBox.NoButton)
 
-            sys.exit(1)
+            clean_exit(1)
 
 
         dialog = PluginDialog(None, install_mode, plugin_reason)
@@ -253,14 +260,14 @@ if mode == GUI_MODE:
             app.exec_()
         except KeyboardInterrupt:
             log.error("User exit")
-            sys.exit(0)
+            clean_exit(0)
 
 
 else: # INTERACTIVE_MODE
     try:
         if not os.geteuid() == 0:
             log.error("You must be root to run this utility.")
-            sys.exit(1)
+            clean_exit(1)
 
         log.info("(Note: Defaults for each question are maked with a '*'. Press <enter> to accept the default.)")
         log.info("")
@@ -278,7 +285,7 @@ else: # INTERACTIVE_MODE
             cont, ans = tui.enter_yes_no("Do you wish to download and re-install the plug-in?")
 
             if not cont or not ans:
-                sys.exit(0)
+                clean_exit(0)
 
 
         if plugin_path is None:
@@ -293,7 +300,7 @@ else: # INTERACTIVE_MODE
                 ['d', 'p'], 'd')
 
             if not cont: # q
-                sys.exit(0)
+                clean_exit(0)
 
 
             if ans == 'd': # d - download
@@ -310,7 +317,7 @@ else: # INTERACTIVE_MODE
 
                     if not ok:
                         log.error("Network connection not detected.")
-                        sys.exit(1)
+                        clean_exit(1)
 
 
                 log.info("Downloading configuration file from: %s" % plugin_conf_url)
@@ -331,7 +338,7 @@ else: # INTERACTIVE_MODE
                         version)).strip()
 
                     if plugin_path.strip().lower() == 'q':
-                        sys.exit(1)
+                        clean_exit(1)
 
                     if not plugin_path.startswith('http://'):
                         plugin_path = os.path.normpath(os.path.abspath(os.path.expanduser(plugin_path)))
@@ -367,7 +374,7 @@ else: # INTERACTIVE_MODE
 
             if not ok:
                 log.error("Network connection not detected.")
-                sys.exit(1)
+                clean_exit(1)
 
         log.info("Downloading plug-in from: %s" % plugin_path)
         pm = tui.ProgressMeter("Downloading plug-in:")
@@ -380,7 +387,7 @@ else: # INTERACTIVE_MODE
             cont, ans = tui.enter_yes_no("Do you still want to install the plug-in?", 'n')
 
             if not cont or not ans:
-                sys.exit(0)
+                clean_exit(0)
 
         elif status != core_install.PLUGIN_INSTALL_ERROR_NONE:
 
@@ -401,7 +408,7 @@ else: # INTERACTIVE_MODE
 
             core.delete_plugin()
             log.error(desc)
-            sys.exit(1)
+            clean_exit(1)
 
 
         tui.header("INSTALLING PLUG-IN")
@@ -428,7 +435,7 @@ else: # INTERACTIVE_MODE
                     d = device.Device(dev)
                 except Error:
                     log.error("Error opening device. Exiting.")
-                    sys.exit(1)
+                    clean_exit(1)
 
                 if d.downloadFirmware():
                     log.info("Firmware download successful.\n")
@@ -441,4 +448,5 @@ else: # INTERACTIVE_MODE
 
 log.info("")
 log.info("Done.")
+clean_exit(0)
 

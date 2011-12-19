@@ -569,6 +569,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-photosmart_380_series.ppd.gz \
    ppd/hpcups/hp-photosmart_420_series.ppd.gz \
    ppd/hpcups/hp-photosmart_470_series.ppd.gz \
+   ppd/hpcups/hp-photosmart_5510d_series.ppd.gz \
    ppd/hpcups/hp-photosmart_5510_series.ppd.gz \
    ppd/hpcups/hp-photosmart_6510_series.ppd.gz \
    ppd/hpcups/hp-photosmart_7150.ppd.gz \

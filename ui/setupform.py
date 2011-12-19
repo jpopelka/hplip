@@ -1070,6 +1070,13 @@ class PasswordDialog(QDialog):
 
         self.connect(self.okPushButton,SIGNAL("clicked()"),self.accept)
         self.connect(self.passwordLineEdit,SIGNAL("returnPressed()"),self.accept)
+
+    def setDefaultUsername(self, defUser, allowUsernameEdit = True):
+        self.usernameLineEdit.setText(defUser)
+        if not allowUsernameEdit:
+            self.usernameLineEdit.setReadOnly(True)
+            self.usernameLineEdit.setPaletteBackgroundColor(QColor("lightgray"))
+
     def getUsername(self):
         return unicode(self.usernameLineEdit.text())
 
@@ -1087,10 +1094,12 @@ class PasswordDialog(QDialog):
         return qApp.translate("PasswordDialog",s,c)
 
 
-
-def showPasswordUI(prompt):
+def showPasswordUI(prompt, userName=None, allowUsernameEdit=True):
     try:
         dlg = PasswordDialog(prompt, None)
+
+        if userName != None:
+            dlg.setDefaultUsername(userName, allowUsernameEdit)
 
         if dlg.exec_loop() == QDialog.Accepted:
             return (dlg.getUsername(), dlg.getPassword())

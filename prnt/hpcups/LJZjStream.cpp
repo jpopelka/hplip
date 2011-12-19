@@ -661,3 +661,181 @@ DRIVER_ERROR    LJZjStream::encapsulateColor (RASTERDATA *raster)
     return err;
 }
 
+
+DRIVER_ERROR LJZjStream::preProcessRasterData(cups_raster_t **ppcups_raster, cups_page_header2_t* firstpage_cups_header, char* pSwapedPagesFileName)
+{
+    int current_page_number = 0;
+	int fdEven = -1;
+	int fdOdd = -1;
+	int fdSwaped = -1;
+    int loopcntr = 0; 
+    DRIVER_ERROR driver_error = NO_ERROR;
+    cups_page_header2_t    cups_header;
+	cups_raster_t *swaped_pages_raster=NULL;
+	cups_raster_t *even_pages_raster=NULL;
+	cups_raster_t *odd_pages_raster = NULL;
+	BYTE* pPageDataBuffer = NULL;
+	char hpEvenPagesFile[] = "/tmp/hplipEvenPagesXXXXXX";
+	char hpOddPagesFile[] = "/tmp/hplipOddPagesXXXXXX";
+		
+	if (1 != m_pJA->pre_process_raster || !cups_header.Duplex){		                                  
+		return  NO_ERROR;                                  
+    }    
+
+    dbglog ("DEBUG: Getting Swaped Pages Raster.....\n");
+
+    memcpy(&cups_header, firstpage_cups_header, sizeof(cups_page_header2_t));
+
+    //Create temp files to store odd, even and swaped pages.
+	fdEven = mkstemp (hpEvenPagesFile);
+	fdOdd = mkstemp (hpOddPagesFile);
+	fdSwaped = mkstemp (pSwapedPagesFileName);
+	if (fdEven < 0 || fdOdd < 0 || fdSwaped < 0){
+		dbglog ("ERROR: Unable to open temp output files for writing\n");
+		driver_error = SYSTEM_ERROR;
+        goto bugout;
+	}
+
+	even_pages_raster = cupsRasterOpen(fdEven, CUPS_RASTER_WRITE);
+	odd_pages_raster = cupsRasterOpen(fdOdd, CUPS_RASTER_WRITE);
+	if (even_pages_raster == NULL || odd_pages_raster == NULL) {
+		dbglog("cupsRasterOpen failed for even_pages_raster or odd_pages_raster\n");
+		driver_error = NULL_POINTER;
+        goto bugout;
+	}
+
+	pPageDataBuffer = new BYTE[cups_header.cupsBytesPerLine+1];
+	if (pPageDataBuffer == NULL) {
+		driver_error = ALLOCMEM_ERROR;
+        goto bugout;
+    }
+
+
+	do
+	{
+		current_page_number++;
+		if(current_page_number % 2) {
+			cupsRasterWriteHeader2(odd_pages_raster, &cups_header);
+		}
+		else {
+			cupsRasterWriteHeader2(even_pages_raster, &cups_header);
+		}
+
+		// Iterating through the raster per page
+		for (int y = 0; y < (int) cups_header.cupsHeight; y++) {
+			cupsRasterReadPixels (*ppcups_raster, pPageDataBuffer, cups_header.cupsBytesPerLine);
+			if(current_page_number % 2) {
+				cupsRasterWritePixels (odd_pages_raster, pPageDataBuffer, cups_header.cupsBytesPerLine);
+			}
+			else {
+				cupsRasterWritePixels (even_pages_raster, pPageDataBuffer, cups_header.cupsBytesPerLine);
+			}
+		}
+		   
+	} while (cupsRasterReadHeader2(*ppcups_raster, &cups_header)); 
+
+	cupsRasterClose(even_pages_raster);
+	cupsRasterClose(odd_pages_raster);
+
+	//Now read even and odd pages rasters and then put into swaped raster 
+	if ((fdEven = open (hpEvenPagesFile, O_RDONLY)) == -1) {
+	    perror("ERROR: Unable to open evenpage raster file for reading.");
+		driver_error = SYSTEM_ERROR;
+        goto bugout;
+	}
+
+	if ((fdOdd = open (hpOddPagesFile, O_RDONLY)) == -1){
+	    perror("ERROR: Unable to open odd page raster file for writing. ");
+		driver_error = SYSTEM_ERROR;
+        goto bugout;
+	}
+	even_pages_raster = cupsRasterOpen(fdEven, CUPS_RASTER_READ);
+	odd_pages_raster = cupsRasterOpen(fdOdd, CUPS_RASTER_READ);
+	swaped_pages_raster = cupsRasterOpen(fdSwaped, CUPS_RASTER_WRITE);
+
+	if (swaped_pages_raster == NULL || even_pages_raster == NULL || odd_pages_raster == NULL) {
+		dbglog("cupsRasterOpen failed for even_pages_raster or odd_pages_raster or swaped_pages_raster\n");
+		driver_error = NULL_POINTER;
+        goto bugout;
+
+	}
+
+	loopcntr = current_page_number / 2;
+	while (loopcntr--) {
+		if(cupsRasterReadHeader2(even_pages_raster, &cups_header)){
+			cupsRasterWriteHeader2(swaped_pages_raster, &cups_header);	
+		
+			// Iterating through the raster per line
+			for (int y = 0; y < (int) cups_header.cupsHeight; y++){
+				cupsRasterReadPixels (even_pages_raster, pPageDataBuffer, cups_header.cupsBytesPerLine);
+				cupsRasterWritePixels (swaped_pages_raster, pPageDataBuffer, cups_header.cupsBytesPerLine);
+			}
+		}
+
+		if(cupsRasterReadHeader2(odd_pages_raster, &cups_header)){
+			cupsRasterWriteHeader2(swaped_pages_raster, &cups_header);	
+	
+			// Iterating through the raster per line
+			for (int y = 0; y < (int) cups_header.cupsHeight; y++) {
+				cupsRasterReadPixels (odd_pages_raster, pPageDataBuffer, cups_header.cupsBytesPerLine);
+				cupsRasterWritePixels (swaped_pages_raster, pPageDataBuffer, cups_header.cupsBytesPerLine);
+			}
+		}
+
+	}
+
+    //Last Page is in odd page file
+	if(current_page_number%2 == 1){
+		cupsRasterReadHeader2(odd_pages_raster, &cups_header);
+		cupsRasterWriteHeader2(swaped_pages_raster, &cups_header);	
+	
+		// Iterating through the raster per line
+		for (int y = 0; y < (int) cups_header.cupsHeight; y++){
+			cupsRasterReadPixels (odd_pages_raster, pPageDataBuffer, cups_header.cupsBytesPerLine);
+			cupsRasterWritePixels (swaped_pages_raster, pPageDataBuffer, cups_header.cupsBytesPerLine);
+		}
+	}
+
+	cupsRasterClose(even_pages_raster);
+	cupsRasterClose(odd_pages_raster);
+	cupsRasterClose(swaped_pages_raster);
+
+    if(pPageDataBuffer){
+	    delete [] pPageDataBuffer;
+        pPageDataBuffer = NULL;
+    }
+
+	//Now send swaped raster file further processing.
+	if ((fdSwaped = open (pSwapedPagesFileName, O_RDONLY)) == -1){
+	    perror("ERROR: Unable to open swaped pages raster file - ");
+		driver_error = SYSTEM_ERROR;
+        goto bugout;
+	}
+	
+	*ppcups_raster = cupsRasterOpen(fdSwaped, CUPS_RASTER_READ);
+	cupsRasterReadHeader2(*ppcups_raster, &cups_header);
+    memcpy(firstpage_cups_header, &cups_header, sizeof(cups_page_header2_t));
+    unlink(hpEvenPagesFile);
+    unlink(hpOddPagesFile); 
+
+    return NO_ERROR; //cups_raster;
+
+bugout:
+        dbglog ("DEBUG:Something went wrong while creating swaped pages raster..\n");
+        if (fdEven > 2)
+	        close(fdEven);
+        if (fdOdd > 2)
+	        close(fdOdd);
+        if (fdSwaped > 2)
+	        close(fdSwaped);
+		//closeFilter();
+
+        if(pPageDataBuffer){
+	        delete [] pPageDataBuffer;
+        }
+
+        unlink(hpEvenPagesFile);
+        unlink(hpOddPagesFile); 
+        return driver_error;
+}
+

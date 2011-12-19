@@ -31,6 +31,20 @@ from base.g import *
 from base import utils, tui
 from core_install import *
 
+def start_systray():
+    path = utils.which('hp-systray')
+    if path:
+        path = os.path.join(path, 'hp-systray')
+    else:
+        path = os.path.join(prop.home_dir, 'systray.py')
+    if not os.path.exists(path):
+        log.warn("Unable to start hp-systray")
+
+    log.debug("Running hp-systray: %s --force-startup" % path)
+    os.spawnlp(os.P_NOWAIT, path, 'hp-systray', '--force-startup')
+    log.debug("Waiting for hp-systray to start...")
+    time.sleep(1)
+
 
 def progress_callback(cmd="", desc="Working..."):
     if cmd:
@@ -354,7 +368,7 @@ def start(language, auto=True, test_depends=False,
                 ok = core.check_password(password_entry, progress_callback)
 
             if not ok:
-                log.error("3 incorrect attempts. Exiting.")
+                log.error("3 incorrect attempts. (or) Insufficient permissions(i.e. try with sudo user).\nExiting.")
                 sys.exit(1)
 
         #
@@ -845,8 +859,12 @@ def start(language, auto=True, test_depends=False,
                     tui.title("CLOSE HP_SYSTRAY")
                     log.info("Sending close message to hp-systray (if it is currently running)...")
                     SessionBus().send_message(msg)
+                    time.sleep(0.5)
                 except:
                     pass
+	
+        tui.title("RE-STARTING HP_SYSTRAY")
+        start_systray()
 
         # Restart or re-plugin if necessary (always True in 2.7.9+)
         if core.selected_component == 'hplip':

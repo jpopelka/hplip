@@ -82,6 +82,7 @@
 # add_user_to_group=<usermod params> [TYPE_STRING] (leave empty for none) [ex. "-a -G sys" or "-G lp"]
 # open_mdns_port=<command(s) to use to open the mdns multicast port 5353> [TYPE_LIST]
 # acl_rules=1|0 [TYPE_BOOL] # For Karmic+
+# libdir_path=<lib directory path> [TYPE_STRING] # Used if libdir location is to be provided in 64 bit machines
 
 # # Only include these sections if supported==1 for this <distro name>:<version name>.
 # [<distro name>:<version name>:<dependency name>]
@@ -111,7 +112,7 @@ supported=0
 
 [suse]
 index=3
-versions=11.3,11.4
+versions=11.3,11.4,12.1
 display_name=SUSE Linux
 alt_names=
 display=1
@@ -594,6 +595,10 @@ packages=cups-devel
 [suse:11.4:python-notify]
 packages=python-notify
 
+
+[suse:12.1]
+same_as_version=11.4
+
 # ****************************************
 [redhat]
 index=6
@@ -794,7 +799,7 @@ ui_toolkit=qt3
 # ****************************************
 [fedora]
 index=5
-versions=14,15
+versions=14,15,16
 display_name=Fedora
 alt_names=Fedora Core
 display=1
@@ -2311,12 +2316,14 @@ packages=polkit,polkit-gnome
 [fedora:12.0]
 same_as_version=12
 
-
 [fedora:13.0]
 same_as_version=12
 
 [fedora:14.0]
 same_as_version=12
+
+[fedora:16]
+same_as_version=15
 
 # ****************************************
 [linspire]
@@ -4330,6 +4337,7 @@ ui_toolkit=qt4
 native_cups=1
 acl_rules=1
 add_user_to_group=-a -Glp,lpadmin
+libdir_path=/usr/lib
 
 [ubuntu:11.04:cups]
 packages=libcups2
@@ -4429,7 +4437,7 @@ same_as_version=11.04
 # ****************************************
 [debian]
 index=2
-versions=5.0,5.0.1,5.0.2,5.0.3,5.0.4,5.0.5,5.0.6,5.0.7,5.0.8,6.0,6.0.1,6.0.2
+versions=5.0,5.0.1,5.0.2,5.0.3,5.0.4,5.0.5,5.0.6,5.0.7,5.0.8,6.0,6.0.1,6.0.2,6.0.3
 display_name=Debian
 alt_names=
 display=1
@@ -5574,6 +5582,8 @@ same_as_version=6.0
 [debian:6.0.2]
 same_as_version=6.0
 
+[debian:6.0.3]
+same_as_version=6.0
 
 # ****************************************
 [xandros]

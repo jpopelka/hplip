@@ -6321,14 +6321,6 @@ t=0"
     Attribute "Product" "" "(HP LaserJet 4si Mx Printer)"
   }
   {
-    ModelName "HP LaserJet 5mp hpijs"
-    Attribute "NickName" "" "HP LaserJet 5mp hpijs pcl3, $Version"
-    Attribute "ShortNickName" "" "HP LaserJet 5mp hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 5mp;DES:hp laserjet 5mp;"
-    PCFileName "hp-laserjet_5mp-hpijs-pcl3.ppd"
-    Attribute "Product" "" "(HP LaserJet 5mp Printer)"
-  }
-  {
     ModelName "HP LaserJet 5l hpijs"
     Attribute "NickName" "" "HP LaserJet 5l hpijs, $Version"
     Attribute "ShortNickName" "" "HP LaserJet 5l hpijs"
@@ -6337,6 +6329,14 @@ t=0"
     Attribute "Product" "" "(HP LaserJet 5l Printer)"
     Attribute "Product" "" "(HP LaserJet 5l-fs Printer)"
     Attribute "Product" "" "(HP LaserJet 5l Xtra Printer)"
+  }
+  {
+    ModelName "HP LaserJet 5mp hpijs"
+    Attribute "NickName" "" "HP LaserJet 5mp hpijs pcl3, $Version"
+    Attribute "ShortNickName" "" "HP LaserJet 5mp hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 5mp;DES:hp laserjet 5mp;"
+    PCFileName "hp-laserjet_5mp-hpijs-pcl3.ppd"
+    Attribute "Product" "" "(HP LaserJet 5mp Printer)"
   }
   {
     ModelName "HP LaserJet 5p hpijs"
@@ -7886,20 +7886,20 @@ nSet=2"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%LJColor:Normal%>
   {
-    ModelName "HP Color LaserJet cm1312 MFP hpijs"
-    Attribute "NickName" "" "HP Color LaserJet cm1312 MFP hpijs pcl3, $Version"
-    Attribute "ShortNickName" "" "HP Color LJ cm1312 MFP hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm1312 mfp;DES:hp color laserjet cm1312 mfp;"
-    PCFileName "hp-color_laserjet_cm1312_mfp-hpijs-pcl3.ppd"
-    Attribute "Product" "" "(HP Color LaserJet cm1312 Multifunction Printer)"
-  }
-  {
     ModelName "HP Color LaserJet cm1312nfi MFP hpijs"
     Attribute "NickName" "" "HP Color LaserJet cm1312nfi MFP hpijs pcl3, $Version"
     Attribute "ShortNickName" "" "HP Color LJ cm1312nfi MFP hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm1312nfi mfp;DES:hp color laserjet cm1312nfi mfp;"
     PCFileName "hp-color_laserjet_cm1312nfi_mfp-hpijs-pcl3.ppd"
     Attribute "Product" "" "(HP Color LaserJet cm1312nfi Multifunction Printer)"
+  }
+  {
+    ModelName "HP Color LaserJet cm1312 MFP hpijs"
+    Attribute "NickName" "" "HP Color LaserJet cm1312 MFP hpijs pcl3, $Version"
+    Attribute "ShortNickName" "" "HP Color LJ cm1312 MFP hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm1312 mfp;DES:hp color laserjet cm1312 mfp;"
+    PCFileName "hp-color_laserjet_cm1312_mfp-hpijs-pcl3.ppd"
+    Attribute "Product" "" "(HP Color LaserJet cm1312 Multifunction Printer)"
   }
   {
     ModelName "HP LaserJet cm1411fn hpijs"
@@ -8030,38 +8030,6 @@ nSet=2"
     Attribute "Product" "" "(HP Business Inkjet 2300 Printer)"
     Attribute "Product" "" "(HP Business Inkjet 2300n Printer)"
     Attribute "Product" "" "(HP Business Inkjet 2300dtn Printer)"
-  }
-  {
-    ModelName "HP Color LaserJet cm2320 MFP hpijs"
-    Attribute "NickName" "" "HP Color LaserJet cm2320 MFP hpijs pcl3, $Version"
-    Attribute "ShortNickName" "" "HP Color LJ cm2320 MFP hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm2320 mfp;DES:hp color laserjet cm2320 mfp;"
-    PCFileName "hp-color_laserjet_cm2320_mfp-hpijs-pcl3.ppd"
-    Attribute "Product" "" "(HP Color LaserJet cm2320 Multifuntion Printer)"
-  }
-  {
-    ModelName "HP Color LaserJet cm2320fxi MFP hpijs"
-    Attribute "NickName" "" "HP Color LaserJet cm2320fxi MFP hpijs pcl3, $Version"
-    Attribute "ShortNickName" "" "HP Color LJ cm2320fxi MFP hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm2320fxi mfp;DES:hp color laserjet cm2320fxi mfp;"
-    PCFileName "hp-color_laserjet_cm2320fxi_mfp-hpijs-pcl3.ppd"
-    Attribute "Product" "" "(HP Color LaserJet cm2320fxi Multifunction Printer)"
-  }
-  {
-    ModelName "HP Color LaserJet cm2320n MFP hpijs"
-    Attribute "NickName" "" "HP Color LaserJet cm2320n MFP hpijs pcl3, $Version"
-    Attribute "ShortNickName" "" "HP Color LJ cm2320n MFP hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm2320n mfp;DES:hp color laserjet cm2320n mfp;"
-    PCFileName "hp-color_laserjet_cm2320n_mfp-hpijs-pcl3.ppd"
-    Attribute "Product" "" "(HP Color LaserJet cm2320n Multifunction Printer)"
-  }
-  {
-    ModelName "HP Color LaserJet cm2320nf MFP hpijs"
-    Attribute "NickName" "" "HP Color LaserJet cm2320nf MFP hpijs pcl3, $Version"
-    Attribute "ShortNickName" "" "HP Color LJ cm2320nf MFP hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm2320nf mfp;DES:hp color laserjet cm2320nf mfp;"
-    PCFileName "hp-color_laserjet_cm2320nf_mfp-hpijs-pcl3.ppd"
-    Attribute "Product" "" "(HP Color LaserJet cm2320nf Multifunction Printer)"
   }
   {
     ModelName "HP Color LaserJet 2500 hpijs"
@@ -8326,6 +8294,39 @@ nSet=2"
     Attribute "Product" "" "(HP Officejet 9110 All-in-one Printer)"
     Attribute "Product" "" "(HP Officejet 9120 All-in-one Printer)"
     Attribute "Product" "" "(HP Officejet 9130 All-in-one Printer)"
+  }
+  // <%LJColor:Normal:Advanced%>
+  {
+    ModelName "HP Color LaserJet cm2320 MFP hpijs"
+    Attribute "NickName" "" "HP Color LaserJet cm2320 MFP hpijs pcl3, $Version"
+    Attribute "ShortNickName" "" "HP Color LJ cm2320 MFP hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm2320 mfp;DES:hp color laserjet cm2320 mfp;"
+    PCFileName "hp-color_laserjet_cm2320_mfp-hpijs-pcl3.ppd"
+    Attribute "Product" "" "(HP Color LaserJet cm2320 Multifuntion Printer)"
+  }
+  {
+    ModelName "HP Color LaserJet cm2320fxi MFP hpijs"
+    Attribute "NickName" "" "HP Color LaserJet cm2320fxi MFP hpijs pcl3, $Version"
+    Attribute "ShortNickName" "" "HP Color LJ cm2320fxi MFP hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm2320fxi mfp;DES:hp color laserjet cm2320fxi mfp;"
+    PCFileName "hp-color_laserjet_cm2320fxi_mfp-hpijs-pcl3.ppd"
+    Attribute "Product" "" "(HP Color LaserJet cm2320fxi Multifunction Printer)"
+  }
+  {
+    ModelName "HP Color LaserJet cm2320n MFP hpijs"
+    Attribute "NickName" "" "HP Color LaserJet cm2320n MFP hpijs pcl3, $Version"
+    Attribute "ShortNickName" "" "HP Color LJ cm2320n MFP hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm2320n mfp;DES:hp color laserjet cm2320n mfp;"
+    PCFileName "hp-color_laserjet_cm2320n_mfp-hpijs-pcl3.ppd"
+    Attribute "Product" "" "(HP Color LaserJet cm2320n Multifunction Printer)"
+  }
+  {
+    ModelName "HP Color LaserJet cm2320nf MFP hpijs"
+    Attribute "NickName" "" "HP Color LaserJet cm2320nf MFP hpijs pcl3, $Version"
+    Attribute "ShortNickName" "" "HP Color LJ cm2320nf MFP hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cm2320nf mfp;DES:hp color laserjet cm2320nf mfp;"
+    PCFileName "hp-color_laserjet_cm2320nf_mfp-hpijs-pcl3.ppd"
+    Attribute "Product" "" "(HP Color LaserJet cm2320nf Multifunction Printer)"
   }
   { 
     // Large format SuperB paper support
@@ -13192,6 +13193,14 @@ lity:PenSet=2,Quality:FullBleed=1"
   }
   // <%Copperhead:AutoDuplex%>  
   {
+    ModelName "HP Photosmart 5510d Series hpijs"
+    Attribute "NickName" "" "HP Photosmart 5510d Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP PS 5510d Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart 5510d series;DES:photosmart 5510d series;"
+    PCFileName "hp-photosmart_5510d_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Photosmart 5510d E-all-in-one)"
+  }
+  {
     ModelName "HP Photosmart 6510 Series hpijs"
     Attribute "NickName" "" "HP Photosmart 6510 Series hpijs, $Version"
     Attribute "ShortNickName" "" "HP Photosmart 6510 Series hpijs"
@@ -14842,7 +14851,9 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "ShortNickName" "" "HP OJ Pro 8500 a910 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet pro 8500 a910;DES:officejet pro 8500 a910;"
     PCFileName "hp-officejet_pro_8500_a910-hpijs.ppd"
-    Attribute "Product" "" "(HP Officejet Pro 8500 a910a)"
+    Attribute "Product" "" "(HP Officejet Pro 8500a E-aio Printer a910a)"
+    Attribute "Product" "" "(HP Officejet Pro 8500a E-aio Printer a910g)"
+    Attribute "Product" "" "(HP Officejet Pro 8500a E-aio Printer a910n)"
   }
 }  // end Corbett
 
@@ -15487,6 +15498,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Photosmart b8553 Photo Printer)"
     Attribute "Product" "" "(HP Photosmart b8558 Photo Printer)"
   }
+  // <%Python:LargeFormatA3:NoAutoDuplex:Advanced%>
   {
     ModelName "HP Photosmart Pro b8800 Series hpijs"
     Attribute "NickName" "" "HP Photosmart Pro b8800 Series hpijs, $Version"

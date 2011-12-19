@@ -479,16 +479,25 @@ def run_plugin_command(required=True, plugin_reason=PLUGIN_REASON_NONE):
     if not required:
         req = '--optional'
 
+
     if utils.which("hp-plugin"):
-        cmd = su_sudo % ("hp-plugin -u %s --reason %s" % (req, plugin_reason))
+        p_path="hp-plugin"
     else:
-        cmd = su_sudo % ("python ./plugin.py -u %s --reason %s" % (req, plugin_reason))
+        p_path="python ./plugin.py"
+
+    if 'gksu' in su_sudo:
+        cmd = su_sudo % ("%s -u %s --reason %s" % (p_path, req, plugin_reason))
+        cmd +=" -m" 
+        cmd += (" \"hp-plugin:- HP Device requires to install HP proprietary plugin. Please enter user (sudo) password to continue\"")
+    else:
+        cmd = su_sudo % ("%s -u %s --reason %s To_install_plugin_for_HP_Device" % (p_path, req, plugin_reason))
 
     log.debug("%s" % cmd)
     if password_f is not None:
         status, output = utils.run(cmd, log_output=True, password_func=password_f, timeout=1)
     else:
         status, output = utils.run(cmd, log_output=True, password_func=None, timeout=1)
+    
     return (status == 0, True)
 
 

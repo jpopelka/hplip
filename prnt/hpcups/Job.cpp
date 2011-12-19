@@ -290,3 +290,10 @@ DRIVER_ERROR Job::setBlankRaster()
     return NO_ERROR;
 }
 
+DRIVER_ERROR Job::preProcessRasterData(cups_raster_t **ppcups_raster, cups_page_header2_t* firstpage_cups_header, char* pPreProcessedRasterFile)
+{
+	dbglog ("DEBUG: Job::preProcessRasterData.............. \n");
+ 	return m_pEncap->preProcessRasterData(ppcups_raster, firstpage_cups_header, pPreProcessedRasterFile);
+}
+   
+

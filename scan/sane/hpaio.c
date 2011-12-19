@@ -22,7 +22,7 @@
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
   Contributing Authors: David Paschal, Don Welch, David Suffield, Narla Naga Samrat Chowdary, 
-                        Yashwant Sahu 
+                        Yashwant Sahu, Sarbeswar Meher 
 
 \************************************************************************************/
 
@@ -268,7 +268,7 @@ static int DevDiscovery(int localOnly)
       }
       else
       {
-         DBG6("unsupported scantype=%d %s\n", ma.scantype, uri);
+         DBG(6,"unsupported scantype=%d %s\n", ma.scantype, uri);
       }
    }
 
@@ -285,7 +285,7 @@ static int DevDiscovery(int localOnly)
       }
       else
       {
-         DBG6("unsupported scantype=%d %s\n", ma.scantype, cups_printer[i]);
+         DBG(6,"unsupported scantype=%d %s\n", ma.scantype, cups_printer[i]);
       }
       free(cups_printer[i]);
    }
@@ -315,12 +315,12 @@ static hpaioScanner_t hpaioFindScanner( SANE_String_Const name )
 {
     hpaioScanner_t p = FirstScanner;
     
-    while( p != LastScanner )
+    while( p != NULL )
     {
         if( strcasecmp( name, p->saneDevice.name ) == 0 )
             return p;
         
-        p++;
+        p=p->next;
     }
     
     return NULL;
@@ -757,6 +757,41 @@ static void hpaioConnEndScan( hpaioScanner_t hpaio )
     SendScanEvent( hpaio->deviceuri, EVENT_END_SCAN_JOB);
 }
 
+static SANE_Status SetResolutionListSCL(hpaioScanner_t hpaio)
+{
+     int supported_res[] = {50, 75, 100, 150, 200, 300, 600, 1200, 2400, 4800, 9600};
+     int i, len = sizeof(supported_res)/sizeof(int);
+     SANE_Status retcode;
+     
+     if (hpaio->currentAdfMode == ADF_MODE_ADF || hpaio->currentAdfMode == ADF_MODE_AUTO)
+     {
+        hpaio->resolutionRange.min = hpaio->scl.minResAdf;
+        hpaio->resolutionRange.max = hpaio->scl.maxResAdf;
+     }
+     else
+     {
+        hpaio->resolutionRange.min = hpaio->scl.minRes;
+        hpaio->resolutionRange.max = hpaio->scl.maxRes;
+     }
+    
+        DBG(6,"minRes=%d maxRes=%d minResAdf=%d maxResAdf=%d\n", hpaio->scl.minRes, hpaio->scl.maxRes, hpaio->scl.minResAdf, hpaio->scl.maxResAdf);
+
+        NumListClear( hpaio->resolutionList );
+        NumListClear( hpaio->lineartResolutionList );
+        for (i = 0; i < len; i++)
+        {
+          if (supported_res[i] >= hpaio->resolutionRange.min &&
+          supported_res[i] <= hpaio->resolutionRange.max)
+		  {
+			  NumListAdd (hpaio->resolutionList, supported_res[i]);
+			  NumListAdd (hpaio->lineartResolutionList, supported_res[i]);
+		  }
+        }
+        hpaio->option[OPTION_SCAN_RESOLUTION].constraint_type = SANE_CONSTRAINT_WORD_LIST;
+        
+        return SANE_STATUS_GOOD;
+}
+
 static SANE_Status hpaioSetDefaultValue( hpaioScanner_t hpaio, int option )
 {
     switch( option )
@@ -919,7 +954,9 @@ static int hpaioUpdateDescriptors( hpaioScanner_t hpaio, int option )
     {
         reload |= SANE_INFO_RELOAD_PARAMS;
     }
-
+    
+    if (hpaio->scannerType == SCANNER_TYPE_SCL)
+            SetResolutionListSCL(hpaio);
     /* OPTION_SCAN_RESOLUTION: */
     if( hpaio->option[OPTION_SCAN_RESOLUTION].constraint_type ==
         SANE_CONSTRAINT_WORD_LIST )
@@ -1622,7 +1659,7 @@ extern SANE_Status sane_hpaio_open(SANE_String_Const devicename, SANE_Handle * p
     struct hpmud_model_attributes ma;
     SANE_Status retcode = SANE_STATUS_INVAL;
     hpaioScanner_t hpaio = 0;
-    int r, bytes_read;
+    int bytes_read;
     char deviceIDString[LEN_DEVICE_ID_STRING];
     char model[256];
     int forceJpegForGrayAndColor = 0;
@@ -1941,96 +1978,144 @@ extern SANE_Status sane_hpaio_open(SANE_String_Const devicename, SANE_Handle * p
         /* Determine the minimum and maximum resolution.
                   * Probe for both X and Y, and pick largest min and smallest max.
                  * For the 1150, set min to 50 to prevent scan head crashes (<42). */
-        SclInquire( hpaio->deviceid, hpaio->scan_channelid,
+        int minXRes, minYRes, maxXRes, maxYRes;
+        retcode = SclInquire( hpaio->deviceid, hpaio->scan_channelid,
                     SCL_CMD_INQUIRE_MINIMUM_VALUE,
                     SCL_CMD_SET_X_RESOLUTION,
-                    &hpaio->scl.minXRes,
+                    &minXRes,
                     0,
                     0 );
 
-        DBG6("min x resolution=%d\n", hpaio->scl.minXRes);
+        DBG(6, "minXRes=%d retcode=%d\n",minXRes, retcode);
         
-        SclInquire( hpaio->deviceid, hpaio->scan_channelid,
+        retcode = SclInquire( hpaio->deviceid, hpaio->scan_channelid,
                     SCL_CMD_INQUIRE_MINIMUM_VALUE,
                     SCL_CMD_SET_Y_RESOLUTION,
-                    &hpaio->scl.minYRes,
+                    &minYRes,
                     0,
                     0 );
 
-        DBG6("min y resolution=%d\n", hpaio->scl.minYRes);
+        DBG(6,"minYRes=%d retcode=%d\n", minYRes, retcode);
         
-        if( hpaio->scl.compat & SCL_COMPAT_1150 &&
-            hpaio->scl.minYRes < SCL_MIN_Y_RES_1150 )
-        {
-            hpaio->scl.minYRes = SCL_MIN_Y_RES_1150;
-        }
-        r = hpaio->scl.minXRes;
-        if( r < hpaio->scl.minYRes )
-        {
-            r = hpaio->scl.minYRes;
-        }
-        
-        hpaio->resolutionRange.min = r;
-        
-        SclInquire( hpaio->deviceid, hpaio->scan_channelid,
+        retcode = SclInquire( hpaio->deviceid, hpaio->scan_channelid,
                     SCL_CMD_INQUIRE_MAXIMUM_VALUE,
                     SCL_CMD_SET_X_RESOLUTION,
-                    &hpaio->scl.maxXRes,
+                    &maxXRes,
                     0,
                     0 );
 
-        DBG6("max x resolution=%d\n", hpaio->scl.maxXRes);
+        DBG(6,"maxXRes=%d retcode=%d\n", maxXRes, retcode);
         
-        SclInquire( hpaio->deviceid, hpaio->scan_channelid,
+        retcode = SclInquire( hpaio->deviceid, hpaio->scan_channelid,
                     SCL_CMD_INQUIRE_MAXIMUM_VALUE,
                     SCL_CMD_SET_Y_RESOLUTION,
-                    &hpaio->scl.maxYRes,
+                    &maxYRes,
                     0,
                    0 );
 
-        DBG6("max y resolution=%d\n", hpaio->scl.maxYRes);
+        DBG(6,"maxYRes=%d retcode=%d\n", maxYRes, retcode);
         
-        r = hpaio->scl.maxXRes;
-        
-        if( r > hpaio->scl.maxYRes )
+        if( hpaio->scl.compat & SCL_COMPAT_1150 &&
+            minYRes < SCL_MIN_Y_RES_1150 )
         {
-            r = hpaio->scl.maxYRes;
+            minYRes = SCL_MIN_Y_RES_1150;
+        }
+        hpaio->scl.minRes = minXRes;
+        if( hpaio->scl.minRes < minYRes )
+        {
+            hpaio->scl.minRes = minYRes;
         }
         
-        if( hpaio->scl.compat & ( SCL_COMPAT_1150 | SCL_COMPAT_1170 ) && r > SCL_MAX_RES_1150_1170 )
+        hpaio->resolutionRange.min = hpaio->scl.minRes;
+        
+        hpaio->scl.maxRes = maxXRes;
+        
+        if( hpaio->scl.maxRes > maxYRes )
         {
-            r = SCL_MAX_RES_1150_1170;
+            hpaio->scl.maxRes = maxYRes;
         }
-        hpaio->resolutionRange.max = r;
-
+        
+        if( hpaio->scl.compat & ( SCL_COMPAT_1150 | SCL_COMPAT_1170 ) 
+            && hpaio->scl.maxRes > SCL_MAX_RES_1150_1170 )
+        {
+            hpaio->scl.maxRes = SCL_MAX_RES_1150_1170;
+        }
+        hpaio->resolutionRange.max = hpaio->scl.maxRes;
+                         
         /* Determine ADF/duplex capabilities. */
         {
-            int flatbedCapability = 1;
-            
-            SclInquire( hpaio->deviceid, hpaio->scan_channelid,
-                        SCL_CMD_INQUIRE_MAXIMUM_VALUE,
-                        SCL_PSEUDO_FLATBED_Y_RESOLUTION,
-                        &flatbedCapability,
-                        0,
-                        0 );
-                        
-            SclInquire( hpaio->deviceid, hpaio->scan_channelid,
+            retcode = SclInquire( hpaio->deviceid, hpaio->scan_channelid,
                         SCL_CMD_INQUIRE_DEVICE_PARAMETER,
                         SCL_INQ_ADF_CAPABILITY,
                         &hpaio->scl.adfCapability,
                         0,
                         0 );
             
-            DBG(6, "ADF capability=%d: %s %d\n", hpaio->scl.adfCapability, __FILE__, __LINE__);
+            DBG(6, "ADF capability=%d retcode=%d: %s %d\n", hpaio->scl.adfCapability, retcode,__FILE__, __LINE__);
             
+            if (hpaio->scl.adfCapability)
+            {
+		      retcode = SclInquire( hpaio->deviceid, hpaio->scan_channelid,
+		                SCL_CMD_INQUIRE_MINIMUM_VALUE,
+		                SCL_PSEUDO_ADF_X_RESOLUTION,
+		                &minXRes,
+		                0,
+		                0 );
+		      DBG(6, "minXResAdf=%d retcode=%d\n", minXRes, retcode);
+		      retcode = SclInquire( hpaio->deviceid, hpaio->scan_channelid,
+		                SCL_CMD_INQUIRE_MINIMUM_VALUE,
+		                SCL_PSEUDO_ADF_Y_RESOLUTION,
+		                &minYRes,
+		                0,
+		                0 );
+	              DBG(6, "minYResAdf=%d retcode=%d\n", minYRes, retcode);
+		      retcode = SclInquire( hpaio->deviceid, hpaio->scan_channelid,
+		                SCL_CMD_INQUIRE_MAXIMUM_VALUE,
+		                SCL_PSEUDO_ADF_X_RESOLUTION,
+		                &maxXRes,
+		                0,
+		                0 );
+                      DBG(6, "maxXResAdf=%d retcode=%d\n", maxXRes, retcode);
+		      retcode = SclInquire( hpaio->deviceid, hpaio->scan_channelid,
+		                SCL_CMD_INQUIRE_MAXIMUM_VALUE,
+		                SCL_PSEUDO_ADF_Y_RESOLUTION,
+		                &maxYRes,
+		                0,
+		               0 );
+		               DBG(6, "maxYResAdf=%d retcode=%d\n", maxYRes, retcode);
+		               if( hpaio->scl.compat & SCL_COMPAT_1150 &&
+					minYRes < SCL_MIN_Y_RES_1150 )
+				{
+					minYRes = SCL_MIN_Y_RES_1150;
+				}
+				hpaio->scl.minResAdf = minXRes;
+				if( hpaio->scl.minResAdf < minYRes )
+				{
+					hpaio->scl.minResAdf = minYRes;
+				}
+				
+				hpaio->scl.maxResAdf = maxXRes;
+				
+				if( hpaio->scl.maxResAdf > maxYRes )
+				{
+					hpaio->scl.maxResAdf = maxYRes;
+				}
+			
+				if( hpaio->scl.compat & ( SCL_COMPAT_1150 | SCL_COMPAT_1170 ) 
+				&& hpaio->scl.maxResAdf > SCL_MAX_RES_1150_1170 )
+				{
+					hpaio->scl.maxResAdf = SCL_MAX_RES_1150_1170;
+				}
+
+            }
             if( !hpaio->scl.adfCapability )
             {
                 hpaio->supportedAdfModes = ADF_MODE_FLATBED;
             }
-            else if( hpaio->scl.compat & SCL_COMPAT_K_SERIES ||
-                     !flatbedCapability )
+            else if( hpaio->scl.compat & SCL_COMPAT_K_SERIES &&
+                     hpaio->scl.adfCapability )
             {
-                hpaio->supportedAdfModes = ADF_MODE_ADF;
+                hpaio->supportedAdfModes = ADF_MODE_FLATBED | ADF_MODE_ADF;
             }
             else
             {

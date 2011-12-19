@@ -7,9 +7,9 @@ SUBSYSTEM!="usb_device", GOTO="hpmud_rules_end"
 LABEL="pid_test"
 
 # Check for LaserJet products (0x03f0xx17).
-SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="??17", ENV{hp_model}="$sysfs{product}", ENV{hp_test}="yes"
+ATTRS{idVendor}=="03f0", ATTRS{idProduct}=="??17", ENV{hp_model}="$attrs{product}", ENV{hp_test}="yes"
 # Check for LaserJet products (0x03f0xx2a).
-SYSFS{idVendor}=="03f0", SYSFS{idProduct}=="??2a", ENV{hp_model}="$sysfs{product}", ENV{hp_test}="yes"
+ATTRS{idVendor}=="03f0", ATTRS{idProduct}=="??2a", ENV{hp_model}="$attrs{product}", ENV{hp_test}="yes"
 ENV{hp_test}=="yes", RUN+="/bin/sh -c '/usr/bin/hp-mkuri -c &'"
 
 LABEL="hpmud_rules_end"

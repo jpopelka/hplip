@@ -198,12 +198,11 @@ struct  hpaioScanner_s
                 int             compat;
                 char            decipixelChar;
 
-                int             minXRes, minYRes;
-                int             maxXRes, maxYRes;
+                int             minRes, maxRes;
                 int             maxXExtent, maxYExtent;
-
-                int             adfCapability;
                 int             unloadAfterScan;
+                int             adfCapability;
+                int             minResAdf, maxResAdf;
 
                 PmlObject_t     objSupportedFunctions;
         } scl;

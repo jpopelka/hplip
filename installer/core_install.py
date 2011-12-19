@@ -251,6 +251,7 @@ class CoreInstall(object):
             'add_user_to_group': TYPE_STRING,
             'open_mdns_port' : TYPE_LIST, # command to use to open mdns multicast port 5353
             'acl_rules' : TYPE_BOOL, # Use ACL uDEV rules (Ubuntu 9.10+)
+            'libdir_path' : TYPE_STRING,
         }
 
         # components
@@ -1188,8 +1189,11 @@ class CoreInstall(object):
 
         if self.ppd_dir is not None:
             configure_cmd += ' --with-hpppddir=%s' % self.ppd_dir
-
-        if self.bitness == 64:
+            
+        libdir_path = self.get_distro_ver_data('libdir_path',False)
+        if libdir_path and self.bitness == 64:
+            configure_cmd += ' --libdir=%s' % (libdir_path)
+        elif self.bitness == 64:
             configure_cmd += ' --libdir=/usr/lib64'
 
         configure_cmd += ' --prefix=%s' % self.install_location
@@ -1797,7 +1801,12 @@ class CoreInstall(object):
                 return True
 
             if callback is not None:
-                callback("", "Password incorrect. %d attempt(s) left." % (3-x))
+                if "not in the sudoers file" in output:
+                    callback("", "%s is not in the sudoers file. Check privileges\n" %(os.getenv('USER')) )
+                    return False
+                else:    
+                    callback("", "Password incorrect. %d attempt(s) left." % (3-x ))
+
 
             x += 1
 
@@ -1933,7 +1942,7 @@ class CoreInstall(object):
         plugin_file = os.path.join(self.plugin_path, self.plugin_name)
 
 
-	#Check whether plugin is accessible in Openprinting.org website otherwise dowload plugin from alternate location.
+        #Check whether plugin is accessible in Openprinting.org website otherwise dowload plugin from alternate location.
         wget = utils.which("wget")
         if wget:
             wget = os.path.join(wget, "wget")
@@ -1943,7 +1952,7 @@ class CoreInstall(object):
             log.debug("wget returned: %d" % status)
 
         try:
-            if (status != 0):
+            if (status != 0) and 'file://' not in url:
                 url = os.path.join(PLUGIN_FALLBACK_LOCATION, self.plugin_name)
                 log.info("Plugin is not accessible. Trying to download it from fallback location: [%s]" % url)
 

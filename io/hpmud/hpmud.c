@@ -305,6 +305,7 @@ static int new_device(const char *uri, enum HPMUD_IO_MODE mode, int *result)
    {
       BUG("invalid uri %s\n", uri);
       *result = HPMUD_R_INVALID_URI;
+      index = 0;
       goto bugout;
    }
    msp->device[i].io_mode = mode;

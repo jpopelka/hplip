@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# Author: Don Welch, Naga Samrat Chowdary Narla, Goutam Kodu
+# Author: Don Welch, Naga Samrat Chowdary Narla, Goutam Kodu, Amarnath Chitumalla
 #
 # Thanks to Henrique M. Holschuh <hmh@debian.org> for various security patches
 #
@@ -26,6 +26,7 @@ from __future__ import generators
 # Std Lib
 import sys
 import os
+from subprocess import Popen, PIPE
 import grp
 import fnmatch
 import tempfile
@@ -1042,13 +1043,13 @@ def get_password_ui():
     fp.close()
     if qt is "qt4":
         from ui4.setupdialog import showPasswordUI
-        username, password = showPasswordUI("Your printer requires to install HP proprietary plugin\nPlease enter root/superuser password to continue")
+        username, password = showPasswordUI("Your HP Device requires to install HP proprietary plugin\nPlease enter root/superuser password to continue", "root", False)
     if qt is "qt3":
         from ui.setupform import showPasswordUI
-        username, password = showPasswordUI("Your priter requires to install HP proprietary plugin\nPlease enter root/superuser password to continue")
-    return password
+        username, password = showPasswordUI("Your HP Device requires to install HP proprietary plugin\nPlease enter root/superuser password to continue", "root", False)
+    return  password
 
-def run(cmd, log_output=True, password_func=get_password, timeout=1):
+def run(cmd, log_output=True, password_func=get_password, timeout=1, spinner=True):
     output = cStringIO.StringIO()
 
     try:
@@ -1058,7 +1059,9 @@ def run(cmd, log_output=True, password_func=get_password, timeout=1):
 
     try:
         while True:
-            update_spinner()
+            if spinner:
+                update_spinner()
+
             i = child.expect(["[pP]assword:", pexpect.EOF, pexpect.TIMEOUT])
 
             if child.before:
@@ -1074,7 +1077,8 @@ def run(cmd, log_output=True, password_func=get_password, timeout=1):
                         child.sendline(password_func())
                 else:
                     child.sendline(get_password())
-
+	        
+ 
             elif i == 1: # EOF
                 break
 
@@ -1084,8 +1088,8 @@ def run(cmd, log_output=True, password_func=get_password, timeout=1):
 
     except Exception, e:
         log.error("Exception: %s" % e)
-
-    cleanup_spinner()
+    if spinner:
+        cleanup_spinner()
     child.close()
 
     return child.exitstatus, output.getvalue()
@@ -1581,7 +1585,7 @@ encoding: utf8
         log.info("contact the HPLIP Team.")
 
         log.info(".SH COPYRIGHT")
-        log.info("Copyright (c) 2001-9 Hewlett-Packard Development Company, L.P.")
+        log.info("Copyright (c) 2011-14 Hewlett-Packard Development Company, L.P.")
         log.info(".LP")
         log.info("This software comes with ABSOLUTELY NO WARRANTY.")
         log.info("This is free software, and you are welcome to distribute it")
@@ -1600,7 +1604,7 @@ def log_title(program_name, version, show_ver=True): # TODO: Move to base/module
 
     log.info(log.bold("%s ver. %s" % (program_name, version)))
     log.info("")
-    log.info("Copyright (c) 2001-9 Hewlett-Packard Development Company, LP")
+    log.info("Copyright (c) 2011-14 Hewlett-Packard Development Company, LP")
     log.info("This software comes with ABSOLUTELY NO WARRANTY.")
     log.info("This is free software, and you are welcome to distribute it")
     log.info("under certain conditions. See COPYING file for more details.")
@@ -1708,3 +1712,42 @@ def escape(s):
         s = s.replace(unichr(c), u"&#%d;" % c)
 
     return s
+
+# checks if given process is running.
+#return value:
+#    True or False
+#    None - if process is not running
+#    grep output - if process is running
+
+def Is_Process_Running(process_name):
+    try:
+        p1 = Popen(["ps", "aux"], stdout=PIPE)
+        p2 = Popen(["grep", process_name], stdin=p1.stdout, stdout=PIPE)
+        p3 = Popen(["grep", "-v", "grep"], stdin=p2.stdout, stdout=PIPE)
+        output = p3.communicate()[0]
+        log.debug("Is_Process_Running outpu = %s " %output)
+
+        if process_name in output:
+            return True, output
+        else:
+            return False, None
+
+    except Exception, e:
+        log.error("Execution failed: process Name[%s]" %process_name)
+        print >>sys.stderr, "Execution failed:", e
+        return False, None
+
+class Sync_Lock:
+    def __init__(self, filename):
+        self.Lock_filename = filename
+        self.handler = open(self.Lock_filename, 'w')
+
+# Wait for another process to release resource and acquires the resource.
+    def acquire(self):
+        fcntl.flock(self.handler, fcntl.LOCK_EX)
+
+    def release(self):
+        fcntl.flock(self.handler, fcntl.LOCK_UN)
+
+    def __del__(self):
+        self.handler.close()

@@ -93,6 +93,7 @@ hp_mkuri_CFLAGS = -DCONFDIR=\"$(hplip_confdir)\"
 # hpmud.rules
 rulesdir = /etc/udev/rules.d
 dist_rules_DATA = data/rules/56-hpmud_support.rules
+dist_rules_DATA += data/rules/86-hpmud_plugin.rules
 if UDEV_ACL_RULES
 dist_rules_DATA += data/rules/40-hplip.rules
 else
@@ -113,6 +114,9 @@ pstotiff_SCRIPTS = fax/filters/pstotiff
 hplip_statedir = /var/lib/hp
 dist_hplip_state_DATA = hplip.state
 
+# Log Files
+hplip_Logdir=/var/log/hp
+
 if FULL_BUILD
 
 dist_hplip_SCRIPTS = hpssd.py __init__.py hpdio.py
@@ -122,7 +126,7 @@ dist_noinst_SCRIPTS += dat2drv.py install.py hplip-install init-suse-firewall in
 cmddir = $(hplipdir)
 dist_cmd_SCRIPTS = align.py info.py print.py toolbox.py clean.py colorcal.py unload.py testpage.py makeuri.py check.py fab.py levels.py \
 	sendfax.py setup.py makecopies.py probe.py timedate.py firmware.py scan.py systray.py plugin.py linefeedcal.py pqdiag.py \
-	faxsetup.py devicesettings.py printsettings.py query.py pkservice.py wificonfig.py
+	faxsetup.py devicesettings.py printsettings.py query.py pkservice.py wificonfig.py check-plugin.py diagnose_plugin.py
 
 # base
 basedir = $(hplipdir)/base
@@ -182,6 +186,7 @@ postscriptdir = $(hplipdir)/data/ps
 localzdir = $(hplipdir)/data/localization
 dist_postscript_DATA = data/ps/testpage.ps.gz data/ps/clean_page.pdf.gz
 dist_models_DATA = data/models/models.dat
+dist_hplip_Log_DATA=
 
 if GUI_BUILD
 dist_images_16x16_DATA = data/images/16x16/*
@@ -423,7 +428,7 @@ if HPCUPS_INSTALL
 #if NEW_HPCUPS
 hpcupsdir = $(cupsfilterdir)
 hpcups_PROGRAMS = hpcups
-hpcups_SOURCES = prnt/hpcups/HPCupsFilter.cpp prnt/hpcups/HPCupsFilter.h prnt/hpcups/Compressor.cpp prnt/hpcups/Compressor.h \
+hpcups_SOURCES = prnt/hpcups/HPCupsFilter.cpp prnt/hpcups/HPCupsFilter.h prnt/hpcups/dbuscomm.cpp prnt/hpcups/dbuscomm.h prnt/hpcups/Compressor.cpp prnt/hpcups/Compressor.h \
 	prnt/hpcups/Mode2.cpp prnt/hpcups/Mode2.h prnt/hpcups/Mode3.cpp prnt/hpcups/Mode3.h \
 	prnt/hpcups/Mode9.cpp prnt/hpcups/Mode9.h prnt/hpcups/Mode10.cpp prnt/hpcups/Mode10.h \
 	prnt/hpcups/ModeDeltaPlus.cpp prnt/hpcups/ModeDeltaPlus.h prnt/hpcups/ModeJbig.cpp prnt/hpcups/ModeJbig.h \
@@ -455,8 +460,8 @@ prnt/hpcups/LJZjStream.cpp prnt/hpcups/LJZjStream.h \
         prnt/hpcups/dj3600ColorMaps.cpp prnt/hpcups/dj3320PrintModes.h \
         prnt/hpcups/dj4100PrintModes.h
 
-hpcups_CXXFLAGS = $(APDK_ENDIAN_FLAG)
-hpcups_LDADD = -ljpeg -ldl -lcups -lcupsimage
+hpcups_CXXFLAGS = $(APDK_ENDIAN_FLAG) $(DBUS_CFLAGS)
+hpcups_LDADD = -ljpeg -ldl -lcups -lcupsimage $(DBUS_LIBS)
 #else
 #hpcupsdir = $(cupsfilterdir)
 #hpcups_PROGRAMS = hpcups
@@ -497,6 +502,18 @@ if CUPS_DRV_INSTALL
 cupsdrv2dir = $(drvdir)
 cupsdrv2_DATA = $(cups_drv)
 endif
+
+install-dist_hplip_LogDATA:
+if FULL_BUILD
+	test -z "$(DESTDIR)$(hplip_Logdir)" || mkdir -p $(DESTDIR)$(hplip_Logdir)
+	chgrp "lp" -R $(DESTDIR)$(hplip_Logdir)
+	chmod 774 $(DESTDIR)$(hplip_Logdir)
+endif	#FULL_BUILD
+if HPLIP_BUILD
+	test -z "$(DESTDIR)$(hplip_Logdir)" || mkdir -p $(DESTDIR)$(hplip_Logdir)
+	chgrp "lp" -R $(DESTDIR)$(hplip_Logdir)
+	chmod 774 $(DESTDIR)$(hplip_Logdir)
+endif	#FULL_BUILD
 
 install-data-hook:
 if HPLIP_BUILD

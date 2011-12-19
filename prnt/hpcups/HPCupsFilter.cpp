@@ -27,7 +27,7 @@
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-  Author: Naga Samrat Chowdary Narla,
+  Author: Naga Samrat Chowdary Narla, Sanjay Kumar, Amarnath Chitumalla
 \*****************************************************************************/
 
 #include "HPCupsFilter.h"
@@ -346,18 +346,26 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
     }
 
 //  Get printer platform name
-    if (((attr = ppdFindAttr(m_ppd, "hpPrinterPlatform", NULL)) != NULL) &&
-        (attr->value != NULL)) {
-        strncpy(m_JA.printer_platform, attr->value, sizeof(m_JA.printer_platform)-1);
-        if (m_iLogLevel & BASIC_LOG) {
-            dbglog("HPCUPS: found Printer Platform, it is - %s", attr->value);
-        }
-      if(strcmp(m_JA.printer_platform, "ljzjscolor") == 0)
-      {
-        if(((attr = ppdFindAttr(m_ppd, "hpLJZjsColorVersion", NULL)) != NULL) && (attr->value != NULL))
-          m_JA.printer_platform_version = atoi(attr->value);
-      }
+    if (((attr = ppdFindAttr(m_ppd, "hpPrinterPlatform", NULL)) != NULL) && (attr->value != NULL)) {
+    
+		strncpy(m_JA.printer_platform, attr->value, sizeof(m_JA.printer_platform)-1);
+
+		if (m_iLogLevel & BASIC_LOG) {
+			dbglog("HPCUPS: found Printer Platform, it is - %s\n", attr->value);
+		}        
+        
+		if(strcmp(m_JA.printer_platform, "ljzjscolor") == 0){
+			if(((attr = ppdFindAttr(m_ppd, "hpLJZjsColorVersion", NULL)) != NULL) && (attr->value != NULL)){
+				m_JA.printer_platform_version = atoi(attr->value);
+			}
+		}   
     }
+    
+//Get Raster Preprocessing status  
+	if(((attr = ppdFindAttr(m_ppd, "hpReverseRasterPages", NULL)) != NULL) && (attr->value != NULL)){				
+		m_JA.pre_process_raster = atoi(attr->value);
+	}      
+    
 
 // Get the encapsulation technology from ppd
 
@@ -370,7 +378,7 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
     }
     strncpy(m_JA.printer_language, attr->value, sizeof(m_JA.printer_language)-1);
     if (m_iLogLevel & BASIC_LOG) {
-        dbglog("HPCUPS: found Printer Language, it is - %s", attr->value);
+        dbglog("HPCUPS: found Printer Language, it is - %s\n", attr->value);
     }
 
 //  Fill in the other PCL header info
@@ -398,6 +406,10 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
             m_JA.printer_name[i++] = *ptr++;
         }
     }
+
+	string strPrinterURI="" ,strPrinterName= "";	
+    m_DBusComm.initDBusComm(DBUS_PATH,DBUS_INTERFACE, getenv("DEVICE_URI"), m_JA.printer_name);
+	
     ptr = strstr(m_argv[5], "job-uuid");
     if (ptr) {
         strncpy(m_JA.uuid, ptr + strlen("job-uuid=urn:uuid:"), sizeof(m_JA.uuid)-1);
@@ -414,7 +426,12 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
     if ((err = m_Job.Init(m_pSys, &m_JA, encap_interface)) != NO_ERROR)
     {
         if (err == PLUGIN_LIBRARY_MISSING)
+        {
             fputs ("STATE: +hplip.plugin-error\n", stderr);
+
+            m_DBusComm.sendEvent(EVENT_PRINT_FAILED_MISSING_PLUGIN, "Plugin missing", m_JA.job_id, m_JA.user_name);
+
+        }
         dbglog ("m_Job initialization failed with error = %d", err);
         ppdClose(m_ppd);
         m_ppd = NULL;
@@ -422,7 +439,7 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
     }
 
     if (m_iLogLevel & BASIC_LOG) {
-        dbglog("HPCUPS: returning NO_ERROR from startPage");
+        dbglog("HPCUPS: returning NO_ERROR from startPage\n");
     }
 
     m_pPrinterBuffer = new BYTE[cups_header->cupsWidth * 4 + 32];
@@ -559,6 +576,7 @@ bool HPCupsFilter::isBlankRaster(BYTE *input_raster, cups_page_header2_t *header
     return false;
 }
 
+
 int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
 {
     FILE                   *kfp = NULL;
@@ -569,16 +587,29 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
     cups_page_header2_t    cups_header;
     DRIVER_ERROR           err;
     int                    ret_status = 0;
+    char hpPreProcessedRasterFile[] = "/tmp/hplipSwapedPagesXXXXXX"; //temp file needed to store raster data with swaped pages.
 
-       
     while (cupsRasterReadHeader2(cups_raster, &cups_header))
     {
         current_page_number++;
 
         if (current_page_number == 1) {
+            
             if (startPage(&cups_header) != NO_ERROR) {
                 return JOB_CANCELED;
             }
+            
+            if(m_JA.pre_process_raster) {
+		        err = m_Job.preProcessRasterData(&cups_raster, &cups_header, hpPreProcessedRasterFile);
+				if (err != NO_ERROR) {
+					if (m_iLogLevel & BASIC_LOG) {
+						dbglog ("DEBUG: Job::StartPage failed with err = %d\n", err);
+					}
+					ret_status = JOB_CANCELED;
+					break;
+				}   
+			}
+            
             if (cups_header.cupsColorSpace == CUPS_CSPACE_RGBW) {
                 rgbRaster = new BYTE[cups_header.cupsWidth * 3];
                 if (rgbRaster == NULL) {
@@ -599,7 +630,6 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
             rgbRaster = NULL;
         }
         else if (cups_header.cupsColorSpace != CUPS_CSPACE_RGBW) {
-            dbglog("5......\n");
             rgbRaster = m_pPrinterBuffer;
             kRaster = NULL;
         }
@@ -634,19 +664,28 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
                 kfp = fopen (szFileName, "w");
                 chmod (szFileName, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
             }
-            dbglog("9......\n");
+
             WriteBMPHeader (cfp, cups_header.cupsWidth, cups_header.cupsHeight, COLOR_RASTER);
             WriteBMPHeader (kfp, cups_header.cupsWidth, cups_header.cupsHeight, BLACK_RASTER);
-            dbglog("10......\n");
         }
 
-        fprintf(stderr, "PAGE: %d %s", current_page_number, m_argv[4]);
+        fprintf(stderr, "PAGE: %d %s\r\n", current_page_number, m_argv[4]);
         // Iterating through the raster per page
         for (int y = 0; y < (int) cups_header.cupsHeight; y++) {
             cupsRasterReadPixels (cups_raster, m_pPrinterBuffer, cups_header.cupsBytesPerLine);
             color_raster = rgbRaster;
             black_raster = kRaster;
 
+            if(y == 0 && (0 == strcmp(m_JA.printer_language, "ljmono")) )
+			{
+				//For ljmono, make sure that first line is not a blankRaster line.Otherwise printer 
+				//may not skip blank lines before actual data
+				//Need to revisit to crosscheck if it is a firmware issue.
+				
+				*m_pPrinterBuffer = 0x01;  
+				dbglog("First raster data plane.." );
+			}
+			
             if (this->isBlankRaster((BYTE *) m_pPrinterBuffer, &cups_header)) {
             
                 color_raster = NULL;
@@ -672,6 +711,8 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
         delete [] kRaster;
         delete [] rgbRaster;
     }
+
+    unlink(hpPreProcessedRasterFile); 
     return ret_status;
 }
 

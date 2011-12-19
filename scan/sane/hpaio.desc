@@ -142,6 +142,18 @@
 :model "HP Officejet d155xi All-in-one Printer"
 :status :good
 
+:model "HP Hewlett-packard LaserJet 200 Color MFP m275u"
+:status :good
+
+:model "HP Hewlett-packard LaserJet 200 Color MFP m275nw"
+:status :good
+
+:model "HP Hewlett-packard LaserJet 200 Color MFP m275s"
+:status :good
+
+:model "HP Hewlett-packard LaserJet 200 Color MFP m275t"
+:status :good
+
 :model "HP Deskjet Ink Advantage k209a All-in-one Printer"
 :status :good
 
@@ -1873,6 +1885,9 @@
 :model "HP Officejet 5510v All-in-one Printer"
 :status :good
 
+:model "HP Photosmart 5510d E-all-in-one"
+:status :good
+
 :model "HP Officejet 5510xi All-in-one Printer"
 :status :good
 
@@ -2365,9 +2380,6 @@
 :model "HP Photosmart c8188 All-in-one Printer"
 :status :good
 
-:model "HP Officejet Pro 8500 a910a"
-:status :good
-
 :model "HP Officejet Pro 8500 Premier All-in-one Printer - a909n"
 :status :good
 
@@ -2375,6 +2387,15 @@
 :status :good
 
 :model "HP Officejet Pro 8500 All-in-one Printer - a909a"
+:status :good
+
+:model "HP Officejet Pro 8500a E-aio Printer a910g"
+:status :good
+
+:model "HP Officejet Pro 8500a E-aio Printer a910a"
+:status :good
+
+:model "HP Officejet Pro 8500a E-aio Printer a910n"
 :status :good
 
 :model "HP Officejet Pro 8600"

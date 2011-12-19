@@ -53,6 +53,7 @@ public:
     virtual void            SetLastBand() {}
     virtual bool            UnpackBits() {return true;}
     virtual void            CancelJob();
+    virtual DRIVER_ERROR    preProcessRasterData(cups_raster_t **cups_raster, cups_page_header2_t* firstpage_cups_header, char* pSwapedPagesFileName);
 
 protected:
     void         addToHeader(const BYTE *command_string, int length);

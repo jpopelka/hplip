@@ -98,7 +98,14 @@ class MarvellFaxDevice(FaxDevice):
 
             lib_name = head+"/fax/plugins/fax_marvell.so"
             log.debug("Load the library %s\n" % lib_name)
-            self.libfax_marvell = cdll.LoadLibrary(lib_name)
+            if not os.path.exists(lib_name):
+                log.error("Loading %s failed. Try after installing plugin libraries\n" %lib_name);
+                log.info("Run \"hp-plugin\" to installa plugin libraries if you are not automatically prompted\n")
+                job_id =0;
+                self.service.SendEvent(device_uri, printer_name, EVENT_FAX_FAILED_MISSING_PLUGIN, os.getenv('USER'), job_id, "Plugin is not installed")
+                sys.exit(1)
+            else:
+                self.libfax_marvell = cdll.LoadLibrary(lib_name)
         except Error, e:
             log.error("Loading fax_marvell failed (%s)\n" % e.msg);
             sys.exit(1)

@@ -42,7 +42,8 @@ from cPickle import loads, HIGHEST_PROTOCOL
 # Local
 from base.g import *
 from base.codes import *
-from base import utils, device, status, models
+from base import utils, device, status, models, module
+from installer import core_install
 
 # dBus
 try:
@@ -346,6 +347,39 @@ def handle_hpdio_event(event, bytes_written):
 
             send_toolbox_event(event, EVENT_DEVICE_UPDATE_REPLY)
 
+def handle_plugin_install():
+    
+#    child_process=os.fork()
+#    if child_process ==0: 	### child process
+#        child_pid=os.getpid()
+#        utils.run('hp-diagnose_plugin',True, None, 1, False)
+#        os.kill(child_pid,signal.SIGKILL)
+#
+#    else:	## parent process
+#        log.debug("Started Plug-in installation wizard")
+
+##### TBD: Valdiation pending for Plug-in is already running or not?... 
+    child_process=os.fork()
+    if child_process== 0:	# child process
+        lockObj = utils.Sync_Lock("/tmp/pluginInstall.tmp")
+        lockObj.acquire()
+        child_pid=os.getpid()
+        core = core_install.CoreInstall()
+        core.set_plugin_version()
+        if not core.check_for_plugin():
+            sts,out = utils.run('hp-diagnose_plugin',True, None, 1, False)
+            if sts != 0:
+                log.error("Failed to load hp-diagnose_plugin")
+                #TBD FailureUI needs to add
+        else:	
+            log.debug("Device Plug-in was already installed. Not Invoking Plug-in installation wizard")
+
+        lockObj.release()
+        os.kill(child_pid,signal.SIGKILL)
+
+    else: #parent process
+        log.debug("Started Plug-in installation wizard")
+    
 
 
 def handle_event(event, more_args=None):
@@ -358,6 +392,10 @@ def handle_event(event, more_args=None):
         more_args = []
 
     event.debug()
+ 
+    if event.event_code == EVENT_AUTO_CONFIGURE:
+        handle_plugin_install()
+        return
 
     if event.device_uri and check_device(event.device_uri) != ERROR_SUCCESS:
         return
@@ -408,6 +446,9 @@ def handle_event(event, more_args=None):
 
         # send EVENT_HISTORY_UPDATE signal to hp-toolbox
         send_toolbox_event(event, EVENT_HISTORY_UPDATE)
+        
+        if event.event_code in (EVENT_PRINT_FAILED_MISSING_PLUGIN, EVENT_SCAN_FAILED_MISSING_PLUGIN,EVENT_FAX_FAILED_MISSING_PLUGIN):
+            handle_plugin_install()
 
     # Handle fax signals
     elif EVENT_FAX_MIN <= event.event_code <= EVENT_FAX_MAX and more_args:

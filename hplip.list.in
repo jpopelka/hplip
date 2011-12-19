@@ -232,6 +232,8 @@ f 0644 root root $ppd/HP prnt/ps/*.ppd.gz
 @epm_full@f 644 root root $home/scan/__init__.py scan/__init__.py
 @epm_full@f 644 root root $home/scan/sane.py scan/sane.py
 @epm_full@f 755 root root $home/plugin.py plugin.py
+@epm_full@f 755 root root $home/check-plugin.py check-plugin.py
+@epm_full@f 755 root root $home/diagnose_plugin.py diagnose_plugin.py
 @epm_full@f 755 root root $home/print.py print.py
 @epm_full@f 755 root root $home/firmware.py firmware.py
 @epm_full@d 775 root root $home/plugins -
@@ -286,6 +288,8 @@ f 0644 root root $ppd/HP prnt/ps/*.ppd.gz
 @epm_full@l 755 root root $bindir/hp-probe ../share/hplip/probe.py
 @epm_full@l 755 root root $bindir/hp-timedate ../share/hplip/timedate.py
 @epm_full@l 755 root root $bindir/hp-plugin ../share/hplip/plugin.py
+@epm_full@l 755 root root $bindir/hp-check-plugin ../share/hplip/check-plugin.py
+@epm_full@l 755 root root $bindir/hp-diagnose_plugin ../share/hplip/diagnose_plugin.py
 @epm_full@l 755 root root $bindir/hp-check ../share/hplip/check.py
 @epm_full@l 755 root root $bindir/hp-info ../share/hplip/info.py
 @epm_full@l 755 root root $bindir/hp-makecopies ../share/hplip/makecopies.py
@@ -433,6 +437,7 @@ f 0644 root root $docdir/copyright prnt/plugins/copyright
 f 0644 root root /var/lib/hp/hplip.state hplip-plugin.state
 f 0644 root root $home/data/firmware data/firmware/*.fw.gz
 d 0775 root root $home/data/plugin -
+d 0775 root lp /var/log/hp -
 
 #scan
 
@@ -464,8 +469,10 @@ EOF
 f 0644 root root $docdir/COPYING COPYING
 f 0644 root root $docdir/copyright copyright
 f 0644 root root /var/lib/hp/hplip.state hplip.state
+d 0775 root lp /var/log/hp -
 %system !darwin
 @epm_print_only_exclude@f 0644 root root /etc/udev/rules.d/56-hpmud_support.rules data/rules/56-hpmud_support.rules
+@epm_print_only_exclude@f 0644 root root /etc/udev/rules.d/86-hpmud_plugin.rules data/rules/86-hpmud_plugin.rules
 %system all
 %endif
 #end PLUGIN

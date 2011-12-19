@@ -94,6 +94,11 @@ ip_pat = re.compile(r"""\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25
 dev_pat = re.compile(r"""/dev/.+""", re.IGNORECASE)
 usb_pat = re.compile(r"""(\d+):(\d+)""", re.IGNORECASE)
 
+### **********Lambda Function UniStar for checking type of arguments to constructor of class event*******************************
+
+UniStr = lambda title: isinstance(title, str) and utils.xrstrip(title, '\x00')[:128] or utils.xrstrip(title, '\x00')[:128].encode('utf-8')  
+
+
 #
 # Event Wrapper Class for pipe IPC
 #
@@ -102,13 +107,13 @@ class Event(object):
     def __init__(self, device_uri, printer_name, event_code,
                  username=prop.username, job_id=0, title='',
                  timedate=0):
-
-        self.device_uri = unicode(utils.xrstrip(device_uri, '\x00'))[:128].encode('utf-8')
-        self.printer_name = unicode(utils.xrstrip(printer_name, '\x00'))[:128].encode('utf-8')
+       # UniStr = lambda title: isinstance(title, str) and utils.xrstrip(title, '\x00')[:128] or utils.xrstrip(title, '\x00')[:128].encode('utf-8')
+        self.device_uri = UniStr(device_uri)
+        self.printer_name = UniStr(printer_name)
         self.event_code = int(event_code)
-        self.username = unicode(utils.xrstrip(username, '\x00'))[:32].encode('utf-8')
+        self.username = UniStr(username)
         self.job_id = int(job_id)
-        self.title = unicode(utils.xrstrip(title, '\x00'))[:128].encode('utf-8')
+        self.title = UniStr(title)
 
         if timedate:
             self.timedate = float(timedate)
@@ -2631,3 +2636,6 @@ class LocalOpener_LEDM(urllib.URLopener):
 
         reply.seek(0)
         return reply.getvalue()
+
+
+    
