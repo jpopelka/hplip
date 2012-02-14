@@ -2499,6 +2499,31 @@ class Device(object):
             if data:
                 data = status.clean(data)
         return data
+
+#-------------------------For LEDM SOAP PROTOCOL(FAX) Devices----------------------------------------------------------------------#
+    
+    def FetchEWS_LEDMUrl(self, url, footer=""):
+        data_fp = cStringIO.StringIO()
+        if footer:
+            data = self.getEWSUrl_LEDM(url, data_fp, footer)
+        else:
+            data = self.getEWSUrl_LEDM(url, data_fp)
+        if data:
+            data = data.split('\r\n\r\n', 1)[1]
+            if data:
+                data = status.clean(data)
+        return data
+
+    def readAttributeFromXml_EWS(self, uri, attribute):
+        stream = cStringIO.StringIO()
+        data = self.FetchEWS_LEDMUrl(uri)
+        if not data:
+            log.error("Unable To read the XML data from device")
+            return ""
+        xmlDict = utils.XMLToDictParser().parseXML(data)
+        return str(xmlDict[attribute])
+
+#---------------------------------------------------------------------------------------------------#
  
     def readAttributeFromXml(self,uri,attribute):
         stream = cStringIO.StringIO()

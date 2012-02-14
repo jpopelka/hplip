@@ -133,9 +133,12 @@ struct soap_session
 
    SANE_Fixed platen_min_width, platen_min_height;
    SANE_Range platen_tlxRange, platen_tlyRange, platen_brxRange, platen_bryRange;
+   SANE_Int platen_resolutionList[MAX_LIST_SIZE];
+
    SANE_Fixed adf_min_width, adf_min_height;
    SANE_Range adf_tlxRange, adf_tlyRange, adf_brxRange, adf_bryRange;
-
+   SANE_Int adf_resolutionList[MAX_LIST_SIZE];
+   
    IP_HANDLE ip_handle;
 
    int index;                    /* dime buffer index */

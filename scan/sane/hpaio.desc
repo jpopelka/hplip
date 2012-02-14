@@ -142,16 +142,16 @@
 :model "HP Officejet d155xi All-in-one Printer"
 :status :good
 
-:model "HP Hewlett-packard LaserJet 200 Color MFP m275u"
+:model "HP LaserJet 200 Color MFP m275nw"
 :status :good
 
-:model "HP Hewlett-packard LaserJet 200 Color MFP m275nw"
+:model "HP LaserJet 200 Color MFP m275s"
 :status :good
 
-:model "HP Hewlett-packard LaserJet 200 Color MFP m275s"
+:model "HP LaserJet 200 Color MFP m275t"
 :status :good
 
-:model "HP Hewlett-packard LaserJet 200 Color MFP m275t"
+:model "HP LaserJet 200 Color MFP m275u"
 :status :good
 
 :model "HP Deskjet Ink Advantage k209a All-in-one Printer"
@@ -170,6 +170,9 @@
 :status :good
 
 :model "HP Printer Scanner Copier 300"
+:status :good
+
+:model "HP LaserJet 300 Color MFP m375nw"
 :status :good
 
 :model "HP Photosmart Premium All-in-one Printer Series - c309h"
@@ -230,6 +233,12 @@
 :status :good
 
 :model "HP Deskjet f394 All-in-one Printer"
+:status :good
+
+:model "HP LaserJet 400 Color MFP m475dw"
+:status :good
+
+:model "HP LaserJet 400 Color MFP m475dn"
 :status :good
 
 :model "HP Photosmart Prem c410 Series"
@@ -472,10 +481,10 @@
 :model "HP Color LaserJet cm1312nfi Multifunction Printer"
 :status :good
 
-:model "HP PSC 1312 All-in-one Printer"
+:model "HP Color LaserJet cm1312 Multifunction Printer"
 :status :good
 
-:model "HP Color LaserJet cm1312 Multifunction Printer"
+:model "HP PSC 1312 All-in-one Printer"
 :status :good
 
 :model "HP PSC 1315v All-in-one Printer"
@@ -1537,10 +1546,10 @@
 :model "HP Deskjet f4473 All-in-one Printer"
 :status :good
 
-:model "HP Deskjet f4480 All-in-one Printer"
+:model "HP Photosmart c4480 All-in-one Printer"
 :status :good
 
-:model "HP Photosmart c4480 All-in-one Printer"
+:model "HP Deskjet f4480 All-in-one Printer"
 :status :good
 
 :model "HP Photosmart c4483 All-in-one Printer"
@@ -2359,9 +2368,6 @@
 :model "HP cm8060 Color Multifunction Printer With Edgeline Technology"
 :status :good
 
-:model "HP Officejet Pro 8100"
-:status :good
-
 :model "HP LaserJet 8100 Multifunction Printer"
 :status :good
 
@@ -2389,16 +2395,19 @@
 :model "HP Officejet Pro 8500 All-in-one Printer - a909a"
 :status :good
 
-:model "HP Officejet Pro 8500a E-aio Printer a910g"
+:model "HP Officejet Pro 8500a E-aio Printer - a910a"
 :status :good
 
-:model "HP Officejet Pro 8500a E-aio Printer a910a"
+:model "HP Officejet Pro 8500a Premium E-aio Printer - a910n"
 :status :good
 
-:model "HP Officejet Pro 8500a E-aio Printer a910n"
+:model "HP Officejet Pro 8500a Plus E-aio Printer - a910g"
 :status :good
 
-:model "HP Officejet Pro 8600"
+:model "HP Officejet Pro 8600 Plus E-aio n911g"
+:status :good
+
+:model "HP Officejet Pro 8600 E-aio n911a"
 :status :good
 
 :model "HP LaserJet 9000 Multifunction Printer"

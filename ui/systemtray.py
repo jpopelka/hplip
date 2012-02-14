@@ -258,7 +258,7 @@ class SystrayIcon(QLabel):
             managerWin = self.locateTray(dpy)
             if managerWin: break
             x += 1
-            if x > 10: break
+            if x > 30: break
             time.sleep(2.0)
 
 

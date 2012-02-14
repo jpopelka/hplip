@@ -237,6 +237,7 @@
 
 //      13 September 2011 Goutam
 //         Added AutoDuplex PaperSizes in Copperhead techclass
+
  
 
 // Include necessary files...
@@ -4805,6 +4806,7 @@ Manufacturer "HP"
      }
 } // End Copperhead
 
+
 //Added by Goutam Kodu
 //////// Python11
 {
@@ -5260,6 +5262,14 @@ Manufacturer "HP"
     Attribute "Product" "" "(HP Photosmart Ink Adv k510)"
   }
   {
+    ModelName "HP Officejet 4400 k410"
+    Attribute "NickName" "" "HP Officejet 4400 k410, $Version"
+    Attribute "ShortNickName" "" "HP Officejet 4400 k410"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 4400 k410;DES:officejet 4400 k410;"
+    PCFileName "hp-officejet_4400_k410.ppd"
+    Attribute "Product" "" "(HP Officejet 4400 k410 All-in-one Printer)"
+  }
+  {
     ModelName "HP Deskjet f4400 Series"
     Attribute "NickName" "" "HP Deskjet f4400 Series, $Version"
     Attribute "ShortNickName" "" "HP Deskjet f4400 Series"
@@ -5275,14 +5285,6 @@ Manufacturer "HP"
     Attribute "Product" "" "(HP Deskjet f4483 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet f4488 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet f4492 All-in-one Printer)"
-  }
-  {
-    ModelName "HP Officejet 4400 k410"
-    Attribute "NickName" "" "HP Officejet 4400 k410, $Version"
-    Attribute "ShortNickName" "" "HP Officejet 4400 k410"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 4400 k410;DES:officejet 4400 k410;"
-    PCFileName "hp-officejet_4400_k410.ppd"
-    Attribute "Product" "" "(HP Officejet 4400 k410 All-in-one Printer)"
   }
   {
     ModelName "HP Officejet 4500 g510a-f"
@@ -6094,9 +6096,9 @@ Manufacturer "HP"
       Attribute "ShortNickName" "" "HP Officejet Pro 8500 a910"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet pro 8500 a910;DES:officejet pro 8500 a910;"
       PCFileName "hp-officejet_pro_8500_a910.ppd"
-      Attribute "Product" "" "(HP Officejet Pro 8500a E-aio Printer a910a)"
-      Attribute "Product" "" "(HP Officejet Pro 8500a E-aio Printer a910g)"
-      Attribute "Product" "" "(HP Officejet Pro 8500a E-aio Printer a910n)"
+      Attribute "Product" "" "(HP Officejet Pro 8500a Plus E-aio Printer - a910g)"
+      Attribute "Product" "" "(HP Officejet Pro 8500a Premium E-aio Printer - a910n)"
+      Attribute "Product" "" "(HP Officejet Pro 8500a E-aio Printer - a910a)"
     }
   } // End Supported media sizes with full bleed.
 
@@ -6295,7 +6297,7 @@ Manufacturer "HP"
       Attribute "ShortNickName" "" "HP Officejet Pro 8100"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet pro 8100;DES:officejet pro 8100;"
       PCFileName "hp-officejet_pro_8100.ppd"
-      Attribute "Product" "" "(HP Officejet Pro 8100)"
+      Attribute "Product" "" "(HP Officejet Pro 8100 eprinter-n811a)"
     }
     {
       ModelName "HP Officejet Pro 8600"
@@ -6303,7 +6305,8 @@ Manufacturer "HP"
       Attribute "ShortNickName" "" "HP Officejet Pro 8600"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet pro 8600;DES:officejet pro 8600;"
       PCFileName "hp-officejet_pro_8600.ppd"
-      Attribute "Product" "" "(HP Officejet Pro 8600)"
+      Attribute "Product" "" "(HP Officejet Pro 8600 E-aio n911a)"
+      Attribute "Product" "" "(HP Officejet Pro 8600 Plus E-aio n911g)"
     }
   } // End Supported media sizes with full bleed.
 
@@ -14989,6 +14992,14 @@ Group "RLT/HP Real Life Technologies"
 
     // <%LJZjsMono:NoAutoDuplex%>
     {
+      ModelName "HP LaserJet Professional p1102s"
+      Attribute "NickName" "" "HP LaserJet Professional p1102s, $Version, requires proprietary plugin"
+      Attribute "ShortNickName" "" "HP LaserJet Professional p1102s"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional p1102s;DES:hp laserjet professional p1102s;"
+      PCFileName "hp-laserjet_professional_p1102s.ppd"
+      Attribute "Product" "" "(HP LaserJet Professional p1102s Printer)"
+    }
+    {
       ModelName "HP LaserJet Professional p1102w"
       Attribute "NickName" "" "HP LaserJet Professional p1102w, $Version, requires proprietary plugin"
       Attribute "ShortNickName" "" "HP LaserJet Professional p1102w"
@@ -15011,6 +15022,22 @@ Group "RLT/HP Real Life Technologies"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional p 1102w;DES:hp laserjet professional p 1102w;"
       PCFileName "hp-laserjet_professional_p_1102w.ppd"
       Attribute "Product" "" "(HP LaserJet Professional P 1102w Printer)"
+    }
+    {
+      ModelName "HP LaserJet Professional p1106"
+      Attribute "NickName" "" "HP LaserJet Professional p1106, $Version, requires proprietary plugin"
+      Attribute "ShortNickName" "" "HP LaserJet Professional p1106"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional p1106;DES:hp laserjet professional p1106;"
+      PCFileName "hp-laserjet_professional_p1106.ppd"
+      Attribute "Product" "" "(HP LaserJet Professional p1106 Printer)"
+    }
+    {
+      ModelName "HP LaserJet Professional p1108"
+      Attribute "NickName" "" "HP LaserJet Professional p1108, $Version, requires proprietary plugin"
+      Attribute "ShortNickName" "" "HP LaserJet Professional p1108"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional p1108;DES:hp laserjet professional p1108;"
+      PCFileName "hp-laserjet_professional_p1108.ppd"
+      Attribute "Product" "" "(HP LaserJet Professional p1108 Printer)"
     }
     {
       ModelName "HP LaserJet Professional m1132 MFP"
@@ -15341,6 +15368,14 @@ Group "RLT/HP Real Life Technologies"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp1215;DES:hp color laserjet cp1215;"
       PCFileName "hp-color_laserjet_cp1215.ppd"
       Attribute "Product" "" "(HP Color LaserJet cp1215 Printer)"
+    }
+    {
+      ModelName "HP Color LaserJet cp1217"
+      Attribute "NickName" "" "HP Color LaserJet cp1217, $Version, requires proprietary plugin"
+      Attribute "ShortNickName" "" "HP Color LaserJet cp1217"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp1217;DES:hp color laserjet cp1217;"
+      PCFileName "hp-color_laserjet_cp1217.ppd"
+      Attribute "Product" "" "(HP Color LaserJet cp1217 Printer)"
     }
     {
       ModelName "HP Color LaserJet 1600"

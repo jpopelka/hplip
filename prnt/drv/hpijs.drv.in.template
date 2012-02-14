@@ -7027,6 +7027,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   // <%Copperhead:AutoDuplex%>  
 } // end Copperhead
 
+
 ////////// Python11
 {
   Attribute "DefaultResolution" "" "1200dpi"

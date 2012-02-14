@@ -27,6 +27,7 @@
   hardware works. The Windows driver has the same limitation.
 
   Author: David Suffield
+  Contributor: Sarbeswar Meher
 
 \************************************************************************************/
 
@@ -513,16 +514,7 @@ SANE_Status soapht_open(SANE_String_Const device, SANE_Handle *handle)
    soapht_control_option(session, SOAP_OPTION_INPUT_SOURCE, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */  
 
    /* Set supported resolutions. */
-   i=1;
-   session->resolutionList[i++] = 75;
-   session->resolutionList[i++] = 100;
-   session->resolutionList[i++] = 150;
-   session->resolutionList[i++] = 200;
-   session->resolutionList[i++] = 300;
-   session->resolutionList[i++] = 600;
-   //session->resolutionList[i++] = 1200;
-   session->resolutionList[0] = i-1;    /* length of word_list */
-   soapht_control_option(session, SOAP_OPTION_SCAN_RESOLUTION, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */
+     soapht_control_option(session, SOAP_OPTION_SCAN_RESOLUTION, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */
 
    /* Set supported contrast. */
    soapht_control_option(session, SOAP_OPTION_CONTRAST, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */
@@ -659,21 +651,33 @@ SANE_Status soapht_control_option(SANE_Handle handle, SANE_Int option, SANE_Acti
          }
          else if (action == SANE_ACTION_SET_VALUE)
          {
-            for (i=0; ps->inputSourceList[i]; i++)
-            {
-               if (strcasecmp(ps->inputSourceList[i], value) == 0)
+          for (i=0; ps->inputSourceList[i]; i++)
+           {
+             if (strcasecmp(ps->inputSourceList[i], value) == 0)
+             {
+               ps->currentInputSource = ps->inputSourceMap[i];
+               set_input_source_side_effects(ps, ps->currentInputSource);
+               if(ps->currentInputSource == IS_ADF || ps->currentInputSource == IS_ADF_DUPLEX)
                {
-                  ps->currentInputSource = ps->inputSourceMap[i];
-                  set_input_source_side_effects(ps, ps->currentInputSource);
-                  stat = SANE_STATUS_GOOD;
-                  break;
+                 i = ps->adf_resolutionList[0] + 1;
+                 while(i--) ps->resolutionList[i] = ps->adf_resolutionList[i];
                }
-            }
+               else //if(ps->currentInputSource == IS_PLATEN) 
+               {
+                 i = ps->platen_resolutionList[0] + 1;
+                 while(i--) ps->resolutionList[i] = ps->platen_resolutionList[i];
+               }
+               mset_result |= SANE_INFO_RELOAD_PARAMS | SANE_INFO_RELOAD_OPTIONS;
+               stat = SANE_STATUS_GOOD;
+               break;
+             }
+           }
          }
          else
          {  /* Set default. */
             ps->currentInputSource = IS_PLATEN;
             set_input_source_side_effects(ps, ps->currentInputSource);
+            mset_result |= SANE_INFO_RELOAD_PARAMS | SANE_INFO_RELOAD_OPTIONS;
             stat = SANE_STATUS_GOOD;
          }
          break;

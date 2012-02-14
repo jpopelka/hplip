@@ -217,8 +217,8 @@ if not log.set_level (log_level):
 
 LOG_FILE = os.path.normpath(LOG_FILE)
 log.info(log.bold("Saving output in log file: %s" % LOG_FILE))
-#if os.path.exists(LOG_FILE):
-#    os.remove(LOG_FILE)
+if os.path.exists(LOG_FILE):
+    os.remove(LOG_FILE)
 
 log.set_logfile(LOG_FILE)
 log.set_where(log.LOG_TO_CONSOLE_AND_FILE)

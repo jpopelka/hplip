@@ -11457,6 +11457,14 @@ Transparency"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%LJZjsMono:NoAutoDuplex%>
   {
+    ModelName "HP LaserJet Professional p1102s hpijs"
+    Attribute "NickName" "" "HP LaserJet Professional p1102s hpijs, $Version, requires proprietary plugin"
+    Attribute "ShortNickName" "" "HP LJ Professional p1102s hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional p1102s;DES:hp laserjet professional p1102s;"
+    PCFileName "hp-laserjet_professional_p1102s-hpijs.ppd"
+    Attribute "Product" "" "(HP LaserJet Professional p1102s Printer)"
+  }
+  {
     ModelName "HP LaserJet Professional p1102w hpijs"
     Attribute "NickName" "" "HP LaserJet Professional p1102w hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LJ Professional p1102w hpijs"
@@ -11479,6 +11487,22 @@ Transparency"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional p 1102w;DES:hp laserjet professional p 1102w;"
     PCFileName "hp-laserjet_professional_p_1102w-hpijs.ppd"
     Attribute "Product" "" "(HP LaserJet Professional P 1102w Printer)"
+  }
+  {
+    ModelName "HP LaserJet Professional p1106 hpijs"
+    Attribute "NickName" "" "HP LaserJet Professional p1106 hpijs, $Version, requires proprietary plugin"
+    Attribute "ShortNickName" "" "HP LJ Professional p1106 hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional p1106;DES:hp laserjet professional p1106;"
+    PCFileName "hp-laserjet_professional_p1106-hpijs.ppd"
+    Attribute "Product" "" "(HP LaserJet Professional p1106 Printer)"
+  }
+  {
+    ModelName "HP LaserJet Professional p1108 hpijs"
+    Attribute "NickName" "" "HP LaserJet Professional p1108 hpijs, $Version, requires proprietary plugin"
+    Attribute "ShortNickName" "" "HP LJ Professional p1108 hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional p1108;DES:hp laserjet professional p1108;"
+    PCFileName "hp-laserjet_professional_p1108-hpijs.ppd"
+    Attribute "Product" "" "(HP LaserJet Professional p1108 Printer)"
   }
   {
     ModelName "HP LaserJet Professional m1132 MFP hpijs"
@@ -12182,6 +12206,14 @@ Transparency"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp1215;DES:hp color laserjet cp1215;"
       PCFileName "hp-color_laserjet_cp1215-hpijs.ppd"
       Attribute "Product" "" "(HP Color LaserJet cp1215 Printer)"
+    }
+    {
+      ModelName "HP Color LaserJet cp1217 hpijs"
+      Attribute "NickName" "" "HP Color LaserJet cp1217 hpijs, $Version, requires proprietary plugin"
+      Attribute "ShortNickName" "" "HP Color LaserJet cp1217 hpijs"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp color laserjet cp1217;DES:hp color laserjet cp1217;"
+      PCFileName "hp-color_laserjet_cp1217-hpijs.ppd"
+      Attribute "Product" "" "(HP Color LaserJet cp1217 Printer)"
     }
     {
       ModelName "HP Color LaserJet 1600 hpijs"
@@ -13210,6 +13242,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   }
 } // end Copperhead
 
+
 ////////// Python11
 {
   Attribute "DefaultResolution" "" "1200dpi"
@@ -13689,6 +13722,14 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Photosmart Ink Adv k510)"
   }
   {
+    ModelName "HP Officejet 4400 k410 hpijs"
+    Attribute "NickName" "" "HP Officejet 4400 k410 hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Officejet 4400 k410 hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 4400 k410;DES:officejet 4400 k410;"
+    PCFileName "hp-officejet_4400_k410-hpijs.ppd"
+    Attribute "Product" "" "(HP Officejet 4400 k410 All-in-one Printer)"
+  }
+  {
     ModelName "HP Deskjet f4400 Series hpijs"
     Attribute "NickName" "" "HP Deskjet f4400 Series hpijs, $Version"
     Attribute "ShortNickName" "" "HP Deskjet f4400 Series hpijs"
@@ -13704,14 +13745,6 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Deskjet f4483 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet f4488 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet f4492 All-in-one Printer)"
-  }
-  {
-    ModelName "HP Officejet 4400 k410 hpijs"
-    Attribute "NickName" "" "HP Officejet 4400 k410 hpijs, $Version"
-    Attribute "ShortNickName" "" "HP Officejet 4400 k410 hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 4400 k410;DES:officejet 4400 k410;"
-    PCFileName "hp-officejet_4400_k410-hpijs.ppd"
-    Attribute "Product" "" "(HP Officejet 4400 k410 All-in-one Printer)"
   }
   {
     ModelName "HP Officejet 4500 g510a-f hpijs"
@@ -14851,9 +14884,9 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "ShortNickName" "" "HP OJ Pro 8500 a910 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet pro 8500 a910;DES:officejet pro 8500 a910;"
     PCFileName "hp-officejet_pro_8500_a910-hpijs.ppd"
-    Attribute "Product" "" "(HP Officejet Pro 8500a E-aio Printer a910a)"
-    Attribute "Product" "" "(HP Officejet Pro 8500a E-aio Printer a910g)"
-    Attribute "Product" "" "(HP Officejet Pro 8500a E-aio Printer a910n)"
+    Attribute "Product" "" "(HP Officejet Pro 8500a Plus E-aio Printer - a910g)"
+    Attribute "Product" "" "(HP Officejet Pro 8500a Premium E-aio Printer - a910n)"
+    Attribute "Product" "" "(HP Officejet Pro 8500a E-aio Printer - a910a)"
   }
 }  // end Corbett
 
@@ -15083,7 +15116,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "ShortNickName" "" "HP Officejet Pro 8100 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet pro 8100;DES:officejet pro 8100;"
     PCFileName "hp-officejet_pro_8100-hpijs.ppd"
-    Attribute "Product" "" "(HP Officejet Pro 8100)"
+    Attribute "Product" "" "(HP Officejet Pro 8100 eprinter-n811a)"
   }
   {
     ModelName "HP Officejet Pro 8600 hpijs"
@@ -15091,7 +15124,8 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "ShortNickName" "" "HP Officejet Pro 8600 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet pro 8600;DES:officejet pro 8600;"
     PCFileName "hp-officejet_pro_8600-hpijs.ppd"
-    Attribute "Product" "" "(HP Officejet Pro 8600)"
+    Attribute "Product" "" "(HP Officejet Pro 8600 E-aio n911a)"
+    Attribute "Product" "" "(HP Officejet Pro 8600 Plus E-aio n911g)"
   }
 } // end Ampere		
 

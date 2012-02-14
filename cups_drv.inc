@@ -66,6 +66,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-color_laserjet_cm6040_mfp.ppd.gz \
    ppd/hpcups/hp-color_laserjet_cm6049_mfp.ppd.gz \
    ppd/hpcups/hp-color_laserjet_cp1215.ppd.gz \
+   ppd/hpcups/hp-color_laserjet_cp1217.ppd.gz \
    ppd/hpcups/hp-color_laserjet_cp1514n-pcl3.ppd.gz \
    ppd/hpcups/hp-color_laserjet_cp1515n-pcl3.ppd.gz \
    ppd/hpcups/hp-color_laserjet_cp1518ni-pcl3.ppd.gz \
@@ -435,8 +436,11 @@ cups_ppd_printers = \
    ppd/hpcups/hp-laserjet_professional_m1217nfw_mfp.ppd.gz \
    ppd/hpcups/hp-laserjet_professional_m1219nf_mfp.ppd.gz \
    ppd/hpcups/hp-laserjet_professional_p1102.ppd.gz \
+   ppd/hpcups/hp-laserjet_professional_p1102s.ppd.gz \
    ppd/hpcups/hp-laserjet_professional_p_1102w.ppd.gz \
    ppd/hpcups/hp-laserjet_professional_p1102w.ppd.gz \
+   ppd/hpcups/hp-laserjet_professional_p1106.ppd.gz \
+   ppd/hpcups/hp-laserjet_professional_p1108.ppd.gz \
    ppd/hpcups/hp-laserjet_professional_p1566.ppd.gz \
    ppd/hpcups/hp-laserjet_professional_p1606dn.ppd.gz \
    ppd/hpcups/hp-mopier_240-pcl3.ppd.gz \

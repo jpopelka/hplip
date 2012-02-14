@@ -90,7 +90,7 @@ Content-length: %d\r
 
 
     def getPhoneNum(self):
-        return self.readAttributeFromXml("/DevMgmt/FaxConfigDyn.xml",'faxcfgdyn:faxconfigdyn-faxcfgdyn:systemsettings-dd:phonenumber')
+        return self.readAttributeFromXml_EWS("/DevMgmt/FaxConfigDyn.xml",'faxcfgdyn:faxconfigdyn-faxcfgdyn:systemsettings-dd:phonenumber')
 
     phone_num = property(getPhoneNum, setPhoneNum)
 
@@ -101,6 +101,6 @@ Content-length: %d\r
 
 
     def getStationName(self):
-        return self.readAttributeFromXml("/DevMgmt/FaxConfigDyn.xml",'faxcfgdyn:faxconfigdyn-faxcfgdyn:systemsettings-dd:companyname')
+        return self.readAttributeFromXml_EWS("/DevMgmt/FaxConfigDyn.xml",'faxcfgdyn:faxconfigdyn-faxcfgdyn:systemsettings-dd:companyname')
 
     station_name = property(getStationName, setStationName) 

@@ -100,7 +100,7 @@ public:
         "HP Color LaserJet 1600\0"     // models with null at end of each
         "HP Color LaserJet 2600n\0"
         "HP Color LaserJet CP1215\0"
-		"Hp LaserJet CP1025\0"
+		"HP LaserJet CP1025\0"
 		"HP LaserJet CP1021\0"
 		"HP LaserJet CP1022\0"
 		"HP LaserJet CP1023\0"

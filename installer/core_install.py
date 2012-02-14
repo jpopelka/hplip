@@ -1862,7 +1862,7 @@ class CoreInstall(object):
                 wget = utils.which("wget")
                 if wget:
                     wget = os.path.join(wget, "wget")
-                    status, output = self.run("%s --timeout=60 --output-document=%s %s" %(wget, local_conf, plugin_conf_url))
+                    status, output = self.run("%s --timeout=60 --output-document=%s %s --cache=off" %(wget, local_conf, plugin_conf_url))
                     if status:
 			log.error("Plugin download failed with error code = %d" %status)
                 	return '', 0, 0, 0, False
@@ -1946,7 +1946,7 @@ class CoreInstall(object):
         wget = utils.which("wget")
         if wget:
             wget = os.path.join(wget, "wget")
-            cmd = "%s %s" % (wget, url)
+            cmd = "%s --cache=off -P %s %s" % (wget,self.plugin_path,url)
             log.debug(cmd)
             status, output = self.run(cmd)
             log.debug("wget returned: %d" % status)
@@ -1955,8 +1955,10 @@ class CoreInstall(object):
             if (status != 0) and 'file://' not in url:
                 url = os.path.join(PLUGIN_FALLBACK_LOCATION, self.plugin_name)
                 log.info("Plugin is not accessible. Trying to download it from fallback location: [%s]" % url)
-
-            filename, headers = urllib.urlretrieve(url, plugin_file, callback)
+            cmd = "%s --cache=off -P %s %s" % (wget,self.plugin_path,url)
+            log.debug(cmd)
+            status, output = self.run(cmd)
+            #filename, headers = urllib.urlretrieve(url, plugin_file, callback)
         except IOError, e:
             log.error("Plug-in download failed: %s" % e.strerror)
             return PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND, e.strerror
@@ -1976,7 +1978,10 @@ class CoreInstall(object):
         log.debug("Downloading %s plug-in digital signature file from '%s' to '%s'..." % (self.plugin_version, digsig_url, digsig_file))
 
         try:
-            filename, headers = urllib.urlretrieve(digsig_url, digsig_file, callback)
+            cmd = "%s --cache=off -P %s %s" % (wget,self.plugin_path,digsig_url)
+            log.debug(cmd)
+            status, output = self.run(cmd)
+            #filename, headers = urllib.urlretrieve(digsig_url, digsig_file, callback)
         except IOError, e:
             log.error("Plug-in GPG file [%s] download failed: %s" % (digsig_url,e.strerror))
             return PLUGIN_INSTALL_ERROR_DIGITAL_SIG_NOT_FOUND, e.strerror

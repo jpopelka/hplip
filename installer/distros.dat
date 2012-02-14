@@ -112,7 +112,7 @@ supported=0
 
 [suse]
 index=3
-versions=11.3,11.4,12.1
+versions=11.4,12.1
 display_name=SUSE Linux
 alt_names=
 display=1
@@ -595,8 +595,30 @@ packages=cups-devel
 [suse:11.4:python-notify]
 packages=python-notify
 
-
+# ********************
 [suse:12.1]
+code_name=
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=3.11.3
+release_date=2011-11-16
+notes=Please be sure to disable the CD repositories in YaST and after installation you must log out and back in to become a member of the lp and sys group to enable printing.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+cups_path_with_bitness=0
+ui_toolkit=qt4
+native_cups=1
+add_user_to_group= -Gsys,lp
+open_mdns_port=/bin/bash ./init-suse-firewall
+pre_depend_cmd=su -c "zypper refresh"
 same_as_version=11.4
 
 # ****************************************
@@ -799,7 +821,7 @@ ui_toolkit=qt3
 # ****************************************
 [fedora]
 index=5
-versions=14,15,16
+versions=15,16
 display_name=Fedora
 alt_names=Fedora Core
 display=1
@@ -2313,16 +2335,29 @@ packages=notify-python
 packages=polkit,polkit-gnome
 
 # ********************
-[fedora:12.0]
-same_as_version=12
-
-[fedora:13.0]
-same_as_version=12
-
-[fedora:14.0]
-same_as_version=12
-
 [fedora:16]
+code_name=Verne
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=3.11.3a
+release_date=24/05/2011
+notes=To complete the install in Fedora 15 you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+policykit=0
+native_cups=1
+add_user_to_group=-a -Gsys,lp
+open_mdns_port=/bin/bash ./init-iptables-firewall
+pre_depend_cmd=su -c "yum clean all"
 same_as_version=15
 
 # ****************************************
@@ -4432,6 +4467,27 @@ packages=python-notify
 
 # ********************
 [ubuntu:11.10]
+code_name=Oneiric
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=3.11.5
+release_date=13/10/2011
+notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.  During the install process you will be added to the lp and lpadmin group, please quit the installer before the setup stage, log out, log back in, and run hp-setup to complete the install.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+native_cups=1
+acl_rules=1
+add_user_to_group=-a -Glp,lpadmin
+libdir_path=/usr/lib
 same_as_version=11.04
 
 # ****************************************
@@ -7390,7 +7446,7 @@ packages=policykit,policykit-gnome
 # ****************************************
 [linuxmint]
 index=22
-versions=5,6,7,8
+versions=10,11,12
 display_name=Linux Mint
 alt_names=mint, mint linux
 display=1
@@ -7854,6 +7910,106 @@ packages=policykit-1,policykit-1-gnome
 
 [linuxmint:8:python-notify]
 packages=python-notify
+
+# ********************
+
+[linuxmint:9]
+code_name=Isadora
+supported=0
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=3.10.4
+release_date=2010
+notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.  During the install process you will be added to the lp group, please quit the installer before the setup stage, log out, log back in, and run hp-setup to complete the install.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+native_cups=1
+acl_rules=1
+add_user_to_group=-a -Glp
+same_as_version=8
+
+# ********************
+
+[linuxmint:10]
+code_name=Julia
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=3.10.4
+release_date=2010
+notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.  During the install process you will be added to the lp group, please quit the installer before the setup stage, log out, log back in, and run hp-setup to complete the install.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+native_cups=1
+acl_rules=1
+add_user_to_group=-a -Glp
+same_as_version=8
+
+# ********************
+
+[linuxmint:11]
+code_name=Katya
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=3.10.4
+release_date=2010
+notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.  During the install process you will be added to the lp group, please quit the installer before the setup stage, log out, log back in, and run hp-setup to complete the install.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+native_cups=1
+acl_rules=1
+add_user_to_group=-a -Glp
+same_as_version=8
+
+# ********************
+
+[linuxmint:12]
+code_name=Lisa
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=3.10.4
+release_date=2010
+notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.  During the install process you will be added to the lp group, please quit the installer before the setup stage, log out, log back in, and run hp-setup to complete the install.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+native_cups=1
+acl_rules=1
+add_user_to_group=-a -Glp
+same_as_version=8
 
 # ****************************************
 
