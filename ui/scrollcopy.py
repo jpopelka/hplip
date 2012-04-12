@@ -66,7 +66,7 @@ class ScrollCopyView(ScrollView):
             if self.quality is None:
                 result_code, self.quality = self.dev.getPML(pml.OID_COPIER_QUALITY)
 
-            if self.scan_style == SCAN_STYLE_FLATBED and self.fit_to_page is None:
+            if self.scan_src == SCAN_SRC_FLATBED and self.fit_to_page is None:
                 result_code, self.fit_to_page = self.dev.getPML(pml.OID_COPIER_FIT_TO_PAGE)
 
                 if result_code != pml.ERROR_OK:
@@ -76,7 +76,7 @@ class ScrollCopyView(ScrollView):
             else:
                 self.fit_to_page = pml.COPIER_FIT_TO_PAGE_DISABLED
 
-            if self.scan_style != SCAN_STYLE_FLATBED:
+            if self.scan_src != SCAN_SRC_FLATBED:
                 self.fitToPageCheckBox.setEnabled(False)
 
             result_code, self.max_reduction = self.dev.getPML(pml.OID_COPIER_REDUCTION_MAXIMUM)
@@ -161,7 +161,7 @@ class ScrollCopyView(ScrollView):
                 s = 'Disabled' # 1
 
             log.debug("Default Fit to page: %s (%s)" % (self.fit_to_page, s))
-            log.debug("Scan style (models.dat: scan-style): %d" % self.scan_style)
+            log.debug("Scan src (models.dat: scan-src): %d" % self.scan_src)
 
         finally:
             self.dev.closePML()
@@ -200,10 +200,10 @@ class ScrollCopyView(ScrollView):
         self.dev = copier.PMLCopyDevice(device_uri=self.cur_device.device_uri,
                                         printer_name=self.cur_printer)
 
-        self.scan_style = self.dev.mq.get('scan-style', SCAN_STYLE_FLATBED)
+        self.scan_src = self.dev.mq.get('scan-src', SCAN_SRC_FLATBED)
         self.copy_type = self.dev.mq.get('copy-type', COPY_TYPE_DEVICE)
 
-        if self.scan_style == SCAN_STYLE_SCROLLFED:
+        if self.scan_src == SCAN_SRC_SCROLLFED:
             self.fitToPageCheckBox.setEnabled(False)
             self.fit_to_page = pml.COPIER_FIT_TO_PAGE_DISABLED
 
@@ -524,7 +524,7 @@ class ScrollCopyView(ScrollView):
                 s = 'Disabled' # 1
 
             log.debug("Fit to page: %s (%s)" % (self.fit_to_page, s))
-            log.debug("Scan style: %d" % self.scan_style)
+            log.debug("Scan src: %d" % self.scan_src)
 
             # Open the dialog box.
             #
@@ -536,7 +536,7 @@ class ScrollCopyView(ScrollView):
             self.copy_timer.start(1000) # 1 sec UI updates
 
             self.dev.copy(self.num_copies, self.contrast, self.reduction,
-                          self.quality, self.fit_to_page, self.scan_style,
+                          self.quality, self.fit_to_page, self.scan_src,
                           self.update_queue, self.event_queue)
 
         finally:

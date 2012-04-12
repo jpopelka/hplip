@@ -23,6 +23,7 @@
 import os.path
 import re
 import os
+import time
 
 # Local
 from base.g import *
@@ -122,6 +123,10 @@ class UserSettings(QSettings):
         self.working_dir = '.'
         self.voice_phone = ''
         self.email_address = ''
+        self.upgrade_notify=True
+        self.upgrade_last_update_time=0
+        self.upgrade_pending_update_time=0
+        self.latest_available_version=""
         self.loadDefaults()
 
 
@@ -186,6 +191,24 @@ class UserSettings(QSettings):
         self.voice_phone = unicode(self.value("voice_phone").toString())
         self.email_address = unicode(self.value("email_address").toString())
         self.endGroup()
+        
+        self.beginGroup("upgrade")
+        self.upgrade_notify= bool(self.value("notify_upgrade").toBool())
+        self.latest_available_version=str(self.value("latest_available_version").toString())
+            
+        i, Ok = self.value("last_upgraded_time").toInt()
+        if Ok and i >0:
+            self.upgrade_last_update_time =i
+        else:
+            self.upgrade_last_update_time = 0
+            
+        i, Ok = self.value("pending_upgrade_time").toInt()
+        if Ok and i >0 :
+            self.upgrade_pending_update_time = i
+        else:
+            self.upgrade_pending_update_time = 0
+            
+        self.endGroup()
 
 
     def save(self):
@@ -222,6 +245,16 @@ class UserSettings(QSettings):
         self.setValue("voice_phone", QVariant(self.voice_phone))
         self.setValue("email_address", QVariant(self.email_address))
         self.endGroup()
+        
+        self.beginGroup("upgrade")
+        self.setValue("notify_upgrade", QVariant(self.upgrade_notify))
+        if self.upgrade_last_update_time <1:
+            self.upgrade_last_update_time = time.time()		# <---Need to verify code once
+            
+        self.setValue("last_upgraded_time", QVariant(self.upgrade_last_update_time))
+        self.setValue("pending_upgrade_time", QVariant(self.upgrade_pending_update_time))
+        self.endGroup()
+
 
         self.sync()
 

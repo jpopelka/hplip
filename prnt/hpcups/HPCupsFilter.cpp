@@ -735,7 +735,7 @@ static BYTE pixel_value[8] = {
         int    k = 0;
         BYTE   *pIn = m_pPrinterBuffer;
         BYTE   kVal = 0;
-        BYTE   b;
+        BYTE   white=0;
         BYTE   *rgb = rgbRaster;
         BYTE   *black   = kRaster;
         memset (kRaster, 0, cups_header->cupsWidth);
@@ -745,34 +745,34 @@ static BYTE pixel_value[8] = {
             rgb[0] = *pIn++;
             rgb[1] = *pIn++;
             rgb[2] = *pIn++;
-            b = *pIn++;
+            white = *pIn++;
 
-            if (b != 0 && b != 0xFF) {
-
-#ifdef __linux
-              //  rgb[0] -= (255 - b);
-              //  rgb[1] -= (255 - b);
-              //  rgb[2] -= (255 - b);
-              int cr,cg,cb;
-              cr = rgb[0] - (int)(255 - b);
-              rgb[0] = cr >= 0 ? cr : 0;
-
-              cg = rgb[1] - (int)(255 - b);
-              rgb[1] = cg >= 0 ? cg : 0;
-
-              cb = rgb[2] - (int)(255 - b);
-              rgb[2] = cb >= 0 ? cb : 0;  
-#else  // This alternate path is for Mac....
-
-                rgb[0] &= b;
-                rgb[1] &= b;
-                rgb[2] &= b;
-#endif
+            if(white == 0)
+            {
+            	//If W component is 0 (means black is 1) then no need of having RGB for that pixel.
+            	//ghostscript >= 8.71 sends both W and RGB for black pixel(i.e RGBW=(0,0,0,0)).
+				kVal |= pixel_value[k];
+				rgb[0] = 0xFF;
+				rgb[1] = 0xFF;
+				rgb[2] = 0xFF;
+            }
+            else if(white == 0xFF)
+            {
+            	kVal |= 0;
             }
             else
-                kVal |= (b == 0) ? pixel_value[k] : 0;
-           // else if (rgb[0] == rgb[1] && rgb[1] ==rgb[2])
-              //  kVal |= (rgb[0] == 0) ? pixel_value[k] : 0;
+            {
+              int cr,cg,cb;
+              cr = rgb[0] - (int)(255 - white);
+              rgb[0] = cr >= 0 ? cr : 0;
+
+              cg = rgb[1] - (int)(255 - white);
+              rgb[1] = cg >= 0 ? cg : 0;
+
+              cb = rgb[2] - (int)(255 - white);
+              rgb[2] = cb >= 0 ? cb : 0;
+            }
+
             rgb += 3;
             if (k == 7) {
                 *black++ = kVal;

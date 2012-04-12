@@ -2,7 +2,7 @@
 
   hpmud.h - public definitions for multi-point transport driver
 
-  (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
+  (c) 2004-2015 Copyright Hewlett-Packard Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-  Author: Naga Samrat Chowdary Narla, Yashwant Sahu
+  Author: Naga Samrat Chowdary Narla, Yashwant Sahu, Sarbeswar Meher
 \*****************************************************************************/
 
 #ifndef _HPMUD_H
@@ -84,9 +84,9 @@ enum HPMUD_SCANTYPE
 enum HPMUD_SCANSRC
 {
    HPMUD_SCANSRC_NA = 0,
-   HPMUD_SCANSRC_ADF= 1,
-   HPMUD_SCANSRC_FLATBED = 2,
-   HPMUD_SCANSRC_BOTH = 3
+   HPMUD_SCANSRC_FLATBED = 0x1,
+   HPMUD_SCANSRC_ADF= 0x2,
+   HPMUD_SCANSRC_CAMERA = 0x4,
 };
 
 enum HPMUD_STATUSTYPE
@@ -138,7 +138,7 @@ typedef int HPMUD_CHANNEL;
 #define HPMUD_CHANNEL_MAX HPMUD_MAX_CHANNEL_ID
 
 #define HPMUD_LINE_SIZE 256     /* Length of a line. */
-#define HPMUD_BUFFER_SIZE 8192  /* General Read/Write buffer. */
+#define HPMUD_BUFFER_SIZE 16384  /* General Read/Write buffer. */
 
 struct hpmud_dstat
 {
@@ -153,12 +153,12 @@ struct hpmud_model_attributes
 {
    enum HPMUD_IO_MODE prt_mode;        /* print only (io_mode) */
    enum HPMUD_IO_MODE mfp_mode;        /* pml | scan | fax (io_mode) */
-   enum HPMUD_SCANTYPE scantype;       /* 0=none */
+   enum HPMUD_SCANTYPE scantype;       /* scan protocol i.e. SCL, PML, SOAP, MARVELL, LEDM */
    enum HPMUD_STATUSTYPE statustype;
    enum HPMUD_SUPPORT_TYPE support;
    enum HPMUD_PLUGIN_TYPE plugin;
    enum HPMUD_SUPPORT_TYPE reserved[5];
-   enum HPMUD_SCANSRC scansrc;
+   enum HPMUD_SCANSRC scansrc; /*Flatbed, ADF, Camera or combination of these*/
 };
 
 #ifdef __cplusplus

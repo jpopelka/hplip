@@ -22,6 +22,7 @@
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
   Contributing Authors: David Paschal, Don Welch, David Suffield, Naga Samrat Chowdary Narla
+						Sarbeswar Meher
 
 \********************************************************************************************/
 
@@ -265,6 +266,34 @@ int __attribute__ ((visibility ("hidden"))) StrListAdd( const char ** list, char
     }
     return 0;
 }
+
+char* __attribute__ ((visibility ("hidden"))) itoa(int value, char* str, int radix)
+{
+  static char dig[] = "0123456789""abcdefghijklmnopqrstuvwxyz";
+  int n = 0, neg = 0;
+  unsigned int v;
+  char* p, *q;
+  char c;
+ 
+  if (radix == 10 && value < 0)
+  {
+    value = -value;
+    neg = 1;
+   }
+  v = value;
+  do {
+    str[n++] = dig[v%radix];
+    v /= radix;
+  } while (v);
+  if (neg)
+    str[n++] = '-';
+    str[n] = '\0';
+ 
+  for (p = str, q = p + (n-1); p < q; ++p, --q)
+    c = *p, *p = *q, *q = c;
+  return str;
+}
+
 
 
 

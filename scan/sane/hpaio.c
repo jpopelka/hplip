@@ -761,7 +761,6 @@ static SANE_Status SetResolutionListSCL(hpaioScanner_t hpaio)
 {
      int supported_res[] = {50, 75, 100, 150, 200, 300, 600, 1200, 2400, 4800, 9600};
      int i, len = sizeof(supported_res)/sizeof(int);
-     SANE_Status retcode;
      
      if (hpaio->currentAdfMode == ADF_MODE_ADF || hpaio->currentAdfMode == ADF_MODE_AUTO)
      {
@@ -1673,6 +1672,8 @@ extern SANE_Status sane_hpaio_open(SANE_String_Const devicename, SANE_Handle * p
     /* Get device attributes and determine what backend to call. */
     snprintf(devname, sizeof(devname)-1, "hp:%s", devicename);   /* prepend "hp:" */
     hpmud_query_model(devname, &ma);
+   DBG(8, "sane_hpaio_open(%s): %s %d scan_type=%d scansrc=%d\n", devicename, __FILE__, __LINE__, ma.scantype, ma.scansrc);
+
     if ((ma.scantype == HPMUD_SCANTYPE_MARVELL) || (ma.scantype == HPMUD_SCANTYPE_MARVELL2))
        return marvell_open(devicename, pHandle);
     if (ma.scantype == HPMUD_SCANTYPE_SOAP)
@@ -1681,8 +1682,6 @@ extern SANE_Status sane_hpaio_open(SANE_String_Const devicename, SANE_Handle * p
        return soapht_open(devicename, pHandle);
     if (ma.scantype == HPMUD_SCANTYPE_LEDM)
        return ledm_open(devicename, pHandle);
-
-    DBG(8, "sane_hpaio_open(%s): %s %d\n", devicename, __FILE__, __LINE__);
 
     hpaio = hpaioFindScanner(devicename);
     
@@ -2108,35 +2107,37 @@ extern SANE_Status sane_hpaio_open(SANE_String_Const devicename, SANE_Handle * p
 				}
 
             }
-            if( !hpaio->scl.adfCapability )
+            if(ma.scansrc & HPMUD_SCANSRC_FLATBED)
             {
+                 hpaio->scl.flatbedCapability = 1;
                 hpaio->supportedAdfModes = ADF_MODE_FLATBED;
             }
-            else if( hpaio->scl.compat & SCL_COMPAT_K_SERIES &&
-                     hpaio->scl.adfCapability )
+            if (hpaio->scl.adfCapability)
             {
-                hpaio->supportedAdfModes = ADF_MODE_FLATBED | ADF_MODE_ADF;
-            }
-            else
-            {
-                int supportedFunctions;
+               if( hpaio->scl.compat & SCL_COMPAT_K_SERIES)
+               {
+                    hpaio->supportedAdfModes  |= ADF_MODE_ADF;
+               }
+               else
+               {
+                  int supportedFunctions;
 
-                hpaio->supportedAdfModes = ADF_MODE_AUTO |
-                                           ADF_MODE_FLATBED |
-                                           ADF_MODE_ADF;
-                if( hpaio->scl.compat & ( SCL_COMPAT_1170 |
-                                          SCL_COMPAT_R_SERIES |
-                                          SCL_COMPAT_G_SERIES ) )
-                {
-                    hpaio->scl.unloadAfterScan = 1;
-                }
-                if( PmlRequestGet( hpaio->deviceid, hpaio->cmd_channelid, hpaio->scl.objSupportedFunctions ) != ERROR &&
-                    PmlGetIntegerValue( hpaio->scl.objSupportedFunctions,
+                  hpaio->supportedAdfModes |=  ADF_MODE_ADF;
+                  if (hpaio->scl.flatbedCapability)
+                        hpaio->supportedAdfModes |= ADF_MODE_AUTO;
+
+                  if( hpaio->scl.compat & ( SCL_COMPAT_1170 | SCL_COMPAT_R_SERIES |SCL_COMPAT_G_SERIES ) )
+                  {
+                      hpaio->scl.unloadAfterScan = 1;
+                  }
+                  if( PmlRequestGet( hpaio->deviceid, hpaio->cmd_channelid, hpaio->scl.objSupportedFunctions ) != ERROR &&
+                      PmlGetIntegerValue( hpaio->scl.objSupportedFunctions,
                                         0,
                                         &supportedFunctions ) != ERROR &&
                     supportedFunctions & PML_SUPPFUNC_DUPLEX )
-                {
-                    hpaio->supportsDuplex = 1;
+                  {
+                      hpaio->supportsDuplex = 1;
+                  }
                 }
             }
         }
@@ -2426,7 +2427,7 @@ extern void sane_hpaio_close(SANE_Handle handle)
        return soapht_close(handle);
     if (strcmp(*((char **)handle), "LEDM") == 0)
        return ledm_close(handle);
-
+       
     DBG(8, "sane_hpaio_close(): %s %d\n", __FILE__, __LINE__); 
 
     hpaioPmlDeallocateObjects(hpaio);
@@ -2890,7 +2891,9 @@ extern SANE_Status sane_hpaio_start(SANE_Handle handle)
     IP_IMAGE_TRAITS traits;
     IP_XFORM_SPEC xforms[IP_MAX_XFORMS], * pXform = xforms;
     WORD wResult;
-        
+    
+    DBG(8, "sane_hpaio_start(): %s %d deviceuri=%s\n", __FILE__, __LINE__, hpaio->deviceuri);
+
     if (strcmp(*((char **)handle), "MARVELL") == 0)
        return marvell_start(handle);
     if (strcmp(*((char **)handle), "SOAP") == 0)
@@ -2901,8 +2904,6 @@ extern SANE_Status sane_hpaio_start(SANE_Handle handle)
        return ledm_start(handle);
 
     hpaio->user_cancel = FALSE;
-
-    DBG(8, "sane_hpaio_start(): %s %d\n", __FILE__, __LINE__);
 
     hpaio->endOfData = 0;
 
@@ -3215,6 +3216,7 @@ abort:
 
     if( retcode != SANE_STATUS_GOOD )
     {
+       if (retcode == SANE_STATUS_NO_DOCS) SendScanEvent (hpaio->deviceuri, EVENT_SCAN_ADF_NO_DOCS);
         sane_hpaio_cancel( handle );
     }
     return retcode;
@@ -3402,7 +3404,7 @@ abort:
 extern void sane_hpaio_cancel( SANE_Handle handle )
 {
     hpaioScanner_t hpaio = ( hpaioScanner_t ) handle;
-
+    DBG(8, "sane_hpaio_cancel(): %s %d\n", __FILE__, __LINE__); 
     if (strcmp(*((char **)handle), "MARVELL") == 0)
        return marvell_cancel(handle);
     if (strcmp(*((char **)handle), "SOAP") == 0)
@@ -3416,7 +3418,6 @@ extern void sane_hpaio_cancel( SANE_Handle handle )
         bug("sane_hpaio_cancel: already cancelled!\n");
     }
     hpaio->user_cancel = TRUE;
-    DBG(8, "sane_hpaio_cancel(): %s %d\n", __FILE__, __LINE__); 
 
     if (hpaio->scannerType==SCANNER_TYPE_PML)
     {

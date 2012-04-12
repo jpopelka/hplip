@@ -958,9 +958,9 @@ try:
                 log.error("Resize parameter is incorrect. Resize must be 0% < resize < 400%.")
                 log.error("Using resize value of 100%.")
             else:
-                new_w = pixels_per_line * resize / 100
-                new_h = lines * resize / 100
-                log.info("Resizing from %dx%d to %dx%d..." % (pixels_per_line, lines, new_w, new_h))
+                new_w = int(pixels_per_line * resize / 100)
+                new_h = int(lines * resize / 100)
+                log.info("Resizing image from %dx%d to %dx%d..." % (pixels_per_line, lines, new_w, new_h))
                 im = im.resize((new_w, new_h), Image.ANTIALIAS)
 
         file_saved = False

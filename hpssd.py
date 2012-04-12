@@ -349,16 +349,6 @@ def handle_hpdio_event(event, bytes_written):
 
 def handle_plugin_install():
     
-#    child_process=os.fork()
-#    if child_process ==0: 	### child process
-#        child_pid=os.getpid()
-#        utils.run('hp-diagnose_plugin',True, None, 1, False)
-#        os.kill(child_pid,signal.SIGKILL)
-#
-#    else:	## parent process
-#        log.debug("Started Plug-in installation wizard")
-
-##### TBD: Valdiation pending for Plug-in is already running or not?... 
     child_process=os.fork()
     if child_process== 0:	# child process
         lockObj = utils.Sync_Lock("/tmp/pluginInstall.tmp")
@@ -366,7 +356,7 @@ def handle_plugin_install():
         child_pid=os.getpid()
         core = core_install.CoreInstall()
         core.set_plugin_version()
-        if not core.check_for_plugin():
+        if core.check_for_plugin() != PLUGIN_INSTALLED:
             sts,out = utils.run('hp-diagnose_plugin',True, None, 1, False)
             if sts != 0:
                 log.error("Failed to load hp-diagnose_plugin")
@@ -376,15 +366,31 @@ def handle_plugin_install():
 
         lockObj.release()
         os.kill(child_pid,signal.SIGKILL)
-
     else: #parent process
         log.debug("Started Plug-in installation wizard")
     
+
+def handle_printer_diagnose():
+    path = utils.which('hp-diagnose_queues')
+    if path:
+        path = os.path.join(path, 'hp-diagnose_queues')
+    else:
+        log.error("Unable to find hp-diagnose_queues on PATH.")
+        return
+
+    log.debug("Running hp-diagnose_queues: %s" % (path))
+    os.spawnlp(os.P_NOWAIT, path, 'hp-diagnose_queues','-s')
 
 
 def handle_event(event, more_args=None):
     #global polling_blocked
     #global request_queue
+
+   # checking if any zombie child process exists. then cleaning same.
+    try:
+        os.waitpid(0, os.WNOHANG)
+    except OSError:
+        pass
 
     log.debug("Handling event...")
 
@@ -397,6 +403,10 @@ def handle_event(event, more_args=None):
         handle_plugin_install()
         return
 
+    if event.event_code == EVENT_DIAGNOSE_PRINTQUEUE:
+        handle_printer_diagnose()
+        return
+        
     if event.device_uri and check_device(event.device_uri) != ERROR_SUCCESS:
         return
 
@@ -547,7 +557,7 @@ def handle_session_signal(*args, **kwds):
 def run(write_pipe1=None,  # write pipe to systemtray
         write_pipe2=None,  # write pipe to hpdio
         read_pipe3=None):  # read pipe from hpdio
-
+        
     global dbus_loop, main_loop
     global system_bus, session_bus
     global w1, w2, r3

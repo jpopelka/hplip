@@ -840,7 +840,7 @@ SANE_Status soap_start(SANE_Handle handle)
    int stat, ret;
 
    DBG8("sane_hpaio_start()\n");
-
+   ps->user_cancel = 0;
    if (set_extents(ps))
    {
       BUG("invalid extents: tlx=%d brx=%d tly=%d bry=%d minwidth=%d minheight%d maxwidth=%d maxheight=%d\n",
@@ -855,7 +855,7 @@ SANE_Status soap_start(SANE_Handle handle)
       stat = SANE_STATUS_IO_ERROR;
       goto bugout;
    }
-
+   SendScanEvent(ps->uri, EVENT_START_SCAN_JOB);
    memset(xforms, 0, sizeof(xforms));    
 
    /* Setup image-processing pipeline for xform. */
@@ -977,7 +977,13 @@ SANE_Status soap_read(SANE_Handle handle, SANE_Byte *data, SANE_Int maxLength, S
    int ret, stat=SANE_STATUS_IO_ERROR;
 
    DBG8("sane_hpaio_read() handle=%p data=%p maxLength=%d\n", (void *)handle, data, maxLength);
-
+   if(ps->user_cancel)
+   {
+     DBG8("soap_read() EVENT_SCAN_CANCEL****uri=%s\n", ps->uri);
+     SendScanEvent(ps->uri, EVENT_SCAN_CANCEL);
+     return SANE_STATUS_CANCELLED;
+   }
+   
    ret = get_ip_data(ps, data, maxLength, length);
 
    if(ret & (IP_INPUT_ERROR | IP_FATAL_ERROR))
@@ -987,7 +993,10 @@ SANE_Status soap_read(SANE_Handle handle, SANE_Byte *data, SANE_Int maxLength, S
    }
 
    if (ret & IP_DONE)
+   {
       stat = SANE_STATUS_EOF;
+      SendScanEvent (ps->uri, EVENT_END_SCAN_JOB);
+   }
    else
       stat = SANE_STATUS_GOOD;
 
@@ -1018,7 +1027,7 @@ void soap_cancel(SANE_Handle handle)
     * Sane_cancel is always called at the end of the scan job. Note that on a multiple page scan job 
     * sane_cancel is called only once.
     */
-
+   ps->user_cancel = 1;
    if (ps->ip_handle)
    {
       ipClose(ps->ip_handle); 

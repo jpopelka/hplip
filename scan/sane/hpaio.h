@@ -201,7 +201,7 @@ struct  hpaioScanner_s
                 int             minRes, maxRes;
                 int             maxXExtent, maxYExtent;
                 int             unloadAfterScan;
-                int             adfCapability;
+                int             flatbedCapability, adfCapability;
                 int             minResAdf, maxResAdf;
 
                 PmlObject_t     objSupportedFunctions;

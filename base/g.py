@@ -268,16 +268,22 @@ prop.hpijs_build = to_bool(sys_conf.get('configure', 'hpijs-install', '0'))
 # Spinner, ala Gentoo Portage
 spinner = "\|/-\|/-"
 spinpos = 0
+enable_spinner = True
+
+def change_spinner_state(enable =True):
+    global enable_spinner
+    enable_spinner = enable
 
 def update_spinner():
-    global spinner, spinpos
-    if not log.is_debug() and sys.stdout.isatty():
+    global spinner, spinpos, enable_spinner
+    if enable_spinner and not log.is_debug() and sys.stdout.isatty():
         sys.stdout.write("\b" + spinner[spinpos])
         spinpos=(spinpos + 1) % 8
         sys.stdout.flush()
 
 def cleanup_spinner():
-    if not log.is_debug() and sys.stdout.isatty():
+    global enable_spinner
+    if enable_spinner and not log.is_debug() and sys.stdout.isatty():
         sys.stdout.write("\b \b")
         sys.stdout.flush()
 

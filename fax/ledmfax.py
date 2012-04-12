@@ -96,7 +96,7 @@ Content-length: %d\r
         self.writeLEDM(data)
         response = cStringIO.StringIO()
 
-        while self.readLEDM(4096, response, timeout=5):
+        while self.readLEDM(512, response, timeout=5):
             pass
 
         response = response.getvalue()
@@ -389,7 +389,7 @@ class LEDMFaxSendThread(FaxSendThread):
                         self.dev.writeLEDM(data)
                         response = cStringIO.StringIO()
                         try:
-                            while self.dev.readLEDM(1000, response, timeout=5):
+                            while self.dev.readLEDM(512, response, timeout=5):
                                 pass
                         except Error:
                             fax_send_state = FAX_SEND_STATE_ERROR
@@ -473,7 +473,7 @@ class LEDMFaxSendThread(FaxSendThread):
 
                             response = cStringIO.StringIO()
                             try:
-                                while self.dev.readLEDM(1000, response, timeout=5):
+                                while self.dev.readLEDM(512, response, timeout=5):
                             	    pass
                             except Error:
                                 fax_send_state = FAX_SEND_STATE_ERROR
@@ -523,7 +523,7 @@ class LEDMFaxSendThread(FaxSendThread):
                               
                             response = cStringIO.StringIO()
                             try:
-                                while self.dev.readLEDM(1000, response, timeout=10):
+                                while self.dev.readLEDM(512, response, timeout=10):
                             	    pass
                             except Error:
                                 fax_send_state = FAX_SEND_STATE_ERROR
@@ -562,7 +562,7 @@ class LEDMFaxSendThread(FaxSendThread):
                         
                         response = cStringIO.StringIO()
                         try:
-                            while self.dev.readLEDM(1000, response, timeout=10):
+                            while self.dev.readLEDM(512, response, timeout=10):
                                 pass
                         except Error:
                             fax_send_state = FAX_SEND_STATE_ERROR

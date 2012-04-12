@@ -22,6 +22,7 @@
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
   Author: Naga Samrat Chowdary Narla,
+  Contributor: Sarbeswar Meher
 \*****************************************************************************/
 
 #include "hpmud.h"
@@ -211,7 +212,6 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) service_to_channel(mud
    else if (strncasecmp(sn, "hp-ledm-scan", 12) == 0)
    {
       *index = HPMUD_LEDM_SCAN_CHANNEL;
-      BUG("io/hpmud/hpmud.c: service_to_channel(): sn=%s\n", sn);   
    }
    /* All the following services require MLC/1284.4. */
    else if (pd->io_mode == HPMUD_RAW_MODE || pd->io_mode == HPMUD_UNI_MODE)
@@ -272,9 +272,9 @@ static int new_device(const char *uri, enum HPMUD_IO_MODE mode, int *result)
 
    if (uri[0] == 0)
       return 0;
-
+   
    pthread_mutex_lock(&msp->mutex);
-
+   
    if (msp->device[i].index)
    {
       BUG("invalid device_open state\n");        /* device is already open for this client, one device per session */

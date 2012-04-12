@@ -272,6 +272,7 @@ class ScanDevice:
             self.last_opt = self.dev.setOption(opt.index, value)
         except scanext.error:
             log.error("Unable to set option %s to value %s" % (key, value))
+            return
 
         # do binary AND to find if we have to reload options:
         if self.last_opt & scanext.INFO_RELOAD_OPTIONS:

@@ -1,8 +1,8 @@
 #
 #  Makefile.am - hplip automake input file
 #
-#  (c) 2004-2010 Copyright Hewlett-Packard Development Company, LP
-#  Author: David Suffield, Naga Samrat Chowdary Narla,
+#  (c) 2004-2015 Copyright Hewlett-Packard Development Company, LP
+#  Author: David Suffield, Naga Samrat Chowdary Narla, Sarbeswar Meher
 
 INCLUDES = -Iip -Iio/hpmud -Iscan/sane -Iprnt/hpijs
 
@@ -49,7 +49,7 @@ libsane_hpaio_la_SOURCES = scan/sane/hpaio.c scan/sane/mfpdtf.c scan/sane/pml.c 
 	  scan/sane/common.c scan/sane/common.h scan/sane/soap.h scan/sane/soapht.h scan/sane/sanei_debug.h scan/sane/sanei.h \
 	  scan/sane/sanei_init_debug.c scan/sane/marvell.h scan/sane/marvelli.h scan/sane/marvell.c scan/sane/soapht.c scan/sane/soap.c \
         scan/sane/soaphti.h scan/sane/soapi.h scan/sane/xml.c scan/sane/xml.h scan/sane/ledm.h scan/sane/ledmi.h scan/sane/ledm.c \
-        scan/sane/bb_ledm.c scan/sane/http.h scan/sane/http.c
+        scan/sane/bb_ledm.c scan/sane/http.h scan/sane/http.c 
 if DARWIN_BUILD
 libsane_hpaio_la_LDFLAGS = -module -framework CoreFoundation -version-info 1:0:0
 else
@@ -94,6 +94,7 @@ hp_mkuri_CFLAGS = -DCONFDIR=\"$(hplip_confdir)\"
 rulesdir = /etc/udev/rules.d
 dist_rules_DATA = data/rules/56-hpmud_support.rules
 dist_rules_DATA += data/rules/86-hpmud_plugin.rules
+dist_rules_DATA += data/rules/56-hpmud_add_printer.rules
 if UDEV_ACL_RULES
 dist_rules_DATA += data/rules/40-hplip.rules
 else
@@ -112,7 +113,8 @@ pstotiff_SCRIPTS = fax/filters/pstotiff
 
 # hplip.state
 hplip_statedir = /var/lib/hp
-dist_hplip_state_DATA = hplip.state
+dist_hplip_state_DATA = 
+#dist_hplip_state_DATA = hplip.state
 
 # Log Files
 hplip_Logdir=/var/log/hp
@@ -126,7 +128,8 @@ dist_noinst_SCRIPTS += dat2drv.py install.py hplip-install init-suse-firewall in
 cmddir = $(hplipdir)
 dist_cmd_SCRIPTS = align.py info.py print.py toolbox.py clean.py colorcal.py unload.py testpage.py makeuri.py check.py fab.py levels.py \
 	sendfax.py setup.py makecopies.py probe.py timedate.py firmware.py scan.py systray.py plugin.py linefeedcal.py pqdiag.py \
-	faxsetup.py devicesettings.py printsettings.py query.py pkservice.py wificonfig.py check-plugin.py diagnose_plugin.py
+	faxsetup.py devicesettings.py printsettings.py query.py pkservice.py wificonfig.py check-plugin.py diagnose_plugin.py uninstall.py \
+	upgrade.py config_usb_printer.py diagnose_queues.py
 
 # base
 basedir = $(hplipdir)/base
@@ -277,7 +280,7 @@ dist_ui_DATA = ui/alignform.py \
 	ui/scrollunload.py ui/scrollcopy.py ui/pluginform2.py ui/pluginform2_base.py ui/systemtray.py \
 	ui/ui_utils.py ui/jobstoragemixin.py ui/pluginlicenseform_base.py ui/pluginlicenseform.py \
 	ui/align13form_base.py ui/align13form.py ui/firmwaredialog_base.py ui/firmwaredialog.py \
-	ui/deviceuricombobox.py
+	ui/deviceuricombobox.py ui/upgradeform.py ui/upgradeform_base.py
 
 dist_noinst_DATA += ui/colorcalform2_base.ui ui/settingsdialog_base.ui ui/aligntype6form1_base.ui \
 	ui/aboutdlg_base.ui ui/imagepropertiesdlg_base.ui ui/paperedgealignform_base.ui ui/aligntype6form2_base.ui \

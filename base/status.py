@@ -1490,7 +1490,7 @@ def clean(data):
     if data[0] is not '<':
         size = -1
         temp = ""
-        while size: 
+        while size:
             index = data.find('\r\n')
             size = int(data[0:index+1], 16)
             temp = temp + data[index+2:index+2+size]
@@ -1498,19 +1498,21 @@ def clean(data):
         data = temp
     return data
 
-def StatusType10FetchUrl(dev, url, footer=""):
+def StatusType10FetchUrl(func, url, footer=""):
     data_fp = cStringIO.StringIO()
     if footer:
-        data = dev.getEWSUrl_LEDM(url, data_fp, footer)
+        #data = dev.getEWSUrl_LEDM(url, data_fp, footer)
+        data = func(url, data_fp, footer)
     else:
-        data = dev.getEWSUrl_LEDM(url, data_fp)
+        #data = dev.getEWSUrl_LEDM(url, data_fp)
+        data = func(url, data_fp)
         if data:
             data = data.split('\r\n\r\n', 1)[1]
             if data:
                 data = clean(data)
     return data
 
-def StatusType10(dev): # Low End Data Model
+def StatusType10(func): # Low End Data Model
     status_block = { 'revision' :    STATUS_REV_UNKNOWN,
                      'agents' :      [],
                      'top-door' :    TOP_DOOR_NOT_PRESENT,
@@ -1528,7 +1530,7 @@ def StatusType10(dev): # Low End Data Model
         return status_block
 
     # Get the dynamic consumables configuration
-    data = StatusType10FetchUrl(dev, "/DevMgmt/ConsumableConfigDyn.xml")
+    data = StatusType10FetchUrl(func, "/DevMgmt/ConsumableConfigDyn.xml")
     if not data:
         return status_block
     data = data.replace("ccdyn:", "").replace("dd:", "")
@@ -1562,7 +1564,7 @@ def StatusType10(dev): # Low End Data Model
                         ink_level = 100
 
                 log.debug("type '%s' state '%s' ink_type '%s' ink_level %d" % (type, state, ink_type, ink_level))
-    
+
                 entry = { 'kind' : element_type10_xlate.get(type, AGENT_KIND_NONE),
                           'type' : pen_type10_xlate.get(ink_type, AGENT_TYPE_NONE),
                           'health' : pen_health10_xlate.get(state, AGENT_HEALTH_OK),
@@ -1579,7 +1581,7 @@ def StatusType10(dev): # Low End Data Model
     status_block['agents'] = agents
 
     # Get the media handling configuration
-    data = StatusType10FetchUrl(dev, "/DevMgmt/MediaHandlingDyn.xml")
+    data = StatusType10FetchUrl(func, "/DevMgmt/MediaHandlingDyn.xml")
     if not data:
         return status_block
     data = data.replace("mhdyn:", "").replace("dd:", "")
@@ -1613,7 +1615,7 @@ def StatusType10(dev): # Low End Data Model
             status_block['duplexer'] = DUPLEXER_DOOR_CLOSED
 
     # Get the product status
-    data = StatusType10FetchUrl(dev, "/DevMgmt/ProductStatusDyn.xml")
+    data = StatusType10FetchUrl(func, "/DevMgmt/ProductStatusDyn.xml")
     if not data:
         return status_block
     data = data.replace("psdyn:", "").replace("locid:", "")

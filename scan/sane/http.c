@@ -338,6 +338,7 @@ enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_read_header(HTTP_H
    if (read_line(ps, data, max_size, tmo, &len))
       goto bugout;
    ps->http_status = strtol(data+9, NULL, 10);
+   *bytes_read = total = len;
 
    /* Check for good status, ignore 400 (no job id found for JobCancelRequest) */                    
    if (!((ps->http_status >= 200 && ps->http_status < 300) || ps->http_status == 400))
@@ -472,6 +473,7 @@ enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_read(HTTP_HANDLE h
 		     strcpy(data, line);
 		     data=data+len;
 		     ps->footer -= len;
+            *bytes_read += len;
          }
       }	
       else

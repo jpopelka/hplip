@@ -34,12 +34,17 @@ class SystrayFrame(QFrame):
         QFrame.__init__(self, parent)
 
 
-    def initUi(self, systray_visible, polling, polling_interval, device_list, systray_messages):
+    def initUi(self, systray_visible, polling, polling_interval, device_list, systray_messages,upgrade_notify,
+                                        upgrade_postpone_time, upgrade_msg):
+                                    
         self.systray_visible = systray_visible
         self.polling = polling
         self.polling_interval = polling_interval
         self.device_list = device_list
         self.systray_messages = systray_messages
+        self.upgrade_notify = upgrade_notify
+        self.upgrade_postpone_time =upgrade_postpone_time
+        self.upgrade_msg = upgrade_msg
 
         self.gridlayout = QGridLayout(self)
 
@@ -96,7 +101,27 @@ class SystrayFrame(QFrame):
         self.listWidget = QListWidget(self.MonitorGroupBox)
         self.gridlayout4.addWidget(self.listWidget,1,0,1,1)
         self.gridlayout1.addWidget(self.MonitorGroupBox,1,0,1,2)
+        
+        
+        #UpdategroupBox  is same as "gridlayout5"
+        self.groupBox_4 = QGroupBox(self.frame)
+        self.UpdategroupBox = QGridLayout(self.groupBox_4)
+        self.UpdategroupBox.setObjectName("UpdategroupBox")
+        self.UpdatecheckBox = QCheckBox(self.groupBox_4)
+        self.UpdatecheckBox.setObjectName("UpdatecheckBox")
+        self.UpdategroupBox.addWidget(self.UpdatecheckBox,0,0,1,4)
+        self.label_5 = QLabel(self.groupBox_4)
+        self.label_5.setObjectName("label_5")
+        self.UpdategroupBox.addWidget(self.label_5, 1, 0, 1, 4)
+        self.textEdit = QTextEdit(self.groupBox_4)
+        self.textEdit.setObjectName("textEdit")
+        self.textEdit.setReadOnly(True)
+        self.UpdategroupBox.addWidget(self.textEdit, 2, 0, 1, 4)
+        self.gridlayout1.addWidget(self.groupBox_4,2,0,1,2)
+
         self.gridlayout.addWidget(self.frame,0,0,1,1)
+        
+        
 
         self.setWindowTitle(QApplication.translate("self", "self", None, QApplication.UnicodeUTF8))
         self.groupBox_2.setTitle(QApplication.translate("self", "System tray icon visibility", None, QApplication.UnicodeUTF8))
@@ -107,17 +132,35 @@ class SystrayFrame(QFrame):
         self.label_2.setText(QApplication.translate("self", "Messages to show:", None, QApplication.UnicodeUTF8))
         self.MonitorGroupBox.setTitle(QApplication.translate("self", "Monitor button presses on devices", None, QApplication.UnicodeUTF8))
         self.label.setText(QApplication.translate("self", "Devices to monitor:", None, QApplication.UnicodeUTF8))
+        
+        
+        self.groupBox_4.setTitle(QApplication.translate("Dialog", "Update Settings", None, QApplication.UnicodeUTF8))
+        self.UpdatecheckBox.setText(QApplication.translate("Dialog", "Check and notify HPLIP updates", None, QApplication.UnicodeUTF8))
+        self.label_5.setText(QApplication.translate("Dialog", "Status:", None, QApplication.UnicodeUTF8))
+        self.textEdit.setPlainText(self.upgrade_msg)
+        
 
         self.connect(self.ShowAlwaysRadioButton, SIGNAL("clicked(bool)"), self.ShowAlwaysRadioButton_clicked)
         self.connect(self.HideWhenInactiveRadioButton, SIGNAL("clicked(bool)"), self.HideWhenInactiveRadioButton_clicked)
         self.connect(self.HideAlwaysRadioButton, SIGNAL("clicked(bool)"), self.HideAlwaysRadioButton_clicked)
         self.connect(self.MessageShowComboBox, SIGNAL("activated(int)"), self.MessageShowComboBox_activated)
+        self.connect(self.UpdatecheckBox, SIGNAL("clicked(bool)"), self.UpdatecheckBox_clicked)
+        
 
+
+
+    def UpdatecheckBox_clicked(self, b):
+        log.debug("Update HPLIP val =%d "%b)
+        if b is False:
+            self.upgrade_notify = False
+        else:
+            self.upgrade_notify = True
 
     def updateUi(self):
         self.updateVisibility()
         self.updateMessages()
         self.updateDeviceList()
+        self.updateUpgradeSettings()
 
 
     def updateVisibility(self):
@@ -158,6 +201,14 @@ class SystrayFrame(QFrame):
 
     def updateDeviceList(self):
         pass
+
+    def updateUpgradeSettings(self):
+        if self.upgrade_notify is True:
+            self.UpdatecheckBox.setChecked(True)
+        else:
+            self.UpdatecheckBox.setChecked(False)
+
+
 
 
     def __tr(self, s, c=None):

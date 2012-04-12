@@ -359,13 +359,10 @@ cups_ppd_printers = \
    ppd/hpcups/hp-laserjet_cm1416fnw-pcl3.ppd.gz \
    ppd/hpcups/hp-laserjet_cm1417fnw-pcl3.ppd.gz \
    ppd/hpcups/hp-laserjet_cm1418fnw-pcl3.ppd.gz \
-   ppd/hpcups/hp-laserjet_cp1021.ppd.gz \
-   ppd/hpcups/hp-laserjet_cp1022.ppd.gz \
-   ppd/hpcups/hp-laserjet_cp1023.ppd.gz \
+   ppd/hpcups/hp-laserjet_cp_1025nw.ppd.gz \
    ppd/hpcups/hp-laserjet_cp1025nw.ppd.gz \
+   ppd/hpcups/hp-laserjet_cp_1025.ppd.gz \
    ppd/hpcups/hp-laserjet_cp1025.ppd.gz \
-   ppd/hpcups/hp-laserjet_cp1027nw.ppd.gz \
-   ppd/hpcups/hp-laserjet_cp1028nw.ppd.gz \
    ppd/hpcups/hp-laserjet_m1005.ppd.gz \
    ppd/hpcups/hp-laserjet_m1120_mfp.ppd.gz \
    ppd/hpcups/hp-laserjet_m1120n_mfp.ppd.gz \
@@ -436,7 +433,6 @@ cups_ppd_printers = \
    ppd/hpcups/hp-laserjet_professional_m1217nfw_mfp.ppd.gz \
    ppd/hpcups/hp-laserjet_professional_m1219nf_mfp.ppd.gz \
    ppd/hpcups/hp-laserjet_professional_p1102.ppd.gz \
-   ppd/hpcups/hp-laserjet_professional_p1102s.ppd.gz \
    ppd/hpcups/hp-laserjet_professional_p_1102w.ppd.gz \
    ppd/hpcups/hp-laserjet_professional_p1102w.ppd.gz \
    ppd/hpcups/hp-laserjet_professional_p1106.ppd.gz \
@@ -466,6 +462,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-officejet_5600_series.ppd.gz \
    ppd/hpcups/hp-officejet_6000_e609a.ppd.gz \
    ppd/hpcups/hp-officejet_6000_e609n.ppd.gz \
+   ppd/hpcups/hp-officejet_6100.ppd.gz \
    ppd/hpcups/hp-officejet_6100_series.ppd.gz \
    ppd/hpcups/hp-officejet_6150_series.ppd.gz \
    ppd/hpcups/hp-officejet_6200_series.ppd.gz \
@@ -474,6 +471,8 @@ cups_ppd_printers = \
    ppd/hpcups/hp-officejet_6500_e709n.ppd.gz \
    ppd/hpcups/hp-officejet_6500_e710a-f.ppd.gz \
    ppd/hpcups/hp-officejet_6500_e710n-z.ppd.gz \
+   ppd/hpcups/hp-officejet_6600.ppd.gz \
+   ppd/hpcups/hp-officejet_6700.ppd.gz \
    ppd/hpcups/hp-officejet_7000_e809a.ppd.gz \
    ppd/hpcups/hp-officejet_7000_e809a_series.ppd.gz \
    ppd/hpcups/hp-officejet_7100_series.ppd.gz \
@@ -535,7 +534,6 @@ cups_ppd_printers = \
    ppd/hpcups/hp-officejet_series_320.ppd.gz \
    ppd/hpcups/hp-officejet_series_330.ppd.gz \
    ppd/hpcups/hp-officejet_series_350.ppd.gz \
-   ppd/hpcups/hp-officejet_series_500.ppd.gz \
    ppd/hpcups/hp-officejet_series_520.ppd.gz \
    ppd/hpcups/hp-officejet_series_570.ppd.gz \
    ppd/hpcups/hp-officejet_series_580.ppd.gz \

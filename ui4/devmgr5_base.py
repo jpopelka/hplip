@@ -2,18 +2,20 @@
 
 # Form implementation generated from reading ui file 'ui4/devmgr5_base.ui'
 #
-# Created: Mon May 18 17:05:52 2009
-#      by: PyQt4 UI code generator 4.4.4
+# Created: Thu Feb  2 15:07:11 2012
+#      by: PyQt4 UI code generator 4.7.4
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4 import QtCore, QtGui
 
 class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
+    def setupUi(self, MainWindow,latest_available_version,Is_autoInstaller_distro):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setWindowModality(QtCore.Qt.ApplicationModal)
         MainWindow.resize(700, 500)
+        self.latest_available_version = latest_available_version
+        self.Is_autoInstaller_distro = Is_autoInstaller_distro
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridlayout = QtGui.QGridLayout(self.centralwidget)
@@ -149,6 +151,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.groupBox_3.sizePolicy().hasHeightForWidth())
         self.groupBox_3.setSizePolicy(sizePolicy)
+        self.groupBox_3.setTitle("")
         self.groupBox_3.setObjectName("groupBox_3")
         self.gridlayout7 = QtGui.QGridLayout(self.groupBox_3)
         self.gridlayout7.setMargin(1)
@@ -165,6 +168,7 @@ class Ui_MainWindow(object):
         self.StartStopIcon.setSizePolicy(sizePolicy)
         self.StartStopIcon.setMinimumSize(QtCore.QSize(16, 16))
         self.StartStopIcon.setMaximumSize(QtCore.QSize(16, 16))
+        self.StartStopIcon.setText("")
         self.StartStopIcon.setObjectName("StartStopIcon")
         self.hboxlayout3.addWidget(self.StartStopIcon)
         self.StartStopLabel = QtGui.QLabel(self.groupBox_3)
@@ -186,6 +190,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.groupBox_4.sizePolicy().hasHeightForWidth())
         self.groupBox_4.setSizePolicy(sizePolicy)
+        self.groupBox_4.setTitle("")
         self.groupBox_4.setObjectName("groupBox_4")
         self.gridlayout8 = QtGui.QGridLayout(self.groupBox_4)
         self.gridlayout8.setMargin(1)
@@ -202,6 +207,7 @@ class Ui_MainWindow(object):
         self.AcceptRejectIcon.setSizePolicy(sizePolicy)
         self.AcceptRejectIcon.setMinimumSize(QtCore.QSize(16, 16))
         self.AcceptRejectIcon.setMaximumSize(QtCore.QSize(16, 16))
+        self.AcceptRejectIcon.setText("")
         self.AcceptRejectIcon.setObjectName("AcceptRejectIcon")
         self.hboxlayout4.addWidget(self.AcceptRejectIcon)
         self.AcceptRejectLabel = QtGui.QLabel(self.groupBox_4)
@@ -223,6 +229,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.groupBox_5.sizePolicy().hasHeightForWidth())
         self.groupBox_5.setSizePolicy(sizePolicy)
+        self.groupBox_5.setTitle("")
         self.groupBox_5.setObjectName("groupBox_5")
         self.gridlayout9 = QtGui.QGridLayout(self.groupBox_5)
         self.gridlayout9.setMargin(1)
@@ -239,6 +246,7 @@ class Ui_MainWindow(object):
         self.SetDefaultIcon.setSizePolicy(sizePolicy)
         self.SetDefaultIcon.setMinimumSize(QtCore.QSize(16, 16))
         self.SetDefaultIcon.setMaximumSize(QtCore.QSize(16, 16))
+        self.SetDefaultIcon.setText("")
         self.SetDefaultIcon.setObjectName("SetDefaultIcon")
         self.hboxlayout5.addWidget(self.SetDefaultIcon)
         self.SetDefaultLabel = QtGui.QLabel(self.groupBox_5)
@@ -276,10 +284,29 @@ class Ui_MainWindow(object):
         self.gridlayout10.addWidget(self.RefreshButton, 1, 2, 1, 1)
         self.gridlayout5.addWidget(self.groupBox_2, 2, 0, 1, 1)
         self.Tabs.addTab(self.Control, "")
+        if self.latest_available_version is not "":
+            self.tab_3 = QtGui.QWidget()
+            self.tab_3.setObjectName("tab_3")
+            self.label = QtGui.QLabel(self.tab_3)
+            self.label.setGeometry(QtCore.QRect(30, 45, 300, 17))
+            self.label.setObjectName("label")
+            if self.Is_autoInstaller_distro:
+                self.InstallLatestButton = QtGui.QPushButton(self.tab_3)
+                self.InstallLatestButton.setGeometry(QtCore.QRect(351, 40, 96, 27))
+                self.InstallLatestButton.setObjectName("pushButton")
+            else:
+                self.ManualInstalllabel = QtGui.QLabel(self.tab_3)
+                self.ManualInstalllabel.setGeometry(QtCore.QRect(30, 70,300, 45))
+                self.ManualInstalllabel.setObjectName("label")
+                self.InstallLatestButton = QtGui.QPushButton(self.tab_3)
+                self.InstallLatestButton.setGeometry(QtCore.QRect(295, 80, 110, 25))
+                self.InstallLatestButton.setObjectName("pushButton")
+            self.Tabs.addTab(self.tab_3, "")
+
         self.gridlayout.addWidget(self.splitter, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.Menubar = QtGui.QMenuBar(MainWindow)
-        self.Menubar.setGeometry(QtCore.QRect(0, 0, 700, 25))
+        self.Menubar.setGeometry(QtCore.QRect(0, 0, 700, 27))
         self.Menubar.setObjectName("Menubar")
         self.DeviceMenu = QtGui.QMenu(self.Menubar)
         self.DeviceMenu.setObjectName("DeviceMenu")
@@ -295,7 +322,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.Statusbar)
         self.toolBar = QtGui.QToolBar(MainWindow)
         self.toolBar.setObjectName("toolBar")
-        MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
+        MainWindow.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar)
         self.QuitAction = QtGui.QAction(MainWindow)
         self.QuitAction.setObjectName("QuitAction")
         self.PreferencesAction = QtGui.QAction(MainWindow)
@@ -369,6 +396,16 @@ class Ui_MainWindow(object):
         self.CancelJobButton.setText(QtGui.QApplication.translate("MainWindow", "Cancel Job", None, QtGui.QApplication.UnicodeUTF8))
         self.RefreshButton.setText(QtGui.QApplication.translate("MainWindow", "Refresh", None, QtGui.QApplication.UnicodeUTF8))
         self.Tabs.setTabText(self.Tabs.indexOf(self.Control), QtGui.QApplication.translate("MainWindow", "Printer Control", None, QtGui.QApplication.UnicodeUTF8))
+        if self.latest_available_version is not "":
+            self.label.setText(QtGui.QApplication.translate("MainWindow", "New version of HPLIP-%s is available"%self.latest_available_version, None, QtGui.QApplication.UnicodeUTF8))
+            self.Tabs.setTabText(self.Tabs.indexOf(self.tab_3), QtGui.QApplication.translate("MainWindow", "Upgrade", None, QtGui.QApplication.UnicodeUTF8))
+            if self.Is_autoInstaller_distro:
+                self.InstallLatestButton.setText(QtGui.QApplication.translate("MainWindow", "Install now", None, QtGui.QApplication.UnicodeUTF8))
+            else:
+                msg="Please install manually as mentioned in "
+                self.ManualInstalllabel.setText(QtGui.QApplication.translate("MainWindow", msg, None, QtGui.QApplication.UnicodeUTF8))
+                self.InstallLatestButton.setText(QtGui.QApplication.translate("MainWindow", "HPLIP website", None, QtGui.QApplication.UnicodeUTF8))
+            
         self.DeviceMenu.setTitle(QtGui.QApplication.translate("MainWindow", "&Device", None, QtGui.QApplication.UnicodeUTF8))
         self.ConfigureMenu.setTitle(QtGui.QApplication.translate("MainWindow", "&Configure", None, QtGui.QApplication.UnicodeUTF8))
         self.HelpMenu.setTitle(QtGui.QApplication.translate("MainWindow", "&Help", None, QtGui.QApplication.UnicodeUTF8))

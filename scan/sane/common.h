@@ -21,7 +21,7 @@
   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-  Contributing Authors: David Paschal, Don Welch, David Suffield 
+  Contributing Authors: David Paschal, Don Welch, David Suffield, Sarbeswar Meher 
 
 \************************************************************************************/
 
@@ -69,6 +69,7 @@
 #define STR_ADF_MODE_AUTO SANE_I18N("Auto")
 #define STR_ADF_MODE_FLATBED  SANE_I18N("Flatbed")
 #define STR_ADF_MODE_ADF  SANE_I18N("ADF")
+#define STR_ADF_MODE_CAMERA  SANE_I18N("Camera")
 
 #define STR_TITLE_ADVANCED SANE_I18N("Advanced")
 
@@ -183,5 +184,5 @@ int __attribute__ ((visibility ("hidden"))) NumListGetFirst( int * list );
 void __attribute__ ((visibility ("hidden"))) StrListClear( const char ** list );
 int __attribute__ ((visibility ("hidden"))) StrListIsInList( const char ** list, char * s );
 int __attribute__ ((visibility ("hidden"))) StrListAdd( const char ** list, char * s );
-
+char* __attribute__ ((visibility ("hidden"))) itoa(int value, char* str, int radix);
 #endif

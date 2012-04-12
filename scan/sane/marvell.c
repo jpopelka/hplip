@@ -397,10 +397,10 @@ SANE_Status marvell_open(SANE_String_Const device, SANE_Handle *handle)
    switch (ma.scantype)
    {
       case HPMUD_SCANTYPE_MARVELL:
-         session->version = MARVELL_1;		 
+         session->version = MARVELL_1;
 		 break;
 	  case HPMUD_SCANTYPE_MARVELL2:
-         session->version = MARVELL_2;		
+         session->version = MARVELL_2;
 		 break;
 	  default:
          session->version = MARVELL_1;
@@ -453,41 +453,35 @@ SANE_Status marvell_open(SANE_String_Const device, SANE_Handle *handle)
    i=0;
    /* Some of the marvell devices supports both flatbed and ADF, No command to get the src types supported */
    /* Getting from the model file */
-   if ( session->scansrc == HPMUD_SCANSRC_BOTH)
-   {
-         session->input_source_list[i] = STR_ADF_MODE_ADF;
-         session->input_source_map[i++] = IS_ADF;
-         session->input_source_list[i] = STR_ADF_MODE_FLATBED;
-         session->input_source_map[i++] = IS_PLATEN;               
-         DBG8("scan src  HPMUD_SCANSRC_BOTH \n"); 
-   }
-   else if ( session->scansrc == HPMUD_SCANSRC_ADF)
+   if ( session->scansrc & HPMUD_SCANSRC_ADF)
    {
          session->input_source_list[i] = STR_ADF_MODE_ADF;
          session->input_source_map[i++] = IS_ADF;
          DBG8("scan src  HPMUD_SCANSRC_ADF \n"); 
    }
-   else if ( session->scansrc == HPMUD_SCANSRC_FLATBED)
+   if ( session->scansrc & HPMUD_SCANSRC_FLATBED)
    {
          session->input_source_list[i] = STR_ADF_MODE_FLATBED;
-         session->input_source_map[i++] = IS_PLATEN;               
-         DBG8("scan src  HPMUD_SCANSRC_FLATBED \n"); 
+         session->input_source_map[i++] = IS_PLATEN;
+         DBG8("scan src  HPMUD_SCANSRC_FLATBED \n");
     }
     /* Values if un specified in the, value is 0,  get ADF state from the printer */   
-   else if (session->bb_is_paper_in_adf(session) == 2) 
+   if (session->scansrc == HPMUD_SCANSRC_NA)
    {
-      session->input_source_list[i] = STR_ADF_MODE_FLATBED;
-      session->input_source_map[i++] = IS_PLATEN;
-      DBG8("scan src  b_is_paper_in_adf value  2 \n");       
-   }
-   else
-   {
-      session->input_source_list[i] = STR_ADF_MODE_ADF;
-      session->input_source_map[i++] = IS_ADF;
-      DBG8("scan src  b_is_paper_in_adf value not 2 \n");             
-   }
+     if (session->bb_is_paper_in_adf(session) == 2) 
+     {
+       session->input_source_list[i] = STR_ADF_MODE_FLATBED;
+       session->input_source_map[i++] = IS_PLATEN;
+       DBG8("scan src  b_is_paper_in_adf value  2 \n");
+     }
+     else
+     {
+       session->input_source_list[i] = STR_ADF_MODE_ADF;
+       session->input_source_map[i++] = IS_ADF;
+       DBG8("scan src  b_is_paper_in_adf value not 2 \n");
+     }
+    }
 
-      
    marvell_control_option(session, MARVELL_OPTION_INPUT_SOURCE, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */  
 
    /* Set supported resolutions. */
@@ -848,6 +842,7 @@ SANE_Status marvell_start(SANE_Handle handle)
       if (ret == 0)
       {
          stat = SANE_STATUS_NO_DOCS;     /* done scanning */
+         SendScanEvent(ps->uri, EVENT_SCAN_ADF_NO_DOCS);
          goto bugout;
       }
       else if (ret < 0)
@@ -863,6 +858,7 @@ SANE_Status marvell_start(SANE_Handle handle)
       goto bugout;
    }
 
+   SendScanEvent(ps->uri, EVENT_START_SCAN_JOB);
    memset(xforms, 0, sizeof(xforms));    
 
    /* Setup image-processing pipeline for xform. */
@@ -956,7 +952,10 @@ SANE_Status marvell_read(SANE_Handle handle, SANE_Byte *data, SANE_Int maxLength
    }
 
    if (ret & IP_DONE)
+   {
       stat = SANE_STATUS_EOF;
+      SendScanEvent(ps->uri, EVENT_END_SCAN_JOB);
+   }
    else
       stat = SANE_STATUS_GOOD;
 
@@ -973,6 +972,9 @@ bugout:
       if (ps->is_user_cancel)
       {
           //Don't do anything. sane_hpaio_cancel() will be invoked automatically
+          SendScanEvent(ps->uri, EVENT_SCAN_CANCEL);
+          return SANE_STATUS_CANCELLED;
+
        }
        else 
 	   {

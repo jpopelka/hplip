@@ -444,7 +444,7 @@ class Module(object):
 
             log.info(log.bold("%s ver. %s" % (self.title, self.version)))
             log.info("")
-            log.info("Copyright (c) 2001-9 Hewlett-Packard Development Company, LP")
+            log.info("Copyright (c) 2001-14 Hewlett-Packard Development Company, LP")
             log.info("This software comes with ABSOLUTELY NO WARRANTY.")
             log.info("This is free software, and you are welcome to distribute it")
             log.info("under certain conditions. See COPYING file for more details.")

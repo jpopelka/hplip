@@ -29,6 +29,7 @@ import cStringIO
 import grp
 import pwd
 import tarfile
+import stat
 
 try:
     import hashlib # new in 2.5
@@ -49,7 +50,7 @@ import urllib # TODO: Replace with urllib2 (urllib is deprecated in Python 3.0)
 # Local
 from base.g import *
 from base.codes import *
-from base import utils, pexpect
+from base import utils, pexpect,tui
 from dcheck import *
 
 
@@ -79,6 +80,12 @@ PLUGIN_INSTALL_ERROR_PLUGIN_FILE_CHECKSUM_ERROR = 4
 PLUGIN_INSTALL_ERROR_NO_NETWORK = 5
 PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR = 6
 PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS = 7
+
+
+#Plugin installation status values
+PLUGIN_STATUS_PARTIAL_FILES_PRESENT = -1
+PLUGIN_STATUS_FILES_NOT_PRESENT = 0
+PLUGIN_STATUS_FILES_PRESENT = 1
 
 
 PING_TARGET = "www.google.com"
@@ -121,6 +128,24 @@ err_pats = {r'(?is)<TITLE>.*?(404|403).*?ERROR.*?</TITLE>': 0.95,
             r'(?is)<BODY.*request.{1,50}unavailable.*</BODY>': 0.10,
             r'(?i)does not exist': 0.10,
            }
+
+
+
+# Note:- If new utility is added, add same utility here to uninstall properly.
+
+BINS_LIST=['hpijs','hp-align','hp-colorcal','hp-faxsetup','hp-linefeedcal','hp-pkservice','hp-printsettings','hp-sendfax','hp-timedate','hp-check','hp-devicesettings','hp-firmware','hp-makecopies','hp-plugin','hp-probe','hp-setup','hp-toolbox','hp-check-plugin','hp-diagnose_plugin','hp-info','hp-makeuri','hp-pqdiag','hp-query','hp-systray','hp-unload','hp-clean','hp-fab','hp-levels','hp-mkuri','hp-print','hp-scan','hp-testpage','hp-wificonfig', 'hp-upgrade','hplip-info','hp-check-upgrade','hp-config_usb_printer','hp-diagnose_queues']
+
+LIBS_LIST=['libhpmud.*','libhpip.*','sane/libsane-hpaio.*','cups/backend/hp','cups/backend/hpfax', 'cups/filter/hpcac', 'cups/filter/pstotiff','cups/filter/hpcups', 'cups/filter/hpcupsfax', 'cups/filter/hplipjs','cups/filter/hpps']
+
+FILES_LIST=['/usr/share/ppd/HP/*','/etc/udev/rules.d/56-hpmud_support.rules', '/etc/udev/rules.d/40-hplip.rules', '/etc/udev/rules.d/56-hpmud_support.rules', '/etc/udev/rules.d/55-hpmud.rules', '/etc/udev/rules.d/86-hpmud-hp_*', '/etc/udev/rules.d/86-hpmud_plugin.rules', '/usr/share/cups/drv/hp/*','/usr/local/share/ppd/HP/*','/usr/local/share/cups/drv/hp/*' ,'/usr/share/applications/hplip.desktop', '/etc/xdg/autostart/hplip-systray.desktop', '/etc/hp/hplip.conf', '/usr/share/doc/hplip-*']
+
+HPLIP_LIST=['*.py','*.pyc', 'base', 'copier','data','installer','pcard','ui4','ui','fax/*.py','fax/*.pyc','fax/pstotiff.convs','fax/pstotiff.types','fax/pstotiff','prnt/*.py', 'prnt/*.pyc', 'scan/*.py','scan/*.pyc']
+
+PLUGIN_LIST=['fax/plugins/','prnt/pluginmode = INTERACTIVE_MODEs/','scan/plugins/']
+PLUGIN_STATE =['/var/lib/hp/hplip.state']
+RMDIR="rm -rf"
+RM="rm -f"
+
 # end
 
 
@@ -1758,7 +1783,7 @@ class CoreInstall(object):
             if callback is not None:
                 callback(hplip_remove_cmd, "Removing old HPLIP version")
 
-                status, output = self.run(hplip_remove_cmd)
+            status, output = self.run(hplip_remove_cmd)
 
             if status == 0:
                 self.hplip_present = self.check_hplip()
@@ -1864,8 +1889,8 @@ class CoreInstall(object):
                     wget = os.path.join(wget, "wget")
                     status, output = self.run("%s --timeout=60 --output-document=%s %s --cache=off" %(wget, local_conf, plugin_conf_url))
                     if status:
-			log.error("Plugin download failed with error code = %d" %status)
-                	return '', 0, 0, 0, False
+                        log.error("Plugin download failed with error code = %d" %status)
+                        return '', 0, 0, 0, False
                 else:
                     log.error("Please install wget package to download the plugin.")
                     return '', 0, 0, 0, False
@@ -1955,10 +1980,11 @@ class CoreInstall(object):
             if (status != 0) and 'file://' not in url:
                 url = os.path.join(PLUGIN_FALLBACK_LOCATION, self.plugin_name)
                 log.info("Plugin is not accessible. Trying to download it from fallback location: [%s]" % url)
-            cmd = "%s --cache=off -P %s %s" % (wget,self.plugin_path,url)
-            log.debug(cmd)
-            status, output = self.run(cmd)
-            #filename, headers = urllib.urlretrieve(url, plugin_file, callback)
+                cmd = "%s --cache=off -P %s %s" % (wget,self.plugin_path,url)
+                log.debug(cmd)
+                status, output = self.run(cmd)
+            if 'file://' in url:  
+                filename, headers = urllib.urlretrieve(url, plugin_file, callback)
         except IOError, e:
             log.error("Plug-in download failed: %s" % e.strerror)
             return PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND, e.strerror
@@ -1978,10 +2004,12 @@ class CoreInstall(object):
         log.debug("Downloading %s plug-in digital signature file from '%s' to '%s'..." % (self.plugin_version, digsig_url, digsig_file))
 
         try:
-            cmd = "%s --cache=off -P %s %s" % (wget,self.plugin_path,digsig_url)
-            log.debug(cmd)
-            status, output = self.run(cmd)
-            #filename, headers = urllib.urlretrieve(digsig_url, digsig_file, callback)
+			if 'file://' in url:
+				filename, headers = urllib.urlretrieve(digsig_url, digsig_file, callback)
+			else:
+				cmd = "%s --cache=off -P %s %s" % (wget,self.plugin_path,digsig_url)
+				log.debug(cmd)
+				status, output = self.run(cmd)
         except IOError, e:
             log.error("Plug-in GPG file [%s] download failed: %s" % (digsig_url,e.strerror))
             return PLUGIN_INSTALL_ERROR_DIGITAL_SIG_NOT_FOUND, e.strerror
@@ -2014,15 +2042,116 @@ class CoreInstall(object):
 
         return PLUGIN_INSTALL_ERROR_NONE, plugin_file
 
+#
+# return value:
+# '-1' --> PLUGIN_VERSION_MISMATCH -->version mismatch
+# '0' --> PLUGIN_NOT_INSTALLED        --> not installed
+# '1' --> PLUGIN_INSTALLED
 
     def check_for_plugin(self):
         sys_state.read()
-        is_installed = utils.to_bool(sys_state.get('plugin', 'installed', '0'))
-        if is_installed:
-            log.debug("plugin is installed")
+        plugin_state = sys_state.get('plugin', 'installed', PLUGIN_NOT_INSTALLED)
+        if plugin_state !=  PLUGIN_NOT_INSTALLED and self.check_plugin_version() is False:
+            log.debug("Plug-in version mismatch. Need to install plugin again")
+            plugin_state = PLUGIN_VERSION_MISMATCH
+        elif plugin_state == PLUGIN_INSTALLED:
+            log.debug("Plugin is installed")
         else:
-            log.debug("plugin is not installed")
-        return is_installed
+            log.debug("Plugin is not installed")
+
+        # cross checking so files present	 or not.
+        if plugin_state != PLUGIN_NOT_INSTALLED:
+            Scan_sts =self.check_scanner_plugin_files()
+            Fax_sts = self.check_fax_plugin_files() 
+            Prnt_sts = self.check_printer_plugin_files()
+            if Scan_sts!= PLUGIN_STATUS_FILES_PRESENT or  Fax_sts!= PLUGIN_STATUS_FILES_PRESENT or Prnt_sts != PLUGIN_STATUS_FILES_PRESENT:
+                log.debug("Plug-in files might be corrupted. Re-install plug-in")
+                plugin_state = PLUGIN_VERSION_MISMATCH
+
+        return plugin_state
+
+    def check_plugin_version(self):
+        sys_state.read()
+        plugin_installed_version = sys_state.get('plugin','version', '0.0.0')
+        hplip_version = sys_conf.get('hplip', 'version', '0.0.0')
+        if plugin_installed_version == hplip_version:
+            return True
+        else:
+            return False
+
+
+
+    def check_printer_plugin_files(self):
+        ret_val = None
+        home = sys_conf.get('dirs', 'home')
+        printer_so_dir= home+"/prnt/plugins/"
+        ret_val = self.check_so_exists(printer_so_dir, 'lj.so', "Printer",ret_val)
+        return ret_val
+
+
+    def check_scanner_plugin_files(self):
+        ret_val = None
+        home = sys_conf.get('dirs', 'home')
+        scan_so_files_list =['bb_marvell.so' , 'bb_soapht.so' , 'bb_soap.so']
+
+        cnt=0
+        scanner_so_dir= home+'/scan/plugins/'
+        while cnt < len(scan_so_files_list):
+            ret_val = self.check_so_exists(scanner_so_dir, scan_so_files_list[cnt], "Scanner",ret_val)
+            cnt += 1
+        return ret_val 
+
+
+
+    def check_fax_plugin_files(self):
+        ret_val = None
+        home = sys_conf.get('dirs', 'home')
+        fax_so_dir= home+"/fax/plugins/"
+        ret_val = self.check_so_exists(fax_so_dir,'fax_marvell.so' ,"Fax",ret_val)
+        return ret_val 
+
+
+    def check_so_exists(self, sym_link_dir, so_file, functionType, Pre_ret_val):
+        ret_val = Pre_ret_val
+        sym_link_file = sym_link_dir + so_file
+        if not os.path.exists(sym_link_file):
+            log.debug("Either %s file is not present or symbolic link is missing: %s" %(functionType, sym_link_file))
+            user_conf.set(functionType+'_plugins', so_file,'Not_Found')
+            if ret_val == None:
+                ret_val= PLUGIN_STATUS_FILES_NOT_PRESENT
+            elif ret_val == PLUGIN_STATUS_FILES_PRESENT:
+                ret_val = PLUGIN_STATUS_PARTIAL_FILES_PRESENT
+        else:
+            # capturing real file path
+            if os.path.islink(sym_link_file):
+                real_file = os.path.realpath(sym_link_file)
+            else:
+                real_file = sym_link_file
+
+            if not os.path.exists(real_file):
+                log.debug("%s Plugin file is missing: %s" % (functionType, real_file))
+                user_conf.set(functionType+'_plugins', so_file,'Not_Found')
+                if ret_val == None:
+                    ret_val= PLUGIN_STATUS_FILES_NOT_PRESENT
+                elif ret_val == PLUGIN_STATUS_FILES_PRESENT:
+                    ret_val = PLUGIN_STATUS_PARTIAL_FILES_PRESENT
+            elif (os.stat(sym_link_file).st_mode & 72) != 72:
+                user_conf.set(functionType+'_plugins', so_file,'Permissin_Error')
+                log.debug("%s Plugin file doesn't have user/group execute permission: %s" % (functionType,sym_link_file))
+                if ret_val == None:
+                    ret_val= PLUGIN_STATUS_FILES_NOT_PRESENT
+                elif ret_val == PLUGIN_STATUS_FILES_PRESENT:
+                    ret_val = PLUGIN_STATUS_PARTIAL_FILES_PRESENT
+            else:
+                user_conf.set(functionType+'_plugins', so_file,'Present')
+                if ret_val == None:
+                    ret_val= PLUGIN_STATUS_FILES_PRESENT
+                elif ret_val == PLUGIN_STATUS_FILES_NOT_PRESENT:
+                    ret_val = PLUGIN_STATUS_PARTIAL_FILES_PRESENT
+
+        log.debug("%s Plug-in file %s status: %d" % (functionType, sym_link_file, ret_val))
+        return ret_val
+ 
 
 
     def run_plugin(self, mode=GUI_MODE, callback=None):
@@ -2049,3 +2178,210 @@ class CoreInstall(object):
             os.unlink(plugin_file)
         if os.path.exists(digsig_file):
             os.unlink(digsig_file)
+
+
+    def is_auto_installer_support(self):
+        if not self.distro_name:
+            self.get_distro()
+            self.distro_name = self.distros_index[self.distro]
+
+        if self.distro_name and self.distro_name in ("ubuntu","debian","suse","fedora"):
+            log.debug("Auto installation is supported for Distro =%s version =%s "%(self.distro_name, self.distro_version))
+            return True
+        else:
+            log.debug("Auto installation is not supported for Distro =%s version =%s "%(self.distro_name, self.distro_version))
+            return False
+
+    
+    def uninstall(self,mode = INTERACTIVE_MODE, callback=None):
+        checkSudo = False
+        if os.getuid() != 0:
+            checkSudo = True
+#            log.error("To run 'hp-uninstall' utility, you must have root privileges.")
+#            return False
+
+        home_dir= sys_conf.get("dirs","home","")
+        version= sys_conf.get("hplip","version","0.0.0")
+        if home_dir is "":
+            log.error("HPLIP is not installed.")
+            return False
+    
+        if mode != NON_INTERACTIVE_MODE:
+            ok,choice = tui.enter_choice("\nAre you sure to uninstall HPLIP-%s (y=yes, n=no*)?:" %version,['y','n'],'n')
+            if not ok or choice == 'n':
+                return False
+
+        hplip_remove_cmd = self.get_distro_data('hplip_remove_cmd')
+        log.debug("hplip_remove_cmd =%s "%hplip_remove_cmd)
+        #read conf file to enter into installed dir
+        log.info("Starting uninstallation...")
+
+        plugin_state = sys_state.get('plugin', 'installed', PLUGIN_NOT_INSTALLED)
+        
+        # check systray is running?
+        status,output = utils.Is_Process_Running('hp-systray')
+        if status is True:
+            if mode != NON_INTERACTIVE_MODE:
+                ok,choice = tui.enter_choice("\nSome HPLIP applications are running. Press 'y' to close and proceed or Press 'n' to quit uninstall (y=yes*, n=no):",['y','n'],'y')
+                if not ok or choice =='n':
+                    log.info("Quiting HPLIP unininstallation. Close application(s) manually and run again.")
+                    return False
+        
+            try:
+                from dbus import SystemBus, lowlevel
+            except ImportError:
+                log.error("Unable to load DBus")
+                pass
+            else:
+                try:
+                    args = ['', '', EVENT_SYSTEMTRAY_EXIT, prop.username, 0, '', '']
+                    msg = lowlevel.SignalMessage('/', 'com.hplip.StatusService', 'Event')
+                    msg.append(signature='ssisiss', *args)
+                    log.debug("Sending close message to hp-systray ...")
+                    SystemBus().send_message(msg)
+                    time.sleep(0.5)
+                except:
+                    log.error("Failed to send DBus message to hp-systray/hp-toolbox.")
+                    pass
+    
+    
+        toolbox_status,output = utils.Is_Process_Running('hp-toolbox')
+        systray_status,output = utils.Is_Process_Running('hp-systray')
+        if toolbox_status is True or systray_status is True:
+            log.error("Failed to close HP-Toolbox/HP-Systray. Close manually and run hp-uninstall again.")
+            return False
+    
+        if hplip_remove_cmd:
+            self.remove_hplip(callback)
+
+        #removing .hplip directory
+        cmd='find /home -name .hplip'
+        if checkSudo:
+            cmd= self.su_sudo() %cmd
+
+        status, output=self.run(cmd)
+        if output is not None:
+            for p in output.splitlines():
+                if p.find("find:") != -1:
+                    continue
+
+                cmd= RMDIR + " " + p
+                if checkSudo:
+                    cmd= self.su_sudo() %cmd
+                log.debug("Removing .hplip folder cmd = %s " %cmd)
+                status, output=self.run(cmd)
+                if 0 != status:
+                    log.debug("Failed to remove directory=%s "%p)
+
+        #remove the binaries and libraries
+        pat=re.compile(r"""(.*)share\/hplip""")
+        base =pat.match(home_dir)
+        usrbin_dir=None
+        if base is not None:
+            usrbin_dir= base.group(1) + "bin/"
+            usrlib_dir= base.group(1) + "lib/"
+            cnt = 0
+            while cnt <len (BINS_LIST ):
+                cmd = RM + " " + usrbin_dir + BINS_LIST[cnt]
+                if checkSudo:
+                    cmd= self.su_sudo() %cmd
+                    
+                log.debug("Removing binaries cmd = %s " %cmd)
+                status, output=self.run(cmd)
+                if 0 != status:
+                    log.debug("Failed to remove '%s' binary." %(usrbin_dir + BINS_LIST[cnt]))
+                cnt += 1
+
+            cnt =0
+            while cnt <len (LIBS_LIST ):
+                cmd = RM + " " + usrlib_dir + LIBS_LIST[cnt]
+                if checkSudo:
+                    cmd= self.su_sudo() %cmd
+
+                log.debug("Removing library cmd = %s " %cmd)
+                status, output=self.run(cmd)
+                if 0 != status:
+                    log.debug("Failed to remove '%s' library." %(usrlib_dir + LIBS_LIST[cnt]))
+                cnt += 1
+    
+
+        remove_plugins = False
+        if mode != NON_INTERACTIVE_MODE and plugin_state !=  PLUGIN_NOT_INSTALLED:
+            ok,choice = tui.enter_choice("\nDo you want to remove HP proprietary plug-ins (y=yes*, n=no)?:",['y','n'],'y')
+            if ok and choice =='y':                
+                remove_plugins = True
+        else:
+            remove_plugins = True
+    
+        # removing HPLIP installed directories/files
+        cnt =0
+        while cnt < len(HPLIP_LIST): 
+            cmd=RMDIR + " " + home_dir+"/"+HPLIP_LIST[cnt]
+            if checkSudo:
+                cmd= self.su_sudo() %cmd
+
+            log.debug("Removing hplip directory/file cmd= %s " %cmd)
+            status, output=self.run(cmd)
+            if 0 != status:
+                log.debug("Failed to remove hplip directory/file=%s "% (home_dir+"/"+HPLIP_LIST[cnt]))
+            cnt +=1
+        
+        # removing configuration files
+        cnt= 0
+        while cnt < len(FILES_LIST):
+            cmd = RMDIR + " " + FILES_LIST[cnt]
+            if checkSudo:
+                cmd= self.su_sudo() %cmd
+            log.debug("Removing conf files cmd= %s" %(cmd))
+            status, output=self.run(cmd)
+            if 0 != status:
+                log.debug("Failed to remove '%s' file" %FILES_LIST[cnt])
+            cnt += 1
+        # removing Plug-in files   
+        if remove_plugins == True:
+            cnt =0
+            while cnt < len(PLUGIN_LIST): 
+                cmd=RMDIR + " " + home_dir+"/"+PLUGIN_LIST[cnt]
+                if checkSudo:
+                    cmd= self.su_sudo() %cmd
+
+                log.debug("Removing hplip Plug-in files cmd= %s " %cmd)
+                status, output=self.run(cmd)
+                if 0 != status:
+                    log.debug("Failed to remove plug-in directory/file=%s "% (home_dir+"/"+PLUGIN_LIST[cnt]))
+                cnt += 1
+            
+            cnt =0
+            while cnt < len(PLUGIN_STATE): 
+                cmd=RMDIR + " "+PLUGIN_STATE[cnt]
+                if checkSudo:
+                    cmd= self.su_sudo() %cmd
+
+                log.debug("Removing hplip Plug-in file cmd= %s " %cmd)
+                status, output=self.run(cmd)
+                if 0 != status:
+                    log.debug("Failed to remove plug-in directory/file=%s "% (PLUGIN_STATE[cnt]))
+                cnt += 1
+
+            cmd =RMDIR+ " "+home_dir
+            if checkSudo:
+                cmd= self.su_sudo() %cmd
+
+            log.debug("Removing hplip directory/file cmd= %s " %cmd)
+            status, output=self.run(cmd)
+            if 0 != status:
+                log.debug("Failed to remove hplip directory=%s "% (home_dir))
+        
+        # removing HPLIP uninstall link
+        if usrbin_dir is not None:
+            cmd=RMDIR + " " + usrbin_dir+"hp-uninstall"
+            if checkSudo:
+                cmd= self.su_sudo() %cmd
+
+            log.debug("Removing hplip binary cmd= %s " %cmd)
+            status, output=self.run(cmd)
+            if 0 != status:
+                log.debug("Failed to remove '%s' file" %(usrbin_dir+"hp-uninstall"))
+        log.info("HPLIP uninstallation is completed")
+        return True
+

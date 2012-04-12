@@ -100,6 +100,7 @@ class AlignDialog(QDialog, Ui_Dialog):
             ALIGN_TYPE_LIDIL_DJ_D1600: 0,
             ALIGN_TYPE_LEDM: 0,
             ALIGN_TYPE_LEDM_MANUAL: 0,
+            ALIGN_TYPE_LEDM_FF_CC_0: 0,
             }
 
         self.seq = { # (func|method, tuple of params|None)
@@ -363,30 +364,34 @@ class AlignDialog(QDialog, Ui_Dialog):
                                (self.showLoadPaperPage, None),
                                (maint.AlignType15Phase1, (lambda : self.dev, lambda: true)),
                                (self.showAlignmentNumberPage, ('A', 'v', 'kc', 3, 23)),
-                               (self.endAlignmentNumberPage, ('A',)), 
+                               (self.endAlignmentNumberPage, ('A',)),
                                (self.showAlignmentNumberPage, ('B', 'h', 'kc', 3, 11)),
-                               (self.endAlignmentNumberPage, ('B',)), 
+                               (self.endAlignmentNumberPage, ('B',)),
                                (self.showAlignmentNumberPage, ('C', 'v', 'k', 3, 23)),
-                               (self.endAlignmentNumberPage, ('C',)), 
+                               (self.endAlignmentNumberPage, ('C',)),
                                (self.showAlignmentNumberPage, ('D', 'v', 'c', 3, 23)),
-                               (self.endAlignmentNumberPage, ('D',)), 
+                               (self.endAlignmentNumberPage, ('D',)),
                                (self.showAlignmentNumberPage, ('E', 'h', 'k', 3, 11)),
-                               (self.endAlignmentNumberPage, ('E',)), 
+                               (self.endAlignmentNumberPage, ('E',)),
                                (self.showAlignmentNumberPage, ('F', 'h', 'k', 3, 11)),
-                               (self.endAlignmentNumberPage, ('F',)), 
+                               (self.endAlignmentNumberPage, ('F',)),
                                (self.showAlignmentNumberPage, ('G', 'h', 'k', 3, 11)),
-                               (self.endAlignmentNumberPage, ('G',)), 
+                               (self.endAlignmentNumberPage, ('G',)),
                                (self.showAlignmentNumberPage, ('H', 'v', 'k', 3, 9)),
-                               (self.endAlignmentNumberPage, ('H',)), 
+                               (self.endAlignmentNumberPage, ('H',)),
                                (self.showAlignmentNumberPage, ('I', 'v', 'c', 3, 9)),
                                (self.endAlignmentNumberPage, ('I',)),
                                (maint.AlignType16Phase1, (lambda: self.dev, lambda: self.a, lambda: self.b,
                                                           lambda: self.c, lambda: self.d, lambda: self.e,
-                                                          lambda: self.f, lambda: self.g, lambda: self.h, 
+                                                          lambda: self.f, lambda: self.g, lambda: self.h,
                                                           lambda: self.i)),
                                (self.close, None),
                             ],
-
+           ALIGN_TYPE_LEDM_FF_CC_0 : [ # 17
+                               (self.showLoadPaperPage, None),
+                               (maint.AlignType17Phase1, (lambda : self.dev, lambda: self.showAioPage)),
+                               (self.close, None),
+                            ],
             }
 
         self.setupUi(self)

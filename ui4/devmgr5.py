@@ -36,6 +36,7 @@ from prnt import cups
 from base.codes import *
 from ui_utils import *
 import hpmudext
+from installer.core_install import *
 
 # Qt
 from PyQt4.QtCore import *
@@ -150,6 +151,18 @@ class PluginInstall(QObject):
         return qApp.translate("DevMgr5",s,c)
 
 
+class DiagnoseQueue(QObject):
+    def __init__(self, parent):
+        self.parent = parent
+
+
+    def exec_(self):
+        ok, output = utils.run('hp-diagnose_queues -r')
+
+    def __tr(self,s,c = None):
+        return qApp.translate("DevMgr5",s,c)
+
+
 
 # ***********************************************************************************
 #
@@ -166,8 +179,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         log.debug("Initializing toolbox UI (Qt4)...")
         log.debug("HPLIP Version: %s" % prop.installed_version)
 
-        self.setupUi(self)
-
+        
         self.toolbox_version = toolbox_version
         self.initial_device_uri = initial_device_uri
         self.device_vars = {}
@@ -177,13 +189,23 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         self.updating = False
         self.init_failed = False
         self.service = None
+        self.Is_autoInstaller_distro = False		# True-->tier1(supports auto installation).   		False--> tier2(manual installation)
 
+        # Distro insformation
+        core =  CoreInstall(MODE_CHECK)
+#        core.init()
+        self.Is_autoInstaller_distro = core.is_auto_installer_support()
         # User settings
         self.user_settings = UserSettings()
         self.user_settings.load()
         self.user_settings.debug()
         self.cur_device_uri = self.user_settings.last_used_device_uri
-
+        installed_version=sys_conf.get('hplip','version')
+        if not utils.Is_HPLIP_older_version( installed_version,  self.user_settings.latest_available_version):
+            self.setupUi(self,"",self.Is_autoInstaller_distro)
+        else:
+            self.setupUi(self, self.user_settings.latest_available_version,self.Is_autoInstaller_distro)
+            
         # Other initialization
         self.initDBus()
         self.initPixmaps()
@@ -278,6 +300,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         self.initPrintSettingsTab()
         self.initPrintControlTab()
 
+
         self.connect(self.Tabs,SIGNAL("currentChanged(int)"),self.Tabs_currentChanged)
 
         # Resize the splitter so that the device list starts as a single column
@@ -295,6 +318,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                           2: self.updateSuppliesTab,
                           3: self.updatePrintSettingsTab,
                           4: self.updatePrintControlTab,
+                          5:self.updateHPLIPupgrade,
                         }
 
         # docs
@@ -1143,6 +1167,13 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                     "plugin",
                     x,
                     lambda : PluginInstall(self, d.plugin, plugin_installed)),
+                    
+                    # Diagnose Queues
+                    (lambda : True,
+                    self.__tr("Diagnose Queues"),
+                    "warning",
+                    self.__tr("Diagnose Print/Fax Queues."),
+                    lambda : DiagnoseQueue(self)),
 
                     # EWS
 
@@ -1739,6 +1770,34 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         # TODO: Check queues at startup and send events if stopped or rejecting
 
 
+    def initUpgradeTab(self):
+        self.connect(self.InstallLatestButton, SIGNAL("clicked()"), self.InstallLatestButton_clicked)
+        self.InstallLatestButton_lock = False
+        
+       
+    def InstallLatestButton_clicked(self):
+        if self.InstallLatestButton_lock is True:
+            return
+        if self.Is_autoInstaller_distro:
+            self.InstallLatestButton.setEnabled(False)
+            terminal_cmd = utils.get_terminal()
+            if terminal_cmd is not None and utils.which("hp-upgrade"):
+                cmd = terminal_cmd + " 'hp-upgrade'"
+                log.debug("cmd = %s " %cmd)
+                os.system(cmd)
+            else:
+                log.error("Failed to run hp-upgrade command from terminal =%s "%terminal_cmd)
+            self.InstallLatestButton.setEnabled(True)
+        else:
+            self.InstallLatestButton_lock = True
+            utils.openURL("http://hplipopensource.com/hplip-web/install/manual/index.html")
+            QTimer.singleShot(1000, self.InstallLatestButton_unlock)
+
+
+    def InstallLatestButton_unlock(self):
+        self.InstallLatestButton_lock = False
+
+
     def CancelJobButton_clicked(self):
         item = self.JobTable.currentItem()
 
@@ -1752,7 +1811,12 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
     def RefreshButton_clicked(self):
         self.updatePrintControlTab()
 
+    def  updateHPLIPupgrade(self):
+        self.initUpgradeTab()
 
+        
+        
+        
     def updatePrintControlTab(self):
         if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
             self.PrintControlPrinterNameLabel.setText(self.__tr("Printer Name:"))

@@ -37,6 +37,7 @@ from base import device, utils, pml, maint, pkit
 from prnt import cups
 from base.codes import *
 from ui_utils import load_pixmap
+from installer.core_install import *
 
 # Qt
 from qt import *
@@ -407,8 +408,18 @@ class DevMgr4(DevMgr4_base):
                  initial_device_uri=None, disable_dbus=False,
                  parent=None, name=None, fl = 0):
 
-        DevMgr4_base.__init__(self, parent, name, fl)
 
+        # Distro insformation
+        core =  CoreInstall(MODE_CHECK)
+#        core.init()
+        self.Is_autoInstaller_distro = core.is_auto_installer_support()
+        self.Latest_ver= user_conf.get('upgrade', 'latest_available_version')
+        installed_version=sys_conf.get('hplip','version')
+        if utils.Is_HPLIP_older_version(installed_version, self.Latest_ver):
+            DevMgr4_base.__init__(self, parent, name, fl,self.Latest_ver,self.Is_autoInstaller_distro)
+        else:
+            self.Latest_ver = ""
+            DevMgr4_base.__init__(self, parent, name, fl,self.Latest_ver,self.Is_autoInstaller_distro)
         log.debug("Initializing toolbox UI (Qt3)...")
         log.debug("HPLIP Version: %s" % prop.installed_version)
 
@@ -599,13 +610,22 @@ class DevMgr4(DevMgr4_base):
               12 : self.__tr("twelve")
               }
 
-
-        self.TabIndex = { self.FunctionsTab: self.UpdateFuncsTab,
+        if self.Latest_ver is "":
+            self.TabIndex = { self.FunctionsTab: self.UpdateFuncsTab,
                 self.StatusTab: self.UpdateStatusTab,
                 self.SuppliesTab: self.UpdateSuppliesTab,
                 self.PrintSettingsTab: self.UpdatePrintSettingsTab,
                 self.PrintJobsTab: self.UpdatePrintControlTab,
                 }
+        else:
+            self.TabIndex = { self.FunctionsTab: self.UpdateFuncsTab,
+                self.StatusTab: self.UpdateStatusTab,
+                self.SuppliesTab: self.UpdateSuppliesTab,
+                self.PrintSettingsTab: self.UpdatePrintSettingsTab,
+                self.PrintJobsTab: self.UpdatePrintControlTab,
+                self.UpgradeTab:self.UpdateUpgradeTab,
+                }
+
 
 
     def InitialUpdate(self):
@@ -1702,6 +1722,8 @@ class DevMgr4(DevMgr4_base):
                     elif align_type == ALIGN_TYPE_LEDM_MANUAL:
                         maint.AlignType16(d, self.LoadPaperUI, self.AlignmentNumberUI)
 
+                    elif align_type == ALIGN_TYPE_LEDM_FF_CC_0:
+                        maint.AlignType17(d, self.LoadPaperUI, self.Align13UI)
                 else:
                     self.CheckDeviceUI()
 
@@ -2678,8 +2700,31 @@ class DevMgr4(DevMgr4_base):
 
         self.UpdatePrintControlTab()
 
+    def UpdateUpgradeTab(self):
+        log.debug("Upgrade Tab is pressed")
+        self.InstallPushButton_lock = False
 
+    def InstallPushButton_clicked(self):
+        if self.InstallPushButton_lock is True:
+            return
 
+        if self.Is_autoInstaller_distro:
+            self.InstallPushButton.setEnabled(False)
+            terminal_cmd = utils.get_terminal()
+            if terminal_cmd is not None and utils.which("hp-upgrade"):
+                cmd = terminal_cmd + " 'hp-upgrade'"
+                log.debug("cmd = %s " %cmd)
+                os.system(cmd)
+            else:
+                log.error("Failed to run hp-upgrade command from terminal =%s "%terminal_cmd)
+            self.InstallPushButton.setEnabled(True)
+        else:
+            self.InstallPushButton_lock = True
+            utils.openURL("http://hplipopensource.com/hplip-web/install/manual/index.html")
+            QTimer.singleShot(1000, self.InstallPushButton_unlock)
+
+    def InstallPushButton_unlock(self):
+        self.InstallPushButton_lock = False
 
     # ***********************************************************************************
     #

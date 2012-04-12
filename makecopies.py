@@ -283,10 +283,10 @@ else: # NON_INTERACTIVE_MODE
                 log.error(e.msg)
                 sys.exit(1)
 
-            scan_style = dev.mq.get('scan-style', SCAN_STYLE_FLATBED)
-            log.debug(scan_style)
+            scan_src = dev.mq.get('scan-src', SCAN_SRC_FLATBED)
+            log.debug(scan_src)
 
-            if scan_style == SCAN_STYLE_SCROLLFED:
+            if scan_src == SCAN_SRC_SCROLLFED:
                 fit_to_page = pml.COPIER_FIT_TO_PAGE_DISABLED
 
             log.debug("num_copies = %d" % num_copies)
@@ -296,13 +296,13 @@ else: # NON_INTERACTIVE_MODE
             log.debug("fit_to_page = %d" % fit_to_page)
             log.debug("max_reduction = %d" % max_reduction)
             log.debug("max_enlargement = %d" % max_enlargement)
-            log.debug("scan_style = %d" % scan_style)
+            log.debug("scan_src = %d" % scan_src)
 
             update_queue = Queue.Queue()
             event_queue = Queue.Queue()
 
             dev.copy(num_copies, contrast, reduction,
-                     quality, fit_to_page, scan_style,
+                     quality, fit_to_page, scan_src,
                      update_queue, event_queue)
 
 

@@ -33,12 +33,12 @@ def AlignType1(dev, loadpaper_ui): # Auto VIP (using embedded PML)
     ok = loadpaper_ui()
     if ok:
         dev.writeEmbeddedPML(pml.OID_AUTO_ALIGNMENT,
-                             pml.AUTO_ALIGNMENT, style=0, 
+                             pml.AUTO_ALIGNMENT, style=0,
                              direct=True)
         dev.closePrint()
 
     return ok
-    
+
 def AlignType1PML(dev, loadpaper_ui): # Auto VIP (using PML)
     ok = loadpaper_ui()
     if ok:
@@ -404,7 +404,7 @@ def alignType10SetPattern(dev):
 
     log.debug("Pattern=%d" % pattern)
     return pattern
-    
+
 
 def alignType10Phase1(dev):
     dev.writeEmbeddedPML(pml.OID_PRINT_INTERNAL_PAGE,
@@ -422,7 +422,7 @@ def alignType10Phase2(dev, values, pattern):
             break
         p = ''.join([p, pcl.ESC, '*o5W\x1a', chr(i), '\x00', chr(pattern), chr(x), '\n'])
 
-    p = ''.join([p, pcl.UEL]) 
+    p = ''.join([p, pcl.UEL])
 
     dev.printData(p)
     dev.closePrint()
@@ -490,7 +490,7 @@ def align10and11and14Controls(pattern, align_type):
                          'F' : (True, 9),
                          'G' : (True, 9),
                          'H' : (True, 9),
-                         'I' : (True, 9),}    
+                         'I' : (True, 9),}
 
     else:
         if pattern == 1:
@@ -530,7 +530,7 @@ def AlignType11(dev, loadpaper_ui, align_ui, invalidpen_ui):
     if pattern is None:
         invalidpen_ui()
         return
-        
+
     state = 0
     while state != -1:
         if state == 0:
@@ -570,9 +570,9 @@ def alignType11SetPattern(dev):
     elif dev.pen_config == AGENT_CONFIG_PHOTO_ONLY:
         return None
 
-    log.debug("Pattern=%d" % pattern) 
+    log.debug("Pattern=%d" % pattern)
     return pattern
-    
+
 
 def alignType11Phase1(dev):
     dev.printData(ldl.buildResetPacket())
@@ -622,85 +622,101 @@ def alignType13Phase1(dev):
 
 calibrationSession = 1
 
-def dataModelHelper(dev, ui2):
-    data = status.StatusType10FetchUrl(dev, "/Calibration/State")
+def dataModelHelper(dev, func, ui2):
+    data = status.StatusType10FetchUrl(func, "/Calibration/State")
     if not data:
-        data = status.StatusType10FetchUrl(dev, "/Calibration/State")
+        data = status.StatusType10FetchUrl(func, "/Calibration/State")
 
     if not data:
         log.debug("Unable to retrieve calibration state")
+        dev.close()
         return 0
 
     if "ParmsRequested" in data:
         log.error("Restart device and start alignment")
-        return 1 
+        dev.close()
+        return 1
 
     if "404 Not Found" in data:
         log.error("Device may not support Alignment")
+        dev.close()
         return 1
 
     if "Printing<" in data:
         log.warn("Previous alignment job not completed")
+        dev.close()
         return 1
 
-    data = status.StatusType10FetchUrl(dev, "/DevMgmt/ConsumableConfigDyn.xml")
+    data = status.StatusType10FetchUrl(func, "/DevMgmt/ConsumableConfigDyn.xml")
     if "AlignmentMode" not in data:
         log.error("Device may not support Alignment")
-        return 1 
+        dev.close()
+        return 1
 
     if "automatic" in data:
         log.debug("Device supports automatic calibration")
-        status.StatusType10FetchUrl(dev, "/Calibration/Session", "<cal:CalibrationState xmlns:cal=\\\"http://www.hp.com/schemas/imaging/con/cnx/markingagentcalibration/2009/04/08\\\" xmlns:dd=\\\"http://www.hp.com/schemas/imaging/con/dictionaries/1.0/\\\">Printing</cal:CalibrationState>")
+        status.StatusType10FetchUrl(func, "/Calibration/Session", "<cal:CalibrationState xmlns:cal=\\\"http://www.hp.com/schemas/imaging/con/cnx/markingagentcalibration/2009/04/08\\\" xmlns:dd=\\\"http://www.hp.com/schemas/imaging/con/dictionaries/1.0/\\\">Printing</cal:CalibrationState>")
+        dev.close()
         return 0
 
     if "semiAutomatic" in data:
         log.debug("Device supports semiAutomatic calibration")
-        status.StatusType10FetchUrl(dev, "/Calibration/Session", "<cal:CalibrationState xmlns:cal=\\\"http://www.hp.com/schemas/imaging/con/cnx/markingagentcalibration/2009/04/08\\\" xmlns:dd=\\\"http://www.hp.com/schemas/imaging/con/dictionaries/1.0/\\\">Printing</cal:CalibrationState>")
+        status.StatusType10FetchUrl(func, "/Calibration/Session", "<cal:CalibrationState xmlns:cal=\\\"http://www.hp.com/schemas/imaging/con/cnx/markingagentcalibration/2009/04/08\\\" xmlns:dd=\\\"http://www.hp.com/schemas/imaging/con/dictionaries/1.0/\\\">Printing</cal:CalibrationState>")
+        dev.close()
         return ui2()
 
     if "manual" in data:
         log.debug("Device supports manual calibration")
-        data = status.StatusType10FetchUrl(dev, "/Calibration/Session", "<cal:CalibrationState xmlns:cal=\\\"http://www.hp.com/schemas/imaging/con/cnx/markingagentcalibration/2009/04/08\\\" xmlns:dd=\\\"http://www.hp.com/schemas/imaging/con/dictionaries/1.0/\\\">Printing</cal:CalibrationState>")
+        data = status.StatusType10FetchUrl(func, "/Calibration/Session", "<cal:CalibrationState xmlns:cal=\\\"http://www.hp.com/schemas/imaging/con/cnx/markingagentcalibration/2009/04/08\\\" xmlns:dd=\\\"http://www.hp.com/schemas/imaging/con/dictionaries/1.0/\\\">Printing</cal:CalibrationState>")
         import string
         data = string.split(data, "/Jobs")[1]
         data = string.split(data, "\r\n")[0]
         data = "/Jobs" + data
-        data = status.StatusType10FetchUrl(dev, data)
+        data = status.StatusType10FetchUrl(func, data)
         data = string.split(data, "Session/")[1]
         data = string.split(data, "<")[0]
         data = "/Calibration/Session/" + data + "/ManualSelectedPatterns.xml"
         global calibrationSession
-        calibrationSession = data 
-
+        calibrationSession = data
+        dev.close()
     return 0
 
 def AlignType16Manual(dev, a, b, c, d, e, f, g, h, i):
     log.debug("a=%s b=%s c=%s d=%s e=%s f=%s g=%s h=%s i=%s" % (a, b, c, d, e, f, g, h, i ))
-    data = status.StatusType10FetchUrl(dev, "/Calibration/State")
-   
+    data = status.StatusType10FetchUrl(func, "/Calibration/State")
+
     if not data:
         return 0
 
     while "ParmsRequested" not in data:
         if "CalibrationValid" in data:
             return
-        data = status.StatusType10FetchUrl(dev, "/Calibration/State")
+        data = status.StatusType10FetchUrl(func, "/Calibration/State")
     data = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- THIS DATA SUBJECT TO DISCLAIMER(S) INCLUDED WITH THE PRODUCT OF ORIGIN. -->\n<ManualSelectedPatterns xmlns=\"http://www.hp.com/schemas/imaging/con/cnx/markingagentcalibration/2009/04/08\" xmlns:locid=\"http://www.hp.com/schemas/imaging/con/ledm/localizationids/2007/10/31/\" xmlns:psdyn=\"http://www.hp.com/schemas/imaging/con/ledm/productstatdyn/2007/10/31\"><SelectedPattern><Identifier><Id>1</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>2</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>3</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>4</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>5</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>6</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>7</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>8</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>9</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern></ManualSelectedPattern>" % ( a, b, c, d, e, f, g, h, i )
     data = "PUT %s HTTP/1.1\r\nHost: localhost\r\nUser-Agent: hp\r\nAccept: text/plain\r\nAccept-Language: en-us,en\r\nAccept-Charset:utf-8\r\nContent-Type: text/xml\r\nContent-Length: %s\r\n\r\n" % ( calibrationSession, len(data)) + data
-    data = status.StatusType10FetchUrl(dev, calibrationSession, data)
+    data = status.StatusType10FetchUrl(func, calibrationSession, data)
 
 def AlignType15(dev, loadpaper_ui, ui2):
     if not loadpaper_ui():
         return
-    return dataModelHelper(dev, ui2)
+    return dataModelHelper(dev, dev.getEWSUrl_LEDM, ui2)
 
 def AlignType15Phase1(dev, ui2):
-    return dataModelHelper(dev, ui2)
+    return dataModelHelper(dev, dev.getEWSUrl_LEDM, ui2)
+
+#AlignType 17 is LEDM via FF/CC/0 USB channel
+def AlignType17(dev, loadpaper_ui, ui2):
+    if not loadpaper_ui():
+        return
+    return dataModelHelper(dev, dev.getUrl_LEDM, ui2)
+
+def AlignType17Phase1(dev, ui2):
+    return dataModelHelper(dev, dev.getUrl_LEDM, ui2)
 
 def AlignType16(dev, loadpaper_ui, align_ui):
     if not loadpaper_ui():
         return
-    dataModelHelper(dev, align_ui)
+    dataModelHelper(dev, dev.getEWSUrl_LEDM, align_ui)
     state, a, b, c, d, e, f, g, h, i = 0, 6, 6, 3, 3, 6, 6, 6, 6, 6
     ok = False
     while state != -1:
@@ -773,7 +789,7 @@ def AlignType14(dev, loadpaper_ui, align_ui, invalidpen_ui):
     if pattern is None:
         invalidpen_ui()
         return
-        
+
     state = 0
     while state != -1:
         if state == 0:
@@ -813,9 +829,9 @@ def alignType14SetPattern(dev):
     elif dev.pen_config == AGENT_CONFIG_PHOTO_ONLY:
         return None
 
-    log.debug("Pattern=%d" % pattern) 
+    log.debug("Pattern=%d" % pattern)
     return pattern
-    
+
 
 def alignType14Phase1(dev):
     dev.printData(ldl.buildResetPacket())
@@ -1227,8 +1243,8 @@ def alignType8Phase2(dev, num_inks, a, b, c, d): # 450
 
     dev.printData(s)
     dev.closePrint()
-    
-    
+
+
 def AlignType12(dev, loadpaper_ui):
     if loadpaper_ui():
         dev.setPML(pml.OID_PRINT_INTERNAL_PAGE, pml.PRINT_INTERNAL_PAGE_ALIGNMENT_PAGE)
@@ -1603,7 +1619,7 @@ def colorCalType4(dev, loadpaper_ui, colorcal_ui, wait_ui):
 def colorCalType4Phase1(dev):
     dev.setPML(pml.OID_PRINT_INTERNAL_PAGE,
               pml.PRINT_INTERNAL_PAGE_COLOR_CAL)
-              
+
     dev.closePML()
 
 
@@ -1637,29 +1653,29 @@ def colorCalType4Phase2(dev, values):
 
     dev.setPML(pml.OID_COLOR_CALIBRATION_ARRAY_1,
                             kadj)
-                            
+
     dev.setPML(pml.OID_COLOR_CALIBRATION_ARRAY_2,
                             Cadj)
-                            
+
     dev.setPML(pml.OID_COLOR_CALIBRATION_ARRAY_3,
                             Madj)
-    
+
     dev.setPML(pml.OID_COLOR_CALIBRATION_ARRAY_4,
                             Yadj)
-                            
+
     dev.setPML(pml.OID_COLOR_CALIBRATION_ARRAY_5,
                             cadj)
-    
+
     dev.setPML(pml.OID_COLOR_CALIBRATION_ARRAY_6,
                             madj)
-                            
+
     dev.closePML()
 
 
 def colorCalType4Phase3(dev):
     dev.setPML(pml.OID_PRINT_INTERNAL_PAGE,
                          pml.PRINT_INTERNAL_PAGE_COLOR_PALETTE_CMYK_PAGE)
-                         
+
     dev.closePML()
 
 
@@ -1668,32 +1684,32 @@ def colorCalType5(dev, loadpaper_ui):
         dev.printData("""\x1b%-12345X@PJL ENTER LANGUAGE=PCL3GUI\n\x1bE\x1b%Puifp.multi_button_push 20;\nudw.quit;\x1b*rC\x1bE\x1b%-12345X""")
         dev.closePrint()
 
-        
+
 def colorCalType6(dev, loadpaper_ui):
     if loadpaper_ui():
         dev.setPML(pml.OID_PRINT_INTERNAL_PAGE, pml.PRINT_INTERNAL_PAGE_COLOR_CAL)
         dev.closePML()
-        
+
 def colorCalType7(dev, loadpaper_ui):
     if loadpaper_ui():
         dev.setPML(pml.OID_PRINT_INTERNAL_PAGE, pml.PRINT_INTERNAL_PAGE_AUTOMATIC_COLOR_CALIBRATION)
         dev.closePML()
 
-# ********************** LF Cal **********************        
-        
+# ********************** LF Cal **********************
+
 def linefeedCalType1(dev, loadpaper_ui):
     if loadpaper_ui():
         dev.printData("""\x1b%-12345X@PJL ENTER LANGUAGE=PCL3GUI\n\x1bE\x1b%Puifp.multi_button_push 3;\nudw.quit;\x1b*rC\x1bE\x1b%-12345X""")
         dev.closePrint()
-        
+
 def linefeedCalType2(dev, loadpaper_ui):
     if loadpaper_ui():
         dev.setPML(pml.OID_PRINT_INTERNAL_PAGE, pml.PRINT_INTERNAL_PAGE_LINEFEED_CALIBRATION)
         dev.closePML()
 
 
-# ********************** PQ Diag **********************        
-        
+# ********************** PQ Diag **********************
+
 def printQualityDiagType1(dev, loadpaper_ui):
     if loadpaper_ui():
         dev.printData("""\x1b%-12345X@PJL ENTER LANGUAGE=PCL3GUI\n\x1bE\x1b%Puifp.multi_button_push 14;\nudw.quit;\x1b*rC\x1bE\x1b%-12345X""")

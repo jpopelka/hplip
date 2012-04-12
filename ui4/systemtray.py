@@ -74,6 +74,7 @@ HIDE_INACTIVE_DELAY = 5000
 BLIP_DELAY = 2000
 SET_MENU_DELAY = 1000
 MAX_MENU_EVENTS = 10
+UPGRADE_CHECK_DELAY=24*60*60*1000 		#1 day
 
 ERROR_STATE_TO_ICON = {
     ERROR_STATE_CLEAR:        QSystemTrayIcon.Information,
@@ -205,7 +206,14 @@ class HistoryDevice(QObject):
 class SystraySettingsDialog(QDialog):
     def __init__(self, parent, systray_visible, polling,
                  polling_interval, systray_messages,
-                 device_list=None):
+                 device_list=None,
+                 upgrade_notify=True,
+                 upgrade_pending_time=0,
+                 upgrade_last_update_time=0,
+                 upgrade_msg=""
+                 ):
+#                 upgrade_pending_update_time=0,
+
 
         QDialog.__init__(self, parent)
 
@@ -219,6 +227,10 @@ class SystraySettingsDialog(QDialog):
 
         self.polling = polling
         self.polling_interval = polling_interval
+        self.upgrade_notify =upgrade_notify
+        self.upgrade_last_update_time=upgrade_last_update_time
+        self.upgrade_pending_time=upgrade_pending_time
+        self.upgrade_msg=upgrade_msg
 
         self.initUi()
         self.SystemTraySettings.updateUi()
@@ -235,7 +247,10 @@ class SystraySettingsDialog(QDialog):
         self.SystemTraySettings.initUi(self.systray_visible,
                                        self.polling, self.polling_interval,
                                        self.device_list,
-                                       self.systray_messages)
+                                       self.systray_messages,
+                                       self.upgrade_notify,
+                                       self.upgrade_pending_time,
+                                       self.upgrade_msg)
 
         sizePolicy = QSizePolicy(QSizePolicy.Expanding,QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -260,6 +275,9 @@ class SystraySettingsDialog(QDialog):
         #QMetaObject.connectSlotsByName(self)
 
         self.setWindowTitle(self.__tr("HP Device Manager - System Tray Settings"))
+        self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))
+#        pm = load_pixmap("hp_logo", "32x32")
+#        self.prop_icon = QIcon(pm)
 
 
     def acceptClicked(self):
@@ -268,11 +286,13 @@ class SystraySettingsDialog(QDialog):
         self.polling_interval = self.SystemTraySettings.polling_interval
         self.device_list = self.SystemTraySettings.device_list
         self.systray_messages = self.SystemTraySettings.systray_messages
+        self.upgrade_notify =self.SystemTraySettings.upgrade_notify
         self.accept()
 
 
     def __tr(self, s, c=None):
         return QApplication.translate("SystraySettingsDialog", s, c, QApplication.UnicodeUTF8)
+
 
 
 
@@ -325,7 +345,13 @@ class SystemTrayApp(QApplication):
         self.tray_icon.setIcon(self.prop_active_icon)
         self.active_icon = True
 
+        self.handle_hplip_updation()
         QTimer.singleShot(SET_MENU_DELAY, self.initDone)
+
+        self.timer = QTimer()
+        self.timer.connect(self.timer,SIGNAL("timeout()"),self.handle_hplip_updation)
+        self.timer.start(UPGRADE_CHECK_DELAY)
+
 
 
     def initDone(self):
@@ -342,6 +368,37 @@ class SystemTrayApp(QApplication):
             devices[device_uri] = HistoryDevice(device_uri)
         else:
             devices[device_uri].needs_update = True
+
+
+    def handle_hplip_updation(self):
+        log.debug("handle_hplip_updation upgrade_notify =%d"%(self.user_settings.upgrade_notify))
+        path = utils.which('hp-upgrade')
+        if self.user_settings.upgrade_notify is False:
+            log.debug("upgrade notification is disabled in systray ")
+            if path:
+                path = os.path.join(path, 'hp-upgrade')
+                log.debug("Running hp-upgrade: %s " % (path))
+                # this just updates the available version in conf file. But won't notify
+                os.spawnlp(os.P_NOWAIT, path, 'hp-upgrade', '--check')
+            return
+            
+            
+        current_time = time.time()
+    
+        if int(current_time) > self.user_settings.upgrade_pending_update_time:
+            path = utils.which('hp-upgrade')
+            if path:
+                path = os.path.join(path, 'hp-upgrade')
+                log.debug("Running hp-upgrade: %s " % (path))
+                os.spawnlp(os.P_NOWAIT, path, 'hp-upgrade', '--notify')
+                
+            else:
+                log.error("Unable to find hp-upgrade --notify on PATH.")
+        else:
+            log.debug("upgrade schedule time is not yet completed. schedule time =%d current time =%d " %(self.user_settings.upgrade_pending_update_time, current_time))
+        
+
+
 
 
 
@@ -417,16 +474,41 @@ class SystemTrayApp(QApplication):
             return
 
         self.sendMessage('', '', EVENT_DEVICE_STOP_POLLING)
+#        sys_conf
+        cur_vers = sys_conf.get('hplip', 'version')
+        self.user_settings.load()
+        installed_time =time.strftime("%d-%m-%Y", time.localtime(self.user_settings.upgrade_last_update_time))
+        if utils.Is_HPLIP_older_version(cur_vers, self.user_settings.latest_available_version):
+            if int(time.time()) < self.user_settings.upgrade_pending_update_time :
+                postponed_time =time.strftime("%d-%m-%Y", time.localtime(self.user_settings.upgrade_pending_update_time))
+                upgrade_msg ="HPLIP-%s version was installed on %s.\n\nNew version of HPLIP-%s is available for upgrade. HPLIP upgrade is scheduled on %s." %(cur_vers,installed_time , self.user_settings.latest_available_version, postponed_time)
+            elif self.user_settings.upgrade_last_update_time:
+                upgrade_msg ="HPLIP-%s version was installed on %s.\n\nNew version of HPLIP-%s is available for upgrade." %(cur_vers,installed_time , self.user_settings.latest_available_version)
+            else:
+                upgrade_msg ="HPLIP-%s version was installed.\n\nNew version of HPLIP-%s is available for upgrade." %(cur_vers, self.user_settings.latest_available_version)
+        elif self.user_settings.upgrade_last_update_time:
+            upgrade_msg ="HPLIP-%s version was installed on %s."%(cur_vers, installed_time)
+        else: 
+            upgrade_msg ="HPLIP-%s version was installed."%(cur_vers)
+            
+        
         try:
             dlg = SystraySettingsDialog(self.menu, self.user_settings.systray_visible,
                                         self.user_settings.polling, self.user_settings.polling_interval,
                                         self.user_settings.systray_messages,
-                                        self.user_settings.polling_device_list)
+                                        self.user_settings.polling_device_list,
+                                        self.user_settings.upgrade_notify,
+                                        self.user_settings.upgrade_pending_update_time,
+                                        self.user_settings.upgrade_last_update_time,
+                                        upgrade_msg)
+
 
             if dlg.exec_() == QDialog.Accepted:
                 self.user_settings.systray_visible = dlg.systray_visible
                 self.user_settings.systray_messages = dlg.systray_messages
-
+                self.user_settings.upgrade_notify = dlg.upgrade_notify
+        
+                log.debug("HPLIP update  notification = %d"%(self.user_settings.upgrade_notify))
                 self.user_settings.save()
 
                 if self.user_settings.systray_visible == SYSTRAY_VISIBLE_SHOW_ALWAYS:

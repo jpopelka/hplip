@@ -105,6 +105,7 @@ TECH_CLASSES = [
     "Copperhead",
     "Ampere",
     "Python11",
+    "Saipan",
 ]
 
 TECH_CLASSES.sort()
@@ -159,6 +160,7 @@ TECH_CLASS_PDLS = {
     "Mimas"      : 'pcl3',
     "StingrayOJ"   : 'pcl3',
     "Copperhead"   : 'pcl3',
+    "Copperhead12"   : 'pcl3',
     "Ampere"	   : 'pcl3'
 }
 
@@ -306,7 +308,6 @@ class ModelData:
             'power-settings': TYPE_INT,
             'pq-diag-type' : TYPE_INT,
             'r-type' : TYPE_INT,
-            'scan-style' : TYPE_INT,
             'scan-type' : TYPE_INT,
             'scan-src' : TYPE_INT,
             #'scan-duplex' : TYPE_BOOL,

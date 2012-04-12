@@ -374,9 +374,8 @@ SANE_Status __attribute__ ((visibility ("hidden"))) ledm_open(SANE_String_Const 
 
   if (hpmud_open_device(session->uri, ma.mfp_mode, &session->dd) != HPMUD_R_OK)
   {
-    free(session);
-    session = NULL;
-    return SANE_STATUS_IO_ERROR;
+    stat = SANE_STATUS_IO_ERROR;
+    goto bugout;
   }
 
   init_options(session);
@@ -384,6 +383,7 @@ SANE_Status __attribute__ ((visibility ("hidden"))) ledm_open(SANE_String_Const 
   if (bb_open(session))
   {
     stat = SANE_STATUS_IO_ERROR;
+    goto bugout;
   }
 
   /* Set supported Scan Modes as determined by bb_open. */
@@ -414,7 +414,22 @@ SANE_Status __attribute__ ((visibility ("hidden"))) ledm_open(SANE_String_Const 
 
   stat = SANE_STATUS_GOOD;
 
-return stat;
+bugout:
+
+   if (stat != SANE_STATUS_GOOD)
+   {
+      if (session)
+      {
+         if (session->cd > 0)
+            hpmud_close_channel(session->dd, session->cd);
+         if (session->dd > 0)
+            hpmud_close_device(session->dd);
+         free(session);
+         session = NULL;
+      }
+   }
+
+   return stat;
 }
 
 const SANE_Option_Descriptor *ledm_get_option_descriptor(SANE_Handle handle, SANE_Int option)
@@ -509,6 +524,7 @@ SANE_Status ledm_control_option(SANE_Handle handle, SANE_Int option, SANE_Action
                  i = session->adf_resolutionList[0] + 1;
                  while(i--) session->resolutionList[i] = session->adf_resolutionList[i];
                }
+               ps->currentResolution = session->resolutionList[1];
                mset_result |= SANE_INFO_RELOAD_PARAMS | SANE_INFO_RELOAD_OPTIONS;
                stat = SANE_STATUS_GOOD;
                break;
@@ -762,12 +778,13 @@ SANE_Status ledm_start(SANE_Handle handle)
   }   
 
   /* If input is ADF and ADF is empty, return SANE_STATUS_NO_DOCS. */
-  if (ps->currentInputSource==IS_ADF)
+  if (ps->currentInputSource==IS_ADF || ps->currentInputSource ==IS_ADF_DUPLEX)
   {
     ret = bb_is_paper_in_adf(ps);   /* 0 = no paper in adf, 1 = paper in adf, -1 = error */
     if (ret == 0)
     {
       stat = SANE_STATUS_NO_DOCS;   /* done scanning */
+      SendScanEvent (ps->uri, EVENT_SCAN_ADF_NO_DOCS);
       goto bugout;
     }
     else if (ret < 0)
@@ -778,11 +795,9 @@ SANE_Status ledm_start(SANE_Handle handle)
   }
 
    /* Start scan and get actual image traits. */
-  if (bb_start_scan(ps))
-  {
-    stat = SANE_STATUS_IO_ERROR;
+  stat = bb_start_scan(ps);
+  if (stat != SANE_STATUS_GOOD)
     goto bugout;
-  }
 
   if(ps->user_cancel)
   {

@@ -508,7 +508,7 @@ try:
             try:
                 output = file(os.path.expanduser('/var/lib/hp/hplip.state'), 'r').read()
             except (IOError, OSError), e:
-                log.error("Could not access file: %s" % e.strerror)
+                log.info("Plugins are not installed. Could not access file: %s" % e.strerror)
             else:
                 log.info(output)
 
@@ -661,15 +661,18 @@ try:
 
                         plugin = d.mq.get('plugin', PLUGIN_NONE)
                         if plugin in (PLUGIN_REQUIRED, PLUGIN_OPTIONAL):
-
-                            if core.check_for_plugin():
+                            plugin_sts = core.check_for_plugin()
+                            if plugin_sts == PLUGIN_INSTALLED:
                                 if plugin == PLUGIN_REQUIRED:
                                     log.info("Required plug-in status: Installed")
                                 else:
                                     log.info("Optional plug-in status: Installed")
+                            elif plugin_sts == PLUGIN_VERSION_MISMATCH:
+                                num_errors += 1
+                                log.warn("Optional plug-in status: Version mismatch")
+                                
                             else:
                                 num_errors += 1
-
                                 if plugin == PLUGIN_REQUIRED:
                                     log.error("Required plug-in status: Not installed")
                                 else:

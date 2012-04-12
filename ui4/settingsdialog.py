@@ -40,12 +40,22 @@ class SettingsDialog(QDialog, Ui_SettingsDialog_base):
 
         self.user_settings = UserSettings()
         self.user_settings.load()
-
+        
+        cur_vers = sys_conf.get('hplip', 'version')
+        last_ver = user_conf.get('upgrade','latest_available_version')
+        if cur_vers != last_ver:
+            upgrade_msg ="Currently HPLIP-%s version is installed.\nLatest HPLIP-%s version is available for installation"%(cur_vers, last_ver)
+        else:
+            upgrade_msg ="HPLIP-%s version is installed"%(cur_vers)
+            
         self.SystemTraySettings.initUi(self.user_settings.systray_visible,
                                        self.user_settings.polling,
                                        self.user_settings.polling_interval,
                                        self.user_settings.device_list,
-                                       self.user_settings.systray_messages)
+                                       self.user_settings.systray_messages,
+                                       self.user_settings.upgrade_notify,
+                                       self.user_settings.upgrade_pending_update_time,
+                                       upgrade_msg)
 
         self.updateControls()
 

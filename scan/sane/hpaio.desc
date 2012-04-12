@@ -250,9 +250,6 @@
 :model "HP PSC 500 All-in-one Printer"
 :status :good
 
-:model "HP Officejet 500 All-in-one Printer"
-:status :good
-
 :model "HP Photosmart Estn c510 Series"
 :status :good
 
@@ -377,6 +374,9 @@
 :status :good
 
 :model "HP LaserJet m1120n Multifunction Printer"
+:status :good
+
+:model "HP LaserJet Professional m1132s Multifunction Printer"
 :status :good
 
 :model "HP LaserJet Professional m1132 Multifunction Printer"
@@ -2201,6 +2201,12 @@
 :status :good
 
 :model "HP Photosmart 6510 E-all-in-one"
+:status :good
+
+:model "HP Officejet 6600 E-all-in-one Printer - h711a"
+:status :good
+
+:model "HP Officejet 6700 E-all-in-one Printer - h711n"
 :status :good
 
 :model "HP Officejet 7100 All-in-one Printer"

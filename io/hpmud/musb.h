@@ -47,6 +47,7 @@ enum FD_ID
    FD_ff_4_1,        /* orblite scan / rest scan interface */
    FD_ff_1_0,        /* Marvell fax support*/
    FD_ff_cc_0,
+   FD_ff_2_10,
    MAX_FD
 };
 

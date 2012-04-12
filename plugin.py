@@ -279,7 +279,7 @@ else: # INTERACTIVE_MODE
 
         tui.header("PLUG-IN INSTALLATION FOR HPLIP %s" % version)
 
-        if core.check_for_plugin() and plugin_path is None:
+        if core.check_for_plugin() == PLUGIN_INSTALLED and plugin_path is None:
             log.info("The driver plugin for HPLIP %s appears to already be installed." % version)
 
             cont, ans = tui.enter_yes_no("Do you wish to download and re-install the plug-in?")

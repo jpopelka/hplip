@@ -10,9 +10,10 @@
 from PyQt4 import QtCore, QtGui
 
 class Ui_Dialog(object):
-    def setupUi(self, Dialog):
+    def setupUi(self, Dialog, upgrade=False):
         Dialog.setObjectName("Dialog")
         Dialog.resize(500, 180)
+        self.upgradePlugin=upgrade
         self.gridlayout = QtGui.QGridLayout(Dialog)
         self.gridlayout.setObjectName("gridlayout")
         self.StackedWidget = QtGui.QStackedWidget(Dialog)
@@ -60,7 +61,10 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", "HP Device Manager - Plug-in Installer", None, QtGui.QApplication.UnicodeUTF8))
         self.label.setText(QtGui.QApplication.translate("Dialog", "Driver Plug-in Required", None, QtGui.QApplication.UnicodeUTF8))
-        self.TitleLabel.setText(QtGui.QApplication.translate("Dialog", "HP Device requires proprietary plug-in which is missing. Press Next to continue plug-in installation", None, QtGui.QApplication.UnicodeUTF8))
+        if self.upgradePlugin is False:
+            self.TitleLabel.setText(QtGui.QApplication.translate("Dialog", "HP Device proprietary plug-in is missing. Click 'Next' to continue plug-in installation.", None, QtGui.QApplication.UnicodeUTF8))
+        else:
+            self.TitleLabel.setText(QtGui.QApplication.translate("Dialog", "HP Device plug-in version mismatch or some files are corrupted.\nClick 'Next' to install required plug-in.", None, QtGui.QApplication.UnicodeUTF8))
         self.NextButton.setText(QtGui.QApplication.translate("Dialog", "Next >", None, QtGui.QApplication.UnicodeUTF8))
         self.CancelButton.setText(QtGui.QApplication.translate("Dialog", "Cancel", None, QtGui.QApplication.UnicodeUTF8))
 

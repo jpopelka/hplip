@@ -435,7 +435,8 @@ def copyPluginFiles(src_dir):
     sys_state.set('plugin', "installed", '1')
     log.debug("Updating hplip.conf - eula = 1")
     sys_state.set('plugin', "eula", '1')
-
+    plugin_version = sys_conf.get('hplip', 'version', '0.0.0')
+    sys_state.set('plugin','version', plugin_version)
     return True
 
 

@@ -616,6 +616,62 @@
                         </widget>
                     </grid>
                 </widget>
+                <widget class="QWidget">
+                    <property name="name">
+                        <cstring>TabPage</cstring>
+                    </property>
+                    <attribute name="title">
+                        <string>Upgrade</string>
+                    </attribute>
+                    <widget class="QPushButton">
+                        <property name="name">
+                            <cstring>pushButton4</cstring>
+                        </property>
+                        <property name="geometry">
+                            <rect>
+                                <x>390</x>
+                                <y>40</y>
+                                <width>111</width>
+                                <height>30</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>pushButton4</string>
+                        </property>
+                    </widget>
+                    <widget class="QLabel">
+                        <property name="name">
+                            <cstring>textLabel1</cstring>
+                        </property>
+                        <property name="geometry">
+                            <rect>
+                                <x>17</x>
+                                <y>43</y>
+                                <width>330</width>
+                                <height>20</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>textLabel1</string>
+                        </property>
+                    </widget>
+                    <widget class="QLabel">
+                        <property name="name">
+                            <cstring>textLabel2</cstring>
+                        </property>
+                        <property name="geometry">
+                            <rect>
+                                <x>11</x>
+                                <y>91</y>
+                                <width>480</width>
+                                <height>70</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>textLabel2</string>
+                        </property>
+                    </widget>
+                </widget>
             </widget>
         </widget>
     </grid>

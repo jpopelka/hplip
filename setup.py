@@ -134,7 +134,7 @@ mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
                     run_as_root_ok=True)
 
 opts, device_uri, printer_name, mode, ui_toolkit, loc = \
-    mod.parseStdOpts('axp:P:f:t:b:d:r',
+    mod.parseStdOpts('axp:P:f:t:b:d:rq',
                      ['ttl=', 'filter=', 'search=', 'find=',
                       'method=', 'time-out=', 'timeout=',
                       'printer=', 'fax=', 'type=', 'port=',
@@ -152,6 +152,7 @@ auto = False
 testpage_in_auto_mode = True
 jd_port = 1
 remove = False
+ignore_plugin_check = False
 
 for o, a in opts:
     if o == '-x':
@@ -199,6 +200,8 @@ for o, a in opts:
 
     elif o in ('-r', '--rm', '--remove'):
         remove = True
+    elif o in ('-q'):
+        ignore_plugin_check = True
 
 
 try:
@@ -373,7 +376,7 @@ else: # INTERACTIVE_MODE
         plugin = mq.get('plugin', PLUGIN_NONE)
 
         plugin_installed = utils.to_bool(sys_state.get('plugin', 'installed', '0'))
-        if plugin > PLUGIN_NONE and not plugin_installed:
+        if ignore_plugin_check is False and plugin > PLUGIN_NONE and not plugin_installed:
             tui.header("PLUG-IN INSTALLATION")
 
             hp_plugin = utils.which('hp-plugin')
@@ -417,13 +420,14 @@ else: # INTERACTIVE_MODE
 
             printer_default_model = default_model
 
+            installed_printer_names = device.getSupportedCUPSPrinterNames(['hp'])
             # Check for duplicate names
-            if device_uri in installed_print_devices and \
-                printer_default_model in installed_print_devices[device_uri]:
+            if (device_uri in installed_print_devices and printer_default_model in installed_print_devices[device_uri]) \
+               or (printer_default_model in installed_printer_names):
                     i = 2
                     while True:
                         t = printer_default_model + "_%d" % i
-                        if t not in installed_print_devices[device_uri]:
+                        if (t not in installed_printer_names) and(device_uri not in installed_print_devices or t not in installed_print_devices[device_uri]):
                             printer_default_model += "_%d" % i
                             break
                         i += 1
@@ -629,13 +633,14 @@ else: # INTERACTIVE_MODE
 
             fax_default_model = default_model + '_fax'
 
+            installed_fax_names = device.getSupportedCUPSPrinterNames(['hpfax'])
             # Check for duplicate names
-            if fax_uri in installed_fax_devices and \
-                fax_default_model in installed_fax_devices[fax_uri]:
+            if (fax_uri in installed_fax_devices and fax_default_model in installed_fax_devices[fax_uri]) \
+                or (fax_default_model in installed_fax_names):
                     i = 2
                     while True:
                         t = fax_default_model + "_%d" % i
-                        if t not in installed_fax_devices[fax_uri]:
+                        if (t in installed_fax_names) and (fax_uri not in installed_fax_devices or t not in installed_fax_devices[fax_uri]):
                             fax_default_model += "_%d" % i
                             break
                         i += 1

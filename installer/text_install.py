@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2014 Hewlett-Packard Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# Author: Don Welch
+# Author: Don Welch, Amarnath Chitumalla
 #
 
 # Std Lib
@@ -32,6 +32,7 @@ from base import utils, tui
 from core_install import *
 
 def start_systray():
+    tui.title("RE-STARTING HP_SYSTRAY")
     path = utils.which('hp-systray')
     if path:
         path = os.path.join(path, 'hp-systray')
@@ -90,6 +91,13 @@ def start(language, auto=True, test_depends=False,
 
         log.info("")
         log.note("Defaults for each question are maked with a '*'. Press <enter> to accept the default.")
+        core.init()
+        if not core.distro_name in ("ubuntu","debian","suse","fedora"):
+            log.error("Auto installation is not supported for '%s' distro so all dependencies may not be installed. \nPlease install manually as mentioned in 'http://hplipopensource.com/hplip-web/install/manual/index.html' web-site"% core.distro_name)
+            ok, choice = tui.enter_choice("\nPress 'y' If you still want to continue auto installation. Press 'n' to quit auto instalation(y=yes, n=no*): ",['y','n'],'n')
+            if not ok or choice =='n':
+                log.info("Installation exit")
+                sys.exit()
 
         if not auto:
             tui.title("INSTALLATION MODE")
@@ -116,7 +124,8 @@ def start(language, auto=True, test_depends=False,
                 return
 
         log.info("\nInitializing. Please wait...")
-        core.init()
+        prev_hplip_version= sys_conf.get("hplip","version","0.0.0")
+
 
         if test_unknown:
             core.distro_name = 'unknown'
@@ -125,21 +134,8 @@ def start(language, auto=True, test_depends=False,
 
 
         #
-        # HPLIP vs. HPIJS INSTALLATION
+        # HPLIP INSTALLATION
         #
-
-        #if not auto:
-            #tui.title("INSTALL TYPE")
-            #log.info("For most users, it is recommended to install HPLIP with full support (scanning, faxing, toolbox, etc).")
-            #log.info("For servers or minimal installations, you can also install print support only (HPIJS only).")
-
-            #ok, choice = tui.enter_choice("\nInstall full hplip support (recommended) or print-only support (f=full hplip support*, p=printing only support, q=quit) ?",
-                #['f', 'p'], 'f')
-            #if not ok: sys.exit(0)
-            #if choice  == 'p':
-                #core.selected_component = 'hpijs'
-
-        #log.debug(core.selected_component)
         core.selected_component = 'hplip'
 
         #
@@ -150,31 +146,9 @@ def start(language, auto=True, test_depends=False,
 
         if core.selected_component == 'hplip':
             log.info("This installer will install HPLIP version %s on your computer." % core.version_public)
-            #core.hpijs_build = False
-        #else:
-            #log.info("This installer will install HPIJS version %s on your computer." % core.version_public)
-            #core.hpijs_build = True
 
         log.info("Please close any running package management systems now (YaST, Adept, Synaptic, Up2date, etc).")
 
-##        #
-##        # RELEASE NOTES
-##        #
-##
-##        if not auto:
-##            if os.getenv('DISPLAY'):
-##                tui.title("VIEW RELEASE NOTES")
-##                log.info("Release notes from this version are available as a web (HTML) document.")
-##                log.info("The release notes file will be shown in a separate web browser window.")
-##
-##                ok, ans = tui.enter_yes_no("\nWould you like to view the release notes for this version of HPLIP", 'n')
-##
-##                if ok and ans:
-##                    log.info("Displaying release notes in a browser window...")
-##                    core.show_release_notes_in_browser()
-##
-##                if not ok:
-##                    sys.exit(0)
 
         # For testing, mark all dependencies missing
         if test_depends:
@@ -327,11 +301,10 @@ def start(language, auto=True, test_depends=False,
 
                 sys.exit(1)
 
+
         #
         # SELECT OPTIONS TO INSTALL
         #
-
-
 
         if not auto:
             tui.title("SELECT HPLIP OPTIONS")
@@ -339,14 +312,6 @@ def start(language, auto=True, test_depends=False,
             log.info("")
             num_opt_missing = core.select_options(option_question_callback)
 
-        #else: # auto
-            #ok, enable_par = tui.enter_yes_no("Would you like to enable support for parallel (LPT:) connected printers?", 'n')
-            #if not ok: sys.exit(0)
-
-            #core.selected_options['parallel'] = enable_par
-
-            #if enable_par:
-                #log.info("Parallel support enabled.")
         else:
             enable_par = False
             core.selected_options['parallel'] = False
@@ -371,7 +336,7 @@ def start(language, auto=True, test_depends=False,
                 log.error("3 incorrect attempts. (or) Insufficient permissions(i.e. try with sudo user).\nExiting.")
                 sys.exit(1)
 
-        #
+
         # INSTALLATION NOTES
         #
 
@@ -440,9 +405,6 @@ def start(language, auto=True, test_depends=False,
                     log.error("Installation cannot continue without this dependency. Please manually install this dependency and re-run this installer.")
                     sys.exit(0)
 
-                #log.info("-"*10)
-                #log.info("")
-
         #
         # OPTIONAL dependencies
         #
@@ -493,11 +455,8 @@ def start(language, auto=True, test_depends=False,
                         core.selected_options[opt] = False
 
 
-                #log.info("-"*10)
-                #log.info("")
 
-
-        log.debug("Dependencies to install: %s" % depends_to_install)
+        log.debug("Dependencies to install: %s  hplip_present:%s" % (depends_to_install, core.hplip_present))
 
         if core.distro_version_supported and \
             (depends_to_install or core.hplip_present) and \
@@ -536,14 +495,17 @@ def start(language, auto=True, test_depends=False,
             #
             # CHECK FOR ACTIVE NETWORK CONNECTION
             #
-
             if not assume_network:
                 tui.title("CHECKING FOR NETWORK CONNECTION")
 
                 if not core.check_network_connection():
-                    log.error("\nThe network appears to be unreachable. Installation cannot complete without access to")
-                    log.error("distribution repositories. Please check the network and try again.")
-                    sys.exit(1)
+                    log.error("The network appears to be unreachable. Installation may not resolve all dependencies without access to distribution repositories.")
+                    ok, choice = tui.enter_choice("Do you want to continue installation without network?. Press 'y' for YES. Press 'n' for NO (y=yes*, n=no) : ",['y', 'n'], 'y')
+                    if not ok or choice == 'n':
+                        log.info("Please connect network and try again")
+                        sys.exit(1)
+                    else:
+                        log.debug("Continuing installation without network")
                 else:
                     log.info("Network connection present.")
 
@@ -662,71 +624,29 @@ def start(language, auto=True, test_depends=False,
                         sys.exit(1)
 
 
-            ##
-            ## HPOJ REMOVAL
-            ##
-
-            #if core.hpoj_present and core.selected_component == 'hplip' and core.distro_version_supported:
-                #log.error("HPOJ is installed and/or running. HPLIP is not compatible with HPOJ.")
-                #failed = True
-                #hpoj_remove_cmd = core.get_distro_data('hpoj_remove_cmd')
-
-                #if hpoj_remove_cmd:
-                    #if auto:
-                        #answer = True
-                    #else:
-                        #ok, answer = tui.enter_yes_no("\nWould you like to have this installer attempt to uninstall HPOJ")
-
-                    #if not ok: sys.exit(0)
-
-                    #if answer:
-                        #failed = core.remove_hpoj(progress_callback)
-
-                        #if failed:
-                            #log.error("HPOJ removal failed. Please manually stop/remove/uninstall HPOJ and then re-run this installer.")
-                            #sys.exit(1)
-                    #else:
-                        #log.error("Please stop/remove/uninstall HPOJ and then re-run this installer.")
-                        #sys.exit(1)
-
-                #else:
-                    #log.error("Please stop/remove/uninstall HPOJ and then re-run this installer.")
-                    #sys.exit(1)
 
 
             #
             # HPLIP REMOVE
             #
-
             if core.hplip_present and core.selected_component == 'hplip' and core.distro_version_supported:
-                failed = True
-                log.warn("A previous install of HPLIP is installed and/or running.")
-
-                hplip_remove_cmd = core.get_distro_data('hplip_remove_cmd')
-                if hplip_remove_cmd:
-                    if auto:
-                        answer = True
-                    else:
-                        ok, answer = tui.enter_yes_no("\nWould you like to have this installer attempt to uninstall the previously installed HPLIP")
-                    if not ok: sys.exit(0)
-
-                    if answer:
-                        failed = core.remove_hplip(progress_callback)
-
-                else:
-                    log.error("The previously installed version of HPLIP may conflict with the new one being installed.")
-                    log.error("It is recommended that you quit this installer, and manually remove HPLIP before continuing.")
+                path = utils.which('hp-uninstall')
+                ok, choice = tui.enter_choice("HPLIP-%s exists, this may conflict with the new one being installed.\nDo you want to ('i'= Remove and Install, 'o'= Overwrite*, 'q'= Quit)?	:"%(prev_hplip_version),['i','o','q'],'o')
+                if not ok or choice=='q':
+                    log.error("User Exit")
                     sys.exit(0)
+                elif choice == 'i':
+#                    log.info("Uninstalling existing HPLIP-%s"%prev_hplip_version)
+                    sts =core.uninstall(NON_INTERACTIVE_MODE)
 
-                if failed:
-                    log.warn("HPLIP removal failed. The previous install may have been installed using a tarball or this installer.")
-                    log.warn("Continuing to run installer - this installation should overwrite the previous one.")
-
+                    if sts is False: 
+                        log.warn("Failed to uninstall existing HPLIP-%s. This installation will overwrite on existing HPLIP" %prev_hplip_version)
+                    else:
+                        log.debug("HPLIP-%s is uninstalled successfully." %prev_hplip_version)
 
             #
             # POST-DEPEND
             #
-
             tui.title("RUNNING POST-PACKAGE COMMANDS")
             core.run_post_depend(progress_callback)
             log.info("OK")
@@ -735,7 +655,6 @@ def start(language, auto=True, test_depends=False,
             #
             # DEPENDENCIES RE-CHECK
             #
-
             tui.title("RE-CHECKING DEPENDENCIES")
             core.check_dependencies()
 
@@ -818,7 +737,8 @@ def start(language, auto=True, test_depends=False,
         #
         # OPEN MDNS MULTICAST PORT
         #
-
+        user_conf = UserConfig()
+        
         if core.selected_options['network']:
             open_mdns_port = core.get_distro_ver_data('open_mdns_port')
             if open_mdns_port:
@@ -845,11 +765,8 @@ def start(language, auto=True, test_depends=False,
 
         if current_version >= 0x030902: # 3.9.2
             try:
-                # dBus
-                #import dbus
                 from dbus import SessionBus, lowlevel
             except ImportError:
-                #log.error("Unable to load DBus")
                 pass
             else:
                 try:
@@ -863,10 +780,17 @@ def start(language, auto=True, test_depends=False,
                 except:
                     pass
 	
-        tui.title("RE-STARTING HP_SYSTRAY")
-        start_systray()
+        tui.title("HPLIP UPDATE NOTIFICATION")
+        ok, choice = tui.enter_choice("Do you want to check for HPLIP updates?. (y=yes*, n=no) : ",['y', 'n'], 'y')
+        if not ok or choice != 'y':
+            user_conf.set('upgrade', 'notify_upgrade', 'false')
+        else:
+            user_conf.set('upgrade', 'notify_upgrade', 'true')
 
-        # Restart or re-plugin if necessary (always True in 2.7.9+)
+        user_conf.set('upgrade','last_upgraded_time',str(int(time.time())))
+        user_conf.set('upgrade','pending_upgrade_time','0')
+
+
         if core.selected_component == 'hplip':
             tui.title("RESTART OR RE-PLUG IS REQUIRED")
             cmd = "hp-setup"
@@ -879,23 +803,29 @@ def start(language, auto=True, test_depends=False,
             ok, choice = tui.enter_choice("Restart or re-plug in your printer (r=restart, p=re-plug in*, i=ignore/continue, q=quit) : ",
                 ['r', 'p', 'i'], 'p')
 
-            if not ok: sys.exit(0)
+            if not ok: 
+                start_systray()
+                sys.exit(0)
 
             if choice == 'r':
                 log.note("")
                 log.note("IMPORTANT! Make sure to save all work in all open applications before restarting!")
 
                 ok, ans = tui.enter_yes_no(log.bold("Restart now"), 'n')
-                if not ok: sys.exit(0)
+                if not ok: 
+                    start_systray()
+                    sys.exit(0)
                 if ans:
                     ok = core.restart()
                     if not ok:
                         log.error("Restart failed. Please restart using the system menu.")
 
+                start_systray()
                 sys.exit(0)
 
             elif choice == 'p': # 'p'
                 if not tui.continue_prompt("Please unplug and re-plugin your printer now. "):
+                    start_systray()
                     sys.exit(0)
 
 
@@ -909,13 +839,16 @@ def start(language, auto=True, test_depends=False,
                 install_printer = True
             else:
                 ok, install_printer = tui.enter_yes_no("Would you like to setup a printer now")
-                if not ok: sys.exit(0)
+                if not ok:
+                    start_systray()
+                    sys.exit(0)
 
             if install_printer:
                 log.info("Please make sure your printer is connected and powered on at this time.")
                 if not core.run_hp_setup():
                     log.error("hp-setup failed. Please run hp-setup manually.")
 
+        start_systray()
     except KeyboardInterrupt:
         log.info("")
         log.error("Aborted.")

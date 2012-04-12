@@ -90,7 +90,7 @@ def install_firmware(Plugin_Installation_Completed):
  
         if ps_plugin is False and ps_diagnose_plugin is False:            
             Plugin_Installation_Completed = True
-            if core.check_for_plugin() is True:
+            if core.check_for_plugin() == PLUGIN_INSTALLED:
                 break
             else:
                 log.error("Failed to download firmware required files. manually run hp-plugin command in terminal fisrt")
@@ -277,11 +277,14 @@ else:
 
 core = core_install.CoreInstall()
 core.set_plugin_version()
-if core.check_for_plugin():
+plugin_sts = core.check_for_plugin()
+if plugin_sts == PLUGIN_INSTALLED:
     log.info("Device Plugin is already installed")
     Is_Plugin_Already_Installed = True
+elif plugin_sts == PLUGIN_VERSION_MISMATCH:
+    log.info("HP Device Plug-in version mismatch or some files are corrupted")
 else:
-    log.info("Device Plugin is not found")
+    log.info("HP Device Plug-in is not found.")
 
 if Systray_Msg_Enabled:
     if not Is_Plugin_Already_Installed:

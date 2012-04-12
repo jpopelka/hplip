@@ -46,7 +46,7 @@ from plugindiagnose_base import Ui_Dialog
 
 
 class PluginDiagnose(QDialog, Ui_Dialog):
-    def __init__(self, parent, install_mode=PLUGIN_NONE, plugin_reason=PLUGIN_REASON_NONE):
+    def __init__(self, parent, install_mode=PLUGIN_NONE, plugin_reason=PLUGIN_REASON_NONE, upgrade=False):
         QDialog.__init__(self, parent)
         self.install_mode = install_mode
         self.plugin_reason = plugin_reason
@@ -54,7 +54,7 @@ class PluginDiagnose(QDialog, Ui_Dialog):
         self.result = False
         self.core = CoreInstall()
         self.core.set_plugin_version()
-        self.setupUi(self)
+        self.setupUi(self, upgrade)
 
         self.user_settings = UserSettings()
         self.user_settings.load()
@@ -99,7 +99,7 @@ class PluginDiagnose(QDialog, Ui_Dialog):
             plugin_reason = PLUGIN_REASON_NONE
             ok, sudo_ok = pkit.run_plugin_command(plugin == PLUGIN_REQUIRED, plugin_reason)
 	
-            if not ok or not self.core.check_for_plugin():
+            if not ok or self.core.check_for_plugin() != PLUGIN_INSTALLED:
                 FailureUI(self, self.__tr("Failed to install Plug-in.\nEither you have chosen to skip the Plug-in installation  or entered incorrect Password."))
 
         finally:

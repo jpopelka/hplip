@@ -155,7 +155,7 @@ int bb_open(struct ledm_session*);
 int bb_close(struct ledm_session*);
 int bb_get_parameters(struct ledm_session*, SANE_Parameters*, int);
 int bb_is_paper_in_adf();         /* 0 = no paper in adf, 1 = paper in adf, -1 = error */
-int bb_start_scan(struct ledm_session*);
+SANE_Status bb_start_scan(struct ledm_session*);
 int bb_get_image_data(struct ledm_session*, int); 
 int bb_end_page(struct ledm_session*, int);
 int bb_end_scan(struct ledm_session* , int);

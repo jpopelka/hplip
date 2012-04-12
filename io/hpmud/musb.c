@@ -22,7 +22,7 @@
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   Client/Server generic message format (see messaging-protocol.doc):
 
-  Author: Naga Samrat Chowdary Narla
+  Author: Naga Samrat Chowdary Narla, Sarbeswar Meher
 \*****************************************************************************/
 
 #include "hpmud.h"
@@ -91,21 +91,22 @@ static char *fd_name[MAX_FD] =
    "ff/4/1",
    "ff/1/0",
    "ff/cc/0",
+   "ff/2/10",
 };
 
 static int fd_class[MAX_FD] =
 {
-   0,0x7,0x7,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+   0,0x7,0x7,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
 };
 
 static int fd_subclass[MAX_FD] =
 {
-   0,0x1,0x1,0x1,0x2,0x3,0xff,0xd4,0x4,0x1,0xcc,
+   0,0x1,0x1,0x1,0x2,0x3,0xff,0xd4,0x4,0x1,0xcc,0x2,
 };
 
 static int fd_protocol[MAX_FD] =
 {
-   0,0x2,0x3,0x1,0x1,0x1,0xff,0,0x1,0,0,
+   0,0x2,0x3,0x1,0x1,0x1,0xff,0,0x1,0,0,0x10,
 };
 
 static const unsigned char venice_power_on[] = {0x1b, '%','P','u','i','f','p','.','p','o','w','e','r',' ','1',';',
@@ -1490,19 +1491,19 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_comp_channel_open
          fd = FD_ff_4_1;
          break;
       case HPMUD_SOAPSCAN_CHANNEL:
-         fd = FD_ff_2_1;   
+         fd = FD_ff_2_1;
          break;
       case HPMUD_SOAPFAX_CHANNEL:
-         fd = FD_ff_3_1;   
+         fd = FD_ff_3_1;
          break;
       case HPMUD_MARVELL_SCAN_CHANNEL:
-         fd = FD_ff_ff_ff;   
+         fd = FD_ff_ff_ff;
          break;
       case HPMUD_MARVELL_FAX_CHANNEL:  //using vendor specific C/S/P codes for fax too
-         fd = FD_ff_1_0;   
+         fd = FD_ff_1_0;
          break;
       case HPMUD_LEDM_SCAN_CHANNEL:  //using vendor specific C/S/P codes for fax too
-        fd = FD_ff_cc_0;
+         fd = FD_ff_cc_0;
          break;
       default:
          stat = HPMUD_R_INVALID_SN;

@@ -296,9 +296,14 @@ def getVSACodes(dev, adapterName):
     if params is not None:
         try:
             severity= params['io:vsacodes-wifi:vsacode-dd:severity']
+        except:
+            severity = ""
+        try:
             rule = params['io:vsacodes-wifi:vsacode-wifi:rulenumber']            
-        except KeyError, e:
-            log.error("Missing response key: %s" % str(e))
+       # except KeyError, e:
+           # log.error("Missing response key: %s" % str(e))
+        except:
+            rule = ""
         ret.append((rule, severity))       
     return ret  
 
@@ -362,22 +367,36 @@ def readXmlDataFromURI(dev,URI,xmlRootNode,xmlChildNode,timeout=5):
     params,code,elementCount ={},HTTP_ERROR,0 
     
     data = format_http_get(URI,0,"")
-    log.info(data)                        
-    dev.openLEDM()
-    dev.writeLEDM(data)
+    log.info(data)
     response = cStringIO.StringIO()
-    try:
-        while dev.readLEDM(1024, response, timeout):
-            pass
-    except Error:
-        dev.closeLEDM()
-        log.error("Unable to read LEDM Channel") 
-    dev.closeEWS_LEDM()    
-    strResp = str(response.getvalue())    
+    if dev.openLEDM() == -1:
+        dev.openEWS_LEDM()
+        dev.writeEWS_LEDM(data)
+        try:
+            while dev.readEWS_LEDM(1024, response, timeout):
+                pass
+        except Error:
+            dev.closeEWS_LEDM()
+            log.error("Unable to read EWS_LEDM Channel")
+    else:
+        dev.writeLEDM(data)
+
+    #response = cStringIO.StringIO()
+        try:
+            while dev.readLEDM(1024, response, timeout):
+                pass
+        except Error:
+            dev.closeLEDM()
+            log.error("Unable to read LEDM Channel") 
+    #dev.closeEWS_LEDM()    
+    strResp = str(response.getvalue())
+    #log.error(strResp)
     if strResp is not None:                         	
         code = get_error_code(strResp)        
     	pos = strResp.find(xmlRootNode,0,len(strResp))    
     	repstr = strResp[pos:].strip()
+        repstr = filter(lambda c: c not in "\r\t\n", repstr) # To remove formating characters from the received xml
+        repstr = repstr.rstrip('0')   # To remove trailing zero from the received xml
     	elementCount = repstr.count(xmlChildNode)          	    	
     	try:
             params = utils.XMLToDictParser().parseXML(repstr)            
@@ -390,17 +409,30 @@ def readXmlDataFromURI(dev,URI,xmlRootNode,xmlChildNode,timeout=5):
 def writeXmlDataToURI(dev,URI,xml,timeout=5):
     code = HTTP_ERROR
 
-    data = format_http_put(URI,len(xml),xml)  
-    dev.openLEDM()
-    dev.writeLEDM(data)
+    data = format_http_put(URI,len(xml),xml)
     response = cStringIO.StringIO()
-    try:
-        while dev.readLEDM(1000, response, timeout):
-            pass
-    except Error:
-        dev.closeLEDM()
-        log.error("Unable to read LEDM Channel") 
-    dev.closeLEDM()
+
+    if dev.openLEDM() == -1:
+        dev.openEWS_LEDM()
+        dev.writeEWS_LEDM(data)
+        try:
+            while dev.readEWS_LEDM(1000, response, timeout):
+                pass
+        except Error:
+                dev.closeEWS_LEDM()
+                log.error("Unable to read EWS_LEDM Channel")
+            
+    else:
+        dev.writeLEDM(data)
+    #response = cStringIO.StringIO()
+        try:
+            while dev.readLEDM(1000, response, timeout):
+                pass
+        except Error:
+            dev.closeLEDM()
+            log.error("Unable to read LEDM Channel") 
+        
+
     strResp = str(response.getvalue())    
     if strResp is not None:
         code = get_error_code(strResp)           

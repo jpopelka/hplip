@@ -45,6 +45,7 @@ import xml.parsers.expat as expat
 import getpass
 import locale
 import htmlentitydefs
+import urllib
 
 try:
     import platform
@@ -545,6 +546,11 @@ class UserSettings(object): # Note: Deprecated after 2.8.8 in Qt4 (see ui4/ui_ut
         self.cmd_copy = user_conf.get('commands', 'cpy', self.cmd_copy)
         self.cmd_fax = user_conf.get('commands', 'fax', self.cmd_fax)
         self.cmd_fab = user_conf.get('commands', 'fab', self.cmd_fab)
+
+        self.upgrade_notify= to_bool(user_conf.get('upgrade', 'notify_upgrade', '0'))
+        self.upgrade_last_update_time = int(user_conf.get('upgrade','last_upgraded_time', '0'))
+        self.upgrade_pending_update_time =int(user_conf.get('upgrade', 'pending_upgrade_time', '0'))
+        self.latest_available_version=str(user_conf.get('upgrade', 'latest_available_version',''))
         self.debug()
 
     def debug(self):
@@ -557,6 +563,10 @@ class UserSettings(object): # Note: Deprecated after 2.8.8 in Qt4 (see ui4/ui_ut
         log.debug("Auto refresh: %s" % self.auto_refresh)
         log.debug("Auto refresh rate: %s" % self.auto_refresh_rate)
         log.debug("Auto refresh type: %s" % self.auto_refresh_type)
+        log.debug("Upgrade notification:%d"  %self.upgrade_notify)
+        log.debug("Last Installed time:%d" %self.upgrade_last_update_time)
+        log.debug("Next scheduled installation time:%d" % self.upgrade_pending_update_time)
+
 
     def save(self):
         log.debug("Saving user settings...")
@@ -568,6 +578,11 @@ class UserSettings(object): # Note: Deprecated after 2.8.8 in Qt4 (see ui4/ui_ut
         user_conf.set('refresh', 'enable',self.auto_refresh)
         user_conf.set('refresh', 'rate', self.auto_refresh_rate)
         user_conf.set('refresh', 'type', self.auto_refresh_type)
+        user_conf.set('upgrade', 'notify_upgrade', self.upgrade_notify)
+        user_conf.set('upgrade','last_upgraded_time', self.upgrade_last_update_time)
+        user_conf.set('upgrade', 'pending_upgrade_time', self.upgrade_pending_update_time)
+        user_conf.set('upgrade', 'latest_available_version', self.latest_available_version)
+
         self.debug()
 
 
@@ -1034,7 +1049,7 @@ def getEndian():
 def get_password():
     return getpass.getpass("Enter password: ")
 
-def get_password_ui():
+def get_password_ui(pswd_msg=''):
     fp = open("/etc/hp/hplip.conf", "r")
     qt = "qt3"
     for line in fp:
@@ -1043,13 +1058,19 @@ def get_password_ui():
     fp.close()
     if qt is "qt4":
         from ui4.setupdialog import showPasswordUI
-        username, password = showPasswordUI("Your HP Device requires to install HP proprietary plugin\nPlease enter root/superuser password to continue", "root", False)
+        if pswd_msg == '':
+            username, password = showPasswordUI("Your HP Device requires to install HP proprietary plugin\nPlease enter root/superuser password to continue", "root", False)
+        else:
+            username, password = showPasswordUI(pswd_msg, "root", False)
     if qt is "qt3":
         from ui.setupform import showPasswordUI
-        username, password = showPasswordUI("Your HP Device requires to install HP proprietary plugin\nPlease enter root/superuser password to continue", "root", False)
+        if pswd_msg == '':
+            username, password = showPasswordUI("Your HP Device requires to install HP proprietary plugin\nPlease enter root/superuser password to continue", "root", False)
+        else:
+            username, password = showPasswordUI(pswd_msg, "root", False)
     return  password
 
-def run(cmd, log_output=True, password_func=get_password, timeout=1, spinner=True):
+def run(cmd, log_output=True, password_func=get_password, timeout=1, spinner=True, pswd_msg=''):
     output = cStringIO.StringIO()
 
     try:
@@ -1072,7 +1093,7 @@ def run(cmd, log_output=True, password_func=get_password, timeout=1, spinner=Tru
             if i == 0: # Password:
                 if password_func is not None:
                     if password_func == "get_password_ui":
-                        child.sendline(get_password_ui())
+                        child.sendline(get_password_ui(pswd_msg))
                     else:
                         child.sendline(password_func())
                 else:
@@ -1585,7 +1606,7 @@ encoding: utf8
         log.info("contact the HPLIP Team.")
 
         log.info(".SH COPYRIGHT")
-        log.info("Copyright (c) 2011-14 Hewlett-Packard Development Company, L.P.")
+        log.info("Copyright (c) 2001-14 Hewlett-Packard Development Company, L.P.")
         log.info(".LP")
         log.info("This software comes with ABSOLUTELY NO WARRANTY.")
         log.info("This is free software, and you are welcome to distribute it")
@@ -1604,7 +1625,7 @@ def log_title(program_name, version, show_ver=True): # TODO: Move to base/module
 
     log.info(log.bold("%s ver. %s" % (program_name, version)))
     log.info("")
-    log.info("Copyright (c) 2011-14 Hewlett-Packard Development Company, LP")
+    log.info("Copyright (c) 2001-14 Hewlett-Packard Development Company, LP")
     log.info("This software comes with ABSOLUTELY NO WARRANTY.")
     log.info("This is free software, and you are welcome to distribute it")
     log.info("under certain conditions. See COPYING file for more details.")
@@ -1737,6 +1758,103 @@ def Is_Process_Running(process_name):
         print >>sys.stderr, "Execution failed:", e
         return False, None
 
+#return tye: strings
+#Return values.
+#   None --> on error.
+#  "terminal name"-->success
+def get_terminal():
+    terminal_list=['gnome-terminal', 'konsole','x-terminal-emulator', 'xterm', 'gtkterm']
+    cnt = 0
+    terminal_cmd = None
+    while cnt < len(terminal_list):
+        if which(terminal_list[cnt]):
+            terminal_cmd = terminal_list[cnt]+" -e "
+            log.debug("Available Terminal = %s " %terminal_cmd)
+            break
+            
+    return terminal_cmd
+
+#Return Type: bool
+# Return values:
+#      True --> if it is older version
+#      False  --> if it is same or later version.
+
+def Is_HPLIP_older_version(installed_version, available_version):
+    
+    if available_version == "" or available_version == None or installed_version == "" or installed_version == None:
+        log.debug("available_version is ''")
+        return False
+
+    installed_array=installed_version.split('.')
+    available_array=available_version.split('.')
+
+    log.debug("HPLIP Installed_version=%s  Available_version=%s"%(installed_version,available_version))
+    cnt = 0
+    Is_older = False
+    while cnt <len(installed_array) and cnt <len(available_array):
+        if(int(installed_array[cnt]) < int(available_array[cnt])):
+            Is_older = True
+            break
+        elif(int(installed_array[cnt]) > int(available_array[cnt])):
+            log.debug("Already new verison is installed")
+            return False
+        cnt += 1
+
+    # To check internal version is installed.
+    if Is_older is False and len(installed_array) >len(available_array):
+        Is_older = True
+
+    return Is_older
+
+
+def downLoad_status(count, blockSize, totalSize):
+    percent = int(count*blockSize*100/totalSize)
+    if count != 0:
+        sys.stdout.write("\b\b\b")
+    sys.stdout.write("%s" %(log.color("%2d%%"%percent, 'bold')))
+    sys.stdout.flush()
+
+
+def download_from_network(weburl, outputFile = None, useURLLIB=False):
+    result =False
+
+    if weburl is "" or weburl is None:
+        log.error("URL is empty")
+        return result, ""
+
+    if outputFile is None:
+        fp, outputFile = make_temp_file()
+
+    try:
+        if useURLLIB is False:
+            wget = which("wget")
+            if wget:
+                wget = os.path.join(wget, "wget")
+                status, output = run("%s --cache=off --timeout=60 --output-document=%s %s" %(wget, outputFile, weburl))
+                if status:
+                    log.error("Failed to connect to HPLIP site. Error code = %d" %status)
+                    return False, ""
+            else:
+                useURLLIB = True
+
+        if useURLLIB:
+            sys.stdout.write("Download in progress...")
+            urllib.urlretrieve(weburl, outputFile, downLoad_status)
+
+    except IOError, e:
+        log.error("I/O Error: %s" % e.strerror)
+        return False, ""
+
+    if not os.path.exists(outputFile):
+        log.error("Failed to get hplip version/ %s file not found."%hplip_version_file)
+        return False, ""
+
+    return True, outputFile
+
+
+
+
+    
 class Sync_Lock:
     def __init__(self, filename):
         self.Lock_filename = filename

@@ -479,11 +479,11 @@ static int parse_key_value_pair(char *buf, int len, struct hpmud_model_attribute
       }
       else if(strcasecmp(key, "scan-type") == 0)
       {
-         ma->scantype = strtol(value, &tail2, 10);
+         ma->scantype = strtol(value, &tail2, 10); /*SCL, PML, SOAP, MARVELL, LEDM*/
       }
       else if(strcasecmp(key, "scan-src") == 0)
       {
-         ma->scansrc = strtol(value, &tail2, 10);
+         ma->scansrc = strtol(value, &tail2, 10); /*Flatbed, ADF, Camera or combination of these*/
       }
       else if(strcasecmp(key, "status-type") == 0)
       {

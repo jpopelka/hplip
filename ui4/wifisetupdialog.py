@@ -86,10 +86,12 @@ class WifiSetupDialog(QDialog, Ui_Dialog):
         self.adapterName = 'Wifi0'
         self.wifiObj = wifi
 
-        if self.device_uri is None:
-            QTimer.singleShot(0, self.showIntroPage)
-        else:
-            QTimer.singleShot(0, self.showNetworkPage)
+        #if self.device_uri is None:
+        #    QTimer.singleShot(0, self.showIntroPage)
+        #else:
+        #    QTimer.singleShot(0, self.showNetworkPage)
+
+        QTimer.singleShot(0, self.showIntroPage)
 
 
     #
@@ -685,6 +687,7 @@ class WifiSetupDialog(QDialog, Ui_Dialog):
             if row != -1:
                 self.device_uri = self.DevicesTableWidget.item(row, 0).device_uri
                 self.mq = device.queryModelByURI(self.device_uri)
+                
                 self.getWifiObject(self.mq['wifi-config'])               
                 back_end, is_hp, bus, model, serial, dev_file, host, zc, port = device.parseDeviceURI(self.device_uri)
                 self.model = models.normalizeModelName(model).lower()

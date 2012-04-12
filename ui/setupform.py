@@ -237,12 +237,12 @@ class SetupForm(SetupForm_base):
             core.set_plugin_version()
             plugin = self.mq.get('plugin', PLUGIN_NONE)
             plugin_reason = self.mq.get('plugin-reason', PLUGIN_REASON_NONE)
-            if plugin > PLUGIN_NONE and not core.check_for_plugin():
+            if plugin > PLUGIN_NONE and core.check_for_plugin() != PLUGIN_INSTALLED:
                 ok, sudo_ok = pkit.run_plugin_command(plugin == PLUGIN_REQUIRED, plugin_reason)
                 if not sudo_ok:
                     self.FailureUI(self.__tr("<b>Unable to find an appropriate su/sudo utility to run hp-plugin.</b><p>Install kdesu, gnomesu, or gksu.</p>"))
                     return
-                if not ok or not core.check_for_plugin():
+                if not ok or core.check_for_plugin() != PLUGIN_INSTALLED:
                     if plugin == PLUGIN_REQUIRED:
                         self.FailureUI(self.__tr("<b>The printer you are trying to setup requires a binary driver plug-in and it failed to install.</b><p>Please check your internet connection and try again.</p><p>Visit <u>http://hplipopensource.com</u> for more information.</p>"))
                         return
@@ -606,13 +606,14 @@ class SetupForm(SetupForm_base):
 
         printer_name = default_model
 
+        installed_printer_names = device.getSupportedCUPSPrinterNames(['hp'])
         # Check for duplicate names
-        if self.device_uri in self.installed_print_devices and \
-            printer_name in self.installed_print_devices[self.device_uri]:
+        if (self.device_uri in self.installed_print_devices and printer_name in self.installed_print_devices[self.device_uri]) \
+           or (printer_name in installed_printer_names):
                 i = 2
                 while True:
                     t = printer_name + "_%d" % i
-                    if t not in self.installed_print_devices[self.device_uri]:
+                    if (t not in installed_printer_names) and (self.device_uri not in self.installed_print_devices or t not in self.installed_print_devices[self.device_uri]):
                         printer_name += "_%d" % i
                         break
                     i += 1
@@ -713,15 +714,16 @@ class SetupForm(SetupForm_base):
         default_model = utils.xstrip(model.replace('series', '').replace('Series', ''), '_')
 
         fax_name = default_model + "_fax"
+        installed_fax_names = device.getSupportedCUPSPrinterNames(['hpfax'])
 
         # Check for duplicate names
-        if self.fax_uri in self.installed_fax_devices and \
-            fax_name in self.installed_fax_devices[self.fax_uri]:
+        if (self.fax_uri in self.installed_fax_devices and fax_name in self.installed_fax_devices[self.fax_uri]) \
+           or (fax_name in installed_fax_names):
         #if fax_name in self.installed_queues or fax_name == self.printer_name:
                 i = 2
                 while True:
                     t = fax_name + "_%d" % i
-                    if t not in self.installed_fax_devices[self.fax_uri]:
+                    if (t not in installed_fax_names) and (self.fax_uri not in self.installed_fax_devices or t not in self.installed_fax_devices[self.fax_uri]):
                         fax_name += "_%d" % i
                         break
                     i += 1

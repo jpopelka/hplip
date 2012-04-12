@@ -96,7 +96,7 @@ usb_pat = re.compile(r"""(\d+):(\d+)""", re.IGNORECASE)
 
 ### **********Lambda Function UniStar for checking type of arguments to constructor of class event*******************************
 
-UniStr = lambda title: isinstance(title, str) and utils.xrstrip(title, '\x00')[:128] or utils.xrstrip(title, '\x00')[:128].encode('utf-8')  
+UniStr = lambda title: isinstance(title, str) and utils.xrstrip(title, '\x00')[:128] or utils.xrstrip(title, '\x00')[:128].encode('utf-8')
 
 
 #
@@ -1303,7 +1303,7 @@ class Device(object):
 
     def openEWS_LEDM(self):
         return self.__openChannel(hpmudext.HPMUD_S_EWS_LEDM_CHANNEL)
-    
+
     def openLEDM(self):
         return self.__openChannel(hpmudext.HPMUD_S_LEDM_SCAN)
 
@@ -1330,7 +1330,7 @@ class Device(object):
 
     def closeEWS_LEDM(self):
         return self.__closeChannel(hpmudext.HPMUD_S_EWS_LEDM_CHANNEL)
-    
+
     def closeLEDM(self):
         return self.__closeChannel(hpmudext.HPMUD_S_LEDM_SCAN)
 
@@ -1714,7 +1714,11 @@ class Device(object):
 
             elif status_type == STATUS_TYPE_LEDM:
                 log.debug("Type 10: LEDM")
-                status_block = status.StatusType10(self)
+                status_block = status.StatusType10(self.getEWSUrl_LEDM)
+
+            elif status_type == STATUS_TYPE_LEDM_FF_CC_0:
+                log.debug("Type 11: LEDM_FF_CC_0")
+                status_block = status.StatusType10(self.getUrl_LEDM)
 
             else:
                 log.error("Unimplemented status type: %d" % status_type)
@@ -2466,12 +2470,12 @@ class Device(object):
                 if footer:
                     return opener.open_hp(url2, data, footer)
                 else:
-                    return opener.open_hp(url2, data) 
+                    return opener.open_hp(url2, data)
             except Error:
                 log.debug("Status read failed: %s" % url2)
         finally:
             self.closeEWS_LEDM()
-    
+
     def getUrl_LEDM(self, url, stream, footer=""):
         try:
             url2 = "%s&loc=%s" % (self.device_uri.replace('hpfax:', 'hp:'), url)
@@ -2481,7 +2485,7 @@ class Device(object):
                 if footer:
                     return opener.open_hp(url2, data, footer)
                 else:
-                    return opener.open_hp(url2, data) 
+                    return opener.open_hp(url2, data)
             except Error:
                 log.debug("Status read failed: %s" % url2)
 
@@ -2501,7 +2505,7 @@ class Device(object):
         return data
 
 #-------------------------For LEDM SOAP PROTOCOL(FAX) Devices----------------------------------------------------------------------#
-    
+
     def FetchEWS_LEDMUrl(self, url, footer=""):
         data_fp = cStringIO.StringIO()
         if footer:
@@ -2521,19 +2525,25 @@ class Device(object):
             log.error("Unable To read the XML data from device")
             return ""
         xmlDict = utils.XMLToDictParser().parseXML(data)
-        return str(xmlDict[attribute])
+        try:
+            return str(xmlDict[attribute])
+        except:
+            return str("")
 
 #---------------------------------------------------------------------------------------------------#
- 
+
     def readAttributeFromXml(self,uri,attribute):
         stream = cStringIO.StringIO()
-        data = self.FetchLEDMUrl(uri)        
+        data = self.FetchLEDMUrl(uri)
         if not data:
             log.error("Unable To read the XML data from device")
             return ""
-        xmlDict = utils.XMLToDictParser().parseXML(data)  
-        return str(xmlDict[attribute])
-		
+        xmlDict = utils.XMLToDictParser().parseXML(data)
+        try:
+            return str(xmlDict[attribute])
+        except:
+            return str("")
+
     def downloadFirmware(self, usb_bus_id=None, usb_device_id=None): # Note: IDs not currently used
         ok = False
         filename = os.path.join(prop.data_dir, "firmware", self.model.lower() + '.fw.gz')
@@ -2630,7 +2640,7 @@ class LocalOpenerEWS_LEDM(urllib.URLopener):
 
         reply = xStringIO()
 
-        while dev.readEWS_LEDM(8080, reply, timeout=3):
+        while dev.readEWS_LEDM(512, reply, timeout=3):
             pass
 
         reply.seek(0)
@@ -2656,11 +2666,11 @@ class LocalOpener_LEDM(urllib.URLopener):
 
         reply = xStringIO()
 
-        while dev.readLEDM(8080, reply, timeout=3):
+        while dev.readLEDM(512, reply, timeout=3):
             pass
 
         reply.seek(0)
         return reply.getvalue()
 
 
-    
+

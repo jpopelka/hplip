@@ -205,12 +205,15 @@ try:
 
                 elif align_type == ALIGN_TYPE_LIDIL_DJ_D1600:
                     maint.AlignType14(d, tui.load_paper_prompt, type10and11and14Align, invalidPen2)
-                
+
                 elif align_type == ALIGN_TYPE_LEDM:
                     maint.AlignType15(d, tui.load_paper_prompt, aioUI2)
 
                 elif align_type == ALIGN_TYPE_LEDM_MANUAL:
                     maint.AlignType16(d, tui.load_paper_prompt, enterAlignmentNumber)
+
+                elif align_type == ALIGN_TYPE_LEDM_FF_CC_0:
+                    maint.AlignType17(d, tui.load_paper_prompt, aioUI2)
 
                 else:
                     log.error("Invalid alignment type.")

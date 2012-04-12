@@ -734,6 +734,11 @@ def delPrinter(printer_name):
     setPasswordPrompt("You do not have permission to delete a printer.")
     return cupsext.delPrinter(printer_name)
 
+def enablePrinter(printer_name):
+    setPasswordPrompt("You do not have permission to enable a printer.")
+    cmd= "cupsenable %s"%printer_name
+    return os.system(cmd)
+
 def getGroupList():
     return cupsext.getGroupList()
 

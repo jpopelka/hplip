@@ -87,7 +87,7 @@ struct soap_session
    char uri[HPMUD_LINE_SIZE];
    char model[HPMUD_LINE_SIZE];
    int scan_type;
-
+   int user_cancel;
    IP_IMAGE_TRAITS image_traits;   /* specified by image header */      
 
    SANE_Option_Descriptor option[SOAP_OPTION_MAX];

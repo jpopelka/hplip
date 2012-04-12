@@ -656,12 +656,12 @@ class SetupDialog(QDialog, Ui_Dialog):
         plugin_reason = self.mq.get('plugin-reason', PLUGIN_REASON_NONE)
         if plugin > PLUGIN_NONE:
 
-            if not core.check_for_plugin():
+            if core.check_for_plugin() != PLUGIN_INSTALLED:
                 ok, sudo_ok = pkit.run_plugin_command(plugin == PLUGIN_REQUIRED, plugin_reason)
                 if not sudo_ok:
                     FailureUI(self, self.__tr("<b>Unable to find an appropriate su/sudo utiltity to run hp-plugin.</b><p>Install kdesu, gnomesu, or gksu.</p>"))
                     return
-                if not ok or not core.check_for_plugin():
+                if not ok or core.check_for_plugin() != PLUGIN_INSTALLED:
                     if plugin == PLUGIN_REQUIRED:
                         FailureUI(self, self.__tr("<b>The printer you are trying to setup requires a binary driver plug-in and it failed to install.</b><p>Please check your internet connection and try again.</p><p>Visit <u>http://hplipopensource.com</u> for more infomation.</p>"))
                         return
@@ -822,14 +822,14 @@ class SetupDialog(QDialog, Ui_Dialog):
         default_model = utils.xstrip(model.replace('series', '').replace('Series', ''), '_')
 
         printer_name = default_model
-
+        installed_printer_names = device.getSupportedCUPSPrinterNames(['hp'])
         # Check for duplicate names
-        if self.device_uri in self.installed_print_devices and \
-            printer_name in self.installed_print_devices[self.device_uri]:
+        if (self.device_uri in self.installed_print_devices and printer_name in self.installed_print_devices[self.device_uri]) \
+           or (printer_name in installed_printer_names):
                 i = 2
                 while True:
                     t = printer_name + "_%d" % i
-                    if t not in self.installed_print_devices[self.device_uri]:
+                    if (t not in installed_printer_names) and (self.device_uri not in self.installed_print_devices or t not in self.installed_print_devices[self.device_uri]):
                         printer_name += "_%d" % i
                         break
                     i += 1
@@ -850,14 +850,14 @@ class SetupDialog(QDialog, Ui_Dialog):
         default_model = utils.xstrip(model.replace('series', '').replace('Series', ''), '_')
 
         fax_name = default_model + "_fax"
-
+        installed_fax_names = device.getSupportedCUPSPrinterNames(['hpfax'])
         # Check for duplicate names
-        if self.fax_uri in self.installed_fax_devices and \
-            fax_name in self.installed_fax_devices[self.fax_uri]:
+        if (self.fax_uri in self.installed_fax_devices and fax_name in self.installed_fax_devices[self.fax_uri]) \
+           or (fax_name in installed_fax_names):
                 i = 2
                 while True:
                     t = fax_name + "_%d" % i
-                    if t not in self.installed_fax_devices[self.fax_uri]:
+                    if (t not in installed_fax_names) and (self.fax_uri not in self.installed_fax_devices or t not in self.installed_fax_devices[self.fax_uri]):
                         fax_name += "_%d" % i
                         break
                     i += 1

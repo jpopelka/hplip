@@ -22,7 +22,7 @@
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   Client/Server generic message format (see messaging-protocol.doc):
 
-  Author: Naga Samrat Chowdary Narla
+  Author: Naga Samrat Chowdary Narla, Sarbeswar Meher
 \*****************************************************************************/
 
 #ifdef HAVE_LIBNETSNMP

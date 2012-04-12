@@ -63,6 +63,7 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-deskjet_935c-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_professional_p1102w-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_3650-hpijs.ppd.gz \
+    ppd/hpijs/hp-laserjet_cp_1025nw-hpijs.ppd.gz \
     ppd/hpijs/hp-color_laserjet_3500-hpijs.ppd.gz \
     ppd/hpijs/hp-officejet_r60-hpijs.ppd.gz \
     ppd/hpijs/hp-color_inkjet_cp1700-hpijs.ppd.gz \
@@ -105,7 +106,6 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-psc_950vr-hpijs.ppd.gz \
     ppd/hpijs/hp-psc_2150_series-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_m4345_mfp-hpijs-pcl3.ppd.gz \
-    ppd/hpijs/hp-laserjet_cp1027nw-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_505j-hpijs.ppd.gz \
     ppd/hpijs/hp-photosmart_c4200_series-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_3380-hpijs-pcl3.ppd.gz \
@@ -167,7 +167,6 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-laserjet_p4015x-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_882c-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_933c-hpijs.ppd.gz \
-    ppd/hpijs/hp-laserjet_cp1021-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_950c-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_f4210_series-hpijs.ppd.gz \
     ppd/hpijs/hp-dj450-hpijs.ppd.gz \
@@ -181,6 +180,7 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-laserjet_1300-hpijs-pcl3.ppd.gz \
     ppd/hpijs/hp-deskjet_841c-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_3050_j610_series-hpijs.ppd.gz \
+    ppd/hpijs/hp-officejet_6100-hpijs.ppd.gz \
     ppd/hpijs/hp-photosmart_c3100_series-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_843c-hpijs.ppd.gz \
     ppd/hpijs/hp-photosmart_c5200_series-hpijs.ppd.gz \
@@ -239,6 +239,7 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-officejet_5500_series-hpijs.ppd.gz \
     ppd/hpijs/hp-officejet_r80xi-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_1000_j110_series-hpijs.ppd.gz \
+    ppd/hpijs/hp-laserjet_cp_1025-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_995c-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_d4300_series-hpijs.ppd.gz \
     ppd/hpijs/hp-photosmart_d110_series-hpijs.ppd.gz \
@@ -257,7 +258,6 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-printer_scanner_copier_300-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_d4100_series-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_400l-hpijs.ppd.gz \
-    ppd/hpijs/hp-laserjet_cp1022-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_682-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_5100-hpijs.ppd.gz \
     ppd/hpijs/hp-psc_780xi-hpijs.ppd.gz \
@@ -324,6 +324,7 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-laserjet_1022-hpijs-pcl3.ppd.gz \
     ppd/hpijs/hp-officejet-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_f2100_series-hpijs.ppd.gz \
+    ppd/hpijs/hp-officejet_6700-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_3020-hpijs-pcl3.ppd.gz \
     ppd/hpijs/hp-laserjet_p2035-hpijs-zjs.ppd.gz \
     ppd/hpijs/hp-officejet_4500_g510n-z-hpijs.ppd.gz \
@@ -421,9 +422,7 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-officejet_6000_e609n-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_8150_series-hpijs-pcl3.ppd.gz \
     ppd/hpijs/hp-color_laserjet_3500n-hpijs.ppd.gz \
-    ppd/hpijs/hp-laserjet_cp1023-hpijs.ppd.gz \
     ppd/hpijs/hp-photosmart_8200_series-hpijs.ppd.gz \
-    ppd/hpijs/hp-officejet_series_500-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_professional_m1213nf_mfp-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_8000-hpijs.ppd.gz \
     ppd/hpijs/hp-color_laserjet_cm3530_mfp-hpijs-pcl3.ppd.gz \
@@ -566,11 +565,9 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-deskjet_1050_j410_series-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_672c-hpijs.ppd.gz \
     ppd/hpijs/hp-photosmart_370_series-hpijs.ppd.gz \
-    ppd/hpijs/hp-laserjet_cp1028nw-hpijs.ppd.gz \
     ppd/hpijs/hp-photosmart_320_series-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_1015-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_m1522nf_mfp-hpijs-pcl3.ppd.gz \
-    ppd/hpijs/hp-laserjet_professional_p1102s-hpijs.ppd.gz \
     ppd/hpijs/hp-officejet_t_series-hpijs.ppd.gz \
     ppd/hpijs/hp-color_laserjet_5500-hpijs-pcl3.ppd.gz \
     ppd/hpijs/hp-deskjet_1280-hpijs.ppd.gz \
@@ -629,6 +626,7 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-officejet_pro_8500_a909g-hpijs.ppd.gz \
     ppd/hpijs/hp-cp1160-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_3820-hpijs.ppd.gz \
+    ppd/hpijs/hp-officejet_6600-hpijs.ppd.gz \
     ppd/hpijs/hp-color_laserjet_cp5520_series-hpijs-pcl3.ppd.gz \
     ppd/hpijs/hp-officejet_lx-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_2300-hpijs-pcl3.ppd.gz \
