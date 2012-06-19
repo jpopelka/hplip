@@ -30,6 +30,7 @@ import grp
 import pwd
 import tarfile
 import stat
+import glob
 
 try:
     import hashlib # new in 2.5
@@ -137,11 +138,11 @@ BINS_LIST=['hpijs','hp-align','hp-colorcal','hp-faxsetup','hp-linefeedcal','hp-p
 
 LIBS_LIST=['libhpmud.*','libhpip.*','sane/libsane-hpaio.*','cups/backend/hp','cups/backend/hpfax', 'cups/filter/hpcac', 'cups/filter/pstotiff','cups/filter/hpcups', 'cups/filter/hpcupsfax', 'cups/filter/hplipjs','cups/filter/hpps']
 
-FILES_LIST=['/usr/share/ppd/HP/*','/etc/udev/rules.d/56-hpmud_support.rules', '/etc/udev/rules.d/40-hplip.rules', '/etc/udev/rules.d/56-hpmud_support.rules', '/etc/udev/rules.d/55-hpmud.rules', '/etc/udev/rules.d/86-hpmud-hp_*', '/etc/udev/rules.d/86-hpmud_plugin.rules', '/usr/share/cups/drv/hp/*','/usr/local/share/ppd/HP/*','/usr/local/share/cups/drv/hp/*' ,'/usr/share/applications/hplip.desktop', '/etc/xdg/autostart/hplip-systray.desktop', '/etc/hp/hplip.conf', '/usr/share/doc/hplip-*']
+FILES_LIST=['/usr/share/ppd/HP/','/etc/udev/rules.d/56-hpmud_support.rules', '/etc/udev/rules.d/40-hplip.rules', '/etc/udev/rules.d/56-hpmud_support.rules', '/etc/udev/rules.d/55-hpmud.rules','/etc/udev/rules.d/56-hpmud_add_printer.rules','/etc/udev/rules.d/55-hpmud_sysfs.rules','/etc/udev/rules.d/56-hpmud_add_printer_sysfs.rules', '/etc/udev/rules.d/56-hpmud_support_sysfs.rules', '/etc/udev/rules.d/86-hpmud_plugin_sysfs.rules', '/etc/udev/rules.d/86-hpmud-hp_*.rules', '/etc/udev/rules.d/86-hpmud_plugin.rules', '/usr/share/cups/drv/hp/','/usr/local/share/ppd/HP/','/usr/local/share/cups/drv/hp/' ,'/usr/share/applications/hplip.desktop', '/etc/xdg/autostart/hplip-systray.desktop', '/etc/hp/hplip.conf', '/usr/share/doc/hplip-*']
 
 HPLIP_LIST=['*.py','*.pyc', 'base', 'copier','data','installer','pcard','ui4','ui','fax/*.py','fax/*.pyc','fax/pstotiff.convs','fax/pstotiff.types','fax/pstotiff','prnt/*.py', 'prnt/*.pyc', 'scan/*.py','scan/*.pyc']
 
-PLUGIN_LIST=['fax/plugins/','prnt/pluginmode = INTERACTIVE_MODEs/','scan/plugins/']
+PLUGIN_LIST=['fax/plugins/','prnt/plugins/','scan/plugins/']
 PLUGIN_STATE =['/var/lib/hp/hplip.state']
 RMDIR="rm -rf"
 RM="rm -f"
@@ -270,6 +271,8 @@ class CoreInstall(object):
             'cups_path_with_bitness' : TYPE_BOOL,
             'ui_toolkit' : TYPE_STRING,  # qt3 or qt4 [or gtk] or none
             'policykit' : TYPE_BOOL,
+            'libusb01' : TYPE_BOOL,
+            'udev_sysfs_rule' : TYPE_BOOL,
             'native_cups' : TYPE_BOOL,
             'package_available' : TYPE_BOOL,
             'package_arch' : TYPE_LIST,
@@ -298,6 +301,8 @@ class CoreInstall(object):
             'scan':     (False, 'Scanning support', []),
             'docs':     (False, 'HPLIP documentation (HTML)', []),
             'policykit': (False, 'Administrative policy framework', []),
+            'libusb01': (False, 'libusb-1.0', []),
+            'udev_sysfs_rule': (False, 'udev_sysfs_rule', []),
         }
 
 
@@ -311,6 +316,8 @@ class CoreInstall(object):
             'scan':        True,
             'docs':        True,
             'policykit':   False,
+            'libusb01' :   False,
+            'udev_sysfs_rule' : False,
             'native_cups': False,
         }
 
@@ -363,6 +370,8 @@ class CoreInstall(object):
             # Required network I/O packages
             'libnetsnmp-devel': (True,  ['network'], "libnetsnmp-devel - SNMP networking library development files", self.check_libnetsnmp, DEPENDENCY_RUN_AND_COMPILE_TIME),
             'libcrypto':        (True,  ['network'], "libcrypto - OpenSSL cryptographic library", self.check_libcrypto, DEPENDENCY_RUN_AND_COMPILE_TIME),
+            'network':        (False, ['network'], "network -wget", self.check_wget, DEPENDENCY_RUN_TIME),
+
         }
 
         for opt in self.options:
@@ -405,6 +414,7 @@ class CoreInstall(object):
             self.have_dependencies[d] = False
 
         self.get_distro()
+        self.distro_name = self.distros_index[self.distro]
         self.distro_changed()
 
         if callback is not None:
@@ -434,7 +444,7 @@ class CoreInstall(object):
 
         update_spinner()
 
-        self.distro_name = self.distros_index[self.distro]
+
         self.distro_version_supported = self.get_distro_ver_data('supported', False)
 
         log.debug("Distro = %s Distro Name = %s Display Name= %s Version = %s Supported = %s" %
@@ -611,6 +621,8 @@ class CoreInstall(object):
             status, name = self.run(cmd + ' -is')
             name = name.lower().strip()
             log.debug("Distro name=%s" % name)
+            if name.find("redhatenterprise") > -1:
+                name="rhel" 
 
             if not status and name:
                 status, ver = self.run(cmd + ' -rs')
@@ -632,6 +644,9 @@ class CoreInstall(object):
                 # Some O/Ss don't have /etc/issue (Mac)
                 self.distro, self.distro_version = DISTRO_UNKNOWN, '0.0'
             else:
+                if name.find("redhatenterprise") > -1:
+                    name="rhel" 
+
                 for d in self.distros:
                     if name.find(d) > -1:
                         self.distro = self.distros[d]['index']
@@ -692,6 +707,8 @@ class CoreInstall(object):
         self.selected_options['network'] = self.get_distro_ver_data('network_supported', True)
         self.selected_options['scan'] = self.get_distro_ver_data('scan_supported', True)
         self.selected_options['policykit'] = self.get_distro_ver_data('policykit', False)
+        self.selected_options['libusb01'] = self.get_distro_ver_data('libusb01', False)
+        self.selected_options['udev_sysfs_rule'] = self.get_distro_ver_data('udev_sysfs_rule', False)
         self.native_cups = self.get_distro_ver_data('native_cups', False)
 
         # Adjust required flag based on the distro ver ui_toolkit value
@@ -774,6 +791,7 @@ class CoreInstall(object):
             self.distros[distro] = d
             versions = self.__fixup_data("versions", distros_dat.get(distro, 'versions'))
             self.distros[distro]['versions'] = {}
+            self.distros[distro]['versions_list'] = versions
 
             for ver in versions:
                 same_as_version, supported = False, True
@@ -857,10 +875,21 @@ class CoreInstall(object):
 
 
     def check_libusb(self):
-        if not check_lib('libusb'):
-            return False
-
-        return len(locate_file_contains("usb.h", '/usr/include', 'usb_init(void)'))
+        Is_libusb01_enabled = self.get_distro_ver_data('libusb01',False)
+        if Is_libusb01_enabled == True:
+            if not check_lib('libusb'):
+                return False
+            if self.distro_name != "rhel":
+                return len(locate_file_contains("usb.h", '/usr/include', 'usb_init'))
+            else:
+                return True
+        else:
+            if not check_lib('libusb-1.0'):
+                return False
+            if self.distro_name != "rhel":
+                return len(locate_file_contains("libusb.h", '/usr/include/libusb-1.0', 'libusb_init'))
+            else:
+                return True
 
 
     def check_libjpeg(self):
@@ -929,7 +958,8 @@ class CoreInstall(object):
 
     def check_xsane(self):
         if os.getenv('DISPLAY'):
-            return check_tool('xsane --version', 0.9) # will fail if X not running...
+            return check_version(get_xsane_version(), '0.9') # will fail if X not running...
+#            return check_tool('xsane --version', 0.9) # will fail if X not running...
         else:
             return bool(utils.which("xsane")) # ...so just see if it installed somewhere
 
@@ -966,6 +996,18 @@ class CoreInstall(object):
         else:
             return False
 
+    def check_pyqt(self):
+        if self.ui_toolkit == 'qt3':
+            try:
+                import qt
+            except ImportError:
+                return False
+            else:
+                return True
+
+        else:
+            return False
+
 
     def check_python_devel(self):
         return check_file('Python.h')
@@ -976,7 +1018,6 @@ class CoreInstall(object):
             import pynotify
         except ImportError:
             return False
-
         return True
 
 
@@ -1024,11 +1065,11 @@ class CoreInstall(object):
 
     def check_cups(self):
         status, output = self.run('lpstat -r')
-        if status > 0:
-            log.debug("CUPS is not running.")
+        if status > 0 or 'not running' in output:
+            log.debug("CUPS is not running. %s"%output)
             return False
         else:
-            log.debug("CUPS is running.")
+            log.debug("CUPS is running. %s "%output)
             return True
 
 
@@ -1071,6 +1112,112 @@ class CoreInstall(object):
     def check_policykit(self):
         log.debug("Checking for PolicyKit...")
         return (check_file('PolicyKit.conf', "/etc/PolicyKit") and check_file('org.gnome.PolicyKit.AuthorizationManager.service', "/usr/share/dbus-1/services")) or (check_file('50-localauthority.conf', "/etc/polkit-1/localauthority.conf.d") and check_file('org.freedesktop.PolicyKit1.service', "/usr/share/dbus-1/system-services"))
+
+    def check_cupsext(self):
+        log.debug("Checking 'cupsext' CUPS extension...")
+        try:
+            import cupsext
+        except ImportError:
+            log.error("NOT FOUND OR FAILED TO LOAD! Please reinstall HPLIP and check for the proper installation of cupsext.")
+            return False
+        else:
+            return True
+
+
+    def check_hpmudext(self):
+        log.debug("Checking 'hpmudext' I/O extension...")
+        try:
+            import hpmudext
+        except ImportError:
+            log.error("NOT FOUND OR FAILED TO LOAD! Please reinstall HPLIP and check for the proper installation of hpmudext.")
+            return False
+        else:
+            return True
+
+
+    def check_pcardext(self):
+        log.debug("Checking 'pcardext' Photocard extension...")
+        try:
+            import pcardext
+        except ImportError:
+            log.error("NOT FOUND OR FAILED TO LOAD! Please reinstall HPLIP and check for the proper installation of pcardext.")
+            return False
+        else:
+            return True
+
+
+    def check_hpaio(self):
+        found = False
+        log.debug("'Checking for hpaio' in '/etc/sane.d/dll.conf'...")
+        try:
+            f = file('/etc/sane.d/dll.conf', 'r')
+        except IOError:
+            log.error("'/etc/sane.d/dll.conf' not found. Is SANE installed?")
+        else:
+            for line in f:
+                lineNoSpace = re.sub(r'\s', '', line) 
+                hpaiomatched=re.match('hpaio',lineNoSpace)
+                if hpaiomatched:
+                    found = True
+                    break
+        return found
+
+    def update_hpaio(self):
+        found = False
+        home_dir = sys_conf.get('dirs', 'home')
+        pat=re.compile(r"""(.*)share\/hplip""")
+        usrbin_dir=None
+        if pat.match(home_dir) is not None:
+            usrlib_dir= pat.match(home_dir).group(1) + "lib/"
+            if os.path.exists(usrlib_dir+'sane/libsane-hpaio.so.1'): 
+                log.debug("'Updating hpaio' in '/etc/sane.d/dll.conf'...")
+                try:
+                    f = file('/etc/sane.d/dll.conf', 'r')
+                except IOError:
+                    log.error("'/etc/sane.d/dll.conf' not found. Creating dll.conf file")
+#                    f = file('/etc/sane.d/dll.conf', 'a+')
+                    cmd = self.su_sudo()%'touch /etc/sane.d/dll.conf'
+                    log.debug("cmd=%s"%cmd)
+                    self.run(cmd)
+                else:
+                    for line in f:
+                        lineNoSpace = re.sub(r'\s', '', line) 
+                        hpaiomatched=re.match('hpaio',lineNoSpace)
+                        if hpaiomatched:
+                            found = True
+                            break
+                    f.close()
+                
+                if not found:
+                    st = os.stat('/etc/sane.d/dll.conf')
+                    cmd= self.su_sudo()%'chmod 777 /etc/sane.d/dll.conf'
+                    log.debug("cmd=%s"%cmd)
+                    self.run(cmd)
+                    try:
+                        f = file('/etc/sane.d/dll.conf', 'a+')
+                    except IOError:
+                        log.error("'/etc/sane.d/dll.conf' not found. Creating dll.conf file")
+                    else:
+                        f.write('hpaio')
+                        f.close()
+                    actv_permissions = st.st_mode &0777
+                    cmd = 'chmod %o /etc/sane.d/dll.conf'%actv_permissions
+                    cmd= self.su_sudo()%cmd
+                    log.debug("cmd=%s"%cmd)
+                    self.run(cmd)   
+        return found
+
+    def check_scanext(self):
+        log.debug("Checking 'scanext' SANE scanning extension...")
+        found = False
+        try:
+            import scanext
+        except ImportError:
+            log.error("NOT FOUND OR FAILED TO LOAD! Please reinstall HPLIP and check for the proper installation of scanext.")
+        else:
+            found = True
+        return found
+
 
     def check_pkg_mgr(self):
         """
@@ -1144,6 +1291,8 @@ class CoreInstall(object):
         configuration['scan-build'] = self.selected_options['scan']
         configuration['doc-build'] = self.selected_options['docs']
         configuration['policykit'] = self.selected_options['policykit']
+        configuration['libusb01_build'] = self.selected_options['libusb01']
+        configuration['udev_sysfs_rules'] = self.selected_options['udev_sysfs_rule']
 
         # Setup printer driver configure flags based on distro data...
         if self.native_cups: # hpcups
@@ -1288,6 +1437,18 @@ class CoreInstall(object):
             configure_cmd += ' --enable-policykit'
 	else:
 	    configure_cmd += ' --disable-policykit'
+
+        self.libusb01 = self.get_distro_ver_data('libusb01')
+        if self.libusb01 is not None and self.libusb01 == 1:
+            configure_cmd += ' --enable-libusb01_build'
+	else:
+	    configure_cmd += ' --disable-libusb01_build'
+
+        self.udev_sysfs_rule = self.get_distro_ver_data('udev_sysfs_rule')
+        if self.udev_sysfs_rule is not None and self.udev_sysfs_rule == 1:
+            configure_cmd += ' --enable-udev_sysfs_rules'
+	else:
+	    configure_cmd += ' --disable-udev_sysfs_rules'
 	
         return configure_cmd
 
@@ -1346,6 +1507,18 @@ class CoreInstall(object):
         else:
             configure_cmd += ' --disable-policykit'
 
+        self.libusb01 = self.get_distro_ver_data('libusb01')
+        if self.libusb01 is not None and self.libusb01 == 1:
+            configure_cmd += ' --enable-libusb01_build'
+        else:
+            configure_cmd += ' --disable-libusb01_build'
+       
+        self.udev_sysfs_rule = self.get_distro_ver_data('udev_sysfs_rule')
+        if self.udev_sysfs_rule is not None and self.udev_sysfs_rule == 1:
+            configure_cmd += ' --enable-udev_sysfs_rules'
+        else:
+            configure_cmd += ' --disable-udev_sysfs_rules'
+
         return configure_cmd
 
 
@@ -1391,9 +1564,13 @@ class CoreInstall(object):
                 self.su_sudo() % 'make install']
 
 
-    def get_distro_ver_data(self, key, default=None):
+    def get_distro_ver_data(self, key, default=None,distro_ver=None):
         try:
-            return self.distros[self.distro_name]['versions'][self.distro_version].get(key, None) or \
+            if distro_ver:
+                return self.distros[self.distro_name]['versions'][distro_ver].get(key, None) or \
+                self.distros[self.distro_name].get(key, None) or default
+            else:
+                return self.distros[self.distro_name]['versions'][self.distro_version].get(key,None) or \
                 self.distros[self.distro_name].get(key, None) or default
         except KeyError:
             return default
@@ -1405,24 +1582,29 @@ class CoreInstall(object):
         try:
             return self.distros[self.distro_name].get(key, None) or default
         except KeyError:
-            return default
+            return default 
 
 
-    def get_ver_data(self, key, default=None):
+    def get_ver_data(self, key, default=None,distro_ver=None):
         try:
-            return self.distros[self.distro_name]['versions'][self.distro_version].get(key, None) or default
+            if distro_ver:
+                return self.distros[self.distro_name]['versions'][distro_ver].get(key, None) or default
+            else:
+                return self.distros[self.distro_name]['versions'][self.distro_version].get(key, None) or default
+
         except KeyError:
             return default
 
         return value
 
 
-    def get_dependency_data(self, dependency):
-        dependency_cmds = self.get_ver_data("dependency_cmds", {})
+    def get_dependency_data(self, dependency,supported_distro_vrs=None):
+        dependency_cmds = self.get_ver_data("dependency_cmds", {},supported_distro_vrs)
         dependency_data = dependency_cmds.get(dependency, {})
         packages = dependency_data.get('packages', [])
         commands = dependency_data.get('commands', [])
         return packages, commands
+
 
 
     def get_dependency_commands(self):
@@ -1570,6 +1752,13 @@ class CoreInstall(object):
         return num_opt_missing
 
 
+    def check_wget(self):
+        if utils.which("wget"):
+            return True
+        else:
+            log.debug("wget is not installed")
+            return False
+
     def check_network_connection(self):
         self.network_connected = False
 
@@ -1606,8 +1795,8 @@ class CoreInstall(object):
         return self.network_connected
 
 
-    def run_pre_install(self, callback=None):
-        pre_cmd = self.get_distro_ver_data('pre_install_cmd')
+    def run_pre_install(self, callback=None,distro_ver=None):
+        pre_cmd = self.get_distro_ver_data('pre_install_cmd',None,distro_ver)
         log.debug(pre_cmd)
         if pre_cmd:
             x = 1
@@ -1628,8 +1817,8 @@ class CoreInstall(object):
             return False
 
 
-    def run_pre_depend(self, callback=None):
-        pre_cmd = self.get_distro_ver_data('pre_depend_cmd')
+    def run_pre_depend(self, callback=None,distro_ver=None):
+        pre_cmd = self.get_distro_ver_data('pre_depend_cmd',None,distro_ver)
         log.debug(pre_cmd)
         if pre_cmd:
             x = 1
@@ -1645,8 +1834,8 @@ class CoreInstall(object):
                 x += 1
 
 
-    def run_post_depend(self, callback=None):
-        post_cmd = self.get_distro_ver_data('post_depend_cmd')
+    def run_post_depend(self, callback=None,distro_ver=None):
+        post_cmd = self.get_distro_ver_data('post_depend_cmd',None,distro_ver)
         log.debug(post_cmd)
         if post_cmd:
             x = 1
@@ -1681,17 +1870,17 @@ class CoreInstall(object):
                 x += 1
 
 
-    def pre_build(self):
+    def pre_build(self,distro_ver=None):
         cmds = []
-        if self.get_distro_ver_data('fix_ppd_symlink', False):
+        if self.get_distro_ver_data('fix_ppd_symlink', False,distro_ver):
             cmds.append(self.su_sudo() % 'python ./installer/fix_symlink.py')
 
         return cmds
 
 
-    def run_pre_build(self, callback=None):
+    def run_pre_build(self, callback=None,distro_ver=None):
         x = 1
-        for cmd in self.pre_build():
+        for cmd in self.pre_build(distro_ver):
             status, output = self.run(cmd)
             if callback is not None:
                 callback(cmd, "Pre-build step %d"  % x)
@@ -1699,9 +1888,9 @@ class CoreInstall(object):
             x += 1
 
 
-    def run_post_build(self, callback=None):
+    def run_post_build(self, callback=None,distro_ver=None):
         x = 1
-        for cmd in self.post_build():
+        for cmd in self.post_build(distro_ver):
             status, output = self.run(cmd)
             if callback is not None:
                 callback(cmd, "Post-build step %d"  % x)
@@ -1709,7 +1898,7 @@ class CoreInstall(object):
             x += 1
 
 
-    def post_build(self):
+    def post_build(self,distro_ver=None):
         cmds = []
         # Reload DBUS configuration if distro supports it and PolicyKit
         # support installed
@@ -1726,7 +1915,7 @@ class CoreInstall(object):
 
         # Add user to group if needed
         # add_user_to_group=<usermod params> [TYPE_STRING] (leave empty for none) [ex. "-a -G sys" or "-G lp"]
-        add_user_to_group = self.get_distro_ver_data('add_user_to_group', '')
+        add_user_to_group = self.get_distro_ver_data('add_user_to_group', '',distro_ver)
         if add_user_to_group:
             usermod = os.path.join(utils.which("usermod"), "usermod") + " %s %s" % (add_user_to_group, prop.username)
             cmds.append(self.su_sudo() % usermod)
@@ -2084,8 +2273,12 @@ class CoreInstall(object):
     def check_printer_plugin_files(self):
         ret_val = None
         home = sys_conf.get('dirs', 'home')
+        print_so_files_list =['lj.so' , 'hbpl1.so']
+        cnt=0
         printer_so_dir= home+"/prnt/plugins/"
-        ret_val = self.check_so_exists(printer_so_dir, 'lj.so', "Printer",ret_val)
+        while cnt < len(print_so_files_list):
+            ret_val = self.check_so_exists(printer_so_dir,print_so_files_list[cnt], "print",ret_val)
+            cnt += 1
         return ret_val
 
 
@@ -2097,7 +2290,7 @@ class CoreInstall(object):
         cnt=0
         scanner_so_dir= home+'/scan/plugins/'
         while cnt < len(scan_so_files_list):
-            ret_val = self.check_so_exists(scanner_so_dir, scan_so_files_list[cnt], "Scanner",ret_val)
+            ret_val = self.check_so_exists(scanner_so_dir, scan_so_files_list[cnt], "scan",ret_val)
             cnt += 1
         return ret_val 
 
@@ -2107,16 +2300,17 @@ class CoreInstall(object):
         ret_val = None
         home = sys_conf.get('dirs', 'home')
         fax_so_dir= home+"/fax/plugins/"
-        ret_val = self.check_so_exists(fax_so_dir,'fax_marvell.so' ,"Fax",ret_val)
+        ret_val = self.check_so_exists(fax_so_dir,'fax_marvell.so' ,"fax",ret_val)
         return ret_val 
 
 
-    def check_so_exists(self, sym_link_dir, so_file, functionType, Pre_ret_val):
+    def check_so_exists(self, sym_link_dir, so_file, functionType, Pre_ret_val, update_log=True):
         ret_val = Pre_ret_val
         sym_link_file = sym_link_dir + so_file
         if not os.path.exists(sym_link_file):
             log.debug("Either %s file is not present or symbolic link is missing: %s" %(functionType, sym_link_file))
-            user_conf.set(functionType+'_plugins', so_file,'Not_Found')
+            if update_log:
+                user_conf.set(functionType+'_plugins', so_file,'Not_Found')
             if ret_val == None:
                 ret_val= PLUGIN_STATUS_FILES_NOT_PRESENT
             elif ret_val == PLUGIN_STATUS_FILES_PRESENT:
@@ -2130,20 +2324,23 @@ class CoreInstall(object):
 
             if not os.path.exists(real_file):
                 log.debug("%s Plugin file is missing: %s" % (functionType, real_file))
-                user_conf.set(functionType+'_plugins', so_file,'Not_Found')
+                if update_log:
+                    user_conf.set(functionType+'_plugins', so_file,'Not_Found')
                 if ret_val == None:
                     ret_val= PLUGIN_STATUS_FILES_NOT_PRESENT
                 elif ret_val == PLUGIN_STATUS_FILES_PRESENT:
                     ret_val = PLUGIN_STATUS_PARTIAL_FILES_PRESENT
             elif (os.stat(sym_link_file).st_mode & 72) != 72:
-                user_conf.set(functionType+'_plugins', so_file,'Permissin_Error')
+                if update_log:
+                    user_conf.set(functionType+'_plugins', so_file,'Permissin_Error')
                 log.debug("%s Plugin file doesn't have user/group execute permission: %s" % (functionType,sym_link_file))
                 if ret_val == None:
                     ret_val= PLUGIN_STATUS_FILES_NOT_PRESENT
                 elif ret_val == PLUGIN_STATUS_FILES_PRESENT:
                     ret_val = PLUGIN_STATUS_PARTIAL_FILES_PRESENT
             else:
-                user_conf.set(functionType+'_plugins', so_file,'Present')
+                if update_log:
+                    user_conf.set(functionType+'_plugins', so_file,'Present')
                 if ret_val == None:
                     ret_val= PLUGIN_STATUS_FILES_PRESENT
                 elif ret_val == PLUGIN_STATUS_FILES_NOT_PRESENT:
@@ -2180,19 +2377,36 @@ class CoreInstall(object):
             os.unlink(digsig_file)
 
 
-    def is_auto_installer_support(self):
+    def is_auto_installer_support(self, distro_version = DISTRO_VER_UNKNOWN):
         if not self.distro_name:
             self.get_distro()
             self.distro_name = self.distros_index[self.distro]
-
-        if self.distro_name and self.distro_name in ("ubuntu","debian","suse","fedora"):
-            log.debug("Auto installation is supported for Distro =%s version =%s "%(self.distro_name, self.distro_version))
+         
+        if distro_version == DISTRO_VER_UNKNOWN:
+            distro_version = self.distro_version
+        
+        if self.distro != DISTRO_UNKNOWN and distro_version != DISTRO_VER_UNKNOWN and self.get_ver_data('supported', False,distro_version):
+            log.debug("Auto installation is supported for Distro =%s version =%s "%(self.distro_name, distro_version))
             return True
         else:
-            log.debug("Auto installation is not supported for Distro =%s version =%s "%(self.distro_name, self.distro_version))
+            log.debug("Auto installation is not supported for Distro =%s version =%s "%(self.distro_name, distro_version))
             return False
 
-    
+    #Expands '*' in File/Dir names.
+    def expandList(self,Files_List, prefix_dir=None):
+        Expanded_Files_list=[]
+        for f in Files_List:
+            if prefix_dir:
+                f= prefix_dir + '/' + f
+            if '*' in f:
+                f_full = glob.glob(f)
+                for file in f_full:
+                  Expanded_Files_list.append(file)
+            else:
+                Expanded_Files_list.append(f)
+        return Expanded_Files_list
+
+
     def uninstall(self,mode = INTERACTIVE_MODE, callback=None):
         checkSudo = False
         if os.getuid() != 0:
@@ -2252,6 +2466,26 @@ class CoreInstall(object):
             return False
     
         if hplip_remove_cmd:
+            pid, cmdline = self.check_pkg_mgr()
+            while pid:
+                ok, user_input = tui.enter_choice("A package manager '%s' appears to be running. Please quit the package manager and press enter to continue (i=ignore, r=retry*, f=force, q=quit) :" % cmdline, ['i', 'r', 'q', 'f'], 'r')
+
+                if not ok: sys.exit(0)
+                elif user_input == 'i':
+                    log.warn("Ignoring running package manager. Some package operations may fail.")
+                    break
+
+                elif user_input == 'f':
+                    ok, ans = tui.enter_yes_no("\nForce quit of package manager '%s'" % cmdline, 'y')
+                    if not ok: sys.exit(0)
+                    if ans:
+                        cmd = self.su_sudo() % ("kill %d" % pid)
+                        status, output = self.run(cmd)
+                        if status != 0:
+                            log.error("Failed to kill process. You may need to manually quit the program.")
+
+                pid, cmdline = self.check_pkg_mgr()
+
             self.remove_hplip(callback)
 
         #removing .hplip directory
@@ -2281,27 +2515,29 @@ class CoreInstall(object):
             usrbin_dir= base.group(1) + "bin/"
             usrlib_dir= base.group(1) + "lib/"
             cnt = 0
-            while cnt <len (BINS_LIST ):
-                cmd = RM + " " + usrbin_dir + BINS_LIST[cnt]
+            BINS_LIST_FULL= self.expandList(BINS_LIST, usrbin_dir)
+            while cnt <len (BINS_LIST_FULL ):
+                cmd = RM + " " + BINS_LIST_FULL[cnt]
                 if checkSudo:
                     cmd= self.su_sudo() %cmd
                     
                 log.debug("Removing binaries cmd = %s " %cmd)
                 status, output=self.run(cmd)
                 if 0 != status:
-                    log.debug("Failed to remove '%s' binary." %(usrbin_dir + BINS_LIST[cnt]))
+                    log.debug("Failed to remove '%s' binary." %(BINS_LIST_FULL[cnt]))
                 cnt += 1
 
             cnt =0
-            while cnt <len (LIBS_LIST ):
-                cmd = RM + " " + usrlib_dir + LIBS_LIST[cnt]
+            LIBS_LIST_FULL = self.expandList(LIBS_LIST, usrlib_dir)
+            while cnt <len (LIBS_LIST_FULL ):
+                cmd = RM + " " + LIBS_LIST_FULL[cnt]
                 if checkSudo:
                     cmd= self.su_sudo() %cmd
 
                 log.debug("Removing library cmd = %s " %cmd)
                 status, output=self.run(cmd)
                 if 0 != status:
-                    log.debug("Failed to remove '%s' library." %(usrlib_dir + LIBS_LIST[cnt]))
+                    log.debug("Failed to remove '%s' library." %( LIBS_LIST_FULL[cnt]))
                 cnt += 1
     
 
@@ -2314,53 +2550,63 @@ class CoreInstall(object):
             remove_plugins = True
     
         # removing HPLIP installed directories/files
+        if remove_plugins is False:
+            HPLIP_LIST_FULL = self.expandList(HPLIP_LIST, home_dir)
+        else:
+            HPLIP_LIST_FULL = []
         cnt =0
-        while cnt < len(HPLIP_LIST): 
-            cmd=RMDIR + " " + home_dir+"/"+HPLIP_LIST[cnt]
+        while cnt < len(HPLIP_LIST_FULL): 
+            cmd=RMDIR + " " + HPLIP_LIST_FULL[cnt]
             if checkSudo:
                 cmd= self.su_sudo() %cmd
 
             log.debug("Removing hplip directory/file cmd= %s " %cmd)
             status, output=self.run(cmd)
             if 0 != status:
-                log.debug("Failed to remove hplip directory/file=%s "% (home_dir+"/"+HPLIP_LIST[cnt]))
+                log.debug("Failed to remove hplip directory/file=%s "% (HPLIP_LIST_FULL[cnt]))
             cnt +=1
-        
+
+                
         # removing configuration files
+        FILES_LIST_FULL=self.expandList(FILES_LIST)
         cnt= 0
-        while cnt < len(FILES_LIST):
-            cmd = RMDIR + " " + FILES_LIST[cnt]
+        while cnt < len(FILES_LIST_FULL):
+            cmd = RMDIR + " " + FILES_LIST_FULL[cnt]
             if checkSudo:
                 cmd= self.su_sudo() %cmd
             log.debug("Removing conf files cmd= %s" %(cmd))
             status, output=self.run(cmd)
             if 0 != status:
-                log.debug("Failed to remove '%s' file" %FILES_LIST[cnt])
+                log.debug("Failed to remove '%s' file" %FILES_LIST_FULL[cnt])
             cnt += 1
-        # removing Plug-in files   
+
+        
+        # removing Plug-in files
         if remove_plugins == True:
             cnt =0
-            while cnt < len(PLUGIN_LIST): 
-                cmd=RMDIR + " " + home_dir+"/"+PLUGIN_LIST[cnt]
+            PLUGIN_LIST_FULL= self.expandList(PLUGIN_LIST,home_dir) 
+            while cnt < len(PLUGIN_LIST_FULL): 
+                cmd=RMDIR + " " + PLUGIN_LIST_FULL[cnt]
                 if checkSudo:
                     cmd= self.su_sudo() %cmd
 
                 log.debug("Removing hplip Plug-in files cmd= %s " %cmd)
                 status, output=self.run(cmd)
                 if 0 != status:
-                    log.debug("Failed to remove plug-in directory/file=%s "% (home_dir+"/"+PLUGIN_LIST[cnt]))
+                    log.debug("Failed to remove plug-in directory/file=%s "% (PLUGIN_LIST_FULL[cnt]))
                 cnt += 1
             
             cnt =0
-            while cnt < len(PLUGIN_STATE): 
-                cmd=RMDIR + " "+PLUGIN_STATE[cnt]
+            PLUGIN_STATE_FULL= self.expandList(PLUGIN_STATE) 
+            while cnt < len(PLUGIN_STATE_FULL): 
+                cmd=RMDIR + " "+PLUGIN_STATE_FULL[cnt]
                 if checkSudo:
                     cmd= self.su_sudo() %cmd
 
                 log.debug("Removing hplip Plug-in file cmd= %s " %cmd)
                 status, output=self.run(cmd)
                 if 0 != status:
-                    log.debug("Failed to remove plug-in directory/file=%s "% (PLUGIN_STATE[cnt]))
+                    log.debug("Failed to remove plug-in directory/file=%s "% (PLUGIN_STATE_FULL[cnt]))
                 cnt += 1
 
             cmd =RMDIR+ " "+home_dir
@@ -2384,4 +2630,5 @@ class CoreInstall(object):
                 log.debug("Failed to remove '%s' file" %(usrbin_dir+"hp-uninstall"))
         log.info("HPLIP uninstallation is completed")
         return True
+
 

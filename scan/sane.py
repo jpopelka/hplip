@@ -394,7 +394,7 @@ class ScanDevice:
 
 
     def waitForScanActive(self):
-        time.sleep(0.5)
+        #time.sleep(0.5)
         if self.scan_thread is not None:
             while True:
                 #print self.scan_thread.isAlive()
@@ -403,7 +403,7 @@ class ScanDevice:
                     self.scan_thread.scan_active:
                     return
 
-                time.sleep(0.5)
+                time.sleep(0.1)
                 #print "Waiting..."
 
 

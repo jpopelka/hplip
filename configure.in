@@ -26,7 +26,7 @@
 #   104 = no libdl
 
 #AC_PREREQ(2.59)
-AC_INIT([HP Linux Imaging and Printing], [3.12.4], [3.12.4], [hplip])
+AC_INIT([HP Linux Imaging and Printing], [3.12.6], [3.12.6], [hplip])
 #AM_INIT_AUTOMAKE([1.9 foreign])
 AM_INIT_AUTOMAKE
 AC_DISABLE_STATIC
@@ -290,6 +290,17 @@ else
 fi
 AM_CONDITIONAL(UDEV_ACL_RULES, test x$udev_acl_rules = xyes)
 
+AC_MSG_CHECKING([for udev sysfs enable rules])
+AC_ARG_ENABLE(udev_sysfs_rules,
+  [  --enable-udev_sysfs_rules    Use SYSFS attribute instead of ATTR/ATTRS attribute in udev rules(default=no)],
+  udev_sysfs_rules=$enableval, udev_sysfs_rules=no)
+if test "$udev_sysfs_rules" = "yes"; then
+   AC_MSG_RESULT(yes)
+else
+   AC_MSG_RESULT(no)
+fi
+AM_CONDITIONAL(UDEV_SYSFS_RULES, test x$udev_sysfs_rules = xyes)
+
 AC_MSG_CHECKING([for shadow build])
 AC_ARG_ENABLE(shadow_build,
   [  --enable-shadow-build    enable shadow build (default=no)],
@@ -300,6 +311,18 @@ else
    AC_MSG_RESULT(no)
 fi
 AM_CONDITIONAL(SHADOW_BUILD, test x$shadow_build = xyes)
+
+AC_MSG_CHECKING([for libusb-0.1 build])
+AC_ARG_ENABLE(libusb01_build,
+  [  --enable-libusb01_build    Use libusb-0.1 instead of libusb-1.0 (default=no. i.e. libusb-1.0)],
+  libusb01_build=$enableval, libusb01_build=no)
+if test "$libusb01_build" = "yes"; then
+   AC_MSG_RESULT(yes)
+   AC_DEFINE(HAVE_LIBUSB01) 
+else
+   AC_MSG_RESULT(no)
+fi
+AM_CONDITIONAL(LIBUSB01_BUILD, test x$libusb01_build = xyes)
 
 AC_ARG_WITH(cupsbackenddir, AC_HELP_STRING([--with-cupsbackenddir=DIR], [set cups backend install directory [default=/usr/lib/cups/backend]]),
    cupsbackenddir=$withval, cupsbackenddir="/usr/lib/cups/backend")
@@ -496,8 +519,13 @@ fi
 if test "$hpijs_only_build" = "no"; then
    AC_CHECK_LIB([cups], [cupsDoFileRequest], [LIBS="$LIBS"], [AC_MSG_ERROR([cannot find libcups support], 9)])
    AC_CHECK_HEADERS(cups/cups.h, ,[AC_MSG_ERROR([cannot find cups-devel support], 3)])
-   AC_CHECK_LIB([usb], [usb_init], [LIBS="$LIBS"], [AC_MSG_ERROR([cannot find libusb support], 2)])
-   AC_CHECK_HEADERS(usb.h, ,[AC_MSG_ERROR([cannot find libusb-devel support], 11)])
+   if test "$libusb01_build" = "yes"; then
+      AC_CHECK_LIB([usb], [usb_init], [LIBS="$LIBS"], [AC_MSG_ERROR([cannot find libusb support], 2)])
+      AC_CHECK_HEADERS(usb.h, ,[AC_MSG_ERROR([cannot find libusb-devel support], 11)])
+   else
+      AC_CHECK_LIB([usb-1.0], [libusb_init], [LIBS="$LIBS"], [AC_MSG_ERROR([cannot find libusb 1.0 support], 2)])
+      AC_CHECK_HEADERS(libusb-1.0/libusb.h, ,[AC_MSG_ERROR([cannot find libusb-1.0-devel support], 11)])
+   fi
 fi
 
 if test "$hpijs_only_build" = "no" && test "$lite_build" = "no" && test "$hpcups_only_build" = "no"; then
@@ -586,6 +614,7 @@ AC_SUBST(hpijs_install)
 AC_SUBST(hpcups_install)
 AC_SUBST(doc_build)
 AC_SUBST(shadow_build)
+AC_SUBST(libusb01_build)
 AC_SUBST(APDK_ENDIAN_FLAG)
 AC_SUBST(APDK_AUTO_INCLUDE_FLAG)
 AC_SUBST(ui_toolkit)
@@ -615,6 +644,7 @@ AC_SUBST(hpcups_only_build)
 AC_SUBST(SNMPLIB)
 AC_SUBST(prefix)
 AC_SUBST(udev_acl_rules)
+AC_SUBST(udev_sysfs_rules)
 
 AC_CONFIG_FILES(Makefile hplip.conf hplip.desktop hplip-systray.desktop prnt/drv/hpijs.drv prnt/drv/hpcups.drv hplip.list data/policykit/com.hp.hplip.service)
 AC_OUTPUT

@@ -31,7 +31,8 @@ from prnt import cups
 from base.codes import *
 from ui_utils import *
 #from installer import core_install
-from installer.core_install import CoreInstall
+from installer.core_install import CoreInstall,\
+                                   MODE_CHECK
 
 # Qt
 from PyQt4.QtCore import *
@@ -651,7 +652,7 @@ class SetupDialog(QDialog, Ui_Dialog):
 
     def showAddPrinterPage(self):
         # Install the plugin if needed...
-        core = CoreInstall()
+        core = CoreInstall(MODE_CHECK)
         plugin = self.mq.get('plugin', PLUGIN_NONE)
         plugin_reason = self.mq.get('plugin-reason', PLUGIN_REASON_NONE)
         if plugin > PLUGIN_NONE:
@@ -1007,9 +1008,8 @@ class SetupDialog(QDialog, Ui_Dialog):
                 if os.geteuid!=0 and utils.addgroup()!=[]:
                     FailureUI(self, self.__tr("<b>Printer queue setup failed. Could not connect to CUPS Server</b><p>Is user added to %s group(s)" %utils.list_to_string(utils.addgroup())))
             else:
-                # TODO:
-                #service.sendEvent(self.hpssd_sock, EVENT_CUPS_QUEUES_CHANGED, device_uri=self.device_uri)
-                pass
+                # sending Event to add this device in hp-systray
+                utils.sendEvent(EVENT_CUPS_QUEUES_CHANGED,self.device_uri, self.printer_name)
 
         finally:
             QApplication.restoreOverrideCursor()
@@ -1037,10 +1037,9 @@ class SetupDialog(QDialog, Ui_Dialog):
                 QApplication.restoreOverrideCursor()
                 FailureUI(self, self.__tr("<b>Fax queue setup failed.</b><p>Please restart CUPS and try again."))
             else:
-                pass
-                # TODO:
-                #service.sendEvent(self.hpssd_sock, EVENT_CUPS_QUEUES_CHANGED, device_uri=self.fax_uri)
-
+                 # sending Event to add this device in hp-systray
+                utils.sendEvent(EVENT_CUPS_QUEUES_CHANGED,self.fax_uri, self.fax_name)
+                
         finally:
             QApplication.restoreOverrideCursor()
 

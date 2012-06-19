@@ -273,7 +273,7 @@ else: # INTERACTIVE_MODE
         log.info("")
 
         from installer import core_install
-        core = core_install.CoreInstall()
+        core = core_install.CoreInstall(core_install.MODE_CHECK)
 
         core.set_plugin_version()
 

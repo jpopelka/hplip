@@ -1820,27 +1820,44 @@ class Device(object):
                                     'rr' : rr,
                                   })
 
+                #Check if device itself is sending the supplies info. If so, then in that case we need not check model.dat static data and
+                #compare with region, kind and type values.
+                dynamic_sku_data = False
+                for agent in agents:
+                    try:
+                        if agent['agent-sku'] != '':
+                            dynamic_sku_data = True
+                            break
+                    except:
+                        pass                                 
+
                 a, aa = 1, 1
                 while True:
-                    mq_agent_kind = self.mq.get('r%d-agent%d-kind' % (r_value, a), -1)
-
-                    if mq_agent_kind == -1:
-                        break
-
-                    mq_agent_type = self.mq.get('r%d-agent%d-type' % (r_value, a), 0)
-                    mq_agent_sku = self.mq.get('r%d-agent%d-sku' % (r_value, a), '')
-
-                    found = False
-
-                    log.debug("Looking for kind=%d, type=%d..." % (mq_agent_kind, mq_agent_type))
-                    for agent in agents:
+                    if dynamic_sku_data:
+                        if a > len(agents):
+                            break 
+                        agent = agents[a-1]
+                        mq_agent_sku = agent['agent-sku']
                         agent_kind = agent['kind']
                         agent_type = agent['type']
+                        found = True
+                    else:
+                        mq_agent_kind = self.mq.get('r%d-agent%d-kind' % (r_value, a), -1)
+                        if mq_agent_kind == -1:
+                            break
+                        mq_agent_type = self.mq.get('r%d-agent%d-type' % (r_value, a), 0)
+                        mq_agent_sku = self.mq.get('r%d-agent%d-sku' % (r_value, a), '')
+                        found = False
 
-                        if agent_kind == mq_agent_kind and \
-                           agent_type == mq_agent_type:
-                           found = True
-                           break
+                        log.debug("Looking for kind=%d, type=%d..." % (mq_agent_kind, mq_agent_type))
+                        for agent in agents:
+                            agent_kind = agent['kind']
+                            agent_type = agent['type']
+
+                            if agent_kind == mq_agent_kind and \
+                               agent_type == mq_agent_type:
+                                   found = True
+                                   break
 
                     if found:
                         log.debug("found: r%d-kind%d-type%d" % (r_value, agent_kind, agent_type))
@@ -1863,7 +1880,7 @@ class Device(object):
                         # if agent health is OK, check for low supplies. If low, use
                         # the agent level trigger description for the agent description.
                         # Otherwise, report the agent health.
-                        if (status_code == STATUS_PRINTER_IDLE or status_code == STATUS_PRINTER_OUT_OF_INK) and \
+                        if (status_code == STATUS_PRINTER_POWER_SAVE or status_code == STATUS_PRINTER_IDLE or status_code == STATUS_PRINTER_OUT_OF_INK) and \
                             (agent_health == AGENT_HEALTH_OK or
                              (agent_health == AGENT_HEALTH_FAIR_MODERATE and agent_kind == AGENT_KIND_HEAD)) and \
                             agent_level_trigger >= AGENT_LEVEL_TRIGGER_MAY_BE_LOW:

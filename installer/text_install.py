@@ -92,9 +92,29 @@ def start(language, auto=True, test_depends=False,
         log.info("")
         log.note("Defaults for each question are maked with a '*'. Press <enter> to accept the default.")
         core.init()
-        if not core.distro_name in ("ubuntu","debian","suse","fedora"):
+        vrs =core.get_distro_data('versions_list')
+        Is_Manual_Distro = False
+        distro_alternate_version=None
+        if core.distro_version not in vrs and len(vrs):
+            distro_alternate_version= vrs[len(vrs)-1]
+            if core.is_auto_installer_support(distro_alternate_version):
+                log.error("%s-%s version is not supported, so all dependencies may not be installed. However trying to install using %s-%s version packages." \
+                                                   %(core.distro_name, core.distro_version, core.distro_name, distro_alternate_version))
+                ok, choice = tui.enter_choice("\nPress 'y' to continue auto installation. Press 'n' to quit auto instalation(y=yes, n=no*): ",['y','n'],'n')
+                if not ok or choice =='n':
+                    log.info("Installation exit")
+                    sys.exit()
+            else:
+                # Even previous distro is not supported
+                Is_Manual_Distro = True
+        elif not core.is_auto_installer_support():
+              # This distro is not supported
+            Is_Manual_Distro = True
+
+
+        if Is_Manual_Distro:
             log.error("Auto installation is not supported for '%s' distro so all dependencies may not be installed. \nPlease install manually as mentioned in 'http://hplipopensource.com/hplip-web/install/manual/index.html' web-site"% core.distro_name)
-            ok, choice = tui.enter_choice("\nPress 'y' If you still want to continue auto installation. Press 'n' to quit auto instalation(y=yes, n=no*): ",['y','n'],'n')
+            ok, choice = tui.enter_choice("\nPress 'y' to continue auto installation. Press 'n' to quit auto instalation(y=yes, n=no*): ",['y','n'],'n')
             if not ok or choice =='n':
                 log.info("Installation exit")
                 sys.exit()
@@ -285,7 +305,8 @@ def start(language, auto=True, test_depends=False,
                     (core.get_distro_data('display_name', '(unknown)'), core.distro_version))
 
 
-            if core.distro == DISTRO_UNKNOWN or not core.distro_version_supported:
+#            if core.distro == DISTRO_UNKNOWN or not core.distro_version_supported:
+            if core.distro == DISTRO_UNKNOWN:
                 log.error("The distribution/OS that you are running is not supported. This installer\ncannot install an unsupported distribution. Please check your distribution/OS\nand re-run this installer or perform a manual installation.")
                 if num_req_missing:
                     log.error("The following REQUIRED dependencies are missing and need to be installed:")
@@ -316,8 +337,6 @@ def start(language, auto=True, test_depends=False,
             enable_par = False
             core.selected_options['parallel'] = False
 
-        log.debug("Req missing=%d Opt missing=%d HPLIP=%s Component=%s" % \
-            (num_req_missing, num_opt_missing, core.hplip_present, core.selected_component))
 
 
         #
@@ -340,9 +359,9 @@ def start(language, auto=True, test_depends=False,
         # INSTALLATION NOTES
         #
 
-        if core.distro_supported():
+        if core.is_auto_installer_support(distro_alternate_version):
             distro_notes = core.get_distro_data('notes', '').strip()
-            ver_notes = core.get_ver_data('notes', '').strip()
+            ver_notes = core.get_ver_data('notes', '',distro_alternate_version).strip()
 
             if distro_notes or ver_notes:
                 tui.title("INSTALLATION NOTES")
@@ -362,7 +381,7 @@ def start(language, auto=True, test_depends=False,
         # PRE-INSTALL COMMANDS
         #
         tui.title("RUNNING PRE-INSTALL COMMANDS")
-        if core.run_pre_install(progress_callback): # some cmds were run...
+        if core.run_pre_install(progress_callback, distro_alternate_version): # some cmds were run...
             num_req_missing = core.count_num_required_missing_dependencies()
             num_opt_missing = core.count_num_optional_missing_dependencies()
         log.info("OK")
@@ -370,7 +389,7 @@ def start(language, auto=True, test_depends=False,
         #
         # REQUIRED DEPENDENCIES INSTALL
         #
-
+        package_mgr_cmd = core.get_distro_data('package_mgr_cmd')
         depends_to_install = []
         if num_req_missing:
             tui.title("INSTALL MISSING REQUIRED DEPENDENCIES")
@@ -382,11 +401,12 @@ def start(language, auto=True, test_depends=False,
                 log.warning("Missing REQUIRED dependency: %s (%s)" % (depend, desc))
 
                 ok = False
-                packages, commands = core.get_dependency_data(depend)
+                packages, commands = core.get_dependency_data(depend,distro_alternate_version)
                 log.debug("Packages: %s" % ','.join(packages))
                 log.debug("Commands: %s" % ','.join(commands))
 
-                if core.distro_version_supported and (packages or commands):
+#                if core.distro_version_supported and (packages or commands):
+                if package_mgr_cmd and (packages or commands):
                     if auto:
                         answer = True
                     else:
@@ -424,12 +444,13 @@ def start(language, auto=True, test_depends=False,
                     log.warning("Missing OPTIONAL dependency for option '%s': %s (%s)" % (opt, depend, desc))
 
                 installed = False
-                packages, commands = core.get_dependency_data(depend)
+                packages, commands = core.get_dependency_data(depend,distro_alternate_version)
                 log.debug("Packages: %s" % ','.join(packages))
                 log.debug("Commands: %s" % ','.join(commands))
 
 
-                if core.distro_version_supported and (packages or commands):
+#                if core.distro_version_supported and (packages or commands):
+                if package_mgr_cmd and (packages or commands):
                     if auto:
                         answer = True
                     else:
@@ -458,10 +479,13 @@ def start(language, auto=True, test_depends=False,
 
         log.debug("Dependencies to install: %s  hplip_present:%s" % (depends_to_install, core.hplip_present))
 
-        if core.distro_version_supported and \
+#        if core.distro_version_supported and \
+#            (depends_to_install or core.hplip_present) and \
+#            core.selected_component == 'hplip':
+
+        if package_mgr_cmd and \
             (depends_to_install or core.hplip_present) and \
             core.selected_component == 'hplip':
-
             #
             # CHECK FOR RUNNING PACKAGE MANAGER
             #
@@ -514,7 +538,7 @@ def start(language, auto=True, test_depends=False,
             #
 
             tui.title("RUNNING PRE-PACKAGE COMMANDS")
-            core.run_pre_depend(progress_callback)
+            core.run_pre_depend(progress_callback,distro_alternate_version)
             log.info("OK")
 
             #
@@ -537,7 +561,7 @@ def start(language, auto=True, test_depends=False,
 
                 for d in depends_to_install:
                     log.debug("*** Processing dependency: %s" % d)
-                    pkgs, commands = core.get_dependency_data(d)
+                    pkgs, commands = core.get_dependency_data(d,distro_alternate_version)
 
                     if pkgs:
                         log.debug("Package(s) '%s' will be installed to satisfy dependency '%s'." %
@@ -702,7 +726,7 @@ def start(language, auto=True, test_depends=False,
                 sys.exit(0)
 
         tui.title("PRE-BUILD COMMANDS")
-        core.run_pre_build(progress_callback)
+        core.run_pre_build(progress_callback, distro_alternate_version)
         log.info("OK")
 
         tui.title("BUILD AND INSTALL")
@@ -732,7 +756,7 @@ def start(language, auto=True, test_depends=False,
         #
 
         tui.title("POST-BUILD COMMANDS")
-        core.run_post_build(progress_callback)
+        core.run_post_build(progress_callback, distro_alternate_version)
 
         #
         # OPEN MDNS MULTICAST PORT
@@ -740,7 +764,7 @@ def start(language, auto=True, test_depends=False,
         user_conf = UserConfig()
         
         if core.selected_options['network']:
-            open_mdns_port = core.get_distro_ver_data('open_mdns_port')
+            open_mdns_port = core.get_distro_ver_data('open_mdns_port',None,distro_alternate_version)
             if open_mdns_port:
                 tui.title("OPEN MDNS/BONJOUR FIREWALL PORT (MULTICAST PORT 5353)")
 

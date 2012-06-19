@@ -27,7 +27,7 @@
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-  Author: Naga Samrat Chowdary Narla, Sanjay Kumar, Amarnath Chitumalla
+  Author: Naga Samrat Chowdary Narla, Sanjay Kumar, Amarnath Chitumalla,Goutam Kodu
 \*****************************************************************************/
 
 #include "HPCupsFilter.h"
@@ -35,7 +35,6 @@
 #include <sys/wait.h>
 #include <sys/utsname.h>
 #include <time.h>
-#include <sys/timeb.h>
 
 #define HP_FILE_VERSION_STR    "03.09.08.0"
 
@@ -322,14 +321,8 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
     int    horz_res = cups_header->HWResolution[0];
     int    vert_res = cups_header->HWResolution[1];
     m_JA.media_attributes.pcl_id = cups_header->cupsInteger[0];
-    m_JA.media_attributes.physical_width   = (cups_header->PageSize[0] * horz_res) / 72;
-    m_JA.media_attributes.physical_height  = (cups_header->PageSize[1] * vert_res) / 72;
-    m_JA.media_attributes.printable_width  = cups_header->cupsWidth;
-    m_JA.media_attributes.printable_height = cups_header->cupsHeight;
-
     m_JA.media_attributes.printable_start_x = (cups_header->Margins[0] * horz_res) / 72;
     m_JA.media_attributes.printable_start_y = ((cups_header->PageSize[1] - cups_header->ImagingBoundingBox[3]) * vert_res) / 72;
-
     m_JA.media_attributes.horizontal_overspray = (xoverspray * horz_res) / 1000;
     m_JA.media_attributes.vertical_overspray   = (yoverspray * vert_res) / 1000;
 
@@ -377,6 +370,21 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
             return SYSTEM_ERROR;
     }
     strncpy(m_JA.printer_language, attr->value, sizeof(m_JA.printer_language)-1);
+
+    if(strcmp(m_JA.printer_language, "hbpl1") == 0) {
+        m_JA.media_attributes.physical_width = cups_header->PageSize[0];
+        m_JA.media_attributes.physical_height = cups_header->PageSize[1];
+        m_JA.media_attributes.printable_width = ((cups_header->ImagingBoundingBox[2]-cups_header->ImagingBoundingBox[0]) * horz_res) / 72;
+        m_JA.media_attributes.printable_height = ((cups_header->ImagingBoundingBox[3]-cups_header->ImagingBoundingBox[1]) * vert_res) / 72;
+        strncpy(m_JA.media_attributes.PageSizeName, cups_header->cupsPageSizeName, sizeof(m_JA.media_attributes.PageSizeName)-1);
+    }
+    else{
+        m_JA.media_attributes.physical_width   = (cups_header->PageSize[0] * horz_res) / 72;
+        m_JA.media_attributes.physical_height  = (cups_header->PageSize[1] * vert_res) / 72;
+        m_JA.media_attributes.printable_width  = cups_header->cupsWidth;
+        m_JA.media_attributes.printable_height = cups_header->cupsHeight;
+    }
+
     if (m_iLogLevel & BASIC_LOG) {
         dbglog("HPCUPS: found Printer Language, it is - %s\n", attr->value);
     }
@@ -456,13 +464,13 @@ int HPCupsFilter::StartPrintJob(int  argc, char *argv[])
 
     memset(&m_JA, 0, sizeof(JobAttributes));
     struct    tm       *t;
-    struct    timeb    tb;
+    struct timeval	 tv;
     time_t             long_time;
     time(&long_time);
     t = localtime(&long_time);
-    ftime(&tb);
+    gettimeofday(&tv, NULL);
     strncpy(m_JA.job_start_time, asctime(t), sizeof(m_JA.job_start_time)-1);    // returns Fri Jun  5 08:12:16 2009
-    snprintf(m_JA.job_start_time+19, sizeof(m_JA.job_start_time) - 20, ":%d %d", tb.millitm, t->tm_year + 1900); // add milliseconds
+    snprintf(m_JA.job_start_time+19, sizeof(m_JA.job_start_time) - 20, ":%ld %d", tv.tv_usec/1000, t->tm_year + 1900); // add milliseconds
 
     getLogLevel();
     m_JA.job_id = atoi(argv[1]);
@@ -587,7 +595,7 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
     cups_page_header2_t    cups_header;
     DRIVER_ERROR           err;
     int                    ret_status = 0;
-    char hpPreProcessedRasterFile[] = "/tmp/hplipSwapedPagesXXXXXX"; //temp file needed to store raster data with swaped pages.
+    char hpPreProcessedRasterFile[64] = "/tmp/hplipSwapedPagesXXXXXX"; //temp file needed to store raster data with swaped pages.
 
     while (cupsRasterReadHeader2(cups_raster, &cups_header))
     {

@@ -38,6 +38,7 @@ hpdir = $(cupsbackenddir)
 hp_PROGRAMS = hp
 hp_SOURCES = prnt/backend/hp.c
 hp_LDADD = libhpmud.la $(DBUS_LIBS)
+hp_LDFLAGS = $(libhpmud_la_LDFLAGS)
 hp_CFLAGS = $(DBUS_CFLAGS)
 
 # hpaio sane backend
@@ -49,7 +50,7 @@ libsane_hpaio_la_SOURCES = scan/sane/hpaio.c scan/sane/mfpdtf.c scan/sane/pml.c 
 	  scan/sane/common.c scan/sane/common.h scan/sane/soap.h scan/sane/soapht.h scan/sane/sanei_debug.h scan/sane/sanei.h \
 	  scan/sane/sanei_init_debug.c scan/sane/marvell.h scan/sane/marvelli.h scan/sane/marvell.c scan/sane/soapht.c scan/sane/soap.c \
         scan/sane/soaphti.h scan/sane/soapi.h scan/sane/xml.c scan/sane/xml.h scan/sane/ledm.h scan/sane/ledmi.h scan/sane/ledm.c \
-        scan/sane/bb_ledm.c scan/sane/http.h scan/sane/http.c 
+        scan/sane/bb_ledm.c scan/sane/http.h scan/sane/http.c scan/sane/sclpml.c scan/sane/sclpml.h
 if DARWIN_BUILD
 libsane_hpaio_la_LDFLAGS = -module -framework CoreFoundation -version-info 1:0:0
 else
@@ -64,15 +65,30 @@ endif # SCAN_BUILD
 # hpmud library
 MUDNAME=hpmud
 lib_LTLIBRARIES += libhpmud.la
-libhpmud_la_SOURCES = io/hpmud/hpmud.c io/hpmud/mlc.c io/hpmud/model.c io/hpmud/musb.c io/hpmud/pml.c \
-	  io/hpmud/hpmud.h io/hpmud/hpmudi.h io/hpmud/list.h io/hpmud/mlc.h io/hpmud/musb.h io/hpmud/pml.h io/hpmud/dot4.c \
-	  io/hpmud/dot4.h io/hpmud/jd.c io/hpmud/jd.h io/hpmud/pp.c io/hpmud/pp.h
-if NETWORK_BUILD
-libhpmud_la_LDFLAGS = -version-info 0:6:0 -lusb -lpthread -l$(SNMPLIB) -lcrypto
-else
-libhpmud_la_LDFLAGS = -version-info 0:6:0 -lusb -lpthread
-endif
+
+if LIBUSB01_BUILD
 libhpmud_la_CFLAGS = -DMUDNAME=\"$(MUDNAME)\" -DCONFDIR=\"$(hplip_confdir)\"
+libhpmud_la_SOURCES = io/hpmud/hpmud.c io/hpmud/mlc.c io/hpmud/model.c io/hpmud/pml.c \
+	  io/hpmud/hpmud.h io/hpmud/hpmudi.h io/hpmud/list.h io/hpmud/mlc.h io/hpmud/pml.h io/hpmud/dot4.c \
+	  io/hpmud/dot4.h io/hpmud/jd.c io/hpmud/jd.h io/hpmud/pp.c io/hpmud/pp.h io/hpmud/musb.h io/hpmud/musb_libusb01.c
+else
+libhpmud_la_CFLAGS = -I/usr/include/libusb-1.0 -DMUDNAME=\"$(MUDNAME)\" -DCONFDIR=\"$(hplip_confdir)\"
+libhpmud_la_SOURCES = io/hpmud/hpmud.c io/hpmud/mlc.c io/hpmud/model.c io/hpmud/pml.c \
+	  io/hpmud/hpmud.h io/hpmud/hpmudi.h io/hpmud/list.h io/hpmud/mlc.h io/hpmud/pml.h io/hpmud/dot4.c \
+	  io/hpmud/dot4.h io/hpmud/jd.c io/hpmud/jd.h io/hpmud/pp.c io/hpmud/pp.h io/hpmud/musb.h io/hpmud/musb.c
+endif
+
+if NETWORK_BUILD
+libhpmud_la_LDFLAGS = -version-info 0:6:0 -lpthread -l$(SNMPLIB) -lcrypto
+else
+libhpmud_la_LDFLAGS = -version-info 0:6:0 -lpthread
+endif
+
+if LIBUSB01_BUILD
+libhpmud_la_LDFLAGS += -lusb
+else
+libhpmud_la_LDFLAGS += -lusb-1.0
+endif
 
 # ip library
 lib_LTLIBRARIES += libhpip.la
@@ -92,6 +108,16 @@ hp_mkuri_CFLAGS = -DCONFDIR=\"$(hplip_confdir)\"
 
 # hpmud.rules
 rulesdir = /etc/udev/rules.d
+if UDEV_SYSFS_RULES
+dist_rules_DATA = data/rules/56-hpmud_support_sysfs.rules
+dist_rules_DATA += data/rules/86-hpmud_plugin_sysfs.rules
+dist_rules_DATA += data/rules/56-hpmud_add_printer_sysfs.rules
+if UDEV_ACL_RULES
+dist_rules_DATA += data/rules/40-hplip_sysfs.rules
+else
+dist_rules_DATA += data/rules/55-hpmud_sysfs.rules
+endif
+else
 dist_rules_DATA = data/rules/56-hpmud_support.rules
 dist_rules_DATA += data/rules/86-hpmud_plugin.rules
 dist_rules_DATA += data/rules/56-hpmud_add_printer.rules
@@ -99,6 +125,7 @@ if UDEV_ACL_RULES
 dist_rules_DATA += data/rules/40-hplip.rules
 else
 dist_rules_DATA += data/rules/55-hpmud.rules
+endif
 endif
 halpredir = /usr/share/hal/fdi/preprobe/10osvendor
 dist_halpre_DATA = data/rules/20-hplip-devices.fdi
@@ -255,7 +282,13 @@ hpmudext_LTLIBRARIES = hpmudext.la
 hpmudext_la_LDFLAGS = -module -avoid-version
 hpmudext_la_SOURCES = io/mudext/hpmudext.c
 hpmudext_la_LIBADD = libhpmud.la
+
+if LIBUSB01_BUILD
 hpmudext_la_CFLAGS = -I$(PYTHONINCLUDEDIR)
+else
+hpmudext_la_CFLAGS =-I/usr/include/libusb-1.0 -I$(PYTHONINCLUDEDIR)
+endif
+
 # ui (qt3)
 if GUI_BUILD
 if QT3_INSTALL
@@ -440,7 +473,7 @@ hpcups_SOURCES = prnt/hpcups/HPCupsFilter.cpp prnt/hpcups/HPCupsFilter.h prnt/hp
 	prnt/hpcups/Pcl3Gui.cpp prnt/hpcups/Pcl3Gui.h prnt/hpcups/Pcl3Gui2.cpp prnt/hpcups/Pcl3Gui2.h \
 	prnt/hpcups/LJMono.cpp prnt/hpcups/LJMono.h prnt/hpcups/LJColor.cpp prnt/hpcups/LJColor.h \
 	prnt/hpcups/LJFastRaster.cpp prnt/hpcups/LJFastRaster.h prnt/hpcups/LJJetReady.cpp prnt/hpcups/LJJetReady.h \
-prnt/hpcups/LJZjStream.cpp prnt/hpcups/LJZjStream.h \
+	prnt/hpcups/LJZjStream.cpp prnt/hpcups/LJZjStream.h \
 	prnt/hpcups/LJZxStream.cpp prnt/hpcups/LJZxStream.h prnt/hpcups/Job.cpp prnt/hpcups/Job.h \
 	prnt/hpcups/Pipeline.cpp prnt/hpcups/Pipeline.h prnt/hpcups/Processor.cpp prnt/hpcups/Processor.h \
 	prnt/hpcups/RasterSender.cpp prnt/hpcups/RasterSender.h prnt/hpcups/ColorMatcher.cpp prnt/hpcups/ColorMatcher.h \
@@ -449,20 +482,21 @@ prnt/hpcups/LJZjStream.cpp prnt/hpcups/LJZjStream.h \
 	prnt/hpcups/dj4100ColorMaps.cpp \
 	prnt/hpcups/BreakTables.cpp prnt/hpcups/PrinterCommands.h prnt/hpcups/Utils.cpp prnt/hpcups/Utils.h \
 	prnt/hpcups/SystemServices.cpp prnt/hpcups/SystemServices.h prnt/hpcups/CommonDefinitions.h prnt/hpcups/hpjbig_wrapper.h \
-        prnt/hpcups/apPrintModes.h prnt/hpcups/dj400PrintModes.h prnt/hpcups/dj540PrintModes.h prnt/hpcups/dj600PrintModes.h \
-        prnt/hpcups/dj630PrintModes.h prnt/hpcups/dj690PrintModes.h prnt/hpcups/dj850PrintModes.h prnt/hpcups/dj890PrintModes.h \
-        prnt/hpcups/dj895PrintModes.h prnt/hpcups/dj8x5PrintModes.h prnt/hpcups/dj970PrintModes.h prnt/hpcups/Pcl3GuiPrintModes.h \
-        prnt/hpcups/Pcl3PrintModes.h prnt/hpcups/ColorMaps.h \
-        prnt/hpcups/QuickConnect.cpp prnt/hpcups/QuickConnect.h \
-        prnt/hpcups/ModeJpeg.cpp prnt/hpcups/ModeJpeg.h \
-        prnt/hpcups/jccolor.c prnt/hpcups/jinclude.h \
-        prnt/hpcups/jdatadbf.c prnt/hpcups/jinclude.h \
-        prnt/hpcups/Lidil.cpp prnt/hpcups/Lidil.h \
-        prnt/hpcups/LidilCompress.cpp prnt/hpcups/LidilCompress.h \
-        prnt/hpcups/LidilPrintModes.h prnt/hpcups/dj3320ColorMaps.cpp \
-        prnt/hpcups/dj3600ColorMaps.cpp prnt/hpcups/dj3320PrintModes.h \
-        prnt/hpcups/dj4100PrintModes.h
-
+	prnt/hpcups/apPrintModes.h prnt/hpcups/dj400PrintModes.h prnt/hpcups/dj540PrintModes.h prnt/hpcups/dj600PrintModes.h \
+	prnt/hpcups/dj630PrintModes.h prnt/hpcups/dj690PrintModes.h prnt/hpcups/dj850PrintModes.h prnt/hpcups/dj890PrintModes.h \
+	prnt/hpcups/dj895PrintModes.h prnt/hpcups/dj8x5PrintModes.h prnt/hpcups/dj970PrintModes.h prnt/hpcups/Pcl3GuiPrintModes.h \
+	prnt/hpcups/Pcl3PrintModes.h prnt/hpcups/ColorMaps.h \
+	prnt/hpcups/QuickConnect.cpp prnt/hpcups/QuickConnect.h \
+	prnt/hpcups/ModeJpeg.cpp prnt/hpcups/ModeJpeg.h \
+	prnt/hpcups/jccolor.c prnt/hpcups/jinclude.h \
+	prnt/hpcups/jdatadbf.c prnt/hpcups/jinclude.h \
+	prnt/hpcups/Lidil.cpp prnt/hpcups/Lidil.h \
+	prnt/hpcups/LidilCompress.cpp prnt/hpcups/LidilCompress.h \
+	prnt/hpcups/LidilPrintModes.h prnt/hpcups/dj3320ColorMaps.cpp \
+	prnt/hpcups/dj3600ColorMaps.cpp prnt/hpcups/dj3320PrintModes.h \
+	prnt/hpcups/dj4100PrintModes.h \
+	prnt/hpcups/Hbpl1.cpp prnt/hpcups/Hbpl1.h prnt/hpcups/Hbpl1_Wrapper.h
+      
 hpcups_CXXFLAGS = $(APDK_ENDIAN_FLAG) $(DBUS_CFLAGS)
 hpcups_LDADD = -ljpeg -ldl -lcups -lcupsimage $(DBUS_LIBS)
 #else

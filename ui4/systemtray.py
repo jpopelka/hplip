@@ -360,6 +360,8 @@ class SystemTrayApp(QApplication):
 
         self.setMenu()
 
+    def resetDevice(self):
+        devices.clear()
 
     def addDevice(self, device_uri):
         try:
@@ -380,6 +382,11 @@ class SystemTrayApp(QApplication):
                 log.debug("Running hp-upgrade: %s " % (path))
                 # this just updates the available version in conf file. But won't notify
                 os.spawnlp(os.P_NOWAIT, path, 'hp-upgrade', '--check')
+                time.sleep(5)
+                try:
+                    os.waitpid(0, os.WNOHANG)
+                except OSError:
+                    pass
             return
             
             
@@ -391,12 +398,16 @@ class SystemTrayApp(QApplication):
                 path = os.path.join(path, 'hp-upgrade')
                 log.debug("Running hp-upgrade: %s " % (path))
                 os.spawnlp(os.P_NOWAIT, path, 'hp-upgrade', '--notify')
-                
+                time.sleep(5)
             else:
                 log.error("Unable to find hp-upgrade --notify on PATH.")
         else:
             log.debug("upgrade schedule time is not yet completed. schedule time =%d current time =%d " %(self.user_settings.upgrade_pending_update_time, current_time))
         
+        try:
+            os.waitpid(0, os.WNOHANG)
+        except OSError:
+            pass
 
 
 
@@ -629,6 +640,13 @@ class SystemTrayApp(QApplication):
                     event = device.Event(*struct.unpack(self.fmt, m[:self.fmt_size]))
 
                     m = m[self.fmt_size:]
+                    
+                    if event.event_code == EVENT_CUPS_QUEUES_CHANGED:
+                        self.resetDevice()
+                        for d in device.getSupportedCUPSDevices(back_end_filter=['hp', 'hpfax']):
+                            self.addDevice(d)
+                            
+                        self.setMenu()
 
                     if event.event_code == EVENT_USER_CONFIGURATION_CHANGED:
                         log.debug("Re-reading configuration (EVENT_USER_CONFIGURATION_CHANGED)")

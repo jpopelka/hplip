@@ -245,6 +245,14 @@ else:
 
     # REVISIT:
     tmp_dir = '/tmp'
+    Cups_service_file="/usr/lib/systemd/system/cups.service"
+    if os.path.exists(Cups_service_file):
+       cmd="grep PrivateTmp=true %s"%Cups_service_file
+       sts, out = utils.run(cmd)
+       if sts == 0:
+          tmp_dir = '/var/log/hp'
+        
+
     pipe_name = os.path.join(tmp_dir, "hpfax-pipe-%d" % job_id)
 
     # Create the named pipe. Make sure it exists before sending
@@ -253,7 +261,7 @@ else:
     try:
         os.mkfifo(pipe_name)
     except OSError:
-        os.unlink(pipe_name)
+        os.unlink(pipe_name)      
         os.mkfifo(pipe_name)
 
     # Send dbus event to hpssd

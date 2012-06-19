@@ -663,6 +663,11 @@ SANE_Status marvell_control_option(SANE_Handle handle, SANE_Int option, SANE_Act
                   break;
                }
             }
+            if (stat != SANE_STATUS_GOOD)
+            {
+                ps->current_resolution = ps->resolution_list[1];
+                stat = SANE_STATUS_GOOD;
+            }
          }
          else
          {  /* Set default. */

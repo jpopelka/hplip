@@ -17,6 +17,7 @@ drv=@abs_drvdir@
 # Following values are determined at configure time and cannot be changed.
 [configure]
 network-build=@network_build@
+libusb01-build=@libusb01_build@
 pp-build=@pp_build@
 gui-build=@gui_build@
 scanner-build=@scan_build@
@@ -41,5 +42,6 @@ policy-kit=@policykit@
 hpijs-only-build=@hpijs_only_build@
 lite-build=@lite_build@
 udev-acl-rules=@udev_acl_rules@
+udev_sysfs_rules=@udev_sysfs_rules@
 hpcups-only-build=@hpcups_only_build@
 hpijs-only-build=@hpijs_only_build@

@@ -29,7 +29,7 @@ from installer.core_install import  PLUGIN_INSTALL_ERROR_NONE, \
                                     PLUGIN_INSTALL_ERROR_PLUGIN_FILE_CHECKSUM_ERROR, \
                                     PLUGIN_INSTALL_ERROR_NO_NETWORK, \
                                     PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR, \
-                                    PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS
+                                    PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS 
 
 from qt import *
 from pluginform2_base import PluginForm2_base
@@ -115,7 +115,7 @@ class PluginForm2(PluginForm2_base):
 
 
     def actionPushButton_clicked(self):
-        core = core_install.CoreInstall()
+        core = core_install.CoreInstall(core_install.MODE_CHECK)
         core.set_plugin_version() #self.version)
 
         if self.path is None: # download

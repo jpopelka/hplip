@@ -171,7 +171,7 @@ class Module(object):
             content.append(utils.USAGE_DEVICE)
             content.append(utils.USAGE_PRINTER)
 
-        if self.avail_modes is not None and self.num_valid_modes > 1:
+        if self.avail_modes is not None and self.num_valid_modes > 0:
             summary.append('[MODE]')
             content.append(utils.USAGE_SPACE)
             content.append(utils.USAGE_MODE)
@@ -263,7 +263,7 @@ class Module(object):
             params = ''.join([params, 'd:p:P:'])
             long_params.extend(['device=', 'device-uri=', 'printer=', 'printer-name'])
 
-        if self.num_valid_modes > 1:
+        if self.num_valid_modes > 0:
             if GUI_MODE in self.avail_modes and prop.gui_build:
                 params = ''.join([params, 'u'])
                 long_params.extend(['gui', 'ui'])
@@ -642,11 +642,11 @@ class Module(object):
         return printer_name_ret, device_uri_ret
 
 
-    def lockInstance(self, suffix=''):
+    def lockInstance(self, suffix='',suppress_error=False):
         if suffix:
             ok, self.lock_file = utils.lock_app('-'.join([self.mod, suffix]))
         else:
-            ok, self.lock_file = utils.lock_app(self.mod)
+            ok, self.lock_file = utils.lock_app(self.mod,suppress_error)
 
         if not ok:
             sys.exit(1)

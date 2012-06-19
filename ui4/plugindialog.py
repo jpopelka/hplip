@@ -34,7 +34,8 @@ from installer.core_install import  PLUGIN_INSTALL_ERROR_NONE, \
                                     PLUGIN_INSTALL_ERROR_PLUGIN_FILE_CHECKSUM_ERROR, \
                                     PLUGIN_INSTALL_ERROR_NO_NETWORK, \
                                     PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR, \
-                                    PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS
+                                    PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS,  \
+                                    MODE_CHECK
 
 # Qt
 from PyQt4.QtCore import *
@@ -57,7 +58,7 @@ class PluginDialog(QDialog, Ui_Dialog):
         self.plugin_reason = plugin_reason
         self.plugin_path = None
         self.result = False
-        self.core = CoreInstall()
+        self.core = CoreInstall(MODE_CHECK)
         self.core.set_plugin_version()
         self.setupUi(self)
 

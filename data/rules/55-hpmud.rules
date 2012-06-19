@@ -6,9 +6,9 @@
 #      "Writing udev rules" Ver 0.74, Daniel Drake. Although it seems 50-udev.rules is no longer used I continue to reuse "55-"
 #      name for backward compatibility with older distros. 2/11/2009, D Suffield 
 #
-#   2. It seems SFSFS has been replaced or depreciated by ATTR/ATTRS, but I continue to use SFSFS in order to be compatible with 
-#      older distros. SFSFS was defined in "Writing udev rules" Ver 0.72, Daniel Drake. 2/11/2009, D Suffield
-#
+#   2. As SYSFS has been replaced or depreciated by ATTR/ATTRS, changed from SYSFS to ATTR/ATTRS. 
+#      If older distros doesn't support ATTR/ATTRS, please relace ATTRS/ATTR with SYSFS keyword.
+#      
 #   3. This rules file is an attempt at being compatable with all distros. Feel free to make your own changes and if you feel your
 #      changes are not distro specific please send your patch to us. 2/11/2009, D Suffield
 #

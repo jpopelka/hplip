@@ -21,7 +21,7 @@
 #
 #
 
-__version__ = '1.0'
+__version__ = '1.1'
 __title__ = 'AutoConfig Utility for Plug-in Installation'
 __mod__ = 'hp-check-plugin'
 __doc__ = "Auto config utility for HPLIP supported multifunction Devices for installing proprietary plug-ins."
@@ -60,25 +60,37 @@ def send_message(device_uri, printer_name, event_code, username, job_id, title, 
     SystemBus().send_message(msg)
     log.debug("send_message() returning")
 
-# plugin installation
+# Plugin installation
 def install_Plugin(systray_running_status, run_directly=False):
     if run_directly:
+        if not utils.canEnterGUIMode4():
+            log.error("%s requires GUI support . Is Qt4 installed?" % __mod__)
+            sys.exit(1)
+
+        try:
+            from PyQt4.QtGui import QApplication, QMessageBox
+            from ui4.plugindiagnose import PluginDiagnose
+            from installer import core_install
+        except ImportError:
+            log.error("Unable to load Qt4 support. Is it installed?")
+            sys.exit(1)
+
+        app = QApplication(sys.argv)
         plugin = PLUGIN_REQUIRED 
         plugin_reason = PLUGIN_REASON_NONE
         ok, sudo_ok = pkit.run_plugin_command(plugin == PLUGIN_REQUIRED, plugin_reason)
         if not ok or not sudo_ok:
             log.error("Failed to install plug-in.")
     elif systray_running_status:
-        send_message( device_uri,  printer_name, EVENT_AUTO_CONFIGURE, username, 0, "AutoConfig")
+        send_message( device_uri,  "", EVENT_AUTO_CONFIGURE, username, 0, "AutoConfig")
         log.debug("Event EVENT_AUTO_CONFIGURE sent to hp-systray to invoke hp-plugin")
     else:
         log.error("Run hp-systray manually and re-plugin printer")
         #TBD: needs to run hp-plugin in silent mode. or needs to show error UI to user.
 
      
-#install Firmware after plugin installation completion.
-def install_firmware(Plugin_Installation_Completed):
-
+#Installs/Uploads the firmware to device once plugin installation is completed.
+def install_firmware(Plugin_Installation_Completed, USB_param):
     #timeout check for plugin installation
     sleep_timeout = 6000	# 10 mins time out
     while Plugin_Installation_Completed is False and sleep_timeout != 0:
@@ -98,9 +110,8 @@ def install_firmware(Plugin_Installation_Completed):
     
     execmd="hp-firmware"
     options=""
-    if usb_bus_id is not None and usb_device_id is not None:
-	options += " -y3 %s:%s"%(usb_bus_id, usb_device_id)
-
+    if USB_param is not None:
+        options += " -y3 %s"%(USB_param)
     if log_level is 'debug':
         options += " -g"
 
@@ -117,20 +128,18 @@ def install_firmware(Plugin_Installation_Completed):
 
 #Usage details
 USAGE = [(__doc__, "", "name", True),
-         ("Usage: %s [MODE] [OPTIONS]" % __mod__, "", "summary", True),
-         utils.USAGE_MODE,
-         utils.USAGE_GUI_MODE,
-         ("Run in interactive mode:", "-i or --interactive (For future use)", "option", False),
+         ("Usage: %s [OPTIONS] [USB bus:device]" % __mod__, "", "summary", True),
          utils.USAGE_OPTIONS,
          ("Install Plug-in through HP System Tray:", "-m (Default)", "option", False),
          ("Install Plug-in through hp-plugin:", "-p", "option", False),
-         ("Download firmware into the device:", "-F", "option", False),
-         ("Download firmware into the known device:", "-f bbb:ddd, where bbb is the USB bus ID and ddd is the USB device ID. The ':' and all leading zeroes must be present", "option", False),
+         ("Download firmware into the device:", "-f", "option", False),
          utils.USAGE_HELP,
          utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
+         utils.USAGE_EXAMPLES,
+          ("Install plugin:", "$%s 001:002"%(__mod__), "example", False),
+          ("Install plugin and firmware:", "$%s -f 001:002"%(__mod__), "example", False),
          utils.USAGE_NOTES,
          ("-m and -p options can't be used together. ","","note",False),
-         ("-f and -F options can't be used together. ","","note",False)
         ]
 
 
@@ -151,7 +160,9 @@ except ImportError:
         log.error("hp-check-plugin Tool requires dBus and python-dbus")
         sys.exit(1)
 try:
-    opts, args = getopt.getopt(sys.argv[1:],'l:hHuUmMf:FpPgG',['gui','help', 'help-rest', 'help-man', 'help-desc','logging='])
+    mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE, (INTERACTIVE_MODE, GUI_MODE), (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4), run_as_root_ok=True, quiet=True)
+    opts, device_uri, printer_name, mode, ui_toolkit, loc = \
+         mod.parseStdOpts('l:hHuUmMfFpPgG',['gui','help', 'help-rest', 'help-man', 'help-desc','logging='],handle_device_printer=False)
 
 except getopt.GetoptError, e:
         log.error(e.msg)
@@ -165,11 +176,8 @@ log_level = 'info'
 Systray_Msg_Enabled = False
 Plugin_option_Enabled = False
 Firmware_Option_Enabled = False
-Firmware_GUI_Option_Enabled = False
 GUI_Mode = True
 Is_Plugin_Already_Installed = False
-usb_bus_id=None
-usb_device_id=None
 
 for o, a in opts:
     if o in ('-h','-H', '--help'):
@@ -205,15 +213,16 @@ for o, a in opts:
     elif o in ('-p', '-P'):
         Plugin_option_Enabled = True
  
-    elif o== '-F':
-        Firmware_GUI_Option_Enabled = True
-
-    elif o =='-f':
-	usb_bus_id, usb_device_id = a.split(":", 1)
+    elif o in ('-F','-f'):
         Firmware_Option_Enabled = True
 
 if not log.set_level (log_level):
     usage()
+    
+try:
+    param = mod.args[0]
+except IndexError:
+    param = ''
 
 LOG_FILE = os.path.normpath(LOG_FILE)
 log.info(log.bold("Saving output in log file: %s" % LOG_FILE))
@@ -239,13 +248,28 @@ if Plugin_option_Enabled and Systray_Msg_Enabled:
     usage()
     sys.exit(1)
 
-if Firmware_GUI_Option_Enabled and Firmware_Option_Enabled:
-    log.error("Both -f and -F options can't be used together.")
+log.debug("param=%s" % param)
+if len(param) < 1:
     usage()
-    sys.exit(1)
+    sys.exit()
 
-if Firmware_GUI_Option_Enabled:
-    Firmware_Option_Enabled =True	# Firmware_GUI_Option_Enabled is just to check both -f: and -F enabled or not
+if param:
+    device_uri, sane_uri, fax_uri = device.makeURI(param)
+if not device_uri:
+    log.error("This is not a valid device")
+    sys.exit(0)
+
+log.debug("\nSetting up device: %s\n" % device_uri)
+#Query model and checks Plugin information.
+mq = device.queryModelByURI(device_uri)
+if not mq or mq.get('support-type', SUPPORT_TYPE_NONE) == SUPPORT_TYPE_NONE:
+    log.error("Unsupported printer model.")
+    sys.exit(1)
+    
+plugin = mq.get('plugin', PLUGIN_NONE)
+if plugin == PLUGIN_NONE:
+    log.debug("This is not a plugin device.")
+    sys.exit()
 
 if not Plugin_option_Enabled:
     Systray_Msg_Enabled = True
@@ -273,7 +297,7 @@ if status is False:
             time.sleep(2)
 else:
     Systray_Is_Running=True
-    log.info("hp-systray service is running\n")
+    log.debug("hp-systray service is running\n")
 
 core = core_install.CoreInstall()
 core.set_plugin_version()
@@ -300,7 +324,7 @@ if Firmware_Option_Enabled:
     else:
         Plugin_Installation_Completed = True
 
-    install_firmware(Plugin_Installation_Completed)  
+    install_firmware(Plugin_Installation_Completed,param)
 
 log.info()
 log.info("Done.")

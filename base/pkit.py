@@ -353,6 +353,7 @@ def copyPluginFiles(src_dir):
 
     for PRODUCT in products:
         MODEL = PRODUCT.replace('hp-', '').replace('hp_', '')
+        UDEV_SYSFS_RULES=sys_conf.get('configure','udev_sysfs_rules','no')
         for s in plugin_spec.get("products", PRODUCT).split(','):
 
             if not plugin_spec.has_section(s):
@@ -362,6 +363,13 @@ def copyPluginFiles(src_dir):
             src = plugin_spec.get(s, 'src', '')
             trg = plugin_spec.get(s, 'trg', '')
             link = plugin_spec.get(s, 'link', '')
+
+           # In Cent os 5.x distro's SYSFS attribute will be used. and Other distro's uses ATTR/ATTRS attribute in rules. 
+           # Following condition to check this...
+            if UDEV_SYSFS_RULES == 'no' and 'sysfs' in src:
+                continue
+            if UDEV_SYSFS_RULES == 'yes' and 'sysfs' not in src:
+                continue
 
             if not src:
                 log.error("Missing 'src=' value in section [%s]" % s)
@@ -489,7 +497,7 @@ def run_plugin_command(required=True, plugin_reason=PLUGIN_REASON_NONE):
     if 'gksu' in su_sudo:
         cmd = su_sudo % ("%s -u %s --reason %s" % (p_path, req, plugin_reason))
         cmd +=" -m" 
-        cmd += (" \"hp-plugin:- HP Device requires to install HP proprietary plugin. Please enter user (sudo) password to continue\"")
+        cmd += (" \"hp-plugin:- HP Device requires to install HP proprietary plugin. Please enter root password to continue\"")
     else:
         cmd = su_sudo % ("%s -u %s --reason %s To_install_plugin_for_HP_Device" % (p_path, req, plugin_reason))
 

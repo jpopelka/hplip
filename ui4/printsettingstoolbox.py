@@ -934,6 +934,17 @@ class PrintSettingsToolbox(QToolBox):
 
             DefaultButton.setText("Default")
 
+            #type of 'value' and 'default' can be unicode (ppd values), str, int or boolean, so we need to typecast it to bool for easy comparison
+            if value == True or value == 'True' or value == 'true':
+               value = True;
+            else:
+               value = False;
+
+            if default == True or default == 'True' or default == 'true':
+               default = True;
+            else:
+               default = False;
+
             if value == default:
                 DefaultButton.setEnabled(False)
             self.connect(DefaultButton, SIGNAL("clicked()"), self.DefaultButton_clicked)

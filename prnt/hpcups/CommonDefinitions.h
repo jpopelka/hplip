@@ -430,6 +430,7 @@ typedef struct MediaAttributes_s
     int        vertical_overspray;
     int        left_overspray; 
     int        top_overspray;
+    char       PageSizeName[64];
 } MediaAttributes;
 
 typedef struct JobAttributes_s

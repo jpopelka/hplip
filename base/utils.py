@@ -41,7 +41,21 @@ import string
 import commands # TODO: Replace with subprocess (commands is deprecated in Python 3.0)
 import cStringIO
 import re
-import xml.parsers.expat as expat
+from base.g import *
+try:
+   import xml.parsers.expat as expat
+except ImportError,e:
+   log.info("\n")
+   log.error("Failed to import xml.parsers.expat(%s).\nThis may be due to the incompatible version of python-xml package.\n"%(e))
+   if "undefined symbol" in str(e):
+       log.info(log.blue("Please re-install compatible version (other than 2.7.2-7.14.1) due to bug reported at 'https://bugzilla.novell.com/show_bug.cgi?id=766778'."))
+       log.info(log.blue("\n        Run the following commands in root mode to change the python-xml package.(i.e Installing 2.7.2-7.1.2)"))
+       log.info(log.blue("\n        Using zypper:\n        'zypper remove python-xml'\n        'zypper install python-xml-2.7.2-7.1.2'"))
+       log.info(log.blue("\n        Using apt-get:\n        'apt-get remove python-xml'\n        'apt-get install python-xml-2.7.2-7.1.2'"))
+       log.info(log.blue("\n        Using yum:\n        'yum remove python-xml'\n        'yum install python-xml-2.7.2-7.1.2'"))
+
+   sys.exit(1)
+
 import getpass
 import locale
 import htmlentitydefs
@@ -53,6 +67,15 @@ try:
 except ImportError:
     platform_avail = False
 
+try:
+    import dbus
+    from dbus import SystemBus, lowlevel
+    dbus_avail=True
+except ImportError:
+    dbus_avail=False
+
+
+
 # Local
 from g import *
 from codes import *
@@ -60,6 +83,7 @@ import pexpect
 
 BIG_ENDIAN = 0
 LITTLE_ENDIAN = 1
+DBUS_SERVICE='com.hplip.StatusService'
 
 def addgroup():
     lis = []
@@ -1869,3 +1893,16 @@ class Sync_Lock:
 
     def __del__(self):
         self.handler.close()
+
+def sendEvent(event_code,device_uri, printer_name, username="", job_id=0, title="", pipe_name=''):
+    
+    if not dbus_avail:
+        log.debug("Failed to import dbus, lowlevel")
+        return
+        
+    log.debug("send_message() entered")
+    args = [device_uri, printer_name, event_code, username, job_id, title, pipe_name]
+    msg = lowlevel.SignalMessage('/', DBUS_SERVICE, 'Event')
+    msg.append(signature='ssisiss', *args)
+    SystemBus().send_message(msg)
+    log.debug("send_message() returning")

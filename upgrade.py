@@ -113,7 +113,7 @@ try:
 
 
 
-    mod.lockInstance()
+    mod.lockInstance('',True)
 except getopt.GetoptError, e:
     log.error(e.msg)
     usage()

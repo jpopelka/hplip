@@ -233,7 +233,7 @@ class SetupForm(SetupForm_base):
 
             norm_model = models.normalizeModelName(model).lower()
 
-            core = core_install.CoreInstall()
+            core = core_install.CoreInstall(core_install.MODE_CHECK)
             core.set_plugin_version()
             plugin = self.mq.get('plugin', PLUGIN_NONE)
             plugin_reason = self.mq.get('plugin-reason', PLUGIN_REASON_NONE)
@@ -888,9 +888,8 @@ class SetupForm(SetupForm_base):
 
             self.FailureUI(self.__tr("<b>Printer queue setup failed.</b><p>Please restart CUPS and try again."))
         else:
-            # TODO:
-            #service.sendEvent(self.hpssd_sock, EVENT_CUPS_QUEUES_CHANGED, device_uri=self.device_uri)
-            pass
+            # sending Event to add this device in hp-systray
+            utils.sendEvent(EVENT_CUPS_QUEUES_CHANGED,self.device_uri, self.printer_name)
 
         QApplication.restoreOverrideCursor()
 
@@ -973,9 +972,8 @@ class SetupForm(SetupForm_base):
 
             self.FailureUI(self.__tr("<b>Fax queue setup failed.</b><p>Please restart CUPS and try again."))
         else:
-            pass
-            # TODO:
-            #service.sendEvent(self.hpssd_sock, EVENT_CUPS_QUEUES_CHANGED, device_uri=self.fax_uri)
+            # sending Event to add this device in hp-systray
+            utils.sendEvent(EVENT_CUPS_QUEUES_CHANGED,self.fax_uri, self.fax_name)
 
         QApplication.restoreOverrideCursor()
 

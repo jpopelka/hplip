@@ -627,6 +627,11 @@ SANE_Status soap_control_option(SANE_Handle handle, SANE_Int option, SANE_Action
                   break;
                }
             }
+            if (stat != SANE_STATUS_GOOD)
+            {
+                ps->currentResolution = ps->resolutionList[1];
+                stat = SANE_STATUS_GOOD;
+            }
          }
          else
          {  /* Set default. */

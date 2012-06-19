@@ -220,7 +220,7 @@ try:
     if not quiet_mode:
         utils.log_title(__title__, __version__)
 
-    log_file = os.path.normpath('/var/loh/hp/hplip_queues.log')
+    log_file = os.path.normpath('/var/log/hp/hplip_queues.log')
     log.debug(log.bold("Saving output in log file: %s" % log_file))
     if os.path.exists(log_file):
         os.remove(log_file)
@@ -246,7 +246,7 @@ try:
     Error_Found = False
     if check_user_groups() is False:
         dialog = QueuesDiagnose(None, "","",QUEUES_MSG_SENDING)
-        core = core_install.CoreInstall()
+        core = core_install.CoreInstall(core_install.MODE_CHECK)
         core.init()
         if add_group(core) is False:
             Error_Found = True
@@ -432,6 +432,8 @@ try:
     if Show_result and (Error_Found is False):
         dialog = QueuesDiagnose(None, "","",QUEUES_MSG_SENDING)
         dialog.showSuccessMessage("Queue(s) configured correctly using HPLIP.")
+    elif not quiet_mode and (Error_Found is False):
+        log.info("Queue(s) configured correctly using HPLIP.")
        
 
 except KeyboardInterrupt:

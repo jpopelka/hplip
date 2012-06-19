@@ -520,7 +520,7 @@ def getPPDFile2(stripped_model, ppds): # New PPD find
         return (matches[0][0], '')
 
     # > 1
-    log.debug("%d matches found. Selecting based on PDL: Host > PS > PCL/Other" % num_matches)
+    log.debug("%d matches found. Searching based on PDL: Host > PS > PCL/Other" % num_matches)
     for p in [models.PDL_TYPE_HOST, models.PDL_TYPE_PS, models.PDL_TYPE_PCL]:
         for f, pdl_list in matches:
             for x in pdl_list:
@@ -529,7 +529,14 @@ def getPPDFile2(stripped_model, ppds): # New PPD find
                     log.debug("Selecting '-%s' PPD: %s" % (x, f))
                     return (f, '')
 
-    # No specific PDL found, so just return 1st found PPD file
+    log.debug("%d matches found. Searching based on Filters: HPCUPS > HPIJS" % num_matches)
+    for p in ["hpcups","hpijs"]:
+        for f, pdl_list in matches:
+            if p in f:
+                log.debug("Selecting PPD: %s" % (f))
+                return (f, '')
+
+    # No specific PDL or Filter found, so just return 1st found PPD file
     log.debug("No specific PDL located. Defaulting to first found PPD file.")
     return (matches[0][0], '')
 

@@ -103,9 +103,12 @@ TECH_CLASSES = [
     "Mimas",
     "StingrayOJ",
     "Copperhead",
+    "Copperhead12",
     "Ampere",
     "Python11",
     "Saipan",
+    "PyramidPlus",
+    "Hbpl1",
 ]
 
 TECH_CLASSES.sort()
@@ -161,7 +164,8 @@ TECH_CLASS_PDLS = {
     "StingrayOJ"   : 'pcl3',
     "Copperhead"   : 'pcl3',
     "Copperhead12"   : 'pcl3',
-    "Ampere"	   : 'pcl3'
+    "Ampere"	   : 'pcl3',
+    "Hbpl1"         : 'hbpl1'
 }
 
 PDL_TYPE_PCL = 0  # less preferred
@@ -185,6 +189,7 @@ PDL_TYPES = { # Used to prioritize PPD file selection in prnt.cups.getPPDFile2()
     'jpg' : PDL_TYPE_HOST,
     'jetready' : PDL_TYPE_HOST,
     'jr' : PDL_TYPE_HOST,
+    'hbpl1' : PDL_TYPE_HOST,
 }
 
 

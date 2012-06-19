@@ -354,7 +354,7 @@ def handle_plugin_install():
         lockObj = utils.Sync_Lock("/tmp/pluginInstall.tmp")
         lockObj.acquire()
         child_pid=os.getpid()
-        core = core_install.CoreInstall()
+        core = core_install.CoreInstall(core_install.MODE_CHECK)
         core.set_plugin_version()
         if core.check_for_plugin() != PLUGIN_INSTALLED:
             sts,out = utils.run('hp-diagnose_plugin',True, None, 1, False)
@@ -491,6 +491,11 @@ def handle_event(event, more_args=None):
         bytes_written = int(more_args[1])
         handle_hpdio_event(event, bytes_written)
 
+    # Qt4 only
+    elif event.event_code == EVENT_CUPS_QUEUES_CHANGED:
+        send_event_to_systray_ui(event)
+        send_toolbox_event(event, EVENT_HISTORY_UPDATE)
+        
     # Qt4 only
     elif event.event_code == EVENT_SYSTEMTRAY_EXIT:
         send_event_to_hpdio(event)

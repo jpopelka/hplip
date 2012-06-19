@@ -129,355 +129,6 @@ ppd_dir=/usr/share/cups/model/manufacturer-PPDs/hp
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
 
-# ********************
-[suse:11.1]
-code_name=
-supported=1
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=2.8.7
-release_date=2008-06-19
-notes=Please be sure to disable the CD repositories in YaST and after installation you must log out and back in to become a member of the lp group to enable printing.
-ppd_install=drv
-udev_mode_fix=1
-ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-cups_path_with_bitness=1
-ui_toolkit=qt4
-native_cups=1
-add_user_to_group=-Alp
-open_mdns_port=/bin/bash ./init-suse-firewall
-
-[suse:11.1:cups]
-packages=cups,cups-client
-
-[suse:11.1:cups-devel]
-packages=cups-devel,cupsddk
-
-[suse:11.1:gcc]
-packages=gcc-c++
-
-[suse:11.1:gs]
-packages=ghostscript-library
-
-[suse:11.1:libcrypto]
-packages=openssl
-
-[suse:11.1:libjpeg]
-packages=libjpeg-devel
-
-[suse:11.1:libnetsnmp-devel]
-packages=net-snmp-devel
-
-[suse:11.1:libpthread]
-packages=glibc
-
-[suse:11.1:libtool]
-packages=libtool,libgphoto2-devel
-
-[suse:11.1:libusb]
-packages=libusb-devel,libusb-1_0-0
-
-[suse:11.1:make]
-packages=make
-
-[suse:11.1:pil]
-packages=python-imaging
-
-[suse:11.1:ppdev]
-packages=
-commands=su -c "modprobe ppdev"
-
-[suse:11.1:pyqt]
-packages=python-qt
-
-[suse:11.1:pyqt4]
-packages=python-qt4
-
-[suse:11.1:pyqt4-dbus]
-packages=dbus-1-python-devel,dbus-1-python
-
-[suse:11.1:python-devel]
-packages=python-devel,python-xml
-
-[suse:11.1:python23]
-packages=python
-
-[suse:11.1:python2x]
-packages=python
-
-[suse:11.1:reportlab]
-packages=
-
-[suse:11.1:sane]
-packages=sane
-
-[suse:11.1:sane-devel]
-packages=sane-backends
-
-[suse:11.1:scanimage]
-packages=sane-backends
-
-[suse:11.1:xsane]
-packages=xsane,sane-frontends
-
-[suse:11.1:cups-ddk]
-packages=cupsddk
-
-[suse:11.1:python-dbus]
-packages=dbus-1-python
-
-[suse:11.1:dbus]
-packages=dbus-1-devel,python-gobject2
-
-[suse:11.1:python-ctypes]
-packages=python-ctypes
-
-[suse:11.1:python-xml]
-packages=python-xml
-
-[suse:11.1:cups-image]
-packages=cups-devel
-
-[suse:11.1:python-notify]
-packages=
-
-# ********************
-[suse:11.2]
-code_name=
-supported=1
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=3.9.8
-release_date=2009-11-12
-notes=Please be sure to disable the CD repositories in YaST and after installation you must log out and back in to become a member of the lp group to enable printing.
-ppd_install=drv
-udev_mode_fix=1
-ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-cups_path_with_bitness=1
-ui_toolkit=qt4
-native_cups=1
-add_user_to_group=-Alp
-open_mdns_port=/bin/bash ./init-suse-firewall
-pre_depend_cmd=su -c "zypper refresh"
-
-[suse:11.2:cups]
-packages=cups,cups-client
-
-[suse:11.2:cups-devel]
-packages=cups-devel,cupsddk
-
-[suse:11.2:gcc]
-packages=gcc-c++
-
-[suse:11.2:gs]
-packages=ghostscript-library
-
-[suse:11.2:libcrypto]
-packages=openssl
-
-[suse:11.2:libjpeg]
-packages=libjpeg-devel
-
-[suse:11.2:libnetsnmp-devel]
-packages=net-snmp-devel
-
-[suse:11.2:libpthread]
-packages=glibc
-
-[suse:11.2:libtool]
-packages=libtool,libgphoto2-devel
-
-[suse:11.2:libusb]
-packages=libusb-1_0-devel,libusb-1_0-0
-
-[suse:11.2:make]
-packages=make
-
-[suse:11.2:pil]
-packages=python-imaging
-
-[suse:11.2:ppdev]
-packages=
-commands=su -c "modprobe ppdev"
-
-[suse:11.2:pyqt]
-packages=python-qt
-
-[suse:11.2:pyqt4]
-packages=python-qt4
-
-[suse:11.2:pyqt4-dbus]
-packages=dbus-1-python-devel,dbus-1-python
-
-[suse:11.2:python-devel]
-packages=python-devel,python-xml
-
-[suse:11.2:python23]
-packages=python
-
-[suse:11.2:python2x]
-packages=python
-
-[suse:11.2:reportlab]
-packages=
-
-[suse:11.2:sane]
-packages=sane
-
-[suse:11.2:sane-devel]
-packages=sane-backends
-
-[suse:11.2:scanimage]
-packages=sane-backends
-
-[suse:11.2:xsane]
-packages=xsane,sane-frontends
-
-[suse:11.2:cups-ddk]
-packages=cupsddk
-
-[suse:11.2:python-dbus]
-packages=dbus-1-python
-
-[suse:11.2:dbus]
-packages=dbus-1-devel,python-gobject2
-
-[suse:11.2:python-xml]
-packages=python-xml
-
-[suse:11.2:cups-image]
-packages=cups-devel
-
-[suse:11.2:python-notify]
-packages=python-notify
-
-# ********************
-[suse:11.3]
-code_name=Rousseau
-supported=1
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=3.10.2
-release_date=2010-15-7
-notes=Please be sure to disable the CD repositories in YaST and after installation you must log out and back in to become a member of the lp and sys group to enable printing.
-ppd_install=drv
-udev_mode_fix=1
-ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-cups_path_with_bitness=0
-ui_toolkit=qt4
-native_cups=1
-add_user_to_group= -Gsys,lp
-open_mdns_port=/bin/bash ./init-suse-firewall
-pre_depend_cmd=su -c "zypper refresh"
-
-[suse:11.3:cups]
-packages=cups,cups-client
-
-[suse:11.3:cups-devel]
-packages=cups-devel,cupsddk
-
-[suse:11.3:gcc]
-packages=gcc-c++
-
-[suse:11.3:gs]
-packages=ghostscript-library
-
-[suse:11.3:libcrypto]
-packages=openssl
-
-[suse:11.3:libjpeg]
-packages=libjpeg-devel
-
-[suse:11.3:libnetsnmp-devel]
-packages=net-snmp-devel
-
-[suse:11.3:libpthread]
-packages=glibc
-
-[suse:11.3:libtool]
-packages=libtool,libgphoto2-devel
-
-[suse:11.3:libusb]
-packages=libusb-1_0-devel,libusb-1_0-0
-
-[suse:11.3:make]
-packages=make
-
-[suse:11.3:pil]
-packages=python-imaging
-
-[suse:11.3:ppdev]
-packages=
-commands=su -c "modprobe ppdev"
-
-[suse:11.3:pyqt]
-packages=python-qt
-
-[suse:11.3:pyqt4]
-packages=python-qt4
-
-[suse:11.3:pyqt4-dbus]
-packages=dbus-1-python-devel,dbus-1-python
-
-[suse:11.3:python-devel]
-packages=python-devel,python-xml
-
-[suse:11.3:python23]
-packages=python
-
-[suse:11.3:python2x]
-packages=python
-
-[suse:11.3:reportlab]
-packages=
-
-[suse:11.3:sane]
-packages=xsane
-
-[suse:11.3:sane-devel]
-packages=sane-backends
-
-[suse:11.3:scanimage]
-packages=sane-backends
-
-[suse:11.3:xsane]
-packages=xsane
-
-[suse:11.3:cups-ddk]
-packages=cupsddk
-
-[suse:11.3:python-dbus]
-packages=dbus-1-python
-
-[suse:11.3:dbus]
-packages=dbus-1-devel,python-gobject2
-
-[suse:11.3:python-xml]
-packages=python-xml
-
-[suse:11.3:cups-image]
-packages=cups-devel
-
-[suse:11.3:python-notify]
-packages=python-notify
 
 # ********************
 [suse:11.4]
@@ -595,6 +246,9 @@ packages=cups-devel
 [suse:11.4:python-notify]
 packages=python-notify
 
+[suse:11.4:network]
+packages=wget
+
 # ********************
 [suse:12.1]
 code_name=
@@ -619,7 +273,102 @@ native_cups=1
 add_user_to_group= -Gsys,lp
 open_mdns_port=/bin/bash ./init-suse-firewall
 pre_depend_cmd=su -c "zypper refresh"
-same_as_version=11.4
+
+[suse:12.1:cups]
+packages=cups,cups-client
+
+[suse:12.1:cups-devel]
+packages=cups-devel,cupsddk
+
+[suse:12.1:gcc]
+packages=gcc-c++
+
+[suse:12.1:gs]
+packages=ghostscript-library
+
+[suse:12.1:libcrypto]
+packages=openssl
+
+[suse:12.1:libjpeg]
+packages=libjpeg-devel
+
+[suse:12.1:libnetsnmp-devel]
+packages=net-snmp-devel
+
+[suse:12.1:libpthread]
+packages=glibc
+
+[suse:12.1:libtool]
+packages=libtool,libgphoto2-devel
+
+[suse:12.1:libusb]
+packages=libusb-1_0-devel,libusb-1_0-0
+
+[suse:12.1:make]
+packages=make
+
+[suse:12.1:pil]
+packages=python-imaging
+
+[suse:12.1:ppdev]
+packages=
+commands=su -c "modprobe ppdev"
+
+[suse:12.1:pyqt]
+packages=python-qt
+
+[suse:12.1:pyqt4]
+packages=python-qt4
+
+[suse:12.1:pyqt4-dbus]
+packages=dbus-1-python-devel,dbus-1-python
+
+[suse:12.1:python-devel]
+packages=python-devel,python-xml,libpython2_7-1_0
+
+[suse:12.1:python23]
+packages=python
+
+[suse:12.1:python2x]
+packages=python
+
+[suse:12.1:reportlab]
+packages=
+
+[suse:12.1:sane]
+packages=xsane
+
+[suse:12.1:sane-devel]
+packages=sane-backends-devel
+
+[suse:12.1:scanimage]
+packages=sane-backends
+
+[suse:12.1:xsane]
+packages=xsane
+
+[suse:12.1:cups-ddk]
+packages=cupsddk
+
+[suse:12.1:python-dbus]
+packages=dbus-1-python
+
+[suse:12.1:dbus]
+packages=dbus-1-devel,python-gobject2
+
+[suse:12.1:python-xml]
+packages=python-xml,libpython2_7-1_0
+
+[suse:12.1:cups-image]
+packages=cups-devel
+
+[suse:12.1:python-notify]
+packages=python-notify
+
+[suse:12.1:network]
+packages=wget
+
+
 
 # ****************************************
 [redhat]
@@ -630,8 +379,9 @@ alt_names=
 display=1
 notes=
 package_mgrs=yum,rpm,up2date
-package_mgr_cmd=rpm install $packages_to_install
-pre_depend_cmd=
+#package_mgr_cmd=rpm install $packages_to_install
+package_mgr_cmd=su -c 'yum -y -d 10 -e 1 install $packages_to_install'
+pre_depend_cmd=su -c 'yum list update'
 post_depend_cmd=
 hplip_remove_cmd=su -c 'rpm -ev hplipfull'
 su_sudo=su
@@ -821,14 +571,14 @@ ui_toolkit=qt3
 # ****************************************
 [fedora]
 index=5
-versions=15,16
+versions=15,16,17
 display_name=Fedora
 alt_names=Fedora Core
 display=1
 notes=SELinux must run in permissive mode or it must be disabled for HPLIP to function properly. Please run SELinux in permissive mode or disable it before continuing.
 package_mgrs=yum,rpm,up2date
 package_mgr_cmd=su -c "yum -y -d 10 -e 1 install $packages_to_install"
-pre_depend_cmd=su -c "yum clean all"
+pre_depend_cmd=su -c "yum clean all",su -c "yum check-update"
 post_depend_cmd=
 hplip_remove_cmd=su -c "yum -y -d 10 -e 1 remove hplip"
 su_sudo=su
@@ -837,1389 +587,6 @@ udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
-
-# ********************
-[fedora:1.0]
-code_name=Yarrow
-supported=0
-scan_supported=1
-fax_supported=0
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=
-release_date=2003-11-5
-notes=
-ppd_install=ppd
-udev_mode_fix=1
-ppd_dir=
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt3
-
-# ********************
-[fedora:2.0]
-code_name=Tettnang
-supported=0
-scan_supported=1
-fax_supported=0
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=
-release_date=2004-5-18
-notes=
-ppd_install=ppd
-udev_mode_fix=1
-ppd_dir=
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt3
-
-# ********************
-[fedora:3.0]
-code_name=Heidelberg
-supported=0
-scan_supported=1
-fax_supported=0
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=
-release_date=2004-11-8
-notes=
-ppd_install=ppd
-udev_mode_fix=1
-ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt3
-
-[fedora:3.0:cups]
-packages=cups
-
-[fedora:3.0:cups-devel]
-packages=cups-devel
-
-[fedora:3.0:gcc]
-packages=gcc-c++
-
-[fedora:3.0:gs]
-packages=ghostscript
-
-[fedora:3.0:libcrypto]
-packages=net-snmp-devel,openssl-devel
-
-[fedora:3.0:libjpeg]
-packages=libjpeg-devel
-
-[fedora:3.0:libnetsnmp-devel]
-packages=net-snmp-devel
-
-[fedora:3.0:libpthread]
-packages=glibc-headers
-
-[fedora:3.0:libtool]
-packages=libtool
-
-[fedora:3.0:libusb]
-packages=libusb-devel
-
-[fedora:3.0:make]
-packages=make
-
-[fedora:3.0:pil]
-packages=python-imaging
-
-[fedora:3.0:ppdev]
-packages=
-commands=su -c "/sbin/modprobe ppdev"
-
-[fedora:3.0:pyqt]
-packages=sip,PyQt
-
-[fedora:3.0:python-devel]
-packages=python-devel
-
-[fedora:3.0:pyqt4]
-packages=
-
-[fedora:3.0:pyqt4-dbus]
-packages=
-
-[fedora:3.0:python23]
-packages=python
-
-[fedora:3.0:python2x]
-packages=python
-
-[fedora:3.0:reportlab]
-packages=python-reportlab
-
-[fedora:3.0:sane]
-packages=sane-backends
-
-[fedora:3.0:sane-devel]
-packages=sane-devel
-
-[fedora:3.0:scanimage]
-packages=sane-frontends
-
-[fedora:3.0:xsane]
-packages=xsane
-
-[fedora:3.0:cups-ddk]
-packages=
-
-[fedora:3.0:python-dbus]
-# packages=dbus-python,dbus-devel,python-gobject
-
-[fedora:3.0:python-ctypes]
-# packages=python-ctypes
-
-[fedora:3.0:cups-image]
-packages=cups-devel
-
-# ********************
-[fedora:4.0]
-code_name=Stentz
-supported=0
-scan_supported=1
-fax_supported=0
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=0.9.7
-release_date=2005-6-13
-notes=
-ppd_install=ppd
-udev_mode_fix=1
-ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt3
-
-[fedora:4.0:cups]
-packages=cups
-
-[fedora:4.0:cups-devel]
-packages=cups-devel
-
-[fedora:4.0:gcc]
-packages=gcc-c++
-
-[fedora:4.0:gs]
-packages=ghostscript
-
-[fedora:4.0:libcrypto]
-packages=net-snmp-devel,openssl-devel
-
-[fedora:4.0:libjpeg]
-packages=libjpeg-devel
-
-[fedora:4.0:libnetsnmp-devel]
-packages=net-snmp-devel
-
-[fedora:4.0:libpthread]
-packages=glibc-headers
-
-[fedora:4.0:libtool]
-packages=libtool
-
-[fedora:4.0:libusb]
-packages=libusb-devel
-
-[fedora:4.0:make]
-packages=make
-
-[fedora:4.0:pil]
-packages=python-imaging
-
-[fedora:4.0:ppdev]
-packages=
-commands=su -c "/sbin/modprobe ppdev"
-
-[fedora:4.0:pyqt]
-packages=PyQt
-
-[fedora:4.0:python-devel]
-packages=python-devel
-
-[fedora:4.0:pyqt4]
-packages=PyQt4
-
-[fedora:4.0:pyqt4-dbus]
-packages=dbus-python
-
-[fedora:4.0:python23]
-packages=python
-
-[fedora:4.0:python2x]
-packages=python
-
-[fedora:4.0:reportlab]
-packages=python-reportlab
-
-[fedora:4.0:sane]
-packages=sane-backends
-
-[fedora:4.0:sane-devel]
-packages=sane-devel
-
-[fedora:4.0:scanimage]
-packages=sane-frontends
-
-[fedora:4.0:xsane]
-packages=xsane
-
-[fedora:4.0:cups-ddk]
-packages=
-
-[fedora:4.0:python-dbus]
-# packages=dbus-python,dbus-devel,python-gobject
-
-[fedora:4.0:python-ctypes]
-# packages=python-ctypes
-
-[fedora:4.0:cups-image]
-packages=cups-devel
-
-# ********************
-[fedora:5]
-code_name=Bordeaux
-supported=0
-scan_supported=1
-fax_supported=0
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=0.9.11
-release_date=2006-3-20
-notes=
-ppd_install=ppd
-udev_mode_fix=1
-ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt3
-
-[fedora:5:cups]
-packages=cups
-
-[fedora:5:cups-devel]
-packages=cups-devel
-
-[fedora:5:gcc]
-packages=gcc-c++
-
-[fedora:5:gs]
-packages=ghostscript
-
-[fedora:5:libcrypto]
-packages=net-snmp-devel,openssl-devel
-
-[fedora:5:libjpeg]
-packages=libjpeg-devel
-
-[fedora:5:libnetsnmp-devel]
-packages=net-snmp-devel
-
-[fedora:5:libpthread]
-packages=glibc-headers
-
-[fedora:5:libtool]
-packages=libtool
-
-[fedora:5:libusb]
-packages=libusb-devel
-
-[fedora:5:make]
-packages=make
-
-[fedora:5:pil]
-packages=python-imaging
-
-[fedora:5:ppdev]
-packages=
-commands=su -c "/sbin/modprobe ppdev"
-
-[fedora:5:pyqt]
-packages=PyQt
-
-[fedora:5:python-devel]
-packages=python-devel
-
-[fedora:5:pyqt4]
-packages=PyQt4
-
-[fedora:5.0:pyqt4-dbus]
-packages=dbus-python
-
-[fedora:5:python23]
-packages=python
-
-[fedora:5:python2x]
-packages=python
-
-[fedora:5:reportlab]
-packages=python-reportlab
-
-[fedora:5:sane]
-packages=sane-backends
-
-[fedora:5:sane-devel]
-packages=sane-devel
-
-[fedora:5:scanimage]
-packages=sane-frontends
-
-[fedora:5:xsane]
-packages=xsane
-
-[fedora:5:cups-ddk]
-# packages=cupsddk,cupsddk-drivers,cupsddk-devel
-
-[fedora:5:python-dbus]
-# packages=dbus-python,dbus-devel,python-gobject
-
-[fedora:5:python-ctypes]
-# packages=python-ctypes
-
-[fedora:5:cups-image]
-packages=cups-devel
-
-# ********************
-[fedora:5.0]
-same_as_version=5
-
-# ********************
-[fedora:5.92]
-code_name=RC3
-supported=0
-scan_supported=1
-fax_supported=0
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=0.9.11
-release_date=2006-10-24
-notes=
-ppd_install=ppd
-udev_mode_fix=1
-ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt3
-
-[fedora:5.92:cups]
-packages=cups
-
-[fedora:5.92:cups-devel]
-packages=cups-devel
-
-[fedora:5.92:gcc]
-packages=gcc-c++
-
-[fedora:5.92:gs]
-packages=ghostscript
-
-[fedora:5.92:libcrypto]
-packages=net-snmp-devel,openssl-devel
-
-[fedora:5.92:libjpeg]
-packages=libjpeg-devel
-
-[fedora:5.92:libnetsnmp-devel]
-packages=net-snmp-devel
-
-[fedora:5.92:libpthread]
-packages=glibc-headers
-
-[fedora:5.92:libtool]
-packages=libtool
-
-[fedora:5.92:libusb]
-packages=libusb-devel
-
-[fedora:5.92:make]
-packages=make
-
-[fedora:5.92:pil]
-packages=python-imaging
-
-[fedora:5.92:ppdev]
-packages=
-commands=su -c "/sbin/modprobe ppdev"
-
-[fedora:5.92:pyqt]
-packages=PyQt
-
-[fedora:5.92:python-devel]
-packages=python-devel
-
-[fedora:5.92:pyqt4]
-packages=PyQt4
-
-[fedora:5.92:pyqt4-dbus]
-packages=dbus-python
-
-[fedora:5.92:python23]
-packages=python
-
-[fedora:5.92:python2x]
-packages=python
-
-[fedora:5.92:reportlab]
-packages=python-reportlab
-
-[fedora:5.92:sane]
-packages=sane-backends
-
-[fedora:5.92:sane-devel]
-packages=sane-devel
-
-[fedora:5.92:scanimage]
-packages=sane-frontends
-
-[fedora:5.92:xsane]
-packages=xsane
-
-[fedora:5.92:cups-ddk]
-packages=
-
-[fedora:5.92:python-dbus]
-# packages=dbus-python,dbus-devel,python-gobject
-
-[fedora:5.92:python-ctypes]
-# packages=python-ctypes
-
-[fedora:5.92:cups-image]
-packages=cups-devel
-
-# ********************
-[fedora:6]
-code_name=
-supported=0
-scan_supported=1
-fax_supported=0
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=1.7.2
-release_date=2006-10-24
-notes=
-ppd_install=drv
-udev_mode_fix=1
-ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt3
-
-[fedora:6:cups]
-packages=cups
-
-[fedora:6:cups-devel]
-packages=cups-devel
-
-[fedora:6:gcc]
-packages=gcc-c++
-
-[fedora:6:gs]
-packages=ghostscript
-
-[fedora:6:libcrypto]
-packages=net-snmp-devel,openssl-devel
-
-[fedora:6:libjpeg]
-packages=libjpeg-devel
-
-[fedora:6:libnetsnmp-devel]
-packages=net-snmp-devel
-
-[fedora:6:libpthread]
-packages=glibc-headers
-
-[fedora:6:libtool]
-packages=libtool
-
-[fedora:6:libusb]
-packages=libusb-devel
-
-[fedora:6:make]
-packages=make
-
-[fedora:6:pil]
-packages=python-imaging
-
-[fedora:6:ppdev]
-packages=
-commands=su -c "/sbin/modprobe ppdev"
-
-[fedora:6:pyqt]
-packages=PyQt
-
-[fedora:6:python-devel]
-packages=python-devel
-
-[fedora:6:pyqt4]
-packages=PyQt4
-
-[fedora:6:pyqt4-dbus]
-packages=dbus-python
-
-[fedora:6:python23]
-packages=python
-
-[fedora:6:python2x]
-packages=python
-
-[fedora:6:reportlab]
-packages=python-reportlab
-
-[fedora:6:sane]
-packages=sane-backends
-
-[fedora:6:sane-devel]
-packages=sane-devel,sane-backends-devel
-
-[fedora:6:scanimage]
-packages=sane-frontends
-
-[fedora:6:xsane]
-packages=xsane
-
-[fedora:6:cups-ddk]
-packages=cupsddk,cupsddk-drivers,cupsddk-devel
-
-[fedora:6::python-dbus]
-# packages=dbus-python,dbus-devel,python-gobject
-
-[fedora:6:python-ctypes]
-# packages=python-ctypes
-
-[fedora:6:cups-image]
-packages=cups-devel
-
-# ********************
-[fedora:6.0]
-same_as_version= 6
-
-# ********************
-[fedora:7]
-code_name=
-supported=0
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=1.7.4a
-release_date=2007-5-31
-notes=
-ppd_install=drv
-udev_mode_fix=1
-ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt3
-
-[fedora:7:cups]
-packages=cups
-
-[fedora:7:cups-devel]
-packages=cups-devel
-
-[fedora:7:gcc]
-packages=gcc-c++
-
-[fedora:7:gs]
-packages=ghostscript
-
-[fedora:7:libcrypto]
-packages=openssl-devel
-
-[fedora:7:libjpeg]
-packages=libjpeg-devel
-
-[fedora:7:libnetsnmp-devel]
-packages=net-snmp-devel
-
-[fedora:7:libpthread]
-packages=glibc-headers
-
-[fedora:7:libtool]
-packages=libtool
-
-[fedora:7:libusb]
-packages=libusb-devel
-
-[fedora:7:make]
-packages=make
-
-[fedora:7:pil]
-packages=python-imaging
-
-[fedora:7:ppdev]
-packages=
-commands=su -c "/sbin/modprobe ppdev"
-
-[fedora:7:pyqt]
-packages=PyQt
-
-[fedora:7:python-devel]
-packages=python-devel
-
-[fedora:7:pyqt4]
-packages=PyQt4,dbus-python
-
-[fedora:7:pyqt4-dbus]
-packages=dbus-python
-
-[fedora:7:python23]
-packages=python
-
-[fedora:7:python2x]
-packages=python
-
-[fedora:7:reportlab]
-packages=python-reportlab
-
-[fedora:7:sane]
-packages=sane-backends
-
-[fedora:7:sane-devel]
-packages=sane-backends-devel
-
-[fedora:7:scanimage]
-packages=sane-frontends
-
-[fedora:7:xsane]
-packages=xsane
-
-[fedora:7:cups-ddk]
-packages=cupsddk,cupsddk-drivers,cupsddk-devel
-
-[fedora:7:python-dbus]
-packages=dbus-python,python-gobject
-
-[fedora:7:dbus]
-packages=dbus-devel
-
-[fedora:7:python-ctypes]
-packages=python-ctypes
-
-[fedora:7:cups-image]
-packages=cups-devel
-
-# ********************
-[fedora:7.0]
-same_as_version= 7
-
-# ********************
-[fedora:8]
-code_name=
-supported=0
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=2.8.2
-release_date=2007-11-8
-notes=
-ppd_install=drv
-udev_mode_fix=1
-ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt3
-native_cups=1
-
-[fedora:8:cups]
-packages=cups
-
-[fedora:8:cups-devel]
-packages=cups-devel
-
-[fedora:8:gcc]
-packages=gcc-c++
-
-[fedora:8:gs]
-packages=ghostscript
-
-[fedora:8:libcrypto]
-packages=openssl-devel
-
-[fedora:8:libjpeg]
-packages=libjpeg-devel
-
-[fedora:8:libnetsnmp-devel]
-packages=net-snmp-devel
-
-[fedora:8:libpthread]
-packages=glibc-headers
-
-[fedora:8:libtool]
-packages=libtool
-
-[fedora:8:libusb]
-packages=libusb-devel
-
-[fedora:8:make]
-packages=make
-
-[fedora:8:pil]
-packages=python-imaging
-
-[fedora:8:ppdev]
-packages=
-commands=su -c "/sbin/modprobe ppdev"
-
-[fedora:8:pyqt]
-packages=PyQt
-
-[fedora:8:python-devel]
-packages=python-devel
-
-[fedora:8:pyqt4]
-packages=PyQt
-
-[fedora:8:pyqt4-dbus]
-packages=dbus-python
-
-[fedora:8:python23]
-packages=python
-
-[fedora:8:python2x]
-packages=python
-
-[fedora:8:reportlab]
-packages=python-reportlab
-
-[fedora:8:sane]
-packages=sane-backends
-
-[fedora:8:sane-devel]
-packages=sane-backends-devel
-
-[fedora:8:scanimage]
-packages=sane-frontends
-
-[fedora:8:xsane]
-packages=xsane
-
-[fedora:8:cups-ddk]
-packages=cupsddk,cupsddk-drivers,cupsddk-devel
-
-[fedora:8:python-dbus]
-packages=dbus-python
-
-[fedora:8:dbus]
-packages=dbus-devel,pygobject2
-
-[fedora:8:python-ctypes]
-packages=python-ctypes
-
-[fedora:8:cups-image]
-packages=cups-devel
-
-# ********************
-[fedora:8.0]
-same_as_version= 8
-
-# ********************
-[fedora:9]
-code_name=sulphur
-supported=0
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=2.8.6
-release_date=2008-05-13
-notes=
-ppd_install=drv
-udev_mode_fix=1
-ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
-native_cups=1
-
-[fedora:9:cups]
-packages=cups
-
-[fedora:9:cups-devel]
-packages=cups-devel
-
-[fedora:9:gcc]
-packages=gcc-c++
-
-[fedora:9:gs]
-packages=ghostscript
-
-[fedora:9:libcrypto]
-packages=openssl-devel
-
-[fedora:9:libjpeg]
-packages=libjpeg-devel
-
-[fedora:9:libnetsnmp-devel]
-packages=net-snmp-devel
-
-[fedora:9:libpthread]
-packages=glibc-headers
-
-[fedora:9:libtool]
-packages=libtool
-
-[fedora:9:libusb]
-packages=libusb-devel
-
-[fedora:9:make]
-packages=make
-
-[fedora:9:pil]
-packages=python-imaging
-
-[fedora:9:ppdev]
-packages=
-commands=su -c "/sbin/modprobe ppdev"
-
-[fedora:9:pyqt]
-packages=PyQt
-
-[fedora:9:python-devel]
-packages=python-devel
-
-[fedora:9:pyqt4]
-packages=PyQt4
-
-[fedora:9:pyqt4-dbus]
-packages=dbus-python
-
-[fedora:9:python23]
-packages=python
-
-[fedora:9:python2x]
-packages=python
-
-[fedora:9:reportlab]
-packages=python-reportlab
-
-[fedora:9:sane]
-packages=sane-backends
-
-[fedora:9:sane-devel]
-packages=sane-backends-devel
-
-[fedora:9:scanimage]
-packages=sane-frontends
-
-[fedora:9:xsane]
-packages=xsane
-
-[fedora:9:cups-ddk]
-packages=cupsddk,cupsddk-drivers,cupsddk-devel
-
-[fedora:9:python-dbus]
-packages=dbus-python,python-gobject
-
-[fedora:9:dbus]
-packages=dbus-devel
-
-[fedora:9:python-ctypes]
-packages=python-ctypes
-
-[fedora:9:cups-image]
-packages=cups-devel
-
-[fedora:9:python-notify]
-packages=notify-python
-
-# ********************
-[fedora:9.0]
-same_as_version= 9
-
-# ********************
-[fedora:10]
-code_name=sulphur
-supported=0
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=2.8.7
-release_date=2009-11-25
-notes=To complete the install in Fedora 10 you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
-ppd_install=drv
-udev_mode_fix=1
-ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
-native_cups=1
-add_user_to_group=-a -Gsys,lp
-open_mdns_port=/bin/bash ./init-iptables-firewall
-
-[fedora:10:cups]
-packages=cups
-
-[fedora:10:cups-devel]
-packages=cups-devel
-
-[fedora:10:gcc]
-packages=gcc-c++
-
-[fedora:10:gs]
-packages=ghostscript
-
-[fedora:10:libcrypto]
-packages=openssl-devel
-
-[fedora:10:libjpeg]
-packages=libjpeg-devel
-
-[fedora:10:libnetsnmp-devel]
-packages=net-snmp-devel
-
-[fedora:10:libpthread]
-packages=glibc-headers
-
-[fedora:10:libtool]
-packages=libtool
-
-[fedora:10:libusb]
-packages=libusb-devel
-
-[fedora:10:make]
-packages=make
-
-[fedora:10:pil]
-packages=python-imaging
-
-[fedora:10:ppdev]
-packages=
-commands=su -c "/sbin/modprobe ppdev"
-
-[fedora:10:pyqt]
-packages=PyQt
-
-[fedora:10:python-devel]
-packages=python-devel
-
-[fedora:10:pyqt4]
-packages=PyQt4
-
-[fedora:10:pyqt4-dbus]
-packages=dbus-python
-
-[fedora:10:python23]
-packages=python
-
-[fedora:10:python2x]
-packages=python
-
-[fedora:10:reportlab]
-packages=python-reportlab
-
-[fedora:10:sane]
-packages=sane-backends
-
-[fedora:10:sane-devel]
-packages=sane-backends-devel
-
-[fedora:10:scanimage]
-packages=sane-frontends
-
-[fedora:10:xsane]
-packages=xsane
-
-[fedora:10:cups-ddk]
-packages=cupsddk,cupsddk-drivers,cupsddk-devel
-
-[fedora:10:python-dbus]
-packages=dbus-python,python-gobject
-
-[fedora:10:dbus]
-packages=dbus-devel
-
-[fedora:10:python-ctypes]
-packages=python-ctypes
-
-[fedora:10:cups-image]
-packages=cups-devel
-
-[fedora:10:policykit]
-packages=PolicyKit,PolicyKit-gnome
-
-[fedora:10:python-notify]
-packages=notify-python
-
-# ********************
-[fedora:10.0]
-same_as_version= 10
-
-# ********************
-[fedora:11]
-code_name=
-supported=0
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=
-release_date=
-notes=To complete the install in Fedora 11 you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
-ppd_install=drv
-udev_mode_fix=1
-ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
-policykit=1
-native_cups=1
-add_user_to_group=-a -Gsys,lp
-open_mdns_port=/bin/bash ./init-iptables-firewall
-
-[fedora:11:cups]
-packages=cups
-
-[fedora:11:cups-devel]
-packages=cups-devel
-
-[fedora:11:gcc]
-packages=gcc-c++
-
-[fedora:11:gs]
-packages=ghostscript
-
-[fedora:11:libcrypto]
-packages=openssl-devel
-
-[fedora:11:libjpeg]
-packages=libjpeg-devel
-
-[fedora:11:libnetsnmp-devel]
-packages=net-snmp-devel
-
-[fedora:11:libpthread]
-packages=glibc-headers
-
-[fedora:11:libtool]
-packages=libtool
-
-[fedora:11:libusb]
-packages=libusb-devel
-
-[fedora:11:make]
-packages=make
-
-[fedora:11:pil]
-packages=python-imaging
-
-[fedora:11:ppdev]
-packages=
-commands=su -c "/sbin/modprobe ppdev"
-
-[fedora:11:pyqt]
-packages=PyQt
-
-[fedora:11:python-devel]
-packages=python-devel
-
-[fedora:11:pyqt4]
-packages=PyQt4
-
-[fedora:11:pyqt4-dbus]
-packages=dbus-python
-
-[fedora:11:python23]
-packages=python
-
-[fedora:11:python2x]
-packages=python
-
-[fedora:11:reportlab]
-packages=python-reportlab
-
-[fedora:11:sane]
-packages=sane-backends
-
-[fedora:11:sane-devel]
-packages=sane-backends-devel
-
-[fedora:11:scanimage]
-packages=sane-frontends
-
-[fedora:11:xsane]
-packages=xsane
-
-[fedora:11:cups-ddk]
-packages=cupsddk,cupsddk-drivers,cupsddk-devel
-
-[fedora:11:python-dbus]
-packages=dbus-python,python-gobject
-
-[fedora:11:dbus]
-packages=dbus-devel
-
-[fedora:11:python-ctypes]
-packages=python-ctypes
-
-[fedora:11:cups-image]
-packages=cups-devel
-
-[fedora:11:policykit]
-packages=PolicyKit,PolicyKit-gnome
-
-[fedora:11:python-notify]
-packages=notify-python
-
-# ********************
-[fedora:11.0]
-same_as_version= 11
-
-# ********************
-[fedora:13]
-code_name=
-supported=1
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=
-release_date=
-notes=To complete the install in Fedora 13 or 14 you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
-ppd_install=drv
-udev_mode_fix=1
-ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
-policykit=0
-native_cups=1
-add_user_to_group=-a -Gsys,lp
-open_mdns_port=/bin/bash ./init-iptables-firewall
-pre_depend_cmd=su -c "yum clean all"
-
-[fedora:13:cups]
-packages=cups
-
-[fedora:13:cups-devel]
-packages=cups-devel
-
-[fedora:13:gcc]
-packages=gcc-c++
-
-[fedora:13:gs]
-packages=ghostscript
-
-[fedora:13:libcrypto]
-packages=openssl-devel
-
-[fedora:13:libjpeg]
-packages=libjpeg-devel
-
-[fedora:13:libnetsnmp-devel]
-packages=net-snmp-devel
-
-[fedora:13:libpthread]
-packages=glibc-headers
-
-[fedora:13:libtool]
-packages=libtool
-
-[fedora:13:libusb]
-packages=libusb-devel
-
-[fedora:13:make]
-packages=make
-
-[fedora:13:pil]
-packages=python-imaging
-
-[fedora:13:ppdev]
-packages=
-commands=su -c "/sbin/modprobe ppdev"
-
-[fedora:13:pyqt]
-packages=PyQt
-
-[fedora:13:python-devel]
-packages=python-devel
-
-[fedora:13:pyqt4]
-packages=PyQt4
-
-[fedora:13:pyqt4-dbus]
-packages=dbus-python
-
-[fedora:13:python23]
-packages=python
-
-[fedora:13:python2x]
-packages=python
-
-[fedora:13:reportlab]
-packages=python-reportlab
-
-[fedora:13:sane]
-packages=sane-backends
-
-[fedora:13:sane-devel]
-packages=sane-backends-devel
-
-[fedora:13:scanimage]
-packages=sane-frontends
-
-[fedora:13:xsane]
-packages=xsane
-
-[fedora:13:python-dbus]
-packages=dbus-python,pygobject2
-
-[fedora:13:dbus]
-packages=dbus-devel
-
-[fedora:13:cups-image]
-packages=cups-devel
-
-[fedora:13:python-notify]
-packages=notify-python
-
-[fedora:13:policykit]
-packages=polkit,polkit-gnome
-
-# ********************
-[fedora:14]
-code_name=
-supported=1
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=
-release_date=
-notes=To complete the install in Fedora 13 or 14 you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
-ppd_install=drv
-udev_mode_fix=1
-ppd_dir=/usr/share/cups/model/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
-policykit=0
-native_cups=1
-add_user_to_group=-a -Gsys,lp
-open_mdns_port=/bin/bash ./init-iptables-firewall
-pre_depend_cmd=su -c "yum clean all"
-
-[fedora:14:cups]
-packages=cups
-
-[fedora:14:cups-devel]
-packages=cups-devel
-
-[fedora:14:gcc]
-packages=gcc-c++
-
-[fedora:14:gs]
-packages=ghostscript
-
-[fedora:14:libcrypto]
-packages=openssl-devel
-
-[fedora:14:libjpeg]
-packages=libjpeg-devel
-
-[fedora:14:libnetsnmp-devel]
-packages=net-snmp-devel
-
-[fedora:14:libpthread]
-packages=glibc-headers
-
-[fedora:14:libtool]
-packages=libtool
-
-[fedora:14:libusb]
-packages=libusb-devel
-
-[fedora:14:make]
-packages=make
-
-[fedora:14:pil]
-packages=python-imaging
-
-[fedora:14:ppdev]
-packages=
-commands=su -c "/sbin/modprobe ppdev"
-
-[fedora:14:pyqt]
-packages=PyQt
-
-[fedora:14:python-devel]
-packages=python-devel
-
-[fedora:14:pyqt4]
-packages=PyQt4
-
-[fedora:14:pyqt4-dbus]
-packages=dbus-python
-
-[fedora:14:python23]
-packages=python
-
-[fedora:14:python2x]
-packages=python
-
-[fedora:14:reportlab]
-packages=python-reportlab
-
-[fedora:14:sane]
-packages=sane-backends
-
-[fedora:14:sane-devel]
-packages=sane-backends-devel
-
-[fedora:14:scanimage]
-packages=sane-frontends
-
-[fedora:14:xsane]
-packages=xsane
-
-[fedora:14:python-dbus]
-packages=dbus-python,pygobject2
-
-[fedora:14:dbus]
-packages=dbus-devel
-
-[fedora:14:cups-image]
-packages=cups-devel
-
-[fedora:14:python-notify]
-packages=notify-python
-
-[fedora:14:policykit]
-packages=polkit,polkit-gnome
 
 # ********************
 [fedora:15]
@@ -2233,7 +600,7 @@ parallel_supported=1
 usb_supported=1
 packaged_version=3.11.3a
 release_date=24/05/2011
-notes=To complete the install in Fedora 15 you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
+notes=To complete the install in Fedora you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
 ppd_install=drv
 udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
@@ -2244,7 +611,7 @@ policykit=0
 native_cups=1
 add_user_to_group=-a -Gsys,lp
 open_mdns_port=/bin/bash ./init-iptables-firewall
-pre_depend_cmd=su -c "yum clean all"
+pre_depend_cmd=su -c "yum clean all",su -c "yum check-update"
 
 [fedora:15:cups]
 packages=cups
@@ -2274,7 +641,7 @@ packages=glibc-headers
 packages=libtool
 
 [fedora:15:libusb]
-packages=libusb-devel
+packages=libusb1-devel
 
 [fedora:15:make]
 packages=make
@@ -2334,6 +701,9 @@ packages=notify-python
 [fedora:15:policykit]
 packages=polkit,polkit-gnome
 
+[fedora:15:network]
+packages=wget
+
 # ********************
 [fedora:16]
 code_name=Verne
@@ -2346,7 +716,7 @@ parallel_supported=1
 usb_supported=1
 packaged_version=3.11.3a
 release_date=24/05/2011
-notes=To complete the install in Fedora 15 you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
+notes=To complete the install in Fedora you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
 ppd_install=drv
 udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
@@ -2357,7 +727,33 @@ policykit=0
 native_cups=1
 add_user_to_group=-a -Gsys,lp
 open_mdns_port=/bin/bash ./init-iptables-firewall
-pre_depend_cmd=su -c "yum clean all"
+pre_depend_cmd=su -c "yum clean all",su -c "yum check-update"
+same_as_version=15
+
+# ********************
+[fedora:17]
+code_name=Beefy Miracle
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=3.12.4
+release_date=22/05/2012
+notes=To complete the install in Fedora you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+policykit=0
+native_cups=1
+add_user_to_group=-a -Gsys,lp
+open_mdns_port=/bin/bash ./init-iptables-firewall
+pre_depend_cmd=su -c "yum clean all",su -c "yum check-update"
 same_as_version=15
 
 # ****************************************
@@ -2403,14 +799,15 @@ ui_toolkit=qt3
 # ****************************************
 [rhel]
 index=7
-versions=5.0,6.0
+versions=5.0,5.1,5.2,5.3,5.4,5.5,5.6,5.7,5.8,6.0
 display_name=Red Hat Enterprise Linux
 alt_names=red hat enterprise linux
 display=1
 notes=
-package_mgrs=yum,rpm,up2date
-package_mgr_cmd=rpm install $packages_to_install
-pre_depend_cmd=
+package_mgrs=yum,rpm,up2date,gpk-update-viewer
+#package_mgr_cmd=su -c 'rpm install $packages_to_install'
+package_mgr_cmd=su -c 'yum -y -d 10 -e 1 install $packages_to_install'
+pre_depend_cmd=su -c 'yum list update'
 post_depend_cmd=
 hplip_remove_cmd=su -c 'rpm -ev hplipfull'
 su_sudo=su
@@ -2439,8 +836,131 @@ ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
-package_available=1
+package_available=0
 package_arch=i386,x86_64
+add_user_to_group=-a -Glp,sys
+
+[rhel:5.0:cups]
+packages=cups
+
+[rhel:5.0:cups-devel]
+packages=cups-devel
+
+[rhel:5.0:gcc]
+packages=gcc-c++
+
+[rhel:5.0:gs]
+packages=ghostscript
+
+[rhel:5.0:libcrypto]
+packages=openssl-devel
+
+[rhel:5.0:libjpeg]
+packages=libjpeg-devel
+
+[rhel:5.0:libnetsnmp-devel]
+packages=net-snmp-devel
+
+[rhel:5.0:libpthread]
+packages=glibc-headers
+
+[rhel:5.0:libtool]
+packages=libtool
+
+[rhel:5.0:libusb]
+packages=libusb1
+
+[rhel:5.0:make]
+packages=make
+
+[rhel:5.0:pil]
+packages=python-imaging
+
+[rhel:5.0:ppdev]
+packages=
+
+[rhel:5.0:pyqt]
+packages=PyQt
+
+[rhel:5.0:python-devel]
+packages=python-devel
+
+[rhel:5.0:pyqt4]
+packages=PyQt4
+
+[rhel:5.0:pyqt4-dbus]
+packages=dbus-python
+
+[rhel:5.0:python23]
+packages=python
+
+[rhel:5.0:python2x]
+packages=python
+
+[rhel:5.0:reportlab]
+packages=python-reportlab
+
+[rhel:5.0:sane]
+packages=sane-backends
+
+[rhel:5.0:sane-devel]
+packages=sane-backends-devel
+
+[rhel:5.0:scanimage]
+packages=sane-frontends
+
+[rhel:5.0:xsane]
+packages=xsane
+
+[rhel:5.0:python-dbus]
+packages=dbus-python,pygobject2
+
+[rhel:5.0:dbus]
+packages=dbus-devel
+
+[rhel:5.0:cups-image]
+packages=cups-devel
+
+[rhel:5.0:python-notify]
+packages=notify-python
+
+[rhel:5.0:policykit]
+packages=polkit,polkit-gnome
+
+[rhel:5.0:network]
+packages=wget
+
+# ********************
+[rhel:5.1]
+same_as_version=5.0
+
+# ********************
+[rhel:5.2]
+same_as_version=5.0
+
+# ********************
+[rhel:5.3]
+same_as_version=5.0
+
+# ********************
+[rhel:5.4]
+same_as_version=5.0
+
+# ********************
+[rhel:5.5]
+same_as_version=5.0
+
+# ********************
+[rhel:5.6]
+same_as_version=5.0
+
+# ********************
+[rhel:5.7]
+same_as_version=5.0
+
+# ********************
+[rhel:5.8]
+same_as_version=5.0
 
 # ********************
 [rhel:6.0]
@@ -2461,8 +981,100 @@ ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
-package_available=1
+package_available=0
 package_arch=i686,x86_64
+add_user_to_group=-a -Glp,sys
+
+[rhel:6.0:cups]
+packages=cups
+
+[rhel:6.0:cups-devel]
+packages=cups-devel
+
+[rhel:6.0:gcc]
+packages=gcc-c++
+
+[rhel:6.0:gs]
+packages=ghostscript
+
+[rhel:6.0:libcrypto]
+packages=openssl-devel
+
+[rhel:6.0:libjpeg]
+packages=libjpeg-devel
+
+[rhel:6.0:libnetsnmp-devel]
+packages=net-snmp-devel
+
+[rhel:6.0:libpthread]
+packages=glibc-headers
+
+[rhel:6.0:libtool]
+packages=libtool
+
+[rhel:6.0:libusb]
+packages=libusb1
+
+[rhel:6.0:make]
+packages=make
+
+[rhel:6.0:pil]
+packages=python-imaging
+
+[rhel:6.0:ppdev]
+packages=
+
+[rhel:6.0:pyqt]
+packages=PyQt
+
+[rhel:6.0:python-devel]
+packages=python-devel
+
+[rhel:6.0:pyqt4]
+packages=PyQt4
+
+[rhel:6.0:pyqt4-dbus]
+packages=dbus-python
+
+[rhel:6.0:python23]
+packages=python
+
+[rhel:6.0:python2x]
+packages=python
+
+[rhel:6.0:reportlab]
+packages=python-reportlab
+
+[rhel:6.0:sane]
+packages=sane-backends
+
+[rhel:6.0:sane-devel]
+packages=sane-backends-devel
+
+[rhel:6.0:scanimage]
+packages=sane-frontends
+
+[rhel:6.0:xsane]
+packages=xsane
+
+[rhel:6.0:python-dbus]
+packages=dbus-python,pygobject2
+
+[rhel:6.0:dbus]
+packages=dbus-devel
+
+[rhel:6.0:cups-image]
+packages=cups-devel
+
+[rhel:6.0:python-notify]
+packages=notify-python
+
+[rhel:6.0:policykit]
+packages=polkit,polkit-gnome
+
+[rhel:6.0:network]
+packages=wget
+
 
 # ****************************************
 [slackware]
@@ -2652,9 +1264,9 @@ display_name=CentOS
 alt_names=
 display=0
 notes=
-package_mgrs=
-package_mgr_cmd=
-pre_depend_cmd=
+package_mgrs=pup,yum,rpm
+package_mgr_cmd=su -c 'yum -y -d 10 -e 1 install $packages_to_install'
+pre_depend_cmd=su -c 'yum list update'
 post_depend_cmd=
 hplip_remove_cmd=
 su_sudo=su
@@ -2674,6 +1286,8 @@ pcard_supported=1
 network_supported=1
 parallel_supported=1
 usb_supported=1
+libusb01=1
+udev_sysfs_rule=1
 packaged_version=
 release_date=
 notes=
@@ -2683,11 +1297,15 @@ ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
+add_user_to_group=-a -Glp,sys
 
 [centos:any:cups]
 packages=cups
 
 [centos:any:cups-devel]
+packages=cups-devel
+
+[centos:any:cups-image]
 packages=cups-devel
 
 [centos:any:gcc]
@@ -2712,7 +1330,7 @@ packages=glibc-headers
 packages=libtool
 
 [centos:any:libusb]
-packages=libusb-devel
+packages=libusb1-devel
 
 [centos:any:make]
 packages=make
@@ -2731,7 +1349,7 @@ packages=PyQt,PyQt-devel
 packages=python-devel,PyXML
 
 [centos:any:pyqt4]
-packages=
+packages=PyQt4
 
 [centos:any:pyqt4-dbus]
 packages=pygobject2
@@ -2743,7 +1361,7 @@ packages=python
 packages=python
 
 [centos:any:reportlab]
-packages=
+packages=python-reportlab
 
 [centos:any:sane]
 packages=sane-backends
@@ -2768,6 +1386,12 @@ packages=
 
 [centos:any:python-notify]
 packages=notify-python
+
+[centos:any:dbus]
+packages=dbus-devel
+
+[centos:any:network]
+packages=wget
 
 # ****************************************
 [gentoo]
@@ -2829,6 +1453,7 @@ udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
+libusb01=1
 
 # ********************
 [pclinuxos:2006.0]
@@ -2842,6 +1467,7 @@ parallel_supported=1
 usb_supported=1
 packaged_version=
 release_date=
+libusb01=1
 notes=
 ppd_install=ppd
 udev_mode_fix=1
@@ -2935,6 +1561,10 @@ packages=
 [pclinuxos:2006.0:cups-image]
 packages=libcups2-devel
 
+[pclinuxos:2006.0:network]
+packages=wget
+
+
 # ********************
 [pclinuxos:2006]
 same_as_version=2006.0
@@ -2958,6 +1588,7 @@ ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+libusb01=1
 
 [pclinuxos:2007.0:cups]
 packages=libcups2
@@ -3047,6 +1678,10 @@ packages=python-ctypes
 [pclinuxos:2007.0:cups-image]
 packages=libcups2-devel
 
+[pclinuxos:2007.0:network]
+packages=wget
+
+
 # ********************
 [pclinuxos:2007]
 same_as_version=2007.0
@@ -3070,6 +1705,7 @@ ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+libusb01=1
 
 [pclinuxos:2008.0:cups]
 packages=libcups2
@@ -3159,6 +1795,9 @@ packages=python-ctypes
 [pclinuxos:2008.0:cups-image]
 packages=libcups2-devel
 
+[pclinuxos:2008.0:network]
+packages=wget
+
 # ********************
 [pclinuxos:2008]
 same_as_version=2008.0
@@ -3182,6 +1821,7 @@ ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+libusb01=1
 
 [pclinuxos:2009.0:cups]
 packages=libcups2
@@ -3271,6 +1911,10 @@ packages=python-ctypes
 [pclinuxos:2009.0:cups-image]
 packages=libcups2-devel
 
+[pclinuxos:2009.0:network]
+packages=wget
+
+
 # ********************
 [pclinuxos:2009]
 same_as_version=2009.0
@@ -3294,6 +1938,7 @@ ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
+libusb01=1
 
 [pclinuxos:2009.1:cups]
 packages=libcups2
@@ -3382,6 +2027,10 @@ packages=python-ctypes
 
 [pclinuxos:2009.1:cups-image]
 packages=libcups2-devel
+
+[pclinuxos:2009.1:network]
+packages=wget
+
 
 # ****************************************
 [igos]
@@ -3508,6 +2157,10 @@ packages=xsane
 [igos:1.0:cups-image]
 packages=
 
+[igos:1.0:network]
+packages=wget
+
+
 # ****************************************
 [ubuntu]
 index=12
@@ -3527,111 +2180,6 @@ udev_mode_fix=1
 ppd_dir=
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
-
-# ********************
-[ubuntu:6.06]
-code_name=Dapper Duck
-supported=0
-scan_supported=1
-fax_supported=0
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=0.9.7
-release_date=2006-6-1
-notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
-ppd_install=ppd
-udev_mode_fix=1
-ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=1
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
-
-[ubuntu:6.06:cups]
-packages=libcups2
-
-[ubuntu:6.06:cups-devel]
-packages=libcups2-dev,cups-bsd,cups-client
-
-[ubuntu:6.06:gcc]
-packages=build-essential
-
-[ubuntu:6.06:gs]
-packages=gs-esp
-
-[ubuntu:6.06:libcrypto]
-packages=openssl
-
-[ubuntu:6.06:libjpeg]
-packages=libjpeg62-dev
-
-[ubuntu:6.06:libnetsnmp-devel]
-packages=libsnmp9-dev
-
-[ubuntu:6.06:libpthread]
-packages=build-essential
-
-[ubuntu:6.06:libtool]
-packages=libtool
-
-[ubuntu:6.06:libusb]
-packages=libusb-dev
-
-[ubuntu:6.06:make]
-packages=build-essential
-
-[ubuntu:6.06:pil]
-packages=python-imaging
-
-[ubuntu:6.06:ppdev]
-packages=
-commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppdev | sudo tee -a /etc/modules
-
-[ubuntu:6.06:pyqt]
-packages=python-qt3
-
-[ubuntu:6.06:python-devel]
-packages=python-dev
-
-[ubuntu:6.06:pyqt4]
-packages=python-qt4
-
-[ubuntu:6.06:pyqt4-dbus]
-packages=python-qt4-dbus
-
-[ubuntu:6.06:python23]
-packages=python
-
-[ubuntu:6.06:python2x]
-packages=python
-
-[ubuntu:6.06:reportlab]
-packages=python-reportlab
-
-[ubuntu:6.06:sane]
-packages=libsane
-
-[ubuntu:6.06:sane-devel]
-packages=libsane-dev
-
-[ubuntu:6.06:scanimage]
-packages=libsane
-
-[ubuntu:6.06:xsane]
-packages=xsane
-
-[ubuntu:6.06:cups-ddk]
-# packages=cups
-
-[ubuntu:6.06:python-dbus]
-# packages=python-gobject
-
-[ubuntu:6.06:python-ctypes]
-# packages=
-
-[ubuntu:6.06:cups-image]
-packages=libcupsys-dev,cupsys-bsd
 
 # ********************
 [ubuntu:8.04]
@@ -3683,7 +2231,7 @@ packages=build-essential
 packages=libtool
 
 [ubuntu:8.04:libusb]
-packages=libusb-dev
+packages=libusb-1.0.0-dev
 
 [ubuntu:8.04:make]
 packages=build-essential
@@ -3749,378 +2297,9 @@ packages=policykit,policykit-gnome
 [ubuntu:8.04:python-notify]
 packages=python-notify
 
+[ubuntu:8.04:network]
+packages=wget
 
-# ********************
-[ubuntu:8.04.1]
-code_name=Hardy Heron
-supported=1
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=2.8.2
-release_date=2008
-notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
-ppd_install=ppd
-udev_mode_fix=1
-ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
-policykit=1
-native_cups=1
-
-[ubuntu:8.04.1:cups]
-packages=libcups2
-
-[ubuntu:8.04.1:cups-devel]
-packages=libcups2-dev,cups-bsd,cups-client
-
-[ubuntu:8.04.1:gcc]
-packages=build-essential
-
-[ubuntu:8.04.1:gs]
-packages=gs-esp
-
-[ubuntu:8.04.1:libcrypto]
-packages=openssl
-
-[ubuntu:8.04.1:libjpeg]
-packages=libjpeg62-dev
-
-[ubuntu:8.04.1:libnetsnmp-devel]
-packages=libsnmp-dev
-
-[ubuntu:8.04.1:libpthread]
-packages=build-essential
-
-[ubuntu:8.04.1:libtool]
-packages=libtool
-
-[ubuntu:8.04.1:libusb]
-packages=libusb-dev
-
-[ubuntu:8.04.1:make]
-packages=build-essential
-
-[ubuntu:8.04.1:pil]
-packages=python-imaging
-
-[ubuntu:8.04.1:ppdev]
-packages=
-commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppdev | sudo tee -a /etc/modules
-
-[ubuntu:8.04.1:pyqt]
-packages=python-qt3
-
-[ubuntu:8.04.1:pyqt4]
-packages=python-qt4
-
-[ubuntu:8.04.1:pyqt4-dbus]
-packages=python-qt4-dbus
-
-[ubuntu:8.04.1:python-devel]
-packages=python2.5-dev
-
-[ubuntu:8.04.1:python23]
-packages=python
-
-[ubuntu:8.04.1:python2x]
-packages=python
-
-[ubuntu:8.04.1:reportlab]
-packages=python-reportlab
-
-[ubuntu:8.04.1:sane]
-packages=libsane
-
-[ubuntu:8.04.1:sane-devel]
-packages=libsane-dev
-
-[ubuntu:8.04.1:scanimage]
-packages=sane-utils
-
-[ubuntu:8.04.1:xsane]
-packages=xsane
-
-[ubuntu:8.04.1:cups-ddk]
-packages=cups
-
-[ubuntu:8.04.1:python-dbus]
-packages=python-dbus,python-gobject
-
-[ubuntu:8.04.1:dbus]
-packages=libdbus-1-dev
-
-[ubuntu:8.04.1:python-ctypes]
-packages=python-ctypes
-
-[ubuntu:8.04.1:cups-image]
-packages=libcupsimage2-dev
-
-[ubuntu:8.04.1:policykit]
-packages=policykit,policykit-gnome
-
-[ubuntu:8.04.1:python-notify]
-packages=python-notify
-
-# ********************
-[ubuntu:8.04.2]
-code_name=Hardy Heron
-supported=1
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=2.8.2
-release_date=2009
-notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
-ppd_install=ppd
-udev_mode_fix=1
-ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
-policykit=1
-native_cups=1
-
-[ubuntu:8.04.2:cups]
-packages=libcups2
-
-[ubuntu:8.04.2:cups-devel]
-packages=libcups2-dev,cups-bsd,cups-client
-
-[ubuntu:8.04.2:gcc]
-packages=build-essential
-
-[ubuntu:8.04.2:gs]
-packages=gs-esp
-
-[ubuntu:8.04.2:libcrypto]
-packages=openssl
-
-[ubuntu:8.04.2:libjpeg]
-packages=libjpeg62-dev
-
-[ubuntu:8.04.2:libnetsnmp-devel]
-packages=libsnmp-dev
-
-[ubuntu:8.04.2:libpthread]
-packages=build-essential
-
-[ubuntu:8.04.2:libtool]
-packages=libtool
-
-[ubuntu:8.04.2:libusb]
-packages=libusb-dev
-
-[ubuntu:8.04.2:make]
-packages=build-essential
-
-[ubuntu:8.04.2:pil]
-packages=python-imaging
-
-[ubuntu:8.04.2:ppdev]
-packages=
-commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppdev | sudo tee -a /etc/modules
-
-[ubuntu:8.04.2:pyqt]
-packages=python-qt3
-
-[ubuntu:8.04.2:pyqt4]
-packages=python-qt4
-
-[ubuntu:8.04.2:pyqt4-dbus]
-packages=python-qt4-dbus
-
-[ubuntu:8.04.2:python-devel]
-packages=python2.5-dev
-
-[ubuntu:8.04.2:python23]
-packages=python
-
-[ubuntu:8.04.2:python2x]
-packages=python
-
-[ubuntu:8.04.2:reportlab]
-packages=python-reportlab
-
-[ubuntu:8.04.2:sane]
-packages=libsane
-
-[ubuntu:8.04.2:sane-devel]
-packages=libsane-dev
-
-[ubuntu:8.04.2:scanimage]
-packages=sane-utils
-
-[ubuntu:8.04.2:xsane]
-packages=xsane
-
-[ubuntu:8.04.2:cups-ddk]
-packages=cups
-
-[ubuntu:8.04.2:python-dbus]
-packages=python-dbus,python-gobject
-
-[ubuntu:8.04.2:dbus]
-packages=libdbus-1-dev
-
-[ubuntu:8.04.2:python-ctypes]
-packages=python-ctypes
-
-[ubuntu:8.04.2:cups-image]
-packages=libcupsimage2-dev
-
-[ubuntu:8.04.2:policykit]
-packages=policykit,policykit-gnome
-
-[ubuntu:8.04.2:python-notify]
-packages=python-notify
-
-# ********************
-[ubuntu:8.10]
-code_name=Intrepid Ibex
-supported=0
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=2.8.7
-release_date=2008
-notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
-ppd_install=drv
-udev_mode_fix=1
-ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
-policykit=1
-native_cups=0
-
-# ********************
-[ubuntu:9.10]
-code_name=Karmic
-supported=1
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=3.9.8
-release_date=2009
-notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.  During the install process you will be added to the lp group, please quit the installer before the setup stage, log out, log back in, and run hp-setup to complete the install.
-ppd_install=drv
-udev_mode_fix=1
-ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
-policykit=1
-native_cups=1
-acl_rules=1
-add_user_to_group=-a -Glp,lpadmin
-
-[ubuntu:9.10:cups]
-packages=libcups2
-
-[ubuntu:9.10:cups-devel]
-packages=libcups2-dev,cups-bsd,cups-client
-
-[ubuntu:9.10:gcc]
-packages=build-essential
-
-[ubuntu:9.10:gs]
-packages=gs-esp
-
-[ubuntu:9.10:libcrypto]
-packages=openssl
-
-[ubuntu:9.10:libjpeg]
-packages=libjpeg62-dev
-
-[ubuntu:9.10:libnetsnmp-devel]
-packages=libsnmp-dev
-
-[ubuntu:9.10:libpthread]
-packages=build-essential
-
-[ubuntu:9.10:libtool]
-packages=libtool
-
-[ubuntu:9.10:libusb]
-packages=libusb-dev
-
-[ubuntu:9.10:make]
-packages=build-essential
-
-[ubuntu:9.10:pil]
-packages=python-imaging
-
-[ubuntu:9.10:ppdev]
-packages=
-commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppdev | sudo tee -a /etc/modules
-
-[ubuntu:9.10:pyqt]
-packages=python-qt3
-
-[ubuntu:9.10:python-devel]
-packages=python-dev
-
-[ubuntu:9.10:pyqt4]
-packages=python-qt4
-
-[ubuntu:9.10:pyqt4-dbus]
-packages=python-qt4-dbus
-
-[ubuntu:9.10:python23]
-packages=python
-
-[ubuntu:9.10:python2x]
-packages=python
-
-[ubuntu:9.10:reportlab]
-packages=python-reportlab
-
-[ubuntu:9.10:sane]
-packages=libsane
-
-[ubuntu:9.10:sane-devel]
-packages=libsane-dev
-
-[ubuntu:9.10:scanimage]
-packages=sane-utils
-
-[ubuntu:9.10:xsane]
-packages=xsane
-
-[ubuntu:9.10:cups-ddk]
-packages=cups
-
-[ubuntu:9.10:python-dbus]
-packages=python-dbus,python-gobject
-
-[ubuntu:9.10:dbus]
-packages=libdbus-1-dev
-
-[ubuntu:9.10:python-ctypes]
-packages=python-ctypes
-
-[ubuntu:9.10:cups-image]
-packages=libcupsimage2-dev
-
-[ubuntu:9.10:policykit]
-packages=policykit,policykit-gnome
-
-[ubuntu:9.10:python-notify]
-packages=python-notify
 
 # ********************
 [ubuntu:10.04]
@@ -4173,7 +2352,7 @@ packages=build-essential
 packages=libtool
 
 [ubuntu:10.04:libusb]
-packages=libusb-dev
+packages=libusb-1.0-0-dev
 
 [ubuntu:10.04:make]
 packages=build-essential
@@ -4236,6 +2415,10 @@ packages=policykit-1,policykit-1-gnome
 [ubuntu:10.04:python-notify]
 packages=python-notify
 
+[ubuntu:10.04:network]
+packages=wget
+
+
 # ************************************
 [ubuntu:10.10]
 code_name=Maverick
@@ -4287,7 +2470,7 @@ packages=build-essential
 packages=libtool
 
 [ubuntu:10.10:libusb]
-packages=libusb-dev
+packages=libusb-1.0.0-dev
 
 [ubuntu:10.10:make]
 packages=build-essential
@@ -4350,6 +2533,9 @@ packages=policykit-1,policykit-1-gnome
 [ubuntu:10.10:python-notify]
 packages=python-notify
 
+[ubuntu:10.10:network]
+packages=wget
+
 # ****************************************
 [ubuntu:11.04]
 code_name=natty
@@ -4402,7 +2588,7 @@ packages=build-essential
 packages=libtool
 
 [ubuntu:11.04:libusb]
-packages=libusb-dev
+packages=libusb-1.0.0-dev
 
 [ubuntu:11.04:make]
 packages=build-essential
@@ -4415,13 +2601,13 @@ packages=
 commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppdev | sudo tee -a /etc/modules
 
 [ubuntu:11.04:pyqt]
-packages=python-qt4
+packages=gtk2-engines-pixbuf,python-qt4
 
 [ubuntu:11.04:python-devel]
 packages=python-dev
 
 [ubuntu:11.04:pyqt4]
-packages=python-qt4
+packages=gtk2-engines-pixbuf,python-qt4
 
 [ubuntu:11.04:pyqt4-dbus]
 packages=python-qt4-dbus
@@ -4445,7 +2631,7 @@ packages=libsane-dev
 packages=sane-utils
 
 [ubuntu:11.04:xsane]
-packages=xsane
+packages=gtk2-engines-pixbuf,xsane
 
 [ubuntu:11.04:python-dbus]
 packages=python-dbus,python-gobject
@@ -4464,6 +2650,10 @@ packages=policykit-1,policykit-1-gnome
 
 [ubuntu:11.04:python-notify]
 packages=python-notify
+
+[ubuntu:11.04:network]
+packages=wget
+
 
 # ********************
 [ubuntu:11.10]
@@ -4542,7 +2732,7 @@ packages=build-essential
 packages=libtool
 
 [ubuntu:12.04:libusb]
-packages=libusb-dev
+packages=libusb-1.0.0-dev
 
 [ubuntu:12.04:make]
 packages=build-essential
@@ -4555,13 +2745,13 @@ packages=
 commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppdev | sudo tee -a /etc/modules
 
 [ubuntu:12.04:pyqt]
-packages=python-qt4
+packages=gtk2-engines-pixbuf,python-qt4
 
 [ubuntu:12.04:python-devel]
 packages=python-dev
 
 [ubuntu:12.04:pyqt4]
-packages=python-qt4
+packages=gtk2-engines-pixbuf,python-qt4
 
 [ubuntu:12.04:pyqt4-dbus]
 packages=python-qt4-dbus
@@ -4585,7 +2775,7 @@ packages=libsane-dev
 packages=sane-utils
 
 [ubuntu:12.04:xsane]
-packages=xsane
+packages=gtk2-engines-pixbuf,xsane
 
 [ubuntu:12.04:python-dbus]
 packages=python-dbus,python-gobject
@@ -4605,10 +2795,13 @@ packages=policykit-1,policykit-1-gnome
 [ubuntu:12.04:python-notify]
 packages=python-notify
 
+[ubuntu:12.04:network]
+packages=wget
+
 # ****************************************
 [debian]
 index=2
-versions=5.0,5.0.1,5.0.2,5.0.3,5.0.4,5.0.5,5.0.6,5.0.7,5.0.8,6.0,6.0.1,6.0.2,6.0.3,6.0.4
+versions=5.0,5.0.1,5.0.2,5.0.3,5.0.4,5.0.5,5.0.6,5.0.7,5.0.8,6.0,6.0.1,6.0.2,6.0.3,6.0.4,6.0.5
 display_name=Debian
 alt_names=
 display=1
@@ -4625,421 +2818,6 @@ ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
 
-# ********************
-[debian:2.2]
-code_name=Potato
-supported=0
-scan_supported=1
-fax_supported=0
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=
-release_date=2000-8-15
-notes=
-ppd_install=ppd
-udev_mode_fix=1
-ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt3
-
-[debian:2.2:cups]
-packages=cupsys,cupsys-client
-
-[debian:2.2:cups-devel]
-packages=libcupsys2-dev,cupsys-bsd
-
-[debian:2.2:gcc]
-packages=gcc,g++
-
-[debian:2.2:gs]
-packages=gs-esp
-
-[debian:2.2:libcrypto]
-packages=libsnmp5-dev
-
-[debian:2.2:libjpeg]
-packages=libjpeg62-dev
-
-[debian:2.2:libnetsnmp-devel]
-packages=libsnmp5-dev
-
-[debian:2.2:libpthread]
-packages=libc6
-
-[debian:2.2:libtool]
-packages=libtool
-
-[debian:2.2:libusb]
-packages=libusb-dev
-
-[debian:2.2:make]
-packages=make
-
-[debian:2.2:pil]
-packages=python-imaging
-
-[debian:2.2:ppdev]
-packages=
-commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
-
-[debian:2.2:pyqt]
-packages=python-qt3
-
-[debian:2.2:python-devel]
-packages=python-dev
-
-[debian:2.2:pyqt4]
-packages=
-
-[debian:2.2:pyqt4-dbus]
-packages=
-
-[debian:2.2:python23]
-packages=python
-
-[debian:2.2:python2x]
-packages=python
-
-[debian:2.2:reportlab]
-packages=python-reportlab
-
-[debian:2.2:sane]
-packages=sane
-
-[debian:2.2:sane-devel]
-packages=libsane-dev
-
-[debian:2.2:scanimage]
-packages=sane-utils
-
-[debian:2.2:xsane]
-packages=sane
-
-[debian:2.2:cups-ddk]
-packages=
-
-[debian:2.2:python-dbus]
-# packages=python-gobject
-
-[debian:2.2:python-ctypes]
-# packages=
-
-[debian:2.2:cups-image]
-packages=libcupsys-dev,cupsys-bsd
-
-# ********************
-[debian:3.0]
-code_name=Woody
-supported=0
-scan_supported=1
-fax_supported=0
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=
-release_date=2002-7-19
-notes=
-ppd_install=ppd
-udev_mode_fix=1
-ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt3
-
-[debian:3.0:cups]
-packages=cupsys,cupsys-client
-
-[debian:3.0:cups-devel]
-packages=libcupsys2-dev,cupsys-bsd
-
-[debian:3.0:gcc]
-packages=gcc,g++
-
-[debian:3.0:gs]
-packages=gs-esp
-
-[debian:3.0:libcrypto]
-packages=libsnmp5-dev
-
-[debian:3.0:libjpeg]
-packages=libjpeg62-dev
-
-[debian:3.0:libnetsnmp-devel]
-packages=libsnmp5-dev
-
-[debian:3.0:libpthread]
-packages=libc6
-
-[debian:3.0:libtool]
-packages=libtool
-
-[debian:3.0:libusb]
-packages=libusb-dev
-
-[debian:3.0:make]
-packages=make
-
-[debian:3.0:pil]
-packages=python-imaging
-
-[debian:3.0:ppdev]
-packages=
-commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
-
-[debian:3.0:pyqt]
-packages=python-qt3
-
-[debian:3.0:python-devel]
-packages=python-dev
-
-[debian:3.0:pyqt4]
-packages=
-
-[debian:3.0:pyqt4-dbus]
-packages=
-
-[debian:3.0:python23]
-packages=python
-
-[debian:3.0:python2x]
-packages=python
-
-[debian:3.0:reportlab]
-packages=python-reportlab
-
-[debian:3.0:sane]
-packages=sane,libsane-dev
-
-[debian:3.0:sane-devel]
-packages=libsane-dev
-
-[debian:3.0:scanimage]
-packages=sane-utils
-
-[debian:3.0:xsane]
-packages=sane
-
-[debian:3.0:cups-ddk]
-packages=
-
-[debian:3.0:python-dbus]
-# packages=python2.3-dbus,dbus-1-dev,python-gobject
-
-[debian:3.0:python-ctypes]
-# packages=python-ctypes
-
-[debian:3.0:cups-image]
-packages=libcupsys-dev,cupsys-bsd
-
-# ********************
-[debian:3.1]
-code_name=Sarge
-supported=0
-scan_supported=1
-fax_supported=0
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=0.9.2
-release_date=2005-6-6
-notes=
-ppd_install=ppd
-udev_mode_fix=1
-ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
-
-[debian:3.1:cups]
-packages=cupsys,cupsys-client
-
-[debian:3.1:cups-devel]
-packages=libcupsys2-dev,cupsys-bsd
-
-[debian:3.1:gcc]
-packages=gcc,g++
-
-[debian:3.1:gs]
-packages=gs-esp
-
-[debian:3.1:libcrypto]
-packages=libsnmp5-dev
-
-[debian:3.1:libjpeg]
-packages=libjpeg62-dev
-
-[debian:3.1:libnetsnmp-devel]
-packages=libsnmp5-dev
-
-[debian:3.1:libpthread]
-packages=libc6
-
-[debian:3.1:libtool]
-packages=libtool
-
-[debian:3.1:libusb]
-packages=libusb-dev
-
-[debian:3.1:make]
-packages=make
-
-[debian:3.1:pil]
-packages=python-imaging
-
-[debian:3.1:ppdev]
-packages=
-commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
-
-[debian:3.1:pyqt]
-packages=python-qt3
-
-[debian:3.1:python-devel]
-packages=python-dev
-
-[debian:3.1:pyqt4]
-packages=python-qt4
-
-[debian:3.1:pyqt4-dbus]
-packages=python-qt4-dbus
-
-[debian:3.1:python23]
-packages=python
-
-[debian:3.1:python2x]
-packages=python
-
-[debian:3.1:reportlab]
-packages=python-reportlab
-
-[debian:3.1:sane]
-packages=sane,libsane-dev
-
-[debian:3.1:sane-devel]
-packages=libsane-dev
-
-[debian:3.1:scanimage]
-packages=sane-utils
-
-[debian:3.1:xsane]
-packages=sane
-
-[debian:3.1:cups-ddk]
-# packages=cupsddk,cupsddk-drivers
-
-[debian:3.1:python-dbus]
-# packages=python2.3-dbus,dbus-1-dev,python-gobject
-
-[debian:3.1:python-ctypes]
-# packages=python-ctypes
-
-[debian:3.1:cups-image]
-packages=libcupsys-dev,cupsys-bsd
-
-# ********************
-[debian:4.0]
-code_name=Etch
-supported=0
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=1.6.10
-release_date=2007-4-8
-notes=Be sure to disable the CD-ROM repositories and also ensure that the main/security repositories are enabled.
-ppd_install=ppd
-udev_mode_fix=1
-ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt3
-native_cups=1
-
-[debian:4.0:cups]
-packages=cupsys,cupsys-client
-
-[debian:4.0:cups-devel]
-packages=libcupsys2-dev,cupsys-bsd
-
-[debian:4.0:cups-image]
-packages=libcupsimage2-dev
-
-[debian:4.0:gcc]
-packages=build-essential
-
-[debian:4.0:gs]
-packages=gs-esp
-
-[debian:4.0:libcrypto]
-packages=libssl-dev
-
-[debian:4.0:libjpeg]
-packages=libjpeg62-dev
-
-[debian:4.0:libnetsnmp-devel]
-packages=libsnmp9-dev
-
-[debian:4.0:libpthread]
-packages=libc6
-
-[debian:4.0:libtool]
-packages=libtool
-
-[debian:4.0:libusb]
-packages=libusb-dev
-
-[debian:4.0:make]
-packages=make
-
-[debian:4.0:pil]
-packages=python-imaging
-
-[debian:4.0:ppdev]
-packages=
-commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
-
-[debian:4.0:pyqt4]
-packages=python-qt3
-
-[debian:4.0:python-devel]
-packages=python-dev
-
-[debian:4.0:python2x]
-packages=python,python-ctypes
-
-[debian:4.0:reportlab]
-packages=python-reportlab
-
-[debian:4.0:sane]
-packages=sane
-
-[debian:4.0:sane-devel]
-packages=libsane-dev
-
-[debian:4.0:scanimage]
-packages=sane-utils
-
-[debian:4.0:xsane]
-packages=xsane
-
-[debian:4.0:python-dbus]
-packages=python-dbus,libdbus-1-dev
-
-[debian:4.0:python-notify]
-packages=python-notify
-
-# ************************************************
-[debian:4.0r0]
-same_as_version= 4.0
-
-[debian:4.0r1]
-same_as_version= 4.0
 
 # ********************
 [debian:5.0]
@@ -5050,6 +2828,7 @@ fax_supported=1
 pcard_supported=1
 network_supported=1
 parallel_supported=1
+libusb01=1
 usb_supported=1
 packaged_version=2.8.6
 release_date=
@@ -5158,6 +2937,10 @@ packages=policykit,policykit-gnome
 [debian:5.0:python-notify]
 packages=python-notify
 
+[debian:5.0:network]
+packages=wget
+
+# ************************
 [debian:5.0.1]
 same_as_version=5.0
 
@@ -5182,453 +2965,6 @@ same_as_version=5.0
 [debian:5.0.8]
 same_as_version=5.0
 
-# ********************
-[debian:stable]
-code_name=Etch
-supported=1
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=2.8.6
-release_date=2007-4-8
-notes=Be sure to disable the CD-ROM repositories and also ensure that the main/security repositories are enabled.
-ppd_install=ppd
-udev_mode_fix=1
-ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
-native_cups=1
-
-[debian:stable:cups]
-packages=cupsys,cupsys-client
-
-[debian:stable:cups-devel]
-packages=libcupsys2-dev,cupsys-bsd
-
-[debian:stable:gcc]
-packages=gcc,g++
-
-[debian:stable:gs]
-packages=gs-esp
-
-[debian:stable:libcrypto]
-packages=libssl-dev
-
-[debian:stable:libjpeg]
-packages=libjpeg-dev
-
-[debian:stable:libnetsnmp-devel]
-packages=libsnmp9-dev
-
-[debian:stable:libpthread]
-packages=libc6
-
-[debian:stable:libtool]
-packages=libtool
-
-[debian:stable:libusb]
-packages=libusb-dev
-
-[debian:stable:make]
-packages=make
-
-[debian:stable:pil]
-packages=python-imaging
-
-[debian:stable:ppdev]
-packages=
-commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
-
-[debian:stable:pyqt]
-packages=python-qt3
-
-[debian:stable:python-devel]
-packages=python-dev
-
-[debian:stable:pyqt4]
-packages=python-qt4
-
-[debian:stable:pyqt4-dbus]
-packages=python-qt4-dbus
-
-[debian:stable:python23]
-packages=python
-
-[debian:stable:python2x]
-packages=python
-
-[debian:stable:reportlab]
-packages=python-reportlab
-
-[debian:stable:sane]
-packages=sane
-
-[debian:stable:sane-devel]
-packages=libsane-dev
-
-[debian:stable:scanimage]
-packages=sane-utils
-
-[debian:stable:xsane]
-packages=xsane
-
-[debian:stable:cups-ddk]
-packages=
-
-[debian:stable:python-dbus]
-packages=python-dbus,python-gobject
-
-[debian:stable:dbus]
-packages=libdbus-1-dev
-
-[debian:stable:python-ctypes]
-packages=python-ctypes
-
-[debian:stable:cups-image]
-packages=libcupsys2-dev,cupsys-bsd
-
-[debian:stable:python-notify]
-packages=python-notify
-
-# ********************
-[debian:testing]
-code_name=sid
-supported=1
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=2.8.6
-release_date=
-notes=NOTE: Disable the CD Sources in your apt sources.list or the install will fail and hang. Also make sure all the lenny repositories are enabled or the install will fail.
-ppd_install=ppd
-udev_mode_fix=1
-ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
-native_cups=1
-
-[debian:testing:cups]
-packages=libcups2
-
-[debian:testing:cups-devel]
-packages=libcups2-dev,cups-bsd,cups-client
-
-[debian:testing:gcc]
-packages=g++
-
-[debian:testing:gs]
-packages=ghostscript,ghostscript-cups,ghostscript-x
-
-[debian:testing:libcrypto]
-packages=libssl-dev
-
-[debian:testing:libjpeg]
-packages=libjpeg62-dev
-
-[debian:testing:libnetsnmp-devel]
-packages=libsnmp-dev
-
-[debian:testing:libpthread]
-packages=libc6
-
-[debian:testing:libtool]
-packages=libtool
-
-[debian:testing:libusb]
-packages=libusb-dev
-
-[debian:testing:make]
-packages=make
-
-[debian:testing:pil]
-packages=python-imaging
-
-[debian:testing:ppdev]
-packages=
-commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
-
-[debian:testing:pyqt]
-packages=python-qt3
-
-[debian:testing:python-devel]
-packages=python-dev
-
-[debian:testing:pyqt4]
-packages=python-qt4
-
-[debian:testing:pyqt4-dbus]
-packages=python-qt4-dbus
-
-[debian:testing:python23]
-packages=python
-
-[debian:testing:python2x]
-packages=python
-
-[debian:testing:reportlab]
-packages=python-reportlab
-
-[debian:testing:sane]
-packages=libsane
-
-[debian:testing:sane-devel]
-packages=libsane-dev
-
-[debian:testing:scanimage]
-packages=sane-utils
-
-[debian:testing:xsane]
-packages=sane
-
-[debian:testing:cups-ddk]
-packages=
-
-[debian:testing:python-dbus]
-packages=python-dbus,python-gobject
-
-[debian:testing:dbus]
-packages=libdbus-1-dev
-
-[debian:testing:python-ctypes]
-packages=python-ctypes
-
-[debian:testing:cups-image]
-packages=libcupsimage2,libcupsimage2-dev
-
-[debian:testing:python-notify]
-packages=python-notify
-
-# ********************
-[debian:lenny/sid]
-code_name=sid
-supported=1
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=2.8.6
-release_date=
-notes=NOTE: Disable the CD Sources in your apt sources.list or the install will fail and hang. Also make sure all the lenny repositories are enabled or the install will fail.
-ppd_install=ppd
-udev_mode_fix=1
-ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
-native_cups=1
-
-[debian:lenny/sid:cups]
-packages=cupsys,cupsys-client
-
-[debian:lenny/sid:cups-devel]
-packages=libcupsys2-dev,cupsys-bsd
-
-[debian:lenny/sid:gcc]
-packages=g++
-
-[debian:lenny/sid:gs]
-packages=gs-esp
-
-[debian:lenny/sid:libcrypto]
-packages=libssl-dev
-
-[debian:lenny/sid:libjpeg]
-packages=libjpeg62-dev
-
-[debian:lenny/sid:libnetsnmp-devel]
-packages=libsnmp-dev
-
-[debian:lenny/sid:libpthread]
-packages=libc6
-
-[debian:lenny/sid:libtool]
-packages=libtool
-
-[debian:lenny/sid:libusb]
-packages=libusb-dev
-
-[debian:lenny/sid:make]
-packages=make
-
-[debian:lenny/sid:pil]
-packages=python-imaging
-
-[debian:lenny/sid:ppdev]
-packages=
-commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
-
-[debian:lenny/sid:pyqt]
-packages=python-qt3
-
-[debian:lenny/sid:python-devel]
-packages=python-dev
-
-[debian:lenny/sid:pyqt4]
-packages=python-qt4,python-qt4-dbus
-
-[debian:lenny/sid:pyqt4-dbus]
-packages=python-qt4-dbus
-
-[debian:lenny/sid:python23]
-packages=python
-
-[debian:lenny/sid:python2x]
-packages=python
-
-[debian:lenny/sid:reportlab]
-packages=python-reportlab
-
-[debian:lenny/sid:sane]
-packages=libsane
-
-[debian:lenny/sid:sane-devel]
-packages=libsane-dev
-
-[debian:lenny/sid:scanimage]
-packages=sane-utils
-
-[debian:lenny/sid:xsane]
-packages=sane
-
-[debian:lenny/sid:cups-ddk]
-packages=
-
-[debian:lenny/sid:python-dbus]
-packages=python-dbus,python-gobject
-
-[debian:lenny/sid:dbus]
-packages=libdbus-1-dev
-
-[debian:lenny/sid:python-ctypes]
-packages=python-ctypes
-
-[debian:lenny/sid:cups-image]
-packages=libcupsys2-dev,cupsys-bsd
-
-[debian:lenny/sid:python-notify]
-packages=python-notify
-
-# ********************
-[debian:lenny]
-code_name=sid
-supported=1
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=2.8.6
-release_date=
-notes=NOTE: Disable the CD Sources in your apt sources.list or the install will fail and hang. Also make sure all the lenny repositories are enabled or the install will fail.
-ppd_install=ppd
-udev_mode_fix=1
-ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
-native_cups=1
-
-[debian:lenny:cups]
-packages=cupsys,cupsys-client
-
-[debian:lenny:cups-devel]
-packages=libcupsys2-dev,cupsys-bsd
-
-[debian:lenny:gcc]
-packages=g++
-
-[debian:lenny:gs]
-packages=gs-esp
-
-[debian:lenny:libcrypto]
-packages=libssl-dev
-
-[debian:lenny:libjpeg]
-packages=libjpeg62-dev
-
-[debian:lenny:libnetsnmp-devel]
-packages=libsnmp-dev
-
-[debian:lenny:libpthread]
-packages=libc6
-
-[debian:lenny:libtool]
-packages=libtool
-
-[debian:lenny:libusb]
-packages=libusb-dev
-
-[debian:lenny:make]
-packages=make
-
-[debian:lenny:pil]
-packages=python-imaging
-
-[debian:lenny:ppdev]
-packages=
-commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
-
-[debian:lenny:pyqt]
-packages=python-qt3
-
-[debian:lenny:python-devel]
-packages=python-dev
-
-[debian:lenny:pyqt4]
-packages=python-qt4
-
-[debian:lenny:pyqt4-dbus]
-packages=python-qt4-dbus
-
-[debian:lenny:python23]
-packages=python
-
-[debian:lenny:python2x]
-packages=python
-
-[debian:lenny:reportlab]
-packages=python-reportlab
-
-[debian:lenny:sane]
-packages=libsane
-
-[debian:lenny:sane-devel]
-packages=libsane-dev
-
-[debian:lenny:scanimage]
-packages=sane-utils
-
-[debian:lenny:xsane]
-packages=sane
-
-[debian:lenny:cups-ddk]
-packages=
-
-[debian:lenny:python-dbus]
-packages=python-dbus,python-gobject
-
-[debian:lenny:dbus]
-packages=libdbus-1-dev
-
-[debian:lenny:python-ctypes]
-packages=python-ctypes
-
-[debian:lenny:cups-image]
-packages=libcupsys2-dev,cupsys-bsd
-
-[debian:lenny:python-notify]
-packages=python-notify
 
 # ********************
 [debian:6.0]
@@ -5681,7 +3017,7 @@ packages=libc6
 packages=libtool
 
 [debian:6.0:libusb]
-packages=libusb-dev
+packages=libusb-1.0.0-dev
 
 [debian:6.0:make]
 packages=make
@@ -5747,6 +3083,10 @@ packages=policykit-1,policykit-1-gnome
 [debian:6.0:python-notify]
 packages=python-notify
 
+[debian:6.0:network]
+packages=wget
+
+# *********************
 [debian:6.0.1]
 same_as_version=6.0
 
@@ -5757,6 +3097,9 @@ same_as_version=6.0
 same_as_version=6.0
 
 [debian:6.0.4]
+same_as_version=6.0
+
+[debian:6.0.5]
 same_as_version=6.0
 
 # ****************************************
@@ -6027,7 +3370,7 @@ packages=build-essential
 packages=libtool
 
 [mepis:6.0:libusb]
-packages=libusb-dev
+packages=libusb-1.0-0-dev
 
 [mepis:6.0:make]
 packages=build-essential
@@ -6084,6 +3427,9 @@ packages=
 [mepis:6.0:cups-image]
 packages=libcupsys2-dev
 
+[mepis:6.0:network]
+packages=wget
+
 # ********************
 [mepis:6.5]
 code_name=
@@ -6132,7 +3478,7 @@ packages=build-essential
 packages=libtool
 
 [mepis:6.5:libusb]
-packages=libusb-dev
+packages=libusb-1.0-0-dev
 
 [mepis:6.5:make]
 packages=build-essential
@@ -6189,6 +3535,9 @@ packages=
 [mepis:6.5:cups-image]
 packages=libcupsys2-dev
 
+[mepis:6.5:network]
+packages=wget
+
 # ********************
 [mepis:7.0]
 code_name=
@@ -6237,7 +3586,7 @@ packages=build-essential
 packages=libtool
 
 [mepis:7.0:libusb]
-packages=libusb-dev
+packages=libusb-1.0-0-dev
 
 [mepis:7.0:make]
 packages=build-essential
@@ -6294,6 +3643,9 @@ packages=python-ctypes
 [mepis:7.0:cups-image]
 packages=libcupsys2-dev
 
+[mepis:7.0:network]
+packages=wget
+
 # ********************
 [mepis:8.0]
 code_name=
@@ -6342,7 +3694,7 @@ packages=build-essential
 packages=libtool
 
 [mepis:8.0:libusb]
-packages=libusb-dev
+packages=libusb-1.0-0-dev
 
 [mepis:8.0:make]
 packages=build-essential
@@ -6398,6 +3750,9 @@ packages=python-ctypes
 
 [mepis:8.0:cups-image]
 packages=libcupsys2-dev
+
+[mepis:8.0:network]
+packages=wget
 
 # ****************************************
 [mandriva]
@@ -6585,6 +3940,9 @@ packages=xsane
 [mandriva:10.1:cups-image]
 packages=cups-devel
 
+[mandriva:10.1:network]
+packages=wget
+
 # ********************
 [mandriva:10.2]
 code_name=Limited edition 2005
@@ -6689,6 +4047,10 @@ packages=xsane
 
 [mandriva:10.2:cups-image]
 packages=cups-devel
+
+[mandriva:10.2:network]
+packages=wget
+
 
 # ********************
 [mandriva:2006.0]
@@ -6795,6 +4157,9 @@ packages=cupsddk,cupsddk-drivers
 [mandriva:2006.0:cups-image]
 packages=cups-devel
 
+[mandriva:2006.0:network]
+packages=wget
+
 # ********************
 [mandriva:2007.0]
 code_name=2k7
@@ -6899,6 +4264,10 @@ packages=cupsddk,cupsddk-drivers
 
 [mandriva:2007.0:cups-image]
 packages=cups-devel
+
+[mandriva:2007.0:network]
+packages=wget
+
 
 # ********************
 [mandriva:2007.1]
@@ -7007,6 +4376,9 @@ packages=python-ctypes
 
 [mandriva:2007.1:cups-image]
 packages=cups-devel
+
+[mandriva:2007.1:network]
+packages=wget
 
 # ********************
 [mandriva:2008.0]
@@ -7117,6 +4489,9 @@ packages=libdbus-1_3-devel
 [mandriva:2008.0:cups-image]
 packages=cups-devel
 
+[mandriva:2008.0:network]
+packages=wget
+
 # ********************
 [mandriva:2008.1]
 code_name=
@@ -7224,6 +4599,9 @@ packages=libdbus-1-devel
 
 [mandriva:2008.1:cups-image]
 packages=cups-devel
+
+[mandriva:2008.1:network]
+packages=wget
 
 # ********************
 [mandriva:2009]
@@ -7337,6 +4715,9 @@ packages=cups-devel
 [mandriva:2009:policykit]
 packages=policykit,policykit-gnome
 
+[mandriva:2009:network]
+packages=wget
+
 # ********************
 [mandriva:2009.0]
 code_name=
@@ -7448,6 +4829,9 @@ packages=cups-devel
 
 [mandriva:2009.0:policykit]
 packages=policykit,policykit-gnome
+
+[mandriva:2009.0:network]
+packages=wget
 
 # ********************
 [mandriva:2010.0]
@@ -7561,6 +4945,9 @@ packages=libcups2
 [mandriva:2010.0:policykit]
 packages=policykit,policykit-gnome
 
+[mandriva:2010.0:network]
+packages=wget
+
 # ********************
 [mandriva:2011.0]
 code_name=
@@ -7673,17 +5060,20 @@ packages=libcups2
 [mandriva:2011.0:policykit]
 packages=policykit,policykit-gnome
 
+[mandriva:2011.0:network]
+packages=wget
+
 # ****************************************
 [linuxmint]
 index=22
-versions=10,11,12
+versions=8,9,10,11,12,13
 display_name=Linux Mint
 alt_names=mint, mint linux
 display=1
 notes=
 package_mgrs=dpkg,apt-get,synaptic,update-manager,adept,aptitude,adept-updater
-package_mgr_cmd=sudo aptitude install --assume-yes $packages_to_install
-pre_depend_cmd=sudo dpkg --configure -a,sudo apt-get install --yes --force-yes -f,sudo aptitude update
+package_mgr_cmd=sudo apt-get install --assume-yes $packages_to_install
+pre_depend_cmd=sudo dpkg --configure -a,sudo apt-get install --yes --force-yes -f,sudo apt-get update
 post_depend_cmd=
 hplip_remove_cmd=sudo aptitude remove --assume-yes hplip hpijs
 su_sudo=sudo
@@ -7694,343 +5084,9 @@ fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
 
 # ********************
-[linuxmint:5]
-code_name=Elyssa
-supported=0
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=2.8.2
-release_date=2008
-notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubunbtu installation media inserted in the drive.
-ppd_install=drv
-udev_mode_fix=1
-ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
-
-[linuxmint:5:cups]
-packages=libcupsys2
-
-[linuxmint:5:cups-devel]
-packages=libcupsys2-dev,cupsys-bsd
-
-[linuxmint:5:gcc]
-packages=build-essential
-
-[linuxmint:5:gs]
-packages=gs-esp
-
-[linuxmint:5:libcrypto]
-packages=openssl
-
-[linuxmint:5:libjpeg]
-packages=libjpeg62-dev
-
-[linuxmint:5:libnetsnmp-devel]
-packages=libsnmp-dev
-
-[linuxmint:5:libpthread]
-packages=build-essential
-
-[linuxmint:5:libtool]
-packages=libtool
-
-[linuxmint:5:libusb]
-packages=libusb-dev
-
-[linuxmint:5:make]
-packages=build-essential
-
-[linuxmint:5:pil]
-packages=python-imaging
-
-[linuxmint:5:ppdev]
-packages=
-commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppdev | sudo tee -a /etc/modules
-
-[linuxmint:5:pyqt]
-packages=python-qt3
-
-[linuxmint:5:python-devel]
-packages=python2.5-dev
-
-[linuxmint:5:pyqt4]
-packages=python-qt4
-
-[linuxmint:5:pyqt4-dbus]
-packages=python-qt4-dbus
-
-[linuxmint:5:python23]
-packages=python
-
-[linuxmint:5:python2x]
-packages=python
-
-[linuxmint:5:reportlab]
-packages=python-reportlab
-
-[linuxmint:5:sane]
-packages=libsane
-
-[linuxmint:5:sane-devel]
-packages=libsane-dev
-
-[linuxmint:5:scanimage]
-packages=sane-utils
-
-[linuxmint:5:xsane]
-packages=xsane
-
-[linuxmint:5:cups-ddk]
-packages=cupsddk,cupsddk-drivers
-
-[linuxmint:5:python-dbus]
-packages=python-dbus,python-gobject
-
-[linuxmint:5:dbus]
-packages=libdbus-1-dev
-
-[linuxmint:5:python-ctypes]
-packages=python-ctypes
-
-[linuxmint:5:cups-image]
-packages=libcupsys2-dev,cupsys-bsd
-
-# ********************
-[linuxmint:6]
-code_name=
-supported=0
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=2.8.7
-release_date=2008
-notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubunbtu installation media inserted in the drive.
-ppd_install=drv
-udev_mode_fix=1
-ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
-
-[linuxmint:6:cups]
-packages=libcupsys2
-
-[linuxmint:6:cups-devel]
-packages=libcupsys2-dev,cupsys-bsd
-
-[linuxmint:6:gcc]
-packages=build-essential
-
-[linuxmint:6:gs]
-packages=gs-esp
-
-[linuxmint:6:libcrypto]
-packages=openssl
-
-[linuxmint:6:libjpeg]
-packages=libjpeg62-dev
-
-[linuxmint:6:libnetsnmp-devel]
-packages=libsnmp-dev
-
-[linuxmint:6:libpthread]
-packages=build-essential
-
-[linuxmint:6:libtool]
-packages=libtool
-
-[linuxmint:6:libusb]
-packages=libusb-dev
-
-[linuxmint:6:make]
-packages=build-essential
-
-[linuxmint:6:pil]
-packages=python-imaging
-
-[linuxmint:6:ppdev]
-packages=
-commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppdev | sudo tee -a /etc/modules
-
-[linuxmint:6:pyqt]
-packages=python-qt3
-
-[linuxmint:6:python-devel]
-packages=python2.5-dev
-
-[linuxmint:6:pyqt4]
-packages=python-qt4
-
-[linuxmint:6:pyqt4-dbus]
-packages=python-qt4-dbus
-
-[linuxmint:6:python23]
-packages=python
-
-[linuxmint:6:python2x]
-packages=python
-
-[linuxmint:6:reportlab]
-packages=python-reportlab
-
-[linuxmint:6:sane]
-packages=libsane
-
-[linuxmint:6:sane-devel]
-packages=libsane-dev
-
-[linuxmint:6:scanimage]
-packages=sane-utils
-
-[linuxmint:6:xsane]
-packages=xsane
-
-[linuxmint:6:cups-ddk]
-packages=cupsddk,cupsddk-drivers
-
-[linuxmint:6:python-dbus]
-packages=python-dbus,python-gobject
-
-[linuxmint:6:dbus]
-packages=libdbus-1-dev
-
-[linuxmint:6:python-ctypes]
-packages=python-ctypes
-
-[linuxmint:6:cups-image]
-packages=libcupsys2-dev,cupsys-bsd
-
-# ****************************************
-
-[linuxmint:7]
-code_name=Gloria
-supported=0
-scan_supported=1
-fax_supported=1
-pcard_supported=1
-network_supported=1
-parallel_supported=1
-usb_supported=1
-packaged_version=3.9.2
-release_date=2009
-notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
-ppd_install=drv
-udev_mode_fix=1
-ppd_dir=/usr/share/ppd/HP
-fix_ppd_symlink=0
-drv_dir=/usr/share/cups/drv/HP
-ui_toolkit=qt4
-policykit=1
-native_cups=1
-
-[linuxmint:7:cups]
-packages=libcups2
-
-[linuxmint:7:cups-devel]
-packages=libcups2-dev,cupsys-bsd
-
-[linuxmint:7:gcc]
-packages=build-essential
-
-[linuxmint:7:gs]
-packages=gs-esp
-
-[linuxmint:7:libcrypto]
-packages=openssl
-
-[linuxmint:7:libjpeg]
-packages=libjpeg62-dev
-
-[linuxmint:7:libnetsnmp-devel]
-packages=libsnmp-dev
-
-[linuxmint:7:libpthread]
-packages=build-essential
-
-[linuxmint:7:libtool]
-packages=libtool
-
-[linuxmint:7:libusb]
-packages=libusb-dev
-
-[linuxmint:7:make]
-packages=build-essential
-
-[linuxmint:7:pil]
-packages=python-imaging
-
-[linuxmint:7:ppdev]
-packages=
-commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppdev | sudo tee -a /etc/modules
-
-[linuxmint:7:pyqt]
-packages=python
-
-[linuxmint:7:python-devel]
-packages=python-dev
-
-[linuxmint:7:pyqt4]
-packages=python-qt4
-
-[linuxmint:7:pyqt4-dbus]
-packages=python-qt4-dbus
-
-[linuxmint:7:python23]
-packages=python
-
-[linuxmint:7:python2x]
-packages=python
-
-[linuxmint:7:reportlab]
-packages=python-reportlab
-
-[linuxmint:7:sane]
-packages=libsane
-
-[linuxmint:7:sane-devel]
-packages=libsane-dev
-
-[linuxmint:7:scanimage]
-packages=sane-utils
-
-[linuxmint:7:xsane]
-packages=xsane
-
-[linuxmint:7:cups-ddk]
-packages=cupsddk,cupsddk-drivers
-
-[linuxmint:7:python-dbus]
-packages=python-dbus,python-gobject
-
-[linuxmint:7:dbus]
-packages=libdbus-1-dev
-
-[linuxmint:7:python-ctypes]
-packages=python-ctypes
-
-[linuxmint:7:cups-image]
-packages=libcupsimage2-dev
-
-[linuxmint:7:policykit]
-packages=policykit,policykit-gnome
-
-[linuxmint:7:python-notify]
-packages=python-notify
-
-# ********************
-
 [linuxmint:8]
 code_name=Helena
-supported=0
+supported=1
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -8048,7 +5104,7 @@ drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 native_cups=1
 acl_rules=1
-add_user_to_group=-a -Glp
+add_user_to_group=-a -Glp,lpadmin
 
 [linuxmint:8:cups]
 packages=libcups2
@@ -8078,7 +5134,7 @@ packages=build-essential
 packages=libtool
 
 [linuxmint:8:libusb]
-packages=libusb-dev
+packages=libusb-1.0.0-dev
 
 [linuxmint:8:make]
 packages=build-essential
@@ -8141,11 +5197,14 @@ packages=policykit-1,policykit-1-gnome
 [linuxmint:8:python-notify]
 packages=python-notify
 
+[linuxmint:8:network]
+packages=wget
+
 # ********************
 
 [linuxmint:9]
 code_name=Isadora
-supported=0
+supported=1
 scan_supported=1
 fax_supported=1
 pcard_supported=1
@@ -8238,7 +5297,7 @@ drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 native_cups=1
 acl_rules=1
-add_user_to_group=-a -Glp
+add_user_to_group=-a -Glp,lpadmin
 
 [linuxmint:12:cups]
 packages=libcups2
@@ -8268,7 +5327,7 @@ packages=build-essential
 packages=libtool
 
 [linuxmint:12:libusb]
-packages=libusb-dev
+packages=libusb-1.0.0-dev
 
 [linuxmint:12:make]
 packages=build-essential
@@ -8323,13 +5382,27 @@ packages=libdbus-1-dev
 packages=libcupsimage2-dev
 
 [linuxmint:12:cups-ddk]
-packages=cups
+packages=cups,libcupsimage2-dev
 
 [linuxmint:12:policykit]
 packages=policykit-1,policykit-1-gnome
 
 [linuxmint:12:python-notify]
 packages=python-notify
+
+[linuxmint:12:network]
+packages=wget
+
+# ********************
+
+[linuxmint:13]
+code_name=Maya
+supported=1
+packaged_version=3.12.2
+release_date=2012
+same_as_version=12
+
+
 
 # ****************************************
 
@@ -8462,6 +5535,9 @@ packages=
 [linpus:9.5:cups-image]
 packages=
 
+[linpus:9.5:network]
+packages=wget
+
 # ********************
 [linpus:9.4]
 code_name=Linpus
@@ -8572,6 +5648,9 @@ packages=
 [linpus:9.4:cups-image]
 packages=
 
+[linpus:9.4:network]
+packages=wget
+
 # ****************************************
 [gos]
 index=24
@@ -8640,7 +5719,7 @@ packages=build-essential
 packages=libtool
 
 [gos:8.04.1:libusb]
-packages=libusb-dev
+packages=libusb-1.0-0-dev
 
 [gos:8.04.1:make]
 packages=build-essential
@@ -8699,6 +5778,9 @@ packages=python-ctypes
 
 [gos:8.04.1:cups-image]
 packages=libcupsys2-dev,cupsys-bsd
+
+[gos:8.04.1:network]
+packages=wget
 
 # ****************************************
 [boss]
@@ -8768,7 +5850,7 @@ packages=libc6
 packages=libtool
 
 [boss:3.0:libusb]
-packages=libusb-dev
+packages=libusb-1.0-0-dev
 
 [boss:3.0:make]
 packages=make
@@ -8827,6 +5909,9 @@ packages=python-ctypes
 
 [boss:3.0:cups-image]
 packages=libcupsimage2-dev
+
+[boss:3.0:network]
+packages=wget
 
 # ****************************************
 [lfs]
@@ -8896,7 +5981,7 @@ packages=libc6
 packages=libtool
 
 [lfs:6:libusb]
-packages=libusb-dev
+packages=libusb-1.0-0-dev
 
 [lfs:6:make]
 packages=make
@@ -8961,3 +6046,6 @@ packages=policykit
 
 [lfs:6:python-notify]
 packages=python-notify
+
+[lfs:6:network]
+packages=wget

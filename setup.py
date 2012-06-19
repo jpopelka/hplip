@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
@@ -597,9 +597,8 @@ else: # INTERACTIVE_MODE
                 log.error("Printer queue setup failed. Please restart CUPS and try again.")
                 sys.exit(1)
             else:
-                pass
-                # TODO:
-                #service.sendEvent(hpssd_sock, EVENT_CUPS_QUEUES_CHANGED, device_uri=print_uri)
+                # sending Event to add this device in hp-systray
+                utils.sendEvent(EVENT_CUPS_QUEUES_CHANGED,print_uri, printer_name)
 
 
         # ******************************* FAX QUEUE SETUP
@@ -758,9 +757,9 @@ else: # INTERACTIVE_MODE
                 log.error("Fax queue setup failed. Please restart CUPS and try again.")
                 sys.exit(1)
             else:
-                pass
-                # TODO:
-                #service.sendEvent(hpssd_sock, EVENT_CUPS_QUEUES_CHANGED, device_uri=fax_uri)
+                # sending Event to add this device in hp-systray
+                utils.sendEvent(EVENT_CUPS_QUEUES_CHANGED,fax_uri, fax_name)
+
 
 
         # ******************************* FAX HEADER SETUP

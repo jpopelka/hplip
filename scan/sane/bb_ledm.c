@@ -34,6 +34,8 @@
 
 # define _BUG(args...) syslog(LOG_ERR, __FILE__ " " STRINGIZE(__LINE__) ": " args)
 
+//# define  BB_LEDM_DEBUG
+
 # ifdef BB_LEDM_DEBUG
    # define _DBG(args...) syslog(LOG_INFO, __FILE__ " " STRINGIZE(__LINE__) ": " args)
 # else
@@ -799,8 +801,8 @@ int bb_is_paper_in_adf(struct ledm_session *ps) /* 0 = no paper in adf, 1 = pape
   pbb->http_handle = 0;
   _DBG("bb_is_paper_in_adf .job_id=%d buf=%s\n", ps->job_id, buf);
   if(strstr(buf, ADF_LOADED)) return 1;
-  if(strstr(buf, ADF_EMPTY) && strstr(buf, SCANNER_BUSY_WITH_SCAN_JOB)) return 2;
-  else return 0;
+  if(strstr(buf, ADF_EMPTY)) return 0;
+  else return -1;
 }
 
 

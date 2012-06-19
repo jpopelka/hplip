@@ -214,6 +214,15 @@ if len(param) < 1:
     sys.exit()
 
 try:
+    #*****************************CHECK SMART INSTALL
+    try:
+        import hpmudext
+    except:
+        log.error("Failed to import hpmudext")
+    else:
+        hpmudext.handle_smartinstall()
+        
+
     # ******************************* MAKEURI
     if param:
         device_uri, sane_uri, fax_uri = device.makeURI(param)
@@ -250,7 +259,6 @@ try:
             printer_name = ""
             username = ""
             send_message( device_uri, printer_name, EVENT_ADD_PRINTQUEUE, username, 0,'')
-            send_message( device_uri, printer_name, EVENT_DIAGNOSE_PRINTQUEUE, username, 0,'')
     else:
         if start_systray():
             printer_name = ""
@@ -261,8 +269,11 @@ try:
     i =0
     while i <24:
         time.sleep(5)
+          
         get_already_added_queues(norm_model, serial, 'hpfax',remove_non_hp_config)
         get_already_added_queues(norm_model, serial, 'hp',remove_non_hp_config)
+        if i == 0:
+            send_message( device_uri, printer_name, EVENT_DIAGNOSE_PRINTQUEUE, username, 0,'')
         i += 1
 
 

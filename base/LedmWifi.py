@@ -22,7 +22,22 @@
 # StdLib
 import time
 import cStringIO
-import xml.parsers.expat
+
+from base.g import *
+try:
+   import xml.parsers.expat
+except ImportError,e:
+   log.info("\n")
+   log.error("Failed to import xml.parsers.expat(%s).\nThis may be due to the incompatible version of python-xml package.\n"%(e))
+   if "undefined symbol" in str(e):
+       log.info(log.blue("Please re-install compatible version (other than 2.7.2-7.14.1) due to bug reported at 'https://bugzilla.novell.com/show_bug.cgi?id=766778'."))
+       log.info(log.blue("\n        Run the following commands in root mode to change the python-xml package.(i.e Installing 2.7.2-7.1.2)"))
+       log.info(log.blue("\n        Using zypper:\n        'zypper remove python-xml'\n        'zypper install python-xml-2.7.2-7.1.2'"))
+       log.info(log.blue("\n        Using apt-get:\n        'apt-get remove python-xml'\n        'apt-get install python-xml-2.7.2-7.1.2'"))
+       log.info(log.blue("\n        Using yum:\n        'yum remove python-xml'\n        'yum install python-xml-2.7.2-7.1.2'"))
+
+   sys.exit(1)
+
 from string import *
 
 # Local
@@ -69,7 +84,7 @@ def getAdaptorList(dev):
                 ret['adaptorstate-0' % a] = ''
                 ret['adaptortype-0' % a] = params['io:adapters-io:adapter-io:hardwareconfig-dd:deviceconnectivityporttype']                
             except KeyError, e:
-                log.error("Missing response key: %s" % e) 
+                log.debug("Missing response key: %s" % e)   # changed from error to debug
         else:
             for a in xrange(elementCount):
                 try:
@@ -79,7 +94,7 @@ def getAdaptorList(dev):
             	    ret['adaptorstate-%d' % a] = ''
             	    ret['adaptortype-%d' % a] = params['io:adapters-io:adapter-io:hardwareconfig-dd:deviceconnectivityporttype-%d' % a]            	    
                 except KeyError, e:
-                    log.error("Missing response key: %s" % e)
+                    log.debug("Missing response key: %s" % e)    #changed from error to debug
     return ret   
 
 
@@ -155,7 +170,11 @@ def performScan(dev, adapterName, ssid=None):
                     ret['ssid-0'] = u'(unknown)'
                 else:
                     ret['ssid-0'] = ssid
-                ret['bssid-0'] = str(params['io:wifinetworks-io:wifinetwork-wifi:bssid']).decode("hex")
+                try:
+                    ret['bssid-0'] = str(params['io:wifinetworks-io:wifinetwork-wifi:bssid']).decode("hex")
+                except:
+                    ret['bssid-0'] = params['io:wifinetworks-io:wifinetwork-wifi:bssid']
+                                   
                 ret['channel-0'] = params['io:wifinetworks-io:wifinetwork-wifi:channel']
                 ret['communicationmode-0'] = params['io:wifinetworks-io:wifinetwork-wifi:communicationmode']
                 ret['dbm-0'] = params['io:wifinetworks-io:wifinetwork-io:signalinfo-wifi:dbm']
@@ -166,12 +185,20 @@ def performScan(dev, adapterName, ssid=None):
         else:
             for a in xrange(elementCount):
                 try:                
-                    ssid = str(params['io:wifinetworks-io:wifinetwork-wifi:ssid-%d' % a]).decode("hex")
+                    try:
+                        ssid = str(params['io:wifinetworks-io:wifinetwork-wifi:ssid-%d' % a]).decode("hex")
+                        #ssid = params['io:wifinetworks-io:wifinetwork-wifi:ssid-%d' % a]
+                    except:
+                        ssid = params['io:wifinetworks-io:wifinetwork-wifi:ssid-%d' % a]
+                        #ssid = str(params['io:wifinetworks-io:wifinetwork-wifi:ssid-%d' % a]).decode("hex")
                     if not ssid:
                         ret['ssid-%d' % a] = u'(unknown)'
                     else:
                         ret['ssid-%d' % a] = ssid
-            	    ret['bssid-%d' % a] = str(params['io:wifinetworks-io:wifinetwork-wifi:bssid-%d' % a]).decode("hex")
+                    try:
+                        ret['bssid-%d' % a] = str(params['io:wifinetworks-io:wifinetwork-wifi:bssid-%d' % a]).decode("hex")
+                    except:
+                        ret['bssid-%d' % a] = params['io:wifinetworks-io:wifinetwork-wifi:bssid-%d' % a]
             	    ret['channel-%d' % a] = params['io:wifinetworks-io:wifinetwork-wifi:channel-%d' % a]
             	    ret['communicationmode-%d' % a] = params['io:wifinetworks-io:wifinetwork-wifi:communicationmode-%d' % a]
             	    ret['dbm-%d' % a] = params['io:wifinetworks-io:wifinetwork-io:signalinfo-wifi:dbm-%d' % a]
@@ -190,8 +217,9 @@ def performScan(dev, adapterName, ssid=None):
 def getIPConfiguration(dev, adapterName):
     ip, hostname, addressmode, subnetmask, gateway, pridns, sec_dns = \
         '0.0.0.0', 'Unknown', 'Unknown', '0.0.0.0', '0.0.0.0', '0.0.0.0', '0.0.0.0'
-    
+    protocol = 'old'
     URI = LEDM_WIFI_BASE_URI + adapterName + "/Protocols"
+    #URI = "/DevMgmt/IOConfigDyn.xml"
     params,code,elementCount = {},HTTP_ERROR,0  
     max_tries = 0
 
@@ -202,29 +230,67 @@ def getIPConfiguration(dev, adapterName):
             break 
      
     if code != HTTP_OK:
+        max_tries = 0
+        URI = "/DevMgmt/IOConfigDyn.xml"
+        while max_tries < MAX_RETRIES:
+            max_tries +=1
+            params,code,elementCount = readXmlDataFromURI(dev,URI,'<iocfgdyn2:IOConfigDyn', '<dd3:IOAdaptorConfig')
+            if code == HTTP_OK:
+                protocol = 'new'
+                break 
+    if code != HTTP_OK:
         log.error("Request Failed With Response Code %d" %code)
         return ip, hostname, addressmode, subnetmask, gateway, pridns, sec_dns
-  
-    if params is not None and code == HTTP_OK:
-        try:
-            ip = params['io:protocols-io:protocol-io:addresses-io:ipv4addresses-io:ipv4address-dd:ipv4address']            
-            subnetmask = params['io:protocols-io:protocol-io:addresses-io:ipv4addresses-io:ipv4address-dd:subnetmask']
-            gateway = params['io:protocols-io:protocol-io:addresses-io:ipv4addresses-io:ipv4address-dd:defaultgateway']
+
+    if protocol == 'old':
+        if params is not None and code == HTTP_OK:
+            try:
+                ip = params['io:protocols-io:protocol-io:addresses-io:ipv4addresses-io:ipv4address-dd:ipv4address']            
+                subnetmask = params['io:protocols-io:protocol-io:addresses-io:ipv4addresses-io:ipv4address-dd:subnetmask']
+                gateway = params['io:protocols-io:protocol-io:addresses-io:ipv4addresses-io:ipv4address-dd:defaultgateway']
             
-            if 'DHCP' in params['io:protocols-io:protocol-io:addresses-io:ipv4addresses-io:ipv4address-dd:configmethod']:
-                addressmode = 'dhcp'
-            else:
-                addressmode = 'autoip'    
-            if elementCount ==1:
-                pridns = params['io:protocols-io:protocol-dd:dnsserveripaddress']
-                sec_dns = params['io:protocols-io:protocol-dd:secondarydnsserveripaddress']          
-            for a in xrange(elementCount):
-                if params['io:protocols-io:protocol-dd:dnsserveripaddress-%d' %a] !="::":
-                    pridns = params['io:protocols-io:protocol-dd:dnsserveripaddress-%d' %a]
-                    sec_dns = params['io:protocols-io:protocol-dd:secondarydnsserveripaddress-%d' %a]
-                    break
-        except KeyError, e:
-            log.error("Missing response key: %s" % str(e))        
+                if 'DHCP' in params['io:protocols-io:protocol-io:addresses-io:ipv4addresses-io:ipv4address-dd:configmethod']:
+                    addressmode = 'dhcp'
+                else:
+                    addressmode = 'autoip'    
+                    if elementCount ==1:
+                        pridns = params['io:protocols-io:protocol-dd:dnsserveripaddress']
+                        sec_dns = params['io:protocols-io:protocol-dd:secondarydnsserveripaddress']          
+                        for a in xrange(elementCount):
+                            if params['io:protocols-io:protocol-dd:dnsserveripaddress-%d' %a] !="::":
+                                pridns = params['io:protocols-io:protocol-dd:dnsserveripaddress-%d' %a]
+                                sec_dns = params['io:protocols-io:protocol-dd:secondarydnsserveripaddress-%d' %a]
+                                break
+            except KeyError, e:
+                log.error("Missing response key: %s" % str(e))
+    else:
+        if params is not None and code == HTTP_OK:
+            try:
+            #ip = params['io:protocols-io:protocol-io:addresses-io:ipv4addresses-io:ipv4address-dd:ipv4address']
+                try:
+                    ip = params['iocfgdyn2:ioconfigdyn-dd3:ioadaptorconfig-dd3:networkadaptorconfig-dd3:ipversionconfig-dd3:ipconfig-dd:ipaddress']
+                except:
+                    ip = params['iocfgdyn2:ioconfigdyn-dd3:ioadaptorconfig-dd3:networkadaptorconfig-dd3:ipversionconfig-dd3:ipconfig-dd:ipaddress-0']
+            #subnetmask = params['io:protocols-io:protocol-io:addresses-io:ipv4addresses-io:ipv4address-dd:subnetmask']
+                    subnetmask = params['iocfgdyn2:ioconfigdyn-dd3:ioadaptorconfig-dd3:networkadaptorconfig-dd3:ipversionconfig-dd3:ipconfig-dd:subnetmask']
+            #gateway = params['io:protocols-io:protocol-io:addresses-io:ipv4addresses-io:ipv4address-dd:defaultgateway']
+                    gateway = params['iocfgdyn2:ioconfigdyn-dd3:ioadaptorconfig-dd3:networkadaptorconfig-dd3:ipversionconfig-dd3:ipconfig-dd:defaultgateway']
+            
+            #if 'DHCP' in params['io:protocols-io:protocol-io:addresses-io:ipv4addresses-io:ipv4address-dd:configmethod']:
+                    if 'DHCP' in params['iocfgdyn2:ioconfigdyn-dd3:ioadaptorconfig-dd3:networkadaptorconfig-dd3:ipversionconfig-dd3:ipconfig-dd:ipconfigmethod-0']:
+                        addressmode = 'dhcp'
+                    else:
+                        addressmode = 'autoip'    
+            #if elementCount ==1:
+            #    pridns = params['io:protocols-io:protocol-dd:dnsserveripaddress']
+            #    sec_dns = params['io:protocols-io:protocol-dd:secondarydnsserveripaddress']          
+            #for a in xrange(elementCount):
+            #    if params['io:protocols-io:protocol-dd:dnsserveripaddress-%d' %a] !="::":
+            #        pridns = params['io:protocols-io:protocol-dd:dnsserveripaddress-%d' %a]
+            #        sec_dns = params['io:protocols-io:protocol-dd:secondarydnsserveripaddress-%d' %a]
+            #        break
+            except KeyError, e:
+                log.error("Missing response key: %s" % str(e))        
 
     return ip, hostname, addressmode, subnetmask, gateway, pridns, sec_dns  
 
@@ -401,7 +467,7 @@ def readXmlDataFromURI(dev,URI,xmlRootNode,xmlChildNode,timeout=5):
     	try:
             params = utils.XMLToDictParser().parseXML(repstr)            
         except xml.parsers.expat.ExpatError, e:
-            log.error("XML parser failed: %s" % e) 
+            log.debug("XML parser failed: %s" % e)  #changed from error to debug 
 
     return params,code,elementCount
 

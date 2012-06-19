@@ -25,12 +25,13 @@ import os
 import os.path
 import re
 import sys
+from subprocess import Popen, PIPE
 
 # Local
 from base.g import *
 from base import utils
 
-
+ver1_pat = re.compile("""(\d+\.\d+\.\d+)""", re.IGNORECASE)
 ver_pat = re.compile("""(\d+.\d+)""", re.IGNORECASE)
 proc_pat = re.compile(r"""(\d+)""", re.I)
 
@@ -221,3 +222,165 @@ def check_lsmod(module):
         status, mod_output = utils.run(os.path.join(lsmod, 'lsmod'), log_output=False)
 
     return mod_output.find(module) >= 0
+
+def check_version(inst_ver_str, min_ver_str='0.0'):
+    log.debug("Checking: installed ver=%s  min ver=%s" % (inst_ver_str, min_ver_str))
+    min_ver = 0
+    if min_ver_str != '-':
+        match_obj=ver_pat.search(min_ver_str)
+        try:
+            ver = match_obj.group(1)
+        except AttributeError:
+            ver = ''
+        try:
+            min_ver = float(ver)
+        except ValueError:
+            min_ver = 0
+
+    inst_ver = 0
+    if inst_ver_str != '-':
+        match_obj=ver_pat.search(inst_ver_str)
+        try:
+            ver = match_obj.group(1)
+        except AttributeError:
+            ver = ''
+        try:
+            inst_ver = float(ver)
+        except ValueError:
+            inst_ver = 0
+
+
+    if inst_ver < min_ver:
+        log.debug("Found, but newer version required.")
+        return False
+    else:
+        log.debug("Found.")
+        return True
+
+
+def get_version(cmd,def_ver='-'):
+    log.debug("Checking: %s" % (cmd))
+    status, output = utils.run(cmd)
+
+    if status != 0:
+        log.debug("Not found!")
+        return def_ver
+    else:
+        try:
+            line = output.splitlines()[0]
+        except IndexError:
+            line = ''
+            
+        log.debug(line)
+        match_obj = ver1_pat.search(line)
+        try:
+            ver = match_obj.group(1)
+        except AttributeError:
+            match_obj = ver_pat.search(line)
+            try:
+                ver = match_obj.group(1)
+            except AttributeError:
+                return def_ver
+            else:
+                return ver
+        else:
+            return ver
+
+def get_python_dbus_ver():
+    try:
+        import dbus
+        dbus_version ="-"
+        try:
+            dbus_version = dbus.__version__
+        except AttributeError:
+            try:
+                dbus_version = '.'.join([str(x) for x in dbus.version])
+            except AttributeError:
+                dbus_version = '-'
+    except ImportError:
+        dbus_version = '-'
+    return dbus_version
+    
+def get_pyQt4_version():
+    log.debug("Checking PyQt 4.x version...")
+    ver ='-'
+    # PyQt 4
+    try:
+        import PyQt4
+    except ImportError:
+        ver='-'
+    else:
+        from PyQt4 import QtCore
+        ver = QtCore.PYQT_VERSION_STR
+    return ver
+
+def get_reportlab_version():
+    try:
+        log.debug("Trying to import 'reportlab'...")
+        import reportlab
+        ver = reportlab.Version
+    except ImportError:
+        return '-'
+    else:
+        return ver
+
+def  get_pyQt_version():
+    log.debug("Checking PyQt 3.x version...")
+    # PyQt 3
+    try:
+        import qt
+    except ImportError:
+        return '-'
+    else:
+        #check version of PyQt
+        try:
+            pyqtVersion = qt.PYQT_VERSION_STR
+        except AttributeError:
+            pyqtVersion = qt.PYQT_VERSION
+                
+        while pyqtVersion.count('.') < 2:
+            pyqtVersion += '.0'
+                
+        return pyqtVersion
+
+def get_xsane_version():
+    installed_ver='-'
+    try:
+        p1 = Popen(["xsane", "--version","2",">","/dev/null"], stdout=PIPE)            
+    except:
+        output =None
+    else:
+        output=p1.communicate()[0]
+
+    if output:          
+        xsane_ver_pat =re.compile('''xsane-(.*) \(c\).*''')
+        xsane_ver_info = output.splitlines()[0]
+        if xsane_ver_pat.search(xsane_ver_info):
+            installed_ver = xsane_ver_pat.search(xsane_ver_info).group(1)
+    return installed_ver
+
+def get_pil_version():
+    try:
+        import Image
+    except ImportError:
+        return '-'
+    else:
+         return Image.VERSION
+
+def get_libpthread_version():
+    try:
+        import sys, ctypes, ctypes.util
+    except ImportError:
+        return '-'
+    else:
+        LIBC = ctypes.CDLL(ctypes.util.find_library('c'), use_errno=True)
+        LIBC.gnu_get_libc_version.restype = ctypes.c_char_p
+        return LIBC.gnu_get_libc_version()
+
+def get_python_xml_version():
+    try:
+        import xml.parsers.expat
+    except ImportError:
+        return '-'
+    else:
+         return '.'.join([str(x) for x in xml.parsers.expat.version_info])

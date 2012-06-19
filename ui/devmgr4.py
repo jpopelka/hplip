@@ -916,8 +916,9 @@ class DevMgr4(DevMgr4_base):
                     devices[d] = dev
 
                 log.debug("Removals (2): %s" % ','.join(removals))
-
+                removed_device=None
                 for d in removals:
+                    removed_device = d
                     item = self.DeviceList.firstItem()
                     log.debug("removing: %s" % d)
 
@@ -939,6 +940,9 @@ class DevMgr4(DevMgr4_base):
                 self.DeviceList.adjustItems()
                 self.DeviceList.updateGeometry()
                 qApp.processEvents()
+                # sending Event to remove this device from hp-systray
+                if removed_device:
+                    utils.sendEvent(EVENT_CUPS_QUEUES_CHANGED,removed_device, "")
 
                 if len(devices):
                     for tab in self.TabIndex:

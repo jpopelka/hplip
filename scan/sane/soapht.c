@@ -699,6 +699,11 @@ SANE_Status soapht_control_option(SANE_Handle handle, SANE_Int option, SANE_Acti
                   break;
                }
             }
+            if (stat != SANE_STATUS_GOOD)
+            {
+                ps->currentResolution = ps->resolutionList[1];
+                stat = SANE_STATUS_GOOD;
+            }
          }
          else
          {  /* Set default. */
@@ -1144,8 +1149,4 @@ void soapht_cancel(SANE_Handle handle)
    }
    ps->bb_end_scan(ps, 0);
 } /* soapht_cancel */
-
-
-
-
 

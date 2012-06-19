@@ -552,11 +552,16 @@ SANE_Status ledm_control_option(SANE_Handle handle, SANE_Int option, SANE_Action
                if (ps->resolutionList[i] == *int_value)
                {
                   ps->currentResolution = *int_value;
-	          if(ps->currentResolution == 4800) SendScanEvent(ps->uri, EVENT_SIZE_WARNING);
+                  if(ps->currentResolution == 4800) SendScanEvent(ps->uri, EVENT_SIZE_WARNING);
                   mset_result |= SANE_INFO_RELOAD_PARAMS;
                   stat = SANE_STATUS_GOOD;
                   break;
                }
+            }
+            if (stat != SANE_STATUS_GOOD)
+            {
+                ps->currentResolution = ps->resolutionList[1];
+                stat = SANE_STATUS_GOOD;
             }
          }
          else

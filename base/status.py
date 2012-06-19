@@ -24,7 +24,21 @@ from __future__ import division
 # Std Lib
 import struct
 import cStringIO
-import xml.parsers.expat as expat
+from base.g import *
+try:
+   import xml.parsers.expat as expat
+except ImportError,e:
+   log.info("\n")
+   log.error("Failed to import xml.parsers.expat(%s).\nThis may be due to the incompatible version of python-xml package.\n"%(e))
+   if "undefined symbol" in str(e):
+       log.info(log.blue("Please re-install compatible version (other than 2.7.2-7.14.1) due to bug reported at 'https://bugzilla.novell.com/show_bug.cgi?id=766778'."))
+       log.info(log.blue("\n        Run the following commands in root mode to change the python-xml package.(i.e Installing 2.7.2-7.1.2)"))
+       log.info(log.blue("\n        Using zypper:\n        'zypper remove python-xml'\n        'zypper install python-xml-2.7.2-7.1.2'"))
+       log.info(log.blue("\n        Using apt-get:\n        'apt-get remove python-xml'\n        'apt-get install python-xml-2.7.2-7.1.2'"))
+       log.info(log.blue("\n        Using yum:\n        'yum remove python-xml'\n        'yum install python-xml-2.7.2-7.1.2'"))
+
+   sys.exit(1)
+
 import re
 import urllib
 try:
@@ -1556,20 +1570,32 @@ def StatusType10(func): # Low End Data Model
                     if state != "missing":
                         try:
                            ink_level = int(e.find("ConsumablePercentageLevelRemaining").text)
+                           if ink_level == 0:
+                               state = "empty"
+                           elif ink_level <=10:
+                               state = "low"
                         except:
                            ink_level = 0
+                elif type == "printhead":
+                     continue; #No need of adding this agent.
                 else:
                     ink_type = ''
                     if state == "ok":
                         ink_level = 100
+                
+                try:
+                    agent_sku = e.find("ConsumableSelectibilityNumber").text
+                except:
+                    agent_sku = ''
 
-                log.debug("type '%s' state '%s' ink_type '%s' ink_level %d" % (type, state, ink_type, ink_level))
+                log.debug("type '%s' state '%s' ink_type '%s' ink_level %d agent_sku = %s" % (type, state, ink_type, ink_level,agent_sku))
 
                 entry = { 'kind' : element_type10_xlate.get(type, AGENT_KIND_NONE),
                           'type' : pen_type10_xlate.get(ink_type, AGENT_TYPE_NONE),
                           'health' : pen_health10_xlate.get(state, AGENT_HEALTH_OK),
                           'level' : int(ink_level),
-                          'level-trigger' : pen_level10_xlate.get(state, AGENT_LEVEL_TRIGGER_SUFFICIENT_0)
+                          'level-trigger' : pen_level10_xlate.get(state, AGENT_LEVEL_TRIGGER_SUFFICIENT_0),
+                          'agent-sku' : agent_sku
                         }
 
                 log.debug("%s" % entry)
@@ -1691,5 +1717,52 @@ def StatusType10(func): # Low End Data Model
             status_block['status-code'] = STATUS_PRINTER_CARTRIDGE_MISSING
         elif e.text == "missingPrintHead":
             status_block['status-code'] = STATUS_PRINTER_PRINTHEAD_MISSING
+
+
+		#Alert messages for Pentane products RQ 8888
+        elif e.text == "scannerADFMispick":
+            status_block['status-code'] = STATUS_SCANNER_ADF_MISPICK
+			
+        elif e.text == "mediaTooShortToAutoDuplex":
+            status_block['status-code'] = STATUS_PRINTER_PAPER_TOO_SHORT_TO_AUTODUPLEX
+			
+        elif e.text == "insertOrCloseTray": 
+            status_block['status-code'] = STATUS_PRINTER_TRAY_2_3_DOOR_OPEN
+			
+        elif e.text == "failedPrintHead" or e.text == "incompatiblePrintHead":
+            status_block['status-code'] =  STATUS_PRINTER_PRINTHEAD_MISSING 
+			
+        elif e.text == "inkTooLowToPrime":
+            status_block['status-code'] = STATUS_PRINTER_INK_TOO_LOW_TO_PRIME
+			
+        elif e.text == "cartridgeVeryLow":
+            status_block['status-code'] = STATUS_PRINTER_VERY_LOW_ON_INK
+			
+        elif e.text == "wasteMarkerCollectorAlmostFull":
+            status_block['status-code'] = STATUS_PRINTER_SERVICE_INK_CONTAINER_ALMOST_FULL
+			
+        elif e.text == "wasteMarkerCollectorFull":
+            status_block['status-code'] = STATUS_PRINTER_SERVICE_INK_CONTAINER_FULL			
+			
+        elif e.text == "wasteMarkerCollectorFullPrompt":
+            status_block['status-code'] = STATUS_PRINTER_SERVICE_INK_CONTAINER_FULL_PROMPT
+			
+        elif e.text == "missingDuplexer":
+            status_block['status-code'] = STATUS_PRINTER_DUPLEX_MODULE_MISSING
+
+        elif e.text == "printBarStall":
+            status_block['status-code'] = STATUS_PRINTER_PRINTHEAD_JAM
+
+        elif e.text == "outputBinClosed":
+            status_block['status-code'] = STATUS_PRINTER_CLEAR_OUTPUT_AREA
+
+        elif e.text == "outputBinOpened":
+            status_block['status-code'] = STATUS_PRINTER_CLEAR_OUTPUT_AREA
+
+        elif e.text == "reseatDuplexer":
+            status_block['status-code'] = STATUS_PRINTER_RESEAT_DUPLEXER
+
+        elif e.text == "unexpectedTypeInTray":
+            status_block['status-code'] = STATUS_PRINTER_MEDIA_TYPE_MISMATCH
 
     return status_block

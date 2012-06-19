@@ -79,7 +79,7 @@ if mode == GUI_MODE:
             sys.exit(1)
 
         app = QApplication(sys.argv)
-        core = core_install.CoreInstall()
+        core = core_install.CoreInstall(core_install.MODE_CHECK)
         plugin_sts = core.check_for_plugin()
         if plugin_sts == PLUGIN_INSTALLED:
             log.info("Device Plugin is already installed")

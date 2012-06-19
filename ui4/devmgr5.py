@@ -418,7 +418,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
 
             elif event.event_code == EVENT_SYSTEMTRAY_EXIT:
                 log.debug("EVENT_SYSTEMTRAY_EXIT")
-                log.error("HPLIP Status Service was closed. HPLIP Device Manager will now exit.")
+                log.warn("HPLIP Status Service was closed. HPLIP Device Manager will now exit.")
                 self.close()
 
             elif event.event_code == EVENT_RAISE_DEVICE_MANAGER:
@@ -667,8 +667,9 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                     device_list[d] = dev
 
                 log.debug("Removals (2): %s" % ','.join(removals))
-
+                removed_device=None
                 for d in removals:
+                    removed_device = d
                     index = self.DeviceList.count()-1
                     item = self.DeviceList.item(index)
                     log.debug("removing: %s" % d)
@@ -690,7 +691,10 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
 
                 self.DeviceList.updateGeometry()
                 qApp.processEvents()
-
+                # sending Event to remove this device from hp-systray
+                if removed_device:
+                    utils.sendEvent(EVENT_CUPS_QUEUES_CHANGED,removed_device, "")
+                
                 if len(device_list):
                     for tab in self.TabIndex:
                         self.Tabs.setTabEnabled(tab, True)
@@ -1477,26 +1481,21 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                 self.cur_device.status_type != STATUS_TYPE_NONE and \
                 self.cur_device.device_state != DEVICE_STATE_NOT_FOUND:
 
-                try:
-                    self.cur_device.sorted_supplies
-                except AttributeError:
-                    self.cur_device.sorted_supplies = []
+                self.cur_device.sorted_supplies = []
+                a = 1
+                while True:
+                    try:
+                        agent_type = int(self.cur_device.dq['agent%d-type' % a])
+                        agent_kind = int(self.cur_device.dq['agent%d-kind' % a])
+                        agent_sku = self.cur_device.dq['agent%d-sku' % a]
+                    except KeyError:
+                        break
+                    else:
+                        self.cur_device.sorted_supplies.append((a, agent_kind, agent_type, agent_sku))
 
-                if not self.cur_device.sorted_supplies:
-                    a = 1
-                    while True:
-                        try:
-                            agent_type = int(self.cur_device.dq['agent%d-type' % a])
-                            agent_kind = int(self.cur_device.dq['agent%d-kind' % a])
-                            agent_sku = self.cur_device.dq['agent%d-sku' % a]
-                        except KeyError:
-                            break
-                        else:
-                            self.cur_device.sorted_supplies.append((a, agent_kind, agent_type, agent_sku))
+                    a += 1
 
-                        a += 1
-
-                    self.cur_device.sorted_supplies.sort(lambda x, y: cmp(x[1], y[1]) or cmp(x[3], y[3]))
+                self.cur_device.sorted_supplies.sort(lambda x, y: cmp(x[1], y[1]) or cmp(x[3], y[3]))
 
                 self.SuppliesTable.setRowCount(len(self.cur_device.sorted_supplies))
                 self.SuppliesTable.setColumnCount(len(self.supplies_headers))

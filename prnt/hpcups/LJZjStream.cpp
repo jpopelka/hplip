@@ -664,20 +664,20 @@ DRIVER_ERROR    LJZjStream::encapsulateColor (RASTERDATA *raster)
 
 DRIVER_ERROR LJZjStream::preProcessRasterData(cups_raster_t **ppcups_raster, cups_page_header2_t* firstpage_cups_header, char* pSwapedPagesFileName)
 {
-    int current_page_number = 0;
+	int current_page_number = 0;
 	int fdEven = -1;
 	int fdOdd = -1;
 	int fdSwaped = -1;
-    int loopcntr = 0; 
-    DRIVER_ERROR driver_error = NO_ERROR;
-    cups_page_header2_t    cups_header;
+	int loopcntr = 0; 
+	DRIVER_ERROR driver_error = NO_ERROR;
+	cups_page_header2_t    cups_header;
 	cups_raster_t *swaped_pages_raster=NULL;
 	cups_raster_t *even_pages_raster=NULL;
 	cups_raster_t *odd_pages_raster = NULL;
 	BYTE* pPageDataBuffer = NULL;
-	char hpEvenPagesFile[] = "/tmp/hplipEvenPagesXXXXXX";
-	char hpOddPagesFile[] = "/tmp/hplipOddPagesXXXXXX";
-		
+	char hpEvenPagesFile[64] = "/tmp/hplipEvenPagesXXXXXX";
+	char hpOddPagesFile[64] = "/tmp/hplipOddPagesXXXXXX";
+	
 	if (1 != m_pJA->pre_process_raster || !cups_header.Duplex){		                                  
 		return  NO_ERROR;                                  
     }    
@@ -691,9 +691,20 @@ DRIVER_ERROR LJZjStream::preProcessRasterData(cups_raster_t **ppcups_raster, cup
 	fdOdd = mkstemp (hpOddPagesFile);
 	fdSwaped = mkstemp (pSwapedPagesFileName);
 	if (fdEven < 0 || fdOdd < 0 || fdSwaped < 0){
-		dbglog ("ERROR: Unable to open temp output files for writing\n");
-		driver_error = SYSTEM_ERROR;
-        goto bugout;
+		dbglog ("Warning: Unable to open temp output files for writing.so trying another location\n");
+                strncpy(hpEvenPagesFile,"/var/log/hp/hplipEvenPagesXXXXXX",sizeof(hpEvenPagesFile));
+                strncpy(hpOddPagesFile,"/var/log/hp/hplipOddPagesXXXXXX",sizeof(hpOddPagesFile));
+                strncpy(pSwapedPagesFileName,"/var/log/hp/hplipSwapedPagesXXXXXX",64);
+
+		fdEven = mkstemp (hpEvenPagesFile);
+		fdOdd = mkstemp (hpOddPagesFile);
+		fdSwaped = mkstemp (pSwapedPagesFileName);
+
+		if (fdEven < 0 || fdOdd < 0 || fdSwaped < 0){
+			dbglog ("ERROR: Unable to open temp output files for writing\n");		
+			driver_error = SYSTEM_ERROR;
+			goto bugout;
+		}
 	}
 
 	even_pages_raster = cupsRasterOpen(fdEven, CUPS_RASTER_WRITE);

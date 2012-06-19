@@ -1,7 +1,7 @@
 /*****************************************************************************\
-    hplipjs.c : HP CUPS filter for PostScript printers
+    hplipjs.c : HP Job Storage Pin Printing filter for PostScript printers
 
-    Copyright (c) 2008, Hewlett-Packard Co.
+    Copyright (c) 2012, Hewlett-Packard Co.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
     STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
     IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
+
+    AUTHOR: GAURAV SOOD
 \*****************************************************************************/
 
 #include <stdio.h>
@@ -210,6 +212,23 @@ fprintf (stderr, "DEBUG: Calling SendJobHoldCommands with %s\n", szJSOptionStrin
 }
 #endif
 
+char secpin[5];
+char* foo(char *szOptions)
+{
+	char szKeyInitials[][10] = {"HPFIDigit", "HPSEDigit", "HPTHDigit", "HPFTDigit"};
+	int i;
+
+	//char secpin[4];
+
+	for (i = 0; i <= 3; i++)
+		if (!(strstr(szOptions, szKeyInitials[i])))
+			secpin[i] = 48;
+		else 
+		secpin[i] = szOptions[strstr(szOptions, szKeyInitials[i]) - szOptions + 10];
+	secpin[i] = '\0';
+	return secpin;
+}
+
 int main (int argc, char **argv)
 {
 #ifdef TESTING
@@ -222,6 +241,12 @@ int main (int argc, char **argv)
     char   *szStartJob = "\x1B%-12345X@PJL JOBNAME=";
     char   *szUEL = "@PJL ENTER LANGUAGE=POSTSCRIPT\x0A";
     char   *szEndJob = "\x1B%-12345X@PJL EOJ\x0A\x1B%-12345X";
+    char   *szUserName = "@PJL SET USERNAME=";
+    char   *szJobName = "@PJL SET JOBNAME=";
+    char   *szNumCopies = "@PJL SET COPIES=";
+    char   *szHold = "@PJL SET HOLD=ON\x0A";
+    char   *szType = "@PJL SET HOLDTYPE=PRIVATE\x0A";
+    char   *szKey = "@PJL SET HOLDKEY=";
 
 /*
  *  Job storage command strings
@@ -273,10 +298,31 @@ int main (int argc, char **argv)
  *  job storage commands.
  */
 
-    if ((strstr (argv[5], "HOLD")))
+   
+
+if  (( strstr(argv[5], "HPPin")) &&  !(strstr (argv[5], "noHPPinPrnt")))
     {
         fprintf (stderr, "DEBUG: found HOLD option\n");
-        SendJobHoldCommands (argv[5], Outfd);
+	HPWrite (Outfd, szHold, strlen (szHold));
+	HPWrite (Outfd, szType, strlen (szType));
+	//pin = foo(argv[5]);
+        //SendJobHoldCommands (argv[5], Outfd);
+	HPWrite (Outfd, szKey, strlen(szKey));
+	sprintf (pBuffer, "\"%s\"\x0A", foo(argv[5]));
+	HPWrite (Outfd, pBuffer, strlen (pBuffer));
+
+	HPWrite (Outfd, szUserName, strlen(szUserName));
+	sprintf (pBuffer, "\"%s\"\x0A", argv[2]);
+	HPWrite (Outfd, pBuffer, strlen (pBuffer));
+
+	HPWrite (Outfd, szJobName, strlen(szJobName));
+	sprintf (pBuffer, "\"%s\"\x0A", argv[3]);
+	HPWrite (Outfd, pBuffer, strlen (pBuffer));
+
+	HPWrite (Outfd, szNumCopies, strlen(szNumCopies));
+	sprintf (pBuffer, "%s\x0A", argv[4]);
+	HPWrite (Outfd, pBuffer, strlen (pBuffer));
+	
     }
     else
     {
@@ -300,4 +346,3 @@ int main (int argc, char **argv)
 #endif
     return 0;
 }
-

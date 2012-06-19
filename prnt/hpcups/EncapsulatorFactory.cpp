@@ -31,6 +31,7 @@
 #include "CommonDefinitions.h"
 #include "EncapsulatorFactory.h"
 #include "Encapsulator.h"
+#include "Hbpl1.h"
 #include "Pcl3.h"
 #include "Pcl3Gui.h"
 #include "Pcl3Gui2.h"
@@ -48,6 +49,11 @@ Encapsulator *EncapsulatorFactory::GetEncapsulator (char *encap_tech)
 {
     if (encap_tech == NULL) {
         return NULL;
+    }
+
+    if (!strcmp (encap_tech, "hbpl1"))
+    {
+        return new Hbpl1();
     }
 
     if (!strcmp (encap_tech, "pcl3"))

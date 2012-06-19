@@ -2,7 +2,7 @@
 
   musb.c - USB support for multi-point transport driver 
  
-  (c) 2010 Copyright Hewlett-Packard Development Company, LP
+  (c) 2010 - 2014 Copyright Hewlett-Packard Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy 
   of this software and associated documentation files (the "Software"), to deal 
@@ -112,20 +112,27 @@ static int fd_protocol[MAX_FD] =
 static const unsigned char venice_power_on[] = {0x1b, '%','P','u','i','f','p','.','p','o','w','e','r',' ','1',';',
         'u','d','w','.','q','u','i','t',';',0x1b,'%','-','1','2','3','4','5','X' };
 
-static struct usb_device *libusb_device;       /* libusb device referenced by URI */
-//static int open_fd;                            /* 7/1/2 file descriptor, used by deviceid and status */
+static libusb_device *libusb_dev = NULL;       /* libusb device referenced by URI */
+static libusb_context *libusb_ctx = NULL;
+static libusb_device **libusb_dev_list = NULL;
+
 static file_descriptor fd_table[MAX_FD];       /* usb file descriptors */
 
 /* This function is similar to usb_get_string_simple, but it handles zero returns. */
-static int get_string_descriptor(usb_dev_handle *dev, int index, char *buf, size_t buflen)
+static int get_string_descriptor(libusb_device_handle *dev_handle, int index, char *buf, size_t buflen)
 {
-   char tbuf[255];       /* Some devices choke on size > 255 */
+   unsigned char tbuf[255] = {0,};       /* Some devices choke on size > 255 */
    int ret, si, di, cnt=5;
 
    while (cnt--)
    {
-      ret = usb_control_msg(dev, USB_ENDPOINT_IN, USB_REQ_GET_DESCRIPTOR, (USB_DT_STRING << 8) + index, 
-               0x409, tbuf, sizeof(tbuf), LIBUSB_CONTROL_REQ_TIMEOUT);
+      ret = libusb_control_transfer(dev_handle, 
+                 LIBUSB_ENDPOINT_IN, 
+                 LIBUSB_REQUEST_GET_DESCRIPTOR, 
+                 (LIBUSB_DT_STRING << 8) + index, 
+                 0x409, 
+                 tbuf, sizeof(tbuf), LIBUSB_CONTROL_REQ_TIMEOUT);
+
       if (ret==0)
       {
          /* This retry is necessary for lj1000 and lj1005. des 12/12/07 */
@@ -141,9 +148,9 @@ static int get_string_descriptor(usb_dev_handle *dev, int index, char *buf, size
       return ret;
    }
 
-   if (tbuf[1] != USB_DT_STRING)
+   if (tbuf[1] != LIBUSB_DT_STRING)
    {
-      BUG("invalid get_string_descriptor tag act=%d exp=%d\n", tbuf[1], USB_DT_STRING); 
+      BUG("invalid get_string_descriptor tag act=%d exp=%d\n", tbuf[1], LIBUSB_DT_STRING); 
       return -EIO;
    }
 
@@ -169,36 +176,13 @@ static int get_string_descriptor(usb_dev_handle *dev, int index, char *buf, size
    return di;
 }
 
-/* Check for USB interface descriptor with specified class. */
-static int is_interface(struct usb_device *dev, int dclass)
-{
-   struct usb_interface_descriptor *pi;
-   int i, j, k;
-
-   for (i=0; i<dev->descriptor.bNumConfigurations; i++)
-   {
-      for (j=0; j<dev->config[i].bNumInterfaces; j++)
-      {
-         for (k=0; k<dev->config[i].interface[j].num_altsetting; k++)
-         {
-            pi = &dev->config[i].interface[j].altsetting[k];
-            if (pi->bInterfaceClass == dclass)
-            {
-               return 1;            /* found interface */
-            }
-         }
-      }
-   }
-   return 0;    /* no interface found */
-}
-
 /* Write HP vendor-specific ECP channel message. */
 static int write_ecp_channel(file_descriptor *pfd, int value)
 {
-   usb_dev_handle *hd;
+   libusb_device_handle *hd;
    int interface = pfd->interface;
    int len, stat=1;
-   char byte;
+   unsigned char byte;
 
    if (pfd->hd == NULL)
    {
@@ -208,9 +192,9 @@ static int write_ecp_channel(file_descriptor *pfd, int value)
 
    hd = pfd->hd;
 
-   len = usb_control_msg(hd, 
-             USB_ENDPOINT_IN | USB_TYPE_VENDOR | USB_RECIP_INTERFACE, /* bmRequestType */
-             USB_REQ_GET_STATUS,        /* bRequest */
+   len = libusb_control_transfer(hd, 
+             LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_INTERFACE, /* bmRequestType */
+             LIBUSB_REQUEST_GET_STATUS,        /* bRequest */
              value,        /* wValue */
              interface, /* wIndex */
              &byte, 1, LIBUSB_CONTROL_REQ_TIMEOUT);
@@ -230,9 +214,9 @@ bugout:
 /* Set Cypress USS-725 Bridge Chip to 1284.4 mode. */
 static int bridge_chip_up(file_descriptor *pfd)
 {
-   usb_dev_handle *hd;
+   libusb_device_handle *hd;
    int len, stat=1;
-   char buf[9];
+   unsigned char buf[9];
    char nullByte=0;
 
    if (pfd->hd == NULL)
@@ -246,9 +230,9 @@ static int bridge_chip_up(file_descriptor *pfd)
    memset(buf, 0, sizeof(buf));
 
    /* Read register values. */
-   len = usb_control_msg(hd, 
-             USB_ENDPOINT_IN | USB_TYPE_VENDOR | USB_RECIP_DEVICE, /* bmRequestType */
-             USB_REQ_SET_FEATURE,        /* bRequest */
+   len = libusb_control_transfer(hd, 
+             LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE, /* bmRequestType */
+             LIBUSB_REQUEST_SET_FEATURE,        /* bRequest */
              0,        /* wValue */
              0, /* wIndex */
              buf, sizeof(buf), LIBUSB_CONTROL_REQ_TIMEOUT);
@@ -262,37 +246,37 @@ static int bridge_chip_up(file_descriptor *pfd)
    if (buf[ECRR] != 0x43)
    {
       /* Place 725 chip in register mode. */
-      len = usb_control_msg(hd, 
-             USB_ENDPOINT_OUT | USB_TYPE_VENDOR | USB_RECIP_DEVICE, /* bmRequestType */
+      len = libusb_control_transfer(hd, 
+             LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE, /* bmRequestType */
              0x04,        /* bRequest */
              0x0758,        /* wValue */
              0, /* wIndex */
              NULL, 0, LIBUSB_CONTROL_REQ_TIMEOUT);
       /* Turn off RLE in auto ECP mode. */
-      len = usb_control_msg(hd, 
-             USB_ENDPOINT_OUT | USB_TYPE_VENDOR | USB_RECIP_DEVICE, /* bmRequestType */
+      len = libusb_control_transfer(hd, 
+             LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE, /* bmRequestType */
              0x04,        /* bRequest */
              0x0a1d,        /* wValue */
              0, /* wIndex */
              NULL, 0, LIBUSB_CONTROL_REQ_TIMEOUT);
       /* Place 725 chip in auto ECP mode. */
-      len = usb_control_msg(hd, 
-             USB_ENDPOINT_OUT | USB_TYPE_VENDOR | USB_RECIP_DEVICE, /* bmRequestType */
+      len = libusb_control_transfer(hd, 
+             LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE, /* bmRequestType */
              0x04,        /* bRequest */
              0x0759,        /* wValue */
              0, /* wIndex */
              NULL, 0, LIBUSB_CONTROL_REQ_TIMEOUT);
       /* Force negotiation. */
-      len = usb_control_msg(hd, 
-             USB_ENDPOINT_OUT | USB_TYPE_VENDOR | USB_RECIP_DEVICE, /* bmRequestType */
+      len = libusb_control_transfer(hd, 
+             LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE, /* bmRequestType */
              0x04,        /* bRequest */
              0x0817,        /* wValue */
              0, /* wIndex */
              NULL, 0, LIBUSB_CONTROL_REQ_TIMEOUT);
       /* Read register values. */
-      len = usb_control_msg(hd, 
-             USB_ENDPOINT_IN | USB_TYPE_VENDOR | USB_RECIP_DEVICE, /* bmRequestType */
-             USB_REQ_SET_FEATURE,        /* bRequest */
+      len = libusb_control_transfer(hd, 
+             LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE, /* bmRequestType */
+             LIBUSB_REQUEST_SET_FEATURE,        /* bRequest */
              0,        /* wValue */
              0, /* wIndex */
              buf, sizeof(buf), LIBUSB_CONTROL_REQ_TIMEOUT);
@@ -303,8 +287,8 @@ static int bridge_chip_up(file_descriptor *pfd)
    }
 
    /* Reset to ECP channel 0. */
-   len = usb_control_msg(hd, 
-             USB_ENDPOINT_OUT | USB_TYPE_VENDOR | USB_RECIP_DEVICE, /* bmRequestType */
+   len = libusb_control_transfer(hd, 
+             LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE, /* bmRequestType */
              0x04,        /* bRequest */
              0x05ce,        /* wValue */
              0, /* wIndex */
@@ -312,8 +296,8 @@ static int bridge_chip_up(file_descriptor *pfd)
    musb_write(pfd->fd, &nullByte, 1, HPMUD_EXCEPTION_TIMEOUT);
 
    /* Switch to ECP channel 77. */
-   len = usb_control_msg(hd, 
-             USB_ENDPOINT_OUT | USB_TYPE_VENDOR | USB_RECIP_DEVICE, /* bmRequestType */
+   len = libusb_control_transfer(hd, 
+             LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE, /* bmRequestType */
              0x04,        /* bRequest */
              0x05cd,        /* wValue */
              0, /* wIndex */
@@ -328,7 +312,7 @@ bugout:
 /* Set Cypress USS-725 Bridge Chip to compatibility mode. */
 static int bridge_chip_down(file_descriptor *pfd)
 {
-   usb_dev_handle *hd;
+   libusb_device_handle *hd;
    int len, stat=1;
 
    if (pfd->hd == NULL)
@@ -339,8 +323,8 @@ static int bridge_chip_down(file_descriptor *pfd)
 
    hd = pfd->hd;
 
-   len = usb_control_msg(hd, 
-             USB_ENDPOINT_OUT | USB_TYPE_VENDOR | USB_RECIP_DEVICE, /* bmRequestType */
+   len = libusb_control_transfer(hd, 
+             LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE, /* bmRequestType */
              0x04,        /* bRequest */
              0x080f,        /* wValue */
              0, /* wIndex */
@@ -360,7 +344,7 @@ bugout:
 /* Write HP vendor-specific Setup command. */
 static int write_phoenix_setup(file_descriptor *pfd)
 {
-   usb_dev_handle *hd;
+   libusb_device_handle *hd;
    int len, stat=1;
 
    if (pfd->hd == NULL)
@@ -371,8 +355,8 @@ static int write_phoenix_setup(file_descriptor *pfd)
 
    hd = pfd->hd;
 
-   len = usb_control_msg(hd, 
-             USB_ENDPOINT_OUT | USB_TYPE_CLASS | USB_RECIP_OTHER, /* bmRequestType */
+   len = libusb_control_transfer(hd, 
+             LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_OTHER, /* bmRequestType */
              0x02,        /* bRequest */
              0,        /* wValue */
              0, /* wIndex */
@@ -391,146 +375,143 @@ bugout:
 }
 
 /* Detach any kernel module that may have claimed specified inteface. */
-static int detach(usb_dev_handle *hd, int interface)
+static int detach(libusb_device_handle *hd, int interface)
 {
-   char driver[32];
-
-   driver[0] = 0;
-
-#ifdef LIBUSB_HAS_DETACH_KERNEL_DRIVER_NP
-   /* If any kernel module (ie:usblp) has claimed this interface, detach it. */
-   usb_get_driver_np(hd, interface, driver, sizeof(driver));
-   if ((driver[0] != 0) && (strcasecmp(driver, "usbfs") != 0))
+   int ret ;
+   /* If any kernel module has claimed this interface, detach it. */
+   ret = libusb_kernel_driver_active (hd, interface);
+   DBG("Active kernel driver on interface=%d ret=%d\n", interface, ret); 
+   if (ret == 1)
    {
-      DBG("removing %s driver interface=%d\n", driver, interface); 
-      if (usb_detach_kernel_driver_np(hd, interface) < 0)
-         BUG("could not remove %s driver interface=%d: %m\n", driver, interface);
+      ret = libusb_detach_kernel_driver(hd, interface);
+      DBG("Detaching kernel driver on interface=%d ret=%d\n", interface, ret); 
+      if (ret < 0)
+         BUG("could not remove kernel driver interface=%d: %m\n",  interface);
    }
-#endif
-
    return 0;
 }
 
 /* Get interface descriptor for specified xx/xx/xx protocol. */
-static int get_interface(struct usb_device *dev, enum FD_ID index, file_descriptor *pfd)
+static int get_interface(libusb_device *dev, enum FD_ID index, file_descriptor *pfd)
 {
-   struct usb_interface_descriptor *pi;
-   int i, j, k;
-
-   for (i=0; i<dev->descriptor.bNumConfigurations; i++)
+   struct libusb_device_descriptor device_desc; /* Current device descriptor */
+   struct libusb_config_descriptor *confptr = NULL; /* Pointer to current configuration */
+   struct libusb_interface *ifaceptr = NULL; /* Pointer to current interface */
+   struct libusb_interface_descriptor *altptr = NULL; /* Pointer to current alternate setting */
+   int conf, iface, altset;
+   
+   libusb_get_device_descriptor (dev, &device_desc);
+   for (conf = 0 ; conf < device_desc.bNumConfigurations; conf++)
    {
-      if (dev->config == NULL)
-         goto bugout; 
-
-      for (j=0; j<dev->config[i].bNumInterfaces; j++)
+      libusb_get_config_descriptor(dev, conf, &confptr);
+      for (iface = 0, ifaceptr = confptr->interface; iface < confptr->bNumInterfaces; iface++, ifaceptr++)
       {
-         if (dev->config[i].interface == NULL)
-            goto bugout; 
-
-         for (k=0; k<dev->config[i].interface[j].num_altsetting; k++)
+         for (altset = 0, altptr = ifaceptr->altsetting; altset < ifaceptr->num_altsetting; altset ++, altptr ++)
          {
-            if (dev->config[i].interface[j].altsetting == NULL)
-               goto bugout; 
+           if (altptr && 
+                altptr->bInterfaceClass == fd_class[index] && 
+                altptr->bInterfaceSubClass == fd_subclass[index] && 
+                altptr->bInterfaceProtocol == fd_protocol[index])
+              {
+                 pfd->config=conf;            /* found interface */
+                 pfd->interface=iface;
+                 pfd->alt_setting=altset;
+                 pfd->fd=index;
+                 DBG("Found interface conf=%d, iface=%d, altset=%d, index=%d\n", conf, iface, altset, index); 
 
-            pi = &dev->config[i].interface[j].altsetting[k];
-            if (pi->bInterfaceClass == fd_class[index] && pi->bInterfaceSubClass == fd_subclass[index] && pi->bInterfaceProtocol == fd_protocol[index])
-            {
-               pfd->config=i;            /* found interface */
-               pfd->interface=j;
-               pfd->alt_setting=k;
-               pfd->fd=index;
-               return 0;
-            }
+                 libusb_free_config_descriptor(confptr);
+                 return 0;
+              }
          }
       }
+      libusb_free_config_descriptor(confptr);
    }
 
-bugout:
    return 1;    /* no interface found */
 }
 
-/* Get out endpoint for specified interface descriptor. */
-static int get_out_ep(struct usb_device *dev, int config, int interface, int altset, int type)
+/* Get endpoint for specified interface descriptor. */
+static int get_ep(libusb_device *dev, int config, int interface, int altset, enum libusb_transfer_type type, enum libusb_endpoint_direction epdir)
 {
-   struct usb_interface_descriptor *pi;
-   int i;
+   struct libusb_config_descriptor *confptr = NULL;
+   const struct libusb_interface_descriptor *pi;
+   int i, endpoint = -1;
+   
+   libusb_get_config_descriptor(dev, config, &confptr);
 
-   if (dev->config == NULL || dev->config[config].interface == NULL || dev->config[config].interface[interface].altsetting == NULL)
+   if (confptr == NULL || confptr->interface == NULL || confptr->interface[interface].altsetting == NULL)
       goto bugout;
 
-   pi = &dev->config[config].interface[interface].altsetting[altset];
+   pi = &(confptr->interface[interface].altsetting[altset]);
    for (i=0; i<pi->bNumEndpoints; i++)
    {
       if (pi->endpoint == NULL)
-         goto bugout;   
-      if (pi->endpoint[i].bmAttributes == type && !(pi->endpoint[i].bEndpointAddress & USB_ENDPOINT_DIR_MASK)) {
-         DBG("get_out_ep(type=%d): out=%d\n", type, pi->endpoint[i].bEndpointAddress);
-         return pi->endpoint[i].bEndpointAddress;
+         goto bugout;
+      if (pi->endpoint[i].bmAttributes == type) 
+      {
+         if (epdir == LIBUSB_ENDPOINT_IN)
+         {
+           if (pi->endpoint[i].bEndpointAddress & LIBUSB_ENDPOINT_IN)
+           {
+              endpoint = pi->endpoint[i].bEndpointAddress;
+              break;
+           }
+         }
+         else if (epdir == LIBUSB_ENDPOINT_OUT)
+         {
+            if (!(pi->endpoint[i].bEndpointAddress & LIBUSB_ENDPOINT_IN))
+            {
+              endpoint = pi->endpoint[i].bEndpointAddress;
+              break;
+            }
+          }
       }
    }
-
+    //DBG("get_ep(bmAttributes=%x): bEndpointAddress=%x interface=%x\n", type, endpoint, interface);
 bugout:
-   DBG("get_out_ep: ERROR! returning -1\n");
-   return -1; /* no endpoint found */
+   libusb_free_config_descriptor(confptr);
+   if (endpoint == -1) DBG("get_ep: ERROR! returning -1\n");
+   return endpoint; /* no endpoint found */
 }
 
-/* Get in endpoint for specified interface descriptor. */
-static int get_in_ep(struct usb_device *dev, int config, int interface, int altset, int type)
+static int get_in_ep(libusb_device *dev, int config, int interface, int altset, enum libusb_transfer_type type)
 {
-   struct usb_interface_descriptor *pi;
-   int i;
-
-   if (dev->config == NULL || dev->config[config].interface == NULL || dev->config[config].interface[interface].altsetting == NULL)
-      goto bugout;
-
-   pi = &dev->config[config].interface[interface].altsetting[altset];
-   for (i=0; i<pi->bNumEndpoints; i++)
-   {
-      if (pi->endpoint == NULL)
-         goto bugout;   
-      if (pi->endpoint[i].bmAttributes == type && (pi->endpoint[i].bEndpointAddress & USB_ENDPOINT_DIR_MASK)) {
-         DBG("get_in_ep(type=%d): out=%d\n", type, pi->endpoint[i].bEndpointAddress);
-         return pi->endpoint[i].bEndpointAddress;
-      }
-   }
-
-bugout:
-   DBG("get_in_ep: ERROR! returning -1\n");
-   return -1;  /* no endpoint found */
+    return get_ep(dev, config, interface, altset, type, LIBUSB_ENDPOINT_IN);
 }
 
-static int claim_interface(struct usb_device *dev, file_descriptor *pfd)
+static int get_out_ep(libusb_device *dev, int config, int interface, int altset, enum libusb_transfer_type type)
+{
+    return get_ep(dev, config, interface, altset, type, LIBUSB_ENDPOINT_OUT);
+}
+
+
+static int claim_interface(libusb_device *dev, file_descriptor *pfd)
 {
    int stat=1;
 
    if (pfd->hd != NULL)
       return 0;  /* interface is already claimed */
-
-   if ((pfd->hd = usb_open(dev)) == NULL)
+   
+   libusb_open(dev, &pfd->hd);
+   if (pfd->hd ==NULL)
    {
       BUG("invalid usb_open: %m\n");
       goto bugout;
    }
-
    detach(pfd->hd, pfd->interface);
 
-#if 0   /* hp devices only have one configuration, so far ... */
-   if (usb_set_configuration(FD[fd].pHD, dev->config[config].bConfigurationValue))
-      goto bugout;
-#endif
-
-   if (usb_claim_interface(pfd->hd, pfd->interface))
+   if (libusb_claim_interface(pfd->hd, pfd->interface))
    {
-      usb_close(pfd->hd);
+      libusb_close(pfd->hd);
       pfd->hd = NULL;
       DBG("invalid claim_interface %s: %m\n", fd_name[pfd->fd]);
       goto bugout;
    }
 
-   if (usb_set_altinterface(pfd->hd, pfd->alt_setting))
+   if (libusb_set_interface_alt_setting(pfd->hd, pfd->interface, pfd->alt_setting))
    {
-      usb_release_interface(pfd->hd, pfd->interface);
-      usb_close(pfd->hd);
+      libusb_release_interface(pfd->hd, pfd->interface);
+      libusb_close(pfd->hd);
       pfd->hd = NULL;
       BUG("invalid set_altinterface %s altset=%d: %m\n", fd_name[pfd->fd], pfd->alt_setting);
       goto bugout;
@@ -560,8 +541,8 @@ static int release_interface(file_descriptor *pfd)
       pfd->write_active = 0;
    }
 
-   usb_release_interface(pfd->hd, pfd->interface);
-   usb_close(pfd->hd);
+   libusb_release_interface(pfd->hd, pfd->interface);
+   libusb_close(pfd->hd);
    pfd->hd = NULL;
    pthread_mutex_destroy(&pfd->mutex);
    pthread_cond_destroy(&pfd->write_done_cond);
@@ -572,7 +553,7 @@ static int release_interface(file_descriptor *pfd)
 }
 
 /* Claim any open interface which is valid for device_id and device status. */
-static int claim_id_interface(struct usb_device *dev)
+static int claim_id_interface(libusb_device *dev)
 {
    enum FD_ID i;
 
@@ -580,7 +561,7 @@ static int claim_id_interface(struct usb_device *dev)
    {
       if (get_interface(dev, i, &fd_table[i]) == 0)
       {
-         if (claim_interface(libusb_device, &fd_table[i]))
+         if (claim_interface(dev, &fd_table[i]))
             continue;  /* interface is busy, try next interface */
          break;  /* done */
       }
@@ -590,25 +571,25 @@ static int claim_id_interface(struct usb_device *dev)
 }
 
 /* See if this usb device and URI match. */
-static int is_uri(struct usb_device *dev, const char *uri)
+static int is_uri(libusb_device *dev, const char *uri)
 {
-   usb_dev_handle *hd=NULL;
-   char sz[128];
-   char uriModel[128];
-   char uriSerial[128];
-   char gen[128];
+   libusb_device_handle *hd=NULL;
+   struct libusb_device_descriptor devdesc;
+   char sz[128], uriModel[128], uriSerial[128], gen[128];
    int r, stat=0;
 
-   if ((hd = usb_open(dev)) == NULL)
+   libusb_open(dev, &hd); 
+   if (hd == NULL)
    {
       BUG("invalid usb_open: %m\n");
       goto bugout;
    }
-
-   if (dev->descriptor.idVendor != 0x3f0)
+   
+   libusb_get_device_descriptor(dev, &devdesc);
+   if (devdesc.idVendor != 0x3f0)
       goto bugout;
 
-   if ((r=get_string_descriptor(hd, dev->descriptor.iProduct, sz, sizeof(sz))) < 0)
+   if ((r=get_string_descriptor(hd, devdesc.iProduct, sz, sizeof(sz))) < 0)
    {
       BUG("invalid product id string ret=%d\n", r);
       goto bugout;
@@ -620,7 +601,7 @@ static int is_uri(struct usb_device *dev, const char *uri)
    if (strcasecmp(uriModel, gen) != 0)
       goto bugout;
 
-   if ((r=get_string_descriptor(hd, dev->descriptor.iSerialNumber, sz, sizeof(sz))) < 0)
+   if ((r=get_string_descriptor(hd, devdesc.iSerialNumber, sz, sizeof(sz))) < 0)
    {
       BUG("invalid serial id string ret=%d\n", r);
       goto bugout;
@@ -639,29 +620,32 @@ static int is_uri(struct usb_device *dev, const char *uri)
      
 bugout:
    if (hd != NULL)
-      usb_close(hd);
+      libusb_close(hd);
 
    return stat;
 }
 
 /* See if this usb device and serial number match. Return model if match. */
-static int is_serial(struct usb_device *dev, const char *sn, char *model, int model_size)
+static int is_serial(libusb_device *dev, const char *sn, char *model, int model_size)
 {
-   usb_dev_handle *hd=NULL;
+   libusb_device_handle *hd=NULL;
+   struct libusb_device_descriptor devdesc;
    char sz[128];
    char gen[128];
    int r, stat=0;
 
-   if ((hd = usb_open(dev)) == NULL)
+   libusb_open(dev, &hd);
+   if (hd == NULL)
    {
       BUG("invalid usb_open: %m\n");
       goto bugout;
    }
 
-   if (dev->descriptor.idVendor != 0x3f0)
+   libusb_get_device_descriptor(dev, &devdesc);
+   if (devdesc.idVendor != 0x3f0)
       goto bugout;      /* not a HP product */
 
-   if ((r=get_string_descriptor(hd, dev->descriptor.iSerialNumber, sz, sizeof(sz))) < 0)
+   if ((r=get_string_descriptor(hd, devdesc.iSerialNumber, sz, sizeof(sz))) < 0)
    {
       BUG("invalid serial id string ret=%d\n", r);
       goto bugout;
@@ -674,7 +658,7 @@ static int is_serial(struct usb_device *dev, const char *sn, char *model, int mo
    if (strncmp(sn, gen, sizeof(gen)) != 0)
       goto bugout;  /* match failed */
 
-   if ((r=get_string_descriptor(hd, dev->descriptor.iProduct, sz, sizeof(sz))) < 0)
+   if ((r=get_string_descriptor(hd, devdesc.iProduct, sz, sizeof(sz))) < 0)
    {
       BUG("invalid product id string ret=%d\n", r);
       goto bugout;
@@ -685,28 +669,68 @@ static int is_serial(struct usb_device *dev, const char *sn, char *model, int mo
      
 bugout:
    if (hd != NULL)
-      usb_close(hd);
+      libusb_close(hd);
 
    return stat;
 }
 
-static struct usb_device *get_libusb_device(const char *uri)
+static libusb_device *get_libusb_device(const char *uri)
 {
-   struct usb_bus *bus;
-   struct usb_device *dev;
-
-   for (bus=usb_busses; bus; bus=bus->next)
-      for (dev=bus->devices; dev; dev=dev->next)
-        if (dev->descriptor.idVendor == 0x3f0 && is_interface(dev, 7))
-          if (is_uri(dev, uri))
-            return dev;  /* found usb device that matches uri */
+   libusb_device *dev = NULL; /* Current device */
+   struct libusb_device_descriptor devdesc; /* Current device descriptor */
+   struct libusb_config_descriptor *confptr = NULL; /* Pointer to current configuration */
+   const struct libusb_interface *ifaceptr = NULL; /* Pointer to current interface */
+   const struct libusb_interface_descriptor *altptr = NULL; /* Pointer to current alternate setting */
+   int numdevs = 0;        /* number of connected devices */
+   int i, conf, iface, altset ;
+   
+   libusb_init(&libusb_ctx);
+   numdevs = libusb_get_device_list(libusb_ctx, &libusb_dev_list);
+   for (i=0; i< numdevs; i++)
+   {
+      dev = libusb_dev_list[i];
+      memset(&devdesc, 0, sizeof(devdesc));
+      libusb_get_device_descriptor (dev, &devdesc);
+      
+      if (!devdesc.bNumConfigurations || !devdesc.idVendor || !devdesc.idProduct)
+          continue;
+      
+      if (devdesc.idVendor != 0x3f0) /*Not a HP device*/
+           continue;
+     
+     for (conf = 0; conf < devdesc.bNumConfigurations; conf++)
+     {
+        if (libusb_get_config_descriptor (dev, conf, &confptr) < 0)
+           continue;
+        for (iface = 0, ifaceptr = confptr->interface; iface < confptr->bNumInterfaces; iface ++, ifaceptr ++)
+        {
+            for (altset = 0, altptr = ifaceptr->altsetting; altset < ifaceptr->num_altsetting; altset++, altptr++)
+            {
+                if ((altptr->bInterfaceClass == LIBUSB_CLASS_PRINTER ) && /* Printer */
+                      (altptr->bInterfaceSubClass == 1) && 
+                      (altptr->bInterfaceProtocol == 1 || altptr->bInterfaceProtocol == 2)) /* Unidirectional or Bidirectional*/
+                    {
+                       if (is_uri(dev, uri))
+                       {
+                          libusb_free_config_descriptor(confptr);
+                          return dev;  /* found usb device that matches uri */
+                       }
+                    }
+            }
+        }
+        libusb_free_config_descriptor(confptr); confptr = NULL;
+     }//end for conf
+   }
+bugout:
+   if (confptr)
+      libusb_free_config_descriptor(confptr);
 
    return NULL;
 }
 
-static int device_id(int fd, char *buffer, int size)
+static int device_id(int fd, unsigned char *buffer, int size)
 {
-   usb_dev_handle *hd;
+   libusb_device_handle *hd;
    int config,interface,alt;
    int len=0, rlen, maxSize;
 
@@ -723,30 +747,15 @@ static int device_id(int fd, char *buffer, int size)
 
    maxSize = (size > 1024) ? 1024 : size;   /* RH8 has a size limit for device id (usb) */
 
-   rlen = usb_control_msg(hd, 
-             USB_ENDPOINT_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE, /* bmRequestType */
-             USB_REQ_GET_STATUS,        /* bRequest */
+   rlen = libusb_control_transfer(hd, 
+             LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE, /* bmRequestType */
+             LIBUSB_REQUEST_GET_STATUS,        /* bRequest */
              config,        /* wValue */
              interface, /* wIndex */    /* note firmware does not follow the USB Printer Class specification for wIndex */
              buffer, maxSize, LIBUSB_CONTROL_REQ_TIMEOUT);
 
    if (rlen < 0)
    {
-#if 0  /* Removed this PS A420 hack so a valid error is returned after USB reset. DES 10/1/09 */
-      /* Following retry is necessary for a firmware problem with PS A420 products. DES 4/17/07 */
-      BUG("invalid deviceid wIndex=%x, retrying wIndex=%x: %m\n", interface, interface << 8);
-      rlen = usb_control_msg(hd, 
-             USB_ENDPOINT_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE, /* bmRequestType */
-             USB_REQ_GET_STATUS,        /* bRequest */
-             config,        /* wValue */
-             interface << 8, /* wIndex */ 
-             buffer, maxSize, LIBUSB_CONTROL_REQ_TIMEOUT);
-      if (rlen < 0)
-      {
-         BUG("invalid deviceid retry ret=%d: %m\n", rlen);
-         goto bugout;
-      }
-#endif
       BUG("invalid deviceid ret=%d: %m\n", rlen);
       goto bugout;
    }
@@ -766,10 +775,10 @@ bugout:
 
 static int device_status(int fd, unsigned int *status)
 {
-   usb_dev_handle *hd;
+   libusb_device_handle *hd;
    int interface;
    int len, stat=1;
-   char byte;
+   unsigned char byte;
 
    hd = fd_table[fd].hd;
    interface = fd_table[fd].interface;
@@ -780,9 +789,9 @@ static int device_status(int fd, unsigned int *status)
       goto bugout;
    }
 
-   len = usb_control_msg(hd, 
-             USB_ENDPOINT_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE, /* bmRequestType */
-             USB_REQ_CLEAR_FEATURE,        /* bRequest */
+   len = libusb_control_transfer(hd, 
+             LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE, /* bmRequestType */
+             LIBUSB_REQUEST_CLEAR_FEATURE,        /* bRequest */
              0,        /* wValue */
              interface, /* wIndex */
              &byte, 1, LIBUSB_CONTROL_REQ_TIMEOUT);
@@ -883,6 +892,22 @@ int __attribute__ ((visibility ("hidden"))) power_up(mud_device *pd, int fd)
    return 0;
 }
 
+static int libusb_bulk_read(libusb_device_handle *dev, int ep, char *bytes, int size, int timeout)
+{
+   int actual_len = 0;
+
+   libusb_bulk_transfer(dev, ep, (unsigned char*)bytes, size, &actual_len, timeout);
+   return actual_len ;
+}
+
+static int libusb_bulk_write(libusb_device_handle *dev, int ep, char *bytes, int size, int timeout)
+{
+   int actual_len = 0;
+
+   libusb_bulk_transfer(dev, ep, (unsigned char*)bytes, size, &actual_len, timeout);
+   return actual_len ;
+}
+
 /* Create channel object given the requested socket id and service name. */
 static int new_channel(mud_device *pd, int index, const char *sn)
 {
@@ -891,16 +916,7 @@ static int new_channel(mud_device *pd, int index, const char *sn)
    /* Check for existing name service already open. */
    if (pd->channel[index].client_cnt)
    {
-#if 0
-      if (index == HPMUD_EWS_CHANNEL)
-      {
-         pd->channel[index].client_cnt++;  /* allow multiple clients for separate USB interfaces only */
-         stat = 0;
-         DBG("reused %s channel=%d clientCnt=%d channelCnt=%d\n", sn, index, pd->channel[index].client_cnt, pd->channel_cnt);
-      }
-      else
-#endif
-         BUG("%s channel=%d is busy, used by [%d], clientCnt=%d channelCnt=%d\n", sn, index, pd->channel[index].pid, pd->channel[index].client_cnt, pd->channel_cnt);
+      BUG("%s channel=%d is busy, used by [%d], clientCnt=%d channelCnt=%d\n", sn, index, pd->channel[index].pid, pd->channel[index].client_cnt, pd->channel_cnt);
       goto bugout; 
    }
 
@@ -951,18 +967,19 @@ static int del_channel(mud_device *pd, mud_channel *pc)
 
 static void write_thread(file_descriptor *pfd)
 {
-   int ep;
+   int ep = -1;
 
    pthread_detach(pthread_self());
 
-   if ((ep = get_out_ep(libusb_device, pfd->config, pfd->interface, pfd->alt_setting, USB_ENDPOINT_TYPE_BULK)) < 0)
+   ep = get_out_ep(libusb_dev, pfd->config, pfd->interface, pfd->alt_setting, LIBUSB_TRANSFER_TYPE_BULK);
+   if (ep < 0)
    {
       BUG("invalid bulk out endpoint\n");
       goto bugout;
    }
 
    /* Wait forever for write to complete (actually 72 hours in ms). */
-   pfd->write_return = usb_bulk_write(pfd->hd, ep, (char *)pfd->write_buf, pfd->write_size, 72*3600*1000);  
+   pfd->write_return = libusb_bulk_write (pfd->hd, ep, (char *)pfd->write_buf, pfd->write_size, 72*3600*1000);  
 
 bugout:
    pthread_mutex_lock(&pfd->mutex);
@@ -1003,9 +1020,8 @@ int __attribute__ ((visibility ("hidden"))) musb_write(int fd, const void *buf, 
       {
          BUG("unable to creat write_thread: %m\n");
          goto bugout; /* bail */
-      } 
+      }
    }
-
    /* Wait for write to complete. */
    pthread_mutex_lock(&fd_table[fd].mutex);
    gettimeofday(&now, NULL);
@@ -1016,9 +1032,10 @@ int __attribute__ ((visibility ("hidden"))) musb_write(int fd, const void *buf, 
    timeout.tv_nsec = now.tv_usec * 1000;
    ret = 0;
    while (fd_table[fd].write_buf && ret != ETIMEDOUT)
+   {
       ret = pthread_cond_timedwait(&fd_table[fd].write_done_cond, &fd_table[fd].mutex, &timeout);
+   }
    pthread_mutex_unlock(&fd_table[fd].mutex);
-
    if (ret == ETIMEDOUT)
    {
       len = -ETIMEDOUT;     /* write timeout, let client know */
@@ -1030,13 +1047,13 @@ int __attribute__ ((visibility ("hidden"))) musb_write(int fd, const void *buf, 
    len = fd_table[fd].write_return;
 #else
    int ep;
-   if ((ep = get_out_ep(libusb_device, fd_table[fd].config, fd_table[fd].interface, fd_table[fd].alt_setting, USB_ENDPOINT_TYPE_BULK)) < 0)
+   if ((ep = get_out_ep(libusb_dev, fd_table[fd].config, fd_table[fd].interface, fd_table[fd].alt_setting, LIBUSB_TRANSFER_TYPE_BULK)) < 0)
    {
       BUG("invalid bulk out endpoint\n");
       goto bugout;
    }
 
-   len = usb_bulk_write(fd_table[fd].hd, ep, (char *)buf, size, usec);
+   len = libusb_bulk_write(fd_table[fd].hd, ep, (char *)buf, size, usec);
 #endif
 
    if (len < 0)
@@ -1045,7 +1062,6 @@ int __attribute__ ((visibility ("hidden"))) musb_write(int fd, const void *buf, 
       goto bugout;
    }
 
-   DBG("write fd=%d len=%d size=%d usec=%d\n", fd, len, size, usec);
    DBG_DUMP(buf, len < 512 ? len : 512);
 
 bugout:
@@ -1066,7 +1082,8 @@ int __attribute__ ((visibility ("hidden"))) musb_read(int fd, void *buf, int siz
 
    gettimeofday (&t1, NULL);     /* get start time */
 
-   if ((ep = get_in_ep(libusb_device, fd_table[fd].config, fd_table[fd].interface, fd_table[fd].alt_setting, USB_ENDPOINT_TYPE_BULK)) < 0)
+   ep = get_in_ep(libusb_dev, fd_table[fd].config, fd_table[fd].interface, fd_table[fd].alt_setting, LIBUSB_TRANSFER_TYPE_BULK);
+   if (ep < 0)
    {
       BUG("invalid bulk in endpoint\n");
       goto bugout;
@@ -1074,7 +1091,7 @@ int __attribute__ ((visibility ("hidden"))) musb_read(int fd, void *buf, int siz
 
    while (1)
    {
-      len = usb_bulk_read(fd_table[fd].hd, ep, (char *)buf, size, tmo_usec/1000);
+      len = libusb_bulk_read(fd_table[fd].hd, ep, (char *)buf, size, tmo_usec/1000);
 
       if (len == -ETIMEDOUT)
          goto bugout;
@@ -1104,7 +1121,7 @@ int __attribute__ ((visibility ("hidden"))) musb_read(int fd, void *buf, int siz
       break;
    }
 
-   DBG("read fd=%d len=%d size=%d usec=%d\n", fd, len, size, usec);
+   //DBG("read fd=%d len=%d size=%d usec=%d ep=%d\n", fd, len, size, usec, ep);
    DBG_DUMP(buf, len < 32 ? len : 32);
 
 bugout:
@@ -1115,13 +1132,9 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_open(mud_device *
 {
    int len=0, fd=0;
    enum HPMUD_RESULT stat = HPMUD_R_IO_ERROR;
-
-   usb_init();
-   usb_find_busses();
-   usb_find_devices();
-
+   
    /* Find usb device for specified uri. */
-   if ((libusb_device = get_libusb_device(pd->uri)) == NULL)
+   if ((libusb_dev = get_libusb_device(pd->uri)) == NULL)
    {
       BUG("unable to open %s\n", pd->uri);
       goto bugout;
@@ -1132,14 +1145,13 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_open(mud_device *
    if (pd->id[0] == 0)
    {
       /* First client. */
-
-      if ((fd = claim_id_interface(libusb_device)) == MAX_FD)
+      if ((fd = claim_id_interface(libusb_dev)) == MAX_FD)
       {
          stat = HPMUD_R_DEVICE_BUSY;
          goto blackout;
       }
-
-      len = device_id(fd, pd->id, sizeof(pd->id));  /* get new copy and cache it  */ 
+      
+      len = device_id(fd, (unsigned char *)pd->id, sizeof(pd->id));  /* get new copy and cache it  */ 
 
       if (len > 0 && is_hp(pd->id))
          power_up(pd, fd);
@@ -1176,6 +1188,15 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_close(mud_device 
 
    pd->id[0] = 0;
 
+   if (libusb_dev)
+   {
+        libusb_free_device_list(libusb_dev_list, 1);
+        libusb_exit(libusb_ctx);
+        libusb_ctx = NULL;
+        libusb_dev_list = NULL;
+        libusb_dev = NULL ;
+   }
+   
    pthread_mutex_unlock(&pd->mutex);
 
    return stat;
@@ -1209,9 +1230,9 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_get_device_id(mud
       if (fd == FD_NA)
       {
          /* Device not in use. Claim interface, but release for other processes. */
-         if ((fd = claim_id_interface(libusb_device)) != MAX_FD)
+         if ((fd = claim_id_interface(libusb_dev)) != MAX_FD)
          {
-            *len = device_id(fd, pd->id, sizeof(pd->id));  /* get new copy and cache it  */ 
+            *len = device_id(fd, (unsigned char *)pd->id, sizeof(pd->id));  /* get new copy and cache it  */ 
             release_interface(&fd_table[fd]);
          }
          else
@@ -1223,7 +1244,7 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_get_device_id(mud
       else
       {
          /* Device in use by current process, leave interface up. Other processes are blocked. */
-         *len = device_id(fd, pd->id, sizeof(pd->id));  /* get new copy and cache it  */ 
+         *len = device_id(fd, (unsigned char *)pd->id, sizeof(pd->id));  /* get new copy and cache it  */ 
       }
    }
 
@@ -1262,7 +1283,7 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_get_device_status
       if (fd == FD_NA)
       {
          /* Device not in use. Claim interface, but release for other processes. */
-         if ((fd = claim_id_interface(libusb_device)) != MAX_FD)
+         if ((fd = claim_id_interface(libusb_dev)) != MAX_FD)
          {
             r = device_status(fd, status);
             release_interface(&fd_table[fd]);
@@ -1365,9 +1386,9 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_raw_channel_open(
    int fd = FD_7_1_2;
    enum HPMUD_RESULT stat = HPMUD_R_DEVICE_BUSY;
 
-   get_interface(libusb_device, fd, &fd_table[fd]);
+   get_interface(libusb_dev, fd, &fd_table[fd]);
 
-   if (claim_interface(libusb_device, &fd_table[fd]))
+   if (claim_interface(libusb_dev, &fd_table[fd]))
       goto bugout;
 
    pc->fd = fd;
@@ -1384,16 +1405,16 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_raw_channel_close
 
    // For New laserjet devices like Tsunami, end point was getting stall or halted, hence clearing it
    int ep = -1;
-   if (( ep = get_in_ep(libusb_device, fd_table[fd].config, fd_table[fd].interface, fd_table[fd].alt_setting, USB_ENDPOINT_TYPE_BULK)) >= 0)
+
+   if (( ep = get_in_ep(libusb_dev, fd_table[fd].config, fd_table[fd].interface, fd_table[fd].alt_setting, LIBUSB_TRANSFER_TYPE_BULK)) >= 0)
    {
-       usb_clear_halt(fd_table[fd].hd,  ep);
+       libusb_clear_halt(fd_table[fd].hd,  ep);
    }
 
-   if (( ep = get_out_ep(libusb_device, fd_table[fd].config, fd_table[fd].interface, fd_table[fd].alt_setting, USB_ENDPOINT_TYPE_BULK)) >= 0)
+   if (( ep = get_out_ep(libusb_dev, fd_table[fd].config, fd_table[fd].interface, fd_table[fd].alt_setting, LIBUSB_TRANSFER_TYPE_BULK)) >= 0)
    {
-       usb_clear_halt(fd_table[fd].hd,  ep);
+       libusb_clear_halt(fd_table[fd].hd,  ep);
    }
-
    release_interface(&fd_table[fd]);
 
    pc->fd = 0;
@@ -1512,18 +1533,18 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_comp_channel_open
          break;
    }
 
-   if (get_interface(libusb_device, fd, &fd_table[fd]))
+   if (get_interface(libusb_dev, fd, &fd_table[fd]))
    {
       stat = HPMUD_R_INVALID_SN;
       BUG("invalid %s channel=%d\n", pc->sn, pc->index);
       goto bugout;
    }
 
-   if (claim_interface(libusb_device, &fd_table[fd]))
+   if (claim_interface(libusb_dev, &fd_table[fd]))
       goto bugout;
 
    pc->fd = fd;
-
+   
    stat = HPMUD_R_OK;
 
 bugout:
@@ -1543,13 +1564,13 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_mlc_channel_open(
    /* Initialize MLC transport if this is the first MLC channel. */
    if (pd->channel_cnt==1)
    {
-      if (get_interface(libusb_device, FD_7_1_3, &fd_table[FD_7_1_3]) == 0 && claim_interface(libusb_device, &fd_table[FD_7_1_3]) == 0)
+      if (get_interface(libusb_dev, FD_7_1_3, &fd_table[FD_7_1_3]) == 0 && claim_interface(libusb_dev, &fd_table[FD_7_1_3]) == 0)
          fd = FD_7_1_3;    /* mlc, dot4 */
-      else if (get_interface(libusb_device, FD_ff_ff_ff, &fd_table[FD_ff_ff_ff]) == 0 && claim_interface(libusb_device, &fd_table[FD_ff_ff_ff]) == 0)
+      else if (get_interface(libusb_dev, FD_ff_ff_ff, &fd_table[FD_ff_ff_ff]) == 0 && claim_interface(libusb_dev, &fd_table[FD_ff_ff_ff]) == 0)
          fd = FD_ff_ff_ff;   /* mlc, dot4 */
-      else if (get_interface(libusb_device, FD_ff_d4_0, &fd_table[FD_ff_d4_0]) == 0 && claim_interface(libusb_device, &fd_table[FD_ff_d4_0]) == 0)
+      else if (get_interface(libusb_dev, FD_ff_d4_0, &fd_table[FD_ff_d4_0]) == 0 && claim_interface(libusb_dev, &fd_table[FD_ff_d4_0]) == 0)
          fd = FD_ff_d4_0;   /* mlc, dot4 */
-      else if (get_interface(libusb_device, FD_7_1_2, &fd_table[FD_7_1_2]) == 0 && claim_interface(libusb_device, &fd_table[FD_7_1_2]) == 0)
+      else if (get_interface(libusb_dev, FD_7_1_2, &fd_table[FD_7_1_2]) == 0 && claim_interface(libusb_dev, &fd_table[FD_7_1_2]) == 0)
          fd = FD_7_1_2;    /* raw, mlc, dot4 */
       else
       {
@@ -1565,15 +1586,6 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_mlc_channel_open(
       }
 
       unsigned int i;
-#if 0
-// Removed reverse drain I seen it hang forever on read, one-time with PSC750 (FC5 64-bit). DES 
-      int len;
-      unsigned char buf[255];
-
-      /* Drain any reverse data. */
-      for (i=0,len=1; len > 0 && i < sizeof(buf); i++)
-         len = (pd->vf.read)(fd, buf+i, 1, 0);    /* no blocking */
-#endif
 
       /* MLC initialize */
       if (MlcInit(pc, fd) != 0)
@@ -1763,20 +1775,20 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_dot4_channel_open
    /* Initialize MLC transport if this is the first MLC channel. */
    if (pd->channel_cnt==1)
    {
-      if (get_interface(libusb_device, FD_7_1_3, &fd_table[FD_7_1_3]) == 0 && claim_interface(libusb_device, &fd_table[FD_7_1_3]) == 0)
+      if (get_interface(libusb_dev, FD_7_1_3, &fd_table[FD_7_1_3]) == 0 && claim_interface(libusb_dev, &fd_table[FD_7_1_3]) == 0)
          fd = FD_7_1_3;    /* mlc, dot4 */
-      else if (get_interface(libusb_device, FD_ff_ff_ff, &fd_table[FD_ff_ff_ff]) == 0 && claim_interface(libusb_device, &fd_table[FD_ff_ff_ff]) == 0)
+      else if (get_interface(libusb_dev, FD_ff_ff_ff, &fd_table[FD_ff_ff_ff]) == 0 && claim_interface(libusb_dev, &fd_table[FD_ff_ff_ff]) == 0)
          fd = FD_ff_ff_ff;   /* mlc, dot4 */
-      else if (get_interface(libusb_device, FD_ff_d4_0, &fd_table[FD_ff_d4_0]) == 0 && claim_interface(libusb_device, &fd_table[FD_ff_d4_0]) == 0)
+      else if (get_interface(libusb_dev, FD_ff_d4_0, &fd_table[FD_ff_d4_0]) == 0 && claim_interface(libusb_dev, &fd_table[FD_ff_d4_0]) == 0)
          fd = FD_ff_d4_0;   /* mlc, dot4 */
-      else if (get_interface(libusb_device, FD_7_1_2, &fd_table[FD_7_1_2]) == 0 && claim_interface(libusb_device, &fd_table[FD_7_1_2]) == 0)
+      else if (get_interface(libusb_dev, FD_7_1_2, &fd_table[FD_7_1_2]) == 0 && claim_interface(libusb_dev, &fd_table[FD_7_1_2]) == 0)
          fd = FD_7_1_2;    /* raw, mlc, dot4 */
       else
       {
          stat = HPMUD_R_DEVICE_BUSY;
          goto bugout;
       }
-         
+      
       if (fd == FD_7_1_2)
       { 
          if (pd->io_mode == HPMUD_DOT4_BRIDGE_MODE)
@@ -1797,15 +1809,7 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_dot4_channel_open
          write_phoenix_setup(&fd_table[fd]);
 
       unsigned int i;
-#if 0
-//   Removed reverse drain LJ1015 can hang forever on read (FC5 64-bit). DES
-      unsigned char buf[255];
-      int len;
 
-      /* Drain any reverse data. */
-      for (i=0,len=1; len > 0 && i < sizeof(buf); i++)
-         len = (pd->vf.read)(fd, buf+i, 1, 0);    /* no blocking */
-#endif
       /* DOT4 initialize */
       if (Dot4Init(pc, fd) != 0)
          goto bugout;
@@ -1834,7 +1838,6 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_dot4_channel_open
          goto bugout;
       }     
    }
-
    pc->rcnt = pc->rindex = 0;
 
    stat = HPMUD_R_OK;
@@ -2006,112 +2009,162 @@ bugout:
 
 int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int lst_size, int *cnt)
 {
-   struct usb_bus *bus;
-   struct usb_device *dev;
-   usb_dev_handle *hd;
+   libusb_context *ctx = NULL;
+   libusb_device **list; /*List of connected USB devices */
+   libusb_device *dev = NULL; /* Current device */
+   struct libusb_device_descriptor devdesc; /* Current device descriptor */
+   struct libusb_config_descriptor *confptr = NULL; /* Pointer to current configuration */
+   const struct libusb_interface *ifaceptr = NULL; /* Pointer to current interface */
+   const struct libusb_interface_descriptor *altptr = NULL; /* Pointer to current alternate setting */
+   libusb_device_handle *hd = NULL;
+
+   int numdevs = 0;        /* number of connected devices */
+   int i, conf, iface, altset ;
+
    struct hpmud_model_attributes ma;
-   char rmodel[128];
-   char rserial[128];
-   char model[128];
-   char serial[128];
-   char mfg[128];
-   char sz[HPMUD_LINE_SIZE];
+   char rmodel[128], rserial[128], model[128];
+   char serial[128], mfg[128], sz[HPMUD_LINE_SIZE];
    int r, size=0;
 
-   usb_init();
-   usb_find_busses();
-   usb_find_devices();
+   libusb_init(&ctx);
+   numdevs = libusb_get_device_list(ctx, &list);
+   
+   if (numdevs <= 0)
+     goto bugout;
 
-   for (bus=usb_busses; bus; bus=bus->next)
+    model[0] = serial[0] = rmodel[0] = rserial[0] = sz[0] = mfg[0] = 0;
+
+   for (i = 0; i < numdevs; i++)
    {
-      for (dev=bus->devices; dev; dev=dev->next)
-      {
+      dev = list[i];
 
-         model[0] = serial[0] = rmodel[0] = rserial[0] = sz[0] = mfg[0] = 0;
+      /* Ignore devices with no configuration data and anything that is not  a printer.  */
 
-         if (dev->descriptor.idVendor == 0x3f0 && is_interface(dev, 7))
-         {
-            if((hd = usb_open(dev)) == NULL)
+      libusb_get_device_descriptor (dev, &devdesc);
+      
+      if (!devdesc.bNumConfigurations || !devdesc.idVendor || !devdesc.idProduct)
+          continue;
+
+       if(devdesc.idVendor != 0x3f0) /*Not a HP device */
+           continue;
+
+     for (conf = 0; conf < devdesc.bNumConfigurations; conf++)
+     {
+        if (libusb_get_config_descriptor (dev, conf, &confptr) < 0)
+           continue;
+        for (iface = 0, ifaceptr = confptr->interface; iface < confptr->bNumInterfaces; iface ++, ifaceptr ++)
+        {
+            for (altset = 0, altptr = ifaceptr->altsetting; altset < ifaceptr->num_altsetting; altset++, altptr++)
             {
-                BUG("Invalid usb_open: %m\n");
-                continue;
+                if ((altptr->bInterfaceClass == LIBUSB_CLASS_PRINTER ) && /* Printer */
+                      (altptr->bInterfaceSubClass == 1) && 
+                      (altptr->bInterfaceProtocol == 1 || altptr->bInterfaceProtocol == 2)) /* Unidirectional or Bidirectional*/
+                    {
+                        libusb_open(dev, &hd);
+                        if (hd == NULL)
+                        {
+                            BUG("Invalid usb_open: %m\n");
+                            continue;
+                        }
+                        /* Found hp device. */
+                        if ((r=get_string_descriptor(hd, devdesc.iProduct, rmodel, sizeof(rmodel))) < 0)
+                             BUG("invalid product id string ret=%d\n", r);
+                        else
+                             generalize_model(rmodel, model, sizeof(model));
+
+                        if ((r=get_string_descriptor(hd, devdesc.iSerialNumber, rserial, sizeof(rserial))) < 0)
+                             BUG("invalid serial id string ret=%d\n", r);
+                        else
+                             generalize_serial(rserial, serial, sizeof(serial));
+
+                        if ((r=get_string_descriptor(hd, devdesc.iManufacturer, sz, sizeof(sz))) < 0)
+                             BUG("invalid manufacturer string ret=%d\n", r);
+                        else
+                             generalize_serial(sz, mfg, sizeof(serial));
+
+                        if (!serial[0])
+                             strcpy(serial, "0"); /* no serial number, make it zero */
+
+                        if (model[0])
+                        {
+                             snprintf(sz, sizeof(sz), "hp:/usb/%s?serial=%s", model, serial);
+
+                             /* See if device is supported by hplip. */
+                             hpmud_query_model(sz, &ma); 
+                             if (ma.support != HPMUD_SUPPORT_TYPE_HPLIP)
+                             {
+                                 BUG("ignoring %s support=%d\n", sz, ma.support);
+                                 continue;           /* ignor, not supported */
+                             }
+
+                             /*
+                             * For Cups 1.2 we append a dummy deviceid. A valid deviceid would require us to claim the USB interface, thus removing usblp. 
+                             * This will allow us to do discovery and not disable other CUPS backend(s) who use /dev/usb/lpx instead of libusb.
+                             */
+                             if (strncasecmp(rmodel, "hp ", 3) == 0)
+                                 size += snprintf(lst+size, lst_size-size, "direct %s \"HP %s\" \"HP %s USB %s HPLIP\" \"MFG:%s;MDL:%s;CLS:PRINTER;DES:%s;SN:%s;\"\n", 
+                                        sz, &rmodel[3], &rmodel[3], serial, mfg, rmodel, rmodel, rserial);
+                             else
+                                 size += snprintf(lst+size, lst_size-size, "direct %s \"HP %s\" \"HP %s USB %s HPLIP\" \"MFG:%s;MDL:%s;CLS:PRINTER;DES:%s;SN:%s;\"\n", 
+                                        sz, rmodel, rmodel, serial, mfg, rmodel, rmodel, rserial);
+
+                        *cnt+=1;
+                        }
+                        libusb_close(hd); hd =NULL;
+                    }
             }
-           /* Found hp device. */
-            if ((r=get_string_descriptor(hd, dev->descriptor.iProduct, rmodel, sizeof(rmodel))) < 0)
-               BUG("invalid product id string ret=%d\n", r);
-            else
-               generalize_model(rmodel, model, sizeof(model));
+        }
+        libusb_free_config_descriptor(confptr); confptr = NULL;
+     }
 
-            if ((r=get_string_descriptor(hd, dev->descriptor.iSerialNumber, rserial, sizeof(rserial))) < 0)
-               BUG("invalid serial id string ret=%d\n", r);
-            else
-               generalize_serial(rserial, serial, sizeof(serial));
+   }//end for loop
 
-            if ((r=get_string_descriptor(hd, dev->descriptor.iManufacturer, sz, sizeof(sz))) < 0)
-               BUG("invalid manufacturer string ret=%d\n", r);
-            else
-               generalize_serial(sz, mfg, sizeof(serial));
-
-            if (!serial[0])
-               strcpy(serial, "0"); /* no serial number, make it zero */
-
-            if (model[0])
-            {
-               snprintf(sz, sizeof(sz), "hp:/usb/%s?serial=%s", model, serial);
-
-               /* See if device is supported by hplip. */
-               hpmud_query_model(sz, &ma); 
-               if (ma.support != HPMUD_SUPPORT_TYPE_HPLIP)
-               {
-                  BUG("ignoring %s support=%d\n", sz, ma.support);
-                  continue;           /* ignor, not supported */
-               }
-
-               /*
-                * For Cups 1.2 we append a dummy deviceid. A valid deviceid would require us to claim the USB interface, thus removing usblp. 
-                * This will allow us to do discovery and not disable other CUPS backend(s) who use /dev/usb/lpx instead of libusb.
-                */
-               if (strncasecmp(rmodel, "hp ", 3) == 0)
-                  size += snprintf(lst+size, lst_size-size, "direct %s \"HP %s\" \"HP %s USB %s HPLIP\" \"MFG:%s;MDL:%s;CLS:PRINTER;DES:%s;SN:%s;\"\n", 
-                                   sz, &rmodel[3], &rmodel[3], serial, mfg, rmodel, rmodel, rserial);
-               else
-                  size += snprintf(lst+size, lst_size-size, "direct %s \"HP %s\" \"HP %s USB %s HPLIP\" \"MFG:%s;MDL:%s;CLS:PRINTER;DES:%s;SN:%s;\"\n", 
-                                   sz, rmodel, rmodel, serial, mfg, rmodel, rmodel, rserial);
-
-               *cnt+=1;
-            }
-	    usb_close(hd);
-         }
-      }
-   }
-
+bugout:
+   if (!hd)
+       libusb_close(hd);
+   if (confptr)
+       libusb_free_config_descriptor(confptr);
+   libusb_free_device_list(list, 1);
+   libusb_exit(ctx);
+   
    return size;
 }
 
 enum HPMUD_RESULT hpmud_make_usb_uri(const char *busnum, const char *devnum, char *uri, int uri_size, int *bytes_read)
 {
-   struct usb_bus *bus;
-   struct usb_device *dev, *found_dev=NULL;
-   usb_dev_handle *hd=NULL;
-   char model[128];
-   char serial[128];
-   char sz[256];
-   int r;
+   libusb_context *ctx = NULL; 
+   libusb_device **list; /*List of connected USB devices */
+   libusb_device *dev = NULL, *found_dev=NULL; 
+   libusb_device_handle *hd=NULL;
+   struct libusb_device_descriptor devdesc; /* Current device descriptor */
+   char model[128], serial[128], sz[256];
+   int r, numdevs, i;
+   int bus_num, dev_num;
    enum HPMUD_RESULT stat = HPMUD_R_INVALID_DEVICE_NODE;
 
    DBG("[%d] hpmud_make_usb_uri() bus=%s dev=%s\n", getpid(), busnum, devnum);
 
    *bytes_read=0;
 
-   usb_init();
-   usb_find_busses();
-   usb_find_devices();
+   libusb_init(&ctx);
+   numdevs = libusb_get_device_list(ctx, &list);
+   
+   if (numdevs <= 0)
+     goto bugout;
 
-   for (bus=usb_busses; bus && !found_dev; bus=bus->next)
-      if (strcmp(bus->dirname, busnum) == 0)
-         for (dev=bus->devices; dev && !found_dev; dev=dev->next)
-            if (strcmp(dev->filename, devnum) == 0)
-                found_dev = dev;  /* found usb device that matches bus:device */
+   for (i = 0; i < numdevs; i++) 
+   {
+       dev = list[i];
+       bus_num = libusb_get_bus_number(dev);
+       if (bus_num != atoi(busnum))
+         continue;
+
+       dev_num = libusb_get_device_address(dev);
+       if (dev_num != atoi(devnum))
+         continue;
+         
+         found_dev = dev;  /* found usb device that matches bus:device */
+   }
 
    if (found_dev == NULL)
    {
@@ -2120,23 +2173,27 @@ enum HPMUD_RESULT hpmud_make_usb_uri(const char *busnum, const char *devnum, cha
    }
 
    dev = found_dev;
-   if ((hd = usb_open(dev)) == NULL)
+   libusb_open(dev, &hd);
+   
+   if (hd == NULL)
    {
-      BUG("invalid usb_open: %m\n");
+      BUG("invalid libusb_open: %m\n");
       goto bugout;
    }
 
    model[0] = serial[0] = sz[0] = 0;
 
-   if (dev->descriptor.idVendor == 0x3f0)
+   libusb_get_device_descriptor (dev, &devdesc);
+   
+   if (devdesc.idVendor == 0x3f0)
    {
       /* Found hp device. */
-      if ((r=get_string_descriptor(hd, dev->descriptor.iProduct, sz, sizeof(sz))) < 0)
+      if ((r=get_string_descriptor(hd, devdesc.iProduct, sz, sizeof(sz))) < 0)
          BUG("invalid product id string ret=%d\n", r);
       else
          generalize_model(sz, model, sizeof(model));
 
-      if ((r=get_string_descriptor(hd, dev->descriptor.iSerialNumber, sz, sizeof(sz))) < 0)
+      if ((r=get_string_descriptor(hd, devdesc.iSerialNumber, sz, sizeof(sz))) < 0)
          BUG("invalid serial id string ret=%d\n", r);
       else
          generalize_serial(sz, serial, sizeof(serial));
@@ -2146,7 +2203,7 @@ enum HPMUD_RESULT hpmud_make_usb_uri(const char *busnum, const char *devnum, cha
    }
    else
    {
-      BUG("invalid vendor id: %d\n", dev->descriptor.idVendor);
+      BUG("invalid vendor id: %d\n", devdesc.idVendor);
       goto bugout;
    }
 
@@ -2154,34 +2211,48 @@ enum HPMUD_RESULT hpmud_make_usb_uri(const char *busnum, const char *devnum, cha
       goto bugout;
    
    *bytes_read = snprintf(uri, uri_size, "hp:/usb/%s?serial=%s", model, serial); 
+   DBG("hpmud_make_usb_uri() uri=%s bytes_read=%d\n", uri, *bytes_read);
    stat = HPMUD_R_OK;
 
 bugout:
    if (hd != NULL)
-      usb_close(hd);
+      libusb_close(hd);
+   
+   libusb_free_device_list(list, 1);
+   libusb_exit(ctx);
 
    return stat;
 }
 
 enum HPMUD_RESULT hpmud_make_usb_serial_uri(const char *sn, char *uri, int uri_size, int *bytes_read)
 {
-   struct usb_bus *bus;
-   struct usb_device *dev, *found_dev=NULL;
+   libusb_context *ctx = NULL; 
+   libusb_device **list; /*List of connected USB devices */
+   libusb_device *dev = NULL, *found_dev=NULL; 
+
    char model[128];
    enum HPMUD_RESULT stat = HPMUD_R_INVALID_DEVICE_NODE;
+   int i, numdevs;
 
    DBG("[%d] hpmud_make_usb_serial_uri() sn=%s\n", getpid(), sn);
 
    *bytes_read=0;
+   
+   libusb_init(&ctx);
+   numdevs = libusb_get_device_list(ctx, &list);
+   
+   if (numdevs <= 0)
+     goto bugout;
 
-   usb_init();
-   usb_find_busses();
-   usb_find_devices();
-
-   for (bus=usb_busses; bus && !found_dev; bus=bus->next)
-      for (dev=bus->devices; dev && !found_dev; dev=dev->next)
+   for (i = 0; i < numdevs; i++) 
+   {
+       dev = list[i];
         if (is_serial(dev, sn, model, sizeof(model)))
+        {
             found_dev = dev;  /* found usb device that matches serial number */
+            break;
+        }
+    }
 
    if (found_dev == NULL)
    {
@@ -2193,5 +2264,15 @@ enum HPMUD_RESULT hpmud_make_usb_serial_uri(const char *sn, char *uri, int uri_s
    stat = HPMUD_R_OK;
 
 bugout:
+   libusb_free_device_list(list, 1);
+   libusb_exit(ctx);
+
    return stat;
+}
+
+/*********HANDLING SMART INSTALL********/
+
+int HandleSmartInstall()
+{
+   return 0; /*To be implemented*/
 }

@@ -2,7 +2,7 @@
 
   musb.h - USB support for multi-point transport driver
  
-  (c) 2010 Copyright Hewlett-Packard Development Company, LP
+  (c) 2010-2014 Copyright Hewlett-Packard Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy 
   of this software and associated documentation files (the "Software"), to deal 
@@ -21,13 +21,18 @@
   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-  Author: Naga Samrat Chowdary Narla
+  Author: Naga Samrat Chowdary Narla, Sarbeswar Meher
 \*****************************************************************************/
 
 #ifndef _MUSB_H
 #define _MUSB_H
 
+#ifdef HAVE_LIBUSB01
 #include <usb.h>
+#else
+#include <libusb.h>
+#endif
+
 #include "hpmud.h"
 #include "hpmudi.h"
 
@@ -61,7 +66,12 @@ enum BRIGE_REG_ID
 /* USB file descriptor, one for each USB protocol. */
 typedef struct
 {
+#ifdef HAVE_LIBUSB01
    usb_dev_handle *hd;
+#else
+   libusb_device_handle *hd;
+#endif
+   
    enum FD_ID fd;
    int config;
    int interface;
@@ -116,6 +126,8 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_dot4_channel_read
 
 int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int lst_size, int *cnt);
 int __attribute__ ((visibility ("hidden"))) power_up(struct _mud_device *pd, int fd);
+
+int HandleSmartInstall();
 
 #endif // _MUSB_H
 
