@@ -186,7 +186,7 @@ if os.path.exists(LOG_FILE):
 
 log.set_logfile(LOG_FILE)
 log.set_where(log.LOG_TO_CONSOLE_AND_FILE)
-cmd="chmod 777 "+LOG_FILE
+cmd="chmod 664 "+LOG_FILE
 sts,output = utils.run(cmd)
 if sts != 0:
     log.warn("Failed to change log file permissions: %s" %output)
@@ -253,7 +253,7 @@ try:
     if len(printer_config_list) ==0  or len(printer_config_list) == 0:
         cmd ="hp-setup -i -x -a -q %s"%param
         log.debug("%s"%cmd)
-        os.system(cmd)
+        utils.run(cmd)
 
         if start_systray():
             printer_name = ""

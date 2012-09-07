@@ -270,12 +270,15 @@ int hpijsFaxServer (int argc, char **argv)
 	IP_IMAGE_TRAITS	traits;
 	IP_HANDLE		hJob;
 
-	char					hpFileName[] = "/tmp/hplipfaxXXXXXX";
+	char					hpFileName[64]; 
 	int					fdFax = -1;
 	BYTE					szFileHeader[68];
 	BYTE					szPageHeader[64];
 	BYTE					*p;
 	unsigned	int			uiPageNum = 0;
+
+	snprintf(hpFileName,sizeof(hpFileName),"%s/hplipfaxXXXXXX","/var/log/hp/tmp");
+
 
 	pFaxStruct = new HPIJSFax ();
 

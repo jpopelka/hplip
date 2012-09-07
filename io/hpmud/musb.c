@@ -923,7 +923,7 @@ static int new_channel(mud_device *pd, int index, const char *sn)
    if (index == HPMUD_EWS_CHANNEL || index == HPMUD_EWS_LEDM_CHANNEL ||
        index == HPMUD_SOAPSCAN_CHANNEL || index == HPMUD_SOAPFAX_CHANNEL || 
        index == HPMUD_MARVELL_SCAN_CHANNEL || index == HPMUD_MARVELL_FAX_CHANNEL ||
-       index == HPMUD_LEDM_SCAN_CHANNEL) {
+       index == HPMUD_LEDM_SCAN_CHANNEL || index == HPMUD_MARVELL_EWS_CHANNEL) {
       pd->channel[index].vf = musb_comp_channel_vf;
    } 
    else if (pd->io_mode == HPMUD_RAW_MODE || pd->io_mode == HPMUD_UNI_MODE) {
@@ -1526,6 +1526,9 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_comp_channel_open
       case HPMUD_LEDM_SCAN_CHANNEL:  //using vendor specific C/S/P codes for fax too
          fd = FD_ff_cc_0;
          break;
+      case HPMUD_MARVELL_EWS_CHANNEL:
+	fd = FD_ff_2_10;
+	break;
       default:
          stat = HPMUD_R_INVALID_SN;
          BUG("invalid %s channel=%d\n", pc->sn, pc->index);
@@ -2272,7 +2275,93 @@ bugout:
 
 /*********HANDLING SMART INSTALL********/
 
+int disable_smartInstall(libusb_device *dev, libusb_device_handle *hd, int Interface)
+{
+    // TBD:: not yet implemented.
+    BUG("HP Device acting like CD ROM (Smart Install is enabled), so prevent from functioning device using USB Cable.\n");
+    BUG("Please Refer following link to fix @ https://bugs.launchpad.net/hplip/+bug/1027004 ");
+
+    return 0;
+}
+
 int HandleSmartInstall()
 {
-   return 0; /*To be implemented*/
+   libusb_context *ctx = NULL;
+   libusb_device **list; /*List of connected USB devices */
+   libusb_device *dev = NULL; /* Current device */
+   struct libusb_device_descriptor devdesc; /* Current device descriptor */
+   struct libusb_config_descriptor *confptr = NULL; /* Pointer to current configuration */
+   libusb_device_handle *hd = NULL;
+   int i, r, conf, numdevs = 0;        /* number of connected devices */
+   char imanufact[128] = {0,} , iproduct[128] = {0,}, iserial[128] ={0,};
+
+   libusb_init(&ctx);
+   numdevs = libusb_get_device_list(ctx, &list);
+
+   if (numdevs <= 0)
+     goto bugout;
+
+   for (i = 0; i < numdevs; i++)
+   {
+      dev = list[i];
+
+      libusb_get_device_descriptor (dev, &devdesc);
+
+      if (!devdesc.bNumConfigurations || !devdesc.idVendor || !devdesc.idProduct)
+          continue;
+
+       if(devdesc.idVendor != 0x3f0) /*Not a HP device */
+           continue;
+
+     for (conf = 0; conf < devdesc.bNumConfigurations; conf++)
+     {
+        if (libusb_get_config_descriptor (dev, conf, &confptr) < 0)
+           continue;
+
+        if (confptr->bNumInterfaces != 1)
+           continue;
+
+        if (confptr->interface[0].altsetting[0].bInterfaceClass == LIBUSB_CLASS_MASS_STORAGE)
+        {
+            libusb_open(dev, &hd);
+            if (hd == NULL)
+            {
+                BUG("Invalid usb_open: %m\n");
+                continue;
+            }
+             /* Found hp device. */
+            if ((r=get_string_descriptor(hd, devdesc.iProduct, iproduct, sizeof(iproduct))) < 0)
+                 BUG("invalid product id string ret=%d\n", r);
+
+            if ((r=get_string_descriptor(hd, devdesc.iSerialNumber, iserial, sizeof(iserial))) < 0)
+                 BUG("invalid serial id string ret=%d\n", r);
+
+            if ((r=get_string_descriptor(hd, devdesc.iManufacturer, imanufact, sizeof(imanufact))) < 0)
+                 BUG("invalid manufacturer string ret=%d\n", r);
+
+            DBG("Manufacturer = %s\n",imanufact);
+            DBG("Product = %s\n",iproduct);
+            DBG("SerialNumber = %s\n",iserial);
+            
+            //Select Laserjet Device only 
+            if(strstr(iproduct,"LaserJet") || strstr(iproduct, "Laserjet"))
+            {
+               disable_smartInstall(dev, hd, confptr->interface[0].altsetting[0].bInterfaceNumber);
+            }
+            libusb_close(hd); 
+            hd = NULL;
+        }
+        libusb_free_config_descriptor(confptr); 
+        confptr = NULL;
+     }
+   }
+   
+bugout:
+   if (!hd)
+       libusb_close(hd);
+   if (confptr)
+       libusb_free_config_descriptor(confptr);
+   libusb_free_device_list(list, 1);
+   libusb_exit(ctx);
+   return 0;
 }

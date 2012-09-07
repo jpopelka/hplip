@@ -498,6 +498,7 @@ void inithpmudext(void)
     insstr(d, "HPMUD_S_WIFI_CHANNEL", HPMUD_S_WIFI_CHANNEL);
     insstr(d, "HPMUD_S_MARVELL_FAX_CHANNEL", HPMUD_S_MARVELL_FAX_CHANNEL);
     insstr(d, "HPMUD_S_LEDM_SCAN", HPMUD_S_LEDM_SCAN);
+    insstr(d, "HPMUD_S_MARVELL_EWS_CHANNEL", HPMUD_S_MARVELL_EWS_CHANNEL);
 
     // Max buffer size
     insint(d, "HPMUD_BUFFER_SIZE", HPMUD_BUFFER_SIZE);

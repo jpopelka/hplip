@@ -106,6 +106,7 @@ EXPECT_WORD_LIST = [
     "口令", # zh
     "wachtwoord", # nl
     "heslo", # czech
+    "密码",
 ]
 
 # Mapping from patterns to probability contribution of pattern
@@ -628,6 +629,10 @@ class CoreInstall(object):
                 status, ver = self.run(cmd + ' -rs')
                 ver = ver.lower().strip()
                 log.debug("Distro version=%s" % ver)
+                if name == "rhel" and ver[0] == "5" and ver[1] == ".":
+                      ver="5.0"
+                elif name == "rhel" and ver[0] == "6" and ver[1] == ".":
+                      ver="6.0"
 
                 if not status and ver:
                     for d in self.distros:
@@ -1410,7 +1415,10 @@ class CoreInstall(object):
 
         self.native_cups =  self.get_distro_ver_data('native_cups')
         if self.native_cups is not None and self.native_cups == 1:
-            configure_cmd += ' --enable-hpcups-install --enable-cups-drv-install --enable-cups-ppd-install --disable-hpijs-install --disable-foomatic-drv-install --disable-foomatic-ppd-install --disable-foomatic-rip-hplip-install' 
+            if self.enable_ppds:
+                configure_cmd += ' --enable-hpcups-install --disable-cups-drv-install --enable-cups-ppd-install --disable-hpijs-install --disable-foomatic-drv-install --disable-foomatic-ppd-install --disable-foomatic-rip-hplip-install'
+            else:
+                configure_cmd += ' --enable-hpcups-install --enable-cups-drv-install --disable-cups-ppd-install --disable-hpijs-install --disable-foomatic-drv-install --disable-foomatic-ppd-install --disable-foomatic-rip-hplip-install'
         else:
             configure_cmd += ' --disable-hpcups-install --disable-cups-drv-install --disable-cups-ppd-install --enable-hpijs-install --enable-foomatic-drv-install --enable-foomatic-ppd-install --enable-foomatic-rip-hplip-install' 
 
@@ -1449,77 +1457,79 @@ class CoreInstall(object):
             configure_cmd += ' --enable-udev_sysfs_rules'
 	else:
 	    configure_cmd += ' --disable-udev_sysfs_rules'
+
+        configure_cmd += ' --enable-doc-build'
 	
         return configure_cmd
 
-    def configure_qt4(self):
-        configure_cmd = './configure'
-        configure_cmd += ' --prefix=/usr'
-        configure_cmd += ' --with-hpppddir=%s' % self.ppd_dir
-
-        if self.bitness == 64:
-            configure_cmd += ' --libdir=/usr/lib64'
-
-        self.ui_toolkit =  self.get_distro_ver_data('ui_toolkit')
-        if self.ui_toolkit is not None and self.ui_toolkit == 'qt3':
-            configure_cmd += ' --enable-qt3 --disable-qt4'
-        else:
-            configure_cmd += ' --enable-qt4'
-
-        self.native_cups =  self.get_distro_ver_data('native_cups')
-        self.ppd_install = self.get_distro_ver_data('ppd_install')
-        if self.native_cups is not None and self.native_cups == 1:
-            configure_cmd += ' --enable-hpcups-install'
-	    if self.ppd_install == 'drv':
-	        configure_cmd += ' --enable-cups-drv-install --disable-cups-ppd-install'
-	    else:
-		configure_cmd += ' --enable-cups-ppd-install --disable-cups-drv-install'
-	    configure_cmd += ' --disable-hpijs-install --disable-foomatic-drv-install --disable-foomatic-ppd-install --disable-foomatic-rip-hplip-install'
-        else:
-	    configure_cmd += ' --enable-hpijs-install'
-	    if self.ppd_install == 'drv':
-	        configure_cmd += ' --enable-foomatic-drv-install --disable-foomatic-ppd-install'
-	    else:
-		configure_cmd += ' --enable-foomatic-ppd-install --disable-foomatic-drv-install'
-	    configure_cmd += ' --enable-foomatic-rip-hplip-install --disable-hpcups-install --disable-cups-drv-install --disable-cups-ppd-install'
-
-        self.fax_supported =  self.get_distro_ver_data('fax_supported')
-        if self.fax_supported is None:
-            configure_cmd += ' --disable-fax-build --disable-dbus-build'
-        else:
-            configure_cmd += ' --enable-fax-build --enable-dbus-build'
-
-        self.network_supported = self.get_distro_ver_data('network_supported')
-        if self.network_supported is None:
-            configure_cmd += ' --disable-network-build'
-        else:
-            configure_cmd += ' --enable-network-build'
-
-        self.scan_supported = self.get_distro_ver_data('scan_supported')
-        if self.scan_supported is None:
-            configure_cmd += ' --disable-scan-build'
-        else:
-            configure_cmd += ' --enable-scan-build'
-
-        self.policykit = self.get_distro_ver_data('policykit')
-        if self.policykit is not None and self.policykit == 1:
-            configure_cmd += ' --enable-policykit'
-        else:
-            configure_cmd += ' --disable-policykit'
-
-        self.libusb01 = self.get_distro_ver_data('libusb01')
-        if self.libusb01 is not None and self.libusb01 == 1:
-            configure_cmd += ' --enable-libusb01_build'
-        else:
-            configure_cmd += ' --disable-libusb01_build'
-       
-        self.udev_sysfs_rule = self.get_distro_ver_data('udev_sysfs_rule')
-        if self.udev_sysfs_rule is not None and self.udev_sysfs_rule == 1:
-            configure_cmd += ' --enable-udev_sysfs_rules'
-        else:
-            configure_cmd += ' --disable-udev_sysfs_rules'
-
-        return configure_cmd
+#    def configure_qt4(self):
+#        configure_cmd = './configure'
+#        configure_cmd += ' --prefix=/usr'
+#        configure_cmd += ' --with-hpppddir=%s' % self.ppd_dir
+#
+#        if self.bitness == 64:
+#            configure_cmd += ' --libdir=/usr/lib64'
+#
+#        self.ui_toolkit =  self.get_distro_ver_data('ui_toolkit')
+#        if self.ui_toolkit is not None and self.ui_toolkit == 'qt3':
+#            configure_cmd += ' --enable-qt3 --disable-qt4'
+#        else:
+#            configure_cmd += ' --enable-qt4'
+#
+#        self.native_cups =  self.get_distro_ver_data('native_cups')
+#        self.ppd_install = self.get_distro_ver_data('ppd_install')
+#        if self.native_cups is not None and self.native_cups == 1:
+#            configure_cmd += ' --enable-hpcups-install'
+#	    if self.ppd_install == 'drv':
+#	        configure_cmd += ' --enable-cups-drv-install --disable-cups-ppd-install'
+#	    else:
+#		configure_cmd += ' --enable-cups-ppd-install --disable-cups-drv-install'
+#	    configure_cmd += ' --disable-hpijs-install --disable-foomatic-drv-install --disable-foomatic-ppd-install --disable-foomatic-rip-hplip-install'
+#        else:
+#	    configure_cmd += ' --enable-hpijs-install'
+#	    if self.ppd_install == 'drv':
+#	        configure_cmd += ' --enable-foomatic-drv-install --disable-foomatic-ppd-install'
+#	    else:
+#		configure_cmd += ' --enable-foomatic-ppd-install --disable-foomatic-drv-install'
+#	    configure_cmd += ' --enable-foomatic-rip-hplip-install --disable-hpcups-install --disable-cups-drv-install --disable-cups-ppd-install'
+#
+#        self.fax_supported =  self.get_distro_ver_data('fax_supported')
+#        if self.fax_supported is None:
+#            configure_cmd += ' --disable-fax-build --disable-dbus-build'
+#        else:
+#            configure_cmd += ' --enable-fax-build --enable-dbus-build'
+#
+#        self.network_supported = self.get_distro_ver_data('network_supported')
+#        if self.network_supported is None:
+#            configure_cmd += ' --disable-network-build'
+#        else:
+#            configure_cmd += ' --enable-network-build'
+#
+#        self.scan_supported = self.get_distro_ver_data('scan_supported')
+#        if self.scan_supported is None:
+#            configure_cmd += ' --disable-scan-build'
+#        else:
+#            configure_cmd += ' --enable-scan-build'
+#
+#        self.policykit = self.get_distro_ver_data('policykit')
+#        if self.policykit is not None and self.policykit == 1:
+#            configure_cmd += ' --enable-policykit'
+#        else:
+#            configure_cmd += ' --disable-policykit'
+#
+#        self.libusb01 = self.get_distro_ver_data('libusb01')
+#        if self.libusb01 is not None and self.libusb01 == 1:
+#            configure_cmd += ' --enable-libusb01_build'
+#        else:
+#            configure_cmd += ' --disable-libusb01_build'
+#       
+#        self.udev_sysfs_rule = self.get_distro_ver_data('udev_sysfs_rule')
+#        if self.udev_sysfs_rule is not None and self.udev_sysfs_rule == 1:
+#            configure_cmd += ' --enable-udev_sysfs_rules'
+#        else:
+#            configure_cmd += ' --disable-udev_sysfs_rules'
+#
+#        return configure_cmd
 
 
     def restart_cups(self):
@@ -2273,7 +2283,7 @@ class CoreInstall(object):
     def check_printer_plugin_files(self):
         ret_val = None
         home = sys_conf.get('dirs', 'home')
-        print_so_files_list =['lj.so' , 'hbpl1.so']
+        print_so_files_list =['lj.so']
         cnt=0
         printer_so_dir= home+"/prnt/plugins/"
         while cnt < len(print_so_files_list):

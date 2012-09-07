@@ -47,7 +47,8 @@
 #define BOD_PPD_ATR "HPBOD"
 #define BOD_PJL "@PJL DMINFO ASCIIHEX=\"%s%s\"\012"
 #define BOD_DATETIME_FORMAT "%04d%02d%02d%02d%02d%02d"
-#define DBG_PSFILE "/tmp/hpps_job%d.out"
+#define DBG_PSFILE "hpps_job"
+#define DBG_TMP_FOLDER "/var/log/hp/tmp/"
 
 #define LINE_SIZE  258
 #define FILE_NAME_SIZE 128
@@ -93,7 +94,7 @@ void open_dbg_outfile(char* szjob_id)
     if (g_savepsfile & SAVE_PS_FILE)
     {
         char    sfile_name[FILE_NAME_SIZE] = {0};
-        sprintf(sfile_name, DBG_PSFILE, szjob_id);
+	sprintf(sfile_name, "%s/%s_%d.out",DBG_TMP_FOLDER,DBG_PSFILE, szjob_id);
         g_fp_outdbgps= fopen(sfile_name, "w");
         chmod(sfile_name, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     }

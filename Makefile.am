@@ -106,6 +106,10 @@ hp_mkuri_SOURCES = io/hpmud/hp-mkuri.c
 hp_mkuri_LDADD = -ldl libhpmud.la
 hp_mkuri_CFLAGS = -DCONFDIR=\"$(hplip_confdir)\"
 
+# cron files
+crondir = /etc/cron.daily
+dist_cron_DATA = data/rules/hplip_cron
+
 # hpmud.rules
 rulesdir = /etc/udev/rules.d
 if UDEV_SYSFS_RULES
@@ -145,6 +149,7 @@ dist_hplip_state_DATA =
 
 # Log Files
 hplip_Logdir=/var/log/hp
+hplip_tmpdir=/var/log/hp/tmp
 
 if FULL_BUILD
 
@@ -156,7 +161,7 @@ cmddir = $(hplipdir)
 dist_cmd_SCRIPTS = align.py info.py print.py toolbox.py clean.py colorcal.py unload.py testpage.py makeuri.py check.py fab.py levels.py \
 	sendfax.py setup.py makecopies.py probe.py timedate.py firmware.py scan.py systray.py plugin.py linefeedcal.py pqdiag.py \
 	faxsetup.py devicesettings.py printsettings.py query.py pkservice.py wificonfig.py check-plugin.py diagnose_plugin.py uninstall.py \
-	upgrade.py config_usb_printer.py diagnose_queues.py
+	upgrade.py config_usb_printer.py diagnose_queues.py logcapture.py
 
 # base
 basedir = $(hplipdir)/base
@@ -217,6 +222,7 @@ localzdir = $(hplipdir)/data/localization
 dist_postscript_DATA = data/ps/testpage.ps.gz data/ps/clean_page.pdf.gz
 dist_models_DATA = data/models/models.dat
 dist_hplip_Log_DATA=
+dist_hplip_tmp_DATA=
 
 if GUI_BUILD
 dist_images_16x16_DATA = data/images/16x16/*
@@ -374,6 +380,7 @@ hppgsz_CXXFLAGS = $(libapdk_la_CXXFLAGS)
 hppgsz_CFLAGS = $(libapdk_la_CFLAGS)
 hppgsz_LDADD = libapdk.la -ljpeg -ldl
 
+if GUI_BUILD
 # hplip.desktop
 hplip_desktopdir = $(icondir)
 hplip_desktop_DATA = hplip.desktop
@@ -381,6 +388,7 @@ hplip_desktop_DATA = hplip.desktop
 # hplip-systray.desktop
 hplip_systraydir = $(systraydir)
 hplip_systray_DATA = hplip-systray.desktop
+endif
 
 # hpipjs (CUPS filter)
 hplipjsdir = $(cupsfilterdir)
@@ -540,6 +548,7 @@ cupsdrv2dir = $(drvdir)
 cupsdrv2_DATA = $(cups_drv)
 endif
 
+
 install-dist_hplip_LogDATA:
 if FULL_BUILD
 	test -z "$(DESTDIR)$(hplip_Logdir)" || mkdir -p $(DESTDIR)$(hplip_Logdir)
@@ -551,6 +560,30 @@ if HPLIP_BUILD
 	chgrp "lp" -R $(DESTDIR)$(hplip_Logdir)
 	chmod 774 $(DESTDIR)$(hplip_Logdir)
 endif	#FULL_BUILD
+
+install-dist_hplip_tmpDATA:
+if FULL_BUILD
+	test -z "$(DESTDIR)$(hplip_tmpdir)" || mkdir -p $(DESTDIR)$(hplip_tmpdir)
+	chgrp "lp" -R $(DESTDIR)$(hplip_tmpdir)
+	chmod 1774 $(DESTDIR)$(hplip_tmpdir)
+endif	#FULL_BUILD
+if HPLIP_BUILD
+	test -z "$(DESTDIR)$(hplip_tmpdir)" || mkdir -p $(DESTDIR)$(hplip_tmpdir)
+	chgrp "lp" -R $(DESTDIR)$(hplip_tmpdir)
+	chmod 1774 $(DESTDIR)$(hplip_tmpdir)
+endif	#FULL_BUILD
+
+install-dist_cronDATA:$(dist_cron_DATA)
+	test -z "$(DESTDIR)$(crondir)" || $(MKDIR_P) "$(DESTDIR)$(crondir)"; \
+	list='$(dist_cron_DATA)'; test -n "$(crondir)" || list=; \ 
+	for p in $$list; do \
+		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+		echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+		echo " $(INSTALL) -m755 $$files '$(DESTDIR)$(crondir)'"; \
+		$(INSTALL) -m755 $$files "$(DESTDIR)$(crondir)" || exit $$?; \
+	done	
 
 install-data-hook:
 if HPLIP_BUILD

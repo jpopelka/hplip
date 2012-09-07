@@ -139,7 +139,7 @@ class CleanDialog(QDialog, Ui_Dialog):
         self.connect(self.NextButton, SIGNAL("clicked()"), self.NextButton_clicked)
         self.connect(self.DeviceComboBox, SIGNAL("DeviceUriComboBox_noDevices"), self.DeviceUriComboBox_noDevices)
         self.connect(self.DeviceComboBox, SIGNAL("DeviceUriComboBox_currentChanged"), self.DeviceUriComboBox_currentChanged)
-        self.DeviceComboBox.setFilter({'clean-type': (operator.gt, 0)})
+        self.DeviceComboBox.setFilter({'clean-type': (operator.ne, CLEAN_TYPE_NONE)})
 
         if self.device_uri:
             self.DeviceComboBox.setInitialDevice(self.device_uri)

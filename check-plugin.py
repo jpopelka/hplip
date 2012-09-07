@@ -231,7 +231,7 @@ if os.path.exists(LOG_FILE):
 
 log.set_logfile(LOG_FILE)
 log.set_where(log.LOG_TO_CONSOLE_AND_FILE)
-cmd="chmod 774 "+LOG_FILE
+cmd="chmod 664 "+LOG_FILE
 sts,output = utils.run(cmd)
 if sts != 0:
     log.warn("Failed to change log file permissions: %s" %output)

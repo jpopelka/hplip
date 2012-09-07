@@ -242,7 +242,8 @@ sub GetUUID
 ###################################################################
 sub GetSystem
 {
-    my $system_name = hostname;
+    my $system_name = `hostname -s`;
+    chomp($system_name);
     if( !$system_name ) {
 	$system_name = "unknown-system_name";
     }
@@ -259,7 +260,8 @@ sub GetSystem
 ###################################################################
 sub GetDomain
 {
-    my $domain = hostname;
+    my $domain = `hostname -d`;
+    chomp($domain);
     if( !$domain ) {
 	$domain = "unknown-domain";
     }
@@ -416,6 +418,36 @@ sub processfile
         close PSFILE;
 }
 
+
+sub processfile_PJL
+{
+        my $fn = shift;
+        open (PSFILE, "<$fn") or abort_exit( "Cannot open '$fn': $!");
+        my( $jobname, $user, $system, $domain, $date, $uuid, $app, $appexe, $dept ) = GetHPAccountingInfo();
+        emit_line( "\x1B%-12345X\@PJL JOBNAME=job-$jobname\n" );
+        emit_line( "\@PJL SET USERNAME=\"$user\"\n" );
+        emit_line( "\@PJL SET JOBNAME=\"$arg_title\"\n" );
+        #emit_line( "\@PJL SET COPIES=$arg_copies\n" );
+        emit_line( "\@PJL SET JOBATTR=\"JobAcct1=$user\"\n" ); #Jobattr1 (User Name)
+        emit_line( "\@PJL SET JOBATTR=\"JobAcct2=$system\"\n" ); #Jobattr2 (Computer Name)
+        emit_line( "\@PJL SET JOBATTR=\"JobAcct3=$domain\"\n" ); #Jobattr3 (Domain Name)
+        emit_line( "\@PJL SET JOBATTR=\"JobAcct4=$date\"\n" ); #Jobattr4 (Date in YYYYMMDDhhmmss format)
+        emit_line( "\@PJL SET JOBATTR=\"JobAcct5=$uuid\"\n" ); #Jobattr5 (UUID)
+        emit_line( "\@PJL SET JOBATTR=\"JobAcct6=$app\"\n" ); #Jobattr6 (Application Name)
+        emit_line( "\@PJL SET JOBATTR=\"JobAcct7=$appexe\"\n" ); #Jobattr7 (User friendly App Name)
+        emit_line( "\@PJL SET JOBATTR=\"JobAcct8=$dept\"\n" ); #Jobattr8 (Department Name)
+        emit_line( "\@PJL SET JOBATTR=\"JobAcct9=\"\n" ); #Jobattr9 (Department Access Code)
+        emit_line( "\@PJL ENTER LANGUAGE=POSTSCRIPT\x0A\n" );
+
+        while (<PSFILE>)
+        {
+                emit_line( $_ );
+        }
+        emit_line( "\x1B%-12345X\@PJL EOJ\x0A\x1B%-12345X\n" );
+        close PSFILE;
+}
+
+
 ###################################################################
 # Main
 ###################################################################
@@ -443,7 +475,7 @@ foreach $key ( sort keys %ENV) {
 
 print_debug( "Processing file");
 open_capture();
-processfile($procfile);
+processfile_PJL($procfile);
 close_capture();
 
 unlink($procfile) or print STDERR "ERROR: $progname - Couldn't remove '$procfile': $!\n";

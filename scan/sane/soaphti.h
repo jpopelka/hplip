@@ -33,8 +33,8 @@
 #ifndef _SOAPHTI_H
 #define _SOAPHTI_H
 
-#define SOAP_CONTRAST_MIN -127
-#define SOAP_CONTRAST_MAX 127
+#define SOAP_CONTRAST_MIN -1000 /*According the SOAP spec*/
+#define SOAP_CONTRAST_MAX 1000
 #define SOAP_CONTRAST_DEFAULT 0
 
 #define MM_PER_INCH     25.4

@@ -595,7 +595,11 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
     cups_page_header2_t    cups_header;
     DRIVER_ERROR           err;
     int                    ret_status = 0;
-    char hpPreProcessedRasterFile[64] = "/tmp/hplipSwapedPagesXXXXXX"; //temp file needed to store raster data with swaped pages.
+
+    char hpPreProcessedRasterFile[64]; //temp file needed to store raster data with swaped pages.
+
+    strcpy(hpPreProcessedRasterFile, "/var/log/hp/tmp/hplipSwapedPagesXXXXXX");
+       
 
     while (cupsRasterReadHeader2(cups_raster, &cups_header))
     {
@@ -656,9 +660,10 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
         
         if (m_iLogLevel & SAVE_INPUT_RASTERS)
         {
-            char    szFileName[32];
+            char    szFileName[64];
             memset(szFileName, 0, sizeof(szFileName));
-            snprintf (szFileName, sizeof(szFileName), "/tmp/hpcupsfilterc_%d.bmp", current_page_number);
+            snprintf (szFileName, sizeof(szFileName), "/var/log/hp/tmp/hpcupsfilterc_%d.bmp", current_page_number);
+
             if (cups_header.cupsColorSpace == CUPS_CSPACE_RGBW ||
                 cups_header.cupsColorSpace == CUPS_CSPACE_RGB)
             {

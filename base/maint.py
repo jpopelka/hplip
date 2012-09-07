@@ -683,6 +683,7 @@ def dataModelHelper(dev, func, ui2):
 
 def AlignType16Manual(dev, a, b, c, d, e, f, g, h, i):
     log.debug("a=%s b=%s c=%s d=%s e=%s f=%s g=%s h=%s i=%s" % (a, b, c, d, e, f, g, h, i ))
+    func = dev.getEWSUrl_LEDM
     data = status.StatusType10FetchUrl(func, "/Calibration/State")
 
     if not data:

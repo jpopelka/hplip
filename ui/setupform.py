@@ -536,33 +536,13 @@ class SetupForm(SetupForm_base):
         if ppds is None or not ppds:
             ppds = cups.getSystemPPDs()
 
-        #print ppds
-
-        default_model = utils.xstrip(model.replace('series', '').replace('Series', ''), '_')
-        stripped_model = cups.stripModel2(models.normalizeModelName(model).lower())
-        
-        
-        #Check if common ppd name is already given in models.dat(This is needed because in case of devices having more than one derivatives
-        #will have diffrent model name strings in device ID, because of which we don't get the common ppd name for search)
-       
-        ppd_name = self.mq.get('ppd-name',0)
-        
-        if ppd_name == 0:
-        	self.ppd = cups.getPPDFile2(stripped_model, ppds)
-        else:
-            self.ppd = cups.getPPDFile2(ppd_name, ppds)
-        
+        self.ppd = cups.getPPDFile2(self.mq,  model , ppds)
         log.debug(self.ppd)
         self.ppdListView.clear()
 
         if self.ppd is not None:
-            #for ppd in self.ppd_dict:
             PPDListViewItem(self.ppdListView, self.ppd[0], self.ppd[1])
 
-#            i = self.ppdListView.firstChild()
-#            self.ppdListView.setCurrentItem(i)
-#            self.ppdListView.setSelected(i, True)
-#            self.ppd_file = self.ppdListView.currentItem().ppd_file
             self.ppd_file = self.ppd[0]
             log.debug(self.ppd_file)
 
@@ -895,35 +875,12 @@ class SetupForm(SetupForm_base):
 
     def setupFax(self):
         QApplication.setOverrideCursor(QApplication.waitCursor)
-
-        if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_MARVELL:
-            fax_ppd_name = "HP-Fax3-hplip" # Fixed width (2528 pixels) and 300dpi rendering
-            nick = "HP Fax 3"
-        if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_SOAP or self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_LEDMSOAP:
-            fax_ppd_name = "HP-Fax2-hplip" # Fixed width (2528 pixels) and 300dpi rendering
-            nick = "HP Fax 2"
-        if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_LEDM:
-            fax_ppd_name = "HP-Fax4-hplip" # Fixed width (1728 pixels) and 200dpi rendering
-            nick = "HP Fax 4"
-        else:
-            fax_ppd_name = "HP-Fax-hplip" # Standard
-            nick = "HP Fax"
-
-        ppds = []
-
-        log.debug("Searching for fax file %s..." % fax_ppd_name)
-
-        ppd_dir = sys_conf.get('dirs', 'ppd')
-        for f in utils.walkFiles(ppd_dir, pattern="HP-Fax*.ppd*", abs_paths=True):
-            ppds.append(f)
-
-        for f in ppds:
-            if f.find(fax_ppd_name) >= 0:
-                fax_ppd = f
-                log.debug("Found PDD file: %s" % fax_ppd)
-                log.debug("Nickname: %s" % cups.getPPDDescription(fax_ppd))
-                break
-        else:
+        back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
+                device.parseDeviceURI(self.device_uri)
+        norm_model = models.normalizeModelName(model).lower()
+        fax_ppd,fax_ppd_name, nick = cups.getFaxPPDFile(self.mq, norm_model)
+        # Fax ppd not found
+        if not fax_ppd:
             QApplication.restoreOverrideCursor()
             log.error("Fax PPD file not found.")
 

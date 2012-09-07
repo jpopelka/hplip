@@ -686,6 +686,7 @@ SANE_Status marvell_control_option(SANE_Handle handle, SANE_Int option, SANE_Act
             if (*int_value >= MARVELL_CONTRAST_MIN && *int_value <= MARVELL_CONTRAST_MAX)
             {
                ps->current_contrast = *int_value;
+               mset_result |= SANE_INFO_RELOAD_PARAMS;
                stat = SANE_STATUS_GOOD;
                break;
             }

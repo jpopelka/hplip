@@ -262,6 +262,7 @@ f 0644 root root $ppd/HP prnt/ps/*.ppd.gz
 @epm_full@f 644 root root $home/prnt/colorcal.py prnt/colorcal.py
 @epm_full@f 755 root root $home/clean.py clean.py
 @epm_full@f 755 root root $home/check.py check.py
+@epm_full@f 755 root root $home/logcapture.py logcapture.py
 @epm_full@d 775 root root $home/pcard -
 @epm_full@f 644 root root $home/pcard/__init__.py pcard/__init__.py
 @epm_full@f 644 root root $home/pcard/photocard.py pcard/photocard.py
@@ -299,6 +300,7 @@ f 0644 root root $ppd/HP prnt/ps/*.ppd.gz
 @epm_full@l 755 root root $bindir/hp-check-plugin ../share/hplip/check-plugin.py
 @epm_full@l 755 root root $bindir/hp-diagnose_plugin ../share/hplip/diagnose_plugin.py
 @epm_full@l 755 root root $bindir/hp-check ../share/hplip/check.py
+@epm_full@l 755 root root $bindir/hp-logcapture ../share/hplip/logcapture.py
 @epm_full@l 755 root root $bindir/hp-info ../share/hplip/info.py
 @epm_full@l 755 root root $bindir/hp-makecopies ../share/hplip/makecopies.py
 @epm_full@l 755 root root $bindir/hp-scan ../share/hplip/scan.py
@@ -450,6 +452,7 @@ d 0755 root root /var/lib/hp/ -
 f 0644 root root $home/data/firmware data/firmware/*.fw.gz
 d 0775 root root $home/data/plugin -
 d 0775 root lp /var/log/hp -
+d 1774 root lp /var/log/hp/tmp -
 
 #scan
 
@@ -458,6 +461,8 @@ d 0775 root lp /var/log/hp -
 %system !darwin
 @epm_print_only_exclude@f 0644 root root /etc/udev/rules.d data/rules/86-hpmud*.rules
 @epm_print_only_exclude@f 0644 root root /etc/udev/rules.d data/rules/56-hpmud_add_printer.rules
+@epm_print_only_exclude@f 0755 root root /etc/cron.daily data/rules/hplip_cron
+
 f 0755 root root $home/prnt/plugins/lj-${machine}.so prnt/plugins/lj-${machine}.so
 l 0755 root root $home/prnt/plugins/lj.so lj-${machine}.so
 f 0755 root root $home/prnt/plugins/hbpl1-${machine}.so prnt/plugins/hbpl1-${machine}.so
@@ -487,10 +492,12 @@ f 0644 root root $docdir/COPYING COPYING
 f 0644 root root $docdir/copyright copyright
 d 0755 root root /var/lib/hp/ -
 d 0775 root lp /var/log/hp -
+d 1774 root lp /var/log/hp/tmp -
 %system !darwin
 @epm_print_only_exclude@f 0644 root root /etc/udev/rules.d/56-hpmud_support.rules data/rules/56-hpmud_support.rules
 @epm_print_only_exclude@f 0644 root root /etc/udev/rules.d/86-hpmud_plugin.rules data/rules/86-hpmud_plugin.rules
 @epm_print_only_exclude@f 0644 root root /etc/udev/rules.d/56-hpmud_add_printer.rules data/rules/56-hpmud_add_printer.rules
+@epm_print_only_exclude@f 0755 root root /etc/cron.daily/hplip_cron data/rules/hplip_cron
 
 %system all
 %endif

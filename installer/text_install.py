@@ -30,6 +30,7 @@ import signal
 from base.g import *
 from base import utils, tui
 from core_install import *
+from prnt import cups
 
 def start_systray():
     tui.title("RE-STARTING HP_SYSTRAY")
@@ -653,7 +654,13 @@ def start(language, auto=True, test_depends=False,
             #
             # HPLIP REMOVE
             #
-            if core.hplip_present and core.selected_component == 'hplip' and core.distro_version_supported:
+            num_req_missing = 0
+            core.check_dependencies()
+            for depend, desc, opt in core.missing_required_dependencies():
+                log.error("A required dependency '%s (%s)' is still missing." % (depend, desc))
+                num_req_missing += 1
+
+            if num_req_missing == 0 and core.hplip_present and core.selected_component == 'hplip' and core.distro_version_supported:
                 path = utils.which('hp-uninstall')
                 ok, choice = tui.enter_choice("HPLIP-%s exists, this may conflict with the new one being installed.\nDo you want to ('i'= Remove and Install, 'o'= Overwrite*, 'q'= Quit)?	:"%(prev_hplip_version),['i','o','q'],'o')
                 if not ok or choice=='q':
@@ -757,6 +764,9 @@ def start(language, auto=True, test_depends=False,
 
         tui.title("POST-BUILD COMMANDS")
         core.run_post_build(progress_callback, distro_alternate_version)
+
+        #This call is just to update the cups PPD cache file@ /var/cache/cups/ppds.dat. If this is not called, hp-setup picks incorrect ppd 1st time for some printers. 
+        cups.getSystemPPDs()
 
         #
         # OPEN MDNS MULTICAST PORT

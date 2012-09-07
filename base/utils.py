@@ -38,6 +38,7 @@ import fcntl
 import errno
 import stat
 import string
+import glob
 import commands # TODO: Replace with subprocess (commands is deprecated in Python 3.0)
 import cStringIO
 import re
@@ -879,14 +880,15 @@ def all(S,f=lambda x:x):
         if not f(x): return False
     return True
 
-
-BROWSERS = ['firefox', 'mozilla', 'konqueror', 'galeon', 'skipstone'] # in preferred order
-BROWSER_OPTS = {'firefox': '-new-window', 'mozilla' : '', 'konqueror': '', 'galeon': '-w', 'skipstone': ''}
+BROWSERS = ['firefox', 'mozilla', 'konqueror', 'epiphany', 'skipstone'] # in preferred order
+BROWSER_OPTS = {'firefox': '-new-tab', 'mozilla': '', 'konqueror': '', 'epiphany': '--new-tab', 'skipstone': ''}
 
 
 def find_browser():
     if platform_avail and platform.system() == 'Darwin':
         return "open"
+    elif which("xdg-open"):
+        return "xdg-open"
     else:
         for b in BROWSERS:
             if which(b):
@@ -900,11 +902,14 @@ def openURL(url, use_browser_opts=True):
         cmd = 'open "%s"' % url
         log.debug(cmd)
         os.system(cmd)
+    elif which("xdg-open"):
+        cmd = 'xdg-open "%s"' % url
+        log.debug(cmd)
+        os.system(cmd)
     else:
         for b in BROWSERS:
-            bb = which(b)
+            bb = which(b, return_full_path='True')
             if bb:
-                bb = os.path.join(bb, b)
                 if use_browser_opts:
                     cmd = """%s %s "%s" &""" % (bb, BROWSER_OPTS[b], url)
                 else:
@@ -1013,9 +1018,112 @@ class XMLToDictParser:
         parser = expat.ParserCreate()
         parser.StartElementHandler = self.startElement
         parser.EndElementHandler = self.endElement
-        parser.CharacterDataHandler = self.charData
-        parser.Parse(text.encode('utf-8'), True)
+        parser.CharacterDataHandler = self.charData        
+        try:
+            parser.Parse(text.encode('utf-8'), True)
+        except UnicodeDecodeError:
+            log.error("Received Unicode error in xml= %s "%text)
         return self.data
+
+
+
+class Element:
+    def __init__(self,name,attributes):
+        self.name = name
+        self.attributes = attributes
+        self.chardata = ''
+        self.children = []
+        
+    def AddChild(self,element):
+        self.children.append(element)
+        
+    def getAttribute(self,key):
+        return self.attributes.get(key)
+    
+    def getData(self):
+        return self.chardata
+        
+    def getElementsByTagName(self,name='',ElementNode=None):
+        if ElementNode:
+            Children_list = ElementNode.children
+        else:
+            Children_list = self.children
+        if not name:
+            return self.children
+        else:
+            elements = []
+            for element in Children_list:
+                if element.name == name:
+                    elements.append(element)
+                
+                rec_elements = self.getElementsByTagName (name,element)
+                for a in rec_elements:
+                    elements.append(a)
+            return elements
+    
+    def getChildElements(self,name=''):
+        if not name:
+            return self.children
+        else:
+            elements = []
+            for element in self.children:
+                if element.name == name:
+                    elements.append(element)
+            return elements
+
+    def toString(self, level=0):
+        retval = " " * level
+        retval += "<%s" % self.name
+        for attribute in self.attributes:
+            retval += " %s=\"%s\"" % (attribute, self.attributes[attribute])
+        c = ""
+        for child in self.children:
+            c += child.toString(level+1)
+        if c == "":
+            if self.chardata:
+                retval += ">"+self.chardata + ("</%s>" % self.name)                
+            else:
+                retval += "/>"
+        else:
+            retval += ">" + c + ("</%s>" % self.name)
+        return retval
+        
+class  extendedExpat:
+    def __init__(self):
+        self.root = None
+        self.nodeStack = []
+        
+    def StartElement_EE(self,name,attributes):
+        element = Element(name.encode(),attributes)
+        
+        if len(self.nodeStack) > 0:
+            parent = self.nodeStack[-1]
+            parent.AddChild(element)
+        else:
+            self.root = element
+        self.nodeStack.append(element)
+        
+    def EndElement_EE(self,name):
+        self.nodeStack = self.nodeStack[:-1]
+
+    def charData_EE(self,data):        
+        if string.strip(data):
+            data = data.encode()
+            element = self.nodeStack[-1]
+            element.chardata += data
+            return
+
+    def Parse(self,xmlString):
+        Parser = expat.ParserCreate()
+
+        Parser.StartElementHandler = self.StartElement_EE
+        Parser.EndElementHandler = self.EndElement_EE
+        Parser.CharacterDataHandler = self.charData_EE
+
+        Parser.Parse(xmlString.encode('utf-8'), True)
+        
+        return self.root
+
 
 
 def dquote(s):
@@ -1906,3 +2014,49 @@ def sendEvent(event_code,device_uri, printer_name, username="", job_id=0, title=
     msg.append(signature='ssisiss', *args)
     SystemBus().send_message(msg)
     log.debug("send_message() returning")
+
+def expand_list(File_exp):
+   File_list = glob.glob(File_exp)
+   if File_list:
+      File_list_str = ' '.join(File_list)
+      return File_list, File_list_str
+   else:
+      return [],""
+
+
+
+def unchunck_xml_data(src_data):
+    index = 0
+    dst_data=""
+    # src_data contains HTTP data + xmlpayload. delimter is '\r\n\r\n'.
+    if src_data.find('\r\n\r\n') != -1:
+        src_data = src_data.split('\r\n\r\n', 1)[1]
+    else:
+        return dst_data
+    
+    if len(src_data) <= 0:
+        return dst_data
+
+    #If xmlpayload doesn't have chuncksize embedded, returning same xml.
+    if src_data[index] == '<':
+        dst_data = src_data
+    else:  # Removing chunck size from xmlpayload
+        try:
+           while index < len(src_data):
+             buf_len = 0
+             while src_data[index] == ' ' or src_data[index] == '\r' or src_data[index] == '\n':
+               index = index +1
+             while src_data[index] != '\n' and src_data[index] != '\r':
+               buf_len = buf_len *16 + int(src_data[index], 16)
+               index = index +1
+             
+             if buf_len == 0:
+                 break;
+
+             dst_data = dst_data+ src_data[index:buf_len+index+2]
+
+             index = buf_len + index + 2  # 2 for after size '\r\n' chars.
+        except IndexError:
+            pass
+    return dst_data
+

@@ -112,7 +112,7 @@ supported=0
 
 [suse]
 index=3
-versions=11.4,12.1
+versions=11.4,12.1,12.2
 display_name=SUSE Linux
 alt_names=
 display=1
@@ -368,7 +368,31 @@ packages=python-notify
 [suse:12.1:network]
 packages=wget
 
-
+# ********************
+[suse:12.2]
+code_name=Mantis
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=0
+network_supported=1
+parallel_supported=0
+usb_supported=1
+packaged_version=3.11.6
+release_date=2012-07-11
+notes=Please be sure to disable the CD repositories in YaST and after installation you must log out and back in to become a member of the lp and sys group to enable printing.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+cups_path_with_bitness=0
+ui_toolkit=qt4
+native_cups=1
+add_user_to_group= -Gsys,lp
+open_mdns_port=/bin/bash ./init-suse-firewall
+pre_depend_cmd=su -c "zypper refresh"
+same_as_version=12.1
 
 # ****************************************
 [redhat]
@@ -799,7 +823,7 @@ ui_toolkit=qt3
 # ****************************************
 [rhel]
 index=7
-versions=5.0,5.1,5.2,5.3,5.4,5.5,5.6,5.7,5.8,6.0
+versions=5.0,6.0
 display_name=Red Hat Enterprise Linux
 alt_names=red hat enterprise linux
 display=1
@@ -821,6 +845,7 @@ drv_dir=/usr/share/cups/drv/HP
 [rhel:5.0]
 code_name=
 supported=0
+libusb01=1
 scan_supported=1
 fax_supported=0
 pcard_supported=1
@@ -836,7 +861,7 @@ ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
-package_available=0
+package_available=1
 package_arch=i386,x86_64
 add_user_to_group=-a -Glp,sys
 
@@ -930,44 +955,13 @@ packages=polkit,polkit-gnome
 [rhel:5.0:network]
 packages=wget
 
-# ********************
-[rhel:5.1]
-same_as_version=5.0
-
-# ********************
-[rhel:5.2]
-same_as_version=5.0
-
-# ********************
-[rhel:5.3]
-same_as_version=5.0
-
-# ********************
-[rhel:5.4]
-same_as_version=5.0
-
-# ********************
-[rhel:5.5]
-same_as_version=5.0
-
-# ********************
-[rhel:5.6]
-same_as_version=5.0
-
-# ********************
-[rhel:5.7]
-same_as_version=5.0
-
-# ********************
-[rhel:5.8]
-same_as_version=5.0
 
 # ********************
 [rhel:6.0]
 code_name=Santiago
 supported=0
 scan_supported=1
-fax_supported=0
+fax_supported=1
 pcard_supported=1
 network_supported=1
 parallel_supported=1
@@ -981,7 +975,7 @@ ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
-package_available=0
+package_available=1
 package_arch=i686,x86_64
 add_user_to_group=-a -Glp,sys
 

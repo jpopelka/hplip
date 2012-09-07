@@ -60,6 +60,7 @@ email_subject = 'hp-scan from %s' % socket.gethostname()
 email_note = ''
 resize = 100
 contrast = 0
+set_contrast = False
 brightness = 0
 page_size = ''
 size_desc = ''
@@ -134,7 +135,8 @@ try:
         ("Scanning resolution:", "-r<resolution_in_dpi> or --res=<resolution_in_dpi> or --resolution=<resolution_in_dpi>", "option", False),
         ("", "where 300 is default.", "option", False),
         ("Image resize:", "--resize=<scale_in_%> (min=1%, max=400%, default=100%)", "option", False),
-        ("Image contrast:", "--contrast=<contrast>", "option", False),
+        ("Image contrast:", "--contrast=<contrast> or -c=<contrast>", "option", False),
+        ("", "The contrast range varies from device to device.", "option", False),
         ("ADF mode:", "--adf (Note, only PDF output is supported when using the ADF)", "option", False),
         utils.USAGE_SPACE,
         ("[OPTIONS] (Scan area)", "", "header", False),
@@ -503,7 +505,8 @@ try:
 
         elif o in ('-c', '--contrast'):
             try:
-                contrast = int(a.strip())
+				set_contrast = True
+				contrast = int(a.strip())
             except ValueError:
                 log.error("Invalid contrast value. Using default of 100.")
                 contrast = 100
@@ -658,6 +661,20 @@ try:
        
         device.setOption('compression', scanner_compression)
 
+        if set_contrast:
+            valid_contrast = device.getOptionObj('contrast').constraint
+            if contrast >= int(valid_contrast[0]) and contrast <= int(valid_contrast[1]):
+                contrast = device.getOptionObj('contrast').limitAndSet(contrast)
+            else:
+                log.warn("Invalid contrast. Contrast range is (%d, %d). Using closest valid contrast of %d " % (int(valid_contrast[0]), int(valid_contrast[1]), contrast))
+                if contrast < int(valid_contrast[0]):
+                    contrast = int(valid_contrast[0])
+                elif contrast > int(valid_contrast[1]):
+                    contrast = int(valid_contrast[1])
+                
+            
+            device.setOption('contrast', contrast)
+
         if brx - tlx <= 0.0 or bry - tly <= 0.0:
             log.error("Invalid scan area (width or height is negative).")
             sys.exit(1)
@@ -666,6 +683,8 @@ try:
         log.info("Resolution: %ddpi" % res)
         log.info("Mode: %s" % scan_mode)
         log.info("Compression: %s" % scanner_compression)
+        if(set_contrast):
+            log.info("Contrast: %d" % contrast)
         log.info("Scan area (mm):")
         log.info("  Top left (x,y): (%fmm, %fmm)" % (tlx, tly))
         log.info("  Bottom right (x,y): (%fmm, %fmm)" % (brx, bry))
@@ -715,7 +734,6 @@ try:
         event_queue = Queue.Queue()
 
         device.setOption("mode", scan_mode)
-        device.setOption("resolution", res)
 
         source_option = device.getOptionObj("source").constraint
         log.debug("Supported source Options: %s size=%d" % (source_option,len(source_option)))
@@ -747,7 +765,10 @@ try:
             except scanext.error:
                 log.debug("Error setting source or batch-scan option (this is probably OK).")
 
-
+        #For some devices, resolution is changed when we set 'source'.
+        #Hence we need to set resolution here, after setting the 'source' 
+        device.setOption("resolution", res)
+				
         if 'file' in dest and not output:
             log.warn("File destination enabled with no output file specified.")
 

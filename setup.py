@@ -210,7 +210,6 @@ except IndexError:
     param = ''
 
 log.debug("param=%s" % param)
-
 if printer_name is not None:
    selected_device_name = printer_name
 else:
@@ -390,7 +389,6 @@ else: # INTERACTIVE_MODE
         ppds = cups.getSystemPPDs()
 
         default_model = utils.xstrip(model.replace('series', '').replace('Series', ''), '_')
-        stripped_model = cups.stripModel2(default_model)
 
         installed_print_devices = device.getSupportedCUPSDevices(['hp'])
         for d in installed_print_devices.keys():
@@ -448,7 +446,7 @@ else: # INTERACTIVE_MODE
 
                         for d in installed_print_devices.keys():
                             for p in installed_print_devices[d]:
-                                if printer_name == p:
+                                if printer_name == p: 
                                     log.error("A print queue with that name already exists. Please enter a different name.")
                                     name_ok = False
                                     break
@@ -473,12 +471,12 @@ else: # INTERACTIVE_MODE
             log.info("Using queue name: %s" % printer_name)
 
             default_model = utils.xstrip(model.replace('series', '').replace('Series', ''), '_')
-            stripped_model = default_model.lower().replace('hp-', '').replace('hp_', '')
+
 
             log.info("Locating PPD file... Please wait.")
-            print_ppd = cups.getPPDFile2(stripped_model, ppds)
-            enter_ppd = False
+            print_ppd = cups.getPPDFile2(mq, default_model, ppds)
 
+            enter_ppd = False
             if print_ppd is None:
                 enter_ppd = True
                 log.error("Unable to find an appropriate PPD file.")
@@ -579,6 +577,7 @@ else: # INTERACTIVE_MODE
             status, output = utils.run(restart_cups())
             log.debug("Restart CUPS returned: exit=%d output=%s" % (status, output))
 
+            time.sleep(3)
             cups.setPasswordPrompt("You do not have permission to add a printer.")
             if not os.path.exists(print_ppd): # assume foomatic: or some such
                 status, status_str = cups.addPrinter(printer_name.encode('utf8'), print_uri,
@@ -684,26 +683,9 @@ else: # INTERACTIVE_MODE
                 fax_name = fax_default_model
 
             log.info("Using queue name: %s" % fax_name)
-
-            fax_type = mq.get('fax-type', FAX_TYPE_NONE)
-
-            if prop.hpcups_build:
-                if fax_type == FAX_TYPE_SOAP or fax_type == FAX_TYPE_LEDMSOAP:
-                    fax_ppd_name = 'HP-Fax2-hpcups'
-                else:
-                    fax_ppd_name = 'HP-Fax-hpcups'
-            else: # hpijs
-                if fax_type == FAX_TYPE_SOAP or fax_type == FAX_TYPE_LEDMSOAP:
-                    fax_ppd_name = 'HP-Fax2-hpijs'
-                else:
-                    fax_ppd_name = 'HP-Fax-hpijs'
-
-            for f in ppds:
-                if f.find(fax_ppd_name) >= 0:
-                    fax_ppd = f
-                    log.debug("Found PDD file: %s" % fax_ppd)
-                    break
-            else:
+            fax_ppd,fax_ppd_type,nick = cups.getFaxPPDFile(mq, fax_name)
+            
+            if not fax_ppd:
                 log.error("Unable to find HP fax PPD file! Please check you HPLIP installation and try again.")
                 sys.exit(1)
 

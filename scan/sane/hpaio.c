@@ -335,8 +335,10 @@ extern SANE_Status sane_hpaio_open(SANE_String_Const devicename, SANE_Handle * p
        return soapht_open(devicename, pHandle);
     if (ma.scantype == HPMUD_SCANTYPE_LEDM)
        return ledm_open(devicename, pHandle);
-    if ((ma.scantype == HPMUD_SCANTYPE_SCL) || (ma.scantype == HPMUD_SCANTYPE_PML))
+    if ((ma.scantype == HPMUD_SCANTYPE_SCL) || (ma.scantype == HPMUD_SCANTYPE_SCL_DUPLEX) ||(ma.scantype == HPMUD_SCANTYPE_PML))
        return sclpml_open(devicename, pHandle);
+    else
+       return SANE_STATUS_UNSUPPORTED;
 }   /* sane_hpaio_open() */
 
 extern void sane_hpaio_close(SANE_Handle handle)
@@ -365,6 +367,8 @@ extern const SANE_Option_Descriptor * sane_hpaio_get_option_descriptor(SANE_Hand
        return ledm_get_option_descriptor(handle, option);
     if (strcmp(*((char **)handle), "SCL-PML") == 0)
        return sclpml_get_option_descriptor(handle, option);
+    else
+       return SANE_STATUS_UNSUPPORTED;
 }  /* sane_hpaio_get_option_descriptor() */
 
 extern SANE_Status sane_hpaio_control_option(SANE_Handle handle, SANE_Int option, SANE_Action action, void * pValue, SANE_Int * pInfo )
@@ -379,7 +383,8 @@ extern SANE_Status sane_hpaio_control_option(SANE_Handle handle, SANE_Int option
        return ledm_control_option(handle, option, action, pValue, pInfo);
     if (strcmp(*((char **)handle), "SCL-PML") == 0)
        return sclpml_control_option(handle, option, action, pValue, pInfo);
-
+    else
+       return SANE_STATUS_UNSUPPORTED;
 }   /* sane_hpaio_control_option() */
 
 extern SANE_Status sane_hpaio_get_parameters(SANE_Handle handle, SANE_Parameters *pParams)
@@ -394,7 +399,8 @@ extern SANE_Status sane_hpaio_get_parameters(SANE_Handle handle, SANE_Parameters
        return ledm_get_parameters(handle, pParams);
     if (strcmp(*((char **)handle), "SCL-PML") == 0)
        return sclpml_get_parameters(handle, pParams);
-
+    else
+       return SANE_STATUS_UNSUPPORTED;
 }  /* sane_hpaio_get_parameters() */
 
 extern SANE_Status sane_hpaio_start(SANE_Handle handle)
@@ -409,7 +415,8 @@ extern SANE_Status sane_hpaio_start(SANE_Handle handle)
        return ledm_start(handle);
     if (strcmp(*((char **)handle), "SCL-PML") == 0)
        return sclpml_start(handle);
-
+    else
+       return SANE_STATUS_UNSUPPORTED;
 }   /* sane_hpaio_start() */
 
 
@@ -425,6 +432,8 @@ extern SANE_Status sane_hpaio_read(SANE_Handle handle, SANE_Byte *data, SANE_Int
        return soapht_read(handle, data, maxLength, pLength);
     if (strcmp(*((char **)handle), "SCL-PML") == 0)
        return sclpml_read(handle, data, maxLength, pLength);
+    else
+       return SANE_STATUS_UNSUPPORTED;
 
 } /* sane_hpaio_read() */
 
@@ -441,7 +450,6 @@ extern void sane_hpaio_cancel( SANE_Handle handle )
        return ledm_cancel(handle);
     if (strcmp(*((char **)handle), "SCL-PML") == 0)
        return sclpml_cancel(handle);
-    
 }  /* sane_hpaio_cancel() */
 
 extern SANE_Status sane_hpaio_set_io_mode(SANE_Handle handle, SANE_Bool nonBlocking)

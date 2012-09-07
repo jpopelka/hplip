@@ -33,9 +33,9 @@
 # include "hpip.h"
 # include "hpmud.h"
 
-# define LEDM_CONTRAST_MIN -127
-# define LEDM_CONTRAST_MAX 127
-# define LEDM_CONTRAST_DEFAULT 0
+# define LEDM_CONTRAST_MIN 0 /*According the LEDM spec*/
+# define LEDM_CONTRAST_MAX 2000
+# define LEDM_CONTRAST_DEFAULT 1000
 
 # define MM_PER_INCH     25.4
 

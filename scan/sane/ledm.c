@@ -525,11 +525,19 @@ SANE_Status ledm_control_option(SANE_Handle handle, SANE_Int option, SANE_Action
                  while(i--) session->resolutionList[i] = session->adf_resolutionList[i];
                }
                ps->currentResolution = session->resolutionList[1];
-               mset_result |= SANE_INFO_RELOAD_PARAMS | SANE_INFO_RELOAD_OPTIONS;
-               stat = SANE_STATUS_GOOD;
                break;
              }
            }
+           /*For some devices resolution varies, when we change 'source' in Xsane.
+           Hence need to update the resolution  */
+           if (i>1) /*Number of sources > 1*/
+           {
+             if(session->platen_resolutionList[1] != session->adf_resolutionList[1])
+                 ps->currentResolution = session->resolutionList[1];
+           }
+           mset_result |= SANE_INFO_RELOAD_PARAMS | SANE_INFO_RELOAD_OPTIONS;
+           stat = SANE_STATUS_GOOD;
+           break;
          }
          else
          {  /* Set default. */
@@ -581,9 +589,13 @@ SANE_Status ledm_control_option(SANE_Handle handle, SANE_Int option, SANE_Action
             if (*int_value >= LEDM_CONTRAST_MIN && *int_value <= LEDM_CONTRAST_MAX)
             {
                ps->currentContrast = *int_value;
-               stat = SANE_STATUS_GOOD;
-               break;
             }
+            else
+            {
+                ps->currentContrast = LEDM_CONTRAST_DEFAULT;
+            }
+            mset_result |= SANE_INFO_RELOAD_PARAMS;
+            stat = SANE_STATUS_GOOD;
          }
          else
          {  /* Set default. */

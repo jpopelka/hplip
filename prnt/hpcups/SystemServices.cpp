@@ -36,8 +36,8 @@ SystemServices::SystemServices(int iLogLevel, int job_id) : m_iLogLevel(iLogLeve
     m_fp = NULL;
     if (iLogLevel & SAVE_PCL_FILE)
     {
-        char    fname[32];
-        sprintf(fname, "/tmp/hpcups_job%d.out", job_id);
+        char    fname[64];
+	sprintf(fname, "%s/hpcups_job%d.out", "/var/log/hp/tmp",job_id);
         m_fp = fopen(fname, "w");
         chmod(fname, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     }

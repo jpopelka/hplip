@@ -740,17 +740,7 @@ class SetupDialog(QDialog, Ui_Dialog):
         try:
             self.print_ppd = None
             self.ppds = cups.getSystemPPDs()
-            
-            #Check if common ppd name is already given in models.dat(This is needed because in case of devices having more than one derivatives
-            #will have diffrent model name strings in device ID, because of which we don't get the common ppd name for search)
-
-            ppd_name = self.mq.get('ppd-name',0)
-    
-            if ppd_name == 0:    #Means ppd-name is not provided So follow earlier path of getting name from device ID.
-            	model = cups.stripModel2(self.model)
-            	self.print_ppd = cups.getPPDFile2(model, self.ppds)
-            else:
-            	self.print_ppd = cups.getPPDFile2(ppd_name, self.ppds)
+            self.print_ppd = cups.getPPDFile2(self.mq, self.model, self.ppds)
             
         finally:
             QApplication.restoreOverrideCursor()
@@ -759,58 +749,17 @@ class SetupDialog(QDialog, Ui_Dialog):
     def findFaxPPD(self):
         QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
         try:
-            log.debug("Searching for fax PPD for model %s" % self.model)
-
-            if prop.hpcups_build:
-                if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_MARVELL:
-                    fax_ppd_name = "HP-Fax3-hpcups" # Fixed width (2528 pixels) and 300dpi rendering
-                    nick = "HP Fax3 hpcups"
-                elif self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_SOAP or self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_LEDMSOAP:
-                    fax_ppd_name = "HP-Fax2-hpcups" # Fixed width (2528 pixels) and 300dpi rendering
-                    nick = "HP Fax2 hpcups"
-                elif self.mq.get('fax-type', FAX_TYPE_LEDM) == FAX_TYPE_LEDM:
-                    fax_ppd_name = "HP-Fax4-hpcups"# Fixed width (2528 pixels) and 300dpi rendering
-                    nick = "HP Fax4 hpcups"
-                else:
-                    fax_ppd_name = "HP-Fax-hpcups" # Standard
-                    nick = "HP Fax hpcups"
-
-            else: # hpijs
-                if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_MARVELL:
-                    fax_ppd_name = "HP-Fax3-hpijs" # Fixed width (2528 pixels) and 300dpi rendering
-                    nick = "HP Fax3 hpijs"
-                if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_SOAP or self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_LEDMSOAP:
-                    fax_ppd_name = "HP-Fax2-hpijs" # Fixed width (2528 pixels) and 300dpi rendering
-                    nick = "HP Fax2 hpijs"
-                if self.mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_LEDM:
-                    fax_ppd_name = "HP-Fax4-hpijs" # Fixed width (2528 pixels) and 300dpi rendering
-                    nick = "HP Fax4 hpijs"
-                else:
-                    fax_ppd_name = "HP-Fax-hpijs" # Standard
-                    nick = "HP Fax hpijs"
-
-            ppds = []
-
-            for f in utils.walkFiles(sys_conf.get('dirs', 'ppd'), pattern="HP-Fax*.ppd*", abs_paths=True):
-                ppds.append(f)
-
-            for f in ppds:
-                if f.find(fax_ppd_name) >= 0 and cups.getPPDDescription(f) == nick:
-                    self.fax_ppd = f
-                    self.fax_setup_ok = True
-                    log.debug("Found fax PPD: %s" % f)
-                    break
+            self.fax_ppd, fax_ppd_name, nick = cups.getFaxPPDFile(self.mq, self.model)
+            if self.fax_ppd:
+                self.fax_setup_ok = True
             else:
-                self.fax_ppd = None
                 self.fax_setup_ok = False
                 FailureUI(self, self.__tr("<b>Unable to locate the HPLIP Fax PPD file:</b><p>%1.ppd.gz</p><p>Fax setup has been disabled.").arg(fax_ppd_name))
                 self.fax_setup = False
                 self.SetupFaxGroupBox.setChecked(False)
                 self.SetupFaxGroupBox.setEnabled(False)
-
         finally:
             QApplication.restoreOverrideCursor()
-
 
 
     def setDefaultPrinterName(self):

@@ -1593,6 +1593,10 @@ class PrintSettingsToolbox(QToolBox):
     def BoolRadioButtons_clicked(self, b): # cups.PPD_UI_BOOLEAN
         sender = self.sender()
         b = int(b)
+        if sender.default == True or sender.default == "True" or sender.default == "true":
+            sender.default = int(True)
+        else:
+            sender.default = int(False)
 
         if b == sender.default:
             self.removePrinterOption(sender.option)
@@ -1632,6 +1636,10 @@ class PrintSettingsToolbox(QToolBox):
         sender.setEnabled(False)
 
         if sender.typ == cups.PPD_UI_BOOLEAN: # () On  (*) Off
+            if sender.default == True or sender.default == 'True' or sender.default == 'true': 
+                sender.default = True
+            else:
+                sender.default = False
             if sender.default:
                 sender.control[0].setChecked(True)
                 sender.control[0].setFocus(Qt.OtherFocusReason)

@@ -1307,6 +1307,9 @@ class Device(object):
     def openLEDM(self):
         return self.__openChannel(hpmudext.HPMUD_S_LEDM_SCAN)
 
+    def openMarvell_EWS(self):
+        return self.__openChannel(hpmudext.HPMUD_S_MARVELL_EWS_CHANNEL)
+
     def closePrint(self):
         return self.__closeChannel(hpmudext.HPMUD_S_PRINT_CHANNEL)
 
@@ -1333,6 +1336,9 @@ class Device(object):
 
     def closeLEDM(self):
         return self.__closeChannel(hpmudext.HPMUD_S_LEDM_SCAN)
+
+    def closeMarvell_EWS(self):
+        return self.__closeChannel(hpmudext.HPMUD_S_MARVELL_EWS_CHANNEL)
 
     def openCfgUpload(self):
         return self.__openChannel(hpmudext.HPMUD_S_CONFIG_UPLOAD_CHANNEL)
@@ -2146,6 +2152,9 @@ class Device(object):
     def readLEDM(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=True):
         return self.__readChannel(self.openLEDM, bytes_to_read, stream, timeout, allow_short_read)
 
+    def readMarvell_EWS(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=True):
+        return self.__readChannel(self.openMarvell_EWS, bytes_to_read, stream, timeout, allow_short_read)
+
     def readSoapFax(self, bytes_to_read, stream=None, timeout=prop.read_timeout, allow_short_read=True):
         return self.__readChannel(self.openSoapFax, bytes_to_read, stream, timeout, allow_short_read)
 
@@ -2231,6 +2240,9 @@ class Device(object):
 
     def writeLEDM(self, data):
         return self.__writeChannel(self.openLEDM, data)
+
+    def writeMarvell_EWS(self, data):
+        return self.__writeChannel(self.openMarvell_EWS, data)
 
     def writeCfgDownload(self, data):
         return self.__writeChannel(self.openCfgDownload, data)
@@ -2543,7 +2555,8 @@ class Device(object):
             return ""
         xmlDict = utils.XMLToDictParser().parseXML(data)
         try:
-            return str(xmlDict[attribute])
+            #return str(xmlDict[attribute])
+            return xmlDict[attribute]
         except:
             return str("")
 
@@ -2682,9 +2695,22 @@ class LocalOpener_LEDM(urllib.URLopener):
             dev.writeLEDM("""GET %s HTTP/1.1\r\nAccept: text/plain\r\nHost:localhost\r\nUser-Agent:hplip\r\n\r\n""" % loc)
 
         reply = xStringIO()
-
+ 
         while dev.readLEDM(512, reply, timeout=3):
             pass
+
+        #TODO:Need to add following code in order to improve the delay.
+        #exp_end_of_data="0\r\n\r\n"
+        #num_of_bytes_read = dev.readEWS_LEDM(512, reply, timeout=5)
+
+        #while num_of_bytes_read:
+            #temp_buf = xStringIO()
+            #num_of_bytes_read = dev.readEWS_LEDM(512, temp_buf, timeout=5)
+            #reply.write(temp_buf.getvalue())
+
+            #if num_of_bytes_read == 5 and exp_end_of_data == temp_buf.getvalue():
+            #    break
+            #pass
 
         reply.seek(0)
         return reply.getvalue()

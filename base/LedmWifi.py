@@ -54,7 +54,11 @@ MAX_RETRIES = 2
 
 LEDM_WIFI_BASE_URI = "/IoMgmt/Adapters/"
 
-adapterPowerXml = """<io:Adapters xmlns:io=\"http://www.hp.com/schemas/imaging/con/ledm/iomgmt/2008/11/30\" xmlns:dd=\"http://www.hp.com/schemas/imaging/con/dictionaries/1.0/\"><io:Adapter><io:HardwareConfig><dd:Power>%s</dd:Power></io:HardwareConfig></io:Adapter></io:Adapters>"""
+# This payload is working for LaserJet Devices
+adapterPowerXml_payload2 ="""<?xml version="1.0" encoding="UTF-8" ?><io:Adapter xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:io="http://www.hp.com/schemas/imaging/con/ledm/iomgmt/2008/11/30" xmlns:dd="http://www.hp.com/schemas/imaging/con/dictionaries/1.0/" xmlns:wifi="http://www.hp.com/schemas/imaging/con/wifi/2009/06/26">  <io:HardwareConfig> <dd:Power>%s</dd:Power> </io:HardwareConfig> </io:Adapter>"""
+
+# This payload is working for OfficeJet and Photosmart Devices
+adapterPowerXml_payload1 = """<?xml version="1.0" encoding="UTF-8"?><io:Adapters xmlns:io="http://www.hp.com/schemas/imaging/con/ledm/iomgmt/2008/11/30" xmlns:dd="http://www.hp.com/schemas/imaging/con/dictionaries/1.0/"><io:Adapter><io:HardwareConfig><dd:Power>%s</dd:Power></io:HardwareConfig></io:Adapter></io:Adapters>"""
 
 passPhraseXml="""<io:Profile xmlns:io="http://www.hp.com/schemas/imaging/con/ledm/iomgmt/2008/11/30" xmlns:dd="http://www.hp.com/schemas/imaging/con/dictionaries/1.0/" xmlns:wifi="http://www.hp.com/schemas/imaging/con/wifi/2009/06/26" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.hp.com/schemas/imaging/con/ledm/iomgmt/2008/11/30 ../../schemas/IoMgmt.xsd http://www.hp.com/schemas/imaging/con/dictionaries/1.0/ ../../schemas/dd/DataDictionaryMasterLEDM.xsd"><io:AdapterProfile><io:WifiProfile><wifi:SSID>%s</wifi:SSID><wifi:CommunicationMode>%s</wifi:CommunicationMode><wifi:EncryptionType>%s</wifi:EncryptionType><wifi:AuthenticationMode>%s</wifi:AuthenticationMode></io:WifiProfile></io:AdapterProfile></io:Profile>"""
 
@@ -66,7 +70,7 @@ def getAdaptorList(dev):
     while max_tries < MAX_RETRIES:
         max_tries +=1
         URI = LEDM_WIFI_BASE_URI[0:len(LEDM_WIFI_BASE_URI)-1]# to remove "\" from the string
-        params,code,elementCount = readXmlDataFromURI(dev,URI,'<io:Adapters', '<io:Adapter>')
+        paramsList,code = readXmlTagDataFromURI(dev,URI,'<io:Adapters', '<io:Adapter>')
         if code == HTTP_OK:
             break
 
@@ -74,32 +78,34 @@ def getAdaptorList(dev):
         log.error("Request Failed With Response Code %d"%code)
         return ret
 
-    ret['adaptorlistlength'] = elementCount
-    if params is not None:        
-        if elementCount == 1:
-            try:
-                ret['adaptorid-0' % a] = params['io:adapters-io:adapter-map:resourcenode-map:resourcelink-dd:resourceuri']
-                ret['adaptorname-0' % a] = params['io:adapters-io:adapter-io:hardwareconfig-dd:name']
-                ret['adaptorpresence-0' % a] = ''
-                ret['adaptorstate-0' % a] = ''
-                ret['adaptortype-0' % a] = params['io:adapters-io:adapter-io:hardwareconfig-dd:deviceconnectivityporttype']                
-            except KeyError, e:
-                log.debug("Missing response key: %s" % e)   # changed from error to debug
-        else:
-            for a in xrange(elementCount):
+    ret['adaptorlistlength'] = len(paramsList)
+    if len(paramsList) != 0:        
+            a = 0
+            for params in paramsList:
+                ret['adaptorpresence-%d' % a] = ''
+                ret['adaptorstate-%d' % a] = ''
                 try:
-                    ret['adaptorid-%d' % a] = params['io:adapters-io:adapter-map:resourcenode-map:resourcelink-dd:resourceuri-%d' % a]
-                    ret['adaptorname-%d' % a] = params['io:adapters-io:adapter-io:hardwareconfig-dd:name-%d' % a]
-            	    ret['adaptorpresence-%d' % a] = ''
-            	    ret['adaptorstate-%d' % a] = ''
-            	    ret['adaptortype-%d' % a] = params['io:adapters-io:adapter-io:hardwareconfig-dd:deviceconnectivityporttype-%d' % a]            	    
+                    ret['adaptorid-%d' % a] = params['io:adapter-map:resourcenode-map:resourcelink-dd:resourceuri']
                 except KeyError, e:
                     log.debug("Missing response key: %s" % e)    #changed from error to debug
+                    ret['adaptorid-%d' % a]=""
+                try:
+                    ret['adaptorname-%d' % a] = params['io:adapter-io:hardwareconfig-dd:name']
+                except KeyError, e:
+                    log.debug("Missing response key: %s" % e)    #changed from error to debug
+                    ret['adaptorname-%d' % a] = ""
+                try:
+                    ret['adaptortype-%d' % a] = params['io:adapter-io:hardwareconfig-dd:deviceconnectivityporttype']
+                except KeyError, e:
+                    log.debug("Missing response key: %s" % e)    #changed from error to debug
+                    ret['adaptortype-%d' % a] = ""
+                    
+                a = a+1
     return ret   
 
 
 def getWifiAdaptorID(dev):
-    ret = {}
+    rVal = []
 
     ret = getAdaptorList(dev)
     try:
@@ -127,20 +133,34 @@ def getWifiAdaptorID(dev):
 
                 r.append(x)
 
-            return r
+            rVal.append(r)
 
-    return -1, 'Unknown', 'Unknown', 'Unknown'
+    return rVal
                          
-def setAdaptorPower(dev, adapterName, adaptor_id=0, power_state='on'):
-    ret,powerXml,URI,code = {},'','',HTTP_ERROR
-    URI = LEDM_WIFI_BASE_URI + adapterName
-    powerXml = adapterPowerXml %(power_state)  
+def setAdaptorPower(dev, adapterList, power_state='on'):
+    adaptor_id=-1
+    adaptorName =""
+    for a in adapterList:
+       adaptor_id = a[0]
+       adaptorName = a[1]
+       ret,powerXml,URI,code = {},'','',HTTP_ERROR
+       URI = LEDM_WIFI_BASE_URI + adaptorName
+       powerXml = adapterPowerXml_payload1 %(power_state)  
   
-    ret['errorreturn'] = writeXmlDataToURI(dev,URI,powerXml,10)    
-    if not(ret['errorreturn'] == HTTP_OK or HTTP_NOCONTENT):
-        log.error("Request Failed With Response Code %d" %code)
-    
-    return ret
+       ret['errorreturn'] = writeXmlDataToURI(dev,URI,powerXml,10)    
+       if not(ret['errorreturn'] == HTTP_OK or ret['errorreturn'] == HTTP_NOCONTENT):
+          log.warn("Wifi Adapter turn ON request Failed. ResponseCode=%s AdaptorId=%s AdaptorName=%s. Trying another interface" %(ret['errorreturn'],adaptor_id,adaptorName))
+          powerXml = adapterPowerXml_payload2 %(power_state)
+          ret['errorreturn'] = writeXmlDataToURI(dev,URI,powerXml,10)
+
+       if not(ret['errorreturn'] == HTTP_OK or ret['errorreturn'] == HTTP_NOCONTENT):
+          log.error("Wifi Adapter turn ON request Failed. ResponseCode=%s AdaptorId=%s AdaptorName=%s" %(ret['errorreturn'],adaptor_id,adaptorName))
+       else:
+          log.debug("Wifi Adapter turn ON request is Success. AdaptorId=%s AdaptorName=%s" %(adaptor_id,adaptorName))
+#          adapaterState = a[2], adapterPresence= a[3] 
+          return adaptor_id, adaptorName, a[2], a[3] 
+
+    return -1 ,"","",""
 
 def performScan(dev, adapterName, ssid=None):
     ret ={}
@@ -181,7 +201,7 @@ def performScan(dev, adapterName, ssid=None):
                 ret['encryptiontype-0'] = params['io:wifinetworks-io:wifinetwork-wifi:encryptiontype']
                 ret['signalstrength-0'] = params['io:wifinetworks-io:wifinetwork-io:signalinfo-wifi:signalstrength']                
             except KeyError, e:
-                log.error("Missing response key: %s" % e)  
+                log.debug("Missing response key: %s" % e)  
         else:
             for a in xrange(elementCount):
                 try:                
@@ -206,7 +226,7 @@ def performScan(dev, adapterName, ssid=None):
                     ret['signalstrength-%d' % a] = params['io:wifinetworks-io:wifinetwork-io:signalinfo-wifi:signalstrength-%d' % a]            	    
             	
                 except KeyError, e:
-                    log.error("Missing response key: %s" % e)  
+                    log.debug("Missing response key: %s" % e)  
                 try:                    
                     ret['signalstrengthmax'] = 5
                     ret['signalstrengthmin'] = 0
@@ -317,7 +337,7 @@ def getCryptoSuite(dev, adapterName):
             alg = parms['io:profile-io:adapterprofile-io:wifiprofile-wifi:encryptiontype']
             secretid = parms['io:profile-io:adapterprofile-io:wifiprofile-wifi:bssid']    
         except KeyError, e:
-            log.error("Missing response key: %s" % str(e))
+            log.debug("Missing response key: %s" % str(e))
     
     return  alg, mode, secretid
 
@@ -356,7 +376,7 @@ def getVSACodes(dev, adapterName):
             break
     
     if code != HTTP_OK:
-        log.error("Request Failed With Response Code %d"%code)
+        log.warn("Request Failed With Response Code %d"%code)
         return ret
  
     if params is not None:
@@ -376,7 +396,7 @@ def getVSACodes(dev, adapterName):
 
 def getHostname(dev):
     hostName = ''
-    URI = "/IoMgmt/IoConfig.xml"
+    URI = "/IoMgmt/IoConfig.xml"    
     max_tries = 0
     
     while max_tries < MAX_RETRIES:
@@ -386,14 +406,14 @@ def getHostname(dev):
             break    
     
     if code != HTTP_OK:
-        log.error("Request failed with Response code %d"%code)
-        return hostName
+        log.warn("Request failed with Response code %d. HostName not found."%code)
+        return  hostName
        
     if params is not None:        
         try:               
             hostName = params['io:ioconfig-io:iodeviceconfig-dd3:hostname']            
         except KeyError, e:
-            log.error("Missing response key: %s" % e)
+            log.debug("Missing response key: %s" % e)
 
     return  hostName
 
@@ -429,6 +449,69 @@ def getSignalStrength(dev, adapterName, ssid, adaptor_id=0):
     return  ss_max, ss_min, ss_val, ss_dbm
 
 
+def readXmlTagDataFromURI(dev,URI,xmlRootNode,xmlReqDataNode,timeout=5):
+    paramsList,code =[],HTTP_ERROR
+    
+    data = format_http_get(URI,0,"")
+    log.info(data)
+    response = cStringIO.StringIO()
+    if dev.openLEDM() == -1:
+        dev.closeLEDM()
+        if dev.openEWS_LEDM() == -1:
+            
+            dev.openMarvell_EWS()
+            dev.writeMarvell_EWS(data)
+            try:
+                while dev.readMarvell_EWS(1024, response, timeout):
+                    pass
+            except Error:
+                dev.closeMarvell_EWS()
+                log.error("Unable to read Marvell_EWS Channel")
+        else:
+            dev.writeEWS_LEDM(data)
+            try:
+                while dev.readEWS_LEDM(1024, response, timeout):
+                    pass
+            except Error:
+                dev.closeEWS_LEDM()
+                log.error("Unable to read EWS_LEDM Channel")
+    else:
+        dev.writeLEDM(data)
+        try:
+            while dev.readLEDM(1024, response, timeout):
+                pass
+        except Error:
+            dev.closeLEDM()
+            log.error("Unable to read LEDM Channel") 
+
+    #dev.closeEWS_LEDM()    
+    strResp = str(response.getvalue())
+    if strResp is not None:                         	
+        code = get_error_code(strResp)
+        if code == HTTP_OK:
+            strResp = utils.unchunck_xml_data(strResp)
+
+    	pos = strResp.find(xmlRootNode,0,len(strResp))    
+    	repstr = strResp[pos:].strip()
+        repstr = filter(lambda c: c not in "\r\t\n", repstr) # To remove formating characters from the received xml
+        repstr = repstr.rstrip('0')   # To remove trailing zero from the received xml
+        try:
+            parser_object = utils.extendedExpat()
+            root_element = parser_object.Parse(repstr)
+            xmlReqDataNode = filter(lambda c: c not in "<>", xmlReqDataNode) # To remove '<' and '>' characters
+            reqDataElementList = root_element.getElementsByTagName(xmlReqDataNode)
+            for node in reqDataElementList:
+                repstr = node.toString()
+                repstr = filter(lambda c: c not in "\r\t\n", repstr) # To remove formating characters from the received xml
+                params = utils.XMLToDictParser().parseXML(repstr)
+                paramsList.append(params)
+        except xml.parsers.expat.ExpatError, e:
+            log.debug("XML parser failed: %s" % e)  #changed from error to debug 
+
+    return paramsList,code
+
+
+
 def readXmlDataFromURI(dev,URI,xmlRootNode,xmlChildNode,timeout=5):
     params,code,elementCount ={},HTTP_ERROR,0 
     
@@ -436,18 +519,27 @@ def readXmlDataFromURI(dev,URI,xmlRootNode,xmlChildNode,timeout=5):
     log.info(data)
     response = cStringIO.StringIO()
     if dev.openLEDM() == -1:
-        dev.openEWS_LEDM()
-        dev.writeEWS_LEDM(data)
-        try:
-            while dev.readEWS_LEDM(1024, response, timeout):
-                pass
-        except Error:
-            dev.closeEWS_LEDM()
-            log.error("Unable to read EWS_LEDM Channel")
+        dev.closeLEDM()
+        if dev.openEWS_LEDM() == -1:
+            
+            dev.openMarvell_EWS()
+            dev.writeMarvell_EWS(data)
+            try:
+                while dev.readMarvell_EWS(1024, response, timeout):
+                    pass
+            except Error:
+                dev.closeMarvell_EWS()
+                log.error("Unable to read Marvell_EWS Channel")
+        else:
+            dev.writeEWS_LEDM(data)
+            try:
+                while dev.readEWS_LEDM(1024, response, timeout):
+                    pass
+            except Error:
+                dev.closeEWS_LEDM()
+                log.error("Unable to read EWS_LEDM Channel")
     else:
         dev.writeLEDM(data)
-
-    #response = cStringIO.StringIO()
         try:
             while dev.readLEDM(1024, response, timeout):
                 pass
@@ -456,9 +548,11 @@ def readXmlDataFromURI(dev,URI,xmlRootNode,xmlChildNode,timeout=5):
             log.error("Unable to read LEDM Channel") 
     #dev.closeEWS_LEDM()    
     strResp = str(response.getvalue())
-    #log.error(strResp)
     if strResp is not None:                         	
         code = get_error_code(strResp)        
+        if code == HTTP_OK:
+             strResp = utils.unchunck_xml_data(strResp)
+
     	pos = strResp.find(xmlRootNode,0,len(strResp))    
     	repstr = strResp[pos:].strip()
         repstr = filter(lambda c: c not in "\r\t\n", repstr) # To remove formating characters from the received xml
@@ -479,12 +573,21 @@ def writeXmlDataToURI(dev,URI,xml,timeout=5):
     response = cStringIO.StringIO()
 
     if dev.openLEDM() == -1:
-        dev.openEWS_LEDM()
-        dev.writeEWS_LEDM(data)
-        try:
-            while dev.readEWS_LEDM(1000, response, timeout):
-                pass
-        except Error:
+        if dev.openEWS_LEDM() == -1:
+            dev.openMarvell_EWS()
+            dev.writeMarvell_EWS(data)
+            try:
+               while dev.readMarvell_EWS(1000, response, timeout):
+                   pass
+            except Error:
+                dev.closeMarvell_EWS()
+                log.error("Unable to read Marvell_EWS Channel")
+        else:
+            dev.writeEWS_LEDM(data)
+            try:
+                while dev.readEWS_LEDM(1000, response, timeout):
+                    pass
+            except Error:
                 dev.closeEWS_LEDM()
                 log.error("Unable to read EWS_LEDM Channel")
             

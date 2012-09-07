@@ -255,17 +255,12 @@ class WifiSetupDialog(QDialog, Ui_Dialog):
         self.num_networks = 0
 
         try:
-            self.adaptor_id, self.adapterName, state, presence = self.wifiObj.getWifiAdaptorID(self.dev)           
+            adaptor_list = self.wifiObj.getWifiAdaptorID(self.dev)           
         except Error, e:
             self.showIOError(e)
             return
-
-        log.debug("Adaptor ID: %s" % self.adaptor_id)
-        log.debug("Adaptor name: %s" % self.adapterName)
-        log.debug("Adaptor state: %s" % state)
-        log.debug("Adaptor presence: %s" % presence)
-
-        if self.adaptor_id == -1:
+        
+        if len(adaptor_list) == 0: 
             FailureUI(self, self.__tr("<b>Unable to locate wireless hardware on device.</b>"))
             if self.dev is not None:
                 self.dev.close()
@@ -274,10 +269,19 @@ class WifiSetupDialog(QDialog, Ui_Dialog):
 
         log.debug("Turning on wireless radio...")
         try:            
-            self.wifiObj.setAdaptorPower(self.dev, self.adapterName, self.adaptor_id)
+            self.adaptor_id, self.adapterName, state, presence =  self.wifiObj.setAdaptorPower(self.dev, adaptor_list )
         except Error, e:
             self.showIOError(e)
             return
+        if self.adaptor_id == -1:
+            FailureUI(self, self.__tr("<b>Unable to turn on wireless adaptor.</b>"))
+            if self.dev is not None:
+                self.dev.close()
+
+        log.debug("Adaptor ID: %s" % self.adaptor_id)
+        log.debug("Adaptor name: %s" % self.adapterName)
+        log.debug("Adaptor state: %s" % state)
+        log.debug("Adaptor presence: %s" % presence)
 
         self.performScan()
         self.setNextButton(BUTTON_NEXT)
@@ -575,12 +579,16 @@ class WifiSetupDialog(QDialog, Ui_Dialog):
             self.RefreshTimer.start(REFRESH_INTERVAL * 1000)
 
         elif self.success == SUCCESS_AUTO_IP:
-            self.pages.append((self.__tr("Your printer has been connected to the wireless network, but it has been assigned an address which may not be usable."), load_pixmap('warning', '16x16')))
-            self.RefreshTimer.start(REFRESH_INTERVAL * 1000)
+#            self.pages.append((self.__tr("Your printer has been connected to the wireless network, but it has been assigned an address which may not be usable."), load_pixmap('warning', '16x16')))
+            self.pages.append((self.__tr("Your printer has been connected to the wireless network and has been assinged a IP. Now run <pre>hp-setup %s</pre>  If IP is not accessible, try again for another IP."%self.ip), load_pixmap('warning', '16x16')))
+       #     self.RefreshTimer.start(REFRESH_INTERVAL * 1000)
+            self.CancelButton.setEnabled(False)
+            self.BackButton.setEnabled(False)
+            self.RefreshTimer.stop()
 
         else: # SUCCESS_CONNECTED
             if self.standalone:
-                self.pages.append((self.__tr("Your printer has been successfully configured on the wireless network. You may now unplug the USB cable. To setup the printer, now run <pre>hp-setup.</pre>"), load_pixmap('info', '16x16')))
+                self.pages.append((self.__tr("Your printer has been successfully configured on the wireless network. You may now unplug the USB cable. To setup the printer, now run <pre>hp-setup %s</pre>"%self.ip), load_pixmap('info', '16x16')))
             else:
                 self.pages.append((self.__tr("Your printer has been successfully configured on the wireless network. You may now unplug the USB cable."), load_pixmap('info', '16x16')))
             self.CancelButton.setEnabled(False)

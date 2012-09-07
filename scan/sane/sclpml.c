@@ -729,6 +729,7 @@ static int hpaioUpdateDescriptors( hpaioScanner_t hpaio, int option )
     if( initValues )
     {
         hpaioSetDefaultValue( hpaio, OPTION_CONTRAST );
+		reload |= SANE_INFO_RELOAD_OPTIONS;
     }
 
     /* OPTION_COMPRESSION: */
@@ -1003,8 +1004,7 @@ static void init_options( hpaioScanner_t hpaio )
     hpaio->option[OPTION_CONTRAST].size = sizeof( SANE_Int );
     hpaio->option[OPTION_CONTRAST].cap = SANE_CAP_SOFT_SELECT |
                                          SANE_CAP_SOFT_DETECT |
-                                         SANE_CAP_ADVANCED |
-                                         SANE_CAP_INACTIVE;
+                                         SANE_CAP_ADVANCED;
     hpaio->option[OPTION_CONTRAST].constraint_type = SANE_CONSTRAINT_RANGE;
     hpaio->option[OPTION_CONTRAST].constraint.range = &hpaio->contrastRange;
     hpaio->contrastRange.min = PML_CONTRAST_MIN;
@@ -1246,6 +1246,10 @@ static SANE_Status hpaioProgramOptions( hpaioScanner_t hpaio )
                         SCL_CMD_SET_Y_EXTENT,
                         MILLIMETERS_TO_DECIPIXELS( hpaio->effectiveBry -
                                                    hpaio->effectiveTly ) );
+	    /* Set Contrast */
+	    SclSendCommand( hpaio->deviceid, hpaio->scan_channelid,
+                        SCL_CMD_SET_CONTRAST,
+                        hpaio->currentContrast );
 
         /* Download color map to OfficeJet Pro 11xx. */
         if( hpaio->scl.compat & ( SCL_COMPAT_1150 | SCL_COMPAT_1170 ) )
@@ -1956,7 +1960,6 @@ SANE_Status sclpml_open(SANE_String_Const device, SANE_Handle *pHandle)
     int bytes_read;
     char deviceIDString[LEN_DEVICE_ID_STRING];
     char model[256];
-    char devname[256];
     enum HPMUD_RESULT stat;
     
     if(session)
@@ -2599,7 +2602,7 @@ SANE_Status sclpml_start(SANE_Handle handle)
             char f[256];
             static int cnt=0;   
             
-            sprintf(f, "/tmp/mfpdtf_%d.out", cnt++);
+            sprintf(f, "/var/log/hp/tmp/mfpdtf_%d.out", cnt++);
             
             bug("saving raw image to %s \n", f);
             

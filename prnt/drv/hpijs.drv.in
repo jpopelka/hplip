@@ -2945,6 +2945,22 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Photosmart c4494 All-in-one Printer)"
   }
   {
+    ModelName "HP Officejet j4500 Series hpijs"
+    Attribute "NickName" "" "HP Officejet j4500 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Officejet j4500 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet j4500 series;DES:officejet j4500 series;"
+    PCFileName "hp-officejet_j4500_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Officejet j4524 All-in-one Printer)"
+    Attribute "Product" "" "(HP Officejet j4525 All-in-one Printer)"
+    Attribute "Product" "" "(HP Officejet j4535 All-in-one Printer)"
+    Attribute "Product" "" "(HP Officejet j4540 All-in-one Printer)"
+    Attribute "Product" "" "(HP Officejet j4550 All-in-one Printer)"
+    Attribute "Product" "" "(HP Officejet j4560 All-in-one Printer)"
+    Attribute "Product" "" "(HP Officejet j4580 All-in-one Printer)"
+    Attribute "Product" "" "(HP Officejet j4580c All-in-one Printer)"
+    Attribute "Product" "" "(HP Officejet j4585 All-in-one Printer)"
+  }
+  {
     ModelName "HP Photosmart c4500 Series hpijs"
     Attribute "NickName" "" "HP Photosmart c4500 Series hpijs, $Version"
     Attribute "ShortNickName" "" "HP PS c4500 Series hpijs"
@@ -2962,22 +2978,6 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Photosmart c4588 All-in-one Printer)"
     Attribute "Product" "" "(HP Photosmart c4593 All-in-one Printer)"
     Attribute "Product" "" "(HP Photosmart c4599 All-in-one Printer)"
-  }
-  {
-    ModelName "HP Officejet j4500 Series hpijs"
-    Attribute "NickName" "" "HP Officejet j4500 Series hpijs, $Version"
-    Attribute "ShortNickName" "" "HP Officejet j4500 Series hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet j4500 series;DES:officejet j4500 series;"
-    PCFileName "hp-officejet_j4500_series-hpijs.ppd"
-    Attribute "Product" "" "(HP Officejet j4524 All-in-one Printer)"
-    Attribute "Product" "" "(HP Officejet j4525 All-in-one Printer)"
-    Attribute "Product" "" "(HP Officejet j4535 All-in-one Printer)"
-    Attribute "Product" "" "(HP Officejet j4540 All-in-one Printer)"
-    Attribute "Product" "" "(HP Officejet j4550 All-in-one Printer)"
-    Attribute "Product" "" "(HP Officejet j4560 All-in-one Printer)"
-    Attribute "Product" "" "(HP Officejet j4580 All-in-one Printer)"
-    Attribute "Product" "" "(HP Officejet j4580c All-in-one Printer)"
-    Attribute "Product" "" "(HP Officejet j4585 All-in-one Printer)"
   }
   {
     ModelName "HP Officejet j4660 Series hpijs"
@@ -3083,16 +3083,6 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Photosmart d5368 Printer)"
   }
   {
-    ModelName "HP Photosmart d5400 Series hpijs"
-    Attribute "NickName" "" "HP Photosmart d5400 Series hpijs, $Version"
-    Attribute "ShortNickName" "" "HP PS d5400 Series hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart d5400 series;DES:photosmart d5400 series;"
-    PCFileName "hp-photosmart_d5400_series-hpijs.ppd"
-    Attribute "Product" "" "(HP Photosmart d5460 Printer)"
-    Attribute "Product" "" "(HP Photosmart d5463 Printer)"
-    Attribute "Product" "" "(HP Photosmart d5468 Printer)"
-  }
-  {
     ModelName "HP Deskjet 5400 Series hpijs"
     Attribute "NickName" "" "HP Deskjet 5400 Series hpijs, $Version"
     Attribute "ShortNickName" "" "HP Deskjet 5400 Series hpijs"
@@ -3106,6 +3096,16 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Deskjet 5440xi Photo Printer)"
     Attribute "Product" "" "(HP Deskjet 5442 Photo Printer)"
     Attribute "Product" "" "(HP Deskjet 5443 Photo Printer)"
+  }
+  {
+    ModelName "HP Photosmart d5400 Series hpijs"
+    Attribute "NickName" "" "HP Photosmart d5400 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP PS d5400 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart d5400 series;DES:photosmart d5400 series;"
+    PCFileName "hp-photosmart_d5400_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Photosmart d5460 Printer)"
+    Attribute "Product" "" "(HP Photosmart d5463 Printer)"
+    Attribute "Product" "" "(HP Photosmart d5468 Printer)"
   }
   {
     ModelName "HP Photosmart c5500 Series hpijs"
@@ -6577,14 +6577,6 @@ t=0"
     Attribute "Product" "" "(HP LaserJet m1522nf Multifunction Printer)"
   }
   {
-    ModelName "HP LaserJet m1536dnf MFP hpijs"
-    Attribute "NickName" "" "HP LaserJet m1536dnf MFP hpijs pcl3, $Version"
-    Attribute "ShortNickName" "" "HP LaserJet m1536dnf MFP hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet m1536dnf mfp;DES:hp laserjet m1536dnf mfp;"
-    PCFileName "hp-laserjet_m1536dnf_mfp-hpijs-pcl3.ppd"
-    Attribute "Product" "" "(HP LaserJet m1536dnf MFP)"
-  }
-  {
     ModelName "HP LaserJet m1537dnf MFP hpijs"
     Attribute "NickName" "" "HP LaserJet m1537dnf MFP hpijs pcl3, $Version"
     Attribute "ShortNickName" "" "HP LaserJet m1537dnf MFP hpijs"
@@ -7002,14 +6994,6 @@ t=0"
     Attribute "Product" "" "(HP LaserJet 4000tn Printer)"
   }
   {
-    ModelName "HP LaserJet p4014n hpijs"
-    Attribute "NickName" "" "HP LaserJet p4014n hpijs, $Version"
-    Attribute "ShortNickName" "" "HP LaserJet p4014n hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p4014n;DES:hp laserjet p4014n;"
-    PCFileName "hp-laserjet_p4014n-hpijs.ppd"
-    Attribute "Product" "" "(HP LaserJet p4014n Printer)"
-  }
-  {
     ModelName "HP LaserJet p4014dn hpijs"
     Attribute "NickName" "" "HP LaserJet p4014dn hpijs, $Version"
     Attribute "ShortNickName" "" "HP LaserJet p4014dn hpijs"
@@ -7024,6 +7008,14 @@ t=0"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p4014;DES:hp laserjet p4014;"
     PCFileName "hp-laserjet_p4014-hpijs.ppd"
     Attribute "Product" "" "(HP LaserJet p4014 Printer)"
+  }
+  {
+    ModelName "HP LaserJet p4014n hpijs"
+    Attribute "NickName" "" "HP LaserJet p4014n hpijs, $Version"
+    Attribute "ShortNickName" "" "HP LaserJet p4014n hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p4014n;DES:hp laserjet p4014n;"
+    PCFileName "hp-laserjet_p4014n-hpijs.ppd"
+    Attribute "Product" "" "(HP LaserJet p4014n Printer)"
   }
   {
     ModelName "HP LaserJet p4015tn hpijs"
@@ -11490,20 +11482,20 @@ Transparency"
     Attribute "Product" "" "(HP LaserJet Professional p1106 Printer)"
   }
   {
-    ModelName "HP LaserJet Professional p1107w hpijs"
-    Attribute "NickName" "" "HP LaserJet Professional p1107w hpijs, $Version, requires proprietary plugin"
-    Attribute "ShortNickName" "" "HP LJ Professional p1107w hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional p1107w;DES:hp laserjet professional p1107w;"
-    PCFileName "hp-laserjet_professional_p1107w-hpijs.ppd"
-    Attribute "Product" "" "(HP LaserJet Professional p1107w Printer)"
-  }
-  {
     ModelName "HP LaserJet Professional p1107 hpijs"
     Attribute "NickName" "" "HP LaserJet Professional p1107 hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LJ Professional p1107 hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional p1107;DES:hp laserjet professional p1107;"
     PCFileName "hp-laserjet_professional_p1107-hpijs.ppd"
     Attribute "Product" "" "(HP LaserJet Professional p1107 Printer)"
+  }
+  {
+    ModelName "HP LaserJet Professional p1107w hpijs"
+    Attribute "NickName" "" "HP LaserJet Professional p1107w hpijs, $Version, requires proprietary plugin"
+    Attribute "ShortNickName" "" "HP LJ Professional p1107w hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional p1107w;DES:hp laserjet professional p1107w;"
+    PCFileName "hp-laserjet_professional_p1107w-hpijs.ppd"
+    Attribute "Product" "" "(HP LaserJet Professional p1107w Printer)"
   }
   {
     ModelName "HP LaserJet Professional p1108w hpijs"
@@ -13710,7 +13702,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
-  // <%Copperhead12:Normal%>   
+  // <%Copperhead12:Normal%>
   {
     ModelName "HP Deskjet 3520 Series hpijs"
     Attribute "NickName" "" "HP Deskjet 3520 Series hpijs, $Version"
@@ -13741,6 +13733,24 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 5520 series;DES:deskjet 5520 series;"
     PCFileName "hp-deskjet_5520_series-hpijs.ppd"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 5525 E-all-in-one)"
+  }
+  // <%Copperhead12:Advanced%>  
+  {
+    ModelName "HP Photosmart 6520 Series hpijs"
+    Attribute "NickName" "" "HP Photosmart 6520 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Photosmart 6520 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart 6520 series;DES:photosmart 6520 series;"
+    PCFileName "hp-photosmart_6520_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Photsmart 6520 E All-in-one)"
+    Attribute "Product" "" "(HP Photosmart 6525 E All-in-one)"
+  }
+  {
+    ModelName "HP Deskjet 6520 Series hpijs"
+    Attribute "NickName" "" "HP Deskjet 6520 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Deskjet 6520 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 6520 series;DES:deskjet 6520 series;"
+    PCFileName "hp-deskjet_6520_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 6525 E-all-in-one)"
   }
 } // end Copperhead12	
 
@@ -14220,6 +14230,16 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart 7510 series;DES:photosmart 7510 series;"
     PCFileName "hp-photosmart_7510_series-hpijs.ppd"
     Attribute "Product" "" "(HP Photosmart 7510 E-all-in-one)"
+  }
+  // <%Python11:Advanced%>   
+  {
+    ModelName "HP Photosmart 7520 Series hpijs"
+    Attribute "NickName" "" "HP Photosmart 7520 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Photosmart 7520 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart 7520 series;DES:photosmart 7520 series;"
+    PCFileName "hp-photosmart_7520_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Photosmart 7520 E-all-in-one)"
+    Attribute "Product" "" "(HP Photosmart 7525 E-all-in-one)"
   }
 } // end Python11
 
@@ -16614,6 +16634,9 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 3050a j611 series;DES:deskjet 3050a j611 series;"
     PCFileName "hp-deskjet_3050a_j611_series-hpijs.ppd"
     Attribute "Product" "" "(HP Deskjet 3050a j611 Series)"
+    Attribute "Product" "" "(HP Deskjet 3055a E-all-in-one Printer j611n)"
+    Attribute "Product" "" "(HP Deskjet 3057a E-all-in-one Printer j611n)"
+    Attribute "Product" "" "(HP Deskjet 3059a E-all-in-one Printer j611n)"
   }
 
 
@@ -16856,6 +16879,18 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Deskjet 2511 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet 2512 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet 2514 All-in-one Printer)"
+  }
+  {
+    ModelName "HP Deskjet 3510 Series hpijs"
+    Attribute "NickName" "" "HP Deskjet 3510 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Deskjet 3510 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 3510 series;DES:deskjet 3510 series;"
+    PCFileName "hp-deskjet_3510_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 3515 E-all-in-one)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 3516 E-all-in-one)"
+    Attribute "Product" "" "(HP Deskjet 3510 E-all-in-one)"
+    Attribute "Product" "" "(HP Deskjet 3511 E-all-in-one)"
+    Attribute "Product" "" "(HP Deskjet 3512 E-all-in-one)"
   }
 
 

@@ -65,7 +65,7 @@ uint32_t (*convert_endian_l)(uint32_t);
 uint16_t (*convert_endian_s)(uint16_t);
 
 static int iLogLevel = 1;
-char hpFileName[64] = "/tmp/hplipfaxLog_XXXXXX";
+char hpFileName[64] ;
 
 #define TIFF_HDR_SIZE 8
 #define LITTLE_ENDIAN_MODE I
@@ -439,16 +439,18 @@ int ProcessTiffData(int fromFD, int toFD)
     int bytes_written = 0;
     int ret_status = 0;
     int bytes_read = 0;
-    char hpTiffFileName[64] = "/tmp/hpliptiffXXXXXX";
+    char hpTiffFileName[64];
     long input_file_size = 0;
+    snprintf(hpTiffFileName,sizeof(hpTiffFileName), "%s/hpliptiffXXXXXX","/var/log/hp/tmp");
+
 
     fdTiff = mkstemp (hpTiffFileName);
     if (fdTiff < 0)
     {
-        DBG ("Warning: Unable to open Fax output file - %s for writing, so trying another location\n", hpTiffFileName);
-        strncpy(hpTiffFileName,"/var/log/hp/hpliptiffXXXXXX",sizeof(hpTiffFileName));
-        fdTiff = mkstemp (hpTiffFileName);
-        if (fdTiff < 0)
+//        DBG ("Warning: Unable to open Fax output file - %s for writing, so trying another location\n", hpTiffFileName);
+//        strncpy(hpTiffFileName,"/var/log/hp/hpliptiffXXXXXX",sizeof(hpTiffFileName));
+//        fdTiff = mkstemp (hpTiffFileName);
+//        if (fdTiff < 0)
         {
             BUG("ERROR: Unable to open Fax output file - %s for writing\n", hpTiffFileName);
             return 1;
@@ -677,14 +679,15 @@ int main (int argc, char **argv)
          i++;
     }
 
+    snprintf(hpFileName,sizeof(hpFileName),"%s/hplipfaxLog_XXXXXX","/var/log/hp/tmp");
 
     fdFax = mkstemp (hpFileName);
     if (fdFax < 0)
     {
-        DBG ("Warning: Unable to open Fax output file - %s for writing,so trying another location.\n", hpFileName);
-        strncpy(hpFileName,"/var/log/hp/hplipfaxLog_XXXXXX",sizeof(hpFileName));
-        fdFax = mkstemp (hpFileName);
-        if (fdFax < 0)
+//        DBG ("Warning: Unable to open Fax output file - %s for writing,so trying another location.\n", hpFileName);
+//        strncpy(hpFileName,"/var/log/hp/hplipfaxLog_XXXXXX",sizeof(hpFileName));
+//        fdFax = mkstemp (hpFileName);
+//        if (fdFax < 0)
         {
             BUG ("ERROR: Unable to open Fax output file - %s for writing\n", hpFileName);
             return 1;

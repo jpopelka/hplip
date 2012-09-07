@@ -99,7 +99,7 @@ class StringTable:
             '1046' : (self.__tr('In power save mode'), ''),
             '1047' : (self.__tr('Incorrect cartridge'), ''),
             '1048' : (self.__tr('Missing cartridge'), ''),
-            '1049' : (self.__tr('Printhead(s): Missing or Damaged'), ''),   
+            '1049' : (self.__tr('Missing Printhead(s)'), ''),   
 
 			#Alert messages for Pentane products RQ 8888
             '1050' : (self.__tr('ADF can not load original, please try reloading'), ''),
@@ -115,6 +115,8 @@ class StringTable:
             '1060' : (self.__tr('Remove paper and other material from output flap area'), ''),
             '1061' : (self.__tr('To Maintain print quality, remove and re-install duplex module'), ''),
             '1062' : (self.__tr('Media type mismatch'), '%try_again%'),
+            '1063' : (self.__tr('Printhead(s) Failed'), ''),   
+            '1064' : (self.__tr('Incompatible Printhead(s)'), ''),   
          
             '1501' : (self.__tr('Black cartridge is low on ink'), ''),
             '1502' : (self.__tr('Tri-color cartridge is low on ink'), ''),

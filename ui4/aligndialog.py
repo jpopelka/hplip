@@ -407,7 +407,7 @@ class AlignDialog(QDialog, Ui_Dialog):
         #self.connect(self.BackButton, SIGNAL("clicked()"), self.BackButton_clicked)
         self.connect(self.DeviceComboBox, SIGNAL("DeviceUriComboBox_noDevices"), self.DeviceUriComboBox_noDevices)
         self.connect(self.DeviceComboBox, SIGNAL("DeviceUriComboBox_currentChanged"), self.DeviceUriComboBox_currentChanged)
-        self.DeviceComboBox.setFilter({'align-type': (operator.gt, 0)})
+        self.DeviceComboBox.setFilter({'align-type': (operator.ne, ALIGN_TYPE_NONE)})
 
         # Application icon
         self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))

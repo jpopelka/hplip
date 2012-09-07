@@ -335,7 +335,7 @@ Manufacturer "HP"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*MediaType Glossy *OutputMode DraftGray"
   UIConstraints "*MediaType Plain *OutputMode Photo"
   UIConstraints "*PageSize Letter *Duplex"
@@ -1004,7 +1004,7 @@ Manufacturer "HP"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*PageSize Letter *Duplex"
   UIConstraints "*PageSize A4 *Duplex"
   UIConstraints "*PageSize Legal *Duplex"
@@ -1229,7 +1229,7 @@ Manufacturer "HP"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*PageSize Letter *Duplex"
   UIConstraints "*PageSize A4 *Duplex"
   UIConstraints "*PageSize Legal *Duplex"
@@ -1442,7 +1442,7 @@ Manufacturer "HP"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*ColorModel KGray *OutputMode Photo"
   UIConstraints "*ColorModel CMYGray *OutputMode Photo"
   UIConstraints "*MediaType Glossy *OutputMode Draft"
@@ -1846,7 +1846,7 @@ Manufacturer "HP"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*MediaType Glossy *OutputMode Draft"
   UIConstraints "*MediaType Plain *OutputMode Photo"
   UIConstraints "*PageSize Letter *Duplex"
@@ -2058,7 +2058,7 @@ Manufacturer "HP"
      Installable "OptionDuplex/Duplexer Installed"
  
      // Constraints
-     UIConstraints "*Duplex *OptionDuplex False"
+     //UIConstraints "*Duplex *OptionDuplex False"
      UIConstraints "*ColorModel KGray *OutputMode Photo"
      UIConstraints "*ColorModel CMYGray *OutputMode Photo"
      UIConstraints "*MediaType Automatic *OutputMode FastDraft"
@@ -2296,7 +2296,7 @@ Manufacturer "HP"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*ColorModel KGray *OutputMode Photo"
   UIConstraints "*ColorModel CMYGray *OutputMode Photo"
   UIConstraints "*MediaType Automatic *OutputMode FastDraft"
@@ -2839,6 +2839,22 @@ Manufacturer "HP"
       Attribute "Product" "" "(HP Photosmart c4494 All-in-one Printer)"
     }
     {
+      ModelName "HP Officejet j4500 Series"
+      Attribute "NickName" "" "HP Officejet j4500 Series, $Version"
+      Attribute "ShortNickName" "" "HP Officejet j4500 Series"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet j4500 series;DES:officejet j4500 series;"
+      PCFileName "hp-officejet_j4500_series.ppd"
+      Attribute "Product" "" "(HP Officejet j4524 All-in-one Printer)"
+      Attribute "Product" "" "(HP Officejet j4525 All-in-one Printer)"
+      Attribute "Product" "" "(HP Officejet j4535 All-in-one Printer)"
+      Attribute "Product" "" "(HP Officejet j4540 All-in-one Printer)"
+      Attribute "Product" "" "(HP Officejet j4550 All-in-one Printer)"
+      Attribute "Product" "" "(HP Officejet j4560 All-in-one Printer)"
+      Attribute "Product" "" "(HP Officejet j4580 All-in-one Printer)"
+      Attribute "Product" "" "(HP Officejet j4580c All-in-one Printer)"
+      Attribute "Product" "" "(HP Officejet j4585 All-in-one Printer)"
+    }
+    {
       ModelName "HP Photosmart c4500 Series"
       Attribute "NickName" "" "HP Photosmart c4500 Series, $Version"
       Attribute "ShortNickName" "" "HP Photosmart c4500 Series"
@@ -2856,22 +2872,6 @@ Manufacturer "HP"
       Attribute "Product" "" "(HP Photosmart c4588 All-in-one Printer)"
       Attribute "Product" "" "(HP Photosmart c4593 All-in-one Printer)"
       Attribute "Product" "" "(HP Photosmart c4599 All-in-one Printer)"
-    }
-    {
-      ModelName "HP Officejet j4500 Series"
-      Attribute "NickName" "" "HP Officejet j4500 Series, $Version"
-      Attribute "ShortNickName" "" "HP Officejet j4500 Series"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet j4500 series;DES:officejet j4500 series;"
-      PCFileName "hp-officejet_j4500_series.ppd"
-      Attribute "Product" "" "(HP Officejet j4524 All-in-one Printer)"
-      Attribute "Product" "" "(HP Officejet j4525 All-in-one Printer)"
-      Attribute "Product" "" "(HP Officejet j4535 All-in-one Printer)"
-      Attribute "Product" "" "(HP Officejet j4540 All-in-one Printer)"
-      Attribute "Product" "" "(HP Officejet j4550 All-in-one Printer)"
-      Attribute "Product" "" "(HP Officejet j4560 All-in-one Printer)"
-      Attribute "Product" "" "(HP Officejet j4580 All-in-one Printer)"
-      Attribute "Product" "" "(HP Officejet j4580c All-in-one Printer)"
-      Attribute "Product" "" "(HP Officejet j4585 All-in-one Printer)"
     }
     {
       ModelName "HP Officejet j4660 Series"
@@ -2977,16 +2977,6 @@ Manufacturer "HP"
       Attribute "Product" "" "(HP Photosmart d5368 Printer)"
     }
     {
-      ModelName "HP Photosmart d5400 Series"
-      Attribute "NickName" "" "HP Photosmart d5400 Series, $Version"
-      Attribute "ShortNickName" "" "HP Photosmart d5400 Series"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart d5400 series;DES:photosmart d5400 series;"
-      PCFileName "hp-photosmart_d5400_series.ppd"
-      Attribute "Product" "" "(HP Photosmart d5460 Printer)"
-      Attribute "Product" "" "(HP Photosmart d5463 Printer)"
-      Attribute "Product" "" "(HP Photosmart d5468 Printer)"
-    }
-    {
       ModelName "HP Deskjet 5400 Series"
       Attribute "NickName" "" "HP Deskjet 5400 Series, $Version"
       Attribute "ShortNickName" "" "HP Deskjet 5400 Series"
@@ -3000,6 +2990,16 @@ Manufacturer "HP"
       Attribute "Product" "" "(HP Deskjet 5440xi Photo Printer)"
       Attribute "Product" "" "(HP Deskjet 5442 Photo Printer)"
       Attribute "Product" "" "(HP Deskjet 5443 Photo Printer)"
+    }
+    {
+      ModelName "HP Photosmart d5400 Series"
+      Attribute "NickName" "" "HP Photosmart d5400 Series, $Version"
+      Attribute "ShortNickName" "" "HP Photosmart d5400 Series"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart d5400 series;DES:photosmart d5400 series;"
+      PCFileName "hp-photosmart_d5400_series.ppd"
+      Attribute "Product" "" "(HP Photosmart d5460 Printer)"
+      Attribute "Product" "" "(HP Photosmart d5463 Printer)"
+      Attribute "Product" "" "(HP Photosmart d5468 Printer)"
     }
     {
       ModelName "HP Photosmart c5500 Series"
@@ -3709,7 +3709,7 @@ Manufacturer "HP"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*ColorModel KGray *OutputMode Photo"
   UIConstraints "*ColorModel CMYGray *OutputMode Photo"
   UIConstraints "*MediaType Glossy *OutputMode FastDraft"
@@ -3965,7 +3965,7 @@ Manufacturer "HP"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*ColorModel KGray *OutputMode Photo"
   UIConstraints "*ColorModel CMYGray *OutputMode Photo"
   UIConstraints "*MediaType Automatic *OutputMode FastDraft"
@@ -4899,16 +4899,13 @@ Manufacturer "HP"
      Choice "FastDraft/Fast Draft" "<</OutputType(-2)/HWResolution[300 300]>>setpagedevice"
      Choice "Best/Best" "<</OutputType(1)/HWResolution[600 600]>>setpagedevice"
   
-    
-    Option "InputSlot/Media Source" PickOne AnySetup 10.0
-       *Choice "Auto/Auto-Select" "<</MediaPosition 7>>setpagedevice"
-
+   
      // Duplexer is optional...
      Installable "OptionDuplex/Duplexer Installed"
 
      // Constraints
      // Non duplex media against duplex
-     UIConstraints "*Duplex *OptionDuplex False"
+     //UIConstraints "*Duplex *OptionDuplex False"
      UIConstraints "*PageSize Card4x6 *Duplex"
      UIConstraints "*PageSize Card5x8 *Duplex"
      UIConstraints "*PageSize A5 *Duplex"
@@ -5018,10 +5015,6 @@ Manufacturer "HP"
          "<</cupsInteger0 25/cupsReal0 .098/cupsReal1 .098/PageSize[435.312 609.552]/ImagingBBox null>>setpagedevice"
       CustomMedia "A5.Duplex/A5 AutoDuplex 148x210mm" 419.76 586.44 9 33.192 9 42.192 "<</cupsInteger0 25/PageSize[419.76 586.44]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 25/PageSize[419.76 586.44]/ImagingBBox null>>setpagedevice"
-      CustomMedia "Cabinet/Cabinet Size 120x165mm" 339.84 468 9 9 9 9 "<</cupsInteger0 119/PageSize[339.84 468]/ImagingBBox null>>setpagedevice"
-         "<</cupsInteger0 119/PageSize[339.84 468]/ImagingBBox null>>setpagedevice"
-      CustomMedia "Cabinet.FB/Cabinet Size Borderless 120x165mm" 352.584 482.112 0 0 0 0 "<</cupsInteger0 119/PageSize[352.584 482.112]/ImagingBBox null>>setpagedevice"
-         "<</cupsInteger0 119/cupsReal0 .079/cupsReal1 .098/PageSize[352.58 478.36]/ImagingBBox null>>setpagedevice"
       CustomMedia "2L/2L 127x178mm" 360 504 9 9 9 9 "<</cupsInteger0 122/PageSize[360 504]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 122/PageSize[360 504]/ImagingBBox null>>setpagedevice"
       CustomMedia "2L.FB/2L Borderless 127x178mm" 372.816 518.112 0 0 0 0 "<</cupsInteger0 122/PageSize[372.816 518.112]/ImagingBBox null>>setpagedevice"
@@ -5100,39 +5093,76 @@ Manufacturer "HP"
       VariablePaperSize Yes
       MinSize 3in 4in
       MaxSize 8.5in 30in
+      {
+            CustomMedia "Cabinet/Cabinet Size 120x165mm" 339.84 468 9 9 9 9 "<</cupsInteger0 119/PageSize[339.84 468]/ImagingBBox null>>setpagedevice"
+                "<</cupsInteger0 119/PageSize[339.84 468]/ImagingBBox null>>setpagedevice"
+            CustomMedia "Cabinet.FB/Cabinet Size Borderless 120x165mm" 352.584 482.112 0 0 0 0 "<</cupsInteger0 119/PageSize[352.584 482.112]/ImagingBBox null>>setpagedevice"
+                "<</cupsInteger0 119/cupsReal0 .079/cupsReal1 .098/PageSize[352.58 478.36]/ImagingBBox null>>setpagedevice"
 
-    // <%Copperhead12:Normal%>
-    {
-      ModelName "HP Deskjet 3520 Series"
-      Attribute "NickName" "" "HP Deskjet 3520 Series, $Version"
-      Attribute "ShortNickName" "" "HP Deskjet 3520 Series"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 3520 series;DES:deskjet 3520 series;"
-      PCFileName "hp-deskjet_3520_series.ppd"
-      Attribute "Product" "" "(HP Deskjet 3520 E-all-in-one Series)"
-      Attribute "Product" "" "(HP Deskjet Ink Advantage 3525 E-all-in-one)"
-      Attribute "Product" "" "(HP Deskjet 3521 E-all-in-one Printer)"
-      Attribute "Product" "" "(HP Deskjet 3522 E-all-in-one Printer)"
-      Attribute "Product" "" "(HP Deskjet 3524 E-all-in-one Printer)"
-    }
-    {
-      ModelName "HP Photosmart 5520 Series"
-      Attribute "NickName" "" "HP Photosmart 5520 Series, $Version"
-      Attribute "ShortNickName" "" "HP Photosmart 5520 Series"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart 5520 series;DES:photosmart 5520 series;"
-      PCFileName "hp-photosmart_5520_series.ppd"
-      Attribute "Product" "" "(HP Photosmart 5520 E-all-in-one)"
-      Attribute "Product" "" "(HP Photosmart 5522 E-all-in-one Printer)"
-      Attribute "Product" "" "(HP Photosmart 5524 E-all-in-one Printer)"
-      Attribute "Product" "" "(HP Photosmart 5525 E-all-in-one Printer)"
-    }
-    {
-      ModelName "HP Deskjet 5520 Series"
-      Attribute "NickName" "" "HP Deskjet 5520 Series, $Version"
-      Attribute "ShortNickName" "" "HP Deskjet 5520 Series"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 5520 series;DES:deskjet 5520 series;"
-      PCFileName "hp-deskjet_5520_series.ppd"
-      Attribute "Product" "" "(HP Deskjet Ink Advantage 5525 E-all-in-one)"
-    }
+			Option "InputSlot/Media Source" PickOne AnySetup 10.0
+			*Choice "Auto/Auto-Select" "<</MediaPosition 7>>setpagedevice"
+			Choice "MainTray/Main Tray" "<</MediaPosition 1>>setpagedevice"
+			// <%Copperhead12:Normal%>
+			{
+     ModelName "HP Deskjet 3520 Series"
+     Attribute "NickName" "" "HP Deskjet 3520 Series, $Version"
+     Attribute "ShortNickName" "" "HP Deskjet 3520 Series"
+     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 3520 series;DES:deskjet 3520 series;"
+     PCFileName "hp-deskjet_3520_series.ppd"
+     Attribute "Product" "" "(HP Deskjet 3520 E-all-in-one Series)"
+     Attribute "Product" "" "(HP Deskjet Ink Advantage 3525 E-all-in-one)"
+     Attribute "Product" "" "(HP Deskjet 3521 E-all-in-one Printer)"
+     Attribute "Product" "" "(HP Deskjet 3522 E-all-in-one Printer)"
+     Attribute "Product" "" "(HP Deskjet 3524 E-all-in-one Printer)"
+			}
+			{
+     ModelName "HP Photosmart 5520 Series"
+     Attribute "NickName" "" "HP Photosmart 5520 Series, $Version"
+     Attribute "ShortNickName" "" "HP Photosmart 5520 Series"
+     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart 5520 series;DES:photosmart 5520 series;"
+     PCFileName "hp-photosmart_5520_series.ppd"
+     Attribute "Product" "" "(HP Photosmart 5520 E-all-in-one)"
+     Attribute "Product" "" "(HP Photosmart 5522 E-all-in-one Printer)"
+     Attribute "Product" "" "(HP Photosmart 5524 E-all-in-one Printer)"
+     Attribute "Product" "" "(HP Photosmart 5525 E-all-in-one Printer)"
+			}
+			{
+     ModelName "HP Deskjet 5520 Series"
+     Attribute "NickName" "" "HP Deskjet 5520 Series, $Version"
+     Attribute "ShortNickName" "" "HP Deskjet 5520 Series"
+     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 5520 series;DES:deskjet 5520 series;"
+     PCFileName "hp-deskjet_5520_series.ppd"
+     Attribute "Product" "" "(HP Deskjet Ink Advantage 5525 E-all-in-one)"
+			}
+	  }
+
+	  {
+            CustomMedia "Statement/Statement 5.5x8.5in" 396 612 9 9 9 9 "<</cupsInteger0 15/PageSize[396 612]/ImagingBBox null>>setpagedevice"
+                "<</cupsInteger0 15/PageSize[396 612]/ImagingBBox null>>setpagedevice"
+
+			Option "InputSlot/Media Source" PickOne AnySetup 10.0
+			*Choice "Auto/Auto-Select" "<</MediaPosition 7>>setpagedevice"
+			Choice "PhotoTray/Photo Tray" "<</MediaPosition 6>>setpagedevice"
+			Choice "MainTray/Main Tray" "<</MediaPosition 1>>setpagedevice"
+			// <%Copperhead12:Advanced%>
+			{
+     ModelName "HP Photosmart 6520 Series"
+     Attribute "NickName" "" "HP Photosmart 6520 Series, $Version"
+     Attribute "ShortNickName" "" "HP Photosmart 6520 Series"
+     Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart 6520 series;DES:photosmart 6520 series;"
+     PCFileName "hp-photosmart_6520_series.ppd"
+     Attribute "Product" "" "(HP Photsmart 6520 E All-in-one)"
+     Attribute "Product" "" "(HP Photosmart 6525 E All-in-one)"
+			}
+			{
+     ModelName "HP Deskjet 6520 Series"
+     Attribute "NickName" "" "HP Deskjet 6520 Series, $Version"
+     Attribute "ShortNickName" "" "HP Deskjet 6520 Series"
+     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 6520 series;DES:deskjet 6520 series;"
+     PCFileName "hp-deskjet_6520_series.ppd"
+     Attribute "Product" "" "(HP Deskjet Ink Advantage 6525 E-all-in-one)"
+			}
+	  }
    // End Supported media sizes with full bleed.
 
 } // End Copperhead12
@@ -5436,7 +5466,7 @@ Manufacturer "HP"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*MediaType Automatic *OutputMode FastDraft"
   UIConstraints "*MediaType Glossy *OutputMode FastDraft"
   UIConstraints "*MediaType TransparencyFilm *OutputMode FastDraft"
@@ -5544,10 +5574,6 @@ Manufacturer "HP"
          "<</cupsInteger0 75/PageSize[360 576]/ImagingBBox null>>setpagedevice"
   CustomMedia "Ofuku/Ofuku-Hagaki 200x148mm" 566.64 419.76 9 9 9 9 "<</cupsInteger0 72/PageSize[566.64 419.76]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 72/PageSize[566.64 419.76]/ImagingBBox null>>setpagedevice"
-  CustomMedia "Cabinet/Cabinet Size 165x120mm" 339.84 468 9 9 9 9 "<</cupsInteger0 119/PageSize[339.84 468]/ImagingBBox null>>setpagedevice"
-         "<</cupsInteger0 119/PageSize[339.84 468]/ImagingBBox null>>setpagedevice"
-  CustomMedia "Cabinet.FB/Cabinet Size 120x165 Borderless" 352.584 482.112 0 0 0 0 "<</cupsInteger0 119/PageSize[352.584 482.112]/ImagingBBox null>>setpagedevice"
-         "<</cupsInteger0 119/cupsReal0 .079/cupsReal1 .098/PageSize[352.584 482.112]/ImagingBBox null>>setpagedevice"
   CustomMedia "A5/A5 148x210mm" 419.76 595.44 9 9 9 9 "<</cupsInteger0 25/PageSize[419.76 595.44]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 25/PageSize[419.76 595.44]/ImagingBBox null>>setpagedevice"
   CustomMedia "A5.FB/A5 Borderless 148x210mm" 435.312 609.552 0 0 0 0 "<</cupsInteger0 25/PageSize[435.312 609.552]/ImagingBBox null>>setpagedevice"
@@ -5597,6 +5623,7 @@ Manufacturer "HP"
   CustomMedia "Photo13x18.FB/Borderless Photo 13x18cm" 372.816 518.112 0 0 0 0 "<</cupsInteger0 122/PageSize[372.816 518.112]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 122/cupsReal0 .089/cupsReal1 .098/PageSize[372.816 518.112]/ImagingBBox null>>setpagedevice"
 
+
 // Envelope
   CustomMedia "EnvA2/A2 Envelope 4.37x5.75in" 314.64 414 9 42.192 9 9 "<</cupsInteger0 109/PageSize[314.64 414]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 109/PageSize[314.64 414]/ImagingBBox null>>setpagedevice"
@@ -5619,21 +5646,43 @@ Manufacturer "HP"
   CustomMedia "EnvC5/C5 Envelope 162x229mm" 459.36 649.44 9 42.192 9 9 "<</cupsInteger0 91/PageSize[459.36 649.44]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 91/PageSize[459.36 649.44]/ImagingBBox null>>setpagedevice"
 
-     // Custom page sizes from 3x4in to Legal
-     HWMargins 9 9 9 9
-     VariablePaperSize Yes
-     MinSize 3in 4in
-     MaxSize 8.5in 30in
+    // Custom page sizes from 3x4in to Legal
+    HWMargins 9 9 9 9
+    VariablePaperSize Yes
+    MinSize 3in 4in
+    MaxSize 8.5in 30in
+    {
+        CustomMedia "Cabinet/Cabinet Size 165x120mm" 339.84 468 9 9 9 9 "<</cupsInteger0 119/PageSize[339.84 468]/ImagingBBox null>>setpagedevice" 
+                                    "<</cupsInteger0 119/PageSize[339.84 468]/ImagingBBox null>>setpagedevice"
+        CustomMedia "Cabinet.FB/Cabinet Size 120x165 Borderless" 352.584 482.112 0 0 0 0 "<</cupsInteger0 119/PageSize[352.584 482.112]/ImagingBBox null>>setpagedevice"
+                                    "<</cupsInteger0 119/cupsReal0 .079/cupsReal1 .098/PageSize[352.584 482.112]/ImagingBBox null>>setpagedevice"
+        // <%Python11:Normal%>
+        {
+          ModelName "HP Photosmart 7510 Series"
+          Attribute "NickName" "" "HP Photosmart 7510 Series, $Version"
+          Attribute "ShortNickName" "" "HP Photosmart 7510 Series"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart 7510 series;DES:photosmart 7510 series;"
+          PCFileName "hp-photosmart_7510_series.ppd"
+          Attribute "Product" "" "(HP Photosmart 7510 E-all-in-one)"
+        }
+    }
 
-  // <%Python11:Normal%>
-  {
-    ModelName "HP Photosmart 7510 Series"
-    Attribute "NickName" "" "HP Photosmart 7510 Series, $Version"
-    Attribute "ShortNickName" "" "HP Photosmart 7510 Series"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart 7510 series;DES:photosmart 7510 series;"
-    PCFileName "hp-photosmart_7510_series.ppd"
-    Attribute "Product" "" "(HP Photosmart 7510 E-all-in-one)"
-  }
+    {
+
+        CustomMedia "Statement/Statement 5.5x8.5in" 396 612 9 9 9 9 "<</cupsInteger0 15/PageSize[396 612]/ImagingBBox null>>setpagedevice"
+        "<</cupsInteger0 15/PageSize[396 612]/ImagingBBox null>>setpagedevice"
+
+        // <%Python11:Advanced%>
+        {
+          ModelName "HP Photosmart 7520 Series"
+          Attribute "NickName" "" "HP Photosmart 7520 Series, $Version"
+          Attribute "ShortNickName" "" "HP Photosmart 7520 Series"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:photosmart 7520 series;DES:photosmart 7520 series;"
+          PCFileName "hp-photosmart_7520_series.ppd"
+          Attribute "Product" "" "(HP Photosmart 7520 E-all-in-one)"
+          Attribute "Product" "" "(HP Photosmart 7525 E-all-in-one)"
+        }
+    }
   
 } // End Python11
 
@@ -6461,7 +6510,7 @@ Manufacturer "HP"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*ColorModel KGray *OutputMode Photo"
   UIConstraints "*ColorModel CMYGray *OutputMode Photo"
   UIConstraints "*MediaType Glossy *OutputMode Draft"
@@ -6736,7 +6785,7 @@ Manufacturer "HP"
      
 
    // Constraints
-     UIConstraints "*Duplex *OptionDuplex False"
+     //UIConstraints "*Duplex *OptionDuplex False"
      UIConstraints "*PageSize Letter *Duplex"
      UIConstraints "*PageSize A4 *Duplex"
      UIConstraints "*PageSize JB5 *Duplex"
@@ -6942,7 +6991,7 @@ Manufacturer "HP"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*MediaType Automatic *OutputMode FastDraft"
   UIConstraints "*MediaType Glossy *OutputMode FastDraft"
   UIConstraints "*MediaType TransparencyFilm *OutputMode FastDraft"
@@ -7200,7 +7249,7 @@ Manufacturer "HP"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*ColorModel KGray *OutputMode Photo"
   UIConstraints "*ColorModel CMYGray *OutputMode Photo"
   UIConstraints "*MediaType Automatic *OutputMode FastDraft"
@@ -7457,7 +7506,7 @@ Manufacturer "HP"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*MediaType Automatic *OutputMode FastDraft"
   UIConstraints "*MediaType Glossy *OutputMode FastDraft"
   UIConstraints "*MediaType TransparencyFilm *OutputMode FastDraft"
@@ -8336,7 +8385,7 @@ Manufacturer "HP"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*MediaType Automatic *OutputMode FastDraft"
   UIConstraints "*MediaType Glossy *OutputMode FastDraft"
   UIConstraints "*MediaType TransparencyFilm *OutputMode FastDraft"
@@ -8638,7 +8687,7 @@ Manufacturer "HP"
   
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*MediaType Automatic *OutputMode FastDraft"
   UIConstraints "*MediaType Glossy *OutputMode FastDraft"
   UIConstraints "*MediaType TransparencyFilm *OutputMode FastDraft"
@@ -9042,6 +9091,9 @@ Manufacturer "HP"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 3050a j611 series;DES:deskjet 3050a j611 series;"
     PCFileName "hp-deskjet_3050a_j611_series.ppd"
     Attribute "Product" "" "(HP Deskjet 3050a j611 Series)"
+    Attribute "Product" "" "(HP Deskjet 3055a E-all-in-one Printer j611n)"
+    Attribute "Product" "" "(HP Deskjet 3057a E-all-in-one Printer j611n)"
+    Attribute "Product" "" "(HP Deskjet 3059a E-all-in-one Printer j611n)"
   }
   
 
@@ -9246,6 +9298,18 @@ Manufacturer "HP"
        Attribute "Product" "" "(HP Deskjet 2511 All-in-one Printer)"
        Attribute "Product" "" "(HP Deskjet 2512 All-in-one Printer)"
        Attribute "Product" "" "(HP Deskjet 2514 All-in-one Printer)"
+     }
+     {
+       ModelName "HP Deskjet 3510 Series"
+       Attribute "NickName" "" "HP Deskjet 3510 Series, $Version"
+       Attribute "ShortNickName" "" "HP Deskjet 3510 Series"
+       Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 3510 series;DES:deskjet 3510 series;"
+       PCFileName "hp-deskjet_3510_series.ppd"
+       Attribute "Product" "" "(HP Deskjet Ink Advantage 3515 E-all-in-one)"
+       Attribute "Product" "" "(HP Deskjet Ink Advantage 3516 E-all-in-one)"
+       Attribute "Product" "" "(HP Deskjet 3510 E-all-in-one)"
+       Attribute "Product" "" "(HP Deskjet 3511 E-all-in-one)"
+       Attribute "Product" "" "(HP Deskjet 3512 E-all-in-one)"
      }
 
 } // End PyramidPlus
@@ -9557,7 +9621,7 @@ Manufacturer "HP"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*ColorModel KGray *OutputMode Photo"
   UIConstraints "*ColorModel CMYGray *OutputMode Photo"
   UIConstraints "*MediaType Automatic *OutputMode FastDraft"
@@ -9917,7 +9981,7 @@ Manufacturer "HP"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*MediaType Glossy *OutputMode DraftRGB"
   UIConstraints "*MediaType Glossy *OutputMode DraftGray"
   UIConstraints "*MediaType Plain *OutputMode Photo"
@@ -10338,7 +10402,7 @@ Manufacturer "HP"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*MediaType Glossy *OutputMode DraftRGB"
   UIConstraints "*MediaType Glossy *OutputMode DraftGray"
   UIConstraints "*MediaType Plain *OutputMode Photo"
@@ -10743,7 +10807,7 @@ Manufacturer "HP"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*MediaType Glossy *OutputMode DraftRGB"
   UIConstraints "*MediaType Glossy *OutputMode DraftGray"
   UIConstraints "*MediaType Plain *OutputMode Photo"
@@ -11472,7 +11536,7 @@ Group "RLT/HP Real Life Technologies"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
 
   Attribute "cupsModelName" "" "HP LaserJet"     // APDK device class 
 
@@ -11833,14 +11897,6 @@ Group "RLT/HP Real Life Technologies"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet m1522nf mfp;DES:hp laserjet m1522nf mfp;"
       PCFileName "hp-laserjet_m1522nf_mfp-pcl3.ppd"
       Attribute "Product" "" "(HP LaserJet m1522nf Multifunction Printer)"
-    }
-    {
-      ModelName "HP LaserJet m1536dnf MFP"
-      Attribute "NickName" "" "HP LaserJet m1536dnf MFP pcl3, $Version"
-      Attribute "ShortNickName" "" "HP LaserJet m1536dnf MFP"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet m1536dnf mfp;DES:hp laserjet m1536dnf mfp;"
-      PCFileName "hp-laserjet_m1536dnf_mfp-pcl3.ppd"
-      Attribute "Product" "" "(HP LaserJet m1536dnf MFP)"
     }
     {
       ModelName "HP LaserJet m1537dnf MFP"
@@ -12260,14 +12316,6 @@ Group "RLT/HP Real Life Technologies"
       Attribute "Product" "" "(HP LaserJet 4000tn Printer)"
     }
     {
-      ModelName "HP LaserJet p4014n"
-      Attribute "NickName" "" "HP LaserJet p4014n, $Version"
-      Attribute "ShortNickName" "" "HP LaserJet p4014n"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p4014n;DES:hp laserjet p4014n;"
-      PCFileName "hp-laserjet_p4014n.ppd"
-      Attribute "Product" "" "(HP LaserJet p4014n Printer)"
-    }
-    {
       ModelName "HP LaserJet p4014dn"
       Attribute "NickName" "" "HP LaserJet p4014dn, $Version"
       Attribute "ShortNickName" "" "HP LaserJet p4014dn"
@@ -12282,6 +12330,14 @@ Group "RLT/HP Real Life Technologies"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p4014;DES:hp laserjet p4014;"
       PCFileName "hp-laserjet_p4014.ppd"
       Attribute "Product" "" "(HP LaserJet p4014 Printer)"
+    }
+    {
+      ModelName "HP LaserJet p4014n"
+      Attribute "NickName" "" "HP LaserJet p4014n, $Version"
+      Attribute "ShortNickName" "" "HP LaserJet p4014n"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p4014n;DES:hp laserjet p4014n;"
+      PCFileName "hp-laserjet_p4014n.ppd"
+      Attribute "Product" "" "(HP LaserJet p4014n Printer)"
     }
     {
       ModelName "HP LaserJet p4015tn"
@@ -12861,7 +12917,7 @@ Group "RLT/HP Real Life Technologies"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
 
   Attribute "cupsModelName" "" "hp color LaserJet"     // APDK device class 
 
@@ -13651,7 +13707,7 @@ Group "RLT/HP Real Life Technologies"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
 
   Attribute "cupsModelName" "" "hp LaserJet 1010"     // APDK device class 
 
@@ -15520,7 +15576,7 @@ Group "RLT/HP Real Life Technologies"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
 
   Attribute "cupsModelName" "" "HP LaserJet 1018"     // APDK device class 
 
@@ -15813,20 +15869,20 @@ Group "RLT/HP Real Life Technologies"
       Attribute "Product" "" "(HP LaserJet Professional p1106 Printer)"
     }
     {
-      ModelName "HP LaserJet Professional p1107w"
-      Attribute "NickName" "" "HP LaserJet Professional p1107w, $Version, requires proprietary plugin"
-      Attribute "ShortNickName" "" "HP LaserJet Professional p1107w"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional p1107w;DES:hp laserjet professional p1107w;"
-      PCFileName "hp-laserjet_professional_p1107w.ppd"
-      Attribute "Product" "" "(HP LaserJet Professional p1107w Printer)"
-    }
-    {
       ModelName "HP LaserJet Professional p1107"
       Attribute "NickName" "" "HP LaserJet Professional p1107, $Version, requires proprietary plugin"
       Attribute "ShortNickName" "" "HP LaserJet Professional p1107"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional p1107;DES:hp laserjet professional p1107;"
       PCFileName "hp-laserjet_professional_p1107.ppd"
       Attribute "Product" "" "(HP LaserJet Professional p1107 Printer)"
+    }
+    {
+      ModelName "HP LaserJet Professional p1107w"
+      Attribute "NickName" "" "HP LaserJet Professional p1107w, $Version, requires proprietary plugin"
+      Attribute "ShortNickName" "" "HP LaserJet Professional p1107w"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional p1107w;DES:hp laserjet professional p1107w;"
+      PCFileName "hp-laserjet_professional_p1107w.ppd"
+      Attribute "Product" "" "(HP LaserJet Professional p1107w Printer)"
     }
     {
       ModelName "HP LaserJet Professional p1108w"
@@ -16024,7 +16080,7 @@ Group "RLT/HP Real Life Technologies"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
   UIConstraints "*PageSize A6 *Duplex"
   UIConstraints "*PageSize A5 *Duplex"
   UIConstraints "*PageSize Postcard *Duplex"
@@ -16252,7 +16308,7 @@ Group "RLT/HP Real Life Technologies"
     Installable "OptionDuplex/Duplexer Installed"
 
     // Constraints
-    UIConstraints "*Duplex *OptionDuplex False"
+    //UIConstraints "*Duplex *OptionDuplex False"
 
     // <%LJZjsColor:Normal%>
     {
@@ -16471,7 +16527,7 @@ Group "RLT/HP Real Life Technologies"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
 
   Attribute "cupsModelName" "" "hp color LaserJet 3500"     // APDK device class 
 
@@ -16629,7 +16685,7 @@ Group "RLT/HP Real Life Technologies"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
 
   Attribute "cupsModelName" "" "HP LaserJet M1005"     // APDK device class 
 
@@ -16779,7 +16835,7 @@ Group "RLT/HP Real Life Technologies"
   Installable "OptionDuplex/Duplexer Installed"
 
   // Constraints
-  UIConstraints "*Duplex *OptionDuplex False"
+  //UIConstraints "*Duplex *OptionDuplex False"
 
   Attribute "cupsModelName" "" "HP LaserJet P1005"     // APDK device class 
 

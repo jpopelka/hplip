@@ -1505,6 +1505,9 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_comp_channel_open
       case HPMUD_LEDM_SCAN_CHANNEL:  //using vendor specific C/S/P codes for fax too
          fd = FD_ff_cc_0;
          break;
+      case HPMUD_MARVELL_EWS_CHANNEL:
+	fd = FD_ff_2_10;
+	break;
       default:
          stat = HPMUD_R_INVALID_SN;
          BUG("invalid %s channel=%d\n", pc->sn, pc->index);
@@ -2196,8 +2199,69 @@ bugout:
    return stat;
 }
 /*********HANDLING SMART INSTALL********/
+int disable_smartInstall(struct usb_device *dev, usb_dev_handle *hd, int Interface)
+{
+    // TBD:: not yet implemented.
+    BUG("HP Device acting like CD ROM (Smart Install is enabled), so prevent from functioning device using USB Cable.\n");
+    BUG("Please Refer following link to fix @ https://bugs.launchpad.net/hplip/+bug/1027004 ");
+    return 0;
+}
 
 int HandleSmartInstall()
 {
-   return 0; /*To be implemented*/
+    struct usb_bus *bus = NULL;
+    struct usb_device *dev = NULL;
+    struct usb_dev_handle *devh = NULL;
+    char imanufact[128] = {0,} , iproduct[128] = {0,}, iserial[128] ={0,};
+    int r ;
+     
+    usb_init();
+    usb_find_busses();
+    usb_find_devices();
+    
+    for (bus=usb_busses; bus; bus=bus->next)
+    {
+        for (dev=bus->devices; dev; dev=dev->next)
+        {
+            DBG("idVendor = %x bNumInterfaces=%d bInterfaceClass=%d\n",dev->descriptor.idVendor, dev->config[0].bNumInterfaces, dev->config[0].interface[0].altsetting[0].bInterfaceClass);
+            if (dev->descriptor.idVendor != 0x3f0) /*Not HP device*/
+               continue;
+
+            if (dev->config[0].bNumInterfaces != 1)
+               continue;
+
+            if (dev->config[0].interface[0].altsetting[0].bInterfaceClass == USB_CLASS_MASS_STORAGE)
+            {
+                DBG("usb_open  USB_CLASS_MASS_STORAGE\n");
+                devh = usb_open(dev);
+                if(!devh)
+                {
+                    BUG("Invalid usb_open: %m\n");
+                    continue;
+                }
+                /* Found HP device. */
+               if ((r=get_string_descriptor(devh, dev->descriptor.iProduct, iproduct, sizeof(iproduct))) < 0)
+                   BUG("invalid product id string ret=%d\n", r);
+
+               if ((r=get_string_descriptor(devh, dev->descriptor.iSerialNumber, iserial, sizeof(iserial))) < 0)
+                 BUG("invalid serial id string ret=%d\n", r);
+
+               if ((r=get_string_descriptor(devh, dev->descriptor.iManufacturer, imanufact, sizeof(imanufact))) < 0)
+                 BUG("invalid manufacturer string ret=%d\n", r);
+
+               DBG("Manufacturer = %s\n",imanufact);
+               DBG("Product = %s\n",iproduct);
+               DBG("SerialNumber = %s\n",iserial);
+            
+               //Select Laserjet Device only 
+               if(strstr(iproduct,"LaserJet") || strstr(iproduct, "Laserjet"))
+               {
+                   disable_smartInstall(dev, devh, dev->config[0].interface[0].altsetting[0].bInterfaceNumber);
+               }
+              usb_close(devh); 
+              devh = NULL;
+            }
+        }
+    }
+    return 0;
 }

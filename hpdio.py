@@ -65,7 +65,7 @@ def run(read_pipe2=None,  # pipe from hpssd
         write_pipe3=None): # pipe to hpssd
 
     global r2, w3
-    tmp_dir = '/tmp'
+#    tmp_dir = '/tmp'
     os.umask(0111)
 
     try:

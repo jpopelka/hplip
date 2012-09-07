@@ -463,12 +463,24 @@ def getPPDFile(stripped_model, ppds): # Old PPD find
     return mins
 
 
-def getPPDFile2(stripped_model, ppds): # New PPD find
+def getPPDFile2(mq,model, ppds): # New PPD find
     # This routine is for the new PPD naming scheme begun in 2.8.10
     # and beginning with implementation in 2.8.12 (Qt4 hp-setup)
     # hp-<model name from models.dat w/o beginning hp_>[-<pdl>][-<pdl>][...].ppd[.gz]
     # 3.9.6: Added handling for hpijs vs. hpcups PPDs/DRVs
-    log.debug("Matching PPD list to model %s..." % stripped_model)
+    
+    
+    #Check if common ppd name is already given in models.dat(This is needed because in case of devices having more than one derivatives
+    #will have diffrent model name strings in device ID, because of which we don't get the common ppd name for search)
+    model = models.normalizeModelName(model)
+    ppd_name = mq.get('ppd-name',0)
+    if ppd_name == 0:
+        stripped_model = stripModel2(model)
+    else:
+        stripped_model = stripModel2(ppd_name)
+        
+    log.debug("Matching PPD list to model  %s..." % stripped_model)
+
     matches = []
     for f in ppds:
         match = ppd_pat.match(f)
@@ -490,6 +502,7 @@ def getPPDFile2(stripped_model, ppds): # New PPD find
 
     if num_matches == 0:
         log.warn("No PPD found for model %s using new algorithm. Trying old algorithm..." % stripped_model)
+        #Using Old algo, ignores the series keyword in ppd searching.
         matches2 = getPPDFile(stripModel(stripped_model), ppds).items()
         log.debug(matches2)
         num_matches2 = len(matches2)
@@ -539,6 +552,66 @@ def getPPDFile2(stripped_model, ppds): # New PPD find
     # No specific PDL or Filter found, so just return 1st found PPD file
     log.debug("No specific PDL located. Defaulting to first found PPD file.")
     return (matches[0][0], '')
+
+##
+# Function :- getFaxPPDFile()
+# Arguments:- 
+#   1) mq  -->  Device model query object
+#    2) model --> Fax model name
+# Return arguments:-
+#   1) fax_ppd --> Found Fax ppd file. (Returns None if not found)
+#   2) expt_fax_ppd_name  -> Expected Fax PPD name
+#   3) nick --> Expected Fax PPD description
+#
+def getFaxPPDFile(mq, model):
+    try:
+        fax_ppd = None
+        nick = "HP Fax hpcups"
+        expected_fax_ppd_name = "HP-Fax-hpcups"
+        log.debug("Searching for fax PPD for model %s  hpcups_build =%d" % (model,prop.hpcups_build))
+        if prop.hpcups_build:
+            if mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_MARVELL:
+                expected_fax_ppd_name = "HP-Fax3-hpcups" # Fixed width (2528 pixels) and 300dpi rendering
+                nick = "HP Fax3 hpcups"
+            elif mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_SOAP or mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_LEDMSOAP:
+                expected_fax_ppd_name = "HP-Fax2-hpcups" # Fixed width (2528 pixels) and 300dpi rendering
+                nick = "HP Fax2 hpcups"
+            elif mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_LEDM:
+                expected_fax_ppd_name = "HP-Fax4-hpcups"# Fixed width (2528 pixels) and 300dpi rendering
+                nick = "HP Fax4 hpcups"
+            else:
+                expected_fax_ppd_name = "HP-Fax-hpcups" # Standard
+                nick = "HP Fax hpcups"
+
+        else: # hpijs
+            if mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_MARVELL:
+                expected_fax_ppd_name = "HP-Fax3-hpijs" # Fixed width (2528 pixels) and 300dpi rendering
+                nick = "HP Fax3 hpijs"
+            if mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_SOAP or mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_LEDMSOAP:
+                expected_fax_ppd_name = "HP-Fax2-hpijs" # Fixed width (2528 pixels) and 300dpi rendering
+                nick = "HP Fax2 hpijs"
+            if mq.get('fax-type', FAX_TYPE_NONE) == FAX_TYPE_LEDM:
+                expected_fax_ppd_name = "HP-Fax4-hpijs" # Fixed width (2528 pixels) and 300dpi rendering
+                nick = "HP Fax4 hpijs"
+            else:
+                expected_fax_ppd_name = "HP-Fax-hpijs" # Standard
+                nick = "HP Fax hpijs"
+
+        ppds = []
+        for f in utils.walkFiles(sys_conf.get('dirs', 'ppd'), pattern="HP-Fax*.ppd*", abs_paths=True):
+            ppds.append(f)
+        log.debug("ppds=%s"%ppds)
+        for f in ppds:
+            if f.find(expected_fax_ppd_name) >= 0 and getPPDDescription(f) == nick:
+                fax_ppd = f
+                log.debug("Found fax PPD: %s" % f)
+                break
+        else:
+            log.error("Unable to locate the HPLIP Fax PPD file: %s.ppd.gz file."%expected_fax_ppd_name)
+
+    finally:
+        return fax_ppd,expected_fax_ppd_name, nick
+
 
 
 

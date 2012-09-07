@@ -244,14 +244,8 @@ else:
         input_fd = 0
 
     # REVISIT:
-    tmp_dir = '/tmp'
-    Cups_service_file="/usr/lib/systemd/system/cups.service"
-    if os.path.exists(Cups_service_file):
-       cmd="grep PrivateTmp=true %s"%Cups_service_file
-       sts, out = utils.run(cmd)
-       if sts == 0:
-          tmp_dir = '/var/log/hp'
-        
+    tmp_dir = '/var/log/hp/tmp'
+
 
     pipe_name = os.path.join(tmp_dir, "hpfax-pipe-%d" % job_id)
 

@@ -130,7 +130,7 @@ enum HPMUD_PLUGIN_TYPE
 #define HPMUD_S_MARVELL_FAX_CHANNEL "HP-MARVELL-FAX"
 #define HPMUD_S_LEDM_SCAN "HP-LEDM-SCAN"
 #define HPMUD_S_WIFI_CHANNEL "HP-WIFICONFIG"
-
+#define HPMUD_S_MARVELL_EWS_CHANNEL "HP-MARVELL-EWS"
 typedef int HPMUD_DEVICE;       /* usb, parallel or jetdirect */
 #define HPMUD_DEVICE_MAX 2      /* zero is not used */
 

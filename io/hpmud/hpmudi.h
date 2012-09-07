@@ -107,6 +107,7 @@ enum HPMUD_CHANNEL_ID
    HPMUD_MARVELL_FAX_CHANNEL = 0x16,    /* Marvell fax interface ff/ff/ff, any unused socket id */
    HPMUD_EWS_LEDM_CHANNEL = 0x17,     /* Embeded Web Server interface ff/4/1, any unused socket id */
    HPMUD_LEDM_SCAN_CHANNEL = 0x18,  /* LEDM scan interface ff/cc/0, any unused socket id */
+   HPMUD_MARVELL_EWS_CHANNEL = 0x19, /*MARVELL EWS interface found in Cicad Series*/
    HPMUD_WIFI_CHANNEL = 0x2b,      /* WIFI config */
    HPMUD_DEVMGMT_CHANNEL = 0x2c,      /* decimal 44 */
    HPMUD_MAX_CHANNEL_ID

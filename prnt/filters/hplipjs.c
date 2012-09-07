@@ -247,7 +247,7 @@ int main (int argc, char **argv)
     char   *szHold = "@PJL SET HOLD=ON\x0A";
     char   *szType = "@PJL SET HOLDTYPE=PRIVATE\x0A";
     char   *szKey = "@PJL SET HOLDKEY=";
-
+    char   szPSFile[64];
 /*
  *  Job storage command strings
  *
@@ -275,8 +275,9 @@ int main (int argc, char **argv)
     {
         fprintf (stderr, "DEBUG: HPLIPJS: argv[%d] = %s\n", i, argv[i]);
     }
+    snprintf(szPSFile, sizeof(szPSFile), "%s/output.ps","/var/log/hp/tmp");
 
-    HPFp = fopen ("/tmp/output.ps", "w");
+    HPFp = fopen (szPSFile, "w");
 #endif
     fd = 0;        // read from stdin
     Outfd = 1;     // HPWrite to stdout
