@@ -108,7 +108,10 @@ struct marvell_session
    SANE_Fixed effectiveTlx, effectiveTly, effectiveBrx, effectiveBry;
    SANE_Fixed min_width, min_height;
 
-   IP_HANDLE ip_handle;
+    SANE_Int platen_resolution_list[MAX_LIST_SIZE];
+    SANE_Int adf_resolution_list[MAX_LIST_SIZE];
+
+    IP_HANDLE ip_handle;
 
    int cnt;                   /* number bytes available in buf[] */ 
    unsigned char buf[32768];  /* line buffer (max = 1200dpi * 8.5inches * 3pixels) */

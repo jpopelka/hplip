@@ -1,6 +1,9 @@
 #!/bin/sh
 
-LOG_DIR=/var/log/hp/tmp
+LC_ALL=C
+LANG=C
+
+LOG_DIR=/var/log/hp/tmp/
 
 # Default for number of days to keep old log files in /var/log/hp/tmp
 LOGFILE_DAYS=1
@@ -8,7 +11,11 @@ MAXSIZE=1048576	# 1 GB
 
 # Clears the logs which are less than 3 days.
 if [ -d $LOG_DIR ]; then
-	find $LOG_DIR -name \* -mtime +$LOGFILE_DAYS -print0  2>/dev/null | xargs -r -0 rm -rf
+	find $LOG_DIR -type f -mtime +$LOGFILE_DAYS -print0  2>/dev/null | xargs -r -0 rm -rf
+else
+	mkdir -p $LOG_DIR
+	chgrp "lp" -R $LOG_DIR
+	chmod 1774 $LOG_DIR	
 fi
 
 USAGE=`du -c $LOG_DIR 2>/dev/null |grep total |cut -d't' -f1`
@@ -21,9 +28,9 @@ while [ $USAGE -gt $MAXSIZE ]; do
 
 	# If same day logs are reaching Max size, deleting all log files.
 	if [ $LOGFILE_DAYS -eq 0 ]; then
-		find $LOG_DIR -name \* -print0 2>/dev/null | xargs -r -0 rm -rf
+		find $LOG_DIR -type f -print0 2>/dev/null | xargs -r -0 rm -rf
 	else	
-		find $LOG_DIR -name \* -mtime +$LOGFILE_DAYS -print0 2>/dev/null | xargs -r -0 rm -rf
+		find $LOG_DIR -type f -mtime +$LOGFILE_DAYS -print0 2>/dev/null | xargs -r -0 rm -rf
 	fi
 	USAGE=`du -c $LOG_DIR 2>/dev/null |grep total |cut -d't' -f1`
 done

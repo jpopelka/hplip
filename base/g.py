@@ -149,6 +149,9 @@ class SysConfig(ConfigBase):
 
 class State(ConfigBase):
     def __init__(self):
+        if not os.path.exists('/var/lib/hp/') and os.geteuid() == 0:
+            os.makedirs('/var/lib/hp/')
+            os.system('chmod 644 /var/lib/hp/')
         ConfigBase.__init__(self, '/var/lib/hp/hplip.state')
 
 

@@ -124,6 +124,12 @@
 :model "HP Photosmart d110 Series Printer"
 :status :good
 
+:model "HP Envy 120 E-all-in-one"
+:status :good
+
+:model "HP Envy 121 E-all-in-one"
+:status :good
+
 :model "HP Officejet d125xi All-in-one Printer"
 :status :good
 
@@ -137,6 +143,9 @@
 :status :good
 
 :model "HP Officejet d145 All-in-one Printer"
+:status :good
+
+:model "HP Officejet 150 Mobile All-in-one"
 :status :good
 
 :model "HP Officejet d155xi All-in-one Printer"
@@ -475,6 +484,9 @@
 :model "HP PSC 1210v All-in-one Printer"
 :status :good
 
+:model "HP LaserJet m1210 MFP Series"
+:status :good
+
 :model "HP PSC 1210 All-in-one Printer"
 :status :good
 
@@ -508,7 +520,16 @@
 :model "HP PSC 1218 All-in-one Printer"
 :status :good
 
+:model "HP Hotspot LaserJet Pro m1218nfs MFP"
+:status :good
+
+:model "HP LaserJet Professional m1219nfs MFP"
+:status :good
+
 :model "HP LaserJet Professional m1219nf MFP"
+:status :good
+
+:model "HP LaserJet Professional m1219nfg MFP"
 :status :good
 
 :model "HP PSC 1219 All-in-one Printer"
@@ -965,6 +986,9 @@
 :status :good
 
 :model "HP Deskjet Ink Advantage 2516 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 2520hc All-in-one"
 :status :good
 
 :model "HP PSC 2550 Photosmart All-in-one Printer"
@@ -1855,9 +1879,6 @@
 :model "HP Color LaserJet 4730 Multifunction Printer"
 :status :good
 
-:model "HP Color LaserJet cm4730fsk Multifunction Printer"
-:status :good
-
 :model "HP Color LaserJet cm4730fm Multifunction Printer"
 :status :good
 
@@ -1865,6 +1886,9 @@
 :status :good
 
 :model "HP Color LaserJet 4730xm Multifunction Printer"
+:status :good
+
+:model "HP Color LaserJet cm4730fsk Multifunction Printer"
 :status :good
 
 :model "HP Photosmart c4740 All-in-one Printer"
@@ -2362,7 +2386,7 @@
 :model "HP Officejet 6600 E-all-in-one Printer - h711a"
 :status :good
 
-:model "HP Officejet 6700 E-all-in-one Printer - h711n"
+:model "HP Officejet 6700 Premium E-all-in-one printer-h711n"
 :status :good
 
 :model "HP Officejet 7100 All-in-one Printer"

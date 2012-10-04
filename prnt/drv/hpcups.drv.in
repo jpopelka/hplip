@@ -4537,6 +4537,14 @@ Manufacturer "HP"
       PCFileName "hp-officejet_100_mobile_l411.ppd"
       Attribute "Product" "" "(HP Officejet 100 Mobile l411)"
     }
+    {
+      ModelName "HP Officejet 150 Mobile l511"
+      Attribute "NickName" "" "HP Officejet 150 Mobile l511, $Version"
+      Attribute "ShortNickName" "" "HP Officejet 150 Mobile l511"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 150 mobile l511;DES:officejet 150 mobile l511;"
+      PCFileName "hp-officejet_150_mobile_l511.ppd"
+      Attribute "Product" "" "(HP Officejet 150 Mobile All-in-one)"
+    }
    // End Supported media sizes with full bleed.
 
 } // End StingrayOJ
@@ -5412,7 +5420,7 @@ Manufacturer "HP"
          Attribute "ShortNickName" "" "HP Officejet 6700"
          Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 6700;DES:officejet 6700;"
          PCFileName "hp-officejet_6700.ppd"
-         Attribute "Product" "" "(HP Officejet 6700 E-all-in-one Printer - h711n)"
+         Attribute "Product" "" "(HP Officejet 6700 Premium E-all-in-one printer-h711n)"
        }
      }
 
@@ -8905,6 +8913,15 @@ Manufacturer "HP"
     PCFileName "hp-envy_110_series.ppd"
     Attribute "Product" "" "(HP Envy 110 E-all-in-one)"
   }
+  {
+    ModelName "HP Envy 120 Series"
+    Attribute "NickName" "" "HP Envy 120 Series, $Version"
+    Attribute "ShortNickName" "" "HP Envy 120 Series"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:envy 120 series;DES:envy 120 series;"
+    PCFileName "hp-envy_120_series.ppd"
+    Attribute "Product" "" "(HP Envy 120 E-all-in-one)"
+    Attribute "Product" "" "(HP Envy 121 E-all-in-one)"
+  }
   } // End Supported media sizes with full bleed.
 
 } // End Mimas
@@ -9286,6 +9303,14 @@ Manufacturer "HP"
 
      // <%PyramidPlus:NoAutoDuplex%>
      {
+       ModelName "HP Deskjet 2020 Series"
+       Attribute "NickName" "" "HP Deskjet 2020 Series, $Version"
+       Attribute "ShortNickName" "" "HP Deskjet 2020 Series"
+       Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 2020 series;DES:deskjet 2020 series;"
+       PCFileName "hp-deskjet_2020_series.ppd"
+       Attribute "Product" "" "(HP Deskjet Ink Advantage 2020hc Printer)"
+     }
+     {
        ModelName "HP Deskjet 2510 Series"
        Attribute "NickName" "" "HP Deskjet 2510 Series, $Version"
        Attribute "ShortNickName" "" "HP Deskjet 2510 Series"
@@ -9298,6 +9323,14 @@ Manufacturer "HP"
        Attribute "Product" "" "(HP Deskjet 2511 All-in-one Printer)"
        Attribute "Product" "" "(HP Deskjet 2512 All-in-one Printer)"
        Attribute "Product" "" "(HP Deskjet 2514 All-in-one Printer)"
+     }
+     {
+       ModelName "HP Deskjet 2520 Series"
+       Attribute "NickName" "" "HP Deskjet 2520 Series, $Version"
+       Attribute "ShortNickName" "" "HP Deskjet 2520 Series"
+       Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 2520 series;DES:deskjet 2520 series;"
+       PCFileName "hp-deskjet_2520_series.ppd"
+       Attribute "Product" "" "(HP Deskjet Ink Advantage 2520hc All-in-one)"
      }
      {
        ModelName "HP Deskjet 3510 Series"
@@ -15996,6 +16029,38 @@ Group "RLT/HP Real Life Technologies"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional m1217nfw mfp;DES:hp laserjet professional m1217nfw mfp;"
       PCFileName "hp-laserjet_professional_m1217nfw_mfp.ppd"
       Attribute "Product" "" "(HP LaserJet Professional m1217nfw Multifunction Printer)"
+    }
+    {
+      ModelName "HP LaserJet Professional m1218nfg MFP"
+      Attribute "NickName" "" "HP LaserJet Professional m1218nfg MFP, $Version, requires proprietary plugin"
+      Attribute "ShortNickName" "" "HP LJ Professional m1218nfg MFP"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional m1218nfg mfp;DES:hp laserjet professional m1218nfg mfp;"
+      PCFileName "hp-laserjet_professional_m1218nfg_mfp.ppd"
+      Attribute "Product" "" "(HP LaserJet m1210 MFP Series)"
+    }
+    {
+      ModelName "HP LaserJet Professional m1218nfs MFP"
+      Attribute "NickName" "" "HP LaserJet Professional m1218nfs MFP, $Version, requires proprietary plugin"
+      Attribute "ShortNickName" "" "HP LJ Professional m1218nfs MFP"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional m1218nfs mfp;DES:hp laserjet professional m1218nfs mfp;"
+      PCFileName "hp-laserjet_professional_m1218nfs_mfp.ppd"
+      Attribute "Product" "" "(HP Hotspot LaserJet Pro m1218nfs MFP)"
+    }
+    {
+      ModelName "HP LaserJet Professional m1219nfg MFP"
+      Attribute "NickName" "" "HP LaserJet Professional m1219nfg MFP, $Version, requires proprietary plugin"
+      Attribute "ShortNickName" "" "HP LJ Professional m1219nfg MFP"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional m1219nfg mfp;DES:hp laserjet professional m1219nfg mfp;"
+      PCFileName "hp-laserjet_professional_m1219nfg_mfp.ppd"
+      Attribute "Product" "" "(HP LaserJet Professional m1219nfg MFP)"
+    }
+    {
+      ModelName "HP LaserJet Professional m1219nfs MFP"
+      Attribute "NickName" "" "HP LaserJet Professional m1219nfs MFP, $Version, requires proprietary plugin"
+      Attribute "ShortNickName" "" "HP LJ Professional m1219nfs MFP"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet professional m1219nfs mfp;DES:hp laserjet professional m1219nfs mfp;"
+      PCFileName "hp-laserjet_professional_m1219nfs_mfp.ppd"
+      Attribute "Product" "" "(HP LaserJet Professional m1219nfs MFP)"
     }
     {
       ModelName "HP LaserJet Professional m1219nf MFP"

@@ -150,6 +150,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                                 (self.showLoadPaperPage, (lambda: True,)),
                                 (maint.alignType2Phase2, (lambda: self.dev, lambda: self.a, lambda: self.b,
                                                           lambda: self.c, lambda: self.d)),
+                                (self.closeAll, None),
                                 (self.close, None),
                               ],
 
@@ -170,6 +171,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                                 (self.showPageEdgePage, None),
                                 (self.endPageEdgePage, None),
                                 (maint.alignType3Phase4, (lambda: self.dev, lambda: self.zca)),
+                                (self.closeAll, None),
                                 (self.close, None),
                              ],
 
@@ -206,6 +208,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                             (self.showAlignmentNumberPage, ('B', 'v', 'k', 2, 11)),
                             (self.endAlignmentNumberPage, ('B',)),
                             (self.setXBowValues, None),
+                            (self.closeAll, None),
                             (self.close, None),
                             ],
 
@@ -214,6 +217,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                             (self.showAlignmentNumberPage, ('B', 'v', 'k', 2, 11)),
                             (self.endAlignmentNumberPage, ('B',)),
                             (self.setXBowValues, None),
+                            (self.closeAll, None),
                             (self.close, None),
                             ],
 
@@ -222,6 +226,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                             (self.showAlignmentNumberPage, ('B', 'v', 'kc', 2, 11)),
                             (self.endAlignmentNumberPage, ('B',)),
                             (self.setXBowValues, None),
+                            (self.closeAll, None),
                             (self.close, None),
                             ],
 
@@ -236,6 +241,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                             (self.showAlignmentNumberPage, ('E', 'v', 'kc', 2, 11)),
                             (self.endAlignmentNumberPage, ('E',)),
                             (self.setXBowValues, None),
+                            (self.closeAll, None),
                             (self.close, None),
                             ],
 
@@ -262,6 +268,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                                 (maint.alignType6Phase1, (lambda: self.dev,)),
                                 (self.setAlignButton, (BUTTON_FINISH,)),
                                 (self.showAioPage, None),
+                                (self.closeAll, None),
                                 (self.close, None),
                             ],
 
@@ -279,6 +286,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                                 (self.endAlignmentNumberPage, ('D',)),
                                 (maint.alignType3Phase2, (lambda: self.dev, lambda: self.num_inks, lambda: self.a,
                                                           lambda: self.b, lambda: self.c, lambda: self.d)),
+                                (self.closeAll, None),
                                 (self.close, None),
                             ],
 
@@ -295,6 +303,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                                 (self.endAlignmentNumberPage, ('D',)),
                                 (maint.alignType3Phase2, (lambda: self.dev, lambda: self.a, lambda: self.b,
                                                           lambda: self.c, lambda: self.d)),
+                                (self.closeAll, None),
                                 (self.close, None),
                             ],
 
@@ -309,6 +318,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                                (self.setAlignButton, (BUTTON_FINISH,)),
                                (self.showLoadPaperPage, (lambda: True,)),
                                (maint.alignType10Phase3, (lambda: self.dev,)),
+                               (self.closeAll, None),
                                (self.close, None),
                             ],
 
@@ -323,12 +333,14 @@ class AlignDialog(QDialog, Ui_Dialog):
                                (self.setAlignButton, (BUTTON_FINISH,)),
                                (self.showLoadPaperPage, (lambda: True,)),
                                (maint.alignType11Phase3, (lambda: self.dev,)),
+                               (self.closeAll, None),
                                (self.close, None),
                             ],
 
             ALIGN_TYPE_OJ_PRO : [ # 12
                                 (self.showLoadPaperPage, None),
                                 (maint.AlignType12, (lambda : self.dev, lambda: true)),
+                                (self.closeAll, None),
                                 (self.close, None),
                             ],
 
@@ -337,6 +349,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                               (maint.alignType13Phase1, (lambda: self.dev,)),
                               (self.setAlignButton, (BUTTON_FINISH,)),
                               (self.showAioPage, None),
+                              (self.closeAll, None),
                               (self.close, None),
                             ],
 
@@ -351,6 +364,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                                (self.setAlignButton, (BUTTON_FINISH,)),
                                (self.showLoadPaperPage, (lambda: True,)),
                                (maint.alignType14Phase3, (lambda: self.dev,)),
+                               (self.closeAll, None),
                                (self.close, None),
                             ],
 
@@ -385,6 +399,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                                                           lambda: self.c, lambda: self.d, lambda: self.e,
                                                           lambda: self.f, lambda: self.g, lambda: self.h,
                                                           lambda: self.i)),
+                               (self.closeAll, None),
                                (self.close, None),
                             ],
            ALIGN_TYPE_LEDM_FF_CC_0 : [ # 17

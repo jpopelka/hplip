@@ -1762,4 +1762,7 @@ def StatusType10(func): # Low End Data Model
         elif e.text == "unexpectedTypeInTray":
             status_block['status-code'] = STATUS_PRINTER_MEDIA_TYPE_MISMATCH
 
+        elif e.text == "manuallyFeed":
+            status_block['status-code'] = STATUS_MANUALLY_FEED
+
     return status_block

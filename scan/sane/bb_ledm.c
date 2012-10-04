@@ -690,17 +690,26 @@ int bb_open(struct ledm_session *ps)
   ps->adf_tlyRange.max = SANE_FIX(pbb->elements.config.adf.maximum_size.height/11.811023);
   ps->adf_bryRange.max = ps->adf_tlyRange.max;
 
-  i = pbb->elements.config.platen.platen_resolution_list[0] + 1;
-  while(i--)
+  if (pbb->elements.config.platen.flatbed_supported)
   {
-  _DBG("bb_open platen_resolution_list = %d\n",  pbb->elements.config.platen.platen_resolution_list[i]);
-    ps->platen_resolutionList[i] = pbb->elements.config.platen.platen_resolution_list[i];
-    ps->resolutionList[i] = pbb->elements.config.platen.platen_resolution_list[i];
+      i = pbb->elements.config.platen.platen_resolution_list[0] + 1;
+      while(i--)
+      {
+          _DBG("bb_open platen_resolution_list = %d\n",  pbb->elements.config.platen.platen_resolution_list[i]);
+          ps->platen_resolutionList[i] = pbb->elements.config.platen.platen_resolution_list[i];
+          ps->resolutionList[i] = pbb->elements.config.platen.platen_resolution_list[i];
+      }
   }
-
-  i = pbb->elements.config.adf.adf_resolution_list[0] + 1;
-  while(i--) ps->adf_resolutionList[i] = pbb->elements.config.adf.adf_resolution_list[i]; 
-
+  if (pbb->elements.config.adf.supported)
+  {
+     i = pbb->elements.config.adf.adf_resolution_list[0] + 1;
+     while(i--)
+     {
+         _DBG("bb_open adf_resolution_list = %d\n", pbb->elements.config.adf.adf_resolution_list[i]);
+         ps->adf_resolutionList[i] = pbb->elements.config.adf.adf_resolution_list[i]; 
+         ps->resolutionList[i] = pbb->elements.config.adf.adf_resolution_list[i];
+     }
+  }
   stat = 0;
 
 bugout:

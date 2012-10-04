@@ -36,7 +36,7 @@ class Align10Form(Align10Form_Base):
         Align10Form_Base.__init__(self,parent,name,modal,fl)
         self.Icon.setPixmap(load_pixmap('align10'))
 
-        self.controls = maint.align10and11Controls(pattern, align_type)
+        self.controls = maint.align10and11and14Controls(pattern, align_type)
 
         for line in self.controls:
             if not self.controls[line][0]:

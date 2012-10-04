@@ -59,7 +59,7 @@ endif
 # The following is a interlibrary dependency that must be compiled first.
 libsane_hpaio_la_LIBADD = libhpip.la libhpmud.la $(DBUS_LIBS) -lcups -ldl
 #libsane_hpaio_la_CFLAGS = -DWITH_NONAMESPACES -DSOAP_DEBUG
-libsane_hpaio_la_CFLAGS = $(DBUS_CFLAGS)
+libsane_hpaio_la_CFLAGS = $(DBUS_CFLAGS) -D_IPP_PRIVATE_STRUCTURES=1
 endif # SCAN_BUILD
 
 # hpmud library
@@ -266,7 +266,7 @@ cupsextdir = $(pyexecdir)
 cupsext_LTLIBRARIES = cupsext.la
 cupsext_la_LDFLAGS = -module -avoid-version
 cupsext_la_SOURCES =  prnt/cupsext/cupsext.c
-cupsext_la_CFLAGS = -I$(PYTHONINCLUDEDIR)
+cupsext_la_CFLAGS = -I$(PYTHONINCLUDEDIR) -D_IPP_PRIVATE_STRUCTURES=1
 cupsext_la_LIBADD = -lcups
 
 if SCAN_BUILD

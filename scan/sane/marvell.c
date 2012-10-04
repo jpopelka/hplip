@@ -365,6 +365,52 @@ static struct marvell_session *create_session()
    return ps;
 }
 
+static void set_supported_resolutions(struct marvell_session *ps)
+{
+    int i;
+    if(ps->scansrc & HPMUD_SCANSRC_ADF)
+    {
+       i = 0;
+       ps->adf_resolution_list[i++] = 5; /*Number of supported resolutions*/
+       ps->adf_resolution_list[i++] = 75;
+       ps->adf_resolution_list[i++] = 100;
+       ps->adf_resolution_list[i++] = 150;
+       ps->adf_resolution_list[i++] = 200;
+       ps->adf_resolution_list[i++] = 300;
+    }
+    if(ps->scansrc & HPMUD_SCANSRC_FLATBED)
+    {
+       i = 0;
+       ps->platen_resolution_list[i++] = 7; /*Number of supported resolutions*/
+       ps->platen_resolution_list[i++] = 75;
+       ps->platen_resolution_list[i++] = 100;
+       ps->platen_resolution_list[i++] = 150;
+       ps->platen_resolution_list[i++] = 200;
+       ps->platen_resolution_list[i++] = 300;
+       ps->platen_resolution_list[i++] = 600;
+       ps->platen_resolution_list[i++] = 1200;
+    }
+
+    if(ps->scansrc & HPMUD_SCANSRC_FLATBED)
+    {
+        ps->resolution_list[0] = ps->platen_resolution_list[0];
+        i = ps->platen_resolution_list[0] + 1;
+        while(i--)
+        {
+            ps->resolution_list[i] = ps->platen_resolution_list[i];
+        }
+    }
+    else 
+    {
+        ps->resolution_list[0] = ps->adf_resolution_list[0];
+        i = ps->adf_resolution_list[0] + 1;
+        while(i--)
+        {
+            ps->resolution_list[i] = ps->adf_resolution_list[i];
+        }
+        
+    }
+}
 /*
  * SANE APIs.
  */
@@ -485,15 +531,7 @@ SANE_Status marvell_open(SANE_String_Const device, SANE_Handle *handle)
    marvell_control_option(session, MARVELL_OPTION_INPUT_SOURCE, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */  
 
    /* Set supported resolutions. */
-   i=1;
-   session->resolution_list[i++] = 75;
-   session->resolution_list[i++] = 100;
-   session->resolution_list[i++] = 150;
-   session->resolution_list[i++] = 200;
-   session->resolution_list[i++] = 300;
-   session->resolution_list[i++] = 600;
-   session->resolution_list[i++] = 1200;
-   session->resolution_list[0] = i-1;    /* length of word_list */
+   set_supported_resolutions(session);
    marvell_control_option(session, MARVELL_OPTION_SCAN_RESOLUTION, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */
 
    /* Set supported contrast. */
@@ -635,6 +673,19 @@ SANE_Status marvell_control_option(SANE_Handle handle, SANE_Int option, SANE_Act
                {
                   ps->current_input_source = ps->input_source_map[i];
                   stat = SANE_STATUS_GOOD;
+                  if(ps->current_input_source == IS_PLATEN) 
+                  {
+                    i = ps->platen_resolution_list[0] + 1;
+                    while(i--) ps->resolution_list[i] = ps->platen_resolution_list[i];
+                  }
+                  else
+                  {
+                     i = ps->adf_resolution_list[0] + 1;
+                     while(i--) ps->resolution_list[i] = ps->adf_resolution_list[i];
+                  }
+                  ps->current_resolution = ps->resolution_list[1];
+                  mset_result |= SANE_INFO_RELOAD_PARAMS | SANE_INFO_RELOAD_OPTIONS;
+                  stat = SANE_STATUS_GOOD;
                   break;
                }
             }
@@ -642,6 +693,7 @@ SANE_Status marvell_control_option(SANE_Handle handle, SANE_Int option, SANE_Act
          else
          {  /* Set default. */
             ps->current_input_source = ps->input_source_map[0];
+            mset_result |= SANE_INFO_RELOAD_PARAMS | SANE_INFO_RELOAD_OPTIONS;
             stat = SANE_STATUS_GOOD;
          }
          break;

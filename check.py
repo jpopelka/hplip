@@ -581,13 +581,13 @@ try:
                 packages_to_install, commands=[],[]
                 if core.is_auto_installer_support():
                     packages_to_install, commands = core.get_dependency_data(d)
-                    if not packages_to_install:
-                        packages_to_install.append(d)
+#                    if not packages_to_install:
+#                        packages_to_install.append(d)
                 else:
                     packages_to_install, commands = core.get_dependency_data(d,supported_distro_vrs)
 
-                    if not packages_to_install:
-                        packages_to_install.append(d)
+#                    if not packages_to_install:
+#                        packages_to_install.append(d)
                 if core.hplip_dependencies[s][d][0]:
                     package_type = "REQUIRED"
                     if Status != 'OK':
@@ -744,7 +744,7 @@ try:
 
                     elif back_end not in ('hp', 'hpfax'):
                         log.warn("Printer is not HPLIP installed. Printers must use the hp: or hpfax: CUPS backend for HP-Devices.")
-                        num_errors += 1
+                        num_warns += 1
 
                 if device_avail and is_hp:
                     d = None
@@ -1031,7 +1031,7 @@ try:
                 if ok and user_input == 'y':
                     if Auth_verified or check_permissions(core):
                         Auth_verified = True
-                        cmd = core.su_sudo() %'hp-plugin'
+                        cmd = core.su_sudo() %'hp-plugin -i'
                         log.info("cmd = %s"%cmd)
                         core.run(cmd)
 

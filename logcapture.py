@@ -123,13 +123,14 @@ def usage(typ='text'):
 def backup_clearLog(strLog):
     if os.path.exists(strLog):
         iArch =1
-	while os.path.exists("%s.%d"%(strLog, iArch)) or os.path.exists("%s.%d.gz"%(strLog, iArch)):
+        while os.path.exists("%s.%d"%(strLog, iArch)) or os.path.exists("%s.%d.gz"%(strLog, iArch)):
             iArch +=1
-        sts,out = utils.run('mv %s %s.%d'%(strLog, strLog, iArch))
+        sts,out = utils.run('cp %s %s.%d'%(strLog, strLog, iArch))
         if sts != 0:
             log.error("Failed to archive %s log file"%strLog)
         else:
-            sts,out = utils.run('cp /dev/null %s'%strLog)
+#            sts,out = utils.run('cp /dev/null %s'%strLog)
+            sts = os.system('cat /dev/null > %s'%strLog)
             if sts != 0:
                 log.warn("Failed to clear the %s log file"%strLog)
             if utils.which('gzip'):
@@ -316,7 +317,7 @@ restore_loglevels()
 log.info("")
 log.info("")
 if sts_compress == 0:
-    log.info(log.bold("Logs are saved as ./%s.tar.gz ."%(LOG_FOLDER_NAME)))
+    log.info(log.bold("Logs are saved as %s/%s.tar.gz"%( os.getcwd(),LOG_FOLDER_NAME)))
 else:
-    log.info(log.bold("Logs are saved as ./%s ."%(LOG_FOLDER_NAME)))
+    log.info(log.bold("Logs are saved as %s/%s"%(os.getcwd(),LOG_FOLDER_NAME)))
 log.info("")
