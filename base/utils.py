@@ -85,6 +85,7 @@ import pexpect
 BIG_ENDIAN = 0
 LITTLE_ENDIAN = 1
 DBUS_SERVICE='com.hplip.StatusService'
+HPLIP_WEB_SITE ="http://hplipopensource.com/hplip-web/index.html"
 
 def addgroup():
     lis = []
@@ -1923,18 +1924,50 @@ def Is_HPLIP_older_version(installed_version, available_version):
     log.debug("HPLIP Installed_version=%s  Available_version=%s"%(installed_version,available_version))
     cnt = 0
     Is_older = False
-    while cnt <len(installed_array) and cnt <len(available_array):
-        if(int(installed_array[cnt]) < int(available_array[cnt])):
-            Is_older = True
-            break
-        elif(int(installed_array[cnt]) > int(available_array[cnt])):
-            log.debug("Already new verison is installed")
-            return False
-        cnt += 1
+    pat=re.compile('''(\d{1,})([a-z]{1,})''')
+    try:
+        while cnt <len(installed_array) and cnt <len(available_array):
 
-    # To check internal version is installed.
-    if Is_older is False and len(installed_array) >len(available_array):
-        Is_older = True
+            installed_ver_dig=0
+            installed_ver_alph=' '     
+            available_ver_dig=0
+            available_ver_alph=' '     
+            if pat.search(installed_array[cnt]):
+                installed_ver_dig = int(pat.search(installed_array[cnt]).group(1))
+                installed_ver_alph = pat.search(installed_array[cnt]).group(2)
+            else:
+                installed_ver_dig = int(installed_array[cnt])
+
+            if pat.search(available_array[cnt]):
+                available_ver_dig = int(pat.search(available_array[cnt]).group(1))
+                available_ver_alph = pat.search(available_array[cnt]).group(2)
+            else:
+                available_ver_dig = int(available_array[cnt])
+            
+            if (installed_ver_dig < available_ver_dig):
+                Is_older = True
+                break
+            elif (installed_ver_dig > available_ver_dig):
+                log.debug("Already new verison is installed")
+                return False
+            #checking sub minor versions .. e.g "3.12.10a" vs "3.12.10".... "3.12.10a" --> latest
+            else:
+                if (installed_ver_alph.lower() < available_ver_alph.lower()):
+                    Is_older = True
+                    break
+                elif (installed_ver_alph.lower() > available_ver_alph.lower()):
+                    log.debug("Already new verison is installed")
+                    return False
+                        
+            cnt += 1
+
+        # To check version is installed. e.g. "3.12.10" vs "3.12.10.1".... "3.12.10.1"-->latest
+        if Is_older is False and len(installed_array) < len(available_array):
+            Is_older = True
+
+    except:
+        log.error("Failed to get the latest version. Check out %s for manually installing latest version of HPLIP."%HPLIP_WEB_SITE)
+        return False
 
     return Is_older
 

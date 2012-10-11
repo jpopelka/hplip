@@ -99,7 +99,7 @@ TEMP_PATH="/tmp/"
 FORCE_INSTALL=False
 CHECKING_ONLY=False
 NOTIFY=False
-HPLIP_SOURCEFORGE_SITE = "http://feed2js.org/feed2js.php?src=http%3A%2F%2Fsourceforge.net%2Fexport%2Frss2_projnews.php%3Fgroup_id%3D149981"
+HPLIP_VERSION_INFO_SITE ="http://hplip.sourceforge.net/hplip_web.conf"
 HPLIP_WEB_SITE ="http://hplipopensource.com/hplip-web/index.html"
 
 try:
@@ -204,15 +204,15 @@ try:
 
 
     HPLIP_latest_ver="0.0.0"
-    # get HPLIP version info from sourceforge
-    pat = re.compile(r"""HPLIP (.*) Public Release""")
-    sts, HPLIP_Ver_file = utils.download_from_network(HPLIP_SOURCEFORGE_SITE)
+    # get HPLIP version info from hplip_web.conf file
+    sts, HPLIP_Ver_file = utils.download_from_network(HPLIP_VERSION_INFO_SITE)    
     if sts is True:
-        HPLIP_latest_ver = parse_HPLIP_version(HPLIP_Ver_file, pat)
+        hplip_version_conf = ConfigBase(HPLIP_Ver_file)
+        HPLIP_latest_ver = hplip_version_conf.get("HPLIP","Latest_version","0.0.0")
 
     # get HPLIP version info from hplip site
     if HPLIP_latest_ver == "0.0.0":	## if failed to connect the sourceforge site, then check HPLIP site.
-        pat = re.compile(r"""The current version of the HPLIP solution is version (.*)\. \(.*""")
+        pat = re.compile(r"""The current version of the HPLIP solution is version (\d{1,}\.\d{1,}\.\d{1,}[a-z]{0,})\. \(.*""")
         sts, HPLIP_Ver_file = utils.download_from_network(HPLIP_WEB_SITE)
         if sts is True:
             HPLIP_latest_ver = parse_HPLIP_version(HPLIP_Ver_file, pat)
