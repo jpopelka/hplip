@@ -100,7 +100,7 @@ class Ui_Dialog(object):
         elif self.Error_msg == QUEUES_PAUSED:
             text="'"+ self.printerName + "' is paused. Do you want to enable queue?"
         elif self.Error_msg == QUEUES_CONFIG_ERROR:
-            text="'"+ self.printerName + "' is not configured using hp-setup utility. Click 'Next' to remove and reconfigure queue."
+            text="'"+ self.printerName + "' is not configured using hp-setup utility. Click 'Remove and Setup' to remove and reconfigure queue."
 
         if self.Error_msg != QUEUES_MSG_SENDING:
             self.TitleLabel.setText(QtGui.QApplication.translate("Dialog", text, None, QtGui.QApplication.UnicodeUTF8))
@@ -108,7 +108,7 @@ class Ui_Dialog(object):
                 self.NextButton.setText(QtGui.QApplication.translate("Dialog", "Yes", None, QtGui.QApplication.UnicodeUTF8))
                 self.CancelButton.setText(QtGui.QApplication.translate("Dialog", "No", None, QtGui.QApplication.UnicodeUTF8))
             else:
-                self.NextButton.setText(QtGui.QApplication.translate("Dialog", "Next >", None, QtGui.QApplication.UnicodeUTF8))
+                self.NextButton.setText(QtGui.QApplication.translate("Dialog", "Remove and Setup", None, QtGui.QApplication.UnicodeUTF8))
                 self.CancelButton.setText(QtGui.QApplication.translate("Dialog", "Cancel", None, QtGui.QApplication.UnicodeUTF8))
 
 
@@ -118,6 +118,18 @@ class QueuesDiagnose(QDialog, Ui_Dialog):
     def __init__(self, parent, printerName, device_uri, Error_msg):
         QDialog.__init__(self, parent)
         self.result = False
+        self.printerName = printerName
+        self.device_uri = device_uri
+        self.Error_msg = Error_msg
+        self.setupUi(self, self.printerName, self.device_uri,self.Error_msg)
+        self.user_settings = UserSettings()
+        self.user_settings.load()
+        self.user_settings.debug()
+
+        self.initUi()
+
+    def init(self, printerName, device_uri, Error_msg):
+        QDialog.__init__(self,None)
         self.printerName = printerName
         self.device_uri = device_uri
         self.Error_msg = Error_msg

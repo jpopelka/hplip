@@ -794,7 +794,7 @@ class PrintSettingsToolbox(QToolBox):
                     log.debug("End adding Group: Summary")
                    
 
-                self.job_storage_enable = self.cur_device.mq.get('job-storage', JOB_STORAGE_DISABLE) == JOB_STORAGE_ENABLE
+                self.job_storage_enable = 0 #self.cur_device.mq.get('job-storage', JOB_STORAGE_DISABLE) == JOB_STORAGE_ENABLE
 
 
                 if self.job_storage_enable:

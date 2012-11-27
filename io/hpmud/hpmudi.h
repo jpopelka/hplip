@@ -1,24 +1,24 @@
 /*****************************************************************************\
 
-  hpmudi.h - internal definitions for multi-point transport driver 
- 
+  hpmudi.h - internal definitions for multi-point transport driver
+
   (c) 2004-2007 Copyright Hewlett-Packard Development Company, LP
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy 
-  of this software and associated documentation files (the "Software"), to deal 
-  in the Software without restriction, including without limitation the rights 
-  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
-  of the Software, and to permit persons to whom the Software is furnished to do 
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+  of the Software, and to permit persons to whom the Software is furnished to do
   so, subject to the following conditions:
 
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
 
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
-  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
-  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
   Author: Naga Samrat Chowdary Narla,
@@ -57,7 +57,7 @@
 #include "pp.h"
 #endif
 
-// Don DO NOT commit with HPMUD_DEBUG enabled :( 
+// Don DO NOT commit with HPMUD_DEBUG enabled :(
 //#define HPMUD_DEBUG
 
 #define _STRINGIZE(x) #x
@@ -120,7 +120,7 @@ enum HPMUD_CHANNEL_ID
 typedef struct
 {
    unsigned short h2pcredit;   /* host to peripheral credit (dot4: primary socket id credit for sending) */
-   unsigned short p2hcredit;  /* peripheral to host credit (dot4: secondary socket id credit for sending) */   
+   unsigned short p2hcredit;  /* peripheral to host credit (dot4: secondary socket id credit for sending) */
    unsigned short h2psize;  /* host to peripheral packet size in bytes (dot4: primary max packet size for sending) */
    unsigned short p2hsize;  /* peripheral to host packet size in bytes (dot4: secondary max packet size for sending) */
 } transport_attributes;
@@ -144,7 +144,7 @@ typedef struct _mud_device_vf
    enum HPMUD_RESULT (*channel_open)(struct _mud_device *pd, const char *channel_name, HPMUD_CHANNEL *cd);                        /* channel specific open */
    enum HPMUD_RESULT (*channel_close)(struct _mud_device *pd, struct _mud_channel *pc);                                     /* channel specific close */
    enum HPMUD_RESULT (*channel_write)(struct _mud_device *pd, struct _mud_channel *pc, const void *buf, int size, int sec_timeout, int *bytes_wrote);
-   enum HPMUD_RESULT (*channel_read)(struct _mud_device *pd, struct _mud_channel *pc, void *buf, int size, int sec_timeout, int *bytes_read);   
+   enum HPMUD_RESULT (*channel_read)(struct _mud_device *pd, struct _mud_channel *pc, void *buf, int size, int sec_timeout, int *bytes_read);
 } mud_device_vf;
 
 typedef struct _mud_channel
@@ -155,7 +155,7 @@ typedef struct _mud_channel
    int index;                  /* channel[index] of this object */
    int fd;                     /* file descriptor for this channel */
    pid_t pid;                  /* process owner */
-   int dindex;                 /* device[dindex] parent device */ 
+   int dindex;                 /* device[dindex] parent device */
 
    /* MLC/1284.4 specific variables. */
    transport_attributes ta;
@@ -188,13 +188,13 @@ typedef struct _mud_device
    int port;
 
    mud_device_vf vf;                 /* virtual function table */
-   pthread_mutex_t mutex;  
+   pthread_mutex_t mutex;
 } mud_device;
 
 typedef struct
 {
    mud_device device[HPMUD_DEVICE_MAX];
-   pthread_mutex_t mutex;  
+   pthread_mutex_t mutex;
 } mud_session;
 
 extern mud_session *msp __attribute__ ((visibility ("hidden")));

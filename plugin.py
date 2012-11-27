@@ -75,17 +75,17 @@ USAGE = [ (__doc__, "", "name", True),
 
 mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
                     (INTERACTIVE_MODE, GUI_MODE),
-                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4), True)
+                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4), True,True)
 
 opts, device_uri, printer_name, mode, ui_toolkit, loc = \
-    mod.parseStdOpts('p:', ['path=', 'plugin=', 'plug-in=', 'reason=',
+    mod.parseStdOpts('sp:', ['path=', 'plugin=', 'plug-in=', 'reason=',
                             'generic', 'optional', 'required'],
                      handle_device_printer=False)
 
 plugin_path = None
 install_mode = PLUGIN_NONE # reuse plugin types for mode (PLUGIN_NONE = generic)
 plugin_reason = PLUGIN_REASON_NONE
-
+Is_quiet_mode = False
 for o, a in opts:
     if o in ('-p', '--path', '--plugin', '--plug-in'):
         plugin_path = os.path.normpath(os.path.abspath(os.path.expanduser(a)))
@@ -102,8 +102,15 @@ for o, a in opts:
 
     elif o == '--reason':
         plugin_reason = int(a)
+        
+    elif o == '-s':
+        Is_quiet_mode = True
 
 
+if not Is_quiet_mode:
+    mod.quiet= False
+    mod.showTitle()
+    
 version = prop.installed_version
 plugin_filename = 'hplip-%s-plugin.run' % version
 
@@ -441,7 +448,6 @@ else: # INTERACTIVE_MODE
                     log.info("Firmware download successful.\n")
 
                 d.close()
-
 
     except KeyboardInterrupt:
         log.error("User exit")

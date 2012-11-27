@@ -718,9 +718,11 @@ bugout:
 
 int bb_close(struct ledm_session *ps)
 {
-  _DBG("bb_close()\n");
-  free(ps->bb_session);
-  ps->bb_session = NULL;
+  if (ps->bb_session)
+  {
+      free(ps->bb_session);
+      ps->bb_session = NULL;
+  }
   return 0;
 } 
 

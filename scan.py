@@ -685,11 +685,12 @@ try:
         log.info("Compression: %s" % scanner_compression)
         if(set_contrast):
             log.info("Contrast: %d" % contrast)
-        log.info("Scan area (mm):")
-        log.info("  Top left (x,y): (%fmm, %fmm)" % (tlx, tly))
-        log.info("  Bottom right (x,y): (%fmm, %fmm)" % (brx, bry))
-        log.info("  Width: %fmm" % (brx - tlx))
-        log.info("  Height: %fmm" % (bry - tly))
+        if units == 'mm':
+            log.info("Scan area (mm):")
+            log.info("  Top left (x,y): (%fmm, %fmm)" % (tlx, tly))
+            log.info("  Bottom right (x,y): (%fmm, %fmm)" % (brx, bry))
+            log.info("  Width: %fmm" % (brx - tlx))
+            log.info("  Height: %fmm" % (bry - tly))
 
         if page_size:
             units = page_units # for display purposes only

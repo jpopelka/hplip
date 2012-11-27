@@ -670,17 +670,17 @@ DRIVER_ERROR LJZjStream::preProcessRasterData(cups_raster_t **ppcups_raster, cup
 	int fdSwaped = -1;
 	int loopcntr = 0; 
 	DRIVER_ERROR driver_error = NO_ERROR;
-	cups_page_header2_t    cups_header;
+	cups_page_header2_t    cups_header={0,};
 	cups_raster_t *swaped_pages_raster=NULL;
 	cups_raster_t *even_pages_raster=NULL;
 	cups_raster_t *odd_pages_raster = NULL;
 	BYTE* pPageDataBuffer = NULL;
-	char hpEvenPagesFile[64];
-	char hpOddPagesFile[64];
+	char hpEvenPagesFile[64]={0,};
+	char hpOddPagesFile[64]={0,};
 	snprintf(hpEvenPagesFile, sizeof(hpEvenPagesFile), "%s/hplipEvenPagesXXXXXX","/var/log/hp/tmp");
 	snprintf(hpOddPagesFile, sizeof(hpOddPagesFile), "%s/hplipOddPagesXXXXXX", "/var/log/hp/tmp");
 	
-	if (1 != m_pJA->pre_process_raster || !cups_header.Duplex){		                                  
+	if (1 != m_pJA->pre_process_raster || !firstpage_cups_header->Duplex){		                                  
 		return  NO_ERROR;                                  
     }    
 

@@ -420,6 +420,7 @@ bugout:
    {
       if (session)
       {
+         bb_close(session);
          if (session->cd > 0)
             hpmud_close_channel(session->dd, session->cd);
          if (session->dd > 0)
@@ -592,7 +593,7 @@ SANE_Status ledm_control_option(SANE_Handle handle, SANE_Int option, SANE_Action
             }
             else
             {
-                ps->currentContrast = LEDM_CONTRAST_DEFAULT;
+              ps->currentContrast = LEDM_CONTRAST_DEFAULT;
             }
             mset_result |= SANE_INFO_RELOAD_PARAMS;
             stat = SANE_STATUS_GOOD;

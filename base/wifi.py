@@ -202,7 +202,9 @@ def getAdaptorList(dev):
 # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 def getWifiAdaptorID(dev):
-    # ret: adaptor_id, name, state, presence
+    # rVal: [[adaptor_id, name, state, presence]]
+    # ret: [adaptor_id, name, state, presence]
+    rVal = []
     ret = getAdaptorList(dev)
 
     try:
@@ -231,31 +233,36 @@ def getWifiAdaptorID(dev):
 
                 r.append(x)
 
-            return r
+            rVal.append(r)
+            
+    return rVal
 
-    return -1, 'Unknown', 'Unknown', 'Unknown'
 
 # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
-
-def setAdaptorPower(dev, adapterName, adaptor_id=0, power_state='PowerOn'):
-    ret = {}
-    request = PREAMBLE + """<SetAdaptorPowerRequest>
+                         
+def setAdaptorPower(dev, adapterList, power_state='PowerOn'):
+    adaptor_id=-1
+    adaptorName =""
+    for a in adapterList:
+        adaptor_id = a[0]
+        adaptorName = a[1]
+        request = PREAMBLE + """<SetAdaptorPowerRequest>
 <AdaptorID>%s</AdaptorID>
 <PowerState>%s</PowerState>
 </SetAdaptorPowerRequest>
 </WiFiConfig>""" % (adaptor_id, power_state.encode('utf-8'))
 
-    errorreturn, params = _readWriteWifiConfig(dev, request)
-    if not params:
-        return {}
+        errorreturn, params = _readWriteWifiConfig(dev, request)
+        if not params:
+            return -1 ,"","",""
 
-    ret['errorreturn'] = errorreturn
-    if errorreturn != 'ok':
-        log.error("SetAdaptorPower returned an error: %s" % errorreturn)
-        return ret
+        if errorreturn != 'ok':
+            log.error("SetAdaptorPower returned an error: %s" % errorreturn)
+        else:
+            log.debug("SetAdaptorPower returned Success.")
+            return adaptor_id, adaptorName, a[2], a[3]
 
-    return ret
+    return -1 ,"","",""
 
 # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 

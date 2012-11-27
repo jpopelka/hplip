@@ -35,7 +35,7 @@ import re
 
 # Local
 from base.g import *
-from base import utils, tui, models
+from base import utils, tui, models,queues
 from installer import dcheck
 from installer.core_install import *
 from prnt import cups
@@ -54,7 +54,7 @@ USAGE = [(__doc__, "", "name", True),
          ("Usage: %s [OPTIONS]" % __mod__, "", "summary", True),
          utils.USAGE_OPTIONS,
          ("Compile-time check:", "-c or --compile", "option", False),
-         ("Run-time check:", "-r or --run", "option", False),
+         ("Run-time check:", "-r or --run or --runtime", "option", False),
          ("Compile and run-time checks:", "-b or --both (default)", "option", False),
          ("Fix the found issues on confirmation:", "--fix", "option", False),
          utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
@@ -79,7 +79,8 @@ COMPILEDEP = 3
 PYEXT = 4 
 SCANCONF = 5
 IS_LIBUSB01_ENABLED = 'no'
-
+IS_QUIET_MODE = False
+TMP_LOG_CONF_FILE = "/var/log/hp/tmp/hp_check_tmp.log"
 ############ Functions #########
 # Usage function
 def usage(typ='text'):
@@ -167,7 +168,7 @@ def start_service(core, service_name=None):
     else:
         if service_name == 'cups':
             cmd = 'lpstat -r'
-            sts,out = core.run(cmd_status)
+            sts,out = core.run(cmd)
             if sts ==0 and 'is running' in out:
                 ret_Val = True
 
@@ -179,7 +180,7 @@ def password_entry():
     
 # password_user_entry function
 def password_user_entry():
-    return getpass.getpass(log.bold("Please enter the user (%s)'s password: " % os.getenv('USER')))
+    return getpass.getpass(log.bold("Please enter the sudoer (%s)'s password: " % os.getenv('USER')))
 
 #progress_callback function
 def progress_callback(cmd="", desc="Working..."):
@@ -194,7 +195,7 @@ def check_permissions(core):
     if not core.running_as_root():
         su_sudo = core.get_distro_data('su_sudo')
         if su_sudo == "sudo":
-            tui.title("ENTER USER PASSWORD")
+            tui.title("ENTER SUDO PASSWORD")
             result = core.check_password(password_user_entry, progress_callback)
         else:
             tui.title("ENTER ROOT/SUPERUSER PASSWORD")
@@ -233,8 +234,12 @@ def check_user_groups(str_grp, avl_grps):
 
     if len(exp_grp_list) == 0:
         result = True
-
-    return result ,exp_grp_list
+    missing_groups_str=''
+    for a in exp_grp_list:
+        if missing_groups_str:
+            missing_groups_str += ','
+        missing_groups_str += a
+    return result ,missing_groups_str
 
     
 
@@ -295,7 +300,14 @@ def get_libusb_version():
         return get_version('libusb-config --version')
     else:
         return '1.0'
-    
+
+
+# This updates the config log file
+def update_log_file(log_conf, section, key, value):
+    if IS_QUIET_MODE:
+        log_conf.set(section, key, value)
+
+
 ########## Classes ###########
 #DependenciesCheck class derived from CoreInstall
 class DependenciesCheck(CoreInstall):
@@ -385,7 +397,7 @@ try:
     log.set_module(__mod__)
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hl:gtcrb', ['help', 'help-rest', 'help-man', 'help-desc', 'logging=', 'run', 'runtime', 'compile', 'both','fix'])
+        opts, args = getopt.getopt(sys.argv[1:], 'hl:gtcrbsi', ['help', 'help-rest', 'help-man', 'help-desc', 'logging=', 'run', 'runtime', 'compile', 'both','fix'])
 
     except getopt.GetoptError, e:
         log.error(e.msg)
@@ -420,56 +432,71 @@ try:
             time_flag = DEPENDENCY_RUN_AND_COMPILE_TIME
         elif o == '--fix':
             Fix_Found_Problems = True
+        elif o == '-s':
+            IS_QUIET_MODE = True
+
 
     if not log.set_level(log_level):
         usage()
 
     if not fmt:
         log.no_formatting()
+        
+    if not IS_QUIET_MODE:
+        utils.log_title(__title__, __version__)
 
-    utils.log_title(__title__, __version__)
+        log.info(log.bold("Note: hp-check can be run in three modes:"))
 
-    log.info(log.bold("Note: hp-check can be run in three modes:"))
+        for l in tui.format_paragraph("1. Compile-time check mode (-c or --compile): Use this mode before compiling the HPLIP supplied tarball (.tar.gz or .run) to determine if the proper dependencies are installed to successfully compile HPLIP."):
+            log.info(l)
 
-    for l in tui.format_paragraph("1. Compile-time check mode (-c or --compile): Use this mode before compiling the HPLIP supplied tarball (.tar.gz or .run) to determine if the proper dependencies are installed to successfully compile HPLIP."):
-        log.info(l)
+        for l in tui.format_paragraph("2. Run-time check mode (-r or --run): Use this mode to determine if a distro supplied package (.deb, .rpm, etc) or an already built HPLIP supplied tarball has the proper dependencies installed to successfully run."):
+            log.info(l)
 
-    for l in tui.format_paragraph("2. Run-time check mode (-r or --run): Use this mode to determine if a distro supplied package (.deb, .rpm, etc) or an already built HPLIP supplied tarball has the proper dependencies installed to successfully run."):
-        log.info(l)
+        for l in tui.format_paragraph("3. Both compile- and run-time check mode (-b or --both) (Default): This mode will check both of the above cases (both compile- and run-time dependencies)."):
+            log.info(l)
 
-    for l in tui.format_paragraph("3. Both compile- and run-time check mode (-b or --both) (Default): This mode will check both of the above cases (both compile- and run-time dependencies)."):
-        log.info(l)
+        log.info()
+        for l in tui.format_paragraph("Check types:"):
+            log.info(l)
+        for l in tui.format_paragraph("a. EXTERNALDEP - External Dependencies"):
+            log.info(l)
+        for l in tui.format_paragraph("b. GENERALDEP  - General Dependencies (required both at compile and run time)"):
+            log.info(l)
+        for l in tui.format_paragraph("c. COMPILEDEP  - Compile time Dependencies"):
+            log.info(l)
+        for l in tui.format_paragraph("d. [All are run-time checks]"):
+            log.info(l)
+        for l in tui.format_paragraph("PYEXT\nSCANCONF\nQUEUES\nPERMISSION"):
+            log.info(l)
 
-    log.info()
-    for l in tui.format_paragraph("Check types:"):
-        log.info(l)
-    for l in tui.format_paragraph("a. EXTERNALDEP - External Dependencies"):
-        log.info(l)
-    for l in tui.format_paragraph("b. GENERALDEP  - General Dependencies (required both at compile and run time)"):
-        log.info(l)
-    for l in tui.format_paragraph("c. COMPILEDEP  - Compile time Dependencies"):
-        log.info(l)
-    for l in tui.format_paragraph("d. [All are run-time checks]"):
-        log.info(l)
-    for l in tui.format_paragraph("PYEXT\nSCANCONF\nQUEUES\nPERMISSION"):
-	    log.info(l)
-
-    log.info()
-    log.info("Status Types:")
-    log.info("    OK")
-    log.info("    MISSING       - Missing Dependency or Permission or Plug-in")
-    log.info("    INCOMPAT      - Incompatible dependency-version or Plugin-version")
-    log.info()
+        log.info()
+        log.info("Status Types:")
+        log.info("    OK")
+        log.info("    MISSING       - Missing Dependency or Permission or Plug-in")
+        log.info("    INCOMPAT      - Incompatible dependency-version or Plugin-version")
+        log.info()
 
     log_file = os.path.abspath('./hp-check.log')
     log.info(log.bold("Saving output in log file: %s" % log_file))
     log.debug("Log file=%s" % log_file)
     if os.path.exists(log_file):
         os.remove(log_file)
+    
+    quiet_mode_log_conf =None
+    log.set_logfile(log_file)    
+    if IS_QUIET_MODE:
+        try:
+           fp = open(TMP_LOG_CONF_FILE, "w")
+           os.chmod(TMP_LOG_CONF_FILE,0666)
+           fp.close()
+        except (OSError, IOError):
+           log.debug("Unable to open file %s for writing." % TMP_LOG_CONF_FILE)
 
-    log.set_logfile(log_file)
-    log.set_where(log.LOG_TO_CONSOLE_AND_FILE)
-
+        quiet_mode_log_conf = ConfigBase(TMP_LOG_CONF_FILE)
+        log.set_where(log.LOG_TO_FILE)
+    else:
+        log.set_where(log.LOG_TO_CONSOLE_AND_FILE)
     log.info("\nInitializing. Please wait...")
     ui_toolkit = sys_conf.get('configure','ui-toolkit')
     core =  DependenciesCheck(MODE_CHECK,INTERACTIVE_MODE,ui_toolkit)
@@ -536,6 +563,8 @@ try:
 
         scanning_enabled = utils.to_bool(sys_conf.get('configure', 'scanner-build', '0'))
         log.info(" %-20s %-20s %-10s %-10s %-10s %-10s %s"%( "<Package-name>", " <Package-Desc>", "<Required/Optional>", "<Min-Version>","<Installed-Version>", "<Status>", "<Comment>"))
+        opt_missing_index=1
+        req_missing_index=1
         for s in core.hplip_dependencies:
             if s == EXTERNALDEP: 
                 if time_flag == DEPENDENCY_RUN_AND_COMPILE_TIME or time_flag == DEPENDENCY_RUN_TIME:
@@ -581,13 +610,12 @@ try:
                 packages_to_install, commands=[],[]
                 if core.is_auto_installer_support():
                     packages_to_install, commands = core.get_dependency_data(d)
-#                    if not packages_to_install:
-#                        packages_to_install.append(d)
+                    if not packages_to_install and d == 'hpaio':
+                        packages_to_install.append(d)
                 else:
                     packages_to_install, commands = core.get_dependency_data(d,supported_distro_vrs)
-
-#                    if not packages_to_install:
-#                        packages_to_install.append(d)
+                    if not packages_to_install and d == 'hpaio':
+                        packages_to_install.append(d)
                 if core.hplip_dependencies[s][d][0]:
                     package_type = "REQUIRED"
                     if Status != 'OK':
@@ -615,6 +643,14 @@ try:
                     log.info(" %-20s %-25s %-15s %-15s %-15s %-10s %s" %(d,core.hplip_dependencies[s][d][2], package_type,core.hplip_dependencies[s][d][4],installed_ver,Status,comment))
                 else:
                     log.info(log.red(" error: %-13s %-25s %-15s %-15s %-15s %-10s %s" %(d,core.hplip_dependencies[s][d][2], package_type,core.hplip_dependencies[s][d][4],installed_ver,Status,comment)))
+                    if package_type == "OPTIONAL":
+                        for pkg in packages_to_install:
+                            update_log_file(quiet_mode_log_conf, "OPTIONAL_MISSING_PACKAGE","package%d"%opt_missing_index, pkg)
+                            opt_missing_index += 1
+                    else:
+                        for pkg in packages_to_install:
+                            update_log_file(quiet_mode_log_conf, "REQUIRED_MISSING_PACKAGE","package%d"%req_missing_index, pkg)
+                            req_missing_index += 1
 
 
         if scanning_enabled:
@@ -721,13 +757,16 @@ try:
                 if os.path.exists(ppd):
                     log.info("PPD: %s" % ppd)
                     nickname_pat = re.compile(r'''\*NickName:\s*\"(.*)"''', re.MULTILINE)
-
-                    f = file(ppd, 'r').read(4096)
-
                     try:
-                        desc = nickname_pat.search(f).group(1)
-                    except AttributeError:
+                        f = file(ppd, 'r').read(4096)
+                    except IOError:
+                        log.warn("Failed to read %s ppd file"%ppd)
                         desc = ''
+                    else:
+                        try:
+                            desc = nickname_pat.search(f).group(1)
+                        except AttributeError:
+                            desc = ''
 
                     log.info("PPD Description: %s" % desc)
 
@@ -750,13 +789,14 @@ try:
                     d = None
                     try:
                         try:
-                            d = device.Device(device_uri)
+                            d = device.Device(device_uri,None, None, None, True)
                         except Error:
                             log.error("Device initialization failed.")
                             continue
 
                         plugin = d.mq.get('plugin', PLUGIN_NONE)
                         if plugin in (PLUGIN_REQUIRED, PLUGIN_OPTIONAL):
+                            update_log_file(quiet_mode_log_conf, "PLUGIN","plugin_printer_present", True)
                             plugin_sts = core.check_for_plugin()
                             if plugin_sts == PLUGIN_INSTALLED:
                                 if plugin == PLUGIN_REQUIRED:
@@ -791,6 +831,7 @@ try:
                             #print deviceid
                             if not deviceid:
                                 log.error("Communication status: Failed")
+                                update_log_file(quiet_mode_log_conf, "DEVICE_COMM_ERRORS",printer_name, device_uri)
                                 num_errors += 1
                             else:
                                 log.info("Communication status: Good")
@@ -804,6 +845,7 @@ try:
                             #print error_code
                             if not deviceid:
                                 log.error("Communication status: Failed")
+                                update_log_file(quiet_mode_log_conf, "DEVICE_COMM_ERRORS",printer_name, device_uri)
                                 num_errors += 1
                             else:
                                 log.info("Communication status: Good")
@@ -827,6 +869,8 @@ try:
             log.info(log.red("error: %-8s %-30s %-15s %-8s %-8s %-8s %s"%("groups", "user-groups", "Required","-", "-", "MISSING", out)))
             num_errors += 1
             user_grp_error = True
+            update_log_file(quiet_mode_log_conf, "GROUPS","missing-user-groups", out)
+            update_log_file(quiet_mode_log_conf, "GROUPS","missing-user-groups-cmd", add_user_to_group)
 
         if hpmudext_avail:
             lsusb = utils.which('lsusb')
@@ -855,7 +899,7 @@ try:
                             #    log.info("    Device URI: %s" %  deviceuri)
                                 d = None
                                 try:
-                                    d = device.Device(deviceuri)
+                                    d = device.Device(deviceuri,None, None, None, True)
                                 except Error:
                                     continue
                                 if not d.supported:
@@ -914,6 +958,7 @@ try:
                         disable_selinux = True
                         log.warn("%-12s %-12s %-10s %-3s %-3s %-8s %s" \
                                       %("SELinux",  "enabled", "Optional", "-", "-", "INCOMPAT", "'SELinux needs to be disabled for Plugin printers and Fax functionality.'"))
+                        update_log_file(quiet_mode_log_conf, "GROUPS","selinux_status", "enabled")
                         break
                 if disable_selinux == False:
                     log.info("%-15s %-15s %-10s %-3s %-3s %-8s %s"\
@@ -922,6 +967,9 @@ try:
         package_mgr_cmd = core.get_distro_data('package_mgr_cmd')
         pre_depend_cmd  = core.get_distro_data('pre_depend_cmd')
         tui.header("SUMMARY")
+#        if IS_QUIET_MODE:
+#            log.set_where(log.LOG_TO_CONSOLE_AND_FILE)
+#            log.debug("")
         log.info(log.bold("Missing Required Dependencies"))
         log.info(log.bold('-'*len("Missing Required Dependencies")))
         
@@ -960,16 +1008,21 @@ try:
         log.error("HPLIP not found.")
         num_errors += 1
         
+    if IS_QUIET_MODE:
+        log.set_where(log.LOG_TO_FILE)
+        
     log.info()
     log.info("Total Errors: %d" % num_errors)
     log.info("Total Warnings: %d" % num_warns)
     log.info()
+    if Fix_Found_Problems:
+        queues.main_function(INTERACTIVE_MODE,None, True,False)
     if num_errors or num_warns:
         if Fix_Found_Problems:
             Auth_verified=False
             if len(overall_install_cmds) >0 and package_mgr_cmd:
                 tui.header("Installation of Missing Packages")
-                ok,user_input =tui.enter_choice("Install missing/incompatible packages. (a=install all*, c=custom_install, s=skip, q=quit):",['a', 'c','s', 'q'], 'a')
+                ok,user_input =tui.enter_choice("Update repository and Install missing/incompatible packages. (a=install all*, c=custom_install, s=skip, q=quit):",['a', 'c','s', 'q'], 'a')
                 if not ok or user_input =='q':
                     log.info("User Exit")
                     sys.exit(0)
@@ -1033,7 +1086,7 @@ try:
                         Auth_verified = True
                         cmd = core.su_sudo() %'hp-plugin -i'
                         log.info("cmd = %s"%cmd)
-                        core.run(cmd)
+                        os.system(cmd)
 
             if user_grp_error:
                 if add_user_to_group:

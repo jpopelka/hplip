@@ -346,6 +346,8 @@ class Ui_MainWindow(object):
         self.ViewAsListAction.setObjectName("ViewAsListAction")
         self.ViewAsIconsAction = QtGui.QAction(MainWindow)
         self.ViewAsIconsAction.setObjectName("ViewAsIconsAction")
+        self.DiagnoseQueueAction = QtGui.QAction(MainWindow)
+        self.DiagnoseQueueAction.setObjectName("DiagnoseQueueAction")
         self.DeviceMenu.addAction(self.DeviceSettingsAction)
         self.DeviceMenu.addSeparator()
         self.DeviceMenu.addAction(self.DeviceRefreshAction)
@@ -353,6 +355,8 @@ class Ui_MainWindow(object):
         self.DeviceMenu.addSeparator()
         self.DeviceMenu.addAction(self.SetupDeviceAction)
         self.DeviceMenu.addAction(self.RemoveDeviceAction)
+        self.DeviceMenu.addSeparator()
+        self.DeviceMenu.addAction(self.DiagnoseQueueAction)
         self.DeviceMenu.addSeparator()
         self.DeviceMenu.addAction(self.QuitAction)
         self.ConfigureMenu.addAction(self.PreferencesAction)
@@ -369,6 +373,8 @@ class Ui_MainWindow(object):
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.SetupDeviceAction)
         self.toolBar.addAction(self.RemoveDeviceAction)
+        self.toolBar.addSeparator()
+        self.toolBar.addAction(self.DiagnoseQueueAction)
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.ContentsAction)
 
@@ -424,5 +430,6 @@ class Ui_MainWindow(object):
         self.ViewAsListAction.setToolTip(QtGui.QApplication.translate("MainWindow", "View Devices as a list", None, QtGui.QApplication.UnicodeUTF8))
         self.ViewAsIconsAction.setText(QtGui.QApplication.translate("MainWindow", "View as Icons", None, QtGui.QApplication.UnicodeUTF8))
         self.ViewAsIconsAction.setToolTip(QtGui.QApplication.translate("MainWindow", "View device list as icons", None, QtGui.QApplication.UnicodeUTF8))
+        self.DiagnoseQueueAction.setText(QtGui.QApplication.translate("MainWindow", "Diagnose Queues...", None, QtGui.QApplication.UnicodeUTF8))
 
 from printsettingstoolbox import PrintSettingsToolbox

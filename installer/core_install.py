@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
 #
@@ -137,7 +137,7 @@ err_pats = {r'(?is)<TITLE>.*?(404|403).*?ERROR.*?</TITLE>': 0.95,
 
 BINS_LIST=['hpijs','hp-align','hp-colorcal','hp-faxsetup','hp-linefeedcal','hp-pkservice','hp-printsettings','hp-sendfax','hp-timedate','hp-check','hp-devicesettings','hp-firmware','hp-makecopies','hp-plugin','hp-probe','hp-setup','hp-toolbox','hp-check-plugin','hp-diagnose_plugin','hp-info','hp-makeuri','hp-pqdiag','hp-query','hp-systray','hp-unload','hp-clean','hp-fab','hp-levels','hp-mkuri','hp-print','hp-scan','hp-testpage','hp-wificonfig', 'hp-upgrade','hplip-info','hp-check-upgrade','hp-config_usb_printer','hp-diagnose_queues']
 
-LIBS_LIST=['libhpmud.*','libhpip.*','sane/libsane-hpaio.*','cups/backend/hp','cups/backend/hpfax', 'cups/filter/hpcac', 'cups/filter/pstotiff','cups/filter/hpcups', 'cups/filter/hpcupsfax', 'cups/filter/hplipjs','cups/filter/hpps']
+LIBS_LIST=['libhpmud.*','libhpip.*','sane/libsane-hpaio.*','cups/backend/hp','cups/backend/hpfax', 'cups/filter/hpcac', 'cups/filter/hpps', 'cups/filter/pstotiff','cups/filter/hpcups', 'cups/filter/hpcupsfax', 'cups/filter/hplipjs']
 
 FILES_LIST=['/usr/share/ppd/HP/','/etc/udev/rules.d/56-hpmud_support.rules', '/etc/udev/rules.d/40-hplip.rules', '/etc/udev/rules.d/56-hpmud_support.rules', '/etc/udev/rules.d/55-hpmud.rules','/etc/udev/rules.d/56-hpmud_add_printer.rules','/etc/udev/rules.d/55-hpmud_sysfs.rules','/etc/udev/rules.d/56-hpmud_add_printer_sysfs.rules', '/etc/udev/rules.d/56-hpmud_support_sysfs.rules', '/etc/udev/rules.d/86-hpmud_plugin_sysfs.rules', '/etc/udev/rules.d/86-hpmud-hp_*.rules', '/etc/udev/rules.d/86-hpmud_plugin.rules', '/usr/share/cups/drv/hp/','/usr/local/share/ppd/HP/','/usr/local/share/cups/drv/hp/' ,'/usr/share/applications/hplip.desktop', '/etc/xdg/autostart/hplip-systray.desktop', '/etc/hp/hplip.conf', '/usr/share/doc/hplip-*']
 
@@ -1021,7 +1021,7 @@ class CoreInstall(object):
     def check_pynotify(self):
         try:
             import pynotify
-        except ImportError:
+        except ImportError, RuntimeError:
             return False
         return True
 
@@ -1170,7 +1170,7 @@ class CoreInstall(object):
     def update_hpaio(self):
         found = False
         home_dir = sys_conf.get('dirs', 'home')
-        pat=re.compile(r"""(.*)share\/hplip""")
+        pat=re.compile(r"""(\S.*)share\/hplip""")
         usrbin_dir=None
         if pat.match(home_dir) is not None:
             usrlib_dir= pat.match(home_dir).group(1) + "lib/"
@@ -2386,6 +2386,18 @@ class CoreInstall(object):
         if os.path.exists(digsig_file):
             os.unlink(digsig_file)
 
+    def validate_disto(self):
+        if self.distro != DISTRO_UNKNOWN:
+            return True
+        else:
+            return True
+    def validate_distro_version(self):
+        if self.validate_disto():
+            for vers in self.distros[self.distro_name]['versions']:
+                if self.distro_version == vers:
+                    return True
+            
+        return False
 
     def is_auto_installer_support(self, distro_version = DISTRO_VER_UNKNOWN):
         if not self.distro_name:
@@ -2518,7 +2530,7 @@ class CoreInstall(object):
                     log.debug("Failed to remove directory=%s "%p)
 
         #remove the binaries and libraries
-        pat=re.compile(r"""(.*)share\/hplip""")
+        pat=re.compile(r"""(\S.*)share\/hplip""")
         base =pat.match(home_dir)
         usrbin_dir=None
         if base is not None:

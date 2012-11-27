@@ -54,18 +54,27 @@ USAGE = [(__doc__, "", "name", True),
          ("Take options from the file instead of command line:","-f<file> (future use)","option",False)
         ]
 
+
+def hold_terminal():
+    if DONOT_CLOSE_TERMINAL:
+        log.info("\n\nPlease close this terminal manually. ")
+        while 1:
+            pass
+
 def usage(typ='text'):
     if typ == 'text':
         utils.log_title(__title__, __version__)
 
     utils.format_text(USAGE, typ, __title__, __mod__, __version__)
+    hold_terminal()
     sys.exit(0)
 
 def clean_exit(code=0, waitTerminal=True):
+    if not NOTIFY and not CHECKING_ONLY and not IS_QUIET_MODE:
+        log.info("Completed..")
     change_spinner_state(True)
     mod.unlockInstance()
-    if CHECKING_ONLY is False and NOTIFY is False and waitTerminal is True:
-        uInput = raw_input("\npress enter to quit.")
+    hold_terminal()
     sys.exit(code)
 
 
@@ -79,7 +88,6 @@ def parse_HPLIP_version(hplip_version_file, pat):
     except IOError:
         log.error("Failed to get hplip version since %s file is not found."%hplip_version_file)
         return ver
-#    pat = re.compile(r"""HPLIP (.*) Public Release""")
     data = fp.read()
     for line in data.splitlines():
         if pat.search(line):
@@ -101,6 +109,8 @@ CHECKING_ONLY=False
 NOTIFY=False
 HPLIP_VERSION_INFO_SITE ="http://hplip.sourceforge.net/hplip_web.conf"
 HPLIP_WEB_SITE ="http://hplipopensource.com/hplip-web/index.html"
+IS_QUIET_MODE = False
+DONOT_CLOSE_TERMINAL = False
 
 try:
     mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
@@ -108,7 +118,7 @@ try:
                     (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4), True, True)
 
     opts, device_uri, printer_name, mode, ui_toolkit, loc = \
-               mod.parseStdOpts('hl:gniup:d:of:', ['notify','check','help', 'help-rest', 'help-man', 'help-desc', 'interactive', 'gui', 'lang=','logging=', 'debug'],
+               mod.parseStdOpts('hl:gniup:d:of:sw', ['notify','check','help', 'help-rest', 'help-man', 'help-desc', 'interactive', 'gui', 'lang=','logging=', 'debug'],
                      handle_device_printer=False)
 
 
@@ -117,7 +127,6 @@ try:
 except getopt.GetoptError, e:
     log.error(e.msg)
     usage()
-#    sys.exit(1)
 
 if os.getenv("HPLIP_DEBUG"):
     log.set_level('debug')
@@ -170,12 +179,16 @@ for o, a in opts:
         CHECKING_ONLY = True
     elif o == '--notify':
         NOTIFY = True
+    elif o == '-s':
+        IS_QUIET_MODE = True
     elif o == '-f':
         log.info("Option from file is not yet supported")
         usage()
         clean_exit(0, False)
+    elif o == '-w':
+        DONOT_CLOSE_TERMINAL = True
 
-if not NOTIFY and not CHECKING_ONLY:
+if not NOTIFY and not CHECKING_ONLY and not IS_QUIET_MODE:
     mod.quiet= False
     mod.showTitle()
 
@@ -284,8 +297,11 @@ try:
     else:
         if FORCE_INSTALL is False:
             if utils.Is_HPLIP_older_version(installed_version, HPLIP_latest_ver):
-                ok,choice = tui.enter_choice("\nPress 'y' to continue to upgrade HPLIP-%s (y=yes*, n=no):"%HPLIP_latest_ver, ['y','n'],'y')
+                if IS_QUIET_MODE:
+                    log.info("Newer version of HPLIP-%s is available."%HPLIP_latest_ver)
+                ok,choice = tui.enter_choice("Press 'y' to continue to upgrade HPLIP-%s (y=yes*, n=no):"%HPLIP_latest_ver, ['y','n'],'y')
                 if not ok or choice == 'n':
+                    log.info("Recommended to install latesr version of HPLIP-%s"%HPLIP_latest_ver)
                     clean_exit(0, False)
             else:
                 log.info("Latest version of HPLIP is already installed.")
@@ -354,12 +370,16 @@ try:
         cmd = "sh %s" %(download_file)
         log.debug("Upgrading  %s and cmd =%s " %(download_file, cmd))
         os.system(cmd)
-
+    if not NOTIFY and not CHECKING_ONLY:
+        log.info(log.bold("Upgrade is Completed"))
     change_spinner_state(True)
     mod.unlockInstance()
+    hold_terminal()
+
 #    log.info("HPLIP upgrade is completed")
 except KeyboardInterrupt:
     change_spinner_state(True)
     mod.unlockInstance()
     log.error("User exit")
+    hold_terminal()
 

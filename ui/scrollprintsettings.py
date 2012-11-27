@@ -527,7 +527,7 @@ class ScrollPrintSettingsView(ScrollView):
                     self.addItem("summry", "quality", self.__tr('Print Quality'),
                         cups.UI_INFO, cur_outputmode, [], 0)
                 
-                self.job_storage_avail = self.cur_device.mq['job-storage'] == JOB_STORAGE_ENABLE
+                self.job_storage_avail = 0 #self.cur_device.mq['job-storage'] == JOB_STORAGE_ENABLE
 
                 #print current_options
 

@@ -80,8 +80,9 @@ $print_only_exclude=@epm_print_only_exclude@
 %endif
 %if hpcups-install
 f 0755 root root $cupsfilter/hpcups hpcups
-f 0755 root root $cupsfilter/hpps hpps
+#f 0755 root root $cupsfilter/hpps hpps
 f 0755 root root $cupsfilter/hplipjs hplipjs
+f 0755 root root $cupsfilter/hpps prnt/filters/hpps
 %endif
 f 0644 root root /etc/hp/hplip.conf hplip.conf
 f 0644 root root /etc/cups/pstotiff.convs fax/filters/pstotiff.convs
@@ -451,8 +452,8 @@ f 0644 root root $docdir/copyright prnt/plugins/copyright
 d 0755 root root /var/lib/hp/ -
 f 0644 root root $home/data/firmware data/firmware/*.fw.gz
 d 0775 root root $home/data/plugin -
-d 0775 root lp /var/log/hp -
-d 1774 root lp /var/log/hp/tmp -
+d 0777 root lp /var/log/hp -
+d 1777 root lp /var/log/hp/tmp -
 
 #scan
 
@@ -491,8 +492,8 @@ EOF
 f 0644 root root $docdir/COPYING COPYING
 f 0644 root root $docdir/copyright copyright
 d 0755 root root /var/lib/hp/ -
-d 0775 root lp /var/log/hp -
-d 1774 root lp /var/log/hp/tmp -
+d 0777 root lp /var/log/hp -
+d 1777 root lp /var/log/hp/tmp -
 %system !darwin
 @epm_print_only_exclude@f 0644 root root /etc/udev/rules.d/56-hpmud_support.rules data/rules/56-hpmud_support.rules
 @epm_print_only_exclude@f 0644 root root /etc/udev/rules.d/86-hpmud_plugin.rules data/rules/86-hpmud_plugin.rules

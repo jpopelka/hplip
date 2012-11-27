@@ -30,7 +30,6 @@ import signal
 from base.g import *
 from base import utils, tui
 from core_install import *
-from prnt import cups
 
 def start_systray():
     tui.title("RE-STARTING HP_SYSTRAY")
@@ -59,7 +58,7 @@ def password_entry():
     return getpass.getpass(log.bold("Please enter the root/superuser password: "))
 
 def password_user_entry():
-    return getpass.getpass(log.bold("Please enter the user (%s)'s password: " % os.getenv('USER')))
+    return getpass.getpass(log.bold("Please enter the sudoer (%s)'s password: " % os.getenv('USER')))
 
 
 def option_question_callback(opt, desc, default='y'):
@@ -201,6 +200,9 @@ def start(language, auto=True, test_depends=False,
 
         if not ok:
             sys.exit(0)
+
+        if distro_alternate_version:
+            core.distro_version = distro_alternate_version
 
         core.distro_changed()
 
@@ -764,9 +766,12 @@ def start(language, auto=True, test_depends=False,
 
         tui.title("POST-BUILD COMMANDS")
         core.run_post_build(progress_callback, distro_alternate_version)
-
-        #This call is just to update the cups PPD cache file@ /var/cache/cups/ppds.dat. If this is not called, hp-setup picks incorrect ppd 1st time for some printers. 
-        cups.getSystemPPDs()
+        try:
+            from prnt import cups
+            #This call is just to update the cups PPD cache file@ /var/cache/cups/ppds.dat. If this is not called, hp-setup picks incorrect ppd 1st time for some printers. 
+            cups.getSystemPPDs()
+        except ImportError:
+            log.error("Failed to Import Cups")
 
         #
         # OPEN MDNS MULTICAST PORT

@@ -368,7 +368,7 @@ extern const SANE_Option_Descriptor * sane_hpaio_get_option_descriptor(SANE_Hand
     if (strcmp(*((char **)handle), "SCL-PML") == 0)
        return sclpml_get_option_descriptor(handle, option);
     else
-       return SANE_STATUS_UNSUPPORTED;
+       return NULL;
 }  /* sane_hpaio_get_option_descriptor() */
 
 extern SANE_Status sane_hpaio_control_option(SANE_Handle handle, SANE_Int option, SANE_Action action, void * pValue, SANE_Int * pInfo )

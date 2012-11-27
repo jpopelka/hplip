@@ -2530,7 +2530,7 @@ class Device(object):
         if data:
             data = data.split('\r\n\r\n', 1)[1]
             if data:
-                data = status.clean(data)
+                data = status.ExtractXMLData(data)
         return data
 
 #-------------------------For LEDM SOAP PROTOCOL(FAX) Devices----------------------------------------------------------------------#
@@ -2544,7 +2544,7 @@ class Device(object):
         if data:
             data = data.split('\r\n\r\n', 1)[1]
             if data:
-                data = status.clean(data)
+                data = status.ExtractXMLData(data)
         return data
 
     def readAttributeFromXml_EWS(self, uri, attribute):
@@ -2670,11 +2670,42 @@ class LocalOpenerEWS_LEDM(urllib.URLopener):
 
         reply = xStringIO()
 
-        while dev.readEWS_LEDM(512, reply, timeout=3):
-            pass
+        #while dev.readEWS_LEDM(512, reply, timeout=3):
+            #pass
 
-        reply.seek(0)
+        END_OF_DATA="0\r\n\r\n"
+        bytes_requested = 1024        
+        bytes_remaining = 0
+        chunkedFlag = True
+
+        bytes_read = dev.readEWS_LEDM(bytes_requested, reply, timeout=3)
+
+        for line in reply.getvalue().splitlines():
+            if line.lower().find("content-length") != -1:   
+                 bytes_remaining = int(line.split(":")[1])
+                 chunkedFlag = False
+                 break
+
+        xml_data_start = reply.getvalue().find("<?xml")
+        if (xml_data_start != -1):
+            bytes_remaining = bytes_remaining - (len(reply.getvalue())  - xml_data_start)
+
+
+        while bytes_read > 0:
+            temp_buf = xStringIO()
+            bytes_read = dev.readEWS_LEDM(bytes_requested, temp_buf, timeout=3)
+            reply.write(temp_buf.getvalue())
+
+            if not chunkedFlag:     # Unchunked data
+                bytes_remaining = bytes_remaining - bytes_read
+                if bytes_remaining <= 0:   
+                    break
+            elif END_OF_DATA == temp_buf.getvalue():   # Chunked data end
+                    break        
+
+        reply.seek(0)  
         return reply.getvalue()
+
 
 # URLs: hp:/usb/HP_OfficeJet_7500?serial=00XXXXXXXXXX&loc=/hp/device/info_device_status.xml
 class LocalOpener_LEDM(urllib.URLopener):
@@ -2696,24 +2727,37 @@ class LocalOpener_LEDM(urllib.URLopener):
 
         reply = xStringIO()
  
-        while dev.readLEDM(512, reply, timeout=3):
-            pass
-
-        #TODO:Need to add following code in order to improve the delay.
-        #exp_end_of_data="0\r\n\r\n"
-        #num_of_bytes_read = dev.readEWS_LEDM(512, reply, timeout=5)
-
-        #while num_of_bytes_read:
-            #temp_buf = xStringIO()
-            #num_of_bytes_read = dev.readEWS_LEDM(512, temp_buf, timeout=5)
-            #reply.write(temp_buf.getvalue())
-
-            #if num_of_bytes_read == 5 and exp_end_of_data == temp_buf.getvalue():
-            #    break
+        #while dev.readLEDM(512, reply, timeout=3):
             #pass
 
-        reply.seek(0)
+        END_OF_DATA="0\r\n\r\n"
+        bytes_requested = 1024        
+        bytes_remaining = 0
+        chunkedFlag = True
+
+        bytes_read = dev.readLEDM(bytes_requested, reply, timeout=3)
+        
+        for line in reply.getvalue().splitlines():
+            if line.lower().find("content-length") != -1:   
+                 bytes_remaining = int(line.split(":")[1])
+                 chunkedFlag = False
+                 break
+
+        xml_data_start = reply.getvalue().find("<?xml")
+        if (xml_data_start != -1):
+            bytes_remaining = bytes_remaining - (len(reply.getvalue())  - xml_data_start)
+
+        while bytes_read > 0:
+            temp_buf = xStringIO()
+            bytes_read = dev.readLEDM(bytes_requested, temp_buf, timeout=3)
+            reply.write(temp_buf.getvalue())
+
+            if not chunkedFlag:     # Unchunked data
+                bytes_remaining = bytes_remaining - bytes_read
+                if bytes_remaining <= 0:   
+                    break
+            elif END_OF_DATA == temp_buf.getvalue():   # Chunked data end
+                    break        
+
+        reply.seek(0)  
         return reply.getvalue()
-
-
-

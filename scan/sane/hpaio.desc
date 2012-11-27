@@ -298,6 +298,12 @@
 :model "HP PSC 500xi All-in-one Printer"
 :status :good
 
+:model "HP LaserJet Pro 500 Color MFP m570dw"
+:status :good
+
+:model "HP LaserJet Pro 500 Color MFP m570dn"
+:status :good
+
 :model "HP PSC 500 All-in-one Printer"
 :status :good
 
@@ -392,6 +398,15 @@
 :status :good
 
 :model "HP Deskjet 1050 j410 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet 1051 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet 1055 All-in-one Printer -j410e"
+:status :good
+
+:model "HP Deskjet 1056 All-in-one Printer -j410a"
 :status :good
 
 :model "HP LaserJet 1100a Xi All-in-one Printer"
@@ -1099,13 +1114,37 @@
 :model "HP LaserJet 3050 All-in-one Printer"
 :status :good
 
+:model "HP Deskjet 3051a E-all-in-one Printer j611h"
+:status :good
+
+:model "HP Deskjet 3052a E-all-in-one Printer j611e"
+:status :good
+
+:model "HP Deskjet 3052a E-all-in-one Printer j611g"
+:status :good
+
+:model "HP Deskjet 3052a E-all-in-one Printer j611f"
+:status :good
+
 :model "HP LaserJet 3052 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet 3054a E-all-in-one Printer j611j"
+:status :good
+
+:model "HP Deskjet 3054a E-all-in-one Printer j611c"
+:status :good
+
+:model "HP Deskjet 3054a E-all-in-one Printer j611d"
 :status :good
 
 :model "HP LaserJet 3055 All-in-one Printer"
 :status :good
 
 :model "HP Deskjet 3055a E-all-in-one Printer j611n"
+:status :good
+
+:model "HP Deskjet 3056a E-all-in-one Printer"
 :status :good
 
 :model "HP Deskjet 3057a E-all-in-one Printer j611n"
@@ -1283,6 +1322,9 @@
 :status :good
 
 :model "HP Deskjet Ink Advantage 3525 E-all-in-one"
+:status :good
+
+:model "HP Deskjet 3526 E-all-in-one Printer"
 :status :good
 
 :model "HP Officejet j3608 All-in-one Printer"

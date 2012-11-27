@@ -1896,12 +1896,11 @@ def Is_Process_Running(process_name):
 #   None --> on error.
 #  "terminal name"-->success
 def get_terminal():
-    terminal_list=['gnome-terminal', 'konsole','x-terminal-emulator', 'xterm', 'gtkterm']
-    cnt = 0
+    terminal_list={'gnome-terminal':'--profile hold', 'konsole':'-hold','x-terminal-emulator':'-hold', 'xterm':'-hold', 'gtkterm':''}
     terminal_cmd = None
-    while cnt < len(terminal_list):
-        if which(terminal_list[cnt]):
-            terminal_cmd = terminal_list[cnt]+" -e "
+    for cmd in terminal_list:
+        if which(cmd):
+            terminal_cmd = cmd +" "+ terminal_list[cmd]+" -e "
             log.debug("Available Terminal = %s " %terminal_cmd)
             break
             

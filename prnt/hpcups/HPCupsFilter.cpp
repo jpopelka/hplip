@@ -662,18 +662,19 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
         {
             char    szFileName[64];
             memset(szFileName, 0, sizeof(szFileName));
-            snprintf (szFileName, sizeof(szFileName), "/var/log/hp/tmp/hpcupsfilterc_%d.bmp", current_page_number);
 
             if (cups_header.cupsColorSpace == CUPS_CSPACE_RGBW ||
                 cups_header.cupsColorSpace == CUPS_CSPACE_RGB)
             {
+                snprintf (szFileName, sizeof(szFileName), "/var/log/hp/tmp/hpcupsfilterc_%d.bmp", current_page_number);
                 cfp = fopen (szFileName, "w");
                 chmod (szFileName, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
             }
+
             if (cups_header.cupsColorSpace == CUPS_CSPACE_RGBW ||
                 cups_header.cupsColorSpace == CUPS_CSPACE_K)
             {
-                szFileName[17] = 'k';
+                snprintf (szFileName, sizeof(szFileName), "/var/log/hp/tmp/hpcupsfilterk_%d.bmp", current_page_number);
                 kfp = fopen (szFileName, "w");
                 chmod (szFileName, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
             }

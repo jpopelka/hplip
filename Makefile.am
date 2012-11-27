@@ -170,7 +170,7 @@ dist_base_DATA = base/maint.py base/codes.py base/g.py base/pml.py base/status.p
 	base/__init__.py base/mfpdtf.py base/utils.py base/wifi.py base/LedmWifi.py \
 	base/device.py base/logger.py base/slp.py base/exif.py base/strings.py base/magic.py \
 	base/imagesize.py base/pexpect.py base/models.py base/mdns.py base/tui.py base/dime.py \
-	base/ldif.py base/vcard.py base/module.py base/pkit.py
+	base/ldif.py base/vcard.py base/module.py base/pkit.py base/queues.py
 
 # installer
 installdir = $(hplipdir)/installer
@@ -395,15 +395,15 @@ hplipjsdir = $(cupsfilterdir)
 hplipjs_PROGRAMS = hplipjs
 hplipjs_SOURCES = prnt/filters/hplipjs.c
 
-# hpps (CUPS filter)
-hppsdir = $(cupsfilterdir)
-hpps_PROGRAMS = hpps
-hpps_SOURCES = prnt/hpps/hppsfilter.c
-hpps_LDADD = -lcups
 
 # hpcac (CUPS filter, Color Access Control, ie: CLJ 4700)
 cacdir = $(cupsfilterdir)
 dist_cac_SCRIPTS = prnt/filters/hpcac
+
+# hpps (Finishing PS filter)
+findir = $(cupsfilterdir)
+dist_fin_SCRIPTS = prnt/filters/hpps
+
 
 endif   # FULL_BUILD
 endif	# HPLIP_BUILD
@@ -553,24 +553,24 @@ install-dist_hplip_LogDATA:
 if FULL_BUILD
 	test -z "$(DESTDIR)$(hplip_Logdir)" || mkdir -p $(DESTDIR)$(hplip_Logdir)
 	chgrp "lp" -R $(DESTDIR)$(hplip_Logdir)
-	chmod 774 $(DESTDIR)$(hplip_Logdir)
+	chmod 777 $(DESTDIR)$(hplip_Logdir)
 endif	#FULL_BUILD
 if HPLIP_BUILD
 	test -z "$(DESTDIR)$(hplip_Logdir)" || mkdir -p $(DESTDIR)$(hplip_Logdir)
 	chgrp "lp" -R $(DESTDIR)$(hplip_Logdir)
-	chmod 774 $(DESTDIR)$(hplip_Logdir)
+	chmod 777 $(DESTDIR)$(hplip_Logdir)
 endif	#FULL_BUILD
 
 install-dist_hplip_tmpDATA:
 if FULL_BUILD
 	test -z "$(DESTDIR)$(hplip_tmpdir)" || mkdir -p $(DESTDIR)$(hplip_tmpdir)
 	chgrp "lp" -R $(DESTDIR)$(hplip_tmpdir)
-	chmod 1774 $(DESTDIR)$(hplip_tmpdir)
+	chmod 1777 $(DESTDIR)$(hplip_tmpdir)
 endif	#FULL_BUILD
 if HPLIP_BUILD
 	test -z "$(DESTDIR)$(hplip_tmpdir)" || mkdir -p $(DESTDIR)$(hplip_tmpdir)
 	chgrp "lp" -R $(DESTDIR)$(hplip_tmpdir)
-	chmod 1774 $(DESTDIR)$(hplip_tmpdir)
+	chmod 1777 $(DESTDIR)$(hplip_tmpdir)
 endif	#FULL_BUILD
 
 install-dist_cronDATA:$(dist_cron_DATA)

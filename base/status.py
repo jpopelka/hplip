@@ -1500,7 +1500,10 @@ pen_health10_xlate = { 'ok' : AGENT_HEALTH_OK,
                        'missing' : AGENT_HEALTH_MISINSTALLED,
                      }
 
-def clean(data):
+
+#ExtractXMLData will extract actual data from http response (Transfer-encoding:  chunked).
+#For unchunked response it will not do anything.
+def ExtractXMLData(data):
     if data[0] is not '<':
         size = -1
         temp = ""
@@ -1515,15 +1518,13 @@ def clean(data):
 def StatusType10FetchUrl(func, url, footer=""):
     data_fp = cStringIO.StringIO()
     if footer:
-        #data = dev.getEWSUrl_LEDM(url, data_fp, footer)
         data = func(url, data_fp, footer)
     else:
-        #data = dev.getEWSUrl_LEDM(url, data_fp)
         data = func(url, data_fp)
         if data:
             data = data.split('\r\n\r\n', 1)[1]
             if data:
-                data = clean(data)
+                data = ExtractXMLData(data)
     return data
 
 def StatusType10(func): # Low End Data Model

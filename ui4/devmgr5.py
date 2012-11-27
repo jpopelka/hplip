@@ -151,18 +151,6 @@ class PluginInstall(QObject):
         return qApp.translate("DevMgr5",s,c)
 
 
-class DiagnoseQueue(QObject):
-    def __init__(self, parent):
-        self.parent = parent
-
-
-    def exec_(self):
-        ok, output = utils.run('hp-diagnose_queues -r')
-
-    def __tr(self,s,c = None):
-        return qApp.translate("DevMgr5",s,c)
-
-
 
 # ***********************************************************************************
 #
@@ -280,6 +268,9 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
 
         self.PreferencesAction.setIcon(QIcon(load_pixmap('settings', '16x16')))
         self.connect(self.PreferencesAction, SIGNAL("triggered()"), self.PreferencesAction_activated)
+        
+        self.DiagnoseQueueAction.setIcon(QIcon(load_pixmap('warning', '16x16')))
+        self.connect(self.DiagnoseQueueAction, SIGNAL("triggered()"), self.DiagnoseQueue_activated)
 
         self.ContentsAction.setIcon(QIcon(load_pixmap("help", "16x16")))
         self.connect(self.ContentsAction, SIGNAL("triggered()"), self.helpContents)
@@ -739,6 +730,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                     self.cur_device = None
                     self.DeviceRefreshAction.setEnabled(False)
                     self.RemoveDeviceAction.setEnabled(False)
+                    self.DiagnoseQueueAction.setEnabled(False)
                     self.updating = False
                     self.statusBar().showMessage(self.__tr("Press F6 to refresh."))
 
@@ -1102,7 +1094,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                     self.__tr("Print a test page to test the setup of your printer."),
                     lambda : PrintTestPageDialog(self, self.cur_printer)),
 
-                    (lambda : True,
+                     (lambda : True,
                     self.__tr("View Printer and Device Information"),
                     "cups",
                     self.__tr("View information about the device and all its CUPS queues."),
@@ -1172,13 +1164,6 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                     x,
                     lambda : PluginInstall(self, d.plugin, plugin_installed)),
                     
-                    # Diagnose Queues
-                    (lambda : True,
-                    self.__tr("Diagnose Queues"),
-                    "warning",
-                    self.__tr("Diagnose Print/Fax Queues."),
-                    lambda : DiagnoseQueue(self)),
-
                     # EWS
 
                     (lambda : printer and d.embedded_server_type > EWS_NONE and bus == 'net',
@@ -1781,7 +1766,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
             self.InstallLatestButton.setEnabled(False)
             terminal_cmd = utils.get_terminal()
             if terminal_cmd is not None and utils.which("hp-upgrade"):
-                cmd = terminal_cmd + " 'hp-upgrade'"
+                cmd = terminal_cmd + " 'hp-upgrade -w'"
                 log.debug("cmd = %s " %cmd)
                 os.system(cmd)
             else:
@@ -2122,6 +2107,15 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         utils.run(cmd, log_output=True, password_func=None, timeout=1)
         self.rescanDevices()
         self.updatePrinterCombos()
+
+    def DiagnoseQueue_activated(self):
+        if utils.which('hp-diagnose_queues'):
+            cmd= 'hp-diagnose_queues'
+        else:
+            cmd= 'python ./diagnose_queues.py'
+        log.debug(cmd) 
+        ok, output = utils.run(cmd)
+
 
 
     # ***********************************************************************************

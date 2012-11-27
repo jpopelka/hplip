@@ -454,6 +454,7 @@ enum HPMUD_RESULT hpmud_get_pml(HPMUD_DEVICE device, HPMUD_CHANNEL channel, cons
       *p++ = PML_GET_REQUEST;
       *p++ = PML_DT_OBJECT_IDENTIFIER;
       *p++ = dLen;                          /* assume oid length is < 10 bits */
+ 
       memcpy(p, oid, dLen);
       result = hpmud_write_channel(device, channel, message, dLen+3, HPMUD_EXCEPTION_SEC_TIMEOUT, &len);
       if (result != HPMUD_R_OK)

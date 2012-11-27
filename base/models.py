@@ -109,6 +109,7 @@ TECH_CLASSES = [
     "Saipan",
     "PyramidPlus",
     "Hbpl1",
+    "Kapan",
 ]
 
 TECH_CLASSES.sort()
@@ -165,7 +166,8 @@ TECH_CLASS_PDLS = {
     "Copperhead"   : 'pcl3',
     "Copperhead12"   : 'pcl3',
     "Ampere"	   : 'pcl3',
-    "Hbpl1"         : 'hbpl1'
+    "Hbpl1"         : 'hbpl1',
+    "Kapan"         : 'pcl3'
 }
 
 PDL_TYPE_PCL = 0  # less preferred

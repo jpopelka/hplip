@@ -816,7 +816,8 @@ def delPrinter(printer_name):
 
 def enablePrinter(printer_name):
     setPasswordPrompt("You do not have permission to enable a printer.")
-    cmd= "cupsenable %s"%printer_name
+    cmd_full_path = utils.which('cupsenable', True)
+    cmd= "%s %s"%(cmd_full_path, printer_name)
     return os.system(cmd)
 
 def getGroupList():

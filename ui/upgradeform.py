@@ -99,7 +99,7 @@ class UpgradeForm(UpgradeForm_base):
             else:
                 terminal_cmd = utils.get_terminal()
                 if terminal_cmd is not None and utils.which("hp-upgrade"):
-                    cmd = terminal_cmd + " 'hp-upgrade '"
+                    cmd = terminal_cmd + " 'hp-upgrade -w'"
                     log.debug("cmd = %s " %cmd)
                     os.system(cmd)
                     self.result = True
