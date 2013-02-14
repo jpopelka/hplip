@@ -151,7 +151,7 @@ drv_dir=/usr/share/cups/drv/HP
 cups_path_with_bitness=0
 ui_toolkit=qt4
 native_cups=1
-add_user_to_group= -Gsys,lp
+add_user_to_group= -Asys,lp
 open_mdns_port=/bin/bash ./init-suse-firewall
 pre_depend_cmd=su -c "zypper refresh"
 
@@ -270,7 +270,7 @@ drv_dir=/usr/share/cups/drv/HP
 cups_path_with_bitness=0
 ui_toolkit=qt4
 native_cups=1
-add_user_to_group= -Gsys,lp
+add_user_to_group= -Asys,lp
 open_mdns_port=/bin/bash ./init-suse-firewall
 pre_depend_cmd=su -c "zypper refresh"
 
@@ -389,7 +389,7 @@ drv_dir=/usr/share/cups/drv/HP
 cups_path_with_bitness=0
 ui_toolkit=qt4
 native_cups=1
-add_user_to_group= -Gsys,lp
+add_user_to_group= -Asys,lp
 open_mdns_port=/bin/bash ./init-suse-firewall
 pre_depend_cmd=su -c "zypper refresh"
 same_as_version=12.1
@@ -595,7 +595,7 @@ ui_toolkit=qt3
 # ****************************************
 [fedora]
 index=5
-versions=15,16,17
+versions=15,16,17,18
 display_name=Fedora
 alt_names=Fedora Core
 display=1
@@ -766,6 +766,32 @@ parallel_supported=1
 usb_supported=1
 packaged_version=3.12.4
 release_date=22/05/2012
+notes=To complete the install in Fedora you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+policykit=0
+native_cups=1
+add_user_to_group=-a -Gsys,lp
+open_mdns_port=/bin/bash ./init-iptables-firewall
+pre_depend_cmd=su -c "yum clean all",su -c "yum check-update"
+same_as_version=15
+
+# ********************
+[fedora:18]
+code_name=Sperical Cow
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=3.12.10a
+release_date=08/01/2013
 notes=To complete the install in Fedora you must quit the installer at the printer setup stage, log out, log back in, and run hp-setup.
 ppd_install=drv
 udev_mode_fix=1
@@ -1426,6 +1452,7 @@ ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=none
+add_user_to_group=-a -Glp
 
 # ****************************************
 [pclinuxos]
@@ -2185,6 +2212,7 @@ pcard_supported=1
 network_supported=1
 parallel_supported=1
 usb_supported=1
+libusb01=1
 packaged_version=2.8.2
 release_date=2008
 notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
@@ -2225,7 +2253,7 @@ packages=build-essential
 packages=libtool
 
 [ubuntu:8.04:libusb]
-packages=libusb-1.0.0-dev
+packages=libusb-dev
 
 [ubuntu:8.04:make]
 packages=build-essential
@@ -5299,6 +5327,7 @@ ui_toolkit=qt4
 native_cups=1
 acl_rules=1
 add_user_to_group=-a -Glp,lpadmin
+libdir_path=/usr/lib
 
 [linuxmint:12:cups]
 packages=libcups2

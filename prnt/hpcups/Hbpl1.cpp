@@ -35,6 +35,7 @@
 
 #include <dlfcn.h>
 #include "Hbpl1.h"
+#include "utils.h"
 #define ZJC_BAND_HEIGHT    100
 
 Hbpl1Wrapper* (*fptr_create)(Hbpl1* const m_Hbpl1);
@@ -52,12 +53,12 @@ Hbpl1::Hbpl1 () : Encapsulator ()
     m_pbyStripData = NULL;
     m_init = false;
 
-    m_hHPLibHandle = LoadPlugin ("hbpl1.so");
+    m_hHPLibHandle = load_plugin_library(UTILS_PRINT_PLUGIN_LIBRARY, PRNT_PLUGIN_HBPL1);
     if (m_hHPLibHandle)
     {
         dlerror ();
-        fptr_create = (Hbpl1Wrapper* (*)(Hbpl1*))dlsym(m_hHPLibHandle, "create_object");
-        fptr_destroy = (void (*)(Hbpl1Wrapper*))dlsym(m_hHPLibHandle, "destroy_object");
+        fptr_create = (Hbpl1Wrapper* (*)(Hbpl1*))get_library_symbol(m_hHPLibHandle, "create_object");
+        fptr_destroy = (void (*)(Hbpl1Wrapper*))get_library_symbol(m_hHPLibHandle, "destroy_object");
         if (fptr_create != NULL && fptr_destroy!= NULL )
             m_init = true;
 
@@ -80,12 +81,9 @@ Hbpl1::~Hbpl1()
     {
         if(fptr_destroy)
             fptr_destroy( m_pHbpl1Wrapper );
-        if (m_hHPLibHandle)
-        {
-            dlclose(m_hHPLibHandle);
-            m_hHPLibHandle = NULL;
-        }
 
+        unload_library(m_hHPLibHandle);
+        m_hHPLibHandle = NULL;
     }
 }
 

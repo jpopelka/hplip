@@ -53,7 +53,7 @@ static struct ledm_session *session = NULL;
 static int set_extents(struct ledm_session *ps)
 {
   int stat = 0;
-
+    
   if ((ps->currentBrx > ps->currentTlx) && (ps->currentBrx - ps->currentTlx >= ps->min_width) && (ps->currentBrx - ps->currentTlx <= ps->tlxRange.max))
   {
     ps->effectiveTlx = ps->currentTlx;
@@ -206,6 +206,14 @@ static int set_input_source_side_effects(struct ledm_session *ps, enum INPUT_SOU
          break;
    }
 
+    if ((ps->adf_bryRange.max != ps->platen_bryRange.max) || (ps->adf_brxRange.max !=  ps->platen_brxRange.max))
+    {
+        ps->currentTly = ps->tlyRange.min;
+        ps->currentBrx = ps->brxRange.max;
+        ps->currentTlx = ps->tlxRange.min;
+        ps->currentBry = ps->bryRange.max;
+    }
+    
    return 0;
 } /* set_input_source_side_effects */
 
@@ -489,7 +497,7 @@ SANE_Status ledm_control_option(SANE_Handle handle, SANE_Int option, SANE_Action
       }
       else
       {  /* Set default. */
-        ps->currentScanMode = CE_COLOR8;
+        ps->currentScanMode = ps->scanModeMap[0];
         set_scan_mode_side_effects(ps, ps->currentScanMode);
         stat = SANE_STATUS_GOOD;
       }
@@ -542,7 +550,7 @@ SANE_Status ledm_control_option(SANE_Handle handle, SANE_Int option, SANE_Action
          }
          else
          {  /* Set default. */
-           ps->currentInputSource = IS_PLATEN;
+           ps->currentInputSource = ps->inputSourceMap[0];
            set_input_source_side_effects(ps, ps->currentInputSource);
            mset_result |= SANE_INFO_RELOAD_PARAMS | SANE_INFO_RELOAD_OPTIONS;
            stat = SANE_STATUS_GOOD;

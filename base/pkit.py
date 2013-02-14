@@ -34,7 +34,8 @@ import stat
 from base.logger import *
 from base.g import *
 from base.codes import *
-from base import utils, device
+from base import utils, password,services
+from installer import pluginhandler
 
 # DBus
 import dbus
@@ -256,8 +257,14 @@ if utils.to_bool(sys_conf.get('configure', 'policy-kit')):
                 return False
 
             log.debug("installPlugin: installing from '%s'" % src_dir)
+            try:
+                from installer import pluginhandler
+            except ImportError,e:
+                log.error("Failed to Import pluginhandler")
+                return False
 
-            if not copyPluginFiles(src_dir):
+            pluginObj = pluginhandler.PluginHandle()
+            if not pluginObj.copyFiles(src_dir):
                 log.error("Plugin installation failed")
                 return False
 
@@ -320,135 +327,9 @@ class PolicyKit(object):
 
 
 
-def copyPluginFiles(src_dir):
-    os.chdir(src_dir)
-
-    plugin_spec = ConfigBase("plugin.spec")
-    products = plugin_spec.keys("products")
-
-    BITNESS = utils.getBitness()
-    ENDIAN = utils.getEndian()
-    PPDDIR = sys_conf.get('dirs', 'ppd')
-    DRVDIR = sys_conf.get('dirs', 'drv')
-    HOMEDIR = sys_conf.get('dirs', 'home')
-    DOCDIR = sys_conf.get('dirs', 'doc')
-    CUPSBACKENDDIR = sys_conf.get('dirs', 'cupsbackend')
-    CUPSFILTERDIR = sys_conf.get('dirs', 'cupsfilter')
-    RULESDIR = '/etc/udev/rules.d'
-
-    processor = utils.getProcessor()
-    if processor == 'power_machintosh':
-        ARCH = 'ppc'
-    else:
-        ARCH = 'x86_%d' % BITNESS
-
-    if BITNESS == 64:
-        SANELIBDIR = '/usr/lib64/sane'
-        LIBDIR = '/usr/lib64'
-    else:
-        SANELIBDIR = '/usr/lib/sane'
-        LIBDIR = '/usr/lib'
-
-    copies = []
-
-    for PRODUCT in products:
-        MODEL = PRODUCT.replace('hp-', '').replace('hp_', '')
-        UDEV_SYSFS_RULES=sys_conf.get('configure','udev_sysfs_rules','no')
-        for s in plugin_spec.get("products", PRODUCT).split(','):
-
-            if not plugin_spec.has_section(s):
-                log.error("Missing section [%s]" % s)
-                return False
-
-            src = plugin_spec.get(s, 'src', '')
-            trg = plugin_spec.get(s, 'trg', '')
-            link = plugin_spec.get(s, 'link', '')
-
-           # In Cent os 5.x distro's SYSFS attribute will be used. and Other distro's uses ATTR/ATTRS attribute in rules. 
-           # Following condition to check this...
-            if UDEV_SYSFS_RULES == 'no' and 'sysfs' in src:
-                continue
-            if UDEV_SYSFS_RULES == 'yes' and 'sysfs' not in src:
-                continue
-
-            if not src:
-                log.error("Missing 'src=' value in section [%s]" % s)
-                return False
-
-            if not trg:
-                log.error("Missing 'trg=' value in section [%s]" % s)
-                return False
-
-            src = os.path.basename(utils.cat(src))
-            trg = utils.cat(trg)
-
-            if link:
-                link = utils.cat(link)
-
-            copies.append((src, trg, link))
-
-    copies = utils.uniqueList(copies)
-    copies.sort()
-
-    os.umask(0)
-
-    for src, trg, link in copies:
-
-        if not os.path.exists(src):
-            log.debug("Source file %s does not exist. Skipping." % src)
-            continue
-
-        if os.path.exists(trg):
-            log.debug("Target file %s already exists. Replacing." % trg)
-            os.remove(trg)
-
-        trg_dir = os.path.dirname(trg)
-
-        if not os.path.exists(trg_dir):
-            log.debug("Target directory %s does not exist. Creating." % trg_dir)
-            os.makedirs(trg_dir, 0755)
-
-        if not os.path.isdir(trg_dir):
-            log.error("Target directory %s exists but is not a directory. Skipping." % trg_dir)
-            continue
-
-        try:
-            shutil.copyfile(src, trg)
-        except (IOError, OSError), e:
-            log.error("File copy failed: %s" % e.strerror)
-            continue
-
-        else:
-            if not os.path.exists(trg):
-                log.error("Target file %s does not exist. File copy failed." % trg)
-                continue
-            else:
-                os.chmod(trg, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH)
-
-            if link:
-                if os.path.exists(link):
-                    log.debug("Symlink already exists. Replacing.")
-                    os.remove(link)
-
-                log.debug("Creating symlink %s (link) to file %s (target)..." %
-                    (link, trg))
-
-                try:
-                    os.symlink(trg, link)
-                except (OSError, IOError), e:
-                    log.debug("Unable to create symlink: %s" % e.strerror)
-                    pass
-
-    log.debug("Updating hplip.conf - installed = 1")
-    sys_state.set('plugin', "installed", '1')
-    log.debug("Updating hplip.conf - eula = 1")
-    sys_state.set('plugin', "eula", '1')
-    plugin_version = sys_conf.get('hplip', 'version', '0.0.0')
-    sys_state.set('plugin','version', plugin_version)
-    return True
 
 
-def run_plugin_command(required=True, plugin_reason=PLUGIN_REASON_NONE):
+def run_plugin_command(required=True, plugin_reason=PLUGIN_REASON_NONE, Mode = GUI_MODE):
     su_sudo = None
     need_sudo = True
     name = None
@@ -466,20 +347,11 @@ def run_plugin_command(required=True, plugin_reason=PLUGIN_REASON_NONE):
     if os.geteuid() == 0:
         su_sudo = "%s"
         need_sudo = False
-
-    password_f = None
+        
+    passwordObj = password.Password(Mode)
     if need_sudo:
-        su_sudo = utils.su_sudo()
-    if su_sudo is "su":
-        name,version,is_su = utils.os_release()
-        log.debug("name = %s version = %s is_su = %s" %(name,version,is_su))
-        if ( name == 'Fedora' and version >= '14' and is_su == True):
-           #using su opening GUI apps fail in Fedora 14. 
-           #To run GUI apps as root, you need a root login shell (su -) in Fedora 14   
-           su_sudo = 'su - -c "%s"'
-        else:
-           su_sudo = 'su -c "%s"'
-        password_f = "get_password_ui"    
+        su_sudo = passwordObj.getAuthType()
+
     if su_sudo is None:
         log.error("Unable to find a suitable sudo command to run 'hp-plugin'")
         return (False, False)
@@ -488,25 +360,22 @@ def run_plugin_command(required=True, plugin_reason=PLUGIN_REASON_NONE):
     if not required:
         req = '--optional'
 
-
     if utils.which("hp-plugin"):
         p_path="hp-plugin"
     else:
         p_path="python ./plugin.py"
 
     if 'gksu' in su_sudo:
-        cmd = su_sudo % ("%s -u %s --reason %s" % (p_path, req, plugin_reason))
+        cmd = passwordObj.getAuthCmd() % ("%s -u %s --reason %s" % (p_path, req, plugin_reason))
         cmd +=" -m" 
         cmd += (" \"hp-plugin:- HP Device requires to install HP proprietary plugin. Please enter root password to continue\"")
     else:
-        cmd = su_sudo % ("%s -u %s --reason %s To_install_plugin_for_HP_Device" % (p_path, req, plugin_reason))
+        cmd = passwordObj.getAuthCmd() % ("%s -u %s --reason %s To_install_plugin_for_HP_Device" % (p_path, req, plugin_reason))
 
+        
     log.debug("%s" % cmd)
-    if password_f is not None:
-        status, output = utils.run(cmd, log_output=True, password_func=password_f, timeout=1)
-    else:
-        status, output = utils.run(cmd, log_output=True, password_func=None, timeout=1)
-    
+    status, output = utils.run(cmd, passwordObj)
+
     return (status == 0, True)
 
 

@@ -35,6 +35,7 @@
 #include <sys/wait.h>
 #include <sys/utsname.h>
 #include <time.h>
+#include "utils.h"
 
 #define HP_FILE_VERSION_STR    "03.09.08.0"
 
@@ -377,6 +378,7 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
         m_JA.media_attributes.printable_width = ((cups_header->ImagingBoundingBox[2]-cups_header->ImagingBoundingBox[0]) * horz_res) / 72;
         m_JA.media_attributes.printable_height = ((cups_header->ImagingBoundingBox[3]-cups_header->ImagingBoundingBox[1]) * vert_res) / 72;
         strncpy(m_JA.media_attributes.PageSizeName, cups_header->cupsPageSizeName, sizeof(m_JA.media_attributes.PageSizeName)-1);
+        strncpy(m_JA.media_attributes.MediaTypeName, cups_header->MediaType, sizeof(m_JA.media_attributes.MediaTypeName)-1);
     }
     else{
         m_JA.media_attributes.physical_width   = (cups_header->PageSize[0] * horz_res) / 72;
@@ -666,17 +668,24 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
             if (cups_header.cupsColorSpace == CUPS_CSPACE_RGBW ||
                 cups_header.cupsColorSpace == CUPS_CSPACE_RGB)
             {
-                snprintf (szFileName, sizeof(szFileName), "/var/log/hp/tmp/hpcupsfilterc_%d.bmp", current_page_number);
-                cfp = fopen (szFileName, "w");
-                chmod (szFileName, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+
+                snprintf (szFileName, sizeof(szFileName), "/var/log/hp/tmp/hpcupsfilterc_bmp_%d_XXXXXX", current_page_number);
+                createTempFile(szFileName, &cfp);
+                if (cfp)
+                {
+                    chmod (szFileName, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+                }
             }
 
             if (cups_header.cupsColorSpace == CUPS_CSPACE_RGBW ||
                 cups_header.cupsColorSpace == CUPS_CSPACE_K)
             {
-                snprintf (szFileName, sizeof(szFileName), "/var/log/hp/tmp/hpcupsfilterk_%d.bmp", current_page_number);
-                kfp = fopen (szFileName, "w");
-                chmod (szFileName, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+                snprintf (szFileName, sizeof(szFileName), "/var/log/hp/tmp/hpcupsfilterk_bmp_%d_XXXXXX", current_page_number);
+                createTempFile(szFileName, &kfp);
+                if (kfp)
+                {
+                    chmod (szFileName, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+                }
             }
 
             WriteBMPHeader (cfp, cups_header.cupsWidth, cups_header.cupsHeight, COLOR_RASTER);

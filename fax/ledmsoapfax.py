@@ -96,8 +96,14 @@ Content-length: %d\r
 
 
     def setStationName(self, name):
-        xml = setStationNameXML %(name)
+        try:
+            xml = setStationNameXML %(name.encode('utf-8'))
+        except(UnicodeEncodeError, UnicodeDecodeError):
+            log.error("Unicode Error")
+
         return self.put("/DevMgmt/FaxConfigDyn.xml", xml)
+
+    
 
 
     def getStationName(self):

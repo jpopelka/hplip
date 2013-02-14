@@ -51,7 +51,7 @@ import urllib # TODO: Replace with urllib2 (urllib is deprecated in Python 3.0)
 # Local
 from base.g import *
 from base.codes import *
-from base import utils, pexpect,tui
+from base import utils, pexpect, tui, password, services, os_utils
 from dcheck import *
 
 
@@ -72,42 +72,7 @@ DEPENDENCY_RUN_TIME = 1
 DEPENDENCY_COMPILE_TIME = 2
 DEPENDENCY_RUN_AND_COMPILE_TIME = 3
 
-# Plug-in download errors
-PLUGIN_INSTALL_ERROR_NONE = 0
-PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND = 1
-PLUGIN_INSTALL_ERROR_DIGITAL_SIG_NOT_FOUND = 2
-PLUGIN_INSTALL_ERROR_DIGITAL_SIG_BAD = 3
-PLUGIN_INSTALL_ERROR_PLUGIN_FILE_CHECKSUM_ERROR = 4
-PLUGIN_INSTALL_ERROR_NO_NETWORK = 5
-PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR = 6
-PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS = 7
 
-
-#Plugin installation status values
-PLUGIN_STATUS_PARTIAL_FILES_PRESENT = -1
-PLUGIN_STATUS_FILES_NOT_PRESENT = 0
-PLUGIN_STATUS_FILES_PRESENT = 1
-
-
-PING_TARGET = "www.google.com"
-HTTP_GET_TARGET = "http://www.google.com"
-PLUGIN_FALLBACK_LOCATION = 'http://hplipopensource.com/hplip-web/plugin/'
-
-EXPECT_WORD_LIST = [
-    pexpect.EOF, # 0
-    pexpect.TIMEOUT, # 1
-    "Continue?", # 2 (for zypper)
-    "passwor[dt]", # en/de/it/ru
-    "kennwort", # de?
-    "password for", # en
-    "mot de passe", # fr
-    "contraseña", # es
-    "palavra passe", # pt
-    "口令", # zh
-    "wachtwoord", # nl
-    "heslo", # czech
-    "密码",
-]
 
 # Mapping from patterns to probability contribution of pattern
 # Example code from David Mertz' Text Processing in Python.
@@ -130,35 +95,24 @@ err_pats = {r'(?is)<TITLE>.*?(404|403).*?ERROR.*?</TITLE>': 0.95,
             r'(?is)<BODY.*request.{1,50}unavailable.*</BODY>': 0.10,
             r'(?i)does not exist': 0.10,
            }
-
-
-
 # Note:- If new utility is added, add same utility here to uninstall properly.
 
-BINS_LIST=['hpijs','hp-align','hp-colorcal','hp-faxsetup','hp-linefeedcal','hp-pkservice','hp-printsettings','hp-sendfax','hp-timedate','hp-check','hp-devicesettings','hp-firmware','hp-makecopies','hp-plugin','hp-probe','hp-setup','hp-toolbox','hp-check-plugin','hp-diagnose_plugin','hp-info','hp-makeuri','hp-pqdiag','hp-query','hp-systray','hp-unload','hp-clean','hp-fab','hp-levels','hp-mkuri','hp-print','hp-scan','hp-testpage','hp-wificonfig', 'hp-upgrade','hplip-info','hp-check-upgrade','hp-config_usb_printer','hp-diagnose_queues']
+BINS_LIST=['hpijs','hp-align','hp-colorcal','hp-faxsetup','hp-linefeedcal','hp-pkservice','hp-printsettings','hp-sendfax','hp-timedate','hp-check','hp-devicesettings','hp-firmware','hp-makecopies','hp-plugin','hp-probe','hp-setup','hp-toolbox','hp-check-plugin','hp-diagnose_plugin','hp-info','hp-makeuri','hp-pqdiag','hp-query','hp-systray','hp-unload','hp-clean','hp-fab','hp-levels','hp-mkuri','hp-print','hp-scan','hp-testpage','hp-wificonfig', 'hp-upgrade','hplip-info','hp-check-upgrade','hp-config_usb_printer','hp-diagnose_queues', 'hp-devicesetup','hp-doctor','hp-logcapture']
 
 LIBS_LIST=['libhpmud.*','libhpip.*','sane/libsane-hpaio.*','cups/backend/hp','cups/backend/hpfax', 'cups/filter/hpcac', 'cups/filter/hpps', 'cups/filter/pstotiff','cups/filter/hpcups', 'cups/filter/hpcupsfax', 'cups/filter/hplipjs']
 
-FILES_LIST=['/usr/share/ppd/HP/','/etc/udev/rules.d/56-hpmud_support.rules', '/etc/udev/rules.d/40-hplip.rules', '/etc/udev/rules.d/56-hpmud_support.rules', '/etc/udev/rules.d/55-hpmud.rules','/etc/udev/rules.d/56-hpmud_add_printer.rules','/etc/udev/rules.d/55-hpmud_sysfs.rules','/etc/udev/rules.d/56-hpmud_add_printer_sysfs.rules', '/etc/udev/rules.d/56-hpmud_support_sysfs.rules', '/etc/udev/rules.d/86-hpmud_plugin_sysfs.rules', '/etc/udev/rules.d/86-hpmud-hp_*.rules', '/etc/udev/rules.d/86-hpmud_plugin.rules', '/usr/share/cups/drv/hp/','/usr/local/share/ppd/HP/','/usr/local/share/cups/drv/hp/' ,'/usr/share/applications/hplip.desktop', '/etc/xdg/autostart/hplip-systray.desktop', '/etc/hp/hplip.conf', '/usr/share/doc/hplip-*']
+FILES_LIST=['/etc/udev/rules.d/56-hpmud_support.rules', '/etc/udev/rules.d/40-hplip.rules', '/etc/udev/rules.d/56-hpmud_support.rules', '/etc/udev/rules.d/55-hpmud.rules','/etc/udev/rules.d/56-hpmud_add_printer.rules','/etc/udev/rules.d/55-hpmud_sysfs.rules','/etc/udev/rules.d/56-hpmud_add_printer_sysfs.rules', '/etc/udev/rules.d/56-hpmud_support_sysfs.rules', '/etc/udev/rules.d/86-hpmud_plugin_sysfs.rules', '/etc/udev/rules.d/86-hpmud-hp_*.rules', '/etc/udev/rules.d/86-hpmud_plugin.rules', '/usr/share/cups/drv/hp/','/usr/local/share/ppd/HP/','/usr/local/share/cups/drv/hp/' ,'/usr/share/applications/hplip.desktop', '/etc/xdg/autostart/hplip-systray.desktop', '/etc/hp/hplip.conf', '/usr/share/doc/hplip-*']
 
 HPLIP_LIST=['*.py','*.pyc', 'base', 'copier','data','installer','pcard','ui4','ui','fax/*.py','fax/*.pyc','fax/pstotiff.convs','fax/pstotiff.types','fax/pstotiff','prnt/*.py', 'prnt/*.pyc', 'scan/*.py','scan/*.pyc']
 
 PLUGIN_LIST=['fax/plugins/','prnt/plugins/','scan/plugins/']
+
 PLUGIN_STATE =['/var/lib/hp/hplip.state']
-RMDIR="rm -rf"
-RM="rm -f"
+
 
 # end
 
 
-EXPECT_LIST = []
-for s in EXPECT_WORD_LIST:
-    try:
-        p = re.compile(s, re.I)
-    except TypeError:
-        EXPECT_LIST.append(s)
-    else:
-        EXPECT_LIST.append(p)
 
 OK_PROCESS_LIST = ['adept-notifier',
                    'adept_notifier',
@@ -212,7 +166,7 @@ class CoreInstall(object):
         os.umask(0022)
         self.mode = mode
         self.ui_mode = ui_mode
-        self.password = ''
+        self.passwordObj = password.Password(ui_mode)
         self.version_description, self.version_public, self.version_internal = '', '', ''
         self.bitness = 32
         self.endian = utils.LITTLE_ENDIAN
@@ -225,13 +179,9 @@ class CoreInstall(object):
         self.ppd_dir = None
         self.drv_dir = None
         self.distros = {}
-        self.network_connected = False
         self.ui_toolkit = ui_toolkit
         self.enable = None
         self.disable = None
-        self.plugin_path = "/tmp"
-        self.plugin_version = '0.0.0'
-        self.plugin_name = ''
         self.reload_dbus = False
 
 
@@ -431,9 +381,9 @@ class CoreInstall(object):
             if callback is not None:
                 callback("Result: %s = %s\n" % (d, self.have_dependencies[d]))
 
-        pid, cmdline = self.check_pkg_mgr()
+        pid, cmdline = utils.check_pkg_mgr(self.package_mgrs)
         if pid:
-            log.debug("Running package manager: %s (%d)" % (cmdline, pid) )
+            log.debug("Running package manager: %s (%s)" % (cmdline, pid) )
 
         self.bitness = utils.getBitness()
         log.debug("Bitness = %d" % self.bitness)
@@ -457,7 +407,7 @@ class CoreInstall(object):
         self.hplip_present = self.check_hplip()
         log.debug("HPLIP (prev install) = %s" % self.hplip_present)
 
-        status, output = self.run('cups-config --version')
+        status, output = utils.run('cups-config --version', self.passwordObj)
         self.cups_ver = output.strip()
         log.debug("CUPS version = %s" % self.cups_ver)
 
@@ -466,7 +416,7 @@ class CoreInstall(object):
 
         log.debug("DBUS configuration reload possible? %s" % self.reload_dbus)
 
-        status, self.sys_uname_info = self.run('uname -a')
+        status, self.sys_uname_info = utils.run('uname -a', self.passwordObj)
         self.sys_uname_info = self.sys_uname_info.replace('\n', '')
         log.debug(self.sys_uname_info)
 
@@ -530,84 +480,6 @@ class CoreInstall(object):
             return ''
 
 
-    def run(self, cmd, callback=None, timeout=300): # ==> status, output
-        if cmd is None:
-            return 1, ''
-        output = cStringIO.StringIO()
-        ok, ret = False, ''
-        # Hack! TODO: Fix!
-        check_timeout = not (cmd.startswith('xterm') or cmd.startswith('gnome-terminal'))
-
-        try:
-            child = pexpect.spawn(cmd, timeout=1)
-        except pexpect.ExceptionPexpect:
-            return 1, ''
-
-        try:
-            try:
-                start = time.time()
-
-                while True:
-                    update_spinner()
-
-                    i = child.expect_list(EXPECT_LIST)
-
-                    cb = child.before
-                    if cb:
-                        # output
-                        start = time.time()
-                        log.log_to_file(cb)
-                        log.debug(cb)
-                        output.write(cb)
-
-                        if callback is not None:
-                            if callback(cb): # cancel
-                                break
-
-                    elif check_timeout:
-                        # no output
-                        span = int(time.time()-start)
-
-                        if span:
-                            if span % 5 == 0:
-                                log.debug("No output seen in %d secs" % span)
-
-                            if span > timeout:
-                                log.error("No output seen in over %d sec... (Is the CD-ROM/DVD source repository enabled? It shouldn't be!)" % timeout)
-                                child.close()
-                                child.terminate(force=True)
-                                break
-
-                    if i == 0: # EOF
-                        ok, ret = True, output.getvalue()
-                        break
-
-                    elif i == 1: # TIMEOUT
-                        continue
-
-                    elif i == 2: # zypper "Continue?"
-                        child.sendline("YES")
-
-                    else: # password
-                        child.sendline(self.password)
-
-            except (Exception, pexpect.ExceptionPexpect):
-                log.exception()
-
-        finally:
-            cleanup_spinner()
-
-            try:
-                child.close()
-            except OSError:
-                pass
-
-        if ok:
-            return child.exitstatus, ret
-        else:
-            return 1, ''
-
-
     def get_distro(self):
         log.debug("Determining distro...")
         self.distro, self.distro_version = DISTRO_UNKNOWN, '0.0'
@@ -619,14 +491,14 @@ class CoreInstall(object):
         if lsb_release:
             log.debug("Using 'lsb_release -is/-rs'")
             cmd = os.path.join(lsb_release, "lsb_release")
-            status, name = self.run(cmd + ' -is')
+            status, name = utils.run(cmd + ' -is', self.passwordObj)
             name = name.lower().strip()
             log.debug("Distro name=%s" % name)
             if name.find("redhatenterprise") > -1:
-                name="rhel" 
+                name="rhel"
 
             if not status and name:
-                status, ver = self.run(cmd + ' -rs')
+                status, ver = utils.run(cmd + ' -rs', self.passwordObj)
                 ver = ver.lower().strip()
                 log.debug("Distro version=%s" % ver)
                 if name == "rhel" and ver[0] == "5" and ver[1] == ".":
@@ -650,7 +522,7 @@ class CoreInstall(object):
                 self.distro, self.distro_version = DISTRO_UNKNOWN, '0.0'
             else:
                 if name.find("redhatenterprise") > -1:
-                    name="rhel" 
+                    name="rhel"
 
                 for d in self.distros:
                     if name.find(d) > -1:
@@ -826,7 +698,6 @@ class CoreInstall(object):
                     dep_section = "%s:%s:%s" % (distro, ver, dep)
 
                     if not distros_dat.has_section(dep_section) and not same_as_version:
-                        log.debug("Missing dependency section in distros.dat: [%s:%s:%s]" % (distro, ver, dep))
                         continue
 
                     #if same_as_version:
@@ -843,7 +714,6 @@ class CoreInstall(object):
 
                 if 'same_as_version' in distros_dat.keys(ver_section):
                     v = self.__fixup_data("same_as_version", distros_dat.get(ver_section, 'same_as_version'))
-                    log.debug("Setting %s:%s to %s:%s" % (distro, ver, distro, v))
 
                     try:
                         vv = self.distros[distro]['versions'][v].copy()
@@ -1069,7 +939,7 @@ class CoreInstall(object):
 
 
     def check_cups(self):
-        status, output = self.run('lpstat -r')
+        status, output = utils.run('lpstat -r', self.passwordObj)
         if status > 0 or 'not running' in output:
             log.debug("CUPS is not running. %s"%output)
             return False
@@ -1085,11 +955,6 @@ class CoreInstall(object):
     def check_hplip(self):
         log.debug("Checking for HPLIP...")
         return locate_files('hplip.conf', '/etc/hp')
-
-
-    def check_hpssd(self):
-        log.debug("Checking for hpssd...")
-        return check_ps(['hpssd'])
 
 
     def check_libtool(self):
@@ -1116,7 +981,15 @@ class CoreInstall(object):
 
     def check_policykit(self):
         log.debug("Checking for PolicyKit...")
-        return (check_file('PolicyKit.conf', "/etc/PolicyKit") and check_file('org.gnome.PolicyKit.AuthorizationManager.service', "/usr/share/dbus-1/services")) or (check_file('50-localauthority.conf', "/etc/polkit-1/localauthority.conf.d") and check_file('org.freedesktop.PolicyKit1.service', "/usr/share/dbus-1/system-services"))
+        if check_file('PolicyKit.conf', "/etc/PolicyKit") and check_file('org.gnome.PolicyKit.AuthorizationManager.service', "/usr/share/dbus-1/services"):
+            return True
+        elif check_file('50-localauthority.conf', "/etc/polkit-1/localauthority.conf.d") and check_file('org.freedesktop.PolicyKit1.service', "/usr/share/dbus-1/system-services"):
+            return True
+        elif check_file('org.freedesktop.PolicyKit1.conf','/etc/dbus-1/system.d'):
+            return True
+        else:
+            return False
+
 
     def check_cupsext(self):
         log.debug("Checking 'cupsext' CUPS extension...")
@@ -1160,7 +1033,7 @@ class CoreInstall(object):
             log.error("'/etc/sane.d/dll.conf' not found. Is SANE installed?")
         else:
             for line in f:
-                lineNoSpace = re.sub(r'\s', '', line) 
+                lineNoSpace = re.sub(r'\s', '', line)
                 hpaiomatched=re.match('hpaio',lineNoSpace)
                 if hpaiomatched:
                     found = True
@@ -1174,30 +1047,30 @@ class CoreInstall(object):
         usrbin_dir=None
         if pat.match(home_dir) is not None:
             usrlib_dir= pat.match(home_dir).group(1) + "lib/"
-            if os.path.exists(usrlib_dir+'sane/libsane-hpaio.so.1'): 
+            if os.path.exists(usrlib_dir+'sane/libsane-hpaio.so.1'):
                 log.debug("'Updating hpaio' in '/etc/sane.d/dll.conf'...")
                 try:
                     f = file('/etc/sane.d/dll.conf', 'r')
                 except IOError:
                     log.error("'/etc/sane.d/dll.conf' not found. Creating dll.conf file")
 #                    f = file('/etc/sane.d/dll.conf', 'a+')
-                    cmd = self.su_sudo()%'touch /etc/sane.d/dll.conf'
+                    cmd = self.passwordObj.getAuthCmd()%'touch /etc/sane.d/dll.conf'
                     log.debug("cmd=%s"%cmd)
-                    self.run(cmd)
+                    utils.run(cmd, self.passwordObj)
                 else:
                     for line in f:
-                        lineNoSpace = re.sub(r'\s', '', line) 
+                        lineNoSpace = re.sub(r'\s', '', line)
                         hpaiomatched=re.match('hpaio',lineNoSpace)
                         if hpaiomatched:
                             found = True
                             break
                     f.close()
-                
+
                 if not found:
                     st = os.stat('/etc/sane.d/dll.conf')
-                    cmd= self.su_sudo()%'chmod 777 /etc/sane.d/dll.conf'
+                    cmd= self.passwordObj.getAuthCmd()%'chmod 777 /etc/sane.d/dll.conf'
                     log.debug("cmd=%s"%cmd)
-                    self.run(cmd)
+                    utils.run(cmd, self.passwordObj)
                     try:
                         f = file('/etc/sane.d/dll.conf', 'a+')
                     except IOError:
@@ -1207,9 +1080,9 @@ class CoreInstall(object):
                         f.close()
                     actv_permissions = st.st_mode &0777
                     cmd = 'chmod %o /etc/sane.d/dll.conf'%actv_permissions
-                    cmd= self.su_sudo()%cmd
+                    cmd= self.passwordObj.getAuthCmd()%cmd
                     log.debug("cmd=%s"%cmd)
-                    self.run(cmd)   
+                    utils.run(cmd, self.passwordObj)
         return found
 
     def check_scanext(self):
@@ -1222,30 +1095,6 @@ class CoreInstall(object):
         else:
             found = True
         return found
-
-
-    def check_pkg_mgr(self):
-        """
-            Check if any pkg mgr processes are running
-        """
-        log.debug("Searching for '%s' in running processes..." % self.package_mgrs)
-
-        processes = get_process_list()
-
-        for pid, cmdline in processes:
-            for p in self.package_mgrs:
-                if p in cmdline:
-                    for k in OK_PROCESS_LIST:
-                        #print k, cmdline
-                        if k in cmdline:
-                            break
-
-                    else:
-                        log.debug("Found: %s (%d)" % (cmdline, pid))
-                        return (pid, cmdline)
-
-        log.debug("Not found")
-        return (0, '')
 
 
     def get_hplip_version(self):
@@ -1283,6 +1132,7 @@ class CoreInstall(object):
                 self.version_description, self.version_public, self.version_internal = '', '', ''
 
         return self.version_description, self.version_public, self.version_internal
+
 
 
     def configure(self):
@@ -1462,116 +1312,12 @@ class CoreInstall(object):
 	
         return configure_cmd
 
-#    def configure_qt4(self):
-#        configure_cmd = './configure'
-#        configure_cmd += ' --prefix=/usr'
-#        configure_cmd += ' --with-hpppddir=%s' % self.ppd_dir
-#
-#        if self.bitness == 64:
-#            configure_cmd += ' --libdir=/usr/lib64'
-#
-#        self.ui_toolkit =  self.get_distro_ver_data('ui_toolkit')
-#        if self.ui_toolkit is not None and self.ui_toolkit == 'qt3':
-#            configure_cmd += ' --enable-qt3 --disable-qt4'
-#        else:
-#            configure_cmd += ' --enable-qt4'
-#
-#        self.native_cups =  self.get_distro_ver_data('native_cups')
-#        self.ppd_install = self.get_distro_ver_data('ppd_install')
-#        if self.native_cups is not None and self.native_cups == 1:
-#            configure_cmd += ' --enable-hpcups-install'
-#	    if self.ppd_install == 'drv':
-#	        configure_cmd += ' --enable-cups-drv-install --disable-cups-ppd-install'
-#	    else:
-#		configure_cmd += ' --enable-cups-ppd-install --disable-cups-drv-install'
-#	    configure_cmd += ' --disable-hpijs-install --disable-foomatic-drv-install --disable-foomatic-ppd-install --disable-foomatic-rip-hplip-install'
-#        else:
-#	    configure_cmd += ' --enable-hpijs-install'
-#	    if self.ppd_install == 'drv':
-#	        configure_cmd += ' --enable-foomatic-drv-install --disable-foomatic-ppd-install'
-#	    else:
-#		configure_cmd += ' --enable-foomatic-ppd-install --disable-foomatic-drv-install'
-#	    configure_cmd += ' --enable-foomatic-rip-hplip-install --disable-hpcups-install --disable-cups-drv-install --disable-cups-ppd-install'
-#
-#        self.fax_supported =  self.get_distro_ver_data('fax_supported')
-#        if self.fax_supported is None:
-#            configure_cmd += ' --disable-fax-build --disable-dbus-build'
-#        else:
-#            configure_cmd += ' --enable-fax-build --enable-dbus-build'
-#
-#        self.network_supported = self.get_distro_ver_data('network_supported')
-#        if self.network_supported is None:
-#            configure_cmd += ' --disable-network-build'
-#        else:
-#            configure_cmd += ' --enable-network-build'
-#
-#        self.scan_supported = self.get_distro_ver_data('scan_supported')
-#        if self.scan_supported is None:
-#            configure_cmd += ' --disable-scan-build'
-#        else:
-#            configure_cmd += ' --enable-scan-build'
-#
-#        self.policykit = self.get_distro_ver_data('policykit')
-#        if self.policykit is not None and self.policykit == 1:
-#            configure_cmd += ' --enable-policykit'
-#        else:
-#            configure_cmd += ' --disable-policykit'
-#
-#        self.libusb01 = self.get_distro_ver_data('libusb01')
-#        if self.libusb01 is not None and self.libusb01 == 1:
-#            configure_cmd += ' --enable-libusb01_build'
-#        else:
-#            configure_cmd += ' --disable-libusb01_build'
-#       
-#        self.udev_sysfs_rule = self.get_distro_ver_data('udev_sysfs_rule')
-#        if self.udev_sysfs_rule is not None and self.udev_sysfs_rule == 1:
-#            configure_cmd += ' --enable-udev_sysfs_rules'
-#        else:
-#            configure_cmd += ' --disable-udev_sysfs_rules'
-#
-#        return configure_cmd
-
-
-    def restart_cups(self):
-        if os.path.exists('/etc/init.d/cups'):
-            cmd = self.su_sudo() % '/etc/init.d/cups restart'
-
-        elif os.path.exists('/etc/init.d/cupsys'):
-            cmd = self.su_sudo() % '/etc/init.d/cupsys restart'
-
-        else:
-            cmd = self.su_sudo() % 'killall -HUP cupsd'
-
-        self.run(cmd)
-
-
-    def stop_hplip(self):
-        return self.su_sudo() % "/etc/init.d/hplip stop"
-
-
-    def su_sudo(self):
-        if os.geteuid() == 0:
-            return '%s'
-        else:
-            try:
-                cmd = self.distros[self.distro_name]['su_sudo']
-            except KeyError:
-                cmd = 'su'
-
-            if cmd == 'su':
-                return 'su -c "%s"'
-            else:
-                return 'sudo %s'
-
-    def su_sudo_str(self):
-        return self.get_distro_data('su_sudo', 'su')
-
 
     def build_cmds(self):
         return [self.configure(),
                 'make clean',
                 'make',
-                self.su_sudo() % 'make install']
+                self.passwordObj.getAuthCmd() % 'make install']
 
 
     def get_distro_ver_data(self, key, default=None,distro_ver=None):
@@ -1592,7 +1338,7 @@ class CoreInstall(object):
         try:
             return self.distros[self.distro_name].get(key, None) or default
         except KeyError:
-            return default 
+            return default
 
 
     def get_ver_data(self, key, default=None,distro_ver=None):
@@ -1663,25 +1409,6 @@ class CoreInstall(object):
         else:
             return True # For docs (manual install)
 
-
-    def sort_vers(self, x, y):
-        try:
-            return cmp(float(x), float(y))
-        except ValueError:
-            return cmp(x, y)
-
-
-    def running_as_root(self):
-        return os.geteuid() == 0
-
-
-    def show_release_notes_in_browser(self):
-        url = "file://%s" % os.path.join(os.getcwd(), 'doc', 'release_notes.html')
-        log.debug(url)
-        status, output = self.run("xhost +")
-        utils.openURL(url)
-
-
     def count_num_required_missing_dependencies(self):
         num_req_missing = 0
         for d, desc, opt in self.missing_required_dependencies():
@@ -1722,7 +1449,7 @@ class CoreInstall(object):
             if self.options[opt][0]: # required options
                 for d in self.options[opt][2]: # dependencies for option
                     if d == 'cups-ddk':
-                        status, output = self.run('cups-config --version')
+                        status, output = utils.run('cups-config --version', self.passwordObj)
                         import string
                         if status == 0 and (string.count(output, '.') == 1 or string.count(output, '.') == 2):
                             if string.count(output, '.') == 1:
@@ -1735,7 +1462,7 @@ class CoreInstall(object):
                                 minor = ord(minor[0]) - ord('0')
                             if major > '1' or (major == '1' and minor >= 4):
                                 continue
-	            if not self.dependencies[d][0]: # optional dep
+                if not self.dependencies[d][0]: # optional dep
                         if not self.have_dependencies[d]: # missing
                             log.debug("Missing optional dependency: %s" % d)
                             yield d, self.dependencies[d][2], self.dependencies[d][0], opt
@@ -1769,40 +1496,6 @@ class CoreInstall(object):
             log.debug("wget is not installed")
             return False
 
-    def check_network_connection(self):
-        self.network_connected = False
-
-        wget = utils.which("wget")
-        if wget:
-            wget = os.path.join(wget, "wget")
-            cmd = "%s --timeout=60 --output-document=- %s" % (wget, HTTP_GET_TARGET)
-            log.debug(cmd)
-            status, output = self.run(cmd)
-            log.debug("wget returned: %d" % status)
-            self.network_connected = (status == 0)
-
-        else:
-            curl = utils.which("curl")
-            if curl:
-                curl = os.path.join(curl, "curl")
-                cmd = "%s --output - --connect-timeout 5 --max-time 10 %s" % (curl, HTTP_GET_TARGET)
-                log.debug(cmd)
-                status, output = self.run(cmd)
-                log.debug("curl returned: %d" % status)
-                self.network_connected = (status == 0)
-
-            else:
-                ping = utils.which("ping")
-
-                if ping:
-                    ping = os.path.join(ping, "ping")
-                    cmd = "%s -c1 -W1 -w10 %s" % (ping, PING_TARGET)
-                    log.debug(cmd)
-                    status, output = self.run(cmd)
-                    log.debug("ping returned: %d" % status)
-                    self.network_connected = (status == 0)
-
-        return self.network_connected
 
 
     def run_pre_install(self, callback=None,distro_ver=None):
@@ -1811,7 +1504,7 @@ class CoreInstall(object):
         if pre_cmd:
             x = 1
             for cmd in pre_cmd:
-                status, output = self.run(cmd)
+                status, output = utils.run(cmd, self.passwordObj)
 
                 if status != 0:
                     log.warn("An error occurred running '%s'" % cmd)
@@ -1833,7 +1526,7 @@ class CoreInstall(object):
         if pre_cmd:
             x = 1
             for cmd in pre_cmd:
-                status, output = self.run(cmd)
+                status, output = utils.run(cmd, self.passwordObj)
 
                 if status != 0:
                     log.warn("An error occurred running '%s'" % cmd)
@@ -1850,7 +1543,7 @@ class CoreInstall(object):
         if post_cmd:
             x = 1
             for cmd in post_cmd:
-                status, output = self.run(cmd)
+                status, output = utils.run(cmd, self.passwordObj)
 
                 if status != 0:
                     log.warn("An error occurred running '%s'" % cmd)
@@ -1861,29 +1554,11 @@ class CoreInstall(object):
                 x += 1
 
 
-    def run_open_mdns_port(self, callback=None):
-        open_mdns_port_cmd = self.get_distro_ver_data('open_mdns_port')
-        log.debug(open_mdns_port_cmd)
-        if open_mdns_port_cmd:
-            x = 1
-            for cmd in open_mdns_port_cmd:
-                cmd = self.su_sudo() % cmd
-                status, output = self.run(cmd)
-
-                if status != 0:
-                    log.warn("An error occurred running '%s'" % cmd)
-                    log.warn(output)
-
-                if callback is not None:
-                    callback(cmd, "Open mDNS/Bonjour step %d" % x)
-
-                x += 1
-
 
     def pre_build(self,distro_ver=None):
         cmds = []
         if self.get_distro_ver_data('fix_ppd_symlink', False,distro_ver):
-            cmds.append(self.su_sudo() % 'python ./installer/fix_symlink.py')
+            cmds.append(self.passwordObj.getAuthCmd() % 'python ./installer/fix_symlink.py')
 
         return cmds
 
@@ -1891,7 +1566,7 @@ class CoreInstall(object):
     def run_pre_build(self, callback=None,distro_ver=None):
         x = 1
         for cmd in self.pre_build(distro_ver):
-            status, output = self.run(cmd)
+            status, output = utils.run(cmd, self.passwordObj)
             if callback is not None:
                 callback(cmd, "Pre-build step %d"  % x)
 
@@ -1901,7 +1576,7 @@ class CoreInstall(object):
     def run_post_build(self, callback=None,distro_ver=None):
         x = 1
         for cmd in self.post_build(distro_ver):
-            status, output = self.run(cmd)
+            status, output = utils.run(cmd, self.passwordObj)
             if callback is not None:
                 callback(cmd, "Post-build step %d"  % x)
 
@@ -1913,76 +1588,36 @@ class CoreInstall(object):
         # Reload DBUS configuration if distro supports it and PolicyKit
         # support installed
         if self.reload_dbus and self.selected_options['policykit']:
-            cmds.append(self.su_sudo() % "sh /etc/init.d/dbus reload")
+            cmds.append(self.passwordObj.getAuthCmd() % "sh /etc/init.d/dbus reload")
             log.debug("Will reload DBUS configuration for PolicyKit support")
 
         # Kill any running hpssd.py instance from a previous install
-        if self.check_hpssd():
-            pid = get_ps_pid('hpssd')
-            if pid:
-                kill = os.path.join(utils.which("kill"), "kill") + " %d" % pid
-                cmds.append(self.su_sudo() % kill)
+        pid_list = get_ps_pid(['hp-systray', 'hpssd'])
+        
+        kill_cmd = utils.which("kill",True)
+        for pid in pid_list:
+            log.debug("Found %s for %s process"%(pid, pid_list[pid]))
+            kill = kill_cmd + " %s"%pid
+            cmds.append(self.passwordObj.getAuthCmd() % kill)
 
         # Add user to group if needed
         # add_user_to_group=<usermod params> [TYPE_STRING] (leave empty for none) [ex. "-a -G sys" or "-G lp"]
         add_user_to_group = self.get_distro_ver_data('add_user_to_group', '',distro_ver)
         if add_user_to_group:
             usermod = os.path.join(utils.which("usermod"), "usermod") + " %s %s" % (add_user_to_group, prop.username)
-            cmds.append(self.su_sudo() % usermod)
+            cmds.append(self.passwordObj.getAuthCmd() % usermod)
 
         return cmds
 
 
-    def logoff(self):
-        ok = False
-        pkill = utils.which('pkill')
-        if pkill:
-            cmd = "%s -KILL -u %s" % (os.path.join(pkill, "pkill"), prop.username)
-            cmd = self.su_sudo() % cmd
-            status, output = self.run(cmd)
-
-            ok = (status == 0)
-
-        return ok
-
-
-    def restart(self):
-        ok = False
-        shutdown = utils.which('shutdown')
-        if shutdown:
-            cmd = "%s -r now" % (os.path.join(shutdown, "shutdown"))
-            cmd = self.su_sudo() % cmd
-            status, output = self.run(cmd)
-
-            ok = (status == 0)
-
-        return ok
-
-
-    def run_hp_setup(self):
-        status = 0
-        hpsetup = utils.which("hp-setup")
-
-        if hpsetup:
-            cmd = 'hp-setup'
-        else:
-            cmd = './setup.py'
-
-        log.debug(cmd)
-        status, output = self.run(cmd)
-        return status == 0
-
-
     def remove_hplip(self, callback=None):
         failed = True
-        self.stop_pre_2x_hplip(callback)
-
         hplip_remove_cmd = self.get_distro_data('hplip_remove_cmd')
         if hplip_remove_cmd:
             if callback is not None:
                 callback(hplip_remove_cmd, "Removing old HPLIP version")
 
-            status, output = self.run(hplip_remove_cmd)
+            status, output = utils.run(hplip_remove_cmd, self.passwordObj)
 
             if status == 0:
                 self.hplip_present = self.check_hplip()
@@ -1993,151 +1628,15 @@ class CoreInstall(object):
         return failed
 
 
-    def stop_pre_2x_hplip(self, callback=None):
-        hplip_init_script = '/etc/init.d/hplip stop'
-        if os.path.exists(hplip_init_script):
-            cmd = self.su_sudo() % hplip_init_script
-
-            if callback is not None:
-                callback(cmd, "Stopping old HPLIP version.")
-
-            status, output = self.run(cmd)
-
-
-
-    def check_password(self, password_entry_callback, callback=None):
-        self.clear_su_sudo_password()
-        x = 1
-        while True:
-            self.password = password_entry_callback()
-            cmd = self.su_sudo() % "true"
-
-            log.debug(cmd)
-
-            status, output = self.run(cmd)
-
-            log.debug(status)
-            log.debug(output)
-
-            if status == 0:
-                if callback is not None:
-                    callback("", "Password accepted")
-                return True
-
-            if callback is not None:
-                if "not in the sudoers file" in output:
-                    callback("", "%s is not in the sudoers file. Check privileges\n" %(os.getenv('USER')) )
-                    return False
-                else:    
-                    callback("", "Password incorrect. %d attempt(s) left." % (3-x ))
-
-
-            x += 1
-
-            if x > 3:
-                return False
-
-
-    def clear_su_sudo_password(self):
-        if self.su_sudo_str() == 'sudo':
-            log.debug("Clearing password...")
-            self.run("sudo -K")
-
+    def check_password(self):
+        self.passwordObj.clearPassword()
+        if self.passwordObj.getPassword() == "":
+            return False
+        else:
+            return True
 
 
     # PLUGIN HELPERS
-
-    def set_plugin_version(self):
-        self.plugin_version = prop.installed_version
-        log.debug("Plug-in version=%s" % self.plugin_version)
-        self.plugin_name = 'hplip-%s-plugin.run' % self.plugin_version
-        log.debug("Plug-in=%s" % self.plugin_name)
-
-
-    def get_plugin_conf_url(self):
-        url = "http://hplip.sf.net/plugin.conf"
-        home = sys_conf.get('dirs', 'home')
-
-        if os.path.exists('/etc/hp/plugin.conf'):
-            url = "file:///etc/hp/plugin.conf"
-
-        elif os.path.exists(os.path.join(home, 'plugin.conf')):
-            url = "file://" + os.path.join(home, 'plugin.conf')
-
-        log.debug("Plugin.conf url: %s" % url)
-        return url
-
-
-    def get_plugin_info(self, plugin_conf_url, callback):
-        ok, size, checksum, timestamp, url = False, 0, 0, 0.0, ''
-
-        if not self.create_plugin_dir():
-            log.error("Could not create plug-in directory.")
-            return '', 0, 0, 0, False
-
-        local_conf_fp, local_conf = utils.make_temp_file()
-
-        #if os.path.exists(local_conf):
-            #os.remove(local_conf)
-
-        try:
-            try:
-                #filename, headers = urllib.urlretrieve(plugin_conf_url, local_conf, callback)
-                wget = utils.which("wget")
-                if wget:
-                    wget = os.path.join(wget, "wget")
-                    status, output = self.run("%s --timeout=60 --output-document=%s %s --cache=off" %(wget, local_conf, plugin_conf_url))
-                    if status:
-                        log.error("Plugin download failed with error code = %d" %status)
-                        return '', 0, 0, 0, False
-                else:
-                    log.error("Please install wget package to download the plugin.")
-                    return '', 0, 0, 0, False
-            except IOError, e:
-                log.error("I/O Error: %s" % e.strerror)
-                return '', 0, 0, 0, False
-
-            if not os.path.exists(local_conf):
-                log.error("plugin.conf not found.")
-                return '', 0, 0, 0, False
-
-            plugin_conf_p = ConfigParser.ConfigParser()
-
-            try:
-                plugin_conf_p.read(local_conf)
-            except (ConfigParser.MissingSectionHeaderError, ConfigParser.ParsingError):
-                log.error("Error parsing file - 404 error?")
-                return '', 0, 0, 0, False
-
-            try:
-                url = plugin_conf_p.get(self.plugin_version, 'url')
-                size = plugin_conf_p.getint(self.plugin_version, 'size')
-                checksum = plugin_conf_p.get(self.plugin_version, 'checksum')
-                timestamp = plugin_conf_p.getfloat(self.plugin_version, 'timestamp')
-                ok = True
-            except (KeyError, ConfigParser.NoSectionError):
-                log.error("Error reading plugin.conf: Missing section [%s]" % self.plugin_version)
-                return '', 0, 0, 0, False
-
-        finally:
-            os.close(local_conf_fp)
-            os.remove(local_conf)
-
-        return url, size, checksum, timestamp, ok
-
-
-    def create_plugin_dir(self):
-        if not os.path.exists(self.plugin_path):
-            try:
-                log.debug("Creating plugin directory: %s" % self.plugin_path)
-                os.umask(0)
-                os.makedirs(self.plugin_path, 0755)
-                return True
-            except (OSError, IOError), e:
-                log.error("Unable to create directory: %s" % e.strerror)
-                return False
-
-        return True
 
 
     def isErrorPage(self, page):
@@ -2157,235 +1656,6 @@ class CoreInstall(object):
         return err_score > 0.50
 
 
-    def download_plugin(self, url, size, checksum, timestamp, callback=None):
-        log.debug("Downloading %s plug-in file from '%s' to '%s'..." % (self.plugin_version, url, self.plugin_path))
-
-        if not self.create_plugin_dir():
-            return PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR, self.plugin_path
-
-        plugin_file = os.path.join(self.plugin_path, self.plugin_name)
-
-
-        #Check whether plugin is accessible in Openprinting.org website otherwise dowload plugin from alternate location.
-        wget = utils.which("wget")
-        if wget:
-            wget = os.path.join(wget, "wget")
-            cmd = "%s --cache=off -P %s %s" % (wget,self.plugin_path,url)
-            log.debug(cmd)
-            status, output = self.run(cmd)
-            log.debug("wget returned: %d" % status)
-
-        try:
-            if (status != 0) and 'file://' not in url:
-                url = os.path.join(PLUGIN_FALLBACK_LOCATION, self.plugin_name)
-                log.info("Plugin is not accessible. Trying to download it from fallback location: [%s]" % url)
-                cmd = "%s --cache=off -P %s %s" % (wget,self.plugin_path,url)
-                log.debug(cmd)
-                status, output = self.run(cmd)
-            if 'file://' in url:  
-                filename, headers = urllib.urlretrieve(url, plugin_file, callback)
-        except IOError, e:
-            log.error("Plug-in download failed: %s" % e.strerror)
-            return PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND, e.strerror
-
-        if self.isErrorPage(file(plugin_file, 'r').read(1024)):
-            log.debug(file(plugin_file, 'r').read(1024))
-            os.remove(plugin_file)
-            return PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND, -1
-
-        calc_checksum = get_checksum(file(plugin_file, 'r').read())
-        log.debug("D/L file checksum=%s" % calc_checksum)
-
-        # Try to download and check the GPG digital signature
-        digsig_url = url + '.asc'
-        digsig_file = plugin_file + '.asc'
-
-        log.debug("Downloading %s plug-in digital signature file from '%s' to '%s'..." % (self.plugin_version, digsig_url, digsig_file))
-
-        try:
-			if 'file://' in url:
-				filename, headers = urllib.urlretrieve(digsig_url, digsig_file, callback)
-			else:
-				cmd = "%s --cache=off -P %s %s" % (wget,self.plugin_path,digsig_url)
-				log.debug(cmd)
-				status, output = self.run(cmd)
-        except IOError, e:
-            log.error("Plug-in GPG file [%s] download failed: %s" % (digsig_url,e.strerror))
-            return PLUGIN_INSTALL_ERROR_DIGITAL_SIG_NOT_FOUND, e.strerror
-
-        if self.isErrorPage(file(digsig_file, 'r').read(1024)):
-            log.debug(file(digsig_file, 'r').read())
-            os.remove(digsig_file)
-            return PLUGIN_INSTALL_ERROR_DIGITAL_SIG_NOT_FOUND, -1
-
-        gpg = utils.which('gpg')
-        if gpg:
-            gpg = os.path.join(gpg, 'gpg')
-            cmd = '%s --no-permission-warning --keyserver pgp.mit.edu --recv-keys 0xA59047B9' % gpg
-            log.info("Receiving digital keys: %s" % cmd)
-            status, output = self.run(cmd)
-            log.debug(output)
-
-            if status != 0:
-                return PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS, status
-
-            cmd = '%s --no-permission-warning --verify %s %s' % (gpg, digsig_file, plugin_file)
-            log.debug("Verifying plugin with digital keys: %s" % cmd)
-            status, output = self.run(cmd)
-            log.debug(output)
-            log.debug("%s status: %d" % (gpg, status))
-
-            if status != 0:
-                return PLUGIN_INSTALL_ERROR_DIGITAL_SIG_BAD, status
-
-
-        return PLUGIN_INSTALL_ERROR_NONE, plugin_file
-
-#
-# return value:
-# '-1' --> PLUGIN_VERSION_MISMATCH -->version mismatch
-# '0' --> PLUGIN_NOT_INSTALLED        --> not installed
-# '1' --> PLUGIN_INSTALLED
-
-    def check_for_plugin(self):
-        sys_state.read()
-        plugin_state = sys_state.get('plugin', 'installed', PLUGIN_NOT_INSTALLED)
-        if plugin_state !=  PLUGIN_NOT_INSTALLED and self.check_plugin_version() is False:
-            log.debug("Plug-in version mismatch. Need to install plugin again")
-            plugin_state = PLUGIN_VERSION_MISMATCH
-        elif plugin_state == PLUGIN_INSTALLED:
-            log.debug("Plugin is installed")
-        else:
-            log.debug("Plugin is not installed")
-
-        # cross checking so files present	 or not.
-        if plugin_state != PLUGIN_NOT_INSTALLED:
-            Scan_sts =self.check_scanner_plugin_files()
-            Fax_sts = self.check_fax_plugin_files() 
-            Prnt_sts = self.check_printer_plugin_files()
-            if Scan_sts!= PLUGIN_STATUS_FILES_PRESENT or  Fax_sts!= PLUGIN_STATUS_FILES_PRESENT or Prnt_sts != PLUGIN_STATUS_FILES_PRESENT:
-                log.debug("Plug-in files might be corrupted. Re-install plug-in")
-                plugin_state = PLUGIN_VERSION_MISMATCH
-
-        return plugin_state
-
-    def check_plugin_version(self):
-        sys_state.read()
-        plugin_installed_version = sys_state.get('plugin','version', '0.0.0')
-        hplip_version = sys_conf.get('hplip', 'version', '0.0.0')
-        if plugin_installed_version == hplip_version:
-            return True
-        else:
-            return False
-
-
-
-    def check_printer_plugin_files(self):
-        ret_val = None
-        home = sys_conf.get('dirs', 'home')
-        print_so_files_list =['lj.so']
-        cnt=0
-        printer_so_dir= home+"/prnt/plugins/"
-        while cnt < len(print_so_files_list):
-            ret_val = self.check_so_exists(printer_so_dir,print_so_files_list[cnt], "print",ret_val)
-            cnt += 1
-        return ret_val
-
-
-    def check_scanner_plugin_files(self):
-        ret_val = None
-        home = sys_conf.get('dirs', 'home')
-        scan_so_files_list =['bb_marvell.so' , 'bb_soapht.so' , 'bb_soap.so']
-
-        cnt=0
-        scanner_so_dir= home+'/scan/plugins/'
-        while cnt < len(scan_so_files_list):
-            ret_val = self.check_so_exists(scanner_so_dir, scan_so_files_list[cnt], "scan",ret_val)
-            cnt += 1
-        return ret_val 
-
-
-
-    def check_fax_plugin_files(self):
-        ret_val = None
-        home = sys_conf.get('dirs', 'home')
-        fax_so_dir= home+"/fax/plugins/"
-        ret_val = self.check_so_exists(fax_so_dir,'fax_marvell.so' ,"fax",ret_val)
-        return ret_val 
-
-
-    def check_so_exists(self, sym_link_dir, so_file, functionType, Pre_ret_val, update_log=True):
-        ret_val = Pre_ret_val
-        sym_link_file = sym_link_dir + so_file
-        if not os.path.exists(sym_link_file):
-            log.debug("Either %s file is not present or symbolic link is missing: %s" %(functionType, sym_link_file))
-            if update_log:
-                user_conf.set(functionType+'_plugins', so_file,'Not_Found')
-            if ret_val == None:
-                ret_val= PLUGIN_STATUS_FILES_NOT_PRESENT
-            elif ret_val == PLUGIN_STATUS_FILES_PRESENT:
-                ret_val = PLUGIN_STATUS_PARTIAL_FILES_PRESENT
-        else:
-            # capturing real file path
-            if os.path.islink(sym_link_file):
-                real_file = os.path.realpath(sym_link_file)
-            else:
-                real_file = sym_link_file
-
-            if not os.path.exists(real_file):
-                log.debug("%s Plugin file is missing: %s" % (functionType, real_file))
-                if update_log:
-                    user_conf.set(functionType+'_plugins', so_file,'Not_Found')
-                if ret_val == None:
-                    ret_val= PLUGIN_STATUS_FILES_NOT_PRESENT
-                elif ret_val == PLUGIN_STATUS_FILES_PRESENT:
-                    ret_val = PLUGIN_STATUS_PARTIAL_FILES_PRESENT
-            elif (os.stat(sym_link_file).st_mode & 72) != 72:
-                if update_log:
-                    user_conf.set(functionType+'_plugins', so_file,'Permissin_Error')
-                log.debug("%s Plugin file doesn't have user/group execute permission: %s" % (functionType,sym_link_file))
-                if ret_val == None:
-                    ret_val= PLUGIN_STATUS_FILES_NOT_PRESENT
-                elif ret_val == PLUGIN_STATUS_FILES_PRESENT:
-                    ret_val = PLUGIN_STATUS_PARTIAL_FILES_PRESENT
-            else:
-                if update_log:
-                    user_conf.set(functionType+'_plugins', so_file,'Present')
-                if ret_val == None:
-                    ret_val= PLUGIN_STATUS_FILES_PRESENT
-                elif ret_val == PLUGIN_STATUS_FILES_NOT_PRESENT:
-                    ret_val = PLUGIN_STATUS_PARTIAL_FILES_PRESENT
-
-        log.debug("%s Plug-in file %s status: %d" % (functionType, sym_link_file, ret_val))
-        return ret_val
- 
-
-
-    def run_plugin(self, mode=GUI_MODE, callback=None):
-        plugin_file = os.path.join(self.plugin_path, self.plugin_name)
-
-        if not os.path.exists(plugin_file):
-            return False
-
-        if mode == GUI_MODE:
-            return os.system("sh %s --nox11 -- -u" % plugin_file) == 0
-        else:
-            if os.system("sh %s --nox11 -- -i" % plugin_file) == 0:
-                return True
-            else:
-                log.error("Python gobject/dbus may be not installed")
-                return False
-
-
-    def delete_plugin(self):
-        plugin_file = os.path.join(self.plugin_path, self.plugin_name)
-        digsig_file = plugin_file + ".asc"
-
-        if os.path.exists(plugin_file):
-            os.unlink(plugin_file)
-        if os.path.exists(digsig_file):
-            os.unlink(digsig_file)
-
     def validate_disto(self):
         if self.distro != DISTRO_UNKNOWN:
             return True
@@ -2396,17 +1666,17 @@ class CoreInstall(object):
             for vers in self.distros[self.distro_name]['versions']:
                 if self.distro_version == vers:
                     return True
-            
+
         return False
 
     def is_auto_installer_support(self, distro_version = DISTRO_VER_UNKNOWN):
         if not self.distro_name:
             self.get_distro()
             self.distro_name = self.distros_index[self.distro]
-         
+
         if distro_version == DISTRO_VER_UNKNOWN:
             distro_version = self.distro_version
-        
+
         if self.distro != DISTRO_UNKNOWN and distro_version != DISTRO_VER_UNKNOWN and self.get_ver_data('supported', False,distro_version):
             log.debug("Auto installation is supported for Distro =%s version =%s "%(self.distro_name, distro_version))
             return True
@@ -2414,21 +1684,13 @@ class CoreInstall(object):
             log.debug("Auto installation is not supported for Distro =%s version =%s "%(self.distro_name, distro_version))
             return False
 
-    #Expands '*' in File/Dir names.
-    def expandList(self,Files_List, prefix_dir=None):
-        Expanded_Files_list=[]
-        for f in Files_List:
-            if prefix_dir:
-                f= prefix_dir + '/' + f
-            if '*' in f:
-                f_full = glob.glob(f)
-                for file in f_full:
-                  Expanded_Files_list.append(file)
-            else:
-                Expanded_Files_list.append(f)
-        return Expanded_Files_list
 
-
+    # Uninstalls the HPLIP package.
+    # Input:
+    #       mode --> INTERACTIVE_MODE, GUI_MODE
+    #
+    # Output:
+    #       result --> returns True on success.
     def uninstall(self,mode = INTERACTIVE_MODE, callback=None):
         checkSudo = False
         if os.getuid() != 0:
@@ -2441,7 +1703,7 @@ class CoreInstall(object):
         if home_dir is "":
             log.error("HPLIP is not installed.")
             return False
-    
+
         if mode != NON_INTERACTIVE_MODE:
             ok,choice = tui.enter_choice("\nAre you sure to uninstall HPLIP-%s (y=yes, n=no*)?:" %version,['y','n'],'n')
             if not ok or choice == 'n':
@@ -2453,7 +1715,7 @@ class CoreInstall(object):
         log.info("Starting uninstallation...")
 
         plugin_state = sys_state.get('plugin', 'installed', PLUGIN_NOT_INSTALLED)
-        
+
         # check systray is running?
         status,output = utils.Is_Process_Running('hp-systray')
         if status is True:
@@ -2462,72 +1724,40 @@ class CoreInstall(object):
                 if not ok or choice =='n':
                     log.info("Quiting HPLIP unininstallation. Close application(s) manually and run again.")
                     return False
-        
-            try:
-                from dbus import SystemBus, lowlevel
-            except ImportError:
-                log.error("Unable to load DBus")
-                pass
-            else:
-                try:
-                    args = ['', '', EVENT_SYSTEMTRAY_EXIT, prop.username, 0, '', '']
-                    msg = lowlevel.SignalMessage('/', 'com.hplip.StatusService', 'Event')
-                    msg.append(signature='ssisiss', *args)
-                    log.debug("Sending close message to hp-systray ...")
-                    SystemBus().send_message(msg)
-                    time.sleep(0.5)
-                except:
-                    log.error("Failed to send DBus message to hp-systray/hp-toolbox.")
-                    pass
-    
-    
+
+            # Kill any running hpssd.py instance from a previous install
+            pid_list = get_ps_pid(['hp-systray'])
+            kill_cmd = utils.which("kill",True)
+            for pid in pid_list:
+                log.debug("Found %s for %s process"%(pid, pid_list[pid]))
+                kill = kill_cmd + " %s"%pid
+                sts, out = utils.run(kill)
+                log.debug("sts =%s out=%s"%(sts,out))
+
         toolbox_status,output = utils.Is_Process_Running('hp-toolbox')
         systray_status,output = utils.Is_Process_Running('hp-systray')
         if toolbox_status is True or systray_status is True:
             log.error("Failed to close HP-Toolbox/HP-Systray. Close manually and run hp-uninstall again.")
             return False
-    
+
         if hplip_remove_cmd:
-            pid, cmdline = self.check_pkg_mgr()
-            while pid:
-                ok, user_input = tui.enter_choice("A package manager '%s' appears to be running. Please quit the package manager and press enter to continue (i=ignore, r=retry*, f=force, q=quit) :" % cmdline, ['i', 'r', 'q', 'f'], 'r')
-
-                if not ok: sys.exit(0)
-                elif user_input == 'i':
-                    log.warn("Ignoring running package manager. Some package operations may fail.")
-                    break
-
-                elif user_input == 'f':
-                    ok, ans = tui.enter_yes_no("\nForce quit of package manager '%s'" % cmdline, 'y')
-                    if not ok: sys.exit(0)
-                    if ans:
-                        cmd = self.su_sudo() % ("kill %d" % pid)
-                        status, output = self.run(cmd)
-                        if status != 0:
-                            log.error("Failed to kill process. You may need to manually quit the program.")
-
-                pid, cmdline = self.check_pkg_mgr()
-
+            User_exit, Is_pkg_mgr_running = self.close_package_managers()
+            if User_exit:
+                sys.exit(0)
             self.remove_hplip(callback)
 
         #removing .hplip directory
         cmd='find /home -name .hplip'
         if checkSudo:
-            cmd= self.su_sudo() %cmd
+            cmd= self.passwordObj.getAuthCmd() %cmd
 
-        status, output=self.run(cmd)
+        status, output=utils.run(cmd, self.passwordObj)
         if output is not None:
             for p in output.splitlines():
                 if p.find("find:") != -1:
                     continue
 
-                cmd= RMDIR + " " + p
-                if checkSudo:
-                    cmd= self.su_sudo() %cmd
-                log.debug("Removing .hplip folder cmd = %s " %cmd)
-                status, output=self.run(cmd)
-                if 0 != status:
-                    log.debug("Failed to remove directory=%s "%p)
+                utils.remove(p, self.passwordObj, checkSudo)
 
         #remove the binaries and libraries
         pat=re.compile(r"""(\S.*)share\/hplip""")
@@ -2537,120 +1767,272 @@ class CoreInstall(object):
             usrbin_dir= base.group(1) + "bin/"
             usrlib_dir= base.group(1) + "lib/"
             cnt = 0
-            BINS_LIST_FULL= self.expandList(BINS_LIST, usrbin_dir)
+            BINS_LIST_FULL= utils.expandList(BINS_LIST, usrbin_dir)
             while cnt <len (BINS_LIST_FULL ):
-                cmd = RM + " " + BINS_LIST_FULL[cnt]
-                if checkSudo:
-                    cmd= self.su_sudo() %cmd
-                    
-                log.debug("Removing binaries cmd = %s " %cmd)
-                status, output=self.run(cmd)
-                if 0 != status:
-                    log.debug("Failed to remove '%s' binary." %(BINS_LIST_FULL[cnt]))
+                utils.remove(BINS_LIST_FULL[cnt], self.passwordObj, checkSudo)
                 cnt += 1
 
             cnt =0
-            LIBS_LIST_FULL = self.expandList(LIBS_LIST, usrlib_dir)
+            LIBS_LIST_FULL = utils.expandList(LIBS_LIST, usrlib_dir)
             while cnt <len (LIBS_LIST_FULL ):
-                cmd = RM + " " + LIBS_LIST_FULL[cnt]
-                if checkSudo:
-                    cmd= self.su_sudo() %cmd
-
-                log.debug("Removing library cmd = %s " %cmd)
-                status, output=self.run(cmd)
-                if 0 != status:
-                    log.debug("Failed to remove '%s' library." %( LIBS_LIST_FULL[cnt]))
+                utils.remove(LIBS_LIST_FULL[cnt], self.passwordObj, checkSudo)
                 cnt += 1
-    
+
 
         remove_plugins = False
         if mode != NON_INTERACTIVE_MODE and plugin_state !=  PLUGIN_NOT_INSTALLED:
             ok,choice = tui.enter_choice("\nDo you want to remove HP proprietary plug-ins (y=yes*, n=no)?:",['y','n'],'y')
-            if ok and choice =='y':                
+            if ok and choice =='y':
                 remove_plugins = True
         else:
             remove_plugins = True
-    
+
         # removing HPLIP installed directories/files
         if remove_plugins is False:
-            HPLIP_LIST_FULL = self.expandList(HPLIP_LIST, home_dir)
+            HPLIP_LIST_FULL = utils.expandList(HPLIP_LIST, home_dir)
         else:
             HPLIP_LIST_FULL = []
         cnt =0
-        while cnt < len(HPLIP_LIST_FULL): 
-            cmd=RMDIR + " " + HPLIP_LIST_FULL[cnt]
-            if checkSudo:
-                cmd= self.su_sudo() %cmd
-
-            log.debug("Removing hplip directory/file cmd= %s " %cmd)
-            status, output=self.run(cmd)
-            if 0 != status:
-                log.debug("Failed to remove hplip directory/file=%s "% (HPLIP_LIST_FULL[cnt]))
+        while cnt < len(HPLIP_LIST_FULL):
+            utils.remove(HPLIP_LIST_FULL[cnt], self.passwordObj, checkSudo)
             cnt +=1
 
-                
+        # removing ppd directory
+        ppd_dir = sys_conf.get('dirs','ppd','')
+        if ppd_dir:
+            utils.remove(ppd_dir, self.passwordObj, checkSudo)
+
         # removing configuration files
-        FILES_LIST_FULL=self.expandList(FILES_LIST)
+        FILES_LIST_FULL = utils.expandList(FILES_LIST)
         cnt= 0
         while cnt < len(FILES_LIST_FULL):
-            cmd = RMDIR + " " + FILES_LIST_FULL[cnt]
-            if checkSudo:
-                cmd= self.su_sudo() %cmd
-            log.debug("Removing conf files cmd= %s" %(cmd))
-            status, output=self.run(cmd)
-            if 0 != status:
-                log.debug("Failed to remove '%s' file" %FILES_LIST_FULL[cnt])
+            utils.remove(FILES_LIST_FULL[cnt], self.passwordObj, checkSudo)
             cnt += 1
 
-        
         # removing Plug-in files
         if remove_plugins == True:
             cnt =0
-            PLUGIN_LIST_FULL= self.expandList(PLUGIN_LIST,home_dir) 
-            while cnt < len(PLUGIN_LIST_FULL): 
-                cmd=RMDIR + " " + PLUGIN_LIST_FULL[cnt]
-                if checkSudo:
-                    cmd= self.su_sudo() %cmd
-
-                log.debug("Removing hplip Plug-in files cmd= %s " %cmd)
-                status, output=self.run(cmd)
-                if 0 != status:
-                    log.debug("Failed to remove plug-in directory/file=%s "% (PLUGIN_LIST_FULL[cnt]))
+            PLUGIN_LIST_FULL = utils.expandList(PLUGIN_LIST,home_dir)
+            while cnt < len(PLUGIN_LIST_FULL):
+                utils.remove(PLUGIN_LIST_FULL[cnt], self.passwordObj, checkSudo)
                 cnt += 1
-            
+
             cnt =0
-            PLUGIN_STATE_FULL= self.expandList(PLUGIN_STATE) 
-            while cnt < len(PLUGIN_STATE_FULL): 
-                cmd=RMDIR + " "+PLUGIN_STATE_FULL[cnt]
-                if checkSudo:
-                    cmd= self.su_sudo() %cmd
-
-                log.debug("Removing hplip Plug-in file cmd= %s " %cmd)
-                status, output=self.run(cmd)
-                if 0 != status:
-                    log.debug("Failed to remove plug-in directory/file=%s "% (PLUGIN_STATE_FULL[cnt]))
+            PLUGIN_STATE_FULL = utils.expandList(PLUGIN_STATE)
+            while cnt < len(PLUGIN_STATE_FULL):
+                utils.remove(PLUGIN_STATE_FULL[cnt], self.passwordObj, checkSudo)
                 cnt += 1
 
-            cmd =RMDIR+ " "+home_dir
-            if checkSudo:
-                cmd= self.su_sudo() %cmd
+            utils.remove(home_dir, self.passwordObj, checkSudo)
 
-            log.debug("Removing hplip directory/file cmd= %s " %cmd)
-            status, output=self.run(cmd)
-            if 0 != status:
-                log.debug("Failed to remove hplip directory=%s "% (home_dir))
-        
         # removing HPLIP uninstall link
         if usrbin_dir is not None:
-            cmd=RMDIR + " " + usrbin_dir+"hp-uninstall"
-            if checkSudo:
-                cmd= self.su_sudo() %cmd
+            hp_uninstall = usrbin_dir+"hp-unistall"
+            utils.remove(hp_uninstall, self.passwordObj, checkSudo)
 
-            log.debug("Removing hplip binary cmd= %s " %cmd)
-            status, output=self.run(cmd)
-            if 0 != status:
-                log.debug("Failed to remove '%s' file" %(usrbin_dir+"hp-uninstall"))
         log.info("HPLIP uninstallation is completed")
         return True
 
+    # close_package_managers() closes the package managers, if running
+    # Input:
+    #       MODE --> INTERACTIVE_MODE, GUI_MODE (GUI_MODE is not yet supported).
+    # Output:
+    #       User_exit (bool) --> returns True, if user quits.
+    #                        --> returns False, if user doesn't select quit option.
+    #       Is_pkg_mgr_running (bool)  -->returns False, if no packages are running at end of function.
+    #                                  -->returns True, if some package(s) is(are) running at end of function.
+    def close_package_managers(self, MODE=INTERACTIVE_MODE):
+        User_exit = False
+        Is_pkg_mgr_running = False
+        pid, cmdline = utils.check_pkg_mgr(self.package_mgrs)
+        while pid:
+            if MODE == INTERACTIVE_MODE:
+                ok, user_input = tui.enter_choice("A package manager '%s' appears to be running. Please quit the package manager and press enter to continue (i=ignore, r=retry*, f=force, q=quit) :" % cmdline, ['i', 'r', 'q', 'f'], 'r')
+                if not ok:
+                    return True, True     #--> User_exit = True , Is_pkg_mgr_running =True
+                if user_input == 'i':
+                    log.warn("Ignoring running package manager. Some package operations may fail.")
+                    break
+                if user_input == 'f':
+                    ok, ans = tui.enter_yes_no("\nForce quit of package manager '%s'" % cmdline, 'y')
+                    if not ok:
+                        return True, True     #--> User_exit = True , Is_pkg_mgr_running =True
+                    if ans:
+                        cmd = self.passwordObj.getAuthCmd() % ("kill %s" % pid)
+                        status, output = utils.run(cmd, self.passwordObj)
+                        if status != 0:
+                            log.error("Failed to kill process. You may need to manually quit the program.")
+            else:
+                log.error("GUI is not yet supported")
+                ## TBD
+                break
+            pid, cmdline = utils.check_pkg_mgr(self.package_mgrs)
+
+        if pid:     # checking for still running package managers
+            Is_pkg_mgr_running = True
+
+        return User_exit, Is_pkg_mgr_running
+
+
+
+
+    #add_groups_to_user()
+    # Input:
+    #      missing_user_groups (string) --> Contains only missing groups, to show to user.
+    #      missing_user_groups_cmd (string) --> command as per distro.dat (i.e. add_user_to_group)
+    #      mode  --> INTERACTIVE_MODE, GUI_MODE (GUI_MODE is not yet supported).
+    # Output:
+    #      ret_val (bool) --> returns True, if succeeded to add groups to user.
+    #                     --> returns False, if Failed to add groups to user.
+    def add_groups_to_user(self, missing_user_groups, missing_user_groups_cmd ,mode = INTERACTIVE_MODE):       # Move to utils
+        ret_val = False
+        if mode == INTERACTIVE_MODE:
+            if not missing_user_groups or not missing_user_groups_cmd:
+                return False
+
+            ok,user_input =tui.enter_choice("Do you want to add missing groups %s to user?(y=yes*, n=no)"%missing_user_groups,['y', 'n'], 'y')
+            if ok and user_input == 'y':
+                usermod_path= utils.which('usermod',True)
+                if usermod_path:
+                    cmd = "%s %s %s" % (usermod_path,missing_user_groups_cmd, prop.username)
+                    cmd = self.passwordObj.getAuthCmd()%cmd
+                    log.debug("cmd =  %s"%cmd)
+                    sts,out = utils.run(cmd, self.passwordObj)
+                    if sts == 0:
+                        ret_val = True
+                else:
+                    log.error("usermod command not found.")
+            else:
+                log.info(log.bold("Please add %s groups to %s user"%(missing_user_groups, prop.username)))
+        else:
+            log.error("GUI is not yet supported")
+            ## TBD
+        return ret_val
+
+
+    #disable_SELinux()
+    # Input:
+    #      MODE  --> INTERACTIVE_MODE, GUI_MODE (GUI_MODE is not yet supported).
+    # Output:
+    #      ret_val (bool) --> returns True, if succeeded to disable SELinux.
+    #                     --> returns False, if Failed to disable SELinux.
+
+    def disable_SELinux(self, mode = INTERACTIVE_MODE):       # Move to utils
+        ret_val = False
+        SELinux_file = '/etc/selinux/config'
+        if mode == INTERACTIVE_MODE:
+            ok,user_input =tui.enter_choice("SELinux is currently enabled in your system. Device may not work properly. Do you want to disable SELinux?(y=yes, n=no*)",['y', 'n'], 'n')
+            if ok and user_input != 'n':
+                if not os.path.exists (SELinux_file):
+                    log.debug("File %s is not found"%SELinux_file)
+                    return False
+                cmd=self.passwordObj.getAuthCmd()%("vi -c %s/enforcing$/disabled -c wq " + SELinux_file)
+                log.debug("cmd= %s "%cmd)
+                sts, out = utils.run(cmd, self.passwordObj)
+                if sts == 0:
+                    ret_val = True
+                if os.path.exists('/selinux/enforce'):
+                    cmd = "echo 0 >/selinux/enforce"
+                    cmd=self.passwordObj.getAuthCmd()%cmd
+                    log.debug("cmd= %s "%cmd)
+#                    utils.run(cmd, self.passwordObj)
+                    os_utils.execute(cmd)
+
+        else:
+            log.error("GUI is not yet supported")
+            ## TBD
+
+        return ret_val
+
+
+    def install_missing_dependencies(self, mode=INTERACTIVE_MODE, required_dependencies=[],optional_dependencies=[], missing_cmd=[]):     # Move to core_install
+        package_mgr_cmd = self.get_distro_data('package_mgr_cmd')
+        pre_depend_cmd  = self.get_distro_data('pre_depend_cmd')
+        overall_install_cmds={}
+
+        if len(required_dependencies):
+            for packages_to_install in required_dependencies:
+               if package_mgr_cmd:
+                   overall_install_cmds[packages_to_install] = utils.cat(package_mgr_cmd)
+               else:
+                   overall_install_cmds[packages_to_install] =packages_to_install
+
+
+        if len(optional_dependencies):
+            for packages_to_install in optional_dependencies:
+                if package_mgr_cmd:
+                    overall_install_cmds[packages_to_install] = utils.cat(package_mgr_cmd)
+                else:
+                    overall_install_cmds[packages_to_install] = packages_to_install
+
+
+        if len(overall_install_cmds) == 0 and len(missing_cmd) == 0:
+            log.info("No missing dependencies")
+            return 0
+
+        if mode == INTERACTIVE_MODE:
+            ok,user_input =tui.enter_choice("Do you want to update repository and Install missing/incompatible packages. (a=install all*, c=custom_install, s=skip):",['a', 'c','s'], 'a')
+            if not ok or user_input =='q':
+                return 1
+            elif user_input == 's':
+                log.info(log.bold("Install manually above missing/incompatible packages."))
+            else:
+                self.close_package_managers()
+
+                log.info(log.bold("Updating repository"))
+                log.info(log.bold('-'*len("Updating repository")))
+                if pre_depend_cmd:
+                    for cmd in pre_depend_cmd:
+                        log.info("cmd =%s"%(cmd))
+                        sts, out = utils.run(cmd, self.passwordObj)
+                        if sts != 0  or "Failed" in out:
+                            log.warn("Failed to update Repository, check if any update/installation is running.")
+
+                if user_input =='c':
+                    log.info(log.bold("Installing missing/incompatible packages"))
+                    log.info(log.bold('-'*len("Installing missing/incompatible packages")))
+                    for d in overall_install_cmds:
+                        ok,user_input =tui.enter_choice("Do you want to install '%s' package?(y=yes*, n=no):"%d,['y', 'n'], 'y')
+                        if ok and user_input == 'y':
+                            if 'hpaio' in overall_install_cmds[d]:
+                                self.update_hpaio()
+                            else:
+                                log.info("cmd =%s"%overall_install_cmds[d])
+                                sts, out = utils.run(overall_install_cmds[d], self.passwordObj)
+                                if sts != 0 or "Failed" in out:
+                                    log.error("Failed to install '%s' package, please install manually. "%d)
+                    if 'cups' in d:
+                        if not services.start_service('cups', self.passwordObj):
+                            log.error("Failed to start CUPS service. Please start CUPS manually or restart system.")
+                    for cmd in missing_cmd:
+                        ok,user_input =tui.enter_choice("Do you want to run '%s' command?(y=yes*, n=no):"%d,['y', 'n'], 'y')
+                        if ok and user_input == 'y':
+                            sts, out = utils.run(cmd, self.passwordObj)
+                            if sts != 0 or "Failed" in out:
+                                log.error("Failed to run '%s' command, please run manually. "%d)
+
+                elif user_input =='a':
+                    log.info(log.bold("Installing Missing/Incompatible packages"))
+                    log.info(log.bold('-'*len("Installing Missing/Incompatible packages")))
+                    for d in overall_install_cmds:
+                        if 'hpaio' in overall_install_cmds[d]:
+                            self.update_hpaio()
+                        else:
+                            log.info("cmd =%s"%overall_install_cmds[d])
+                            sts, out = utils.run(overall_install_cmds[d], self.passwordObj)
+                            if sts != 0 or "Failed" in out:
+                                log.error("Failed to install '%s' package, please install manually. "%d)
+                    if 'cups' in d:
+                        if not services.start_service('cups',self.passwordObj):
+                            log.error("Failed to start CUPS sevice. Please start CUPS manually or restart system.")
+                    for cmd in missing_cmd:
+                        sts, out = utils.run(cmd, self.passwordObj)
+                        if sts != 0 or "Failed" in out:
+                            log.error("Failed to run '%s' command, please run manually. "%d)
+
+        else:
+            log.error("GUI is not yet supported..1")
+            ## TBD
+
+        return 0
 

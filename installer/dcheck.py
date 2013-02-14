@@ -29,11 +29,13 @@ from subprocess import Popen, PIPE
 
 # Local
 from base.g import *
-from base import utils
+from base import utils, services
 
 ver1_pat = re.compile("""(\d+\.\d+\.\d+)""", re.IGNORECASE)
 ver_pat = re.compile("""(\d+.\d+)""", re.IGNORECASE)
-proc_pat = re.compile(r"""(\d+)""", re.I)
+PID = 0
+CMDLINE = 1
+
 
 ld_output = ''
 #ps_output = ''
@@ -161,58 +163,43 @@ def check_file_contains(f, s):
         cleanup_spinner()
 
 
-def get_process_list():
-    processes = [] # (pid, cmdline), ...
-    for x in utils.walkFiles("/proc", False, True, True):
-        s = proc_pat.search(x) 
-        if s is not None:
-            try:
-                cmdline = file(os.path.join(x, 'cmdline'), 'r').read().replace('\x00', '').replace('\n', '').strip()
-            except IOError:
-                cmdline = None
-                
-            if cmdline:
-                processes.append((int(s.group(1)), cmdline))
-
-    return processes
-
-
 def check_ps(process_list):
-    log.debug("Searching any process(es) '%s' in running processes..." % process_list)
-    processes = get_process_list()
-
+    if process_list is not None:
+        log.debug("Searching for '%s' in running processes..." % process_list)
     try:
-        for pid, cmdline in processes:
+        for p in process_list:
             update_spinner()
-            for p in process_list:
-                if p in cmdline:
-                    log.debug("'%s' found." % cmdline)
-                    return True
+            status,process = utils.Is_Process_Running(p)
+            if status is True:
+                for p in process:
+                    log.debug("Found: %s (%s)" % (process[p], p))
+                return True
 
         log.debug("Not found")
         return False
-
     finally:
         cleanup_spinner()
 
+def get_ps_pid(process_name_list):
+    processes_list = {}
 
-def get_ps_pid(process):
-    log.debug("Searching for the PID for process '%s' in running processes..." % process)
-    processes = get_process_list()
+    if process_name_list is not None:
+        log.debug("Searching for '%s' in running processes..." % process_name_list)
 
-    try:
-        for pid, cmdline in processes:
-            update_spinner()
-            if process in cmdline:
-                log.debug("'%s' found." % cmdline)
-                return pid
+        try:
+            for p in process_name_list:
+                update_spinner()
+                status,processes = utils.Is_Process_Running(p)
+                if status is True:
+                    log.debug("Found: %d processes" % len(processes))
+                    for pid in processes:
+                        processes_list[pid] =processes[pid]
+                else:
+                    log.debug("Not found")
+        finally:
+            cleanup_spinner()
 
-        log.debug("Not found")
-        return 0
-
-    finally:
-        cleanup_spinner()
-
+    return processes_list
 
 def check_lsmod(module):
     global mod_output
@@ -270,7 +257,7 @@ def get_version(cmd,def_ver='-'):
             line = output.splitlines()[0]
         except IndexError:
             line = ''
-            
+
         log.debug(line)
         match_obj = ver1_pat.search(line)
         try:
@@ -300,7 +287,7 @@ def get_python_dbus_ver():
     except ImportError:
         dbus_version = '-'
     return dbus_version
-    
+
 def get_pyQt4_version():
     log.debug("Checking PyQt 4.x version...")
     ver ='-'
@@ -337,22 +324,22 @@ def  get_pyQt_version():
             pyqtVersion = qt.PYQT_VERSION_STR
         except AttributeError:
             pyqtVersion = qt.PYQT_VERSION
-                
+
         while pyqtVersion.count('.') < 2:
             pyqtVersion += '.0'
-                
+
         return pyqtVersion
 
 def get_xsane_version():
     installed_ver='-'
     try:
-        p1 = Popen(["xsane", "--version","2",">","/dev/null"], stdout=PIPE)            
+        p1 = Popen(["xsane", "--version","2",">","/dev/null"], stdout=PIPE)
     except:
         output =None
     else:
         output=p1.communicate()[0]
 
-    if output:          
+    if output:
         xsane_ver_pat =re.compile('''xsane-(\d{1,}\.\d{1,}).*''')
         xsane_ver_info = output.splitlines()[0]
         if xsane_ver_pat.search(xsane_ver_info):
@@ -373,7 +360,8 @@ def get_libpthread_version():
     except ImportError:
         return '-'
     else:
-        LIBC = ctypes.CDLL(ctypes.util.find_library('c'), use_errno=True)
+#        LIBC = ctypes.CDLL(ctypes.util.find_library('c'), use_errno=True)
+        LIBC = ctypes.CDLL(ctypes.util.find_library('c'),ctypes.DEFAULT_MODE,None, True)
         LIBC.gnu_get_libc_version.restype = ctypes.c_char_p
         return LIBC.gnu_get_libc_version()
 
@@ -384,3 +372,6 @@ def get_python_xml_version():
         return '-'
     else:
          return '.'.join([str(x) for x in xml.parsers.expat.version_info])
+
+def get_HPLIP_version():
+    return prop.version

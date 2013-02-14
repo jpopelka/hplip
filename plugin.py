@@ -278,15 +278,12 @@ else: # INTERACTIVE_MODE
 
         log.info("(Note: Defaults for each question are maked with a '*'. Press <enter> to accept the default.)")
         log.info("")
-
-        from installer import core_install
-        core = core_install.CoreInstall(core_install.MODE_CHECK)
-
-        core.set_plugin_version()
-
+        
+        from installer import pluginhandler
         tui.header("PLUG-IN INSTALLATION FOR HPLIP %s" % version)
+        pluginObj = pluginhandler.PluginHandle()
 
-        if core.check_for_plugin() == PLUGIN_INSTALLED and plugin_path is None:
+        if pluginObj.getStatus() == pluginhandler.PLUGIN_INSTALLED and plugin_path is None:
             log.info("The driver plugin for HPLIP %s appears to already be installed." % version)
 
             cont, ans = tui.enter_yes_no("Do you wish to download and re-install the plug-in?")
@@ -304,42 +301,16 @@ else: # INTERACTIVE_MODE
             table.output()
 
             cont, ans = tui.enter_choice("\nEnter option (d=download*, p=specify path, q=quit) ? ",
-                ['d', 'p'], 'd')
+                ['d', 'p','q'], 'd')
 
-            if not cont: # q
+            if not cont or ans == 'q': # q
                 clean_exit(0)
 
 
             if ans == 'd': # d - download
-                # read plugin.conf (local or on sf.net) to get plugin_path (http://)
-                plugin_conf_url = core.get_plugin_conf_url()
+                plugin_path = ""
 
-                if plugin_conf_url.startswith('file://'):
-                    tui.header("COPY CONFIGURATION")
-                else:
-                    tui.header("DOWNLOAD CONFIGURATION")
-
-                    log.info("Checking for network connection...")
-                    ok = core.check_network_connection()
-
-                    if not ok:
-                        log.error("Network connection not detected.")
-                        clean_exit(1)
-
-
-                log.info("Downloading configuration file from: %s" % plugin_conf_url)
-                pm = tui.ProgressMeter("Downloading configuration:")
-
-                plugin_path, size, checksum, timestamp, ok = core.get_plugin_info(plugin_conf_url,
-                    plugin_download_callback)
-
-                print
-
-                if not plugin_path.startswith('http://') and not plugin_path.startswith('file://'):
-                    plugin_path = 'file://' + plugin_path
-
-            else: # p - specify plugin path
-
+            else : # p - specify plugin path
                 while True:
                     plugin_path = raw_input(log.bold("Enter the path to the 'hplip-%s-plugin.run' file (q=quit) : " %
                         version)).strip()
@@ -347,7 +318,11 @@ else: # INTERACTIVE_MODE
                     if plugin_path.strip().lower() == 'q':
                         clean_exit(1)
 
-                    if not plugin_path.startswith('http://'):
+                    if  plugin_path.startswith('http://'):
+                        log.error("Plug-in filename =%s must be local file." % plugin_path)
+                        continue
+
+                    else:
                         plugin_path = os.path.normpath(os.path.abspath(os.path.expanduser(plugin_path)))
 
                         if not os.path.exists(plugin_path):
@@ -375,9 +350,8 @@ else: # INTERACTIVE_MODE
             tui.header("COPY PLUGIN")
         else:
             tui.header("DOWNLOAD PLUGIN")
-
             log.info("Checking for network connection...")
-            ok = core.check_network_connection()
+            ok = utils.check_network_connection()
 
             if not ok:
                 log.error("Network connection not detected.")
@@ -386,41 +360,42 @@ else: # INTERACTIVE_MODE
         log.info("Downloading plug-in from: %s" % plugin_path)
         pm = tui.ProgressMeter("Downloading plug-in:")
 
-        status, ret = core.download_plugin(plugin_path, size, checksum, timestamp, plugin_download_callback)
+        status, plugin_path = pluginObj.download(plugin_path, plugin_download_callback)
         print
 
-        if status in (core_install.PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS, core_install.PLUGIN_INSTALL_ERROR_DIGITAL_SIG_NOT_FOUND):
+        if status in (pluginhandler.PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS, pluginhandler.PLUGIN_INSTALL_ERROR_DIGITAL_SIGN_NOT_FOUND):
             log.error("Digital signature file download failed. Without this file, it is not possible to authenticate and validate the plug-in prior to installation.")
             cont, ans = tui.enter_yes_no("Do you still want to install the plug-in?", 'n')
 
             if not cont or not ans:
                 clean_exit(0)
 
-        elif status != core_install.PLUGIN_INSTALL_ERROR_NONE:
+        elif status != pluginhandler.PLUGIN_INSTALL_ERROR_NONE:
 
-            if status == core_install.PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND:
-                desc = "Plug-in file not found (server returned 404 or similar error). Error code: %s" % str(ret)
+            if status == pluginhandler.PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND:
+                desc = "Plug-in file not found (server returned 404 or similar error)"
 
-            elif status == core_install.PLUGIN_INSTALL_ERROR_DIGITAL_SIG_BAD:
-                desc = "Plug-in file does not match its digital signature. File may have been corrupted or altered. Error code: %s" % str(ret)
+            elif status == pluginhandler.PLUGIN_INSTALL_ERROR_DIGITAL_SIGN_BAD:
+                desc = "Plug-in file does not match its digital signature. File may have been corrupted or altered. "
 
-            elif status == core_install.PLUGIN_INSTALL_ERROR_PLUGIN_FILE_CHECKSUM_ERROR:
+            elif status == pluginhandler.PLUGIN_INSTALL_ERROR_PLUGIN_FILE_CHECKSUM_ERROR:
                 desc = "Plug-in file does not match its checksum. File may have been corrupted or altered."
 
-            elif status == core_install.PLUGIN_INSTALL_ERROR_NO_NETWORK:
+            elif status == pluginhandler.PLUGIN_INSTALL_ERROR_NO_NETWORK:
                 desc = "Unable to connect to network to download the plug-in. Please check your network connection and try again."
 
-            elif status == core_install.PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR:
+            elif status == pluginhandler.PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR:
                 desc = "Unable to create the plug-in directory. Please check your permissions and try again."
 
-            core.delete_plugin()
+            pluginObj.deleteInstallationFiles(plugin_path)
             log.error(desc)
             clean_exit(1)
 
 
         tui.header("INSTALLING PLUG-IN")
 
-        core.run_plugin(mode, plugin_install_callback)
+        pluginObj.run_plugin(plugin_path, mode)
+        pluginObj.deleteInstallationFiles(plugin_path)
 
         cups_devices = device.getSupportedCUPSDevices(['hp']) #, 'hpfax'])
         #print cups_devices
@@ -448,6 +423,7 @@ else: # INTERACTIVE_MODE
                     log.info("Firmware download successful.\n")
 
                 d.close()
+
 
     except KeyboardInterrupt:
         log.error("User exit")

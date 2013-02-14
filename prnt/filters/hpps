@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# Author: Don Welch, Gaurav Sood
+# Author: Gaurav Sood, Sanjay Kumar
 #
 
 __version__ = '1.1'
@@ -131,7 +131,6 @@ except KeyError:
     sys.exit(CUPS_FILTER_FAILED)
 
 
-
 try:
     job_id, username, title, copies, options = args[0:5]
     job_id = int(job_id)
@@ -143,10 +142,7 @@ START_JOB = "\x1b%-12345X@PJL JOBNAME="
 UEL = "@PJL ENTER LANGUAGE=POSTSCRIPT\x0a"
 END_JOB = "\x1b%-12345X@PJL EOJ\x0a\x1b%-12345X"
 
-
-
 #output_fd = os.open("/var/log/hp/tmp/PSC.out", os.O_WRONLY | os.O_CREAT)
-
 
 os.write(output_fd, START_JOB)
 os.write(output_fd, "hplip_%s_%s\x0a" % (username, job_id))
@@ -159,7 +155,6 @@ for opt in options.split():
         continue
     else:
         opts[o] = v
-
 
 
 # --------------------Secure Printing---------------------
@@ -196,7 +191,8 @@ except IOError:
     bug("Unabel to read PPD File")
     sys.exit(CUPS_FILTER_FAILED)
 
-key_list = [x for x in ['HPAccountingInfo', 'HPBOD', 'HPPJLEconoMode'] if x in ppd_str]
+key_list = [x for x in ['HPAccountingInfo', 'HPBOD', 'HPPJLEconoMode', 'HPPJLOutputMode', 'HPPJLDryTime', 
+                        'HPPJLSaturation', 'HPPJLInkBleed', 'HPPJLColorAsGray'] if x in ppd_str]
 
 if 'HPAccountingInfo' in key_list:
     p = subprocess.Popen(['hostname', '-s'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -222,11 +218,6 @@ if 'HPAccountingInfo' in key_list:
 # Based upon the "BornOnDate_PJL_DMINFO_PJL_TIMESTAMP.doc
 # -----------------------------------------------------------------
 
-
-
-#----------------------------PJL's for EconoMode in TaiShan-------------------
-#-----------------------------------------------------------------------------
-
 if 'HPBOD' in key_list:
     BOD_fixed = "0400040101020D10100115"  # HEX value of the time stamp OID
     BOD_time = time.strftime("%Y%m%d%I%M%S", time.gmtime()) # Timestamp GMT
@@ -235,6 +226,7 @@ if 'HPBOD' in key_list:
         BOD_Var = BOD_Var + hex(ord(x))[2:]
     os.write(output_fd, '@PJL DMINFO ASCIIHEX=\"%s%s\"\x0A' % (BOD_fixed, BOD_Var))
 
+# -------------------------Other Features ----------------------------
 if 'HPPJLEconoMode' in key_list:
 	if 'HPPJLEconoMode' in options and 'noHPPJLEconoMode' not in options:
 		os.write(output_fd, "@PJL SET ECONOMODE=ON\x0a")
@@ -243,8 +235,71 @@ if 'HPPJLEconoMode' in key_list:
 	os.write(output_fd, "@PJL SET RESOLUTION=600\x0a")
 	os.write(output_fd, "@PJL SET BITSPERPIXEL=2\x0a")
 
-	
-	
+if 'HPPJLOutputMode' in key_list:
+	try:
+        	if opts['HPPJLOutputMode'] == 'GeneralOffice':
+              		os.write(output_fd, '@PJL SET PRINTQUALITY=DRAFT\x0a') 
+        	elif opts['HPPJLOutputMode'] == 'Professional':
+              		os.write(output_fd, '@PJL SET PRINTQUALITY=NORMAL\x0a') 
+        	elif opts['HPPJLOutputMode'] == 'Presentation':
+              		os.write(output_fd, '@PJL SET PRINTQUALITY=BEST\x0a') 
+        	if opts['HPPJLOutputMode'] == 'MaximumDPI':
+			os.write(output_fd, '@PJL SET PRINTQUALITY=MAX\x0a') 
+	except:
+		os.write(output_fd, '@PJL SET PRINTQUALITY=NORMAL\x0a')
+
+if 'HPPJLDryTime' in key_list:
+	try:
+        	if opts['HPPJLDryTime'] == '0':
+              		os.write(output_fd, '@PJL SET DRYTIME=0\x0a') 
+        	elif opts['HPPJLDryTime'] == '1':
+              		os.write(output_fd, '@PJL SET DRYTIME=4\x0a') 
+        	if opts['HPPJLDryTime'] == '2':
+			os.write(output_fd, '@PJL SET DRYTIME=7\x0a') 
+	except:
+		os.write(output_fd, '@PJL SET DRYTIME=4\x0a')
+
+if 'HPPJLSaturation' in key_list:
+	try:
+        	if opts['HPPJLSaturation'] == '-2':
+              		os.write(output_fd, '@PJL SET SATURATION=0\x0a') 
+        	elif opts['HPPJLSaturation'] == '-1':
+              		os.write(output_fd, '@PJL SET SATURATION=2\x0a') 
+        	elif opts['HPPJLSaturation'] == '0':
+              		os.write(output_fd, '@PJL SET SATURATION=4\x0a') 
+        	elif opts['HPPJLSaturation'] == '+1':
+              		os.write(output_fd, '@PJL SET SATURATION=6\x0a') 
+        	if opts['HPPJLSaturation'] == '+2':
+              		os.write(output_fd, '@PJL SET SATURATION=8\x0a')
+	except:
+		os.write(output_fd, '@PJL SET SATURATION=4\x0a')
+
+if 'HPPJLInkBleed' in key_list:
+	try:
+        	if opts['HPPJLInkBleed'] == '-2':
+              		os.write(output_fd, '@PJL SET INKBLEED=0\x0a') 
+        	elif opts['HPPJLInkBleed'] == '-1':
+              		os.write(output_fd, '@PJL SET INKBLEED=2\x0a') 
+        	elif opts['HPPJLInkBleed'] == '0':
+              		os.write(output_fd, '@PJL SET INKBLEED=4\x0a') 
+        	elif opts['HPPJLInkBleed'] == '+1':
+              		os.write(output_fd, '@PJL SET INKBLEED=6\x0a') 
+        	elif opts['HPPJLInkBleed'] == '+2':
+              		os.write(output_fd, '@PJL SET INKBLEED=8\x0a') 
+	except:
+		os.write(output_fd, '@PJL SET INKBLEED=4\x0a')
+
+if 'HPPJLColorAsGray' in key_list:
+	try:
+        	if opts['HPPJLColorAsGray'] == 'Off':
+              		os.write(output_fd, '@PJL SET GRAYSCALE=OFF\x0a') 
+        	elif opts['HPPJLColorAsGray'] == 'HighQuality':
+              		os.write(output_fd, '@PJL SET GRAYSCALE=COMPOSITE\x0a') 
+        	elif opts['HPPJLColorAsGray'] == 'BlackInkOnly':
+              		os.write(output_fd, '@PJL SET GRAYSCALE=BLACKONLY\x0a') 
+	except:
+		os.write(output_fd, '@PJL SET GRAYSCALE=OFF\x0a')
+		
 os.write(output_fd, UEL)
 
 while True:

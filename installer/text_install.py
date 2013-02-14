@@ -30,21 +30,7 @@ import signal
 from base.g import *
 from base import utils, tui
 from core_install import *
-
-def start_systray():
-    tui.title("RE-STARTING HP_SYSTRAY")
-    path = utils.which('hp-systray')
-    if path:
-        path = os.path.join(path, 'hp-systray')
-    else:
-        path = os.path.join(prop.home_dir, 'systray.py')
-    if not os.path.exists(path):
-        log.warn("Unable to start hp-systray")
-
-    log.debug("Running hp-systray: %s --force-startup" % path)
-    os.spawnlp(os.P_NOWAIT, path, 'hp-systray', '--force-startup')
-    log.debug("Waiting for hp-systray to start...")
-    time.sleep(1)
+from installer import pluginhandler
 
 
 def progress_callback(cmd="", desc="Working..."):
@@ -52,13 +38,6 @@ def progress_callback(cmd="", desc="Working..."):
         log.info("%s (%s)" % (cmd, desc))
     else:
         log.info(desc)
-
-
-def password_entry():
-    return getpass.getpass(log.bold("Please enter the root/superuser password: "))
-
-def password_user_entry():
-    return getpass.getpass(log.bold("Please enter the sudoer (%s)'s password: " % os.getenv('USER')))
 
 
 def option_question_callback(opt, desc, default='y'):
@@ -78,7 +57,7 @@ def start(language, auto=True, test_depends=False,
         core.enable = enable
         core.disable = disable
 
-        if core.running_as_root():
+        if services.running_as_root():
             log.error("You are running the installer as root. It is highly recommended that you run the installer as")
             log.error("a regular (non-root) user. Do you still wish to continue?")
 
@@ -144,14 +123,14 @@ def start(language, auto=True, test_depends=False,
                 return
 
         log.info("\nInitializing. Please wait...")
-        prev_hplip_version= sys_conf.get("hplip","version","0.0.0")
-
+        prev_hplip_version = sys_conf.get("hplip","version","0.0.0")
+        pluginObj = pluginhandler.PluginHandle()
+        prev_hplip_plugin_status = pluginObj.getStatus()
 
         if test_unknown:
             core.distro_name = 'unknown'
             core.distro = 0
             core.distro_version = 0
-
 
         #
         # HPLIP INSTALLATION
@@ -163,7 +142,6 @@ def start(language, auto=True, test_depends=False,
         #
 
         tui.title("INTRODUCTION")
-
         if core.selected_component == 'hplip':
             log.info("This installer will install HPLIP version %s on your computer." % core.version_public)
 
@@ -185,7 +163,6 @@ def start(language, auto=True, test_depends=False,
 
         tui.title("DISTRO/OS CONFIRMATION")
 
-
         if core.distro_known():
             log.info("Distro appears to be %s %s.\n" % (core.get_distro_data('display_name', '(unknown)'), core.distro_version))
 
@@ -205,7 +182,6 @@ def start(language, auto=True, test_depends=False,
             core.distro_version = distro_alternate_version
 
         core.distro_changed()
-
         if not distro_ok:
             tui.title("DISTRO/OS SELECTION")
             core.distro, core.distro_version = DISTRO_UNKNOWN, DISTRO_VER_UNKNOWN
@@ -249,10 +225,9 @@ def start(language, auto=True, test_depends=False,
 
             if core.distro != DISTRO_UNKNOWN:
                 versions = core.distros[core.distro_name]['versions'].keys()
-                versions.sort(lambda x, y: core.sort_vers(x, y))
+                versions.sort(lambda x, y: utils.compare(x, y))
 
                 log.info(log.bold('\nChoose the version of "%s" that most closely matches your system:\n' % distro_display_name))
-
                 formatter = utils.TextFormatter(
                         (
                             {'width': 4},
@@ -325,7 +300,6 @@ def start(language, auto=True, test_depends=False,
 
                 sys.exit(1)
 
-
         #
         # SELECT OPTIONS TO INSTALL
         #
@@ -340,20 +314,16 @@ def start(language, auto=True, test_depends=False,
             enable_par = False
             core.selected_options['parallel'] = False
 
-
-
         #
         # COLLECT SUPERUSER PASSWORD
         #
-        if not core.running_as_root():
-            su_sudo = core.get_distro_data('su_sudo')
-            if su_sudo == "sudo":
+        if not services.running_as_root():
+            if core.passwordObj.getAuthType() == "sudo":
                 tui.title("ENTER USER PASSWORD")
-                ok = core.check_password(password_user_entry, progress_callback)
             else:
                 tui.title("ENTER ROOT/SUPERUSER PASSWORD")
-                ok = core.check_password(password_entry, progress_callback)
 
+            ok = core.check_password()
             if not ok:
                 log.error("3 incorrect attempts. (or) Insufficient permissions(i.e. try with sudo user).\nExiting.")
                 sys.exit(1)
@@ -431,7 +401,6 @@ def start(language, auto=True, test_depends=False,
         #
         # OPTIONAL dependencies
         #
-
         if num_opt_missing:
             tui.title("INSTALL MISSING OPTIONAL DEPENDENCIES")
             log.warn("There are %d missing OPTIONAL dependencies." % num_opt_missing)
@@ -492,32 +461,11 @@ def start(language, auto=True, test_depends=False,
             #
             # CHECK FOR RUNNING PACKAGE MANAGER
             #
-
-            pid, cmdline = core.check_pkg_mgr()
-            while pid:
-                ok, user_input = tui.enter_choice("A package manager '%s' appears to be running. Please quit the package manager and press enter to continue (i=ignore, r=retry*, f=force, q=quit) :"
-                    % cmdline, ['i', 'r', 'q', 'f'], 'r')
-
-                if not ok: sys.exit(0)
-
-                if user_input == 'i':
-                    log.warn("Ignoring running package manager. Some package operations may fail.")
-                    break
-
-                if user_input == 'f':
-                    ok, ans = tui.enter_yes_no("\nForce quit of package manager '%s'" % cmdline, 'y')
-
-                    if not ok: sys.exit(0)
-
-                    if ans:
-                        cmd = core.su_sudo() % ("kill %d" % pid)
-                        status, output = core.run(cmd)
-
-                        if status != 0:
-                            log.error("Failed to kill process. You may need to manually quit the program.")
-
-                pid, cmdline = core.check_pkg_mgr()
-
+            User_exit, Is_pkg_mgr_running = core.close_package_managers()
+            if User_exit:
+                sys.exit(0)
+#            if Is_pkg_mgr_running:
+#                log.debug("Some Package manager are still running. ")
 
             #
             # CHECK FOR ACTIVE NETWORK CONNECTION
@@ -525,7 +473,7 @@ def start(language, auto=True, test_depends=False,
             if not assume_network:
                 tui.title("CHECKING FOR NETWORK CONNECTION")
 
-                if not core.check_network_connection():
+                if not utils.check_network_connection():
                     log.error("The network appears to be unreachable. Installation may not resolve all dependencies without access to distribution repositories.")
                     ok, choice = tui.enter_choice("Do you want to continue installation without network?. Press 'y' for YES. Press 'n' for NO (y=yes*, n=no) : ",['y', 'n'], 'y')
                     if not ok or choice == 'n':
@@ -594,7 +542,7 @@ def start(language, auto=True, test_depends=False,
                             log.debug("Package manager command: %s" % cmd)
 
                             log.info("Running '%s'\nPlease wait, this may take several minutes..." % cmd)
-                            status, output = core.run(cmd)
+                            status, output = utils.run(cmd, core.passwordObj)
 
                             if status != 0:
                                 retries += 1
@@ -623,7 +571,7 @@ def start(language, auto=True, test_depends=False,
                         log.debug("Package manager command: %s" % cmd)
 
                         log.info("Running '%s'\nPlease wait, this may take several minutes..." % cmd)
-                        status, output = core.run(cmd)
+                        status, output = utils.run(cmd, core.passwordObj)
 
                         if status != 0:
                             log.error("Package install command failed with error code %d" % status)
@@ -644,7 +592,7 @@ def start(language, auto=True, test_depends=False,
                 for cmd in commands_to_run:
                     log.debug(cmd)
                     log.info("Running '%s'\nPlease wait, this may take several minutes..." % cmd)
-                    status, output = core.run(cmd)
+                    status, output = utils.run(cmd, core.passwordObj)
 
                     if status != 0:
                         log.error("Install command failed with error code %d" % status)
@@ -664,7 +612,7 @@ def start(language, auto=True, test_depends=False,
 
             if num_req_missing == 0 and core.hplip_present and core.selected_component == 'hplip' and core.distro_version_supported:
                 path = utils.which('hp-uninstall')
-                ok, choice = tui.enter_choice("HPLIP-%s exists, this may conflict with the new one being installed.\nDo you want to ('i'= Remove and Install, 'o'= Overwrite*, 'q'= Quit)?	:"%(prev_hplip_version),['i','o','q'],'o')
+                ok, choice = tui.enter_choice("HPLIP-%s exists, this may conflict with the new one being installed.\nDo you want to ('i'= Remove and Install*, 'o'= Overwrite, 'q'= Quit)?	:"%(prev_hplip_version),['i','o','q'],'i')
                 if not ok or choice=='q':
                     log.error("User Exit")
                     sys.exit(0)
@@ -672,7 +620,7 @@ def start(language, auto=True, test_depends=False,
 #                    log.info("Uninstalling existing HPLIP-%s"%prev_hplip_version)
                     sts =core.uninstall(NON_INTERACTIVE_MODE)
 
-                    if sts is False: 
+                    if sts is False:
                         log.warn("Failed to uninstall existing HPLIP-%s. This installation will overwrite on existing HPLIP" %prev_hplip_version)
                     else:
                         log.debug("HPLIP-%s is uninstalled successfully." %prev_hplip_version)
@@ -739,15 +687,14 @@ def start(language, auto=True, test_depends=False,
         log.info("OK")
 
         tui.title("BUILD AND INSTALL")
-
         os.umask(0022)
         for cmd in core.build_cmds():
             log.info("Running '%s'\nPlease wait, this may take several minutes..." % cmd)
-            status, output = core.run(cmd)
+            status, output = utils.run(cmd , core.passwordObj)
 
             if status != 0:
                 if 'configure' in cmd:
-                    log.error("Configure failed with error: %s" % CONFIGURE_ERRORS.get(status, CONFIGURE_ERRORS[1]))
+                    log.error("Configure failed with error: %s" % (CONFIGURE_ERRORS.get(status, CONFIGURE_ERRORS[1])))
 
                 else:
                     log.error("'%s' command failed with status code %d" % (cmd, status))
@@ -768,7 +715,7 @@ def start(language, auto=True, test_depends=False,
         core.run_post_build(progress_callback, distro_alternate_version)
         try:
             from prnt import cups
-            #This call is just to update the cups PPD cache file@ /var/cache/cups/ppds.dat. If this is not called, hp-setup picks incorrect ppd 1st time for some printers. 
+            #This call is just to update the cups PPD cache file@ /var/cache/cups/ppds.dat. If this is not called, hp-setup picks incorrect ppd 1st time for some printers.
             cups.getSystemPPDs()
         except ImportError:
             log.error("Failed to Import Cups")
@@ -777,7 +724,7 @@ def start(language, auto=True, test_depends=False,
         # OPEN MDNS MULTICAST PORT
         #
         user_conf = UserConfig()
-        
+
         if core.selected_options['network']:
             open_mdns_port = core.get_distro_ver_data('open_mdns_port',None,distro_alternate_version)
             if open_mdns_port:
@@ -793,7 +740,7 @@ def start(language, auto=True, test_depends=False,
                 if not ok: sys.exit(0)
 
                 if ans:
-                    core.run_open_mdns_port()
+                    services.run_open_mdns_port(core, core.passwordObj)
                 else:
                     log.warn("Skipping firewall setup. If this port is blocked on your firewall when setting up network printers, use SLP discovery and device URIs with ?ip=x.x.x.x. When using hp-setup, choose 'SLP' discovery under 'Advanced'.")
 
@@ -818,7 +765,7 @@ def start(language, auto=True, test_depends=False,
                     time.sleep(0.5)
                 except:
                     pass
-	
+
         tui.title("HPLIP UPDATE NOTIFICATION")
         ok, choice = tui.enter_choice("Do you want to check for HPLIP updates?. (y=yes*, n=no) : ",['y', 'n'], 'y')
         if not ok or choice != 'y':
@@ -829,6 +776,13 @@ def start(language, auto=True, test_depends=False,
         user_conf.set('upgrade','last_upgraded_time',str(int(time.time())))
         user_conf.set('upgrade','pending_upgrade_time','0')
 
+        tui.title("HPLIP UPDATE NOTIFICATION")
+        if prev_hplip_plugin_status != pluginhandler.PLUGIN_NOT_INSTALLED:
+            ok, choice = tui.enter_choice("HPLIP Plug-in's needs to be installed/updated. Do you want to update plug-in's?. (y=yes*, n=no) : ",['y', 'n'], 'y')
+            if ok and choice == 'y':
+                services.run_hp_tools_with_auth('hp-plugin', core.passwordObj)
+            else:
+                log.info(log.bold("Please install manually hp plugin's, otherwise some functionality may break"))
 
         if core.selected_component == 'hplip':
             tui.title("RESTART OR RE-PLUG IS REQUIRED")
@@ -842,8 +796,9 @@ def start(language, auto=True, test_depends=False,
             ok, choice = tui.enter_choice("Restart or re-plug in your printer (r=restart, p=re-plug in*, i=ignore/continue, q=quit) : ",
                 ['r', 'p', 'i'], 'p')
 
-            if not ok: 
-                start_systray()
+            if not ok:
+                tui.title("RE-STARTING HP_SYSTRAY")
+                services.run_systray()
                 sys.exit(0)
 
             if choice == 'r':
@@ -851,20 +806,23 @@ def start(language, auto=True, test_depends=False,
                 log.note("IMPORTANT! Make sure to save all work in all open applications before restarting!")
 
                 ok, ans = tui.enter_yes_no(log.bold("Restart now"), 'n')
-                if not ok: 
-                    start_systray()
+                if not ok:
+                    tui.title("RE-STARTING HP_SYSTRAY")
+                    services.run_systray()
                     sys.exit(0)
                 if ans:
-                    ok = core.restart()
+                    ok = services.restart(core.passwordObj)
                     if not ok:
                         log.error("Restart failed. Please restart using the system menu.")
 
-                start_systray()
+                tui.title("RE-STARTING HP_SYSTRAY")
+                services.run_systray()
                 sys.exit(0)
 
             elif choice == 'p': # 'p'
                 if not tui.continue_prompt("Please unplug and re-plugin your printer now. "):
-                    start_systray()
+                    tui.title("RE-STARTING HP_SYSTRAY")
+                    services.run_systray()
                     sys.exit(0)
 
 
@@ -879,15 +837,17 @@ def start(language, auto=True, test_depends=False,
             else:
                 ok, install_printer = tui.enter_yes_no("Would you like to setup a printer now")
                 if not ok:
-                    start_systray()
+                    tui.title("RE-STARTING HP_SYSTRAY")
+                    services.run_systray()
                     sys.exit(0)
 
             if install_printer:
                 log.info("Please make sure your printer is connected and powered on at this time.")
-                if not core.run_hp_setup():
+                if not services.run_hp_tools( 'hp-setup'):
                     log.error("hp-setup failed. Please run hp-setup manually.")
 
-        start_systray()
+        tui.title("RE-STARTING HP_SYSTRAY")
+        services.run_systray()
     except KeyboardInterrupt:
         log.info("")
         log.error("Aborted.")

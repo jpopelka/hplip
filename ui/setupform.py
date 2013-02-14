@@ -31,8 +31,8 @@ import operator
 from base.g import *
 from base import device, utils, models, pkit
 from prnt import cups
-from installer import core_install
 from ui_utils import load_pixmap
+from installer import pluginhandler
 
 try:
     from fax import fax
@@ -48,16 +48,6 @@ from qt import *
 from setupform_base import SetupForm_base
 from setupsettings import SetupSettings
 from setupmanualfind import SetupManualFind
-
-def restart_cups():
-    if os.path.exists('/etc/init.d/cups'):
-        return '/etc/init.d/cups restart'
-
-    elif os.path.exists('/etc/init.d/cupsys'):
-        return '/etc/init.d/cupsys restart'
-
-    else:
-        return 'killall -HUP cupsd'
 
 
 class DeviceListViewItem(QListViewItem):
@@ -233,16 +223,16 @@ class SetupForm(SetupForm_base):
 
             norm_model = models.normalizeModelName(model).lower()
 
-            core = core_install.CoreInstall(core_install.MODE_CHECK)
-            core.set_plugin_version()
+            pluginObj = pluginhandler.PluginHandle()
+
             plugin = self.mq.get('plugin', PLUGIN_NONE)
             plugin_reason = self.mq.get('plugin-reason', PLUGIN_REASON_NONE)
-            if plugin > PLUGIN_NONE and core.check_for_plugin() != PLUGIN_INSTALLED:
+            if plugin > PLUGIN_NONE and pluginObj.getStatus() != pluginhandler.PLUGIN_INSTALLED:
                 ok, sudo_ok = pkit.run_plugin_command(plugin == PLUGIN_REQUIRED, plugin_reason)
                 if not sudo_ok:
                     self.FailureUI(self.__tr("<b>Unable to find an appropriate su/sudo utility to run hp-plugin.</b><p>Install kdesu, gnomesu, or gksu.</p>"))
                     return
-                if not ok or core.check_for_plugin() != PLUGIN_INSTALLED:
+                if not ok or pluginObj.getStatus() != pluginhandler.PLUGIN_INSTALLED:
                     if plugin == PLUGIN_REQUIRED:
                         self.FailureUI(self.__tr("<b>The printer you are trying to setup requires a binary driver plug-in and it failed to install.</b><p>Please check your internet connection and try again.</p><p>Visit <u>http://hplipopensource.com</u> for more information.</p>"))
                         return
@@ -424,6 +414,14 @@ class SetupForm(SetupForm_base):
                         filter_dict[f] = (operator.gt, 0)
             else:
                 filter_dict['scan-type'] = (operator.ge, SCAN_TYPE_NONE)
+
+            if self.bus == 'usb':
+                try:
+                    from base import smart_install
+                except ImportError:
+                    log.error("Failed to Import smart_install.py")
+                else:   # check if any SmartInstall devices and disables (if not, ignores)
+                    smart_install.disable(GUI_MODE, 'qt3')
 
             devices = device.probeDevices([self.bus], self.timeout, self.ttl, filter_dict, self.search, net_search='slp')
 
@@ -1065,3 +1063,15 @@ def showPasswordUI(prompt, userName=None, allowUsernameEdit=True):
         pass
 
     return ("", "")
+
+
+def FailureMessageUI(prompt):
+    try:
+        dlg = SetupForm("usb", "")
+#        dlg = PasswordDialog(prompt, None)
+        dlg.FailureUI( prompt)
+
+    finally:
+        pass
+
+

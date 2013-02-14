@@ -295,6 +295,12 @@
 :model "HP Photosmart Prem c410 Series"
 :status :good
 
+:model "HP Officejet Pro x476dn MFP"
+:status :good
+
+:model "HP Officejet Pro x476dw MFP"
+:status :good
+
 :model "HP PSC 500xi All-in-one Printer"
 :status :good
 
@@ -317,6 +323,12 @@
 :status :good
 
 :model "HP Officejet 570 All-in-one Printer"
+:status :good
+
+:model "HP Officejet Pro x576dn MFP"
+:status :good
+
+:model "HP Officejet Pro x576dw MFP"
 :status :good
 
 :model "HP Officejet 580 All-in-one Printer"

@@ -35,6 +35,7 @@
 #include <syslog.h>
 #include <dlfcn.h>
 #include "hpmud.h"
+#include "utils.h"
 
 #define _STRINGIZE(x) #x
 #define STRINGIZE(x) _STRINGIZE(x)
@@ -265,45 +266,36 @@ static int notify(const char *summary, const char *message, int ms_timeout)
 
     /* Bypass glib build dependencies by loading libnotify manually. */  
 
-    if ((handle = dlopen("libnotify.so.1", RTLD_LAZY)) == NULL)
+    if ((handle = load_library("libnotify.so.1")) == NULL)
     {
        BUG("failed to open libnotify: %m\n");
        goto bugout;
     }
 
-    if ((n_init = (notify_init_t)dlsym(handle, "notify_init")) == NULL)
-    {
-       BUG("failed to find notify_init: %m\n");
+    if ((n_init = (notify_init_t)get_library_symbol(handle, "notify_init")) == NULL)
        goto bugout; 
-    }
+
     n_init("Basics");
 
-    if ((n_new = (notify_notification_new_t)dlsym(handle, "notify_notification_new")) == NULL)
-    {
-       BUG("failed to find notify_notification_new: %m\n");
+    if ((n_new = (notify_notification_new_t)get_library_symbol(handle, "notify_notification_new")) == NULL)
        goto bugout;
-    }
+
     n = n_new(summary, message, NULL, NULL);
 
-    if ((n_timeout = (notify_notification_set_timeout_t)dlsym(handle, "notify_notification_set_timeout")) == NULL)
-    {
-        BUG("failed to find notify_notification_set_timeout: %m\n");
+    if ((n_timeout = (notify_notification_set_timeout_t)get_library_symbol(handle, "notify_notification_set_timeout")) == NULL)
         goto bugout;
-    }
+
     n_timeout(n, ms_timeout);
 
-    if ((n_show = (notify_notification_show_t)dlsym(handle, "notify_notification_show")) == NULL)
-    {
-       BUG("failed to find notify_notification_show: %m\n");
+    if ((n_show = (notify_notification_show_t)get_library_symbol(handle, "notify_notification_show")) == NULL)
        goto bugout;
-    }
+
     n_show(n, NULL);
 
     stat=0;
 
 bugout:
-    if (handle)
-       dlclose(handle);
+    unload_library(handle);
 
     return stat;
 } /* notify */
@@ -346,13 +338,13 @@ static int check_support(int send_notify)
 
    snprintf(datfile, sizeof(datfile), "%s/data/models/models.dat", homedir);
 
-   if (hpmud_get_key_value(datfile, model, "support-type", value, sizeof(value)) != HPMUD_R_OK)
+   if (get_key_value(datfile, model, "support-type", value, sizeof(value)) != UTILS_CONF_OK)
       goto bugout;
    support = strtol(value, NULL, 10);
-   if (hpmud_get_key_value(datfile, model, "plugin", value, sizeof(value)) != HPMUD_R_OK)
+   if (get_key_value(datfile, model, "plugin", value, sizeof(value)) != UTILS_CONF_OK)
       goto bugout;
    plugin = strtol(value, NULL, 10);
-   if (hpmud_get_key_value(datfile, model, "fax-type", value, sizeof(value)) != HPMUD_R_OK)
+   if (get_key_value(datfile, model, "fax-type", value, sizeof(value)) != UTILS_CONF_OK)
       goto bugout;
    fax = strtol(value, NULL, 10);
 

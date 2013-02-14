@@ -21,6 +21,7 @@
 
 #global
 import os
+import os.path
 import sys
 
 # Local
@@ -34,8 +35,10 @@ from ui_utils import *
 # Qt
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-
+from PyQt4.QtGui import QMessageBox
 from PyQt4 import QtCore, QtGui
+
+HPLIP_INFO_SITE ="http://hplip.sourceforge.net/hplip_web.conf"
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog, printerName, device_uri,Error_msg):
@@ -89,13 +92,20 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", "HP Device Manager - Queues diagnose", None, QtGui.QApplication.UnicodeUTF8))
+        if self.Error_msg ==  QUEUES_SMART_INSTALL_ENABLED:
+            Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", "HP SmartInstall/Mass storage Disabler", None, QtGui.QApplication.UnicodeUTF8))
+        else:
+            Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", "HP Device Manager - Queues diagnose", None, QtGui.QApplication.UnicodeUTF8))
         if self.Error_msg == QUEUES_PAUSED:
             self.label.setText(QtGui.QApplication.translate("Dialog", "Print/Fax Queue is Paused", None, QtGui.QApplication.UnicodeUTF8))
+        elif self.Error_msg ==  QUEUES_SMART_INSTALL_ENABLED:
+            self.label.setText(QtGui.QApplication.translate("Dialog", "Smart Install Device(s) Detected", None, QtGui.QApplication.UnicodeUTF8))
         else:
             self.label.setText(QtGui.QApplication.translate("Dialog", "Queue needs to be reconfigured", None, QtGui.QApplication.UnicodeUTF8))
             
-        if self.Error_msg == QUEUES_INCORRECT_PPD:
+        if self.Error_msg ==  QUEUES_SMART_INSTALL_ENABLED:
+            text= "Smart Install is enabled in "+ self.printerName + " device(s). \nDo you want to download and disable smart install to perform device functionalities?"
+        elif self.Error_msg == QUEUES_INCORRECT_PPD:
             text= "'"+ self.printerName + "' is using incorrect PPD file. Do you want to remove and reconfigure queue?"
         elif self.Error_msg == QUEUES_PAUSED:
             text="'"+ self.printerName + "' is paused. Do you want to enable queue?"
@@ -104,9 +114,15 @@ class Ui_Dialog(object):
 
         if self.Error_msg != QUEUES_MSG_SENDING:
             self.TitleLabel.setText(QtGui.QApplication.translate("Dialog", text, None, QtGui.QApplication.UnicodeUTF8))
+#            if self.Error_msg == QUEUES_PAUSED or self.Error_msg == QUEUES_INCORRECT_PPD or self.Error_msg ==  QUEUES_SMART_INSTALL_ENABLED:
             if self.Error_msg == QUEUES_PAUSED or self.Error_msg == QUEUES_INCORRECT_PPD:
                 self.NextButton.setText(QtGui.QApplication.translate("Dialog", "Yes", None, QtGui.QApplication.UnicodeUTF8))
                 self.CancelButton.setText(QtGui.QApplication.translate("Dialog", "No", None, QtGui.QApplication.UnicodeUTF8))
+
+            elif self.Error_msg ==  QUEUES_SMART_INSTALL_ENABLED:
+                self.NextButton.setText(QtGui.QApplication.translate("Dialog", "Download and Disable", None, QtGui.QApplication.UnicodeUTF8))
+                self.CancelButton.setText(QtGui.QApplication.translate("Dialog", "Cancel", None, QtGui.QApplication.UnicodeUTF8))
+
             else:
                 self.NextButton.setText(QtGui.QApplication.translate("Dialog", "Remove and Setup", None, QtGui.QApplication.UnicodeUTF8))
                 self.CancelButton.setText(QtGui.QApplication.translate("Dialog", "Cancel", None, QtGui.QApplication.UnicodeUTF8))
@@ -115,12 +131,13 @@ class Ui_Dialog(object):
 # Ui
 
 class QueuesDiagnose(QDialog, Ui_Dialog):
-    def __init__(self, parent, printerName, device_uri, Error_msg):
+    def __init__(self, parent, printerName, device_uri, Error_msg,passwordObj=None):
         QDialog.__init__(self, parent)
         self.result = False
         self.printerName = printerName
         self.device_uri = device_uri
         self.Error_msg = Error_msg
+        self.passwordObj = passwordObj
         self.setupUi(self, self.printerName, self.device_uri,self.Error_msg)
         self.user_settings = UserSettings()
         self.user_settings.load()
@@ -162,20 +179,25 @@ class QueuesDiagnose(QDialog, Ui_Dialog):
 
 
     def NextButton_clicked(self):
+        beginWaitCursor()
         try:
-            if  self.Error_msg != QUEUES_PAUSED:
+            if self.Error_msg ==  QUEUES_SMART_INSTALL_ENABLED:
+                self.disable_smart_install()
+
+            elif  self.Error_msg == QUEUES_PAUSED:
+                cups.enablePrinter(self.printerName)
+                msg ="'"+self.printerName+"' is enabled successfully"
+                SuccessUI(self, self.__tr(msg))
+
+            else:
                 cups.delPrinter(self.printerName)
                 msg="' "+self.printerName+" ' removed successfully.\nRe-configuring this printer by hp-setup..."
                 log.debug(msg)
                 path = utils.which('hp-setup')
                 if path:
                     log.debug("Starting hp-setup")
-                    utils.run('hp-setup')
+                    utils.run('hp-setup --gui')
 
-            else:
-                cups.enablePrinter(self.printerName)
-                msg ="'"+self.printerName+"' is enabled successfully"
-                SuccessUI(self, self.__tr(msg))
 
         finally:
             endWaitCursor()
@@ -190,4 +212,45 @@ class QueuesDiagnose(QDialog, Ui_Dialog):
 
     def __tr(self,s,c = None):
         return qApp.translate("PluginDialog",s,c)
+
+
+    def disable_smart_install(self):
+        if not utils.check_network_connection():
+            FailureUI(self, self.__tr("Internet connection not found."))
+        else:
+            sts, HPLIP_file = utils.download_from_network(HPLIP_INFO_SITE)
+            if sts is True:
+                hplip_si_conf = ConfigBase(HPLIP_file)
+                source = hplip_si_conf.get("SMART_INSTALL","url","")
+                if not source :
+                    FailureUI(self, self.__tr("Failed to download %s"%HPLIP_INFO_SITE))
+                    return 
+
+            response_file, smart_install_run = utils.download_from_network(source)
+            response_asc, smart_install_asc = utils.download_from_network(source+'.asc')
+            
+            if response_file  and response_asc :
+                if self.passwordObj == None:
+                    try:
+                        from base.password import Password
+                    except ImportError:
+                        return SIH_FAILED_TO_VERIFY_DIG_SIGN, smart_install_run , ""
+                    self.passwordObj = Password(GUI_MODE)
+
+                if utils.ERROR_NONE == utils.validateDownloadFile(smart_install_run, smart_install_asc, "", self.passwordObj):
+                    sts, out = utils.run("sh %s"%smart_install_run)
+                else:
+                
+                    if QMessageBox.question(self, self.__tr("Digital signature download failed"),
+                        self.__tr("<b>The download of the digital signature file failed.</b><p>Without this file, it is not possible to authenticate and validate this tool prior to installation.</p>Do you still want to run Smart Install disabler?"),
+                        QMessageBox.Yes | QMessageBox.No) == QMessageBox.Yes:
+                        # Disabling without verification.
+                        sts, out = utils.run("sh %s"%smart_install_run)
+
+            else:
+                if not response_asc:
+                    FailureUI(self, self.__tr("Failed to download %s file."%(source+'.asc')))
+                else:
+                    FailureUI(self, self.__tr("Failed to download %s file."%source))
+
 

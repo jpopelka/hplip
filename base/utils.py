@@ -43,21 +43,7 @@ import commands # TODO: Replace with subprocess (commands is deprecated in Pytho
 import cStringIO
 import re
 from base.g import *
-try:
-   import xml.parsers.expat as expat
-except ImportError,e:
-   log.info("\n")
-   log.error("Failed to import xml.parsers.expat(%s).\nThis may be due to the incompatible version of python-xml package.\n"%(e))
-   if "undefined symbol" in str(e):
-       log.info(log.blue("Please re-install compatible version (other than 2.7.2-7.14.1) due to bug reported at 'https://bugzilla.novell.com/show_bug.cgi?id=766778'."))
-       log.info(log.blue("\n        Run the following commands in root mode to change the python-xml package.(i.e Installing 2.7.2-7.1.2)"))
-       log.info(log.blue("\n        Using zypper:\n        'zypper remove python-xml'\n        'zypper install python-xml-2.7.2-7.1.2'"))
-       log.info(log.blue("\n        Using apt-get:\n        'apt-get remove python-xml'\n        'apt-get install python-xml-2.7.2-7.1.2'"))
-       log.info(log.blue("\n        Using yum:\n        'yum remove python-xml'\n        'yum install python-xml-2.7.2-7.1.2'"))
-
-   sys.exit(1)
-
-import getpass
+import xml.parsers.expat as expat
 import locale
 import htmlentitydefs
 import urllib
@@ -75,19 +61,76 @@ try:
 except ImportError:
     dbus_avail=False
 
+try:
+    import hashlib # new in 2.5
+
+    def get_checksum(s):
+        return hashlib.sha1(s).hexdigest()
+
+except ImportError:
+    import sha # deprecated in 2.6/3.0
+
+    def get_checksum(s):
+        return sha.new(s).hexdigest()
+
+
 
 
 # Local
 from g import *
 from codes import *
 import pexpect
+#from base.password import Password
 
 BIG_ENDIAN = 0
 LITTLE_ENDIAN = 1
-DBUS_SERVICE='com.hplip.StatusService'
-HPLIP_WEB_SITE ="http://hplipopensource.com/hplip-web/index.html"
 
-def addgroup():
+RMDIR="rm -rf"
+RM="rm -f"
+
+DBUS_SERVICE='com.hplip.StatusService'
+
+HPLIP_WEB_SITE ="http://hplipopensource.com/hplip-web/index.html"
+HTTP_CHECK_TARGET = "http://www.hp.com"
+PING_CHECK_TARGET = "www.hp.com"
+
+ERROR_NONE = 0
+ERROR_FILE_CHECKSUM = 1
+ERROR_UNABLE_TO_RECV_KEYS =2 
+ERROR_DIGITAL_SIGN_BAD =3
+
+
+
+
+
+EXPECT_WORD_LIST = [
+    pexpect.EOF, # 0
+    pexpect.TIMEOUT, # 1
+    "Continue?", # 2 (for zypper)
+    "passwor[dt]", # en/de/it/ru
+    "kennwort", # de?
+    "password for", # en
+    "mot de passe", # fr
+    "contraseña", # es
+    "palavra passe", # pt
+    "口令", # zh
+    "wachtwoord", # nl
+    "heslo", # czech
+    "密码",
+]
+
+
+EXPECT_LIST = []
+for s in EXPECT_WORD_LIST:
+    try:
+        p = re.compile(s, re.I)
+    except TypeError:
+        EXPECT_LIST.append(s)
+    else:
+        EXPECT_LIST.append(p)
+
+
+def get_cups_systemgroup_list():
     lis = []
     try:
         fp=open('/etc/cups/cupsd.conf')
@@ -108,14 +151,6 @@ def addgroup():
     fp.close()
     return lis
 
-def list_to_string(lis):
-    if len(lis) == 0:
-        return ""
-    if len(lis) == 1:
-        return str("\""+lis[0]+"\"")
-    if len(lis) >= 1:
-        return "\""+"\", \"".join(lis)+"\" and \""+str(lis.pop())+"\""
-        
 def lock(f):
     log.debug("Locking: %s" % f.name)
     try:
@@ -181,6 +216,14 @@ def Translator(frm='', to='', delete='', keep=None):
     return callable
 
 
+def list_to_string(lis):
+    if len(lis) == 0:
+        return ""
+    if len(lis) == 1:
+        return str("\""+lis[0]+"\"")
+    if len(lis) >= 1:
+        return "\""+"\", \"".join(lis)+"\" and \""+str(lis.pop())+"\""
+
 def to_bool_str(s, default='0'):
     """ Convert an arbitrary 0/1/T/F/Y/N string to a normalized string 0/1."""
     if isinstance(s, str) and s:
@@ -204,6 +247,7 @@ def to_bool(s, default=False):
     return default
 
 
+# Compare with os.walk()
 def walkFiles(root, recurse=True, abs_paths=False, return_folders=False, pattern='*', path=None):
     if path is None:
         path = root
@@ -901,12 +945,10 @@ def find_browser():
 def openURL(url, use_browser_opts=True):
     if platform_avail and platform.system() == 'Darwin':
         cmd = 'open "%s"' % url
-        log.debug(cmd)
-        os.system(cmd)
+        os_utils.execute(cmd)
     elif which("xdg-open"):
         cmd = 'xdg-open "%s"' % url
-        log.debug(cmd)
-        os.system(cmd)
+        os_utils.execute(cmd)
     else:
         for b in BROWSERS:
             bb = which(b, return_full_path='True')
@@ -915,8 +957,7 @@ def openURL(url, use_browser_opts=True):
                     cmd = """%s %s "%s" &""" % (bb, BROWSER_OPTS[b], url)
                 else:
                     cmd = """%s "%s" &""" % (bb, url)
-                log.debug(cmd)
-                os.system(cmd)
+                os_utils.execute(cmd)
                 break
         else:
             log.warn("Unable to open URL: %s" % url)
@@ -1019,11 +1060,12 @@ class XMLToDictParser:
         parser = expat.ParserCreate()
         parser.StartElementHandler = self.startElement
         parser.EndElementHandler = self.endElement
-        parser.CharacterDataHandler = self.charData        
+        parser.CharacterDataHandler = self.charData
+
         try:
-            parser.Parse(text.encode('utf-8'), True)
-        except UnicodeDecodeError:
-            log.error("Received Unicode error in xml= %s "%text)
+           parser.Parse(text, True)
+        except:
+           log.error("Unicode Error")
         return self.data
 
 
@@ -1034,16 +1076,16 @@ class Element:
         self.attributes = attributes
         self.chardata = ''
         self.children = []
-        
+
     def AddChild(self,element):
         self.children.append(element)
-        
+
     def getAttribute(self,key):
         return self.attributes.get(key)
-    
+
     def getData(self):
         return self.chardata
-        
+
     def getElementsByTagName(self,name='',ElementNode=None):
         if ElementNode:
             Children_list = ElementNode.children
@@ -1056,12 +1098,12 @@ class Element:
             for element in Children_list:
                 if element.name == name:
                     elements.append(element)
-                
+
                 rec_elements = self.getElementsByTagName (name,element)
                 for a in rec_elements:
                     elements.append(a)
             return elements
-    
+
     def getChildElements(self,name=''):
         if not name:
             return self.children
@@ -1082,32 +1124,32 @@ class Element:
             c += child.toString(level+1)
         if c == "":
             if self.chardata:
-                retval += ">"+self.chardata + ("</%s>" % self.name)                
+                retval += ">"+self.chardata + ("</%s>" % self.name)
             else:
                 retval += "/>"
         else:
             retval += ">" + c + ("</%s>" % self.name)
         return retval
-        
+
 class  extendedExpat:
     def __init__(self):
         self.root = None
         self.nodeStack = []
-        
+
     def StartElement_EE(self,name,attributes):
         element = Element(name.encode(),attributes)
-        
+
         if len(self.nodeStack) > 0:
             parent = self.nodeStack[-1]
             parent.AddChild(element)
         else:
             self.root = element
         self.nodeStack.append(element)
-        
+
     def EndElement_EE(self,name):
         self.nodeStack = self.nodeStack[:-1]
 
-    def charData_EE(self,data):        
+    def charData_EE(self,data):
         if string.strip(data):
             data = data.encode()
             element = self.nodeStack[-1]
@@ -1122,7 +1164,7 @@ class  extendedExpat:
         Parser.CharacterDataHandler = self.charData_EE
 
         Parser.Parse(xmlString.encode('utf-8'), True)
-        
+
         return self.root
 
 
@@ -1179,36 +1221,17 @@ def getEndian():
         return LITTLE_ENDIAN
 
 
-def get_password():
-    return getpass.getpass("Enter password: ")
+#
+# Function: run()
+#   Note:- to run su/sudo commands, caller needs to pass passwordObj.
+#          password object can be created from base.password.py
 
-def get_password_ui(pswd_msg=''):
-    fp = open("/etc/hp/hplip.conf", "r")
-    qt = "qt3"
-    for line in fp:
-        if string.find(line, "qt4") is not -1 and string.find(line, "yes") is not -1:
-            qt = "qt4"
-    fp.close()
-    if qt is "qt4":
-        from ui4.setupdialog import showPasswordUI
-        if pswd_msg == '':
-            username, password = showPasswordUI("Your HP Device requires to install HP proprietary plugin\nPlease enter root/superuser password to continue", "root", False)
-        else:
-            username, password = showPasswordUI(pswd_msg, "root", False)
-    if qt is "qt3":
-        from ui.setupform import showPasswordUI
-        if pswd_msg == '':
-            username, password = showPasswordUI("Your HP Device requires to install HP proprietary plugin\nPlease enter root/superuser password to continue", "root", False)
-        else:
-            username, password = showPasswordUI(pswd_msg, "root", False)
-    return  password
-
-def run(cmd, log_output=True, password_func=get_password, timeout=1, spinner=True, pswd_msg=''):
+def run(cmd, passwordObj = None, pswd_msg='', log_output=True, spinner=True, timeout=1):
     output = cStringIO.StringIO()
 
     try:
         child = pexpect.spawn(cmd, timeout=timeout)
-    except pexpect.ExceptionPexpect:
+    except pexpect.ExceptionPexpect, e:
         return -1, ''
 
     try:
@@ -1216,37 +1239,39 @@ def run(cmd, log_output=True, password_func=get_password, timeout=1, spinner=Tru
             if spinner:
                 update_spinner()
 
-            i = child.expect(["[pP]assword:", pexpect.EOF, pexpect.TIMEOUT])
+            i = child.expect(EXPECT_LIST)
 
             if child.before:
                 output.write(child.before)
                 if log_output:
                     log.debug(child.before)
 
-            if i == 0: # Password:
-                if password_func is not None:
-                    if password_func == "get_password_ui":
-                        child.sendline(get_password_ui(pswd_msg))
-                    else:
-                        child.sendline(password_func())
-                else:
-                    child.sendline(get_password())
-	        
- 
-            elif i == 1: # EOF
+            if i == 0: # EOF
                 break
 
-            elif i == 2: # TIMEOUT
+            elif i == 1: # TIMEOUT
                 continue
 
+            elif i == 2:    # zypper
+                child.sendline("YES")
+
+            else: # Password:
+                if not passwordObj :
+                    raise Exception("password Object(i.e. passwordObj) is not valid")
+
+                child.sendline(passwordObj.getPassword(pswd_msg))
 
     except Exception, e:
         log.error("Exception: %s" % e)
     if spinner:
         cleanup_spinner()
-    child.close()
+    try:
+        child.close()
+    except pexpect.ExceptionPexpect, e:
+        pass
 
     return child.exitstatus, output.getvalue()
+
 
 
 def expand_range(ns): # ns -> string repr. of numeric range, e.g. "1-4, 7, 9-12"
@@ -1487,8 +1512,6 @@ if sys_conf.get('configure', 'ui-toolkit', 'qt3') == 'qt3':
 else:
     USAGE_USE_QT3 = ("Use Qt3:",  "--qt3",  "option",  False)
     USAGE_USE_QT4 = ("Use Qt4:",  "--qt4 (Default)",  "option",  False)
-
-
 
 
 def ttysize(): # TODO: Move to base/tui
@@ -1739,7 +1762,7 @@ encoding: utf8
         log.info("contact the HPLIP Team.")
 
         log.info(".SH COPYRIGHT")
-        log.info("Copyright (c) 2001-14 Hewlett-Packard Development Company, L.P.")
+        log.info("Copyright (c) 2001-13 Hewlett-Packard Development Company, L.P.")
         log.info(".LP")
         log.info("This software comes with ABSOLUTELY NO WARRANTY.")
         log.info("This is free software, and you are welcome to distribute it")
@@ -1758,7 +1781,7 @@ def log_title(program_name, version, show_ver=True): # TODO: Move to base/module
 
     log.info(log.bold("%s ver. %s" % (program_name, version)))
     log.info("")
-    log.info("Copyright (c) 2001-14 Hewlett-Packard Development Company, LP")
+    log.info("Copyright (c) 2001-13 Hewlett-Packard Development Company, LP")
     log.info("This software comes with ABSOLUTELY NO WARRANTY.")
     log.info("This is free software, and you are welcome to distribute it")
     log.info("under certain conditions. See COPYING file for more details.")
@@ -1768,58 +1791,6 @@ def log_title(program_name, version, show_ver=True): # TODO: Move to base/module
 def ireplace(old, search, replace):
     regex = '(?i)' + re.escape(search)
     return re.sub(regex, replace, old)
-
-
-def su_sudo():
-    su_sudo_str = None
-
-    if which('kdesu'):
-        su_sudo_str = 'kdesu -- %s'
-
-    elif which('gnomesu'):
-        su_sudo_str = 'gnomesu -c "%s"'
-
-    elif which('gksu'):
-        su_sudo_str = 'gksu "%s"'
-    
-    elif which('su'):
-        su_sudo_str = 'su'
-
-    return su_sudo_str
-
-# This function returns the distro name and distro version. 
-#This is provided to check on Fedora 14 in pkit.py file for Plugin-installation. 
-#is_su variable is used to provide a check on Fedora 8 
-def os_release():
-    os_name = None;
-    os_version = None;
-    is_su = None;
-    if which('lsb_release'):
-       name = os.popen('lsb_release -i | cut -f 2')
-       os_name = name.read().strip()
-       name.close()
-       version = os.popen('lsb_release -r | cut -f 2')
-       os_version=version.read().strip()
-       version.close()
-       is_su = True
-    else:
-       name = os.popen('cat /etc/issue | cut -c 1-6 | head -n 1')
-       os_name = name.read().strip()
-       name.close()
-       version1=os.popen('cat /etc/issue | cut -c 16 | head -n 1')
-       version2=version1.read().strip()
-       version1.close()
-       if (version2 == '1'):
-           version=os.popen('cat /etc/issue | cut -c 16-17 | head -n 1')
-           is_su = True
-       else: 
-           version=os.popen('cat /etc/issue | cut -c 16 | head -n 1')
-           is_su = False
-       os_version=version.read().strip()
-       version.close()
-
-    return os_name,os_version,is_su 
-    
 
 #
 # Removes HTML or XML character references and entities from a text string.
@@ -1867,43 +1838,20 @@ def escape(s):
 
     return s
 
-# checks if given process is running.
-#return value:
-#    True or False
-#    None - if process is not running
-#    grep output - if process is running
-
-def Is_Process_Running(process_name):
-    try:
-        p1 = Popen(["ps", "aux"], stdout=PIPE)
-        p2 = Popen(["grep", process_name], stdin=p1.stdout, stdout=PIPE)
-        p3 = Popen(["grep", "-v", "grep"], stdin=p2.stdout, stdout=PIPE)
-        output = p3.communicate()[0]
-        log.debug("Is_Process_Running outpu = %s " %output)
-
-        if process_name in output:
-            return True, output
-        else:
-            return False, None
-
-    except Exception, e:
-        log.error("Execution failed: process Name[%s]" %process_name)
-        print >>sys.stderr, "Execution failed:", e
-        return False, None
 
 #return tye: strings
 #Return values.
 #   None --> on error.
 #  "terminal name"-->success
 def get_terminal():
-    terminal_list={'gnome-terminal':'--profile hold', 'konsole':'-hold','x-terminal-emulator':'-hold', 'xterm':'-hold', 'gtkterm':''}
+    terminal_list=['gnome-terminal', 'konsole','x-terminal-emulator', 'xterm', 'gtkterm']
     terminal_cmd = None
     for cmd in terminal_list:
         if which(cmd):
-            terminal_cmd = cmd +" "+ terminal_list[cmd]+" -e "
+            terminal_cmd = cmd +" -e "
             log.debug("Available Terminal = %s " %terminal_cmd)
             break
-            
+
     return terminal_cmd
 
 #Return Type: bool
@@ -1912,7 +1860,7 @@ def get_terminal():
 #      False  --> if it is same or later version.
 
 def Is_HPLIP_older_version(installed_version, available_version):
-    
+
     if available_version == "" or available_version == None or installed_version == "" or installed_version == None:
         log.debug("available_version is ''")
         return False
@@ -1928,9 +1876,9 @@ def Is_HPLIP_older_version(installed_version, available_version):
         while cnt <len(installed_array) and cnt <len(available_array):
 
             installed_ver_dig=0
-            installed_ver_alph=' '     
+            installed_ver_alph=' '
             available_ver_dig=0
-            available_ver_alph=' '     
+            available_ver_alph=' '
             if pat.search(installed_array[cnt]):
                 installed_ver_dig = int(pat.search(installed_array[cnt]).group(1))
                 installed_ver_alph = pat.search(installed_array[cnt]).group(2)
@@ -1942,7 +1890,7 @@ def Is_HPLIP_older_version(installed_version, available_version):
                 available_ver_alph = pat.search(available_array[cnt]).group(2)
             else:
                 available_ver_dig = int(available_array[cnt])
-            
+
             if (installed_ver_dig < available_ver_dig):
                 Is_older = True
                 break
@@ -1957,7 +1905,7 @@ def Is_HPLIP_older_version(installed_version, available_version):
                 elif (installed_ver_alph.lower() > available_ver_alph.lower()):
                     log.debug("Already new verison is installed")
                     return False
-                        
+
             cnt += 1
 
         # To check version is installed. e.g. "3.12.10" vs "3.12.10.1".... "3.12.10.1"-->latest
@@ -1994,7 +1942,7 @@ def download_from_network(weburl, outputFile = None, useURLLIB=False):
             wget = which("wget")
             if wget:
                 wget = os.path.join(wget, "wget")
-                status, output = run("%s --cache=off --timeout=60 --output-document=%s %s" %(wget, outputFile, weburl))
+                status, output = run("%s --cache=off --tries=3 --timeout=60 --output-document=%s %s" %(wget, outputFile, weburl))
                 if status:
                     log.error("Failed to connect to HPLIP site. Error code = %d" %status)
                     return False, ""
@@ -2018,7 +1966,7 @@ def download_from_network(weburl, outputFile = None, useURLLIB=False):
 
 
 
-    
+
 class Sync_Lock:
     def __init__(self, filename):
         self.Lock_filename = filename
@@ -2035,11 +1983,11 @@ class Sync_Lock:
         self.handler.close()
 
 def sendEvent(event_code,device_uri, printer_name, username="", job_id=0, title="", pipe_name=''):
-    
+
     if not dbus_avail:
         log.debug("Failed to import dbus, lowlevel")
         return
-        
+
     log.debug("send_message() entered")
     args = [device_uri, printer_name, event_code, username, job_id, title, pipe_name]
     msg = lowlevel.SignalMessage('/', DBUS_SERVICE, 'Event')
@@ -2065,7 +2013,7 @@ def unchunck_xml_data(src_data):
         src_data = src_data.split('\r\n\r\n', 1)[1]
     else:
         return dst_data
-    
+
     if len(src_data) <= 0:
         return dst_data
 
@@ -2081,7 +2029,7 @@ def unchunck_xml_data(src_data):
              while src_data[index] != '\n' and src_data[index] != '\r':
                buf_len = buf_len *16 + int(src_data[index], 16)
                index = index +1
-             
+
              if buf_len == 0:
                  break;
 
@@ -2092,3 +2040,231 @@ def unchunck_xml_data(src_data):
             pass
     return dst_data
 
+
+#check_user_groups function checks required groups and returns missing list.
+#Input:
+#       required_grps_str --> required groups from distro.dat
+#       avl_grps    --> Current groups list (as a string) for this user.
+# Output:
+#       result  --> Returns True, if required groups are present
+#               --> Returns False, if required groups are not present
+#       missing_groups_str --> Returns the missing groups list (as a string)
+#
+def check_user_groups(required_grps_str, avl_grps):
+    result = False
+    exp_grp_list=[]
+    exp_pat =re.compile('''.*-G(.*)''')
+    if required_grps_str and exp_pat.search(required_grps_str):
+        grps = exp_pat.search(required_grps_str).group(1)
+        grps =re.sub(r'\s', '', str(grps))
+        exp_grp_list = grps.split(',')
+    else:
+        exp_grp_list.append('lp')
+
+    log.debug("Requied groups list =[%s]"%exp_grp_list)
+
+    avl_grps = avl_grps.rstrip('\r\n')
+    grp_list= avl_grps.split(' ')
+    for  g in grp_list:
+        grp_index = 0
+        for p in exp_grp_list:
+            if g == p:
+                del exp_grp_list[grp_index]
+                break
+            grp_index +=1
+
+    if len(exp_grp_list) == 0:
+        result = True
+    missing_groups_str=''
+    for a in exp_grp_list:
+        if missing_groups_str:
+            missing_groups_str += ','
+        missing_groups_str += a
+    return result ,missing_groups_str
+
+
+def check_library( so_file_path):
+    ret_val = False
+    if not os.path.exists(so_file_path):
+        log.debug("Either %s file is not present or symbolic link is missing" %(so_file_path))
+    else:
+        # capturing real file path
+        if os.path.islink(so_file_path):
+            real_file = os.path.realpath(so_file_path)
+        else:
+            real_file = so_file_path
+
+        if not os.path.exists(real_file):
+            log.debug("%s library file is missing." % (real_file))
+        elif (os.stat(so_file_path).st_mode & 72) != 72:
+            log.debug("%s library file doesn't have user/group execute permission." % (so_file_path))
+        else:
+            log.debug("%s library file present." % (so_file_path))
+            ret_val = True
+
+    log.debug("%s library status: %d" % (so_file_path, ret_val))
+    return ret_val
+
+
+def download_via_wget(target):
+    status = -1
+    wget = which("wget")
+    if target and wget:
+        wget = os.path.join(wget, "wget")
+        cmd = "%s --cache=off --tries=3 --timeout=60 --output-document=- %s" % (wget, target)
+        log.debug(cmd)
+        status, output = run(cmd)
+        log.debug("wget returned: %d" % status)
+    else:
+        log.debug("wget not found")
+    return status
+
+def download_via_curl(target):
+    status = -1
+    curl = which("curl")
+    if target and curl:
+        curl = os.path.join(curl, "curl")
+        cmd = "%s --output - --connect-timeout 5 --max-time 10 %s" % (curl, target)
+        log.debug(cmd)
+        status, output = run(cmd)
+        log.debug("curl returned: %d" % status)
+    else:
+        log.debug("curl not found")
+    return status
+
+def check_network_via_ping(target):
+    status = -1
+    ping = which("ping")
+    if target and ping:
+        ping = os.path.join(ping, "ping")
+        cmd = "%s -c1 -W1 -w10 %s" % (ping, target)
+        log.debug(cmd)
+        status, output = run(cmd)
+        log.debug("ping returned: %d" % status)
+    else:
+        log.debug("ping not found")
+    return status
+
+def check_network_connection(url=HTTP_CHECK_TARGET, ping_server=PING_CHECK_TARGET):
+    status = download_via_wget(url)
+    if (status != 0):
+        status = download_via_curl(url)
+        if (status != 0):
+            status = check_network_via_ping(ping_server)
+    return (status == 0)
+
+#Expands '*' in File/Dir names.
+def expandList(Files_List, prefix_dir=None):
+    Expanded_Files_list=[]
+    for f in Files_List:
+        if prefix_dir:
+            f= prefix_dir + '/' + f
+        if '*' in f:
+            f_full = glob.glob(f)
+            for file in f_full:
+              Expanded_Files_list.append(file)
+        else:
+            Expanded_Files_list.append(f)
+    return Expanded_Files_list
+
+def compare(x, y):
+    try:
+        return cmp(float(x), float(y))
+    except ValueError:
+        return cmp(x, y)
+
+
+def check_pkg_mgr( package_mgrs = None):
+    if package_mgrs is not None:
+        log.debug("Searching for '%s' in running processes..." % package_mgrs)
+        for p in package_mgrs:
+                status,process = Is_Process_Running(p)
+                if status is True:
+                    for pid in process:
+                        log.debug("Found: %s (%s)" % (process[pid], pid))
+                        return (pid, process[pid])
+
+    log.debug("Not found")
+    return (0, '')
+
+# checks if given process is running.
+#return value:
+#    True or False
+#    None - if process is not running
+#    grep output - if process is running
+
+def Is_Process_Running(process_name):
+    if not process_name:
+        return False, {}
+
+    try:
+        process = {}
+        p1 = Popen(["ps", "-w", "-w", "aux"], stdout=PIPE)
+        p2 = Popen(["grep", process_name], stdin=p1.stdout, stdout=PIPE)
+        p3 = Popen(["grep", "-v", "grep"], stdin=p2.stdout, stdout=PIPE)
+        output = p3.communicate()[0]
+        log.debug("Is_Process_Running output = %s " %output)
+
+        if output:
+            for p in output.splitlines():
+                cmd = "echo %s | awk {'print $2'}" %p
+                status,pid = commands.getstatusoutput(cmd)
+                cmd = "echo %s | awk {'print $11,$12'}" %p
+                status,cmdline = commands.getstatusoutput(cmd)
+                if pid :
+                    process[pid] = cmdline
+
+            return True, process
+        else:
+            return False, {}
+
+    except Exception, e:
+        log.error("Execution failed: process Name[%s]" %process_name)
+        print >>sys.stderr, "Execution failed:", e
+        return False, {}
+
+
+def remove(path, passwordObj = None, cksudo = False):
+    cmd= RMDIR + " " + path
+    if cksudo and passwordObj:
+        cmd= passwordObj.getAuthCmd() %cmd
+
+    log.debug("Removing %s cmd = %s " %(path, cmd))
+    status, output = run(cmd, passwordObj)
+    if 0 != status:
+        log.debug("Failed to remove=%s "%path)
+
+
+def validateDownloadFile(downloaded_file, digsig_file, req_checksum='', passwordObj = None):
+    calc_checksum = get_checksum(file(downloaded_file, 'r').read())
+    log.debug("File checksum=%s" % calc_checksum)
+
+    if req_checksum and req_checksum != calc_checksum:
+        return ERROR_FILE_CHECKSUM
+
+    gpg = which('gpg',True)
+    if gpg:
+        cmd = '%s --no-permission-warning --keyserver pgp.mit.edu --recv-keys 0xA59047B9' % gpg
+        if passwordObj:
+            cmd = passwordObj.getAuthCmd()%cmd
+
+        log.info("Receiving digital keys: %s" % cmd)
+        status, output = run(cmd, passwordObj)
+        log.debug(output)
+
+        if status != 0:
+            return ERROR_UNABLE_TO_RECV_KEYS
+
+        cmd = '%s --no-permission-warning --verify %s %s' % (gpg, digsig_file, downloaded_file)
+        if passwordObj:
+            cmd = passwordObj.getAuthCmd()%cmd
+
+        log.debug("Verifying plugin with digital keys: %s" % cmd)
+        status, output = run(cmd,passwordObj)
+        log.debug(output)
+        log.debug("%s status: %d" % (gpg, status))
+
+        if status != 0:
+            return ERROR_DIGITAL_SIGN_BAD
+
+    return ERROR_NONE

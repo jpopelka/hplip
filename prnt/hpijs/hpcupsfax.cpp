@@ -54,6 +54,7 @@
 #include "hpip.h"
 #include "hpcupsfax.h"
 #include "bug.h"
+#include "utils.h"
 using namespace std;
 
 int    fax_encoding = RASTER_MMR;
@@ -441,20 +442,16 @@ int ProcessTiffData(int fromFD, int toFD)
     int bytes_read = 0;
     char hpTiffFileName[64];
     long input_file_size = 0;
+    FILE* pFilePtrFax;
     snprintf(hpTiffFileName,sizeof(hpTiffFileName), "%s/hpliptiffXXXXXX","/var/log/hp/tmp");
 
 
-    fdTiff = mkstemp (hpTiffFileName);
+//    fdTiff = mkstemp (hpTiffFileName);
+    fdTiff = createTempFile(hpTiffFileName, &pFilePtrFax);
     if (fdTiff < 0)
     {
-//        DBG ("Warning: Unable to open Fax output file - %s for writing, so trying another location\n", hpTiffFileName);
-//        strncpy(hpTiffFileName,"/var/log/hp/hpliptiffXXXXXX",sizeof(hpTiffFileName));
-//        fdTiff = mkstemp (hpTiffFileName);
-//        if (fdTiff < 0)
-        {
-            BUG("ERROR: Unable to open Fax output file - %s for writing\n", hpTiffFileName);
-            return 1;
-        }
+        BUG("ERROR: Unable to open Fax output file - %s for writing\n", hpTiffFileName);
+        return 1;
     }
 
     memset (szFileHeader, 0, sizeof (szFileHeader));
@@ -648,7 +645,7 @@ int main (int argc, char **argv)
     int                 fd = 0;
     int                 fdFax = -1;
     int i = 0;
-    FILE                *fdTiff;
+    FILE                *pFilePtrFax;
     cups_raster_t       *cups_raster;
     ppd_file_t          *ppd;
     ppd_attr_t          *attr;
@@ -681,17 +678,12 @@ int main (int argc, char **argv)
 
     snprintf(hpFileName,sizeof(hpFileName),"%s/hplipfaxLog_XXXXXX","/var/log/hp/tmp");
 
-    fdFax = mkstemp (hpFileName);
+//    fdFax = mkstemp (hpFileName);
+    fdFax = createTempFile(hpFileName, &pFilePtrFax);
     if (fdFax < 0)
     {
-//        DBG ("Warning: Unable to open Fax output file - %s for writing,so trying another location.\n", hpFileName);
-//        strncpy(hpFileName,"/var/log/hp/hplipfaxLog_XXXXXX",sizeof(hpFileName));
-//        fdFax = mkstemp (hpFileName);
-//        if (fdFax < 0)
-        {
-            BUG ("ERROR: Unable to open Fax output file - %s for writing\n", hpFileName);
-            return 1;
-        }
+         BUG ("ERROR: Unable to open Fax output file - %s for writing\n", hpFileName);
+         return 1;
     }
 
     /*********** MAIN ***********/

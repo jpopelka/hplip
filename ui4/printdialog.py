@@ -167,7 +167,7 @@ class PrintDialog(QDialog, Ui_Dialog):
     def executePrint(self):
         for cmd in self.OptionsToolBox.getPrintCommands(self.Files.file_list):
             log.debug(cmd)
-            status, output = utils.run(cmd, log_output=True, password_func=None, timeout=1)
+            status, output = utils.run(cmd)
             if status != 0:
                 FailureUI(self, self.__tr("<b>Print command failed with status code %1.</b><p>%2</p>").arg(status).arg(cmd))
 

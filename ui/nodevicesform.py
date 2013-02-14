@@ -59,7 +59,7 @@ class NoDevicesForm(NoDevicesForm_base):
             cmd = 'python ./setup.py -u'
 
         log.debug(cmd)
-        utils.run(cmd, log_output=True, password_func=None, timeout=1)
+        utils.run(cmd)
 
         try:
             self.parent().RescanDevices()

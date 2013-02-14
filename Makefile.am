@@ -3,8 +3,9 @@
 #
 #  (c) 2004-2015 Copyright Hewlett-Packard Development Company, LP
 #  Author: David Suffield, Naga Samrat Chowdary Narla, Sarbeswar Meher
-
-INCLUDES = -Iip -Iio/hpmud -Iscan/sane -Iprnt/hpijs
+INCLUDES = -Iip -Iio/hpmud -Iscan/sane -Iprnt/hpijs -Icommon/
+CFLAGS+= -DCONFDIR=\"$(hplip_confdir)\"
+CXXFLAGS+= -DCONFDIR=\"$(hplip_confdir)\"
 
 hplipdir = $(datadir)/hplip
 
@@ -50,7 +51,7 @@ libsane_hpaio_la_SOURCES = scan/sane/hpaio.c scan/sane/mfpdtf.c scan/sane/pml.c 
 	  scan/sane/common.c scan/sane/common.h scan/sane/soap.h scan/sane/soapht.h scan/sane/sanei_debug.h scan/sane/sanei.h \
 	  scan/sane/sanei_init_debug.c scan/sane/marvell.h scan/sane/marvelli.h scan/sane/marvell.c scan/sane/soapht.c scan/sane/soap.c \
         scan/sane/soaphti.h scan/sane/soapi.h scan/sane/xml.c scan/sane/xml.h scan/sane/ledm.h scan/sane/ledmi.h scan/sane/ledm.c \
-        scan/sane/bb_ledm.c scan/sane/http.h scan/sane/http.c scan/sane/sclpml.c scan/sane/sclpml.h
+        scan/sane/bb_ledm.c scan/sane/http.h scan/sane/http.c scan/sane/sclpml.c scan/sane/sclpml.h common/utils.c common/utils.h
 if DARWIN_BUILD
 libsane_hpaio_la_LDFLAGS = -module -framework CoreFoundation -version-info 1:0:0
 else
@@ -70,18 +71,20 @@ if LIBUSB01_BUILD
 libhpmud_la_CFLAGS = -DMUDNAME=\"$(MUDNAME)\" -DCONFDIR=\"$(hplip_confdir)\"
 libhpmud_la_SOURCES = io/hpmud/hpmud.c io/hpmud/mlc.c io/hpmud/model.c io/hpmud/pml.c \
 	  io/hpmud/hpmud.h io/hpmud/hpmudi.h io/hpmud/list.h io/hpmud/mlc.h io/hpmud/pml.h io/hpmud/dot4.c \
-	  io/hpmud/dot4.h io/hpmud/jd.c io/hpmud/jd.h io/hpmud/pp.c io/hpmud/pp.h io/hpmud/musb.h io/hpmud/musb_libusb01.c
+	  io/hpmud/dot4.h io/hpmud/jd.c io/hpmud/jd.h io/hpmud/pp.c io/hpmud/pp.h io/hpmud/musb.h io/hpmud/musb_libusb01.c \
+	  common/utils.c common/utils.h
 else
 libhpmud_la_CFLAGS = -I/usr/include/libusb-1.0 -DMUDNAME=\"$(MUDNAME)\" -DCONFDIR=\"$(hplip_confdir)\"
 libhpmud_la_SOURCES = io/hpmud/hpmud.c io/hpmud/mlc.c io/hpmud/model.c io/hpmud/pml.c \
 	  io/hpmud/hpmud.h io/hpmud/hpmudi.h io/hpmud/list.h io/hpmud/mlc.h io/hpmud/pml.h io/hpmud/dot4.c \
-	  io/hpmud/dot4.h io/hpmud/jd.c io/hpmud/jd.h io/hpmud/pp.c io/hpmud/pp.h io/hpmud/musb.h io/hpmud/musb.c
+	  io/hpmud/dot4.h io/hpmud/jd.c io/hpmud/jd.h io/hpmud/pp.c io/hpmud/pp.h io/hpmud/musb.h io/hpmud/musb.c \
+	  common/utils.c common/utils.h
 endif
 
+libhpmud_la_LDFLAGS = -version-info 0:6:0 -lpthread -ldl
+
 if NETWORK_BUILD
-libhpmud_la_LDFLAGS = -version-info 0:6:0 -lpthread -l$(SNMPLIB) -lcrypto
-else
-libhpmud_la_LDFLAGS = -version-info 0:6:0 -lpthread
+libhpmud_la_LDFLAGS += -l$(SNMPLIB) -lcrypto
 endif
 
 if LIBUSB01_BUILD
@@ -144,7 +147,7 @@ pstotiff_SCRIPTS = fax/filters/pstotiff
 
 # hplip.state
 hplip_statedir = /var/lib/hp
-dist_hplip_state_DATA = 
+dist_hplip_state_DATA =
 #dist_hplip_state_DATA = hplip.state
 
 # Log Files
@@ -160,8 +163,11 @@ dist_noinst_SCRIPTS += dat2drv.py install.py hplip-install init-suse-firewall in
 cmddir = $(hplipdir)
 dist_cmd_SCRIPTS = align.py info.py print.py toolbox.py clean.py colorcal.py unload.py testpage.py makeuri.py check.py fab.py levels.py \
 	sendfax.py setup.py makecopies.py probe.py timedate.py firmware.py scan.py systray.py plugin.py linefeedcal.py pqdiag.py \
-	faxsetup.py devicesettings.py printsettings.py query.py pkservice.py wificonfig.py check-plugin.py diagnose_plugin.py uninstall.py \
-	upgrade.py config_usb_printer.py diagnose_queues.py logcapture.py
+	faxsetup.py devicesettings.py printsettings.py query.py pkservice.py wificonfig.py diagnose_plugin.py uninstall.py \
+	upgrade.py config_usb_printer.py diagnose_queues.py logcapture.py doctor.py
+
+homedir = $(hplipdir)
+dist_home_DATA =  check-plugin.py 
 
 # base
 basedir = $(hplipdir)/base
@@ -170,11 +176,12 @@ dist_base_DATA = base/maint.py base/codes.py base/g.py base/pml.py base/status.p
 	base/__init__.py base/mfpdtf.py base/utils.py base/wifi.py base/LedmWifi.py \
 	base/device.py base/logger.py base/slp.py base/exif.py base/strings.py base/magic.py \
 	base/imagesize.py base/pexpect.py base/models.py base/mdns.py base/tui.py base/dime.py \
-	base/ldif.py base/vcard.py base/module.py base/pkit.py base/queues.py
+	base/ldif.py base/vcard.py base/module.py base/pkit.py base/queues.py base/password.py \
+	base/services.py base/os_utils.py base/smart_install.py
 
 # installer
 installdir = $(hplipdir)/installer
-dist_install_DATA = installer/__init__.py installer/dcheck.py installer/distros.dat installer/core_install.py
+dist_install_DATA = installer/__init__.py installer/dcheck.py installer/distros.dat installer/core_install.py installer/pluginhandler.py
 dist_noinst_DATA += installer/text_install.py
 
 # makecopies
@@ -329,7 +336,7 @@ dist_noinst_DATA += ui/colorcalform2_base.ui ui/settingsdialog_base.ui ui/alignt
 	ui/align10form_base.ui  ui/pluginform2_base.ui \
 	plugins/powersettingsdialog_base.ui ui/faxsettingsform_base.ui ui/coverpageform_base.ui \
 	ui/allowabletypesdlg_base.ui ui/setupform_base.ui ui/setupmanualfind_base.ui \
-	ui/setupsettings_base.ui ui/pluginlicenseform_base.ui ui/align13form_base.ui ui/firmwaredialog_base.ui 
+	ui/setupsettings_base.ui ui/pluginlicenseform_base.ui ui/align13form_base.ui ui/firmwaredialog_base.ui
 endif
 endif
 
@@ -444,7 +451,8 @@ libapdk_la_SOURCES = prnt/hpijs/models.cpp prnt/hpijs/breaks_open.cpp \
 	prnt/hpijs/ljjetready.cpp prnt/hpijs/ljjetready.h prnt/hpijs/jdatadbf.c prnt/hpijs/jccolor.c prnt/hpijs/ljfastraster.cpp prnt/hpijs/ljfastraster.h \
 	prnt/hpijs/jinclude.h prnt/hpijs/jpegint.h prnt/hpijs/dj55xx.h prnt/hpijs/hpijsfax.h prnt/hpijs/ojprokx50.h \
 	prnt/hpijs/ljzjs.cpp prnt/hpijs/ljzjs.h prnt/hpijs/ljzjsmono.cpp prnt/hpijs/ljm1005.cpp prnt/hpijs/ljm1005.h \
-	prnt/hpijs/ljzjsmono.h prnt/hpijs/hpjbig_wrapper.h prnt/hpijs/quickconnect.cpp prnt/hpijs/quickconnect.h prnt/hpijs/ljp1xxx.h prnt/hpijs/ljzjscolor.cpp prnt/hpijs/ljzjscolor.h
+	prnt/hpijs/ljzjsmono.h prnt/hpijs/hpjbig_wrapper.h prnt/hpijs/quickconnect.cpp prnt/hpijs/quickconnect.h prnt/hpijs/ljp1xxx.h prnt/hpijs/ljzjscolor.cpp prnt/hpijs/ljzjscolor.h \
+	common/utils.c common/utils.h
 libapdk_la_CXXFLAGS = -DAPDK_DJ660 -DAPDK_DJ6xx -DAPDK_DJ6xxPhoto -DAPDK_DJ8xx -DAPDK_DJ9xx -DAPDK_DJ9xxVIP -DAPDK_DJ630 \
 	-DAPDK_APOLLO2XXX -DAPDK_APOLLO21XX -DAPDK_APOLLO2560 -DAPDK_DJ600 -DAPDK_DJ350 -DAPDK_DJ8x5 -DAPDK_PSP100 -DAPDK_AUTODUPLEX \
 	-DAPDK_HIGH_RES_MODES -DAPDK_LJMONO -DAPDK_DJ540 -DAPDK_DJ850 -DAPDK_DJ890 -DAPDK_DJ3320 -DAPDK_LJCOLOR -DAPDK_DJGENERICVIP \
@@ -457,7 +465,9 @@ if HPIJS_INSTALL
 # hpijs
 bin_PROGRAMS = hpijs
 hpijs_SOURCES = prnt/hpijs/hpijs.cpp prnt/hpijs/ijs_server.c prnt/hpijs/ijs.c prnt/hpijs/hpijsfax.cpp prnt/hpijs/services.cpp prnt/hpijs/bug.h \
-	prnt/hpijs/hpijs.h prnt/hpijs/ijs.h prnt/hpijs/ijs_server.h prnt/hpijs/services.h prnt/hpijs/ijs_client.h prnt/hpijs/hpiom.c prnt/hpijs/hpiom.h
+	prnt/hpijs/hpijs.h prnt/hpijs/ijs.h prnt/hpijs/ijs_server.h prnt/hpijs/services.h prnt/hpijs/ijs_client.h prnt/hpijs/hpiom.c \
+	prnt/hpijs/hpiom.h common/utils.h common/utils.c
+
 hpijs_CXXFLAGS = $(libapdk_la_CXXFLAGS)
 hpijs_CFLAGS = $(libapdk_la_CFLAGS)
 if HPLIP_BUILD
@@ -503,8 +513,9 @@ hpcups_SOURCES = prnt/hpcups/HPCupsFilter.cpp prnt/hpcups/HPCupsFilter.h prnt/hp
 	prnt/hpcups/LidilPrintModes.h prnt/hpcups/dj3320ColorMaps.cpp \
 	prnt/hpcups/dj3600ColorMaps.cpp prnt/hpcups/dj3320PrintModes.h \
 	prnt/hpcups/dj4100PrintModes.h \
-	prnt/hpcups/Hbpl1.cpp prnt/hpcups/Hbpl1.h prnt/hpcups/Hbpl1_Wrapper.h
-      
+	prnt/hpcups/Hbpl1.cpp prnt/hpcups/Hbpl1.h prnt/hpcups/Hbpl1_Wrapper.h \
+	common/utils.c common/utils.h
+
 hpcups_CXXFLAGS = $(APDK_ENDIAN_FLAG) $(DBUS_CFLAGS)
 hpcups_LDADD = -ljpeg -ldl -lcups -lcupsimage $(DBUS_LIBS)
 #else
@@ -524,8 +535,8 @@ if FAX_BUILD
 # hpcupsfax
 hpcupsfaxdir = $(cupsfilterdir)
 hpcupsfax_PROGRAMS = hpcupsfax
-hpcupsfax_SOURCES = prnt/hpijs/hpcupsfax.cpp prnt/hpijs/hpcupsfax.h
-hpcupsfax_LDADD = libhpip.la -lcups -lcupsimage
+hpcupsfax_SOURCES = prnt/hpijs/hpcupsfax.cpp prnt/hpijs/hpcupsfax.h common/utils.h common/utils.c
+hpcupsfax_LDADD = libhpip.la -lcups -lcupsimage -ldl
 endif # FAX_BUILD
 endif # HPCUPS ONLY
 endif # HPCUPS_INSTALL
@@ -553,29 +564,29 @@ install-dist_hplip_LogDATA:
 if FULL_BUILD
 	test -z "$(DESTDIR)$(hplip_Logdir)" || mkdir -p $(DESTDIR)$(hplip_Logdir)
 	chgrp "lp" -R $(DESTDIR)$(hplip_Logdir)
-	chmod 777 $(DESTDIR)$(hplip_Logdir)
+	chmod 775 $(DESTDIR)$(hplip_Logdir)
 endif	#FULL_BUILD
 if HPLIP_BUILD
 	test -z "$(DESTDIR)$(hplip_Logdir)" || mkdir -p $(DESTDIR)$(hplip_Logdir)
 	chgrp "lp" -R $(DESTDIR)$(hplip_Logdir)
-	chmod 777 $(DESTDIR)$(hplip_Logdir)
+	chmod 775 $(DESTDIR)$(hplip_Logdir)
 endif	#FULL_BUILD
 
 install-dist_hplip_tmpDATA:
 if FULL_BUILD
 	test -z "$(DESTDIR)$(hplip_tmpdir)" || mkdir -p $(DESTDIR)$(hplip_tmpdir)
 	chgrp "lp" -R $(DESTDIR)$(hplip_tmpdir)
-	chmod 1777 $(DESTDIR)$(hplip_tmpdir)
+	chmod 1775 $(DESTDIR)$(hplip_tmpdir)
 endif	#FULL_BUILD
 if HPLIP_BUILD
 	test -z "$(DESTDIR)$(hplip_tmpdir)" || mkdir -p $(DESTDIR)$(hplip_tmpdir)
 	chgrp "lp" -R $(DESTDIR)$(hplip_tmpdir)
-	chmod 1777 $(DESTDIR)$(hplip_tmpdir)
+	chmod 1775 $(DESTDIR)$(hplip_tmpdir)
 endif	#FULL_BUILD
 
 install-dist_cronDATA:$(dist_cron_DATA)
 	test -z "$(DESTDIR)$(crondir)" || $(MKDIR_P) "$(DESTDIR)$(crondir)"; \
-	list='$(dist_cron_DATA)'; test -n "$(crondir)" || list=; \ 
+	list='$(dist_cron_DATA)'; test -n "$(crondir)" || list=; \
 	for p in $$list; do \
 		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 		echo "$$d$$p"; \
@@ -583,7 +594,7 @@ install-dist_cronDATA:$(dist_cron_DATA)
 	while read files; do \
 		echo " $(INSTALL) -m755 $$files '$(DESTDIR)$(crondir)'"; \
 		$(INSTALL) -m755 $$files "$(DESTDIR)$(crondir)" || exit $$?; \
-	done	
+	done
 
 install-data-hook:
 if HPLIP_BUILD

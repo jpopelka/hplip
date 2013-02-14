@@ -128,6 +128,7 @@ Content-length: %d\r
 
 
     def setPhoneNum(self, num):
+        
         xml = setPhoneNumXML %(num)
         log.debug("SetPhoneNum:xml Value:%s" %xml)
         return self.put("/DevMgmt/FaxConfigDyn.xml", xml)
@@ -140,7 +141,11 @@ Content-length: %d\r
 
 
     def setStationName(self, name):
-        xml = setStationNameXML %(name)
+        try:
+           xml = setStationNameXML %(name.encode('utf-8'))
+        except(UnicodeEncodeError, UnicodeDecodeError):
+           log.error("Unicode Error")
+        
         return self.put("/DevMgmt/FaxConfigDyn.xml", xml)
 
 

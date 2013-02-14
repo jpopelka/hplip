@@ -30,7 +30,7 @@ import getopt, os, sys, re, time
 
 # Local
 from base.g import *
-from base import utils, tui, module
+from base import utils, tui, module, os_utils
 from installer.core_install import *
 
 
@@ -58,8 +58,12 @@ USAGE = [(__doc__, "", "name", True),
 def hold_terminal():
     if DONOT_CLOSE_TERMINAL:
         log.info("\n\nPlease close this terminal manually. ")
-        while 1:
+        try:
+            while 1:
+                pass
+        except KeyboardInterrupt:
             pass
+
 
 def usage(typ='text'):
     if typ == 'text':
@@ -93,7 +97,7 @@ def parse_HPLIP_version(hplip_version_file, pat):
         if pat.search(line):
             ver = pat.search(line).group(1)
             break
-    
+
     log.debug("Latest HPLIP version = %s." % ver)
     return ver
 
@@ -103,7 +107,7 @@ log.set_module(__mod__)
 mode = INTERACTIVE_MODE
 auto = False
 HPLIP_PATH=None
-TEMP_PATH="/tmp/"
+TEMP_DIR="/tmp/"
 FORCE_INSTALL=False
 CHECKING_ONLY=False
 NOTIFY=False
@@ -111,7 +115,7 @@ HPLIP_VERSION_INFO_SITE ="http://hplip.sourceforge.net/hplip_web.conf"
 HPLIP_WEB_SITE ="http://hplipopensource.com/hplip-web/index.html"
 IS_QUIET_MODE = False
 DONOT_CLOSE_TERMINAL = False
-
+CURRENT_WORKING_DIR = ''
 try:
     mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
                     (INTERACTIVE_MODE, GUI_MODE),
@@ -123,7 +127,6 @@ try:
 
 
 
-    mod.lockInstance('',True)
 except getopt.GetoptError, e:
     log.error(e.msg)
     usage()
@@ -161,16 +164,16 @@ for o, a in opts:
         log.info("NON_INTERACTIVE mode is not yet supported.")
         usage()
         clean_exit(0,False)
- 
+
     elif o == '-p':
         HPLIP_PATH=a
 
     elif o == '-d':
-        TEMP_PATH=a
-    
+        TEMP_DIR=a
+
     elif o == '-o':
         FORCE_INSTALL = True
-    
+
     elif o in ('-u', '--gui'):
         log.info("GUI is not yet supported.")
         usage()
@@ -192,6 +195,11 @@ if not NOTIFY and not CHECKING_ONLY and not IS_QUIET_MODE:
     mod.quiet= False
     mod.showTitle()
 
+if NOTIFY or CHECKING_ONLY:
+    mod.lockInstance('check',True)
+else:
+    mod.lockInstance('upgrade',True)
+
 log_file = os.path.normpath('/var/log/hp/hp-upgrade.log')
 
 if os.path.exists(log_file):
@@ -206,8 +214,7 @@ log.debug("")
 try:
     change_spinner_state(False)
     core =  CoreInstall(MODE_CHECK)
-#    core.init()
-    if not core.check_network_connection():
+    if not utils.check_network_connection():
         log.error("Either Internet is not working or Wget is not installed.")
         clean_exit(0)
 
@@ -218,7 +225,7 @@ try:
 
     HPLIP_latest_ver="0.0.0"
     # get HPLIP version info from hplip_web.conf file
-    sts, HPLIP_Ver_file = utils.download_from_network(HPLIP_VERSION_INFO_SITE)    
+    sts, HPLIP_Ver_file = utils.download_from_network(HPLIP_VERSION_INFO_SITE)
     if sts is True:
         hplip_version_conf = ConfigBase(HPLIP_Ver_file)
         HPLIP_latest_ver = hplip_version_conf.get("HPLIP","Latest_version","0.0.0")
@@ -234,7 +241,7 @@ try:
         log.error("Failed to get latest version of HPLIP.")
         clean_exit(0)
 
-            
+
     if CHECKING_ONLY is True:
         user_conf.set('upgrade','latest_available_version',HPLIP_latest_ver)
         log.debug("Available HPLIP version =%s."%HPLIP_latest_ver)
@@ -243,7 +250,7 @@ try:
         if not utils.Is_HPLIP_older_version(installed_version, HPLIP_latest_ver):
             log.debug("Latest version of HPLIP is already installed.")
         else:
-                  
+
             msg = "Latest version of HPLIP-%s is available."%HPLIP_latest_ver
             if core.is_auto_installer_support():
                 distro_type= 1
@@ -262,7 +269,7 @@ try:
                 except ImportError:
                     log.error("Unable to load Qt3 support. Is it installed? ")
                     clean_exit(1)
-                    
+
 
                 # create the main application object
                 app = QApplication(sys.argv)
@@ -272,7 +279,7 @@ try:
 
                 log.debug("Starting GUI loop...")
                 app.exec_loop()
-                    
+
 
             else: #qt4
                 if not utils.canEnterGUIMode4():
@@ -288,12 +295,12 @@ try:
 
                 app = QApplication(sys.argv)
                 dialog = UpgradeDialog(None, distro_type, msg)
-            
-            
+
+
                 dialog.show()
                 log.debug("Starting GUI loop...")
                 app.exec_()
-                    
+
     else:
         if FORCE_INSTALL is False:
             if utils.Is_HPLIP_older_version(installed_version, HPLIP_latest_ver):
@@ -306,12 +313,12 @@ try:
             else:
                 log.info("Latest version of HPLIP is already installed.")
                 clean_exit(0,False)
-    
+
         # check distro information.
         if not core.is_auto_installer_support():
             log.info("Please install HPLIP manually as mentioned in 'http://hplipopensource.com/hplip-web/install/manual/index.html' site")
             clean_exit(0)
- 
+
         # check systray is running?
         status,output = utils.Is_Process_Running('hp-systray')
         if status is True:
@@ -319,7 +326,7 @@ try:
             if not ok or choice =='n':
                 log.info("Manually close HPLIP applications and run hp-upgrade again.")
                 clean_exit(0, False)
-        
+
             try:
             # dBus
             #import dbus
@@ -339,39 +346,45 @@ try:
                     log.error("Failed to send DBus message to hp-systray/hp-toolbox.")
                     pass
 
-    
+
         toolbox_status,output = utils.Is_Process_Running('hp-toolbox')
-#        systray_status,output = utils.Is_Process_Running('hp-systray')
+
         if toolbox_status is True:
             log.error("Failed to close either HP-Toolbox/HP-Systray. Manually close and run hp-upgrade again.")
             clean_exit(0)
 
-      
+
         if HPLIP_PATH is not None:
             if os.path.exists(HPLIP_PATH):
                 download_file = HPLIP_PATH
             else:
                 log.error("%s file is not present. Downloading from Net..." %HPLIP_PATH)
                 HPLIP_PATH = None
-    
+
         if HPLIP_PATH is None:
             url="http://sourceforge.net/projects/hplip/files/hplip/%s/hplip-%s.run/download" %(HPLIP_latest_ver, HPLIP_latest_ver)
             download_file = None
-            if TEMP_PATH:
-                download_file = "%s/hplip-%s.run" %(TEMP_PATH,HPLIP_latest_ver)
-            log.info("Downloading hplip-%s.run file..... Please wait. "%HPLIP_latest_ver ) 
+            if TEMP_DIR:
+                download_file = "%s/hplip-%s.run" %(TEMP_DIR,HPLIP_latest_ver)
+            log.info("Downloading hplip-%s.run file..... Please wait. "%HPLIP_latest_ver )
             sts,download_file = utils.download_from_network(url, download_file, True)
 
             if not os.path.exists(download_file):
                 log.error("Failed to download %s file."%download_file)
                 clean_exit()
-    
+        CURRENT_WORKING_DIR = os.getcwd()
+        os.chdir(TEMP_DIR)
         # Installing hplip run.
         cmd = "sh %s" %(download_file)
-        log.debug("Upgrading  %s and cmd =%s " %(download_file, cmd))
-        os.system(cmd)
+        log.debug("Upgrading  %s" % download_file)
+        sts = os_utils.execute(cmd)
+        os.chdir(CURRENT_WORKING_DIR)
     if not NOTIFY and not CHECKING_ONLY:
-        log.info(log.bold("Upgrade is Completed"))
+        if sts == 0:
+            log.info(log.bold("Upgrade is Completed."))
+        else:
+            log.info(log.bold("Upgrade Failed or Skipped."))
+
     change_spinner_state(True)
     mod.unlockInstance()
     hold_terminal()
@@ -380,6 +393,10 @@ try:
 except KeyboardInterrupt:
     change_spinner_state(True)
     mod.unlockInstance()
-    log.error("User exit")
+    if CURRENT_WORKING_DIR:
+        os.chdir(CURRENT_WORKING_DIR)
+    if not IS_QUIET_MODE:
+        log.error("User exit")
+
     hold_terminal()
 

@@ -37,6 +37,7 @@
 #include "hpjbig_wrapper.h"
 #include <dlfcn.h>
 #include "Utils.h"
+#include "utils.h"
 
 extern "C"
 {
@@ -115,10 +116,8 @@ ModeJbig::ModeJbig (unsigned int RasterSize) : Compressor (RasterSize, false)
 
 ModeJbig::~ModeJbig()
 {
-    if (m_hHPLibHandle)
-    {
-        dlclose(m_hHPLibHandle);
-    }
+    unload_library(m_hHPLibHandle);
+
     if (m_pszInputRasterData)
     {
         delete [] m_pszInputRasterData;
@@ -133,12 +132,12 @@ DRIVER_ERROR ModeJbig::Init(int iLastRaster, int iPlanes, int iBPP, ZJPLATFORM z
     m_iBPP         = iBPP;
     m_ezj_platform = zj_platform;
 
-    m_hHPLibHandle = LoadPlugin ("lj.so");
+    m_hHPLibHandle = load_plugin_library(UTILS_PRINT_PLUGIN_LIBRARY, PRNT_PLUGIN_LJ);
     if (m_hHPLibHandle)
     {
         dlerror ();
-        *(void **) (&HPLJJBGCompress) = dlsym (m_hHPLibHandle, "hp_encode_bits_to_jbig");
-        *(void **) (&HPLJSoInit) = dlsym (m_hHPLibHandle, "hp_init_lib");
+        *(void **) (&HPLJJBGCompress) = get_library_symbol(m_hHPLibHandle, "hp_encode_bits_to_jbig");
+        *(void **) (&HPLJSoInit) = get_library_symbol(m_hHPLibHandle, "hp_init_lib");
         if (!HPLJSoInit || (HPLJSoInit && !HPLJSoInit (1)))
         {
             return PLUGIN_LIBRARY_MISSING;

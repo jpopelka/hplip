@@ -40,7 +40,7 @@ import operator
 
 # Local
 from base.g import *
-from base import tui, device, module, utils
+from base import tui, device, module, utils, os_utils
 from prnt import cups
 
 
@@ -68,6 +68,7 @@ page_units = 'mm'
 default_res = 300
 scanner_compression = 'JPEG'
 adf = False
+duplex = False
 
 PAGE_SIZES = { # in mm
     '5x7' : (127, 178, "5x7 photo", 'in'),
@@ -138,6 +139,7 @@ try:
         ("Image contrast:", "--contrast=<contrast> or -c=<contrast>", "option", False),
         ("", "The contrast range varies from device to device.", "option", False),
         ("ADF mode:", "--adf (Note, only PDF output is supported when using the ADF)", "option", False),
+        ("", "--duplex or --dup for duplex scanning using ADF.", "option", False),
         utils.USAGE_SPACE,
         ("[OPTIONS] (Scan area)", "", "header", False),
         ("Specify the units for area/box measurements:", "-t<units> or --units=<units>", "option", False),
@@ -195,7 +197,7 @@ try:
     opts, device_uri, printer_name, mode, ui_toolkit, lang = \
         mod.parseStdOpts('s:m:r:c:t:a:b:o:v:f:c:x:e:',
                          ['dest=', 'mode=', 'res=', 'resolution=',
-                          'resize=', 'contrast=', 'adf', 'unit=',
+                          'resize=', 'contrast=', 'adf', 'duplex', 'dup', 'unit=',
                           'units=', 'area=', 'box=', 'tlx=',
                           'tly=', 'brx=', 'bry=', 'size=',
                           'file=', 'output=', 'pdf=', 'viewer=',
@@ -505,8 +507,8 @@ try:
 
         elif o in ('-c', '--contrast'):
             try:
-				set_contrast = True
-				contrast = int(a.strip())
+                set_contrast = True
+                contrast = int(a.strip())
             except ValueError:
                 log.error("Invalid contrast value. Using default of 100.")
                 contrast = 100
@@ -514,7 +516,10 @@ try:
         elif o == '--adf':
             adf = True
             output_type = 'pdf'
-
+        elif o in ('--dup', '--duplex'):
+            duplex = True
+            adf = True
+            output_type = 'pdf'
 
     if printer_name is not None and \
         device.getDeviceURIByPrinterName(printer_name) is not None and \
@@ -614,14 +619,51 @@ try:
             sane.reportError(e)
             sys.exit(1)
 
+        source_option = device.getOptionObj("source").constraint
+        log.debug("Supported source Options: %s size=%d" % (source_option,len(source_option)))
+        if source_option is None:
+             log.error("Device doesn't have scanner.")
+             sys.exit(1)
+
+        #check if device has only ADF
+        if 'Flatbed' not in source_option and 'ADF' in source_option:
+             log.debug("Device has only ADF support")
+             adf = True
+
+        if adf:
+            try:
+                if 'ADF' not in source_option:
+                    log.error("Failed to set ADF mode. This device doesn't support ADF.")
+                    sys.exit(1)
+                else:
+                    if duplex == True:
+                        if 'Duplex' in source_option:
+                            device.setOption("source", "Duplex")
+                        else:
+                            log.warn("Device doesn't support Duplex scanning. Continuing with Simplex ADF scan.")
+                            device.setOption("source", "ADF")
+                    else:
+                        device.setOption("source", "ADF")
+                    device.setOption("batch-scan", True)
+            except scanext.error:
+                log.error("Error in setting ADF mode Duplex=%d." % duplex)
+                sys.exit(1)
+
+        else:
+            try:
+                device.setOption("source", "Flatbed")
+                device.setOption("batch-scan", False)
+            except scanext.error:
+                log.debug("Error setting source or batch-scan option (this is probably OK).")
+
+
         tlx = device.getOptionObj('tl-x').limitAndSet(tlx)
         tly = device.getOptionObj('tl-y').limitAndSet(tly)
         brx = device.getOptionObj('br-x').limitAndSet(brx)
         bry = device.getOptionObj('br-y').limitAndSet(bry)
 
         scan_area = (brx - tlx) * (bry - tly) # mm^2
-        scan_px = scan_area * res * res / 645.16 # res is in DPI
-        
+
         valid_res = device.getOptionObj('resolution').constraint
         log.debug("Device supported resolutions %s" % (valid_res,))
         if 0 in valid_res: #min-max range in tuple
@@ -630,7 +672,7 @@ try:
            if res < valid_res[0]:
               res = valid_res[0]
            elif res > valid_res[1]:
-              res = valid_res[1] 
+              res = valid_res[1]
 
         else:
           if res not in valid_res:
@@ -644,7 +686,8 @@ try:
                         res = x
 
         res = device.getOptionObj('resolution').limitAndSet(res)
-        
+        scan_px = scan_area * res * res / 645.16 # res is in DPI
+
         if scan_mode == 'color':
             scan_size = scan_px * 3 # 3 bytes/px
         else:
@@ -658,7 +701,7 @@ try:
 
             log.warn("This can cause the scan to take a long time to complete and may cause your system to slow down.")
             log.warn("Approx. number of bytes to read from scanner: %s" % utils.format_bytes(scan_size, True))
-       
+
         device.setOption('compression', scanner_compression)
 
         if set_contrast:
@@ -671,8 +714,8 @@ try:
                     contrast = int(valid_contrast[0])
                 elif contrast > int(valid_contrast[1]):
                     contrast = int(valid_contrast[1])
-                
-            
+
+
             device.setOption('contrast', contrast)
 
         if brx - tlx <= 0.0 or bry - tly <= 0.0:
@@ -734,42 +777,20 @@ try:
         update_queue = Queue.Queue()
         event_queue = Queue.Queue()
 
+        available_scan_mode = device.getOptionObj("mode").constraint
+        available_scan_mode = [x.lower() for x in available_scan_mode]
+        log.debug("Supported modes: %s size=%d" % (available_scan_mode,len(available_scan_mode)))
+        if scan_mode.lower() not in available_scan_mode:
+            log.warn("Device doesn't support %s mode. Continuing with %s mode."%(scan_mode,available_scan_mode[0]))
+            scan_mode = available_scan_mode[0]
+
         device.setOption("mode", scan_mode)
 
-        source_option = device.getOptionObj("source").constraint
-        log.debug("Supported source Options: %s size=%d" % (source_option,len(source_option)))
-        if source_option is None:
-             log.error("Device doesn't have scanner.")
-             sys.exit(1)
-
-        #check if device has only ADF
-        if len(source_option) == 1 and 'ADF'  in source_option:
-             log.debug("Device has only ADF support")
-             adf = True
-
-        if adf:
-            try:
-                if 'ADF' not in source_option:
-                     log.error("Failed to set ADF mode. This device doesn't support ADF.")
-                     sys.exit(1)
-                else:
-                     device.setOption("source", "ADF")
-                     device.setOption("batch-scan", True)
-            except scanext.error:
-                log.error("Error in setting ADF mode.")
-                sys.exit(1)
-
-        else:
-            try:
-                device.setOption("source", "Flatbed")
-                device.setOption("batch-scan", False)
-            except scanext.error:
-                log.debug("Error setting source or batch-scan option (this is probably OK).")
 
         #For some devices, resolution is changed when we set 'source'.
-        #Hence we need to set resolution here, after setting the 'source' 
+        #Hence we need to set resolution here, after setting the 'source'
         device.setOption("resolution", res)
-				
+
         if 'file' in dest and not output:
             log.warn("File destination enabled with no output file specified.")
 
@@ -848,9 +869,9 @@ try:
 
                     if expected_bytes > 0:
                         if adf:
-                            log.info("Expecting to read %s from scanner (per page)." % utils.format_bytes(expected_bytes))
+                            log.debug("Expecting to read %s from scanner (per page)." % utils.format_bytes(expected_bytes))
                         else:
-                            log.info("Expecting to read %s from scanner." % utils.format_bytes(expected_bytes))
+                            log.debug("Expecting to read %s from scanner." % utils.format_bytes(expected_bytes))
 
                     device.waitForScanActive()
 
@@ -896,6 +917,9 @@ try:
                             pm.update(0,
                                 utils.format_bytes(bytes_read))
 
+                # For Marvell devices, making scan progress bar to 100%
+                if bytes_read and bytes_read != expected_bytes:
+                     pm.update(int(100),utils.format_bytes(bytes_read))
                 log.info("")
 
                 if bytes_read:
@@ -920,6 +944,8 @@ try:
                             sys.exit(1)
                     elif scan_mode == 'lineart':
                         try:
+                            pixels_per_line = bytes_per_line * 8          # Calculation of pixels_per_line for Lineart must be 8 time of bytes_per_line
+                                                                          # Otherwise, scanned image will be corrupted (slanted)
                             im = Image.frombuffer('RGBA', (pixels_per_line, lines), buffer.read(),
                                 'raw', 'RGBA', 0, 1).convert('L')
                         except ValueError:
@@ -954,7 +980,7 @@ try:
             if not output:
                 output = utils.createSequencedFilename("hpscan", ".pdf")
 
-            c = canvas.Canvas(output, (brx/0.3528, bry/0.3528)) 
+            c = canvas.Canvas(output, (brx/0.3528, bry/0.3528))
 
             for p in adf_page_files:
                 log.info("Processing page %s..." % p)
@@ -971,8 +997,8 @@ try:
             log.info("Saving to file %s" % output)
             c.save()
             log.info("Viewing PDF file in %s" % pdf_viewer)
-            os.system("%s %s &" % (pdf_viewer, output))
-
+            cmd = "%s %s &" % (pdf_viewer, output)
+            os_utils.execute(cmd)
             sys.exit(0)
 
         if resize != 100:
@@ -1041,7 +1067,7 @@ try:
                     continue
 
                 pdf_output = utils.createSequencedFilename("hpscan", ".pdf")
-                c = canvas.Canvas(pdf_output, (brx/0.3528, bry/0.3528)) 
+                c = canvas.Canvas(pdf_output, (brx/0.3528, bry/0.3528))
 
                 try:
                     c.drawInlineImage(im, (tlx/0.3528), (tly/0.3528), ((brx-tlx)/0.3528),((bry-tly)/0.3528))
@@ -1053,8 +1079,8 @@ try:
                 log.info("Saving to file %s" % pdf_output)
                 c.save()
                 log.info("Viewing PDF file in %s" % pdf_viewer)
-                os.system("%s %s &" % (pdf_viewer, pdf_output))
-                
+                cmd = "%s %s &" % (pdf_viewer, pdf_output)
+                os_utils.execute(cmd)
                 sys.exit(0)
 
             elif d == 'printer':
@@ -1064,7 +1090,7 @@ try:
                 else:
                     cmd = "python ./print.py %s &" % output
 
-                os.system(cmd)
+                os_utils.execute(cmd)
 
             elif d == 'email':
                 try:
@@ -1133,14 +1159,16 @@ try:
             elif d == 'viewer':
                 if viewer:
                     log.info("Viewing file in %s" % viewer)
-                    os.system("%s %s &" % (viewer, output))
+                    cmd = "%s %s &" % (viewer, output)
+                    os_utils.execute(cmd)
                 else:
                     log.error("Viewer not found.")
 
             elif d == 'editor':
                 if editor:
                     log.info("Editing file in %s" % editor)
-                    os.system("%s %s &" % (editor, output))
+                    cmd = "%s %s &" % (editor, output)
+                    os_utils.execute(cmd)
                 else:
                     log.error("Editor not found.")
 

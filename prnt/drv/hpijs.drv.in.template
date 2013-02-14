@@ -1,19 +1,19 @@
 //
 // hpijs.drv - hpijs driver information file for foomatic-rip
 //
-// This driver information file (drv) produces PPD files for the hpijs/ghostscript/foomatic-rip solution. 
+// This driver information file (drv) produces PPD files for the hpijs/ghostscript/foomatic-rip solution.
 // Multiple printers are supported by a finite set of device classes. This file defines the device classes
 // and each model that is associated with that device class.
 //
 // Each model entry has the following convention.
-// 
+//
 //    ModelName "HP DeskJet 3810 Foomatic/hpijs"          // friendly name
 //    PCFileName "hp-deskjet_3810-hpijs.ppd"                 // PPD file name
-//    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_3810;DES:deskjet_3810;"   // for generic auto-ppd-selection 
-// 
+//    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_3810;DES:deskjet_3810;"   // for generic auto-ppd-selection
+//
 // The "ModelName" is a friendly name that can be displayed to the user for driver selection.
 //
-// The "PCFileName" should match the IEEE 1284 device-id model name. The model name is generated from the 
+// The "PCFileName" should match the IEEE 1284 device-id model name. The model name is generated from the
 // IEEE 1284 "MDL" field. Leading and trailing spaces are removed, in-line spaces are replaced with a single
 // "_" character. Then an "hp-" prefix and "-hpijs.ppd" postfix is added/changed.
 //
@@ -35,8 +35,8 @@
 // the following PPD file naming convention.
 //
 // hpijs with foomatic-rip
-//   hp-xxxxxxx-hpijs-zzz.ppd for 
-// 
+//   hp-xxxxxxx-hpijs-zzz.ppd for
+//
 // hpijs with native CUPS
 //   hp-xxxxxxx-zzz.ppd
 //
@@ -49,7 +49,7 @@
 //
 // History
 //    dsuffield 					12/17/07 	New
-//    Parul Singh and Naga Samrat Chowdary, Narla 	01/08/10	Added New SubClass LargeFormatA3:SmallMargins to OJ7000 
+//    Parul Singh and Naga Samrat Chowdary, Narla 	01/08/10	Added New SubClass LargeFormatA3:SmallMargins to OJ7000
 //
 // Line specification for autogeneration of Model entries using dat2drv.py:
 //       // <%APDK Class:HPLIP subclass:...%>
@@ -97,7 +97,7 @@ Filter "application/vnd.cups-pdf 0 @foomatic_filter@"
 
 /////////////// Apollo
 {
-  // Set an up-stream hint for applications that we suppport 300/600/1200dpi. 
+  // Set an up-stream hint for applications that we suppport 300/600/1200dpi.
   Attribute "DefaultResolution" "" "300dpi"
 
   // Custom page sizes from 1x4in to Legal
@@ -272,7 +272,7 @@ et=4"
 
 ///////// DJ9xx
 {
-  // Set an up-stream hint for applications that we suppport 300/600/1200dpi. 
+  // Set an up-stream hint for applications that we suppport 300/600/1200dpi.
   Attribute "DefaultResolution" "" "1200dpi"
 
   // Custom page sizes from 1x4in to SuperB
@@ -458,7 +458,7 @@ et=2"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
 
   // <%DJ9xx:Normal%>
-  { 
+  {
     // Large format SuperB paper support
     CustomMedia "B4JIS/B4 (JIS)" 729.00 1033.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=B4JIS" "%% FoomaticRIPOptionSetting: PageSize=B4JIS"
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"
@@ -471,7 +471,7 @@ et=2"
 
 /////////// DJ9xx but without photo modes
 {
-  // Set an up-stream hint for applications that we suppport 300/600/1200dpi. 
+  // Set an up-stream hint for applications that we suppport 300/600/1200dpi.
   Attribute "DefaultResolution" "" "600dpi"
 
   // Custom page sizes from 1x4in to SuperB
@@ -555,7 +555,7 @@ dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
  -dDEVICEHEIGHTPOINTS=935"
   ///////// Large format paper support
-  Attribute "FoomaticRIPOptionSetting" "PageSize=B4JIS" " -dDEVICEWIDTHPOINTS=729 -d&&	
+  Attribute "FoomaticRIPOptionSetting" "PageSize=B4JIS" " -dDEVICEWIDTHPOINTS=729 -d&&
 DEVICEHEIGHTPOINTS=1033"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Ledger" " -dDEVICEWIDTHPOINTS=792 -&&
 dDEVICEHEIGHTPOINTS=1224"
@@ -651,7 +651,7 @@ et=2"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJ9xx:NoPhotoMode%>
-  { 
+  {
     // Large format SuperB paper support
     CustomMedia "B4JIS/B4 (JIS)" 729.00 1033.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=B4JIS" "%% FoomaticRIPOptionSetting: PageSize=B4JIS"
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"
@@ -664,7 +664,7 @@ et=2"
 
 ///////// DJ9xx but without photo/hires/best color modes
 {
-  // Set an up-stream hint for applications that we suppport 300/600/1200dpi. 
+  // Set an up-stream hint for applications that we suppport 300/600/1200dpi.
   Attribute "DefaultResolution" "" "600dpi"
 
   // Custom page sizes from 1x4in to SuperB
@@ -1252,7 +1252,7 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
   CustomMedia "EnvC5/Envelope C5" 459.00 649.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=EnvC5" "%% FoomaticRIPOptionSetting: PageSize=EnvC5"
   CustomMedia "EnvC6/Envelope C6" 323.00 459.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=EnvC6" "%% FoomaticRIPOptionSetting: PageSize=EnvC6"
   CustomMedia "EnvDL/Envelope DL" 312.00 624.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=EnvDL" "%% FoomaticRIPOptionSetting: PageSize=EnvDL"
-  CustomMedia "EnvISOB5/Envelope B5" 499.00 709.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5" "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5"	
+  CustomMedia "EnvISOB5/Envelope B5" 499.00 709.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5" "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5"
   CustomMedia "EnvMonarch/Envelope Monarch" 279.00 540.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=EnvMonarch" "%% FoomaticRIPOptionSetting: PageSize=EnvMonarch"
   CustomMedia "Executive/Executive" 522.00 756.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Executive" "%% FoomaticRIPOptionSetting: PageSize=Executive"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
@@ -1483,7 +1483,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
-  // <%DJ55xx:Normal%>   
+  // <%DJ55xx:Normal%>
 } // end DJ55xx
 
 /////////////// DJGenericVIP
@@ -1718,7 +1718,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJGenericVIP:Normal%>
   // <%DJGenericVIP:NoEvenDuplex%>
-  { 
+  {
     // Large format SuperB paper support
     CustomMedia "B4JIS/B4 (JIS)" 729.00 1033.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=B4JIS" "%% FoomaticRIPOptionSetting: PageSize=B4JIS"
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"
@@ -1959,7 +1959,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
 
-  { 
+  {
     // Large format SuperB paper support
     CustomMedia "B4JIS/B4 (JIS)" 729.00 1033.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=B4JIS" "%% FoomaticRIPOptionSetting: PageSize=B4JIS"
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"
@@ -2188,7 +2188,7 @@ et=2"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%DJGenericVIP:NoFullBleed%>
   // <%OJProKx50:NoFullBleed%>
-  { 
+  {
     // Large format SuperB paper support
     CustomMedia "B4JIS/B4 (JIS)" 729.00 1033.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=B4JIS" "%% FoomaticRIPOptionSetting: PageSize=B4JIS"
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"
@@ -3614,7 +3614,7 @@ nSet=2"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%LJColor:Normal%>
   // <%LJColor:Normal:Advanced%>
-  { 
+  {
     // Large format SuperB paper support
     CustomMedia "B4JIS/B4 (JIS)" 729.00 1033.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=B4JIS" "%% FoomaticRIPOptionSetting: PageSize=B4JIS"
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"
@@ -6221,8 +6221,12 @@ Transparency"
   }
   {
     Attribute "hpLJZjsColorVersion" "" "2"
-    // <%LJZjsColor:Advanced%>  
+    // <%LJZjsColor:Advanced%>
   }
+
+} //LJZjsColor End
+
+
 
 ///////////// LJP1XXX (for proprietary plugin)
 {
@@ -6800,7 +6804,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
-  // <%StingrayOJ:Normal%>   
+  // <%StingrayOJ:Normal%>
 } // end StingrayOJ
 
 ////////// Copperhead
@@ -7022,9 +7026,9 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
-  // <%Copperhead:Normal%> 
+  // <%Copperhead:Normal%>
   // <%Copperhead:AutoDuplex%>
-  // <%Copperhead:Trim%>  
+  // <%Copperhead:Trim%>
 } // end Copperhead
 
 ////////// Copperhead12
@@ -7247,8 +7251,8 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%Copperhead12:Normal%>
-  // <%Copperhead12:Advanced%>  
-} // end Copperhead12	
+  // <%Copperhead12:Advanced%>
+} // end Copperhead12
 
 
 
@@ -7472,8 +7476,11 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%Saipan:Normal%>
-  // <%Saipan:AutoDuplex%> 
+  // <%Saipan:AutoDuplex%>
+  // <%Saipan:Advanced%>
 } // end Saipan
+
+
 
 ////////// Python11
 {
@@ -7694,8 +7701,8 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
-  // <%Python11:Normal%>   
-  // <%Python11:Advanced%>   
+  // <%Python11:Normal%>
+  // <%Python11:Advanced%>
 } // end Python11
 
 
@@ -9085,8 +9092,8 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
-  // <%Ampere:Normal%>   
-} // end Ampere		
+  // <%Ampere:Normal%>
+} // end Ampere
 
 
 //////// Python and OJ7000
@@ -9326,7 +9333,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   // <%Python:NoAutoDuplex:NoCDDVD:NoMaxDPI%>
   // <%Python10:NoCDDVD:NoMaxDPI%>
   // <%Python10:NoAutoTray%>
-  { 
+  {
     // Large format SuperB paper support
     CustomMedia "B4JIS/B4 (JIS)" 729.00 1033.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=B4JIS" "%% FoomaticRIPOptionSetting: PageSize=B4JIS"
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"

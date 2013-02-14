@@ -252,6 +252,7 @@ f 0644 root root $ppd/HP prnt/ps/*.ppd.gz
 @epm_full@f 644 root root $home/installer/__init__.py installer/__init__.py
 @epm_full@f 644 root root $home/installer/dcheck.py installer/dcheck.py
 @epm_full@f 644 root root $home/installer/core_install.py installer/core_install.py
+@epm_full@f 644 root root $home/installer/pluginhandler.py installer/pluginhandler.py
 @epm_full@f 755 root root $home/uninstall.py uninstall.py
 @epm_full@f 755 root root $home/upgrade.py upgrade.py
 @epm_full@f 755 root root $home/colorcal.py colorcal.py
@@ -263,6 +264,7 @@ f 0644 root root $ppd/HP prnt/ps/*.ppd.gz
 @epm_full@f 644 root root $home/prnt/colorcal.py prnt/colorcal.py
 @epm_full@f 755 root root $home/clean.py clean.py
 @epm_full@f 755 root root $home/check.py check.py
+@epm_full@f 755 root root $home/doctor.py doctor.py
 @epm_full@f 755 root root $home/logcapture.py logcapture.py
 @epm_full@d 775 root root $home/pcard -
 @epm_full@f 644 root root $home/pcard/__init__.py pcard/__init__.py
@@ -298,9 +300,9 @@ f 0644 root root $ppd/HP prnt/ps/*.ppd.gz
 @epm_full@l 755 root root $bindir/hp-probe ../share/hplip/probe.py
 @epm_full@l 755 root root $bindir/hp-timedate ../share/hplip/timedate.py
 @epm_full@l 755 root root $bindir/hp-plugin ../share/hplip/plugin.py
-@epm_full@l 755 root root $bindir/hp-check-plugin ../share/hplip/check-plugin.py
 @epm_full@l 755 root root $bindir/hp-diagnose_plugin ../share/hplip/diagnose_plugin.py
 @epm_full@l 755 root root $bindir/hp-check ../share/hplip/check.py
+@epm_full@l 755 root root $bindir/hp-doctor ../share/hplip/doctor.py
 @epm_full@l 755 root root $bindir/hp-logcapture ../share/hplip/logcapture.py
 @epm_full@l 755 root root $bindir/hp-info ../share/hplip/info.py
 @epm_full@l 755 root root $bindir/hp-makecopies ../share/hplip/makecopies.py
@@ -452,8 +454,8 @@ f 0644 root root $docdir/copyright prnt/plugins/copyright
 d 0755 root root /var/lib/hp/ -
 f 0644 root root $home/data/firmware data/firmware/*.fw.gz
 d 0775 root root $home/data/plugin -
-d 0777 root lp /var/log/hp -
-d 1777 root lp /var/log/hp/tmp -
+d 0775 root lp /var/log/hp -
+d 1775 root lp /var/log/hp/tmp -
 
 #scan
 
@@ -492,8 +494,8 @@ EOF
 f 0644 root root $docdir/COPYING COPYING
 f 0644 root root $docdir/copyright copyright
 d 0755 root root /var/lib/hp/ -
-d 0777 root lp /var/log/hp -
-d 1777 root lp /var/log/hp/tmp -
+d 0775 root lp /var/log/hp -
+d 1775 root lp /var/log/hp/tmp -
 %system !darwin
 @epm_print_only_exclude@f 0644 root root /etc/udev/rules.d/56-hpmud_support.rules data/rules/56-hpmud_support.rules
 @epm_print_only_exclude@f 0644 root root /etc/udev/rules.d/86-hpmud_plugin.rules data/rules/86-hpmud_plugin.rules

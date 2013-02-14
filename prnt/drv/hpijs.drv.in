@@ -1,19 +1,19 @@
 //
 // hpijs.drv - hpijs driver information file for foomatic-rip
 //
-// This driver information file (drv) produces PPD files for the hpijs/ghostscript/foomatic-rip solution. 
+// This driver information file (drv) produces PPD files for the hpijs/ghostscript/foomatic-rip solution.
 // Multiple printers are supported by a finite set of device classes. This file defines the device classes
 // and each model that is associated with that device class.
 //
 // Each model entry has the following convention.
-// 
+//
 //    ModelName "HP DeskJet 3810 Foomatic/hpijs"          // friendly name
 //    PCFileName "hp-deskjet_3810-hpijs.ppd"                 // PPD file name
-//    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_3810;DES:deskjet_3810;"   // for generic auto-ppd-selection 
-// 
+//    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet_3810;DES:deskjet_3810;"   // for generic auto-ppd-selection
+//
 // The "ModelName" is a friendly name that can be displayed to the user for driver selection.
 //
-// The "PCFileName" should match the IEEE 1284 device-id model name. The model name is generated from the 
+// The "PCFileName" should match the IEEE 1284 device-id model name. The model name is generated from the
 // IEEE 1284 "MDL" field. Leading and trailing spaces are removed, in-line spaces are replaced with a single
 // "_" character. Then an "hp-" prefix and "-hpijs.ppd" postfix is added/changed.
 //
@@ -35,8 +35,8 @@
 // the following PPD file naming convention.
 //
 // hpijs with foomatic-rip
-//   hp-xxxxxxx-hpijs-zzz.ppd for 
-// 
+//   hp-xxxxxxx-hpijs-zzz.ppd for
+//
 // hpijs with native CUPS
 //   hp-xxxxxxx-zzz.ppd
 //
@@ -49,7 +49,7 @@
 //
 // History
 //    dsuffield 					12/17/07 	New
-//    Parul Singh and Naga Samrat Chowdary, Narla 	01/08/10	Added New SubClass LargeFormatA3:SmallMargins to OJ7000 
+//    Parul Singh and Naga Samrat Chowdary, Narla 	01/08/10	Added New SubClass LargeFormatA3:SmallMargins to OJ7000
 //
 // Line specification for autogeneration of Model entries using dat2drv.py:
 //       // <%APDK Class:HPLIP subclass:...%>
@@ -97,7 +97,7 @@ Filter "application/vnd.cups-pdf 0 @foomatic_filter@"
 
 /////////////// Apollo
 {
-  // Set an up-stream hint for applications that we suppport 300/600/1200dpi. 
+  // Set an up-stream hint for applications that we suppport 300/600/1200dpi.
   Attribute "DefaultResolution" "" "300dpi"
 
   // Custom page sizes from 1x4in to Legal
@@ -336,7 +336,7 @@ et=4"
 
 ///////// DJ9xx
 {
-  // Set an up-stream hint for applications that we suppport 300/600/1200dpi. 
+  // Set an up-stream hint for applications that we suppport 300/600/1200dpi.
   Attribute "DefaultResolution" "" "1200dpi"
 
   // Custom page sizes from 1x4in to SuperB
@@ -961,7 +961,7 @@ et=2"
     Attribute "Product" "" "(HP Officejet 5110 All-in-one Printer)"
     Attribute "Product" "" "(HP Officejet 5110xi All-in-one Printer)"
   }
-  { 
+  {
     // Large format SuperB paper support
     CustomMedia "B4JIS/B4 (JIS)" 729.00 1033.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=B4JIS" "%% FoomaticRIPOptionSetting: PageSize=B4JIS"
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"
@@ -1001,7 +1001,7 @@ et=2"
 
 /////////// DJ9xx but without photo modes
 {
-  // Set an up-stream hint for applications that we suppport 300/600/1200dpi. 
+  // Set an up-stream hint for applications that we suppport 300/600/1200dpi.
   Attribute "DefaultResolution" "" "600dpi"
 
   // Custom page sizes from 1x4in to SuperB
@@ -1085,7 +1085,7 @@ dDEVICEHEIGHTPOINTS=420"
   Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
  -dDEVICEHEIGHTPOINTS=935"
   ///////// Large format paper support
-  Attribute "FoomaticRIPOptionSetting" "PageSize=B4JIS" " -dDEVICEWIDTHPOINTS=729 -d&&	
+  Attribute "FoomaticRIPOptionSetting" "PageSize=B4JIS" " -dDEVICEWIDTHPOINTS=729 -d&&
 DEVICEHEIGHTPOINTS=1033"
   Attribute "FoomaticRIPOptionSetting" "PageSize=Ledger" " -dDEVICEWIDTHPOINTS=792 -&&
 dDEVICEHEIGHTPOINTS=1224"
@@ -1192,7 +1192,7 @@ et=2"
     Attribute "Product" "" "(HP 2000cn Printer)"
     Attribute "Product" "" "(HP 2000cxi Printer)"
   }
-  { 
+  {
     // Large format SuperB paper support
     CustomMedia "B4JIS/B4 (JIS)" 729.00 1033.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=B4JIS" "%% FoomaticRIPOptionSetting: PageSize=B4JIS"
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"
@@ -1217,7 +1217,7 @@ et=2"
 
 ///////// DJ9xx but without photo/hires/best color modes
 {
-  // Set an up-stream hint for applications that we suppport 300/600/1200dpi. 
+  // Set an up-stream hint for applications that we suppport 300/600/1200dpi.
   Attribute "DefaultResolution" "" "600dpi"
 
   // Custom page sizes from 1x4in to SuperB
@@ -2019,7 +2019,7 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
   CustomMedia "EnvC5/Envelope C5" 459.00 649.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=EnvC5" "%% FoomaticRIPOptionSetting: PageSize=EnvC5"
   CustomMedia "EnvC6/Envelope C6" 323.00 459.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=EnvC6" "%% FoomaticRIPOptionSetting: PageSize=EnvC6"
   CustomMedia "EnvDL/Envelope DL" 312.00 624.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=EnvDL" "%% FoomaticRIPOptionSetting: PageSize=EnvDL"
-  CustomMedia "EnvISOB5/Envelope B5" 499.00 709.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5" "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5"	
+  CustomMedia "EnvISOB5/Envelope B5" 499.00 709.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5" "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5"
   CustomMedia "EnvMonarch/Envelope Monarch" 279.00 540.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=EnvMonarch" "%% FoomaticRIPOptionSetting: PageSize=EnvMonarch"
   CustomMedia "Executive/Executive" 522.00 756.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Executive" "%% FoomaticRIPOptionSetting: PageSize=Executive"
   CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
@@ -2286,7 +2286,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
-  // <%DJ55xx:Normal%>   
+  // <%DJ55xx:Normal%>
   {
     ModelName "HP Deskjet 460 hpijs"
     Attribute "NickName" "" "HP Deskjet 460 hpijs, $Version"
@@ -3703,7 +3703,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Photosmart c8183 All-in-one Printer)"
     Attribute "Product" "" "(HP Photosmart c8188 All-in-one Printer)"
   }
-  { 
+  {
     // Large format SuperB paper support
     CustomMedia "B4JIS/B4 (JIS)" 729.00 1033.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=B4JIS" "%% FoomaticRIPOptionSetting: PageSize=B4JIS"
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"
@@ -3980,7 +3980,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
 
-  { 
+  {
     // Large format SuperB paper support
     CustomMedia "B4JIS/B4 (JIS)" 729.00 1033.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=B4JIS" "%% FoomaticRIPOptionSetting: PageSize=B4JIS"
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"
@@ -4333,7 +4333,7 @@ et=2"
     Attribute "Product" "" "(HP Officejet Pro l7750 All-in-one Printer)"
     Attribute "Product" "" "(HP Officejet Pro l7780 All-in-one Printer)"
   }
-  { 
+  {
     // Large format SuperB paper support
     CustomMedia "B4JIS/B4 (JIS)" 729.00 1033.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=B4JIS" "%% FoomaticRIPOptionSetting: PageSize=B4JIS"
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"
@@ -8320,7 +8320,7 @@ nSet=2"
     PCFileName "hp-color_laserjet_cm2320n_mfp-hpijs-pcl3.ppd"
     Attribute "Product" "" "(HP Color LaserJet cm2320n Multifunction Printer)"
   }
-  { 
+  {
     // Large format SuperB paper support
     CustomMedia "B4JIS/B4 (JIS)" 729.00 1033.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=B4JIS" "%% FoomaticRIPOptionSetting: PageSize=B4JIS"
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"
@@ -12364,7 +12364,7 @@ Transparency"
   }
   {
     Attribute "hpLJZjsColorVersion" "" "2"
-    // <%LJZjsColor:Advanced%>  
+    // <%LJZjsColor:Advanced%>
     {
       ModelName "HP LaserJet cp1025nw hpijs"
       Attribute "NickName" "" "HP LaserJet cp1025nw hpijs, $Version, requires proprietary plugin"
@@ -12398,6 +12398,10 @@ Transparency"
       Attribute "Product" "" "(HP LaserJet Pro Cp 1025 Color Printer Series)"
     }
   }
+
+} //LJZjsColor End
+
+
 
 ///////////// LJP1XXX (for proprietary plugin)
 {
@@ -13081,7 +13085,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
-  // <%StingrayOJ:Normal%>   
+  // <%StingrayOJ:Normal%>
   {
     ModelName "HP Officejet 100 Mobile l411 hpijs"
     Attribute "NickName" "" "HP Officejet 100 Mobile l411 hpijs, $Version"
@@ -13319,7 +13323,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
-  // <%Copperhead:Normal%> 
+  // <%Copperhead:Normal%>
   {
     ModelName "HP Deskjet 3070 b611 Series hpijs"
     Attribute "NickName" "" "HP Deskjet 3070 b611 Series hpijs, $Version"
@@ -13353,7 +13357,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     PCFileName "hp-photosmart_6510_series-hpijs.ppd"
     Attribute "Product" "" "(HP Photosmart 6510 E-all-in-one)"
   }
-  // <%Copperhead:Trim%>  
+  // <%Copperhead:Trim%>
   {
     ModelName "HP Officejet 4610 Series hpijs"
     Attribute "NickName" "" "HP Officejet 4610 Series hpijs, $Version"
@@ -13643,7 +13647,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     PCFileName "hp-deskjet_5520_series-hpijs.ppd"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 5525 E-all-in-one)"
   }
-  // <%Copperhead12:Advanced%>  
+  // <%Copperhead12:Advanced%>
   {
     ModelName "HP Photosmart 6520 Series hpijs"
     Attribute "NickName" "" "HP Photosmart 6520 Series hpijs, $Version"
@@ -13661,7 +13665,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     PCFileName "hp-deskjet_6520_series-hpijs.ppd"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 6525 E-all-in-one)"
   }
-} // end Copperhead12	
+} // end Copperhead12
 
 
 
@@ -13901,7 +13905,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     PCFileName "hp-officejet_6600-hpijs.ppd"
     Attribute "Product" "" "(HP Officejet 6600 E-all-in-one Printer - h711a)"
   }
-  // <%Saipan:AutoDuplex%> 
+  // <%Saipan:AutoDuplex%>
   {
     ModelName "HP Officejet 6700 hpijs"
     Attribute "NickName" "" "HP Officejet 6700 hpijs, $Version"
@@ -13910,7 +13914,18 @@ lity:PenSet=2,Quality:FullBleed=1"
     PCFileName "hp-officejet_6700-hpijs.ppd"
     Attribute "Product" "" "(HP Officejet 6700 Premium E-all-in-one printer-h711n)"
   }
+  // <%Saipan:Advanced%>
+  {
+    ModelName "HP Officejet 7110 Series hpijs"
+    Attribute "NickName" "" "HP Officejet 7110 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Officejet 7110 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 7110 series;DES:officejet 7110 series;"
+    PCFileName "hp-officejet_7110_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Officejet 7110 Wide Format Eprinter)"
+  }
 } // end Saipan
+
+
 
 ////////// Python11
 {
@@ -14131,7 +14146,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
-  // <%Python11:Normal%>   
+  // <%Python11:Normal%>
   {
     ModelName "HP Photosmart 7510 Series hpijs"
     Attribute "NickName" "" "HP Photosmart 7510 Series hpijs, $Version"
@@ -14140,7 +14155,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     PCFileName "hp-photosmart_7510_series-hpijs.ppd"
     Attribute "Product" "" "(HP Photosmart 7510 E-all-in-one)"
   }
-  // <%Python11:Advanced%>   
+  // <%Python11:Advanced%>
   {
     ModelName "HP Photosmart 7520 Series hpijs"
     Attribute "NickName" "" "HP Photosmart 7520 Series hpijs, $Version"
@@ -15797,7 +15812,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
-  // <%Ampere:Normal%>   
+  // <%Ampere:Normal%>
   {
     ModelName "HP Officejet Pro 8100 hpijs"
     Attribute "NickName" "" "HP Officejet Pro 8100 hpijs, $Version"
@@ -15815,7 +15830,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Officejet Pro 8600 E-aio n911a)"
     Attribute "Product" "" "(HP Officejet Pro 8600 Plus E-aio n911g)"
   }
-} // end Ampere		
+} // end Ampere
 
 
 //////// Python and OJ7000
@@ -16191,7 +16206,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     PCFileName "hp-officejet_6500_e710n-z-hpijs.ppd"
     Attribute "Product" "" "(HP Oficejet 6500 e710n-z)"
   }
-  { 
+  {
     // Large format SuperB paper support
     CustomMedia "B4JIS/B4 (JIS)" 729.00 1033.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=B4JIS" "%% FoomaticRIPOptionSetting: PageSize=B4JIS"
     CustomMedia "Ledger/Ledger" 792.00 1224.00 14.40 36.00 14.40 9.00 "%% FoomaticRIPOptionSetting: PageSize=Ledger" "%% FoomaticRIPOptionSetting: PageSize=Ledger"

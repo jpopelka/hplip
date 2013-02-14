@@ -98,7 +98,10 @@ class MarvellFaxDevice(FaxDevice):
 
             lib_name = head+"/fax/plugins/fax_marvell.so"
             log.debug("Load the library %s\n" % lib_name)
-            if not os.path.exists(lib_name):
+            from installer import pluginhandler
+            pluginObj = pluginhandler.PluginHandle()
+
+            if pluginObj.getStatus() != pluginhandler.PLUGIN_INSTALLED:
                 log.error("Loading %s failed. Try after installing plugin libraries\n" %lib_name);
                 log.info("Run \"hp-plugin\" to installa plugin libraries if you are not automatically prompted\n")
                 job_id =0;
@@ -251,7 +254,11 @@ class MarvellFaxDevice(FaxDevice):
         log.debug(date_buf)
 
         result = self.libfax_marvell.create_packet(SET_FAX_SETTINGS, 0, 0, 0, 0, byref(i_buf))
-        result = self.libfax_marvell.create_fax_settings_packet(str(name), self.phone_num, date_buf, byref(c_buf))
+        
+        try:
+            result = self.libfax_marvell.create_fax_settings_packet(name.encode('utf-8'), self.phone_num, date_buf, byref(c_buf))
+        except(UnicodeEncodeError, UnicodeDecodeError):
+            log.error("Unicode Error")
 
         msg_buf = buffer(i_buf)
         msg_c_buf = buffer(c_buf)

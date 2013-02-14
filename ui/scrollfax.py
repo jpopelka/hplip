@@ -21,7 +21,7 @@
 
 # Local
 from base.g import *
-from base import utils, magic, pml
+from base import utils, magic, pml, os_utils
 from prnt import cups
 from ui_utils import load_pixmap
 
@@ -935,8 +935,7 @@ class ScrollFaxView(ScrollView):
         args = cmd.split()
 
         self.CleanupChildren()
-        #os.spawnvp(os.P_NOWAIT, path, args)
-        os.system(cmd)
+        os_utils.execute(cmd)
 
         self.db.load()
         self.updateRecipientList()

@@ -31,7 +31,7 @@ import getopt
 import glob
 
 from base.g import *
-from base import utils,tui,module
+from base import utils,tui,module, os_utils
 
 
 CUPS_FILE='/etc/cups/cupsd.conf'
@@ -70,7 +70,7 @@ def enable_log():
            cmd = "/etc/init.d/cups restart"
         else:
            log.error("service command not found.. Please restart cups manually..")
-        
+
         if cmd:
            log.debug("CUPS restart cmd = %s"%cmd)
            sts,out = utils.run(cmd)
@@ -129,8 +129,8 @@ def backup_clearLog(strLog):
         if sts != 0:
             log.error("Failed to archive %s log file"%strLog)
         else:
-#            sts,out = utils.run('cp /dev/null %s'%strLog)
-            sts = os.system('cat /dev/null > %s'%strLog)
+            cmd = 'cat /dev/null > %s' % strLog
+            sts = os_utils.execute(cmd)
             if sts != 0:
                 log.warn("Failed to clear the %s log file"%strLog)
             if utils.which('gzip'):
@@ -141,7 +141,7 @@ def backup_clearLog(strLog):
                     log.info("Existing %s log file copied to %s.%d.gz"%(strLog, strLog, iArch))
             else:
                 log.info("Existing %s log file copied to %s.%d"%(strLog, strLog, iArch))
-         
+
 
 
 USAGE = [(__doc__, "", "name", True),
@@ -244,7 +244,7 @@ while 1:
         restore_loglevels()
         log.warn("User exit")
         sys.exit(1)
-   
+
 ######## Copying logs to Temporary log folder #######
 sts,out = utils.run('hp-check')
 if sts != 0:
@@ -261,12 +261,10 @@ if os.path.exists('/var/log/messages'):
     if sts != 0:
       log.error("Failed to capture %s log file."%("/var/log/messages"))
 
-
 if os.path.exists('/var/log/cups/error_log'):
     sts,out = utils.run('cp -f /var/log/cups/error_log %s/cups_error_log.log'%LOG_FILES)
     if sts != 0:
       log.error("Failed to capture %s log file."%("/var/log/cups/error_log"))
-
 
 File_list, File_list_str = utils.expand_list('/var/log/hp/*.log')
 if File_list:
@@ -274,26 +272,26 @@ if File_list:
     if sts != 0:
       log.error("Failed to capture %s log files."%(File_list_str))
 
-File_list, File_list_str =utils.expand_list('%s/*.bmp'%TMP_DIR)
+File_list, File_list_str =utils.expand_list('%s/hpcupsfilter*'%TMP_DIR)
 if File_list:
     sts,out = utils.run('cp -f %s %s'%(File_list_str, LOG_FILES))
     if sts != 0:
       log.error("Failed to capture %s log files."%(File_list_str))
 
-
-File_list, File_list_str =utils.expand_list('%s/*.out'%TMP_DIR)
+File_list, File_list_str =utils.expand_list('%s/hpcups_*'%TMP_DIR)
 if File_list:
     sts,out = utils.run('cp -f %s %s'%(File_list_str, LOG_FILES))
     if sts != 0:
       log.error("Failed to capture %s log files."%(File_list_str))
-
 
 sts,out = utils.run('mv -f ./hp-check.log %s'%LOG_FILES)
 if sts != 0:
     log.error("Failed to capture %s log files."%("./hp-check.log"))
-ists,out = utils.run('chmod 666 -R %s'%LOG_FILES)
+ists,out = utils.run('chmod 755  %s'%LOG_FILES)
 if sts != 0:
     log.error("Failed to change permissions for %s. Only root can access."%(LOG_FILES))
+cmd = 'chmod 666 -R %s/*' % LOG_FILES
+ists = os_utils.execute(cmd)
 
 ######## Compressing log files #######
 cmd = 'tar -zcf %s.tar.gz %s'%(LOG_FOLDER_NAME,LOG_FILES)
@@ -318,6 +316,7 @@ log.info("")
 log.info("")
 if sts_compress == 0:
     log.info(log.bold("Logs are saved as %s/%s.tar.gz"%( os.getcwd(),LOG_FOLDER_NAME)))
+    log.info(log.bold("Please create a bug @https://bugs.launchpad.net/hplip/+filebug and upload this log file."))
 else:
     log.info(log.bold("Logs are saved as %s/%s"%(os.getcwd(),LOG_FOLDER_NAME)))
 log.info("")

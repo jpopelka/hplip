@@ -345,7 +345,9 @@ class SystemTrayApp(QApplication):
         self.tray_icon.setIcon(self.prop_active_icon)
         self.active_icon = True
 
-        self.handle_hplip_updation()
+        if "--ignore-update-firsttime" not in args:
+            self.handle_hplip_updation()
+
         QTimer.singleShot(SET_MENU_DELAY, self.initDone)
 
         self.timer = QTimer()

@@ -42,8 +42,7 @@ from cPickle import loads, HIGHEST_PROTOCOL
 # Local
 from base.g import *
 from base.codes import *
-from base import utils, device, status, models, module
-from installer import core_install
+from base import utils, device, status, models, module, services, os_utils
 
 # dBus
 try:
@@ -348,20 +347,18 @@ def handle_hpdio_event(event, bytes_written):
             send_toolbox_event(event, EVENT_DEVICE_UPDATE_REPLY)
 
 def handle_plugin_install():
-    
+
     child_process=os.fork()
     if child_process== 0:	# child process
         lockObj = utils.Sync_Lock("/tmp/pluginInstall.tmp")
         lockObj.acquire()
         child_pid=os.getpid()
-        core = core_install.CoreInstall(core_install.MODE_CHECK)
-        core.set_plugin_version()
-        if core.check_for_plugin() != PLUGIN_INSTALLED:
-            sts,out = utils.run('hp-diagnose_plugin',True, None, 1, False)
-            if sts != 0:
-                log.error("Failed to load hp-diagnose_plugin")
-                #TBD FailureUI needs to add
-        else:	
+        from installer import pluginhandler
+        pluginObj = pluginhandler.PluginHandle()
+
+        if pluginObj.getStatus() != PLUGIN_INSTALLED:
+            os_utils.execute('hp-diagnose_plugin')
+        else:
             log.debug("Device Plug-in was already installed. Not Invoking Plug-in installation wizard")
 
         lockObj.release()
@@ -398,7 +395,7 @@ def handle_event(event, more_args=None):
         more_args = []
 
     event.debug()
- 
+
     if event.event_code == EVENT_AUTO_CONFIGURE:
         handle_plugin_install()
         return
@@ -456,7 +453,7 @@ def handle_event(event, more_args=None):
 
         # send EVENT_HISTORY_UPDATE signal to hp-toolbox
         send_toolbox_event(event, EVENT_HISTORY_UPDATE)
-        
+
         if event.event_code in (EVENT_PRINT_FAILED_MISSING_PLUGIN, EVENT_SCAN_FAILED_MISSING_PLUGIN,EVENT_FAX_FAILED_MISSING_PLUGIN):
             handle_plugin_install()
 
@@ -495,7 +492,7 @@ def handle_event(event, more_args=None):
     elif event.event_code == EVENT_CUPS_QUEUES_CHANGED:
         send_event_to_systray_ui(event)
         send_toolbox_event(event, EVENT_HISTORY_UPDATE)
-        
+
     # Qt4 only
     elif event.event_code == EVENT_SYSTEMTRAY_EXIT:
         send_event_to_hpdio(event)
@@ -562,7 +559,7 @@ def handle_session_signal(*args, **kwds):
 def run(write_pipe1=None,  # write pipe to systemtray
         write_pipe2=None,  # write pipe to hpdio
         read_pipe3=None):  # read pipe from hpdio
-        
+
     global dbus_loop, main_loop
     global system_bus, session_bus
     global w1, w2, r3

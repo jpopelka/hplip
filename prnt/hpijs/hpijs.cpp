@@ -42,6 +42,7 @@
 #include "ijs_server.h"
 #include "hpijs.h"
 #include "services.h"
+#include "utils.h"
 
 extern void SendDbusMessage (const char *dev, const char *printer, int code, 
                              const char *username, const int jobid, const char *title);
@@ -97,9 +98,10 @@ void setLogLevel(UXServices *pSS)
     if (pSS->m_iLogLevel & SAVE_PCL_FILE)
     {
         char    szFileName[64];
-	snprintf (szFileName,sizeof(szFileName), "/var/log/hp/tmp/hpijs_%d.out", getpid());
+        snprintf (szFileName,sizeof(szFileName), "/var/log/hp/tmp/hpijs_%d_XXXXXX", getpid());
+        createTempFile(szFileName, &pSS->outfp);
 
-	pSS->outfp = fopen (szFileName, "w");
+//	pSS->outfp = fopen (szFileName, "w");
 	if (pSS->outfp)
 	{
 	    chmod (szFileName, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);

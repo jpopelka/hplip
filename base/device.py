@@ -31,11 +31,14 @@ import cStringIO
 import httplib
 import struct
 import string
+import time
 
 # Local
 from g import *
 from codes import *
 import utils
+import services
+import os_utils
 import status
 import pml
 import status
@@ -528,7 +531,6 @@ def probeDevices(bus=DEFAULT_PROBE_BUS, timeout=10,
                 bn = hpmudext.HPMUD_BUS_USB
 
             result_code, data = hpmudext.probe_devices(bn)
-
             if result_code == hpmudext.HPMUD_R_OK:
                 for x in data.splitlines():
                     m = direct_pat.match(x)
@@ -1835,13 +1837,13 @@ class Device(object):
                             dynamic_sku_data = True
                             break
                     except:
-                        pass                                 
+                        pass
 
                 a, aa = 1, 1
                 while True:
                     if dynamic_sku_data:
                         if a > len(agents):
-                            break 
+                            break
                         agent = agents[a-1]
                         mq_agent_sku = agent['agent-sku']
                         agent_kind = agent['kind']
@@ -2381,8 +2383,7 @@ class Device(object):
                 else:
                     c = 'lp -c -d%s %s %s' % (printer_name, lp_opt, file_name)
 
-                log.debug(c)
-                exit_code = os.system(c)
+                exit_code = os_utils.execute(c)
 
                 if exit_code != 0:
                     log.error("Print command failed with exit code %d!" % exit_code)
@@ -2400,8 +2401,7 @@ class Device(object):
                 else:
                     c = 'lpr -P%s %s %s %s' % (printer_name, raw_str, rem_str, file_name)
 
-                log.debug(c)
-                exit_code = os.system(c)
+                exit_code = os_utils.execute(c)
 
                 if exit_code != 0:
                     log.error("Print command failed with exit code %d!" % exit_code)
@@ -2554,6 +2554,7 @@ class Device(object):
             log.error("Unable To read the XML data from device")
             return ""
         xmlDict = utils.XMLToDictParser().parseXML(data)
+
         try:
             #return str(xmlDict[attribute])
             return xmlDict[attribute]
@@ -2570,9 +2571,10 @@ class Device(object):
             return ""
         xmlDict = utils.XMLToDictParser().parseXML(data)
         try:
-            return str(xmlDict[attribute])
+            return xmlDict[attribute]
         except:
             return str("")
+
 
     def downloadFirmware(self, usb_bus_id=None, usb_device_id=None): # Note: IDs not currently used
         ok = False
@@ -2674,14 +2676,14 @@ class LocalOpenerEWS_LEDM(urllib.URLopener):
             #pass
 
         END_OF_DATA="0\r\n\r\n"
-        bytes_requested = 1024        
+        bytes_requested = 1024
         bytes_remaining = 0
         chunkedFlag = True
 
         bytes_read = dev.readEWS_LEDM(bytes_requested, reply, timeout=3)
 
         for line in reply.getvalue().splitlines():
-            if line.lower().find("content-length") != -1:   
+            if line.lower().find("content-length") != -1:
                  bytes_remaining = int(line.split(":")[1])
                  chunkedFlag = False
                  break
@@ -2698,12 +2700,12 @@ class LocalOpenerEWS_LEDM(urllib.URLopener):
 
             if not chunkedFlag:     # Unchunked data
                 bytes_remaining = bytes_remaining - bytes_read
-                if bytes_remaining <= 0:   
+                if bytes_remaining <= 0:
                     break
             elif END_OF_DATA == temp_buf.getvalue():   # Chunked data end
-                    break        
+                    break
 
-        reply.seek(0)  
+        reply.seek(0)
         return reply.getvalue()
 
 
@@ -2726,19 +2728,19 @@ class LocalOpener_LEDM(urllib.URLopener):
             dev.writeLEDM("""GET %s HTTP/1.1\r\nAccept: text/plain\r\nHost:localhost\r\nUser-Agent:hplip\r\n\r\n""" % loc)
 
         reply = xStringIO()
- 
+
         #while dev.readLEDM(512, reply, timeout=3):
             #pass
 
         END_OF_DATA="0\r\n\r\n"
-        bytes_requested = 1024        
+        bytes_requested = 1024
         bytes_remaining = 0
         chunkedFlag = True
 
         bytes_read = dev.readLEDM(bytes_requested, reply, timeout=3)
-        
+
         for line in reply.getvalue().splitlines():
-            if line.lower().find("content-length") != -1:   
+            if line.lower().find("content-length") != -1:
                  bytes_remaining = int(line.split(":")[1])
                  chunkedFlag = False
                  break
@@ -2754,10 +2756,10 @@ class LocalOpener_LEDM(urllib.URLopener):
 
             if not chunkedFlag:     # Unchunked data
                 bytes_remaining = bytes_remaining - bytes_read
-                if bytes_remaining <= 0:   
+                if bytes_remaining <= 0:
                     break
             elif END_OF_DATA == temp_buf.getvalue():   # Chunked data end
-                    break        
+                    break
 
-        reply.seek(0)  
+        reply.seek(0)
         return reply.getvalue()

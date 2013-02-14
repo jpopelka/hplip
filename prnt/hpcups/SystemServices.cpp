@@ -30,6 +30,7 @@
 
 #include "CommonDefinitions.h"
 #include "SystemServices.h"
+#include "utils.h"
 
 SystemServices::SystemServices(int iLogLevel, int job_id) : m_iLogLevel(iLogLevel)
 {
@@ -37,9 +38,11 @@ SystemServices::SystemServices(int iLogLevel, int job_id) : m_iLogLevel(iLogLeve
     if (iLogLevel & SAVE_PCL_FILE)
     {
         char    fname[64];
-	sprintf(fname, "%s/hpcups_job%d.out", "/var/log/hp/tmp",job_id);
-        m_fp = fopen(fname, "w");
-        chmod(fname, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+        sprintf(fname, "%s/hpcups_out_job%d_XXXXXX", "/var/log/hp/tmp",job_id);
+        
+        createTempFile(fname, &m_fp);
+        if (m_fp)
+            chmod(fname, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     }
 }
 

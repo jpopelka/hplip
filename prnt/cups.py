@@ -31,7 +31,7 @@ import glob
 
 # Local
 from base.g import *
-from base import utils, models
+from base import utils, models, os_utils
 
 INVALID_PRINTER_NAME_CHARS = """~`!@#$%^&*()=+[]{}()\\/,.<>?'\";:| """
 
@@ -203,7 +203,7 @@ def getPPDPath(addtional_paths=None):
 
 def getAllowableMIMETypes():
     """
-        Scan all /etc/cups/*.convs and /usr/share/cups/mime 
+        Scan all /etc/cups/*.convs and /usr/share/cups/mime
         files for allowable file formats.
     """
     paths = []
@@ -468,8 +468,8 @@ def getPPDFile2(mq,model, ppds): # New PPD find
     # and beginning with implementation in 2.8.12 (Qt4 hp-setup)
     # hp-<model name from models.dat w/o beginning hp_>[-<pdl>][-<pdl>][...].ppd[.gz]
     # 3.9.6: Added handling for hpijs vs. hpcups PPDs/DRVs
-    
-    
+
+
     #Check if common ppd name is already given in models.dat(This is needed because in case of devices having more than one derivatives
     #will have diffrent model name strings in device ID, because of which we don't get the common ppd name for search)
     model = models.normalizeModelName(model)
@@ -478,7 +478,7 @@ def getPPDFile2(mq,model, ppds): # New PPD find
         stripped_model = stripModel2(model)
     else:
         stripped_model = stripModel2(ppd_name)
-        
+
     log.debug("Matching PPD list to model  %s..." % stripped_model)
 
     matches = []
@@ -501,7 +501,7 @@ def getPPDFile2(mq,model, ppds): # New PPD find
     num_matches = len(matches)
 
     if num_matches == 0:
-        log.warn("No PPD found for model %s using new algorithm. Trying old algorithm..." % stripped_model)
+        log.debug("No PPD found for model %s using new algorithm. Trying old algorithm..." % stripped_model)
         #Using Old algo, ignores the series keyword in ppd searching.
         matches2 = getPPDFile(stripModel(stripped_model), ppds).items()
         log.debug(matches2)
@@ -555,7 +555,7 @@ def getPPDFile2(mq,model, ppds): # New PPD find
 
 ##
 # Function :- getFaxPPDFile()
-# Arguments:- 
+# Arguments:-
 #   1) mq  -->  Device model query object
 #    2) model --> Fax model name
 # Return arguments:-
@@ -796,7 +796,7 @@ def printFile(printer, filename, title):
 	filename = filename.encode('utf-8')
 	title = title.encode('utf-8')
         return cupsext.printFileWithOptions(printer, filename, title)
-	
+
     else:
         return -1
 
@@ -817,8 +817,8 @@ def delPrinter(printer_name):
 def enablePrinter(printer_name):
     setPasswordPrompt("You do not have permission to enable a printer.")
     cmd_full_path = utils.which('cupsenable', True)
-    cmd= "%s %s"%(cmd_full_path, printer_name)
-    return os.system(cmd)
+    cmd= "%s %s" % (cmd_full_path, printer_name)
+    return os_utils.execute(cmd)
 
 def getGroupList():
     return cupsext.getGroupList()

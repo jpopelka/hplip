@@ -27,7 +27,7 @@ import time
 
 # Local
 from base.g import *
-from base import device, utils, models
+from base import device, utils, models, os_utils
 from ui_utils import load_pixmap
 
 # Qt
@@ -89,7 +89,7 @@ class UpgradeForm(UpgradeForm_base):
         elif self.remindRadioBtton.isChecked():
             schedule_days = str(self.daysSpinBox.value())
             log.debug("HPLIP Upgrade, selected remind later radiobutton  days= %d" %(int(schedule_days)))
-            next_time = time.time() + (int(schedule_days) *24 * 60 *60) 
+            next_time = time.time() + (int(schedule_days) *24 * 60 *60)
             user_conf.set('upgrade', 'pending_upgrade_time', str(int(next_time)))
         else:
             log.debug("HPLIP Upgrade, selected Install radiobutton  distro_type=%d" %self.distro_type)
@@ -100,8 +100,7 @@ class UpgradeForm(UpgradeForm_base):
                 terminal_cmd = utils.get_terminal()
                 if terminal_cmd is not None and utils.which("hp-upgrade"):
                     cmd = terminal_cmd + " 'hp-upgrade -w'"
-                    log.debug("cmd = %s " %cmd)
-                    os.system(cmd)
+                    os_utils.execute(cmd)
                     self.result = True
                 else:
                     log.error("Failed to run hp-upgrade command from terminal =%s "%terminal_cmd)
@@ -130,7 +129,7 @@ class UpgradeForm(UpgradeForm_base):
                               QMessageBox.Ok,
                               QMessageBox.NoButton,
                               QMessageBox.NoButton)
- 
+
 
     def __tr(self,s,c = None):
         return qApp.translate("UpgradeDialog",s,c)

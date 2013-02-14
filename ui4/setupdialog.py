@@ -30,9 +30,7 @@ from base import device, utils, models, pkit
 from prnt import cups
 from base.codes import *
 from ui_utils import *
-#from installer import core_install
-from installer.core_install import CoreInstall,\
-                                   MODE_CHECK
+from installer import pluginhandler
 
 # Qt
 from PyQt4.QtCore import *
@@ -138,6 +136,13 @@ class PasswordDialog(QDialog):
     def __tr(self,s,c = None):
         return qApp.translate("SetupDialog",s,c)
 
+
+def FailureMessageUI(prompt):
+    try:	
+        dlg = PasswordDialog(prompt, None)
+        FailureUI(dlg, prompt)
+    finally:
+        pass
 
 
 def showPasswordUI(prompt, userName=None, allowUsernameEdit=True):
@@ -537,8 +542,19 @@ class SetupDialog(QDialog, Ui_Dialog):
                     else: # DEVICE_DESC_ALL
                         filter_dict = {}
 
+                    if self.bus == 'usb':
+                        try:
+                            from base import smart_install
+                        except ImportError:
+                            log.error("Failed to Import smart_install.py from base")
+                        else:   #if no Smart Install device found, ignores.
+                            QApplication.restoreOverrideCursor()
+                            smart_install.disable(GUI_MODE, 'qt4')
+                            QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
+
                     self.devices = device.probeDevices([self.bus], self.timeout, self.ttl,
                                                        filter_dict, self.search, net_search=net_search_type)
+
         finally:
             QApplication.restoreOverrideCursor()
 
@@ -652,17 +668,17 @@ class SetupDialog(QDialog, Ui_Dialog):
 
     def showAddPrinterPage(self):
         # Install the plugin if needed...
-        core = CoreInstall(MODE_CHECK)
+        pluginObj = pluginhandler.PluginHandle()
         plugin = self.mq.get('plugin', PLUGIN_NONE)
         plugin_reason = self.mq.get('plugin-reason', PLUGIN_REASON_NONE)
         if plugin > PLUGIN_NONE:
 
-            if core.check_for_plugin() != PLUGIN_INSTALLED:
+            if pluginObj.getStatus() != pluginhandler.PLUGIN_INSTALLED:
                 ok, sudo_ok = pkit.run_plugin_command(plugin == PLUGIN_REQUIRED, plugin_reason)
                 if not sudo_ok:
                     FailureUI(self, self.__tr("<b>Unable to find an appropriate su/sudo utiltity to run hp-plugin.</b><p>Install kdesu, gnomesu, or gksu.</p>"))
                     return
-                if not ok or core.check_for_plugin() != PLUGIN_INSTALLED:
+                if not ok or pluginObj.getStatus() != pluginhandler.PLUGIN_INSTALLED:
                     if plugin == PLUGIN_REQUIRED:
                         FailureUI(self, self.__tr("<b>The printer you are trying to setup requires a binary driver plug-in and it failed to install.</b><p>Please check your internet connection and try again.</p><p>Visit <u>http://hplipopensource.com</u> for more infomation.</p>"))
                         return
@@ -954,8 +970,8 @@ class SetupDialog(QDialog, Ui_Dialog):
                 self.printer_name not in self.installed_print_devices[self.device_uri]:
 
                 QApplication.restoreOverrideCursor()
-                if os.geteuid!=0 and utils.addgroup()!=[]:
-                    FailureUI(self, self.__tr("<b>Printer queue setup failed. Could not connect to CUPS Server</b><p>Is user added to %s group(s)" %utils.list_to_string(utils.addgroup())))
+                if os.geteuid!=0 and utils.get_cups_systemgroup_list()!=[]:
+                    FailureUI(self, self.__tr("<b>Printer queue setup failed. Could not connect to CUPS Server</b><p>Is user added to %s group(s)" %utils.list_to_string(utils.get_cups_systemgroup_list())))
             else:
                 # sending Event to add this device in hp-systray
                 utils.sendEvent(EVENT_CUPS_QUEUES_CHANGED,self.device_uri, self.printer_name)
@@ -1207,10 +1223,10 @@ class SetupDialog(QDialog, Ui_Dialog):
             self.print_desc = unicode(self.PrinterDescriptionLineEdit.text()).encode('utf8')
             self.print_location = unicode(self.PrinterLocationLineEdit.text()).encode('utf8')
             self.fax_setup = self.SetupFaxGroupBox.isChecked()
-            self.fax_desc = unicode(self.FaxDescriptionLineEdit.text()).encode('utf8')
-            self.fax_location = unicode(self.FaxLocationLineEdit.text()).encode('utf8')
-            self.fax_name_company = unicode(self.NameCompanyLineEdit.text()).encode('utf8')
-            self.fax_number = unicode(self.FaxNumberLineEdit.text()).encode('utf8')
+            self.fax_desc = unicode(self.FaxDescriptionLineEdit.text())
+            self.fax_location = unicode(self.FaxLocationLineEdit.text())
+            self.fax_name_company = unicode(self.NameCompanyLineEdit.text())
+            self.fax_number = unicode(self.FaxNumberLineEdit.text())
             self.addPrinter()
 
         elif p == PAGE_REMOVE:
@@ -1220,8 +1236,8 @@ class SetupDialog(QDialog, Ui_Dialog):
                     item = self.RemoveDevicesTableWidget.item(row, 1)
                     printer = unicode(item.data(Qt.UserRole).toString()).encode('utf-8')
                     log.debug("Removing printer: %s" % printer)
-                    if cups.delPrinter(printer) == 0 and os.geteuid!=0 and utils.addgroup()!=[]:
-                            FailureUI(self, self.__tr("<b>Unable to delete printer queue. Could not connect to CUPS Server</b><p>Is user added to %s group(s)" %utils.list_to_string(utils.addgroup())))
+                    if cups.delPrinter(printer) == 0 and os.geteuid!=0 and utils.get_cups_systemgroup_list()!=[]:
+                            FailureUI(self, self.__tr("<b>Unable to delete printer queue. Could not connect to CUPS Server</b><p>Is user added to %s group(s)" %utils.list_to_string(utils.get_cups_systemgroup_list())))
             self.close()
 
         else:

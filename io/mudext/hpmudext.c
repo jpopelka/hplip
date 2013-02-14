@@ -69,18 +69,7 @@ result_code, ip_address = get_zc_ip_address(hostname)
 result_code, uri = make_par_uri(devnode)
 
 */
-static PyObject *handle_smartinstall(PyObject *self, PyObject *args)
-{
-    int result;
-    if (!PyArg_ParseTuple(args, ""))
-        return NULL;
 
-    Py_BEGIN_ALLOW_THREADS
-    result = HandleSmartInstall();
-    Py_END_ALLOW_THREADS
-
-    return Py_BuildValue("i", result);
-}
 
  static PyObject *open_device(PyObject *self, PyObject *args)
 {
@@ -411,7 +400,6 @@ static PyMethodDef mudext_functions[] =
     {"make_zc_uri",         (PyCFunction)make_zc_uri,  METH_VARARGS },
     {"get_zc_ip_address",   (PyCFunction)get_zc_ip_address, METH_VARARGS },
     {"make_par_uri",        (PyCFunction)make_par_uri,  METH_VARARGS },
-    {"handle_smartinstall", (PyCFunction)handle_smartinstall,  METH_VARARGS },
     { NULL, NULL }
 };
 

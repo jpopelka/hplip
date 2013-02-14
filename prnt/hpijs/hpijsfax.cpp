@@ -53,6 +53,7 @@
 #endif
 #include "hpip.h"
 #include "hpijsfax.h"
+#include "utils.h"
 
 int hpijsfax_status_cb (void *status_cb_data, IjsServerCtx *ctx, IjsJobId job_id)
 {
@@ -269,6 +270,7 @@ int hpijsFaxServer (int argc, char **argv)
 	IP_XFORM_SPEC	xForm[3];
 	IP_IMAGE_TRAITS	traits;
 	IP_HANDLE		hJob;
+	 FILE *pFilePtrFax;
 
 	char					hpFileName[64]; 
 	int					fdFax = -1;
@@ -316,7 +318,8 @@ int hpijsFaxServer (int argc, char **argv)
 		    pFaxStruct->SetFirstRaster (0);
 			if (fdFax == -1)
 			{
-				fdFax = mkstemp (hpFileName);
+//				fdFax = mkstemp (hpFileName);
+				fdFax = createTempFile(hpFileName, &pFilePtrFax);
 				if (fdFax < 0)
 				{
 					BUG ("Unable to open Fax output file - %s for writing\n", hpFileName);

@@ -56,6 +56,7 @@
 #include "soap.h"
 #include "soapi.h"
 #include "io.h"
+#include "utils.h"
 
 #define DEBUG_DECLARE_ONLY
 #include "sanei_debug.h"
@@ -64,77 +65,49 @@ static struct soap_session *session = NULL;   /* assume one sane_open per proces
 
 static int bb_load(struct soap_session *ps, const char *so)
 {
-   char home[128];
-   char sz[255]; 
    int stat=1;
 
    /* Load hpmud manually with symbols exported. Otherwise the plugin will not find it. */ 
-   if ((ps->hpmud_handle = dlopen("libhpmud.so", RTLD_LAZY|RTLD_GLOBAL)) == NULL)
-   {
-      BUG("unable to load restricted library: %s\n", dlerror());
+   if ((ps->hpmud_handle = load_library("libhpmud.so")) == NULL)
       goto bugout;
-   } 
 
    /* Load math library manually with symbols exported (Ubuntu 8.04). Otherwise the plugin will not find it. */ 
-   if ((ps->math_handle = dlopen("libm.so", RTLD_LAZY|RTLD_GLOBAL)) == NULL)
+   if ((ps->math_handle = load_library("libm.so")) == NULL)
    {
-      if ((ps->math_handle = dlopen("libm.so.6", RTLD_LAZY|RTLD_GLOBAL)) == NULL)
-      {
-         BUG("unable to load restricted library: %s\n", dlerror());
+      if ((ps->math_handle = load_library("libm.so.6")) == NULL)
          goto bugout;
-      }
    } 
 
-   if (hpmud_get_conf("[dirs]", "home", home, sizeof(home)) != HPMUD_R_OK)
-      goto bugout;
-   snprintf(sz, sizeof(sz), "%s/scan/plugins/%s", home, so);
-   if ((ps->bb_handle = dlopen(sz, RTLD_NOW|RTLD_GLOBAL)) == NULL)
+   if ((ps->bb_handle = load_plugin_library(UTILS_SCAN_PLUGIN_LIBRARY, so)) == NULL)
    {
-      BUG("unable to load restricted library %s: %s\n", sz, dlerror());
       SendScanEvent(ps->uri, EVENT_PLUGIN_FAIL);
       goto bugout;
    } 
    
-   if ((ps->bb_open = dlsym(ps->bb_handle, "bb_open")) == NULL)
-   {
-      BUG("unable to load restricted library %s: %s\n", sz, dlerror());
+   if ((ps->bb_open = get_library_symbol(ps->bb_handle, "bb_open")) == NULL)
       goto bugout;
-   } 
-   if ((ps->bb_close = dlsym(ps->bb_handle, "bb_close")) == NULL)
-   {
-      BUG("unable to load restricted library %s: %s\n", sz, dlerror());
+
+   if ((ps->bb_close = get_library_symbol(ps->bb_handle, "bb_close")) == NULL)
       goto bugout;
-   } 
-   if ((ps->bb_get_parameters = dlsym(ps->bb_handle, "bb_get_parameters")) == NULL)
-   {
-      BUG("unable to load restricted library %s: %s\n", sz, dlerror());
+
+   if ((ps->bb_get_parameters = get_library_symbol(ps->bb_handle, "bb_get_parameters")) == NULL)
       goto bugout;
-   } 
-   if ((ps->bb_is_paper_in_adf = dlsym(ps->bb_handle, "bb_is_paper_in_adf")) == NULL)
-   {
-      BUG("unable to load restricted library %s: %s\n", sz, dlerror());
+
+   if ((ps->bb_is_paper_in_adf = get_library_symbol(ps->bb_handle, "bb_is_paper_in_adf")) == NULL)
       goto bugout;
-   } 
-   if ((ps->bb_start_scan = dlsym(ps->bb_handle, "bb_start_scan")) == NULL)
-   {
-      BUG("unable to load restricted library %s: %s\n", sz, dlerror());
+
+   if ((ps->bb_start_scan = get_library_symbol(ps->bb_handle, "bb_start_scan")) == NULL)
       goto bugout;
-   } 
-   if ((ps->bb_end_scan = dlsym(ps->bb_handle, "bb_end_scan")) == NULL)
-   {
-      BUG("unable to load restricted library %s: %s\n", sz, dlerror());
+
+    if ((ps->bb_end_scan = get_library_symbol(ps->bb_handle, "bb_end_scan")) == NULL)
       goto bugout;
-   } 
-   if ((ps->bb_get_image_data = dlsym(ps->bb_handle, "bb_get_image_data")) == NULL)
-   {
-      BUG("unable to load restricted library %s: %s\n", sz, dlerror());
+
+   if ((ps->bb_get_image_data = get_library_symbol(ps->bb_handle, "bb_get_image_data")) == NULL)
       goto bugout;
-   } 
-   if ((ps->bb_end_page = dlsym(ps->bb_handle, "bb_end_page")) == NULL)
-   {
-      BUG("unable to load restricted library %s: %s\n", sz, dlerror());
+
+   if ((ps->bb_end_page = get_library_symbol(ps->bb_handle, "bb_end_page")) == NULL)
       goto bugout;
-   } 
+
 
    stat=0;
 
@@ -144,21 +117,15 @@ bugout:
 
 static int bb_unload(struct soap_session *ps)
 {
-   if (ps->bb_handle)
-   {   
-      dlclose(ps->bb_handle);
-      ps->bb_handle = NULL;
-   }  
-   if (ps->hpmud_handle)
-   {   
-      dlclose(ps->hpmud_handle);
-      ps->hpmud_handle = NULL;
-   }  
-   if (ps->math_handle)
-   {   
-      dlclose(ps->math_handle);
-      ps->math_handle = NULL;
-   }  
+    unload_library(ps->bb_handle);
+    ps->bb_handle = NULL;
+
+    unload_library(ps->hpmud_handle);
+    ps->hpmud_handle = NULL;
+
+    unload_library(ps->math_handle);
+    ps->math_handle = NULL;
+
    return 0;
 } /* bb_unload */
 
@@ -459,7 +426,7 @@ SANE_Status soap_open(SANE_String_Const device, SANE_Handle *handle)
       return SANE_STATUS_IO_ERROR;
    }
 
-   if (bb_load(session, "bb_soap.so"))
+   if (bb_load(session, SCAN_PLUGIN_SOAP))
    {
       stat = SANE_STATUS_IO_ERROR;
       goto bugout;
@@ -604,7 +571,7 @@ SANE_Status soap_control_option(SANE_Handle handle, SANE_Int option, SANE_Action
          }
          else
          {  /* Set default. */
-            ps->currentScanMode = CE_RGB24;
+            ps->currentScanMode = ps->scanModeMap[0];
             set_scan_mode_side_effects(ps, ps->currentScanMode);
             stat = SANE_STATUS_GOOD;
          }

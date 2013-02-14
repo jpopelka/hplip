@@ -37,15 +37,15 @@ import time
 
 # Local
 from base.g import *
-from base import utils, device, tui, module, pkit
-from installer import core_install
+from base import utils, device, tui, module, pkit, services
+from installer import pluginhandler
 
 
 # Temp values for testing; May not be needed
 username = ""
 device_uri = ""
 printer_name = ""
-LOG_FILE = "/var/log/hp/hplip_ac.log" 
+LOG_FILE = "/var/log/hp/hplip_ac.log"
 DBUS_SERVICE='com.hplip.StatusService'
 
 ##### METHODS #####
@@ -76,7 +76,7 @@ def install_Plugin(systray_running_status, run_directly=False):
             sys.exit(1)
 
         app = QApplication(sys.argv)
-        plugin = PLUGIN_REQUIRED 
+        plugin = PLUGIN_REQUIRED
         plugin_reason = PLUGIN_REASON_NONE
         ok, sudo_ok = pkit.run_plugin_command(plugin == PLUGIN_REQUIRED, plugin_reason)
         if not ok or not sudo_ok:
@@ -88,26 +88,26 @@ def install_Plugin(systray_running_status, run_directly=False):
         log.error("Run hp-systray manually and re-plugin printer")
         #TBD: needs to run hp-plugin in silent mode. or needs to show error UI to user.
 
-     
+
 #Installs/Uploads the firmware to device once plugin installation is completed.
-def install_firmware(Plugin_Installation_Completed, USB_param):
+def install_firmware(pluginObj,Plugin_Installation_Completed, USB_param):
     #timeout check for plugin installation
     sleep_timeout = 6000	# 10 mins time out
     while Plugin_Installation_Completed is False and sleep_timeout != 0:
 	time.sleep(0.3)	#0.3 sec delay
 	sleep_timeout = sleep_timeout -3
-	
+
 	ps_plugin,output = utils.Is_Process_Running('hp-plugin')
 	ps_diagnose_plugin,output = utils.Is_Process_Running('hp-diagnose_plugin')
- 
-        if ps_plugin is False and ps_diagnose_plugin is False:            
+
+        if ps_plugin is False and ps_diagnose_plugin is False:
             Plugin_Installation_Completed = True
-            if core.check_for_plugin() == PLUGIN_INSTALLED:
+            if pluginObj.getStatus() == PLUGIN_INSTALLED:
                 break
             else:
                 log.error("Failed to download firmware required files. manually run hp-plugin command in terminal fisrt")
                 sys.exit(1)
-    
+
     execmd="hp-firmware"
     options=""
     if USB_param is not None:
@@ -195,7 +195,7 @@ for o, a in opts:
 
 #    elif o in ('-i', '-I', '--interactive'):
 #        #this is future use
-#        GUI_Mode = False 
+#        GUI_Mode = False
 
     elif o == '--help-desc':
         print __doc__,
@@ -209,16 +209,16 @@ for o, a in opts:
 
     elif o in ('-m', '-M'):
         Systray_Msg_Enabled = True
-    
+
     elif o in ('-p', '-P'):
         Plugin_option_Enabled = True
- 
+
     elif o in ('-F','-f'):
         Firmware_Option_Enabled = True
 
 if not log.set_level (log_level):
     usage()
-    
+
 try:
     param = mod.args[0]
 except IndexError:
@@ -265,7 +265,7 @@ mq = device.queryModelByURI(device_uri)
 if not mq or mq.get('support-type', SUPPORT_TYPE_NONE) == SUPPORT_TYPE_NONE:
     log.error("Unsupported printer model.")
     sys.exit(1)
-    
+
 plugin = mq.get('plugin', PLUGIN_NONE)
 if plugin == PLUGIN_NONE:
     log.debug("This is not a plugin device.")
@@ -275,40 +275,30 @@ if not Plugin_option_Enabled:
     Systray_Msg_Enabled = True
 
 # checking whether HP-systray is running or not. Invokes, if systray is not running
+Systray_Is_Running=False
 status,output = utils.Is_Process_Running('hp-systray')
 if status is False:
-    Systray_Is_Running=False
-    log.info("hp-systray is not running.")
     if os.getuid() == 0:
         log.error(" hp-systray must be running.\n Run \'hp-systray &\' in a terminal. ")
     else:
         log.info("Starting hp-systray service")
-        child_pid = os.fork()
-        if child_pid == 0:
-            Systray_Is_Running=True
-            status,output =utils.run('hp-systray &', True, None, 1, False)
-            if status is not 0:
-                log.error("Failed to start \'hp-systray\' service. Manually run \'hp-sysray &\' from terminal as non-root user.")
-                Systray_Is_Running=False
-	    
-            sys.exit()
-        else:
-            Systray_Is_Running=True
-            time.sleep(2)
-else:
+        services.run_systray()
+        status,output = utils.Is_Process_Running('hp-systray')
+
+if status == True:
     Systray_Is_Running=True
     log.debug("hp-systray service is running\n")
 
-core = core_install.CoreInstall()
-core.set_plugin_version()
-plugin_sts = core.check_for_plugin()
-if plugin_sts == PLUGIN_INSTALLED:
+pluginObj = pluginhandler.PluginHandle()
+plugin_sts = pluginObj.getStatus()
+if plugin_sts == pluginhandler.PLUGIN_INSTALLED:
     log.info("Device Plugin is already installed")
     Is_Plugin_Already_Installed = True
-elif plugin_sts == PLUGIN_VERSION_MISMATCH:
-    log.info("HP Device Plug-in version mismatch or some files are corrupted")
+
+elif plugin_sts == pluginhandler.PLUGIN_NOT_INSTALLED :
+    log.info("HP Device Plug-in is not found")
 else:
-    log.info("HP Device Plug-in is not found.")
+    log.info("HP Device Plug-in version mismatch or some files are corrupted")
 
 if Systray_Msg_Enabled:
     if not Is_Plugin_Already_Installed:
@@ -324,7 +314,7 @@ if Firmware_Option_Enabled:
     else:
         Plugin_Installation_Completed = True
 
-    install_firmware(Plugin_Installation_Completed,param)
+    install_firmware(pluginObj, Plugin_Installation_Completed, param)
 
 log.info()
 log.info("Done.")

@@ -13,6 +13,7 @@ icon=@icondir@
 cupsbackend=@cupsbackenddir@
 cupsfilter=@cupsfilterdir@
 drv=@abs_drvdir@
+bin=/usr/bin
 
 # Following values are determined at configure time and cannot be changed.
 [configure]

@@ -33,6 +33,7 @@
 #include "ModeJpeg.h"
 #include <dlfcn.h>
 #include "Utils.h"
+#include "utils.h"
 
 #define MAX_JPEG_FILE_SIZE 2097152    // 2 Mgabytes
 
@@ -104,14 +105,14 @@ DRIVER_ERROR ModeJpeg::Init(int color_mode, int band_height, COMPRESS_MODE *eCom
     m_eCompressor = COMPRESSOR_JPEG_JETREADY;
     if (*eCompressMode == COMPRESS_MODE_LJ)
     {
-        m_hHPLibHandle = LoadPlugin ("lj.so");
+        m_hHPLibHandle = load_plugin_library(UTILS_PRINT_PLUGIN_LIBRARY, PRNT_PLUGIN_LJ);
         if (m_hHPLibHandle)
         {
             dlerror ();
-            *(void **) (&HPLJJRCompress) = dlsym (m_hHPLibHandle, "HPJetReadyCompress");
+            *(void **) (&HPLJJRCompress) = get_library_symbol(m_hHPLibHandle, "HPJetReadyCompress");
             if (HPLJJRCompress == NULL)
             {
-                dlclose(m_hHPLibHandle);
+                unload_library(m_hHPLibHandle);
                 m_hHPLibHandle = NULL;
                 *eCompressMode = COMPRESS_MODE_JPEG;
             }
@@ -126,10 +127,7 @@ DRIVER_ERROR ModeJpeg::Init(int color_mode, int band_height, COMPRESS_MODE *eCom
 
 ModeJpeg::~ModeJpeg()
 {
-    if (m_hHPLibHandle)
-    {
-        dlclose(m_hHPLibHandle);
-    }
+    unload_library(m_hHPLibHandle);
     if (m_pbyInputBuffer)
     {
         delete [] m_pbyInputBuffer;

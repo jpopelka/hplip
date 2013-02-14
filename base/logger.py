@@ -162,6 +162,10 @@ class Logger(object):
         self._where = where
 
 
+    def get_where(self):
+        return self._where
+
+
     def get_level(self):
         return self._level
 

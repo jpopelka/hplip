@@ -42,7 +42,7 @@ except ImportError:
 
 # Local
 from base.g import *
-from base import device, utils, tui, models, module
+from base import device, utils, tui, models, module, services, os_utils
 from prnt import cups
 
 pm = None
@@ -115,18 +115,6 @@ def showPasswordUI(prompt):
     password = getpass.getpass("Password: ")
 
     return (username, password)
-
-
-def restart_cups():
-    if os.path.exists('/etc/init.d/cups'):
-        return '/etc/init.d/cups restart'
-
-    elif os.path.exists('/etc/init.d/cupsys'):
-        return '/etc/init.d/cupsys restart'
-
-    else:
-        return 'killall -HUP cupsd'
-
 
 mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
                     (INTERACTIVE_MODE, GUI_MODE),
@@ -218,7 +206,7 @@ else:
 log.debug("selected_device_name=%s" % selected_device_name)
 
 if mode == GUI_MODE:
-    if selected_device_name is not None: 
+    if selected_device_name is not None:
         log.warning("-p or -f option is not supported")
     if ui_toolkit == 'qt3':
         if not utils.canEnterGUIMode():
@@ -382,9 +370,10 @@ else: # INTERACTIVE_MODE
 
             if hp_plugin:
                 if prop.gui_build:
-                    os.system("hp-plugin -i")
+                    cmd = "hp-plugin -i"
                 else:
-                    os.system("hp-plugin")
+                    cmd = "hp-plugin"
+                os_utils.execute(cmd)
 
         ppds = cups.getSystemPPDs()
 
@@ -446,7 +435,7 @@ else: # INTERACTIVE_MODE
 
                         for d in installed_print_devices.keys():
                             for p in installed_print_devices[d]:
-                                if printer_name == p: 
+                                if printer_name == p:
                                     log.error("A print queue with that name already exists. Please enter a different name.")
                                     name_ok = False
                                     break
@@ -574,7 +563,7 @@ else: # INTERACTIVE_MODE
             log.info("Information: %s" % info)
 
             log.debug("Restarting CUPS...")
-            status, output = utils.run(restart_cups())
+            status, output = utils.run(services.restart_cups())
             log.debug("Restart CUPS returned: exit=%d output=%s" % (status, output))
 
             time.sleep(3)
@@ -684,7 +673,7 @@ else: # INTERACTIVE_MODE
 
             log.info("Using queue name: %s" % fax_name)
             fax_ppd,fax_ppd_type,nick = cups.getFaxPPDFile(mq, fax_name)
-            
+
             if not fax_ppd:
                 log.error("Unable to find HP fax PPD file! Please check you HPLIP installation and try again.")
                 sys.exit(1)
@@ -881,9 +870,7 @@ else: # INTERACTIVE_MODE
                 else:
                     cmd = 'python ./testpage.py %s' % param
 
-                log.debug(cmd)
-
-                os.system(cmd)
+                os_utils.execute(cmd)
 
     except KeyboardInterrupt:
         log.error("User exit")

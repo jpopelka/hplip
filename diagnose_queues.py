@@ -33,7 +33,7 @@ import getopt
 
 # Local
 from base.g import *
-from base import utils, module, queues
+from base import utils, module, queues, password
 
 def usage(typ='text'):
     if typ == 'text':
@@ -104,18 +104,21 @@ try:
         usage()
     if not quiet_mode:
         utils.log_title(__title__, __version__)
-
+        
+    mod.lockInstance(__mod__, True)
     log_file = os.path.normpath('/var/log/hp/hplip_queues.log')
     log.debug(log.bold("Saving output in log file: %s" % log_file))
     if os.path.exists(log_file):
         os.remove(log_file)
     log.set_logfile(log_file)
     log.set_where(log.LOG_TO_CONSOLE_AND_FILE)
-    
-    queues.main_function(mode,ui_toolkit, quiet_mode, True )
+
+    passwordObj = password.Password(mode)
+    queues.main_function(passwordObj, mode,ui_toolkit, quiet_mode, True )
     
                
 except KeyboardInterrupt:
     log.error("User exit")
 
+mod.unlockInstance()
 log.debug("Done.")

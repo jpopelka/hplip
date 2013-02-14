@@ -43,7 +43,7 @@ class SettingsDialog(QDialog, Ui_SettingsDialog_base):
         
         cur_vers = sys_conf.get('hplip', 'version')
         last_ver = user_conf.get('upgrade','latest_available_version')
-        if cur_vers != last_ver:
+        if utils.Is_HPLIP_older_version(cur_vers, last_ver):
             upgrade_msg ="Currently HPLIP-%s version is installed.\nLatest HPLIP-%s version is available for installation"%(cur_vers, last_ver)
         else:
             upgrade_msg ="HPLIP-%s version is installed"%(cur_vers)
@@ -71,6 +71,7 @@ class SettingsDialog(QDialog, Ui_SettingsDialog_base):
         self.ScanCommandLineEdit.setText(self.user_settings.cmd_scan)
         self.SystemTraySettings.systray_visible = self.user_settings.systray_visible
         self.SystemTraySettings.systray_messages = self.user_settings.systray_messages
+        self.SystemTraySettings.upgrade_notify = self.user_settings.upgrade_notify
         self.SystemTraySettings.updateUi()
 
 
@@ -79,6 +80,7 @@ class SettingsDialog(QDialog, Ui_SettingsDialog_base):
         self.user_settings.systray_messages = self.SystemTraySettings.systray_messages
         self.user_settings.cmd_scan = unicode(self.ScanCommandLineEdit.text())
         self.user_settings.auto_refresh = bool(self.AutoRefreshCheckBox.isChecked())
+        self.user_settings.upgrade_notify = self.SystemTraySettings.upgrade_notify
 
         if self.RefreshCurrentRadioButton.isChecked():
             self.user_settings.auto_refresh_type = 1

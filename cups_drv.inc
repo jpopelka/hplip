@@ -508,6 +508,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-officejet_7000_e809a.ppd.gz \
    ppd/hpcups/hp-officejet_7000_e809a_series.ppd.gz \
    ppd/hpcups/hp-officejet_7100_series.ppd.gz \
+   ppd/hpcups/hp-officejet_7110_series.ppd.gz \
    ppd/hpcups/hp-officejet_7200_series.ppd.gz \
    ppd/hpcups/hp-officejet_7300_series.ppd.gz \
    ppd/hpcups/hp-officejet_7400_series.ppd.gz \

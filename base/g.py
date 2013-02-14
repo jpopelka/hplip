@@ -34,6 +34,7 @@ import re
 # Local
 from codes import *
 import logger
+from base import os_utils
 
 # System wide logger
 log = logger.Logger('', logger.Logger.LOG_LEVEL_INFO, logger.Logger.LOG_TO_CONSOLE)
@@ -120,7 +121,7 @@ class ConfigBase(object):
                 fp = open(self.filename, "r")
                 self.conf.readfp(fp)
                 fp.close()
-            except (OSError, IOError):
+            except (OSError, IOError, ConfigParser.MissingSectionHeaderError):
                 log.debug("Unable to open file %s for reading." % self.filename)
 
     def write(self):
@@ -151,7 +152,8 @@ class State(ConfigBase):
     def __init__(self):
         if not os.path.exists('/var/lib/hp/') and os.geteuid() == 0:
             os.makedirs('/var/lib/hp/')
-            os.system('chmod 644 /var/lib/hp/')
+            cmd = 'chmod 644 /var/lib/hp/'
+            os_utils.execute(cmd)
         ConfigBase.__init__(self, '/var/lib/hp/hplip.state')
 
 

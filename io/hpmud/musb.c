@@ -28,6 +28,7 @@ Author: Naga Samrat Chowdary Narla, Sarbeswar Meher
 #include "hpmud.h"
 #include "hpmudi.h"
 #include <dlfcn.h>
+#include "utils.h"
 
 
 mud_device_vf __attribute__ ((visibility ("hidden"))) musb_mud_device_vf =
@@ -2027,6 +2028,7 @@ int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int ls
 
 	int numdevs = 0;        /* number of connected devices */
 	int i, conf, iface, altset ;
+	int dev_already_counted = 0;
 
 	struct hpmud_model_attributes ma;
 	char rmodel[128], rserial[128], model[128];
@@ -2044,6 +2046,7 @@ int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int ls
 	for (i = 0; i < numdevs; i++)
 	{
 		dev = list[i];
+		dev_already_counted = 0 ;
 
 		/* Ignore devices with no configuration data and anything that is not  a printer.  */
 
@@ -2055,17 +2058,16 @@ int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int ls
 		if(devdesc.idVendor != 0x3f0) /*Not a HP device */
 			continue;
 
-		for (conf = 0; conf < devdesc.bNumConfigurations; conf++)
+		for (conf = 0; (dev_already_counted == 0 && conf < devdesc.bNumConfigurations); conf++)
 		{
 			if (libusb_get_config_descriptor (dev, conf, &confptr) < 0)
 				continue;
-			for (iface = 0, ifaceptr = confptr->interface; iface < confptr->bNumInterfaces; iface ++, ifaceptr ++)
+			for (iface = 0, ifaceptr = confptr->interface; 
+				(dev_already_counted == 0 && iface < confptr->bNumInterfaces); iface ++, ifaceptr ++)
 			{
 				for (altset = 0, altptr = ifaceptr->altsetting; altset < ifaceptr->num_altsetting; altset++, altptr++)
 				{
-					if ((altptr->bInterfaceClass == LIBUSB_CLASS_PRINTER ) && /* Printer */
-							(altptr->bInterfaceSubClass == 1) &&
-							(altptr->bInterfaceProtocol == 1 || altptr->bInterfaceProtocol == 2)) /* Unidirectional or Bidirectional*/
+					if (altptr->bInterfaceClass == LIBUSB_CLASS_PRINTER )  /* Printer */						
 					{
 						libusb_open(dev, &hd);
 						if (hd == NULL)
@@ -2117,7 +2119,9 @@ int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int ls
 
 							*cnt+=1;
 						}
-						libusb_close(hd); hd =NULL;
+						libusb_close(hd); hd = NULL;
+						dev_already_counted = 1;
+						break;
 					}
 				}
 			}
@@ -2144,8 +2148,12 @@ enum HPMUD_RESULT hpmud_make_usb_uri(const char *busnum, const char *devnum, cha
 	libusb_device *dev = NULL, *found_dev=NULL;
 	libusb_device_handle *hd=NULL;
 	struct libusb_device_descriptor devdesc; /* Current device descriptor */
+	struct libusb_config_descriptor *confptr = NULL; /* Pointer to current configuration */
+	const struct libusb_interface *ifaceptr = NULL; /* Pointer to current interface */
+	const struct libusb_interface_descriptor *altptr = NULL; /* Pointer to current alternate setting */
 	char model[128], serial[128], sz[256];
 	int r, numdevs, i;
+	int conf, iface, altset ;
 	int bus_num, dev_num;
 	enum HPMUD_RESULT stat = HPMUD_R_INVALID_DEVICE_NODE;
 
@@ -2207,6 +2215,24 @@ enum HPMUD_RESULT hpmud_make_usb_uri(const char *busnum, const char *devnum, cha
 
 		if (!serial[0])
 			strcpy(serial, "0"); /* no serial number, make it zero */
+
+		for (conf = 0; conf < devdesc.bNumConfigurations; conf++)
+		{
+			if (libusb_get_config_descriptor (dev, conf, &confptr) < 0)
+				continue;
+			for (iface = 0, ifaceptr = confptr->interface; iface < confptr->bNumInterfaces; iface ++, ifaceptr ++)
+			{
+				for (altset = 0, altptr = ifaceptr->altsetting; altset < ifaceptr->num_altsetting; altset++, altptr++)
+				{
+					if (altptr->bInterfaceClass == LIBUSB_CLASS_MASS_STORAGE )
+					{
+                        strcpy(serial, "SMART_INSTALL_ENABLED"); /* no serial number, make it zero */
+					}
+				}
+			}
+			libusb_free_config_descriptor(confptr); confptr = NULL;
+		}//end for conf
+
 	}
 	else
 	{
@@ -2278,95 +2304,3 @@ bugout:
 }
 
 
-/*********HANDLING SMART INSTALL********/
-
-int disable_smartInstall(libusb_device *dev, libusb_device_handle *hd, int Interface)
-{
-	// TBD:: not yet implemented.
-    BUG("HP Device acting like CD ROM (Smart Install is enabled), so prevent from functioning device using USB Cable.\n");
-    BUG("Please Refer following link to fix @ https://bugs.launchpad.net/hplip/+bug/1027004 ");
-
-    return 0;
-}
-
-int HandleSmartInstall()
-{
-	libusb_context *ctx = NULL;
-	libusb_device **list; /*List of connected USB devices */
-	libusb_device *dev = NULL; /* Current device */
-	struct libusb_device_descriptor devdesc; /* Current device descriptor */
-	struct libusb_config_descriptor *confptr = NULL; /* Pointer to current configuration */
-	libusb_device_handle *hd = NULL;
-	int i, r, conf, numdevs = 0;        /* number of connected devices */
-	char imanufact[128] = {0,} , iproduct[128] = {0,}, iserial[128] ={0,};
-
-	libusb_init(&ctx);
-	numdevs = libusb_get_device_list(ctx, &list);
-
-	if (numdevs <= 0)
-		goto bugout;
-
-	for (i = 0; i < numdevs; i++)
-	{
-		dev = list[i];
-
-		libusb_get_device_descriptor (dev, &devdesc);
-
-		if (!devdesc.bNumConfigurations || !devdesc.idVendor || !devdesc.idProduct)
-			continue;
-
-		if(devdesc.idVendor != 0x3f0) /*Not a HP device */
-			continue;
-
-		for (conf = 0; conf < devdesc.bNumConfigurations; conf++)
-		{
-			if (libusb_get_config_descriptor (dev, conf, &confptr) < 0)
-				continue;
-
-			if (confptr->bNumInterfaces != 1)
-				continue;
-
-			if (confptr->interface[0].altsetting[0].bInterfaceClass == LIBUSB_CLASS_MASS_STORAGE)
-			{
-				libusb_open(dev, &hd);
-				if (hd == NULL)
-				{
-					BUG("Invalid usb_open: %m\n");
-					continue;
-				}
-				/* Found hp device. */
-				if ((r=get_string_descriptor(hd, devdesc.iProduct, iproduct, sizeof(iproduct))) < 0)
-					BUG("invalid product id string ret=%d\n", r);
-
-				if ((r=get_string_descriptor(hd, devdesc.iSerialNumber, iserial, sizeof(iserial))) < 0)
-					BUG("invalid serial id string ret=%d\n", r);
-
-				if ((r=get_string_descriptor(hd, devdesc.iManufacturer, imanufact, sizeof(imanufact))) < 0)
-					BUG("invalid manufacturer string ret=%d\n", r);
-
-				DBG("Manufacturer = %s\n",imanufact);
-				DBG("Product = %s\n",iproduct);
-				DBG("SerialNumber = %s\n",iserial);
-
-				//Select Laserjet Device only
-				if(strstr(iproduct,"LaserJet") || strstr(iproduct, "Laserjet"))
-				{
-					disable_smartInstall(dev, hd, confptr->interface[0].altsetting[0].bInterfaceNumber);
-				}
-				libusb_close(hd);
-				hd = NULL;
-			}
-			libusb_free_config_descriptor(confptr);
-			confptr = NULL;
-		}
-	}
-
-bugout:
-	if (!hd)
-		libusb_close(hd);
-	if (confptr)
-		libusb_free_config_descriptor(confptr);
-	libusb_free_device_list(list, 1);
-	libusb_exit(ctx);
-	return 0;
-}

@@ -259,7 +259,7 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
                 name_company = self.dev.getStationName()
                 log.debug("name_company = '%s'" % name_company)
                 self.NameCompanyLineEdit.setText(name_company)
-                fax_number = self.dev.getPhoneNum()
+                fax_number = str(self.dev.getPhoneNum())
                 log.debug("fax_number = '%s'" % fax_number)
                 self.FaxNumberLineEdit.setText(fax_number)
             except Error:

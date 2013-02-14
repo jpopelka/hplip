@@ -55,7 +55,8 @@ if __name__ == '__main__':
         extra_options=[("Startup even if no hplip CUPS queues are present:", "-x or --force-startup", "option", False)])
 
     opts, device_uri, printer_name, mode, ui_toolkit, lang = \
-        mod.parseStdOpts('x', ['force-startup'], False)
+        mod.parseStdOpts('x', ['force-startup','ignore-update-firsttime'], False)
+        # ignore-update-firsttime is required. ui/systemtray and ui4/systemtray will read this value using sys.args.
 
     force_startup = False
     for o, a in opts:

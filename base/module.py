@@ -444,7 +444,7 @@ class Module(object):
 
             log.info(log.bold("%s ver. %s" % (self.title, self.version)))
             log.info("")
-            log.info("Copyright (c) 2001-14 Hewlett-Packard Development Company, LP")
+            log.info("Copyright (c) 2001-13 Hewlett-Packard Development Company, LP")
             log.info("This software comes with ABSOLUTELY NO WARRANTY.")
             log.info("This is free software, and you are welcome to distribute it")
             log.info("under certain conditions. See COPYING file for more details.")
@@ -644,7 +644,7 @@ class Module(object):
 
     def lockInstance(self, suffix='',suppress_error=False):
         if suffix:
-            ok, self.lock_file = utils.lock_app('-'.join([self.mod, suffix]))
+            ok, self.lock_file = utils.lock_app('-'.join([self.mod, suffix]),suppress_error)
         else:
             ok, self.lock_file = utils.lock_app(self.mod,suppress_error)
 

@@ -53,6 +53,10 @@ try:
     device_uri = mod.getDeviceUri(device_uri, printer_name, 
         filter={'fax-type': (operator.gt, 0)})
 
+    if device_uri is None:
+        log.error("Device doesn't support FAX functionality")
+        sys.exit(1)
+
     if not utils.canEnterGUIMode4():
         log.error("%s requires Qt4 GUI support. Exiting." % __mod__)
         sys.exit(1)

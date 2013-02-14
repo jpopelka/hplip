@@ -26,16 +26,7 @@ from base import device, utils
 from prnt import cups
 from base.codes import *
 from ui_utils import *
-from installer.core_install import CoreInstall
-from installer.core_install import  PLUGIN_INSTALL_ERROR_NONE, \
-                                    PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND, \
-                                    PLUGIN_INSTALL_ERROR_DIGITAL_SIG_NOT_FOUND, \
-                                    PLUGIN_INSTALL_ERROR_DIGITAL_SIG_BAD, \
-                                    PLUGIN_INSTALL_ERROR_PLUGIN_FILE_CHECKSUM_ERROR, \
-                                    PLUGIN_INSTALL_ERROR_NO_NETWORK, \
-                                    PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR, \
-                                    PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS,  \
-                                    MODE_CHECK
+from installer import pluginhandler
 
 # Qt
 from PyQt4.QtCore import *
@@ -56,10 +47,9 @@ class PluginDialog(QDialog, Ui_Dialog):
         QDialog.__init__(self, parent)
         self.install_mode = install_mode
         self.plugin_reason = plugin_reason
-        self.plugin_path = None
+        self.plugin_path = ""
         self.result = False
-        self.core = CoreInstall(MODE_CHECK)
-        self.core.set_plugin_version()
+        self.pluginObj = pluginhandler.PluginHandle()
         self.setupUi(self)
 
         self.user_settings = UserSettings()
@@ -72,7 +62,7 @@ class PluginDialog(QDialog, Ui_Dialog):
 
 
     def isPluginInstalled(self):
-        return self.core.check_for_plugin()
+        return self.pluginObj.getStatus()
 
 
     def initUi(self):
@@ -167,10 +157,10 @@ class PluginDialog(QDialog, Ui_Dialog):
     def setPathIndicators(self):
         ok = True
         if not self.plugin_path or (self.plugin_path and os.path.isdir(self.plugin_path)):
-            self.PathLineEdit.setToolTip(self.__tr("You must specify a path to the '%1' file.").arg(self.core.plugin_name))
+            self.PathLineEdit.setToolTip(self.__tr("You must specify a path to the '%1' file.").arg(self.pluginObj.getFileName() ))
             ok = False
-        elif os.path.basename(self.plugin_path) != self.core.plugin_name:
-            self.PathLineEdit.setToolTip(self.__tr("The plugin filename must be '%1'.").arg(self.core.plugin_name))
+        elif os.path.basename(self.plugin_path) != self.pluginObj.getFileName():
+            self.PathLineEdit.setToolTip(self.__tr("The plugin filename must be '%1'.").arg(self.pluginObj.getFileName()))
             ok = False
 
         if not ok:
@@ -190,7 +180,7 @@ class PluginDialog(QDialog, Ui_Dialog):
 
     def BrowseToolButton_clicked(self):
         t = unicode(self.PathLineEdit.text())
-
+        path =""
         if not os.path.exists(t):
             path = unicode(QFileDialog.getOpenFileName(self, self.__tr("Select Plug-in File"),
                                                 #user_conf.workingDirectory(),
@@ -228,44 +218,13 @@ class PluginDialog(QDialog, Ui_Dialog):
         beginWaitCursor()
         try:
 
-            if self.plugin_path is None: # download
-                # read plugin.conf (local or on sf.net) to get plugin_path (http://)
-                plugin_conf_url = self.core.get_plugin_conf_url()
-
-                if plugin_conf_url.startswith('file://'):
-                    pass
-                else:
-                    log.info("Checking for network connection...")
-                    ok = self.core.check_network_connection()
-
-                    if not ok:
-                        log.error("Network connection not detected.")
-                        endWaitCursor()
-                        FailureUI(self, self.__tr("Network connection not detected."))
-                        self.close()
-                        return
-
-                log.info("Downloading configuration file from: %s" % plugin_conf_url)
-                self.plugin_path, size, checksum, timestamp, ok = self.core.get_plugin_info(plugin_conf_url,
-                    self.plugin_download_callback)
-
-                log.debug("path=%s, size=%d, checksum=%s, timestamp=%f, ok=%s" %
-                        (self.plugin_path, size, checksum, timestamp, ok))
-
-                if not self.plugin_path.startswith('http://') and not self.plugin_path.startswith('file://'):
-                    self.plugin_path = 'file://' + self.plugin_path
-
-            else: # path
+            if self.plugin_path: # User specified Path
                 if not self.plugin_path.startswith('http://'):
                     self.plugin_path = 'file://' + self.plugin_path
 
-                size, checksum, timestamp = 0, '', 0
-
-            if self.plugin_path.startswith('file://'):
-                pass
             else:
                 log.info("Checking for network connection...")
-                ok = self.core.check_network_connection()
+                ok = utils.check_network_connection()
 
                 if not ok:
                     log.error("Network connection not detected.")
@@ -276,44 +235,43 @@ class PluginDialog(QDialog, Ui_Dialog):
 
             log.info("Downloading plug-in from: %s" % self.plugin_path)
 
-            status, ret = self.core.download_plugin(self.plugin_path, size, checksum, timestamp,
-                self.plugin_download_callback)
+            status, download_plugin_file = self.pluginObj.download(self.plugin_path,self.plugin_download_callback)
 
-            if status in (PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS, PLUGIN_INSTALL_ERROR_DIGITAL_SIG_NOT_FOUND):
+            if status in (pluginhandler.PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS, pluginhandler.PLUGIN_INSTALL_ERROR_DIGITAL_SIGN_NOT_FOUND):
                 endWaitCursor()
                 if QMessageBox.question(self, self.__tr("Digital signature download failed"),
                         self.__tr("<b>The download of the digital signature file failed.</b><p>Without this file, it is not possible to authenticate and validate the plug-in prior to installation.</p>Do you still want to install the plug-in?"),
                         QMessageBox.Yes | QMessageBox.No) != QMessageBox.Yes:
 
-                    self.core.delete_plugin()
+                    self.pluginObj.deleteInstallationFiles(download_plugin_file)
                     self.close()
                     return
 
-            elif status != PLUGIN_INSTALL_ERROR_NONE:
+            elif status != pluginhandler.PLUGIN_INSTALL_ERROR_NONE:
 
-                if status == PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND:
-                    desc = self.__tr("<b>ERROR: Plug-in file not found (server returned 404 or similar error).</b><p>Error code: %1</p>").arg(str(ret))
+                if status == pluginhandler.PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND:
+                    desc = self.__tr("<b>ERROR: Plug-in file not found (server returned 404 or similar error)")
 
-                elif status == PLUGIN_INSTALL_ERROR_DIGITAL_SIG_BAD:
-                    desc = self.__tr("<b>ERROR: Plug-in file does not match its digital signature.</b><p>File may have been corrupted or altered.</p><p>Error code: %1</p>").arg(str(ret))
+                elif status == pluginhandler.PLUGIN_INSTALL_ERROR_DIGITAL_SIGN_BAD:
+                    desc = self.__tr("<b>ERROR: Plug-in file does not match its digital signature.</b><p>File may have been corrupted or altered.")
 
-                elif status == PLUGIN_INSTALL_ERROR_PLUGIN_FILE_CHECKSUM_ERROR:
+                elif status == pluginhandler.PLUGIN_INSTALL_ERROR_PLUGIN_FILE_CHECKSUM_ERROR:
                     desc = self.__tr("<b>ERROR: Plug-in file does not match its checksum. File may have been corrupted or altered.")
 
-                elif status == PLUGIN_INSTALL_ERROR_NO_NETWORK:
+                elif status == pluginhandler.PLUGIN_INSTALL_ERROR_NO_NETWORK:
                     desc = self.__tr("<b>ERROR: Unable to connect to network to download the plug-in.</b><p>Please check your network connection and try again.</p>")
 
-                elif status == PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR:
+                elif status == pluginhandler.PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR:
                     desc = self.__tr("<b>ERROR: Unable to create the plug-in directory.</b><p>Please check your permissions and try again.</p>")
 
-                self.core.delete_plugin()
+                self.pluginObj.deleteInstallationFiles(download_plugin_file)
                 endWaitCursor()
                 FailureUI(self, desc)
                 self.close()
                 return
 
-            if not self.core.run_plugin(GUI_MODE, self.plugin_install_callback):
-                self.core.delete_plugin()
+            if not self.pluginObj.run_plugin(download_plugin_file, GUI_MODE):
+                self.pluginObj.deleteInstallationFiles(download_plugin_file)
                 endWaitCursor()
                 FailureUI(self, self.__tr("Plug-in install failed."))
                 self.close()
@@ -348,8 +306,8 @@ class PluginDialog(QDialog, Ui_Dialog):
         finally:
             endWaitCursor()
 
-        self.core.delete_plugin()
-        SuccessUI(self, self.__tr("<b>Plug-in installation successful.</b>"))
+        self.pluginObj.deleteInstallationFiles(download_plugin_file)
+        SuccessUI(self, self.__tr("<b>Plug-in installation successful</b>"))
         self.result = True
         self.close()
 

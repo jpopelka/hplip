@@ -35,7 +35,7 @@ import time
 
 # Local
 from base.g import *
-from base import device,utils, tui, models,module
+from base import device,utils, tui, models,module, services
 from prnt import cups
 
 
@@ -83,31 +83,8 @@ def check_cups_process():
     sts, output = utils.run('lpstat -r')
     if sts == 0 and ('is running' in output):
         cups_running_sts = True
-    
+
     return cups_running_sts
-
-
-def showPasswordUI(prompt):
-    import getpass
-    print ""
-    print log.bold(prompt)
-    username = raw_input("Username: ")
-    password = getpass.getpass("Password: ")
-
-    return (username, password)
-
-
-# Restart cups
-def restart_cups():
-    if os.path.exists('/etc/init.d/cups'):
-        return '/etc/init.d/cups restart'
-
-    elif os.path.exists('/etc/init.d/cupsys'):
-        return '/etc/init.d/cupsys restart'
-
-    else:
-        return 'killall -HUP cupsd'
-
 
 # Send dbus event to hpssd on dbus system bus
 def send_message(device_uri, printer_name, event_code, username, job_id, title, pipe_name=''):
@@ -129,26 +106,19 @@ def start_systray():
     Systray_Is_Running=False
     status,output = utils.Is_Process_Running('hp-systray')
     if status is False:
-        log.debug("hp-systray is not running.")
         if os.getuid() == 0:
-            log.error("Run \'hp-systray &\' in a terminal. ")
+            log.error(" hp-systray must be running.\n Run \'hp-systray &\' in a terminal. ")
         else:
-            log.debug("Starting hp-systray service")
-            child_pid = os.fork()
-            if child_pid == 0:
-                status,output =utils.run('hp-systray &', True, None, 1, False)
-                if status is not 0:
-                    log.error("Failed to start \'hp-systray\' service. Manually run \'hp-sysray &\' from terminal as non-root user.")
-                sys.exit()
-            else:
-                time.sleep(1)
-                status,output = utils.Is_Process_Running('hp-systray')
-                if  status is True:
-                    Systray_Is_Running=True
-    else:
+            log.info("Starting hp-systray service")
+            services.run_systray()
+            status,output = utils.Is_Process_Running('hp-systray')
+
+    if status == True:
         Systray_Is_Running=True
         log.debug("hp-systray service is running\n")
+
     return Systray_Is_Running
+
 
 
 USAGE = [ (__doc__, "", "name", True),
@@ -180,7 +150,7 @@ opts, device_uri, printer_name, mode, ui_toolkit, loc = \
     mod.parseStdOpts('gh',['time-out=', 'timeout='],handle_device_printer=False)
 
 
-LOG_FILE = "/var/log/hp/hplip_config_usb_printer.log" 
+LOG_FILE = "/var/log/hp/hplip_config_usb_printer.log"
 if os.path.exists(LOG_FILE):
     os.remove(LOG_FILE)
 
@@ -214,14 +184,6 @@ if len(param) < 1:
     sys.exit()
 
 try:
-    #*****************************CHECK SMART INSTALL
-    try:
-        import hpmudext
-    except:
-        log.error("Failed to import hpmudext")
-    else:
-        hpmudext.handle_smartinstall()
-        
 
     # ******************************* MAKEURI
     if param:
@@ -251,14 +213,18 @@ try:
 
     printer_config_list = get_already_added_queues(norm_model, serial, back_end, remove_non_hp_config)
     if len(printer_config_list) ==0  or len(printer_config_list) == 0:
-        cmd ="hp-setup -i -x -a -q %s"%param
-        log.debug("%s"%cmd)
-        utils.run(cmd)
+        if "SMART_INSTALL_ENABLED" not in device_uri:
+            cmd ="hp-setup -i -x -a -q %s"%param
+            log.debug("%s"%cmd)
+            utils.run(cmd)
 
         if start_systray():
             printer_name = ""
             username = ""
-            send_message( device_uri, printer_name, EVENT_ADD_PRINTQUEUE, username, 0,'')
+            if "SMART_INSTALL_ENABLED" in device_uri:
+                send_message( device_uri, printer_name, EVENT_DIAGNOSE_PRINTQUEUE, username, 0,'')
+            else:
+                send_message( device_uri, printer_name, EVENT_ADD_PRINTQUEUE, username, 0,'')
     else:
         if start_systray():
             printer_name = ""
@@ -269,10 +235,11 @@ try:
     i =0
     while i <24:
         time.sleep(5)
-          
+
         get_already_added_queues(norm_model, serial, 'hpfax',remove_non_hp_config)
         get_already_added_queues(norm_model, serial, 'hp',remove_non_hp_config)
         if i == 0:
+            username = ""
             send_message( device_uri, printer_name, EVENT_DIAGNOSE_PRINTQUEUE, username, 0,'')
         i += 1
 

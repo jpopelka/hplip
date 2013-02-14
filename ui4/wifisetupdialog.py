@@ -157,7 +157,17 @@ class WifiSetupDialog(QDialog, Ui_Dialog):
                 log.info("Searching on USB bus...")
                 filter_dict = {'wifi-config' : (operator.gt, WIFI_CONFIG_NONE)}
 
+                try:
+                    from base import smart_install
+                except ImportError:
+                    log.error("Failed to Import smart_install.py from base")
+                else:
+                    endWaitCursor()
+                    smart_install.disable(GUI_MODE, 'qt4')
+                    beginWaitCursor()
+
                 self.devices = device.probeDevices([self.bus], 0, 0, filter_dict, self.search)
+
         finally:
             endWaitCursor()
 

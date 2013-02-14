@@ -73,21 +73,21 @@ if mode == GUI_MODE:
         try:
             from PyQt4.QtGui import QApplication, QMessageBox
             from ui4.plugindiagnose import PluginDiagnose
-	    from installer import core_install
+            from installer import pluginhandler
         except ImportError:
             log.error("Unable to load Qt4 support. Is it installed?")
             sys.exit(1)
 
         app = QApplication(sys.argv)
-        core = core_install.CoreInstall(core_install.MODE_CHECK)
-        plugin_sts = core.check_for_plugin()
+        pluginObj = pluginhandler.PluginHandle()
+        plugin_sts = pluginObj.getStatus()
         if plugin_sts == PLUGIN_INSTALLED:
             log.info("Device Plugin is already installed")
             sys.exit(0)
-        elif plugin_sts == PLUGIN_VERSION_MISMATCH:
-            dialog = PluginDiagnose(None, install_mode, plugin_reason, True)
-        else:
+        elif plugin_sts == PLUGIN_NOT_INSTALLED:
             dialog = PluginDiagnose(None, install_mode, plugin_reason)
+        else:
+            dialog = PluginDiagnose(None, install_mode, plugin_reason, True)
 
         dialog.show()
         try:

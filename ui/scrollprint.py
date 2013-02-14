@@ -21,7 +21,7 @@
 
 # Local
 from base.g import *
-from base import utils, magic
+from base import utils, magic, os_utils
 from prnt import cups
 from ui_utils import load_pixmap
 
@@ -343,7 +343,7 @@ class ScrollPrintView(ScrollView):
         if dlg.exec_loop() == QDialog.Accepted:
                 results = dlg.selectedFile()
                 working_directory = unicode(dlg.dir().absPath())
-                log.debug("results: %s" % results)
+                #log.debug("results: %s" % unicode(results))
                 user_conf.setWorkingDirectory(working_directory)
 
                 if results:
@@ -1069,9 +1069,8 @@ class ScrollPrintView(ScrollView):
                     if not alt_nup:
                         cmd = ''.join([cmd, ' "', p, '"'])
 
-                    log.debug("Printing: %s" % cmd)
-
-                    code = os.system(cmd)
+                    #code = os_utils.execute(cmd)
+                    code, out = utils.run(cmd)
                     if code != 0:
                         log.error("Print command failed.")
                         self.form.FailureUI(self.__tr("Print command failed with error code %1").arg(code))

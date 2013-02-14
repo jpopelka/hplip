@@ -232,6 +232,7 @@ Keep-Alive: 300\r\nProxy-Connection: keep-alive\r\nCookie: AccessCounter=new\r\n
 # define JOBSTATE_PROCESSING "<j:JobState>Processing</j:JobState>"
 # define JOBSTATE_CANCELED "<j:JobState>Canceled</j:JobState>"
 # define JOBSTATE_COMPLETED "<j:JobState>Completed</j:JobState>"
+# define PRESCANPAGE "<PreScanPage>"
 
 static int parse_scan_elements(const char *payload, int size, struct wscn_scan_elements *elements)
 {
@@ -839,7 +840,7 @@ SANE_Status bb_start_scan(struct ledm_session *ps)
 {
   char buf[4096] = {0};
   char buf1[1024]={0};
-  int len, bytes_read;
+  int len, bytes_read, paper_status;
   int i, timeout = 10 ;
   char szPage_ID[5] = {0};
   char szJob_ID[5] = {0};
@@ -976,6 +977,12 @@ SANE_Status bb_start_scan(struct ledm_session *ps)
         //goto bugout
         _DBG("bb_start_scan() read_http_payload FAILED len=%d buf=%s\n", len, buf);
         break;
+     }
+      //For a new scan, buf must contain <PreScanPage>. 
+     if (NULL == strstr(buf,PRESCANPAGE)) 
+     {         //i.e Paper is not present in Scanner
+         stat = SANE_STATUS_NO_DOCS;
+       	goto bugout;
      }
      if (strstr(buf,JOBSTATE_CANCELED) || strstr(buf, CANCELED_BY_DEVICE) || strstr(buf, CANCELED_BY_CLIENT))
      {

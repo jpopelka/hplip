@@ -348,6 +348,8 @@ class Ui_MainWindow(object):
         self.ViewAsIconsAction.setObjectName("ViewAsIconsAction")
         self.DiagnoseQueueAction = QtGui.QAction(MainWindow)
         self.DiagnoseQueueAction.setObjectName("DiagnoseQueueAction")
+        self.DiagnoseHPLIPAction = QtGui.QAction(MainWindow)
+        self.DiagnoseHPLIPAction.setObjectName("DiagnoseHPLIPAction")
         self.DeviceMenu.addAction(self.DeviceSettingsAction)
         self.DeviceMenu.addSeparator()
         self.DeviceMenu.addAction(self.DeviceRefreshAction)
@@ -357,6 +359,7 @@ class Ui_MainWindow(object):
         self.DeviceMenu.addAction(self.RemoveDeviceAction)
         self.DeviceMenu.addSeparator()
         self.DeviceMenu.addAction(self.DiagnoseQueueAction)
+        self.DeviceMenu.addAction(self.DiagnoseHPLIPAction)
         self.DeviceMenu.addSeparator()
         self.DeviceMenu.addAction(self.QuitAction)
         self.ConfigureMenu.addAction(self.PreferencesAction)
@@ -375,6 +378,7 @@ class Ui_MainWindow(object):
         self.toolBar.addAction(self.RemoveDeviceAction)
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.DiagnoseQueueAction)
+        self.toolBar.addAction(self.DiagnoseHPLIPAction)
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.ContentsAction)
 
@@ -431,5 +435,6 @@ class Ui_MainWindow(object):
         self.ViewAsIconsAction.setText(QtGui.QApplication.translate("MainWindow", "View as Icons", None, QtGui.QApplication.UnicodeUTF8))
         self.ViewAsIconsAction.setToolTip(QtGui.QApplication.translate("MainWindow", "View device list as icons", None, QtGui.QApplication.UnicodeUTF8))
         self.DiagnoseQueueAction.setText(QtGui.QApplication.translate("MainWindow", "Diagnose Queues...", None, QtGui.QApplication.UnicodeUTF8))
+        self.DiagnoseHPLIPAction.setText(QtGui.QApplication.translate("MainWindow", "Diagnose HPLIP Driver...", None, QtGui.QApplication.UnicodeUTF8))
 
 from printsettingstoolbox import PrintSettingsToolbox

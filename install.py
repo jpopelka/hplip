@@ -36,7 +36,7 @@ import re
 
 # Local
 from base.g import *
-from base import utils
+from base import utils, os_utils
 
 
 USAGE = [(__doc__, "", "name", True),
@@ -87,9 +87,10 @@ disable = []
 
 if((re.search(' ',os.getcwd()))!= None):
  	log.info("Current hplip source directory path has space character in it. Please update path by removing space characters. Example: Change %s.run to %s.run" % (os.getcwd(),(os.getcwd()).replace(' ','')))
- 	os.system("rm -r ../%s"%(os.getcwd()).rsplit('/').pop())
-	sys.exit(0)		
-		
+ 	cmd = "rm -r ../%s" % (os.getcwd()).rsplit('/').pop()
+ 	os_utils.execute(cmd)
+	sys.exit(0)
+
 try:
     opts, args = getopt.getopt(sys.argv[1:], 'hl:giatxdq:nr:b',
         ['help', 'help-rest', 'help-man', 'help-desc', 'gui', 'lang=',

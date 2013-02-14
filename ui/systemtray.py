@@ -429,7 +429,8 @@ class SystemTrayApp(QApplication):
         self.icon_warn = load_pixmap('warning', '16x16')
         self.icon_error = load_pixmap('error', '16x16')
         
-        self.handle_hplip_updation()
+        if "--ignore-update-firsttime" not in args:
+            self.handle_hplip_updation()
         self.timer = QTimer()
         self.timer.connect(self.timer,SIGNAL("timeout()"),self.handle_hplip_updation)
         self.timer.start(UPGRADE_CHECK_DELAY)

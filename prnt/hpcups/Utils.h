@@ -32,5 +32,4 @@ int SendChunkHeader (BYTE *szStr, DWORD dwSize, DWORD dwChunkType, DWORD dwNumIt
 int SendItem (BYTE *szStr, BYTE cType, WORD wItem, DWORD dwValue);
 int SendItemExtra (BYTE *szStr, BYTE cType, WORD wItem, DWORD dwValue, DWORD dwExtra);
 int SendIntItem (BYTE *szStr, int iItem, int iItemType, int iItemValue);
-void *LoadPlugin (const char *szPluginName);
 

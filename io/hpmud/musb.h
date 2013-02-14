@@ -127,7 +127,5 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_dot4_channel_read
 int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int lst_size, int *cnt);
 int __attribute__ ((visibility ("hidden"))) power_up(struct _mud_device *pd, int fd);
 
-int HandleSmartInstall();
-
 #endif // _MUSB_H
 

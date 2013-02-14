@@ -68,7 +68,7 @@
 #define _STRINGIZE(x) #x
 #define STRINGIZE(x) _STRINGIZE(x)
 
-#define dbglog(args...) {syslog(LOG_ERR, __FILE__ " " STRINGIZE(__LINE__) ": " args); \
+#define dbglog(args...) {syslog(LOG_DEBUG, __FILE__ " " STRINGIZE(__LINE__) ": " args); \
 fprintf(stderr, __FILE__ " " STRINGIZE(__LINE__) ": " args);}
 
 
@@ -431,6 +431,7 @@ typedef struct MediaAttributes_s
     int        left_overspray; 
     int        top_overspray;
     char       PageSizeName[64];
+    char       MediaTypeName[64];
 } MediaAttributes;
 
 typedef struct JobAttributes_s

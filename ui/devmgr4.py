@@ -33,7 +33,7 @@ import Queue
 
 # Local
 from base.g import *
-from base import device, utils, pml, maint, pkit
+from base import device, utils, pml, maint, pkit, os_utils
 from prnt import cups
 from base.codes import *
 from ui_utils import load_pixmap
@@ -2717,8 +2717,7 @@ class DevMgr4(DevMgr4_base):
             terminal_cmd = utils.get_terminal()
             if terminal_cmd is not None and utils.which("hp-upgrade"):
                 cmd = terminal_cmd + " 'hp-upgrade -w'"
-                log.debug("cmd = %s " %cmd)
-                os.system(cmd)
+                os_utils.execute(cmd)
             else:
                 log.error("Failed to run hp-upgrade command from terminal =%s "%terminal_cmd)
             self.InstallPushButton.setEnabled(True)
@@ -2814,7 +2813,7 @@ class DevMgr4(DevMgr4_base):
             cmd = 'python ./setup.py --gui'
 
         log.debug(cmd)
-        utils.run(cmd, log_output=True, password_func=None, timeout=1)
+        utils.run(cmd)
         self.RescanDevices()
 
 
