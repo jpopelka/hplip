@@ -35,6 +35,8 @@ from PyQt4.QtGui import *
 # Ui
 from plugindialog_base import Ui_Dialog
 
+#signal
+import signal
 
 PAGE_SOURCE = 0
 # PAGE_LICENSE = 1 # part of plug-in itself, this is a placeholder
@@ -111,6 +113,7 @@ class PluginDialog(QDialog, Ui_Dialog):
         self.connect(self.SkipRadioButton, SIGNAL("toggled(bool)"), self.SkipRadioButton_toggled)
         self.connect(self.PathLineEdit, SIGNAL("textChanged(const QString &)"), self.PathLineEdit_textChanged)
         self.connect(self.BrowseToolButton, SIGNAL("clicked()"), self.BrowseToolButton_clicked)
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
 
         self.BrowseToolButton.setIcon(QIcon(load_pixmap('folder_open', '16x16')))
 

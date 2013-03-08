@@ -26,6 +26,7 @@ import gzip
 import time
 import os.path, os
 import operator
+import signal
 
 # Local
 from base.g import *
@@ -184,7 +185,7 @@ class SetupForm(SetupForm_base):
             self.__tr('Current: Filter: [%2]  Search: "%3"  TTL: %4  Timeout: %5s').arg(','.join(self.filter)).arg(self.search or '').arg(self.ttl).arg(self.timeout))
 
         cups.setPasswordCallback(showPasswordUI)
-
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
 
     def showPage(self, page):
         orig_page = page

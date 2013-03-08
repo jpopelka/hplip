@@ -21,6 +21,7 @@
 
 # StdLib
 import operator
+import signal
 
 # Local
 from base.g import *
@@ -105,6 +106,7 @@ class WifiSetupDialog(QDialog, Ui_Dialog):
         self.connect(self.CancelButton, SIGNAL("clicked()"), self.CancelButton_clicked)
         self.connect(self.BackButton, SIGNAL("clicked()"), self.BackButton_clicked)
         self.connect(self.NextButton, SIGNAL("clicked()"), self.NextButton_clicked)
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
 
         self.initIntroPage()
         self.initDevicesPage()

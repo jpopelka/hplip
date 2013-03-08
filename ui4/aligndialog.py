@@ -21,6 +21,7 @@
 
 # StdLib
 import operator
+import signal
 
 # Local
 from base.g import *
@@ -423,6 +424,8 @@ class AlignDialog(QDialog, Ui_Dialog):
         self.connect(self.DeviceComboBox, SIGNAL("DeviceUriComboBox_noDevices"), self.DeviceUriComboBox_noDevices)
         self.connect(self.DeviceComboBox, SIGNAL("DeviceUriComboBox_currentChanged"), self.DeviceUriComboBox_currentChanged)
         self.DeviceComboBox.setFilter({'align-type': (operator.ne, ALIGN_TYPE_NONE)})
+
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
 
         # Application icon
         self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))

@@ -19,6 +19,7 @@
 # Authors: Don Welch
 
 # Std Lib
+import signal
 
 # Local
 from base.g import *
@@ -47,6 +48,7 @@ class PrinterForm(QMainWindow):
         self.statusBar()
 
         self.setIcon(load_pixmap('hp_logo', '128x128'))
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
 
         if not name:
             self.setName("PrinterForm")
@@ -130,7 +132,7 @@ class PrinterForm(QMainWindow):
                 self.statusBar().message(self.device_uri)
 
         QTimer.singleShot(0, self.InitialUpdate)
-
+        
 
     def InitialUpdate(self):
         if self.init_failed:

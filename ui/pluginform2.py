@@ -26,6 +26,7 @@ from installer import pluginhandler
 
 from qt import *
 from pluginform2_base import PluginForm2_base
+import signal
 
 class PluginForm2(PluginForm2_base):
     def __init__(self,parent = None,name = None,modal = 0,fl = 0):
@@ -38,6 +39,7 @@ class PluginForm2(PluginForm2_base):
         self.titleTextLabel.setFont(QFont('Helvetica', 16))
 
         self.sourceGroup.emit(SIGNAL("clicked(int)"), (0,))
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
 
     def sourceGroup_clicked(self, item):
         self.pathLineEdit.setEnabled(item == 1)

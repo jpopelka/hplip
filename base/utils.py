@@ -117,6 +117,7 @@ EXPECT_WORD_LIST = [
     "wachtwoord", # nl
     "heslo", # czech
     "密码",
+    "Lösenord", #sv
 ]
 
 
@@ -1235,6 +1236,7 @@ def run(cmd, passwordObj = None, pswd_msg='', log_output=True, spinner=True, tim
         return -1, ''
 
     try:
+        pswd_queried_cnt = 0
         while True:
             if spinner:
                 update_spinner()
@@ -1259,7 +1261,8 @@ def run(cmd, passwordObj = None, pswd_msg='', log_output=True, spinner=True, tim
                 if not passwordObj :
                     raise Exception("password Object(i.e. passwordObj) is not valid")
 
-                child.sendline(passwordObj.getPassword(pswd_msg))
+                child.sendline(passwordObj.getPassword(pswd_msg, pswd_queried_cnt))
+                pswd_queried_cnt += 1
 
     except Exception, e:
         log.error("Exception: %s" % e)

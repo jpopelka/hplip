@@ -27,7 +27,7 @@ import os
 import signal
 import os.path
 import time
-
+import signal
 
 # Local
 from base.g import *
@@ -335,6 +335,7 @@ class SystemTrayApp(QApplication):
         notifier = QSocketNotifier(self.read_pipe, QSocketNotifier.Read)
         QObject.connect(notifier, SIGNAL("activated(int)"), self.notifierActivated)
         QObject.connect(self.tray_icon, SIGNAL("activated(QSystemTrayIcon::ActivationReason)"), self.trayActivated)
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
         self.tray_icon.show()
 
         if self.user_settings.systray_visible == SYSTRAY_VISIBLE_SHOW_ALWAYS:

@@ -295,10 +295,13 @@
 :model "HP Photosmart Prem c410 Series"
 :status :good
 
-:model "HP Officejet Pro x476dn MFP"
+:model "HP Officejet Pro x476dn Multifunction Printer"
 :status :good
 
-:model "HP Officejet Pro x476dw MFP"
+:model "HP Officejet Pro x476 Multifunction Printer Series"
+:status :good
+
+:model "HP Officejet Pro x476dw Multifunction Printer"
 :status :good
 
 :model "HP PSC 500xi All-in-one Printer"
@@ -325,10 +328,10 @@
 :model "HP Officejet 570 All-in-one Printer"
 :status :good
 
-:model "HP Officejet Pro x576dn MFP"
+:model "HP Officejet Pro x576dw Multifunction Printer"
 :status :good
 
-:model "HP Officejet Pro x576dw MFP"
+:model "HP Officejet Pro x576 Multifunction Printer Series"
 :status :good
 
 :model "HP Officejet 580 All-in-one Printer"
@@ -1369,13 +1372,13 @@
 :model "HP Officejet 4105 All-in-one Printer"
 :status :good
 
-:model "HP Officejet 4110xi All-in-one Printer"
-:status :good
-
 :model "HP Photosmart c4110 All-in-one Printer"
 :status :good
 
 :model "HP Officejet 4110v All-in-one Printer"
+:status :good
+
+:model "HP Officejet 4110xi All-in-one Printer"
 :status :good
 
 :model "HP Officejet 4110 All-in-one Printer"

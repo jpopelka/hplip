@@ -34,6 +34,8 @@ from printsettingsdialog_base import Ui_Dialog
 from printsettingstoolbox import PrintSettingsToolbox
 from printernamecombobox import PRINTERNAMECOMBOBOX_TYPE_PRINTER_AND_FAX, PRINTERNAMECOMBOBOX_TYPE_FAX_ONLY
 
+#signal
+import signal
 
 class PrintSettingsDialog(QDialog, Ui_Dialog):
     def __init__(self, parent, printer_name, fax_mode=False):
@@ -74,6 +76,8 @@ class PrintSettingsDialog(QDialog, Ui_Dialog):
 
         self.connect(self.PrinterName, SIGNAL("PrinterNameComboBox_noPrinters"),
             self.PrinterNameComboBox_noPrinters)
+
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
 
         # Application icon
         self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))

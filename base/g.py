@@ -152,7 +152,7 @@ class State(ConfigBase):
     def __init__(self):
         if not os.path.exists('/var/lib/hp/') and os.geteuid() == 0:
             os.makedirs('/var/lib/hp/')
-            cmd = 'chmod 644 /var/lib/hp/'
+            cmd = 'chmod 755 /var/lib/hp/'
             os_utils.execute(cmd)
         ConfigBase.__init__(self, '/var/lib/hp/hplip.state')
 

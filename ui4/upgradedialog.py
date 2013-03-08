@@ -22,6 +22,7 @@
 #Global
 import os
 import time
+import signal
 
 # Local
 from base.g import *
@@ -56,6 +57,7 @@ class UpgradeDialog(QDialog, Ui_Dialog):
         self.connect(self.installRadioBtton, SIGNAL("toggled(bool)"), self.installRadioBtton_toggled)
         self.connect(self.remindRadioBtton, SIGNAL("toggled(bool)"), self.remindRadioBtton_toggled)
         self.connect(self.dontRemindRadioBtton, SIGNAL("toggled(bool)"), self.dontRemindRadioBtton_toggled)
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
 
         # Application icon
         self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))

@@ -23,6 +23,7 @@
 import os
 import os.path
 import sys
+import signal
 
 # Local
 from base.g import *
@@ -162,6 +163,7 @@ class QueuesDiagnose(QDialog, Ui_Dialog):
         # connect signals/slots
         self.connect(self.CancelButton, SIGNAL("clicked()"), self.CancelButton_clicked)
         self.connect(self.NextButton, SIGNAL("clicked()"), self.NextButton_clicked)
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
 
         # Application icon
         self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))

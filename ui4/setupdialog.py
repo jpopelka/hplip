@@ -23,6 +23,7 @@
 import socket
 import operator
 import commands
+import signal
 
 # Local
 from base.g import *
@@ -207,6 +208,7 @@ class SetupDialog(QDialog, Ui_Dialog):
         self.connect(self.BackButton, SIGNAL("clicked()"), self.BackButton_clicked)
         self.connect(self.NextButton, SIGNAL("clicked()"), self.NextButton_clicked)
         self.connect(self.ManualGroupBox,  SIGNAL("clicked(bool)"),  self.ManualGroupBox_clicked)
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
 
         if self.remove:
             self.initRemovePage()

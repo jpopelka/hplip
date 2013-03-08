@@ -232,6 +232,7 @@ class Password(object):
                 #TBD.. IF user dosn't have sudo permissions, needs to change to "su" type and query for password
 #                self.__changeAuthType()
             else:
+                self.__password = ""
                 x += 1
                 if self.__mode == GUI_MODE:
                     if qt == "qt4":
@@ -241,13 +242,13 @@ class Password(object):
 
                     if x > PASSWORD_RETRY_COUNT:
                         FailureMessageUI("Password incorrect. ")
-                        sys.exit(1)
+                        return
                     else:
                         FailureMessageUI("Password incorrect. %d attempt(s) left." % (PASSWORD_RETRY_COUNT +1 -x ))
                 else:
                     if x > PASSWORD_RETRY_COUNT:
                         log.error("Password incorrect. ")
-                        sys.exit(1)
+                        return
                     else:
                         log.error("Password incorrect. %d attempt(s) left." % (PASSWORD_RETRY_COUNT +1 -x ))
 
@@ -308,8 +309,11 @@ class Password(object):
         return AuthCmd
 
 
-    def getPassword(self, pswd_msg=''):
+    def getPassword(self, pswd_msg='', psswd_queried_cnt = 0):
         if self.__passwordValidated:
+            return self.__password
+
+        if psswd_queried_cnt:
             return self.__password
 
         self.__validatePassword( pswd_msg)

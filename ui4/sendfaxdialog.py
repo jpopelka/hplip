@@ -23,6 +23,7 @@
 import operator
 import struct
 import Queue
+import signal
 
 # Local
 from base.g import *
@@ -135,6 +136,7 @@ class SendFaxDialog(QDialog, Ui_Dialog):
         self.connect(self.CancelButton, SIGNAL("clicked()"), self.CancelButton_clicked)
         self.connect(self.BackButton, SIGNAL("clicked()"), self.BackButton_clicked)
         self.connect(self.NextButton, SIGNAL("clicked()"), self.NextButton_clicked)
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
 
         self.initSelectFaxPage()
         self.initCoverpagePage()

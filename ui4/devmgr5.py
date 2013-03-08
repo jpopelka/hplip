@@ -28,6 +28,7 @@ import os
 import gzip
 import select
 import struct
+import signal
 
 # Local
 from base.g import *
@@ -287,6 +288,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
 
         self.connect(self.PrintControlPrinterNameCombo, SIGNAL("activated(const QString &)"), self.PrintControlPrinterNameCombo_activated)
         self.connect(self.PrintSettingsPrinterNameCombo, SIGNAL("activated(const QString &)"), self.PrintSettingsPrinterNameCombo_activated)
+        signal.signal(signal.SIGINT, signal.SIG_IGN)
 
 
          # Init tabs/controls
@@ -798,6 +800,12 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
             self.updatePrinterCombos()
             self.updateCurrentTab()
             self.statusBar().showMessage(self.cur_device_uri)
+            if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
+                self.Tabs.setTabText(self.Tabs.indexOf(self.Settings), QApplication.translate("MainWindow", "Print Settings", None, QApplication.UnicodeUTF8))
+                self.Tabs.setTabText(self.Tabs.indexOf(self.Control), QApplication.translate("MainWindow", "Printer Control", None, QApplication.UnicodeUTF8))
+            else:
+                self.Tabs.setTabText(self.Tabs.indexOf(self.Settings), QApplication.translate("MainWindow", "Fax Settings", None, QApplication.UnicodeUTF8))
+                self.Tabs.setTabText(self.Tabs.indexOf(self.Control), QApplication.translate("MainWindow", "Fax Control", None, QApplication.UnicodeUTF8))
 
 
     def DeviceList_currentChanged(self, i,  j):
@@ -1809,8 +1817,10 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
     def updatePrintControlTab(self):
         if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
             self.PrintControlPrinterNameLabel.setText(self.__tr("Printer Name:"))
+            self.groupBox.setTitle(QApplication.translate("MainWindow", "Printer Queue Control", None, QApplication.UnicodeUTF8))
         else:
             self.PrintControlPrinterNameLabel.setText(self.__tr("Fax Name:"))
+            self.groupBox.setTitle(QApplication.translate("MainWindow", "Fax Queue Control", None, QApplication.UnicodeUTF8))
 
         self.JobTable.clear()
         self.JobTable.setRowCount(0)
@@ -1867,18 +1877,23 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
     def updatePrintController(self):
         # default printer
         self.SetDefaultButton.setText(self.__tr("Set as Default"))
-
+        
         default_printer = cups.getDefaultPrinter()
         if default_printer is not None:
             default_printer = default_printer.decode('utf8')
+            
+        if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
+            device_string = "Printer"
+        else:
+            device_string = "Fax"
 
         if default_printer == self.cur_printer:
-            self.SetDefaultLabel.setText(self.__tr("Default Printer"))
+            self.SetDefaultLabel.setText(self.__tr("Default %s"%device_string))
             self.SetDefaultIcon.setPixmap(load_pixmap("ok", "16x16"))
             self.SetDefaultButton.setEnabled(False)
 
         else:
-            self.SetDefaultLabel.setText(self.__tr("Not Default Printer"))
+            self.SetDefaultLabel.setText(self.__tr("Not Default %s"%device_string))
             self.SetDefaultIcon.setPixmap(load_pixmap("info", "16x16"))
             self.SetDefaultButton.setEnabled(True)
 
@@ -1888,31 +1903,18 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         if self.printer_state == cups.IPP_PRINTER_STATE_IDLE:
             self.StartStopLabel.setText(self.__tr("Started/Idle"))
             self.StartStopIcon.setPixmap(load_pixmap("idle", "16x16"))
+            self.StartStopButton.setText(self.__tr("Stop %s"%device_string))
 
-            if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
-                self.StartStopButton.setText(self.__tr("Stop Printer"))
-
-            else:
-                self.StartStopButton.setText(self.__tr("Stop Fax"))
 
         elif self.printer_state == cups.IPP_PRINTER_STATE_PROCESSING:
             self.StartStopLabel.setText(self.__tr("Started/Processing"))
             self.StartStopIcon.setPixmap(load_pixmap("busy", "16x16"))
+            self.StartStopButton.setText(self.__tr("Stop %s"%device_string))
 
-            if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
-                self.StartStopButton.setText(self.__tr("Stop Printer"))
-
-            else:
-                self.StartStopButton.setText(self.__tr("Stop Fax"))
         else:
             self.StartStopLabel.setText(self.__tr("Stopped"))
             self.StartStopIcon.setPixmap(load_pixmap("warning", "16x16"))
-
-            if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
-                self.StartStopButton.setText(self.__tr("Start Printer"))
-
-            else:
-                self.StartStopButton.setText(self.__tr("Start Fax"))
+            self.StartStopButton.setText(self.__tr("Start %s"%device_string))
 
         # reject/accept
         if self.printer_accepting:

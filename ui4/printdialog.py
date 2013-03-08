@@ -36,6 +36,9 @@ from printdialog_base import Ui_Dialog
 from filetable import FileTable, FILETABLE_TYPE_PRINT
 from printernamecombobox import PRINTERNAMECOMBOBOX_TYPE_PRINTER_ONLY
 
+#signal
+import signal
+
 PAGE_FILE = 0
 PAGE_OPTIONS = 1
 PAGE_MAX = 1
@@ -73,6 +76,7 @@ class PrintDialog(QDialog, Ui_Dialog):
         self.connect(self.CancelButton, SIGNAL("clicked()"), self.CancelButton_clicked)
         self.connect(self.BackButton, SIGNAL("clicked()"), self.BackButton_clicked)
         self.connect(self.NextButton, SIGNAL("clicked()"), self.NextButton_clicked)
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
 
         self.initFilePage()
         self.initOptionsPage()

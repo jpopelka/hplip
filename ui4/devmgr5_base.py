@@ -395,7 +395,7 @@ class Ui_MainWindow(object):
         self.PrintSettingsPrinterNameLabel.setText(QtGui.QApplication.translate("MainWindow", "Printer Name:", None, QtGui.QApplication.UnicodeUTF8))
         self.Tabs.setTabText(self.Tabs.indexOf(self.Settings), QtGui.QApplication.translate("MainWindow", "Print Settings", None, QtGui.QApplication.UnicodeUTF8))
         self.PrintControlPrinterNameLabel.setText(QtGui.QApplication.translate("MainWindow", "Printer Name:", None, QtGui.QApplication.UnicodeUTF8))
-        self.groupBox.setTitle(QtGui.QApplication.translate("MainWindow", "Printer/Queue Control", None, QtGui.QApplication.UnicodeUTF8))
+        self.groupBox.setTitle(QtGui.QApplication.translate("MainWindow", "Printer Queue Control", None, QtGui.QApplication.UnicodeUTF8))
         self.StartStopLabel.setText(QtGui.QApplication.translate("MainWindow", "Started", None, QtGui.QApplication.UnicodeUTF8))
         self.StartStopButton.setText(QtGui.QApplication.translate("MainWindow", "Stop Printer", None, QtGui.QApplication.UnicodeUTF8))
         self.AcceptRejectLabel.setText(QtGui.QApplication.translate("MainWindow", "Accepting", None, QtGui.QApplication.UnicodeUTF8))

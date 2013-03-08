@@ -28,6 +28,7 @@ from ui_utils import *
 # Qt
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+import signal
 
 # Ui
 from printtestpagedialog_base import Ui_Dialog
@@ -58,6 +59,8 @@ class PrintTestPageDialog(QDialog, Ui_Dialog):
 
         self.connect(self.PrinterNameCombo, SIGNAL("PrinterNameComboBox_noPrinters"),
             self.PrinterNameComboBox_noPrinters)
+            
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
 
         if self.printer_name:
             self.PrinterNameCombo.setInitialPrinter(self.printer_name)

@@ -5095,7 +5095,7 @@ packages=wget
 # ****************************************
 [linuxmint]
 index=22
-versions=8,9,10,11,12,13
+versions=8,9,10,11,12,13,14
 display_name=Linux Mint
 alt_names=mint, mint linux
 display=1
@@ -5431,6 +5431,14 @@ supported=1
 packaged_version=3.12.2
 release_date=2012
 same_as_version=12
+
+[linuxmint:14]
+code_name=Nadia
+supported=1
+packaged_version=3.13.3
+release_date=2012
+same_as_version=12
+
 
 
 

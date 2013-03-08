@@ -594,7 +594,7 @@ try:
             from base import subproc as subprocess
 
         try:
-            import Image
+            from PIL import Image
         except ImportError:
             log.error("%s requires the Python Imaging Library (PIL). Exiting." % __mod__)
             sys.exit(1)

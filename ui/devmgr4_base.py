@@ -318,7 +318,7 @@ class DevMgr4_base(QMainWindow):
         self.jobList.header().setLabel(4,self.__tr("Job ID"))
         self.cancelToolButton.setText(QString.null)
         self.infoToolButton.setText(QString.null)
-        self.groupBox1.setTitle(self.__tr("Printer (Queue) Control"))
+        self.groupBox1.setTitle(self.__tr("Printer Queue Control"))
         self.defaultPushButton.setText(self.__tr("Set As Default"))
         self.rejectacceptPushButton.setText(self.__tr("Reject Jobs"))
         self.stopstartPushButton.setText(self.__tr("Stop Printer"))

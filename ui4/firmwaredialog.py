@@ -21,6 +21,7 @@
 
 # Std Lib
 import operator
+import signal
 
 # Local
 from base.g import *
@@ -53,6 +54,7 @@ class FirmwareDialog(QDialog, Ui_Dialog):
         self.connect(self.DeviceComboBox, SIGNAL("DeviceUriComboBox_currentChanged"), self.DeviceUriComboBox_currentChanged)
         self.connect(self.CancelButton, SIGNAL("clicked()"), self.close)
         self.connect(self.DownloadFirmwareButton, SIGNAL("clicked()"), self.downloadFirmware)
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
 
         # Application icon
         self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))

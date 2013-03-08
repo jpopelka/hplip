@@ -21,6 +21,7 @@
 
 # StdLib
 import operator
+import signal
 
 # Local
 from base.g import *
@@ -72,6 +73,7 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
         self.connect(self.FaxComboBox, SIGNAL("DeviceUriComboBox_noDevices"), self.FaxComboBox_noDevices)
         self.connect(self.FaxComboBox, SIGNAL("DeviceUriComboBox_currentChanged"), self.FaxComboBox_currentChanged)
         self.FaxComboBox.setType(DEVICEURICOMBOBOX_TYPE_FAX_ONLY)
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
 
         # Application icon
         self.setWindowIcon(QIcon(load_pixmap('hp_logo', '128x128')))
