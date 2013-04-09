@@ -417,6 +417,9 @@ COLORANT_INDEX_TO_AGENT_TYPE_MAP = {
                                     'magenta':  AGENT_TYPE_MAGENTA,
                                     'yellow' :  AGENT_TYPE_YELLOW,
                                     'black' :   AGENT_TYPE_BLACK,
+                                    'photoblack': AGENT_TYPE_PHOTO_BLACK,
+                                    'matteblack' : AGENT_TYPE_MATTE_BLACK,
+                                    'gray' : AGENT_TYPE_LG,
                                    }
 
 MARKER_SUPPLES_TYPE_TO_AGENT_KIND_MAP = {
@@ -567,6 +570,7 @@ def StatusType3( dev, parsedID ): # LaserJet Status (PML/SNMP)
                     else: # SUCCESS
                         if colorant_value is not None:
                             log.debug("colorant value: %s" % colorant_value)
+                            colorant_value = colorant_value.lower().strip()
                             agent_type = COLORANT_INDEX_TO_AGENT_TYPE_MAP.get( colorant_value, AGENT_TYPE_BLACK )
 
                         if agent_type == AGENT_TYPE_NONE:
@@ -1544,12 +1548,27 @@ def StatusType10(func): # Low End Data Model
         log.error("cannot get status for printer. please load ElementTree module")
         return status_block
 
+    status_block = StatusType10Agents(func)
+
+    temp_status_block = {}
+    temp_status_block = StatusType10Media(func)
+    status_block.update(temp_status_block)
+
+    temp_status_block = {}
+    temp_status_block = StatusType10Status(func)
+    status_block.update(temp_status_block)
+
+    return status_block
+
+
+def StatusType10Agents(func): # Low End Data Model
+    status_block = {}
     # Get the dynamic consumables configuration
     data = StatusType10FetchUrl(func, "/DevMgmt/ConsumableConfigDyn.xml")
     if not data:
         return status_block
     data = data.replace("ccdyn:", "").replace("dd:", "")
-
+   
     # Parse the agent status XML
     agents = []
     try:
@@ -1561,6 +1580,7 @@ def StatusType10(func): # Low End Data Model
         for e in elements:
             health = AGENT_HEALTH_OK
             ink_level = 0
+            agent_sku = ''
             try:
                 type = e.find("ConsumableTypeEnum").text
                 state = e.find("ConsumableLifeState/ConsumableState").text
@@ -1575,6 +1595,8 @@ def StatusType10(func): # Low End Data Model
                                state = "empty"
                            elif ink_level <=10:
                                state = "low"
+
+                           agent_sku = 'Unknown' #Initialize to unknown. IN some old devices, ConsumableSelectibilityNumber is not returned by device.
                         except:
                            ink_level = 0
                 elif type == "printhead":
@@ -1583,11 +1605,11 @@ def StatusType10(func): # Low End Data Model
                     ink_type = ''
                     if state == "ok":
                         ink_level = 100
-                
+
                 try:
                     agent_sku = e.find("ConsumableSelectibilityNumber").text
                 except:
-                    agent_sku = ''
+                    pass
 
                 log.debug("type '%s' state '%s' ink_type '%s' ink_level %d agent_sku = %s" % (type, state, ink_type, ink_level,agent_sku))
 
@@ -1606,7 +1628,10 @@ def StatusType10(func): # Low End Data Model
     except (expat.ExpatError, UnboundLocalError):
         agents = []
     status_block['agents'] = agents
+    return status_block						  
 
+def StatusType10Media(func): # Low End Data Model
+    status_block = {}
     # Get the media handling configuration
     data = StatusType10FetchUrl(func, "/DevMgmt/MediaHandlingDyn.xml")
     if not data:
@@ -1641,13 +1666,17 @@ def StatusType10(func): # Low End Data Model
         if e.text == "autoDuplexor":
             status_block['duplexer'] = DUPLEXER_DOOR_CLOSED
 
+    return status_block
+
+def StatusType10Status(func): # Low End Data Model
+    status_block = {}
     # Get the product status
     data = StatusType10FetchUrl(func, "/DevMgmt/ProductStatusDyn.xml")
     if not data:
         return status_block
     data = data.replace("psdyn:", "").replace("locid:", "")
     data = data.replace("pscat:", "").replace("dd:", "").replace("ad:", "")
-
+	
     # Parse the product status XML
     try:
         if etree_loaded:
@@ -1657,10 +1686,14 @@ def StatusType10(func): # Low End Data Model
         elements = tree.findall("Status/StatusCategory")
     except (expat.ExpatError, UnboundLocalError):
         elements = []
+
     for e in elements:
+
         if e.text == "processing":
             status_block['status-code'] = STATUS_PRINTER_PRINTING
-        if e.text == "closeDoorOrCover":
+        elif e.text == "ready":
+            status_block['status-code'] = STATUS_PRINTER_IDLE
+        elif e.text == "closeDoorOrCover":
             status_block['status-code'] = STATUS_PRINTER_DOOR_OPEN
         elif e.text == "shuttingDown":
             status_block['status-code'] = STATUS_PRINTER_TURNING_OFF
@@ -1723,28 +1756,28 @@ def StatusType10(func): # Low End Data Model
 		#Alert messages for Pentane products RQ 8888
         elif e.text == "scannerADFMispick":
             status_block['status-code'] = STATUS_SCANNER_ADF_MISPICK
-			
+
         elif e.text == "mediaTooShortToAutoDuplex":
             status_block['status-code'] = STATUS_PRINTER_PAPER_TOO_SHORT_TO_AUTODUPLEX
-			
-        elif e.text == "insertOrCloseTray": 
+
+        elif e.text == "insertOrCloseTray":
             status_block['status-code'] = STATUS_PRINTER_TRAY_2_3_DOOR_OPEN
 
         elif e.text == "inkTooLowToPrime":
             status_block['status-code'] = STATUS_PRINTER_INK_TOO_LOW_TO_PRIME
-			
+
         elif e.text == "cartridgeVeryLow":
             status_block['status-code'] = STATUS_PRINTER_VERY_LOW_ON_INK
-			
+
         elif e.text == "wasteMarkerCollectorAlmostFull":
             status_block['status-code'] = STATUS_PRINTER_SERVICE_INK_CONTAINER_ALMOST_FULL
-			
+
         elif e.text == "wasteMarkerCollectorFull":
-            status_block['status-code'] = STATUS_PRINTER_SERVICE_INK_CONTAINER_FULL			
-			
+            status_block['status-code'] = STATUS_PRINTER_SERVICE_INK_CONTAINER_FULL
+
         elif e.text == "wasteMarkerCollectorFullPrompt":
             status_block['status-code'] = STATUS_PRINTER_SERVICE_INK_CONTAINER_FULL_PROMPT
-			
+
         elif e.text == "missingDuplexer":
             status_block['status-code'] = STATUS_PRINTER_DUPLEX_MODULE_MISSING
 
@@ -1765,5 +1798,8 @@ def StatusType10(func): # Low End Data Model
 
         elif e.text == "manuallyFeed":
             status_block['status-code'] = STATUS_MANUALLY_FEED
+
+        else:
+            status_block['status-code'] = STATUS_UNKNOWN
 
     return status_block

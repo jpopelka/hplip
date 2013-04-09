@@ -2220,6 +2220,10 @@ enum HPMUD_RESULT hpmud_make_usb_uri(const char *busnum, const char *devnum, cha
 		{
 			if (libusb_get_config_descriptor (dev, conf, &confptr) < 0)
 				continue;
+
+            if ( confptr->bNumInterfaces > 1)
+                break;
+
 			for (iface = 0, ifaceptr = confptr->interface; iface < confptr->bNumInterfaces; iface ++, ifaceptr ++)
 			{
 				for (altset = 0, altptr = ifaceptr->altsetting; altset < ifaceptr->num_altsetting; altset++, altptr++)

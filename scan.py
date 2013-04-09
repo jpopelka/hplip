@@ -69,6 +69,8 @@ default_res = 300
 scanner_compression = 'JPEG'
 adf = False
 duplex = False
+dest_printer = None
+dest_devUri = None
 
 PAGE_SIZES = { # in mm
     '5x7' : (127, 178, "5x7 photo", 'in'),
@@ -188,7 +190,8 @@ try:
         ("", 'Use double quotes (") around the note/message if it contains space characters.', "option", False),
         utils.USAGE_SPACE,
         ("[OPTIONS] ('printer' dest)", "", "header", False),
-        ("Printer queue/printer:", "--printer=<printer_name>", "option", False),
+        ("Printer queue/printer dest:", "--dp=<printer_name> or --dest-printer=<printer_name>", "option", False),
+        ("Printer device-URI dest:", "--dd=<device-uri> or --dest-device=<device-uri>", "option", False),
         utils.USAGE_SPACE,
         ("[OPTIONS] (advanced)", "", "header", False),
         ("Set the scanner compression mode:", "-x<mode> or --compression=<mode>, <mode>='raw', 'none' or 'jpeg' ('jpeg' is default) ('raw' and 'none' are equivalent)", "option", False),],
@@ -209,7 +212,8 @@ try:
                           'greyscale', 'email-subject=',
                           'subject=', 'to=', 'from=', 'jpg',
                           'grey-scale', 'gray-scale', 'about=',
-                          'editor='
+                          'editor=', 'dp=', 'dest-printer=', 'dd=',
+			  'dest-device='
                          ])
 
 
@@ -438,10 +442,19 @@ try:
             a = a.strip().lower().split(',')
             for aa in a:
                 aa = aa.strip()
-                if aa in ('file', 'viewer', 'editor', 'printer', 'print', 'email', 'pdf') \
+                if aa in ('file', 'viewer', 'editor', 'print', 'email', 'pdf') \
                     and aa not in dest:
-                    if aa == 'print': aa = 'printer'
                     dest.append(aa)
+
+        elif o in ('--dd', '--dest-device'):
+            dest_devUri = a.strip()
+            if 'print' not in dest:
+                dest.append('print')
+
+        elif o in ('--dp', '--dest-printer'):
+            dest_printer = a.strip()
+            if 'print' not in dest:
+                dest.append('print')
 
         elif o in ('-v', '--viewer'):
             a = a.strip()
@@ -520,12 +533,6 @@ try:
             duplex = True
             adf = True
             output_type = 'pdf'
-
-    if printer_name is not None and \
-        device.getDeviceURIByPrinterName(printer_name) is not None and \
-        'printer' not in dest:
-
-        dest.append('printer')
 
     if not dest:
         log.warn("No destinations specified. Adding 'file' destination by default.")
@@ -619,11 +626,14 @@ try:
             sane.reportError(e)
             sys.exit(1)
 
-        source_option = device.getOptionObj("source").constraint
-        log.debug("Supported source Options: %s size=%d" % (source_option,len(source_option)))
-        if source_option is None:
-             log.error("Device doesn't have scanner.")
-             sys.exit(1)
+        try:
+            source_option = device.getOptionObj("source").constraint
+            log.debug("Supported source Options: %s size=%d" % (source_option,len(source_option)))
+            if source_option is None:
+                log.error("Device doesn't have scanner.")
+                sys.exit(1)
+        except:
+            log.error("Failed to get the source from device.")
 
         #check if device has only ADF
         if 'Flatbed' not in source_option and 'ADF' in source_option:
@@ -874,7 +884,7 @@ try:
                             log.debug("Expecting to read %s from scanner." % utils.format_bytes(expected_bytes))
 
                     device.waitForScanActive()
-
+                    
                     pm = tui.ProgressMeter("Reading data:")
 
                     while device.isScanActive():
@@ -1037,7 +1047,7 @@ try:
             dest.remove("file")
 
         temp_saved = False
-        if ('editor' in dest or 'viewer' in dest or 'email' in dest or 'printer' in dest) \
+        if ('editor' in dest or 'viewer' in dest or 'email' in dest or 'print' in dest) \
             and not file_saved:
 
             output_fd, output = utils.make_temp_file(suffix='.png')
@@ -1083,13 +1093,20 @@ try:
                 os_utils.execute(cmd)
                 sys.exit(0)
 
-            elif d == 'printer':
-                hp_print = utils.which("hp-print")
-                if hp_print:
-                    cmd = 'hp-print %s &' % output
+            elif d == 'print':
+                hp_print = utils.which("hp-print", True)
+                if not hp_print:
+                    hp_print = 'python ./print.py'
+                 
+                if dest_printer is not None:
+                   cmd = '%s -p %s %s &' % (hp_print, dest_printer, output)
+                elif dest_devUri is not None:
+		   tmp = dest_devUri.partition(":")[2]
+		   dest_devUri = "hp:" + tmp
+                   cmd = '%s -d %s %s &' % (hp_print, dest_devUri, output)
                 else:
-                    cmd = "python ./print.py %s &" % output
-
+                   cmd = '%s %s &' % (hp_print, output)
+                
                 os_utils.execute(cmd)
 
             elif d == 'email':

@@ -965,7 +965,7 @@ class CoreInstall(object):
     def check_pil(self):
         log.debug("Checking for PIL...")
         try:
-            import Image
+            from PIL import Image
             return True
         except ImportError:
             return False
@@ -1672,7 +1672,11 @@ class CoreInstall(object):
     def is_auto_installer_support(self, distro_version = DISTRO_VER_UNKNOWN):
         if not self.distro_name:
             self.get_distro()
-            self.distro_name = self.distros_index[self.distro]
+            try:
+                self.distro_name = self.distros_index[self.distro]
+            except KeyError:
+                log.debug("Auto installation is not supported as Distro Name can't find for distro index [%d]."%(self.distro))
+                return False
 
         if distro_version == DISTRO_VER_UNKNOWN:
             distro_version = self.distro_version

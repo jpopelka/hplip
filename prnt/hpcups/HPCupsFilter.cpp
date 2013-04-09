@@ -268,7 +268,7 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
     if (m_iLogLevel & BASIC_LOG) {
         printCupsHeaderInfo(cups_header);
     }
-     
+
     m_JA.quality_attributes.media_type = cups_header->cupsMediaType;
     m_JA.quality_attributes.print_quality = atoi(cups_header->OutputType);
     m_JA.quality_attributes.horizontal_resolution = cups_header->HWResolution[0];
@@ -309,10 +309,10 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
      *  and is stored as <width, height>
      *  The ImagingBoundingBox is in PostScript units and are stored as <lower_left> <upper_right>
      *  and <0, 0> is at the bottom left
-     *      lower_left_x = ImagingBoundingBox[0] 
-     *      lower_left_y = ImagingBoundingBox[1] 
-     *      upper_right_x = ImagingBoundingBox[2] 
-     *      upper_right_y = ImagingBoundingBox[3] 
+     *      lower_left_x = ImagingBoundingBox[0]
+     *      lower_left_y = ImagingBoundingBox[1]
+     *      upper_right_x = ImagingBoundingBox[2]
+     *      upper_right_y = ImagingBoundingBox[3]
      *  We require <top_left> <bottom_right> values and <0, 0> is top left
      *  So,
      *      PrintableStartX = lower_left_x
@@ -327,7 +327,7 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
     m_JA.media_attributes.horizontal_overspray = (xoverspray * horz_res) / 1000;
     m_JA.media_attributes.vertical_overspray   = (yoverspray * vert_res) / 1000;
 
-    /* 
+    /*
      * Left and top overspray in dots. We haven't defined ovespray for all classes in the drv.
      * Hence using default values in the case of older classes.
      */
@@ -341,25 +341,25 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
 
 //  Get printer platform name
     if (((attr = ppdFindAttr(m_ppd, "hpPrinterPlatform", NULL)) != NULL) && (attr->value != NULL)) {
-    
+
 		strncpy(m_JA.printer_platform, attr->value, sizeof(m_JA.printer_platform)-1);
 
 		if (m_iLogLevel & BASIC_LOG) {
 			dbglog("HPCUPS: found Printer Platform, it is - %s\n", attr->value);
-		}        
-        
+		}
+
 		if(strcmp(m_JA.printer_platform, "ljzjscolor") == 0){
 			if(((attr = ppdFindAttr(m_ppd, "hpLJZjsColorVersion", NULL)) != NULL) && (attr->value != NULL)){
 				m_JA.printer_platform_version = atoi(attr->value);
 			}
-		}   
+		}
     }
-    
-//Get Raster Preprocessing status  
-	if(((attr = ppdFindAttr(m_ppd, "hpReverseRasterPages", NULL)) != NULL) && (attr->value != NULL)){				
+
+//Get Raster Preprocessing status
+	if(((attr = ppdFindAttr(m_ppd, "hpReverseRasterPages", NULL)) != NULL) && (attr->value != NULL)){
 		m_JA.pre_process_raster = atoi(attr->value);
-	}      
-    
+	}
+
 
 // Get the encapsulation technology from ppd
 
@@ -377,8 +377,10 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
         m_JA.media_attributes.physical_height = cups_header->PageSize[1];
         m_JA.media_attributes.printable_width = ((cups_header->ImagingBoundingBox[2]-cups_header->ImagingBoundingBox[0]) * horz_res) / 72;
         m_JA.media_attributes.printable_height = ((cups_header->ImagingBoundingBox[3]-cups_header->ImagingBoundingBox[1]) * vert_res) / 72;
-        strncpy(m_JA.media_attributes.PageSizeName, cups_header->cupsPageSizeName, sizeof(m_JA.media_attributes.PageSizeName)-1);
-        strncpy(m_JA.media_attributes.MediaTypeName, cups_header->MediaType, sizeof(m_JA.media_attributes.MediaTypeName)-1);
+        strncpy(m_JA.media_attributes.PageSizeName, &cups_header->cupsString[0][0], sizeof(m_JA.media_attributes.PageSizeName));
+        strncpy(m_JA.media_attributes.MediaTypeName, cups_header->MediaType, sizeof(m_JA.media_attributes.MediaTypeName));
+        strncpy(m_JA.quality_attributes.hbpl1_print_quality, cups_header->OutputType, sizeof(m_JA.quality_attributes.hbpl1_print_quality));
+        m_JA.color_mode = cups_header->cupsRowStep;
     }
     else{
         m_JA.media_attributes.physical_width   = (cups_header->PageSize[0] * horz_res) / 72;
@@ -417,9 +419,9 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
         }
     }
 
-	string strPrinterURI="" ,strPrinterName= "";	
+	string strPrinterURI="" ,strPrinterName= "";
     m_DBusComm.initDBusComm(DBUS_PATH,DBUS_INTERFACE, getenv("DEVICE_URI"), m_JA.printer_name);
-	
+
     ptr = strstr(m_argv[5], "job-uuid");
     if (ptr) {
         strncpy(m_JA.uuid, ptr + strlen("job-uuid=urn:uuid:"), sizeof(m_JA.uuid)-1);
@@ -453,7 +455,7 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
     }
 
     m_pPrinterBuffer = new BYTE[cups_header->cupsWidth * 4 + 32];
-    
+
 
     return NO_ERROR;
 }
@@ -565,7 +567,7 @@ int HPCupsFilter::StartPrintJob(int  argc, char *argv[])
 }
 
 bool HPCupsFilter::isBlankRaster(BYTE *input_raster, cups_page_header2_t *header)
-{   
+{
     int length_in_bytes = (int)header->cupsBytesPerLine;
     if (input_raster == NULL) {
         return true;
@@ -601,18 +603,18 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
     char hpPreProcessedRasterFile[64]; //temp file needed to store raster data with swaped pages.
 
     strcpy(hpPreProcessedRasterFile, "/var/log/hp/tmp/hplipSwapedPagesXXXXXX");
-       
+
 
     while (cupsRasterReadHeader2(cups_raster, &cups_header))
     {
         current_page_number++;
 
         if (current_page_number == 1) {
-            
+
             if (startPage(&cups_header) != NO_ERROR) {
                 return JOB_CANCELED;
             }
-            
+
             if(m_JA.pre_process_raster) {
 		        err = m_Job.preProcessRasterData(&cups_raster, &cups_header, hpPreProcessedRasterFile);
 				if (err != NO_ERROR) {
@@ -621,9 +623,9 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
 					}
 					ret_status = JOB_CANCELED;
 					break;
-				}   
+				}
 			}
-            
+
             if (cups_header.cupsColorSpace == CUPS_CSPACE_RGBW) {
                 rgbRaster = new BYTE[cups_header.cupsWidth * 3];
                 if (rgbRaster == NULL) {
@@ -659,7 +661,7 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
             ret_status = JOB_CANCELED;
             break;
         }
-        
+
         if (m_iLogLevel & SAVE_INPUT_RASTERS)
         {
             char    szFileName[64];
@@ -701,21 +703,21 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
 
             if(y == 0 && (0 == strcmp(m_JA.printer_language, "ljmono")) )
 			{
-				//For ljmono, make sure that first line is not a blankRaster line.Otherwise printer 
+				//For ljmono, make sure that first line is not a blankRaster line.Otherwise printer
 				//may not skip blank lines before actual data
 				//Need to revisit to crosscheck if it is a firmware issue.
-				
-				*m_pPrinterBuffer = 0x01;  
+
+				*m_pPrinterBuffer = 0x01;
 				dbglog("First raster data plane.." );
 			}
-			
+
             if (this->isBlankRaster((BYTE *) m_pPrinterBuffer, &cups_header)) {
-            
+
                 color_raster = NULL;
                 black_raster = NULL;
             }
             extractBlackPixels(&cups_header, black_raster, color_raster);
-            //! Sending Raster bits off to encapsulation 
+            //! Sending Raster bits off to encapsulation
             err = m_Job.SendRasters (black_raster, color_raster);
             if (err != NO_ERROR) {
                 break;
@@ -735,7 +737,7 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
         delete [] rgbRaster;
     }
 
-    unlink(hpPreProcessedRasterFile); 
+    unlink(hpPreProcessedRasterFile);
     return ret_status;
 }
 
@@ -745,7 +747,7 @@ void HPCupsFilter::extractBlackPixels(cups_page_header2_t *cups_header, BYTE *kR
  *  DON'T DO BITPACKING HERE, DO IT IN HALFTONER FOR CMYK PRINTES
  *  AND IN MODE9 FOR RGB PRINTERS
  */
-    
+
 static BYTE pixel_value[8] = {
             0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01
             };
@@ -762,8 +764,8 @@ static BYTE pixel_value[8] = {
         BYTE   *rgb = rgbRaster;
         BYTE   *black   = kRaster;
         memset (kRaster, 0, cups_header->cupsWidth);
-        
-        
+
+
         for (unsigned int i = 0; i < cups_header->cupsWidth; i++) {
             rgb[0] = *pIn++;
             rgb[1] = *pIn++;
@@ -853,6 +855,7 @@ void HPCupsFilter::printCupsHeaderInfo(cups_page_header2_t *header)
     dbglog ("DEBUG: cupsBytesPerLine = %d\n", header->cupsBytesPerLine);
     dbglog ("DEBUG: cupsColorOrder = %d\n", header->cupsColorOrder);
     dbglog ("DEBUG: cupsColorSpace = %d\n", header->cupsColorSpace);
+    dbglog ("DEBUG: cupsRowStep = %d\n", header->cupsRowStep);
     dbglog ("DEBUG: cupsCompression = %d\n", header->cupsCompression);
     dbglog ("DEBUG: cupsPageSizeName = %s\n", header->cupsPageSizeName);
     dbglog ("DEBUG: cupsInteger0 = %d\n", header->cupsInteger[0]); // max jpeg filesize

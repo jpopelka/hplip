@@ -82,11 +82,17 @@ static int ReadReply(mud_channel *pc)
 static int device_id(const char *ip, int port, char *buffer, int size)
 {
    int len=0, maxSize, result, dt, status;
+   int public_comunity_index = 4; //By default we need to pass community name = "public"
 
    maxSize = (size > 1024) ? 1024 : size;   /* RH8 has a size limit for device id */
 
-   if ((len = GetSnmp(ip, port, (char *)kStatusOID, (unsigned char *)buffer, maxSize, &dt, &status, &result)) == 0)
-      BUG("unable to read device-id\n");
+   if ((len = GetSnmp(ip, public_comunity_index, (char *)kStatusOID, (unsigned char *)buffer, maxSize, &dt, &status, &result)) == 0)
+   {
+      if ((len = GetSnmp(ip, port, (char *)kStatusOID, (unsigned char *)buffer, maxSize, &dt, &status, &result)) == 0)
+      {
+   	BUG("unable to read device-id\n");
+      }
+   }
 
    return len; /* length does not include zero termination */
 }

@@ -149,7 +149,7 @@ def setAdaptorPower(dev, adapterList, power_state='on'):
   
        ret['errorreturn'] = writeXmlDataToURI(dev,URI,powerXml,10)    
        if not(ret['errorreturn'] == HTTP_OK or ret['errorreturn'] == HTTP_NOCONTENT):
-          log.warn("Wifi Adapter turn ON request Failed. ResponseCode=%s AdaptorId=%s AdaptorName=%s. Trying another interface" %(ret['errorreturn'],adaptor_id,adaptorName))
+          log.debug("Wifi Adapter turn ON request Failed. ResponseCode=%s AdaptorId=%s AdaptorName=%s. Trying another interface" %(ret['errorreturn'],adaptor_id,adaptorName))
           powerXml = adapterPowerXml_payload2 %(power_state)
           ret['errorreturn'] = writeXmlDataToURI(dev,URI,powerXml,10)
 
@@ -291,16 +291,30 @@ def getIPConfiguration(dev, adapterName):
                     ip = params['iocfgdyn2:ioconfigdyn-dd3:ioadaptorconfig-dd3:networkadaptorconfig-dd3:ipversionconfig-dd3:ipconfig-dd:ipaddress']
                 except:
                     ip = params['iocfgdyn2:ioconfigdyn-dd3:ioadaptorconfig-dd3:networkadaptorconfig-dd3:ipversionconfig-dd3:ipconfig-dd:ipaddress-0']
-            #subnetmask = params['io:protocols-io:protocol-io:addresses-io:ipv4addresses-io:ipv4address-dd:subnetmask']
+
+                #subnetmask = params['io:protocols-io:protocol-io:addresses-io:ipv4addresses-io:ipv4address-dd:subnetmask']
+                try:
                     subnetmask = params['iocfgdyn2:ioconfigdyn-dd3:ioadaptorconfig-dd3:networkadaptorconfig-dd3:ipversionconfig-dd3:ipconfig-dd:subnetmask']
-            #gateway = params['io:protocols-io:protocol-io:addresses-io:ipv4addresses-io:ipv4address-dd:defaultgateway']
+                except:
+                    subnetmask = params['iocfgdyn2:ioconfigdyn-dd3:ioadaptorconfig-dd3:networkadaptorconfig-dd3:ipversionconfig-dd3:ipconfig-dd:subnetmask-0']
+
+                #gateway = params['io:protocols-io:protocol-io:addresses-io:ipv4addresses-io:ipv4address-dd:defaultgateway']
+                try:
                     gateway = params['iocfgdyn2:ioconfigdyn-dd3:ioadaptorconfig-dd3:networkadaptorconfig-dd3:ipversionconfig-dd3:ipconfig-dd:defaultgateway']
-            
-            #if 'DHCP' in params['io:protocols-io:protocol-io:addresses-io:ipv4addresses-io:ipv4address-dd:configmethod']:
-                    if 'DHCP' in params['iocfgdyn2:ioconfigdyn-dd3:ioadaptorconfig-dd3:networkadaptorconfig-dd3:ipversionconfig-dd3:ipconfig-dd:ipconfigmethod-0']:
-                        addressmode = 'dhcp'
-                    else:
-                        addressmode = 'autoip'    
+                except:
+                    gateway = params['iocfgdyn2:ioconfigdyn-dd3:ioadaptorconfig-dd3:networkadaptorconfig-dd3:ipversionconfig-dd3:ipconfig-dd:defaultgateway-0']
+
+                #if 'DHCP' in params['io:protocols-io:protocol-io:addresses-io:ipv4addresses-io:ipv4address-dd:configmethod']:
+                try:
+                    addressmode = params['iocfgdyn2:ioconfigdyn-dd3:ioadaptorconfig-dd3:networkadaptorconfig-dd3:ipversionconfig-dd3:ipconfig-dd:ipconfigmethod'] 
+                except:
+                    addressmode = params['iocfgdyn2:ioconfigdyn-dd3:ioadaptorconfig-dd3:networkadaptorconfig-dd3:ipversionconfig-dd3:ipconfig-dd:ipconfigmethod-0'] 
+
+                if 'dhcp' in addressmode.lower():
+                    addressmode = 'dhcp'
+                else:
+                    addressmode = 'autoip'
+
             #if elementCount ==1:
             #    pridns = params['io:protocols-io:protocol-dd:dnsserveripaddress']
             #    sec_dns = params['io:protocols-io:protocol-dd:secondarydnsserveripaddress']          
@@ -312,6 +326,7 @@ def getIPConfiguration(dev, adapterName):
             except KeyError, e:
                 log.error("Missing response key: %s" % str(e))        
 
+    log.debug("ip=%s, hostname=%s, addressmode=%s, subnetmask=%s, gateway=%s, pridns=%s, sec_dns=%s"%(ip, hostname, addressmode, subnetmask, gateway, pridns, sec_dns))
     return ip, hostname, addressmode, subnetmask, gateway, pridns, sec_dns  
 
 
@@ -491,22 +506,24 @@ def readXmlTagDataFromURI(dev,URI,xmlRootNode,xmlReqDataNode,timeout=5):
         if code == HTTP_OK:
             strResp = utils.unchunck_xml_data(strResp)
 
-    	pos = strResp.find(xmlRootNode,0,len(strResp))    
-    	repstr = strResp[pos:].strip()
-        repstr = filter(lambda c: c not in "\r\t\n", repstr) # To remove formating characters from the received xml
-        repstr = repstr.rstrip('0')   # To remove trailing zero from the received xml
-        try:
-            parser_object = utils.extendedExpat()
-            root_element = parser_object.Parse(repstr)
-            xmlReqDataNode = filter(lambda c: c not in "<>", xmlReqDataNode) # To remove '<' and '>' characters
-            reqDataElementList = root_element.getElementsByTagName(xmlReqDataNode)
-            for node in reqDataElementList:
-                repstr = node.toString()
-                repstr = filter(lambda c: c not in "\r\t\n", repstr) # To remove formating characters from the received xml
-                params = utils.XMLToDictParser().parseXML(repstr)
-                paramsList.append(params)
-        except xml.parsers.expat.ExpatError, e:
-            log.debug("XML parser failed: %s" % e)  #changed from error to debug 
+            pos = strResp.find(xmlRootNode,0,len(strResp))    
+            repstr = strResp[pos:].strip()
+            repstr = repstr.replace('\r',' ').replace('\t',' ').replace('\n',' ') # To remove formating characters from the received xml
+            repstr = repstr.rstrip('0')   # To remove trailing zero from the received xml
+            try:
+                parser_object = utils.extendedExpat()
+                root_element = parser_object.Parse(repstr)
+                xmlReqDataNode = filter(lambda c: c not in "<>", xmlReqDataNode) # To remove '<' and '>' characters
+                reqDataElementList = root_element.getElementsByTagName(xmlReqDataNode)
+                for node in reqDataElementList:
+                    repstr = node.toString()
+                    repstr = repstr.replace('\r',' ').replace('\t',' ').replace('\n',' ') # To remove formating characters from the received xml
+                    params = utils.XMLToDictParser().parseXML(repstr)
+                    paramsList.append(params)
+            except xml.parsers.expat.ExpatError, e:
+                log.debug("XML parser failed: %s" % e)  #changed from error to debug 
+        else:
+            log.debug("HTTP Responce failed with %s code"%code)
 
     return paramsList,code
 
@@ -551,17 +568,19 @@ def readXmlDataFromURI(dev,URI,xmlRootNode,xmlChildNode,timeout=5):
     if strResp is not None:                         	
         code = get_error_code(strResp)        
         if code == HTTP_OK:
-             strResp = utils.unchunck_xml_data(strResp)
+            strResp = utils.unchunck_xml_data(strResp)
 
-    	pos = strResp.find(xmlRootNode,0,len(strResp))    
-    	repstr = strResp[pos:].strip()
-        repstr = filter(lambda c: c not in "\r\t\n", repstr) # To remove formating characters from the received xml
-        repstr = repstr.rstrip('0')   # To remove trailing zero from the received xml
-    	elementCount = repstr.count(xmlChildNode)          	    	
-    	try:
-            params = utils.XMLToDictParser().parseXML(repstr)            
-        except xml.parsers.expat.ExpatError, e:
-            log.debug("XML parser failed: %s" % e)  #changed from error to debug 
+            pos = strResp.find(xmlRootNode,0,len(strResp))    
+            repstr = strResp[pos:].strip()
+            repstr = repstr.replace('\r',' ').replace('\t',' ').replace('\n',' ') # To remove formating characters from the received xml
+            repstr = repstr.rstrip('0')   # To remove trailing zero from the received xml
+            elementCount = repstr.count(xmlChildNode)          	    	
+            try:
+                params = utils.XMLToDictParser().parseXML(repstr)            
+            except xml.parsers.expat.ExpatError, e:
+                log.debug("XML parser failed: %s" % e)  #changed from error to debug 
+        else:
+            log.debug(" HTTP Responce failed with %s code"%code)
 
     return params,code,elementCount
 

@@ -74,6 +74,7 @@ class CleanDialog(QDialog, Ui_Dialog):
                       CLEAN_TYPE_PCL : 4,
                       CLEAN_TYPE_LIDIL : 4,
                       CLEAN_TYPE_PCL_WITH_PRINTOUT : 4,
+                      CLEAN_TYPE_LEDM : 4,
                     }
 
         self.seq = { # (func|method, tuple of params|None)
@@ -115,6 +116,20 @@ class CleanDialog(QDialog, Ui_Dialog):
                             ],
 
                     CLEAN_TYPE_PCL_WITH_PRINTOUT : [ # 3
+                            (self.showLevel1Page, None),
+                            (self.endLevel1Page, None),
+                            (self.doClean, (1,)),
+                            (self.showLevel2Page, None),
+                            (self.endLevel2Page, None),
+                            (self.doClean, (2,)),
+                            (self.showLevel3Page, None),
+                            (self.endLevel3Page, None),
+                            (self.doClean, (3,)),
+                            # TODO: Add print-out
+                            (self.close, None),
+                            ],
+
+                    CLEAN_TYPE_LEDM : [ # 4
                             (self.showLevel1Page, None),
                             (self.endLevel1Page, None),
                             (self.doClean, (1,)),
@@ -283,25 +298,42 @@ class CleanDialog(QDialog, Ui_Dialog):
 
                         if level == 1:
                             maint.cleanType1(self.dev)
+                            maint.print_clean_test_page(self.dev)
 
                         elif level == 2:
                             maint.primeType1(self.dev)
+                            maint.print_clean_test_page(self.dev)
 
                         else: # 3
                             maint.wipeAndSpitType1(self.dev)
+                            maint.print_clean_test_page(self.dev)
 
 
                     elif self.clean_type == CLEAN_TYPE_LIDIL: # 2
                         if level == 1:
                             maint.cleanType2(self.dev)
+                            maint.print_clean_test_page(self.dev)
 
                         elif level == 2:
                             maint.primeType2(self.dev)
+                            maint.print_clean_test_page(self.dev)
 
                         else: # 3
                             maint.wipeAndSpitType2(self.dev)
+                            maint.print_clean_test_page(self.dev)
 
-                    maint.print_clean_test_page(self.dev)
+                    elif self.clean_type == CLEAN_TYPE_LEDM: # 4
+                        if level == 1:
+                            maint.cleanTypeLedm(self.dev)
+                            maint.cleanTypeVerify(self.dev,level)
+
+                        elif level == 2:
+                            maint.cleanTypeLedm1(self.dev)
+                            maint.cleanTypeVerify(self.dev,level)
+
+                        else: # 3
+                            maint.cleanTypeLedm2(self.dev)
+                            maint.cleanTypeVerify(self.dev,level)
 
                 else:
                     CheckDeviceUI(self)

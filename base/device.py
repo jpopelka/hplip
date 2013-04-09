@@ -46,6 +46,10 @@ from prnt import pcl, ldl, cups
 import models, mdns, slp
 from strings import StringTable
 
+http_result_pat = re.compile("""HTTP/\d.\d\s(\d+)""", re.I)
+
+HTTP_OK = 200
+HTTP_ERROR = 500
 
 try:
     import hpmudext
@@ -976,6 +980,8 @@ AGENT_types = { AGENT_TYPE_NONE        : 'invalid',
                 AGENT_TYPE_PG          : 'photo_gray',
                 AGENT_TYPE_C_M         : 'cyan_and_magenta',
                 AGENT_TYPE_K_Y         : 'black_and_yellow',
+                AGENT_TYPE_PHOTO_BLACK : 'photo_black',
+                AGENT_TYPE_MATTE_BLACK : 'matte_black',
                 AGENT_TYPE_UNSPECIFIED : 'unspecified', # Kind=5,6
             }
 
@@ -1081,6 +1087,11 @@ class Device(object):
         self.model = models.normalizeModelName(self.model)
 
         log.debug("Model/UI model: %s/%s" % (self.model, self.model_ui))
+
+        if self.bus == 'net':
+            self.http_host = self.host
+        else:
+            self.http_host = 'localhost'  
 
         # TODO:
         #service.setAlertsEx(self.hpssd_sock)
@@ -2302,6 +2313,52 @@ class Device(object):
 
         self.printData(data, direct=direct, raw=True)
 
+    def post(self, url, post):
+        status_type = self.mq.get('status-type', STATUS_TYPE_NONE)
+        data = """POST %s HTTP/1.1\r
+Connection: Keep-alive\r
+User-agent: hplip/2.0\r
+Host: %s\r
+Content-type: text/xml\r
+Content-length: %d\r
+\r
+%s""" % (url, self.http_host, len(post), post)
+        log.log_data(data)
+        if status_type == STATUS_TYPE_LEDM:
+            log.debug("status-type: %d" % status_type)
+            self.writeEWS_LEDM(data)
+            response = cStringIO.StringIO()
+
+            while self.readEWS_LEDM(512, response, timeout=5):
+                pass
+
+            response = response.getvalue()
+            log.log_data(response)
+            self.closeEWS_LEDM()
+
+        elif status_type == STATUS_TYPE_LEDM_FF_CC_0:
+            log.debug("status-type: %d" % status_type)
+            self.writeLEDM(data)
+            response = cStringIO.StringIO()
+
+            while self.readLEDM(512, response, timeout=5):
+                pass
+
+            response = response.getvalue()
+            log.log_data(response)
+            self.closeLEDM()
+
+        else:
+            log.error("Not an LEDM status-type: %d" % status_type)
+
+        match = http_result_pat.match(response)
+        if match is None: return HTTP_OK
+        try:
+            code = int(match.group(1))
+        except (ValueError, TypeError):
+            code = HTTP_ERROR
+
+        return code == HTTP_OK
 
     def printGzipFile(self, file_name, printer_name=None, direct=False, raw=True, remove=False):
         return self.printFile(file_name, printer_name, direct, raw, remove)

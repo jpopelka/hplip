@@ -348,7 +348,7 @@ def get_xsane_version():
 
 def get_pil_version():
     try:
-        import Image
+        from PIL import Image
     except ImportError:
         return '-'
     else:

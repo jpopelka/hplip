@@ -2148,7 +2148,8 @@ enum HPMUD_RESULT hpmud_make_usb_uri(const char *busnum, const char *devnum, cha
 
 		if (!serial[0])
 			strcpy(serial, "0"); /* no serial number, make it zero */
-        if( is_interface(dev, 8))
+
+        if( dev->config[0].bNumInterfaces == 1 && is_interface(dev, 8))
         {
              strcpy(serial, "SMART_INSTALL_ENABLED"); /* no serial number, make it zero */
         }

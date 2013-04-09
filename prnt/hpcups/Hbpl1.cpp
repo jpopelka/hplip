@@ -37,6 +37,11 @@
 #include "Hbpl1.h"
 #include "utils.h"
 #define ZJC_BAND_HEIGHT    100
+#define ON 1
+#define OFF 0
+#define COLOR 0
+#define BLACKONLY 1
+#define GRAYSCALE 2
 
 Hbpl1Wrapper* (*fptr_create)(Hbpl1* const m_Hbpl1);
 void (*fptr_destroy)(Hbpl1Wrapper*);
@@ -52,6 +57,8 @@ Hbpl1::Hbpl1 () : Encapsulator ()
     m_nBandCount = 0;
     m_pbyStripData = NULL;
     m_init = false;
+    m_ColorMode = COLORTYPE_BOTH; //Grayscale
+    m_ColorTheme = NONE;
 
     m_hHPLibHandle = load_plugin_library(UTILS_PRINT_PLUGIN_LIBRARY, PRNT_PLUGIN_HBPL1);
     if (m_hHPLibHandle)
@@ -114,11 +121,23 @@ DRIVER_ERROR Hbpl1::StartJob(SystemServices *pSystemServices, JobAttributes *pJA
     m_nScanLineSize = m_JA.media_attributes.printable_width;
     m_nStripSize = m_nScanLineSize * 3 * m_nStripHeight;
     m_numStrips = m_JA.media_attributes.printable_height/m_nStripHeight;
-   	m_JA.krgb_mode = (m_JA.integer_values[1] == 1) ? true : false;
+   	m_Economode = (m_JA.integer_values[2] == ON) ? true : false;  //Economode
+    m_ColorTheme = (COLORTHEME)m_JA.integer_values[5]; // cupsInteger5 value
+    m_PrintinGrayscale = m_JA.integer_values[3]; // cupsInterger3 value
     m_pSystemServices = pSystemServices; //Reset and UEL not required
     err = m_pHbpl1Wrapper->StartJob((void**)&m_pOutBuffer, &m_OutBuffSize);
     err = sendBuffer(static_cast<const BYTE *>(m_pOutBuffer), m_OutBuffSize);
     m_pHbpl1Wrapper->FreeBuffer(m_pOutBuffer, m_OutBuffSize);
+
+    if (m_PrintinGrayscale ==  ON){  //Grayscale = ON
+        m_ColorMode = COLORTYPE_BOTH;
+    } else if(m_JA.color_mode == COLOR){ // if color cartridge && Grayscale = OFF
+        m_ColorMode = COLORTYPE_COLOR;
+    } else if(m_JA.color_mode == BLACKONLY){ // if black cartridge && Grayscale = OFF
+        m_ColorMode = COLORTYPE_BLACK;
+    } else
+        m_ColorMode = COLORTYPE_BOTH; //Grayscale
+
     return err;
 }
 

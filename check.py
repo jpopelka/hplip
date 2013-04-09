@@ -315,7 +315,7 @@ class DependenciesCheck(CoreInstall):
         Sts, Proc_info =utils.run("uname -r -v -o")
         log.info(" Kernel: %s Host: %s Proc: %s Distribution: %s %s"\
              %(Kernel_info,Host_info,Proc_info,self.distro_name, self.distro_version))
-
+        log.info(" Bitness: %s bit\n"%utils.getBitness())
         tui.header("HPLIP CONFIGURATION")
         v = sys_conf.get('hplip', 'version')
         if v:

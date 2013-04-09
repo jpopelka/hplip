@@ -1438,6 +1438,8 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         self.TYPE_TO_PIX_MAP = {
                                AGENT_TYPE_UNSPECIFIED : [black],
                                AGENT_TYPE_BLACK: [black],
+                               AGENT_TYPE_MATTE_BLACK : [black],
+                               AGENT_TYPE_PHOTO_BLACK : [dark_grey],
                                AGENT_TYPE_BLACK_B8800: [black],
                                AGENT_TYPE_CMY: [cyan, magenta, yellow],
                                AGENT_TYPE_KCM: [light_cyan, light_magenta, light_yellow],

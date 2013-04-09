@@ -150,6 +150,12 @@ try:
                                         CleanUI1, CleanUI2, CleanUI3,
                                         None)
 
+                    elif clean_type == CLEAN_TYPE_LEDM:
+                        maint.cleaning(d, clean_type, maint.cleanTypeLedm, maint.cleanTypeLedm1,
+                                        maint.cleanTypeLedm2, tui.load_paper_prompt,
+                                        CleanUI1, CleanUI2, CleanUI3,
+                                        None)
+
                     else:
                         log.error("Cleaning not needed or supported on this device.")
 

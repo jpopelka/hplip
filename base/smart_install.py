@@ -58,7 +58,7 @@ def get_usb_details(vid_pid):
 
     lsusb_cmd = utils.which('lsusb',True)
     if lsusb_cmd:
-        sts,out = utils.run("%s -d %s -v"%(lsusb_cmd, vid_pid))
+        sts,out = utils.run("%s -d %s -v"%(lsusb_cmd, vid_pid), passwordObj = None, pswd_msg='', log_output=False)
         if sts == 0:
             for l in out.splitlines():
                 for s in param_search:

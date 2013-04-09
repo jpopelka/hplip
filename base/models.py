@@ -224,7 +224,10 @@ TECH_SUBCLASSES = [
     "Trim",
     "4800x1200dpi",
     "Advanced",
-    "AutoDuplex"
+    "Mono",
+    "Color",
+    "AutoDuplex",
+    "K10"
 ]
 
 TECH_SUBCLASSES.sort()

@@ -413,7 +413,7 @@ class PrintSettingsToolbox(QToolBox):
                     current = current_options.get('outputorder', 'normal')
 
                     self.addControlRow("outputorder",
-                        self.__tr("Output Order (Print last page first)"),
+                        self.__tr("Output Order"),
                         cups.PPD_UI_PICKONE, current,
                         [('normal', self.__tr('Normal (Print first page first)')),
                          ('reverse', self.__tr('Reversed (Print last page first)'))], 'normal')

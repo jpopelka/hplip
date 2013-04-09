@@ -112,7 +112,7 @@ supported=0
 
 [suse]
 index=3
-versions=11.4,12.1,12.2
+versions=11.4,12.1,12.2,12.3
 display_name=SUSE Linux
 alt_names=
 display=1
@@ -393,6 +393,125 @@ add_user_to_group= -Asys,lp
 open_mdns_port=/bin/bash ./init-suse-firewall
 pre_depend_cmd=su -c "zypper refresh"
 same_as_version=12.1
+
+# ********************
+[suse:12.3]
+code_name=Dartmouth
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=0
+network_supported=1
+parallel_supported=0
+usb_supported=1
+packaged_version=3.12.11
+release_date=2013-03-13
+notes=Please be sure to disable the CD repositories in YaST and after installation you must log out and back in to become a member of the lp and sys group to enable printing.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+cups_path_with_bitness=0
+ui_toolkit=qt4
+native_cups=1
+add_user_to_group= -a -G sys,lp
+open_mdns_port=/bin/bash ./init-suse-firewall
+pre_depend_cmd=su -c "zypper refresh"
+
+[suse:12.3:cups]
+packages=cups,cups-client
+
+[suse:12.3:cups-devel]
+packages=cups-devel,cupsddk
+
+[suse:12.3:gcc]
+packages=gcc-c++
+
+[suse:12.3:gs]
+packages=ghostscript-library
+
+[suse:12.3:libcrypto]
+packages=openssl
+
+[suse:12.3:libjpeg]
+packages=libjpeg-devel
+
+[suse:12.3:libnetsnmp-devel]
+packages=net-snmp-devel
+
+[suse:12.3:libpthread]
+packages=glibc
+
+[suse:12.3:libtool]
+packages=libtool,libgphoto2-devel
+
+[suse:12.3:libusb]
+packages=libusb-1_0-devel,libusb-1_0-0
+
+[suse:12.3:make]
+packages=make
+
+[suse:12.3:pil]
+packages=python-imaging
+
+[suse:12.3:ppdev]
+packages=
+commands=su -c "modprobe ppdev"
+
+[suse:12.3:pyqt]
+packages=python-qt
+
+[suse:12.3:pyqt4]
+packages=python-qt4
+
+[suse:12.3:pyqt4-dbus]
+packages=dbus-1-python-devel,dbus-1-python
+
+[suse:12.3:python-devel]
+packages=python-devel,python-xml,libpython2_7-1_0
+
+[suse:12.3:python23]
+packages=python
+
+[suse:12.3:python2x]
+packages=python
+
+[suse:12.3:reportlab]
+packages=
+
+[suse:12.3:sane]
+packages=xsane
+
+[suse:12.3:sane-devel]
+packages=sane-backends-devel
+
+[suse:12.3:scanimage]
+packages=sane-backends
+
+[suse:12.3:xsane]
+packages=xsane
+
+[suse:12.3:cups-ddk]
+packages=cupsddk
+
+[suse:12.3:python-dbus]
+packages=dbus-1-python
+
+[suse:12.3:dbus]
+packages=dbus-1-devel,python-gobject2
+
+[suse:12.3:python-xml]
+packages=python-xml,libpython2_7-1_0
+
+[suse:12.3:cups-image]
+packages=cups-devel
+
+[suse:12.3:python-notify]
+packages=python-notify
+
+[suse:12.3:network]
+packages=wget
 
 # ****************************************
 [redhat]
@@ -2827,7 +2946,7 @@ same_as_version=12.04
 # ****************************************
 [debian]
 index=2
-versions=5.0,5.0.1,5.0.2,5.0.3,5.0.4,5.0.5,5.0.6,5.0.7,5.0.8,6.0,6.0.1,6.0.2,6.0.3,6.0.4,6.0.5,6.0.6
+versions=5.0,5.0.1,5.0.2,5.0.3,5.0.4,5.0.5,5.0.6,5.0.7,5.0.8,6.0,6.0.1,6.0.2,6.0.3,6.0.4,6.0.5,6.0.6,6.0.7
 display_name=Debian
 alt_names=
 display=1
@@ -3129,6 +3248,9 @@ same_as_version=6.0
 same_as_version=6.0
 
 [debian:6.0.6]
+same_as_version=6.0
+
+[debian:6.0.7]
 same_as_version=6.0
 
 # ****************************************

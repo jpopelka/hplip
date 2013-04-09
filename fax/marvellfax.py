@@ -343,7 +343,7 @@ class MarvellFaxDevice(FaxDevice):
         log.debug(date_buf)
 
         result = self.libfax_marvell.create_packet(SET_FAX_SETTINGS, 0, 0, 0, 0, byref(i_buf))
-        result = create_marvell_faxsettings_pkt(self.phone_num, self.station_name, date_buf, c_buf)
+        result = self.libfax_marvell.create_fax_settings_packet(self.phone_num, self.station_name, date_buf, c_buf)
 
         msg_buf = buffer(i_buf)
         for i in range(0, 31):
@@ -351,8 +351,8 @@ class MarvellFaxDevice(FaxDevice):
 
         set_buf.write(c_buf.raw)
         set_buf = set_buf.getvalue()
-        self.dev.writeMarvellFax(set_buf)
-        while self.dev.readMarvellFax(32, ret_buf, timeout=5):
+        self.writeMarvellFax(set_buf)
+        while self.readMarvellFax(32, ret_buf, timeout=5):
                             pass
         ret_buf = ret_buf.getvalue()
         self.closeMarvellFax()

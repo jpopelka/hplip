@@ -99,7 +99,7 @@ class StringTable:
             '1046' : (self.__tr('In power save mode'), ''),
             '1047' : (self.__tr('Incorrect cartridge'), ''),
             '1048' : (self.__tr('Missing cartridge'), ''),
-            '1049' : (self.__tr('Missing Printhead(s)'), ''),   
+            '1049' : (self.__tr('Missing Printhead(s)'), ''),
 
             #Alert messages for Pentane products RQ 8888
             '1050' : (self.__tr('ADF can not load original, please try reloading'), ''),
@@ -115,9 +115,9 @@ class StringTable:
             '1060' : (self.__tr('Remove paper and other material from output flap area'), ''),
             '1061' : (self.__tr('To Maintain print quality, remove and re-install duplex module'), ''),
             '1062' : (self.__tr('Manually feed correct paper in MP tray'), ''),
-            '1063' : (self.__tr('Printhead(s) Failed'), ''),   
-            '1064' : (self.__tr('Incompatible Printhead(s)'), ''),   
-         
+            '1063' : (self.__tr('Printhead(s) Failed'), ''),
+            '1064' : (self.__tr('Incompatible Printhead(s)'), ''),
+
             '1501' : (self.__tr('Black cartridge is low on ink'), ''),
             '1502' : (self.__tr('Tri-color cartridge is low on ink'), ''),
             '1503' : (self.__tr('Photo cartridge is low on ink'), ''),
@@ -215,6 +215,15 @@ class StringTable:
             'agent_yellow_head' : (self.__tr('Yellow print head'), ''),
             'agent_yellow_supply' : (self.__tr('Yellow ink cartridge'), ''),
             'agent_yellow_cartridge': (self.__tr('Yellow cartridge'), ''),
+            'agent_photo_black_head' : (self.__tr('Photo Black print head'), ''),
+            'agent_photo_black_supply' : (self.__tr('Photo Black ink cartridge'), ''),
+            'agent_photo_black_cartridge': (self.__tr('Photo Black cartridge'), ''),
+            'agent_matte_black_head' : (self.__tr('Matte Black print head'), ''),
+            'agent_matte_black_supply' : (self.__tr('Matte Black ink cartridge'), ''),
+            'agent_matte_black_cartridge': (self.__tr('Matte Black cartridge'), ''),
+            'agent_light_gray_head' : (self.__tr('Gray print head'), ''),
+            'agent_light_gray_supply' : (self.__tr('Gray ink cartridge'), ''),
+            'agent_light_gray_cartridge': (self.__tr('Gray cartridge'), ''),
             'agent_photo_cyan_head' : (self.__tr('Photo cyan print head'), ''),
             'agent_photo_cyan_supply' : (self.__tr('Photo cyan ink cartridge'), ''),
             'agent_photo_cyan_cartridge' : (self.__tr('Photo cyan cartridge'), ''),

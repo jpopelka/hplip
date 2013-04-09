@@ -47,6 +47,14 @@
 
 class Hbpl1Wrapper;
 
+enum COLORTHEME
+{
+    NONE            = 0,
+    DEFAULTSRGB     = 1,
+    PHOTOSRGB       = 2,
+    ADOBERGB        = 3,
+    VIVIDSRGB       = 4
+};
 
 class Hbpl1 : public Encapsulator
 {
@@ -90,6 +98,10 @@ private:
     JobAttributes   m_JA;
     void           *m_hHPLibHandle;
     bool            m_init;
+    bool            m_Economode;
+    bool            m_PrintinGrayscale;
+    COLORTHEME      m_ColorTheme;
+    COLORTYPE       m_ColorMode;
     Hbpl1Wrapper   *m_pHbpl1Wrapper;
 }; // Hbpl1
 

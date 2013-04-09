@@ -26,6 +26,19 @@ from g import *
 from codes import *
 import status, pml
 from prnt import pcl, ldl, colorcal
+import time
+
+# ************************* LEDM Clean**************************************** #
+CleanXML = """<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!--  THIS DATA SUBJECT TO DISCLAIMER(S)INCLUDED WITH THE PRODUCT OF ORIGIN. -->
+<ipcap:InternalPrintCap xmlns:ipcap=\"http://www.hp.com/schemas/imaging/con/ledm/internalprintcap/2008/03/21\" xmlns:ipdyn=\"http://www.hp.com/schemas/imaging/con/ledm/internalprintdyn/2008/03/21\" xmlns:dd=\"http://www.hp.com/schemas/imaging/con/dictionaries/1.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.hp.com/schemas/imaging/con/ledm/internalprintcap/2008/03/21 ../schemas/InternalPrintCap.xsd http://www.hp.com/schemas/imaging/con/ledm/internalprintdyn/2008/03/21 ../schemas/InternalPrintDyn.xsd http://www.hp.com/schemas/imaging/con/dictionaries/1.0/ ../schemas/dd/DataDictionaryMasterLEDM.xsd\">
+                                <ipdyn:JobType>%s</ipdyn:JobType>
+</ipcap:InternalPrintCap>\"
+
+        """
+
+status_xml = '/DevMgmt/InternalPrintDyn.xml'
+# **************************************************************************** #
 
 # ********************** Align **********************
 
@@ -1258,6 +1271,7 @@ def cleaning(dev, clean_type, level1, level2, level3,
               loadpaper_ui, dlg1, dlg2, dlg3, wait_ui):
 
     state = 0
+    level = 0
 
     while state != -1:
         if state == 0: # Initial level1 print
@@ -1279,7 +1293,10 @@ def cleaning(dev, clean_type, level1, level2, level3,
 
         elif state == 3: # Print test page
             state = 4
-            print_clean_test_page(dev)
+            if clean_type == CLEAN_TYPE_LEDM:
+                cleanTypeVerify(dev,level = 1)
+            else:
+                print_clean_test_page(dev)
 
         elif state == 4: # Need level 2?
             state = -1
@@ -1299,7 +1316,10 @@ def cleaning(dev, clean_type, level1, level2, level3,
 
         elif state == 7: # Print test page
             state = 8
-            print_clean_test_page(dev)
+            if clean_type == CLEAN_TYPE_LEDM:
+                cleanTypeVerify(dev,level = 2)
+            else:
+                print_clean_test_page(dev)
 
         elif state == 8: # Need level 3?
             state = -1
@@ -1319,7 +1339,10 @@ def cleaning(dev, clean_type, level1, level2, level3,
 
         elif state == 11: # Print test page
             state = 12
-            print_clean_test_page(dev)
+            if clean_type == CLEAN_TYPE_LEDM:
+                cleanTypeVerify(dev,level = 3)
+            else:
+                print_clean_test_page(dev)
 
         elif state == 12:
             state = -1
@@ -1365,6 +1388,61 @@ def wipeAndSpitType2(dev): # LIDIL, Level 3
                                        ldl.COMMAND_HANDLE_PEN,
                                        ldl.COMMAND_HANDLE_PEN_CLEAN_LEVEL3))
     dev.closePrint()
+
+def setCleanType(name):
+    try:
+      xml = CleanXML %(name.encode('utf-8'))
+    except(UnicodeEncodeError, UnicodeDecodeError):
+      log.error("Unicode Error")
+    return xml
+
+def cleanTypeLedm(dev): #LEDM, level 1
+    xml = setCleanType('cleaningPage')
+    dev.post(status_xml, xml)
+    dev.closePrint()
+
+def cleanTypeLedm1(dev): #LEDM, level 2
+    xml = setCleanType('cleaningPageLevel1')
+    dev.post(status_xml, xml)
+    dev.closePrint()
+
+def cleanTypeLedm2(dev): #LEDM, level 3
+    xml = setCleanType('cleaningPageLevel2')
+    dev.post(status_xml, xml)
+    dev.closePrint()
+
+def cleanTypeVerify(dev,level): #LEDM Test Page
+    state = 0
+    timeout = 0
+    status_type = dev.mq.get('status-type', STATUS_TYPE_NONE)
+    xml = setCleanType('cleaningVerificationPage')
+
+    if status_type == STATUS_TYPE_LEDM:
+       func = dev.getEWSUrl_LEDM
+
+    elif status_type == STATUS_TYPE_LEDM_FF_CC_0:
+       func = dev.getUrl_LEDM
+
+    else:
+        log.error("Not an LEDM status-type: %d" % status_type)
+
+    print "Performing level %d cleaning...." % level
+
+    while state != -1:
+       status_block = status.StatusType10Status(func)
+
+       if status_block['status-code'] == STATUS_PRINTER_IDLE: # Printer Ready
+             dev.post(status_xml, xml)
+             state = -1
+       else:
+
+             time.sleep(8)
+             timeout += 1
+
+       if timeout > 20:
+             log.error("Timeout waiting for Clean to finish.")
+             sys.exit(0)
+
 
 
 # ********************** Color Cal **********************

@@ -143,7 +143,7 @@ struct soap_session
 
    int index;                    /* dime buffer index */
    int cnt;                      /* dime buffer count */
-   unsigned char buf[16384];    /* dime buffer */
+   unsigned char buf[65536];    /* dime buffer */ /*Setting to max 64K for dime buffer*/
    int user_cancel;
 
    void *hpmud_handle;         /* returned by dlopen */

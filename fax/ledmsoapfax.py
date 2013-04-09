@@ -103,10 +103,21 @@ Content-length: %d\r
 
         return self.put("/DevMgmt/FaxConfigDyn.xml", xml)
 
-    
-
 
     def getStationName(self):
         return self.readAttributeFromXml_EWS("/DevMgmt/FaxConfigDyn.xml",'faxcfgdyn:faxconfigdyn-faxcfgdyn:systemsettings-dd:companyname')
 
     station_name = property(getStationName, setStationName) 
+
+
+    def setDateAndTime(self):
+        t = time.localtime()
+        date_buf = "%4d-%02d-%02dT%02d:%02d:%02d" % (t[0], t[1], t[2], t[3], t[4], t[5])
+        xml = setDateTimeXML %(date_buf)
+        log.debug("setDateTimeXML Value:%s" %xml)
+        
+        if self.put("/DevMgmt/ProductConfigDyn.xml", xml):
+            return True
+        else:
+            log.debug ("Failed to set date and time. Set date and time using front panel.")
+            return False

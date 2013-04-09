@@ -124,6 +124,12 @@
 :model "HP Photosmart d110 Series Printer"
 :status :good
 
+:model "HP Envy 111 E-all-in-one"
+:status :good
+
+:model "HP Envy 114 E-all-in-one"
+:status :good
+
 :model "HP Envy 120 E-all-in-one"
 :status :good
 
@@ -212,6 +218,9 @@
 :status :good
 
 :model "HP Photosmart Plus b210 Series"
+:status :good
+
+:model "HP Officejet Pro 276dw Multifunction Printer"
 :status :good
 
 :model "HP Printer Scanner Copier 300"
@@ -323,6 +332,12 @@
 :status :good
 
 :model "HP Officejet 520 All-in-one Printer"
+:status :good
+
+:model "HP LaserJet Pro m521dw Multifunction Printer"
+:status :good
+
+:model "HP LaserJet Pro m521dn Multifunction Printer"
 :status :good
 
 :model "HP Officejet 570 All-in-one Printer"

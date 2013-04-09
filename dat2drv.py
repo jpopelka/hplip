@@ -529,12 +529,19 @@ def main(args):
                         drv_in_file_f.write('%sModelName "%s"\n' % (indent2, orig_model_name))
 
                         if len(models_dict[p]['tech-class']) > 1:
-                            drv_in_file_f.write('%sAttribute "NickName" "" "%s %s, $Version' %
-                                (indent2, orig_model_name, models.TECH_CLASS_PDLS[tech_class]))
+                            if basename == "hpcups":
+                                drv_in_file_f.write('%sAttribute "NickName" "" "%s %s, %s $Version' %
+                                    (indent2, orig_model_name, models.TECH_CLASS_PDLS[tech_class],basename))
+                            else:
+                                drv_in_file_f.write('%sAttribute "NickName" "" "%s %s, $Version' %
+                                    (indent2, orig_model_name, models.TECH_CLASS_PDLS[tech_class]))
                         else:
-                            drv_in_file_f.write('%sAttribute "NickName" "" "%s, $Version' %
-                                (indent2, orig_model_name))
-
+                            if basename == "hpcups":
+                                drv_in_file_f.write('%sAttribute "NickName" "" "%s, %s $Version' %
+                                    (indent2, orig_model_name, basename))
+                            else:
+                                drv_in_file_f.write('%sAttribute "NickName" "" "%s, $Version' %
+                                    (indent2, orig_model_name))
                         if models_dict[p]['plugin'] in (1, 2):
                             if (models_dict[p]['plugin-reason'] & 15 ) in (1, 2, 3, 4, 5, 6, 8, 9, 10, 12):
                                 drv_in_file_f.write(', requires proprietary plugin')

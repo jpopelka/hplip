@@ -26,6 +26,8 @@ from base import device, codes
 from soapfax import SOAPFaxDevice
 from pmlfax import PMLFaxDevice
 from marvellfax import MarvellFaxDevice
+from ledmfax import LEDMFaxDevice
+from ledmsoapfax import LEDMSOAPFaxDevice
 
 def FaxDevice(device_uri=None, printer_name=None,
               callback=None, 
@@ -62,7 +64,6 @@ def FaxDevice(device_uri=None, printer_name=None,
         return MarvellFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
         
     elif fax_type == FAX_TYPE_LEDM:
-        from ledmfax import LEDMFaxDevice
         return LEDMFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
         
 

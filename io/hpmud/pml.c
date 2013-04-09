@@ -44,7 +44,7 @@
 #include <net-snmp/net-snmp-config.h>
 #include <net-snmp/net-snmp-includes.h>
 #endif
-static const char *SnmpPort[] = { "","public.1","public.2","public.3" };
+static const char *SnmpPort[] = { "","public.1","public.2","public.3","public" };
 #endif
 
 static int PmlOidToHex(const char *szoid, unsigned char *oid, int oidSize)
@@ -233,7 +233,7 @@ int __attribute__ ((visibility ("hidden"))) GetSnmp(const char *ip, int port, co
    session.version = SNMP_VERSION_1;
    session.community = (unsigned char *)SnmpPort[port];
    session.community_len = strlen((const char *)session.community);
-   session.retries = 2;
+   session.retries = 1;
    session.timeout = 1000000;         /* 1 second */
    ss = snmp_open(&session);                     /* establish the session */
    if (ss == NULL)

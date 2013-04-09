@@ -133,7 +133,7 @@ def install_plugin(core):
         cmd=utils.which('hp-plugin',True)
         if cmd:
             cmd = core.passwordObj.getAuthCmd() %append_options(cmd)
-            os_utils.execute(cmd)
+            sts = os_utils.execute(cmd)
             if sts == 0:
                 return True
         else:

@@ -37,6 +37,13 @@ import os
 from base.g import *
 from base import utils, module
 
+def usage(typ='text'):
+    if typ == 'text':
+        utils.log_title(__title__, __version__)
+    utils.format_text(USAGE, typ, __title__, __mod__, __version__)
+    sys.exit(0)
+
+
 USAGE = [ (__doc__, "", "name", True),
           ("Usage: %s [OPTIONS]" % __mod__, "", "summary", True),
           utils.USAGE_OPTIONS,
