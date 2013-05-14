@@ -117,6 +117,7 @@ class StringTable:
             '1062' : (self.__tr('Manually feed correct paper in MP tray'), ''),
             '1063' : (self.__tr('Printhead(s) Failed'), ''),
             '1064' : (self.__tr('Incompatible Printhead(s)'), ''),
+            '1065' : (self.__tr('Unknown status'), ''),
 
             '1501' : (self.__tr('Black cartridge is low on ink'), ''),
             '1502' : (self.__tr('Tri-color cartridge is low on ink'), ''),

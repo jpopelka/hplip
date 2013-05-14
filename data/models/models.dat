@@ -13633,6 +13633,53 @@ usb-pid=0
 usb-vid=3f0
 wifi-config=0
 
+[hp_laserjet_mfp_m725]
+align-type=0
+clean-type=0
+color-cal-type=0
+copy-type=0
+embedded-server-type=1
+fax-type=0
+fw-download=False
+icon=hp_color_laserjet_cp3525.png
+io-mfp-mode=1
+io-mode=1
+io-support=6
+job-storage=1
+linefeed-cal-type=0
+model1=HP LaserJet Enterprise MFP M725 series
+model2=HP LaserJet Enterprise MFP M725dn
+model3=HP LaserJet Enterprise MFP M725fw
+model4=HP LaserJet Enterprise MFP M725z
+model5=HP LaserJet Enterprise MFP M725z+
+monitor-type=0
+panel-check-type=0
+pcard-type=0
+plugin=0
+plugin-reason=0
+power-settings=0
+ppd-name=laserjet_mfp_m725
+pq-diag-type=0
+r-type=0
+r0-agent1-kind=4
+r0-agent1-sku=CF214A
+r0-agent1-type=1
+scan-src=0
+scan-type=0
+status-battery-check=0
+status-dynamic-counters=0
+status-type=3
+support-released=True
+support-subtype=430e
+support-type=2
+support-ver=3.13.5
+tech-class=Postscript
+tech-subclass=Normal
+tech-type=3
+usb-pid=9d17
+usb-vid=3f0
+wifi-config=0
+
 [officejet_series_725]
 align-type=0
 clean-type=0
@@ -33426,6 +33473,90 @@ usb-pid=0
 usb-vid=3f0
 wifi-config=0
 
+[officejet_pro_3610]
+align-type=15
+clean-type=4
+color-cal-type=0
+copy-type=0
+embedded-server-type=1
+fax-type=0
+fw-download=False
+icon=officejet_k550.png
+io-mfp-mode=1
+io-mode=1
+io-support=6
+job-storage=0
+linefeed-cal-type=0
+model1=HP Officejet Pro 3610 Black and White e-All-in-One
+monitor-type=0
+panel-check-type=0
+pcard-type=0
+plugin=0
+plugin-reason=0
+power-settings=0
+pq-diag-type=0
+r-type=0
+r0-agent1-kind=2
+r0-agent1-sku=960/960XL
+r0-agent1-type=1
+scan-src=1
+scan-type=7
+status-battery-check=0
+status-dynamic-counters=2
+status-type=10
+support-released=True
+support-subtype=430e
+support-type=2
+support-ver=3.13.5
+tech-class=Kapan
+tech-subclass=Duplex
+tech-type=1
+usb-pid=6812
+usb-vid=3f0
+wifi-config=0
+
+[officejet_pro_3620]
+align-type=17
+clean-type=4
+color-cal-type=0
+copy-type=0
+embedded-server-type=1
+fax-type=6
+fw-download=False
+icon=officejet_k550.png
+io-mfp-mode=1
+io-mode=1
+io-support=6
+job-storage=0
+linefeed-cal-type=0
+model1=HP Officejet Pro 3620 Black and White e-All-in-One
+monitor-type=0
+panel-check-type=0
+pcard-type=0
+plugin=0
+plugin-reason=0
+power-settings=0
+pq-diag-type=0
+r-type=0
+r0-agent1-kind=2
+r0-agent1-sku=960/960XL
+r0-agent1-type=1
+scan-src=3
+scan-type=7
+status-battery-check=0
+status-dynamic-counters=2
+status-type=11
+support-released=True
+support-subtype=430e
+support-type=2
+support-ver=3.13.5
+tech-class=Kapan
+tech-subclass=Duplex
+tech-type=1
+usb-pid=6d12
+usb-vid=3f0
+wifi-config=0
+
 [deskjet_3650]
 align-type=5
 clean-type=2
@@ -51649,7 +51780,7 @@ scan-src=3
 scan-type=7
 status-battery-check=0
 status-dynamic-counters=0
-status-type=10
+status-type=11
 support-released=True
 support-subtype=219b2b
 support-type=2
@@ -53526,7 +53657,6 @@ wifi-config=0
 # LJZjsMono
 # LJm1005
 # Mimas
-# MimasTDR
 # OJ7000
 # OJProKx50
 # PSP100

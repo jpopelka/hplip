@@ -1360,6 +1360,12 @@
 :model "HP Officejet j3608 All-in-one Printer"
 :status :good
 
+:model "HP Officejet Pro 3610 Black And White E-all-in-one"
+:status :good
+
+:model "HP Officejet Pro 3620 Black And White E-all-in-one"
+:status :good
+
 :model "HP Officejet j3625 All-in-one Printer"
 :status :good
 

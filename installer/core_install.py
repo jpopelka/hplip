@@ -101,7 +101,7 @@ BINS_LIST=['hpijs','hp-align','hp-colorcal','hp-faxsetup','hp-linefeedcal','hp-p
 
 LIBS_LIST=['libhpmud.*','libhpip.*','sane/libsane-hpaio.*','cups/backend/hp','cups/backend/hpfax', 'cups/filter/hpcac', 'cups/filter/hpps', 'cups/filter/pstotiff','cups/filter/hpcups', 'cups/filter/hpcupsfax', 'cups/filter/hplipjs']
 
-FILES_LIST=['/etc/udev/rules.d/56-hpmud_support.rules', '/etc/udev/rules.d/40-hplip.rules', '/etc/udev/rules.d/56-hpmud_support.rules', '/etc/udev/rules.d/55-hpmud.rules','/etc/udev/rules.d/56-hpmud_add_printer.rules','/etc/udev/rules.d/55-hpmud_sysfs.rules','/etc/udev/rules.d/56-hpmud_add_printer_sysfs.rules', '/etc/udev/rules.d/56-hpmud_support_sysfs.rules', '/etc/udev/rules.d/86-hpmud_plugin_sysfs.rules', '/etc/udev/rules.d/86-hpmud-hp_*.rules', '/etc/udev/rules.d/86-hpmud_plugin.rules', '/usr/share/cups/drv/hp/','/usr/local/share/ppd/HP/','/usr/local/share/cups/drv/hp/' ,'/usr/share/applications/hplip.desktop', '/etc/xdg/autostart/hplip-systray.desktop', '/etc/hp/hplip.conf', '/usr/share/doc/hplip-*']
+FILES_LIST=['/etc/udev/rules.d/56-hpmud.rules','/etc/udev/rules.d/56-hpmud_sysfs.rules', '/etc/udev/rules.d/40-hplip.rules', '/etc/udev/rules.d/56-hpmud_support.rules', '/etc/udev/rules.d/56-hpmud_support_sysfs.rules','/etc/udev/rules.d/55-hpmud.rules','/etc/udev/rules.d/55-hpmud_sysfs.rules','/etc/udev/rules.d/56-hpmud_add_printer.rules','/etc/udev/rules.d/56-hpmud_add_printer_sysfs.rules', '/etc/udev/rules.d/86-hpmud-hp_*.rules', '/etc/udev/rules.d/86-hpmud_plugin.rules', '/etc/udev/rules.d/86-hpmud_plugin_sysfs.rules', '/usr/share/cups/drv/hp/','/usr/local/share/ppd/HP/','/usr/local/share/cups/drv/hp/' ,'/usr/share/applications/hplip.desktop', '/etc/xdg/autostart/hplip-systray.desktop', '/etc/hp/hplip.conf', '/usr/share/doc/hplip-*','/usr/lib/systemd/system/hplip-printer*.service']
 
 HPLIP_LIST=['*.py','*.pyc', 'base', 'copier','data','installer','pcard','ui4','ui','fax/*.py','fax/*.pyc','fax/pstotiff.convs','fax/pstotiff.types','fax/pstotiff','prnt/*.py', 'prnt/*.pyc', 'scan/*.py','scan/*.pyc']
 
@@ -322,7 +322,7 @@ class CoreInstall(object):
             'libnetsnmp-devel': (True,  ['network'], "libnetsnmp-devel - SNMP networking library development files", self.check_libnetsnmp, DEPENDENCY_RUN_AND_COMPILE_TIME),
             'libcrypto':        (True,  ['network'], "libcrypto - OpenSSL cryptographic library", self.check_libcrypto, DEPENDENCY_RUN_AND_COMPILE_TIME),
             'network':        (False, ['network'], "network -wget", self.check_wget, DEPENDENCY_RUN_TIME),
-
+            'passwd_util':        (False, ['gui_qt4'], "GUI Password utility (gksu/kdesu)", self.check_passwd_util, DEPENDENCY_RUN_TIME),
         }
 
         for opt in self.options:
@@ -1496,6 +1496,17 @@ class CoreInstall(object):
             log.debug("wget is not installed")
             return False
 
+
+    def check_passwd_util(self):
+        if utils.which("gksu"):
+            return True
+        elif utils.which("kdesu"):
+            return True
+        elif utils.which("kdesudo"):
+            return True
+        else:
+            log.debug("GUI password gksu/kdesu/kdesudo utility is not installed")
+            return False
 
 
     def run_pre_install(self, callback=None,distro_ver=None):

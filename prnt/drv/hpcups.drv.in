@@ -5476,6 +5476,154 @@ Manufacturer "HP"
 
 } // End Saipan
 
+//////// Kapan
+{
+
+    Attribute "hpPrinterLanguage" "" "pcl3gui2"
+    Attribute "HPMechOffset" "" "130"
+
+
+    Group "General/General"
+
+    Option "ColorModel/Output Mode" PickOne AnySetup 10.0
+    *Choice "KGray/Black Only Grayscale" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 2>>setpagedevice"
+
+
+    // cupsMediaType values map to MEDIATYPE from global_types.h
+    Option "MediaType/Media Type" PickOne AnySetup 10.0
+    *Choice "Plain/Plain Paper" "<</MediaType(Plain)/cupsMediaType 0>>setpagedevice"
+
+
+     // cupsCompression values map to QUALITY_MODE from global_types.h
+    Option "OutputMode/Print Quality" PickOne AnySetup 10.0
+    *Choice "Normal/Normal" "<</OutputType(0)/HWResolution[600 600]>>setpagedevice"
+     Choice "Draft/Draft" "<</OutputType(-2)/HWResolution[300 300]>>setpagedevice"
+     Choice "Best/Best" "<</OutputType(1)/HWResolution[600 600]>>setpagedevice"
+
+    Option "InputSlot/Media Source" PickOne AnySetup 10.0
+     *Choice "Tray1/Tray 1" "<</MediaPosition 1>>setpagedevice"
+
+
+      // 4x6 or smaller
+      CustomMedia "Card3x5/Index Card 3x5in" 216 360 9.36 9.36 9.36 9.36 "<</cupsInteger0 78/PageSize [216 360]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 78/PageSize[216 360]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Card4x6/Index Card 4x6in" 288 432 9.36 9.36 9.36 9.36 "<</cupsInteger0 74/PageSize [288 432]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+      CustomMedia "A6/A6 105x148mm" 297.65 419.54 9.36 9.36 9.36 9.36 "<</cupsInteger0 73/PageSize[297.65 419.54]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 73/PageSize[297.65 419.54]/ImagingBBox null>>setpagedevice"
+      // 5x7
+      CustomMedia "Card5x8/Index Card 5x8in" 360 576 9.36 9.36 9.36 9.36 "<</cupsInteger0 75/PageSize[360 576]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 75/PageSize[360 576]/ImagingBBox null>>setpagedevice"
+      CustomMedia "A5/A5 148x210mm" 419.544 595.296 9.36 9.36 9.36 9.36 "<</cupsInteger0 25/PageSize[419.544 595.296]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 25/PageSize[419.544 595.296]/ImagingBBox null>>setpagedevice"
+      // Standard
+      CustomMedia "6x8/6x8in" 432 576 9.36 9.36 9.36 9.36 "<</cupsInteger0 101/PageSize[432 576]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 101/PageSize[432 576]/ImagingBBox null>>setpagedevice"
+      CustomMedia "JB5/JB5 182x257mm" 515.88 728.49 9.36 9.36 9.36 9.36 "<</cupsInteger0 45/PageSize[515.88 728.49]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 45/PageSize [515.88 728.49]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Executive/Executive 7.25x10.5in" 522 756 9.36 9.36 9.36 9.36 "<</cupsInteger0 1/PageSize[522 756]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 1/PageSize[522 756]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Statement/Statement 5.5x8.5in" 396 612 9.36 9.36 9.36 9.36 "<</cupsInteger0 15/PageSize[396 612]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 15/PageSize[396 612]/ImagingBBox null>>setpagedevice"
+     *CustomMedia "Letter/Letter 8.5x11in" 612 792 9.36 9.36 9.36 9.36 "<</cupsInteger0 2/PageSize[612 792]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 2/PageSize[612 792]/ImagingBBox null>>setpagedevice"
+      CustomMedia "CardLetter/Index Card Letter 8.5x11in" 612 792 9.36 9.36 9.36 9.36 "<</cupsInteger0 2/PageSize[612 792]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 2/PageSize[612 792]/ImagingBBox null>>setpagedevice"
+      CustomMedia "A4/A4 210x297mm" 595.29 841.44 9.36 9.36 9.36 9.36 "<</cupsInteger0 26/PageSize[595.29 841.44]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 26/PageSize[595.29 841.44]/ImagingBBox null>>setpagedevice"
+      CustomMedia "CardA4/Index Card A4 210x297mm" 595.44 841.68 9.36 9.36 9.36 9.36 "<</cupsInteger0 26/PageSize[595.44 841.68]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 26/PageSize[595.44 841.68]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Legal/Legal 8.5x14in" 612 1008 9.36 9.36 9.36 9.36 "<</cupsInteger0 3/PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 3/PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+      CustomMedia "8.5x13/8.5x13in" 612 936 9.36 9.36 9.36 9.36 "<</cupsInteger0 101/PageSize[612 936]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 101/PageSize[612 936]/ImagingBBox null>>setpagedevice"
+      // Envelope
+      CustomMedia "EnvA2/A2 Envelope 4.37x5.75in" 314.64 413.856 9.36 46.8 9.36 46.8 "<</cupsInteger0 109/PageSize[314.64 413.856]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 109/PageSize[314.64 413.856]/ImagingBBox null>>setpagedevice"
+      CustomMedia "EnvC6/C6 Envelope 114x162mm" 323.136 459.216 9.36 46.8 9.36 46.8 "<</cupsInteger0 92/PageSize[323.136 459.216]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 92/PageSize[323.136 459.216]/ImagingBBox null>>setpagedevice"
+      CustomMedia "EnvCard/Card Envelope 4.4x6in" 315.36 432 9.36 46.8 9.36 46.8 "<</cupsInteger0 114/PageSize[315.36 432]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 114/PageSize[315.36 432]/ImagingBBox null>>setpagedevice"
+      CustomMedia "EnvMonarch/Monarch Envelope 3.875x7.5in" 279.36 540 9.36 46.8 9.36 46.8 "<</cupsInteger0 80/PageSize[279.36 540]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 80/PageSize[279.36 540]/ImagingBBox null>>setpagedevice"
+      CustomMedia "EnvDL/DL Envelope 110x220mm" 311.832 623.592 9.36 46.8 9.36 46.8 "<</cupsInteger0 90/PageSize[311.832 623.592]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 90/PageSize[311.832 623.592]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Env10/#10 Envelope 4.125x9.5in" 297.36 684 9.36 46.8 9.36 46.8 "<</cupsInteger0 81/PageSize[297.36 684]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 81/PageSize[297.36 684]/ImagingBBox null>>setpagedevice"
+      CustomMedia "EnvC5/C5 Envelope 162x229mm" 459.216 649.152 9.36 46.8 9.36 46.8 "<</cupsInteger0 91/PageSize[459.216 649.152]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 91/PageSize[459.216 649.152]/ImagingBBox null>>setpagedevice"
+
+     // Custom page sizes from 1x4in to legal
+      HWMargins 9.36 9.36 9.36 9.36
+      VariablePaperSize Yes
+      MinSize 3in 5in
+      MaxSize 8.5in 14in
+
+
+    {
+
+        Attribute "cupsEvenDuplex" "" "True"
+        Attribute "cupsBackSide" "" "Rotated"
+        Attribute "cupsFlipDuplex" "" "True"
+
+         // Non duplex media against duplex
+         UIConstraints "*PageSize Card3x5 *Duplex"
+         UIConstraints "*PageSize Card4x6 *Duplex"
+         UIConstraints "*PageSize A6 *Duplex"
+         UIConstraints "*PageSize Card5x8 *Duplex"
+         UIConstraints "*PageSize A5 *Duplex"
+         UIConstraints "*PageSize JB5 *Duplex"
+         UIConstraints "*PageSize Executive *Duplex"
+         UIConstraints "*PageSize Legal *Duplex"
+         UIConstraints "*PageSize EnvA2 *Duplex"
+         UIConstraints "*PageSize EnvC6 *Duplex"
+         UIConstraints "*PageSize EnvCard *Duplex"
+         UIConstraints "*PageSize EnvMonarch *Duplex"
+         UIConstraints "*PageSize EnvDL *Duplex"
+         UIConstraints "*PageSize Env10 *Duplex"
+         UIConstraints "*PageSize EnvC5 *Duplex"
+         UIConstraints "*PageSize 6X8 *Duplex"
+         UIConstraints "*PageSize 8.5X13 *Duplex"
+
+
+        // Duplexer is optional...
+        Installable "OptionDuplex/Duplexer Installed"
+
+
+         Option "Duplex/Double-Sided Printing" PickOne AnySetup 10.0
+             Choice "DuplexNoTumble/Long Edge (Standard)" "<</Duplex true/Tumble false>>setpagedevice"
+             Choice "DuplexTumble/Short Edge (Flip)" "<</Duplex true/Tumble true>>setpagedevice"
+             *Choice "None/Off" "<</Duplex false/Tumble false>>setpagedevice"
+
+
+      CustomMedia "Letter.Duplex/Letter AutoDuplex 8.5x11in" 612 749.44 9.36 33.192 9.36 42.552 "<</cupsInteger0 2/PageSize[612 749.44]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 2/PageSize[612 749.44]/ImagingBBox null>>setpagedevice"
+      CustomMedia "CardLetter.Duplex/Index Card Letter AutoDuplex 8.5x11in AutoDuplex" 612 749.44 9.36 33.192 9.36 42.552 "<</cupsInteger0 2/PageSize[612 749.44]/ImagingBBox null>>setpagedevice"  "<</cupsInteger0 2/PageSize[612 749.44]/ImagingBBox null>>setpagedevice"
+      CustomMedia "A4.Duplex/A4 AutoDuplex 210x297mm" 595.27 841.88 9.36 33.192 9.36 42.552 "<</cupsInteger0 26/PageSize[595.27 841.88]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 26/PageSize[595.27 841.88]/ImagingBBox null>>setpagedevice"
+      CustomMedia "CardA4.Duplex/Index Card A4 AutoDuplex 210x297mm AutoDuplex" 595.44 799.13 9.36 33.192 9.36 42.552 "<</cupsInteger0 26/PageSize[595.44 799.13]/ImagingBBox null>>setpagedevice" "<</cupsInteger0 26/PageSize[595.44 799.13]/ImagingBBox null>>setpagedevice"
+
+
+        // <%Kapan:Duplex%>
+        {
+          ModelName "HP Officejet Pro 3610"
+          Attribute "NickName" "" "HP Officejet Pro 3610, hpcups $Version"
+          Attribute "ShortNickName" "" "HP Officejet Pro 3610"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet pro 3610;DES:officejet pro 3610;"
+          PCFileName "hp-officejet_pro_3610.ppd"
+          Attribute "Product" "" "(HP Officejet Pro 3610 Black And White E-all-in-one)"
+        }
+        {
+          ModelName "HP Officejet Pro 3620"
+          Attribute "NickName" "" "HP Officejet Pro 3620, hpcups $Version"
+          Attribute "ShortNickName" "" "HP Officejet Pro 3620"
+          Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet pro 3620;DES:officejet pro 3620;"
+          PCFileName "hp-officejet_pro_3620.ppd"
+          Attribute "Product" "" "(HP Officejet Pro 3620 Black And White E-all-in-one)"
+        }
+    }
+
+} // End Kapan
 
 //////// Python11
 {
@@ -9029,8 +9177,8 @@ Manufacturer "HP"
          "<</cupsInteger0 101/PageSize[432 576]/ImagingBBox null>>setpagedevice"
   CustomMedia "Mutsugiri/Mutsugiri 8x10in" 576 720 9 41.04 9 4.32 "<</cupsInteger0 7/PageSize[576 720]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 7/PageSize[576 720]/ImagingBBox null>>setpagedevice"
-  CustomMedia "FLSA/American Foolscap 8.5x13in" 612 936 9.00 41.04 9.00 4.32 "<</cupsInteger0 10/PageSize[612 936]/ImagingBBox null>>setpagedevice"
-         "<</cupsInteger0 10/PageSize[612 936]/ImagingBBox null>>setpagedevice"
+  CustomMedia "FLSA/American Foolscap 8.5x13in" 612 936 9.00 41.04 9.00 4.32 "<</cupsInteger0 101/PageSize[612 936]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 101/PageSize[612 936]/ImagingBBox null>>setpagedevice"
   CustomMedia "B5/B5 176x250mm" 498.96 708.48 9 41.04 9 4.32 "<</cupsInteger0 65/PageSize[498.96 708.48]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 65/PageSize[498.96 708.48]/ImagingBBox null>>setpagedevice"
   CustomMedia "JB5/JB5 182x257mm" 516.24 728.64 9 41.04 9 4.32 "<</cupsInteger0 45/PageSize[516.24 728.64]/ImagingBBox null>>setpagedevice"

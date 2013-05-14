@@ -271,6 +271,8 @@ class Password(object):
 
         if utils.which('kdesu'):
             AuthType, AuthCmd = 'kdesu', 'kdesu -- %s'
+        elif utils.which('kdesudo'):
+            AuthType, AuthCmd = 'kdesudo', 'kdesudo -- %s'
         elif utils.which('gnomesu'):
             AuthType, AuthCmd = 'gnomesu', 'gnomesu -c "%s"'
         elif utils.which('gksu'):

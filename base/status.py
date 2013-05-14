@@ -1800,6 +1800,7 @@ def StatusType10Status(func): # Low End Data Model
             status_block['status-code'] = STATUS_MANUALLY_FEED
 
         else:
-            status_block['status-code'] = STATUS_UNKNOWN
+            status_block['status-code'] = STATUS_UNKNOWN_CODE
+
 
     return status_block

@@ -333,7 +333,7 @@ f 0644 root root $ppd/HP prnt/ps/*.ppd.gz
 
 # Use LINPUS8 for Acer Aspire One
 %if LINPUS8 RHEL5
-@epm_print_only_exclude@f 0644 root root /etc/udev/rules.d/55-hpmud_pam.rules data/rules/55-hpmud_pam.rules
+@epm_print_only_exclude@f 0644 root root /etc/udev/rules.d/56-hpmud_sysfs.rules data/rules/56-hpmud_sysfs.rules
 %endif
 
 %if RHEL3
@@ -351,7 +351,7 @@ l 0644 root root /usr/share/cups/model/foomatic-ppds $ppd/HP
 
 %system !darwin
 %if !LINPUS8 !RHEL3 !UBUNTU804 !SUSE9 !RHEL5
-@epm_print_only_exclude@f 0644 root root /etc/udev/rules.d/55-hpmud.rules data/rules/55-hpmud.rules
+@epm_print_only_exclude@f 0644 root root /etc/udev/rules.d/56-hpmud.rules data/rules/56-hpmud.rules
 @epm_print_only_exclude@f 0644 root root /usr/share/hal/fdi/preprobe/10osvendor/20-hplip-devices.fdi data/rules/20-hplip-devices.fdi
 %endif
 %system all
@@ -389,7 +389,7 @@ EOF
 @epm_full@%replaces hplip-data
 @epm_full@f 0644 root root /usr/share/hal/fdi/preprobe/10osvendor/20-hplip-devices.fdi data/rules/20-hplip-devices.fdi
 @epm_full@%postinstall <<EOF
-@epm_full@install -m 644 data/rules/55-hpmud.rules /etc/udev/rules.d
+@epm_full@install -m 644 data/rules/56-hpmud.rules /etc/udev/rules.d
 @epm_full@EOF
 %endif
 
@@ -400,7 +400,7 @@ EOF
 @epm_lite@%replaces hplip-data
 @epm_lite@f 0644 root root /usr/share/hal/fdi/preprobe/10osvendor/20-hplip-devices.fdi data/rules/20-hplip-devices.fdi
 @epm_lite@%postinstall <<EOF
-@epm_lite@install -m 644 data/rules/55-hpmud.rules /etc/udev/rules.d
+@epm_lite@install -m 644 data/rules/56-hpmud.rules /etc/udev/rules.d
 @epm_lite@EOF
 %endif
 
@@ -423,7 +423,7 @@ EOF
 @epm_full@%replaces hplip-data
 @epm_full@%replaces hplip-gui
 @epm_full@%postinstall <<EOF
-@epm_full@sed -i -e s/GROUP=\"lp\"/GROUP=\"scanner\"/ /etc/udev/rules.d/55-hpmud.rules
+@epm_full@sed -i -e s/GROUP=\"lp\"/GROUP=\"scanner\"/ /etc/udev/rules.d/56-hpmud.rules
 @epm_full@EOF
 %endif
 
@@ -443,7 +443,7 @@ EOF
 @epm_lite@%replaces hplip
 @epm_lite@%replaces hplip-data
 @epm_lite@%postinstall <<EOF
-@epm_lite@sed -i -e s/GROUP=\"lp\"/GROUP=\"scanner\"/ /etc/udev/rules.d/55-hpmud.rules
+@epm_lite@sed -i -e s/GROUP=\"lp\"/GROUP=\"scanner\"/ /etc/udev/rules.d/56-hpmud.rules
 @epm_lite@EOF
 %endif
 
@@ -462,8 +462,6 @@ d 1775 root lp /var/log/hp/tmp -
 @epm_print_only_exclude@f 0644 root root $home/data/models/models.dat data/models/models.dat
 
 %system !darwin
-@epm_print_only_exclude@f 0644 root root /etc/udev/rules.d data/rules/86-hpmud*.rules
-@epm_print_only_exclude@f 0644 root root /etc/udev/rules.d data/rules/56-hpmud_add_printer.rules
 @epm_print_only_exclude@f 0755 root root /etc/cron.daily data/rules/hplip_cron
 
 f 0755 root root $home/prnt/plugins/lj-${machine}.so prnt/plugins/lj-${machine}.so
@@ -497,9 +495,7 @@ d 0755 root root /var/lib/hp/ -
 d 0775 root lp /var/log/hp -
 d 1775 root lp /var/log/hp/tmp -
 %system !darwin
-@epm_print_only_exclude@f 0644 root root /etc/udev/rules.d/56-hpmud_support.rules data/rules/56-hpmud_support.rules
-@epm_print_only_exclude@f 0644 root root /etc/udev/rules.d/86-hpmud_plugin.rules data/rules/86-hpmud_plugin.rules
-@epm_print_only_exclude@f 0644 root root /etc/udev/rules.d/56-hpmud_add_printer.rules data/rules/56-hpmud_add_printer.rules
+@epm_print_only_exclude@f 0644 root root /etc/udev/rules.d/56-hpmud.rules data/rules/56-hpmud.rules
 @epm_print_only_exclude@f 0755 root root /etc/cron.daily/hplip_cron data/rules/hplip_cron
 
 %system all

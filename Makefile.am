@@ -109,6 +109,10 @@ hp_mkuri_SOURCES = io/hpmud/hp-mkuri.c
 hp_mkuri_LDADD = -ldl libhpmud.la
 hp_mkuri_CFLAGS = -DCONFDIR=\"$(hplip_confdir)\"
 
+#hpmud rules data dir
+rulessystemdir=/usr/lib/systemd/system
+dist_rulessystem_DATA =data/rules/hplip-printer@.service
+
 # cron files
 crondir = /etc/cron.daily
 dist_cron_DATA = data/rules/hplip_cron
@@ -116,24 +120,11 @@ dist_cron_DATA = data/rules/hplip_cron
 # hpmud.rules
 rulesdir = /etc/udev/rules.d
 if UDEV_SYSFS_RULES
-dist_rules_DATA = data/rules/56-hpmud_support_sysfs.rules
-dist_rules_DATA += data/rules/86-hpmud_plugin_sysfs.rules
-dist_rules_DATA += data/rules/56-hpmud_add_printer_sysfs.rules
-if UDEV_ACL_RULES
-dist_rules_DATA += data/rules/40-hplip_sysfs.rules
+dist_rules_DATA = data/rules/56-hpmud_sysfs.rules
 else
-dist_rules_DATA += data/rules/55-hpmud_sysfs.rules
+dist_rules_DATA = data/rules/56-hpmud.rules
 endif
-else
-dist_rules_DATA = data/rules/56-hpmud_support.rules
-dist_rules_DATA += data/rules/86-hpmud_plugin.rules
-dist_rules_DATA += data/rules/56-hpmud_add_printer.rules
-if UDEV_ACL_RULES
-dist_rules_DATA += data/rules/40-hplip.rules
-else
-dist_rules_DATA += data/rules/55-hpmud.rules
-endif
-endif
+
 halpredir = /usr/share/hal/fdi/preprobe/10osvendor
 dist_halpre_DATA = data/rules/20-hplip-devices.fdi
 
@@ -148,7 +139,6 @@ pstotiff_SCRIPTS = fax/filters/pstotiff
 # hplip.state
 hplip_statedir = /var/lib/hp
 dist_hplip_state_DATA =
-#dist_hplip_state_DATA = hplip.state
 
 # Log Files
 hplip_Logdir=/var/log/hp
@@ -344,10 +334,6 @@ endif
 if GUI_BUILD
 if QT4_INSTALL
 ui4dir=$(hplipdir)/ui4
-#dist_ui4_SCRIPTS = ui4/devmgr5.py ui4/systemtray.py ui4/devmgr5_base.py ui4/__init__.py ui4/ui_utils.py \
-#	ui4/settingsdialog_base.py ui4/settingsdialog.py ui4/printsettingstoolbox.py ui4/printdialog_base.py \
-#	ui4/printdialog.py
-#dist_noinst_DATA += ui4/devmgr5_base.ui ui4/settingsdialog_base.ui ui4/printdialog_base.ui
 dist_ui4_DATA = ui4/*.py
 dist_noinst_DATA += ui4/*.ui
 endif

@@ -65,13 +65,13 @@ DIST_COMMON = $(am__configure_deps) $(am__dist_base_DATA_DIST) \
 	$(am__dist_policykit_policy_DATA_DIST) \
 	$(am__dist_postscript_DATA_DIST) $(am__dist_ppd_DATA_DIST) \
 	$(am__dist_prnt_DATA_DIST) $(am__dist_rip_SCRIPTS_DIST) \
-	$(am__dist_rules_DATA_DIST) $(am__dist_scan_DATA_DIST) \
-	$(am__dist_ui4_DATA_DIST) $(am__dist_ui_DATA_DIST) \
-	$(am__dist_www0_DATA_DIST) $(am__dist_www3_DATA_DIST) \
-	$(am__dist_www4_DATA_DIST) $(dist_hplip_Log_DATA) \
-	$(dist_hplip_state_DATA) $(dist_hplip_tmp_DATA) \
-	$(dist_plugins4_SCRIPTS) $(dist_unrel_DATA) \
-	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(am__dist_rules_DATA_DIST) $(am__dist_rulessystem_DATA_DIST) \
+	$(am__dist_scan_DATA_DIST) $(am__dist_ui4_DATA_DIST) \
+	$(am__dist_ui_DATA_DIST) $(am__dist_www0_DATA_DIST) \
+	$(am__dist_www3_DATA_DIST) $(am__dist_www4_DATA_DIST) \
+	$(dist_hplip_Log_DATA) $(dist_hplip_state_DATA) \
+	$(dist_hplip_tmp_DATA) $(dist_plugins4_SCRIPTS) \
+	$(dist_unrel_DATA) $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/cups_drv.inc $(srcdir)/foomatic_drv.inc \
 	$(srcdir)/hplip-systray.desktop.in $(srcdir)/hplip.conf.in \
 	$(srcdir)/hplip.desktop.in $(srcdir)/hplip.list.in \
@@ -88,11 +88,7 @@ DIST_COMMON = $(am__configure_deps) $(am__dist_base_DATA_DIST) \
 @HPLIP_BUILD_TRUE@@LIBUSB01_BUILD_TRUE@am__append_3 = -lusb
 @HPLIP_BUILD_TRUE@@LIBUSB01_BUILD_FALSE@am__append_4 = -lusb-1.0
 @HPLIP_BUILD_TRUE@hp_mkuri_PROGRAMS = hp-mkuri$(EXEEXT)
-@HPLIP_BUILD_TRUE@@UDEV_ACL_RULES_TRUE@@UDEV_SYSFS_RULES_TRUE@am__append_5 = data/rules/40-hplip_sysfs.rules
-@HPLIP_BUILD_TRUE@@UDEV_ACL_RULES_FALSE@@UDEV_SYSFS_RULES_TRUE@am__append_6 = data/rules/55-hpmud_sysfs.rules
-@HPLIP_BUILD_TRUE@@UDEV_ACL_RULES_TRUE@@UDEV_SYSFS_RULES_FALSE@am__append_7 = data/rules/40-hplip.rules
-@HPLIP_BUILD_TRUE@@UDEV_ACL_RULES_FALSE@@UDEV_SYSFS_RULES_FALSE@am__append_8 = data/rules/55-hpmud.rules
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am__append_9 =  \
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am__append_5 =  \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	scan/sane/hpaio.desc \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	prnt/drv/hpijs.drv.in.template \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	installer/text_install.py \
@@ -103,13 +99,13 @@ DIST_COMMON = $(am__configure_deps) $(am__dist_base_DATA_DIST) \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	data/localization/hplip_pt.ts \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	data/localization/hplip_ru.ts \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	data/localization/hplip_zh.ts
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am__append_10 = dat2drv.py install.py hplip-install init-suse-firewall init-iptables-firewall
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am__append_6 = dat2drv.py install.py hplip-install init-suse-firewall init-iptables-firewall
 
 # ptest
 
 # hppgsz
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am__append_11 = ptest hppgsz
-@FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@am__append_12 = ui/colorcalform2_base.ui ui/settingsdialog_base.ui ui/aligntype6form1_base.ui \
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am__append_7 = ptest hppgsz
+@FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@am__append_8 = ui/colorcalform2_base.ui ui/settingsdialog_base.ui ui/aligntype6form1_base.ui \
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@	ui/aboutdlg_base.ui ui/imagepropertiesdlg_base.ui ui/paperedgealignform_base.ui ui/aligntype6form2_base.ui \
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@	ui/nodevicesform_base.ui ui/cleaningform_base.ui ui/colorcalform_base.ui ui/devmgr4_base.ui ui/loadpaperform_base.ui \
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@	ui/cleaningform2_base.ui ui/waitform_base.ui ui/coloradjform_base.ui ui/faxaddrbookeditform_base.ui \
@@ -119,14 +115,14 @@ DIST_COMMON = $(am__configure_deps) $(am__dist_base_DATA_DIST) \
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@	ui/allowabletypesdlg_base.ui ui/setupform_base.ui ui/setupmanualfind_base.ui \
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@	ui/setupsettings_base.ui ui/pluginlicenseform_base.ui ui/align13form_base.ui ui/firmwaredialog_base.ui
 
-@FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT4_INSTALL_TRUE@am__append_13 = ui4/*.ui
+@FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT4_INSTALL_TRUE@am__append_9 = ui4/*.ui
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@hplipjs_PROGRAMS =  \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	hplipjs$(EXEEXT)
 @HPIJS_INSTALL_TRUE@bin_PROGRAMS = hpijs$(EXEEXT)
 @HPCUPS_INSTALL_TRUE@hpcups_PROGRAMS = hpcups$(EXEEXT)
 @FAX_BUILD_TRUE@@HPCUPS_INSTALL_TRUE@@HPCUPS_ONLY_BUILD_FALSE@hpcupsfax_PROGRAMS = hpcupsfax$(EXEEXT)
-@FOOMATIC_PPD_INSTALL_TRUE@am__append_14 = $(foomatic_ppd_printers)
-@CUPS_PPD_INSTALL_TRUE@am__append_15 = $(cups_ppd_printers)
+@FOOMATIC_PPD_INSTALL_TRUE@am__append_10 = $(foomatic_ppd_printers)
+@CUPS_PPD_INSTALL_TRUE@am__append_11 = $(cups_ppd_printers)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -191,11 +187,12 @@ am__installdirs = "$(DESTDIR)$(cupsextdir)" "$(DESTDIR)$(hpmudextdir)" \
 	"$(DESTDIR)$(policykit_policydir)" \
 	"$(DESTDIR)$(postscriptdir)" "$(DESTDIR)$(ppddir)" \
 	"$(DESTDIR)$(prntdir)" "$(DESTDIR)$(rulesdir)" \
-	"$(DESTDIR)$(scandir)" "$(DESTDIR)$(uidir)" \
-	"$(DESTDIR)$(ui4dir)" "$(DESTDIR)$(unreldir)" \
-	"$(DESTDIR)$(www0dir)" "$(DESTDIR)$(www3dir)" \
-	"$(DESTDIR)$(www4dir)" "$(DESTDIR)$(docdir)" \
-	"$(DESTDIR)$(hplip_confdir)" "$(DESTDIR)$(hplip_desktopdir)" \
+	"$(DESTDIR)$(rulessystemdir)" "$(DESTDIR)$(scandir)" \
+	"$(DESTDIR)$(uidir)" "$(DESTDIR)$(ui4dir)" \
+	"$(DESTDIR)$(unreldir)" "$(DESTDIR)$(www0dir)" \
+	"$(DESTDIR)$(www3dir)" "$(DESTDIR)$(www4dir)" \
+	"$(DESTDIR)$(docdir)" "$(DESTDIR)$(hplip_confdir)" \
+	"$(DESTDIR)$(hplip_desktopdir)" \
 	"$(DESTDIR)$(hplip_systraydir)"
 LTLIBRARIES = $(cupsext_LTLIBRARIES) $(hpmudext_LTLIBRARIES) \
 	$(lib_LTLIBRARIES) $(libsane_hpaio_LTLIBRARIES) \
@@ -778,6 +775,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	prnt/ps/hp-color_laserjet_3000-ps.ppd.gz \
 	prnt/ps/hp-designjet_z5200_postscript-ps.ppd.gz \
 	prnt/ps/hp-color_laserjet_cp4020_series-ps.ppd.gz \
+	prnt/ps/hp-laserjet_mfp_m725-ps.ppd.gz \
 	prnt/ps/hp-business_inkjet_2300-ps.ppd.gz \
 	prnt/ps/hp-laserjet_3052-ps.ppd.gz \
 	prnt/ps/hp-color_laserjet_2605-ps.ppd.gz \
@@ -1032,6 +1030,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	ppd/hpijs/hp-officejet_j6400_series-hpijs.ppd.gz \
 	ppd/hpijs/hp-deskjet_3450-hpijs.ppd.gz \
 	ppd/hpijs/hp-officejet_v30-hpijs.ppd.gz \
+	ppd/hpijs/hp-officejet_pro_3610-hpijs.ppd.gz \
 	ppd/hpijs/hp-laserjet_5mp-hpijs-pcl3.ppd.gz \
 	ppd/hpijs/hp-deskjet_694-hpijs.ppd.gz \
 	ppd/hpijs/hp-envy_120_series-hpijs.ppd.gz \
@@ -1411,6 +1410,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	ppd/hpijs/hp-laserjet_2420-hpijs-pcl3.ppd.gz \
 	ppd/hpijs/hp-laserjet_5200l-hpijs-pcl3.ppd.gz \
 	ppd/hpijs/hp-officejet_k7100-hpijs.ppd.gz \
+	ppd/hpijs/hp-officejet_pro_3620-hpijs.ppd.gz \
 	ppd/hpijs/hp-deskjet_957c-hpijs.ppd.gz \
 	ppd/hpijs/hp-photosmart_c6200_series-hpijs.ppd.gz \
 	ppd/hpijs/hp-officejet_pro_8500_a909g-hpijs.ppd.gz \
@@ -2158,6 +2158,8 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	ppd/hpcups/hp-officejet_lx.ppd.gz \
 	ppd/hpcups/hp-officejet_pro_1150c.ppd.gz \
 	ppd/hpcups/hp-officejet_pro_1170c_series.ppd.gz \
+	ppd/hpcups/hp-officejet_pro_3610.ppd.gz \
+	ppd/hpcups/hp-officejet_pro_3620.ppd.gz \
 	ppd/hpcups/hp-officejet_pro_8000_a809.ppd.gz \
 	ppd/hpcups/hp-officejet_pro_8100.ppd.gz \
 	ppd/hpcups/hp-officejet_pro_8500_a909a.ppd.gz \
@@ -2337,15 +2339,9 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	ppd/hpcups/hp-psc_950vr.ppd.gz ppd/hpcups/hp-psc_950xi.ppd.gz
 am__dist_prnt_DATA_DIST = prnt/cups.py prnt/__init__.py prnt/ldl.py \
 	prnt/pcl.py prnt/colorcal.py
-am__dist_rules_DATA_DIST = data/rules/56-hpmud_support.rules \
-	data/rules/86-hpmud_plugin.rules \
-	data/rules/56-hpmud_add_printer.rules \
-	data/rules/40-hplip.rules data/rules/55-hpmud.rules \
-	data/rules/56-hpmud_support_sysfs.rules \
-	data/rules/86-hpmud_plugin_sysfs.rules \
-	data/rules/56-hpmud_add_printer_sysfs.rules \
-	data/rules/40-hplip_sysfs.rules \
-	data/rules/55-hpmud_sysfs.rules
+am__dist_rules_DATA_DIST = data/rules/56-hpmud.rules \
+	data/rules/56-hpmud_sysfs.rules
+am__dist_rulessystem_DATA_DIST = data/rules/hplip-printer@.service
 am__dist_scan_DATA_DIST = scan/__init__.py scan/sane.py
 am__dist_ui_DATA_DIST = ui/alignform.py ui/colorcalform_base.py \
 	ui/colorcalform.py ui/coloradjform_base.py ui/coloradjform.py \
@@ -2413,10 +2409,10 @@ DATA = $(cupsdrv_DATA) $(cupsdrv2_DATA) $(dist_base_DATA) \
 	$(dist_policykit_dbus_share_DATA) \
 	$(dist_policykit_policy_DATA) $(dist_postscript_DATA) \
 	$(dist_ppd_DATA) $(dist_prnt_DATA) $(dist_rules_DATA) \
-	$(dist_scan_DATA) $(dist_ui_DATA) $(dist_ui4_DATA) \
-	$(dist_unrel_DATA) $(dist_www0_DATA) $(dist_www3_DATA) \
-	$(dist_www4_DATA) $(doc_DATA) $(hplip_conf_DATA) \
-	$(hplip_desktop_DATA) $(hplip_systray_DATA)
+	$(dist_rulessystem_DATA) $(dist_scan_DATA) $(dist_ui_DATA) \
+	$(dist_ui4_DATA) $(dist_unrel_DATA) $(dist_www0_DATA) \
+	$(dist_www3_DATA) $(dist_www4_DATA) $(doc_DATA) \
+	$(hplip_conf_DATA) $(hplip_desktop_DATA) $(hplip_systray_DATA)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -2635,8 +2631,8 @@ INCLUDES = -Iip -Iio/hpmud -Iscan/sane -Iprnt/hpijs -Icommon/
 hplipdir = $(datadir)/hplip
 doc_DATA = COPYING copyright prnt/hpijs/README_LIBJPG
 EXTRA_DIST = prnt/hpijs/gdevijs-krgb-1.5-gs8.61.patch prnt/hpijs/README_LIBJPG copyright
-dist_noinst_SCRIPTS = $(am__append_10)
-dist_noinst_DATA = $(am__append_9) $(am__append_12) $(am__append_13)
+dist_noinst_SCRIPTS = $(am__append_6)
+dist_noinst_DATA = $(am__append_5) $(am__append_8) $(am__append_9)
 lib_LTLIBRARIES = $(am__append_1)
 foomatic_ppd_printers = \
     ppd/hpijs/hp-officejet_7400_series-hpijs.ppd.gz \
@@ -2757,6 +2753,7 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-officejet_j6400_series-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_3450-hpijs.ppd.gz \
     ppd/hpijs/hp-officejet_v30-hpijs.ppd.gz \
+    ppd/hpijs/hp-officejet_pro_3610-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_5mp-hpijs-pcl3.ppd.gz \
     ppd/hpijs/hp-deskjet_694-hpijs.ppd.gz \
     ppd/hpijs/hp-envy_120_series-hpijs.ppd.gz \
@@ -3136,6 +3133,7 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-laserjet_2420-hpijs-pcl3.ppd.gz \
     ppd/hpijs/hp-laserjet_5200l-hpijs-pcl3.ppd.gz \
     ppd/hpijs/hp-officejet_k7100-hpijs.ppd.gz \
+    ppd/hpijs/hp-officejet_pro_3620-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_957c-hpijs.ppd.gz \
     ppd/hpijs/hp-photosmart_c6200_series-hpijs.ppd.gz \
     ppd/hpijs/hp-officejet_pro_8500_a909g-hpijs.ppd.gz \
@@ -3433,6 +3431,7 @@ foomatic_ps_printers = \
     prnt/ps/hp-color_laserjet_3000-ps.ppd.gz \
     prnt/ps/hp-designjet_z5200_postscript-ps.ppd.gz \
     prnt/ps/hp-color_laserjet_cp4020_series-ps.ppd.gz \
+    prnt/ps/hp-laserjet_mfp_m725-ps.ppd.gz \
     prnt/ps/hp-business_inkjet_2300-ps.ppd.gz \
     prnt/ps/hp-laserjet_3052-ps.ppd.gz \
     prnt/ps/hp-color_laserjet_2605-ps.ppd.gz \
@@ -4112,6 +4111,8 @@ cups_ppd_printers = \
    ppd/hpcups/hp-officejet_lx.ppd.gz \
    ppd/hpcups/hp-officejet_pro_1150c.ppd.gz \
    ppd/hpcups/hp-officejet_pro_1170c_series.ppd.gz \
+   ppd/hpcups/hp-officejet_pro_3610.ppd.gz \
+   ppd/hpcups/hp-officejet_pro_3620.ppd.gz \
    ppd/hpcups/hp-officejet_pro_8000_a809.ppd.gz \
    ppd/hpcups/hp-officejet_pro_8100.ppd.gz \
    ppd/hpcups/hp-officejet_pro_8500_a909a.ppd.gz \
@@ -4359,24 +4360,18 @@ cups_drv = prnt/drv/hpcups.drv
 @HPLIP_BUILD_TRUE@hp_mkuri_LDADD = -ldl libhpmud.la
 @HPLIP_BUILD_TRUE@hp_mkuri_CFLAGS = -DCONFDIR=\"$(hplip_confdir)\"
 
+#hpmud rules data dir
+@HPLIP_BUILD_TRUE@rulessystemdir = /usr/lib/systemd/system
+@HPLIP_BUILD_TRUE@dist_rulessystem_DATA = data/rules/hplip-printer@.service
+
 # cron files
 @HPLIP_BUILD_TRUE@crondir = /etc/cron.daily
 @HPLIP_BUILD_TRUE@dist_cron_DATA = data/rules/hplip_cron
 
 # hpmud.rules
 @HPLIP_BUILD_TRUE@rulesdir = /etc/udev/rules.d
-@HPLIP_BUILD_TRUE@@UDEV_SYSFS_RULES_FALSE@dist_rules_DATA = data/rules/56-hpmud_support.rules \
-@HPLIP_BUILD_TRUE@@UDEV_SYSFS_RULES_FALSE@	data/rules/86-hpmud_plugin.rules \
-@HPLIP_BUILD_TRUE@@UDEV_SYSFS_RULES_FALSE@	data/rules/56-hpmud_add_printer.rules \
-@HPLIP_BUILD_TRUE@@UDEV_SYSFS_RULES_FALSE@	$(am__append_7) \
-@HPLIP_BUILD_TRUE@@UDEV_SYSFS_RULES_FALSE@	$(am__append_8)
-@HPLIP_BUILD_TRUE@@UDEV_SYSFS_RULES_TRUE@dist_rules_DATA = data/rules/56-hpmud_support_sysfs.rules \
-@HPLIP_BUILD_TRUE@@UDEV_SYSFS_RULES_TRUE@	data/rules/86-hpmud_plugin_sysfs.rules \
-@HPLIP_BUILD_TRUE@@UDEV_SYSFS_RULES_TRUE@	data/rules/56-hpmud_add_printer_sysfs.rules \
-@HPLIP_BUILD_TRUE@@UDEV_SYSFS_RULES_TRUE@	$(am__append_5) \
-@HPLIP_BUILD_TRUE@@UDEV_SYSFS_RULES_TRUE@	$(am__append_6) \
-@HPLIP_BUILD_TRUE@@UDEV_SYSFS_RULES_TRUE@	$(am__append_7) \
-@HPLIP_BUILD_TRUE@@UDEV_SYSFS_RULES_TRUE@	$(am__append_8)
+@HPLIP_BUILD_TRUE@@UDEV_SYSFS_RULES_FALSE@dist_rules_DATA = data/rules/56-hpmud.rules
+@HPLIP_BUILD_TRUE@@UDEV_SYSFS_RULES_TRUE@dist_rules_DATA = data/rules/56-hpmud_sysfs.rules
 @HPLIP_BUILD_TRUE@halpredir = /usr/share/hal/fdi/preprobe/10osvendor
 @HPLIP_BUILD_TRUE@dist_halpre_DATA = data/rules/20-hplip-devices.fdi
 
@@ -4391,7 +4386,6 @@ cups_drv = prnt/drv/hpcups.drv
 # hplip.state
 @HPLIP_BUILD_TRUE@hplip_statedir = /var/lib/hp
 @HPLIP_BUILD_TRUE@dist_hplip_state_DATA = 
-#dist_hplip_state_DATA = hplip.state
 
 # Log Files
 @HPLIP_BUILD_TRUE@hplip_Logdir = /var/log/hp
@@ -4548,10 +4542,6 @@ cups_drv = prnt/drv/hpcups.drv
 
 #ui4 (qt4)
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT4_INSTALL_TRUE@ui4dir = $(hplipdir)/ui4
-#dist_ui4_SCRIPTS = ui4/devmgr5.py ui4/systemtray.py ui4/devmgr5_base.py ui4/__init__.py ui4/ui_utils.py \
-#	ui4/settingsdialog_base.py ui4/settingsdialog.py ui4/printsettingstoolbox.py ui4/printdialog_base.py \
-#	ui4/printdialog.py
-#dist_noinst_DATA += ui4/devmgr5_base.ui ui4/settingsdialog_base.ui ui4/printdialog_base.ui
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT4_INSTALL_TRUE@dist_ui4_DATA = ui4/*.py
 
 # ui plugins (qt3)
@@ -4708,8 +4698,8 @@ libapdk_la_CFLAGS = $(libapdk_la_CXXFLAGS) -Iprnt/hpijs
 
 # PPDs
 ppddir = $(hpppddir)
-dist_ppd_DATA = $(foomatic_ps_printers) $(am__append_14) \
-	$(am__append_15)
+dist_ppd_DATA = $(foomatic_ps_printers) $(am__append_10) \
+	$(am__append_11)
 @FOOMATIC_DRV_INSTALL_TRUE@cupsdrvdir = $(drvdir)
 @FOOMATIC_DRV_INSTALL_TRUE@cupsdrv_DATA = $(foomatic_drv)
 @CUPS_DRV_INSTALL_TRUE@cupsdrv2dir = $(drvdir)
@@ -8254,6 +8244,26 @@ uninstall-dist_rulesDATA:
 	test -n "$$files" || exit 0; \
 	echo " ( cd '$(DESTDIR)$(rulesdir)' && rm -f" $$files ")"; \
 	cd "$(DESTDIR)$(rulesdir)" && rm -f $$files
+install-dist_rulessystemDATA: $(dist_rulessystem_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(rulessystemdir)" || $(MKDIR_P) "$(DESTDIR)$(rulessystemdir)"
+	@list='$(dist_rulessystem_DATA)'; test -n "$(rulessystemdir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(rulessystemdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(rulessystemdir)" || exit $$?; \
+	done
+
+uninstall-dist_rulessystemDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_rulessystem_DATA)'; test -n "$(rulessystemdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(rulessystemdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(rulessystemdir)" && rm -f $$files
 install-dist_scanDATA: $(dist_scan_DATA)
 	@$(NORMAL_INSTALL)
 	test -z "$(scandir)" || $(MKDIR_P) "$(DESTDIR)$(scandir)"
@@ -8680,7 +8690,7 @@ all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(SCRIPTS) $(DATA)
 install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs:
-	for dir in "$(DESTDIR)$(cupsextdir)" "$(DESTDIR)$(hpmudextdir)" "$(DESTDIR)$(libdir)" "$(DESTDIR)$(libsane_hpaiodir)" "$(DESTDIR)$(pcardextdir)" "$(DESTDIR)$(scanextdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(hpdir)" "$(DESTDIR)$(hp_mkuridir)" "$(DESTDIR)$(hpcupsdir)" "$(DESTDIR)$(hpcupsfaxdir)" "$(DESTDIR)$(hplipjsdir)" "$(DESTDIR)$(cacdir)" "$(DESTDIR)$(cmddir)" "$(DESTDIR)$(findir)" "$(DESTDIR)$(hpfaxdir)" "$(DESTDIR)$(hplipdir)" "$(DESTDIR)$(plugins4dir)" "$(DESTDIR)$(ripdir)" "$(DESTDIR)$(pstotiffdir)" "$(DESTDIR)$(cupsdrvdir)" "$(DESTDIR)$(cupsdrv2dir)" "$(DESTDIR)$(basedir)" "$(DESTDIR)$(copierdir)" "$(DESTDIR)$(crondir)" "$(DESTDIR)$(faxdir)" "$(DESTDIR)$(fax_filtersdir)" "$(DESTDIR)$(halpredir)" "$(DESTDIR)$(homedir)" "$(DESTDIR)$(hpcupsfaxppddir)" "$(DESTDIR)$(hpijsfaxppddir)" "$(DESTDIR)$(hplip_Logdir)" "$(DESTDIR)$(hplip_statedir)" "$(DESTDIR)$(hplip_tmpdir)" "$(DESTDIR)$(images_128x128dir)" "$(DESTDIR)$(images_16x16dir)" "$(DESTDIR)$(images_24x24dir)" "$(DESTDIR)$(images_256x256dir)" "$(DESTDIR)$(images_32x32dir)" "$(DESTDIR)$(images_64x64dir)" "$(DESTDIR)$(images_devicesdir)" "$(DESTDIR)$(images_otherdir)" "$(DESTDIR)$(installdir)" "$(DESTDIR)$(ldldir)" "$(DESTDIR)$(localzdir)" "$(DESTDIR)$(modelsdir)" "$(DESTDIR)$(pcarddir)" "$(DESTDIR)$(pcldir)" "$(DESTDIR)$(pluginsdir)" "$(DESTDIR)$(policykit_dbus_etcdir)" "$(DESTDIR)$(policykit_dbus_sharedir)" "$(DESTDIR)$(policykit_policydir)" "$(DESTDIR)$(postscriptdir)" "$(DESTDIR)$(ppddir)" "$(DESTDIR)$(prntdir)" "$(DESTDIR)$(rulesdir)" "$(DESTDIR)$(scandir)" "$(DESTDIR)$(uidir)" "$(DESTDIR)$(ui4dir)" "$(DESTDIR)$(unreldir)" "$(DESTDIR)$(www0dir)" "$(DESTDIR)$(www3dir)" "$(DESTDIR)$(www4dir)" "$(DESTDIR)$(docdir)" "$(DESTDIR)$(hplip_confdir)" "$(DESTDIR)$(hplip_desktopdir)" "$(DESTDIR)$(hplip_systraydir)"; do \
+	for dir in "$(DESTDIR)$(cupsextdir)" "$(DESTDIR)$(hpmudextdir)" "$(DESTDIR)$(libdir)" "$(DESTDIR)$(libsane_hpaiodir)" "$(DESTDIR)$(pcardextdir)" "$(DESTDIR)$(scanextdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(hpdir)" "$(DESTDIR)$(hp_mkuridir)" "$(DESTDIR)$(hpcupsdir)" "$(DESTDIR)$(hpcupsfaxdir)" "$(DESTDIR)$(hplipjsdir)" "$(DESTDIR)$(cacdir)" "$(DESTDIR)$(cmddir)" "$(DESTDIR)$(findir)" "$(DESTDIR)$(hpfaxdir)" "$(DESTDIR)$(hplipdir)" "$(DESTDIR)$(plugins4dir)" "$(DESTDIR)$(ripdir)" "$(DESTDIR)$(pstotiffdir)" "$(DESTDIR)$(cupsdrvdir)" "$(DESTDIR)$(cupsdrv2dir)" "$(DESTDIR)$(basedir)" "$(DESTDIR)$(copierdir)" "$(DESTDIR)$(crondir)" "$(DESTDIR)$(faxdir)" "$(DESTDIR)$(fax_filtersdir)" "$(DESTDIR)$(halpredir)" "$(DESTDIR)$(homedir)" "$(DESTDIR)$(hpcupsfaxppddir)" "$(DESTDIR)$(hpijsfaxppddir)" "$(DESTDIR)$(hplip_Logdir)" "$(DESTDIR)$(hplip_statedir)" "$(DESTDIR)$(hplip_tmpdir)" "$(DESTDIR)$(images_128x128dir)" "$(DESTDIR)$(images_16x16dir)" "$(DESTDIR)$(images_24x24dir)" "$(DESTDIR)$(images_256x256dir)" "$(DESTDIR)$(images_32x32dir)" "$(DESTDIR)$(images_64x64dir)" "$(DESTDIR)$(images_devicesdir)" "$(DESTDIR)$(images_otherdir)" "$(DESTDIR)$(installdir)" "$(DESTDIR)$(ldldir)" "$(DESTDIR)$(localzdir)" "$(DESTDIR)$(modelsdir)" "$(DESTDIR)$(pcarddir)" "$(DESTDIR)$(pcldir)" "$(DESTDIR)$(pluginsdir)" "$(DESTDIR)$(policykit_dbus_etcdir)" "$(DESTDIR)$(policykit_dbus_sharedir)" "$(DESTDIR)$(policykit_policydir)" "$(DESTDIR)$(postscriptdir)" "$(DESTDIR)$(ppddir)" "$(DESTDIR)$(prntdir)" "$(DESTDIR)$(rulesdir)" "$(DESTDIR)$(rulessystemdir)" "$(DESTDIR)$(scandir)" "$(DESTDIR)$(uidir)" "$(DESTDIR)$(ui4dir)" "$(DESTDIR)$(unreldir)" "$(DESTDIR)$(www0dir)" "$(DESTDIR)$(www3dir)" "$(DESTDIR)$(www4dir)" "$(DESTDIR)$(docdir)" "$(DESTDIR)$(hplip_confdir)" "$(DESTDIR)$(hplip_desktopdir)" "$(DESTDIR)$(hplip_systraydir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -8761,7 +8771,8 @@ install-data-am: install-cupsdrv2DATA install-cupsdrvDATA \
 	install-dist_policykit_policyDATA install-dist_postscriptDATA \
 	install-dist_ppdDATA install-dist_prntDATA \
 	install-dist_ripSCRIPTS install-dist_rulesDATA \
-	install-dist_scanDATA install-dist_ui4DATA install-dist_uiDATA \
+	install-dist_rulessystemDATA install-dist_scanDATA \
+	install-dist_ui4DATA install-dist_uiDATA \
 	install-dist_unrelDATA install-dist_www0DATA \
 	install-dist_www3DATA install-dist_www4DATA install-docDATA \
 	install-hpPROGRAMS install-hp_mkuriPROGRAMS \
@@ -8846,11 +8857,11 @@ uninstall-am: uninstall-binPROGRAMS uninstall-cupsdrv2DATA \
 	uninstall-dist_policykit_policyDATA \
 	uninstall-dist_postscriptDATA uninstall-dist_ppdDATA \
 	uninstall-dist_prntDATA uninstall-dist_ripSCRIPTS \
-	uninstall-dist_rulesDATA uninstall-dist_scanDATA \
-	uninstall-dist_ui4DATA uninstall-dist_uiDATA \
-	uninstall-dist_unrelDATA uninstall-dist_www0DATA \
-	uninstall-dist_www3DATA uninstall-dist_www4DATA \
-	uninstall-docDATA uninstall-hpPROGRAMS \
+	uninstall-dist_rulesDATA uninstall-dist_rulessystemDATA \
+	uninstall-dist_scanDATA uninstall-dist_ui4DATA \
+	uninstall-dist_uiDATA uninstall-dist_unrelDATA \
+	uninstall-dist_www0DATA uninstall-dist_www3DATA \
+	uninstall-dist_www4DATA uninstall-docDATA uninstall-hpPROGRAMS \
 	uninstall-hp_mkuriPROGRAMS uninstall-hpcupsPROGRAMS \
 	uninstall-hpcupsfaxPROGRAMS uninstall-hplip_confDATA \
 	uninstall-hplip_desktopDATA uninstall-hplip_systrayDATA \
@@ -8899,7 +8910,8 @@ uninstall-am: uninstall-binPROGRAMS uninstall-cupsdrv2DATA \
 	install-dist_policykit_policyDATA install-dist_postscriptDATA \
 	install-dist_ppdDATA install-dist_prntDATA \
 	install-dist_ripSCRIPTS install-dist_rulesDATA \
-	install-dist_scanDATA install-dist_ui4DATA install-dist_uiDATA \
+	install-dist_rulessystemDATA install-dist_scanDATA \
+	install-dist_ui4DATA install-dist_uiDATA \
 	install-dist_unrelDATA install-dist_www0DATA \
 	install-dist_www3DATA install-dist_www4DATA install-docDATA \
 	install-dvi install-dvi-am install-exec install-exec-am \
@@ -8944,16 +8956,17 @@ uninstall-am: uninstall-binPROGRAMS uninstall-cupsdrv2DATA \
 	uninstall-dist_policykit_policyDATA \
 	uninstall-dist_postscriptDATA uninstall-dist_ppdDATA \
 	uninstall-dist_prntDATA uninstall-dist_ripSCRIPTS \
-	uninstall-dist_rulesDATA uninstall-dist_scanDATA \
-	uninstall-dist_ui4DATA uninstall-dist_uiDATA \
-	uninstall-dist_unrelDATA uninstall-dist_www0DATA \
-	uninstall-dist_www3DATA uninstall-dist_www4DATA \
-	uninstall-docDATA uninstall-hook uninstall-hpPROGRAMS \
-	uninstall-hp_mkuriPROGRAMS uninstall-hpcupsPROGRAMS \
-	uninstall-hpcupsfaxPROGRAMS uninstall-hplip_confDATA \
-	uninstall-hplip_desktopDATA uninstall-hplip_systrayDATA \
-	uninstall-hplipjsPROGRAMS uninstall-hpmudextLTLIBRARIES \
-	uninstall-libLTLIBRARIES uninstall-libsane_hpaioLTLIBRARIES \
+	uninstall-dist_rulesDATA uninstall-dist_rulessystemDATA \
+	uninstall-dist_scanDATA uninstall-dist_ui4DATA \
+	uninstall-dist_uiDATA uninstall-dist_unrelDATA \
+	uninstall-dist_www0DATA uninstall-dist_www3DATA \
+	uninstall-dist_www4DATA uninstall-docDATA uninstall-hook \
+	uninstall-hpPROGRAMS uninstall-hp_mkuriPROGRAMS \
+	uninstall-hpcupsPROGRAMS uninstall-hpcupsfaxPROGRAMS \
+	uninstall-hplip_confDATA uninstall-hplip_desktopDATA \
+	uninstall-hplip_systrayDATA uninstall-hplipjsPROGRAMS \
+	uninstall-hpmudextLTLIBRARIES uninstall-libLTLIBRARIES \
+	uninstall-libsane_hpaioLTLIBRARIES \
 	uninstall-pcardextLTLIBRARIES uninstall-pstotiffSCRIPTS \
 	uninstall-scanextLTLIBRARIES
 

@@ -136,7 +136,11 @@ Cache-control: No-cache
 
 
     def setStationName(self, name):
-        return self.post("/hp/device/set_config.html", {"FaxCompanyName": str(name)})
+        try:
+            name = name.encode('utf-8')
+        except(UnicodeEncodeError, UnicodeDecodeError):
+            log.error("Unicode Error")
+        return self.post("/hp/device/set_config.html", {"FaxCompanyName": name})
 
 
     def getStationName(self):

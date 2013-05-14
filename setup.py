@@ -566,7 +566,7 @@ else: # INTERACTIVE_MODE
             status, output = utils.run(services.restart_cups())
             log.debug("Restart CUPS returned: exit=%d output=%s" % (status, output))
 
-            time.sleep(3)
+            time.sleep(1)
             cups.setPasswordPrompt("You do not have permission to add a printer.")
             if not os.path.exists(print_ppd): # assume foomatic: or some such
                 status, status_str = cups.addPrinter(printer_name.encode('utf8'), print_uri,

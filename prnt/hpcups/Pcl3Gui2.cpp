@@ -113,6 +113,7 @@ DRIVER_ERROR Pcl3Gui2::StartPage(JobAttributes *pJA)
     DRIVER_ERROR    err = NO_ERROR;
     char            szStr[256];
     int             top_margin = 0;
+    unsigned int unit_of_measure = 300;
     page_number++;
 
 //  Under windows, pJA address may have changed, re-init here.
@@ -148,8 +149,11 @@ DRIVER_ERROR Pcl3Gui2::StartPage(JobAttributes *pJA)
 	*cur_pcl_buffer_ptr++ = (BYTE) m_pJA->color_mode;
     }
 
-    sprintf(szStr,"\033&u%dD", m_pQA->horizontal_resolution);
+    unit_of_measure = (m_pQA->horizontal_resolution < m_pQA->actual_vertical_resolution) ? m_pQA->horizontal_resolution : m_pQA->actual_vertical_resolution;
+    sprintf(szStr,"\033&u%dD", unit_of_measure);
     addToHeader((const BYTE *) szStr, strlen(szStr));
+
+    
     sprintf(szStr,"\033*t%dR", m_pQA->actual_vertical_resolution);
     addToHeader((const BYTE *) szStr, strlen(szStr));
 

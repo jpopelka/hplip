@@ -626,20 +626,21 @@ class WifiSetupDialog(QDialog, Ui_Dialog):
         self.SignalStrengthIcon.setPixmap(load_pixmap('signal%d' % ss_val, 'other'))
 
         for c, s in vsa_codes:
-            ss = s.lower()
-            if ss.startswith("info"):
-                pixmap = load_pixmap('info', '16x16')
+            if c :
+                ss = s.lower()
+                if ss.startswith("info"):
+                    pixmap = load_pixmap('info', '16x16')
 
-            elif ss.startswith("warn"):
-                pixmap = load_pixmap('warning', '16x16')
+                elif ss.startswith("warn"):
+                    pixmap = load_pixmap('warning', '16x16')
 
-            elif ss.startswith("crit"):
-                pixmap = load_pixmap('error', '16x16')
+                elif ss.startswith("crit"):
+                    pixmap = load_pixmap('error', '16x16')
 
-            else:
-                pixmap = load_pixmap('info', '16x16')
+                else:
+                    pixmap = load_pixmap('info', '16x16')
 
-            self.pages.append((device.queryString("vsa_%s" % str(c).zfill(3)), pixmap))
+                self.pages.append((device.queryString("vsa_%s" % str(c).zfill(3)), pixmap))
 
         num_pages = len(self.pages)
         self.PageSpinBox.setMaximum(num_pages)

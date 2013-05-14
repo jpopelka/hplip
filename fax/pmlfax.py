@@ -147,7 +147,11 @@ class PMLFaxDevice(FaxDevice):
 
 
     def setStationName(self, name):
-        return self.setPML(pml.OID_FAX_STATION_NAME, str(name))
+        try:
+            name = name.encode('utf-8')
+        except(UnicodeEncodeError, UnicodeDecodeError):
+            log.error("Unicode Error")
+        return self.setPML(pml.OID_FAX_STATION_NAME, name)
 
     def getStationName(self):
         return utils.printable(str(self.getPML(pml.OID_FAX_STATION_NAME)[1]))
