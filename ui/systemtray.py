@@ -71,7 +71,7 @@ TrayIcon_Information = 2
 
 theBalloonTip = None
 UPGRADE_CHECK_DELAY=24*60*60*1000               #1 day
-
+CLEAN_EXEC_DELAY=4*60*60*1000                  #4 Hrs
 
 class BalloonTip(QDialog):
     def __init__(self, msg_icon, title, msg, tray_icon):
@@ -435,6 +435,14 @@ class SystemTrayApp(QApplication):
         self.timer.connect(self.timer,SIGNAL("timeout()"),self.handle_hplip_updation)
         self.timer.start(UPGRADE_CHECK_DELAY)
 
+        # Cleans the /var/log/hp/tmp directory
+        self.handle_hplip_clean()
+        
+        self.clean_timer = QTimer()
+        self.clean_timer.connect(self.clean_timer,SIGNAL("timeout()"),self.handle_hplip_clean)
+        self.clean_timer.start(CLEAN_EXEC_DELAY)
+
+
         self.ERROR_STATE_TO_ICON = {
             ERROR_STATE_CLEAR: self.icon_info,
             ERROR_STATE_OK: self.icon_info,
@@ -529,6 +537,14 @@ class SystemTrayApp(QApplication):
 
             else:
                 break
+
+
+    def handle_hplip_clean(self):
+        log.debug("handle_hplip_clean ")
+        home_dir = sys_conf.get('dirs', 'home')
+        cmd = 'sh %s/hplip_clean.sh'%home_dir
+        os.system(cmd)
+
 
     def handle_hplip_updation(self):
         log.debug("handle_hplip_updation upgrade_notify =%d"%(self.user_settings.upgrade_notify))

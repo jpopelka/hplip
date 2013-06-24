@@ -548,6 +548,9 @@ static SANE_Status hpaioSetDefaultValue( hpaioScanner_t hpaio, int option )
         case OPTION_CONTRAST:
             hpaio->currentContrast = hpaio->defaultContrast;
             break;
+        case OPTION_BRIGHTNESS:
+            hpaio->currentBrightness = hpaio->defaultBrightness;
+            break;
 
         case OPTION_COMPRESSION:
             {
@@ -725,10 +728,11 @@ static int hpaioUpdateDescriptors( hpaioScanner_t hpaio, int option )
         reload |= SANE_INFO_RELOAD_PARAMS;
     }
 
-    /* OPTION_CONTRAST: */
+    /* OPTION_CONTRAST, OPTION_BRIGHTNESS */
     if( initValues )
     {
         hpaioSetDefaultValue( hpaio, OPTION_CONTRAST );
+        hpaioSetDefaultValue (hpaio, OPTION_BRIGHTNESS);
 		reload |= SANE_INFO_RELOAD_OPTIONS;
     }
 
@@ -1012,6 +1016,22 @@ static void init_options( hpaioScanner_t hpaio )
     hpaio->contrastRange.quant = 0;
     hpaio->defaultContrast = PML_CONTRAST_DEFAULT;
 
+    hpaio->option[OPTION_BRIGHTNESS].name = SANE_NAME_BRIGHTNESS;
+    hpaio->option[OPTION_BRIGHTNESS].title = SANE_TITLE_BRIGHTNESS;
+    hpaio->option[OPTION_BRIGHTNESS].desc = SANE_DESC_BRIGHTNESS;
+    hpaio->option[OPTION_BRIGHTNESS].type = SANE_TYPE_INT;
+    hpaio->option[OPTION_BRIGHTNESS].unit = SANE_UNIT_NONE;
+    hpaio->option[OPTION_BRIGHTNESS].size = sizeof( SANE_Int );
+    hpaio->option[OPTION_BRIGHTNESS].cap = SANE_CAP_SOFT_SELECT |
+                                         SANE_CAP_SOFT_DETECT |
+                                         SANE_CAP_ADVANCED;
+    hpaio->option[OPTION_BRIGHTNESS].constraint_type = SANE_CONSTRAINT_RANGE;
+    hpaio->option[OPTION_BRIGHTNESS].constraint.range = &hpaio->brightnessRange;
+    hpaio->brightnessRange.min = PML_BRIGHTNESS_MIN;
+    hpaio->brightnessRange.max = PML_BRIGHTNESS_MAX;
+    hpaio->brightnessRange.quant = 0;
+    hpaio->defaultBrightness = PML_BRIGHTNESS_DEFAULT;
+    
     hpaio->option[OPTION_COMPRESSION].name = STR_NAME_COMPRESSION;
     hpaio->option[OPTION_COMPRESSION].title = STR_TITLE_COMPRESSION;
     hpaio->option[OPTION_COMPRESSION].desc = STR_DESC_COMPRESSION;
@@ -1246,10 +1266,16 @@ static SANE_Status hpaioProgramOptions( hpaioScanner_t hpaio )
                         SCL_CMD_SET_Y_EXTENT,
                         MILLIMETERS_TO_DECIPIXELS( hpaio->effectiveBry -
                                                    hpaio->effectiveTly ) );
-	    /* Set Contrast */
-	    SclSendCommand( hpaio->deviceid, hpaio->scan_channelid,
+        /* Set Contrast */
+        SclSendCommand( hpaio->deviceid, hpaio->scan_channelid,
                         SCL_CMD_SET_CONTRAST,
                         hpaio->currentContrast );
+
+        /* Set Brightness */
+        SclSendCommand( hpaio->deviceid, hpaio->scan_channelid,
+                        SCL_CMD_SET_BRIGHTNESS,
+                        hpaio->currentBrightness );
+
 
         /* Download color map to OfficeJet Pro 11xx. */
         if( hpaio->scl.compat & ( SCL_COMPAT_1150 | SCL_COMPAT_1170 ) )
@@ -2136,6 +2162,9 @@ SANE_Status sclpml_control_option(SANE_Handle handle, SANE_Int option, SANE_Acti
                 case OPTION_CONTRAST:
                     *pIntValue = hpaio->currentContrast;
                     break;
+                case OPTION_BRIGHTNESS:
+                    *pIntValue = hpaio->currentBrightness;
+                    break;
 
                 case OPTION_COMPRESSION:
                     switch( hpaio->currentCompression )
@@ -2286,6 +2315,14 @@ SANE_Status sclpml_control_option(SANE_Handle handle, SANE_Int option, SANE_Acti
                         return SANE_STATUS_INVAL;
                     }
                     hpaio->currentContrast = *pIntValue;
+                    break;
+                case OPTION_BRIGHTNESS:
+                    if( *pIntValue<hpaio->brightnessRange.min ||
+                        *pIntValue>hpaio->brightnessRange.max )
+                    {
+                        return SANE_STATUS_INVAL;
+                    }
+                    hpaio->currentBrightness = *pIntValue;
                     break;
 
                 case OPTION_COMPRESSION:

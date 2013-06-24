@@ -41,7 +41,7 @@ from prnt import cups
 
 def CleanUIx(level):
     global d
-    ok = tui.continue_prompt("Ready to perform level %d cleaning (Note: Wait for previous print to finish)." % level)
+    ok = tui.continue_prompt("Ready to perform level %d cleaning ." % level)
 
     if ok:
         timeout = 0
@@ -74,20 +74,33 @@ def CleanUIx(level):
 
     return ok
 
-def CleanUI1():
-    log.note("Please wait for page to complete printing before continuing.")
-    log.info("\nLevel 1 cleaning complete. If the printout looks OK, enter 'q' to quit or <enter> to do a level 2 cleaning.")
+def CleanUI1(msg=""):
+    if not msg:
+        log.note("Please wait for page to complete printing before continuing.\nLevel 1 cleaning complete. If the printout looks OK.")
+        log.info("Note: Wait for previous print to finish") 
+    else:
+        log.note(msg)
+
+    log.info("Press enter 'q' to quit or <enter> to do a level 2 cleaning.")
     return CleanUIx(2)
 
 
-def CleanUI2():
-    log.note("Please wait for page to complete printing before continuing.")
-    log.info("\nLevel 2 cleaning complete. If the printout looks OK, enter 'q' to quit or <enter> to do a level 3 cleaning.")
+def CleanUI2(msg=""):
+    if not msg:
+        log.note("Please wait for page to complete printing before continuing.\nLevel 2 cleaning complete. If the printout looks OK.")
+        log.info("Note: Wait for previous print to finish") 
+    else:
+        log.note(msg)
+
+    log.info("Press enter 'q' to quit or <enter> to do a level 3 cleaning.")
     log.warn("Level 3 uses a lot of ink.")
     return CleanUIx(3)
 
-def CleanUI3():
-    log.info("\nLevel 3 cleaning complete. Check this page to see if the problem was fixed. If the test page was not printed OK, replace the print cartridge(s).")
+def CleanUI3(msg =""):
+    if msg:
+        log.info(msg)
+    else:
+        log.info("\nLevel 3 cleaning complete. Check this page to see if the problem was fixed. If the test page was not printed OK, replace the print cartridge(s).")
 
 
 try:
@@ -154,7 +167,7 @@ try:
                         maint.cleaning(d, clean_type, maint.cleanTypeLedm, maint.cleanTypeLedm1,
                                         maint.cleanTypeLedm2, tui.load_paper_prompt,
                                         CleanUI1, CleanUI2, CleanUI3,
-                                        None)
+                                        None, maint.isCleanTypeLedmWithPrint)
 
                     else:
                         log.error("Cleaning not needed or supported on this device.")

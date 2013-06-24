@@ -126,6 +126,10 @@ typedef struct PmlObject_s * PmlObject_t;
 #define PML_CONTRAST_MAX    127
 #define PML_CONTRAST_DEFAULT    0
 
+#define PML_BRIGHTNESS_MIN    -127
+#define PML_BRIGHTNESS_MAX    127
+#define PML_BRIGHTNESS_DEFAULT    0
+
 #define PML_COMPRESSION_NONE    1
 #define PML_COMPRESSION_DEFAULT   2
 #define PML_COMPRESSION_MH    3

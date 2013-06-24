@@ -23,7 +23,7 @@
 __version__ = '2.1'
 __mod__ = 'hp-plugin'
 __title__ = 'Plugin Download and Install Utility'
-__doc__ = ""
+__doc__ = "HP Proprietary Plugin Download and Install Utility"
 
 # Std Lib
 import sys

@@ -691,7 +691,7 @@ class DependenciesCheck(CoreInstall):
                                     if not d.supported:
                                         continue
                                 else:
-                                    log.warn("    Device URI: (Makeuri FAILED)")
+                                    log.debug("    Device URI: (Makeuri FAILED)")
                                     continue
                                 printers = cups.getPrinters()
                                 printer_name=None

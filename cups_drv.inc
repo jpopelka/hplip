@@ -260,6 +260,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-envy_100_d410_series.ppd.gz \
    ppd/hpcups/hp-envy_110_series.ppd.gz \
    ppd/hpcups/hp-envy_120_series.ppd.gz \
+   ppd/hpcups/hp-envy_4500_series.ppd.gz \
    ppd/hpcups/hp-laserjet_1000.ppd.gz \
    ppd/hpcups/hp-laserjet_1005_series.ppd.gz \
    ppd/hpcups/hp-laserjet_1010.ppd.gz \

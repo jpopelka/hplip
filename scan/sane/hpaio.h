@@ -21,7 +21,7 @@
   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-  Contributing Authors: David Paschal, Don Welch, David Suffield 
+  Contributing Authors: David Paschal, Don Welch, David Suffield, Sarbeswar Meher 
 
 \************************************************************************************/
 
@@ -57,6 +57,7 @@ enum hpaioOption_e {
                     OPTION_SCAN_RESOLUTION,
     GROUP_ADVANCED,
                     OPTION_CONTRAST,
+                    OPTION_BRIGHTNESS,
                     OPTION_COMPRESSION,
                     OPTION_JPEG_COMPRESSION_FACTOR,
                     OPTION_BATCH_SCAN,
@@ -133,6 +134,9 @@ struct  hpaioScanner_s
         SANE_Range              contrastRange;
         SANE_Int                defaultContrast, currentContrast;
 
+        SANE_Range              brightnessRange;
+        SANE_Int                defaultBrightness, currentBrightness;
+    
         SANE_String_Const       compressionList[MAX_LIST_SIZE];
         int                     defaultCompression[SCAN_MODE_LAST];
         SANE_Int                currentCompression;  /* One of the COMPRESSION_* values. */

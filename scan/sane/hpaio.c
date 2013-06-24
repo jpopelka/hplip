@@ -4,25 +4,25 @@
 
   (c) 2001-2008 Copyright Hewlett-Packard Development Company, LP
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy 
-  of this software and associated documentation files (the "Software"), to deal 
-  in the Software without restriction, including without limitation the rights 
-  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
-  of the Software, and to permit persons to whom the Software is furnished to do 
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+  of the Software, and to permit persons to whom the Software is furnished to do
   so, subject to the following conditions:
 
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
 
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
-  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
-  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-  Contributing Authors: David Paschal, Don Welch, David Suffield, Narla Naga Samrat Chowdary, 
-                        Yashwant Sahu, Sarbeswar Meher 
+  Contributing Authors: David Paschal, Don Welch, David Suffield, Narla Naga Samrat Chowdary,
+                        Yashwant Sahu, Sarbeswar Meher
 
 \************************************************************************************/
 
@@ -46,6 +46,47 @@
 
 #define DEBUG_DECLARE_ONLY
 #include "sanei_debug.h"
+
+#if (CUPS_VERSION_MAJOR > 1) || (CUPS_VERSION_MINOR > 5)
+#define HAVE_CUPS_1_6 1
+#endif
+
+#ifndef HAVE_CUPS_1_6
+#define ippGetGroupTag(attr)  attr->group_tag
+#define ippGetValueTag(attr)  attr->value_tag
+#define ippGetName(attr)      attr->name
+#define ippGetString(attr, element, language) attr->values[element].string.text
+
+static ipp_attribute_t * ippFirstAttribute( ipp_t *ipp )
+{
+    if (!ipp)
+        return (NULL);
+    return (ipp->current = ipp->attrs);
+}
+
+static ipp_attribute_t * ippNextAttribute( ipp_t *ipp )
+{
+    if (!ipp || !ipp->current)
+        return (NULL);
+    return (ipp->current = ipp->current->next);
+}
+
+static int ippSetOperation( ipp_t *ipp, ipp_op_t op )
+{
+    if (!ipp)
+        return (0);
+    ipp->request.op.operation_id = op;
+    return (1);
+}
+
+static int ippSetRequestId( ipp_t *ipp, int request_id )
+{
+    if (!ipp)
+        return (0);
+    ipp->request.any.request_id = request_id;
+    return (1);
+}
+#endif
 
 static SANE_Device **DeviceList = NULL;
 
@@ -106,7 +147,7 @@ static int GetUriLine(char *buf, char *uri, char **tail)
    int maxBuf = HPMUD_LINE_SIZE*64;
 
    uri[0] = 0;
-   
+
    if (strncasecmp(&buf[i], "direct ", 7) == 0)
    {
       i = 7;
@@ -186,8 +227,8 @@ static int GetCupsPrinters(char ***printer)
    /* Assemble the IPP request */
    request = ippNew();
 
-   request->request.op.operation_id = CUPS_GET_PRINTERS;
-   request->request.any.request_id  = 1;
+   ippSetOperation( request, CUPS_GET_PRINTERS );
+   ippSetRequestId( request, 1 );
 
    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET, "attributes-charset", NULL, "utf-8");
    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE, "attributes-natural-language", NULL, "en");
@@ -197,20 +238,20 @@ static int GetCupsPrinters(char ***printer)
    if ((response = cupsDoRequest(http, request, "/")) == NULL)
       goto bugout;
 
-   for (attr = response->attrs; attr != NULL; attr = attr->next)
+   for (attr = ippFirstAttribute ( response ); attr != NULL; attr = ippNextAttribute( response ))
    {
       /* Skip leading attributes until we hit a printer. */
-      while (attr != NULL && attr->group_tag != IPP_TAG_PRINTER)
-         attr = attr->next;
+      while (attr != NULL && ippGetGroupTag( attr ) != IPP_TAG_PRINTER)
+         attr = ippNextAttribute( response );
 
       if (attr == NULL)
          break;
 
-      while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
+      while (attr != NULL && ippGetGroupTag( attr ) == IPP_TAG_PRINTER)
       {
-         if (strcmp(attr->name, "device-uri") == 0 && attr->value_tag == IPP_TAG_URI && AddCupsList(attr->values[0].string.text, printer) == 0)
+         if (strcmp(ippGetName( attr ), "device-uri") == 0 && ippGetValueTag( attr ) == IPP_TAG_URI && AddCupsList(ippGetString( attr, 0, NULL ), printer) == 0)
             cnt++;
-         attr = attr->next;
+         attr = ippNextAttribute( response );
       }
 
       if (attr == NULL)
@@ -230,12 +271,12 @@ static int DevDiscovery(int localOnly)
    char uri[HPMUD_LINE_SIZE];
    char model[HPMUD_LINE_SIZE];
    char *tail;
-   int i, scan_type, cnt=0, total=0, bytes_read;  
+   int i, scan_type, cnt=0, total=0, bytes_read;
    char **cups_printer=NULL;     /* list of printers */
    enum HPMUD_RESULT stat;
 
    stat = hpmud_probe_devices(HPMUD_BUS_ALL, message, sizeof(message), &cnt, &bytes_read);
- 
+
    if (stat != HPMUD_R_OK)
       goto bugout;
 
@@ -321,7 +362,7 @@ extern SANE_Status sane_hpaio_open(SANE_String_Const devicename, SANE_Handle * p
 {
     struct hpmud_model_attributes ma;
     char devname[256];
-  
+
     /* Get device attributes and determine what backend to call. */
     snprintf(devname, sizeof(devname)-1, "hp:%s", devicename);   /* prepend "hp:" */
     hpmud_query_model(devname, &ma);

@@ -51,6 +51,7 @@ BUTTON_CLEAN = 0
 BUTTON_NEXT = 1
 BUTTON_FINISH = 2
 
+LEDM_CLEAN_VERIFY_PAGE_JOB="<ipdyn:JobType>cleaningVerificationPage</ipdyn:JobType>"
 
 #d = None
 def true():
@@ -323,17 +324,26 @@ class CleanDialog(QDialog, Ui_Dialog):
                             maint.print_clean_test_page(self.dev)
 
                     elif self.clean_type == CLEAN_TYPE_LEDM: # 4
+                        IPCap_data = maint.getCleanLedmCapacity(self.dev)
+                        print_verification_page = True
+                        if LEDM_CLEAN_VERIFY_PAGE_JOB not in IPCap_data:
+                            print_verification_page = False
+
                         if level == 1:
                             maint.cleanTypeLedm(self.dev)
-                            maint.cleanTypeVerify(self.dev,level)
+                            maint.cleanTypeVerify(self.dev,level, print_verification_page)
+                            if print_verification_page is False:
+                                self.setCustomMessage(self.Prompt_5,"Cleaning level 1 is Completed. \nPress \"Cancel\" to Finish. Press \"Clean\" for next level clean")
 
                         elif level == 2:
                             maint.cleanTypeLedm1(self.dev)
-                            maint.cleanTypeVerify(self.dev,level)
+                            maint.cleanTypeVerify(self.dev,level, print_verification_page)
+                            if print_verification_page is False:
+                                self.setCustomMessage(self.Prompt_6,"Cleaning level 2 is Completed. \nPress \"Cancel\" to Finish. Press \"Clean\" for next level clean")
 
                         else: # 3
                             maint.cleanTypeLedm2(self.dev)
-                            maint.cleanTypeVerify(self.dev,level)
+                            maint.cleanTypeVerify(self.dev,level, print_verification_page)
 
                 else:
                     CheckDeviceUI(self)
@@ -374,6 +384,9 @@ class CleanDialog(QDialog, Ui_Dialog):
         elif typ == BUTTON_FINISH:
             self.NextButton.setText(self.__tr("Finish"))
 
+
+    def setCustomMessage(self, button, message):
+        button.setText(self.__tr(message))
 
     def __tr(self,s,c = None):
         return qApp.translate("CleanDialog",s,c)

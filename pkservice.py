@@ -23,7 +23,7 @@
 __version__ = '1.0'
 __mod__ = 'hp-pkservice'
 __title__ = 'Policy Kit Service'
-__doc__ = ""
+__doc__ = "Policy Kit Service"
 
 # Std Lib
 import sys

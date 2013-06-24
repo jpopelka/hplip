@@ -267,6 +267,19 @@ static int init_options(struct ledm_session *ps)
   ps->option[LEDM_OPTION_GROUP_ADVANCED].type = SANE_TYPE_GROUP;
   ps->option[LEDM_OPTION_GROUP_ADVANCED].cap = SANE_CAP_ADVANCED;
 
+  ps->option[LEDM_OPTION_BRIGHTNESS].name = SANE_NAME_BRIGHTNESS;
+  ps->option[LEDM_OPTION_BRIGHTNESS].title = SANE_TITLE_BRIGHTNESS;
+  ps->option[LEDM_OPTION_BRIGHTNESS].desc = SANE_DESC_BRIGHTNESS;
+  ps->option[LEDM_OPTION_BRIGHTNESS].type = SANE_TYPE_INT;
+  ps->option[LEDM_OPTION_BRIGHTNESS].unit = SANE_UNIT_NONE;
+  ps->option[LEDM_OPTION_BRIGHTNESS].size = sizeof(SANE_Int);
+  ps->option[LEDM_OPTION_BRIGHTNESS].cap = SANE_CAP_SOFT_SELECT | SANE_CAP_SOFT_DETECT | SANE_CAP_ADVANCED;
+  ps->option[LEDM_OPTION_BRIGHTNESS].constraint_type = SANE_CONSTRAINT_RANGE;
+  ps->option[LEDM_OPTION_BRIGHTNESS].constraint.range = &ps->brightnessRange;
+  ps->brightnessRange.min = LEDM_BRIGHTNESS_MIN;
+  ps->brightnessRange.max = LEDM_BRIGHTNESS_MAX;
+  ps->brightnessRange.quant = 0;
+
   ps->option[LEDM_OPTION_CONTRAST].name = SANE_NAME_CONTRAST;
   ps->option[LEDM_OPTION_CONTRAST].title = SANE_TITLE_CONTRAST;
   ps->option[LEDM_OPTION_CONTRAST].desc = SANE_DESC_CONTRAST;
@@ -405,6 +418,9 @@ SANE_Status __attribute__ ((visibility ("hidden"))) ledm_open(SANE_String_Const 
 
   /* Set supported contrast. */
   ledm_control_option(session, LEDM_OPTION_CONTRAST, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */
+
+  /* Set supported brightness. */
+  ledm_control_option(session, LEDM_OPTION_BRIGHTNESS, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */
 
   /* Set supported compression. (Note, cm1017 may say it supports MMR, but it doesn't) */
   ledm_control_option(session, LEDM_OPTION_COMPRESSION, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */
@@ -609,6 +625,30 @@ SANE_Status ledm_control_option(SANE_Handle handle, SANE_Int option, SANE_Action
          else
          {  /* Set default. */
             ps->currentContrast = LEDM_CONTRAST_DEFAULT;
+            stat = SANE_STATUS_GOOD;
+         }
+         break;
+      case LEDM_OPTION_BRIGHTNESS:
+         if (action == SANE_ACTION_GET_VALUE)
+         {
+            *int_value = ps->currentBrightness;
+            stat = SANE_STATUS_GOOD;
+         }
+         else if (action == SANE_ACTION_SET_VALUE)
+         {
+            if (*int_value >= LEDM_BRIGHTNESS_MIN && *int_value <= LEDM_BRIGHTNESS_MAX)
+            {
+               ps->currentBrightness = *int_value;
+            }
+            else
+            {
+              ps->currentBrightness = LEDM_BRIGHTNESS_DEFAULT;
+            }
+            stat = SANE_STATUS_GOOD;
+         }
+         else
+         {  /* Set default. */
+            ps->currentBrightness = LEDM_BRIGHTNESS_DEFAULT;
             stat = SANE_STATUS_GOOD;
          }
          break;

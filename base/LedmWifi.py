@@ -485,16 +485,14 @@ def readXmlTagDataFromURI(dev,URI,xmlRootNode,xmlReqDataNode,timeout=5):
         else:
             dev.writeEWS_LEDM(data)
             try:
-                while dev.readEWS_LEDM(1024, response, timeout):
-                    pass
+                dev.readLEDMData(dev.readEWS_LEDM, response, timeout)
             except Error:
                 dev.closeEWS_LEDM()
                 log.error("Unable to read EWS_LEDM Channel")
     else:
         dev.writeLEDM(data)
         try:
-            while dev.readLEDM(1024, response, timeout):
-                pass
+            dev.readLEDMData(dev.readLEDM, response, timeout)
         except Error:
             dev.closeLEDM()
             log.error("Unable to read LEDM Channel") 
@@ -505,7 +503,6 @@ def readXmlTagDataFromURI(dev,URI,xmlRootNode,xmlReqDataNode,timeout=5):
         code = get_error_code(strResp)
         if code == HTTP_OK:
             strResp = utils.unchunck_xml_data(strResp)
-
             pos = strResp.find(xmlRootNode,0,len(strResp))    
             repstr = strResp[pos:].strip()
             repstr = repstr.replace('\r',' ').replace('\t',' ').replace('\n',' ') # To remove formating characters from the received xml
@@ -550,16 +547,14 @@ def readXmlDataFromURI(dev,URI,xmlRootNode,xmlChildNode,timeout=5):
         else:
             dev.writeEWS_LEDM(data)
             try:
-                while dev.readEWS_LEDM(1024, response, timeout):
-                    pass
+                dev.readLEDMData(dev.readEWS_LEDM, response,timeout)
             except Error:
                 dev.closeEWS_LEDM()
                 log.error("Unable to read EWS_LEDM Channel")
     else:
         dev.writeLEDM(data)
         try:
-            while dev.readLEDM(1024, response, timeout):
-                pass
+            dev.readLEDMData(dev.readLEDM, response,timeout)
         except Error:
             dev.closeLEDM()
             log.error("Unable to read LEDM Channel") 
@@ -569,7 +564,6 @@ def readXmlDataFromURI(dev,URI,xmlRootNode,xmlChildNode,timeout=5):
         code = get_error_code(strResp)        
         if code == HTTP_OK:
             strResp = utils.unchunck_xml_data(strResp)
-
             pos = strResp.find(xmlRootNode,0,len(strResp))    
             repstr = strResp[pos:].strip()
             repstr = repstr.replace('\r',' ').replace('\t',' ').replace('\n',' ') # To remove formating characters from the received xml
@@ -604,8 +598,7 @@ def writeXmlDataToURI(dev,URI,xml,timeout=5):
         else:
             dev.writeEWS_LEDM(data)
             try:
-                while dev.readEWS_LEDM(1000, response, timeout):
-                    pass
+                dev.readLEDMData(dev.readEWS_LEDM, response, timeout)
             except Error:
                 dev.closeEWS_LEDM()
                 log.error("Unable to read EWS_LEDM Channel")
@@ -614,8 +607,7 @@ def writeXmlDataToURI(dev,URI,xml,timeout=5):
         dev.writeLEDM(data)
     #response = cStringIO.StringIO()
         try:
-            while dev.readLEDM(1000, response, timeout):
-                pass
+            dev.readLEDMData(dev.readLEDM, response,timeout )
         except Error:
             dev.closeLEDM()
             log.error("Unable to read LEDM Channel") 

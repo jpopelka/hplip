@@ -2156,6 +2156,7 @@ enum HPMUD_RESULT hpmud_make_usb_uri(const char *busnum, const char *devnum, cha
 	int conf, iface, altset ;
 	int bus_num, dev_num;
 	enum HPMUD_RESULT stat = HPMUD_R_INVALID_DEVICE_NODE;
+	int isSmartInstall_enabled = 0, isPrinter = 0;
 
 	DBG("[%d] hpmud_make_usb_uri() bus=%s dev=%s\n", getpid(), busnum, devnum);
 
@@ -2221,16 +2222,20 @@ enum HPMUD_RESULT hpmud_make_usb_uri(const char *busnum, const char *devnum, cha
 			if (libusb_get_config_descriptor (dev, conf, &confptr) < 0)
 				continue;
 
-            if ( confptr->bNumInterfaces > 1)
-                break;
-
 			for (iface = 0, ifaceptr = confptr->interface; iface < confptr->bNumInterfaces; iface ++, ifaceptr ++)
 			{
 				for (altset = 0, altptr = ifaceptr->altsetting; altset < ifaceptr->num_altsetting; altset++, altptr++)
 				{
-					if (altptr->bInterfaceClass == LIBUSB_CLASS_MASS_STORAGE )
+					if (confptr->bNumInterfaces == 1 && altptr->bInterfaceClass == LIBUSB_CLASS_MASS_STORAGE )
 					{
-                        strcpy(serial, "SMART_INSTALL_ENABLED"); /* no serial number, make it zero */
+						strcpy(serial, "SMART_INSTALL_ENABLED"); /* no serial number, make it zero */
+						isSmartInstall_enabled = 1;
+						break;
+					}
+					else if  (altptr->bInterfaceClass == LIBUSB_CLASS_PRINTER )
+					{
+						isPrinter = 1;
+						break;
 					}
 				}
 			}
@@ -2247,9 +2252,14 @@ enum HPMUD_RESULT hpmud_make_usb_uri(const char *busnum, const char *devnum, cha
 	if (!model[0] || !serial[0])
 		goto bugout;
 
-	*bytes_read = snprintf(uri, uri_size, "hp:/usb/%s?serial=%s", model, serial);
-	DBG("hpmud_make_usb_uri() uri=%s bytes_read=%d\n", uri, *bytes_read);
-	stat = HPMUD_R_OK;
+	if ( isPrinter  == 1 || isSmartInstall_enabled == 1)
+	{
+		*bytes_read = snprintf(uri, uri_size, "hp:/usb/%s?serial=%s", model, serial);
+		DBG("hpmud_make_usb_uri() uri=%s bytes_read=%d\n", uri, *bytes_read);
+		stat = HPMUD_R_OK;
+	}
+	else
+		DBG("hpmud_make_usb_uri() Invalid Device =%s\n", model);
 
 bugout:
 	if (hd != NULL)

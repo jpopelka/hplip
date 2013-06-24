@@ -22,8 +22,8 @@
 
 __version__ = '1.0'
 __mod__ = 'hp-diagnose_plugin'
-__title__ = 'Plugin Download and Install Utility'
-__doc__ = ""
+__title__ = 'Diagnose Plugin Utility'
+__doc__ = "Diagnose HP Plugin. Installs plugins if absent"
 
 # Std Lib
 import sys

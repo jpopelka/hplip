@@ -75,6 +75,7 @@ BLIP_DELAY = 2000
 SET_MENU_DELAY = 1000
 MAX_MENU_EVENTS = 10
 UPGRADE_CHECK_DELAY=24*60*60*1000 		#1 day
+CLEAN_EXEC_DELAY=4*60*60*1000 		#4 Hrs
 
 ERROR_STATE_TO_ICON = {
     ERROR_STATE_CLEAR:        QSystemTrayIcon.Information,
@@ -351,9 +352,17 @@ class SystemTrayApp(QApplication):
 
         QTimer.singleShot(SET_MENU_DELAY, self.initDone)
 
-        self.timer = QTimer()
-        self.timer.connect(self.timer,SIGNAL("timeout()"),self.handle_hplip_updation)
-        self.timer.start(UPGRADE_CHECK_DELAY)
+        self.update_timer = QTimer()
+        self.update_timer.connect(self.update_timer,SIGNAL("timeout()"),self.handle_hplip_updation)
+        self.update_timer.start(UPGRADE_CHECK_DELAY)
+
+        # Cleans the /var/log/hp/tmp directory
+        self.handle_hplip_clean()
+        
+        self.clean_timer = QTimer()
+        self.clean_timer.connect(self.clean_timer,SIGNAL("timeout()"),self.handle_hplip_clean)
+        self.clean_timer.start(CLEAN_EXEC_DELAY)
+        
 
 
 
@@ -374,6 +383,12 @@ class SystemTrayApp(QApplication):
         else:
             devices[device_uri].needs_update = True
 
+    def handle_hplip_clean(self):
+        log.debug("handle_hplip_clean ")
+        home_dir = sys_conf.get('dirs', 'home')
+        cmd = 'sh %s/hplip_clean.sh'%home_dir
+        os.system(cmd)
+        
 
     def handle_hplip_updation(self):
         log.debug("handle_hplip_updation upgrade_notify =%d"%(self.user_settings.upgrade_notify))

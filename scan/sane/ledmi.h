@@ -22,7 +22,7 @@
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
   Primary Author: Naga Samrat Chowdary, Narla
-  Contributing Authors: Yashwant Kumar Sahu
+  Contributing Authors: Yashwant Kumar Sahu, Sarbeswar Meher
 
 \************************************************************************************/
 
@@ -36,6 +36,9 @@
 # define LEDM_CONTRAST_MIN 0 /*According the LEDM spec*/
 # define LEDM_CONTRAST_MAX 2000
 # define LEDM_CONTRAST_DEFAULT 1000
+# define LEDM_BRIGHTNESS_MIN 0
+# define LEDM_BRIGHTNESS_MAX 2000
+# define LEDM_BRIGHTNESS_DEFAULT 1000
 
 # define MM_PER_INCH     25.4
 
@@ -43,18 +46,19 @@ enum LEDM_OPTION_NUMBER
 {
   LEDM_OPTION_COUNT = 0,
   LEDM_OPTION_GROUP_SCAN_MODE,
-    LEDM_OPTION_SCAN_MODE,
-    LEDM_OPTION_SCAN_RESOLUTION,
-    LEDM_OPTION_INPUT_SOURCE,     /* platen, ADF, ADFDuplex */
+        LEDM_OPTION_SCAN_MODE,
+        LEDM_OPTION_SCAN_RESOLUTION,
+        LEDM_OPTION_INPUT_SOURCE,     /* platen, ADF, ADFDuplex */
   LEDM_OPTION_GROUP_ADVANCED,
-    LEDM_OPTION_CONTRAST,
-    LEDM_OPTION_COMPRESSION,
-    LEDM_OPTION_JPEG_QUALITY,
+        LEDM_OPTION_BRIGHTNESS,
+        LEDM_OPTION_CONTRAST,
+        LEDM_OPTION_COMPRESSION,
+        LEDM_OPTION_JPEG_QUALITY,
   LEDM_OPTION_GROUP_GEOMETRY,
-    LEDM_OPTION_TL_X,
-    LEDM_OPTION_TL_Y,
-    LEDM_OPTION_BR_X,
-    LEDM_OPTION_BR_Y,
+        LEDM_OPTION_TL_X,
+        LEDM_OPTION_TL_Y,
+        LEDM_OPTION_BR_X,
+        LEDM_OPTION_BR_Y,
   LEDM_OPTION_MAX
 };
 
@@ -138,6 +142,9 @@ struct ledm_session
   SANE_Fixed adf_min_width, adf_min_height;
   SANE_Range adf_tlxRange, adf_tlyRange, adf_brxRange, adf_bryRange;
   SANE_Int adf_resolutionList[MAX_LIST_SIZE];
+
+  SANE_Range brightnessRange;
+  SANE_Int currentBrightness;
 
   IP_HANDLE ip_handle;
 

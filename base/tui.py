@@ -140,8 +140,10 @@ def header(text):
     log.info("")
 
 
-def load_paper_prompt():
-    return continue_prompt("A page will be printed.\nPlease load plain paper into the printer.")
+def load_paper_prompt(msg="", title=""):
+    if not msg:
+        msg = "A page will be printed.\nPlease load plain paper into the printer."
+    return continue_prompt(msg)
 
 
 def load_scanner_for_align_prompt():

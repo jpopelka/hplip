@@ -203,7 +203,10 @@ else:
 log_file = os.path.normpath('/var/log/hp/hp-upgrade.log')
 
 if os.path.exists(log_file):
-    os.remove(log_file)
+    try:
+        os.remove(log_file)
+    except OSError:
+        pass
 
 log.set_logfile(log_file)
 log.set_where(log.LOG_TO_CONSOLE_AND_FILE)

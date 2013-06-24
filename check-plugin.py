@@ -227,19 +227,22 @@ except IndexError:
 LOG_FILE = os.path.normpath(LOG_FILE)
 log.info(log.bold("Saving output in log file: %s" % LOG_FILE))
 if os.path.exists(LOG_FILE):
-    os.remove(LOG_FILE)
+    try:
+        os.remove(LOG_FILE)
+    except OSError:
+        pass
 
 log.set_logfile(LOG_FILE)
 log.set_where(log.LOG_TO_CONSOLE_AND_FILE)
 cmd="chmod 664 "+LOG_FILE
 sts,output = utils.run(cmd)
 if sts != 0:
-    log.warn("Failed to change log file permissions: %s" %output)
+    log.debug("Failed to change log file permissions: %s" %output)
 
 cmd="chgrp lp "+LOG_FILE
 sts,output = utils.run(cmd)
 if sts != 0:
-    log.warn("Failed to change log file group permissions: %s" %output)
+    log.debug("Failed to change log file group permissions: %s" %output)
 
 log.debug(" hp-check-plugin started")
 

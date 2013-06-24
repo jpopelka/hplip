@@ -619,7 +619,7 @@ class UserSettings(object): # Note: Deprecated after 2.8.8 in Qt4 (see ui4/ui_ut
         self.cmd_fab = user_conf.get('commands', 'fab', self.cmd_fab)
 
         self.upgrade_notify= to_bool(user_conf.get('upgrade', 'notify_upgrade', '0'))
-        self.upgrade_last_update_time = int(user_conf.get('upgrade','last_upgraded_time', '0'))
+        self.upgrade_last_update_time = int(float(user_conf.get('upgrade','last_upgraded_time', '0')))
         self.upgrade_pending_update_time =int(user_conf.get('upgrade', 'pending_upgrade_time', '0'))
         self.latest_available_version=str(user_conf.get('upgrade', 'latest_available_version',''))
         self.debug()
@@ -1738,7 +1738,8 @@ encoding: utf8
                 log.info(".B %s" % text1.replace('Usage:', ''))
 
             elif format == 'name':
-                log.info(".SH DESCRIPTION\n%s" % text1)
+                if text1:
+                    log.info(".SH DESCRIPTION\n%s" % text1)
 
             elif format in ('option', 'example', 'note'):
                 if text1:
@@ -2012,10 +2013,13 @@ def unchunck_xml_data(src_data):
     index = 0
     dst_data=""
     # src_data contains HTTP data + xmlpayload. delimter is '\r\n\r\n'.
-    if src_data.find('\r\n\r\n') != -1:
-        src_data = src_data.split('\r\n\r\n', 1)[1]
-    else:
-        return dst_data
+    while 1:
+        if src_data.find('\r\n\r\n') != -1:
+            src_data = src_data.split('\r\n\r\n', 1)[1]
+            if not src_data.startswith("HTTP"):
+                break
+        else:
+            return dst_data
 
     if len(src_data) <= 0:
         return dst_data

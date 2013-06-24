@@ -62,6 +62,8 @@ resize = 100
 contrast = 0
 set_contrast = False
 brightness = 0
+set_brightness = False
+brightness = 0
 page_size = ''
 size_desc = ''
 page_units = 'mm'
@@ -138,8 +140,10 @@ try:
         ("Scanning resolution:", "-r<resolution_in_dpi> or --res=<resolution_in_dpi> or --resolution=<resolution_in_dpi>", "option", False),
         ("", "where 300 is default.", "option", False),
         ("Image resize:", "--resize=<scale_in_%> (min=1%, max=400%, default=100%)", "option", False),
-        ("Image contrast:", "--contrast=<contrast> or -c=<contrast>", "option", False),
+        ("Image contrast:", "-c=<contrast> or --contrast=<contrast>", "option", False),
         ("", "The contrast range varies from device to device.", "option", False),
+        ("Image brightness:", "-b=<brightness> or --brightness=<brightness>", "option", False),
+        ("", "The brightness range varies from device to device.", "option", False),
         ("ADF mode:", "--adf (Note, only PDF output is supported when using the ADF)", "option", False),
         ("", "--duplex or --dup for duplex scanning using ADF.", "option", False),
         utils.USAGE_SPACE,
@@ -213,7 +217,7 @@ try:
                           'subject=', 'to=', 'from=', 'jpg',
                           'grey-scale', 'gray-scale', 'about=',
                           'editor=', 'dp=', 'dest-printer=', 'dd=',
-			  'dest-device='
+                          'dest-device=', 'brightness=', 
                          ])
 
 
@@ -366,7 +370,7 @@ try:
                     log.error("Invalid value for bry. Using defaults.")
                     bry = None
 
-        elif o in ('-b', '--box'): # tlx, tly, w, h
+        elif o == '--box': # tlx, tly, w, h
             a = a.strip().lower()
             try:
                 tlx, tly, width, height = a.split(',')[:4]
@@ -426,8 +430,8 @@ try:
                 if 'file' in dest:
                     dest.remove('file')
             else:
-                if ext.lower() not in ('.jpg', '.png'):
-                    log.error("Only JPG (.jpg) and PNG (.png) output files are supported.")
+                if ext.lower() not in ('.jpg', '.png', '.pdf'):
+                    log.error("Only JPG (.jpg), PNG (.png) and PDF (.pdf) output files are supported.")
                     output = ''
                     if 'file' in dest:
                         dest.remove('file')
@@ -516,15 +520,20 @@ try:
                 log.error("Invalid resize value. Using default of 100%.")
 
         elif o in ('-b', '--brightness'):
-            pass
+            try:
+                set_brightness = True
+                brightness = int(a.strip())
+            except ValueError:
+                log.error("Invalid brightness value. Using default of 0.")
+                brightness = 0
 
         elif o in ('-c', '--contrast'):
             try:
                 set_contrast = True
                 contrast = int(a.strip())
             except ValueError:
-                log.error("Invalid contrast value. Using default of 100.")
-                contrast = 100
+                log.error("Invalid contrast value. Using default of 0.")
+                contrast = 0
 
         elif o == '--adf':
             adf = True
@@ -724,9 +733,19 @@ try:
                     contrast = int(valid_contrast[0])
                 elif contrast > int(valid_contrast[1]):
                     contrast = int(valid_contrast[1])
-
-
             device.setOption('contrast', contrast)
+
+        if set_brightness:
+            valid_brightness = device.getOptionObj('brightness').constraint
+            if brightness >= int(valid_brightness[0]) and brightness <= int(valid_brightness[1]):
+                brightness = device.getOptionObj('brightness').limitAndSet(brightness)
+            else:
+                log.warn("Invalid brightness. Brightness range is (%d, %d). Using closest valid brightness of %d " % (int(valid_brightness[0]), int(valid_brightness[1]), brightness))
+                if brightness < int(valid_brightness[0]):
+                    brightness = int(valid_brightness[0])
+                elif brightness > int(valid_brightness[1]):
+                    brightness = int(valid_brightness[1])
+            device.setOption('brightness', brightness)
 
         if brx - tlx <= 0.0 or bry - tly <= 0.0:
             log.error("Invalid scan area (width or height is negative).")
@@ -738,6 +757,8 @@ try:
         log.info("Compression: %s" % scanner_compression)
         if(set_contrast):
             log.info("Contrast: %d" % contrast)
+        if(set_brightness):
+            log.info("Brightness: %d" % brightness)
         if units == 'mm':
             log.info("Scan area (mm):")
             log.info("  Top left (x,y): (%fmm, %fmm)" % (tlx, tly))
@@ -962,7 +983,7 @@ try:
                             log.error("Did not read enough data from scanner (I/O Error?)")
                             sys.exit(1)
 
-                    if adf:
+                    if adf or output_type == 'pdf':
                         temp_output = utils.createSequencedFilename("hpscan_pg%d_" % page, ".png")
                         adf_page_files.append(temp_output)
                         im.save(temp_output)
@@ -980,7 +1001,7 @@ try:
             log.info("Closing device.")
             device.cancelScan()
 
-        if adf:
+        if adf or output_type == 'pdf':
             try:
                 from reportlab.pdfgen import canvas
             except ImportError:
@@ -993,7 +1014,7 @@ try:
             c = canvas.Canvas(output, (brx/0.3528, bry/0.3528))
 
             for p in adf_page_files:
-                log.info("Processing page %s..." % p)
+                #log.info("Processing page %s..." % p)
                 image = Image.open(p)
 
                 try:
@@ -1003,6 +1024,7 @@ try:
                     sys.exit(1)
 
                 c.showPage()
+                #os.unlink(p)
 
             log.info("Saving to file %s" % output)
             c.save()

@@ -60,7 +60,7 @@ endif
 # The following is a interlibrary dependency that must be compiled first.
 libsane_hpaio_la_LIBADD = libhpip.la libhpmud.la $(DBUS_LIBS) -lcups -ldl
 #libsane_hpaio_la_CFLAGS = -DWITH_NONAMESPACES -DSOAP_DEBUG
-libsane_hpaio_la_CFLAGS = $(DBUS_CFLAGS) -D_IPP_PRIVATE_STRUCTURES=1
+libsane_hpaio_la_CFLAGS = $(DBUS_CFLAGS)
 endif # SCAN_BUILD
 
 # hpmud library
@@ -113,10 +113,6 @@ hp_mkuri_CFLAGS = -DCONFDIR=\"$(hplip_confdir)\"
 rulessystemdir=/usr/lib/systemd/system
 dist_rulessystem_DATA =data/rules/hplip-printer@.service
 
-# cron files
-crondir = /etc/cron.daily
-dist_cron_DATA = data/rules/hplip_cron
-
 # hpmud.rules
 rulesdir = /etc/udev/rules.d
 if UDEV_SYSFS_RULES
@@ -158,6 +154,7 @@ dist_cmd_SCRIPTS = align.py info.py print.py toolbox.py clean.py colorcal.py unl
 
 homedir = $(hplipdir)
 dist_home_DATA =  check-plugin.py 
+dist_home_DATA +=  hplip_clean.sh
 
 # base
 basedir = $(hplipdir)/base
@@ -263,7 +260,7 @@ cupsextdir = $(pyexecdir)
 cupsext_LTLIBRARIES = cupsext.la
 cupsext_la_LDFLAGS = -module -avoid-version
 cupsext_la_SOURCES =  prnt/cupsext/cupsext.c
-cupsext_la_CFLAGS = -I$(PYTHONINCLUDEDIR) -D_IPP_PRIVATE_STRUCTURES=1
+cupsext_la_CFLAGS = -I$(PYTHONINCLUDEDIR)
 cupsext_la_LIBADD = -lcups
 
 if SCAN_BUILD
@@ -562,25 +559,13 @@ install-dist_hplip_tmpDATA:
 if FULL_BUILD
 	test -z "$(DESTDIR)$(hplip_tmpdir)" || mkdir -p $(DESTDIR)$(hplip_tmpdir)
 	chgrp "lp" -R $(DESTDIR)$(hplip_tmpdir)
-	chmod 1775 $(DESTDIR)$(hplip_tmpdir)
+	chmod 0775 $(DESTDIR)$(hplip_tmpdir)
 endif	#FULL_BUILD
 if HPLIP_BUILD
 	test -z "$(DESTDIR)$(hplip_tmpdir)" || mkdir -p $(DESTDIR)$(hplip_tmpdir)
 	chgrp "lp" -R $(DESTDIR)$(hplip_tmpdir)
-	chmod 1775 $(DESTDIR)$(hplip_tmpdir)
+	chmod 0775 $(DESTDIR)$(hplip_tmpdir)
 endif	#FULL_BUILD
-
-install-dist_cronDATA:$(dist_cron_DATA)
-	test -z "$(DESTDIR)$(crondir)" || $(MKDIR_P) "$(DESTDIR)$(crondir)"; \
-	list='$(dist_cron_DATA)'; test -n "$(crondir)" || list=; \
-	for p in $$list; do \
-		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-		echo "$$d$$p"; \
-	done | $(am__base_list) | \
-	while read files; do \
-		echo " $(INSTALL) -m755 $$files '$(DESTDIR)$(crondir)'"; \
-		$(INSTALL) -m755 $$files "$(DESTDIR)$(crondir)" || exit $$?; \
-	done
 
 install-data-hook:
 if HPLIP_BUILD

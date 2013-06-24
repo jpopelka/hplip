@@ -42,7 +42,7 @@ SystemServices::SystemServices(int iLogLevel, int job_id) : m_iLogLevel(iLogLeve
         
         createTempFile(fname, &m_fp);
         if (m_fp)
-            chmod(fname, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+            chmod(fname, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
     }
 }
 

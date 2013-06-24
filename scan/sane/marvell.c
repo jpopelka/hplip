@@ -21,7 +21,7 @@
   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-  Author: David Suffield, Yashwant Sahu
+  Author: David Suffield, Yashwant Sahu, Sarbeswar Meher
 
 \************************************************************************************/
 
@@ -216,7 +216,20 @@ static int init_options(struct marvell_session *ps)
    ps->option[MARVELL_OPTION_GROUP_ADVANCED].type = SANE_TYPE_GROUP;
    ps->option[MARVELL_OPTION_GROUP_ADVANCED].cap = SANE_CAP_ADVANCED;
 
-   ps->option[MARVELL_OPTION_CONTRAST].name = SANE_NAME_CONTRAST;
+   ps->option[MARVELL_OPTION_BRIGHTNESS].name = SANE_NAME_BRIGHTNESS;
+   ps->option[MARVELL_OPTION_BRIGHTNESS].title = SANE_TITLE_BRIGHTNESS;
+   ps->option[MARVELL_OPTION_BRIGHTNESS].desc = SANE_DESC_BRIGHTNESS;
+   ps->option[MARVELL_OPTION_BRIGHTNESS].type = SANE_TYPE_INT;
+   ps->option[MARVELL_OPTION_BRIGHTNESS].unit = SANE_UNIT_NONE;
+   ps->option[MARVELL_OPTION_BRIGHTNESS].size = sizeof(SANE_Int);
+   ps->option[MARVELL_OPTION_BRIGHTNESS].cap = SANE_CAP_SOFT_SELECT | SANE_CAP_SOFT_DETECT | SANE_CAP_ADVANCED;
+   ps->option[MARVELL_OPTION_BRIGHTNESS].constraint_type = SANE_CONSTRAINT_RANGE;
+   ps->option[MARVELL_OPTION_BRIGHTNESS].constraint.range = &ps->brightnessRange;
+   ps->brightnessRange.min = MARVELL_BRIGHTNESS_MIN;
+   ps->brightnessRange.max = MARVELL_BRIGHTNESS_MAX;
+   ps->brightnessRange.quant = 0;
+
+    ps->option[MARVELL_OPTION_CONTRAST].name = SANE_NAME_CONTRAST;
    ps->option[MARVELL_OPTION_CONTRAST].title = SANE_TITLE_CONTRAST;
    ps->option[MARVELL_OPTION_CONTRAST].desc = SANE_DESC_CONTRAST;
    ps->option[MARVELL_OPTION_CONTRAST].type = SANE_TYPE_INT;
@@ -500,6 +513,9 @@ SANE_Status marvell_open(SANE_String_Const device, SANE_Handle *handle)
    /* Set supported contrast. */
    marvell_control_option(session, MARVELL_OPTION_CONTRAST, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */
 
+   /* Set supported brightness. */
+  marvell_control_option(session, MARVELL_OPTION_BRIGHTNESS, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */
+
    /* Set x,y extents. See bb_open(). */
    marvell_control_option(session, MARVELL_OPTION_TL_X, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */
    marvell_control_option(session, MARVELL_OPTION_TL_Y, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */
@@ -701,14 +717,41 @@ SANE_Status marvell_control_option(SANE_Handle handle, SANE_Int option, SANE_Act
             if (*int_value >= MARVELL_CONTRAST_MIN && *int_value <= MARVELL_CONTRAST_MAX)
             {
                ps->current_contrast = *int_value;
-               mset_result |= SANE_INFO_RELOAD_PARAMS;
-               stat = SANE_STATUS_GOOD;
-               break;
             }
+            else
+            {
+              ps->current_contrast = MARVELL_CONTRAST_DEFAULT;
+            }
+            mset_result |= SANE_INFO_RELOAD_PARAMS;
+            stat = SANE_STATUS_GOOD;
          }
          else
          {  /* Set default. */
             ps->current_contrast = MARVELL_CONTRAST_DEFAULT;
+            stat = SANE_STATUS_GOOD;
+         }
+         break;
+      case MARVELL_OPTION_BRIGHTNESS:
+         if (action == SANE_ACTION_GET_VALUE)
+         {
+            *int_value = ps->currentBrightness;
+            stat = SANE_STATUS_GOOD;
+         }
+         else if (action == SANE_ACTION_SET_VALUE)
+         {
+            if (*int_value >= MARVELL_BRIGHTNESS_MIN && *int_value <= MARVELL_BRIGHTNESS_MAX)
+            {
+               ps->currentBrightness = *int_value;
+            }
+            else
+            {
+              ps->currentBrightness = MARVELL_BRIGHTNESS_DEFAULT;
+            }
+            stat = SANE_STATUS_GOOD;
+         }
+         else
+         {  /* Set default. */
+            ps->currentBrightness = MARVELL_BRIGHTNESS_DEFAULT;
             stat = SANE_STATUS_GOOD;
          }
          break;

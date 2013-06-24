@@ -699,7 +699,7 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
                 createTempFile(szFileName, &cfp);
                 if (cfp)
                 {
-                    chmod (szFileName, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+                    chmod (szFileName, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
                 }
             }
 
@@ -710,7 +710,7 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
                 createTempFile(szFileName, &kfp);
                 if (kfp)
                 {
-                    chmod (szFileName, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+                    chmod (szFileName, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
                 }
             }
 

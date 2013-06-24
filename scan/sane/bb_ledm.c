@@ -197,7 +197,7 @@ Keep-Alive: 20\r\nProxy-Connection: keep-alive\r\nCookie: AccessCounter=new\r\n0
 <GrayRendering>NTSC</GrayRendering>\
 <ToneMap>\
 <Gamma>0</Gamma>\
-<Brightness>1000</Brightness>\
+<Brightness>%d</Brightness>\
 <Contrast>%d</Contrast>\
 <Highlite>0</Highlite>\
 <Shadow>0</Shadow></ToneMap>\
@@ -877,18 +877,19 @@ SANE_Status bb_start_scan(struct ledm_session *ps)
     }
 
     len = snprintf(buf, sizeof(buf), CREATE_SCAN_JOB_REQUEST,
-  		ps->currentResolution,//<XResolution>
-  		ps->currentResolution,//<YResolution>
-    	(int) (ps->currentTlx / 5548.7133),//<XStart>
-    	(int) ((ps->currentBrx / 5548.7133) - (ps->currentTlx / 5548.7133)),//<Width>
-    	(int) (ps->currentTly / 5548.7133),//<YStart>
-    	(int) ((ps->currentBry / 5548.7133) - (ps->currentTly / 5548.7133)),//<Height>
-    	"Jpeg",//<Format>
-    	(! strcmp(ce_element[ps->currentScanMode], "Color8")) ? "Color" : (! strcmp(ce_element[ps->currentScanMode], "Gray8")) ? "Gray" : "Gray",//<ColorSpace>
-    	((! strcmp(ce_element[ps->currentScanMode], "Color8")) || (! strcmp(ce_element[ps->currentScanMode], "Gray8"))) ? 8: 8,//<BitDepth>
-    	ps->currentInputSource == IS_PLATEN ? is_element[1] : is_element[2],//<InputSource>
-    	ps->currentInputSource == IS_PLATEN ? is_element[1] : is_element[2],//<InputSourceType>
-    	ps->currentInputSource != IS_ADF_DUPLEX ? "" : "<AdfOptions><AdfOption>Duplex</AdfOption></AdfOptions>",
+        ps->currentResolution,//<XResolution>
+        ps->currentResolution,//<YResolution>
+        (int) (ps->currentTlx / 5548.7133),//<XStart>
+        (int) ((ps->currentBrx / 5548.7133) - (ps->currentTlx / 5548.7133)),//<Width>
+        (int) (ps->currentTly / 5548.7133),//<YStart>
+        (int) ((ps->currentBry / 5548.7133) - (ps->currentTly / 5548.7133)),//<Height>
+        "Jpeg",//<Format>
+        (! strcmp(ce_element[ps->currentScanMode], "Color8")) ? "Color" : (! strcmp(ce_element[ps->currentScanMode], "Gray8")) ? "Gray" : "Gray",//<ColorSpace>
+        ((! strcmp(ce_element[ps->currentScanMode], "Color8")) || (! strcmp(ce_element[ps->currentScanMode], "Gray8"))) ? 8: 8,//<BitDepth>
+        ps->currentInputSource == IS_PLATEN ? is_element[1] : is_element[2],//<InputSource>
+        ps->currentInputSource == IS_PLATEN ? is_element[1] : is_element[2],//<InputSourceType>
+        ps->currentInputSource != IS_ADF_DUPLEX ? "" : "<AdfOptions><AdfOption>Duplex</AdfOption></AdfOptions>",
+        (int)ps->currentBrightness,//<Brightness>
         (int)ps->currentContrast);//<Contrast>
 
     len = len + strlen(ZERO_FOOTER);

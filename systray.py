@@ -22,7 +22,7 @@
 __version__ = '2.0'
 __mod__ = 'hp-systray'
 __title__ = 'System Tray Status Service'
-__doc__ = ""
+__doc__ = "System Tray monitors the HP device status and Displays"
 
 # StdLib
 import sys

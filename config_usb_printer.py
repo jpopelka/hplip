@@ -160,19 +160,22 @@ opts, device_uri, printer_name, mode, ui_toolkit, loc = mod.parseStdOpts('gh',['
 
 LOG_FILE = "/var/log/hp/hplip_config_usb_printer.log"
 if os.path.exists(LOG_FILE):
-    os.remove(LOG_FILE)
+    try:
+        os.remove(LOG_FILE)
+    except OSError:
+        pass
 
 log.set_logfile(LOG_FILE)
 log.set_where(log.LOG_TO_CONSOLE_AND_FILE)
 cmd="chmod 664 "+LOG_FILE
 sts,output = utils.run(cmd)
 if sts != 0:
-    log.warn("Failed to change log file permissions: %s" %output)
+    log.debug("Failed to change log file permissions: %s" %output)
 
 cmd="chgrp lp "+LOG_FILE
 sts,output = utils.run(cmd)
 if sts != 0:
-    log.warn("Failed to change log file group permissions: %s" %output)
+    log.debug("Failed to change log file group permissions: %s" %output)
 
 try:
     import dbus
@@ -257,7 +260,7 @@ try:
        # ******************************* RUNNING FIRMWARE DOWNLOAD TO DEVICE FOR SUPPORTED PRINTER'S
        fw_download_req = mq.get('fw-download', False)
        if fw_download_req:
-           fw_cmd = utlis.which('hp-firmware', True)
+           fw_cmd = utils.which('hp-firmware', True)
            if fw_cmd:
                 fw_cmd += " -y3 -s %s"%param
                 log.debug(fw_cmd)
@@ -270,7 +273,7 @@ try:
     # ******************************* REMOVING CUPS CREATED QUEUE, If any
     i =0
     while i <12:
-        time.sleep(5)
+        time.sleep(2)
         get_already_added_queues(norm_model, serial, 'hpfax',remove_non_hp_config)
         get_already_added_queues(norm_model, serial, 'hp',remove_non_hp_config)
         if i == 0:

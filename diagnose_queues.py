@@ -109,7 +109,10 @@ try:
     log_file = os.path.normpath('/var/log/hp/hplip_queues.log')
     log.debug(log.bold("Saving output in log file: %s" % log_file))
     if os.path.exists(log_file):
-        os.remove(log_file)
+        try:
+            os.remove(log_file)
+        except OSError:
+            pass
     log.set_logfile(log_file)
     log.set_where(log.LOG_TO_CONSOLE_AND_FILE)
 

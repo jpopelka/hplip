@@ -101,7 +101,9 @@ BINS_LIST=['hpijs','hp-align','hp-colorcal','hp-faxsetup','hp-linefeedcal','hp-p
 
 LIBS_LIST=['libhpmud.*','libhpip.*','sane/libsane-hpaio.*','cups/backend/hp','cups/backend/hpfax', 'cups/filter/hpcac', 'cups/filter/hpps', 'cups/filter/pstotiff','cups/filter/hpcups', 'cups/filter/hpcupsfax', 'cups/filter/hplipjs']
 
-FILES_LIST=['/etc/udev/rules.d/56-hpmud.rules','/etc/udev/rules.d/56-hpmud_sysfs.rules', '/etc/udev/rules.d/40-hplip.rules', '/etc/udev/rules.d/56-hpmud_support.rules', '/etc/udev/rules.d/56-hpmud_support_sysfs.rules','/etc/udev/rules.d/55-hpmud.rules','/etc/udev/rules.d/55-hpmud_sysfs.rules','/etc/udev/rules.d/56-hpmud_add_printer.rules','/etc/udev/rules.d/56-hpmud_add_printer_sysfs.rules', '/etc/udev/rules.d/86-hpmud-hp_*.rules', '/etc/udev/rules.d/86-hpmud_plugin.rules', '/etc/udev/rules.d/86-hpmud_plugin_sysfs.rules', '/usr/share/cups/drv/hp/','/usr/local/share/ppd/HP/','/usr/local/share/cups/drv/hp/' ,'/usr/share/applications/hplip.desktop', '/etc/xdg/autostart/hplip-systray.desktop', '/etc/hp/hplip.conf', '/usr/share/doc/hplip-*','/usr/lib/systemd/system/hplip-printer*.service']
+FILES_LIST=[ '/usr/share/cups/drv/hp/','/usr/local/share/ppd/HP/','/usr/local/share/cups/drv/hp/' ,'/usr/share/applications/hplip.desktop', '/etc/xdg/autostart/hplip-systray.desktop', '/etc/hp/hplip.conf', '/usr/share/doc/hplip-*','/usr/lib/systemd/system/hplip-printer*.service']
+
+RULES_LIST=['56-hpmud.rules','56-hpmud_sysfs.rules', '40-hplip.rules', '56-hpmud_support.rules', '56-hpmud_support_sysfs.rules','55-hpmud.rules','55-hpmud_sysfs.rules','56-hpmud_add_printer.rules','56-hpmud_add_printer_sysfs.rules', '86-hpmud-hp_*.rules', '86-hpmud_plugin.rules', '86-hpmud_plugin_sysfs.rules']
 
 HPLIP_LIST=['*.py','*.pyc', 'base', 'copier','data','installer','pcard','ui4','ui','fax/*.py','fax/*.pyc','fax/pstotiff.convs','fax/pstotiff.types','fax/pstotiff','prnt/*.py', 'prnt/*.pyc', 'scan/*.py','scan/*.pyc']
 
@@ -1823,6 +1825,15 @@ class CoreInstall(object):
         while cnt < len(FILES_LIST_FULL):
             utils.remove(FILES_LIST_FULL[cnt], self.passwordObj, checkSudo)
             cnt += 1
+
+        # removing Rules files
+        RULES_LIST_FULL = utils.expandList(RULES_LIST, '/etc/udev/rules.d')
+        for fl in RULES_LIST_FULL:
+            utils.remove(fl, self.passwordObj, checkSudo)
+
+        RULES_LIST_FULL = utils.expandList(RULES_LIST, '/lib/udev/rules.d')
+        for fl in RULES_LIST_FULL:
+            utils.remove(fl , self.passwordObj, checkSudo)
 
         # removing Plug-in files
         if remove_plugins == True:

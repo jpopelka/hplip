@@ -61,7 +61,7 @@ User-agent: hplip/2.0\r
 Host: %s\r
 Content-length: %d\r
 \r
-%s""" % (url, self.http_host, len(post), post)
+%s""" % (url, str(self.http_host), len(post), post)
         log.log_data(data)
         self.writeEWS_LEDM(data)
         response = cStringIO.StringIO()

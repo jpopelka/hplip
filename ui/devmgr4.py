@@ -1614,8 +1614,14 @@ class DevMgr4(DevMgr4_base):
         self.FailureUI(self.__tr("<b>Device is busy or in an error state.</b><p>Please check device and try again."))
 
 
-    def LoadPaperUI(self):
-        if LoadPaperForm(self).exec_loop() == QDialog.Accepted:
+    def LoadPaperUI(self, msg="", title=""):
+        LPFObj = LoadPaperForm(self)
+        if title:
+            LPFObj.setCaption(title)
+        if msg:
+            LPFObj.textLabel7.setText(msg)
+
+        if LPFObj.exec_loop() == QDialog.Accepted:
             return True
         return False
 
@@ -1830,15 +1836,21 @@ class DevMgr4(DevMgr4_base):
         dlg.exec_loop()
 
 
-    def CleanUI1(self):
-        return CleaningForm(self, self.cur_device, 1).exec_loop() == QDialog.Accepted
+    def CleanUI1(self, msg=""):
+        CFObj = CleaningForm(self, self.cur_device, 1)
+        if msg:
+            CFObj.CleaningText.setText(msg)
+        return CFObj.exec_loop() == QDialog.Accepted
 
 
-    def CleanUI2(self):
-        return CleaningForm(self, self.cur_device, 2).exec_loop() == QDialog.Accepted
+    def CleanUI2(self, msg=""):
+        CFObj = CleaningForm(self, self.cur_device, 2)
+        if msg:
+            CFObj.CleaningText.setText(msg)
+        return CFObj.exec_loop() == QDialog.Accepted
 
 
-    def CleanUI3(self):
+    def CleanUI3(self, msg=""):
         CleaningForm2(self).exec_loop()
         return True
 
@@ -1885,7 +1897,7 @@ class DevMgr4(DevMgr4_base):
                         maint.cleaning(d, clean_type, maint.cleanTypeLedm, maint.cleanTypeLedm1,
                             maint.cleanTypeLedm2, self.LoadPaperUI,
                             self.CleanUI1, self.CleanUI2, self.CleanUI3,
-                            self.WaitUI)
+                            self.WaitUI, maint.isCleanTypeLedmWithPrint)
                 else:
                     self.CheckDeviceUI()
 

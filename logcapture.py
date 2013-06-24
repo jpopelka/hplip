@@ -63,9 +63,10 @@ def enable_log():
            log.error("Failed to update Loglevel to Debug in cups=%s"%CUPS_FILE)
 
         cmd=None
-        path=utils.which('service')
-        if path:
-           cmd = os.path.join(path, 'service')+" cups restart"
+        if utils.which('service'):
+           cmd = os.path.join(utils.which('service'), 'service')+" cups restart"
+        elif utils.which('systemctl'):
+           cmd = os.path.join(utils.which('systemctl'), 'systemctl')+" restart %s.service"%service_name
         elif os.path.exists('/etc/init.d/cups'):
            cmd = "/etc/init.d/cups restart"
         else:
@@ -83,6 +84,7 @@ def enable_log():
 #This function restores CUPS conf file to previous value and restarts CUPS service.
 
 def restore_loglevels():
+    result = False
     cmd='cp -f %s %s'%(CUPS_BACKUP_FILE,CUPS_FILE)
     log.debug("Restoring CUPS conf file. cmd=%s"%cmd)
     sts, out = utils.run(cmd)
@@ -95,14 +97,16 @@ def restore_loglevels():
     else:
        log.error("Failed to restore cups config file = %s"%CUPS_FILE)
     log.debug("Restarting CUPS service")
+
     cmd=None
-    path=utils.which('service')
-    if path:
-        cmd = os.path.join(path, 'service')+" cups restart"
+    if utils.which('service'):
+       cmd = os.path.join(utils.which('service'), 'service')+" cups restart"
+    elif utils.which('systemctl'):
+       cmd = os.path.join(utils.which('systemctl'), 'systemctl')+" restart %s.service"%service_name
     elif os.path.exists('/etc/init.d/cups'):
-        cmd = "/etc/init.d/cups restart"
+       cmd = "/etc/init.d/cups restart"
     else:
-        log.error("service command not found.. Please restart cups manually..")
+       log.error("service command not found.. Please restart cups manually..")
 
     if cmd:
         log.debug("CUPS restart cmd = %s"%cmd)
@@ -287,18 +291,20 @@ if File_list:
 sts,out = utils.run('mv -f ./hp-check.log %s'%LOG_FILES)
 if sts != 0:
     log.error("Failed to capture %s log files."%("./hp-check.log"))
-ists,out = utils.run('chmod 755  %s'%LOG_FILES)
+sts,out = utils.run('chmod 755  %s'%LOG_FILES)
 if sts != 0:
     log.error("Failed to change permissions for %s. Only root can access."%(LOG_FILES))
 cmd = 'chmod 666 -R %s/*' % LOG_FILES
-ists = os_utils.execute(cmd)
+sts = os_utils.execute(cmd)
+if sts != 0:
+    log.error("Failed to change permissions for %s. Only root can access."%(LOG_FILES))
 
 ######## Compressing log files #######
 cmd = 'tar -zcf %s.tar.gz %s'%(LOG_FOLDER_NAME,LOG_FILES)
 log.debug("Compressing logs. cmd =%s"%cmd)
 
 sts_compress,out = utils.run(cmd)
-if sts != 0:
+if sts_compress != 0:
     log.error("Failed to compress %s folder."%(LOG_FILES))
 else:
     log.debug("Changing Permissions of ./%s.tar.gz "%LOG_FOLDER_NAME)

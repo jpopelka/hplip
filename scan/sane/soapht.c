@@ -291,6 +291,19 @@ static int init_options(struct soap_session *ps)
    ps->option[SOAP_OPTION_GROUP_ADVANCED].type = SANE_TYPE_GROUP;
    ps->option[SOAP_OPTION_GROUP_ADVANCED].cap = SANE_CAP_ADVANCED;
 
+   ps->option[SOAP_OPTION_BRIGHTNESS].name = SANE_NAME_BRIGHTNESS;
+   ps->option[SOAP_OPTION_BRIGHTNESS].title = SANE_TITLE_BRIGHTNESS;
+   ps->option[SOAP_OPTION_BRIGHTNESS].desc = SANE_DESC_BRIGHTNESS;
+   ps->option[SOAP_OPTION_BRIGHTNESS].type = SANE_TYPE_INT;
+   ps->option[SOAP_OPTION_BRIGHTNESS].unit = SANE_UNIT_NONE;
+   ps->option[SOAP_OPTION_BRIGHTNESS].size = sizeof(SANE_Int);
+   ps->option[SOAP_OPTION_BRIGHTNESS].cap = SANE_CAP_SOFT_SELECT | SANE_CAP_SOFT_DETECT | SANE_CAP_ADVANCED;
+   ps->option[SOAP_OPTION_BRIGHTNESS].constraint_type = SANE_CONSTRAINT_RANGE;
+   ps->option[SOAP_OPTION_BRIGHTNESS].constraint.range = &ps->brightnessRange;
+   ps->brightnessRange.min = SOAP_BRIGHTNESS_MIN;
+   ps->brightnessRange.max = SOAP_BRIGHTNESS_MAX;
+   ps->brightnessRange.quant = 0;
+
    ps->option[SOAP_OPTION_CONTRAST].name = SANE_NAME_CONTRAST;
    ps->option[SOAP_OPTION_CONTRAST].title = SANE_TITLE_CONTRAST;
    ps->option[SOAP_OPTION_CONTRAST].desc = SANE_DESC_CONTRAST;
@@ -489,7 +502,10 @@ SANE_Status soapht_open(SANE_String_Const device, SANE_Handle *handle)
    soapht_control_option(session, SOAP_OPTION_INPUT_SOURCE, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */  
 
    /* Set supported resolutions. */
-     soapht_control_option(session, SOAP_OPTION_SCAN_RESOLUTION, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */
+   soapht_control_option(session, SOAP_OPTION_SCAN_RESOLUTION, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */
+
+   /* Set supported brightness. */
+   soapht_control_option(session, SOAP_OPTION_BRIGHTNESS, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */
 
    /* Set supported contrast. */
    soapht_control_option(session, SOAP_OPTION_CONTRAST, SANE_ACTION_SET_AUTO, NULL, NULL); /* set default option */
@@ -708,6 +724,30 @@ SANE_Status soapht_control_option(SANE_Handle handle, SANE_Int option, SANE_Acti
          else
          {  /* Set default. */
             ps->currentContrast = SOAP_CONTRAST_DEFAULT;
+            stat = SANE_STATUS_GOOD;
+         }
+         break;
+      case SOAP_OPTION_BRIGHTNESS:
+         if (action == SANE_ACTION_GET_VALUE)
+         {
+            *int_value = ps->currentBrightness;
+            stat = SANE_STATUS_GOOD;
+         }
+         else if (action == SANE_ACTION_SET_VALUE)
+         {
+            if (*int_value >= SOAP_BRIGHTNESS_MIN && *int_value <= SOAP_BRIGHTNESS_MAX)
+            {
+               ps->currentBrightness = *int_value;
+            }
+            else
+            {
+              ps->currentBrightness = SOAP_BRIGHTNESS_DEFAULT;
+            }
+            stat = SANE_STATUS_GOOD;
+         }
+         else
+         {  /* Set default. */
+            ps->currentBrightness = SOAP_BRIGHTNESS_DEFAULT;
             stat = SANE_STATUS_GOOD;
          }
          break;

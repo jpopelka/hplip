@@ -685,6 +685,8 @@ int main (int argc, char **argv)
          BUG ("ERROR: Unable to open Fax output file - %s for writing\n", hpFileName);
          return 1;
     }
+    else
+        chmod(hpFileName, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP );
 
     /*********** MAIN ***********/
 

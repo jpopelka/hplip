@@ -40,7 +40,6 @@ ui-toolkit=@ui_toolkit@
 qt3=@qt3@
 qt4=@qt4@
 policy-kit=@policykit@
-hpijs-only-build=@hpijs_only_build@
 lite-build=@lite_build@
 udev-acl-rules=@udev_acl_rules@
 udev_sysfs_rules=@udev_sysfs_rules@

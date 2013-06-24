@@ -73,7 +73,8 @@
 #define SCL_CMD_SCAN_WINDOW     SCL_CMD('f','S')
 #define SCL_CMD_SET_DEVICE_LOCK     SCL_CMD('f','H')
 #define SCL_CMD_SET_DEVICE_LOCK_TIMEOUT   SCL_CMD('f','I')
-#define SCL_CMD_SET_CONTRAST	SCL_CMD('a', 'K')
+#define SCL_CMD_SET_CONTRAST        SCL_CMD('a', 'K')
+#define SCL_CMD_SET_BRIGHTNESS       SCL_CMD('a', 'L')
 
 #if 0
 #define SCL_CMD_SET_PRESCAN     SCL_CMD('m','B')
