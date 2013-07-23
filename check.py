@@ -482,169 +482,169 @@ class DependenciesCheck(CoreInstall):
                         log.info("No devices found.")
 
 
-            tui.header("INSTALLED CUPS PRINTER QUEUES")
+                tui.header("INSTALLED CUPS PRINTER QUEUES")
 
-            lpstat_pat = re.compile(r"""(\S*): (.*)""", re.IGNORECASE)
-            status, output = utils.run('lpstat -v')
-            log.info()
+                lpstat_pat = re.compile(r"""(\S*): (.*)""", re.IGNORECASE)
+                status, output = utils.run('lpstat -v')
+                log.info()
 
-            cups_printers = []
-            plugin_sts = None
-            for p in output.splitlines():
-                try:
-                    match = lpstat_pat.search(p)
-                    printer_name = match.group(1)
-                    device_uri = match.group(2)
-                    cups_printers.append((printer_name, device_uri))
-                except AttributeError:
-                    pass
-
-            log.debug(cups_printers)
-            if cups_printers:
-                #non_hp = False
-                for p in cups_printers:
-                    printer_name, device_uri = p
-
-                    if device_uri.startswith("cups-pdf:/") or \
-                        device_uri.startswith('ipp://'):
-                        continue
-
+                cups_printers = []
+                plugin_sts = None
+                for p in output.splitlines():
                     try:
-                        back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
-                            device.parseDeviceURI(device_uri)
-                    except Error:
-                        back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
-                            '', False, '', '', '', '', '', '', 1
+                        match = lpstat_pat.search(p)
+                        printer_name = match.group(1)
+                        device_uri = match.group(2)
+                        cups_printers.append((printer_name, device_uri))
+                    except AttributeError:
+                        pass
 
-                    #print back_end, is_hp, bus, model, serial, dev_file, host, zc, port
+                log.debug(cups_printers)
+                if cups_printers:
+                    #non_hp = False
+                    for p in cups_printers:
+                        printer_name, device_uri = p
 
-                    log.info(log.bold(printer_name))
-                    log.info(log.bold('-'*len(printer_name)))
+                        if device_uri.startswith("cups-pdf:/") or \
+                            device_uri.startswith('ipp://'):
+                            continue
 
-                    x = "Unknown"
-                    if back_end == 'hpfax':
-                        x = "Fax"
-                    elif back_end == 'hp':
-                        x = "Printer"
-
-                    log.info("Type: %s" % x)
-
-                    #if is_hp:
-                    #    x = 'Yes, using the %s: CUPS backend.' % back_end
-                    #else:
-                    #    x = 'No, not using the hp: or hpfax: CUPS backend.'
-                    #    non_hp = True
-
-                    #log.info("Installed in HPLIP?: %s" % x)
-                    log.info("Device URI: %s" % device_uri)
-
-                    ppd = os.path.join('/etc/cups/ppd', printer_name + '.ppd')
-
-                    if os.path.exists(ppd):
-                        log.info("PPD: %s" % ppd)
-                        nickname_pat = re.compile(r'''\*NickName:\s*\"(.*)"''', re.MULTILINE)
                         try:
-                            f = file(ppd, 'r').read(4096)
-                        except IOError:
-                            log.warn("Failed to read %s ppd file"%ppd)
-                            desc = ''
-                        else:
+                            back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
+                                device.parseDeviceURI(device_uri)
+                        except Error:
+                            back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
+                                '', False, '', '', '', '', '', '', 1
+
+                        #print back_end, is_hp, bus, model, serial, dev_file, host, zc, port
+
+                        log.info(log.bold(printer_name))
+                        log.info(log.bold('-'*len(printer_name)))
+
+                        x = "Unknown"
+                        if back_end == 'hpfax':
+                            x = "Fax"
+                        elif back_end == 'hp':
+                            x = "Printer"
+
+                        log.info("Type: %s" % x)
+
+                        #if is_hp:
+                        #    x = 'Yes, using the %s: CUPS backend.' % back_end
+                        #else:
+                        #    x = 'No, not using the hp: or hpfax: CUPS backend.'
+                        #    non_hp = True
+
+                        #log.info("Installed in HPLIP?: %s" % x)
+                        log.info("Device URI: %s" % device_uri)
+
+                        ppd = os.path.join('/etc/cups/ppd', printer_name + '.ppd')
+
+                        if os.path.exists(ppd):
+                            log.info("PPD: %s" % ppd)
+                            nickname_pat = re.compile(r'''\*NickName:\s*\"(.*)"''', re.MULTILINE)
                             try:
-                                desc = nickname_pat.search(f).group(1)
-                            except AttributeError:
+                                f = file(ppd, 'r').read(4096)
+                            except IOError:
+                                log.warn("Failed to read %s ppd file"%ppd)
                                 desc = ''
+                            else:
+                                try:
+                                    desc = nickname_pat.search(f).group(1)
+                                except AttributeError:
+                                    desc = ''
 
-                        log.info("PPD Description: %s" % desc)
+                            log.info("PPD Description: %s" % desc)
 
-                        status, output = utils.run('lpstat -p%s' % printer_name)
-                        log.info("Printer status: %s" % output.replace("\n", ""))
+                            status, output = utils.run('lpstat -p%s' % printer_name)
+                            log.info("Printer status: %s" % output.replace("\n", ""))
 
-                        if back_end == 'hpfax' and not 'HP Fax' in desc:
-                            self.num_errors += 1
-                            log.error("Incorrect PPD file for fax queue '%s'. Fax queues must use 'HP-Fax-hplip.ppd'." % printer_name)
+                            if back_end == 'hpfax' and not 'HP Fax' in desc:
+                                self.num_errors += 1
+                                log.error("Incorrect PPD file for fax queue '%s'. Fax queues must use 'HP-Fax-hplip.ppd'." % printer_name)
 
-                        elif back_end == 'hp' and 'HP Fax' in desc:
-                            self.num_errors += 1
-                            log.error("Incorrect PPD file for a print queue '%s'. Print queues must not use 'HP-Fax-hplip.ppd'." % printer_name)
+                            elif back_end == 'hp' and 'HP Fax' in desc:
+                                self.num_errors += 1
+                                log.error("Incorrect PPD file for a print queue '%s'. Print queues must not use 'HP-Fax-hplip.ppd'." % printer_name)
 
-                        elif back_end not in ('hp', 'hpfax'):
-                            log.warn("Printer is not HPLIP installed. Printers must use the hp: or hpfax: CUPS backend for HP-Devices.")
-                            self.num_warns += 1
+                            elif back_end not in ('hp', 'hpfax'):
+                                log.warn("Printer is not HPLIP installed. Printers must use the hp: or hpfax: CUPS backend for HP-Devices.")
+                                self.num_warns += 1
 
-                    if device_avail and is_hp:
-                        d = None
-                        try:
+                        if device_avail and is_hp:
+                            d = None
                             try:
-                                d = device.Device(device_uri,None, None, None, True)
-                            except Error:
-                                log.error("Device initialization failed.")
-                                continue
-
-                            plugin = d.mq.get('plugin', PLUGIN_NONE)
-                            if plugin in (PLUGIN_REQUIRED, PLUGIN_OPTIONAL):
-                                if not plugin_sts:
-                                    from installer import pluginhandler
-                                    pluginObj = pluginhandler.PluginHandle()
-                                    plugin_sts = pluginObj.getStatus()
-
-                                if plugin_sts == pluginhandler.PLUGIN_INSTALLED:
-                                    self.plugin_status = PLUGIN_INSTALLED
-                                    if plugin == pluginhandler.PLUGIN_REQUIRED:
-                                        log.info("Required plug-in status: Installed")
-                                    else:
-                                        log.info("Optional plug-in status: Installed")
-                                elif plugin_sts == pluginhandler.PLUGIN_NOT_INSTALLED:
-                                    self.plugin_status = PLUGIN_NOT_INSTALLED
-                                    if plugin == PLUGIN_REQUIRED:
-                                        self.num_errors += 1
-                                        log.error("Required plug-in status: Not installed")
-                                    else:
-                                        self.num_warns +=1
-                                        log.warn("Optional plug-in status: Not installed")
-                                elif plugin_sts == pluginhandler.PLUGIN_VERSION_MISMATCH:
-                                    self.num_warns += 1
-                                    self.plugin_status = pluginhandler.PLUGIN_VERSION_MISMATCH
-                                    log.warn("plug-in status: Version mismatch")
-
-
-                            if bus in ('par', 'usb'):
                                 try:
-                                    d.open()
-                                except Error, e:
-                                    log.error(e.msg)
-                                    deviceid = ''
-                                else:
-                                    deviceid = d.getDeviceID()
-                                    log.debug(deviceid)
-
-                                #print deviceid
-                                if not deviceid:
-                                    log.error("Communication status: Failed")
-                                    self.comm_error_devices[printer_name] = device_uri
-                                    self.num_errors += 1
-                                else:
-                                    log.info("Communication status: Good")
-
-                            elif bus == 'net':
-                                try:
-                                    error_code, deviceid = d.getPML(pml.OID_DEVICE_ID)
+                                    d = device.Device(device_uri,None, None, None, True)
                                 except Error:
-                                    pass
+                                    log.error("Device initialization failed.")
+                                    continue
 
-                                #print error_code
-                                if not deviceid:
-                                    log.error("Communication status: Failed")
-                                    self.comm_error_devices[printer_name] = device_uri
-                                    self.num_errors += 1
-                                else:
-                                    log.info("Communication status: Good")
+                                plugin = d.mq.get('plugin', PLUGIN_NONE)
+                                if plugin in (PLUGIN_REQUIRED, PLUGIN_OPTIONAL):
+                                    if not plugin_sts:
+                                        from installer import pluginhandler
+                                        pluginObj = pluginhandler.PluginHandle()
+                                        plugin_sts = pluginObj.getStatus()
 
-                        finally:
-                            if d is not None:
-                                d.close()
-                    log.info()
-            else:
-                log.warn("No queues found.")
+                                    if plugin_sts == pluginhandler.PLUGIN_INSTALLED:
+                                        self.plugin_status = PLUGIN_INSTALLED
+                                        if plugin == pluginhandler.PLUGIN_REQUIRED:
+                                            log.info("Required plug-in status: Installed")
+                                        else:
+                                            log.info("Optional plug-in status: Installed")
+                                    elif plugin_sts == pluginhandler.PLUGIN_NOT_INSTALLED:
+                                        self.plugin_status = PLUGIN_NOT_INSTALLED
+                                        if plugin == PLUGIN_REQUIRED:
+                                            self.num_errors += 1
+                                            log.error("Required plug-in status: Not installed")
+                                        else:
+                                            self.num_warns +=1
+                                            log.warn("Optional plug-in status: Not installed")
+                                    elif plugin_sts == pluginhandler.PLUGIN_VERSION_MISMATCH:
+                                        self.num_warns += 1
+                                        self.plugin_status = pluginhandler.PLUGIN_VERSION_MISMATCH
+                                        log.warn("plug-in status: Version mismatch")
+
+
+                                if bus in ('par', 'usb'):
+                                    try:
+                                        d.open()
+                                    except Error, e:
+                                        log.error(e.msg)
+                                        deviceid = ''
+                                    else:
+                                        deviceid = d.getDeviceID()
+                                        log.debug(deviceid)
+
+                                    #print deviceid
+                                    if not deviceid:
+                                        log.error("Communication status: Failed")
+                                        self.comm_error_devices[printer_name] = device_uri
+                                        self.num_errors += 1
+                                    else:
+                                        log.info("Communication status: Good")
+
+                                elif bus == 'net':
+                                    try:
+                                        error_code, deviceid = d.getPML(pml.OID_DEVICE_ID)
+                                    except Error:
+                                        pass
+
+                                    #print error_code
+                                    if not deviceid:
+                                        log.error("Communication status: Failed")
+                                        self.comm_error_devices[printer_name] = device_uri
+                                        self.num_errors += 1
+                                    else:
+                                        log.info("Communication status: Good")
+
+                            finally:
+                                if d is not None:
+                                    d.close()
+                        log.info()
+                else:
+                    log.warn("No queues found.")
 
             tui.header("PERMISSION")
             sts,avl_grps_out =utils.run('groups')
@@ -818,7 +818,7 @@ class DependenciesCheck(CoreInstall):
         log.info("Total Warnings: %d" % self.num_warns)
         log.info()
         if self.disable_selinux or self.missing_user_grps or (self.plugin_status == PLUGIN_VERSION_MISMATCH) or (self.plugin_status == PLUGIN_NOT_INSTALLED) or len(self.req_deps_to_be_installed) or len(self.opt_deps_to_be_installed):
-             log.info("Re-run 'hp-doctor' command to prompt and fix the issues. ")
+             log.info("Run 'hp-doctor' command to prompt and fix the issues. ")
              
 
 ############ Main #######################

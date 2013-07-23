@@ -167,7 +167,7 @@ try:
                 d.close()
 
                 if align_type == ALIGN_TYPE_UNSUPPORTED:
-                    log.error("Alignment through HPLIP not supported for this printer. Please use the printer's front panel to perform cartrdige alignment.")
+                    log.error("Alignment through HPLIP not supported for this printer. Please use the printer's front panel to perform cartridge alignment.")
 
                 elif align_type == ALIGN_TYPE_AUTO:
                     maint.AlignType1PML(d, tui.load_paper_prompt)

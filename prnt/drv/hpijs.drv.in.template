@@ -10015,6 +10015,7 @@ lity:PenSet=2,Quality:FullBleed=1"
 
 
   // <%Pyramid:NoAutoDuplex:NoCDDVD%>
+  // <%Pyramid:K10%>
 
 
 } // End Pyramid

@@ -987,7 +987,7 @@ try:
                         temp_output = utils.createSequencedFilename("hpscan_pg%d_" % page, ".png")
                         adf_page_files.append(temp_output)
                         im.save(temp_output)
-                        log.debug("Saved page %d to file %s" % (page, temp_output))
+                        #log.debug("Saved page %d to file %s" % (page, temp_output))
                 else:
                     log.error("No data read.")
                     sys.exit(1)
@@ -1024,7 +1024,7 @@ try:
                     sys.exit(1)
 
                 c.showPage()
-                #os.unlink(p)
+                os.unlink(p)
 
             log.info("Saving to file %s" % output)
             c.save()

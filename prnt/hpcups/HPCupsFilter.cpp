@@ -85,10 +85,8 @@ void HPCupsFilter::CreateBMPHeader (int width, int height, int planes, int bpp)
 
 void HPCupsFilter::WriteBMPHeader (FILE *fp, int width, int height, eRasterType raster_type)
 {
-    if (fp == NULL) {
-        dbglog("ERROR: File pointer is NULL!\n");
+    if (fp == NULL) 
         return;
-    }
 
     if (raster_type == BLACK_RASTER) {
         WriteKBMPHeader (fp, width, height);
@@ -99,10 +97,8 @@ void HPCupsFilter::WriteBMPHeader (FILE *fp, int width, int height, eRasterType 
 
 void HPCupsFilter::WriteCBMPHeader (FILE *fp, int width, int height)
 {
-    if (fp == NULL) {
-        dbglog("ERROR: File pointer is NULL!\n");
+    if (fp == NULL) 
         return;
-    }
 
     adj_c_width = width;
     if (width % 4)
@@ -124,10 +120,8 @@ void HPCupsFilter::WriteKBMPHeader(FILE *fp, int width, int height)
 {
     BYTE    cmap[8];
 
-    if (fp == NULL) {
-        dbglog("ERROR: File pointer is NULL!\n");
+    if (fp == NULL)
         return;
-    }
 
     adj_k_width = width;
     if (width % 32)
@@ -153,10 +147,8 @@ void HPCupsFilter::WriteKBMPHeader(FILE *fp, int width, int height)
 
 void HPCupsFilter::WriteBMPRaster (FILE *fp, BYTE *raster, int width, eRasterType raster_type)
 {
-    if (fp == NULL) {
-        dbglog("ERROR: File pointer is NULL!\n");
+    if (fp == NULL)
         return;
-    }
 
     if (raster_type == BLACK_RASTER) {
         return WriteKBMPRaster (fp, raster, width);
@@ -167,10 +159,9 @@ void HPCupsFilter::WriteBMPRaster (FILE *fp, BYTE *raster, int width, eRasterTyp
 
 void HPCupsFilter::WriteCBMPRaster (FILE *fp, BYTE *pbyrgb, int width)
 {
-    if (fp == NULL) {
-        dbglog("ERROR: File pointer is NULL!\n");
+    if (fp == NULL)
         return;
-    }
+
     //BYTE    c[3];
     int     i;
     BYTE    *p = pbyrgb;
@@ -192,10 +183,8 @@ void HPCupsFilter::WriteCBMPRaster (FILE *fp, BYTE *pbyrgb, int width)
 
 void HPCupsFilter::WriteKBMPRaster (FILE *fp, BYTE *pbyk, int width)
 {
-    if (fp == NULL) {
-        dbglog("ERROR: File pointer is NULL!\n");
+    if (fp == NULL)
         return;
-    }
 
     if (pbyk == NULL) {
         memset (black_raster, 0, adj_k_width);
@@ -748,8 +737,11 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
                 break;
             }
 
-            WriteBMPRaster (cfp, color_raster, cups_header.cupsWidth, COLOR_RASTER);
-            WriteBMPRaster (kfp, black_raster, cups_header.cupsWidth/8, BLACK_RASTER);
+            if (m_iLogLevel & SAVE_INPUT_RASTERS)
+            {
+                WriteBMPRaster (cfp, color_raster, cups_header.cupsWidth, COLOR_RASTER);
+                WriteBMPRaster (kfp, black_raster, cups_header.cupsWidth/8, BLACK_RASTER);
+            }
         }  // for() loop end
 
         m_Job.NewPage();

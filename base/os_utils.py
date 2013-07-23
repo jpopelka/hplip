@@ -21,6 +21,7 @@
 
 # Global import
 import os
+import os.path
 
 #Local
 from base import logger
@@ -33,3 +34,14 @@ def execute(cmd):
     else:
         log.error("Command not found \n" % cmd)
         return 127
+
+
+# Returns the file size in bytes.
+# If file is not exists, returns size as -1.
+#
+def getFileSize(filename):
+    if not os.path.exists(filename):
+        return -1
+
+    return os.path.getsize(filename)
+

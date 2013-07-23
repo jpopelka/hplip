@@ -260,15 +260,13 @@ try:
        # ******************************* RUNNING FIRMWARE DOWNLOAD TO DEVICE FOR SUPPORTED PRINTER'S
        fw_download_req = mq.get('fw-download', False)
        if fw_download_req:
-           fw_cmd = utils.which('hp-firmware', True)
-           if fw_cmd:
-                fw_cmd += " -y3 -s %s"%param
-                log.debug(fw_cmd)
-                fw_sts, fw_out = utils.run(fw_cmd)
-                if fw_sts == 0:
-                    log.debug("Firmware downloaded to %s "%device_uri)
-                else:
-                    log.debug("Failed to download firmware to %s device"%device_uri)     
+           fw_cmd = "hp-firmware -y3 -s %s"%param
+           log.info(fw_cmd)
+           fw_sts, fw_out = utils.run(fw_cmd)
+           if fw_sts == 0:
+               log.debug("Firmware downloaded to %s "%device_uri)
+           else:
+               log.warn("Failed to download firmware to %s device"%device_uri)     
 
     # ******************************* REMOVING CUPS CREATED QUEUE, If any
     i =0

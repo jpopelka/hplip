@@ -498,8 +498,13 @@ except AttributeError:
 
 
 def which(command, return_full_path=False):
-    path = os.getenv('PATH').split(':')
+    path=[]
+    path_val = os.getenv('PATH')
+    if path_val:
+        path = path_val.split(':')
 
+    path.append('/usr/bin')
+    path.append('/usr/local/bin')
     # Add these paths for Fedora
     path.append('/sbin')
     path.append('/usr/sbin')

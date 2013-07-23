@@ -189,6 +189,7 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-deskjet_d2600_series-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_500c-hpijs.ppd.gz \
     ppd/hpijs/hp-business_inkjet_2200-hpijs.ppd.gz \
+    ppd/hpijs/hp-envy_5530_series-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_8150_mfp-hpijs.ppd.gz \
     ppd/hpijs/hp-officejet_7200_series-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_3052-hpijs-pcl3.ppd.gz \
@@ -473,6 +474,8 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-deskjet_3050_j610_series-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_3200-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_m1538dnf_mfp-hpijs-pcl3.ppd.gz \
+    ppd/hpijs/hp-officejet_7610_series-hpijs.ppd.gz \
+    ppd/hpijs/hp-deskjet_1010_series-hpijs.ppd.gz \
     ppd/hpijs/hp-officejet_6100-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_670tv-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_3070_b611_series-hpijs.ppd.gz \

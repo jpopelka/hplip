@@ -568,7 +568,7 @@ ui_toolkit=qt3
 # ****************************************
 [fedora]
 index=5
-versions=17,18
+versions=17,18,19
 display_name=Fedora
 alt_names=Fedora Core
 display=1
@@ -816,6 +816,16 @@ packages=polkit,polkit-gnome
 
 [fedora:18:network]
 packages=wget
+
+# ****************************************
+
+[fedora:19]
+code_name=Schrodinger's Cat
+supported=1
+packaged_version=3.13.5
+release_date=02/07/2013
+same_as_version=17
+
 
 # ****************************************
 [linspire]
@@ -2580,7 +2590,7 @@ same_as_version=12.04
 # ****************************************
 [debian]
 index=2
-versions=6.0,6.0.1,6.0.2,6.0.3,6.0.4,6.0.5,6.0.6,6.0.7,7.0
+versions=6.0,6.0.1,6.0.2,6.0.3,6.0.4,6.0.5,6.0.6,6.0.7,7.0,7.1
 display_name=Debian
 alt_names=
 display=1
@@ -2863,6 +2873,12 @@ packages=python-notify
 packages=wget
 
 # ****************************************
+
+[debian:7.1]
+same_as_version=7.0
+
+# *********************
+
 [xandros]
 index=13
 versions=any

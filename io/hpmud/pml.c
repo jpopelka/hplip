@@ -504,7 +504,10 @@ enum HPMUD_RESULT hpmud_get_pml(HPMUD_DEVICE device, HPMUD_CHANNEL channel, cons
       dLen = ((*p & 0x3) << 8 | *(p+1));         /* read 10 bit len from 2 byte field */
       p += 2;                               /* eat type and length */
    }
-   
+
+   if (dLen > buf_size)
+        dLen = buf_size;
+
    memcpy(buf, p, dLen);
    *bytes_read = dLen; 
    *type = dt;

@@ -2173,6 +2173,12 @@
 :model "HP Photosmart 5525 E-all-in-one Printer"
 :status :good
 
+:model "HP Envy 5530 E-all-in-one Printer"
+:status :good
+
+:model "HP Envy 5535 E-all-in-one Printer"
+:status :good
+
 :model "HP Photosmart c5540 All-in-one Printer"
 :status :good
 
@@ -2615,6 +2621,9 @@
 :status :good
 
 :model "HP Officejet Pro l7600 Series All-in-one Printer"
+:status :good
+
+:model "HP Officejet 7610 Wide Format E-all-in-one Printer"
 :status :good
 
 :model "HP Officejet Pro l7650 All-in-one Printer"

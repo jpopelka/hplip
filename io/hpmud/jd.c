@@ -90,7 +90,7 @@ static int device_id(const char *ip, int port, char *buffer, int size)
    {
       if ((len = GetSnmp(ip, port, (char *)kStatusOID, (unsigned char *)buffer, maxSize, &dt, &status, &result)) == 0)
       {
-   	BUG("unable to read device-id\n");
+          BUG("unable to read device-id\n");
       }
    }
 

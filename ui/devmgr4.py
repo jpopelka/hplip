@@ -1741,6 +1741,10 @@ class DevMgr4(DevMgr4_base):
 
                     elif align_type == ALIGN_TYPE_LEDM_FF_CC_0:
                         maint.AlignType17(d, self.LoadPaperUI, self.Align13UI)
+
+                    elif align_type == ALIGN_TYPE_UNSUPPORTED:
+                        self.WarningUI(self.__tr("<p><b>Alignment through HPLIP not supported for this printer. Please use the printer's front panel to perform cartridge alignment.</b>"))
+
                 else:
                     self.CheckDeviceUI()
 
@@ -1898,6 +1902,10 @@ class DevMgr4(DevMgr4_base):
                             maint.cleanTypeLedm2, self.LoadPaperUI,
                             self.CleanUI1, self.CleanUI2, self.CleanUI3,
                             self.WaitUI, maint.isCleanTypeLedmWithPrint)
+
+                    elif clean_type == CLEAN_TYPE_UNSUPPORTED:
+                        self.WarningUI(self.__tr("<p><b>Cleaning through HPLIP not supported for this printer. Please use the printer's front panel to perform cartridge cleaning.</b>"))
+
                 else:
                     self.CheckDeviceUI()
 

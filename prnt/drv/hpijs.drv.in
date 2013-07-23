@@ -13922,6 +13922,14 @@ lity:PenSet=2,Quality:FullBleed=1"
     PCFileName "hp-officejet_7110_series-hpijs.ppd"
     Attribute "Product" "" "(HP Officejet 7110 Wide Format Eprinter)"
   }
+  {
+    ModelName "HP Officejet 7610 Series hpijs"
+    Attribute "NickName" "" "HP Officejet 7610 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Officejet 7610 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 7610 series;DES:officejet 7610 series;"
+    PCFileName "hp-officejet_7610_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Officejet 7610 Wide Format E-all-in-one Printer)"
+  }
 } // end Saipan
 
 
@@ -14392,6 +14400,15 @@ lity:PenSet=2,Quality:FullBleed=1"
     PCFileName "hp-envy_4500_series-hpijs.ppd"
     Attribute "Product" "" "(HP Envy 4500 E-all-in-one)"
     Attribute "Product" "" "(HP Envy 4502 E-all-in-one)"
+  }
+  {
+    ModelName "HP Envy 5530 Series hpijs"
+    Attribute "NickName" "" "HP Envy 5530 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Envy 5530 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:envy 5530 series;DES:envy 5530 series;"
+    PCFileName "hp-envy_5530_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Envy 5530 E-all-in-one Printer)"
+    Attribute "Product" "" "(HP Envy 5535 E-all-in-one Printer)"
   }
 
 } // end MimasTDR
@@ -17053,6 +17070,16 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Deskjet 3054a E-all-in-one Printer j611c)"
     Attribute "Product" "" "(HP Deskjet 3054a E-all-in-one Printer j611d)"
     Attribute "Product" "" "(HP Deskjet 3054a E-all-in-one Printer j611j)"
+  }
+  // <%Pyramid:K10%>
+  {
+    ModelName "HP Deskjet 1010 Series hpijs"
+    Attribute "NickName" "" "HP Deskjet 1010 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Deskjet 1010 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 1010 series;DES:deskjet 1010 series;"
+    PCFileName "hp-deskjet_1010_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Deskjet 1010 Printer)"
+    Attribute "Product" "" "(HP Deskjet 1012 Printer)"
   }
 
 

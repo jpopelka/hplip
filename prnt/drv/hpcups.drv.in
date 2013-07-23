@@ -5470,6 +5470,14 @@ Manufacturer "HP"
          PCFileName "hp-officejet_7110_series.ppd"
          Attribute "Product" "" "(HP Officejet 7110 Wide Format Eprinter)"
        }
+       {
+         ModelName "HP Officejet 7610 Series"
+         Attribute "NickName" "" "HP Officejet 7610 Series, hpcups $Version"
+         Attribute "ShortNickName" "" "HP Officejet 7610 Series"
+         Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 7610 series;DES:officejet 7610 series;"
+         PCFileName "hp-officejet_7610_series.ppd"
+         Attribute "Product" "" "(HP Officejet 7610 Wide Format E-all-in-one Printer)"
+       }
       }
       }
      
@@ -9373,6 +9381,15 @@ Manufacturer "HP"
       Attribute "Product" "" "(HP Envy 4500 E-all-in-one)"
       Attribute "Product" "" "(HP Envy 4502 E-all-in-one)"
     }
+    {
+      ModelName "HP Envy 5530 Series"
+      Attribute "NickName" "" "HP Envy 5530 Series, hpcups $Version"
+      Attribute "ShortNickName" "" "HP Envy 5530 Series"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:envy 5530 series;DES:envy 5530 series;"
+      PCFileName "hp-envy_5530_series.ppd"
+      Attribute "Product" "" "(HP Envy 5530 E-all-in-one Printer)"
+      Attribute "Product" "" "(HP Envy 5535 E-all-in-one Printer)"
+    }
 
 } // End MimasTDR
 
@@ -9411,10 +9428,10 @@ Manufacturer "HP"
          "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
   CustomMedia "Photo4x6/Photo 4x6in" 288 432 9 41.04 9 4.32 "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice" 
          "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Photo4x6tab/Photo 4x6in (tab)" 288 432 9 41.04 9 4.32 "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
   CustomMedia "A6/A6 105x148mm" 297.36 419.76 9 41.04 9 4.32 "<</cupsInteger0 73/PageSize[297.36 419.76]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 73/PageSize[297.36 419.76]/ImagingBBox null>>setpagedevice"
-  CustomMedia "Cabinet/Cabinet Size 120x165" 339.84 468 9 41.04 9 4.32 "<</cupsInteger0 119/PageSize[339.84 468]/ImagingBBox null>>setpagedevice"
-         "<</cupsInteger0 119/PageSize[339.84 468]/ImagingBBox null>>setpagedevice"
   CustomMedia "Hagaki/Hagaki 100x148mm" 283.68 419.76 9 41.04 9 4.32 "<</cupsInteger0 71/PageSize[283.68 419.76]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 71/PageSize[283.68 419.76]/ImagingBBox null>>setpagedevice"
 
@@ -9427,6 +9444,8 @@ Manufacturer "HP"
          "<</cupsInteger0 72/PageSize[566.64 419.76]/ImagingBBox null>>setpagedevice"
   CustomMedia "Photo5x7/Photo 5x7in" 360 504 9 41.04 9 4.32 "<</cupsInteger0 122/PageSize[360 504]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 122/PageSize[360 504]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Photo13x18/Photo 13x18cm" 360 504 9 41.04 9 4.32 "<</cupsInteger0 122/PageSize[360 504]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 122/PageSize[360 504]/ImagingBBox null>>setpagedevice"
   CustomMedia "A5/A5 148x210mm" 419.76 595.44 9 41.04 9 4.32 "<</cupsInteger0 25/PageSize[419.76 595.44]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 25/PageSize[419.76 595.44]/ImagingBBox null>>setpagedevice"
 
@@ -9434,6 +9453,8 @@ Manufacturer "HP"
   CustomMedia "6x8/6x8in" 432 576 9 41.04 9 4.32 "<</cupsInteger0 101/PageSize[432 576]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 101/PageSize[432 576]/ImagingBBox null>>setpagedevice"
   CustomMedia "Mutsugiri/Mutsugiri 8x10in" 576 720 9 41.04 9 4.32 "<</cupsInteger0 7/PageSize[576 720]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 7/PageSize[576 720]/ImagingBBox null>>setpagedevice"
+  CustomMedia "8x10/8x10in" 576 720 9 41.04 9 4.32 "<</cupsInteger0 7/PageSize[576 720]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 7/PageSize[576 720]/ImagingBBox null>>setpagedevice"
   CustomMedia "FLSA/American Foolscap 8.5x13in" 612 936 9.00 41.04 9.00 4.32 "<</cupsInteger0 101/PageSize[612 936]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 101/PageSize[612 936]/ImagingBBox null>>setpagedevice"
@@ -9445,7 +9466,11 @@ Manufacturer "HP"
          "<</cupsInteger0 1/PageSize[522 756]/ImagingBBox null>>setpagedevice"
   CustomMedia "Legal/Legal 8.5x14in" 612 1008 9 41.04 9 4.32 "<</cupsInteger0 3/PageSize[612 1008]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 3/PageSize[612 1008]/ImagingBBox null>>setpagedevice"
-  CustomMedia "A4/A4 210x297mm" 595.44 841.68 9 41.04 9 4.32 "<</cupsInteger0 26/PageSize[595.44 841.68]/ImagingBBox null>>setpagedevice" 
+  CustomMedia "Photo10x15/Photo 10x15cm" 288 432 9 41.04 9 4.32 "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+  CustomMedia "Photo10x15tab/Photo 10x15cm (tab)" 288 432 9 41.04 9 4.32 "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+  CustomMedia "A4/A4 210x297mm" 595.44 841.68 9 41.04 9 4.32 "<</cupsInteger0 26/PageSize[595.44 841.68]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 26/PageSize[595.44 841.68]/ImagingBBox null>>setpagedevice"
   *CustomMedia "Letter/Letter 8.5x11in" 612 792 9 41.04 9 4.32 "<</cupsInteger0 2/PageSize[612 792]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 2/PageSize[612 792]/ImagingBBox null>>setpagedevice"
@@ -9460,15 +9485,13 @@ Manufacturer "HP"
          "<</cupsInteger0 92/PageSize[323.28 459.36]/ImagingBBox null>>setpagedevice"
   CustomMedia "EnvC5/C5 Envelope 162x229mm" 459.36 649.44 9 41.04 9 4.32 "<</cupsInteger0 91/PageSize[459.36 649.44]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 91/PageSize[459.36 649.44]/ImagingBBox null>>setpagedevice"
-  CustomMedia "EnvChou2/#2 Envelope 111x146mm" 314.64 414 9 41.04 9 4.32 "<</cupsInteger0 109/PageSize[314.64 414]/ImagingBBox null>>setpagedevice"
-         "<</cupsInteger0 109/PageSize[314.64 414]/ImagingBBox null>>setpagedevice"
   CustomMedia "EnvCard/Card Envelope 4.4x6in" 315 432 9 41.04 9 4.32 "<</cupsInteger0 114/PageSize[315 432]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 114/PageSize[315 432]/ImagingBBox null>>setpagedevice"
   CustomMedia "EnvChou3/#3 Japanese Envelope 120x235mm" 339.84 666 9 41.04 9 4.32 "<</cupsInteger0 110/PageSize[339.84 666]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 110/PageSize[339.84 666]/ImagingBBox null>>setpagedevice"
   CustomMedia "Env10/#10 Envelope 4.125x9.5in" 297 684 9 41.04 9 4.32 "<</cupsInteger0 81/PageSize[297 684]/ImagingBBox null>>setpagedevice"
          "<</cupsInteger0 81/PageSize[297 684]/ImagingBBox null>>setpagedevice"
- 
+
   // Custom page sizes from 3x4in to Legal
   HWMargins 9 41.04 9 4.32
   VariablePaperSize Yes
@@ -9572,6 +9595,27 @@ Manufacturer "HP"
     Attribute "Product" "" "(HP Deskjet 3054a E-all-in-one Printer j611c)"
     Attribute "Product" "" "(HP Deskjet 3054a E-all-in-one Printer j611d)"
     Attribute "Product" "" "(HP Deskjet 3054a E-all-in-one Printer j611j)"
+  }
+  }
+  {
+  // cupsCompression values map to QUALITY_MODE from global_types.h
+  Option "OutputMode/Print Quality" PickOne AnySetup 10.0
+    Choice "Draft/Draft" "<</OutputType(-2)/HWResolution[300 300]>>setpagedevice"
+    *Choice "Normal/Normal" "<</OutputType(0)/HWResolution[600 300]>>setpagedevice"
+    Choice "Best/Best" "<</OutputType(1)/HWResolution[600 600]>>setpagedevice"
+    Choice "Photo/High-Resolution Photo" "<</OutputType(2)/HWResolution[1200 1200]>>setpagedevice"
+
+   UIConstraints "*MediaType Photo *OutputMode Draft"
+
+  // <%Pyramid:K10%>
+  {
+    ModelName "HP Deskjet 1010 Series"
+    Attribute "NickName" "" "HP Deskjet 1010 Series, hpcups $Version"
+    Attribute "ShortNickName" "" "HP Deskjet 1010 Series"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 1010 series;DES:deskjet 1010 series;"
+    PCFileName "hp-deskjet_1010_series.ppd"
+    Attribute "Product" "" "(HP Deskjet 1010 Printer)"
+    Attribute "Product" "" "(HP Deskjet 1012 Printer)"
   }
   }
 

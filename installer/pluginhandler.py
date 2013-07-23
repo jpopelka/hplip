@@ -60,7 +60,7 @@ PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS = 7
 
 
 class PluginHandle(object):
-    def __init__(self, pluginPath = "/tmp"):
+    def __init__(self, pluginPath = "/var/log/hp/tmp"):
         self.__plugin_path = pluginPath
         self.__required_version = ""
         self.__plugin_name = ""
@@ -224,7 +224,7 @@ class PluginHandle(object):
 
         finally:
             os.close(local_conf_fp)
-#            os.remove(local_conf)
+            os.remove(local_conf)
 
         return status, url, check_sum
 
@@ -280,7 +280,7 @@ class PluginHandle(object):
 
         if pluginPath:#     and os.path.exists(pluginPath):
             src = pluginPath
-            checksum = ""       # TBD: Local copy may have different checksum. So ignoring checksume
+            checksum = ""       # TBD: Local copy may have different checksum. So ignoring checksum
         else:
             src = url
             if sts != PLUGIN_INSTALL_ERROR_NONE:
@@ -299,10 +299,7 @@ class PluginHandle(object):
 
         except (OSError, IOError), e:
             log.error("Failed in OS operations:%s "%e.strerror)
-            return status, url, check_sum
-
-        #Check whether plugin is accessible in Openprinting.org website otherwise dowload plugin from alternate location.
-
+            return PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR, ""
 
         try:
             if src.startswith('file://'):
@@ -315,21 +312,26 @@ class PluginHandle(object):
                     status, output = utils.run(cmd)
                     log.debug("wget returned: %d" % status)
 
-                if status != 0:
+                #Check whether plugin is accessible in Openprinting.org website otherwise dowload plugin from alternate location.
+                if status != 0 or os_utils.getFileSize(plugin_file) <= 0:
                     src = os.path.join(PLUGIN_FALLBACK_LOCATION, self.__plugin_name)
                     log.info("Plugin is not accessible. Trying to download it from fallback location: [%s]" % src)
                     cmd = "%s --cache=off -P %s %s" % (wget,self.__plugin_path,src)
                     log.debug(cmd)
                     status, output = utils.run(cmd)
 
+                if status != 0 or os_utils.getFileSize(plugin_file) <= 0:
+                    log.error("Plug-in download is failed from both URL and fallback location.")
+                    return PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND, ""
+
         except IOError, e:
             log.error("Plug-in download failed: %s" % e.strerror)
-            return PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND, e.strerror
+            return PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND, ""
 
         if core.isErrorPage(file(plugin_file, 'r').read(1024)):
             log.debug(file(plugin_file, 'r').read(1024))
             os.remove(plugin_file)
-            return PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND, -1
+            return PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND, ""
 
         # Try to download and check the GPG digital signature
         digsig_url = src + '.asc'
@@ -358,17 +360,30 @@ class PluginHandle(object):
 
 
     def run_plugin(self, plugin_file, mode=GUI_MODE):
+        result = False
         log.debug("run_plugin plugin_file =%s mode=%d"%(plugin_file, mode))
+
+        cwd = os.getcwd()
+        os.chdir(self.__plugin_path)
+
         if mode == GUI_MODE:
-            cmd = "sh %s --nox11 -- -u" % plugin_file
+            cmd = "sh %s --keep --nox11 -- -u" % plugin_file
         else:
-            cmd = "sh %s --nox11 -- -i" % plugin_file
+            cmd = "sh %s --keep --nox11 -- -i" % plugin_file
 
         if os_utils.execute(cmd) == 0:
-            return True
+            result = True
         else:
             log.error("Python gobject/dbus may be not installed")
-            return False
+            result = False
+
+        try:
+            shutil.rmtree('./plugin_tmp')
+        except OSError:
+            log.warn("Failed to remove the temporary files")
+
+        os.chdir(cwd)
+        return result
 
 
     def copyFiles(self, src_dir):

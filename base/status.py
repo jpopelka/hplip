@@ -1525,11 +1525,10 @@ def StatusType10FetchUrl(func, url, footer=""):
         data = func(url, data_fp, footer)
     else:
         data = func(url, data_fp)
-
-    if data:
-        data = data.split('\r\n\r\n', 1)[1]
         if data:
-            data = ExtractXMLData(data)
+            data = data.split('\r\n\r\n', 1)[1]
+            if data:
+                data = ExtractXMLData(data)
     return data
 
 def StatusType10(func): # Low End Data Model
