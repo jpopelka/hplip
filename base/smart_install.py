@@ -113,7 +113,7 @@ def get_smartinstall_enabled_devices():
                     continue    # These are not HP-devices
 
                 log.debug("Product['%s'],Interfaces[%s],InterfaceClass[%s]"%(usb_params["iProduct"], usb_params["bNumInterfaces"],usb_params["bInterfaceClass"]))
-                if usb_params["bNumInterfaces"] == '1' and usb_params["bInterfaceClass"] == '8':    #'8' is MASS STORAGE CLASS,
+                if usb_params["bNumInterfaces"] == '1' and usb_params["bInterfaceClass"] == '8' and "laserjet" in usb_params["iProduct"].lower():    #'8' is MASS STORAGE
                     smartinstall_dev_list.append(usb_params["iProduct"])
 
             else:

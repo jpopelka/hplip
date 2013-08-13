@@ -14393,6 +14393,16 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%MimasTDR:Normal%>
   {
+    ModelName "HP Deskjet 3540 Series hpijs"
+    Attribute "NickName" "" "HP Deskjet 3540 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Deskjet 3540 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 3540 series;DES:deskjet 3540 series;"
+    PCFileName "hp-deskjet_3540_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 3540 E-all-in-one Printer Series)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 3545 E-all-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 3546 E-all-in-one Printer)"
+  }
+  {
     ModelName "HP Envy 4500 Series hpijs"
     Attribute "NickName" "" "HP Envy 4500 Series hpijs, $Version"
     Attribute "ShortNickName" "" "HP Envy 4500 Series hpijs"
@@ -17080,6 +17090,30 @@ lity:PenSet=2,Quality:FullBleed=1"
     PCFileName "hp-deskjet_1010_series-hpijs.ppd"
     Attribute "Product" "" "(HP Deskjet 1010 Printer)"
     Attribute "Product" "" "(HP Deskjet 1012 Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 1010 Printer Series)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 1015 Printer)"
+  }
+  {
+    ModelName "HP Deskjet 1510 Series hpijs"
+    Attribute "NickName" "" "HP Deskjet 1510 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Deskjet 1510 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 1510 series;DES:deskjet 1510 series;"
+    PCFileName "hp-deskjet_1510_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Deskjet 1510 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet 1512 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet 1513 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 1510 All-in-one Printer Series)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 1515 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 1516 All-in-one Printer)"
+  }
+  {
+    ModelName "HP Deskjet 2540 Series hpijs"
+    Attribute "NickName" "" "HP Deskjet 2540 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Deskjet 2540 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 2540 series;DES:deskjet 2540 series;"
+    PCFileName "hp-deskjet_2540_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Deskjet 2540 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet 2542 All-in-one Printer)"
   }
 
 

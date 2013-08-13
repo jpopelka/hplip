@@ -592,6 +592,7 @@ def main(args):
         template_file_f.close()
         drv_in_file_f.close()
         tui.cleanup_spinner()
+
         for tc in models.TECH_CLASSES:
             if tc.lower() in ('undefined', 'postscript', 'unsupported'):
                 continue

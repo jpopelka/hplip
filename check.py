@@ -203,6 +203,7 @@ class DependenciesCheck(CoreInstall):
             'xsane':            (False, ['scan'], "SANE-GUI", self.check_xsane,'0.9','FUNC#get_xsane_version'),
             'scanimage':        (False, ['scan'], "Shell-Scanning", self.check_scanimage,'1.0','scanimage --version'),
             'network':        (False, ['network'], "Network-wget", self.check_wget,'-','wget --version'),
+            'avahi-utils':        (False, ['network'], "avahi-utils", self.check_avahi_utils, '-','avahi-browse --version'),
             },
             GENERALDEP:
             {'libpthread':       (True,  ['base'], "POSIX-Threads-Lib", self.check_libpthread,'-','FUNC#get_libpthread_version'),

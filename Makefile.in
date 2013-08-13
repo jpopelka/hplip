@@ -612,7 +612,7 @@ am__dist_base_DATA_DIST = base/maint.py base/codes.py base/g.py \
 	base/mdns.py base/tui.py base/dime.py base/ldif.py \
 	base/vcard.py base/module.py base/pkit.py base/queues.py \
 	base/password.py base/services.py base/os_utils.py \
-	base/smart_install.py
+	base/smart_install.py base/avahi.py
 am__dist_copier_DATA_DIST = copier/copier.py copier/__init__.py
 am__dist_fax_DATA_DIST = fax/fax.py fax/__init__.py fax/coverpages.py \
 	fax/pmlfax.py fax/ledmfax.py fax/soapfax.py fax/ledmsoapfax.py \
@@ -1303,6 +1303,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	ppd/hpijs/hp-deskjet_d5500_series-hpijs.ppd.gz \
 	ppd/hpijs/hp-officejet_6700-hpijs.ppd.gz \
 	ppd/hpijs/hp-officejet_j5700_series-hpijs.ppd.gz \
+	ppd/hpijs/hp-deskjet_1510_series-hpijs.ppd.gz \
 	ppd/hpijs/hp-psc_2170_series-hpijs.ppd.gz \
 	ppd/hpijs/hp-laserjet_8100_mfp-hpijs.ppd.gz \
 	ppd/hpijs/hp-laserjet_m3027_mfp-hpijs-pcl3.ppd.gz \
@@ -1525,6 +1526,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	ppd/hpijs/hp-color_laserjet_cm6040_mfp-hpijs.ppd.gz \
 	ppd/hpijs/hp-deskjet_5850-hpijs.ppd.gz \
 	ppd/hpijs/hp-officejet_9100_series-hpijs-pcl3.ppd.gz \
+	ppd/hpijs/hp-deskjet_2540_series-hpijs.ppd.gz \
 	ppd/hpijs/hp-color_laserjet_cm1312_mfp-hpijs-pcl3.ppd.gz \
 	ppd/hpijs/hp-deskjet_841c-hpijs.ppd.gz \
 	ppd/hpijs/hp-laserjet_9040-hpijs-pcl3.ppd.gz \
@@ -1587,6 +1589,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	ppd/hpijs/hp-laserjet_1015-hpijs.ppd.gz \
 	ppd/hpijs/hp-deskjet_1100-hpijs.ppd.gz \
 	ppd/hpijs/hp-officejet_6000_e609a-hpijs.ppd.gz \
+	ppd/hpijs/hp-deskjet_3540_series-hpijs.ppd.gz \
 	ppd/hpijs/hp-deskjet_695-hpijs.ppd.gz \
 	ppd/hpijs/hp-laserjet_m9040_mfp-hpijs-pcl3.ppd.gz \
 	ppd/hpijs/hp-photosmart_d5300_series-hpijs.ppd.gz \
@@ -1720,6 +1723,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	ppd/hpcups/hp-deskjet_1200c.ppd.gz \
 	ppd/hpcups/hp-deskjet_1220c.ppd.gz \
 	ppd/hpcups/hp-deskjet_1280.ppd.gz \
+	ppd/hpcups/hp-deskjet_1510_series.ppd.gz \
 	ppd/hpcups/hp-deskjet_1600c.ppd.gz \
 	ppd/hpcups/hp-deskjet_1600cm.ppd.gz \
 	ppd/hpcups/hp-deskjet_1600cn.ppd.gz \
@@ -1728,6 +1732,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	ppd/hpcups/hp-deskjet_2050_j510_series.ppd.gz \
 	ppd/hpcups/hp-deskjet_2510_series.ppd.gz \
 	ppd/hpcups/hp-deskjet_2520_series.ppd.gz \
+	ppd/hpcups/hp-deskjet_2540_series.ppd.gz \
 	ppd/hpcups/hp-deskjet_3000_j310_series.ppd.gz \
 	ppd/hpcups/hp-deskjet_3050_j610_series.ppd.gz \
 	ppd/hpcups/hp-deskjet_3050a_j611_series.ppd.gz \
@@ -1740,6 +1745,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	ppd/hpcups/hp-deskjet_3500.ppd.gz \
 	ppd/hpcups/hp-deskjet_3510_series.ppd.gz \
 	ppd/hpcups/hp-deskjet_3520_series.ppd.gz \
+	ppd/hpcups/hp-deskjet_3540_series.ppd.gz \
 	ppd/hpcups/hp-deskjet_3550.ppd.gz \
 	ppd/hpcups/hp-deskjet_3600.ppd.gz \
 	ppd/hpcups/hp-deskjet_3650.ppd.gz \
@@ -3034,6 +3040,7 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-deskjet_d5500_series-hpijs.ppd.gz \
     ppd/hpijs/hp-officejet_6700-hpijs.ppd.gz \
     ppd/hpijs/hp-officejet_j5700_series-hpijs.ppd.gz \
+    ppd/hpijs/hp-deskjet_1510_series-hpijs.ppd.gz \
     ppd/hpijs/hp-psc_2170_series-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_8100_mfp-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_m3027_mfp-hpijs-pcl3.ppd.gz \
@@ -3256,6 +3263,7 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-color_laserjet_cm6040_mfp-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_5850-hpijs.ppd.gz \
     ppd/hpijs/hp-officejet_9100_series-hpijs-pcl3.ppd.gz \
+    ppd/hpijs/hp-deskjet_2540_series-hpijs.ppd.gz \
     ppd/hpijs/hp-color_laserjet_cm1312_mfp-hpijs-pcl3.ppd.gz \
     ppd/hpijs/hp-deskjet_841c-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_9040-hpijs-pcl3.ppd.gz \
@@ -3318,6 +3326,7 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-laserjet_1015-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_1100-hpijs.ppd.gz \
     ppd/hpijs/hp-officejet_6000_e609a-hpijs.ppd.gz \
+    ppd/hpijs/hp-deskjet_3540_series-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_695-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_m9040_mfp-hpijs-pcl3.ppd.gz \
     ppd/hpijs/hp-photosmart_d5300_series-hpijs.ppd.gz \
@@ -3682,6 +3691,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-deskjet_1200c.ppd.gz \
    ppd/hpcups/hp-deskjet_1220c.ppd.gz \
    ppd/hpcups/hp-deskjet_1280.ppd.gz \
+   ppd/hpcups/hp-deskjet_1510_series.ppd.gz \
    ppd/hpcups/hp-deskjet_1600c.ppd.gz \
    ppd/hpcups/hp-deskjet_1600cm.ppd.gz \
    ppd/hpcups/hp-deskjet_1600cn.ppd.gz \
@@ -3690,6 +3700,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-deskjet_2050_j510_series.ppd.gz \
    ppd/hpcups/hp-deskjet_2510_series.ppd.gz \
    ppd/hpcups/hp-deskjet_2520_series.ppd.gz \
+   ppd/hpcups/hp-deskjet_2540_series.ppd.gz \
    ppd/hpcups/hp-deskjet_3000_j310_series.ppd.gz \
    ppd/hpcups/hp-deskjet_3050_j610_series.ppd.gz \
    ppd/hpcups/hp-deskjet_3050a_j611_series.ppd.gz \
@@ -3702,6 +3713,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-deskjet_3500.ppd.gz \
    ppd/hpcups/hp-deskjet_3510_series.ppd.gz \
    ppd/hpcups/hp-deskjet_3520_series.ppd.gz \
+   ppd/hpcups/hp-deskjet_3540_series.ppd.gz \
    ppd/hpcups/hp-deskjet_3550.ppd.gz \
    ppd/hpcups/hp-deskjet_3600.ppd.gz \
    ppd/hpcups/hp-deskjet_3650.ppd.gz \
@@ -4422,7 +4434,7 @@ cups_drv = prnt/drv/hpcups.drv
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	base/device.py base/logger.py base/slp.py base/exif.py base/strings.py base/magic.py \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	base/imagesize.py base/pexpect.py base/models.py base/mdns.py base/tui.py base/dime.py \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	base/ldif.py base/vcard.py base/module.py base/pkit.py base/queues.py base/password.py \
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	base/services.py base/os_utils.py base/smart_install.py
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	base/services.py base/os_utils.py base/smart_install.py base/avahi.py
 
 
 # installer

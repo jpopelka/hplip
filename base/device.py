@@ -44,7 +44,7 @@ import status
 import pml
 import status
 from prnt import pcl, ldl, cups
-import models, mdns, slp
+from base import models, mdns, slp, avahi
 from strings import StringTable
 
 http_result_pat = re.compile("""HTTP/\d.\d\s(\d+)""", re.I)
@@ -455,7 +455,7 @@ def queryModelByURI(device_uri):
 #
 
 def probeDevices(bus=DEFAULT_PROBE_BUS, timeout=10,
-                 ttl=4, filter=DEFAULT_FILTER,  search='', net_search='mdns',
+                 ttl=4, filter=DEFAULT_FILTER,  search='', net_search='slp',
                  back_end_filter=('hp',)):
 
     num_devices, ret_devices = 0, {}
@@ -480,7 +480,13 @@ def probeDevices(bus=DEFAULT_PROBE_BUS, timeout=10,
                 except Error, socket.error:
                     log.error("An error occured during network probe.")
                     raise ERROR_INTERNAL
-            else:
+            elif net_search == 'avahi':
+                try:
+                    detected_devices = avahi.detectNetworkDevices(ttl, timeout)
+                except Error, socket.error:
+                    log.error("An error occured during network probe.")
+                    raise ERROR_INTERNAL
+            else :#if net_search = 'mdns'
                 try:
                     detected_devices = mdns.detectNetworkDevices(ttl, timeout)
                 except Error, socket.error:

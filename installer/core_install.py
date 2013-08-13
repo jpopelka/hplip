@@ -324,6 +324,7 @@ class CoreInstall(object):
             'libnetsnmp-devel': (True,  ['network'], "libnetsnmp-devel - SNMP networking library development files", self.check_libnetsnmp, DEPENDENCY_RUN_AND_COMPILE_TIME),
             'libcrypto':        (True,  ['network'], "libcrypto - OpenSSL cryptographic library", self.check_libcrypto, DEPENDENCY_RUN_AND_COMPILE_TIME),
             'network':        (False, ['network'], "network -wget", self.check_wget, DEPENDENCY_RUN_TIME),
+            'avahi-utils':        (False, ['network'], "avahi-utils", self.check_avahi_utils, DEPENDENCY_RUN_TIME),
             'passwd_util':        (False, ['gui_qt4'], "GUI Password utility (gksu/kdesu)", self.check_passwd_util, DEPENDENCY_RUN_TIME),
         }
 
@@ -1498,7 +1499,13 @@ class CoreInstall(object):
             log.debug("wget is not installed")
             return False
 
-
+    def check_avahi_utils(self):
+        if utils.which("avahi-browse"):
+            return True
+        else:
+            log.debug("avahi-browse is not installed")
+            return False
+        
     def check_passwd_util(self):
         if utils.which("gksu"):
             return True

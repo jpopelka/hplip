@@ -721,6 +721,18 @@
 :model "HP PSC 1510v All-in-one Printer"
 :status :good
 
+:model "HP Deskjet 1510 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 1510 All-in-one Printer Series"
+:status :good
+
+:model "HP Deskjet 1512 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet 1513 All-in-one Printer"
+:status :good
+
 :model "HP PSC 1513s All-in-one Printer"
 :status :good
 
@@ -728,6 +740,12 @@
 :status :good
 
 :model "HP PSC 1514 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 1515 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 1516 All-in-one Printer"
 :status :good
 
 :model "HP LaserJet m1522n Multifunction Printer"
@@ -1034,6 +1052,12 @@
 :status :good
 
 :model "HP Deskjet Ink Advantage 2520hc All-in-one"
+:status :good
+
+:model "HP Deskjet 2540 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet 2542 All-in-one Printer"
 :status :good
 
 :model "HP PSC 2550 Photosmart All-in-one Printer"
@@ -1355,6 +1379,15 @@
 :status :good
 
 :model "HP Deskjet 3526 E-all-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 3540 E-all-in-one Printer Series"
+:status :good
+
+:model "HP Deskjet Ink Advantage 3545 E-all-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 3546 E-all-in-one Printer"
 :status :good
 
 :model "HP Officejet j3608 All-in-one Printer"

@@ -248,6 +248,8 @@ packages=python-notify
 [suse:12.2:network]
 packages=wget
 
+[suse:12.2:avahi-utils]
+packages=avahi-utils
 # ********************
 [suse:12.3]
 code_name=Dartmouth
@@ -367,6 +369,8 @@ packages=python-notify
 [suse:12.3:network]
 packages=wget
 
+[suse:12.3:avahi-utils]
+packages=avahi-utils
 # ****************************************
 [redhat]
 index=6
@@ -701,6 +705,8 @@ packages=polkit,polkit-gnome
 [fedora:17:network]
 packages=wget
 
+[fedora:17:avahi-utils]
+packages=avahi-tools
 # ********************
 [fedora:18]
 code_name=Sperical Cow
@@ -751,7 +757,7 @@ packages=net-snmp-devel
 packages=glibc-headers
 
 [fedora:18:libtool]
-packages=libtool
+packages=audit,libtool
 
 [fedora:18:libusb]
 packages=libusb1-devel
@@ -817,6 +823,8 @@ packages=polkit,polkit-gnome
 [fedora:18:network]
 packages=wget
 
+[fedora:18:avahi-utils]
+packages=avahi-tools
 # ****************************************
 
 [fedora:19]
@@ -1116,7 +1124,8 @@ packages=polkit,polkit-gnome
 [rhel:6.0:network]
 packages=wget
 
-
+[rhel:6.0:avahi-utils]
+packages=avahi-tools
 # ****************************************
 [slackware]
 index=8
@@ -1434,6 +1443,8 @@ packages=dbus-devel
 [centos:any:network]
 packages=wget
 
+[centos:any:avahi-utils]
+packages=avahi-tools
 # ****************************************
 [gentoo]
 index=9
@@ -1606,7 +1617,8 @@ packages=libcups2-devel
 [pclinuxos:2006.0:network]
 packages=wget
 
-
+[pclinuxos:2006.0:avahi-utils]
+packages=avahi
 # ********************
 [pclinuxos:2006]
 same_as_version=2006.0
@@ -1723,7 +1735,8 @@ packages=libcups2-devel
 [pclinuxos:2007.0:network]
 packages=wget
 
-
+[pclinuxos:2007.0:avahi-utils]
+packages=avahi
 # ********************
 [pclinuxos:2007]
 same_as_version=2007.0
@@ -1840,6 +1853,8 @@ packages=libcups2-devel
 [pclinuxos:2008.0:network]
 packages=wget
 
+[pclinuxos:2008.0:avahi-utils]
+packages=avahi
 # ********************
 [pclinuxos:2008]
 same_as_version=2008.0
@@ -1956,7 +1971,8 @@ packages=libcups2-devel
 [pclinuxos:2009.0:network]
 packages=wget
 
-
+[pclinuxos:2009.0:avahi-utils]
+packages=avahi
 # ********************
 [pclinuxos:2009]
 same_as_version=2009.0
@@ -2073,7 +2089,8 @@ packages=libcups2-devel
 [pclinuxos:2009.1:network]
 packages=wget
 
-
+[pclinuxos:2009.1:avahi-utils]
+packages=avahi
 # ****************************************
 [igos]
 index=32
@@ -2202,7 +2219,8 @@ packages=
 [igos:1.0:network]
 packages=wget
 
-
+[igos:1.0:avahi-utils]
+packages=avahi
 # ****************************************
 [ubuntu]
 index=12
@@ -2340,6 +2358,8 @@ packages=python-notify
 [ubuntu:10.04:network]
 packages=wget
 
+[ubuntu:10.04:avahi-utils]
+packages=avahi-utils
 # ********************
 [ubuntu:11.10]
 code_name=Oneiric
@@ -2458,6 +2478,8 @@ packages=python-notify
 [ubuntu:11.10:network]
 packages=wget
 
+[ubuntu:11.10:avahi-utils]
+packages=avahi-utils
 # ********************
 [ubuntu:12.04]
 code_name=Precise
@@ -2579,6 +2601,8 @@ packages=wget
 [ubuntu:12.04:passwd_util]
 packages=gksu
 
+[ubuntu:12.04:avahi-utils]
+packages=avahi-utils
 # ********************
 [ubuntu:12.10]
 same_as_version=12.04
@@ -2727,6 +2751,8 @@ packages=python-notify
 [debian:6.0:network]
 packages=wget
 
+[debian:6.0:avahi-utils]
+packages=avahi-utils
 # *********************
 [debian:6.0.1]
 same_as_version=6.0
@@ -2872,6 +2898,8 @@ packages=python-notify
 [debian:7.0:network]
 packages=wget
 
+[debian:7.0:avahi-utils]
+packages=avahi-utils
 # ****************************************
 
 [debian:7.1]
@@ -3206,6 +3234,8 @@ packages=libcupsys2-dev
 [mepis:6.0:network]
 packages=wget
 
+[mepis:6.0:avahi-utils]
+packages=avahi-utils
 # ********************
 [mepis:6.5]
 code_name=
@@ -3314,6 +3344,9 @@ packages=libcupsys2-dev
 [mepis:6.5:network]
 packages=wget
 
+[mepis:6.5:avahi-utils]
+packages=avahi-utils
+# ********************
 # ********************
 [mepis:7.0]
 code_name=
@@ -3422,6 +3455,9 @@ packages=libcupsys2-dev
 [mepis:7.0:network]
 packages=wget
 
+[mepis:7.0:avahi-utils]
+packages=avahi-utils
+# ********************
 # ********************
 [mepis:8.0]
 code_name=
@@ -3530,6 +3566,9 @@ packages=libcupsys2-dev
 [mepis:8.0:network]
 packages=wget
 
+[mepis:8.0:avahi-utils]
+packages=avahi-utils
+# ********************
 # ****************************************
 [mandriva]
 index=4
@@ -3719,6 +3758,9 @@ packages=cups-devel
 [mandriva:10.1:network]
 packages=wget
 
+[mandriva:10.1:avahi-utils]
+packages=avahi-tools
+# ********************
 # ********************
 [mandriva:10.2]
 code_name=Limited edition 2005
@@ -3827,7 +3869,8 @@ packages=cups-devel
 [mandriva:10.2:network]
 packages=wget
 
-
+[mandriva:10.2:avahi-utils]
+packages=avahi-tools
 # ********************
 [mandriva:2006.0]
 code_name=2k6
@@ -3936,6 +3979,8 @@ packages=cups-devel
 [mandriva:2006.0:network]
 packages=wget
 
+[mandriva:2006.0:avahi-utils]
+packages=avahi-tools
 # ********************
 [mandriva:2007.0]
 code_name=2k7
@@ -4044,7 +4089,8 @@ packages=cups-devel
 [mandriva:2007.0:network]
 packages=wget
 
-
+[mandriva:2007.0:avahi-utils]
+packages=avahi-tools
 # ********************
 [mandriva:2007.1]
 code_name=2k7
@@ -4156,6 +4202,8 @@ packages=cups-devel
 [mandriva:2007.1:network]
 packages=wget
 
+[mandriva:2007.1:avahi-utils]
+packages=avahi-tools
 # ********************
 [mandriva:2008.0]
 code_name=2k7
@@ -4268,6 +4316,8 @@ packages=cups-devel
 [mandriva:2008.0:network]
 packages=wget
 
+[mandriva:2008.0:avahi-utils]
+packages=avahi-tools
 # ********************
 [mandriva:2008.1]
 code_name=
@@ -4379,6 +4429,8 @@ packages=cups-devel
 [mandriva:2008.1:network]
 packages=wget
 
+[mandriva:2008.1:avahi-utils]
+packages=avahi-tools
 # ********************
 [mandriva:2009]
 code_name=
@@ -4494,6 +4546,8 @@ packages=policykit,policykit-gnome
 [mandriva:2009:network]
 packages=wget
 
+[mandriva:2009:avahi-utils]
+packages=avahi-tools
 # ********************
 [mandriva:2009.0]
 code_name=
@@ -4609,6 +4663,8 @@ packages=policykit,policykit-gnome
 [mandriva:2009.0:network]
 packages=wget
 
+[mandriva:2009.0:avahi-utils]
+packages=avahi-tools
 # ********************
 [mandriva:2010.0]
 code_name=
@@ -4724,6 +4780,8 @@ packages=policykit,policykit-gnome
 [mandriva:2010.0:network]
 packages=wget
 
+[mandriva:2010.0:avahi-utils]
+packages=avahi-tools
 # ********************
 [mandriva:2011.0]
 code_name=
@@ -4839,6 +4897,8 @@ packages=policykit,policykit-gnome
 [mandriva:2011.0:network]
 packages=wget
 
+[mandriva:2011.0:avahi-utils]
+packages=avahi-tools
 # ****************************************
 [linuxmint]
 index=22
@@ -4979,6 +5039,8 @@ packages=python-notify
 [linuxmint:13:network]
 packages=wget
 
+[linuxmint:13:avahi-utils]
+packages=avahi-utils
 # ****************************************
 
 [linuxmint:14]
@@ -4987,9 +5049,6 @@ supported=1
 packaged_version=3.13.3
 release_date=2012
 same_as_version=13
-
-
-
 
 # ****************************************
 
@@ -5110,6 +5169,8 @@ packages=python-notify
 [linuxmint:15:network]
 packages=wget
 
+[linuxmint:15:avahi-utils]
+packages=avahi-utils
 # ****************************************
 
 [linpus]
@@ -5244,6 +5305,8 @@ packages=
 [linpus:9.5:network]
 packages=wget
 
+[linpus:9.5:avahi-utils]
+packages=avahi-tools
 # ********************
 [linpus:9.4]
 code_name=Linpus
@@ -5357,6 +5420,8 @@ packages=
 [linpus:9.4:network]
 packages=wget
 
+[linpus:9.4:avahi-utils]
+packages=avahi-tools
 # ****************************************
 [gos]
 index=24
@@ -5488,6 +5553,8 @@ packages=libcupsys2-dev,cupsys-bsd
 [gos:8.04.1:network]
 packages=wget
 
+[gos:8.04.1:avahi-utils]
+packages=avahi
 # ****************************************
 [boss]
 index=34
@@ -5619,6 +5686,8 @@ packages=libcupsimage2-dev
 [boss:3.0:network]
 packages=wget
 
+[boss:3.0:avahi-utils]
+packages=avahi
 # ****************************************
 [lfs]
 index=50
@@ -5755,3 +5824,6 @@ packages=python-notify
 
 [lfs:6:network]
 packages=wget
+
+[lfs:6:avahi-utils]
+packages=avahi

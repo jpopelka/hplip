@@ -276,12 +276,12 @@ class PluginHandle(object):
 
     def download(self, pluginPath='',callback = None):
         core = core_install.CoreInstall()
-        sts, url, checksum = self.__getPluginInformation(callback)
 
         if pluginPath:#     and os.path.exists(pluginPath):
             src = pluginPath
             checksum = ""       # TBD: Local copy may have different checksum. So ignoring checksum
         else:
+            sts, url, checksum = self.__getPluginInformation(callback)
             src = url
             if sts != PLUGIN_INSTALL_ERROR_NONE:
                 return sts, ""

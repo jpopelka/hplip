@@ -421,7 +421,7 @@ class SetupDialog(QDialog, Ui_Dialog):
     def setNetworkDiscovery(self, enabled):
         self.NetworkDiscoveryMethodLabel.setEnabled(enabled)
         self.NetworkDiscoveryMethodComboBox.setEnabled(enabled)
-        self.NetworkDiscoveryMethodComboBox.setCurrentIndex(1)
+        self.NetworkDiscoveryMethodComboBox.setCurrentIndex(0)
 
 
     def UsbRadioButton_toggled(self, radio_enabled):
@@ -525,8 +525,10 @@ class SetupDialog(QDialog, Ui_Dialog):
                     if self.bus == 'net':
                         if self.discovery_method == 0:
                             net_search_type = "slp"
-                        else:
+                        elif self.discovery_method == 1:
                             net_search_type = "mdns"
+                        else:
+                            net_search_type = "avahi"
 
                         log.info("Searching... (bus=%s, timeout=%d, ttl=%d, search=%s desc=%d, method=%s)" %
                                  (self.bus,  self.timeout, self.ttl, self.search or "(None)",
