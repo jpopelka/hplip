@@ -134,6 +134,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-deskjet_3940.ppd.gz \
    ppd/hpcups/hp-deskjet_400.ppd.gz \
    ppd/hpcups/hp-deskjet_400l.ppd.gz \
+   ppd/hpcups/hp-deskjet_4510_series.ppd.gz \
    ppd/hpcups/hp-deskjet_460.ppd.gz \
    ppd/hpcups/hp-deskjet_4610_series.ppd.gz \
    ppd/hpcups/hp-deskjet_4620_series.ppd.gz \
@@ -492,6 +493,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-officejet_4500_k710.ppd.gz \
    ppd/hpcups/hp-officejet_4610_series.ppd.gz \
    ppd/hpcups/hp-officejet_4620_series.ppd.gz \
+   ppd/hpcups/hp-officejet_4630_series.ppd.gz \
    ppd/hpcups/hp-officejet_5100_series.ppd.gz \
    ppd/hpcups/hp-officejet_5105.ppd.gz \
    ppd/hpcups/hp-officejet_5110.ppd.gz \

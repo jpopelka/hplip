@@ -453,7 +453,7 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
             m_DBusComm.sendEvent(EVENT_PRINT_FAILED_MISSING_PLUGIN, "Plugin missing", m_JA.job_id, m_JA.user_name);
 
         }
-        dbglog ("m_Job initialization failed with error = %d", err);
+        dbglog ("m_Job initialization failed with error = %d\n", err);
         ppdClose(m_ppd);
         m_ppd = NULL;
         return err;
@@ -559,7 +559,7 @@ int HPCupsFilter::StartPrintJob(int  argc, char *argv[])
         }
 
         if (m_iLogLevel & BASIC_LOG)
-            dbglog("HPCUPS: processRasterData returned %d, calling closeFilter()", err);
+            dbglog("HPCUPS: processRasterData returned %d, calling closeFilter()\n", err);
 
         closeFilter();
         cupsRasterClose(cups_raster);
@@ -571,7 +571,7 @@ int HPCupsFilter::StartPrintJob(int  argc, char *argv[])
     }
 
     if (m_iLogLevel & BASIC_LOG)
-        dbglog("HPCUPS: StartPrintJob end of job, calling closeFilter()");
+        dbglog("HPCUPS: StartPrintJob end of job, calling closeFilter()\n");
 
     closeFilter();
     cupsRasterClose(cups_raster);
@@ -721,7 +721,7 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
                 //Need to revisit to crosscheck if it is a firmware issue.
 
                 *m_pPrinterBuffer = 0x01;
-                dbglog("First raster data plane.." );
+                dbglog("First raster data plane..\n" );
             }
 
             if (this->isBlankRaster((BYTE *) m_pPrinterBuffer, &cups_header)) {

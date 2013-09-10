@@ -48,6 +48,7 @@ public:
     DRIVER_ERROR    Configure(Pipeline **pipeline);
     DRIVER_ERROR    EndJob();
     DRIVER_ERROR    FormFeed();
+    bool            CanSkipRasters() {return false;}
 protected:
     virtual DRIVER_ERROR addJobSettings();
     void    configureRasterData();

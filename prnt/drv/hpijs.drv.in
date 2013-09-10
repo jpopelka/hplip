@@ -13637,6 +13637,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Photosmart 5522 E-all-in-one Printer)"
     Attribute "Product" "" "(HP Photosmart 5524 E-all-in-one Printer)"
     Attribute "Product" "" "(HP Photosmart 5525 E-all-in-one Printer)"
+    Attribute "Product" "" "(HP Photosmart 5521 E-all-in-one Printer)"
   }
   {
     ModelName "HP Deskjet 5520 Series hpijs"
@@ -14410,6 +14411,26 @@ lity:PenSet=2,Quality:FullBleed=1"
     PCFileName "hp-envy_4500_series-hpijs.ppd"
     Attribute "Product" "" "(HP Envy 4500 E-all-in-one)"
     Attribute "Product" "" "(HP Envy 4502 E-all-in-one)"
+    Attribute "Product" "" "(HP Envy 4504 E-all-in-one)"
+  }
+  {
+    ModelName "HP Deskjet 4510 Series hpijs"
+    Attribute "NickName" "" "HP Deskjet 4510 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Deskjet 4510 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 4510 series;DES:deskjet 4510 series;"
+    PCFileName "hp-deskjet_4510_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 4515 E-all-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 4518 E-all-in-one Printer)"
+  }
+  {
+    ModelName "HP Officejet 4630 Series hpijs"
+    Attribute "NickName" "" "HP Officejet 4630 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Officejet 4630 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 4630 series;DES:officejet 4630 series;"
+    PCFileName "hp-officejet_4630_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Officejet 4630 E-all-in-one)"
+    Attribute "Product" "" "(HP Officejet 4632 E-all-in-one Printer)"
+    Attribute "Product" "" "(HP Officejet 4635 E-all-in-one Printer)"
   }
   {
     ModelName "HP Envy 5530 Series hpijs"
@@ -16328,6 +16349,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     PCFileName "hp-officejet_pro_8600-hpijs.ppd"
     Attribute "Product" "" "(HP Officejet Pro 8600 E-aio n911a)"
     Attribute "Product" "" "(HP Officejet Pro 8600 Plus E-aio n911g)"
+    Attribute "Product" "" "(HP Officejet Pro 8600 Premium E-aio n911n)"
   }
 } // end Ampere		
 
@@ -17092,6 +17114,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Deskjet 1012 Printer)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 1010 Printer Series)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 1015 Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 1018 Printer)"
   }
   {
     ModelName "HP Deskjet 1510 Series hpijs"
@@ -17105,6 +17128,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 1510 All-in-one Printer Series)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 1515 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 1516 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 1518 All-in-one Printer)"
   }
   {
     ModelName "HP Deskjet 2540 Series hpijs"
@@ -17114,6 +17138,9 @@ lity:PenSet=2,Quality:FullBleed=1"
     PCFileName "hp-deskjet_2540_series-hpijs.ppd"
     Attribute "Product" "" "(HP Deskjet 2540 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet 2542 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 2545 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 2546 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 2540 All-in-one Printer Series)"
   }
 
 

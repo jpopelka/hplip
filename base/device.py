@@ -87,7 +87,7 @@ DEFAULT_FILTER = None
 VALID_FILTERS = ('print', 'scan', 'fax', 'pcard', 'copy')
 DEFAULT_BE_FILTER = ('hp',)
 
-pat_deviceuri = re.compile(r"""(.*):/(.*?)/(\S*?)\?(?:serial=(\S*)|device=(\S*)|ip=(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}[^&]*)|zc=(\S+))(?:&port=(\d))?""", re.IGNORECASE)
+pat_deviceuri = re.compile(r"""(.*):/(.*?)/(\S*?)\?(?:serial=(\S*)|device=(\S*)|ip=(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}[^&]*)|zc=(\S+)|hostname=(\S+))(?:&port=(\d))?""", re.IGNORECASE)
 http_pat_url = re.compile(r"""/(.*?)/(\S*?)\?(?:serial=(\S*)|device=(\S*))&loc=(\S*)""", re.IGNORECASE)
 direct_pat = re.compile(r'direct (.*?) "(.*?)" "(.*?)" "(.*?)"', re.IGNORECASE)
 
@@ -255,9 +255,9 @@ def init_dbus(dbus_loop=None):
                 session_bus = dbus.SessionBus(dbus_loop)
         except dbus.exceptions.DBusException, e:
             if os.getuid() != 0:
-                log.error("Unable to connect to dbus session bus.")
+                log.error("Unable to connect to dbus session bus. %s "%e)
             else:
-                log.debug("Unable to connect to dbus session bus (running as root?)")
+                log.debug("Unable to connect to dbus session bus (running as root?). %s "%e)
 
             dbus_avail = False
             return dbus_avail, None,  None
@@ -368,8 +368,19 @@ def makeURI(param, port=1):
             log.debug("Found: %s" % uri)
             found = True
             cups_uri = uri
-        else:
-            log.debug("Not found.")
+
+        else: # Try DNS hostname
+            log.debug("Device not found using mDNS hostname. Trying with DNS hostname %s" % param)
+
+            result_code, uri = hpmudext.make_net_uri(param, port)
+
+            if result_code == hpmudext.HPMUD_R_OK and uri:
+                uri = uri.replace("ip","hostname")
+                log.debug("Found: %s" % uri)
+                found = True
+                cups_uri = uri
+            else:
+                log.debug("Not found.")
 
     if not found:
         log.debug("Trying serial number %s" % param)
@@ -825,9 +836,14 @@ def parseDeviceURI(device_uri):
     serial = m.group(4) or ''
     dev_file = m.group(5) or ''
     host = m.group(6) or ''
-    zc = ''
-    if not host:
-        zc = host = m.group(7) or ''
+    zc = m.group(7) or ''
+    hostname = m.group(8) or ''
+
+    if hostname:
+        host = hostname
+    elif zc:
+        host = zc
+
     port = m.group(8) or 1
 
     if bus == 'net':
@@ -1408,6 +1424,9 @@ class Device(object):
 
     def getDeviceID(self):
         needs_close = False
+        self.raw_deviceID = ''
+        self.deviceID = {}
+
         if self.io_state != IO_STATE_HP_OPEN:
            try:
                self.open()
@@ -1417,10 +1436,7 @@ class Device(object):
 
         result_code, data = hpmudext.get_device_id(self.device_id)
 
-        if result_code != hpmudext.HPMUD_R_OK:
-            self.raw_deviceID = ''
-            self.deviceID = {}
-        else:
+        if result_code == hpmudext.HPMUD_R_OK:
             self.raw_deviceID = data
             self.deviceID = parseDeviceID(data)
 

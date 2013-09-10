@@ -342,8 +342,10 @@ class SetupDialog(QDialog, Ui_Dialog):
 
             name = host
             if bus == 'net':
-                try:
-                    name = socket.gethostbyaddr(host)[0]
+                try:                                        
+                    if device.ip_pat.search(name) is not None:
+                        log.debug("Getting host name from IP address (%s)" % name)
+                        name = socket.gethostbyaddr(host)[0]
                 except (socket.herror, socket.gaierror):
                     pass
 
@@ -615,6 +617,8 @@ class SetupDialog(QDialog, Ui_Dialog):
             self.DevicesTableWidget.setItem(row, device_uri_col, i)
 
             if self.bus == 'net':
+                #if device.ip_pat.search(host) is None:
+                     #host = socket.gethostbyname(host)
                 i = QTableWidgetItem(QString(host))
                 i.setFlags(flags)
                 self.DevicesTableWidget.setItem(row, 1, i)

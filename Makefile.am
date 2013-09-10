@@ -380,16 +380,6 @@ hplip_systraydir = $(systraydir)
 hplip_systray_DATA = hplip-systray.desktop
 endif
 
-# hpipjs (CUPS filter)
-hplipjsdir = $(cupsfilterdir)
-hplipjs_PROGRAMS = hplipjs
-hplipjs_SOURCES = prnt/filters/hplipjs.c
-
-
-# hpcac (CUPS filter, Color Access Control, ie: CLJ 4700)
-cacdir = $(cupsfilterdir)
-dist_cac_SCRIPTS = prnt/filters/hpcac
-
 # hpps (Finishing PS filter)
 findir = $(cupsfilterdir)
 dist_fin_SCRIPTS = prnt/filters/hpps

@@ -364,12 +364,12 @@ static int check_support(int send_notify)
       switch (plugin)
       {
          case HPMUD_PLUGIN_TYPE_REQUIRED:
-            BUG("%s requires a proprietary plugin\n", pm);
-            notify(pm, "requires a proprietary plugin, run hp-setup", 30000);
+            BUG("%s requires a proprietary plugin\n", m);
+            notify(m, "requires a proprietary plugin, run hp-setup", 30000);
             break;
          case HPMUD_PLUGIN_TYPE_OPTIONAL:
-            BUG("%s has a optional proprietary plugin\n", pm);
-            notify(pm, "has a optional proprietary plugin, run hp-setup", 30000);
+            BUG("%s has a optional proprietary plugin\n", m);
+            notify(m, "has a optional proprietary plugin, run hp-setup", 30000);
             break;
          default:
             break;

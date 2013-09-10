@@ -35,6 +35,7 @@
 #include "hpmud.h"
 #include "hpmudi.h"
 
+
 mud_device_vf __attribute__ ((visibility ("hidden"))) jd_mud_device_vf = 
 {
    .open = jd_open,
@@ -79,16 +80,16 @@ static int ReadReply(mud_channel *pc)
    return num;
 }
 
-static int device_id(const char *ip, int port, char *buffer, int size)
+static int device_id(const char *iporhostname, int port, char *buffer, int size)
 {
    int len=0, maxSize, result, dt, status;
    int public_comunity_index = 4; //By default we need to pass community name = "public"
 
    maxSize = (size > 1024) ? 1024 : size;   /* RH8 has a size limit for device id */
 
-   if ((len = GetSnmp(ip, public_comunity_index, (char *)kStatusOID, (unsigned char *)buffer, maxSize, &dt, &status, &result)) == 0)
+   if ((len = GetSnmp(iporhostname, public_comunity_index, (char *)kStatusOID, (unsigned char *)buffer, maxSize, &dt, &status, &result)) == 0)
    {
-      if ((len = GetSnmp(ip, port, (char *)kStatusOID, (unsigned char *)buffer, maxSize, &dt, &status, &result)) == 0)
+      if ((len = GetSnmp(iporhostname, port, (char *)kStatusOID, (unsigned char *)buffer, maxSize, &dt, &status, &result)) == 0)
       {
           BUG("unable to read device-id\n");
       }
@@ -316,14 +317,28 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) jd_channel_close(mud_d
 enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) jd_s_channel_open(mud_channel *pc)
 {
    mud_device *pd = &msp->device[pc->dindex];
-   struct sockaddr_in pin;  
+   struct sockaddr_in pin,tmp_pin;  
+   struct hostent *he;
    char buf[HPMUD_LINE_SIZE];
    int r, len, port;
    enum HPMUD_RESULT stat = HPMUD_R_IO_ERROR;
 
+   bzero(&tmp_pin, sizeof(tmp_pin)); 
    bzero(&pin, sizeof(pin));  
    pin.sin_family = AF_INET;  
-   pin.sin_addr.s_addr = inet_addr(pd->ip);  
+
+   if(inet_pton(AF_INET, pd->ip, &(tmp_pin.sin_addr))) //Returns 0 when IP is invalid.
+        pin.sin_addr.s_addr = inet_addr(pd->ip);  
+   else
+   {
+        if((he=gethostbyname(pd->ip)) == NULL)
+        {
+            BUG("gethostbyname() returned NULL\n");
+            goto bugout;  
+        }
+
+        pin.sin_addr = *((struct in_addr *)he->h_addr);
+   }
 
    switch (pc->index)
    {

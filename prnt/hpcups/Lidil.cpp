@@ -103,7 +103,7 @@ DRIVER_ERROR Lidil::Configure(Pipeline **pipeline)
     if (m_pPM->BaseResX != m_pQA->horizontal_resolution ||
         m_pPM->BaseResY != m_pQA->vertical_resolution)
     {
-        dbglog("Requested resolution not supported with requested printmode");
+        dbglog("Requested resolution not supported with requested printmode\n");
         return UNSUPPORTED_PRINTMODE;
     }
 
@@ -166,7 +166,7 @@ DRIVER_ERROR Lidil::StartJob(SystemServices *pSystemServices, JobAttributes *pJA
 
     if (!selectPrintMode())
     {
-        dbglog("selectPrintMode failed, PrintMode name = %s", m_pQA->print_mode_name);
+        dbglog("selectPrintMode failed, PrintMode name = %s\n", m_pQA->print_mode_name);
         return UNSUPPORTED_PRINTMODE;
     }
     
@@ -174,7 +174,7 @@ DRIVER_ERROR Lidil::StartJob(SystemServices *pSystemServices, JobAttributes *pJA
     if (m_pPM->BaseResX != m_pQA->horizontal_resolution ||
         m_pPM->BaseResY != m_pQA->vertical_resolution)
     {
-        dbglog("Requested resolution not supported with requested printmode");        
+        dbglog("Requested resolution not supported with requested printmode\n");        
 		dbglog(" m_pPM->BaseResX = %d\n",m_pPM->BaseResX);
 		dbglog(" m_pPM->BaseResY = %d\n",m_pPM->BaseResY);
 		dbglog(" m_pQA->horizontal_resolution = %d\n",m_pQA->horizontal_resolution);
@@ -193,7 +193,7 @@ DRIVER_ERROR Lidil::StartJob(SystemServices *pSystemServices, JobAttributes *pJA
     err = allocateSwathBuffers();
     if (err != NO_ERROR)
     {
-        dbglog("allocateSwathBuffers failed, err = %d", err);
+        dbglog("allocateSwathBuffers failed, err = %d\n", err);
         return err;
     }
 
@@ -625,7 +625,7 @@ bool Lidil::selectPrintMode()
 {
     if (m_pJA->printer_platform[0] == 0)
     {
-        dbglog("printer_platform is undefined");
+        dbglog("printer_platform is undefined\n");
         return false;
     }
     for (unsigned int i = 0; i < sizeof(lidil_print_modes_table) / sizeof(lidil_print_modes_table[0]); i++)
@@ -635,7 +635,7 @@ bool Lidil::selectPrintMode()
             return selectPrintMode(i);
         }
     }
-    dbglog("Unsupported printer_platform: %s", m_pJA->printer_platform);
+    dbglog("Unsupported printer_platform: %s\n", m_pJA->printer_platform);
     return false;
 }
 

@@ -265,9 +265,6 @@ static IP_XFORM_TBL * const xformJumpTables[] = {
 void fatalBreakPoint (void)
 {
    /* do nothing */
-#if defined _DEBUG
-    __asm int 3;
-#endif
    PRINT0 (_T("\nhit fatalBreakPoint!\n"));
 }
 

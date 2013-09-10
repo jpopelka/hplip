@@ -1656,7 +1656,7 @@ def StatusType10Media(func): # Low End Data Model
         elif bin_name == "PhotoTray":
             status_block['photo-tray'] = PHOTO_TRAY_ENGAGED
         else:
-            log.error("found invalid bin name '%s'" % bin_name)
+            log.debug("found invalid bin name '%s'" % bin_name)
 
     try:
         elements = tree.findall("Accessories/MediaHandlingDeviceFunctionType")

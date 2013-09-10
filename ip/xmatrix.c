@@ -380,7 +380,7 @@ FUNC_STATUS WORD mat_convert (
 
         while (pwOut < (WORD*)pOutAfter)
         {
-            int prod0, prod1, prod2;
+            int prod0 = 0, prod1 = 0, prod2 = 0;
 
             /* The fixed-point calculations below are as follows:
              *     17.15 = input pixel

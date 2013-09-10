@@ -80,8 +80,6 @@ $print_only_exclude=@epm_print_only_exclude@
 %endif
 %if hpcups-install
 f 0755 root root $cupsfilter/hpcups hpcups
-#f 0755 root root $cupsfilter/hpps hpps
-f 0755 root root $cupsfilter/hplipjs hplipjs
 f 0755 root root $cupsfilter/hpps prnt/filters/hpps
 %endif
 f 0644 root root /etc/hp/hplip.conf hplip.conf

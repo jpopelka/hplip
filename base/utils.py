@@ -463,7 +463,7 @@ def sort_dict_by_value(d):
 
 
 def commafy(val):
-    return unicode(locale.format("%d", val, grouping=True))
+    return locale.format("%d", val, grouping=True).decode(locale.getpreferredencoding())
 
 
 def format_bytes(s, show_bytes=False):

@@ -934,8 +934,12 @@ class SendFaxDialog(QDialog, Ui_Dialog):
     def CheckTimer_timeout(self):
         if not self.busy:
             #log.debug("Checking for incoming faxes...")
-            device_uri, printer_name, event_code, username, job_id, title, timedate, fax_file = \
-                self.service.CheckForWaitingFax(self.device_uri, prop.username, self.last_job_id)
+            try:
+                device_uri, printer_name, event_code, username, job_id, title, timedate, fax_file = \
+                    self.service.CheckForWaitingFax(self.device_uri, prop.username, self.last_job_id)
+            except Exception, e:
+                log.debug("Exception caught in CheckTimer_timeout: %s" % e)
+                fax_file = None
 
             if fax_file:
                 self.last_job_id = 0

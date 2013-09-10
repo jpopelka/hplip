@@ -39,11 +39,10 @@ build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = $(am__EXEEXT_1)
 DIST_COMMON = $(am__configure_deps) $(am__dist_base_DATA_DIST) \
-	$(am__dist_cac_SCRIPTS_DIST) $(am__dist_cmd_SCRIPTS_DIST) \
-	$(am__dist_copier_DATA_DIST) $(am__dist_fax_DATA_DIST) \
-	$(am__dist_fax_filters_DATA_DIST) $(am__dist_fin_SCRIPTS_DIST) \
-	$(am__dist_halpre_DATA_DIST) $(am__dist_home_DATA_DIST) \
-	$(am__dist_hpcupsfaxppd_DATA_DIST) \
+	$(am__dist_cmd_SCRIPTS_DIST) $(am__dist_copier_DATA_DIST) \
+	$(am__dist_fax_DATA_DIST) $(am__dist_fax_filters_DATA_DIST) \
+	$(am__dist_fin_SCRIPTS_DIST) $(am__dist_halpre_DATA_DIST) \
+	$(am__dist_home_DATA_DIST) $(am__dist_hpcupsfaxppd_DATA_DIST) \
 	$(am__dist_hpfax_SCRIPTS_DIST) \
 	$(am__dist_hpijsfaxppd_DATA_DIST) \
 	$(am__dist_hplip_SCRIPTS_DIST) \
@@ -116,8 +115,6 @@ DIST_COMMON = $(am__configure_deps) $(am__dist_base_DATA_DIST) \
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@	ui/setupsettings_base.ui ui/pluginlicenseform_base.ui ui/align13form_base.ui ui/firmwaredialog_base.ui
 
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT4_INSTALL_TRUE@am__append_9 = ui4/*.ui
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@hplipjs_PROGRAMS =  \
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	hplipjs$(EXEEXT)
 @HPIJS_INSTALL_TRUE@bin_PROGRAMS = hpijs$(EXEEXT)
 @HPCUPS_INSTALL_TRUE@hpcups_PROGRAMS = hpcups$(EXEEXT)
 @FAX_BUILD_TRUE@@HPCUPS_INSTALL_TRUE@@HPCUPS_ONLY_BUILD_FALSE@hpcupsfax_PROGRAMS = hpcupsfax$(EXEEXT)
@@ -161,8 +158,7 @@ am__installdirs = "$(DESTDIR)$(cupsextdir)" "$(DESTDIR)$(hpmudextdir)" \
 	"$(DESTDIR)$(pcardextdir)" "$(DESTDIR)$(scanextdir)" \
 	"$(DESTDIR)$(bindir)" "$(DESTDIR)$(hpdir)" \
 	"$(DESTDIR)$(hp_mkuridir)" "$(DESTDIR)$(hpcupsdir)" \
-	"$(DESTDIR)$(hpcupsfaxdir)" "$(DESTDIR)$(hplipjsdir)" \
-	"$(DESTDIR)$(cacdir)" "$(DESTDIR)$(cmddir)" \
+	"$(DESTDIR)$(hpcupsfaxdir)" "$(DESTDIR)$(cmddir)" \
 	"$(DESTDIR)$(findir)" "$(DESTDIR)$(hpfaxdir)" \
 	"$(DESTDIR)$(hplipdir)" "$(DESTDIR)$(plugins4dir)" \
 	"$(DESTDIR)$(ripdir)" "$(DESTDIR)$(pstotiffdir)" \
@@ -380,8 +376,7 @@ scanext_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am__EXEEXT_1 = ptest$(EXEEXT) \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	hppgsz$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS) $(hp_PROGRAMS) $(hp_mkuri_PROGRAMS) \
-	$(hpcups_PROGRAMS) $(hpcupsfax_PROGRAMS) $(hplipjs_PROGRAMS) \
-	$(noinst_PROGRAMS)
+	$(hpcups_PROGRAMS) $(hpcupsfax_PROGRAMS) $(noinst_PROGRAMS)
 am__hp_SOURCES_DIST = prnt/backend/hp.c
 @HPLIP_BUILD_TRUE@am_hp_OBJECTS = hp-hp.$(OBJEXT)
 hp_OBJECTS = $(am_hp_OBJECTS)
@@ -527,11 +522,6 @@ hpijs_OBJECTS = $(am_hpijs_OBJECTS)
 hpijs_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(hpijs_CXXFLAGS) $(CXXFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-am__hplipjs_SOURCES_DIST = prnt/filters/hplipjs.c
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am_hplipjs_OBJECTS =  \
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	hplipjs.$(OBJEXT)
-hplipjs_OBJECTS = $(am_hplipjs_OBJECTS)
-hplipjs_LDADD = $(LDADD)
 am__hppgsz_SOURCES_DIST = prnt/hpijs/PrinterProperties.cpp \
 	prnt/hpijs/PrinterProperties.h prnt/hpijs/bug.h
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am_hppgsz_OBJECTS = hppgsz-PrinterProperties.$(OBJEXT)
@@ -546,7 +536,6 @@ am__ptest_SOURCES_DIST = pcard/ptest.c pcard/ptest.h pcard/fat.c \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	fat.$(OBJEXT)
 ptest_OBJECTS = $(am_ptest_OBJECTS)
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@ptest_DEPENDENCIES = libhpmud.la
-am__dist_cac_SCRIPTS_DIST = prnt/filters/hpcac
 am__dist_cmd_SCRIPTS_DIST = align.py info.py print.py toolbox.py \
 	clean.py colorcal.py unload.py testpage.py makeuri.py check.py \
 	fab.py levels.py sendfax.py setup.py makecopies.py probe.py \
@@ -562,7 +551,7 @@ am__dist_hplip_SCRIPTS_DIST = hpssd.py __init__.py hpdio.py
 am__dist_noinst_SCRIPTS_DIST = dat2drv.py install.py hplip-install \
 	init-suse-firewall init-iptables-firewall
 am__dist_rip_SCRIPTS_DIST = prnt/hpijs/foomatic-rip-hplip
-SCRIPTS = $(dist_cac_SCRIPTS) $(dist_cmd_SCRIPTS) $(dist_fin_SCRIPTS) \
+SCRIPTS = $(dist_cmd_SCRIPTS) $(dist_fin_SCRIPTS) \
 	$(dist_hpfax_SCRIPTS) $(dist_hplip_SCRIPTS) \
 	$(dist_noinst_SCRIPTS) $(dist_plugins4_SCRIPTS) \
 	$(dist_rip_SCRIPTS) $(pstotiff_SCRIPTS)
@@ -593,8 +582,7 @@ SOURCES = $(cupsext_la_SOURCES) $(hpmudext_la_SOURCES) \
 	$(libhpmud_la_SOURCES) $(libsane_hpaio_la_SOURCES) \
 	$(pcardext_la_SOURCES) $(scanext_la_SOURCES) $(hp_SOURCES) \
 	$(hp_mkuri_SOURCES) $(hpcups_SOURCES) $(hpcupsfax_SOURCES) \
-	$(hpijs_SOURCES) $(hplipjs_SOURCES) $(hppgsz_SOURCES) \
-	$(ptest_SOURCES)
+	$(hpijs_SOURCES) $(hppgsz_SOURCES) $(ptest_SOURCES)
 DIST_SOURCES = $(am__cupsext_la_SOURCES_DIST) \
 	$(am__hpmudext_la_SOURCES_DIST) $(libapdk_la_SOURCES) \
 	$(am__libhpip_la_SOURCES_DIST) $(am__libhpmud_la_SOURCES_DIST) \
@@ -602,8 +590,8 @@ DIST_SOURCES = $(am__cupsext_la_SOURCES_DIST) \
 	$(am__pcardext_la_SOURCES_DIST) $(am__scanext_la_SOURCES_DIST) \
 	$(am__hp_SOURCES_DIST) $(am__hp_mkuri_SOURCES_DIST) \
 	$(am__hpcups_SOURCES_DIST) $(am__hpcupsfax_SOURCES_DIST) \
-	$(am__hpijs_SOURCES_DIST) $(am__hplipjs_SOURCES_DIST) \
-	$(am__hppgsz_SOURCES_DIST) $(am__ptest_SOURCES_DIST)
+	$(am__hpijs_SOURCES_DIST) $(am__hppgsz_SOURCES_DIST) \
+	$(am__ptest_SOURCES_DIST)
 am__dist_base_DATA_DIST = base/maint.py base/codes.py base/g.py \
 	base/pml.py base/status.py base/__init__.py base/mfpdtf.py \
 	base/utils.py base/wifi.py base/LedmWifi.py base/device.py \
@@ -714,6 +702,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	prnt/ps/hp-laserjet_100_color_mfp_m175-ps.ppd.gz \
 	prnt/ps/hp-designjet_t920-postscript.ppd.gz \
 	prnt/ps/hp-laserjet_4100_series-ps.ppd.gz \
+	prnt/ps/hp-laserjet_pro_mfp_m435-ps.ppd.gz \
 	prnt/ps/hp-designjet_4520mfp-ps.ppd.gz \
 	prnt/ps/hp-laserjet_2410-ps.ppd.gz \
 	prnt/ps/hp-designjet_t1120ps_24in-ps.ppd.gz \
@@ -745,6 +734,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	prnt/ps/hp-laserjet_2100_series-ps.ppd.gz \
 	prnt/ps/hp-laserjet_3200m-ps.ppd.gz \
 	prnt/ps/hp-laserjet_1320-ps.ppd.gz \
+	prnt/ps/hp-designjet_z5400-postscript.ppd.gz \
 	prnt/ps/hp-designjet_t1200_postscript-ps.ppd.gz \
 	prnt/ps/hp-color_laserjet_cm1015-ps.ppd.gz \
 	prnt/ps/hp-designjet_4500ps.ppd.gz \
@@ -1215,6 +1205,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	ppd/hpijs/hp-photosmart_8700_series-hpijs.ppd.gz \
 	ppd/hpijs/hp-laserjet_1220se-hpijs.ppd.gz \
 	ppd/hpijs/hp-photosmart_7510_series-hpijs.ppd.gz \
+	ppd/hpijs/hp-deskjet_4510_series-hpijs.ppd.gz \
 	ppd/hpijs/hp-laserjet_professional_m1219nfg_mfp-hpijs.ppd.gz \
 	ppd/hpijs/hp-laserjet_9055mfp-hpijs-pcl3.ppd.gz \
 	ppd/hpijs/hp-photosmart_7900_series-hpijs.ppd.gz \
@@ -1565,6 +1556,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	ppd/hpijs/hp-deskjet_5800-hpijs.ppd.gz \
 	ppd/hpijs/hp-laserjet_p2014-hpijs-zxs.ppd.gz \
 	ppd/hpijs/hp-psc_1400_series-hpijs.ppd.gz \
+	ppd/hpijs/hp-officejet_4630_series-hpijs.ppd.gz \
 	ppd/hpijs/hp-envy_100_d410_series-hpijs.ppd.gz \
 	ppd/hpijs/hp-officejet_4000_k210-hpijs.ppd.gz \
 	ppd/hpijs/hp-laserjet_m9059_mfp-hpijs-pcl3.ppd.gz \
@@ -1763,6 +1755,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	ppd/hpcups/hp-deskjet_3940.ppd.gz \
 	ppd/hpcups/hp-deskjet_400.ppd.gz \
 	ppd/hpcups/hp-deskjet_400l.ppd.gz \
+	ppd/hpcups/hp-deskjet_4510_series.ppd.gz \
 	ppd/hpcups/hp-deskjet_460.ppd.gz \
 	ppd/hpcups/hp-deskjet_4610_series.ppd.gz \
 	ppd/hpcups/hp-deskjet_4620_series.ppd.gz \
@@ -2120,6 +2113,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	ppd/hpcups/hp-officejet_4500_k710.ppd.gz \
 	ppd/hpcups/hp-officejet_4610_series.ppd.gz \
 	ppd/hpcups/hp-officejet_4620_series.ppd.gz \
+	ppd/hpcups/hp-officejet_4630_series.ppd.gz \
 	ppd/hpcups/hp-officejet_5100_series.ppd.gz \
 	ppd/hpcups/hp-officejet_5105.ppd.gz \
 	ppd/hpcups/hp-officejet_5110.ppd.gz \
@@ -2952,6 +2946,7 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-photosmart_8700_series-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_1220se-hpijs.ppd.gz \
     ppd/hpijs/hp-photosmart_7510_series-hpijs.ppd.gz \
+    ppd/hpijs/hp-deskjet_4510_series-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_professional_m1219nfg_mfp-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_9055mfp-hpijs-pcl3.ppd.gz \
     ppd/hpijs/hp-photosmart_7900_series-hpijs.ppd.gz \
@@ -3302,6 +3297,7 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-deskjet_5800-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_p2014-hpijs-zxs.ppd.gz \
     ppd/hpijs/hp-psc_1400_series-hpijs.ppd.gz \
+    ppd/hpijs/hp-officejet_4630_series-hpijs.ppd.gz \
     ppd/hpijs/hp-envy_100_d410_series-hpijs.ppd.gz \
     ppd/hpijs/hp-officejet_4000_k210-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_m9059_mfp-hpijs-pcl3.ppd.gz \
@@ -3393,6 +3389,7 @@ foomatic_ps_printers = \
     prnt/ps/hp-laserjet_100_color_mfp_m175-ps.ppd.gz \
     prnt/ps/hp-designjet_t920-postscript.ppd.gz \
     prnt/ps/hp-laserjet_4100_series-ps.ppd.gz \
+    prnt/ps/hp-laserjet_pro_mfp_m435-ps.ppd.gz \
     prnt/ps/hp-designjet_4520mfp-ps.ppd.gz \
     prnt/ps/hp-laserjet_2410-ps.ppd.gz \
     prnt/ps/hp-designjet_t1120ps_24in-ps.ppd.gz \
@@ -3424,6 +3421,7 @@ foomatic_ps_printers = \
     prnt/ps/hp-laserjet_2100_series-ps.ppd.gz \
     prnt/ps/hp-laserjet_3200m-ps.ppd.gz \
     prnt/ps/hp-laserjet_1320-ps.ppd.gz \
+    prnt/ps/hp-designjet_z5400-postscript.ppd.gz \
     prnt/ps/hp-designjet_t1200_postscript-ps.ppd.gz \
     prnt/ps/hp-color_laserjet_cm1015-ps.ppd.gz \
     prnt/ps/hp-designjet_4500ps.ppd.gz \
@@ -3731,6 +3729,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-deskjet_3940.ppd.gz \
    ppd/hpcups/hp-deskjet_400.ppd.gz \
    ppd/hpcups/hp-deskjet_400l.ppd.gz \
+   ppd/hpcups/hp-deskjet_4510_series.ppd.gz \
    ppd/hpcups/hp-deskjet_460.ppd.gz \
    ppd/hpcups/hp-deskjet_4610_series.ppd.gz \
    ppd/hpcups/hp-deskjet_4620_series.ppd.gz \
@@ -4089,6 +4088,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-officejet_4500_k710.ppd.gz \
    ppd/hpcups/hp-officejet_4610_series.ppd.gz \
    ppd/hpcups/hp-officejet_4620_series.ppd.gz \
+   ppd/hpcups/hp-officejet_4630_series.ppd.gz \
    ppd/hpcups/hp-officejet_5100_series.ppd.gz \
    ppd/hpcups/hp-officejet_5105.ppd.gz \
    ppd/hpcups/hp-officejet_5110.ppd.gz \
@@ -4600,14 +4600,6 @@ cups_drv = prnt/drv/hpcups.drv
 # hplip-systray.desktop
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@hplip_systraydir = $(systraydir)
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@hplip_systray_DATA = hplip-systray.desktop
-
-# hpipjs (CUPS filter)
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@hplipjsdir = $(cupsfilterdir)
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@hplipjs_SOURCES = prnt/filters/hplipjs.c
-
-# hpcac (CUPS filter, Color Access Control, ie: CLJ 4700)
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@cacdir = $(cupsfilterdir)
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@dist_cac_SCRIPTS = prnt/filters/hpcac
 
 # hpps (Finishing PS filter)
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@findir = $(cupsfilterdir)
@@ -5209,49 +5201,6 @@ clean-hpcupsfaxPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-install-hplipjsPROGRAMS: $(hplipjs_PROGRAMS)
-	@$(NORMAL_INSTALL)
-	test -z "$(hplipjsdir)" || $(MKDIR_P) "$(DESTDIR)$(hplipjsdir)"
-	@list='$(hplipjs_PROGRAMS)'; test -n "$(hplipjsdir)" || list=; \
-	for p in $$list; do echo "$$p $$p"; done | \
-	sed 's/$(EXEEXT)$$//' | \
-	while read p p1; do if test -f $$p || test -f $$p1; \
-	  then echo "$$p"; echo "$$p"; else :; fi; \
-	done | \
-	sed -e 'p;s,.*/,,;n;h' -e 's|.*|.|' \
-	    -e 'p;x;s,.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/' | \
-	sed 'N;N;N;s,\n, ,g' | \
-	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1 } \
-	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
-	    if ($$2 == $$4) files[d] = files[d] " " $$1; \
-	    else { print "f", $$3 "/" $$4, $$1; } } \
-	  END { for (d in files) print "f", d, files[d] }' | \
-	while read type dir files; do \
-	    if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
-	    test -z "$$files" || { \
-	    echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(hplipjsdir)$$dir'"; \
-	    $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(hplipjsdir)$$dir" || exit $$?; \
-	    } \
-	; done
-
-uninstall-hplipjsPROGRAMS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(hplipjs_PROGRAMS)'; test -n "$(hplipjsdir)" || list=; \
-	files=`for p in $$list; do echo "$$p"; done | \
-	  sed -e 'h;s,^.*/,,;s/$(EXEEXT)$$//;$(transform)' \
-	      -e 's/$$/$(EXEEXT)/' `; \
-	test -n "$$list" || exit 0; \
-	echo " ( cd '$(DESTDIR)$(hplipjsdir)' && rm -f" $$files ")"; \
-	cd "$(DESTDIR)$(hplipjsdir)" && rm -f $$files
-
-clean-hplipjsPROGRAMS:
-	@list='$(hplipjs_PROGRAMS)'; test -n "$$list" || exit 0; \
-	echo " rm -f" $$list; \
-	rm -f $$list || exit $$?; \
-	test -n "$(EXEEXT)" || exit 0; \
-	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
-	echo " rm -f" $$list; \
-	rm -f $$list
 
 clean-noinstPROGRAMS:
 	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
@@ -5276,49 +5225,12 @@ hpcupsfax$(EXEEXT): $(hpcupsfax_OBJECTS) $(hpcupsfax_DEPENDENCIES)
 hpijs$(EXEEXT): $(hpijs_OBJECTS) $(hpijs_DEPENDENCIES) 
 	@rm -f hpijs$(EXEEXT)
 	$(hpijs_LINK) $(hpijs_OBJECTS) $(hpijs_LDADD) $(LIBS)
-hplipjs$(EXEEXT): $(hplipjs_OBJECTS) $(hplipjs_DEPENDENCIES) 
-	@rm -f hplipjs$(EXEEXT)
-	$(LINK) $(hplipjs_OBJECTS) $(hplipjs_LDADD) $(LIBS)
 hppgsz$(EXEEXT): $(hppgsz_OBJECTS) $(hppgsz_DEPENDENCIES) 
 	@rm -f hppgsz$(EXEEXT)
 	$(hppgsz_LINK) $(hppgsz_OBJECTS) $(hppgsz_LDADD) $(LIBS)
 ptest$(EXEEXT): $(ptest_OBJECTS) $(ptest_DEPENDENCIES) 
 	@rm -f ptest$(EXEEXT)
 	$(LINK) $(ptest_OBJECTS) $(ptest_LDADD) $(LIBS)
-install-dist_cacSCRIPTS: $(dist_cac_SCRIPTS)
-	@$(NORMAL_INSTALL)
-	test -z "$(cacdir)" || $(MKDIR_P) "$(DESTDIR)$(cacdir)"
-	@list='$(dist_cac_SCRIPTS)'; test -n "$(cacdir)" || list=; \
-	for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  if test -f "$$d$$p"; then echo "$$d$$p"; echo "$$p"; else :; fi; \
-	done | \
-	sed -e 'p;s,.*/,,;n' \
-	    -e 'h;s|.*|.|' \
-	    -e 'p;x;s,.*/,,;$(transform)' | sed 'N;N;N;s,\n, ,g' | \
-	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1; } \
-	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
-	    if ($$2 == $$4) { files[d] = files[d] " " $$1; \
-	      if (++n[d] == $(am__install_max)) { \
-		print "f", d, files[d]; n[d] = 0; files[d] = "" } } \
-	    else { print "f", d "/" $$4, $$1 } } \
-	  END { for (d in files) print "f", d, files[d] }' | \
-	while read type dir files; do \
-	     if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
-	     test -z "$$files" || { \
-	       echo " $(INSTALL_SCRIPT) $$files '$(DESTDIR)$(cacdir)$$dir'"; \
-	       $(INSTALL_SCRIPT) $$files "$(DESTDIR)$(cacdir)$$dir" || exit $$?; \
-	     } \
-	; done
-
-uninstall-dist_cacSCRIPTS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(dist_cac_SCRIPTS)'; test -n "$(cacdir)" || exit 0; \
-	files=`for p in $$list; do echo "$$p"; done | \
-	       sed -e 's,.*/,,;$(transform)'`; \
-	test -n "$$list" || exit 0; \
-	echo " ( cd '$(DESTDIR)$(cacdir)' && rm -f" $$files ")"; \
-	cd "$(DESTDIR)$(cacdir)" && rm -f $$files
 install-dist_cmdSCRIPTS: $(dist_cmd_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	test -z "$(cmddir)" || $(MKDIR_P) "$(DESTDIR)$(cmddir)"
@@ -5619,7 +5531,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hpijs-ijs_server.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hpijs-services.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hpijs-utils.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hplipjs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hpmudext_la-hpmudext.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hppgsz-PrinterProperties.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ipmain.Plo@am__quote@
@@ -6353,20 +6264,6 @@ hpijs-utils.obj: common/utils.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='common/utils.c' object='hpijs-utils.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hpijs_CFLAGS) $(CFLAGS) -c -o hpijs-utils.obj `if test -f 'common/utils.c'; then $(CYGPATH_W) 'common/utils.c'; else $(CYGPATH_W) '$(srcdir)/common/utils.c'; fi`
-
-hplipjs.o: prnt/filters/hplipjs.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT hplipjs.o -MD -MP -MF $(DEPDIR)/hplipjs.Tpo -c -o hplipjs.o `test -f 'prnt/filters/hplipjs.c' || echo '$(srcdir)/'`prnt/filters/hplipjs.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/hplipjs.Tpo $(DEPDIR)/hplipjs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='prnt/filters/hplipjs.c' object='hplipjs.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o hplipjs.o `test -f 'prnt/filters/hplipjs.c' || echo '$(srcdir)/'`prnt/filters/hplipjs.c
-
-hplipjs.obj: prnt/filters/hplipjs.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT hplipjs.obj -MD -MP -MF $(DEPDIR)/hplipjs.Tpo -c -o hplipjs.obj `if test -f 'prnt/filters/hplipjs.c'; then $(CYGPATH_W) 'prnt/filters/hplipjs.c'; else $(CYGPATH_W) '$(srcdir)/prnt/filters/hplipjs.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/hplipjs.Tpo $(DEPDIR)/hplipjs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='prnt/filters/hplipjs.c' object='hplipjs.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o hplipjs.obj `if test -f 'prnt/filters/hplipjs.c'; then $(CYGPATH_W) 'prnt/filters/hplipjs.c'; else $(CYGPATH_W) '$(srcdir)/prnt/filters/hplipjs.c'; fi`
 
 ptest.o: pcard/ptest.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ptest.o -MD -MP -MF $(DEPDIR)/ptest.Tpo -c -o ptest.o `test -f 'pcard/ptest.c' || echo '$(srcdir)/'`pcard/ptest.c
@@ -8709,7 +8606,7 @@ all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(SCRIPTS) $(DATA)
 install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs:
-	for dir in "$(DESTDIR)$(cupsextdir)" "$(DESTDIR)$(hpmudextdir)" "$(DESTDIR)$(libdir)" "$(DESTDIR)$(libsane_hpaiodir)" "$(DESTDIR)$(pcardextdir)" "$(DESTDIR)$(scanextdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(hpdir)" "$(DESTDIR)$(hp_mkuridir)" "$(DESTDIR)$(hpcupsdir)" "$(DESTDIR)$(hpcupsfaxdir)" "$(DESTDIR)$(hplipjsdir)" "$(DESTDIR)$(cacdir)" "$(DESTDIR)$(cmddir)" "$(DESTDIR)$(findir)" "$(DESTDIR)$(hpfaxdir)" "$(DESTDIR)$(hplipdir)" "$(DESTDIR)$(plugins4dir)" "$(DESTDIR)$(ripdir)" "$(DESTDIR)$(pstotiffdir)" "$(DESTDIR)$(cupsdrvdir)" "$(DESTDIR)$(cupsdrv2dir)" "$(DESTDIR)$(basedir)" "$(DESTDIR)$(copierdir)" "$(DESTDIR)$(faxdir)" "$(DESTDIR)$(fax_filtersdir)" "$(DESTDIR)$(halpredir)" "$(DESTDIR)$(homedir)" "$(DESTDIR)$(hpcupsfaxppddir)" "$(DESTDIR)$(hpijsfaxppddir)" "$(DESTDIR)$(hplip_Logdir)" "$(DESTDIR)$(hplip_statedir)" "$(DESTDIR)$(hplip_tmpdir)" "$(DESTDIR)$(images_128x128dir)" "$(DESTDIR)$(images_16x16dir)" "$(DESTDIR)$(images_24x24dir)" "$(DESTDIR)$(images_256x256dir)" "$(DESTDIR)$(images_32x32dir)" "$(DESTDIR)$(images_64x64dir)" "$(DESTDIR)$(images_devicesdir)" "$(DESTDIR)$(images_otherdir)" "$(DESTDIR)$(installdir)" "$(DESTDIR)$(ldldir)" "$(DESTDIR)$(localzdir)" "$(DESTDIR)$(modelsdir)" "$(DESTDIR)$(pcarddir)" "$(DESTDIR)$(pcldir)" "$(DESTDIR)$(pluginsdir)" "$(DESTDIR)$(policykit_dbus_etcdir)" "$(DESTDIR)$(policykit_dbus_sharedir)" "$(DESTDIR)$(policykit_policydir)" "$(DESTDIR)$(postscriptdir)" "$(DESTDIR)$(ppddir)" "$(DESTDIR)$(prntdir)" "$(DESTDIR)$(rulesdir)" "$(DESTDIR)$(rulessystemdir)" "$(DESTDIR)$(scandir)" "$(DESTDIR)$(uidir)" "$(DESTDIR)$(ui4dir)" "$(DESTDIR)$(unreldir)" "$(DESTDIR)$(www0dir)" "$(DESTDIR)$(www3dir)" "$(DESTDIR)$(www4dir)" "$(DESTDIR)$(docdir)" "$(DESTDIR)$(hplip_confdir)" "$(DESTDIR)$(hplip_desktopdir)" "$(DESTDIR)$(hplip_systraydir)"; do \
+	for dir in "$(DESTDIR)$(cupsextdir)" "$(DESTDIR)$(hpmudextdir)" "$(DESTDIR)$(libdir)" "$(DESTDIR)$(libsane_hpaiodir)" "$(DESTDIR)$(pcardextdir)" "$(DESTDIR)$(scanextdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(hpdir)" "$(DESTDIR)$(hp_mkuridir)" "$(DESTDIR)$(hpcupsdir)" "$(DESTDIR)$(hpcupsfaxdir)" "$(DESTDIR)$(cmddir)" "$(DESTDIR)$(findir)" "$(DESTDIR)$(hpfaxdir)" "$(DESTDIR)$(hplipdir)" "$(DESTDIR)$(plugins4dir)" "$(DESTDIR)$(ripdir)" "$(DESTDIR)$(pstotiffdir)" "$(DESTDIR)$(cupsdrvdir)" "$(DESTDIR)$(cupsdrv2dir)" "$(DESTDIR)$(basedir)" "$(DESTDIR)$(copierdir)" "$(DESTDIR)$(faxdir)" "$(DESTDIR)$(fax_filtersdir)" "$(DESTDIR)$(halpredir)" "$(DESTDIR)$(homedir)" "$(DESTDIR)$(hpcupsfaxppddir)" "$(DESTDIR)$(hpijsfaxppddir)" "$(DESTDIR)$(hplip_Logdir)" "$(DESTDIR)$(hplip_statedir)" "$(DESTDIR)$(hplip_tmpdir)" "$(DESTDIR)$(images_128x128dir)" "$(DESTDIR)$(images_16x16dir)" "$(DESTDIR)$(images_24x24dir)" "$(DESTDIR)$(images_256x256dir)" "$(DESTDIR)$(images_32x32dir)" "$(DESTDIR)$(images_64x64dir)" "$(DESTDIR)$(images_devicesdir)" "$(DESTDIR)$(images_otherdir)" "$(DESTDIR)$(installdir)" "$(DESTDIR)$(ldldir)" "$(DESTDIR)$(localzdir)" "$(DESTDIR)$(modelsdir)" "$(DESTDIR)$(pcarddir)" "$(DESTDIR)$(pcldir)" "$(DESTDIR)$(pluginsdir)" "$(DESTDIR)$(policykit_dbus_etcdir)" "$(DESTDIR)$(policykit_dbus_sharedir)" "$(DESTDIR)$(policykit_policydir)" "$(DESTDIR)$(postscriptdir)" "$(DESTDIR)$(ppddir)" "$(DESTDIR)$(prntdir)" "$(DESTDIR)$(rulesdir)" "$(DESTDIR)$(rulessystemdir)" "$(DESTDIR)$(scandir)" "$(DESTDIR)$(uidir)" "$(DESTDIR)$(ui4dir)" "$(DESTDIR)$(unreldir)" "$(DESTDIR)$(www0dir)" "$(DESTDIR)$(www3dir)" "$(DESTDIR)$(www4dir)" "$(DESTDIR)$(docdir)" "$(DESTDIR)$(hplip_confdir)" "$(DESTDIR)$(hplip_desktopdir)" "$(DESTDIR)$(hplip_systraydir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -8741,10 +8638,9 @@ clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-cupsextLTLIBRARIES clean-generic \
 	clean-hpPROGRAMS clean-hp_mkuriPROGRAMS clean-hpcupsPROGRAMS \
-	clean-hpcupsfaxPROGRAMS clean-hplipjsPROGRAMS \
-	clean-hpmudextLTLIBRARIES clean-libLTLIBRARIES \
-	clean-libsane_hpaioLTLIBRARIES clean-libtool \
-	clean-noinstLTLIBRARIES clean-noinstPROGRAMS \
+	clean-hpcupsfaxPROGRAMS clean-hpmudextLTLIBRARIES \
+	clean-libLTLIBRARIES clean-libsane_hpaioLTLIBRARIES \
+	clean-libtool clean-noinstLTLIBRARIES clean-noinstPROGRAMS \
 	clean-pcardextLTLIBRARIES clean-scanextLTLIBRARIES \
 	mostlyclean-am
 
@@ -8769,22 +8665,22 @@ info-am:
 
 install-data-am: install-cupsdrv2DATA install-cupsdrvDATA \
 	install-cupsextLTLIBRARIES install-dist_baseDATA \
-	install-dist_cacSCRIPTS install-dist_cmdSCRIPTS \
-	install-dist_copierDATA install-dist_faxDATA \
-	install-dist_fax_filtersDATA install-dist_finSCRIPTS \
-	install-dist_halpreDATA install-dist_homeDATA \
-	install-dist_hpcupsfaxppdDATA install-dist_hpfaxSCRIPTS \
-	install-dist_hpijsfaxppdDATA install-dist_hplipSCRIPTS \
-	install-dist_hplip_LogDATA install-dist_hplip_stateDATA \
-	install-dist_hplip_tmpDATA install-dist_images_128x128DATA \
-	install-dist_images_16x16DATA install-dist_images_24x24DATA \
-	install-dist_images_256x256DATA install-dist_images_32x32DATA \
-	install-dist_images_64x64DATA install-dist_images_devicesDATA \
-	install-dist_images_otherDATA install-dist_installDATA \
-	install-dist_ldlDATA install-dist_localzDATA \
-	install-dist_modelsDATA install-dist_pcardDATA \
-	install-dist_pclDATA install-dist_plugins4SCRIPTS \
-	install-dist_pluginsDATA install-dist_policykit_dbus_etcDATA \
+	install-dist_cmdSCRIPTS install-dist_copierDATA \
+	install-dist_faxDATA install-dist_fax_filtersDATA \
+	install-dist_finSCRIPTS install-dist_halpreDATA \
+	install-dist_homeDATA install-dist_hpcupsfaxppdDATA \
+	install-dist_hpfaxSCRIPTS install-dist_hpijsfaxppdDATA \
+	install-dist_hplipSCRIPTS install-dist_hplip_LogDATA \
+	install-dist_hplip_stateDATA install-dist_hplip_tmpDATA \
+	install-dist_images_128x128DATA install-dist_images_16x16DATA \
+	install-dist_images_24x24DATA install-dist_images_256x256DATA \
+	install-dist_images_32x32DATA install-dist_images_64x64DATA \
+	install-dist_images_devicesDATA install-dist_images_otherDATA \
+	install-dist_installDATA install-dist_ldlDATA \
+	install-dist_localzDATA install-dist_modelsDATA \
+	install-dist_pcardDATA install-dist_pclDATA \
+	install-dist_plugins4SCRIPTS install-dist_pluginsDATA \
+	install-dist_policykit_dbus_etcDATA \
 	install-dist_policykit_dbus_shareDATA \
 	install-dist_policykit_policyDATA install-dist_postscriptDATA \
 	install-dist_ppdDATA install-dist_prntDATA \
@@ -8796,10 +8692,9 @@ install-data-am: install-cupsdrv2DATA install-cupsdrvDATA \
 	install-hpPROGRAMS install-hp_mkuriPROGRAMS \
 	install-hpcupsPROGRAMS install-hpcupsfaxPROGRAMS \
 	install-hplip_confDATA install-hplip_desktopDATA \
-	install-hplip_systrayDATA install-hplipjsPROGRAMS \
-	install-hpmudextLTLIBRARIES install-libsane_hpaioLTLIBRARIES \
-	install-pcardextLTLIBRARIES install-pstotiffSCRIPTS \
-	install-scanextLTLIBRARIES
+	install-hplip_systrayDATA install-hpmudextLTLIBRARIES \
+	install-libsane_hpaioLTLIBRARIES install-pcardextLTLIBRARIES \
+	install-pstotiffSCRIPTS install-scanextLTLIBRARIES
 	@$(NORMAL_INSTALL)
 	$(MAKE) $(AM_MAKEFLAGS) install-data-hook
 install-dvi: install-dvi-am
@@ -8850,15 +8745,14 @@ ps-am:
 
 uninstall-am: uninstall-binPROGRAMS uninstall-cupsdrv2DATA \
 	uninstall-cupsdrvDATA uninstall-cupsextLTLIBRARIES \
-	uninstall-dist_baseDATA uninstall-dist_cacSCRIPTS \
-	uninstall-dist_cmdSCRIPTS uninstall-dist_copierDATA \
-	uninstall-dist_faxDATA uninstall-dist_fax_filtersDATA \
-	uninstall-dist_finSCRIPTS uninstall-dist_halpreDATA \
-	uninstall-dist_homeDATA uninstall-dist_hpcupsfaxppdDATA \
-	uninstall-dist_hpfaxSCRIPTS uninstall-dist_hpijsfaxppdDATA \
-	uninstall-dist_hplipSCRIPTS uninstall-dist_hplip_LogDATA \
-	uninstall-dist_hplip_stateDATA uninstall-dist_hplip_tmpDATA \
-	uninstall-dist_images_128x128DATA \
+	uninstall-dist_baseDATA uninstall-dist_cmdSCRIPTS \
+	uninstall-dist_copierDATA uninstall-dist_faxDATA \
+	uninstall-dist_fax_filtersDATA uninstall-dist_finSCRIPTS \
+	uninstall-dist_halpreDATA uninstall-dist_homeDATA \
+	uninstall-dist_hpcupsfaxppdDATA uninstall-dist_hpfaxSCRIPTS \
+	uninstall-dist_hpijsfaxppdDATA uninstall-dist_hplipSCRIPTS \
+	uninstall-dist_hplip_LogDATA uninstall-dist_hplip_stateDATA \
+	uninstall-dist_hplip_tmpDATA uninstall-dist_images_128x128DATA \
 	uninstall-dist_images_16x16DATA \
 	uninstall-dist_images_24x24DATA \
 	uninstall-dist_images_256x256DATA \
@@ -8883,8 +8777,8 @@ uninstall-am: uninstall-binPROGRAMS uninstall-cupsdrv2DATA \
 	uninstall-hp_mkuriPROGRAMS uninstall-hpcupsPROGRAMS \
 	uninstall-hpcupsfaxPROGRAMS uninstall-hplip_confDATA \
 	uninstall-hplip_desktopDATA uninstall-hplip_systrayDATA \
-	uninstall-hplipjsPROGRAMS uninstall-hpmudextLTLIBRARIES \
-	uninstall-libLTLIBRARIES uninstall-libsane_hpaioLTLIBRARIES \
+	uninstall-hpmudextLTLIBRARIES uninstall-libLTLIBRARIES \
+	uninstall-libsane_hpaioLTLIBRARIES \
 	uninstall-pcardextLTLIBRARIES uninstall-pstotiffSCRIPTS \
 	uninstall-scanextLTLIBRARIES
 	@$(NORMAL_INSTALL)
@@ -8894,10 +8788,9 @@ uninstall-am: uninstall-binPROGRAMS uninstall-cupsdrv2DATA \
 .PHONY: CTAGS GTAGS all all-am am--refresh check check-am clean \
 	clean-binPROGRAMS clean-cupsextLTLIBRARIES clean-generic \
 	clean-hpPROGRAMS clean-hp_mkuriPROGRAMS clean-hpcupsPROGRAMS \
-	clean-hpcupsfaxPROGRAMS clean-hplipjsPROGRAMS \
-	clean-hpmudextLTLIBRARIES clean-libLTLIBRARIES \
-	clean-libsane_hpaioLTLIBRARIES clean-libtool \
-	clean-noinstLTLIBRARIES clean-noinstPROGRAMS \
+	clean-hpcupsfaxPROGRAMS clean-hpmudextLTLIBRARIES \
+	clean-libLTLIBRARIES clean-libsane_hpaioLTLIBRARIES \
+	clean-libtool clean-noinstLTLIBRARIES clean-noinstPROGRAMS \
 	clean-pcardextLTLIBRARIES clean-scanextLTLIBRARIES ctags dist \
 	dist-all dist-bzip2 dist-gzip dist-lzma dist-shar dist-tarZ \
 	dist-xz dist-zip distcheck distclean distclean-compile \
@@ -8907,22 +8800,22 @@ uninstall-am: uninstall-binPROGRAMS uninstall-cupsdrv2DATA \
 	install-cupsdrv2DATA install-cupsdrvDATA \
 	install-cupsextLTLIBRARIES install-data install-data-am \
 	install-data-hook install-dist_baseDATA \
-	install-dist_cacSCRIPTS install-dist_cmdSCRIPTS \
-	install-dist_copierDATA install-dist_faxDATA \
-	install-dist_fax_filtersDATA install-dist_finSCRIPTS \
-	install-dist_halpreDATA install-dist_homeDATA \
-	install-dist_hpcupsfaxppdDATA install-dist_hpfaxSCRIPTS \
-	install-dist_hpijsfaxppdDATA install-dist_hplipSCRIPTS \
-	install-dist_hplip_LogDATA install-dist_hplip_stateDATA \
-	install-dist_hplip_tmpDATA install-dist_images_128x128DATA \
-	install-dist_images_16x16DATA install-dist_images_24x24DATA \
-	install-dist_images_256x256DATA install-dist_images_32x32DATA \
-	install-dist_images_64x64DATA install-dist_images_devicesDATA \
-	install-dist_images_otherDATA install-dist_installDATA \
-	install-dist_ldlDATA install-dist_localzDATA \
-	install-dist_modelsDATA install-dist_pcardDATA \
-	install-dist_pclDATA install-dist_plugins4SCRIPTS \
-	install-dist_pluginsDATA install-dist_policykit_dbus_etcDATA \
+	install-dist_cmdSCRIPTS install-dist_copierDATA \
+	install-dist_faxDATA install-dist_fax_filtersDATA \
+	install-dist_finSCRIPTS install-dist_halpreDATA \
+	install-dist_homeDATA install-dist_hpcupsfaxppdDATA \
+	install-dist_hpfaxSCRIPTS install-dist_hpijsfaxppdDATA \
+	install-dist_hplipSCRIPTS install-dist_hplip_LogDATA \
+	install-dist_hplip_stateDATA install-dist_hplip_tmpDATA \
+	install-dist_images_128x128DATA install-dist_images_16x16DATA \
+	install-dist_images_24x24DATA install-dist_images_256x256DATA \
+	install-dist_images_32x32DATA install-dist_images_64x64DATA \
+	install-dist_images_devicesDATA install-dist_images_otherDATA \
+	install-dist_installDATA install-dist_ldlDATA \
+	install-dist_localzDATA install-dist_modelsDATA \
+	install-dist_pcardDATA install-dist_pclDATA \
+	install-dist_plugins4SCRIPTS install-dist_pluginsDATA \
+	install-dist_policykit_dbus_etcDATA \
 	install-dist_policykit_dbus_shareDATA \
 	install-dist_policykit_policyDATA install-dist_postscriptDATA \
 	install-dist_ppdDATA install-dist_prntDATA \
@@ -8935,20 +8828,19 @@ uninstall-am: uninstall-binPROGRAMS uninstall-cupsdrv2DATA \
 	install-hpPROGRAMS install-hp_mkuriPROGRAMS \
 	install-hpcupsPROGRAMS install-hpcupsfaxPROGRAMS \
 	install-hplip_confDATA install-hplip_desktopDATA \
-	install-hplip_systrayDATA install-hplipjsPROGRAMS \
-	install-hpmudextLTLIBRARIES install-html install-html-am \
-	install-info install-info-am install-libLTLIBRARIES \
-	install-libsane_hpaioLTLIBRARIES install-man \
-	install-pcardextLTLIBRARIES install-pdf install-pdf-am \
-	install-ps install-ps-am install-pstotiffSCRIPTS \
-	install-scanextLTLIBRARIES install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-binPROGRAMS \
-	uninstall-cupsdrv2DATA uninstall-cupsdrvDATA \
-	uninstall-cupsextLTLIBRARIES uninstall-dist_baseDATA \
-	uninstall-dist_cacSCRIPTS uninstall-dist_cmdSCRIPTS \
+	install-hplip_systrayDATA install-hpmudextLTLIBRARIES \
+	install-html install-html-am install-info install-info-am \
+	install-libLTLIBRARIES install-libsane_hpaioLTLIBRARIES \
+	install-man install-pcardextLTLIBRARIES install-pdf \
+	install-pdf-am install-ps install-ps-am \
+	install-pstotiffSCRIPTS install-scanextLTLIBRARIES \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-binPROGRAMS uninstall-cupsdrv2DATA \
+	uninstall-cupsdrvDATA uninstall-cupsextLTLIBRARIES \
+	uninstall-dist_baseDATA uninstall-dist_cmdSCRIPTS \
 	uninstall-dist_copierDATA uninstall-dist_faxDATA \
 	uninstall-dist_fax_filtersDATA uninstall-dist_finSCRIPTS \
 	uninstall-dist_halpreDATA uninstall-dist_homeDATA \
@@ -8980,9 +8872,8 @@ uninstall-am: uninstall-binPROGRAMS uninstall-cupsdrv2DATA \
 	uninstall-hpPROGRAMS uninstall-hp_mkuriPROGRAMS \
 	uninstall-hpcupsPROGRAMS uninstall-hpcupsfaxPROGRAMS \
 	uninstall-hplip_confDATA uninstall-hplip_desktopDATA \
-	uninstall-hplip_systrayDATA uninstall-hplipjsPROGRAMS \
-	uninstall-hpmudextLTLIBRARIES uninstall-libLTLIBRARIES \
-	uninstall-libsane_hpaioLTLIBRARIES \
+	uninstall-hplip_systrayDATA uninstall-hpmudextLTLIBRARIES \
+	uninstall-libLTLIBRARIES uninstall-libsane_hpaioLTLIBRARIES \
 	uninstall-pcardextLTLIBRARIES uninstall-pstotiffSCRIPTS \
 	uninstall-scanextLTLIBRARIES
 

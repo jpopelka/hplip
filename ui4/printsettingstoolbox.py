@@ -460,7 +460,7 @@ class PrintSettingsToolbox(QToolBox):
 
                     self.beginControlGroup(g, QString(text))
 
-                    log.debug("  Text: %s" % unicode(text))
+                    log.debug("  Text: %s" % repr(text))
                     log.debug("Num subgroups: %d" % num_subgroups)
 
                     options = cups.getOptionList(g)

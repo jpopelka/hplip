@@ -179,7 +179,7 @@ if 'HPPin' in options and 'noHPPinPrnt' not in options:
 
 os.write(output_fd, '@PJL SET USERNAME="%s"\x0a' % username)
 os.write(output_fd, '@PJL SET JOBNAME="%s"\x0a' % title)
-os.write(output_fd, '@PJL SET COPIES="%s"\x0a' % copies)
+#os.write(output_fd, '@PJL SET COPIES="%s"\x0a' % copies)
     
 #----------------Job Accouting----------------------------
 # Embeds the job accouting (1-8) PJL's into print stream

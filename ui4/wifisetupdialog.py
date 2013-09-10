@@ -321,7 +321,7 @@ class WifiSetupDialog(QDialog, Ui_Dialog):
             self.dev.close()
             endWaitCursor()
 
-        self.num_networks = self.networks['numberofscanentries']
+        self.num_networks = self.networks.get('numberofscanentries')
         self.clearNetworksTable()
 
         if self.num_networks:

@@ -304,6 +304,9 @@
 :model "HP Photosmart Prem c410 Series"
 :status :good
 
+:model "HP LaserJet Pro MFP m435nw"
+:status :good
+
 :model "HP Officejet Pro x476dn Multifunction Printer"
 :status :good
 
@@ -748,6 +751,9 @@
 :model "HP Deskjet Ink Advantage 1516 All-in-one Printer"
 :status :good
 
+:model "HP Deskjet Ink Advantage 1518 All-in-one Printer"
+:status :good
+
 :model "HP LaserJet m1522n Multifunction Printer"
 :status :good
 
@@ -1054,10 +1060,19 @@
 :model "HP Deskjet Ink Advantage 2520hc All-in-one"
 :status :good
 
+:model "HP Deskjet Ink Advantage 2540 All-in-one Printer Series"
+:status :good
+
 :model "HP Deskjet 2540 All-in-one Printer"
 :status :good
 
 :model "HP Deskjet 2542 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 2545 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 2546 All-in-one Printer"
 :status :good
 
 :model "HP PSC 2550 Photosmart All-in-one Printer"
@@ -1858,6 +1873,15 @@
 :model "HP Envy 4502 E-all-in-one"
 :status :good
 
+:model "HP Envy 4504 E-all-in-one"
+:status :good
+
+:model "HP Deskjet Ink Advantage 4515 E-all-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 4518 E-all-in-one Printer"
+:status :good
+
 :model "HP Designjet 4520mfp"
 :status :good
 
@@ -1951,7 +1975,16 @@
 :model "HP Deskjet Ink Advantage 4625 E-all-in-one Printer"
 :status :good
 
+:model "HP Officejet 4630 E-all-in-one"
+:status :good
+
+:model "HP Officejet 4632 E-all-in-one Printer"
+:status :good
+
 :model "HP Photosmart c4635 All-in-one Printer"
+:status :good
+
+:model "HP Officejet 4635 E-all-in-one Printer"
 :status :good
 
 :model "HP Photosmart c4640 All-in-one Printer"
@@ -2192,6 +2225,9 @@
 :status :good
 
 :model "HP Photosmart 5520 E-all-in-one"
+:status :good
+
+:model "HP Photosmart 5521 E-all-in-one Printer"
 :status :good
 
 :model "HP Photosmart 5522 E-all-in-one Printer"
@@ -2720,6 +2756,9 @@
 :status :good
 
 :model "HP Officejet Pro 8500a Plus E-aio Printer - a910g"
+:status :good
+
+:model "HP Officejet Pro 8600 Premium E-aio n911n"
 :status :good
 
 :model "HP Officejet Pro 8600 Plus E-aio n911g"

@@ -362,18 +362,30 @@ else: # INTERACTIVE_MODE
         norm_model = models.normalizeModelName(model).lower()
         plugin = mq.get('plugin', PLUGIN_NONE)
 
-        plugin_installed = utils.to_bool(sys_state.get('plugin', 'installed', '0'))
-        if ignore_plugin_check is False and plugin > PLUGIN_NONE and not plugin_installed:
-            tui.header("PLUG-IN INSTALLATION")
-
-            hp_plugin = utils.which('hp-plugin')
-
-            if hp_plugin:
-                if prop.gui_build:
-                    cmd = "hp-plugin -i"
+        if ignore_plugin_check is False and plugin > PLUGIN_NONE:
+            from installer import pluginhandler
+            pluginObj = pluginhandler.PluginHandle() 
+            plugin_sts = pluginObj.getStatus()
+            if plugin_sts != pluginhandler.PLUGIN_INSTALLED:
+                if plugin_sts == pluginhandler.PLUGIN_VERSION_MISMATCH:
+                    tui.header("UPDATING PLUGIN")
                 else:
-                    cmd = "hp-plugin"
-                os_utils.execute(cmd)
+                    tui.header("PLUG-IN INSTALLATION")
+
+                hp_plugin = utils.which('hp-plugin')
+                if hp_plugin:
+                    cmd = "hp-plugin -i"
+                    if os.getuid() != 0:
+                        from base import password
+                        PasswordObj = password.Password(INTERACTIVE_MODE)
+                        PasswordObj.clearPassword()
+                        log.info("Enter Password to install the plugin")
+                        cmd = PasswordObj.getAuthCmd()%cmd
+
+                    # su -c '%s' --> su -c 'hp-plugin -i'
+                    if os_utils.execute(cmd) != 0:
+                        log.error("Failed to install Plugin.")
+                        sys.exit(1)
 
         ppds = cups.getSystemPPDs()
 
@@ -474,14 +486,13 @@ else: # INTERACTIVE_MODE
                 print_ppd, desc = print_ppd
                 log.info("\nFound PPD file: %s" % print_ppd)
 
-                if desc:
-                    log.info("Description: %s" % desc)
+                log.info("Description: %s" % desc)
 #
-                    if not auto:
-                        log.info("\nNote: The model number may vary slightly from the actual model number on the device.")
-                        ok, ans = tui.enter_yes_no("\nDoes this PPD file appear to be the correct one")
-                        if not ok: sys.exit(0)
-                        if not ans: enter_ppd = True
+                if not auto:
+                    log.info("\nNote: The model number may vary slightly from the actual model number on the device.")
+                    ok, ans = tui.enter_yes_no("\nDoes this PPD file appear to be the correct one")
+                    if not ok: sys.exit(0)
+                    if not ans: enter_ppd = True
 
 
             if enter_ppd:
@@ -866,9 +877,9 @@ else: # INTERACTIVE_MODE
                     param = "-d%s" % print_uri
 
                 if len(path) > 0:
-                    cmd = 'hp-testpage %s' % param
+                    cmd = 'hp-testpage -i %s' % param
                 else:
-                    cmd = 'python ./testpage.py %s' % param
+                    cmd = 'python ./testpage.py -i %s' % param
 
                 os_utils.execute(cmd)
 

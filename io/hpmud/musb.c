@@ -711,9 +711,7 @@ static libusb_device *get_libusb_device(const char *uri)
 			{
 				for (altset = 0, altptr = ifaceptr->altsetting; altset < ifaceptr->num_altsetting; altset++, altptr++)
 				{
-					if ((altptr->bInterfaceClass == LIBUSB_CLASS_PRINTER ) && /* Printer */
-							(altptr->bInterfaceSubClass == 1) &&
-							(altptr->bInterfaceProtocol == 1 || altptr->bInterfaceProtocol == 2)) /* Unidirectional or Bidirectional*/
+					if ((altptr->bInterfaceClass == LIBUSB_CLASS_PRINTER) && (altptr->bInterfaceSubClass == 1)) 
 					{
 						if (is_uri(dev, uri))
 						{

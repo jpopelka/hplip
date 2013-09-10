@@ -454,6 +454,8 @@ int hpmud_get_uri_datalink(const char *uri, char *buf, int buf_size)
       p+=7;
    else if ((p = strcasestr(uri, "ip=")) != NULL)
       p+=3;
+   else if ((p = strcasestr(uri, "hostname=")) != NULL)
+      p+=9;
    else if ((p = strcasestr(uri, "zc=")) != NULL)
    {
       p+=3;

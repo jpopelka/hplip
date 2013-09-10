@@ -3759,7 +3759,7 @@ packages=cups-devel
 packages=wget
 
 [mandriva:10.1:avahi-utils]
-packages=avahi-tools
+packages=avahi
 # ********************
 # ********************
 [mandriva:10.2]
@@ -3870,7 +3870,7 @@ packages=cups-devel
 packages=wget
 
 [mandriva:10.2:avahi-utils]
-packages=avahi-tools
+packages=avahi
 # ********************
 [mandriva:2006.0]
 code_name=2k6
@@ -3980,7 +3980,7 @@ packages=cups-devel
 packages=wget
 
 [mandriva:2006.0:avahi-utils]
-packages=avahi-tools
+packages=avahi
 # ********************
 [mandriva:2007.0]
 code_name=2k7
@@ -4090,7 +4090,7 @@ packages=cups-devel
 packages=wget
 
 [mandriva:2007.0:avahi-utils]
-packages=avahi-tools
+packages=avahi
 # ********************
 [mandriva:2007.1]
 code_name=2k7
@@ -4203,7 +4203,7 @@ packages=cups-devel
 packages=wget
 
 [mandriva:2007.1:avahi-utils]
-packages=avahi-tools
+packages=avahi
 # ********************
 [mandriva:2008.0]
 code_name=2k7
@@ -4317,7 +4317,7 @@ packages=cups-devel
 packages=wget
 
 [mandriva:2008.0:avahi-utils]
-packages=avahi-tools
+packages=avahi
 # ********************
 [mandriva:2008.1]
 code_name=
@@ -4430,7 +4430,7 @@ packages=cups-devel
 packages=wget
 
 [mandriva:2008.1:avahi-utils]
-packages=avahi-tools
+packages=avahi
 # ********************
 [mandriva:2009]
 code_name=
@@ -4547,7 +4547,7 @@ packages=policykit,policykit-gnome
 packages=wget
 
 [mandriva:2009:avahi-utils]
-packages=avahi-tools
+packages=avahi
 # ********************
 [mandriva:2009.0]
 code_name=
@@ -4664,7 +4664,7 @@ packages=policykit,policykit-gnome
 packages=wget
 
 [mandriva:2009.0:avahi-utils]
-packages=avahi-tools
+packages=avahi
 # ********************
 [mandriva:2010.0]
 code_name=
@@ -4781,7 +4781,7 @@ packages=policykit,policykit-gnome
 packages=wget
 
 [mandriva:2010.0:avahi-utils]
-packages=avahi-tools
+packages=avahi
 # ********************
 [mandriva:2011.0]
 code_name=
@@ -4898,7 +4898,7 @@ packages=policykit,policykit-gnome
 packages=wget
 
 [mandriva:2011.0:avahi-utils]
-packages=avahi-tools
+packages=avahi
 # ****************************************
 [linuxmint]
 index=22

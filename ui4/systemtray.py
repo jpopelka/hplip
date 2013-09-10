@@ -466,7 +466,7 @@ class SystemTrayApp(QApplication):
                     try:
                         self.service = self.session_bus.get_object('com.hplip.StatusService',
                                                                   "/com/hplip/StatusService")
-                    except DBusException:
+                    except dbus.DBusException:
                         log.warn("Unable to connect to StatusService. Retrying...")
 
                     t += 1
@@ -779,7 +779,10 @@ class SystemTrayApp(QApplication):
                                     else:
                                         n.set_timeout(TRAY_MESSAGE_DELAY)
 
-                                    n.show()
+                                    try:
+                                        n.show()
+                                    except:
+                                        log.error("Failed to show notification!")
 
                                 else: # Use "standard" message bubbles
                                     icon = ERROR_STATE_TO_ICON.get(error_state, QSystemTrayIcon.Information)
@@ -820,7 +823,13 @@ def run(read_pipe):
     log.set_module("hp-systray(qt4)")
     log.debug("PID=%d" % os.getpid())
 
-    app = SystemTrayApp(sys.argv, read_pipe)
+    try:
+        app = SystemTrayApp(sys.argv, read_pipe)
+    except dbus.DBusException, e:
+        # No session bus
+        log.debug("Caught exception: %s" % e)
+        sys.exit(1)
+
     app.setQuitOnLastWindowClosed(False) # If not set, settings dlg closes app
 
     i = 0
