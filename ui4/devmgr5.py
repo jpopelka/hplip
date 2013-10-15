@@ -417,6 +417,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
             elif event.event_code == EVENT_SYSTEMTRAY_EXIT:
                 log.debug("EVENT_SYSTEMTRAY_EXIT")
                 log.warn("HPLIP Status Service was closed. HPLIP Device Manager will now exit.")
+                cups.releaseCupsInstance()
                 self.close()
 
             elif event.event_code == EVENT_RAISE_DEVICE_MANAGER:
@@ -939,7 +940,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                 beginWaitCursor()
 
                 if f.split(':')[0] in ('http', 'https', 'file'):
-                    log.debug("Opening browser to: %s" % item.cmd)
+                    log.debug("Opening browser to: %s" % f)
                     utils.openURL(f)
                 else:
                     self.runExternalCommand(f)
@@ -1935,27 +1936,27 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         beginWaitCursor()
         try:
             if self.printer_state in (cups.IPP_PRINTER_STATE_IDLE, cups.IPP_PRINTER_STATE_PROCESSING):
-                result = cups.stop(self.cur_printer)
-                if result:
+                result, result_str = cups.cups_operation(cups.stop, GUI_MODE, 'qt4', self, self.cur_printer)
+                if result == cups.IPP_OK:
                     if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
                         e = EVENT_PRINTER_QUEUE_STOPPED
                     else:
                         e = EVENT_FAX_QUEUE_STOPPED
 
             else:
-                result = cups.start(self.cur_printer)
-                if result:
+                result, result_str = cups.cups_operation(cups.start, GUI_MODE, 'qt4', self, self.cur_printer)
+                if result == cups.IPP_OK:
                     if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
                         e = EVENT_PRINTER_QUEUE_STARTED
                     else:
                         e = EVENT_FAX_QUEUE_STARTED
 
-            if result:
+            if result == cups.IPP_OK:
                 self.updatePrintController()
                 self.cur_device.sendEvent(e, self.cur_printer)
             else:
-                if os.geteuid!=0 and utils.get_cups_systemgroup_list()!=[]:
-                    FailureUI(self, self.__tr("<b>Start/Stop printer queue operation fails. Could not connect to CUPS Server</b><p>Is user added to %s group(s)" %utils.list_to_string(utils.get_cups_systemgroup_list())))
+                FailureUI(self, self.__tr("<b>Start/Stop printer queue operation fails. </b><p>Error : %s"%result_str))
+                cups.releaseCupsInstance()
 
         finally:
             endWaitCursor()
@@ -1966,27 +1967,27 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
         beginWaitCursor()
         try:
             if self.printer_accepting:
-                result = cups.reject(self.cur_printer)
-                if result:
+                result, result_str = cups.cups_operation(cups.reject, GUI_MODE, 'qt4', self, self.cur_printer)
+                if result == cups.IPP_OK:
                     if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
                         e = EVENT_PRINTER_QUEUE_REJECTING_JOBS
                     else:
                         e = EVENT_FAX_QUEUE_REJECTING_JOBS
 
             else:
-                result = cups.accept(self.cur_printer)
-                if result:
+                result, result_str = cups.cups_operation(cups.accept, GUI_MODE, 'qt4', self, self.cur_printer)
+                if result == cups.IPP_OK:
                     if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
                         e = EVENT_PRINTER_QUEUE_ACCEPTING_JOBS
                     else:
                         e = EVENT_FAX_QUEUE_ACCEPTING_JOBS
 
-            if result:
+            if result == cups.IPP_OK:
                 self.updatePrintController()
                 self.cur_device.sendEvent(e, self.cur_printer)
             else:
-                if os.geteuid!=0 and utils.get_cups_systemgroup_list()!=[]:
-                    FailureUI(self, self.__tr("<b>Accept/Reject printer queue operation fails. Could not connect to CUPS Server</b><p>Is user added to %s group(s)" %utils.list_to_string(utils.get_cups_systemgroup_list())))
+                FailureUI(self, self.__tr("<b>Accept/Reject printer queue operation fails.</b><p>Error : %s"%result_str))
+                cups.releaseCupsInstance()
 
         finally:
             endWaitCursor()
@@ -1996,10 +1997,10 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
     def SetDefaultButton_clicked(self):
         beginWaitCursor()
         try:
-            result = cups.setDefaultPrinter(self.cur_printer.encode('utf8'))
-            if not result:
-                if os.geteuid!=0 and utils.get_cups_systemgroup_list()!=[]:
-                    FailureUI(self, self.__tr("<b>Set printer queue as default operation fails. Could not connect to CUPS Server</b><p>Is user added to %s group(s)" %utils.list_to_string(utils.get_cups_systemgroup_list())))
+            result, result_str = cups.cups_operation(cups.setDefaultPrinter, GUI_MODE, 'qt4', self, self.cur_printer.encode('utf8'))
+            if result != cups.IPP_OK:
+                FailureUI(self, self.__tr("<b>Set printer queue as default operation fails. </b><p>Error : %s"%result_str))
+                cups.releaseCupsInstance()
             else:
                 self.updatePrintController()
                 if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
@@ -2058,6 +2059,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
 
     def quit(self):
         self.cleanupChildren()
+        cups.releaseCupsInstance()
         self.close()
 
 
@@ -2152,7 +2154,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
 
         try:
             if len(cmd) == 0:
-                FailureUI(self.__tr("<p><b>Unable to run command. No command specified.</b><p>Use <pre>Configure...</pre> to specify a command to run."))
+                FailureUI(self,self.__tr("<p><b>Unable to run command. No command specified.</b><p>Use <pre>Configure...</pre> to specify a command to run."))
                 log.error("No command specified. Use settings to configure commands.")
             else:
                 log.debug("Run: %s %s (%s) %s" % ("*"*20, cmd, self.cur_device_uri, "*"*20))

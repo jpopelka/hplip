@@ -182,7 +182,7 @@ class DependenciesCheck(CoreInstall):
         self.num_errors = 0
         self.num_warns = 0
         
-        self.missing_user_grps = ''
+#        self.missing_user_grps = ''
         self.disable_selinux = False
         self.req_deps_to_be_installed = []
         self.opt_deps_to_be_installed =[]
@@ -275,8 +275,8 @@ class DependenciesCheck(CoreInstall):
         return self.comm_error_devices
 
 
-    def get_missing_user_grps(self):
-        return self.missing_user_grps
+#    def get_missing_user_grps(self):
+#        return self.missing_user_grps
 
 
     def get_user_grp_cmd(self):
@@ -295,7 +295,6 @@ class DependenciesCheck(CoreInstall):
         ############ Variables #######################
         cups_ddk_not_req = False
         hpmudext_avail = False
-        add_user_to_group = None
         ui_toolkit = sys_conf.get('configure','ui-toolkit')
         org_log_location = log.get_where()
 
@@ -648,15 +647,14 @@ class DependenciesCheck(CoreInstall):
                     log.warn("No queues found.")
 
             tui.header("PERMISSION")
-            sts,avl_grps_out =utils.run('groups')
-            self.user_grps_cmd  = self.get_distro_ver_data('add_user_to_group', '',supported_distro_vrs)
-            sts, out = utils.check_user_groups(self.user_grps_cmd, avl_grps_out) 
-            if sts:
-                log.info("%-15s %-30s %-15s %-8s %-8s %-8s %s"%("groups", "user-groups","Required", "-","-", "OK",avl_grps_out))
-            else:
-                log.info(log.red("error: %-8s %-30s %-15s %-8s %-8s %-8s %s"%("groups", "user-groups", "Required","-", "-", "MISSING", out)))
-                self.num_errors += 1
-                self.missing_user_grps = out
+#            sts,avl_grps_out =utils.run('groups')
+#            sts, out = utils.check_user_groups(self.user_grps_cmd, avl_grps_out) 
+#            if sts:
+#                log.info("%-15s %-30s %-15s %-8s %-8s %-8s %s"%("groups", "user-groups","Required", "-","-", "OK",avl_grps_out))
+#            else:
+#                log.info(log.red("error: %-8s %-30s %-15s %-8s %-8s %-8s %s"%("groups", "user-groups", "Required","-", "-", "MISSING", out)))
+#                self.num_errors += 1
+#                self.missing_user_grps = out
 
             if hpmudext_avail:
                 lsusb = utils.which('lsusb')
@@ -799,11 +797,11 @@ class DependenciesCheck(CoreInstall):
             log.info(log.bold('-'*len("SELINUX")))
             log.error("SELINUX need to be disabled")
         
-        if self.missing_user_grps:
-            log.info("")
-            log.info(log.bold("USER GROUPS"))
-            log.info(log.bold('-'*len("USER GROUPS")))
-            log.error("%s groups need to be added for %s user"%(self.missing_user_grps,prop.username))
+#        if self.missing_user_grps:
+#            log.info("")
+#            log.info(log.bold("USER GROUPS"))
+#            log.info(log.bold('-'*len("USER GROUPS")))
+#            log.error("%s groups need to be added for %s user"%(self.missing_user_grps,prop.username))
             
         if self.smart_install_devices:
             log.info("")
@@ -818,7 +816,8 @@ class DependenciesCheck(CoreInstall):
         log.info("Total Errors: %d" % self.num_errors)
         log.info("Total Warnings: %d" % self.num_warns)
         log.info()
-        if self.disable_selinux or self.missing_user_grps or (self.plugin_status == PLUGIN_VERSION_MISMATCH) or (self.plugin_status == PLUGIN_NOT_INSTALLED) or len(self.req_deps_to_be_installed) or len(self.opt_deps_to_be_installed):
+#        if self.disable_selinux or self.missing_user_grps or (self.plugin_status == PLUGIN_VERSION_MISMATCH) or (self.plugin_status == PLUGIN_NOT_INSTALLED) or len(self.req_deps_to_be_installed) or len(self.opt_deps_to_be_installed):
+        if self.disable_selinux or (self.plugin_status == PLUGIN_VERSION_MISMATCH) or (self.plugin_status == PLUGIN_NOT_INSTALLED) or len(self.req_deps_to_be_installed) or len(self.opt_deps_to_be_installed):
              log.info("Run 'hp-doctor' command to prompt and fix the issues. ")
              
 
@@ -879,7 +878,11 @@ if __name__ == "__main__":
         log.info(log.bold("Saving output in log file: %s" % log_file))
 
         if os.path.exists(log_file):
-            os.remove(log_file)
+            try:
+                os.remove(log_file)
+            except OSError:
+                log.info("Failed to remove %s file"%log_file)
+                pass
 
         log.set_logfile(log_file)
         if not is_quiet_mode:

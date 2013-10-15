@@ -23,7 +23,7 @@
 __version__ = '1.0'
 __title__ = 'Self Diagnse Utility and Healing Utility'
 __mod__ = 'hp-doctor'
-__doc__ = """Check for the deprecated, plug-in, dependencies, queues and Permission issues. And provides self diagnose steps"""
+__doc__ = """Tool checks for the deprecated, plug-in, dependencies, queues, permission issues and provides self diagnose steps"""
 
 
 # global import
@@ -247,7 +247,7 @@ try:
     mod.lockInstance('')
     mod.quiet= False
     mod.showTitle()
-    log_file = os.path.normpath('/var/log/hp/hp-doctor.log')
+    log_file = os.path.normpath('%s/hp-doctor.log'%prop.user_dir)
 
     if os.path.exists(log_file):
         try:
@@ -299,16 +299,17 @@ try:
             core.install_missing_dependencies(INTERACTIVE_MODE,core.get_required_deps(),core.get_optional_deps(), core.get_cmd_to_run())
 
         log.info(log.bold("\n\nChecking Permissions...."))
-        if not core.get_missing_user_grps() and not core.get_disable_selinux_status():
+#        if not core.get_missing_user_grps() and not core.get_disable_selinux_status():
+        if not core.get_disable_selinux_status():
             log.info("Permissions are correct.")
 
-        if core.get_missing_user_grps():
-            log.info(log.bold("Missing User Groups"))
-            log.info(log.bold('-'*len("Missing User Groups")))
-            log.info("%s"%core.get_missing_user_grps())
-            authenticate(core)
-            if core.add_groups_to_user(core.get_missing_user_grps(), core.get_user_grp_cmd()):
-                IS_RESTART_REQ = True
+#        if core.get_missing_user_grps():
+#            log.info(log.bold("Missing User Groups"))
+#            log.info(log.bold('-'*len("Missing User Groups")))
+#            log.info("%s"%core.get_missing_user_grps())
+#            authenticate(core)
+#            if core.add_groups_to_user(core.get_missing_user_grps(), core.get_user_grp_cmd()):
+#                IS_RESTART_REQ = True
 
         if core.get_disable_selinux_status():
             log.info(log.bold("SELinux Status"))
@@ -319,7 +320,7 @@ try:
                 IS_RESTART_REQ = True
 
     log.info(log.bold("\n\nChecking for Configured Queues...."))
-    queues.main_function(core.passwordObj, MODE,ui_toolkit, False,False, DEVICE_URI)
+    queues.main_function(core.passwordObj, MODE,ui_toolkit, False, DEVICE_URI)
 
     log.info(log.bold("\n\nChecking for HP Properitery Plugin's...."))
     ### Check for Plugin Printers

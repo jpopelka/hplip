@@ -77,6 +77,7 @@ char hpFileName[64] ;
 // GrayLevel = (5/16)R + (9/16)G + (2/16)B
 #define RGB2BW(r, g, b) (BYTE) (((r << 2) + r + (g << 3) + g + (b << 1)) >> 4)
 
+
 void RGB2Gray (BYTE *pRGBData, int iNumPixels, BYTE *pGData)
 {
     int     i;
@@ -421,7 +422,7 @@ BUGOUT:
  * Reading from stdin into a temp file
  * Getting the final file with HPLIP file and page headers
  */
-int ProcessTiffData(int fromFD, int toFD)
+int ProcessTiffData(int fromFD, int toFD, char* user_name)
 {
     BYTE      *p;
     int       fdTiff;
@@ -443,7 +444,7 @@ int ProcessTiffData(int fromFD, int toFD)
     char hpTiffFileName[64];
     long input_file_size = 0;
     FILE* pFilePtrFax;
-    snprintf(hpTiffFileName,sizeof(hpTiffFileName), "%s/hpliptiffXXXXXX","/var/log/hp/tmp");
+    snprintf(hpTiffFileName,sizeof(hpTiffFileName), "%s/hp_%s_fax_tiffXXXXXX",CUPS_TMP_DIR,user_name);
 
 
 //    fdTiff = mkstemp (hpTiffFileName);
@@ -676,7 +677,7 @@ int main (int argc, char **argv)
          i++;
     }
 
-    snprintf(hpFileName,sizeof(hpFileName),"%s/hplipfaxLog_XXXXXX","/var/log/hp/tmp");
+    snprintf(hpFileName,sizeof(hpFileName),"%s/hp_%s_fax_Log_XXXXXX",CUPS_TMP_DIR, argv[2]);
 
 //    fdFax = mkstemp (hpFileName);
     fdFax = createTempFile(hpFileName, &pFilePtrFax);
@@ -753,7 +754,7 @@ int main (int argc, char **argv)
 
     if (fax_encoding == RASTER_TIFF)
     {
-        status = ProcessTiffData(fd, fdFax);
+        status = ProcessTiffData(fd, fdFax, argv[2]);
     } else {
        cups_raster = cupsRasterOpen (fd, CUPS_RASTER_READ);
        if (cups_raster == NULL)

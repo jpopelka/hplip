@@ -32,13 +32,13 @@
 #include "SystemServices.h"
 #include "utils.h"
 
-SystemServices::SystemServices(int iLogLevel, int job_id) : m_iLogLevel(iLogLevel)
+SystemServices::SystemServices(int iLogLevel, int job_id, char* user_name) : m_iLogLevel(iLogLevel)
 {
     m_fp = NULL;
     if (iLogLevel & SAVE_PCL_FILE)
     {
         char    fname[64];
-        sprintf(fname, "%s/hpcups_out_job%d_XXXXXX", "/var/log/hp/tmp",job_id);
+        sprintf(fname, "%s/hp_%s_cups_out_job%d_XXXXXX",CUPS_TMP_DIR, user_name, job_id);
         
         createTempFile(fname, &m_fp);
         if (m_fp)

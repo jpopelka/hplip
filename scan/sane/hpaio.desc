@@ -742,6 +742,9 @@
 :model "HP PSC 1513 All-in-one Printer"
 :status :good
 
+:model "HP Deskjet 1514 All-in-one Printer"
+:status :good
+
 :model "HP PSC 1514 All-in-one Printer"
 :status :good
 
@@ -1069,10 +1072,16 @@
 :model "HP Deskjet 2542 All-in-one Printer"
 :status :good
 
+:model "HP Deskjet 2544 All-in-one Printer"
+:status :good
+
 :model "HP Deskjet Ink Advantage 2545 All-in-one Printer"
 :status :good
 
 :model "HP Deskjet Ink Advantage 2546 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 2548 All-in-one Printer"
 :status :good
 
 :model "HP PSC 2550 Photosmart All-in-one Printer"
@@ -1124,6 +1133,12 @@
 :status :good
 
 :model "HP Photosmart 2615 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 2645 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 2646 All-in-one Printer"
 :status :good
 
 :model "HP Photosmart 2710 All-in-one Printer"
@@ -2243,6 +2258,12 @@
 :status :good
 
 :model "HP Envy 5530 E-all-in-one Printer"
+:status :good
+
+:model "HP Envy 5531 E-all-in-one Printer"
+:status :good
+
+:model "HP Envy 5532 E-all-in-one Printer"
 :status :good
 
 :model "HP Envy 5535 E-all-in-one Printer"

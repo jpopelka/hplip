@@ -3,6 +3,7 @@
 #include <dlfcn.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <stdlib.h>
 
 extern int errno;
 
@@ -221,10 +222,7 @@ void unload_library(void *pLibHandler)
 
 int createTempFile(char* szFileName, FILE** pFilePtr)
 {
-    char* pFilePos = NULL;
-    char szFolderName[64]={0,};
-    struct stat st;
-    int iFD;
+    int iFD = -1;
 
     if (szFileName == NULL || szFileName[0] == '\0' || pFilePtr == NULL)
     {
@@ -235,26 +233,14 @@ int createTempFile(char* szFileName, FILE** pFilePtr)
     if (strstr(szFileName,"XXXXXX") == NULL)
         strcat(szFileName,"_XXXXXX");
 
-    pFilePos = strrchr(szFileName, '/');
-    if (pFilePos)
+    iFD = mkstemp(szFileName);
+    if(-1 == iFD)
     {
-        strncpy(szFolderName, szFileName, (pFilePos - szFileName));
-        if(stat(szFolderName,&st) == 0)
-        {
-            if(st.st_mode & S_IFDIR != 0)
-            {
-                iFD = mkstemp(szFileName);
-                *pFilePtr = fdopen(iFD,"w+");
-            }
-            else
-                BUG("Insufficient directory [%s] permissions\n",szFolderName);
-        }
-        else
-                BUG("Failed to check directory [%s] errno[%d]\n",szFolderName, errno);
+        BUG("Failed to create the temp file Name[%s] errno[%d : %s]\n",szFileName,errno,strerror(errno));
+        return 0;
     }
     else
     {
-        iFD = mkstemp(szFileName);
         *pFilePtr = fdopen(iFD,"w+");
     }
 

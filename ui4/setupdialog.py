@@ -189,6 +189,7 @@ class SetupDialog(QDialog, Ui_Dialog):
             QTimer.singleShot(0, self.showRemovePage)
         else:
             if self.skip_discovery:
+                self.discovery_method = 0 # SLP
                 QTimer.singleShot(0, self.showDevicesPage)
             else:
                 QTimer.singleShot(0, self.showDiscoveryPage)
@@ -941,17 +942,38 @@ class SetupDialog(QDialog, Ui_Dialog):
     #
 
     def addPrinter(self):
-        self.setupPrinter()
+        print_sts = self.setupPrinter()
+        if print_sts == cups.IPP_FORBIDDEN or print_sts == cups.IPP_NOT_AUTHENTICATED or print_sts == cups.IPP_NOT_AUTHORIZED:
+            pass  # User doesn't have sufficient permissions so ignored.
+        else:
+            if self.fax_setup:
+                if self.setupFax() == cups.IPP_OK:
+                    self.readwriteFaxInformation(False)
 
-        if self.fax_setup:
-            self.setupFax()
-            self.readwriteFaxInformation(False)
+            if print_sts == cups.IPP_OK:
+                self.flashFirmware()
 
-        if self.print_test_page:
-            self.printTestPage()
+                if self.print_test_page:
+                    self.printTestPage()
 
         self.close()
 
+
+    #
+    # Updating firmware download for supported devices.
+    #
+    def flashFirmware(self):
+        if self.mq.get('fw-download', False):
+            try:
+                d = device.Device(self.device_uri)
+            except Error , e:
+                FailureUI(self, self.__tr("<b>Error opening device. Firmware download is Failed.</b><p>%s (%s)." % (e.msg, e.opt)))
+            else:
+                if d.downloadFirmware():
+                    log.info("Firmware download successful.\n")
+                else:
+                    FailureUI(self, self.__tr("<b>Firmware download is Failed.</b>"))
+                d.close()
 
 
     #
@@ -959,39 +981,33 @@ class SetupDialog(QDialog, Ui_Dialog):
     #
 
     def setupPrinter(self):
+        status = cups.IPP_BAD_REQUEST
         QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
         try:
-            cups.setPasswordPrompt("You do not have permission to add a printer.")
             if not os.path.exists(self.print_ppd[0]): # assume foomatic: or some such
-                status, status_str = cups.addPrinter(self.printer_name.encode('utf8'), self.device_uri,
-                    self.print_location, '', self.print_ppd[0], self.print_desc)
+                add_prnt_args = (self.printer_name.encode('utf8'), self.device_uri, self.print_location, '', self.print_ppd[0], self.print_desc)
             else:
-                status, status_str = cups.addPrinter(self.printer_name.encode('utf8'), self.device_uri,
-                    self.print_location, self.print_ppd[0], '', self.print_desc)
+                add_prnt_args = (self.printer_name.encode('utf8'), self.device_uri, self.print_location, self.print_ppd[0], '', self.print_desc)
 
-            log.debug("addPrinter() returned (%d, %s)" % (status, status_str))
-            self.installed_print_devices = device.getSupportedCUPSDevices(['hp'])
+            status, status_str = cups.cups_operation(cups.addPrinter, GUI_MODE, 'qt4', self, *add_prnt_args)
+            log.debug(device.getSupportedCUPSDevices(['hp']))
 
-            log.debug(self.installed_print_devices)
-
-            if self.device_uri not in self.installed_print_devices or \
-                self.printer_name not in self.installed_print_devices[self.device_uri]:
-
+            if status != cups.IPP_OK:
                 QApplication.restoreOverrideCursor()
-                if os.geteuid!=0 and utils.get_cups_systemgroup_list()!=[]:
-                    FailureUI(self, self.__tr("<b>Printer queue setup failed. Could not connect to CUPS Server</b><p>Is user added to %s group(s)" %utils.list_to_string(utils.get_cups_systemgroup_list())))
+                FailureUI(self, self.__tr("<b>Printer queue setup failed.</b> <p>Error : %s"%status_str))
             else:
                 # sending Event to add this device in hp-systray
                 utils.sendEvent(EVENT_CUPS_QUEUES_CHANGED,self.device_uri, self.printer_name)
 
         finally:
             QApplication.restoreOverrideCursor()
+        return status
 
 
     def setupFax(self):
+        status = cups.IPP_BAD_REQUEST
         QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
         try:
-            cups.setPasswordPrompt("You do not have permission to add a fax device.")
             if not os.path.exists(self.fax_ppd):
                 status, status_str = cups.addPrinter(self.fax_name.encode('utf8'),
                     self.fax_uri, self.fax_location, '', self.fax_ppd,  self.fax_desc)
@@ -999,22 +1015,19 @@ class SetupDialog(QDialog, Ui_Dialog):
                 status, status_str = cups.addPrinter(self.fax_name.encode('utf8'),
                     self.fax_uri, self.fax_location, self.fax_ppd, '', self.fax_desc)
 
-            log.debug("addPrinter() returned (%d, %s)" % (status, status_str))
-            self.installed_fax_devices = device.getSupportedCUPSDevices(['hpfax'])
+            log.debug(device.getSupportedCUPSDevices(['hpfax']))
 
-            log.debug(self.installed_fax_devices)
-
-            if self.fax_uri not in self.installed_fax_devices or \
-                self.fax_name not in self.installed_fax_devices[self.fax_uri]:
-
+            if status != cups.IPP_OK:
                 QApplication.restoreOverrideCursor()
-                FailureUI(self, self.__tr("<b>Fax queue setup failed.</b><p>Please restart CUPS and try again."))
+                FailureUI(self, self.__tr("<b>Fax queue setup failed.</b><p>Error : %s"%status_str))
             else:
                  # sending Event to add this device in hp-systray
                 utils.sendEvent(EVENT_CUPS_QUEUES_CHANGED,self.fax_uri, self.fax_name)
                 
         finally:
             QApplication.restoreOverrideCursor()
+
+        return status
 
 
     def readwriteFaxInformation(self, read=True):
@@ -1244,8 +1257,12 @@ class SetupDialog(QDialog, Ui_Dialog):
                     item = self.RemoveDevicesTableWidget.item(row, 1)
                     printer = unicode(item.data(Qt.UserRole).toString()).encode('utf-8')
                     log.debug("Removing printer: %s" % printer)
-                    if cups.delPrinter(printer) == 0 and os.geteuid!=0 and utils.get_cups_systemgroup_list()!=[]:
-                            FailureUI(self, self.__tr("<b>Unable to delete printer queue. Could not connect to CUPS Server</b><p>Is user added to %s group(s)" %utils.list_to_string(utils.get_cups_systemgroup_list())))
+                    status, status_str = cups.cups_operation(cups.delPrinter, GUI_MODE, 'qt4', self, printer)
+
+                    if  status != cups.IPP_OK:
+                        FailureUI(self, self.__tr("<b>Unable to delete '%s' queue. </b><p>Error : %s"%(printer,status_str)))
+                        if status == cups.IPP_FORBIDDEN or status == cups.IPP_NOT_AUTHENTICATED or status == cups.IPP_NOT_AUTHORIZED:
+                            break
             self.close()
 
         else:

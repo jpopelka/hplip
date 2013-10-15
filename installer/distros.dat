@@ -112,7 +112,7 @@ supported=0
 
 [suse]
 index=3
-versions=12.2,12.3
+versions=12.2,12.3,13.1
 display_name=SUSE Linux
 alt_names=
 display=1
@@ -150,7 +150,6 @@ drv_dir=/usr/share/cups/drv/HP
 cups_path_with_bitness=0
 ui_toolkit=qt4
 native_cups=1
-add_user_to_group= -Asys,lp
 open_mdns_port=/bin/bash ./init-suse-firewall
 pre_depend_cmd=su -c "zypper refresh"
 
@@ -271,7 +270,6 @@ drv_dir=/usr/share/cups/drv/HP
 cups_path_with_bitness=0
 ui_toolkit=qt4
 native_cups=1
-add_user_to_group= -a -G sys,lp
 open_mdns_port=/bin/bash ./init-suse-firewall
 pre_depend_cmd=su -c "zypper refresh"
 
@@ -371,6 +369,15 @@ packages=wget
 
 [suse:12.3:avahi-utils]
 packages=avahi-utils
+# ****************************************
+
+[suse:13.1]
+code_name=Evergreen
+supported=1
+packaged_version=3.13.7
+release_date=19.09.2013
+same_as_version=12.3
+
 # ****************************************
 [redhat]
 index=6
@@ -610,7 +617,6 @@ drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 policykit=0
 native_cups=1
-add_user_to_group=-a -Gsys,lp
 open_mdns_port=/bin/bash ./init-iptables-firewall
 pre_depend_cmd=su -c "yum clean all",su -c "yum check-update"
 
@@ -728,7 +734,6 @@ drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 policykit=0
 native_cups=1
-add_user_to_group=-a -Gsys,lp
 open_mdns_port=/bin/bash ./init-iptables-firewall
 pre_depend_cmd=su -c "yum clean all",su -c "yum check-update"
 
@@ -918,7 +923,7 @@ drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
 package_available=1
 package_arch=i386,x86_64
-add_user_to_group=-a -Glp,sys
+
 
 [rhel:5.0:cups]
 packages=cups
@@ -1032,7 +1037,7 @@ drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 package_available=1
 package_arch=i686,x86_64
-add_user_to_group=-a -Glp,sys
+
 
 [rhel:6.0:cups]
 packages=cups
@@ -1347,7 +1352,7 @@ ppd_dir=/usr/share/cups/model/HP
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt3
-add_user_to_group=-a -Glp,sys
+
 
 [centos:any:cups]
 packages=cups
@@ -1484,7 +1489,7 @@ ppd_dir=/usr/share/ppd/HP
 fix_ppd_symlink=0
 drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=none
-add_user_to_group=-a -Glp
+
 
 # ****************************************
 [pclinuxos]
@@ -2224,7 +2229,7 @@ packages=avahi
 # ****************************************
 [ubuntu]
 index=12
-versions=10.04,11.10,12.04,12.10,13.04
+versions=10.04,11.10,12.04,12.10,13.04,13.10
 display_name=Ubuntu
 alt_names=kubuntu,edubuntu,xubuntu
 display=1
@@ -2262,7 +2267,7 @@ drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 native_cups=1
 acl_rules=1
-add_user_to_group=-a -Glp,lpadmin
+
 
 [ubuntu:10.04:cups]
 packages=libcups2
@@ -2381,7 +2386,7 @@ drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 native_cups=1
 acl_rules=1
-add_user_to_group=-a -Glp,lpadmin
+
 libdir_path=/usr/lib
 
 [ubuntu:11.10:cups]
@@ -2501,7 +2506,7 @@ drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 native_cups=1
 acl_rules=1
-add_user_to_group=-a -Glp,lpadmin
+
 libdir_path=/usr/lib
 
 [ubuntu:12.04:cups]
@@ -2598,9 +2603,6 @@ packages=python-notify
 [ubuntu:12.04:network]
 packages=wget
 
-[ubuntu:12.04:passwd_util]
-packages=gksu
-
 [ubuntu:12.04:avahi-utils]
 packages=avahi-utils
 # ********************
@@ -2610,6 +2612,126 @@ same_as_version=12.04
 # ********************
 [ubuntu:13.04]
 same_as_version=12.04
+
+# ********************
+[ubuntu:13.10]
+code_name=Saucy
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=3.13.7
+release_date=17/10/2013
+notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.  During the install process you will be added to the lp and lpadmin group, please quit the installer before the setup stage, log out, log back in, and run hp-setup to complete the install.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+native_cups=1
+acl_rules=1
+
+libdir_path=/usr/lib
+[ubuntu:13.10:cups]
+packages=libcups2
+
+[ubuntu:13.10:cups-devel]
+packages=libcups2-dev,cups-bsd,cups-client
+
+[ubuntu:13.10:gcc]
+packages=build-essential
+
+[ubuntu:13.10:gs]
+packages=ghostscript
+
+[ubuntu:13.10:libcrypto]
+packages=openssl
+
+[ubuntu:13.10:libjpeg]
+packages=libjpeg-dev
+
+[ubuntu:13.10:libnetsnmp-devel]
+packages=libsnmp-dev,snmp-mibs-downloader
+
+[ubuntu:13.10:libpthread]
+packages=build-essential
+
+[ubuntu:13.10:libtool]
+packages=libtool
+
+[ubuntu:13.10:libusb]
+packages=libusb-1.0.0-dev
+
+[ubuntu:13.10:make]
+packages=build-essential
+
+[ubuntu:13.10:pil]
+packages=python-imaging
+
+[ubuntu:13.10:ppdev]
+packages=
+commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppdev | sudo tee -a /etc/modules
+
+[ubuntu:13.10:pyqt]
+packages=gtk2-engines-pixbuf,python-qt4
+
+[ubuntu:13.10:python-devel]
+packages=python-dev
+
+[ubuntu:13.10:pyqt4]
+packages=gtk2-engines-pixbuf,python-qt4
+
+[ubuntu:13.10:pyqt4-dbus]
+packages=python-qt4-dbus
+
+#[ubuntu:13.10:python23]
+#packages=python
+
+[ubuntu:13.10:python2x]
+packages=python
+
+[ubuntu:13.10:reportlab]
+packages=python-reportlab
+
+[ubuntu:13.10:sane]
+packages=libsane
+
+[ubuntu:13.10:sane-devel]
+packages=libsane-dev
+
+[ubuntu:13.10:scanimage]
+packages=sane-utils
+
+[ubuntu:13.10:xsane]
+packages=gtk2-engines-pixbuf,xsane
+
+[ubuntu:13.10:python-dbus]
+packages=python-dbus,python-gobject
+
+[ubuntu:13.10:dbus]
+packages=libdbus-1-dev
+
+[ubuntu:13.10:cups-image]
+packages=libcupsimage2-dev
+
+[ubuntu:13.10:cups-ddk]
+packages=cups
+
+[ubuntu:13.10:policykit]
+packages=policykit-1,policykit-1-gnome
+
+[ubuntu:13.10:python-notify]
+packages=python-notify
+
+[ubuntu:13.10:network]
+packages=wget
+
+[ubuntu:13.10:avahi-utils]
+packages=avahi-utils
 
 # ****************************************
 [debian]
@@ -2652,7 +2774,7 @@ drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 native_cups=1
 policykit=0
-add_user_to_group=-a -G lp,lpadmin
+
 
 [debian:6.0:cups]
 packages=libcups2
@@ -2797,7 +2919,7 @@ drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 native_cups=1
 policykit=0
-add_user_to_group=-a -G lp,lpadmin
+
 # This libdir_path will be used only for 64 bit machine.
 libdir_path=/usr/lib/x86_64-linux-gnu
 
@@ -4942,7 +5064,7 @@ drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 native_cups=1
 acl_rules=1
-add_user_to_group=-a -Glp,lpadmin
+
 libdir_path=/usr/lib
 
 [linuxmint:13:cups]
@@ -5072,7 +5194,7 @@ drv_dir=/usr/share/cups/drv/HP
 ui_toolkit=qt4
 native_cups=1
 acl_rules=1
-add_user_to_group=-a -Glp,lpadmin
+
 libdir_path=/usr/lib/x86_64-linux-gnu
 
 [linuxmint:15:cups]

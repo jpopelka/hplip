@@ -20,6 +20,7 @@
 #define SCAN_PLUGIN_SOAPHT "bb_soapht.so"
 
 #define HPLIP_PLUGIN_STATE  "/var/lib/hp/hplip.state"
+#define CUPS_TMP_DIR   getenv("TMPDIR") ? : getenv("HOME") ?:"/tmp"
 
 enum UTILS_CONF_RESULT
 {

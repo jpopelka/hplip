@@ -34,7 +34,7 @@
 class SystemServices
 {
 public:
-    SystemServices(int iLogLevel, int job_id);
+    SystemServices(int iLogLevel, int job_id, char* user_name);
     ~SystemServices();
     DRIVER_ERROR Send(const BYTE *pData, int iLength);
 private:

@@ -713,6 +713,7 @@ def checkPyQtImport(): # qt3
     # PyQt
     try:
         import qt
+        import ui
     except ImportError:
         if os.getenv('DISPLAY') and os.getenv('STARTED_FROM_MENU'):
             no_qt_message_gtk()
@@ -762,7 +763,9 @@ def checkPyQtImport(): # qt3
 def checkPyQtImport4():
     try:
         import PyQt4
+        import ui4
     except ImportError:
+        log.error("HPLIP is not installed properly or is installed without graphical support. Please reinstall HPLIP")
         return False
     else:
         return True
@@ -1967,7 +1970,7 @@ def download_from_network(weburl, outputFile = None, useURLLIB=False):
         return False, ""
 
     if not os.path.exists(outputFile):
-        log.error("Failed to get hplip version/ %s file not found."%hplip_version_file)
+        log.error("Failed to download %s file."%outputFile)
         return False, ""
 
     return True, outputFile

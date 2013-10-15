@@ -88,49 +88,74 @@ typedef int Py_ssize_t;
 #endif
 
 #if (CUPS_VERSION_MAJOR > 1) || (CUPS_VERSION_MINOR > 5)
-#define HAVE_CUPS_1_6 1
+    #define HAVE_CUPS_1_6 1
 #endif
 
 #ifndef HAVE_CUPS_1_6
-#define ippGetCount(attr)     attr->num_values
-#define ippGetGroupTag(attr)  attr->group_tag
-#define ippGetValueTag(attr)  attr->value_tag
-#define ippGetName(attr)      attr->name
-#define ippGetBoolean(attr, element) attr->values[element].boolean
-#define ippGetInteger(attr, element) attr->values[element].integer
-#define ippGetStatusCode(ipp) ipp->request.status.status_code
-#define ippGetString(attr, element, language) attr->values[element].string.text
+    #define ippGetCount(attr)     attr->num_values
+    #define ippGetGroupTag(attr)  attr->group_tag
+    #define ippGetValueTag(attr)  attr->value_tag
+    #define ippGetName(attr)      attr->name
+    #define ippGetBoolean(attr, element) attr->values[element].boolean
+    #define ippGetInteger(attr, element) attr->values[element].integer
+    #define ippGetStatusCode(ipp) ipp->request.status.status_code
+    #define ippGetString(attr, element, language) attr->values[element].string.text
 
-static ipp_attribute_t * ippFirstAttribute( ipp_t *ipp )
-{
-    if (!ipp)
-        return (NULL);
-    return (ipp->current = ipp->attrs);
-}
 
-static ipp_attribute_t * ippNextAttribute( ipp_t *ipp )
-{
-    if (!ipp || !ipp->current)
-        return (NULL);
-    return (ipp->current = ipp->current->next);
-}
+    static ipp_attribute_t * ippFirstAttribute( ipp_t *ipp )
+    {
+        if (!ipp)
+            return (NULL);
+        return (ipp->current = ipp->attrs);
+    }
 
-static int ippSetOperation( ipp_t *ipp, ipp_op_t op )
-{
-    if (!ipp)
-        return (0);
-    ipp->request.op.operation_id = op;
-    return (1);
-}
+    static ipp_attribute_t * ippNextAttribute( ipp_t *ipp )
+    {
+        if (!ipp || !ipp->current)
+            return (NULL);
+        return (ipp->current = ipp->current->next);
+    }
 
-static int ippSetRequestId( ipp_t *ipp, int request_id )
-{
-    if (!ipp)
-        return (0);
-    ipp->request.any.request_id = request_id;
-    return (1);
-}
+    static int ippSetOperation( ipp_t *ipp, ipp_op_t op )
+    {
+        if (!ipp)
+            return (0);
+        ipp->request.op.operation_id = op;
+        return (1);
+    }
+
+    static int ippSetRequestId( ipp_t *ipp, int request_id )
+    {
+        if (!ipp)
+            return (0);
+        ipp->request.any.request_id = request_id;
+        return (1);
+    }
 #endif
+
+static http_t * http = NULL;     /* HTTP object */
+
+static http_t* acquireCupsInstance()
+{
+    if ( http == NULL)
+    {
+        http = httpConnectEncrypt( cupsServer(), ippPort(), cupsEncryption() );
+    }
+
+    return http;
+}
+
+
+PyObject * releaseCupsInstance( PyObject * self, PyObject * args )
+{
+    if (http)
+    {
+        httpClose(http);
+    }
+    
+    http = NULL;
+    return Py_BuildValue( "i", 1 );
+}
 
 int g_num_options = 0;
 cups_option_t * g_options;
@@ -140,6 +165,8 @@ cups_dest_t * dest = NULL;
 
 cups_dest_t * g_dests = NULL;
 int g_num_dests = 0;
+
+static int auth_cancel_req = 0;    // 0--> authentication cancel is not requested, 1 --> authentication cancelled
 
 const char * g_ppd_file = NULL;
 
@@ -349,7 +376,6 @@ static PyObject * newPrinter( PyObject * self, PyObject * args, PyObject * kwarg
 
 PyObject * getPrinters( PyObject * self, PyObject * args )
 {
-    http_t * http = NULL;     /* HTTP object */
     ipp_t *request = NULL;  /* IPP request object */
     ipp_t *response = NULL; /* IPP response object */
     ipp_attribute_t *attr;     /* Current IPP attribute */
@@ -370,10 +396,11 @@ PyObject * getPrinters( PyObject * self, PyObject * args )
     };
 
     /* Connect to the HTTP server */
-    if ( ( http = httpConnectEncrypt( cupsServer(), ippPort(), cupsEncryption() ) ) == NULL )
+    if (acquireCupsInstance() == NULL)
     {
         goto abort;
     }
+
 
     /* Assemble the IPP request */
     request = ippNew();
@@ -495,9 +522,6 @@ abort:
     if ( response != NULL )
         ippDelete( response );
 
-    if ( http != NULL )
-        httpClose( http );
-
     return printer_list;
 }
 
@@ -505,12 +529,10 @@ abort:
 PyObject * addPrinter( PyObject * self, PyObject * args )
 {
     //char buf[1024];
-    ipp_status_t status;
-    http_t *http = NULL;     /* HTTP object */
+    ipp_status_t status = IPP_BAD_REQUEST;
     ipp_t *request = NULL;  /* IPP request object */
     ipp_t *response = NULL; /* IPP response object */
     cups_lang_t * language;
-    int r;
     char printer_uri[ HTTP_MAX_URI ];
     char * name, * device_uri, *location, *ppd_file, * info, * model;
     const char * status_str = "successful-ok";
@@ -524,7 +546,6 @@ PyObject * addPrinter( PyObject * self, PyObject * args )
                             &info              // info/description
                           ) )
     {
-        r = 0;
         status_str = "Invalid arguments";
         goto abort;
     }
@@ -532,14 +553,12 @@ PyObject * addPrinter( PyObject * self, PyObject * args )
     if ( ( strlen( ppd_file ) > 0 && strlen( model ) > 0 ) ||
             ( strlen( ppd_file ) == 0 && strlen( model ) == 0) )
     {
-        r = 0;
         status_str = "Invalid arguments: specify only ppd_file or model, not both or neither";
         goto abort;
     }
 
     if ( !validate_name( name ) )
     {
-        r = 0;
         status_str = "Invalid printer name";
         goto abort;
     }
@@ -550,10 +569,10 @@ PyObject * addPrinter( PyObject * self, PyObject * args )
     if ( info == NULL )
         strcpy( info, name );
 
+    cupsSetUser ("root");
     /* Connect to the HTTP server */
-    if ( ( http = httpConnectEncrypt( cupsServer(), ippPort(), cupsEncryption() ) ) == NULL )
+    if (acquireCupsInstance() == NULL)
     {
-        r = 0;
         status_str = "Unable to connect to CUPS server";
         goto abort;
     }
@@ -601,29 +620,27 @@ PyObject * addPrinter( PyObject * self, PyObject * args )
         response = cupsDoFileRequest( http, request, "/admin/", ppd_file );
     }
 
-    if ( response == NULL )
-    {
+    if (response == NULL)
         status = cupsLastError();
-        r = 0;
-    }
     else
-    {
         status = ippGetStatusCode( response );
-        //ippDelete( response );
-        r = 1;
+
+    // If user cancels the authentication pop-up, changing error code to IPP_NOT_AUTHENTICATED from IPP_FORBIDDEN
+    if (status == IPP_FORBIDDEN && auth_cancel_req)
+    {
+        status = IPP_NOT_AUTHENTICATED;
+        auth_cancel_req = 0;    // Reseting cancel request.
     }
 
     status_str = ippErrorString( status );
+    if ( status <= IPP_OK_CONFLICT )
+        status =IPP_OK;
 
 abort:
-
-    if ( http != NULL )
-        httpClose( http );
-
     if ( response != NULL )
         ippDelete( response );
 
-    return Py_BuildValue( "is", r, status_str );
+    return Py_BuildValue( "is", status, status_str );
 
 }
 
@@ -637,9 +654,9 @@ PyObject * delPrinter( PyObject * self, PyObject * args )
     cups_lang_t *language;                /* Default language */
     char uri[ HTTP_MAX_URI ];        /* URI for printer/class */
     char * name;
-    http_t *http = NULL;     /* HTTP object */
     int r = 0;
     const char *username = NULL;
+    const char * status_str = "";
 
     username = cupsUser();
 
@@ -654,8 +671,9 @@ PyObject * delPrinter( PyObject * self, PyObject * args )
         goto abort;
     }
 
+    cupsSetUser ("root");
     /* Connect to the HTTP server */
-    if ( ( http = httpConnectEncrypt( cupsServer(), ippPort(), cupsEncryption() ) ) == NULL )
+    if (acquireCupsInstance() == NULL)
     {
         goto abort;
     }
@@ -690,22 +708,30 @@ PyObject * delPrinter( PyObject * self, PyObject * args )
      */
     response = cupsDoRequest( http, request, "/admin/" );
 
-    if ( ( response != NULL ) && ( ippGetStatusCode( response ) <= IPP_OK_CONFLICT ) )
+    if (response == NULL)
+        r = cupsLastError();
+    else
+        r = ippGetStatusCode( response );
+
+    // If user cancels the authentication pop-up, changing error code to IPP_NOT_AUTHENTICATED from IPP_FORBIDDEN
+    if (r == IPP_FORBIDDEN && auth_cancel_req)
     {
-        r = 1;
+        r = IPP_NOT_AUTHENTICATED;
+        auth_cancel_req = 0;    // Reseting cancel request.
     }
+
+    status_str = ippErrorString( r );
+    if ( r <= IPP_OK_CONFLICT )
+        r = IPP_OK;
 
 abort:
     if (username)
         cupsSetUser(username);
 
-    if ( http != NULL )
-        httpClose( http );
-
     if ( response != NULL )
         ippDelete( response );
 
-    return Py_BuildValue( "i", r );
+    return Py_BuildValue( "is", r ,status_str);
 
 }
 
@@ -721,9 +747,9 @@ PyObject * setDefaultPrinter( PyObject * self, PyObject * args )
                      *response = NULL;                /* IPP Response */
     cups_lang_t *language;                /* Default language */
     char * name;
-    http_t *http = NULL;     /* HTTP object */
     int r = 0;
     const char *username = NULL;
+    const char * status_str = "";
 
     username = cupsUser();
 
@@ -742,8 +768,9 @@ PyObject * setDefaultPrinter( PyObject * self, PyObject * args )
         goto abort;
     }
 
+    cupsSetUser ("root");
     /* Connect to the HTTP server */
-    if ( ( http = httpConnectEncrypt( cupsServer(), ippPort(), cupsEncryption() ) ) == NULL )
+    if ( acquireCupsInstance () == NULL)
     {
         goto abort;
     }
@@ -783,22 +810,30 @@ PyObject * setDefaultPrinter( PyObject * self, PyObject * args )
 
     response = cupsDoRequest( http, request, "/admin/" );
 
-    if ( ( response != NULL ) && ( ippGetStatusCode( response ) <= IPP_OK_CONFLICT ) )
+    if (response == NULL)
+        r = cupsLastError();
+    else
+        r = ippGetStatusCode(response );
+
+    // If user cancels the authentication pop-up, changing error code to IPP_NOT_AUTHENTICATED from IPP_FORBIDDEN
+    if (r == IPP_FORBIDDEN && auth_cancel_req)
     {
-        r = 1;
+        r = IPP_NOT_AUTHENTICATED;
+        auth_cancel_req = 0;    // Reseting cancel request.
     }
+
+    status_str = ippErrorString( r );
+    if ( r <= IPP_OK_CONFLICT )
+        r = IPP_OK;
 
 abort:
     if (username)
         cupsSetUser(username);
 
-    if ( http != NULL )
-        httpClose( http );
-
     if ( response != NULL )
         ippDelete( response );
 
-    return Py_BuildValue( "i", r );
+    return Py_BuildValue( "is", r,status_str );
 
 
 }
@@ -810,12 +845,12 @@ PyObject * controlPrinter( PyObject * self, PyObject * args )
     ipp_t *request = NULL,                 /* IPP Request */
                      *response = NULL;                /* IPP Response */
     char * name;
-    http_t *http = NULL;     /* HTTP object */
     int op;
-    int r = 0;
+    int r = IPP_BAD_REQUEST;
     char uri[ HTTP_MAX_URI ];        /* URI for printer/class */
     cups_lang_t *language;
     const char *username = NULL;
+    const char * status_str = "";
 
     username = cupsUser();
 
@@ -829,8 +864,9 @@ PyObject * controlPrinter( PyObject * self, PyObject * args )
         goto abort;
     }
 
+    cupsSetUser ("root");
     /* Connect to the HTTP server */
-    if ( ( http = httpConnectEncrypt( cupsServer(), ippPort(), cupsEncryption() ) ) == NULL )
+    if (acquireCupsInstance () == NULL)
     {
         goto abort;
     }
@@ -862,22 +898,30 @@ PyObject * controlPrinter( PyObject * self, PyObject * args )
 
     response = cupsDoRequest(http, request, "/admin/");
 
-    if (( response != NULL ) && (ippGetStatusCode( response ) <= IPP_OK_CONFLICT))
+    if (response == NULL)
+        r = cupsLastError();
+    else
+        r = ippGetStatusCode( response );
+
+    // If user cancels the authentication pop-up, changing error code to IPP_NOT_AUTHENTICATED from IPP_FORBIDDEN
+    if (r == IPP_FORBIDDEN && auth_cancel_req)
     {
-        r = 1;
+        r = IPP_NOT_AUTHENTICATED;
+        auth_cancel_req = 0;    // Reseting cancel request.
     }
+
+    status_str = ippErrorString( r );
+    if ( r <= IPP_OK_CONFLICT)
+        r = IPP_OK;
 
 abort:
     if (username)
         cupsSetUser(username);
 
-    if ( http != NULL )
-        httpClose( http );
-
     if ( response != NULL )
         ippDelete( response );
 
-    return Py_BuildValue( "i", r );
+    return Py_BuildValue( "is", r, status_str );
 }
 
 
@@ -1143,13 +1187,10 @@ PyObject * getPPDList( PyObject * self, PyObject * args )
     PyObject * result;
     cups_lang_t *language;
     ipp_attribute_t * attr;
-    //PyObject * ppd_list;
-    http_t *http = NULL;     /* HTTP object */
-    //char buf[1024];
 
     result = PyDict_New ();
 
-    if ( ( http = httpConnectEncrypt( cupsServer(), ippPort(), cupsEncryption() ) ) == NULL )
+    if (acquireCupsInstance () == NULL)
     {
         goto abort;
     }
@@ -1241,9 +1282,6 @@ PyObject * getPPDList( PyObject * self, PyObject * args )
     }
 
 abort:
-    if ( http != NULL )
-        httpClose( http );
-
     if ( response != NULL )
         ippDelete( response );
 
@@ -1822,15 +1860,17 @@ const char * password_callback(const char * prompt)
         if (!usernameObj)
             return "";
         username = PyString_AsString(usernameObj);
-        /*      printf("usernameObj=%p, username='%s'\n", usernameObj, username); */
+        // printf("usernameObj=%p, username='%s'\n", usernameObj, username); 
         if (!username)
             return "";
+
+        auth_cancel_req = ('\0' == username[0])? 1 : 0 ;
 
         passwordObj = PyTuple_GetItem(result, 1);
         if (!passwordObj)
             return "";
         password = PyString_AsString(passwordObj);
-        /*      printf("passwordObj=%p, password='%s'\n", passwordObj, password); */
+        // printf("passwrdObj=%p, passwrd='%s'\n", passwordObj, password); 
         if (!password)
             return "";
 
@@ -1897,9 +1937,6 @@ PyObject * getPassword( PyObject * self, PyObject * args )
 
 
 
-
-
-
 // ***************************************************************************************************
 
 static PyMethodDef cupsext_methods[] =
@@ -1940,6 +1977,7 @@ static PyMethodDef cupsext_methods[] =
     { "setPasswordCallback", ( PyCFunction ) setPasswordCallback, METH_VARARGS },
     { "getPassword", ( PyCFunction ) getPassword, METH_VARARGS },
     { "findPPDAttribute", ( PyCFunction ) findPPDAttribute, METH_VARARGS },
+    { "releaseCupsInstance", ( PyCFunction ) releaseCupsInstance, METH_VARARGS },
     { NULL, NULL }
 };
 

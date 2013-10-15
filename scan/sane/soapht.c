@@ -63,7 +63,10 @@ static int bb_load(struct soap_session *ps, const char *so)
 
    /* Load hpmud manually with symbols exported. Otherwise the plugin will not find it. */ 
    if ((ps->hpmud_handle = load_library("libhpmud.so.0")) == NULL)
-      goto bugout;
+   {
+	   if ((ps->hpmud_handle = load_library("libhpmud.so.0")) == NULL)
+           goto bugout;
+   }
 
    /* Load math library manually with symbols exported (Ubuntu 8.04). Otherwise the plugin will not find it. */ 
    if ((ps->math_handle = load_library("libm.so")) == NULL)

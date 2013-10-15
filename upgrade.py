@@ -49,7 +49,7 @@ USAGE = [(__doc__, "", "name", True),
          ("Check only available version:","--check","option",False),
          ("Non-interactive mode:","-n(Without asking permissions)(future use)","option",False),
          ("Download Path to install from local system:","-p<path>","option", False),
-         ("Download HPLIP package location:","-d<path> (default location /tmp/)","option", False),
+         ("Download HPLIP package location:","-d<path> (default location ~/.hplip/)","option", False),
          ("Override existing HPLIP installation even if latest vesrion is installed:","-o","option",False),
          ("Take options from the file instead of command line:","-f<file> (future use)","option",False)
         ]
@@ -107,7 +107,7 @@ log.set_module(__mod__)
 mode = INTERACTIVE_MODE
 auto = False
 HPLIP_PATH=None
-TEMP_DIR="/tmp/"
+TEMP_DIR=prop.user_dir
 FORCE_INSTALL=False
 CHECKING_ONLY=False
 NOTIFY=False
@@ -200,7 +200,7 @@ if NOTIFY or CHECKING_ONLY:
 else:
     mod.lockInstance('upgrade',True)
 
-log_file = os.path.normpath('/var/log/hp/hp-upgrade.log')
+log_file = os.path.normpath('%s/hp-upgrade.log'%prop.user_dir)
 
 if os.path.exists(log_file):
     try:
@@ -240,6 +240,7 @@ try:
         if sts is True:
             HPLIP_latest_ver = parse_HPLIP_version(HPLIP_Ver_file, pat)
 
+    os.unlink(HPLIP_Ver_file)
     if HPLIP_latest_ver == "0.0.0":
         log.error("Failed to get latest version of HPLIP.")
         clean_exit(0)

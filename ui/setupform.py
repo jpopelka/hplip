@@ -282,24 +282,31 @@ class SetupForm(SetupForm_base):
             #status, output = utils.run(restart_cups())
             #log.debug("Restart CUPS returned: exit=%d output=%s" % (status, output))
 
-            self.setupPrinter()
-
-            if self.setup_fax:
-                self.setupFax()
-                self.readwriteFaxInformation(False)
-
-                self.lineEdit5.setText(self.fax_number)
-                self.lineEdit6.setText(self.fax_name)
-                self.lineEdit7.setText(self.fax_name_company)
-                self.lineEdit8.setText(self.fax_location)
-                self.lineEdit9.setText(self.fax_desc)
-
-                self.faxGroupBox.setEnabled(True)
-
+            print_sts = self.setupPrinter()
+            if print_sts == cups.IPP_FORBIDDEN or print_sts == cups.IPP_NOT_AUTHENTICATED or print_sts == cups.IPP_NOT_AUTHORIZED:
+                pass
             else:
-                self.faxGroupBox.setEnabled(False)
+                if self.setup_fax:
+                    if self.setupFax() == cups.IPP_OK:
+                        self.readwriteFaxInformation(False)
 
-            self.setFinishEnabled(self.FinishedPage, True)
+                        self.lineEdit5.setText(self.fax_number)
+                        self.lineEdit6.setText(self.fax_name)
+                        self.lineEdit7.setText(self.fax_name_company)
+                        self.lineEdit8.setText(self.fax_location)
+                        self.lineEdit9.setText(self.fax_desc)
+
+                        self.faxGroupBox.setEnabled(True)
+
+                else:
+                    self.faxGroupBox.setEnabled(False)
+
+            if print_sts == cups.IPP_OK:
+                self.flashFirmware()
+
+                self.setFinishEnabled(self.FinishedPage, True)
+            else:
+                self.close()
 
         if orig_page != page:
             try:
@@ -841,38 +848,55 @@ class SetupForm(SetupForm_base):
         finally:
             QApplication.restoreOverrideCursor()
 
+
+    #
+    # Updating firmware download for supported devices.
+    #
+    def flashFirmware(self):
+        if self.mq.get('fw-download', False):
+            try:
+                d = device.Device(self.device_uri)
+            except Error , e:
+                self.FailureUI(self.__tr("<b>Error opening device. Firmware download is Failed.</b><p>%s (%s)." % (e.msg, e.opt)))
+            else:
+                if d.downloadFirmware():
+                    log.info("Firmware download successful.\n")
+                else:
+                    self.FailureUI(self.__tr("<b>Firmware download is Failed.</b>"))
+                d.close()
+
+
     #
     # SETUP PRINTER/FAX
     #
 
     def setupPrinter(self):
+        status = cups.IPP_BAD_REQUEST
         QApplication.setOverrideCursor(QApplication.waitCursor)
 
-        cups.setPasswordPrompt("You do not have permission to add a printer.")
         #if self.ppd_file.startswith("foomatic:"):
         if not os.path.exists(self.ppd_file): # assume foomatic: or some such
-            status, status_str = cups.addPrinter(self.printer_name.encode('utf8'), self.device_uri,
-                self.location, '', self.ppd_file, self.desc)
+            add_prnt_args = (self.printer_name.encode('utf8'), self.device_uri,self.location, '', self.ppd_file, self.desc)
         else:
-            status, status_str = cups.addPrinter(self.printer_name.encode('utf8'), self.device_uri,
-                self.location, self.ppd_file, '', self.desc)
+            add_prnt_args = (self.printer_name.encode('utf8'), self.device_uri, self.location, self.ppd_file, '', self.desc)
+
+        status, status_str = cups.cups_operation(cups.addPrinter, GUI_MODE, 'qt3', self, *add_prnt_args)
 
         log.debug("addPrinter() returned (%d, %s)" % (status, status_str))
-        self.installed_print_devices = device.getSupportedCUPSDevices(['hp'])
+        log.debug(device.getSupportedCUPSDevices(['hp']))
 
-        log.debug(self.installed_print_devices)
-
-        if self.device_uri not in self.installed_print_devices or \
-            self.printer_name not in self.installed_print_devices[self.device_uri]:
-
-            self.FailureUI(self.__tr("<b>Printer queue setup failed.</b><p>Please restart CUPS and try again."))
+        if status != cups.IPP_OK:
+            self.FailureUI(self.__tr("<b>Printer queue setup failed.</b><p>Error : %s "%status_str))
         else:
             # sending Event to add this device in hp-systray
             utils.sendEvent(EVENT_CUPS_QUEUES_CHANGED,self.device_uri, self.printer_name)
 
         QApplication.restoreOverrideCursor()
+        return status
+
 
     def setupFax(self):
+        status = cups.IPP_BAD_REQUEST
         QApplication.setOverrideCursor(QApplication.waitCursor)
         back_end, is_hp, bus, model, serial, dev_file, host, zc, port = \
                 device.parseDeviceURI(self.device_uri)
@@ -910,7 +934,6 @@ class SetupForm(SetupForm_base):
             else: # Quit
                 return
 
-        cups.setPasswordPrompt("You do not have permission to add a fax device.")
         if not os.path.exists(fax_ppd):
             status, status_str = cups.addPrinter(self.fax_name.encode('utf8'),
                 self.fax_uri, self.fax_location, '', fax_ppd,  self.fax_desc)
@@ -919,19 +942,16 @@ class SetupForm(SetupForm_base):
                 self.fax_uri, self.fax_location, fax_ppd, '', self.fax_desc)
 
         log.debug("addPrinter() returned (%d, %s)" % (status, status_str))
-        self.installed_fax_devices = device.getSupportedCUPSDevices(['hpfax'])
+        log.debug(device.getSupportedCUPSDevices(['hpfax']))
 
-        log.debug(self.installed_fax_devices)
-
-        if self.fax_uri not in self.installed_fax_devices or \
-            self.fax_name not in self.installed_fax_devices[self.fax_uri]:
-
-            self.FailureUI(self.__tr("<b>Fax queue setup failed.</b><p>Please restart CUPS and try again."))
+        if status != cups.IPP_OK:
+            self.FailureUI(self.__tr("<b>Fax queue setup failed.</b><p>Error : %s "%status_str))
         else:
             # sending Event to add this device in hp-systray
             utils.sendEvent(EVENT_CUPS_QUEUES_CHANGED,self.fax_uri, self.fax_name)
 
         QApplication.restoreOverrideCursor()
+        return status
 
     def accept(self):
         if self.print_test_page:

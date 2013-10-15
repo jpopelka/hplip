@@ -486,25 +486,7 @@ int HPCupsFilter::StartPrintJob(int  argc, char *argv[])
 
     getLogLevel();
     m_JA.job_id = atoi(argv[1]);
-    FILE    *fp;
-    char    dFileName[32];
-    memset(dFileName, 0, sizeof(dFileName));
-    m_JA.job_id = atoi(argv[1]);
-    snprintf (dFileName, sizeof(dFileName), "/var/spool/cups/d%05d-001", m_JA.job_id);
-    if ((fp = fopen (dFileName, "r")))
-    {
-        char    line[258];
-        for (int i = 0; i < 10; i++)
-        {
-            fgets (line, 256, fp);
-            if (!strncmp (line, "%%Pages:", 8))
-            {
-                sscanf (line+9, "%d", &m_JA.total_pages);
-                break;
-            }
-        }
-        fclose (fp);
-    }
+    strncpy(m_JA.user_name,argv[2],sizeof(m_JA.user_name)-1);
 
     m_ppd = ppdOpenFile(getenv("PPD"));
     if (m_ppd == NULL) {
@@ -532,7 +514,7 @@ int HPCupsFilter::StartPrintJob(int  argc, char *argv[])
         }
     }
 
-    m_pSys = new SystemServices(m_iLogLevel, m_JA.job_id);
+    m_pSys = new SystemServices(m_iLogLevel, m_JA.job_id, m_JA.user_name);
 
 /*
  *  When user cancels a print job, the spooler sends SIGTERM signal
@@ -614,7 +596,8 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
 
     char hpPreProcessedRasterFile[64]; //temp file needed to store raster data with swaped pages.
 
-    strcpy(hpPreProcessedRasterFile, "/var/log/hp/tmp/hplipSwapedPagesXXXXXX");
+
+    sprintf(hpPreProcessedRasterFile, "%s/hp_%s_cups_SwapedPagesXXXXXX",CUPS_TMP_DIR, m_JA.user_name);
 
 
     while (cupsRasterReadHeader2(cups_raster, &cups_header))
@@ -651,7 +634,7 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
                 memset (kRaster, 0, cups_header.cupsWidth);
                 memset (rgbRaster, 0xFF, cups_header.cupsWidth * 3);
             }
-        } // current_page_number == 1
+        } // end of if(current_page_number == 1)
 
         if (cups_header.cupsColorSpace == CUPS_CSPACE_K) {
             kRaster = m_pPrinterBuffer;
@@ -684,7 +667,7 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
                 cups_header.cupsColorSpace == CUPS_CSPACE_RGB)
             {
 
-                snprintf (szFileName, sizeof(szFileName), "/var/log/hp/tmp/hpcupsfilterc_bmp_%d_XXXXXX", current_page_number);
+                snprintf (szFileName, sizeof(szFileName), "%s/hp_%s_cups_filterc_bmp_%d_XXXXXX", CUPS_TMP_DIR, m_JA.user_name, current_page_number);
                 createTempFile(szFileName, &cfp);
                 if (cfp)
                 {
@@ -695,7 +678,7 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
             if (cups_header.cupsColorSpace == CUPS_CSPACE_RGBW ||
                 cups_header.cupsColorSpace == CUPS_CSPACE_K)
             {
-                snprintf (szFileName, sizeof(szFileName), "/var/log/hp/tmp/hpcupsfilterk_bmp_%d_XXXXXX", current_page_number);
+                snprintf (szFileName, sizeof(szFileName), "%s/hp_%s_cups_filterk_bmp_%d_XXXXXX", CUPS_TMP_DIR, m_JA.user_name, current_page_number);
                 createTempFile(szFileName, &kfp);
                 if (kfp)
                 {

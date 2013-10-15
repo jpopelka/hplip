@@ -104,6 +104,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-deskjet_2510_series.ppd.gz \
    ppd/hpcups/hp-deskjet_2520_series.ppd.gz \
    ppd/hpcups/hp-deskjet_2540_series.ppd.gz \
+   ppd/hpcups/hp-deskjet_2640_series.ppd.gz \
    ppd/hpcups/hp-deskjet_3000_j310_series.ppd.gz \
    ppd/hpcups/hp-deskjet_3050_j610_series.ppd.gz \
    ppd/hpcups/hp-deskjet_3050a_j611_series.ppd.gz \

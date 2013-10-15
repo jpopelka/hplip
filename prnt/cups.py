@@ -689,27 +689,27 @@ def getDefaultPrinter():
     return r
 
 def setDefaultPrinter(printer_name):
-    setPasswordPrompt("You do not have permission to set the default printer.")
+    setPasswordPrompt("You do not have permission to set the default printer. You need authentication.")
     return cupsext.setDefaultPrinter(printer_name)
 
 def accept(printer_name):
-    setPasswordPrompt("You do not have permission to accept jobs on a printer queue.")
+    setPasswordPrompt("You do not have permission to accept jobs on a printer queue. You need authentication.")
     return controlPrinter(printer_name, CUPS_ACCEPT_JOBS)
 
 def reject(printer_name):
-    setPasswordPrompt("You do not have permission to reject jobs on a printer queue.")
+    setPasswordPrompt("You do not have permission to reject jobs on a printer queue. You need authentication.")
     return controlPrinter(printer_name, CUPS_REJECT_JOBS)
 
 def start(printer_name):
-    setPasswordPrompt("You do not have permission to start a printer queue.")
+    setPasswordPrompt("You do not have permission to start a printer queue. You need authentication.")
     return controlPrinter(printer_name, IPP_RESUME_PRINTER)
 
 def stop(printer_name):
-    setPasswordPrompt("You do not have permission to stop a printer queue.")
+    setPasswordPrompt("You do not have permission to stop a printer queue. You need authentication.")
     return controlPrinter(printer_name, IPP_PAUSE_PRINTER)
 
 def purge(printer_name):
-    setPasswordPrompt("You do not have permission to purge jobs.")
+    setPasswordPrompt("You do not have permission to purge jobs. You need authentication.")
     return controlPrinter(printer_name, IPP_PURGE_JOBS)
 
 def controlPrinter(printer_name, cups_op):
@@ -770,7 +770,7 @@ def getServer():
     return cupsext.getServer()
 
 def cancelJob(jobid, dest=None):
-    setPasswordPrompt("You do not have permission to cancel a job.")
+    setPasswordPrompt("You do not have permission to cancel a job. You need authentication.")
     if dest is not None:
         return cupsext.cancelJob(dest, jobid)
     else:
@@ -801,6 +801,7 @@ def printFile(printer, filename, title):
         return -1
 
 def addPrinter(printer_name, device_uri, location, ppd_file, model, info):
+    setPasswordPrompt("You do not have permission to add a printer. You need authentication.")
     log.debug("addPrinter('%s', '%s', '%s', '%s', '%s', '%s')" %
         ( printer_name, device_uri, location, ppd_file, model, info))
 
@@ -811,11 +812,11 @@ def addPrinter(printer_name, device_uri, location, ppd_file, model, info):
     return cupsext.addPrinter(printer_name, device_uri, location, ppd_file, model, info)
 
 def delPrinter(printer_name):
-    setPasswordPrompt("You do not have permission to delete a printer.")
+    setPasswordPrompt("You do not have permission to delete a printer. You need authentication.")
     return cupsext.delPrinter(printer_name)
 
 def enablePrinter(printer_name):
-    setPasswordPrompt("You do not have permission to enable a printer.")
+    setPasswordPrompt("You do not have permission to enable a printer. You need authentication.")
     cmd_full_path = utils.which('cupsenable', True)
     cmd= "%s %s" % (cmd_full_path, printer_name)
     return os_utils.execute(cmd)
@@ -852,3 +853,27 @@ def setPasswordPrompt(prompt):
 
 def findPPDAttribute(name, spec):
     return cupsext.findPPDAttribute(name, spec)
+
+def releaseCupsInstance():
+    return cupsext.releaseCupsInstance()
+
+
+def cups_operation(operation_func, mode, ui_toolkit, ui_obj, *cups_op_args):
+    cnt = 0
+    while cnt < 3:
+        cnt += 1
+        result, status_str = operation_func(*cups_op_args)
+        if result != IPP_FORBIDDEN:
+            break
+        else:
+            releaseCupsInstance()
+            if cnt < 3:
+                if mode == INTERACTIVE_MODE:
+                    log.error("Could not connect to CUPS Server due to insufficient privileges.Try with valid user")
+                elif ui_toolkit == 'qt3':
+                    ui_obj.FailureUI("<b>Could not connect to CUPS Server due to insufficient privileges.</b><p>Try with valid user")
+                else:
+                    from ui4 import ui_utils
+                    ui_utils.FailureUI(ui_obj, "<b>Could not connect to CUPS Server due to insufficient privileges.</b><p>Try with valid user")
+
+    return result, status_str

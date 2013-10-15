@@ -176,15 +176,10 @@ class PolicyKitService(dbus.service.Object):
                                     "/org/freedesktop/PolicyKit1/Authority",
                                     "org.freedesktop.PolicyKit1.Authority")
         policy_kit = dbus.Interface(obj, "org.freedesktop.PolicyKit1.Authority")
-        info = dbus.Interface(connection.get_object("org.freedesktop.DBus",
-                                                    "/org/freedesktop/DBus/Bus",
-                                                    False),
-                              "org.freedesktop.DBus")
-        pid = info.GetConnectionUnixProcessID(sender)
-        
+
         subject = (
-            'unix-process',
-            { 'pid' : dbus.UInt32(pid, variant_level = 1) }
+           'system-bus-name',
+            { 'name' : dbus.String(sender, variant_level = 1) }
         )
         details = { '' : '' }
         flags = dbus.UInt32(1)         # AllowUserInteraction = 0x00000001
@@ -198,6 +193,7 @@ class PolicyKitService(dbus.service.Object):
                                           cancel_id)
         if not ok:
             log.error("Session not authorized by PolicyKit version 1")
+            raise AccessDeniedException("Session not authorized by PolicyKit")
 
         return ok
 

@@ -9421,6 +9421,8 @@ Manufacturer "HP"
       PCFileName "hp-envy_5530_series.ppd"
       Attribute "Product" "" "(HP Envy 5530 E-all-in-one Printer)"
       Attribute "Product" "" "(HP Envy 5535 E-all-in-one Printer)"
+      Attribute "Product" "" "(HP Envy 5532 E-all-in-one Printer)"
+      Attribute "Product" "" "(HP Envy 5531 E-all-in-one Printer)"
     }
 
 } // End MimasTDR
@@ -9665,6 +9667,7 @@ Manufacturer "HP"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 1515 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 1516 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 1518 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet 1514 All-in-one Printer)"
   }
   {
     ModelName "HP Deskjet 2540 Series"
@@ -9677,6 +9680,17 @@ Manufacturer "HP"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 2545 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 2546 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 2540 All-in-one Printer Series)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 2548 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet 2544 All-in-one Printer)"
+  }
+  {
+    ModelName "HP Deskjet 2640 Series"
+    Attribute "NickName" "" "HP Deskjet 2640 Series, hpcups $Version"
+    Attribute "ShortNickName" "" "HP Deskjet 2640 Series"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 2640 series;DES:deskjet 2640 series;"
+    PCFileName "hp-deskjet_2640_series.ppd"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 2645 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 2646 All-in-one Printer)"
   }
   }
 

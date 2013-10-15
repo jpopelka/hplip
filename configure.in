@@ -26,7 +26,7 @@
 #   104 = no libdl
 
 #AC_PREREQ(2.59)
-AC_INIT([HP Linux Imaging and Printing], [3.13.9], [3.13.9], [hplip])
+AC_INIT([HP Linux Imaging and Printing], [3.13.10], [3.13.10], [hplip])
 #AM_INIT_AUTOMAKE([1.9 foreign])
 AM_INIT_AUTOMAKE
 AC_DISABLE_STATIC
@@ -350,6 +350,8 @@ AC_ARG_WITH(mimedir, AC_HELP_STRING([--with-mimedir=DIR], [set cups mime.types l
 AC_ARG_WITH(docdir, AC_HELP_STRING([--with-docdir=DIR], [set hplip documentation directory [default=datadir/doc]]),
    hpdocdir=$withval, hpdocdir="$datadir/doc/hplip-$VERSION")
 
+AC_ARG_WITH(htmldir, AC_HELP_STRING([--with-htmldir=DIR], [set hplip html documentation directory [default=datadir/doc]]),
+   hphtmldir=$withval, hphtmldir="$datadir/doc/hplip-$VERSION")
 AC_MSG_CHECKING([for foomatic ppd install])
 AC_ARG_ENABLE(foomatic_ppd_install,
   [  --enable-foomatic-ppd-install    enable foomatic static ppd install (default=no), uses hpppddir],
@@ -579,6 +581,7 @@ AC_DEFINE_DIR([abs_datadir], [datadir])
 AC_DEFINE_DIR([abs_sbindir], [sbindir])
 AC_DEFINE_DIR([abs_hpppddir], [hpppddir])
 AC_DEFINE_DIR([abs_docdir], [hpdocdir])
+AC_DEFINE_DIR([abs_htmldir], [hphtmldir])
 abs_ppddir=${abs_hpppddir%/*}
 AC_DEFINE_DIR([abs_drvdir], [drvdir])
 
@@ -586,6 +589,7 @@ AC_SUBST(abs_datadir)
 AC_SUBST(abs_sbindir) 
 AC_SUBST(abs_hpppddir) 
 AC_SUBST(abs_docdir) 
+AC_SUBST(abs_htmldir) 
 AC_SUBST(abs_ppddir) 
 AC_SUBST(abs_drvdir) 
 AC_SUBST(abs_mimedir) 
@@ -596,6 +600,7 @@ AC_SUBST(cupsbackenddir)
 AC_SUBST(cupsfilterdir)
 AC_SUBST(hpppddir)
 AC_SUBST(hpdocdir)
+AC_SUBST(hphtmldir)
 AC_SUBST(drvdir)
 AC_SUBST(network_build)
 AC_SUBST(pp_build)

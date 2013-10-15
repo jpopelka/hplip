@@ -32,14 +32,17 @@ import glob
 
 from base.g import *
 from base import utils,tui,module, os_utils
-
+from subprocess import Popen, PIPE
 
 CUPS_FILE='/etc/cups/cupsd.conf'
 CUPS_BACKUP_FILE='/etc/cups/cupsd.conf_orginal'
 LOG_FOLDER_PATH='./'
 LOG_FOLDER_NAME='hplip_troubleshoot_logs'
 LOG_FILES=LOG_FOLDER_PATH + LOG_FOLDER_NAME
-TMP_DIR='/var/log/hp/tmp'
+TMP_DIR = "/var/spool/cups/tmp"
+USER_NAME =""
+USERS={}
+
 ############ enable_log() function ############
 #This function changes CUPS conf log level to debug and restarts CUPS service.
 
@@ -149,8 +152,10 @@ def backup_clearLog(strLog):
 
 
 USAGE = [(__doc__, "", "name", True),
-         ("Usage: [su -c /sudo] %s [OPTIONS]" % __mod__, "", "summary", True),
+         ("Usage: [su -c /sudo] %s [USER INFO] [OPTIONS]" % __mod__, "", "summary", True),
          ("e.g. su -c '%s'"%__mod__,"","summary",True),
+         ("[USER INFO]", "", "heading", False),
+         ("User name for which logs to be collected:", "--user=<username> ", "option", False),
          utils.USAGE_OPTIONS,
          utils.USAGE_HELP,
          utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
@@ -160,11 +165,10 @@ USAGE = [(__doc__, "", "name", True),
 ######## Main #######
 try:
     mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
-                    (INTERACTIVE_MODE, GUI_MODE),
-                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4), True, True)
+                    (INTERACTIVE_MODE,),run_as_root_ok=True, quiet=True)
 
     opts, device_uri, printer_name, mode, ui_toolkit, loc = \
-               mod.parseStdOpts('hl:g', ['help', 'help-rest', 'help-man', 'help-desc', 'logging=', 'debug'],handle_device_printer=False)
+               mod.parseStdOpts('hl:g', ['help', 'help-rest', 'help-man', 'help-desc', 'logging=', 'debug','user='],handle_device_printer=False)
 except getopt.GetoptError, e:
     log.error(e.msg)
     usage()
@@ -194,10 +198,27 @@ for o, a in opts:
     elif o in ('-g', '--debug'):
         log.set_level('debug')
 
+    elif o == '--user':
+        USER_NAME = a
+
+
 
 if os.getuid() != 0:
     log.error("logCapture needs root permissions since cups service restart requires....")
     sys.exit()
+
+if not USER_NAME:
+    pout = Popen(["who", "am", "i"], stdout=PIPE)
+    output = pout.communicate()[0]
+    if output:
+        USER_NAME = output.split(' ')[0]
+
+    if not USER_NAME:
+        log.error("Failed to get the user name. Try again by passing '--user' option")
+        sys.exit(1)
+
+if not os.path.exists(TMP_DIR):
+    TMP_DIR = "/tmp"
 
 cmd = "mkdir -p %s"%LOG_FILES
 log.debug("Creating temporary logs folder =%s"%cmd)
@@ -205,6 +226,24 @@ sts, out = utils.run(cmd)
 if sts != 0:
    log.error("Failed to create directory =%s. Exiting"%LOG_FILES)
    sys.exit(1)
+
+sts,out = utils.run('chmod 755  %s'%LOG_FILES)
+if sts != 0:
+    log.error("Failed to change permissions for %s."%(LOG_FILES))
+
+
+USERS[USER_NAME]="/home/"+USER_NAME+"/.hplip"
+        
+USERS['root']="/root/.hplip"
+for u in USERS:
+    sts, out = utils.run('mkdir -p %s/%s'%(LOG_FILES,u))
+    if sts != 0:
+       log.error("Failed to create directory =%s. Exiting"%LOG_FILES)
+       sys.exit(1)
+
+    sts,out = utils.run('chmod 755  %s/%s'%(LOG_FILES,u))
+    if sts != 0:
+        log.error("Failed to change permissions for %s/%s."%(LOG_FILES,u))
 
 
 enable_log()
@@ -221,21 +260,23 @@ if ok and user_input == "y":
     backup_clearLog('/var/log/messages')
     backup_clearLog('/var/log/cups/error_log')
 
-File_list, File_list_str =utils.expand_list('%s/*.bmp'%TMP_DIR)
-if File_list:
-    cmd= 'rm -rf %s'%File_list_str
-    log.debug("cmd= %s"%cmd)
-    sts,out = utils.run(cmd)
-    if sts != 0:
-        log.warn("Failed to remove %s files"%File_list_st)
+'''
+sts = os.system('rm -f %s/hpcupsfilter*'%TMP_DIR)
+if sts != 0:
+  log.error("Failed to remove hpcupsfilter tmp files.")
 
-File_list, File_list_str =utils.expand_list('%s/*.out'%TMP_DIR)
-if File_list:
-    cmd= 'rm -rf %s'%File_list_str
-    log.debug("cmd= %s"%cmd)
-    sts,out = utils.run(cmd)
-    if sts != 0:
-        log.warn("Failed to remove %s files"%File_list_st)
+sts = os.system('rm -f %s/hpcups_* '%TMP_DIR)
+if sts != 0:
+  log.error("Failed to remove hpcups tmp files.")
+
+sts = os.system('rm -f %s/hpliptiff*'%TMP_DIR)
+if sts != 0:
+  log.error("Failed to remove hpliptiff tmp files.")
+
+sts = os.system('rm -f %s/hplipfaxLog* '%TMP_DIR)
+if sts != 0:
+  log.error("Failed to remove hpcups tmp files.")
+'''
 
 
 ######## Waiting for user to completed job #######
@@ -270,34 +311,20 @@ if os.path.exists('/var/log/cups/error_log'):
     if sts != 0:
       log.error("Failed to capture %s log file."%("/var/log/cups/error_log"))
 
-File_list, File_list_str = utils.expand_list('/var/log/hp/*.log')
-if File_list:
-    sts,out = utils.run('cp -f %s %s'%(File_list_str, LOG_FILES))
-    if sts != 0:
-      log.error("Failed to capture %s log files."%(File_list_str))
+for u in USERS:
+    sts = os.system('cp -f %s/*.log  %s/%s 2>/devnull '%(USERS[u],LOG_FILES,u))
+    sts = os.system('cp -f %s/*.out  %s/%s 2>/devnull '%(USERS[u],LOG_FILES,u))
+    sts = os.system('cp -f %s/hp_*  %s 2>/devnull '%(USERS[u],LOG_FILES))
 
-File_list, File_list_str =utils.expand_list('%s/hpcupsfilter*'%TMP_DIR)
-if File_list:
-    sts,out = utils.run('cp -f %s %s'%(File_list_str, LOG_FILES))
-    if sts != 0:
-      log.error("Failed to capture %s log files."%(File_list_str))
-
-File_list, File_list_str =utils.expand_list('%s/hpcups_*'%TMP_DIR)
-if File_list:
-    sts,out = utils.run('cp -f %s %s'%(File_list_str, LOG_FILES))
-    if sts != 0:
-      log.error("Failed to capture %s log files."%(File_list_str))
+sts = os.system('cp -f %s/hp_%s_*  %s 2>/devnull '%(TMP_DIR, USER_NAME, LOG_FILES))
 
 sts,out = utils.run('mv -f ./hp-check.log %s'%LOG_FILES)
 if sts != 0:
     log.error("Failed to capture %s log files."%("./hp-check.log"))
-sts,out = utils.run('chmod 755  %s'%LOG_FILES)
-if sts != 0:
-    log.error("Failed to change permissions for %s. Only root can access."%(LOG_FILES))
-cmd = 'chmod 666 -R %s/*' % LOG_FILES
+cmd = 'chmod 666  %s/*.log' % LOG_FILES
 sts = os_utils.execute(cmd)
 if sts != 0:
-    log.error("Failed to change permissions for %s. Only root can access."%(LOG_FILES))
+    log.error("Failed to change permissions for %s."%(LOG_FILES))
 
 ######## Compressing log files #######
 cmd = 'tar -zcf %s.tar.gz %s'%(LOG_FOLDER_NAME,LOG_FILES)
@@ -310,7 +337,7 @@ else:
     log.debug("Changing Permissions of ./%s.tar.gz "%LOG_FOLDER_NAME)
     sts,out = utils.run('chmod 666 -R ./%s.tar.gz'%(LOG_FOLDER_NAME))
     if sts != 0:
-        log.error("Failed to change permissions for %s.tar.gz Only root can access."%(LOG_FILES))
+        log.error("Failed to change permissions for %s.tar.gz."%(LOG_FILES))
     log.debug("Removing Temporary log files..")
     sts,out = utils.run('rm -rf %s'%LOG_FILES)
     if sts != 0:

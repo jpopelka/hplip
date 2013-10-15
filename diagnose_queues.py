@@ -106,7 +106,7 @@ try:
         utils.log_title(__title__, __version__)
         
     mod.lockInstance(__mod__, True)
-    log_file = os.path.normpath('/var/log/hp/hplip_queues.log')
+    log_file = os.path.normpath('%s/hplip_queues.log'%prop.user_dir)
     log.debug(log.bold("Saving output in log file: %s" % log_file))
     if os.path.exists(log_file):
         try:
@@ -117,7 +117,7 @@ try:
     log.set_where(log.LOG_TO_CONSOLE_AND_FILE)
 
     passwordObj = password.Password(mode)
-    queues.main_function(passwordObj, mode,ui_toolkit, quiet_mode, True )
+    queues.main_function(passwordObj, mode,ui_toolkit, quiet_mode )
     
                
 except KeyboardInterrupt:

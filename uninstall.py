@@ -106,7 +106,7 @@ if log_level is not None:
     if not log.set_level(log_level):
         usage()
         
-log_file = os.path.normpath('/var/log/hp/hplip-uninstall.log')
+log_file = os.path.normpath('%s/hplip-uninstall.log'%prop.user_dir)
 if os.getuid() != 0:
     log.error("To run 'hp-uninstall' utility, you must have root privileges.(Try using 'sudo' or 'su -c')")
     sys.exit(1)

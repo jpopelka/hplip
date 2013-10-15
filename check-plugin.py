@@ -45,7 +45,7 @@ from installer import pluginhandler
 username = ""
 device_uri = ""
 printer_name = ""
-LOG_FILE = "/var/log/hp/hplip_ac.log"
+LOG_FILE = "%s/hplip_ac.log"%prop.user_dir
 DBUS_SERVICE='com.hplip.StatusService'
 
 ##### METHODS #####
@@ -234,15 +234,6 @@ if os.path.exists(LOG_FILE):
 
 log.set_logfile(LOG_FILE)
 log.set_where(log.LOG_TO_CONSOLE_AND_FILE)
-cmd="chmod 664 "+LOG_FILE
-sts,output = utils.run(cmd)
-if sts != 0:
-    log.debug("Failed to change log file permissions: %s" %output)
-
-cmd="chgrp lp "+LOG_FILE
-sts,output = utils.run(cmd)
-if sts != 0:
-    log.debug("Failed to change log file group permissions: %s" %output)
 
 log.debug(" hp-check-plugin started")
 

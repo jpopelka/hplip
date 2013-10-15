@@ -387,6 +387,7 @@ class UpdateThread(QThread):
             finally:
                 dev.close()
                 #print "THREAD LOCK RELEASE"
+                cups.releaseCupsInstance()
                 devices_lock.release()
 
             log.debug("Device state = %d" % dev.device_state)
@@ -2632,27 +2633,29 @@ class DevMgr4(DevMgr4_base):
         QApplication.setOverrideCursor(QApplication.waitCursor)
         try:
             if self.printer_state in (cups.IPP_PRINTER_STATE_IDLE, cups.IPP_PRINTER_STATE_PROCESSING):
-                result = cups.stop(self.cur_printer)
-                if result:
+
+                result, result_str = cups.cups_operation(cups.stop, GUI_MODE, 'qt3', self, self.cur_printer)
+                if result == cups.IPP_OK:
                     if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
                         e = EVENT_PRINTER_QUEUE_STOPPED
                     else:
                         e = EVENT_FAX_QUEUE_STOPPED
 
             else:
-                result = cups.start(self.cur_printer)
-                if result:
+                result, result_str = cups.cups_operation(cups.start, GUI_MODE, 'qt3', self, self.cur_printer)
+                if result == cups.IPP_OK:
                     if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
                         e = EVENT_PRINTER_QUEUE_STARTED
                     else:
                         e = EVENT_FAX_QUEUE_STARTED
 
-            if result:
+            if result == cups.IPP_OK:
                 self.UpdatePrintController()
                 self.cur_device.sendEvent(e, self.cur_printer)
             else:
                 log.error("Start/Stop printer operation failed")
-                self.FailureUI(self.__tr("<b>Start/Stop printer operation failed.</b><p>Try after add user to \"lp\" group."))
+                self.FailureUI(self.__tr("<b>Start/Stop printer operation failed.</b><p> Error : %s"%result_str))
+                cups.releaseCupsInstance()
 
         finally:
             QApplication.restoreOverrideCursor()
@@ -2662,27 +2665,28 @@ class DevMgr4(DevMgr4_base):
         QApplication.setOverrideCursor(QApplication.waitCursor)
         try:
             if self.printer_accepting:
-                result = cups.reject(self.cur_printer)
-                if result:
+                result ,result_str = cups.cups_operation(cups.reject, GUI_MODE, 'qt3', self, self.cur_printer)
+                if result == cups.IPP_OK:
                     if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
                         e = EVENT_PRINTER_QUEUE_REJECTING_JOBS
                     else:
                         e = EVENT_FAX_QUEUE_REJECTING_JOBS
 
             else:
-                result = cups.accept(self.cur_printer)
-                if result:
+                result ,result_str = cups.cups_operation(cups.accept, GUI_MODE, 'qt3', self, self.cur_printer)
+                if result == cups.IPP_OK:
                     if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
                         e = EVENT_PRINTER_QUEUE_ACCEPTING_JOBS
                     else:
                         e = EVENT_FAX_QUEUE_ACCEPTING_JOBS
 
-            if result:
+            if result == cups.IPP_OK:
                 self.UpdatePrintController()
                 self.cur_device.sendEvent(e, self.cur_printer)
             else:
                 log.error("Reject/Accept jobs operation failed")
-                self.FailureUI(self.__tr("<b>Accept/Reject printer operation failed.</b><p>Try after add user to \"lp\" group."))
+                self.FailureUI(self.__tr("<b>Accept/Reject printer operation failed.</b><p>Error : %s"%result_str))
+                cups.releaseCupsInstance()
 
         finally:
             QApplication.restoreOverrideCursor()
@@ -2691,10 +2695,12 @@ class DevMgr4(DevMgr4_base):
     def defaultPushButton_clicked(self):
         QApplication.setOverrideCursor(QApplication.waitCursor)
         try:
-            result = cups.setDefaultPrinter(self.cur_printer.encode('utf8'))
-            if not result:
+            result, result_str = cups.cups_operation(cups.setDefaultPrinter, GUI_MODE, 'qt3', self, self.cur_printer.encode('utf8'))
+
+            if result != cups.IPP_OK:
                 log.error("Set default printer failed.")
-                self.FailureUI(self.__tr("<b>Set default printer operation failed.</b><p>Try after add user to \"lp\" group."))
+                self.FailureUI(self.__tr("<b>Set default printer operation failed.</b><p>Error : %s"%result_str))
+                cups.releaseCupsInstance()
             else:
                 self.UpdatePrintController()
                 if self.cur_device.device_type == DEVICE_TYPE_PRINTER:
@@ -2858,9 +2864,12 @@ class DevMgr4(DevMgr4_base):
                     if d in (print_uri, fax_uri):
                         for p in self.cups_devices[d]:
                             log.debug("Removing %s" % p)
-                            r = cups.delPrinter(p)
-                            if r == 0:
-                                self.FailureUI(self.__tr("<p><b>Delete printer queue fails.</b><p>Try after add user to \"lp\" group."))
+                            r, result_str = cups.cups_operation(cups.delPrinter, GUI_MODE, 'qt3', self, p)
+
+                            if r != cups.IPP_OK:
+                                self.FailureUI(self.__tr("<p><b>Delete printer queue fails.</b><p>Error : %s"%result_str))
+                                print_uri =""   # Ignoring further devices delete operation, as authentication is failed or cancelled.
+                                fax_uri = ""
 
                 self.cur_device = None
                 self.cur_device_uri = ''

@@ -97,9 +97,11 @@ err_pats = {r'(?is)<TITLE>.*?(404|403).*?ERROR.*?</TITLE>': 0.95,
            }
 # Note:- If new utility is added, add same utility here to uninstall properly.
 
-BINS_LIST=['hpijs','hp-align','hp-colorcal','hp-faxsetup','hp-linefeedcal','hp-pkservice','hp-printsettings','hp-sendfax','hp-timedate','hp-check','hp-devicesettings','hp-firmware','hp-makecopies','hp-plugin','hp-probe','hp-setup','hp-toolbox','hp-check-plugin','hp-diagnose_plugin','hp-info','hp-makeuri','hp-pqdiag','hp-query','hp-systray','hp-unload','hp-clean','hp-fab','hp-levels','hp-mkuri','hp-print','hp-scan','hp-testpage','hp-wificonfig', 'hp-upgrade','hplip-info','hp-check-upgrade','hp-config_usb_printer','hp-diagnose_queues', 'hp-devicesetup','hp-doctor','hp-logcapture']
+BINS_LIST=['hpijs','hp-align','hp-colorcal','hp-faxsetup','hp-linefeedcal','hp-pkservice','hp-printsettings','hp-sendfax','hp-timedate','hp-check','hp-devicesettings','hp-firmware','hp-makecopies','hp-plugin','hp-probe','hp-setup','hp-toolbox','hp-check-plugin','hp-diagnose_plugin','hp-info','hp-makeuri','hp-pqdiag','hp-query','hp-systray','hp-unload','hp-clean','hp-fab','hp-levels','hp-print','hp-scan','hp-testpage','hp-wificonfig', 'hp-upgrade','hplip-info','hp-check-upgrade','hp-config_usb_printer','hp-diagnose_queues', 'hp-devicesetup','hp-doctor','hp-logcapture']
 
 LIBS_LIST=['libhpmud.*','libhpip.*','sane/libsane-hpaio.*','cups/backend/hp','cups/backend/hpfax', 'cups/filter/hpcac', 'cups/filter/hpps', 'cups/filter/pstotiff','cups/filter/hpcups', 'cups/filter/hpcupsfax', 'cups/filter/hplipjs']
+
+HPLIP_EXT_LIST = ['cupsext.so', 'cupsext.la', 'scanext.so', 'scanext.la', 'hpmudext.so', 'hpmudext.la', 'pcardext.so', 'pcardext.la']
 
 FILES_LIST=[ '/usr/share/cups/drv/hp/','/usr/local/share/ppd/HP/','/usr/local/share/cups/drv/hp/' ,'/usr/share/applications/hplip.desktop', '/etc/xdg/autostart/hplip-systray.desktop', '/etc/hp/hplip.conf', '/usr/share/doc/hplip-*','/usr/lib/systemd/system/hplip-printer*.service']
 
@@ -229,7 +231,6 @@ class CoreInstall(object):
             'native_cups' : TYPE_BOOL,
             'package_available' : TYPE_BOOL,
             'package_arch' : TYPE_LIST,
-            'add_user_to_group': TYPE_STRING,
             'open_mdns_port' : TYPE_LIST, # command to use to open mdns multicast port 5353
             'acl_rules' : TYPE_BOOL, # Use ACL uDEV rules (Ubuntu 9.10+)
             'libdir_path' : TYPE_STRING,
@@ -325,7 +326,7 @@ class CoreInstall(object):
             'libcrypto':        (True,  ['network'], "libcrypto - OpenSSL cryptographic library", self.check_libcrypto, DEPENDENCY_RUN_AND_COMPILE_TIME),
             'network':        (False, ['network'], "network -wget", self.check_wget, DEPENDENCY_RUN_TIME),
             'avahi-utils':        (False, ['network'], "avahi-utils", self.check_avahi_utils, DEPENDENCY_RUN_TIME),
-            'passwd_util':        (False, ['gui_qt4'], "GUI Password utility (gksu/kdesu)", self.check_passwd_util, DEPENDENCY_RUN_TIME),
+#            'passwd_util':        (False, ['gui_qt4'], "GUI Password utility (gksu/kdesu)", self.check_passwd_util, DEPENDENCY_RUN_TIME),
         }
 
         for opt in self.options:
@@ -1029,18 +1030,25 @@ class CoreInstall(object):
 
     def check_hpaio(self):
         found = False
-        log.debug("'Checking for hpaio' in '/etc/sane.d/dll.conf'...")
-        try:
-            f = file('/etc/sane.d/dll.conf', 'r')
-        except IOError:
-            log.error("'/etc/sane.d/dll.conf' not found. Is SANE installed?")
-        else:
-            for line in f:
-                lineNoSpace = re.sub(r'\s', '', line)
-                hpaiomatched=re.match('hpaio',lineNoSpace)
-                if hpaiomatched:
-                    found = True
-                    break
+        for path in ['/etc/sane.d/dll.conf','/etc/sane.d/dll.d/hpaio', '/etc/sane.d/dll.d/hplip']:
+            log.debug("'Checking for hpaio' in '%s'..." % path)
+            try:
+                f = file(path, 'r')
+            except IOError:
+                log.info("'%s' not found." % path)
+            else:
+                for line in f:
+                    lineNoSpace = re.sub(r'\s', '', line) 
+                    hpaiomatched=re.match('hpaio',lineNoSpace)
+                    if hpaiomatched:
+                        found = True
+                        break            
+            if found:
+                break
+
+        if not found:
+            log.error("'hpaio' not found in SANE conf files. Is SANE installed?")
+
         return found
 
     def update_hpaio(self):
@@ -1505,7 +1513,9 @@ class CoreInstall(object):
         else:
             log.debug("avahi-browse is not installed")
             return False
-        
+
+
+    '''
     def check_passwd_util(self):
         if utils.which("gksu"):
             return True
@@ -1515,7 +1525,7 @@ class CoreInstall(object):
             return True
         else:
             log.debug("GUI password gksu/kdesu/kdesudo utility is not installed")
-            return False
+            return False'''
 
 
     def run_pre_install(self, callback=None,distro_ver=None):
@@ -1619,13 +1629,6 @@ class CoreInstall(object):
             log.debug("Found %s for %s process"%(pid, pid_list[pid]))
             kill = kill_cmd + " %s"%pid
             cmds.append(self.passwordObj.getAuthCmd() % kill)
-
-        # Add user to group if needed
-        # add_user_to_group=<usermod params> [TYPE_STRING] (leave empty for none) [ex. "-a -G sys" or "-G lp"]
-        add_user_to_group = self.get_distro_ver_data('add_user_to_group', '',distro_ver)
-        if add_user_to_group:
-            usermod = os.path.join(utils.which("usermod"), "usermod") + " %s %s" % (add_user_to_group, prop.username)
-            cmds.append(self.passwordObj.getAuthCmd() % usermod)
 
         return cmds
 
@@ -1842,6 +1845,25 @@ class CoreInstall(object):
         for fl in RULES_LIST_FULL:
             utils.remove(fl , self.passwordObj, checkSudo)
 
+        # removing (unused) hplip folder from other location 
+        cmd = 'find /usr -type d -name hplip'
+        cmd = self.passwordObj.getAuthCmd() %cmd
+        status, output=utils.run(cmd, self.passwordObj, checkSudo)
+        if status == 0:
+            hplip_folders = output.splitlines()
+            for hplip_d in hplip_folders:
+                if hplip_d != home_dir:
+                    utils.remove(hplip_d, self.passwordObj, checkSudo)
+
+        # removing all hplip extension libraries
+        for ext_f in HPLIP_EXT_LIST:
+            if ext_f:
+                cmd = 'find /usr -type f -name %s -delete'%ext_f
+                cmd = self.passwordObj.getAuthCmd() %cmd
+                status,output = utils.run(cmd , self.passwordObj, checkSudo)
+                if status != 0:
+                    log.warn("Failed to delete %s library  [%s]"%(ext_f,output))
+
         # removing Plug-in files
         if remove_plugins == True:
             cnt =0
@@ -1905,8 +1927,6 @@ class CoreInstall(object):
             Is_pkg_mgr_running = True
 
         return User_exit, Is_pkg_mgr_running
-
-
 
 
     #add_groups_to_user()

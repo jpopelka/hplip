@@ -76,7 +76,7 @@ def restart(passwordObj):
     if shutdown and passwordObj:
         cmd = "%s -r now" % (os.path.join(shutdown, "shutdown"))
         cmd = passwordObj.getAuthCmd() % cmd
-        status, output = utils.run(cmd, passwordObj)
+        status, output = utils.run(cmd, passwordObj, "Need authentication to restart system")
 
         ok = (status == 0)
     return ok
@@ -89,7 +89,7 @@ def run_open_mdns_port(core, passwordObj, callback=None):
         x = 1
         for cmd in open_mdns_port_cmd:
             cmd = passwordObj.getAuthCmd() % cmd
-            status, output = utils.run(cmd, passwordObj)
+            status, output = utils.run(cmd, passwordObj,"Need authentication to open mdns port [%s]"%cmd)
 
             if status != 0:
                 log.warn("An error occurred running '%s'" % cmd)
@@ -126,7 +126,7 @@ def run_hp_tools_with_auth(cmd, passwordObj):
         hpCommand = passwordObj.getAuthCmd() % hpCommand
 
         log.debug(hpCommand)
-        status, output = utils.run(hpCommand, passwordObj)
+        status, output = utils.run(hpCommand, passwordObj, "Need authentication to run %s command"%cmd)
         return status == 0
     else:
         log.error("Command not found or password object is not valid")
@@ -148,12 +148,12 @@ def start_service( service_name, passwordObj):
     if utils.which('systemctl'):
         cmd_status = passwordObj.getAuthCmd()%("systemctl status %s.service"%service_name)
         log.debug(cmd_status)
-        sts,out = utils.run(cmd_status, passwordObj)
+        sts,out = utils.run(cmd_status, passwordObj, "Need authentication to get %s service status"%service_name)
         if sts ==0:
             if 'stop' in out or 'inactive' in out:
                 cmd_start = passwordObj.getAuthCmd()%("systemctl start %s.service"%service_name)
                 log.debug("cmd_start=%s"%cmd_start)
-                sts,out = utils.run(cmd_start, passwordObj)
+                sts,out = utils.run(cmd_start, passwordObj, "Need authentication to start/restart %s service"%service_name)
                 if sts ==0:
                     ret_Val = True
             else:
@@ -164,12 +164,12 @@ def start_service( service_name, passwordObj):
     elif utils.which('service'):
         cmd_status = passwordObj.getAuthCmd()%("service %s status"%service_name)
         log.debug(cmd_status)
-        sts,out = utils.run(cmd_status, passwordObj)
+        sts,out = utils.run(cmd_status, passwordObj, "Need authentication to get %s service status"%service_name)
         if sts ==0:
             if 'stop' in out or 'inactive' in out:
                 cmd_start = passwordObj.getAuthCmd()%("service %s start"%service_name)
                 log.debug("cmd_start=%s"%cmd_start)
-                sts,out = utils.run(cmd_start, passwordObj)
+                sts,out = utils.run(cmd_start, passwordObj,"Need authentication to start/restart %s service"%service_name)
                 if sts ==0:
                     ret_Val = True
             elif 'unrecognized service' in out:
@@ -182,12 +182,12 @@ def start_service( service_name, passwordObj):
     elif os.path.exists('/etc/init.d/%s'%service_name):
         cmd_status = passwordObj.getAuthCmd()%('/etc/init.d/%s status'%service_name)
         log.debug(cmd_status)
-        sts,out = utils.run(cmd_status, passwordObj)
+        sts,out = utils.run(cmd_status, passwordObj, "Need authentication to get %s service status"%service_name)
         if sts ==0:
             if 'stop' in out or 'inactive' in out:
                 cmd_start = passwordObj.getAuthCmd()%('/etc/init.d/%s start'%service_name)
                 log.debug("cmd_start=%s"%cmd_start)
-                sts,out = utils.run(cmd_start, passwordObj)
+                sts,out = utils.run(cmd_start, passwordObj, "Need authentication to start/restart %s service"%service_name)
                 if sts ==0:
                     ret_Val = True
             else:
@@ -197,7 +197,7 @@ def start_service( service_name, passwordObj):
     else:
         if service_name == 'cups':
             cmd = 'lpstat -r'
-            sts,out = utils.run(cmd, passwordObj)
+            sts,out = utils.run(cmd, passwordObj, "Need authentication to get %s service status"%service_name)
             if sts ==0 and 'is running' in out:
                 ret_Val = True
             else:

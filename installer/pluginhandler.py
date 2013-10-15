@@ -60,7 +60,7 @@ PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS = 7
 
 
 class PluginHandle(object):
-    def __init__(self, pluginPath = "/var/log/hp/tmp"):
+    def __init__(self, pluginPath = prop.user_dir):
         self.__plugin_path = pluginPath
         self.__required_version = ""
         self.__plugin_name = ""

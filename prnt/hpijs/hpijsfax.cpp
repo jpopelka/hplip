@@ -55,6 +55,7 @@
 #include "hpijsfax.h"
 #include "utils.h"
 
+
 int hpijsfax_status_cb (void *status_cb_data, IjsServerCtx *ctx, IjsJobId job_id)
 {
     return 0;
@@ -278,8 +279,12 @@ int hpijsFaxServer (int argc, char **argv)
 	BYTE					szPageHeader[64];
 	BYTE					*p;
 	unsigned	int			uiPageNum = 0;
+	char user_name[32]={0,};
 
-	snprintf(hpFileName,sizeof(hpFileName),"%s/hplipfaxXXXXXX","/var/log/hp/tmp");
+   if (argc > 2)
+        strncpy(user_name, argv[2], sizeof(user_name));
+
+    snprintf(hpFileName,sizeof(hpFileName),"%s/hp_%s_ijsfax_Log_XXXXXX",CUPS_TMP_DIR, user_name);
 
 
 	pFaxStruct = new HPIJSFax ();

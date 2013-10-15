@@ -9,6 +9,7 @@ run=/var/run
 ppd=@abs_hpppddir@
 ppdbase=@abs_ppddir@
 doc=@abs_docdir@
+html=@abs_htmldir@
 icon=@icondir@
 cupsbackend=@cupsbackenddir@
 cupsfilter=@cupsfilterdir@

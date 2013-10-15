@@ -192,14 +192,18 @@ class QueuesDiagnose(QDialog, Ui_Dialog):
                 SuccessUI(self, self.__tr(msg))
 
             else:
-                cups.delPrinter(self.printerName)
-                msg="' "+self.printerName+" ' removed successfully.\nRe-configuring this printer by hp-setup..."
-                log.debug(msg)
-                path = utils.which('hp-setup')
-                if path:
-                    log.debug("Starting hp-setup")
-                    utils.run('hp-setup --gui')
+                status, status_str = cups.cups_operation(cups.delPrinter, GUI_MODE, 'qt4', self, self.printerName)
 
+                if status != cups.IPP_OK:
+                    msg="Failed to remove ' "+self.printerName+" ' queue.\nRemove using hp-toolbox..."
+                    FailureUI(self, self.__tr(msg))
+                else:
+                    msg="' "+self.printerName+" ' removed successfully.\nRe-configuring this printer by hp-setup..."
+                    log.debug(msg)
+                    path = utils.which('hp-setup')
+                    if path:
+                        log.debug("Starting hp-setup")
+                        utils.run('hp-setup --gui')
 
         finally:
             endWaitCursor()

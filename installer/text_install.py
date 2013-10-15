@@ -776,8 +776,8 @@ def start(language, auto=True, test_depends=False,
         user_conf.set('upgrade','last_upgraded_time',str(int(time.time())))
         user_conf.set('upgrade','pending_upgrade_time','0')
 
-        tui.title("HPLIP UPDATE NOTIFICATION")
         if prev_hplip_plugin_status != pluginhandler.PLUGIN_NOT_INSTALLED:
+            tui.title("HPLIP PLUGIN UPDATE NOTIFICATION")
             ok, choice = tui.enter_choice("HPLIP Plug-in's needs to be installed/updated. Do you want to update plug-in's?. (y=yes*, n=no) : ",['y', 'n'], 'y')
             if ok and choice == 'y':
                 services.run_hp_tools_with_auth('hp-plugin', core.passwordObj)
@@ -843,7 +843,7 @@ def start(language, auto=True, test_depends=False,
 
             if install_printer:
                 log.info("Please make sure your printer is connected and powered on at this time.")
-                if not services.run_hp_tools( 'hp-setup'):
+                if not services.run_hp_tools_with_auth( 'hp-setup', core.passwordObj):
                     log.error("hp-setup failed. Please run hp-setup manually.")
 
         tui.title("RE-STARTING HP_SYSTRAY")

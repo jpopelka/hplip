@@ -159,15 +159,15 @@ class State(ConfigBase):
 
 class UserConfig(ConfigBase):
     def __init__(self):
+
+        prop.user_dir = os.path.expanduser('~/.hplip')
+        try:
+            if not os.path.exists(prop.user_dir):
+                os.makedirs(prop.user_dir)
+        except OSError:
+            log.error("Failed to create %s directory. User preferences and collection of debug logs can't be supported."%(prop.user_dir))
+
         if not os.geteuid() == 0:
-            prop.user_dir = os.path.expanduser('~/.hplip')
-
-            try:
-                if not os.path.exists(prop.user_dir):
-                    os.makedirs(prop.user_dir)
-            except OSError:
-                pass # This is sometimes OK, if running hpfax: for example
-
             prop.user_config_file = os.path.join(prop.user_dir, 'hplip.conf')
 
             if not os.path.exists(prop.user_config_file):
@@ -182,7 +182,6 @@ class UserConfig(ConfigBase):
 
         else:
             # If running as root, conf file is None
-            prop.user_dir = None
             prop.user_config_file = None
             ConfigBase.__init__(self, None)
 
@@ -291,6 +290,7 @@ def cleanup_spinner():
     if enable_spinner and not log.is_debug() and sys.stdout.isatty():
         sys.stdout.write("\b \b")
         sys.stdout.flush()
+
 
 
 # Internal/messaging errors

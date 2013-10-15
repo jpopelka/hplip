@@ -243,11 +243,12 @@ else:
     except IndexError:
         input_fd = 0
 
-    # REVISIT:
-    tmp_dir = '/var/log/hp/tmp'
+    if os.path.exists("/home/%s/.hplip"%username):
+        tmp_dir = "/home/%s/.hplip"%username
+    else:
+        tmp_dir = "/tmp"
 
-
-    pipe_name = os.path.join(tmp_dir, "hpfax-pipe-%d" % job_id)
+    pipe_name = os.path.join(tmp_dir, "hp_fax-pipe-%d" % job_id)
 
     # Create the named pipe. Make sure it exists before sending
     # message to hppsd.
@@ -255,7 +256,7 @@ else:
     try:
         os.mkfifo(pipe_name)
     except OSError:
-        os.unlink(pipe_name)      
+        os.unlink(pipe_name)
         os.mkfifo(pipe_name)
 
     # Send dbus event to hpssd

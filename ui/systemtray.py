@@ -436,11 +436,11 @@ class SystemTrayApp(QApplication):
         self.timer.start(UPGRADE_CHECK_DELAY)
 
         # Cleans the /var/log/hp/tmp directory
-        self.handle_hplip_clean()
+        #self.handle_hplip_clean()
         
-        self.clean_timer = QTimer()
-        self.clean_timer.connect(self.clean_timer,SIGNAL("timeout()"),self.handle_hplip_clean)
-        self.clean_timer.start(CLEAN_EXEC_DELAY)
+        #self.clean_timer = QTimer()
+        #self.clean_timer.connect(self.clean_timer,SIGNAL("timeout()"),self.handle_hplip_clean)
+        #self.clean_timer.start(CLEAN_EXEC_DELAY)
 
 
         self.ERROR_STATE_TO_ICON = {
