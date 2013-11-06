@@ -50,7 +50,7 @@
 #include "ErnieFilter.h"
 
 
-#if defined(__APPLE__) || defined(__linux) || defined(__GLIBC__)
+#if defined(__APPLE__) || defined(__linux) || defined(__GLIBC__) || defined(__NetBSD__)
 #include <math.h>
 #endif
 
