@@ -242,3 +242,39 @@ def disable_SmartInstall():
                 log.error("Failed to install plug-in.")
         except ImportError:
             log.warn("Import error\n")
+
+
+def close_running_hp_processes():
+    # check systray is running?  
+    status,output = utils.Is_Process_Running('hp-systray')
+    if status is True:
+        ok,choice = tui.enter_choice("\nSome HPLIP applications are running. Press 'y' to close applications or press 'n' to quit upgrade(y=yes*, n=no):",['y','n'],'y')
+        if not ok or choice =='n':
+            log.info("Manually close HPLIP applications and run hp-upgrade again.")
+            return False
+
+        try:
+        # dBus
+            from dbus import SystemBus, lowlevel
+        except ImportError:
+            log.error("Unable to load DBus.")
+            pass
+        else:
+            try:
+                args = ['', '', EVENT_SYSTEMTRAY_EXIT, prop.username, 0, '', '']
+                msg = lowlevel.SignalMessage('/', 'com.hplip.StatusService', 'Event')
+                msg.append(signature='ssisiss', *args)
+                log.debug("Sending close message to hp-systray ...")
+                SystemBus().send_message(msg)
+                time.sleep(0.5)
+            except:
+                log.error("Failed to send DBus message to hp-systray/hp-toolbox.")
+                pass
+
+    toolbox_status,output = utils.Is_Process_Running('hp-toolbox')
+
+    if toolbox_status is True:
+        log.error("Failed to close either HP-Toolbox/HP-Systray. Manually close and run hp-upgrade again.")
+        return False
+
+    return True

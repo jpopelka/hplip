@@ -30,9 +30,8 @@ import getopt, os, sys, re, time
 
 # Local
 from base.g import *
-from base import utils, tui, module, os_utils
+from base import utils, tui, module, os_utils, password, services, validation
 from installer.core_install import *
-
 
 
 USAGE = [(__doc__, "", "name", True),
@@ -49,10 +48,23 @@ USAGE = [(__doc__, "", "name", True),
          ("Check only available version:","--check","option",False),
          ("Non-interactive mode:","-n(Without asking permissions)(future use)","option",False),
          ("Download Path to install from local system:","-p<path>","option", False),
-         ("Download HPLIP package location:","-d<path> (default location ~/.hplip/)","option", False),
+         ("Download HPLIP package location:","-d<path> (default location ~/Downloads)","option", False),
          ("Override existing HPLIP installation even if latest vesrion is installed:","-o","option",False),
          ("Take options from the file instead of command line:","-f<file> (future use)","option",False)
         ]
+
+mode = INTERACTIVE_MODE
+EXISTING_PACKAGE_PATH=None
+PATH_TO_DOWNLOAD_INSTALLER=os.path.expanduser('~/Downloads')
+FORCE_INSTALL=False
+CHECKING_ONLY=False
+NOTIFY=False
+HPLIP_VERSION_INFO_SOURCEFORGE_SITE ="http://hplip.sourceforge.net/hplip_web.conf"
+HPLIP_WEB_SITE ="http://hplipopensource.com/hplip-web/index.html"
+HPLIP_PACKAGE_SITE = "http://sourceforge.net/projects/hplip/files/hplip"
+IS_QUIET_MODE = False
+DONOT_CLOSE_TERMINAL = False
+CURRENT_WORKING_DIR = ''
 
 
 def hold_terminal():
@@ -60,6 +72,7 @@ def hold_terminal():
         log.info("\n\nPlease close this terminal manually. ")
         try:
             while 1:
+                raw_input("")
                 pass
         except KeyboardInterrupt:
             pass
@@ -75,7 +88,8 @@ def usage(typ='text'):
 
 def clean_exit(code=0, waitTerminal=True):
     if not NOTIFY and not CHECKING_ONLY and not IS_QUIET_MODE:
-        log.info("Completed..")
+        log.info("")
+        log.info("Done.")
     change_spinner_state(True)
     mod.unlockInstance()
     hold_terminal()
@@ -92,6 +106,7 @@ def parse_HPLIP_version(hplip_version_file, pat):
     except IOError:
         log.error("Failed to get hplip version since %s file is not found."%hplip_version_file)
         return ver
+
     data = fp.read()
     for line in data.splitlines():
         if pat.search(line):
@@ -102,20 +117,75 @@ def parse_HPLIP_version(hplip_version_file, pat):
     return ver
 
 
-log.set_module(__mod__)
+def get_hplip_version_from_sourceforge():
+    HPLIP_latest_ver="0.0.0"
 
-mode = INTERACTIVE_MODE
-auto = False
-HPLIP_PATH=None
-TEMP_DIR=prop.user_dir
-FORCE_INSTALL=False
-CHECKING_ONLY=False
-NOTIFY=False
-HPLIP_VERSION_INFO_SITE ="http://hplip.sourceforge.net/hplip_web.conf"
-HPLIP_WEB_SITE ="http://hplipopensource.com/hplip-web/index.html"
-IS_QUIET_MODE = False
-DONOT_CLOSE_TERMINAL = False
-CURRENT_WORKING_DIR = ''
+    # get HPLIP version info from hplip_web.conf file
+    sts, HPLIP_Ver_file = utils.download_from_network(HPLIP_VERSION_INFO_SOURCEFORGE_SITE)
+    if sts is True:
+        hplip_version_conf = ConfigBase(HPLIP_Ver_file)
+        HPLIP_latest_ver = hplip_version_conf.get("HPLIP","Latest_version","0.0.0")
+        os.unlink(HPLIP_Ver_file)
+
+    return HPLIP_latest_ver
+
+
+def get_hplip_version_from_hplipopensource():
+    HPLIP_latest_ver="0.0.0"
+    pat = re.compile(r"""The current version of the HPLIP solution is version (\d{1,}\.\d{1,}\.\d{1,}[a-z]{0,})\. \(.*""")
+    sts, HPLIP_Ver_file = utils.download_from_network(HPLIP_WEB_SITE)
+    if sts is True:
+        HPLIP_latest_ver = parse_HPLIP_version(HPLIP_Ver_file, pat)
+        os.unlink(HPLIP_Ver_file)
+
+    return HPLIP_latest_ver
+
+
+def get_latest_hplip_version():
+    HPLIP_latest_ver = get_hplip_version_from_sourceforge()
+
+    if HPLIP_latest_ver == "0.0.0":     ## if failed to connect the sourceforge site, then check HPLIP site.
+        HPLIP_latest_ver = get_hplip_version_from_hplipopensource()
+                           
+    return HPLIP_latest_ver
+
+
+def digital_signature_fail_confirmation(msg):
+    log.error(log.bold(msg))
+    ok,choice = tui.enter_choice("Do you want continue without Digital Signature verification (y=yes, n=no*):", ['y','n'],'n')
+    if not ok or choice == 'n':
+       return False
+    else:
+        return True
+
+
+def download_hplip_installer(path_to_download, hplip_version):
+    url="%s/%s/hplip-%s.run" %(HPLIP_PACKAGE_SITE, hplip_version, hplip_version)
+    hplip_package = "%s/hplip-%s.run" %(path_to_download, hplip_version)
+
+    log.info("Downloading hplip-%s.run file..... Please wait. "%hplip_version )
+    sts,download_file = utils.download_from_network(url, hplip_package, True)
+    log.info("")
+
+    if not os.path.exists(hplip_package):
+        log.error("Failed to download %s file."%hplip_package)
+        return '',''
+
+    log.info("Downloading hplip-%s.run.asc file..... Please wait. "%hplip_version )
+    hplip_digsig =  hplip_package+".asc"
+    url = url +".asc"
+    sts,download_file = utils.download_from_network(url, hplip_digsig)
+    log.info("")
+
+    if not os.path.exists(hplip_digsig):
+        log.error("Failed to download %s file."%hplip_package)
+        return hplip_package, ''
+
+    return hplip_package, hplip_digsig
+
+
+###################### Main ###############
+log.set_module(__mod__)
 try:
     mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
                     (INTERACTIVE_MODE, GUI_MODE),
@@ -124,8 +194,6 @@ try:
     opts, device_uri, printer_name, mode, ui_toolkit, loc = \
                mod.parseStdOpts('hl:gniup:d:of:sw', ['notify','check','help', 'help-rest', 'help-man', 'help-desc', 'interactive', 'gui', 'lang=','logging=', 'debug'],
                      handle_device_printer=False)
-
-
 
 except getopt.GetoptError, e:
     log.error(e.msg)
@@ -166,10 +234,10 @@ for o, a in opts:
         clean_exit(0,False)
 
     elif o == '-p':
-        HPLIP_PATH=a
+        EXISTING_PACKAGE_PATH=a
 
     elif o == '-d':
-        TEMP_DIR=a
+        PATH_TO_DOWNLOAD_INSTALLER=a
 
     elif o == '-o':
         FORCE_INSTALL = True
@@ -219,48 +287,31 @@ try:
     core =  CoreInstall(MODE_CHECK)
     if not utils.check_network_connection():
         log.error("Either Internet is not working or Wget is not installed.")
-        clean_exit(0)
+        clean_exit(1)
 
     installed_version=sys_conf.get("hplip","version","0.0.0")
     log.debug("HPLIP previous installed version =%s." %installed_version)
 
+    HPLIP_latest_ver = get_latest_hplip_version()
 
-
-    HPLIP_latest_ver="0.0.0"
-    # get HPLIP version info from hplip_web.conf file
-    sts, HPLIP_Ver_file = utils.download_from_network(HPLIP_VERSION_INFO_SITE)
-    if sts is True:
-        hplip_version_conf = ConfigBase(HPLIP_Ver_file)
-        HPLIP_latest_ver = hplip_version_conf.get("HPLIP","Latest_version","0.0.0")
-
-    # get HPLIP version info from hplip site
-    if HPLIP_latest_ver == "0.0.0":	## if failed to connect the sourceforge site, then check HPLIP site.
-        pat = re.compile(r"""The current version of the HPLIP solution is version (\d{1,}\.\d{1,}\.\d{1,}[a-z]{0,})\. \(.*""")
-        sts, HPLIP_Ver_file = utils.download_from_network(HPLIP_WEB_SITE)
-        if sts is True:
-            HPLIP_latest_ver = parse_HPLIP_version(HPLIP_Ver_file, pat)
-
-    os.unlink(HPLIP_Ver_file)
     if HPLIP_latest_ver == "0.0.0":
         log.error("Failed to get latest version of HPLIP.")
-        clean_exit(0)
+        clean_exit(1)
 
-
+    user_conf.set('upgrade','latest_available_version',HPLIP_latest_ver)
     if CHECKING_ONLY is True:
-        user_conf.set('upgrade','latest_available_version',HPLIP_latest_ver)
         log.debug("Available HPLIP version =%s."%HPLIP_latest_ver)
+
     elif NOTIFY is True:
-        user_conf.set('upgrade','latest_available_version',HPLIP_latest_ver)
         if not utils.Is_HPLIP_older_version(installed_version, HPLIP_latest_ver):
             log.debug("Latest version of HPLIP is already installed.")
-        else:
 
+        else:
             msg = "Latest version of HPLIP-%s is available."%HPLIP_latest_ver
             if core.is_auto_installer_support():
                 distro_type= 1
             else:
                 distro_type= 2
-
 
             if ui_toolkit == 'qt3':
                 if not utils.canEnterGUIMode():
@@ -274,7 +325,6 @@ try:
                     log.error("Unable to load Qt3 support. Is it installed? ")
                     clean_exit(1)
 
-
                 # create the main application object
                 app = QApplication(sys.argv)
                 QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
@@ -283,7 +333,6 @@ try:
 
                 log.debug("Starting GUI loop...")
                 app.exec_loop()
-
 
             else: #qt4
                 if not utils.canEnterGUIMode4():
@@ -300,7 +349,6 @@ try:
                 app = QApplication(sys.argv)
                 dialog = UpgradeDialog(None, distro_type, msg)
 
-
                 dialog.show()
                 log.debug("Starting GUI loop...")
                 app.exec_()
@@ -312,7 +360,7 @@ try:
                     log.info("Newer version of HPLIP-%s is available."%HPLIP_latest_ver)
                 ok,choice = tui.enter_choice("Press 'y' to continue to upgrade HPLIP-%s (y=yes*, n=no):"%HPLIP_latest_ver, ['y','n'],'y')
                 if not ok or choice == 'n':
-                    log.info("Recommended to install latesr version of HPLIP-%s"%HPLIP_latest_ver)
+                    log.info("Recommended to install latest version of HPLIP-%s"%HPLIP_latest_ver)
                     clean_exit(0, False)
             else:
                 log.info("Latest version of HPLIP is already installed.")
@@ -323,84 +371,71 @@ try:
             log.info("Please install HPLIP manually as mentioned in 'http://hplipopensource.com/hplip-web/install/manual/index.html' site")
             clean_exit(0)
 
-        # check systray is running?
-        status,output = utils.Is_Process_Running('hp-systray')
-        if status is True:
-            ok,choice = tui.enter_choice("\nSome HPLIP applications are running. Press 'y' to close applications or press 'n' to quit upgrade(y=yes*, n=no):",['y','n'],'y')
-            if not ok or choice =='n':
-                log.info("Manually close HPLIP applications and run hp-upgrade again.")
-                clean_exit(0, False)
+        if not services.close_running_hp_processes():
+            clean_exit(1)
 
-            try:
-            # dBus
-            #import dbus
-                from dbus import SystemBus, lowlevel
-            except ImportError:
-                log.error("Unable to load DBus.")
-                pass
+        if EXISTING_PACKAGE_PATH:
+            downloaded_file = "%s/hplip-%s.run"%(EXISTING_PACKAGE_PATH, HPLIP_latest_ver)
+            digsig_file = "%s/hplip-%s.run.asc"%(EXISTING_PACKAGE_PATH, HPLIP_latest_ver)
+            PATH_TO_DOWNLOAD_INSTALLER = EXISTING_PACKAGE_PATH
+        else:
+            downloaded_file, digsig_file = download_hplip_installer(PATH_TO_DOWNLOAD_INSTALLER, HPLIP_latest_ver)
+
+        PasswordObj = password.Password(INTERACTIVE_MODE)
+        PasswordObj.clearPassword()
+        try:
+            gpg_obj = validation.GPG_Verification()
+        except Exception:
+            digsig_sts = validation.DIGSIG_ERROR_GPG_CMD_NOT_FOUND
+        else:
+            digsig_sts = gpg_obj.validate(downloaded_file, digsig_file, PasswordObj)
+
+        if digsig_sts != validation.DIGSIG_ERROR_NONE:
+            if digsig_sts in (validation.DIGSIG_ERROR_INCORRECT_PASSWORD, validation.DIGSIG_ERROR_FILE_NOT_FOUND):
+                clean_exit(1)
+
+            elif digsig_sts == validation.DIGSIG_ERROR_DIGITAL_SIGN_NOT_FOUND:
+                if not digital_signature_fail_confirmation("Digital signature file not found or failed to download. Unable to validate the installer file."):
+                    clean_exit(1)
+
+            elif digsig_sts == validation.DIGSIG_ERROR_GPG_CMD_NOT_FOUND:
+                if not digital_signature_fail_confirmation("GPG command not found. Unable to validate the installer file."):
+                    clean_exit(1)
+
+            elif digsig_sts in (validation.DIGSIG_ERROR_DIGITAL_SIGN_BAD, validation.DIGSIG_ERROR_UNABLE_TO_RECV_KEYS):
+                if not digital_signature_fail_confirmation("File does not match its digital signature. File may have been corrupted or altered"):
+                    clean_exit(1)
+
             else:
-                try:
-                    args = ['', '', EVENT_SYSTEMTRAY_EXIT, prop.username, 0, '', '']
-                    msg = lowlevel.SignalMessage('/', 'com.hplip.StatusService', 'Event')
-                    msg.append(signature='ssisiss', *args)
-                    log.debug("Sending close message to hp-systray ...")
-                    SystemBus().send_message(msg)
-                    time.sleep(0.5)
-                except:
-                    log.error("Failed to send DBus message to hp-systray/hp-toolbox.")
-                    pass
+                log.error("Failed to validate digital signature. Unknow error: %s"%digsig_sts)
+                clean_exit(1)
 
-
-        toolbox_status,output = utils.Is_Process_Running('hp-toolbox')
-
-        if toolbox_status is True:
-            log.error("Failed to close either HP-Toolbox/HP-Systray. Manually close and run hp-upgrade again.")
-            clean_exit(0)
-
-
-        if HPLIP_PATH is not None:
-            if os.path.exists(HPLIP_PATH):
-                download_file = HPLIP_PATH
-            else:
-                log.error("%s file is not present. Downloading from Net..." %HPLIP_PATH)
-                HPLIP_PATH = None
-
-        if HPLIP_PATH is None:
-            url="http://sourceforge.net/projects/hplip/files/hplip/%s/hplip-%s.run/download" %(HPLIP_latest_ver, HPLIP_latest_ver)
-            download_file = None
-            if TEMP_DIR:
-                download_file = "%s/hplip-%s.run" %(TEMP_DIR,HPLIP_latest_ver)
-            log.info("Downloading hplip-%s.run file..... Please wait. "%HPLIP_latest_ver )
-            sts,download_file = utils.download_from_network(url, download_file, True)
-
-            if not os.path.exists(download_file):
-                log.error("Failed to download %s file."%download_file)
-                clean_exit()
         CURRENT_WORKING_DIR = os.getcwd()
-        os.chdir(TEMP_DIR)
+        os.chdir(PATH_TO_DOWNLOAD_INSTALLER)
+
         # Installing hplip run.
-        cmd = "sh %s" %(download_file)
-        log.debug("Upgrading  %s" % download_file)
+        cmd = "sh %s" %(downloaded_file)
+        log.debug("Upgrading  %s" % downloaded_file)
+
         sts = os_utils.execute(cmd)
         os.chdir(CURRENT_WORKING_DIR)
-    if not NOTIFY and not CHECKING_ONLY:
+
         if sts == 0:
             log.info(log.bold("Upgrade is Completed."))
         else:
-            log.info(log.bold("Upgrade Failed or Skipped."))
+            log.info(log.bold("Upgrade Failed or Skipped. status: %s"%sts))
 
     change_spinner_state(True)
     mod.unlockInstance()
     hold_terminal()
 
-#    log.info("HPLIP upgrade is completed")
 except KeyboardInterrupt:
-    change_spinner_state(True)
-    mod.unlockInstance()
     if CURRENT_WORKING_DIR:
         os.chdir(CURRENT_WORKING_DIR)
+
     if not IS_QUIET_MODE:
         log.error("User exit")
 
-    hold_terminal()
+    clean_exit(1)
+
 

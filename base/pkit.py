@@ -23,18 +23,11 @@
 import os
 import os.path
 import sys
-import re
-import time
-import cStringIO
-import ConfigParser
-import shutil
-import stat
 
 # Local
-from base.logger import *
 from base.g import *
 from base.codes import *
-from base import utils, password,services
+from base import utils, password
 from installer import pluginhandler
 
 # DBus
@@ -201,10 +194,9 @@ class PolicyKitService(dbus.service.Object):
 if utils.to_bool(sys_conf.get('configure', 'policy-kit')):
     class BackendService(PolicyKitService):
         INTERFACE_NAME = 'com.hp.hplip'
-        SERVICE_NAME   = 'com.hp.hplip'
-        LOGFILE_NAME   = '/tmp/hp-pkservice.log'
+        SERVICE_NAME   = 'com.hp.hplip'  
 
-        def __init__(self, connection=None, path='/', logfile=LOGFILE_NAME):
+        def __init__(self, connection=None, path='/'):
             if connection is None:
                 connection = get_service_bus()
 
@@ -213,8 +205,6 @@ if utils.to_bool(sys_conf.get('configure', 'policy-kit')):
             self.name = dbus.service.BusName(self.SERVICE_NAME, connection)
             self.loop = gobject.MainLoop()
             self.version = 0
-
-            log.set_logfile("%s.%d" % (logfile, os.getpid()))
             log.set_level("debug")
 
         def run(self, version=None):
@@ -225,7 +215,6 @@ if utils.to_bool(sys_conf.get('configure', 'policy-kit')):
                     return
 
             self.version = version
-            log.set_where(Logger.LOG_TO_CONSOLE_AND_FILE)
             log.debug("Starting back-end service loop (version %d)" % version)
 
             self.loop.run()
@@ -240,6 +229,7 @@ if utils.to_bool(sys_conf.get('configure', 'policy-kit')):
                 try:
                     self.check_permission_v0(sender, INSTALL_PLUGIN_ACTION)
                 except AccessDeniedException, e:
+                    log.error("installPlugin:  Failed due to permission error [%s]" %e)
                     return False
 
             elif self.version == 1:
@@ -328,8 +318,6 @@ class PolicyKit(object):
 def run_plugin_command(required=True, plugin_reason=PLUGIN_REASON_NONE, Mode = GUI_MODE):
     su_sudo = None
     need_sudo = True
-    name = None
-    version = None
 
     if utils.to_bool(sys_conf.get('configure', 'policy-kit')):
         try:
@@ -338,7 +326,7 @@ def run_plugin_command(required=True, plugin_reason=PLUGIN_REASON_NONE, Mode = G
             need_sudo = False
             log.debug("Using PolicyKit for authentication")
         except dbus.DBusException, ex:
-            log.error("PolicyKit NOT installed when configured for use")
+            log.error("PolicyKit NOT installed when configured for use. [%s]"%ex)
 
     if os.geteuid() == 0:
         su_sudo = "%s"

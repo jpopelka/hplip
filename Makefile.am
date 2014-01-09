@@ -155,7 +155,7 @@ dist_base_DATA = base/maint.py base/codes.py base/g.py base/pml.py base/status.p
 	base/device.py base/logger.py base/slp.py base/exif.py base/strings.py base/magic.py \
 	base/imagesize.py base/pexpect.py base/models.py base/mdns.py base/tui.py base/dime.py \
 	base/ldif.py base/vcard.py base/module.py base/pkit.py base/queues.py base/password.py \
-	base/services.py base/os_utils.py base/smart_install.py base/avahi.py
+	base/services.py base/os_utils.py base/smart_install.py base/avahi.py base/validation.py
 
 # installer
 installdir = $(hplipdir)/installer

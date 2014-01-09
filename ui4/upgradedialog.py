@@ -114,7 +114,7 @@ class UpgradeDialog(QDialog, Ui_Dialog):
                     self.result = True
                 else:
                     log.error("Failed to run hp-upgrade command from terminal =%s "%terminal_cmd)
-                    ErrorUI(self, self.__tr("Failed to run hp-upgrade"))
+                    FailureUI(self, self.__tr("Failed to run hp-upgrade"))
 
         self.close()
 

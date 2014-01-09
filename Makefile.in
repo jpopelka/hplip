@@ -589,7 +589,7 @@ am__dist_base_DATA_DIST = base/maint.py base/codes.py base/g.py \
 	base/mdns.py base/tui.py base/dime.py base/ldif.py \
 	base/vcard.py base/module.py base/pkit.py base/queues.py \
 	base/password.py base/services.py base/os_utils.py \
-	base/smart_install.py base/avahi.py
+	base/smart_install.py base/avahi.py base/validation.py
 am__dist_copier_DATA_DIST = copier/copier.py copier/__init__.py
 am__dist_fax_DATA_DIST = fax/fax.py fax/__init__.py fax/coverpages.py \
 	fax/pmlfax.py fax/ledmfax.py fax/soapfax.py fax/ledmsoapfax.py \
@@ -4450,7 +4450,7 @@ cups_drv = prnt/drv/hpcups.drv
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	base/device.py base/logger.py base/slp.py base/exif.py base/strings.py base/magic.py \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	base/imagesize.py base/pexpect.py base/models.py base/mdns.py base/tui.py base/dime.py \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	base/ldif.py base/vcard.py base/module.py base/pkit.py base/queues.py base/password.py \
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	base/services.py base/os_utils.py base/smart_install.py base/avahi.py
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	base/services.py base/os_utils.py base/smart_install.py base/avahi.py base/validation.py
 
 
 # installer
