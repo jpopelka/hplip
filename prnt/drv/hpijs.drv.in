@@ -7657,14 +7657,6 @@ PenSet=0"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 14.40 18.00 14.40 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%LJMono:300dpiOnly%>
   {
-    ModelName "HP LaserJet 4ml hpijs"
-    Attribute "NickName" "" "HP LaserJet 4ml hpijs, $Version"
-    Attribute "ShortNickName" "" "HP LaserJet 4ml hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 4ml;DES:hp laserjet 4ml;"
-    PCFileName "hp-laserjet_4ml-hpijs.ppd"
-    Attribute "Product" "" "(HP LaserJet 4ml Printer)"
-  }
-  {
     ModelName "HP LaserJet 4l hpijs"
     Attribute "NickName" "" "HP LaserJet 4l hpijs, $Version"
     Attribute "ShortNickName" "" "HP LaserJet 4l hpijs"
@@ -7673,6 +7665,14 @@ PenSet=0"
     Attribute "Product" "" "(HP LaserJet 4l Printer)"
     Attribute "Product" "" "(HP LaserJet 4l Pro Printer)"
     Attribute "Product" "" "(HP LaserJet 4lc Printer)"
+    Attribute "Product" "" "(HP LaserJet 4ml Printer)"
+  }
+  {
+    ModelName "HP LaserJet 4ml hpijs"
+    Attribute "NickName" "" "HP LaserJet 4ml hpijs, $Version"
+    Attribute "ShortNickName" "" "HP LaserJet 4ml hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 4ml;DES:hp laserjet 4ml;"
+    PCFileName "hp-laserjet_4ml-hpijs.ppd"
     Attribute "Product" "" "(HP LaserJet 4ml Printer)"
   }
 }  // end LJMono 300dpi only
@@ -12532,6 +12532,54 @@ Transparency"
 
   // <%Hbpl1:Mono%>
   {
+    ModelName "HP LaserJet Pro MFP m125a hpijs"
+    Attribute "NickName" "" "HP LaserJet Pro MFP m125a hpijs, $Version, requires proprietary plugin"
+    Attribute "ShortNickName" "" "HP LaserJet Pro MFP m125a hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m125a;DES:hp laserjet pro mfp m125a;"
+    PCFileName "hp-laserjet_pro_mfp_m125a-hpijs.ppd"
+    Attribute "Product" "" "(HP LaserJet Pro MFP m125a)"
+  }
+  {
+    ModelName "HP LaserJet Pro MFP m125nw hpijs"
+    Attribute "NickName" "" "HP LaserJet Pro MFP m125nw hpijs, $Version, requires proprietary plugin"
+    Attribute "ShortNickName" "" "HP LJ Pro MFP m125nw hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m125nw;DES:hp laserjet pro mfp m125nw;"
+    PCFileName "hp-laserjet_pro_mfp_m125nw-hpijs.ppd"
+    Attribute "Product" "" "(HP LaserJet Pro MFP m125nw)"
+  }
+  {
+    ModelName "HP LaserJet Pro MFP m125rnw hpijs"
+    Attribute "NickName" "" "HP LaserJet Pro MFP m125rnw hpijs, $Version, requires proprietary plugin"
+    Attribute "ShortNickName" "" "HP LJ Pro MFP m125rnw hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m125rnw;DES:hp laserjet pro mfp m125rnw;"
+    PCFileName "hp-laserjet_pro_mfp_m125rnw-hpijs.ppd"
+    Attribute "Product" "" "(HP LaserJet Pro MFP m125rnw)"
+  }
+  {
+    ModelName "HP LaserJet Pro MFP m126a hpijs"
+    Attribute "NickName" "" "HP LaserJet Pro MFP m126a hpijs, $Version, requires proprietary plugin"
+    Attribute "ShortNickName" "" "HP LaserJet Pro MFP m126a hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m126a;DES:hp laserjet pro mfp m126a;"
+    PCFileName "hp-laserjet_pro_mfp_m126a-hpijs.ppd"
+    Attribute "Product" "" "(HP LaserJet Pro MFP m126a)"
+  }
+  {
+    ModelName "HP LaserJet Pro MFP m126nw hpijs"
+    Attribute "NickName" "" "HP LaserJet Pro MFP m126nw hpijs, $Version, requires proprietary plugin"
+    Attribute "ShortNickName" "" "HP LJ Pro MFP m126nw hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m126nw;DES:hp laserjet pro mfp m126nw;"
+    PCFileName "hp-laserjet_pro_mfp_m126nw-hpijs.ppd"
+    Attribute "Product" "" "(HP LaserJet Pro MFP m126nw)"
+  }
+  {
+    ModelName "HP LaserJet Pro MFP m127fp hpijs"
+    Attribute "NickName" "" "HP LaserJet Pro MFP m127fp hpijs, $Version, requires proprietary plugin"
+    Attribute "ShortNickName" "" "HP LJ Pro MFP m127fp hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m127fp;DES:hp laserjet pro mfp m127fp;"
+    PCFileName "hp-laserjet_pro_mfp_m127fp-hpijs.ppd"
+    Attribute "Product" "" "(HP LaserJet Pro MFP m127fp)"
+  }
+  {
     ModelName "HP LaserJet Pro MFP m127fw hpijs"
     Attribute "NickName" "" "HP LaserJet Pro MFP m127fw hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LJ Pro MFP m127fw hpijs"
@@ -14595,6 +14643,17 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Officejet 4630 E-all-in-one)"
     Attribute "Product" "" "(HP Officejet 4632 E-all-in-one Printer)"
     Attribute "Product" "" "(HP Officejet 4635 E-all-in-one Printer)"
+  }
+  {
+    ModelName "HP Deskjet 4640 Series hpijs"
+    Attribute "NickName" "" "HP Deskjet 4640 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Deskjet 4640 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 4640 series;DES:deskjet 4640 series;"
+    PCFileName "hp-deskjet_4640_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 4640 E-all-in-one Printer Series)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 4645 E-all-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 4646 E-all-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 4648 E-all-in-one Printer)"
   }
   {
     ModelName "HP Envy 5530 Series hpijs"

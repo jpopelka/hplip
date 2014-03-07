@@ -5461,6 +5461,8 @@ Manufacturer "HP"
            "<</cupsInteger0 27/PageSize[841.68 1190.88]/ImagingBBox null>>setpagedevice"
         CustomMedia "A3+SM/A3+ 330x483mm SmallMargins" 935.424 1364.152 14.184 14.184 14.184 14.184 "<</cupsInteger0 16/PageSize[935.424 1364.152]/ImagingBBox null>>setpagedevice"
            "<</cupsInteger0 16/PageSize[935.424 1369.152]/ImagingBBox null>>setpagedevice"
+        CustomMedia "Env6/#6 Envelope 3.63x6.5in" 261.36 468 9.36 46.8 9.36 46.8 "<</cupsInteger0 83/PageSize[261.36 468]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 83/PageSize[261.36 468]/ImagingBBox null>>setpagedevice"
        
        // <%Saipan:Advanced%>
        {
@@ -8564,7 +8566,7 @@ Manufacturer "HP"
 
 } // End Python B-size
 
-//Sanjay: changes Start
+
 //////// Python10
 {
   Attribute "cupsEvenDuplex" "" "True"
@@ -9126,7 +9128,6 @@ Manufacturer "HP"
 
 } // End Mimas
 
-//Sanjay: Changes End
 
 //////// MimasTDR
 {
@@ -9412,6 +9413,17 @@ Manufacturer "HP"
       Attribute "Product" "" "(HP Officejet 4630 E-all-in-one)"
       Attribute "Product" "" "(HP Officejet 4632 E-all-in-one Printer)"
       Attribute "Product" "" "(HP Officejet 4635 E-all-in-one Printer)"
+    }
+    {
+      ModelName "HP Deskjet 4640 Series"
+      Attribute "NickName" "" "HP Deskjet 4640 Series, hpcups $Version"
+      Attribute "ShortNickName" "" "HP Deskjet 4640 Series"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 4640 series;DES:deskjet 4640 series;"
+      PCFileName "hp-deskjet_4640_series.ppd"
+      Attribute "Product" "" "(HP Deskjet Ink Advantage 4640 E-all-in-one Printer Series)"
+      Attribute "Product" "" "(HP Deskjet Ink Advantage 4645 E-all-in-one Printer)"
+      Attribute "Product" "" "(HP Deskjet Ink Advantage 4646 E-all-in-one Printer)"
+      Attribute "Product" "" "(HP Deskjet Ink Advantage 4648 E-all-in-one Printer)"
     }
     {
       ModelName "HP Envy 5530 Series"
@@ -13238,14 +13250,6 @@ Group "RLT/HP Real Life Technologies"
       UIConstraints "*OutputMode Best *MediaType" 
       // <%LJMono:300dpiOnly%>
       {
-        ModelName "HP LaserJet 4ml"
-        Attribute "NickName" "" "HP LaserJet 4ml, hpcups $Version"
-        Attribute "ShortNickName" "" "HP LaserJet 4ml"
-        Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 4ml;DES:hp laserjet 4ml;"
-        PCFileName "hp-laserjet_4ml.ppd"
-        Attribute "Product" "" "(HP LaserJet 4ml Printer)"
-      }
-      {
         ModelName "HP LaserJet 4l"
         Attribute "NickName" "" "HP LaserJet 4l, hpcups $Version"
         Attribute "ShortNickName" "" "HP LaserJet 4l"
@@ -13254,6 +13258,14 @@ Group "RLT/HP Real Life Technologies"
         Attribute "Product" "" "(HP LaserJet 4l Printer)"
         Attribute "Product" "" "(HP LaserJet 4l Pro Printer)"
         Attribute "Product" "" "(HP LaserJet 4lc Printer)"
+        Attribute "Product" "" "(HP LaserJet 4ml Printer)"
+      }
+      {
+        ModelName "HP LaserJet 4ml"
+        Attribute "NickName" "" "HP LaserJet 4ml, hpcups $Version"
+        Attribute "ShortNickName" "" "HP LaserJet 4ml"
+        Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet 4ml;DES:hp laserjet 4ml;"
+        PCFileName "hp-laserjet_4ml.ppd"
         Attribute "Product" "" "(HP LaserJet 4ml Printer)"
       }
     }
@@ -17145,6 +17157,54 @@ Group "RLT/HP Real Life Technologies"
     Choice "FastRes1200/FastRes 1200" "<</OutputType(best)/HWResolution[600 600]>>setpagedevice"
 
    // <%Hbpl1:Mono%>
+   {
+     ModelName "HP LaserJet Pro MFP m125a"
+     Attribute "NickName" "" "HP LaserJet Pro MFP m125a, hpcups $Version, requires proprietary plugin"
+     Attribute "ShortNickName" "" "HP LaserJet Pro MFP m125a"
+     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m125a;DES:hp laserjet pro mfp m125a;"
+     PCFileName "hp-laserjet_pro_mfp_m125a.ppd"
+     Attribute "Product" "" "(HP LaserJet Pro MFP m125a)"
+   }
+   {
+     ModelName "HP LaserJet Pro MFP m125nw"
+     Attribute "NickName" "" "HP LaserJet Pro MFP m125nw, hpcups $Version, requires proprietary plugin"
+     Attribute "ShortNickName" "" "HP LaserJet Pro MFP m125nw"
+     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m125nw;DES:hp laserjet pro mfp m125nw;"
+     PCFileName "hp-laserjet_pro_mfp_m125nw.ppd"
+     Attribute "Product" "" "(HP LaserJet Pro MFP m125nw)"
+   }
+   {
+     ModelName "HP LaserJet Pro MFP m125rnw"
+     Attribute "NickName" "" "HP LaserJet Pro MFP m125rnw, hpcups $Version, requires proprietary plugin"
+     Attribute "ShortNickName" "" "HP LaserJet Pro MFP m125rnw"
+     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m125rnw;DES:hp laserjet pro mfp m125rnw;"
+     PCFileName "hp-laserjet_pro_mfp_m125rnw.ppd"
+     Attribute "Product" "" "(HP LaserJet Pro MFP m125rnw)"
+   }
+   {
+     ModelName "HP LaserJet Pro MFP m126a"
+     Attribute "NickName" "" "HP LaserJet Pro MFP m126a, hpcups $Version, requires proprietary plugin"
+     Attribute "ShortNickName" "" "HP LaserJet Pro MFP m126a"
+     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m126a;DES:hp laserjet pro mfp m126a;"
+     PCFileName "hp-laserjet_pro_mfp_m126a.ppd"
+     Attribute "Product" "" "(HP LaserJet Pro MFP m126a)"
+   }
+   {
+     ModelName "HP LaserJet Pro MFP m126nw"
+     Attribute "NickName" "" "HP LaserJet Pro MFP m126nw, hpcups $Version, requires proprietary plugin"
+     Attribute "ShortNickName" "" "HP LaserJet Pro MFP m126nw"
+     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m126nw;DES:hp laserjet pro mfp m126nw;"
+     PCFileName "hp-laserjet_pro_mfp_m126nw.ppd"
+     Attribute "Product" "" "(HP LaserJet Pro MFP m126nw)"
+   }
+   {
+     ModelName "HP LaserJet Pro MFP m127fp"
+     Attribute "NickName" "" "HP LaserJet Pro MFP m127fp, hpcups $Version, requires proprietary plugin"
+     Attribute "ShortNickName" "" "HP LaserJet Pro MFP m127fp"
+     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m127fp;DES:hp laserjet pro mfp m127fp;"
+     PCFileName "hp-laserjet_pro_mfp_m127fp.ppd"
+     Attribute "Product" "" "(HP LaserJet Pro MFP m127fp)"
+   }
    {
      ModelName "HP LaserJet Pro MFP m127fw"
      Attribute "NickName" "" "HP LaserJet Pro MFP m127fw, hpcups $Version, requires proprietary plugin"

@@ -264,12 +264,12 @@ if 'HPPJLDryTime' in key_list:
 	try:
         	if opts['HPPJLDryTime'] == '0':
               		os.write(output_fd, '@PJL SET DRYTIME=0\x0a') 
-        	elif opts['HPPJLDryTime'] == '1':
+        	elif opts['HPPJLDryTime'] == 'Medium':
               		os.write(output_fd, '@PJL SET DRYTIME=4\x0a') 
-        	if opts['HPPJLDryTime'] == '2':
+        	if opts['HPPJLDryTime'] == 'Long':
 			os.write(output_fd, '@PJL SET DRYTIME=7\x0a') 
 	except:
-		os.write(output_fd, '@PJL SET DRYTIME=4\x0a')
+		os.write(output_fd, '@PJL SET DRYTIME=0\x0a')
 
 if 'HPPJLSaturation' in key_list:
 	try:
@@ -288,14 +288,16 @@ if 'HPPJLSaturation' in key_list:
 
 if 'HPPJLInkBleed' in key_list:
 	try:
-        	if opts['HPPJLInkBleed'] == '-2':
+        	if opts['HPPJLInkBleed'] == '-2' or opts['HPPJLInkBleed'] == 'Default':
               		os.write(output_fd, '@PJL SET INKBLEED=0\x0a') 
         	elif opts['HPPJLInkBleed'] == '-1':
               		os.write(output_fd, '@PJL SET INKBLEED=2\x0a') 
-        	elif opts['HPPJLInkBleed'] == '0':
+        	elif opts['HPPJLInkBleed'] == '0' or opts['HPPJLInkBleed'] == 'Less':
               		os.write(output_fd, '@PJL SET INKBLEED=4\x0a') 
         	elif opts['HPPJLInkBleed'] == '+1':
               		os.write(output_fd, '@PJL SET INKBLEED=6\x0a') 
+        	elif opts['HPPJLInkBleed'] == 'Least':
+              		os.write(output_fd, '@PJL SET INKBLEED=7\x0a') 
         	elif opts['HPPJLInkBleed'] == '+2':
               		os.write(output_fd, '@PJL SET INKBLEED=8\x0a') 
 	except:

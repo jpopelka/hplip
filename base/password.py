@@ -76,7 +76,8 @@ def get_distro_name():
        name = os.popen('lsb_release -i | cut -f 2')
        os_name = name.read().strip()
        name.close()
-    else:
+
+    if not os_name:
        name = os.popen("cat /etc/issue | awk '{print $1}' | head -n 1")
        os_name = name.read().strip()
        name.close()
@@ -176,7 +177,7 @@ class Password(object):
         ok, ret = False, ''
 
         try:
-            child = pexpect.spawn(cmd, timeout=1)
+            child = pexpect.spawn(cmd, timeout=timeout)
         except pexpect.ExceptionPexpect:
             return 1, ''
 

@@ -136,10 +136,28 @@
 :model "HP Envy 121 E-all-in-one"
 :status :good
 
+:model "HP LaserJet Pro MFP m125nw"
+:status :good
+
+:model "HP LaserJet Pro MFP m125rnw"
+:status :good
+
+:model "HP LaserJet Pro MFP m125a"
+:status :good
+
 :model "HP Officejet d125xi All-in-one Printer"
 :status :good
 
+:model "HP LaserJet Pro MFP m126nw"
+:status :good
+
+:model "HP LaserJet Pro MFP m126a"
+:status :good
+
 :model "HP LaserJet Pro MFP m127fn"
+:status :good
+
+:model "HP LaserJet Pro MFP m127fp"
 :status :good
 
 :model "HP LaserJet Pro MFP m127fw"
@@ -2023,7 +2041,19 @@
 :model "HP Officejet 4635 E-all-in-one Printer"
 :status :good
 
+:model "HP Deskjet Ink Advantage 4640 E-all-in-one Printer Series"
+:status :good
+
 :model "HP Photosmart c4640 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 4645 E-all-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 4646 E-all-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 4648 E-all-in-one Printer"
 :status :good
 
 :model "HP Photosmart c4650 All-in-one Printer"

@@ -701,7 +701,7 @@ class DevMgr4(DevMgr4_base):
                                 self.UpdateHistory(dev)
                                 self.UpdateDevice(dev)
 
-                        elif event.event_code == EVENT_CUPS_QUEUES_CHANGED:
+                        elif event.event_code == EVENT_CUPS_QUEUES_REMOVED or event.event_code == EVENT_CUPS_QUEUES_ADDED:
                             pass
 
                         elif event.event_code == EVENT_RAISE_DEVICE_MANAGER: # 9001
@@ -944,7 +944,7 @@ class DevMgr4(DevMgr4_base):
                 qApp.processEvents()
                 # sending Event to remove this device from hp-systray
                 if removed_device:
-                    utils.sendEvent(EVENT_CUPS_QUEUES_CHANGED,removed_device, "")
+                    utils.sendEvent(EVENT_CUPS_QUEUES_REMOVED,removed_device, "")
 
                 if len(devices):
                     for tab in self.TabIndex:
@@ -2151,17 +2151,20 @@ class DevMgr4(DevMgr4_base):
         light_magenta = "#ffccff"
         black = "#000000"
         blue = "#0000ff"
-        dark_grey = "#808080"
-        light_grey = "#c0c0c0"
+        gray = "#808080"
+        dark_gray = "#a9a9a9"
+        light_gray = "#c0c0c0"
+        red = "#ff0000"
 
         self.TYPE_TO_PIX_MAP = {
                                AGENT_TYPE_UNSPECIFIED : [black],
                                AGENT_TYPE_BLACK: [black],
                                AGENT_TYPE_MATTE_BLACK : [black],
-                               AGENT_TYPE_PHOTO_BLACK : [dark_grey],
+                               AGENT_TYPE_PHOTO_BLACK : [dark_gray],
+                               AGENT_TYPE_BLACK_B8800: [black],
                                AGENT_TYPE_CMY: [cyan, magenta, yellow],
                                AGENT_TYPE_KCM: [light_cyan, light_magenta, light_yellow],
-                               AGENT_TYPE_GGK: [dark_grey],
+                               AGENT_TYPE_GGK: [dark_gray],
                                AGENT_TYPE_YELLOW: [yellow],
                                AGENT_TYPE_MAGENTA: [magenta],
                                AGENT_TYPE_CYAN : [cyan],
@@ -2173,12 +2176,15 @@ class DevMgr4(DevMgr4_base):
                                AGENT_TYPE_LC_LM: [light_cyan, light_magenta],
                                #AGENT_TYPE_Y_M: [yellow, magenta],
                                #AGENT_TYPE_C_K: [black, cyan],
-                               AGENT_TYPE_LG_PK: [light_grey, dark_grey],
-                               AGENT_TYPE_LG: [light_grey],
-                               AGENT_TYPE_G: [dark_grey],
-                               AGENT_TYPE_PG: [light_grey],
+                               AGENT_TYPE_LG_PK: [light_gray, dark_gray],
+                               AGENT_TYPE_LG: [light_gray],
+                               AGENT_TYPE_G: [gray],
+                               AGENT_TYPE_DG: [dark_gray],
+                               AGENT_TYPE_PG: [light_gray],
                                AGENT_TYPE_C_M: [cyan, magenta],
                                AGENT_TYPE_K_Y: [black, yellow],
+                               AGENT_TYPE_LC: [light_cyan],
+                               AGENT_TYPE_RED : [red],
                                }
 
         self.suppliesList.setSorting(-1)

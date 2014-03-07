@@ -317,6 +317,7 @@ else: # INTERACTIVE_MODE
 
             if cups.IPP_OK == status:
                 log.info("Successfully deleted %s Print/Fax queue"%selected_device_name)
+                utils.sendEvent(EVENT_CUPS_QUEUES_REMOVED,remove_device[1], remove_device[0])
                 clean_exit(0)
             else:
                 log.error("Failed to delete %s Print/Fax queue. Error : %s"%(selected_device_name,status_str))
@@ -557,7 +558,7 @@ else: # INTERACTIVE_MODE
                     clean_exit(1)
 
             if auto:
-                location, info = '', 'Automatically setup by HPLIP'
+                location, info = '', '%s Device (Automatically setup by HPLIP)'%(default_model.replace('_',' '))
             else:
                 while True:
                     location = raw_input(log.bold("Enter a location description for this printer (q=quit) ?"))
@@ -606,7 +607,7 @@ else: # INTERACTIVE_MODE
                 clean_exit(1)
             else:
                 # sending Event to add this device in hp-systray
-                utils.sendEvent(EVENT_CUPS_QUEUES_CHANGED,print_uri, printer_name)
+                utils.sendEvent(EVENT_CUPS_QUEUES_ADDED,print_uri, printer_name)
 
         # Updating firmware download for supported devices.
         if ignore_plugin_check is False and mq.get('fw-download', False):
@@ -659,7 +660,7 @@ else: # INTERACTIVE_MODE
                     i = 2
                     while True:
                         t = fax_default_model + "_%d" % i
-                        if (t in installed_fax_names) and (fax_uri not in installed_fax_devices or t not in installed_fax_devices[fax_uri]):
+                        if (t not in installed_fax_names) and (fax_uri not in installed_fax_devices or t not in installed_fax_devices[fax_uri]):
                             fax_default_model += "_%d" % i
                             break
                         i += 1
@@ -711,7 +712,7 @@ else: # INTERACTIVE_MODE
                 clean_exit(1)
 
             if auto:
-                location, info = '', 'Automatically setup by HPLIP'
+                location, info = '', '%s Fax Device (Automatically setup by HPLIP)'%(default_model.replace('_',' '))
             else:
                 while True:
                     location = raw_input(log.bold("Enter a location description for this printer (q=quit) ?"))
@@ -756,7 +757,7 @@ else: # INTERACTIVE_MODE
                 clean_exit(1)
             else:
                 # sending Event to add this device in hp-systray
-                utils.sendEvent(EVENT_CUPS_QUEUES_CHANGED,fax_uri, fax_name)
+                utils.sendEvent(EVENT_CUPS_QUEUES_ADDED,fax_uri, fax_name)
 
 
 
@@ -800,7 +801,7 @@ else: # INTERACTIVE_MODE
 
                             try:
                                 current_phone_num = str(d.getPhoneNum())
-                                current_station_name = str(d.getStationName())
+                                current_station_name = d.getStationName()
                             except Error:
                                 log.error("Could not communicate with device. Device may be busy. Please wait for retry...")
                                 time.sleep(5)
@@ -844,15 +845,19 @@ else: # INTERACTIVE_MODE
 
                             while True:
                                 if current_station_name:
-                                    station_name = raw_input(log.bold("\nEnter the name and/or company for this device (c=use current:'%s'*, q=quit) ?" % current_station_name))
+                                    station_name = raw_input(log.bold("\nEnter the name and/or company for this device (c=use current:'%s'*, q=quit) ?" % current_station_name.encode('utf-8')))
                                 else:
                                     station_name = raw_input(log.bold("\nEnter the name and/or company for this device (q=quit) ?"))
+                                    
                                 if station_name.strip().lower() == 'q':
                                     log.info("OK, done.")
                                     clean_exit(0)
 
                                 if current_station_name and (not station_name or station_name.strip().lower() == 'c'):
                                     station_name = current_station_name
+                                    
+                                if isinstance(station_name, str):
+                                    station_name = station_name.decode('utf-8')
 
 
                                 if len(station_name) > 50:

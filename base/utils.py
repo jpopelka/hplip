@@ -2222,9 +2222,9 @@ def Is_Process_Running(process_name):
 
         if output:
             for p in output.splitlines():
-                cmd = "echo %s | awk {'print $2'}" %p
+                cmd = "echo '%s' | awk {'print $2'}" %p
                 status,pid = commands.getstatusoutput(cmd)
-                cmd = "echo %s | awk {'print $11,$12'}" %p
+                cmd = "echo '%s' | awk {'print $11,$12'}" %p
                 status,cmdline = commands.getstatusoutput(cmd)
                 if pid :
                     process[pid] = cmdline

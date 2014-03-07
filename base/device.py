@@ -999,12 +999,16 @@ AGENT_types = { AGENT_TYPE_NONE        : 'invalid',
                 #AGENT_TYPE_C_K         : 'cyan_and_black',
                 AGENT_TYPE_LG_PK       : 'light_gray_and_photo_black',
                 AGENT_TYPE_LG          : 'light_gray',
-                AGENT_TYPE_G           : 'medium_gray',
+                AGENT_TYPE_G           : 'gray',
+                AGENT_TYPE_DG          : 'dark_gray',
                 AGENT_TYPE_PG          : 'photo_gray',
                 AGENT_TYPE_C_M         : 'cyan_and_magenta',
                 AGENT_TYPE_K_Y         : 'black_and_yellow',
                 AGENT_TYPE_PHOTO_BLACK : 'photo_black',
+                AGENT_TYPE_LC          : 'light_cyan',
+                AGENT_TYPE_LM          : 'light_magenta',
                 AGENT_TYPE_MATTE_BLACK : 'matte_black',
+                AGENT_TYPE_RED         : 'red',
                 AGENT_TYPE_UNSPECIFIED : 'unspecified', # Kind=5,6
             }
 

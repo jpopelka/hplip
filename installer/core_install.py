@@ -723,12 +723,13 @@ class CoreInstall(object):
                         vv = self.distros[distro]['versions'][v].copy()
                         vv['same_as_version'] = v
                         self.distros[distro]['versions'][ver] = vv
+
+                        for key in distros_dat.keys(ver_section):
+                           vv[key] = self.__fixup_data(key, distros_dat.get(ver_section, key))
+
                     except KeyError:
                         log.debug("Missing 'same_as_version=' version in distros.dat for section [%s:%s]." % (distro, v))
                         continue
-
-        #import pprint
-        #pprint.pprint(self.distros)
 
     def pre_install(self):
         pass

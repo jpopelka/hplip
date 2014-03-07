@@ -37,7 +37,7 @@ SystemServices::SystemServices(int iLogLevel, int job_id, char* user_name) : m_i
     m_fp = NULL;
     if (iLogLevel & SAVE_PCL_FILE)
     {
-        char    fname[64];
+        char    fname[MAX_FILE_PATH_LEN];
         sprintf(fname, "%s/hp_%s_cups_out_job%d_XXXXXX",CUPS_TMP_DIR, user_name, job_id);
         
         createTempFile(fname, &m_fp);

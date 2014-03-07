@@ -659,7 +659,7 @@ class SystemTrayApp(QApplication):
 
                     m = m[self.fmt_size:]
                     
-                    if event.event_code == EVENT_CUPS_QUEUES_CHANGED:
+                    if event.event_code == EVENT_CUPS_QUEUES_REMOVED or event.event_code == EVENT_CUPS_QUEUES_ADDED:
                         self.resetDevice()
                         for d in device.getSupportedCUPSDevices(back_end_filter=['hp', 'hpfax']):
                             self.addDevice(d)
@@ -704,9 +704,12 @@ class SystemTrayApp(QApplication):
                         log.debug("Waiting to hide...")
                         QTimer.singleShot(HIDE_INACTIVE_DELAY, self.timeoutHideWhenInactive)
 
-                    if event.event_code <= EVENT_MAX_USER_EVENT:
-                        self.addDevice(event.device_uri)
-                        self.setMenu()
+                    if event.event_code <= EVENT_MAX_USER_EVENT or \
+                        event.event_code == EVENT_CUPS_QUEUES_REMOVED or event.event_code == EVENT_CUPS_QUEUES_ADDED:
+
+                        if event.event_code != EVENT_CUPS_QUEUES_REMOVED:
+                            self.addDevice(event.device_uri)
+                            self.setMenu()
 
                         if self.tray_icon.supportsMessages():
 

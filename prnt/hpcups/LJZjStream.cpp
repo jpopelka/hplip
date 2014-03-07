@@ -676,8 +676,8 @@ DRIVER_ERROR LJZjStream::preProcessRasterData(cups_raster_t **ppcups_raster, cup
 	cups_raster_t *even_pages_raster=NULL;
 	cups_raster_t *odd_pages_raster = NULL;
 	BYTE* pPageDataBuffer = NULL;
-	char hpEvenPagesFile[64]={0,};
-	char hpOddPagesFile[64]={0,};
+	char hpEvenPagesFile[MAX_FILE_PATH_LEN]={0,};
+	char hpOddPagesFile[MAX_FILE_PATH_LEN]={0,};
 	snprintf(hpEvenPagesFile, sizeof(hpEvenPagesFile), "%s/hp_%s_cups_EvenPagesXXXXXX",CUPS_TMP_DIR, m_pJA->user_name);
 	snprintf(hpOddPagesFile, sizeof(hpOddPagesFile), "%s/hp_%s_cups_OddPagesXXXXXX", CUPS_TMP_DIR, m_pJA->user_name);
 	

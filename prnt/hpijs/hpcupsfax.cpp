@@ -66,7 +66,7 @@ uint32_t (*convert_endian_l)(uint32_t);
 uint16_t (*convert_endian_s)(uint16_t);
 
 static int iLogLevel = 1;
-char hpFileName[64] ;
+char hpFileName[MAX_FILE_PATH_LEN] ;
 
 #define TIFF_HDR_SIZE 8
 #define LITTLE_ENDIAN_MODE I
@@ -441,7 +441,7 @@ int ProcessTiffData(int fromFD, int toFD, char* user_name)
     int bytes_written = 0;
     int ret_status = 0;
     int bytes_read = 0;
-    char hpTiffFileName[64];
+    char hpTiffFileName[MAX_FILE_PATH_LEN];
     long input_file_size = 0;
     FILE* pFilePtrFax;
     snprintf(hpTiffFileName,sizeof(hpTiffFileName), "%s/hp_%s_fax_tiffXXXXXX",CUPS_TMP_DIR,user_name);

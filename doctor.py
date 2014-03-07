@@ -125,7 +125,7 @@ def install_plugin(core):
         log.info("Plugin's already installed")
         return True
     else:
-        log.info("HP Properitery Plugin's are not required as no plug-in printer is present.")
+        log.info("No plug-in printers are configured.")
         return True
 
     if ok and user_input == 'y':
@@ -149,8 +149,7 @@ def deprecated_check(core):
         log.info("No Deprecated items are found")
     else:
         log.error("This distro (i.e %s  %s) is either deprecated or not yet supported."%(core.distro_name, core.distro_version))
-        ok,user_input =tui.enter_choice(log.red("The diagnosis is limited on unsupported platforms. Do you want to continue?(y=yes, n=no*):"),['y', 'n'], 'n')
-#        ok,user_input =tui.enter_choice(log.red("This tool may not diagnose all the problems. Do you want to continue?(y=yes, n=no*)"),['y', 'n'], 'n')
+        ok,user_input =tui.enter_choice(log.red("The diagnosis is limited on unsupported platforms. Do you want to continue?(y=yes*, n=no):"),['y', 'n'], 'y')
         if not ok or user_input !='y':
             clean_exit(2)
 

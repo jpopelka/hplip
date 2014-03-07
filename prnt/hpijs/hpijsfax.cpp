@@ -273,7 +273,7 @@ int hpijsFaxServer (int argc, char **argv)
 	IP_HANDLE		hJob;
 	 FILE *pFilePtrFax;
 
-	char					hpFileName[64]; 
+	char					hpFileName[MAX_FILE_PATH_LEN]; 
 	int					fdFax = -1;
 	BYTE					szFileHeader[68];
 	BYTE					szPageHeader[64];

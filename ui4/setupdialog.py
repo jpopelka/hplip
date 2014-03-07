@@ -22,7 +22,6 @@
 # StdLib
 import socket
 import operator
-import commands
 import signal
 
 # Local
@@ -696,8 +695,7 @@ class SetupDialog(QDialog, Ui_Dialog):
 
         self.setNextButton(BUTTON_ADD_PRINTER)
 
-        if not self.printer_name:
-            self.setDefaultPrinterName()
+        self.setDefaultPrinterName()
 
         self.findPrinterPPD()
 
@@ -708,8 +706,7 @@ class SetupDialog(QDialog, Ui_Dialog):
             self.SetupFaxGroupBox.setChecked(True)
             self.SetupFaxGroupBox.setEnabled(True)
 
-            if not self.fax_name:
-                self.setDefaultFaxName()
+            self.setDefaultFaxName()
 
             self.findFaxPPD()
 
@@ -997,7 +994,7 @@ class SetupDialog(QDialog, Ui_Dialog):
                 FailureUI(self, self.__tr("<b>Printer queue setup failed.</b> <p>Error : %s"%status_str))
             else:
                 # sending Event to add this device in hp-systray
-                utils.sendEvent(EVENT_CUPS_QUEUES_CHANGED,self.device_uri, self.printer_name)
+                utils.sendEvent(EVENT_CUPS_QUEUES_ADDED,self.device_uri, self.printer_name)
 
         finally:
             QApplication.restoreOverrideCursor()
@@ -1022,7 +1019,7 @@ class SetupDialog(QDialog, Ui_Dialog):
                 FailureUI(self, self.__tr("<b>Fax queue setup failed.</b><p>Error : %s"%status_str))
             else:
                  # sending Event to add this device in hp-systray
-                utils.sendEvent(EVENT_CUPS_QUEUES_CHANGED,self.fax_uri, self.fax_name)
+                utils.sendEvent(EVENT_CUPS_QUEUES_ADDED,self.fax_uri, self.fax_name)
                 
         finally:
             QApplication.restoreOverrideCursor()
@@ -1256,6 +1253,7 @@ class SetupDialog(QDialog, Ui_Dialog):
                 if widget.checkState() == Qt.Checked:
                     item = self.RemoveDevicesTableWidget.item(row, 1)
                     printer = unicode(item.data(Qt.UserRole).toString()).encode('utf-8')
+                    uri = device.getDeviceURIByPrinterName(printer)
                     log.debug("Removing printer: %s" % printer)
                     status, status_str = cups.cups_operation(cups.delPrinter, GUI_MODE, 'qt4', self, printer)
 
@@ -1263,6 +1261,10 @@ class SetupDialog(QDialog, Ui_Dialog):
                         FailureUI(self, self.__tr("<b>Unable to delete '%s' queue. </b><p>Error : %s"%(printer,status_str)))
                         if status == cups.IPP_FORBIDDEN or status == cups.IPP_NOT_AUTHENTICATED or status == cups.IPP_NOT_AUTHORIZED:
                             break
+                    else:
+                        # sending Event to add this device in hp-systray
+                        utils.sendEvent(EVENT_CUPS_QUEUES_REMOVED, uri, printer)
+
             self.close()
 
         else:

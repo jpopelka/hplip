@@ -419,7 +419,12 @@ COLORANT_INDEX_TO_AGENT_TYPE_MAP = {
                                     'black' :   AGENT_TYPE_BLACK,
                                     'photoblack': AGENT_TYPE_PHOTO_BLACK,
                                     'matteblack' : AGENT_TYPE_MATTE_BLACK,
-                                    'gray' : AGENT_TYPE_LG,
+                                    'lightgray' : AGENT_TYPE_LG,
+                                    'gray': AGENT_TYPE_G,
+                                    'darkgray': AGENT_TYPE_DG,
+                                    'lightcyan': AGENT_TYPE_LC,
+                                    'lightmagenta': AGENT_TYPE_LM,
+                                    'red' : AGENT_TYPE_RED,
                                    }
 
 MARKER_SUPPLES_TYPE_TO_AGENT_KIND_MAP = {
@@ -1526,7 +1531,11 @@ def StatusType10FetchUrl(func, url, footer=""):
     else:
         data = func(url, data_fp)
         if data:
-            data = data.split('\r\n\r\n', 1)[1]
+            while data.find('\r\n\r\n') != -1:
+                data = data.split('\r\n\r\n', 1)[1]
+                if not data.startswith("HTTP"):
+                    break
+
             if data:
                 data = ExtractXMLData(data)
     return data

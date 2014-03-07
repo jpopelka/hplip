@@ -276,7 +276,6 @@ EVENT_ERROR_DEVICEOPEN_FAILED_DEV_NODE_MOVED = 5038
 # end
 
 # diagnosis tool codes
-EVENT_ADD_PRINTQUEUE = 5501
 EVENT_DIAGNOSE_PRINTQUEUE = 5502
 #end
 
@@ -306,7 +305,7 @@ EVENT_FAX_MAX = 8999
 
 # UI
 EVENT_MIN_UI_EVENT = 9000
-EVENT_CUPS_QUEUES_CHANGED = 9000 # sent by hp-setup if queues added (or removed)
+EVENT_CUPS_QUEUES_ADDED = 9000 # sent by hp-setup if queues added
 EVENT_RAISE_DEVICE_MANAGER = 9001
 #EVENT_JOB_STORAGE_UI_REQUEST = 9002 # sent by hplipjs CUPS filter for job storage UI
 EVENT_HISTORY_UPDATE = 9003 # sent by hp-systray to hp-toolbox when a device's history changes
@@ -321,6 +320,7 @@ EVENT_DEVICE_UPDATE_ACTIVE = 9030
 EVENT_DEVICE_UPDATE_INACTIVE = 9031
 EVENT_DEVICE_UPDATE_BLIP = 9032
 EVENT_SYSTEMTRAY_EXIT = 9040
+EVENT_CUPS_QUEUES_REMOVED = 9041 # sent by hp-setup if queues removed
 EVENT_MAX_UI_EVENT = 9999
 
 EVENT_MAX_EVENT = 9999
@@ -592,10 +592,13 @@ AGENT_TYPE_K_Y = 14 # black and yellow (for LJ Pro)
 AGENT_TYPE_C_M = 15 # cyan and magenta (for LJ Pro)
 AGENT_TYPE_LG_PK = 16 # light grey and photo black
 AGENT_TYPE_LG = 17 # light grey
-AGENT_TYPE_G = 18 # medium grey
+AGENT_TYPE_G = 18 # grey
 AGENT_TYPE_PG = 19 # photo grey
 AGENT_TYPE_PHOTO_BLACK = 20 # photo black
 AGENT_TYPE_MATTE_BLACK = 21 # matte black
+AGENT_TYPE_LC = 22 #light cyan
+AGENT_TYPE_LM = 23 #light magenta
+AGENT_TYPE_DG = 24 #dark gray
 AGENT_TYPE_BLACK_B8800 = 39 # For PS B8800
 AGENT_TYPE_WHITE = 0x20 # For ISO 10180 compatibility
 AGENT_TYPE_RED = 0x21 # For ISO 10180 compatibility

@@ -117,7 +117,7 @@ display_name=SUSE Linux
 alt_names=
 display=1
 notes=
-package_mgrs=yast,yast2,opensuse-updater,zypper
+package_mgrs=yast,yast2,opensuse-updater,zypper,package-manager
 package_mgr_cmd=su -c "zypper --non-interactive --no-gpg-checks in --auto-agree-with-licenses $packages_to_install"
 pre_depend_cmd=
 post_depend_cmd=
@@ -579,7 +579,7 @@ ui_toolkit=qt3
 # ****************************************
 [fedora]
 index=5
-versions=17,18,19
+versions=17,18,19,20
 display_name=Fedora
 alt_names=Fedora Core
 display=1
@@ -838,6 +838,17 @@ supported=1
 packaged_version=3.13.5
 release_date=02/07/2013
 same_as_version=17
+
+
+
+# ****************************************
+
+[fedora:20]
+code_name=Heisenbug
+supported=1
+packaged_version=3.13.9
+release_date=12/11/2013
+same_as_version=19
 
 
 # ****************************************
@@ -2607,12 +2618,19 @@ packages=wget
 
 [ubuntu:12.04:avahi-utils]
 packages=avahi-utils
+
 # ********************
 [ubuntu:12.10]
+code_name=Quantal
+packaged_version=3.12.11
+release_date=18/10/2012
 same_as_version=12.04
 
 # ********************
 [ubuntu:13.04]
+code_name=Raring
+packaged_version=3.13.4
+release_date=25/04/2013
 same_as_version=12.04
 
 # ********************
@@ -2738,7 +2756,7 @@ packages=avahi-utils
 # ****************************************
 [debian]
 index=2
-versions=6.0,6.0.1,6.0.2,6.0.3,6.0.4,6.0.5,6.0.6,6.0.7,6.0.8,7.0,7.1,7.2
+versions=6.0,6.0.1,6.0.2,6.0.3,6.0.4,6.0.5,6.0.6,6.0.7,6.0.8,6.0.9,7.0,7.1,7.2,7.3,7.4
 display_name=Debian
 alt_names=
 display=1
@@ -2902,6 +2920,9 @@ same_as_version=6.0
 [debian:6.0.8]
 same_as_version=6.0
 
+[debian:6.0.9]
+same_as_version=6.0
+
 # *********************
 
 [debian:7.0]
@@ -3033,6 +3054,12 @@ packages=avahi-utils
 same_as_version=7.0
 
 [debian:7.2]
+same_as_version=7.0
+
+[debian:7.3]
+same_as_version=7.0
+
+[debian:7.4]
 same_as_version=7.0
 
 # *********************
@@ -5032,7 +5059,7 @@ packages=avahi
 # ****************************************
 [linuxmint]
 index=22
-versions=13,14,15
+versions=13,14,15,16
 display_name=Linux Mint
 alt_names=mint, mint linux
 display=1
@@ -5091,7 +5118,7 @@ packages=ghostscript
 packages=openssl
 
 [linuxmint:13:libjpeg]
-packages=libjpeg62-dev
+packages=libjpeg8-dev
 
 [linuxmint:13:libnetsnmp-devel]
 packages=libsnmp-dev
@@ -5224,7 +5251,7 @@ packages=openssl
 packages=libjpeg8-dev
 
 [linuxmint:15:libnetsnmp-devel]
-packages=libsnmp-dev
+packages=libsnmp-dev,snmp-mibs-downloader
 
 [linuxmint:15:libpthread]
 packages=build-essential
@@ -5233,7 +5260,7 @@ packages=build-essential
 packages=libtool
 
 [linuxmint:15:libusb]
-packages=libusb-1.0.0-dev
+packages=libusb-1.0.0-dev,libusb-dev
 
 [linuxmint:15:make]
 packages=build-essential
@@ -5301,6 +5328,15 @@ packages=wget
 
 [linuxmint:15:avahi-utils]
 packages=avahi-utils
+
+# ****************************************
+
+[linuxmint:16]
+code_name=Petra
+packaged_version=3.14.1
+release_date=30/11/2013
+same_as_version=15
+
 # ****************************************
 
 [linpus]

@@ -505,7 +505,7 @@ def readXmlTagDataFromURI(dev,URI,xmlRootNode,xmlReqDataNode,timeout=5):
             strResp = utils.unchunck_xml_data(strResp)
             pos = strResp.find(xmlRootNode,0,len(strResp))    
             repstr = strResp[pos:].strip()
-            repstr = repstr.replace('\r',' ').replace('\t',' ').replace('\n',' ') # To remove formating characters from the received xml
+            repstr = repstr.replace('\r','').replace('\t','').replace('\n','') # To remove formating characters from the received xml
             repstr = repstr.rstrip('0')   # To remove trailing zero from the received xml
             try:
                 parser_object = utils.extendedExpat()
@@ -514,7 +514,7 @@ def readXmlTagDataFromURI(dev,URI,xmlRootNode,xmlReqDataNode,timeout=5):
                 reqDataElementList = root_element.getElementsByTagName(xmlReqDataNode)
                 for node in reqDataElementList:
                     repstr = node.toString()
-                    repstr = repstr.replace('\r',' ').replace('\t',' ').replace('\n',' ') # To remove formating characters from the received xml
+                    repstr = repstr.replace('\r','').replace('\t','').replace('\n','') # To remove formating characters from the received xml
                     params = utils.XMLToDictParser().parseXML(repstr)
                     paramsList.append(params)
             except xml.parsers.expat.ExpatError, e:
@@ -566,7 +566,7 @@ def readXmlDataFromURI(dev,URI,xmlRootNode,xmlChildNode,timeout=5):
             strResp = utils.unchunck_xml_data(strResp)
             pos = strResp.find(xmlRootNode,0,len(strResp))    
             repstr = strResp[pos:].strip()
-            repstr = repstr.replace('\r',' ').replace('\t',' ').replace('\n',' ') # To remove formating characters from the received xml
+            repstr = repstr.replace('\r','').replace('\t','').replace('\n','') # To remove formating characters from the received xml
             repstr = repstr.rstrip('0')   # To remove trailing zero from the received xml
             elementCount = repstr.count(xmlChildNode)          	    	
             try:

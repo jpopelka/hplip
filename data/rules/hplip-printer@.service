@@ -2,4 +2,4 @@
 Description=Configure HP Plugged-In Printer
 
 [Service]
-ExecStart=/usr/bin/hp-config_usb_printer "%i"
+ExecStart=/usr/bin/python /usr/bin/hp-config_usb_printer "%i"

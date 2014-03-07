@@ -489,7 +489,7 @@ def handle_event(event, more_args=None):
         handle_hpdio_event(event, bytes_written)
 
     # Qt4 only
-    elif event.event_code == EVENT_CUPS_QUEUES_CHANGED:
+    elif event.event_code == EVENT_CUPS_QUEUES_ADDED or event.event_code == EVENT_CUPS_QUEUES_REMOVED:
         send_event_to_systray_ui(event)
         send_toolbox_event(event, EVENT_HISTORY_UPDATE)
 

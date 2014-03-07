@@ -41,6 +41,7 @@
 #include "common.h"
 #include "scl.h"
 #include "hpaio.h"
+#include "utils.h"
 
 #define DEBUG_DECLARE_ONLY
 #include "sanei_debug.h"
@@ -2640,7 +2641,7 @@ SANE_Status sclpml_start(SANE_Handle handle)
 
         if( log_output )
         {
-            char f[256];
+            char f[MAX_FILE_PATH_LEN];
             static int cnt=0;
 
             if (getenv("HOME"))

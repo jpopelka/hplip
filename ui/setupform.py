@@ -889,7 +889,7 @@ class SetupForm(SetupForm_base):
             self.FailureUI(self.__tr("<b>Printer queue setup failed.</b><p>Error : %s "%status_str))
         else:
             # sending Event to add this device in hp-systray
-            utils.sendEvent(EVENT_CUPS_QUEUES_CHANGED,self.device_uri, self.printer_name)
+            utils.sendEvent(EVENT_CUPS_QUEUES_ADDED,self.device_uri, self.printer_name)
 
         QApplication.restoreOverrideCursor()
         return status
@@ -948,7 +948,7 @@ class SetupForm(SetupForm_base):
             self.FailureUI(self.__tr("<b>Fax queue setup failed.</b><p>Error : %s "%status_str))
         else:
             # sending Event to add this device in hp-systray
-            utils.sendEvent(EVENT_CUPS_QUEUES_CHANGED,self.fax_uri, self.fax_name)
+            utils.sendEvent(EVENT_CUPS_QUEUES_ADDED,self.fax_uri, self.fax_name)
 
         QApplication.restoreOverrideCursor()
         return status

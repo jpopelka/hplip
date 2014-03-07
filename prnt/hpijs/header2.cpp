@@ -171,7 +171,7 @@ void Header::SetQuality(Quality qual)
         default: DBG1("<out of range, using> Normal\n"); break;
     }
 #endif
-    ASSERT (qual >= qualityAuto || qual <= qualityFastNormal);
+    ASSERT (qual >= qualityAuto && qual <= qualityFastNormal);
 
     if (qual < qualityAuto || qual > qualityFastNormal)
         qual = qualityNormal;

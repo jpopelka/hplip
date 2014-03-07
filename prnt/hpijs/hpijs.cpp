@@ -97,7 +97,7 @@ void setLogLevel(UXServices *pSS, char*user_name)
 
     if (pSS->m_iLogLevel & SAVE_PCL_FILE)
     {
-        char    szFileName[64];
+        char    szFileName[MAX_FILE_PATH_LEN];
         snprintf (szFileName,sizeof(szFileName), "%s/hp_%s_ijs_%d_XXXXXX", CUPS_TMP_DIR, user_name,  getpid());
         createTempFile(szFileName, &pSS->outfp);
 
@@ -632,7 +632,7 @@ int main (int argc, char *argv[], char *evenp[])
    setLogLevel(pSS, user_name);
 
 #ifdef CAPTURE
-   char szCapOutFile[64];
+   char szCapOutFile[MAX_FILE_PATH_LEN];
    snprintf(szCapOutFile, sizeof(szCapOutFile),"%s/hp_%s_ijs_capout_XXXXXX",CUPS_TMP_DIR, user_name);
    if ((pSS->InitScript(szCapOutFile, TRUE)) != NO_ERROR)
       BUG("unable to init capture");

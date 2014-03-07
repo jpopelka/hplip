@@ -13,6 +13,8 @@
 #define UTILS_LINE_SIZE 256     /* Length of a line. */
 #define UTILS_BUFFER_SIZE 16384  /* General Read/Write buffer. */
 
+#define MAX_FILE_PATH_LEN   512
+
 #define PRNT_PLUGIN_LJ "lj.so"
 #define PRNT_PLUGIN_HBPL1 "hbpl1.so"
 #define SCAN_PLUGIN_MARVELL "bb_marvell.so"

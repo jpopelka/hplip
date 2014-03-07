@@ -26,7 +26,7 @@
 #   104 = no libdl
 
 #AC_PREREQ(2.59)
-AC_INIT([HP Linux Imaging and Printing], [3.14.1], [3.14.1], [hplip])
+AC_INIT([HP Linux Imaging and Printing], [3.14.3], [3.14.3], [hplip])
 #AM_INIT_AUTOMAKE([1.9 foreign])
 AM_INIT_AUTOMAKE
 AC_DISABLE_STATIC
@@ -279,17 +279,6 @@ else
    AC_MSG_RESULT(no)
 fi
 
-AC_MSG_CHECKING([for udev acl rules])
-AC_ARG_ENABLE(udev_acl_rules,
-  [  --enable-udev-acl-rules    enable udev acl rules (default=no)],
-  udev_acl_rules=$enableval, udev_acl_rules=no)
-if test "$udev_acl_rules" = "yes"; then
-   AC_MSG_RESULT(yes)
-else
-   AC_MSG_RESULT(no)
-fi
-AM_CONDITIONAL(UDEV_ACL_RULES, test x$udev_acl_rules = xyes)
-
 AC_MSG_CHECKING([for udev sysfs enable rules])
 AC_ARG_ENABLE(udev_sysfs_rules,
   [  --enable-udev_sysfs_rules    Use SYSFS attribute instead of ATTR/ATTRS attribute in udev rules(default=no)],
@@ -352,6 +341,7 @@ AC_ARG_WITH(docdir, AC_HELP_STRING([--with-docdir=DIR], [set hplip documentation
 
 AC_ARG_WITH(htmldir, AC_HELP_STRING([--with-htmldir=DIR], [set hplip html documentation directory [default=datadir/doc]]),
    hphtmldir=$withval, hphtmldir="$datadir/doc/hplip-$VERSION")
+
 AC_MSG_CHECKING([for foomatic ppd install])
 AC_ARG_ENABLE(foomatic_ppd_install,
   [  --enable-foomatic-ppd-install    enable foomatic static ppd install (default=no), uses hpppddir],
@@ -648,7 +638,6 @@ AC_SUBST(lite_build)
 AC_SUBST(hpcups_only_build)
 AC_SUBST(SNMPLIB)
 AC_SUBST(prefix)
-AC_SUBST(udev_acl_rules)
 AC_SUBST(udev_sysfs_rules)
 
 AC_CONFIG_FILES(Makefile hplip.conf hplip.desktop hplip-systray.desktop prnt/drv/hpijs.drv prnt/drv/hpcups.drv hplip.list data/policykit/com.hp.hplip.service)

@@ -171,7 +171,7 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
                 log.debug("Saving station name %s to device" % s)
                 self.dev.setStationName(s)
             except Error:
-                CheckDeviceUI()
+                CheckDeviceUI(self)
         finally:
             endWaitCursor()
 
@@ -195,7 +195,7 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
                 log.debug("Saving fax number %s to device" % s)
                 self.dev.setPhoneNum(s)
             except Error:
-                CheckDeviceUI()
+                CheckDeviceUI(self)
         finally:
             endWaitCursor()
 
@@ -265,7 +265,7 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
                 log.debug("fax_number = '%s'" % fax_number)
                 self.FaxNumberLineEdit.setText(fax_number)
             except Error:
-                CheckDeviceUI()
+                CheckDeviceUI(self)
         finally:
             endWaitCursor()
 
