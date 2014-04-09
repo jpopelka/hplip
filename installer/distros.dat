@@ -141,7 +141,7 @@ parallel_supported=0
 usb_supported=1
 packaged_version=3.11.6
 release_date=2012-07-11
-notes=Please be sure to disable the CD repositories in YaST and after installation you must log out and back in to become a member of the lp and sys group to enable printing.
+notes=Please be sure to disable the CD repositories in YaST.
 ppd_install=drv
 udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
@@ -261,7 +261,7 @@ parallel_supported=0
 usb_supported=1
 packaged_version=3.12.11
 release_date=2013-03-13
-notes=Please be sure to disable the CD repositories in YaST and after installation you must log out and back in to become a member of the lp and sys group to enable printing.
+notes=Please be sure to disable the CD repositories in YaST.
 ppd_install=drv
 udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
@@ -1026,7 +1026,8 @@ packages=polkit,polkit-gnome
 [rhel:5.0:network]
 packages=wget
 
-
+[rhel:5.0:avahi-utils]
+packages=avahi-tools
 # ********************
 [rhel:6.0]
 code_name=Santiago
@@ -2242,7 +2243,7 @@ packages=avahi
 # ****************************************
 [ubuntu]
 index=12
-versions=10.04,11.10,12.04,12.10,13.04,13.10
+versions=10.04,11.10,12.04,12.10,13.04,13.10,14.04
 display_name=Ubuntu
 alt_names=kubuntu,edubuntu,xubuntu
 display=1
@@ -2271,7 +2272,7 @@ parallel_supported=1
 usb_supported=1
 packaged_version=3.10.2
 release_date=2010
-notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.  During the install process you will be added to the lp group, please quit the installer before the setup stage, log out, log back in, and run hp-setup to complete the install.
+notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
 ppd_install=drv
 udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
@@ -2390,7 +2391,7 @@ parallel_supported=1
 usb_supported=1
 packaged_version=3.11.5
 release_date=13/10/2011
-notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.  During the install process you will be added to the lp and lpadmin group, please quit the installer before the setup stage, log out, log back in, and run hp-setup to complete the install.
+notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
 ppd_install=drv
 udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
@@ -2510,7 +2511,7 @@ parallel_supported=1
 usb_supported=1
 packaged_version=3.12.2
 release_date=28/04/2012
-notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.  During the install process you will be added to the lp and lpadmin group, please quit the installer before the setup stage, log out, log back in, and run hp-setup to complete the install.
+notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
 ppd_install=drv
 udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
@@ -2611,7 +2612,7 @@ packages=cups
 packages=policykit-1,policykit-1-gnome
 
 [ubuntu:12.04:python-notify]
-packages=python-notify
+packages=python-notify2
 
 [ubuntu:12.04:network]
 packages=wget
@@ -2645,7 +2646,7 @@ parallel_supported=1
 usb_supported=1
 packaged_version=3.13.7
 release_date=17/10/2013
-notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.  During the install process you will be added to the lp and lpadmin group, please quit the installer before the setup stage, log out, log back in, and run hp-setup to complete the install.
+notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
 ppd_install=drv
 udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
@@ -2753,6 +2754,13 @@ packages=wget
 [ubuntu:13.10:avahi-utils]
 packages=avahi-utils
 
+
+# ********************
+[ubuntu:14.04]
+code_name=Trusty
+packaged_version=3.14.1
+release_date=17/04/2014
+same_as_version=13.10
 # ****************************************
 [debian]
 index=2
@@ -3819,7 +3827,7 @@ parallel_supported=1
 usb_supported=1
 packaged_version=0.9.1
 release_date=2004-9-16
-notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also be sure to disable the cdrom1-12 media sources. *Important* After the install run: su -c "/usr/sbin/usermod -G lp <your.username> Then logout and log back in.
+notes=Before proceeding, please add the "contrib", "main", and "updates" installation sources to your URPMI configuration./n Open your browser and go to http://easyurpmi.zarb.org/ and follow the instructions provided and then proceed with the HPLIP install. Also be sure to disable the cdrom1-12 media sources. 
 ppd_install=ppd
 udev_mode_fix=1
 ppd_dir=/usr/share/cups/model/HP
@@ -5090,7 +5098,7 @@ parallel_supported=1
 usb_supported=1
 packaged_version=3.12.2
 release_date=2012
-notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.  During the install process you will be added to the lp group, please quit the installer before the setup stage, log out, log back in, and run hp-setup to complete the install.
+notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
 ppd_install=drv
 udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
@@ -5220,7 +5228,7 @@ parallel_supported=1
 usb_supported=1
 packaged_version=3.13.3
 release_date=2013
-notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.  During the install process you will be added to the lp group, please quit the installer before the setup stage, log out, log back in, and run hp-setup to complete the install.
+notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
 ppd_install=drv
 udev_mode_fix=1
 ppd_dir=/usr/share/ppd/HP
@@ -5260,7 +5268,7 @@ packages=build-essential
 packages=libtool
 
 [linuxmint:15:libusb]
-packages=libusb-1.0.0-dev,libusb-dev
+packages=libusb-1.0.0-dev
 
 [linuxmint:15:make]
 packages=build-essential

@@ -645,7 +645,7 @@ try:
             log.error("Failed to get the source from device.")
 
         #check if device has only ADF
-        if 'Flatbed' not in source_option and 'ADF' in source_option:
+        if len(source_option) == 1 and 'ADF' in source_option:
              log.debug("Device has only ADF support")
              adf = True
 

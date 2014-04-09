@@ -233,7 +233,7 @@ if sts != 0:
 
 
 USERS[USER_NAME]="/home/"+USER_NAME+"/.hplip"
-        
+
 USERS['root']="/root/.hplip"
 for u in USERS:
     sts, out = utils.run('mkdir -p %s/%s'%(LOG_FILES,u))
@@ -259,24 +259,6 @@ if ok and user_input == "y":
     backup_clearLog('/var/log/syslog')
     backup_clearLog('/var/log/messages')
     backup_clearLog('/var/log/cups/error_log')
-
-'''
-sts = os.system('rm -f %s/hpcupsfilter*'%TMP_DIR)
-if sts != 0:
-  log.error("Failed to remove hpcupsfilter tmp files.")
-
-sts = os.system('rm -f %s/hpcups_* '%TMP_DIR)
-if sts != 0:
-  log.error("Failed to remove hpcups tmp files.")
-
-sts = os.system('rm -f %s/hpliptiff*'%TMP_DIR)
-if sts != 0:
-  log.error("Failed to remove hpliptiff tmp files.")
-
-sts = os.system('rm -f %s/hplipfaxLog* '%TMP_DIR)
-if sts != 0:
-  log.error("Failed to remove hpcups tmp files.")
-'''
 
 
 ######## Waiting for user to completed job #######
@@ -313,10 +295,6 @@ if os.path.exists('/var/log/cups/error_log'):
 
 for u in USERS:
     sts = os.system('cp -f %s/*.log  %s/%s 2>/devnull '%(USERS[u],LOG_FILES,u))
-    sts = os.system('cp -f %s/*.out  %s/%s 2>/devnull '%(USERS[u],LOG_FILES,u))
-    sts = os.system('cp -f %s/hp_*  %s 2>/devnull '%(USERS[u],LOG_FILES))
-
-sts = os.system('cp -f %s/hp_%s_*  %s 2>/devnull '%(TMP_DIR, USER_NAME, LOG_FILES))
 
 sts,out = utils.run('mv -f ./hp-check.log %s'%LOG_FILES)
 if sts != 0:

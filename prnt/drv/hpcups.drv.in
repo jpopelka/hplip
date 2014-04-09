@@ -710,14 +710,6 @@ Manufacturer "HP"
       Attribute "Product" "" "(HP Deskjet 948c Printer)"
     }
     {
-      ModelName "HP Deskjet 950c"
-      Attribute "NickName" "" "HP Deskjet 950c, hpcups $Version"
-      Attribute "ShortNickName" "" "HP Deskjet 950c"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 950c;DES:deskjet 950c;"
-      PCFileName "hp-deskjet_950c.ppd"
-      Attribute "Product" "" "(HP Deskjet 950c Printer)"
-    }
-    {
       ModelName "HP PSC 950xi"
       Attribute "NickName" "" "HP PSC 950xi, hpcups $Version"
       Attribute "ShortNickName" "" "HP PSC 950xi"
@@ -740,6 +732,14 @@ Manufacturer "HP"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:psc 950;DES:psc 950;"
       PCFileName "hp-psc_950.ppd"
       Attribute "Product" "" "(HP PSC 950 All-in-one Printer)"
+    }
+    {
+      ModelName "HP Deskjet 950c"
+      Attribute "NickName" "" "HP Deskjet 950c, hpcups $Version"
+      Attribute "ShortNickName" "" "HP Deskjet 950c"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 950c;DES:deskjet 950c;"
+      PCFileName "hp-deskjet_950c.ppd"
+      Attribute "Product" "" "(HP Deskjet 950c Printer)"
     }
     {
       ModelName "HP Deskjet 952c"
@@ -7154,6 +7154,32 @@ Manufacturer "HP"
       Attribute "Product" "" "(HP Officejet Pro 8600 Plus E-aio n911g)"
       Attribute "Product" "" "(HP Officejet Pro 8600 Premium E-aio n911n)"
     }
+    {
+      ModelName "HP Officejet Pro 8610"
+      Attribute "NickName" "" "HP Officejet Pro 8610, hpcups $Version"
+      Attribute "ShortNickName" "" "HP Officejet Pro 8610"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp officejet pro 8610;DES:hp officejet pro 8610;"
+      PCFileName "hp-officejet_pro_8610.ppd"
+      Attribute "Product" "" "(HP Officejet Pro 8610 E-all-in-one Printer)"
+      Attribute "Product" "" "(HP Officejet Pro 8615 E-all-in-one Printer)"
+    }
+    {
+      ModelName "HP Officejet Pro 8620"
+      Attribute "NickName" "" "HP Officejet Pro 8620, hpcups $Version"
+      Attribute "ShortNickName" "" "HP Officejet Pro 8620"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp officejet pro 8620;DES:hp officejet pro 8620;"
+      PCFileName "hp-officejet_pro_8620.ppd"
+      Attribute "Product" "" "(HP Officejet Pro 8620 E-all-in-one Printer)"
+      Attribute "Product" "" "(HP Officejet Pro 8625 E-all-in-one Printer)"
+    }
+    {
+      ModelName "HP Officejet Pro 8630"
+      Attribute "NickName" "" "HP Officejet Pro 8630, hpcups $Version"
+      Attribute "ShortNickName" "" "HP Officejet Pro 8630"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp officejet pro 8630;DES:hp officejet pro 8630;"
+      PCFileName "hp-officejet_pro_8630.ppd"
+      Attribute "Product" "" "(HP Officejet Pro 8630 E-all-in-one Printer)"
+    }
   } // End Supported media sizes with full bleed.
 
 } // End Ampere
@@ -9410,9 +9436,12 @@ Manufacturer "HP"
       Attribute "ShortNickName" "" "HP Officejet 4630 Series"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 4630 series;DES:officejet 4630 series;"
       PCFileName "hp-officejet_4630_series.ppd"
-      Attribute "Product" "" "(HP Officejet 4630 E-all-in-one)"
+      Attribute "Product" "" "(HP Officejet 4630 E-all-in-one Printer)"
+      Attribute "Product" "" "(HP Officejet 4631 E-all-in-one Printer)"
       Attribute "Product" "" "(HP Officejet 4632 E-all-in-one Printer)"
+      Attribute "Product" "" "(HP Officejet 4634 E-all-in-one Printer)"
       Attribute "Product" "" "(HP Officejet 4635 E-all-in-one Printer)"
+      Attribute "Product" "" "(HP Officejet 4636 E-all-in-one Printer)"
     }
     {
       ModelName "HP Deskjet 4640 Series"
@@ -9661,6 +9690,7 @@ Manufacturer "HP"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 1010 series;DES:deskjet 1010 series;"
     PCFileName "hp-deskjet_1010_series.ppd"
     Attribute "Product" "" "(HP Deskjet 1010 Printer)"
+    Attribute "Product" "" "(HP Deskjet 1011 Printer)"
     Attribute "Product" "" "(HP Deskjet 1012 Printer)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 1010 Printer Series)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 1015 Printer)"
@@ -9673,13 +9703,14 @@ Manufacturer "HP"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 1510 series;DES:deskjet 1510 series;"
     PCFileName "hp-deskjet_1510_series.ppd"
     Attribute "Product" "" "(HP Deskjet 1510 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet 1511 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet 1512 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet 1513 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet 1514 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 1510 All-in-one Printer Series)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 1515 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 1516 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 1518 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet 1514 All-in-one Printer)"
   }
   {
     ModelName "HP Deskjet 2540 Series"
@@ -11243,6 +11274,17 @@ Manufacturer "HP"
       Attribute "Product" "" "(HP Officejet j3508 All-in-one Printer)"
     }
     {
+      ModelName "HP Deskjet 3600"
+      Attribute "NickName" "" "HP Deskjet 3600, hpcups $Version"
+      Attribute "ShortNickName" "" "HP Deskjet 3600"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 3600;DES:deskjet 3600;"
+      PCFileName "hp-deskjet_3600.ppd"
+      Attribute "Product" "" "(HP Deskjet 3600 Color Inkjet Printer)"
+      Attribute "Product" "" "(HP Deskjet 3620 Color Inkjet Printer)"
+      Attribute "Product" "" "(HP Deskjet 3645 Color Inkjet Printer)"
+      Attribute "Product" "" "(HP Deskjet 3647 Color Inkjet Printer)"
+    }
+    {
       ModelName "HP Officejet j3600 Series"
       Attribute "NickName" "" "HP Officejet j3600 Series, hpcups $Version"
       Attribute "ShortNickName" "" "HP Officejet j3600 Series"
@@ -11254,17 +11296,6 @@ Manufacturer "HP"
       Attribute "Product" "" "(HP Officejet j3640 All-in-one Printer)"
       Attribute "Product" "" "(HP Officejet j3650 All-in-one Printer)"
       Attribute "Product" "" "(HP Officejet j3680 All-in-one Printer)"
-    }
-    {
-      ModelName "HP Deskjet 3600"
-      Attribute "NickName" "" "HP Deskjet 3600, hpcups $Version"
-      Attribute "ShortNickName" "" "HP Deskjet 3600"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 3600;DES:deskjet 3600;"
-      PCFileName "hp-deskjet_3600.ppd"
-      Attribute "Product" "" "(HP Deskjet 3600 Color Inkjet Printer)"
-      Attribute "Product" "" "(HP Deskjet 3620 Color Inkjet Printer)"
-      Attribute "Product" "" "(HP Deskjet 3645 Color Inkjet Printer)"
-      Attribute "Product" "" "(HP Deskjet 3647 Color Inkjet Printer)"
     }
     {
       ModelName "HP Deskjet 3650"
@@ -12954,20 +12985,20 @@ Group "RLT/HP Real Life Technologies"
       Attribute "Product" "" "(HP LaserJet p4014dn Printer)"
     }
     {
-      ModelName "HP LaserJet p4014n"
-      Attribute "NickName" "" "HP LaserJet p4014n, hpcups $Version"
-      Attribute "ShortNickName" "" "HP LaserJet p4014n"
-      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p4014n;DES:hp laserjet p4014n;"
-      PCFileName "hp-laserjet_p4014n.ppd"
-      Attribute "Product" "" "(HP LaserJet p4014n Printer)"
-    }
-    {
       ModelName "HP LaserJet p4014"
       Attribute "NickName" "" "HP LaserJet p4014, hpcups $Version"
       Attribute "ShortNickName" "" "HP LaserJet p4014"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p4014;DES:hp laserjet p4014;"
       PCFileName "hp-laserjet_p4014.ppd"
       Attribute "Product" "" "(HP LaserJet p4014 Printer)"
+    }
+    {
+      ModelName "HP LaserJet p4014n"
+      Attribute "NickName" "" "HP LaserJet p4014n, hpcups $Version"
+      Attribute "ShortNickName" "" "HP LaserJet p4014n"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet p4014n;DES:hp laserjet p4014n;"
+      PCFileName "hp-laserjet_p4014n.ppd"
+      Attribute "Product" "" "(HP LaserJet p4014n Printer)"
     }
     {
       ModelName "HP LaserJet p4015tn"
@@ -17166,20 +17197,20 @@ Group "RLT/HP Real Life Technologies"
      Attribute "Product" "" "(HP LaserJet Pro MFP m125a)"
    }
    {
-     ModelName "HP LaserJet Pro MFP m125nw"
-     Attribute "NickName" "" "HP LaserJet Pro MFP m125nw, hpcups $Version, requires proprietary plugin"
-     Attribute "ShortNickName" "" "HP LaserJet Pro MFP m125nw"
-     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m125nw;DES:hp laserjet pro mfp m125nw;"
-     PCFileName "hp-laserjet_pro_mfp_m125nw.ppd"
-     Attribute "Product" "" "(HP LaserJet Pro MFP m125nw)"
-   }
-   {
      ModelName "HP LaserJet Pro MFP m125rnw"
      Attribute "NickName" "" "HP LaserJet Pro MFP m125rnw, hpcups $Version, requires proprietary plugin"
      Attribute "ShortNickName" "" "HP LaserJet Pro MFP m125rnw"
      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m125rnw;DES:hp laserjet pro mfp m125rnw;"
      PCFileName "hp-laserjet_pro_mfp_m125rnw.ppd"
      Attribute "Product" "" "(HP LaserJet Pro MFP m125rnw)"
+   }
+   {
+     ModelName "HP LaserJet Pro MFP m125nw"
+     Attribute "NickName" "" "HP LaserJet Pro MFP m125nw, hpcups $Version, requires proprietary plugin"
+     Attribute "ShortNickName" "" "HP LaserJet Pro MFP m125nw"
+     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m125nw;DES:hp laserjet pro mfp m125nw;"
+     PCFileName "hp-laserjet_pro_mfp_m125nw.ppd"
+     Attribute "Product" "" "(HP LaserJet Pro MFP m125nw)"
    }
    {
      ModelName "HP LaserJet Pro MFP m126a"
@@ -17206,6 +17237,14 @@ Group "RLT/HP Real Life Technologies"
      Attribute "Product" "" "(HP LaserJet Pro MFP m127fp)"
    }
    {
+     ModelName "HP LaserJet Pro MFP m127fn"
+     Attribute "NickName" "" "HP LaserJet Pro MFP m127fn, hpcups $Version, requires proprietary plugin"
+     Attribute "ShortNickName" "" "HP LaserJet Pro MFP m127fn"
+     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m127fn;DES:hp laserjet pro mfp m127fn;"
+     PCFileName "hp-laserjet_pro_mfp_m127fn.ppd"
+     Attribute "Product" "" "(HP LaserJet Pro MFP m127fn)"
+   }
+   {
      ModelName "HP LaserJet Pro MFP m127fw"
      Attribute "NickName" "" "HP LaserJet Pro MFP m127fw, hpcups $Version, requires proprietary plugin"
      Attribute "ShortNickName" "" "HP LaserJet Pro MFP m127fw"
@@ -17214,12 +17253,28 @@ Group "RLT/HP Real Life Technologies"
      Attribute "Product" "" "(HP LaserJet Pro MFP m127fw)"
    }
    {
-     ModelName "HP LaserJet Pro MFP m127fn"
-     Attribute "NickName" "" "HP LaserJet Pro MFP m127fn, hpcups $Version, requires proprietary plugin"
-     Attribute "ShortNickName" "" "HP LaserJet Pro MFP m127fn"
-     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m127fn;DES:hp laserjet pro mfp m127fn;"
-     PCFileName "hp-laserjet_pro_mfp_m127fn.ppd"
-     Attribute "Product" "" "(HP LaserJet Pro MFP m127fn)"
+     ModelName "HP LaserJet Pro MFP m128fn"
+     Attribute "NickName" "" "HP LaserJet Pro MFP m128fn, hpcups $Version, requires proprietary plugin"
+     Attribute "ShortNickName" "" "HP LaserJet Pro MFP m128fn"
+     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m128fn;DES:hp laserjet pro mfp m128fn;"
+     PCFileName "hp-laserjet_pro_mfp_m128fn.ppd"
+     Attribute "Product" "" "(HP LaserJet Pro MFP m128fn)"
+   }
+   {
+     ModelName "HP LaserJet Pro MFP m128fp"
+     Attribute "NickName" "" "HP LaserJet Pro MFP m128fp, hpcups $Version, requires proprietary plugin"
+     Attribute "ShortNickName" "" "HP LaserJet Pro MFP m128fp"
+     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m128fp;DES:hp laserjet pro mfp m128fp;"
+     PCFileName "hp-laserjet_pro_mfp_m128fp.ppd"
+     Attribute "Product" "" "(HP LaserJet Pro MFP m1278fp)"
+   }
+   {
+     ModelName "HP LaserJet Pro MFP m128fw"
+     Attribute "NickName" "" "HP LaserJet Pro MFP m128fw, hpcups $Version, requires proprietary plugin"
+     Attribute "ShortNickName" "" "HP LaserJet Pro MFP m128fw"
+     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m128fw;DES:hp laserjet pro mfp m128fw;"
+     PCFileName "hp-laserjet_pro_mfp_m128fw.ppd"
+     Attribute "Product" "" "(HP LaserJet Pro MFP m128fw)"
    }
   }
 
