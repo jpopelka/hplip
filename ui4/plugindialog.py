@@ -238,38 +238,22 @@ class PluginDialog(QDialog, Ui_Dialog):
 
             log.info("Downloading plug-in from: %s" % self.plugin_path)
 
-            status, download_plugin_file = self.pluginObj.download(self.plugin_path,self.plugin_download_callback)
+            status, download_plugin_file, error_str = self.pluginObj.download(self.plugin_path,self.plugin_download_callback)
 
-            if status in (pluginhandler.PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS, pluginhandler.PLUGIN_INSTALL_ERROR_DIGITAL_SIGN_NOT_FOUND):
+            if status in (ERROR_UNABLE_TO_RECV_KEYS, ERROR_DIGITAL_SIGN_NOT_FOUND):
                 endWaitCursor()
-                if QMessageBox.question(self, self.__tr("Digital signature download failed"),
-                        self.__tr("<b>The download of the digital signature file failed.</b><p>Without this file, it is not possible to authenticate and validate the plug-in prior to installation.</p>Do you still want to install the plug-in?"),
+                if QMessageBox.question(self, " ",
+                        self.__tr("<b>%s</b><p>Without this, it is not possible to authenticate and validate the plug-in prior to installation.</p>Do you still want to install the plug-in?" %error_str),
                         QMessageBox.Yes | QMessageBox.No) != QMessageBox.Yes:
 
                     self.pluginObj.deleteInstallationFiles(download_plugin_file)
                     self.close()
                     return
 
-            elif status != pluginhandler.PLUGIN_INSTALL_ERROR_NONE:
-
-                if status == pluginhandler.PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND:
-                    desc = self.__tr("<b>ERROR: Plug-in file not found (server returned 404 or similar error)")
-
-                elif status == pluginhandler.PLUGIN_INSTALL_ERROR_DIGITAL_SIGN_BAD:
-                    desc = self.__tr("<b>ERROR: Plug-in file does not match its digital signature.</b><p>File may have been corrupted or altered.")
-
-                elif status == pluginhandler.PLUGIN_INSTALL_ERROR_PLUGIN_FILE_CHECKSUM_ERROR:
-                    desc = self.__tr("<b>ERROR: Plug-in file does not match its checksum. File may have been corrupted or altered.")
-
-                elif status == pluginhandler.PLUGIN_INSTALL_ERROR_NO_NETWORK:
-                    desc = self.__tr("<b>ERROR: Unable to connect to network to download the plug-in.</b><p>Please check your network connection and try again.</p>")
-
-                elif status == pluginhandler.PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR:
-                    desc = self.__tr("<b>ERROR: Unable to create the plug-in directory.</b><p>Please check your permissions and try again.</p>")
-
+            elif status != ERROR_SUCCESS:
                 self.pluginObj.deleteInstallationFiles(download_plugin_file)
                 endWaitCursor()
-                FailureUI(self, desc)
+                FailureUI(self, error_str)
                 self.close()
                 return
 

@@ -592,7 +592,7 @@ class WifiSetupDialog(QDialog, Ui_Dialog):
 
         elif self.success == SUCCESS_AUTO_IP:
 #            self.pages.append((self.__tr("Your printer has been connected to the wireless network, but it has been assigned an address which may not be usable."), load_pixmap('warning', '16x16')))
-            self.pages.append((self.__tr("Your printer has been connected to the wireless network and has been assinged a IP. Now run <pre>hp-setup %s</pre>  If IP is not accessible, try again for another IP."%self.ip), load_pixmap('warning', '16x16')))
+            self.pages.append((self.__tr("Your printer has been connected to the wireless network and has been assinged a IP. Now run <pre>hp-setup %1</pre>  If IP is not accessible, try again for another IP.").arg(QString(self.ip)), load_pixmap('warning', '16x16')))
        #     self.RefreshTimer.start(REFRESH_INTERVAL * 1000)
             self.CancelButton.setEnabled(False)
             self.BackButton.setEnabled(False)

@@ -44,7 +44,6 @@
 #include <net-snmp/net-snmp-config.h>
 #include <net-snmp/net-snmp-includes.h>
 #endif
-static const char *SnmpPort[] = { "","public.1","public.2","public.3","public" };
 #endif
 
 static int PmlOidToHex(const char *szoid, unsigned char *oid, int oidSize)
@@ -341,7 +340,7 @@ enum HPMUD_RESULT hpmud_set_pml(HPMUD_DEVICE device, HPMUD_CHANNEL channel, cons
       if ((psz = strstr(ds.uri, "port=")) != NULL)
          port = strtol(psz+5, &tail, 10);
       else
-         port = 1;
+         port = PORT_PUBLIC;
 
       SetSnmp(ip, port, snmp_oid, type, data, data_size, &status, &result);
       if (result != HPMUD_R_OK)
@@ -433,14 +432,19 @@ enum HPMUD_RESULT hpmud_get_pml(HPMUD_DEVICE device, HPMUD_CHANNEL channel, cons
       if ((psz = strstr(ds.uri, "port=")) != NULL)
          port = strtol(psz+5, &tail, 10);
       else
-         port = 1;
+         port = PORT_PUBLIC;
 
       dLen = GetSnmp(ip, port, snmp_oid, message, sizeof(message), &dt, &status, &result);
       if (result != HPMUD_R_OK)
       {
-         BUG("GetPml failed ret=%d\n", result);
-         stat = result;
-         goto bugout;       
+        //Try one more time with previous default community name string ("public.1" which was used for old HP printers)  
+        dLen = GetSnmp(ip, PORT_PUBLIC_1, snmp_oid, message, sizeof(message), &dt, &status, &result);
+        if (result != HPMUD_R_OK)
+        {
+            BUG("GetPml failed ret=%d\n", result);
+            stat = result;
+            goto bugout;
+        }
       }
       p = message;    
    }       

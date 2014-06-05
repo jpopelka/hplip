@@ -26,8 +26,10 @@ import string
 import shutil
 import urllib # TODO: Replace with urllib2 (urllib is deprecated in Python 3.0)
 
-from base import utils, tui, os_utils
+from base import utils, tui, os_utils, validation
 from base.g import *
+from base.codes import *
+from base.strings import *
 from installer import core_install
 from base import pexpect
 
@@ -48,15 +50,6 @@ PLUGIN_STATE_FILE = '/var/lib/hp/hplip.state'
 PLUGIN_FALLBACK_LOCATION = 'http://hplipopensource.com/hplip-web/plugin/'
 
 
-# Plug-in download errors
-PLUGIN_INSTALL_ERROR_NONE = 0
-PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND = 1
-PLUGIN_INSTALL_ERROR_DIGITAL_SIGN_NOT_FOUND = 2
-PLUGIN_INSTALL_ERROR_DIGITAL_SIGN_BAD = 3
-PLUGIN_INSTALL_ERROR_PLUGIN_FILE_CHECKSUM_ERROR = 4
-PLUGIN_INSTALL_ERROR_NO_NETWORK = 5
-PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR = 6
-PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS = 7
 
 
 class PluginHandle(object):
@@ -178,12 +171,12 @@ class PluginHandle(object):
 
 
     def __getPluginInformation(self, callback=None):
-        status, url, check_sum = PLUGIN_INSTALL_ERROR_NO_NETWORK, '',''
+        status, url, check_sum = ERROR_NO_NETWORK, '',''
 
         if self.__plugin_conf_file.startswith('http://'):
             if not utils.check_network_connection():
                 log.error("Network connection not detected.")
-                return PLUGIN_INSTALL_ERROR_NO_NETWORK, '',0
+                return ERROR_NO_NETWORK, '', 0
 
         local_conf_fp, local_conf = utils.make_temp_file()
 
@@ -214,13 +207,13 @@ class PluginHandle(object):
                 plugin_conf_p = ConfigBase(local_conf)
                 url = plugin_conf_p.get(self.__required_version, 'url','')
                 check_sum  = plugin_conf_p.get(self.__required_version, 'checksum')
-                status = PLUGIN_INSTALL_ERROR_NONE
+                status = ERROR_SUCCESS
             except (KeyError, ConfigParser.NoSectionError):
                 log.error("Error reading plugin.conf: Missing section [%s]" % self.__required_version)
-                return PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND, url, check_sum
+                return ERROR_FILE_NOT_FOUND, url, check_sum
 
             if url == '':
-                return PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND, url, check_sum
+                return ERROR_FILE_NOT_FOUND, url, check_sum
 
         finally:
             os.close(local_conf_fp)
@@ -232,30 +225,14 @@ class PluginHandle(object):
     def __validatePlugin(self,plugin_file, digsig_file, req_checksum):
         calc_checksum = get_checksum(file(plugin_file, 'r').read())
         log.debug("D/L file checksum=%s" % calc_checksum)
-
         if req_checksum and req_checksum != calc_checksum:
-            return PLUGIN_INSTALL_ERROR_PLUGIN_FILE_CHECKSUM_ERROR
+            return ERROR_CHECKSUM_ERROR, queryString(ERROR_CHECKSUM_ERROR, 0, plugin_file)
 
-        gpg = utils.which('gpg',True)
-        if gpg:
-            cmd = '%s --no-permission-warning --keyserver pgp.mit.edu --recv-keys 0xA59047B9' % gpg
-            log.info("Receiving digital keys: %s" % cmd)
-            status, output = utils.run(cmd)
-            log.debug(output)
+        gpg_obj = validation.GPG_Verification()
+        digsig_sts, error_str = gpg_obj.validate(plugin_file, digsig_file)
 
-            if status != 0:
-                return PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS
+        return digsig_sts, error_str
 
-            cmd = '%s --no-permission-warning --verify %s %s' % (gpg, digsig_file, plugin_file)
-            log.debug("Verifying plugin with digital keys: %s" % cmd)
-            status, output = utils.run(cmd)
-            log.debug(output)
-            log.debug("%s status: %d" % (gpg, status))
-
-            if status != 0:
-                return PLUGIN_INSTALL_ERROR_DIGITAL_SIGN_BAD
-
-        return PLUGIN_INSTALL_ERROR_NONE
 
 
     def __setPluginConfFile(self):
@@ -283,8 +260,8 @@ class PluginHandle(object):
         else:
             sts, url, checksum = self.__getPluginInformation(callback)
             src = url
-            if sts != PLUGIN_INSTALL_ERROR_NONE:
-                return sts, ""
+            if sts != ERROR_SUCCESS:
+                return sts, "", queryString(ERROR_CHECKSUM_ERROR, 0, src)
 
         log.debug("Downloading %s plug-in file from '%s' to '%s'..." % (self.__required_version, src, self.__plugin_path))
         plugin_file = os.path.join(self.__plugin_path, self.__plugin_name)
@@ -299,7 +276,7 @@ class PluginHandle(object):
 
         except (OSError, IOError), e:
             log.error("Failed in OS operations:%s "%e.strerror)
-            return PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR, ""
+            return ERROR_DIRECTORY_NOT_FOUND, "", self.__plugin_path + queryString(102)
 
         try:
             if src.startswith('file://'):
@@ -322,16 +299,16 @@ class PluginHandle(object):
 
                 if status != 0 or os_utils.getFileSize(plugin_file) <= 0:
                     log.error("Plug-in download is failed from both URL and fallback location.")
-                    return PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND, ""
+                    return ERROR_FILE_NOT_FOUND, "", queryString(ERROR_FILE_NOT_FOUND, 0, plugin_file)
 
         except IOError, e:
             log.error("Plug-in download failed: %s" % e.strerror)
-            return PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND, ""
+            return ERROR_FILE_NOT_FOUND, "", queryString(ERROR_FILE_NOT_FOUND, 0, plugin_file)
 
         if core.isErrorPage(file(plugin_file, 'r').read(1024)):
             log.debug(file(plugin_file, 'r').read(1024))
             os.remove(plugin_file)
-            return PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND, ""
+            return ERROR_FILE_NOT_FOUND, "", queryString(ERROR_FILE_NOT_FOUND, 0, plugin_file)
 
         # Try to download and check the GPG digital signature
         digsig_url = src + '.asc'
@@ -348,15 +325,15 @@ class PluginHandle(object):
                 status, output = utils.run(cmd)
         except IOError, e:
             log.error("Plug-in GPG file [%s] download failed: %s" % (digsig_url,e.strerror))
-            return PLUGIN_INSTALL_ERROR_DIGITAL_SIGN_NOT_FOUND, plugin_file
+            return ERROR_DIGITAL_SIGN_NOT_FOUND, plugin_file, queryString(ERROR_DIGITAL_SIGN_NOT_FOUND, 0, digsig_file)
 
         if core.isErrorPage(file(digsig_file, 'r').read(1024)):
             log.debug(file(digsig_file, 'r').read())
             os.remove(digsig_file)
-            return PLUGIN_INSTALL_ERROR_DIGITAL_SIGN_NOT_FOUND, plugin_file
+            return ERROR_DIGITAL_SIGN_NOT_FOUND, plugin_file, queryString(ERROR_DIGITAL_SIGN_NOT_FOUND, 0, digsig_file)
 
-        sts = self.__validatePlugin(plugin_file, digsig_file, checksum)
-        return sts, plugin_file
+        sts, error_str = self.__validatePlugin(plugin_file, digsig_file, checksum)
+        return sts, plugin_file, error_str
 
 
     def run_plugin(self, plugin_file, mode=GUI_MODE):

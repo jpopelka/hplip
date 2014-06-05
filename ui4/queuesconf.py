@@ -30,7 +30,8 @@ from base.g import *
 from base import utils
 from prnt import cups
 from base.codes import *
-from ui_utils import *
+from base import validation
+from .ui_utils import *
 
 
 # Qt
@@ -222,41 +223,38 @@ class QueuesDiagnose(QDialog, Ui_Dialog):
 
     def disable_smart_install(self):
         if not utils.check_network_connection():
-            FailureUI(self, self.__tr("Internet connection not found."))
+            FailureUI(self, queryString(ERROR_NO_NETWORK))
         else:
             sts, HPLIP_file = utils.download_from_network(HPLIP_INFO_SITE)
             if sts is True:
                 hplip_si_conf = ConfigBase(HPLIP_file)
                 source = hplip_si_conf.get("SMART_INSTALL","url","")
                 if not source :
-                    FailureUI(self, self.__tr("Failed to download %s"%HPLIP_INFO_SITE))
+                    FailureUI(self, queryString(ERROR_FAILED_TO_DOWNLOAD_FILE, 0, HPLIP_INFO_SITE))
                     return 
 
             response_file, smart_install_run = utils.download_from_network(source)
             response_asc, smart_install_asc = utils.download_from_network(source+'.asc')
             
             if response_file  and response_asc :
-                if self.passwordObj == None:
-                    try:
-                        from base.password import Password
-                    except ImportError:
-                        return SIH_FAILED_TO_VERIFY_DIG_SIGN, smart_install_run , ""
-                    self.passwordObj = Password(GUI_MODE)
 
-                if utils.ERROR_NONE == utils.validateDownloadFile(smart_install_run, smart_install_asc, "", self.passwordObj):
+                gpg_obj = validation.GPG_Verification()
+                digsig_sts, error_str = gpg_obj.validate(smart_install_run, smart_install_asc)
+
+                if ERROR_SUCCESS == digsig_sts:
                     sts, out = utils.run("sh %s"%smart_install_run)
                 else:
                 
-                    if QMessageBox.question(self, self.__tr("Digital signature download failed"),
-                        self.__tr("<b>The download of the digital signature file failed.</b><p>Without this file, it is not possible to authenticate and validate this tool prior to installation.</p>Do you still want to run Smart Install disabler?"),
+                    if QMessageBox.question(self, " ",
+                        self.__tr("<b>%s</b><p>Without this, it is not possible to authenticate and validate this tool prior to installation.</p>Do you still want to run Smart Install disabler?" %error_str),
                         QMessageBox.Yes | QMessageBox.No) == QMessageBox.Yes:
                         # Disabling without verification.
                         sts, out = utils.run("sh %s"%smart_install_run)
-
+ 
             else:
-                if not response_asc:
-                    FailureUI(self, self.__tr("Failed to download %s file."%(source+'.asc')))
+                if response_asc:
+                    FailureUI(self, queryString(ERROR_FAILED_TO_DOWNLOAD_FILE, 0, source + ".asc"))
                 else:
-                    FailureUI(self, self.__tr("Failed to download %s file."%source))
+                    FailureUI(self, queryString(ERROR_FAILED_TO_DOWNLOAD_FILE, 0, source))
 
 

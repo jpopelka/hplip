@@ -954,7 +954,7 @@ class SendFaxDialog(QDialog, Ui_Dialog):
             ok, num_pages, hort_dpi, vert_dpi, page_size, resolution, encoding = \
                 self.getFileInfo(fax_file)
             if ok:
-                self.FilesTable.addFile(fax_file, 'application/hplip-fax', 'HPLIP Fax', title, num_pages)
+                self.FilesTable.addFile(unicode(fax_file), 'application/hplip-fax', 'HPLIP Fax', title, num_pages)
 
         finally:
             self.busy = False

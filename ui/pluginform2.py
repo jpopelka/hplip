@@ -127,33 +127,12 @@ class PluginForm2(PluginForm2_base):
 
         log.info("Downloading plug-in from: %s" % self.path)
 
-        status, self.path = self.pluginObj.download(self.path, self.plugin_download_callback)
+        status, self.path, error_str = self.pluginObj.download(self.path, self.plugin_download_callback)
 
-        if status != pluginhandler.PLUGIN_INSTALL_ERROR_NONE:
-
-            if status == pluginhandler.PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND:
-                desc = self.__tr("<b>ERROR: Plug-in file not found (server returned 404 or similar error).")
-
-            elif status == pluginhandler.PLUGIN_INSTALL_ERROR_DIGITAL_SIGN_NOT_FOUND:
-                desc = self.__tr("<b>ERROR: Plug-in digital signature file not found (server returned 404 or similar error).")
-
-            elif status == pluginhandler.PLUGIN_INSTALL_ERROR_DIGITAL_SIGN_BAD:
-                desc = self.__tr("<b>ERROR: Plug-in file does not match its digital signature.</b><p>File may have been corrupted or altered.")
-
-            elif status == pluginhandler.PLUGIN_INSTALL_ERROR_PLUGIN_FILE_CHECKSUM_ERROR:
-                desc = self.__tr("<b>ERROR: Plug-in file does not match its checksum. File may have been corrupted or altered.")
-
-            elif status == pluginhandler.PLUGIN_INSTALL_ERROR_NO_NETWORK:
-                desc = self.__tr("<b>ERROR: Unable to connect to network to download the plug-in.</b><p>Please check your network connection and try again.</p>")
-
-            elif status == pluginhandler.PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR:
-                desc = self.__tr("<b>ERROR: Unable to create the plug-in directory.</b><p>Please check your permissions and try again.</p>")
-
-            elif status == pluginhandler.PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS:
-                desc = self.__tr("<b>ERROR: Unable to download the public HPLIP keys from the keyserver.")
+        if status != ERROR_SUCCESS:
 
             self.pluginObj.deleteInstallationFiles(self.path)
-            self.FailureUI(desc)
+            self.FailureUI(error_str)
             self.close()
             return
 

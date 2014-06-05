@@ -246,3 +246,29 @@ int createTempFile(char* szFileName, FILE** pFilePtr)
 
     return iFD;
 }
+
+int getHPLogLevel()
+{
+    FILE    *fp;
+    char    str[258];
+    char    *p;
+    int iLogLevel = 0;
+    fp = fopen ("/etc/cups/cupsd.conf", "r");
+    if (fp == NULL)
+        return 0;
+    while (!feof (fp))
+    {
+        if (!fgets (str, 256, fp))
+        {
+            break;
+        }
+        if ((p = strstr (str, "hpLogLevel")))
+        {
+            p += strlen ("hpLogLevel") + 1;
+            iLogLevel = atoi (p);
+            break;
+        }
+    }
+    fclose (fp);
+    return iLogLevel;
+}

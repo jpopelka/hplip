@@ -61,7 +61,7 @@ def detectNetworkDevices(ttl=4, timeout=10):
                     y['hn'] = bits[6].replace('.local', '')
                     details = bits[9].split('" "')
                     for item in details:
-                        key, value = item.split('=')
+                        key, value = item.split('=', 1)
                         if key == 'ty':
                             y['mdns'] = value
                             y['device1'] = "MFG:Hewlett-Packard;MDL:%s;CLS:PRINTER;" % value

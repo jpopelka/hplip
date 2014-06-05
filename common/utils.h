@@ -151,6 +151,7 @@ extern "C" {
     */
 
     int createTempFile(char* szFileName, FILE** pFilePtr);
+    int getHPLogLevel();
 
 #ifdef __cplusplus
 }

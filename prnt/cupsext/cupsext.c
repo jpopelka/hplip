@@ -79,6 +79,8 @@ Yashwant Kumar Sahu
 #include <cups/cups.h>
 #include <cups/language.h>
 #include <cups/ppd.h>
+#include <sys/types.h>
+#include <pwd.h>
 
 /* Ref: PEP 353 (Python 2.5) */
 #if PY_VERSION_HEX < 0x02050000
@@ -170,6 +172,15 @@ static int auth_cancel_req = 0;    // 0--> authentication cancel is not requeste
 
 const char * g_ppd_file = NULL;
 
+static char *getUserName()
+{
+  struct passwd *pw = getpwuid(geteuid());
+  if (pw)
+  {
+    return pw->pw_name;
+  }
+  return NULL;
+}
 /*
  * 'validate_name()' - Make sure the printer name only contains valid chars.
  */
@@ -1806,10 +1817,16 @@ PyObject * printFileWithOptions( PyObject * self, PyObject * args )
     cups_dest_t * dest = NULL;
     int num_dests = 0;
     int i = 0;
+    char *requesting_user_name = NULL;
 
     if ( !PyArg_ParseTuple( args, "zzz", &printer, &filename, &title ) )
     {
         return Py_BuildValue( "" ); // None
+    }
+    requesting_user_name = getUserName();
+    if(requesting_user_name)
+    {
+        cupsSetUser(requesting_user_name);
     }
 
     num_dests = cupsGetDests(&dests);

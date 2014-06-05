@@ -194,7 +194,7 @@ class Password(object):
                         # output
                         start = time.time()
                         log.log_to_file(cb)
-                        log.debug(cb)
+                        #log.debug(cb)
                         output.write(cb)
 
                     if i == 0: # EOF

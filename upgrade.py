@@ -30,7 +30,8 @@ import getopt, os, sys, re, time
 
 # Local
 from base.g import *
-from base import utils, tui, module, os_utils, password, services, validation
+from base.strings import *
+from base import utils, tui, module, os_utils, services, validation
 from installer.core_install import *
 
 
@@ -39,18 +40,18 @@ USAGE = [(__doc__, "", "name", True),
          utils.USAGE_SPACE,
          utils.USAGE_MODE,
          ("Run in interactive mode:", "-i or --interactive (Default)", "option", False),
-         ("Run in graphical UI mode:", "-u or --gui (future use)", "option", False),
+#         ("Run in graphical UI mode:", "-u or --gui (future use)", "option", False),
          utils.USAGE_SPACE,
          utils.USAGE_OPTIONS,
          utils.USAGE_HELP,
          utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
          ("Check for update and notify:","--notify","option",False),
          ("Check only available version:","--check","option",False),
-         ("Non-interactive mode:","-n(Without asking permissions)(future use)","option",False),
+#         ("Non-interactive mode:","-n(Without asking permissions)(future use)","option",False),
          ("Download Path to install from local system:","-p<path>","option", False),
          ("Download HPLIP package location:","-d<path> (default location ~/Downloads)","option", False),
          ("Override existing HPLIP installation even if latest vesrion is installed:","-o","option",False),
-         ("Take options from the file instead of command line:","-f<file> (future use)","option",False)
+#         ("Take options from the file instead of command line:","-f<file> (future use)","option",False)
         ]
 
 mode = INTERACTIVE_MODE
@@ -198,6 +199,10 @@ try:
 except getopt.GetoptError, e:
     log.error(e.msg)
     usage()
+
+if os.geteuid() == 0:
+    log.error("hp-upgrade should not be run as root/superuser")
+    clean_exit(1)
 
 if os.getenv("HPLIP_DEBUG"):
     log.set_level('debug')
@@ -381,34 +386,18 @@ try:
         else:
             downloaded_file, digsig_file = download_hplip_installer(PATH_TO_DOWNLOAD_INSTALLER, HPLIP_latest_ver)
 
-        PasswordObj = password.Password(INTERACTIVE_MODE)
-        PasswordObj.clearPassword()
-        try:
-            gpg_obj = validation.GPG_Verification()
-        except Exception:
-            digsig_sts = validation.DIGSIG_ERROR_GPG_CMD_NOT_FOUND
-        else:
-            digsig_sts = gpg_obj.validate(downloaded_file, digsig_file, PasswordObj)
 
-        if digsig_sts != validation.DIGSIG_ERROR_NONE:
-            if digsig_sts in (validation.DIGSIG_ERROR_INCORRECT_PASSWORD, validation.DIGSIG_ERROR_FILE_NOT_FOUND):
-                clean_exit(1)
+        gpg_obj = validation.GPG_Verification()
+        digsig_sts, error_str = gpg_obj.validate(downloaded_file, digsig_file)
 
-            elif digsig_sts == validation.DIGSIG_ERROR_DIGITAL_SIGN_NOT_FOUND:
-                if not digital_signature_fail_confirmation("Digital signature file not found or failed to download. Unable to validate the installer file."):
+        if digsig_sts != ERROR_SUCCESS:
+            if digsig_sts in  (ERROR_UNABLE_TO_RECV_KEYS, ERROR_DIGITAL_SIGN_NOT_FOUND, ERROR_DIGITAL_SIGN_BAD):
+                if not digital_signature_fail_confirmation(error_str):
                     clean_exit(1)
-
-            elif digsig_sts == validation.DIGSIG_ERROR_GPG_CMD_NOT_FOUND:
-                if not digital_signature_fail_confirmation("GPG command not found. Unable to validate the installer file."):
-                    clean_exit(1)
-
-            elif digsig_sts in (validation.DIGSIG_ERROR_DIGITAL_SIGN_BAD, validation.DIGSIG_ERROR_UNABLE_TO_RECV_KEYS):
-                if not digital_signature_fail_confirmation("File does not match its digital signature. File may have been corrupted or altered"):
-                    clean_exit(1)
-
             else:
-                log.error("Failed to validate digital signature. Unknow error: %s"%digsig_sts)
+                log.error(error_str)
                 clean_exit(1)
+
 
         CURRENT_WORKING_DIR = os.getcwd()
         os.chdir(PATH_TO_DOWNLOAD_INSTALLER)

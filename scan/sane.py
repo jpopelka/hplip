@@ -79,7 +79,7 @@ UNIT_STR = { scanext.UNIT_NONE:        "UNIT_NONE",
              scanext.UNIT_PERCENT:     "UNIT_PERCENT",
              scanext.UNIT_MICROSECOND: "UNIT_MICROSECOND" }
 
-
+MAX_READSIZE = 65536
 
 
 class Option:
@@ -435,6 +435,7 @@ class ScanThread(threading.Thread):
         self.bytes_per_line = -1
         self.pad_bytes = -1
         self.total_read = 0
+        self.total_write = 0
         self.byte_format = byte_format
 
 
@@ -446,7 +447,7 @@ class ScanThread(threading.Thread):
                 status = -1 #scanext.SANE_STATUS_GOOD
 
             self.update_queue.put((status, bytes_read))
-            time.sleep(0)
+
 
 
     def run(self):
@@ -464,6 +465,8 @@ class ScanThread(threading.Thread):
         log.debug("byte_format=%s" % self.byte_format)
 
         w = self.buffer.write
+        #To get the exact buffer to read
+        readbuffer = self.bytes_per_line
 
         if self.format == scanext.FRAME_RGB: # "Color"
             if self.depth == 8: # 8 bpp (32bit)
@@ -476,7 +479,7 @@ class ScanThread(threading.Thread):
                     dir = 1
 
                 try:
-                    st, t = self.dev.readScan(self.bytes_per_line)
+                    st, t = self.dev.readScan(readbuffer)
                 except scanext.error, st:
                     self.updateQueue(st, 0)
 
@@ -484,21 +487,19 @@ class ScanThread(threading.Thread):
                 while st == scanext.SANE_STATUS_GOOD:
 
                     if t:
-                        index = 0
-                        while index < len(t) - self.pad_bytes:
-                            w(t[index:index+3:dir])
-                            w('\xff')
-                            index += 3
+                        len_t = len(t)
+                        w("".join([t[index:index+3:dir] + '\xff' for index in range(0,len_t - self.pad_bytes,3)]))
 
-                        self.total_read += len(t)
+                        self.total_read += len_t
+                        self.total_write +=  len_t+(len_t - self.pad_bytes)/3
                         self.updateQueue(st, self.total_read)
-                        log.debug("Read %d bytes" % self.total_read)
+                        log.debug("Color Read %d bytes" % self.total_read)
 
                     else:
                         time.sleep(0.1)
 
                     try:
-                        st, t = self.dev.readScan(self.bytes_per_line)
+                        st, t = self.dev.readScan(readbuffer)
                     except scanext.error, st:
                         self.updateQueue(st, self.total_read)
                         break
@@ -514,15 +515,16 @@ class ScanThread(threading.Thread):
                 log.debug("pad_bytes=%d" % self.pad_bytes)
 
                 try:
-                    st, t = self.dev.readScan(self.bytes_per_line)
+                    st, t = self.dev.readScan(readbuffer)
                 except scanext.error, st:
                     self.updateQueue(st, 0)
 
                 while st == scanext.SANE_STATUS_GOOD:
 
                     if t:
+                        len_t = len(t)
                         index = 0
-                        while index < len(t) - self.pad_bytes:
+                        while index < len_t - self.pad_bytes:
                             k = 0x80
                             j = ord(t[index])
 
@@ -536,14 +538,15 @@ class ScanThread(threading.Thread):
 
                             index += 1
 
-                        self.total_read += len(t)
+                        self.total_read += len_t
+                        self.total_write += ((len_t - self.pad_bytes) * 32)
                         self.updateQueue(st, self.total_read)
-                        log.debug("Read %d bytes" % self.total_read)
+                        log.debug("Lineart Read %d bytes" % self.total_read)
                     else:
                         time.sleep(0.1)
 
                     try:
-                        st, t = self.dev.readScan(self.bytes_per_line)
+                        st, t = self.dev.readScan(readbuffer)
                     except scanext.error, st:
                         self.updateQueue(st, self.total_read)
                         break
@@ -557,31 +560,25 @@ class ScanThread(threading.Thread):
                 log.debug("pad_bytes=%d" % self.pad_bytes)
 
                 try:
-                    st, t = self.dev.readScan(self.bytes_per_line)
+                    st, t = self.dev.readScan(readbuffer)
                 except scanext.error, st:
                     self.updateQueue(st, 0)
 
                 while st == scanext.SANE_STATUS_GOOD:
 
                     if t:
-                        index = 0
-                        while index < len(t) - self.pad_bytes:
-                            j = t[index]
-                            w(j)
-                            w(j)
-                            w(j)
-                            w("\xff")
+                        len_t = len(t)
+                        w("".join([3*t[index:index+1] + '\xff' for index in range(0, len_t - self.pad_bytes)]))
 
-                            index += 1
-
-                        self.total_read += len(t)
+                        self.total_read += len_t 
+                        self.total_write += ((len_t  - self.pad_bytes) * 4)
                         self.updateQueue(st, self.total_read)
-                        log.debug("Read %d bytes" % self.total_read)
+                        log.debug("Gray Read %d bytes" % self.total_read)
                     else:
                         time.sleep(0.1)
 
                     try:
-                        st, t = self.dev.readScan(self.bytes_per_line)
+                        st, t = self.dev.readScan(readbuffer)
                     except scanext.error, st:
                         self.updateQueue(st, self.total_read)
                         break

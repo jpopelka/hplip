@@ -163,6 +163,9 @@
 :model "HP LaserJet Pro MFP m127fw"
 :status :good
 
+:model "HP LaserJet Pro MFP m128fp"
+:status :good
+
 :model "HP LaserJet Pro MFP m128fw"
 :status :good
 
@@ -241,13 +244,13 @@
 :model "HP LaserJet 200 Colormfp m276v"
 :status :good
 
+:model "HP Photosmart Plus All-in-one Printer - b209b"
+:status :good
+
 :model "HP Deskjet Ink Advantage k209a All-in-one Printer"
 :status :good
 
 :model "HP Photosmart Plus All-in-one Printer - b209a"
-:status :good
-
-:model "HP Photosmart Plus All-in-one Printer - b209b"
 :status :good
 
 :model "HP Photosmart Plus All-in-one Printer - b209c"
@@ -632,9 +635,6 @@
 :status :good
 
 :model "HP LaserJet 1220se All-in-one Printer"
-:status :good
-
-:model "HP LaserJet Pro MFP m1278fp"
 :status :good
 
 :model "HP PSC 1300 All-in-one Printer"
@@ -1123,6 +1123,9 @@
 :model "HP Deskjet 2542 All-in-one Printer"
 :status :good
 
+:model "HP Deskjet 2543 All-in-one Printer"
+:status :good
+
 :model "HP Deskjet 2544 All-in-one Printer"
 :status :good
 
@@ -1133,6 +1136,9 @@
 :status :good
 
 :model "HP Deskjet Ink Advantage 2548 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet 2549 All-in-one Printer"
 :status :good
 
 :model "HP PSC 2550 Photosmart All-in-one Printer"
@@ -2882,6 +2888,12 @@
 :status :good
 
 :model "HP Officejet Pro 8630 E-all-in-one Printer"
+:status :good
+
+:model "HP Officejet Pro 8640 E-all-in-one Printer"
+:status :good
+
+:model "HP Officejet Pro 8660 E-all-in-one Printer"
 :status :good
 
 :model "HP LaserJet 9000 Multifunction Printer"

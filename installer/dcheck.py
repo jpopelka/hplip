@@ -361,7 +361,10 @@ def get_libpthread_version():
         return '-'
     else:
 #        LIBC = ctypes.CDLL(ctypes.util.find_library('c'), use_errno=True)
-        LIBC = ctypes.CDLL(ctypes.util.find_library('c'),ctypes.DEFAULT_MODE,None, True)
+        try:
+            LIBC = ctypes.CDLL(ctypes.util.find_library('c'),ctypes.DEFAULT_MODE,None, True)
+        except:
+            LIBC = ctypes.CDLL(ctypes.util.find_library('c'),ctypes.DEFAULT_MODE,None) #python2.4 and below syntax
         LIBC.gnu_get_libc_version.restype = ctypes.c_char_p
         return LIBC.gnu_get_libc_version()
 

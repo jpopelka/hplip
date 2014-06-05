@@ -930,6 +930,7 @@ class FaxSendThread(threading.Thread):
     def render_cover_page(self, a):
         log.debug("Creating cover page...")
 
+        user_conf.read()
         pdf = self.cover_func(page_size=coverpages.PAGE_SIZE_LETTER,
                               total_pages=self.job_total_pages,
 

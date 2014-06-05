@@ -780,9 +780,19 @@ def start(language, auto=True, test_depends=False,
             tui.title("HPLIP PLUGIN UPDATE NOTIFICATION")
             ok, choice = tui.enter_choice("HPLIP Plug-in's needs to be installed/updated. Do you want to update plug-in's?. (y=yes*, n=no) : ",['y', 'n'], 'y')
             if ok and choice == 'y':
-                services.run_hp_tools_with_auth('hp-plugin', core.passwordObj)
+                ok, choice = tui.enter_choice("Do you want to install plug-in's in GUI mode?. (u=GUI mode*, i=Interactive mode) : ",['u', 'i'], 'u')
+                if ok and choice == 'u':
+                    if not services.run_hp_tools_with_auth('hp-plugin', core.passwordObj):
+                        log.error("hp-plugin command failed. Please run hp-plugin manually.")
+                elif ok and choice == 'i':
+                    plugin_cmd = core.passwordObj.getAuthCmd() % 'hp-plugin  -i'
+                    log.info("Running '%s' command...."%plugin_cmd)
+                    if os_utils.execute(plugin_cmd) != 0:
+                        log.error("hp-plugin command failed. Please run hp-plugin manually.")
+                else:
+                    log.info(log.bold("Please install hp plugin's manually, otherwise some functionality may break"))
             else:
-                log.info(log.bold("Please install manually hp plugin's, otherwise some functionality may break"))
+                log.info(log.bold("Please install hp plugin's manually, otherwise some functionality may break"))
 
         if core.selected_component == 'hplip':
             tui.title("RESTART OR RE-PLUG IS REQUIRED")
@@ -843,8 +853,16 @@ def start(language, auto=True, test_depends=False,
 
             if install_printer:
                 log.info("Please make sure your printer is connected and powered on at this time.")
-                if not services.run_hp_tools_with_auth( 'hp-setup', core.passwordObj):
-                    log.error("hp-setup failed. Please run hp-setup manually.")
+                ok, choice = tui.enter_choice("Do you want to setup printer in GUI mode? (u=GUI mode*, i=Interactive mode) : ",['u', 'i'], 'u')
+                if ok and choice == 'u':
+                    if not services.run_hp_tools_with_auth('hp-setup', core.passwordObj):
+                        log.error("hp-setup failed. Please run hp-setup manually.")
+
+                elif ok and choice == 'i':
+                    setup_cmd = core.passwordObj.getAuthCmd() % 'hp-setup  -i'
+                    log.info("Running '%s' command...."%setup_cmd)
+                    if os_utils.execute(setup_cmd) != 0:
+                        log.error("hp-setup failed. Please run hp-setup manually.")
 
         tui.title("RE-STARTING HP_SYSTRAY")
         services.run_systray()

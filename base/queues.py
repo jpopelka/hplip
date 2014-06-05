@@ -335,8 +335,8 @@ def main_function(passwordObj = None, mode = GUI_MODE, ui_toolkit= UI_TOOLKIT_QT
                 log.debug("Single print queue is configured for '%s'. " %val[0].PrinterName)
                 reconfigure_Queue(val[0], mode)
 
-        SI_sts = smart_install.disable(mode, '', None, None, passwordObj)
-        if SI_sts != smart_install.SIH_NO_SI_DEVICES:
+        SI_sts, error_str = smart_install.disable(mode, '', None, None, passwordObj)
+        if SI_sts != ERROR_NO_SI_DEVICE:
             Error_Found = True
 
         if Error_Found is False:
@@ -383,8 +383,8 @@ def main_function(passwordObj = None, mode = GUI_MODE, ui_toolkit= UI_TOOLKIT_QT
                 log.debug("Single print queue is configured for '%s'. " %val[0].PrinterName)
                 reconfigure_Queue(val[0], mode, dialog, app)
 
-        SI_sts = smart_install.disable(mode, ui_toolkit, dialog, app, passwordObj)
-        if SI_sts != smart_install.SIH_NO_SI_DEVICES:
+        SI_sts, error_str = smart_install.disable(mode, ui_toolkit, dialog, app, passwordObj)
+        if SI_sts != ERROR_NO_SI_DEVICE:
             Error_Found = True
 
         if Error_Found is False:

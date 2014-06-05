@@ -360,36 +360,23 @@ else: # INTERACTIVE_MODE
         log.info("Downloading plug-in from: %s" % plugin_path)
         pm = tui.ProgressMeter("Downloading plug-in:")
 
-        status, plugin_path = pluginObj.download(plugin_path, plugin_download_callback)
-        print
+        status, plugin_path, error_str = pluginObj.download(plugin_path, plugin_download_callback)
+        print()
 
-        if status in (pluginhandler.PLUGIN_INSTALL_ERROR_UNABLE_TO_RECV_KEYS, pluginhandler.PLUGIN_INSTALL_ERROR_DIGITAL_SIGN_NOT_FOUND):
-            log.error("Digital signature file download failed. Without this file, it is not possible to authenticate and validate the plug-in prior to installation.")
-            cont, ans = tui.enter_yes_no("Do you still want to install the plug-in?", 'n')
 
-            if not cont or not ans:
-                clean_exit(0)
+        if status != ERROR_SUCCESS:
 
-        elif status != pluginhandler.PLUGIN_INSTALL_ERROR_NONE:
+            log.error(error_str)
 
-            if status == pluginhandler.PLUGIN_INSTALL_ERROR_PLUGIN_FILE_NOT_FOUND:
-                desc = "Plug-in file not found (server returned 404 or similar error)"
+            if status in (ERROR_UNABLE_TO_RECV_KEYS, ERROR_DIGITAL_SIGN_NOT_FOUND):
+                cont, ans = tui.enter_yes_no("Do you still want to install the plug-in?", 'n')
 
-            elif status == pluginhandler.PLUGIN_INSTALL_ERROR_DIGITAL_SIGN_BAD:
-                desc = "Plug-in file does not match its digital signature. File may have been corrupted or altered. "
-
-            elif status == pluginhandler.PLUGIN_INSTALL_ERROR_PLUGIN_FILE_CHECKSUM_ERROR:
-                desc = "Plug-in file does not match its checksum. File may have been corrupted or altered."
-
-            elif status == pluginhandler.PLUGIN_INSTALL_ERROR_NO_NETWORK:
-                desc = "Unable to connect to network to download the plug-in. Please check your network connection and try again."
-
-            elif status == pluginhandler.PLUGIN_INSTALL_ERROR_DIRECTORY_ERROR:
-                desc = "Unable to create the plug-in directory. Please check your permissions and try again."
-
-            pluginObj.deleteInstallationFiles(plugin_path)
-            log.error(desc)
-            clean_exit(1)
+                if not cont or not ans:
+                    pluginObj.deleteInstallationFiles(plugin_path)
+                    clean_exit(0)
+            else:
+                pluginObj.deleteInstallationFiles(plugin_path)
+                clean_exit(1)
 
 
         tui.header("INSTALLING PLUG-IN")

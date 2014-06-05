@@ -449,7 +449,7 @@ static PyObject *setAutoOption (_ScanDevice * self, PyObject * args)
     return Py_BuildValue ("i", i);
 }
 
-#define MAX_READSIZE 32768
+#define MAX_READSIZE 65536
 
 static PyObject *readScan (_ScanDevice * self, PyObject * args)
 {

@@ -43,14 +43,14 @@ USAGE = [(__doc__, "", "name", True),
          utils.USAGE_SPACE,
          utils.USAGE_MODE,
          ("Run in interactive mode:", "-i or --interactive (Default)", "option", False),
-         ("Run in graphical UI mode:", "-u or --gui (future use)", "option", False),
+#         ("Run in graphical UI mode:", "-u or --gui (future use)", "option", False),
          utils.USAGE_SPACE,
          utils.USAGE_OPTIONS,
          utils.USAGE_HELP,
          utils.USAGE_LOGGING1, utils.USAGE_LOGGING2, utils.USAGE_LOGGING3,
-         ("Non-interactive mode:","-n(Without asking permissions)(future use)","option",False),
-         ("Perform the task for the given device id:","-d<device id>(future use)","option",False),
-         ("Take options from the file instead of command line:","-f<file> (future use)","option",False)
+#         ("Non-interactive mode:","-n(Without asking permissions)(future use)","option",False),
+#         ("Perform the task for the given device id:","-d<device id>(future use)","option",False),
+#         ("Take options from the file instead of command line:","-f<file> (future use)","option",False)
 
         ]
 

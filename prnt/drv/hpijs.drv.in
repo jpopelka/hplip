@@ -12609,7 +12609,7 @@ Transparency"
     Attribute "ShortNickName" "" "HP LJ Pro MFP m128fp hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m128fp;DES:hp laserjet pro mfp m128fp;"
     PCFileName "hp-laserjet_pro_mfp_m128fp-hpijs.ppd"
-    Attribute "Product" "" "(HP LaserJet Pro MFP m1278fp)"
+    Attribute "Product" "" "(HP LaserJet Pro MFP m128fp)"
   }
   {
     ModelName "HP LaserJet Pro MFP m128fw hpijs"
@@ -16629,6 +16629,22 @@ lity:PenSet=2,Quality:FullBleed=1"
     PCFileName "hp-officejet_pro_8630-hpijs.ppd"
     Attribute "Product" "" "(HP Officejet Pro 8630 E-all-in-one Printer)"
   }
+  {
+    ModelName "HP Officejet Pro 8640 hpijs"
+    Attribute "NickName" "" "HP Officejet Pro 8640 hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Officejet Pro 8640 hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp officejet pro 8640;DES:hp officejet pro 8640;"
+    PCFileName "hp-officejet_pro_8640-hpijs.ppd"
+    Attribute "Product" "" "(HP Officejet Pro 8640 E-all-in-one Printer)"
+  }
+  {
+    ModelName "HP Officejet Pro 8660 hpijs"
+    Attribute "NickName" "" "HP Officejet Pro 8660 hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Officejet Pro 8660 hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp officejet pro 8660;DES:hp officejet pro 8660;"
+    PCFileName "hp-officejet_pro_8660-hpijs.ppd"
+    Attribute "Product" "" "(HP Officejet Pro 8660 E-all-in-one Printer)"
+  }
 } // end Ampere		
 
 
@@ -17419,11 +17435,13 @@ lity:PenSet=2,Quality:FullBleed=1"
     PCFileName "hp-deskjet_2540_series-hpijs.ppd"
     Attribute "Product" "" "(HP Deskjet 2540 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet 2542 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet 2543 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet 2544 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet 2549 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 2540 All-in-one Printer Series)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 2545 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 2546 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet Ink Advantage 2540 All-in-one Printer Series)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 2548 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet 2544 All-in-one Printer)"
   }
   {
     ModelName "HP Officejet 2620 Series hpijs"

@@ -7180,6 +7180,22 @@ Manufacturer "HP"
       PCFileName "hp-officejet_pro_8630.ppd"
       Attribute "Product" "" "(HP Officejet Pro 8630 E-all-in-one Printer)"
     }
+    {
+      ModelName "HP Officejet Pro 8640"
+      Attribute "NickName" "" "HP Officejet Pro 8640, hpcups $Version"
+      Attribute "ShortNickName" "" "HP Officejet Pro 8640"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp officejet pro 8640;DES:hp officejet pro 8640;"
+      PCFileName "hp-officejet_pro_8640.ppd"
+      Attribute "Product" "" "(HP Officejet Pro 8640 E-all-in-one Printer)"
+    }
+    {
+      ModelName "HP Officejet Pro 8660"
+      Attribute "NickName" "" "HP Officejet Pro 8660, hpcups $Version"
+      Attribute "ShortNickName" "" "HP Officejet Pro 8660"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp officejet pro 8660;DES:hp officejet pro 8660;"
+      PCFileName "hp-officejet_pro_8660.ppd"
+      Attribute "Product" "" "(HP Officejet Pro 8660 E-all-in-one Printer)"
+    }
   } // End Supported media sizes with full bleed.
 
 } // End Ampere
@@ -9720,11 +9736,13 @@ Manufacturer "HP"
     PCFileName "hp-deskjet_2540_series.ppd"
     Attribute "Product" "" "(HP Deskjet 2540 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet 2542 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet 2543 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet 2544 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet 2549 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 2540 All-in-one Printer Series)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 2545 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 2546 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet Ink Advantage 2540 All-in-one Printer Series)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 2548 All-in-one Printer)"
-    Attribute "Product" "" "(HP Deskjet 2544 All-in-one Printer)"
   }
   {
     ModelName "HP Officejet 2620 Series"
@@ -17266,7 +17284,7 @@ Group "RLT/HP Real Life Technologies"
      Attribute "ShortNickName" "" "HP LaserJet Pro MFP m128fp"
      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m128fp;DES:hp laserjet pro mfp m128fp;"
      PCFileName "hp-laserjet_pro_mfp_m128fp.ppd"
-     Attribute "Product" "" "(HP LaserJet Pro MFP m1278fp)"
+     Attribute "Product" "" "(HP LaserJet Pro MFP m128fp)"
    }
    {
      ModelName "HP LaserJet Pro MFP m128fw"

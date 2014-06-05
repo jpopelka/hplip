@@ -17,27 +17,19 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# Author: Amarnath Chitumalla
+# Author: Amarnath Chitumalla, Sanjay Kumar
 #
 #Global imports
 import os
+import stat
 
 #Local imports
+from base.codes import *
+from base.strings import *
 from base import utils
+from base import os_utils
 from base.g import *
-
-
-# GPGP validation errors
-DIGSIG_ERROR_NONE = 0
-DIGSIG_ERROR_FILE_NOT_FOUND = 1
-DIGSIG_ERROR_DIGITAL_SIGN_NOT_FOUND = 2
-DIGSIG_ERROR_DIGITAL_SIGN_BAD = 3
-DIGSIG_ERROR_UNABLE_TO_RECV_KEYS = 4
-DIGSIG_ERROR_GPG_CMD_NOT_FOUND = 5
-DIGSIG_ERROR_INCORRECT_PASSWORD = 6
-
-
-DIGSIG_ERROR_GPG_CMD_NOT_FOUND_STR ="GPG Command Not Found"
+from subprocess import Popen, PIPE
 
 class DigiSign_Verification(object):
     def __init__(self):
@@ -48,56 +40,82 @@ class DigiSign_Verification(object):
 
 
 class GPG_Verification(DigiSign_Verification):
+
     def __init__(self, pgp_site = 'pgp.mit.edu', key = 0xA59047B9):
         self.__pgp_site = pgp_site
         self.__key = key
         self.__gpg = utils.which('gpg',True)
-        if not self.__gpg:
-            raise Exception(DIGSIG_ERROR_GPG_CMD_NOT_FOUND_STR)
+
+        sts, self.__hplipdir = os_utils.getHPLIPDir()
+        self.__gpg_dir = os.path.join(self.__hplipdir, ".gnupg")
+        
+        if not os.path.exists(self.__gpg_dir):
+            try:
+                os.mkdir(self.__gpg_dir, 0755)
+            except OSError:
+                log.error("Failed to create %s" % self.__gpg_dir)
+
+        self.__change_owner()
 
 
-    def __gpg_check(self, hplip_package, hplip_digsig, passwordObj):
-        cmd = '%s --no-permission-warning --verify %s %s' % (self.__gpg, hplip_digsig, hplip_package)
-        cmd = passwordObj.getAuthCmd()%cmd
-        log.debug("Verifying file %s with digital keys: %s" % (hplip_package,cmd))
+    def __change_owner(self, Recursive = False):
+        try:
+            os.umask(0)
+            s = os.stat(self.__hplipdir)
 
-        status, output = utils.run(cmd, passwordObj)
+            #When validation is done is sudo mode, files and directories created will have root as owner. 
+            #Changing the ownership back to normal user otherwise next validation operation will fail when run as normal user. 
+            os_utils.changeOwner(self.__gpg_dir, s[stat.ST_UID], s[stat.ST_GID], Recursive)
+
+        except OSError:
+            log.error("Failed to Change ownership of %s" %self.__gpg_dir)
+
+    def __gpg_check(self, hplip_package, hplip_digsig):
+
+        cmd = '%s --homedir %s -no-permission-warning --verify %s %s' % (self.__gpg, self.__gpg_dir, hplip_digsig, hplip_package)
+
+        log.debug("Verifying file %s : cmd = [%s]" % (hplip_package,cmd))
+
+        status, output = utils.run(cmd)
+
         log.debug("%s status: %d  output:%s" % (self.__gpg, status,output))
+
         return status
 
 
-    def acquire_gpg_key(self, passwordObj):
-        cmd = '%s --no-permission-warning --keyserver %s --recv-keys 0x%X' \
-              % (self.__gpg, self.__pgp_site, self.__key)
+    def __acquire_gpg_key(self):
 
-        cmd = passwordObj.getAuthCmd()%cmd
+        cmd = '%s --homedir %s --no-permission-warning --keyserver %s --recv-keys 0x%X' \
+              % (self.__gpg, self.__gpg_dir, self.__pgp_site, self.__key)
+
         log.info("Receiving digital keys: %s" % cmd)
-
-        status, output = utils.run(cmd, passwordObj)
+        status, output = utils.run(cmd)
         log.debug(output)
+
+        self.__change_owner(True)
+
         return status 
 
 
-    def validate(self, hplip_package, hplip_digsig, passwordObj):
+    def validate(self, hplip_package, hplip_digsig):      
+
+        log.debug("Validating %s with %s signature file" %(hplip_package, hplip_digsig))
+        if not self.__gpg:
+            return ERROR_GPG_CMD_NOT_FOUND, queryString(ERROR_GPG_CMD_NOT_FOUND)
+
         if not os.path.exists(hplip_package):
-            log.error("%s file doesn't exists." %(hplip_package))
-            return DIGSIG_ERROR_FILE_NOT_FOUND
+            return ERROR_FILE_NOT_FOUND, queryString(ERROR_FILE_NOT_FOUND, 0, hplip_package)
 
         if not os.path.exists(hplip_digsig):
-            log.warn("%s file doesn't exists." %(hplip_digsig))
-            return DIGSIG_ERROR_DIGITAL_SIGN_NOT_FOUND
+            return ERROR_DIGITAL_SIGN_NOT_FOUND, queryString(ERROR_DIGITAL_SIGN_NOT_FOUND, 0, hplip_digsig)
 
-        log.info(log.bold("\n\nNeed authentication to validate HPLIP package."))
-        if not passwordObj.getPassword():
-            return DIGSIG_ERROR_INCORRECT_PASSWORD
-
-        status = self.acquire_gpg_key(passwordObj)
+        status = self.__acquire_gpg_key()
         if status != 0:
-            return DIGSIG_ERROR_UNABLE_TO_RECV_KEYS
+            return ERROR_UNABLE_TO_RECV_KEYS, queryString(ERROR_UNABLE_TO_RECV_KEYS)
 
-        status = self.__gpg_check(hplip_package, hplip_digsig, passwordObj)
+        status = self.__gpg_check(hplip_package, hplip_digsig)
         if status != 0:
-            return DIGSIG_ERROR_DIGITAL_SIGN_BAD
+            return ERROR_DIGITAL_SIGN_BAD, queryString(ERROR_DIGITAL_SIGN_BAD, 0, hplip_package)
         else:
-            return DIGSIG_ERROR_NONE
+            return ERROR_SUCCESS, ""
 

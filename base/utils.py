@@ -2250,36 +2250,3 @@ def remove(path, passwordObj = None, cksudo = False):
         log.debug("Failed to remove=%s "%path)
 
 
-def validateDownloadFile(downloaded_file, digsig_file, req_checksum='', passwordObj = None):
-    calc_checksum = get_checksum(file(downloaded_file, 'r').read())
-    log.debug("File checksum=%s" % calc_checksum)
-
-    if req_checksum and req_checksum != calc_checksum:
-        return ERROR_FILE_CHECKSUM
-
-    gpg = which('gpg',True)
-    if gpg:
-        cmd = '%s --no-permission-warning --keyserver pgp.mit.edu --recv-keys 0xA59047B9' % gpg
-        if passwordObj:
-            cmd = passwordObj.getAuthCmd()%cmd
-
-        log.info("Receiving digital keys: %s" % cmd)
-        status, output = run(cmd, passwordObj)
-        log.debug(output)
-
-        if status != 0:
-            return ERROR_UNABLE_TO_RECV_KEYS
-
-        cmd = '%s --no-permission-warning --verify %s %s' % (gpg, digsig_file, downloaded_file)
-        if passwordObj:
-            cmd = passwordObj.getAuthCmd()%cmd
-
-        log.debug("Verifying plugin with digital keys: %s" % cmd)
-        status, output = run(cmd,passwordObj)
-        log.debug(output)
-        log.debug("%s status: %d" % (gpg, status))
-
-        if status != 0:
-            return ERROR_DIGITAL_SIGN_BAD
-
-    return ERROR_NONE

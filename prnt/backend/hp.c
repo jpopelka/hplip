@@ -45,6 +45,8 @@
 #endif
 #include "hpmud.h"
 #include <signal.h>
+#include<errno.h>
+#include<utils.h>
 
 //#define HP_DEBUG
 
@@ -108,9 +110,11 @@ struct pjl_attributes
 
 /* Definitions for hpLogLevel in cupsd.conf. */
 #define BASIC_LOG          1
-#define SAVE_PCL_FILE      2
+#define SAVE_OUT_FILE      2
 #define SAVE_INPUT_RASTERS 4
-#define SEND_TO_PRINTER_ALSO    8
+#define SAVE_OUT_FILE_IN_BACKEND    8
+#define DONT_SEND_TO_BACKEND    16
+#define DONT_SEND_TO_PRINTER    32
 
 /* Actual vstatus codes are mapped to 1000+vstatus for DeviceError messages. */ 
 typedef enum
@@ -634,6 +638,44 @@ static int loop_test(HPMUD_DEVICE dd, HPMUD_CHANNEL cd, struct pjl_attributes *p
    return stat;
 }
 
+static FILE* create_out_file(char* job_id, char* user_name)
+{
+    char    fname[256] = {0,};
+    FILE  *temp_fp = NULL;
+    snprintf(fname, sizeof(fname), "%s/hp_%s_out_%s_XXXXXX",CUPS_TMP_DIR, user_name, job_id);
+    createTempFile(fname, &temp_fp);
+    if (temp_fp)
+    {
+        chmod(fname, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
+    }
+    else
+    {
+        BUG("ERROR: unable to create Temporary file %s: %m\n", fname);
+    }
+    return temp_fp;
+}
+static void save_out_file(int fd, int copies, FILE * temp_fp)
+{
+   int len = 0;
+   char buf[HPMUD_BUFFER_SIZE];
+   if (NULL == temp_fp)
+   {
+       BUG("ERROR: save_out_file function recieved NULL temp_fp pointer\n");
+       return;
+   }
+   while (copies > 0)
+   {
+      copies--;
+      if (fd != 0)
+      {
+         lseek(fd, 0, SEEK_SET);
+      }
+      while ((len = read(fd, buf, sizeof(buf))) > 0)
+      {
+          fwrite (buf, 1, len, temp_fp);
+      }
+   }
+}
 int main(int argc, char *argv[])
 {
    int fd;
@@ -647,6 +689,9 @@ int main(int argc, char *argv[])
    int n, total=0, retry=0, size, pages;
    enum HPMUD_RESULT stat;
    char *printer = getenv("PRINTER"); 
+   int iLogLevel = 0;
+   FILE  *temp_fp = NULL;
+   int saveoutfile = 0;
    
    //     0        1     2     3     4      5
    // device_uri job-id user title copies options
@@ -690,6 +735,22 @@ int main(int argc, char *argv[])
       copies = atoi(argv[4]);
    }
 
+   iLogLevel = getHPLogLevel();
+   if(SAVE_OUT_FILE_IN_BACKEND & iLogLevel)
+   {
+      temp_fp = create_out_file(argv[1], argv[2]);
+      if(temp_fp)
+          saveoutfile = 1;
+   }
+   if( DONT_SEND_TO_PRINTER & iLogLevel )
+   {
+       if(temp_fp)
+       {
+            saveoutfile = 1;
+            save_out_file(fd, copies, temp_fp);
+       }
+       exit (BACKEND_OK);
+   }
    signal(SIGTERM, SIG_IGN);
    init_dbus();
 
@@ -722,6 +783,8 @@ int main(int argc, char *argv[])
 
          while (size > 0)
          {
+            if (saveoutfile)
+                  fwrite (buf, 1, len, temp_fp);
             /* Got some data now open the hp device. This will handle any HPIJS device contention. */
             if (hd <= 0)
             {
@@ -917,6 +980,8 @@ bugout:
       hpmud_close_device(hd);   
    if (fd != 0)
       close(fd);
+   if (temp_fp)
+      fclose(temp_fp);
 
    exit (exit_stat);
 }

@@ -574,6 +574,8 @@ cups_ppd_printers = \
    ppd/hpcups/hp-officejet_pro_8610.ppd.gz \
    ppd/hpcups/hp-officejet_pro_8620.ppd.gz \
    ppd/hpcups/hp-officejet_pro_8630.ppd.gz \
+   ppd/hpcups/hp-officejet_pro_8640.ppd.gz \
+   ppd/hpcups/hp-officejet_pro_8660.ppd.gz \
    ppd/hpcups/hp-officejet_pro_k5300.ppd.gz \
    ppd/hpcups/hp-officejet_pro_k5400.ppd.gz \
    ppd/hpcups/hp-officejet_pro_k550.ppd.gz \

@@ -484,7 +484,7 @@ int HPCupsFilter::StartPrintJob(int  argc, char *argv[])
     strncpy(m_JA.job_start_time, asctime(t), sizeof(m_JA.job_start_time)-1);    // returns Fri Jun  5 08:12:16 2009
     snprintf(m_JA.job_start_time+19, sizeof(m_JA.job_start_time) - 20, ":%ld %d", tv.tv_usec/1000, t->tm_year + 1900); // add milliseconds
 
-    getLogLevel();
+    m_iLogLevel = getHPLogLevel();
     m_JA.job_id = atoi(argv[1]);
     strncpy(m_JA.user_name,argv[2],sizeof(m_JA.user_name)-1);
 
@@ -667,7 +667,7 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
                 cups_header.cupsColorSpace == CUPS_CSPACE_RGB)
             {
 
-                snprintf (szFileName, sizeof(szFileName), "%s/hp_%s_cups_filterc_bmp_%d_XXXXXX", CUPS_TMP_DIR, m_JA.user_name, current_page_number);
+                snprintf (szFileName, sizeof(szFileName), "%s/hpcups_%s_c_bmp_%d_XXXXXX", CUPS_TMP_DIR, m_JA.user_name, current_page_number);
                 createTempFile(szFileName, &cfp);
                 if (cfp)
                 {
@@ -678,7 +678,7 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
             if (cups_header.cupsColorSpace == CUPS_CSPACE_RGBW ||
                 cups_header.cupsColorSpace == CUPS_CSPACE_K)
             {
-                snprintf (szFileName, sizeof(szFileName), "%s/hp_%s_cups_filterk_bmp_%d_XXXXXX", CUPS_TMP_DIR, m_JA.user_name, current_page_number);
+                snprintf (szFileName, sizeof(szFileName), "%s/hpcups_%s_k_bmp_%d_XXXXXX", CUPS_TMP_DIR, m_JA.user_name, current_page_number);
                 createTempFile(szFileName, &kfp);
                 if (kfp)
                 {
@@ -737,6 +737,8 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
     if (cups_header.cupsColorSpace == CUPS_CSPACE_RGBW) {
         delete [] kRaster;
         delete [] rgbRaster;
+        kRaster = NULL;
+        rgbRaster = NULL;
     }
 
     unlink(hpPreProcessedRasterFile);
@@ -868,27 +870,4 @@ void HPCupsFilter::printCupsHeaderInfo(cups_page_header2_t *header)
     dbglog ("DEBUG: cupsReal1 = %f\n", header->cupsReal[1]); // Top overspray
 }
 
-void HPCupsFilter::getLogLevel ()
-{
-    FILE    *fp;
-    char    str[258];
-    char    *p;
-    fp = fopen ("/etc/cups/cupsd.conf", "r");
-    if (fp == NULL)
-        return;
-    while (!feof (fp))
-    {
-        if (!fgets (str, 256, fp))
-        {
-            break;
-        }
-        if ((p = strstr (str, "hpLogLevel")))
-        {
-            p += strlen ("hpLogLevel") + 1;
-            m_iLogLevel = atoi (p);
-            break;
-        }
-    }
-    fclose (fp);
-}
 

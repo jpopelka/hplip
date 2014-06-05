@@ -138,7 +138,7 @@ class Ui_Dialog(object):
         self.gridlayout5.addWidget(self.JetDirectLabel, 0, 2, 1, 1)
         self.JetDirectSpinBox = QtGui.QSpinBox(self.ManualGroupBox)
         self.JetDirectSpinBox.setMinimum(1)
-        self.JetDirectSpinBox.setMaximum(3)
+        self.JetDirectSpinBox.setMaximum(4)
         self.JetDirectSpinBox.setObjectName("JetDirectSpinBox")
         self.gridlayout5.addWidget(self.JetDirectSpinBox, 0, 3, 1, 1)
         self.gridlayout3.addWidget(self.ManualGroupBox, 1, 0, 1, 1)

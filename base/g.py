@@ -160,13 +160,8 @@ class State(ConfigBase):
 class UserConfig(ConfigBase):
     def __init__(self):
 
-        prop.user_dir = os.path.expanduser('~/.hplip')
-        try:
-            if not os.path.exists(prop.user_dir):
-                os.makedirs(prop.user_dir)
-        except OSError:
-            log.error("Failed to create %s directory. User preferences and collection of debug logs can't be supported."%(prop.user_dir))
-
+        sts, prop.user_dir = os_utils.getHPLIPDir()
+   
         if not os.geteuid() == 0:
             prop.user_config_file = os.path.join(prop.user_dir, 'hplip.conf')
 

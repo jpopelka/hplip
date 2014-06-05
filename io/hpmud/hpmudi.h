@@ -212,5 +212,10 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) service_to_channel(mud
 int (*getSIData)(char **pData , int *pDataLen, char **pModeSwitch, int *pModeSwitchLen);
 void (*freeSIData)(char *pData, char *pModeSwitch);
 
+static const char *SnmpPort[] = { "","public","public.1","public.2","public.3"};
+#define PORT_PUBLIC  1
+#define PORT_PUBLIC_1  2
+#define PORT_PUBLIC_2  3
+#define PORT_PUBLIC_3  4
 #endif // _HPMUDI_H
 

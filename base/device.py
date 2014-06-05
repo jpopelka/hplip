@@ -45,7 +45,7 @@ import pml
 import status
 from prnt import pcl, ldl, cups
 from base import models, mdns, slp, avahi
-from strings import StringTable
+from strings import *
 
 http_result_pat = re.compile("""HTTP/\d.\d\s(\d+)""", re.I)
 
@@ -375,7 +375,7 @@ def makeURI(param, port=1):
             result_code, uri = hpmudext.make_net_uri(param, port)
 
             if result_code == hpmudext.HPMUD_R_OK and uri:
-                uri = uri.replace("ip","hostname")
+                uri = uri.replace("ip=","hostname=")
                 log.debug("Found: %s" % uri)
                 found = True
                 cups_uri = uri
@@ -909,75 +909,6 @@ def validateFilterList(filter):
     return True
 
 
-#
-# UI String Queries (why is this here?)
-#
-
-inter_pat = re.compile(r"""%(.*)%""", re.IGNORECASE)
-st = StringTable()
-strings_init = False
-
-
-def initStrings():
-    global strings_init, st
-    strings_init = True
-    cycles = 0
-
-    while True:
-        found = False
-
-        for s in st.string_table:
-            short_string, long_string = st.string_table[s]
-            short_replace, long_replace = short_string, long_string
-
-            try:
-                short_match = inter_pat.match(short_string).group(1)
-            except (AttributeError, TypeError):
-                short_match = None
-
-            if short_match is not None:
-                found = True
-
-                try:
-                    short_replace, dummy = st.string_table[short_match]
-                except KeyError:
-                    log.error("String interpolation error: %s" % short_match)
-
-            try:
-                long_match = inter_pat.match(long_string).group(1)
-            except (AttributeError, TypeError):
-                long_match = None
-
-            if long_match is not None:
-                found = True
-
-                try:
-                    dummy, long_replace = st.string_table[long_match]
-                except KeyError:
-                    log.error("String interpolation error: %s" % long_match)
-
-            if found:
-                st.string_table[s] = (short_replace, long_replace)
-
-        if not found:
-            break
-        else:
-            cycles +=1
-            if cycles > 1000:
-                break
-
-
-def queryString(string_id, typ=0):
-    if not strings_init:
-        initStrings()
-
-    #log.debug("queryString(%s)" % string_id)
-    s = st.string_table.get(str(string_id), ('', ''))[typ]
-
-    if type(s) == type(''):
-        return s
-
-    return s()
 
 
 AGENT_types = { AGENT_TYPE_NONE        : 'invalid',

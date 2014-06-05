@@ -34,6 +34,19 @@ class StringTable:
             'unknown' : (self.__tr('Unknown'), ''),
             'try_again' : ('', self.__tr('Please correct the problem and try again')),
             'press_continue' : ('',self.__tr('Please correct the problem and press continue on the printer')),
+            'unable_validate' : (self.__tr('Unable to validate'), ''),
+            '101' : (self.__tr('<STR1> file not found'), ''),
+            '102' : (self.__tr('<STR1> directory not found'), ''),
+            '103' : (self.__tr('Unable to connect to network. Please check your network connection and try again'), ''),
+            '104' : (self.__tr('<STR1> file does not match its checksum. File may have been corrupted or altered'), ''),
+            '105' : (self.__tr('GPG command not found'), ''),
+            '106' : (self.__tr('Unable to recieve key from keyserver'), ''),
+            '107' : (self.__tr('Failed to download <STR1>'), ''),
+            '108' : (self.__tr('Digital signature verification failed for the file <STR1>. File may have been corrupted or altered'), ''),
+            '109' : (self.__tr('Incorrect password'), ''),
+            '110' : (self.__tr('Unknown error'), ''),
+            '111' : (self.__tr('No device found having smart install enabled'), ''),
+            '112' : (self.__tr('Failed to disable smart install'), ''),
             '500' : (self.__tr('Started a print job'), ''),
             '501' : (self.__tr('Print job has completed'), ''),
             '502' : (self.__tr("Print job failed - required plug-in not found"), self.__tr("Please run hp-plugin (as root) to install the required plug-in")),
@@ -315,3 +328,81 @@ class StringTable:
 
     def __tr(self,s,c = None):
         return s
+		
+import re
+from base import logger
+log = logger.Logger('', logger.Logger.LOG_LEVEL_INFO, logger.Logger.LOG_TO_CONSOLE)
+
+inter_pat = re.compile(r"""%(.*)%""", re.IGNORECASE)
+st = StringTable()
+strings_init = False
+
+
+def initStrings():
+    global strings_init, st
+    strings_init = True
+    cycles = 0
+
+    while True:
+        found = False
+
+        for s in st.string_table:
+            short_string, long_string = st.string_table[s]
+            short_replace, long_replace = short_string, long_string
+
+            try:
+                short_match = inter_pat.match(short_string).group(1)
+            except (AttributeError, TypeError):
+                short_match = None
+
+            if short_match is not None:
+                found = True
+
+                try:
+                    short_replace, dummy = st.string_table[short_match]
+                except KeyError:
+                    log.error("String interpolation error: %s" % short_match)
+
+            try:
+                long_match = inter_pat.match(long_string).group(1)
+            except (AttributeError, TypeError):
+                long_match = None
+
+            if long_match is not None:
+                found = True
+
+                try:
+                    dummy, long_replace = st.string_table[long_match]
+                except KeyError:
+                    log.error("String interpolation error: %s" % long_match)
+
+            if found:
+                st.string_table[s] = (short_replace, long_replace)
+
+        if not found:
+            break
+        else:
+            cycles +=1
+            if cycles > 1000:
+                break
+
+
+def queryString(string_id, typ=0, str1=None, str2=None):
+    if not strings_init:
+        initStrings()
+
+    s = st.string_table.get(str(string_id), ('', ''))[typ]
+   
+    if str1 is not None:
+         s = s.replace("<STR1>", str1)
+    elif "<STR" in s:
+         raise Exception("Substitution string needed for this string. <STRING: %s>" %s) 
+
+    if str2 is not None:
+         s = s.replace("<STR2>", str2)
+
+    if type(s) == type(''):
+        return s
+
+    return s()
+

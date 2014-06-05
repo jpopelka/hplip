@@ -30,19 +30,15 @@ import os
 # Local
 from base.g import *
 from base import utils, tui
+from base import password, validation
+from base.codes import *
+from base.strings import *
 
 
 ##### Global variables ###
 HPLIP_INFO_SITE ="http://hplip.sourceforge.net/hplip_web.conf"
 
 
-SIH_DISABLED_SUCCESSFULLY = 0
-SIH_NO_SI_DEVICES = 1
-SIH_FAILED_TO_DISABLE = 2
-SIH_FAILED_TO_DOWNLOAD = 3
-SIH_FAILED_TO_VERIFY_DIG_SIGN = 4
-SIH_FAILED_TO_IMPORT_UI = 5
-SIH_VERIFIED_DIG_SIGN = 6
 
 
 ########### methods ###########
@@ -154,12 +150,26 @@ def get_SmartInstall_tool_info():
 
     return url, file_name
 
+def validate(mode, smart_install_run, smart_install_asc, req_checksum=''):
 
+    #Validate Checksum
+    calc_checksum = utils.get_checksum(open(smart_install_run, 'r').read())
+    log.debug("File checksum=%s" % calc_checksum)
+
+    if req_checksum and req_checksum != calc_checksum:
+        return ERROR_FILE_CHECKSUM, queryString(ERROR_CHECKSUM_ERROR, 0, plugin_file)
+
+
+    #Validate Digital signatures
+    gpg_obj = validation.GPG_Verification()
+    digsig_sts, error_str = gpg_obj.validate(smart_install_run, smart_install_asc)
+
+    return digsig_sts, smart_install_run, smart_install_asc, error_str
 
 def download(mode, passwordObj):
     if not utils.check_network_connection():
         log.error("Internet connection not found.")
-        return SIH_FAILED_TO_DOWNLOAD, "" , ""
+        return ERROR_NO_NETWORK, "" , "" ,queryString(ERROR_NO_NETWORK)
 
     else:
         sts, HPLIP_file = utils.download_from_network(HPLIP_INFO_SITE)
@@ -168,30 +178,21 @@ def download(mode, passwordObj):
             source = hplip_si_conf.get("SMART_INSTALL","url","")
             if not source:
                 log.error("Failed to download %s."%HPLIP_INFO_SITE)
-                return SIH_FAILED_TO_DOWNLOAD, "" , ""
+                return ERROR_FAILED_TO_DOWNLOAD_FILE, "" , "", queryString(ERROR_FAILED_TO_DOWNLOAD_FILE, 0, HPLIP_INFO_SITE)
 
         sts, smart_install_run = utils.download_from_network(source)
         if not sts:
             log.error("Failed to download %s."%source)
-            return SIH_FAILED_TO_DOWNLOAD, "" , ""
+            return ERROR_FAILED_TO_DOWNLOAD_FILE, "" , "", queryString(ERROR_FAILED_TO_DOWNLOAD_FILE, 0, source)
 
         sts, smart_install_asc = utils.download_from_network(source+'.asc')
         if not sts:
             log.error("Failed to download %s."%(source+'.asc'))
-            return SIH_FAILED_TO_VERIFY_DIG_SIGN, smart_install_run , ""
+            return ERROR_FAILED_TO_DOWNLOAD_FILE, "" , "", queryString(ERROR_FAILED_TO_DOWNLOAD_FILE, 0, source + ".asc")
 
-        if passwordObj == None:
-            try:
-                from base.password import Password
-            except ImportError:
-                return SIH_FAILED_TO_VERIFY_DIG_SIGN, smart_install_run , ""
-            passwordObj = Password(mode)
+        digsig_sts, smart_install_run, smart_install_asc, error_str = validate(mode, smart_install_run, smart_install_asc)
 
-        if utils.ERROR_NONE == utils.validateDownloadFile(smart_install_run, smart_install_asc,"",passwordObj):
-            return SIH_VERIFIED_DIG_SIGN, smart_install_run, smart_install_asc
-        else:
-            log.error("GPG verification failed for %s ."%source)
-            return SIH_FAILED_TO_VERIFY_DIG_SIGN, smart_install_run, smart_install_asc
+        return digsig_sts, smart_install_run, smart_install_asc, error_str
 
 
 def disable(mode, ui_toolkit='qt4', dialog=None, app=None, passwordObj = None):
@@ -199,9 +200,10 @@ def disable(mode, ui_toolkit='qt4', dialog=None, app=None, passwordObj = None):
     dev_list = get_smartinstall_enabled_devices()
     if not dev_list:
         log.debug("No Smart Install Device found")
-        return SIH_NO_SI_DEVICES
+        return ERROR_NO_SI_DEVICE, queryString(ERROR_NO_SI_DEVICE)
 
-    return_val = SIH_FAILED_TO_DISABLE
+    return_val = ERROR_FAILED_TO_DISABLE_SI
+    return_error_str = queryString(ERROR_FAILED_TO_DISABLE_SI)
     url, file_name = get_SmartInstall_tool_info()
     printer_names  = utils.list_to_string(dev_list)
 
@@ -218,7 +220,7 @@ def disable(mode, ui_toolkit='qt4', dialog=None, app=None, passwordObj = None):
             else: #qt4
                 if not utils.canEnterGUIMode4():
                     log.error("%s requires GUI support . Is Qt4 installed?" % __mod__)
-                    return SIH_FAILED_TO_DISABLE
+                    return ERROR_FAILED_TO_DISABLE_SI, queryString(ERROR_FAILED_TO_DISABLE_SI)
 
                 if dialog and app:  # If QT app already opened, re-using same object
                     dialog.init(printer_names, "", QUEUES_SMART_INSTALL_ENABLED)
@@ -245,33 +247,41 @@ def disable(mode, ui_toolkit='qt4', dialog=None, app=None, passwordObj = None):
             response, value = tui.enter_choice("Do you want to download and disable smart install?(y=yes*, n=no):",['y', 'n'], 'y')
 
             if not response or value != 'y':   #User exit
-                return_val = SIH_FAILED_TO_DISABLE
+                return_val = ERROR_FAILED_TO_DISABLE_SI
+                return_error_str = queryString(ERROR_FAILED_TO_DISABLE_SI)
 
             else:
-                sts, smart_install_run, smart_install_asc = download(mode, passwordObj)
-                if sts == SIH_FAILED_TO_VERIFY_DIG_SIGN:
+                sts, smart_install_run, smart_install_asc, error_str = download(mode, passwordObj)
+                disable_si = False
+                return_val = sts
+                if sts == ERROR_SUCCESS:
+                    disable_si = True
+                elif sts in (ERROR_UNABLE_TO_RECV_KEYS, ERROR_DIGITAL_SIGN_NOT_FOUND):
                     response, value = tui.enter_yes_no("Digital Sign verification failed, Do you want to continue?")
                     if not response or not value:
-                        return_val = SIH_FAILED_TO_VERIFY_DIG_SIGN
+                        sys.exit(0)
                     else:   # Continue without validation succes.
-                        sts = SIH_VERIFIED_DIG_SIGN
+                        disable_si = True
+                else:
+                    return_error_str = queryString(sts)
 
-                if sts == SIH_VERIFIED_DIG_SIGN:
+                if disable_si: 
                     sts, out = utils.run("sh %s"%smart_install_run)
 
                     # Once smart install disabler installation completed, cross verifying to ensure no smart install devices found
                     if sts or check_SmartInstall():
-                        log.error("Failed to disable smart install.")
+                        log.error("Failed to disable smart install .")
                         log.error("Please refer link \'%s\' to disable manually"%url)
+                        return_val = ERROR_FAILED_TO_DISABLE_SI
+                        return_error_str = queryString(ERROR_FAILED_TO_DISABLE_SI)
                     else:
                         log.info("Smart install disabled successfully.")
-                        return_val = SIH_DISABLED_SUCCESSFULLY
-                else:
-                    return_val = sts
+                        return_val = ERROR_SUCCESS
+                        return_error_str = ""
 
     except KeyboardInterrupt:
         log.error("User exit")
         sys.exit(0)
 
-    return return_val
+    return return_val ,return_error_str
 
