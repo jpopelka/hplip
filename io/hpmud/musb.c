@@ -28,6 +28,7 @@ Author: Naga Samrat Chowdary Narla, Sarbeswar Meher
 #include "hpmud.h"
 #include "hpmudi.h"
 #include <dlfcn.h>
+#include <stdlib.h>
 #include "utils.h"
 
 

@@ -24,6 +24,7 @@
 import sys
 import os.path
 import os
+import subprocess
 
 # Local
 from base.g import *
@@ -262,6 +263,19 @@ class FileTable(QWidget):
         if self.typ == FILETABLE_TYPE_PRINT:
             s = self.__tr("Select File(s) to Print")
         else:
+            stat = ''
+            try :
+                p = subprocess.Popen('getenforce', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                stat, err = p.communicate()
+            except OSError :
+                pass
+            except :
+                log.exception()
+            if stat.strip('\n') == 'Enforcing' :
+                FailureUI(self, self.__tr("<b>Unable to add file. Please disable SeLinux.</b><p>Either disable it manually or run hp-doctor from terminal.</p>"),
+                    self.__tr("HP Device Manager"))
+                return
+
             s = self.__tr("Select File(s) to Send")
 
         files = list(QFileDialog.getOpenFileNames(self, s,

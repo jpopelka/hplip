@@ -72,17 +72,24 @@ def showPasswordPrompt(prompt):
 #TBD this function shoud be removed once distro class implemented
 def get_distro_name():
     os_name = None;
-    if utils.which('lsb_release'):
-       name = os.popen('lsb_release -i | cut -f 2')
-       os_name = name.read().strip()
-       name.close()
+    try:
+        import platform
+        os_name = platform.dist()[0].lower()
+    except:
+        os_name = None
+
+    if not os_name:
+        if utils.which('lsb_release'):
+           name = os.popen('lsb_release -i | cut -f 2')
+           os_name = name.read().strip()
+           name.close()
 
     if not os_name:
        name = os.popen("cat /etc/issue | awk '{print $1}' | head -n 1")
        os_name = name.read().strip()
        name.close()
 
-    if "redhatenterprise" in os_name.lower():
+    if os_name.lower() in ("redhatenterprise","redhat"):
         os_name = 'rhel'
     elif "suse" in os_name.lower():
         os_name = 'suse'

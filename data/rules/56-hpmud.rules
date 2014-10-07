@@ -11,7 +11,7 @@ LABEL="hpmud_usb_rules"
 ATTR{idVendor}=="03f0", ATTR{idProduct}=="????", OWNER="root", GROUP="lp", MODE="0664", ENV{sane_hpaio}="yes", ENV{libsane_matched}="yes", ENV{hp_test}="yes", ENV{ID_HPLIP}="1"
 
 
-# This rule will add the printer and install plugin
+# This rule will check the smart install feature, plugin status and firmware download for the required printers.
 ENV{hp_test}=="yes", PROGRAM="/bin/sh -c 'logger -p user.info loading HP Device $env{BUSNUM} $env{DEVNUM}'", RUN+="/bin/sh -c 'if [ -f /usr/bin/systemctl ]; then /usr/bin/systemctl --no-block start hplip-printer@$env{BUSNUM}:$env{DEVNUM}.service; else /usr/bin/nohup /usr/bin/python /usr/bin/hp-config_usb_printer $env{BUSNUM}:$env{DEVNUM} ; fi &'"
 
 # If sane-bankends is installed add hpaio backend support to dll.conf if needed.

@@ -181,6 +181,7 @@ static char *getUserName()
   }
   return NULL;
 }
+
 /*
  * 'validate_name()' - Make sure the printer name only contains valid chars.
  */
@@ -1823,9 +1824,15 @@ PyObject * printFileWithOptions( PyObject * self, PyObject * args )
     {
         return Py_BuildValue( "" ); // None
     }
+
     requesting_user_name = getUserName();
     if(requesting_user_name)
     {
+        /*
+         *Sometimes cupsUser() is explicitly set as "root", in order to avoid authentication popup multiple times in toolbox or any other utility.
+         *While submitting the job to cups, we should set the correct user (who initiates print/fax) name  always.
+         */
+
         cupsSetUser(requesting_user_name);
     }
 

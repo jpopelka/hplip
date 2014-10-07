@@ -346,8 +346,10 @@ else: # INTERACTIVE_MODE
 
         if not device_uri:
             log.debug("\nDEVICE CHOOSER setup_fax=%s, setup_print=%s" % (setup_fax, setup_print))
-            device_uri = mod.getDeviceUri(device_uri, selected_device_name, devices = device.probeDevices(bus))
+            device_uri = mod.getDeviceUri(devices = device.probeDevices(bus))
 
+        if not device_uri:
+            clean_exit(0)
 
         # ******************************* QUERY MODEL AND COLLECT PPDS
         log.info(log.bold("\nSetting up device: %s\n" % device_uri))

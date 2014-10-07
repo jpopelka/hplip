@@ -709,8 +709,10 @@ try:
 
         if scan_mode == 'color':
             scan_size = scan_px * 3 # 3 bytes/px
-        else:
+        elif scan_mode == 'gray':
             scan_size = scan_px # 1 byte/px
+        else: # lineart
+            scan_size = scan_px // 8 
 
         if scan_size > 52428800: # 50MB
             if res > 600:
@@ -1212,6 +1214,7 @@ try:
                     log.error("Editor not found.")
 
         device.freeScan()
+        device.closeScan()
         sane.deInit()
 
 

@@ -3154,19 +3154,6 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Deskjet 5652 Color Inkjet Printer)"
   }
   {
-    ModelName "HP Deskjet 5700 hpijs"
-    Attribute "NickName" "" "HP Deskjet 5700 hpijs, $Version"
-    Attribute "ShortNickName" "" "HP Deskjet 5700 hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 5700;DES:deskjet 5700;"
-    PCFileName "hp-deskjet_5700-hpijs.ppd"
-    Attribute "Product" "" "(HP Deskjet 5700 Color Inkjet Printer)"
-    Attribute "Product" "" "(HP Deskjet 5740 Color Inkjet Printer)"
-    Attribute "Product" "" "(HP Deskjet 5740xi Color Inkjet Printer)"
-    Attribute "Product" "" "(HP Deskjet 5743 Color Inkjet Printer)"
-    Attribute "Product" "" "(HP Deskjet 5745 Color Inkjet Printer)"
-    Attribute "Product" "" "(HP Deskjet 5748 Color Inkjet Printer)"
-  }
-  {
     ModelName "HP Officejet j5700 Series hpijs"
     Attribute "NickName" "" "HP Officejet j5700 Series hpijs, $Version"
     Attribute "ShortNickName" "" "HP Officejet j5700 Series hpijs"
@@ -3184,6 +3171,19 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Officejet j5785 All-in-one Printer)"
     Attribute "Product" "" "(HP Officejet j5788 All-in-one Printer)"
     Attribute "Product" "" "(HP Officejet j5790 All-in-one Printer)"
+  }
+  {
+    ModelName "HP Deskjet 5700 hpijs"
+    Attribute "NickName" "" "HP Deskjet 5700 hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Deskjet 5700 hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 5700;DES:deskjet 5700;"
+    PCFileName "hp-deskjet_5700-hpijs.ppd"
+    Attribute "Product" "" "(HP Deskjet 5700 Color Inkjet Printer)"
+    Attribute "Product" "" "(HP Deskjet 5740 Color Inkjet Printer)"
+    Attribute "Product" "" "(HP Deskjet 5740xi Color Inkjet Printer)"
+    Attribute "Product" "" "(HP Deskjet 5743 Color Inkjet Printer)"
+    Attribute "Product" "" "(HP Deskjet 5745 Color Inkjet Printer)"
+    Attribute "Product" "" "(HP Deskjet 5748 Color Inkjet Printer)"
   }
   {
     ModelName "HP Deskjet 5800 hpijs"
@@ -12532,12 +12532,28 @@ Transparency"
 
   // <%Hbpl1:Mono%>
   {
+    ModelName "HP LaserJet Pro MFP m125r hpijs"
+    Attribute "NickName" "" "HP LaserJet Pro MFP m125r hpijs, $Version, requires proprietary plugin"
+    Attribute "ShortNickName" "" "HP LaserJet Pro MFP m125r hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m125r;DES:hp laserjet pro mfp m125r;"
+    PCFileName "hp-laserjet_pro_mfp_m125r-hpijs.ppd"
+    Attribute "Product" "" "(HP LaserJet Pro MFP m125r)"
+  }
+  {
     ModelName "HP LaserJet Pro MFP m125a hpijs"
     Attribute "NickName" "" "HP LaserJet Pro MFP m125a hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LaserJet Pro MFP m125a hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m125a;DES:hp laserjet pro mfp m125a;"
     PCFileName "hp-laserjet_pro_mfp_m125a-hpijs.ppd"
     Attribute "Product" "" "(HP LaserJet Pro MFP m125a)"
+  }
+  {
+    ModelName "HP LaserJet Pro MFP m125ra hpijs"
+    Attribute "NickName" "" "HP LaserJet Pro MFP m125ra hpijs, $Version, requires proprietary plugin"
+    Attribute "ShortNickName" "" "HP LJ Pro MFP m125ra hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp laserjet pro mfp m125ra;DES:hp laserjet pro mfp m125ra;"
+    PCFileName "hp-laserjet_pro_mfp_m125ra-hpijs.ppd"
+    Attribute "Product" "" "(HP LaserJet Pro MFP m125ra)"
   }
   {
     ModelName "HP LaserJet Pro MFP m125rnw hpijs"
@@ -13630,6 +13646,391 @@ lity:PenSet=2,Quality:FullBleed=1"
   }
 } // end Copperhead
 
+//////// CopperheadXLP
+{
+    Attribute "cupsEvenDuplex" "" "True"
+    Attribute "cupsBackSide" "" "Rotated"
+    Attribute "cupsFlipDuplex" "" "True"
+    Attribute "hpPrinterLanguage" "" "pcl3gui2"
+    Attribute "HPMechOffset" "" "71"
+
+    Group "General/General"
+
+    Option "ColorModel/Output Mode" PickOne AnySetup 10.0
+    *Choice "RGB/Color" "<</cupsColorSpace 17/cupsBitsPerColor 8/cupsRowStep 0>>setpagedevice"
+    Choice "CMYGray/High Quality Grayscale" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 1>>setpagedevice"
+    Choice "KGray/Black Only Grayscale" "<</cupsColorSpace 1/cupsBitsPerColor 8/cupsRowStep 2>>setpagedevice"
+
+    // cupsMediaType values map to MEDIATYPE from global_types.h
+    Option "MediaType/Media Type" PickOne AnySetup 10.0
+    *Choice "Plain/Plain paper" "<</MediaType/cupsMediaType 0>>setpagedevice"
+    Choice "ThickPlain/Thick plain paper" "<</MediaType/cupsMediaType 0>>setpagedevice"
+    Choice "Glossy/HP Photo Papers" "<</MediaType/cupsMediaType 5>>setpagedevice"
+    Choice "FastGlossy/Other photo inkjet papers" "<</MediaType/cupsMediaType 5>>setpagedevice"
+    Choice "HagakiGlossy/Photo hagaki" "<</MediaType/cupsMediaType 5>>setpagedevice"
+    Choice "CoatedBrochure/HP Matte Brochure or Professional Paper" "<</MediaType/cupsMediaType 2>>setpagedevice"
+    Choice "CoatedMatte/HP Matte Presentation Paper" "<</MediaType/cupsMediaType 2>>setpagedevice"
+    Choice "Coated/Other matte inkjet papers" "<</MediaType/cupsMediaType 2>>setpagedevice"
+    Choice "BrochureGlosy/HP Glosy Brochure or Professional Paper" "<</MediaType/cupsMediaType 8>>setpagedevice"
+    Choice "Brochure/Other glosy inkjet papers" "<</MediaType/cupsMediaType 8>>setpagedevice"
+    Choice "BrochureHagaki/Inkjet hagaki" "<</MediaType/cupsMediaType 8>>setpagedevice"
+
+
+     // cupsCompression values map to QUALITY_MODE from global_types.h
+    Option "OutputMode/Print Quality" PickOne AnySetup 10.0
+    *Choice "Normal/Normal" "<</OutputType(0)/HWResolution[600 600]>>setpagedevice"
+     Choice "FastDraft/Draft" "<</OutputType(-2)/HWResolution[300 300]>>setpagedevice"
+     Choice "Best/Best" "<</OutputType(1)/HWResolution[600 600]>>setpagedevice"
+     Choice "Photo/High-Resolution Photo" "<</OutputType(2)/HWResolution[1200 1200]>>setpagedevice"
+
+
+    Option "InputSlot/Media Source" PickOne AnySetup 10.0
+       *Choice "Auto/Auto-Select" "<</MediaPosition 7>>setpagedevice"
+        Choice "Upper/Main Tray" "<</MediaPosition 1>>setpagedevice"
+
+    Option "Duplex/Double-Sided Printing" PickOne AnySetup 10.0
+     Choice "DuplexNoTumble/Long Edge (Standard)" "<</Duplex true/Tumble false>>setpagedevice"
+     Choice "DuplexTumble/Short Edge (Flip)" "<</Duplex true/Tumble true>>setpagedevice"
+    *Choice "None/Off" "<</Duplex false/Tumble false>>setpagedevice"
+
+    Installable "OptionDuplex/Duplexer Installed"
+
+     //Constraints
+     //MediaType & OutputMode
+     UIConstraints "*MediaType Plain *OutputMode Photo"
+     UIConstraints "*MediaType ThickPlain *OutputMode Photo"
+     UIConstraints "*MediaType FastGlossy *OutputMode FastDraft"
+     UIConstraints "*MediaType HagakiGlossy *OutputMode FastDraft"
+     UIConstraints "*MediaType Glossy *OutputMode FastDraft"
+     UIConstraints "*MediaType CoatedBrochure *OutputMode FastDraft"
+     UIConstraints "*MediaType CoatedMatte *OutputMode FastDraft"
+     UIConstraints "*MediaType Coated *OutputMode FastDraft"
+     UIConstraints "*MediaType BrochureGlosy *OutputMode FastDraft"
+     UIConstraints "*MediaType Brochure *OutputMode FastDraft"
+     UIConstraints "*MediaType BrochureHagaki *OutputMode FastDraft"
+
+     //PaperSizes & MediaTypes
+     UIConstraints "*PageSize L.FB *MediaType Plain"
+     UIConstraints "*PageSize Photo4x6.FB *MediaType Plain"
+     UIConstraints "*PageSize Photo10x15.FB *MediaType Plain"
+     UIConstraints "*PageSize Photo2L.FB *MediaType Plain"
+     UIConstraints "*PageSize Photo13x18.FB *MediaType Plain"
+     UIConstraints "*PageSize Photo5x7.FB *MediaType Plain"
+     UIConstraints "*PageSize 8x10.FB *MediaType Plain"
+     UIConstraints "*PageSize Photo3x5 *MediaType Plain"
+     UIConstraints "*PageSize PhotoL *MediaType Plain"
+     UIConstraints "*PageSize Photo10x15 *MediaType Plain"
+     UIConstraints "*PageSize Photo4x6 *MediaType Plain"
+     UIConstraints "*PageSize Photo2L *MediaType Plain"
+     UIConstraints "*PageSize Photo13x18 *MediaType Plain"
+     UIConstraints "*PageSize Photo5x7 *MediaType Plain"
+     UIConstraints "*PageSize Photo8x10 *MediaType Plain"
+
+     UIConstraints "*PageSize L.FB *MediaType ThickPlain"
+     UIConstraints "*PageSize Photo4x6.FB *MediaType ThickPlain"
+     UIConstraints "*PageSize Photo10x15.FB *MediaType ThickPlain"
+     UIConstraints "*PageSize Photo2L.FB *MediaType ThickPlain"
+     UIConstraints "*PageSize Photo13x18.FB *MediaType ThickPlain"
+     UIConstraints "*PageSize Photo5x7.FB *MediaType ThickPlain"
+     UIConstraints "*PageSize 8x10.FB *MediaType ThickPlain"
+     UIConstraints "*PageSize Photo3x5 *MediaType ThickPlain"
+     UIConstraints "*PageSize PhotoL *MediaType ThickPlain"
+     UIConstraints "*PageSize Photo10x15 *MediaType ThickPlain"
+     UIConstraints "*PageSize Photo4x6 *MediaType ThickPlain"
+     UIConstraints "*PageSize Photo2L *MediaType ThickPlain"
+     UIConstraints "*PageSize Photo13x18 *MediaType ThickPlain"
+     UIConstraints "*PageSize Photo5x7 *MediaType ThickPlain"
+     UIConstraints "*PageSize Photo8x10 *MediaType ThickPlain"
+
+     UIConstraints "*PageSize A5 *MediaType FastGlossy"
+     UIConstraints "*PageSize JB5 *MediaType FastGlossy"
+     UIConstraints "*PageSize B5 *MediaType FastGlossy"
+     UIConstraints "*PageSize Executive *MediaType FastGlossy"
+     UIConstraints "*PageSize A4 *MediaType FastGlossy"
+     UIConstraints "*PageSize Letter *MediaType FastGlossy"
+     UIConstraints "*PageSize Legal *MediaType FastGlossy"
+     UIConstraints "*PageSize CardA4 *MediaType FastGlossy"
+     UIConstraints "*PageSize CardLetter *MediaType FastGlossy"
+     UIConstraints "*PageSize Card3x5 *MediaType FastGlossy"
+     UIConstraints "*PageSize Card4x6 *MediaType FastGlossy"
+     UIConstraints "*PageSize Card5x8 *MediaType FastGlossy"
+     UIConstraints "*PageSize 8.5x13 *MediaType FastGlossy"
+     UIConstraints "*PageSize Statement *MediaType FastGlossy"
+
+
+     UIConstraints "*PageSize EnvChou4 *MediaType FastGlossy"
+     UIConstraints "*PageSize EnvA2 *MediaType FastGlossy"
+     UIConstraints "*PageSize EnvC6 *MediaType FastGlossy"
+     UIConstraints "*PageSize EnvChou3 *MediaType FastGlossy"
+     UIConstraints "*PageSize EnvMonarch *MediaType FastGlossy"
+     UIConstraints "*PageSize Env10 *MediaType FastGlossy"
+     UIConstraints "*PageSize EnvDL *MediaType FastGlossy"
+     UIConstraints "*PageSize EnvC5 *MediaType FastGlossy"
+     UIConstraints "*PageSize Env6 *MediaType FastGlossy"
+     UIConstraints "*PageSize EnvCard *MediaType FastGlossy"
+
+     UIConstraints "*PageSize A5 *MediaType HagakiGlossy"
+     UIConstraints "*PageSize JB5 *MediaType HagakiGlossy"
+     UIConstraints "*PageSize B5 *MediaType HagakiGlossy"
+     UIConstraints "*PageSize Executive *MediaType HagakiGlossy"
+     UIConstraints "*PageSize A4 *MediaType HagakiGlossy"
+     UIConstraints "*PageSize Letter *MediaType HagakiGlossy"
+     UIConstraints "*PageSize Legal *MediaType HagakiGlossy"
+     UIConstraints "*PageSize CardA4 *MediaType HagakiGlossy"
+     UIConstraints "*PageSize CardLetter *MediaType HagakiGlossy"
+     UIConstraints "*PageSize Card3x5 *MediaType HagakiGlossy"
+     UIConstraints "*PageSize Card4x6 *MediaType HagakiGlossy"
+     UIConstraints "*PageSize Card5x8 *MediaType HagakiGlossy"
+     UIConstraints "*PageSize 8.5x13 *MediaType HagakiGlossy"
+     UIConstraints "*PageSize Statement *MediaType HagakiGlossy"
+
+
+     UIConstraints "*PageSize EnvChou4 *MediaType HagakiGlossy"
+     UIConstraints "*PageSize EnvA2 *MediaType HagakiGlossy"
+     UIConstraints "*PageSize EnvC6 *MediaType HagakiGlossy"
+     UIConstraints "*PageSize EnvChou3 *MediaType HagakiGlossy"
+     UIConstraints "*PageSize EnvMonarch *MediaType HagakiGlossy"
+     UIConstraints "*PageSize Env10 *MediaType HagakiGlossy"
+     UIConstraints "*PageSize EnvDL *MediaType HagakiGlossy"
+     UIConstraints "*PageSize EnvC5 *MediaType HagakiGlossy"
+     UIConstraints "*PageSize Env6 *MediaType HagakiGlossy"
+     UIConstraints "*PageSize EnvCard *MediaType HagakiGlossy"
+
+     UIConstraints "*PageSize A5 *MediaType Glossy"
+     UIConstraints "*PageSize JB5 *MediaType Glossy"
+     UIConstraints "*PageSize B5 *MediaType Glossy"
+     UIConstraints "*PageSize Executive *MediaType Glossy"
+     UIConstraints "*PageSize A4 *MediaType Glossy"
+     UIConstraints "*PageSize Letter *MediaType Glossy"
+     UIConstraints "*PageSize Legal *MediaType Glossy"
+     UIConstraints "*PageSize CardA4 *MediaType Glossy"
+     UIConstraints "*PageSize CardLetter *MediaType Glossy"
+     UIConstraints "*PageSize Card3x5 *MediaType Glossy"
+     UIConstraints "*PageSize Card4x6 *MediaType Glossy"
+     UIConstraints "*PageSize Card5x8 *MediaType Glossy"
+     UIConstraints "*PageSize 8.5x13 *MediaType Glossy"
+     UIConstraints "*PageSize Statement *MediaType Glossy"
+
+
+     UIConstraints "*PageSize EnvChou4 *MediaType Glossy"
+     UIConstraints "*PageSize EnvA2 *MediaType Glossy"
+     UIConstraints "*PageSize EnvC6 *MediaType Glossy"
+     UIConstraints "*PageSize EnvChou3 *MediaType Glossy"
+     UIConstraints "*PageSize EnvMonarch *MediaType Glossy"
+     UIConstraints "*PageSize Env10 *MediaType Glossy"
+     UIConstraints "*PageSize EnvDL *MediaType Glossy"
+     UIConstraints "*PageSize EnvC5 *MediaType Glossy"
+     UIConstraints "*PageSize Env6 *MediaType Glossy"
+     UIConstraints "*PageSize EnvCard *MediaType Glossy"
+
+     //UIConstraints "*Duplex *OptionDuplex False"
+     UIConstraints "*PageSize L.FB *Duplex"
+     UIConstraints "*PageSize A6.FB *Duplex"
+     UIConstraints "*PageSize A5.FB *Duplex"
+     UIConstraints "*PageSize JB5.FB *Duplex"
+     UIConstraints "*PageSize Photo2L.FB *Duplex"
+     UIConstraints "*PageSize Photo5x7.FB *Duplex"
+     UIConstraints "*PageSize Photo4x6.FB *Duplex"
+     UIConstraints "*PageSize 8x10.FB *Duplex"
+     UIConstraints "*PageSize Photo10x15.FB *Duplex"
+     UIConstraints "*PageSize Photo13x18.FB *Duplex"
+
+     UIConstraints "*PageSize A5 *Duplex"
+     UIConstraints "*PageSize A6 *Duplex"
+     UIConstraints "*PageSize JB5 *Duplex"
+     UIConstraints "*PageSize 6x8 *Duplex"
+     UIConstraints "*PageSize Env6 *Duplex"
+     UIConstraints "*PageSize Legal *Duplex"
+     UIConstraints "*PageSize Env10 *Duplex"
+     UIConstraints "*PageSize EnvA2 *Duplex"
+     UIConstraints "*PageSize EnvC5 *Duplex"
+     UIConstraints "*PageSize EnvC6 *Duplex"
+     UIConstraints "*PageSize EnvDL *Duplex"
+     UIConstraints "*PageSize PhotoL *Duplex"
+     UIConstraints "*PageSize 8.5x13 *Duplex"
+     UIConstraints "*PageSize CardA4 *Duplex"
+     UIConstraints "*PageSize Oufuku *Duplex"
+     UIConstraints "*PageSize EnvCard *Duplex"
+     UIConstraints "*PageSize Photo2L *Duplex"
+     UIConstraints "*PageSize Card3x5 *Duplex"
+     UIConstraints "*PageSize Card4x6 *Duplex"
+     UIConstraints "*PageSize Card5x8 *Duplex"
+     UIConstraints "*PageSize EnvChou3 *Duplex"
+     UIConstraints "*PageSize EnvChou4 *Duplex"
+     UIConstraints "*PageSize Photo5x7 *Duplex"
+     UIConstraints "*PageSize Photo3x5 *Duplex"
+     UIConstraints "*PageSize Photo4x6 *Duplex"
+     UIConstraints "*PageSize Statement *Duplex"
+     UIConstraints "*PageSize Photo8x10 *Duplex"
+     UIConstraints "*PageSize Photo10x15 *Duplex"
+     UIConstraints "*PageSize Photo13x18 *Duplex"
+     UIConstraints "*PageSize EnvMonarch *Duplex"
+     UIConstraints "*PageSize CardLetter *Duplex"
+
+
+    // 4x6 or smaller
+      CustomMedia "Card3x5/Index Card 3x5in" 216 360 8.4 8.4 8.4 8.4 "<</cupsInteger0 78/PageSize [216 360]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 78/PageSize[216 360]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Card4x6/Index Card 4x6in" 288 432 8.4 8.4 8.4 8.4 "<</cupsInteger0 74/PageSize [288 432]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo3x5/Photo 3x5in" 216 360 8.4 8.4 8.4 8.4 "<</cupsInteger0 78/PageSize [216 360]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 78/PageSize[216 360]/ImagingBBox null>>setpagedevice"
+      CustomMedia "PhotoL/Photo L 89x127mm" 252 360 8.4 8.4 8.4 8.4 "<</cupsInteger0 121/PageSize[252 360]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 121/PageSize[252 360]/ImagingBBox null>>setpagedevice"
+      CustomMedia "L.FB/Borderless Photo L 89x127mm" 266.4 371.952 0 0 0 0 "<</cupsInteger0 121/cupsReal0 .1/cupsReal1 .066/PageSize [266.4 371.952]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 121/cupsReal0 .1/cupsReal1 .066/PageSize[266.4 371.952]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo4x6/Photo 4x6in" 288 432 8.4 8.4 8.4 8.4 "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo4x6.FB/Borderless Photo 4x6in" 302.4 443.952 0 0 0 0 "<</cupsInteger0 74/cupsReal0 .1/cupsReal1 .066/PageSize[302.4 443.952]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 74/cupsReal0 .1/cupsReal1 .066/PageSize[302.4 443.952]/ImagingBBox null>>setpagedevice"
+      CustomMedia "A6/A6 105x148mm" 297.36 419.76 8.4 8.4 8.4 8.4 "<</cupsInteger0 73/PageSize[297.36 419.76]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 73/PageSize[297.36 419.76]/ImagingBBox null>>setpagedevice"
+      CustomMedia "A6.FB/A6 Borderless 105x148mm" 311.76 431.712 0 0 0 0 "<</cupsInteger0 73/PageSize[311.76 431.712]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 73/cupsReal0 .1/cupsReal1 .066/PageSize[311.76 431.712]/ImagingBBox null>>setpagedevice"
+
+      // 5x7
+      CustomMedia "Photo5x7/Photo 5x7in" 360 504 8.4 8.4 8.4 8.4 "<</cupsInteger0 122/PageSize[360 504]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 122/PageSize[360 504]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo5x7.FB/Photo Borderless 5x7in" 374.4 515.952 0 0 0 0 "<</cupsInteger0 122/PageSize[374.4 515.952]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 122/cupsReal0 .1/cupsReal1 .066/PageSize[374.4 515.952]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Card5x8/Index Card 5x8in" 360 576 8.4 8.4 8.4 8.4 "<</cupsInteger0 75/PageSize[360 576]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 75/PageSize[360 576]/ImagingBBox null>>setpagedevice"
+      CustomMedia "A5/A5 148x210mm" 419.76 595.44 8.4 8.4 8.4 8.4 "<</cupsInteger0 25/PageSize[419.76 595.44]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 25/PageSize[419.76 595.44]/ImagingBBox null>>setpagedevice"
+      CustomMedia "A5.FB/A5 Borderless 148x210mm" 434.16 607.392 0 0 0 0 "<</cupsInteger0 25/PageSize[434.16 607.392]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 25/cupsReal0 .1/cupsReal1 .066/PageSize[434.16 607.392]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Oufuku/Oufuku-Hagaki 200x148mm" 566.64 419.76 8.4 8.4 8.4 8.4 "<</cupsInteger0 72/PageSize[566.64 419.76]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 72/PageSize[566.64 419.76]/ImagingBBox null>>setpagedevice"
+
+
+      // Standard
+      CustomMedia "Postcard/Postcard" 283 420 8.4 8.4 8.4 8.4 "<</cupsInteger0 71/PageSize[283 420]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 71/PageSize[283 420]/ImagingBBox null>>setpagedevice"
+
+      CustomMedia "6x8/6x8in" 432 576 8.4 8.4 8.4 8.4 "<</cupsInteger0 101/PageSize[432 576]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 101/PageSize[432 576]/ImagingBBox null>>setpagedevice"
+      CustomMedia "8.5x13/8.5x13in" 612 936 8.4 8.4 8.4 8.4 "<</cupsInteger0 10/PageSize[612 936]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 10/PageSize[612 936]/ImagingBBox null>>setpagedevice"
+      CustomMedia "B5/B5 176x250mm" 498.96 708.48 8.4 8.4 8.4 8.4 "<</cupsInteger0 101/PageSize[498.96 708.48]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 101/PageSize[498.96 708.48]/ImagingBBox null>>setpagedevice"
+      CustomMedia "B5.Duplex/B5 AutoDuplex 176x250mm" 498.96 708.48 8.4 0 8.4 8.4 "<</cupsInteger0 101/PageSize[498.96 708.48]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 101/PageSize[498.96 708.48]/ImagingBBox null>>setpagedevice"
+      CustomMedia "JB5/JB5 182x257mm" 516.24 728.64 8.4 8.4 8.4 8.4 "<</cupsInteger0 45/PageSize[516.24 728.64]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 45/PageSize [516.24 728.64]/ImagingBBox null>>setpagedevice"
+      CustomMedia "JB5.FB/JB5 Borderless 182x257mm" 530.64 740.592 0 0 0 0 "<</cupsInteger0 45/PageSize[530.64 740.592]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 45/cupsReal0 .1/cupsReal1 .066/PageSize [530.64 740.592]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Executive/Executive 7.25x10.5in" 522 756 8.4 8.4 8.4 8.4 "<</cupsInteger0 1/PageSize[522 756]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 1/PageSize[522 756]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Executive.Duplex/Executive AutoDuplex 7.25x10.5in" 522 756 8.4 0 8.4 8.4 "<</cupsInteger0 1/PageSize[522 756]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 1/PageSize[522 756]/ImagingBBox null>>setpagedevice"
+      *CustomMedia "Letter/Letter 8.5x11in" 612 792 8.4 8.4 8.4 8.4 "<</cupsInteger0 2/PageSize[612 792]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 2/PageSize[612 792]/ImagingBBox null>>setpagedevice"
+       CustomMedia "Letter.Duplex/Letter AutoDuplex 8.5x11in" 612 792 8.4 0 8.4 8.4 "<</cupsInteger0 2/PageSize[612 792]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 2/PageSize[612 792]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Letter.FB/Letter Borderless 8.5x11in" 626.4 803.952 0 0 0 0 "<</cupsInteger0 2/PageSize[626.4 803.952]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 2/cupsReal0 .1/cupsReal1 .066/PageSize[626.4 803.952]/ImagingBBox null>>setpagedevice"
+      CustomMedia "CardLetter/Index Card Letter 8.5x11in" 612 792 8.4 8.4 8.4 8.4 "<</cupsInteger0 2/PageSize[612 792]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 2/PageSize[612 792]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Statement/Statement 5.5x8.5in" 396 612 8.4 8.4 8.4 8.4 "<</cupsInteger0 15/PageSize[396 612]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 15/PageSize[396 612]/ImagingBBox null>>setpagedevice"
+
+      CustomMedia "A4/A4 210x297mm" 595.44 841.68 8.4 8.4 8.4 8.4 "<</cupsInteger0 26/PageSize[595.44 841.68]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 26/PageSize[595.44 841.68]/ImagingBBox null>>setpagedevice"
+      CustomMedia "A4.Duplex/A4 AutoDuplex 210x297mm" 595.44 841.68 8.4 0 8.4 8.4 "<</cupsInteger0 26/PageSize[595.44 841.68]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 26/PageSize[595.44 841.68]/ImagingBBox null>>setpagedevice"
+
+      CustomMedia "A4.FB/A4 Borderless 210x297mm" 609.84 853.632 0 0 0 0 "<</cupsInteger0 26/PageSize[609.84 853.632]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 26/cupsReal0 .1/cupsReal1 .066/PageSize[609.84 853.632]/ImagingBBox null>>setpagedevice"
+      CustomMedia "CardA4/Index Card A4 210x297mm" 595.44 841.68 8.4 8.4 8.4 8.4 "<</cupsInteger0 26/PageSize[595.44 841.68]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 26/PageSize[595.44 841.68]/ImagingBBox null>>setpagedevice"
+
+      CustomMedia "Legal/Legal 8.5x14in" 612 1008 8.4 8.4 8.4 8.4 "<</cupsInteger0 3/PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 3/PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo10x15/Photo 10x15cm" 288 432 8.4 8.4 8.4 8.4 "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 74/PageSize[288 432]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo10x15.FB/Borderless Photo 10x15cm" 302.4 443.952 0 0 0 0 "<</cupsInteger0 74/cupsReal0 .1/cupsReal1 .066/PageSize[302.4 443.952]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 74/cupsReal0 .1/cupsReal1 .066/PageSize[302.4 443.952]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo2L/Photo 2L 127x178mm" 360 504 8.4 8.4 8.4 8.4 "<</cupsInteger0 126/PageSize[360 504]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 126/PageSize[360 504]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo2L.FB/Photo 2L Borderless 127x178mm" 374.4 515.952 0 0 0 0 "<</cupsInteger0 126/PageSize[374.4 515.952]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 126/cupsReal0 .1/cupsReal1 .066/PageSize[374.4 515.952]/ImagingBBox null>>setpagedevice"
+
+      CustomMedia "Photo13x18/Photo 13x18cm" 360 504 8.4 8.4 8.4 8.4 "<</cupsInteger0 122/PageSize[360 504]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 122/PageSize[360 504]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo13x18.FB/Photo Borderless 13x18cm" 374.4 515.952 0 0 0 0 "<</cupsInteger0 122/PageSize[374.4 515.952]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 122/cupsReal0 .1/cupsReal1 .066/PageSize[374.4 515.952]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Photo8x10/Photo 8x10in" 576 720 8.4 8.4 8.4 8.4 "<</cupsInteger0 7/PageSize[576 720]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 7/PageSize[576 720]/ImagingBBox null>>setpagedevice"
+      CustomMedia "8x10.FB/Borderless 8x10in" 590.4 731.952 0 0 0 0 "<</cupsInteger0 7/PageSize[590.4 731.952]/ImagingBBox null>>setpagedevice"
+         "<</cupsInteger0 7/cupsReal0 .1/cupsReal1 .066/PageSize[590.4 731.952]/ImagingBBox null>>setpagedevice"
+
+
+    {
+      // Custom page sizes from 1x4in to legal
+      HWMargins 9 9 9 9
+      VariablePaperSize Yes
+      MinSize 3in 4in
+      MaxSize 8.5in 30in
+
+
+    }
+
+
+         // Envelope
+      CustomMedia "EnvA2/A2 Envelope 4.37x5.75in" 314.64 414 8.4 46.8 8.4 46.8 "<</cupsInteger0 109/PageSize[314.64 414]/ImagingBBox null>>setpagedevice"
+             "<</cupsInteger0 109/PageSize[314.64 414]/ImagingBBox null>>setpagedevice"
+      CustomMedia "EnvC6/C6 Envelope 114x162mm" 323.28 459.36 8.4 46.8 8.4 46.8 "<</cupsInteger0 92/PageSize[323.28 459.36]/ImagingBBox null>>setpagedevice"
+             "<</cupsInteger0 92/PageSize[323.28 459.36]/ImagingBBox null>>setpagedevice"
+          CustomMedia "EnvChou4/#4 Japanese Envelope 90x205mm" 254.88 581.04 8.4 46.8 8.4 46.8 "<</cupsInteger0 111/PageSize[254.88 581.04]/ImagingBBox null>>setpagedevice"
+             "<</cupsInteger0 111/PageSize[254.88 581.04]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Env6/#6 Envelope 3.63x6.5in" 261.36 468 8.4 46.8 8.4 46.8 "<</cupsInteger0 83/PageSize[261.36 468]/ImagingBBox null>>setpagedevice"
+             "<</cupsInteger0 83/PageSize[261.36 468]/ImagingBBox null>>setpagedevice"
+      CustomMedia "EnvCard/Card Envelope 4.4x6in" 316 432 8.4 46.8 8.4 46.8 "<</cupsInteger0 114/PageSize[316 432]/ImagingBBox null>>setpagedevice"
+             "<</cupsInteger0 114/PageSize[316 432]/ImagingBBox null>>setpagedevice"
+      CustomMedia "EnvMonarch/Monarch Envelope 3.875x7.5in" 279 540 8.4 46.8 8.4 46.8 "<</cupsInteger0 80/PageSize[279 540]/ImagingBBox null>>setpagedevice"
+             "<</cupsInteger0 80/PageSize[279 540]/ImagingBBox null>>setpagedevice"
+      CustomMedia "EnvDL/DL Envelope 110x220mm" 311.76 623.52 8.4 46.8 8.4 46.8 "<</cupsInteger0 90/PageSize[311.76 623.52]/ImagingBBox null>>setpagedevice"
+             "<</cupsInteger0 90/PageSize[311.76 623.52]/ImagingBBox null>>setpagedevice"
+      CustomMedia "Env10/#10 Envelope 4.125x9.5in" 297 684 8.4 46.8 8.4 46.8 "<</cupsInteger0 81/PageSize[297 684]/ImagingBBox null>>setpagedevice"
+             "<</cupsInteger0 81/PageSize[297 684]/ImagingBBox null>>setpagedevice"
+      CustomMedia "EnvChou3/#3 Japanese Envelope 120x235mm" 339.84 666 8.4 46.8 8.4 46.8 "<</cupsInteger0 110/PageSize[339.84 666]/ImagingBBox null>>setpagedevice"
+             "<</cupsInteger0 110/PageSize[339.84 666]/ImagingBBox null>>setpagedevice"
+      CustomMedia "EnvC5/C5 Envelope 162x229mm" 459.36 649.44 8.4 46.8 8.4 46.8 "<</cupsInteger0 91/PageSize[459.36 649.44]/ImagingBBox null>>setpagedevice"
+             "<</cupsInteger0 91/PageSize[459.36 649.44]/ImagingBBox null>>setpagedevice"
+
+          // <%CopperheadXLP:Normal%>
+          {
+            ModelName "HP Officejet Pro 6230 hpijs"
+            Attribute "NickName" "" "HP Officejet Pro 6230 hpijs, $Version"
+            Attribute "ShortNickName" "" "HP Officejet Pro 6230 hpijs"
+            Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet pro 6230;DES:officejet pro 6230;"
+            PCFileName "hp-officejet_pro_6230-hpijs.ppd"
+            Attribute "Product" "" "(HP Officejet Pro 6230 Eprinter)"
+          }
+          {
+            ModelName "HP Officejet 6800 hpijs"
+            Attribute "NickName" "" "HP Officejet 6800 hpijs, $Version"
+            Attribute "ShortNickName" "" "HP Officejet 6800 hpijs"
+            Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 6800;DES:officejet 6800;"
+            PCFileName "hp-officejet_6800-hpijs.ppd"
+            Attribute "Product" "" "(HP Officejet 6800 E-all-in-one)"
+            Attribute "Product" "" "(HP Officejet 6810 E-all-in-one Printer Series)"
+            Attribute "Product" "" "(HP Officejet 6812 E-all-in-one Printer)"
+            Attribute "Product" "" "(HP Officejet 6815 E-all-in-one Printer)"
+          }
+          {
+            ModelName "HP Officejet Pro 6830 hpijs"
+            Attribute "NickName" "" "HP Officejet Pro 6830 hpijs, $Version"
+            Attribute "ShortNickName" "" "HP Officejet Pro 6830 hpijs"
+            Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet pro 6830;DES:officejet pro 6830;"
+            PCFileName "hp-officejet_pro_6830-hpijs.ppd"
+            Attribute "Product" "" "(HP Officejet Pro 6830 E-all-in-one)"
+            Attribute "Product" "" "(HP Officejet Pro 6835 E-all-in-one)"
+          }
+
+}// End CopperheadXLP
+
+
 ////////// Copperhead12
 {
   Attribute "DefaultResolution" "" "1200dpi"
@@ -13903,6 +14304,274 @@ lity:PenSet=2,Quality:FullBleed=1"
   }
 } // end Copperhead12	
 
+////////// CopperheadIPH
+{
+  Attribute "DefaultResolution" "" "1200dpi"
+
+  // Custom page sizes from 1x4in to Legal
+  HWMargins 18 36 18 9
+  VariablePaperSize Yes
+  MinSize 1in 4in
+  MaxSize 8.5in 14in
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Custom" " -dDEVICEWIDTHPOINTS=0 -dD&&
+EVICEHEIGHTPOINTS=0"
+
+  Attribute "FoomaticIDs" "" "HP-DeskJet_5550 hpijs"
+  Attribute "FoomaticRIPCommandLine" "" "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPA&&
+USE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFi&&
+le=- -"
+  Attribute "FoomaticRIPOption" "Model" "enum CmdLine A 100"
+  Attribute "FoomaticRIPOptionSetting" "Model=HP-DeskJet_5550" " -sDeviceManufacture&&
+r=&quot;HEWLETT-PACKARD&quot; -sDeviceModel=&quot;deskjet 5550&quot;"
+  Attribute "FoomaticRIPOption" "PrintoutMode" "enum Composite B"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Draft" "Quality=300FastDraftCol&&
+orCMYK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Draft.Gray" "Quality=300FastDra&&
+ftGrayscaleK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Normal" "Quality=300ColorCMYK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Normal.Gray" "Quality=300Graysc&&
+aleK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=High" "Quality=600ColorCMYK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=High.Gray" "Quality=600Grayscal&&
+eK"
+  Attribute "FoomaticRIPOptionSetting" "PrintoutMode=Photo" "Quality=1200PhotoCMYKFu&&
+llBleed"
+  Attribute "FoomaticRIPOption" "InputSlot" "enum CmdLine C"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Default" ",PS:MediaPosition=7"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=PhotoTray" ",PS:MediaPosition=6"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Upper" ",PS:MediaPosition=1"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Lower" ",PS:MediaPosition=4"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=CDDVDTray" ",PS:MediaPosition=14"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Envelope" ",PS:MediaPosition=3"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=LargeCapacity" ",PS:MediaPosition=&&
+5"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=Manual" ",PS:MediaPosition=2"
+  Attribute "FoomaticRIPOptionSetting" "InputSlot=MPTray" ",PS:MediaPosition=8"
+  Attribute "FoomaticRIPOption" "PageSize" "enum CmdLine A"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Letter" " -dDEVICEWIDTHPOINTS=612 -&&
+dDEVICEHEIGHTPOINTS=792"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A4" " -dDEVICEWIDTHPOINTS=595 -dDEV&&
+ICEHEIGHTPOINTS=842"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Photo" " -dDEVICEWIDTHPOINTS=288 -d&&
+DEVICEHEIGHTPOINTS=432"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Photo5x7" " -dDEVICEWIDTHPOINTS=360&&
+ -dDEVICEHEIGHTPOINTS=504"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=PhotoTearOff" " -dDEVICEWIDTHPOINTS&&
+=288 -dDEVICEHEIGHTPOINTS=432"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=3x5" " -dDEVICEWIDTHPOINTS=216 -dDE&&
+VICEHEIGHTPOINTS=360"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=5x8" " -dDEVICEWIDTHPOINTS=360 -dDE&&
+VICEHEIGHTPOINTS=576"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A5" " -dDEVICEWIDTHPOINTS=420 -dDEV&&
+ICEHEIGHTPOINTS=595"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A6" " -dDEVICEWIDTHPOINTS=297 -dDEV&&
+ICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=A6TearOff" " -dDEVICEWIDTHPOINTS=29&&
+7 -dDEVICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=B5JIS" " -dDEVICEWIDTHPOINTS=516 -d&&
+DEVICEHEIGHTPOINTS=729"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=CDDVD80" " -dDEVICEWIDTHPOINTS=237 &&
+-dDEVICEHEIGHTPOINTS=237"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=CDDVD120" " -dDEVICEWIDTHPOINTS=360&&
+ -dDEVICEHEIGHTPOINTS=360"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Env10" " -dDEVICEWIDTHPOINTS=297 -d&&
+DEVICEHEIGHTPOINTS=684"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvC5" " -dDEVICEWIDTHPOINTS=459 -d&&
+DEVICEHEIGHTPOINTS=649"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvC6" " -dDEVICEWIDTHPOINTS=323 -d&&
+DEVICEHEIGHTPOINTS=459"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvDL" " -dDEVICEWIDTHPOINTS=312 -d&&
+DEVICEHEIGHTPOINTS=624"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvISOB5" " -dDEVICEWIDTHPOINTS=499&&
+ -dDEVICEHEIGHTPOINTS=709"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=EnvMonarch" " -dDEVICEWIDTHPOINTS=2&&
+79 -dDEVICEHEIGHTPOINTS=540"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Executive" " -dDEVICEWIDTHPOINTS=52&&
+2 -dDEVICEHEIGHTPOINTS=756"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=FLSA" " -dDEVICEWIDTHPOINTS=612 -dD&&
+EVICEHEIGHTPOINTS=936"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Hagaki" " -dDEVICEWIDTHPOINTS=283 -&&
+dDEVICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Legal" " -dDEVICEWIDTHPOINTS=612 -d&&
+DEVICEHEIGHTPOINTS=1008"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=Oufuku" " -dDEVICEWIDTHPOINTS=567 -&&
+dDEVICEHEIGHTPOINTS=420"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w558h774" " -dDEVICEWIDTHPOINTS=558&&
+ -dDEVICEHEIGHTPOINTS=774"
+  Attribute "FoomaticRIPOptionSetting" "PageSize=w612h935" " -dDEVICEWIDTHPOINTS=612&&
+ -dDEVICEHEIGHTPOINTS=935"
+  Attribute "FoomaticRIPOption" "Duplex" "enum CmdLine A"
+  Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexNoTumble" " -dDuplex=true -dTum&&
+ble=false"
+  Attribute "FoomaticRIPOptionSetting" "Duplex=DuplexTumble" " -dDuplex=true -dTumbl&&
+e=true"
+  Attribute "FoomaticRIPOptionSetting" "Duplex=None" " -dDuplex=false"
+  Attribute "FoomaticRIPOption" "DryTime" "enum CmdLine B"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Zero" ""
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Five" ",DryTime=5"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Ten" ",DryTime=10"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Fifteen" ",DryTime=15"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Twenty" ",DryTime=20"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=TwentyFive" ",DryTime=25"
+  Attribute "FoomaticRIPOptionSetting" "DryTime=Thirty" ",DryTime=30"
+  Attribute "FoomaticRIPOption" "Quality" "enum CmdLine B"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300ColorCMYK" " -r300 -sIjsParams=Qu&&
+ality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quality:PenSet&&
+=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300ColorCMYKFullBleed" " -r300 -sIjs&&
+Params=Quality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quali&&
+ty:PenSet=2,Quality:FullBleed=1"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300DraftColorCMYK" " -r300 -sIjsPara&&
+ms=Quality:Quality=1,Quality:ColorMode=2,Quality:MediaType=0,Quality:P&&
+enSet=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300DraftGrayscaleK" " -r300 -sIjs&&
+Params=Quality:Quality=1,Quality:ColorMode=0,Quality:MediaType=0,Quali&&
+ty:PenSet=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300FastDraftColorCMYK" " -r300 -sIjs&&
+Params=Quality:Quality=4,Quality:ColorMode=2,Quality:MediaType=0,Quali&&
+ty:PenSet=2,Quality:SpeedMech=1"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300FastDraftGrayscaleK" " -r300 -&&
+sIjsParams=Quality:Quality=4,Quality:ColorMode=0,Quality:MediaType=0,Q&&
+uality:PenSet=2,Quality:SpeedMech=1"
+  Attribute "FoomaticRIPOptionSetting" "Quality=300GrayscaleK" " -r300 -sIjsParam&&
+s=Quality:Quality=0,Quality:ColorMode=0,Quality:MediaType=0,Quality:Pe&&
+nSet=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600ColorCMYK" " -r600 -sIjsParams=Qu&&
+ality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quality:PenSet&&
+=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600ColorCMYKFullBleed" " -r600 -sIjs&&
+Params=Quality:Quality=0,Quality:ColorMode=2,Quality:MediaType=0,Quali&&
+ty:PenSet=2,Quality:FullBleed=1"
+  Attribute "FoomaticRIPOptionSetting" "Quality=600GrayscaleK" " -r600 -sIjsParam&&
+s=Quality:Quality=0,Quality:ColorMode=0,Quality:MediaType=0,Quality:Pe&&
+nSet=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=1200PhotoCMYK" " -r1200 -sIjsParams=&&
+Quality:Quality=3,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenS&&
+et=2"
+  Attribute "FoomaticRIPOptionSetting" "Quality=1200PhotoCMYKFullBleed" " -r1200 -sI&&
+jsParams=Quality:Quality=3,Quality:ColorMode=2,Quality:MediaType=2,Qua&&
+lity:PenSet=2,Quality:FullBleed=1"
+  Group "General/General"
+    Option "PrintoutMode/Printout Mode" PickOne AnySetup 10.0
+      Choice "Draft/Draft (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=Draft"
+      Choice "Draft.Gray/Draft Grayscale (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=Draft.Gray"
+      *Choice "Normal/Normal (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=Normal"
+      Choice "Normal.Gray/Normal Grayscale (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=Normal.Gray"
+      Choice "High/High Quality (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=High"
+      Choice "High.Gray/High Quality Grayscale (auto-detect paper type)" "%% FoomaticRIPOptionSetting: PrintoutMode=High.Gray"
+      Choice "Photo/Photo (on photo paper)" "%% FoomaticRIPOptionSetting: PrintoutMode=Photo"
+    Option "InputSlot/Media Source" PickOne AnySetup 100.0
+      *Choice "Default/Printer default" "%% FoomaticRIPOptionSetting: InputSlot=Default"
+      Choice "PhotoTray/Photo Tray" "%% FoomaticRIPOptionSetting: InputSlot=PhotoTray"
+      Choice "Upper/Upper Tray" "%% FoomaticRIPOptionSetting: InputSlot=Upper"
+      Choice "Lower/Lower Tray" "%% FoomaticRIPOptionSetting: InputSlot=Lower"
+      Choice "CDDVDTray/CD or DVD Tray" "%% FoomaticRIPOptionSetting: InputSlot=CDDVDTray"
+      Choice "Envelope/Envelope Feeder" "%% FoomaticRIPOptionSetting: InputSlot=Envelope"
+      Choice "LargeCapacity/Large Capacity Tray" "%% FoomaticRIPOptionSetting: InputSlot=LargeCapacity"
+      Choice "Manual/Manual Feeder" "%% FoomaticRIPOptionSetting: InputSlot=Manual"
+      Choice "MPTray/Multi Purpose Tray" "%% FoomaticRIPOptionSetting: InputSlot=MPTray"
+    Option "Duplex/Double-Sided Printing" PickOne AnySetup 120.0
+      Choice "DuplexNoTumble/Long Edge (Standard)" "%% FoomaticRIPOptionSetting: Duplex=DuplexNoTumble"
+      Choice "DuplexTumble/Short Edge (Flip)" "%% FoomaticRIPOptionSetting: Duplex=DuplexTumble"
+      *Choice "None/Off" "%% FoomaticRIPOptionSetting: Duplex=None"
+    Option "DryTime/Additional Dry Time" PickOne AnySetup 120.0
+      *Choice "Zero/Printer Default" "%% FoomaticRIPOptionSetting: DryTime=Zero"
+      Choice "Five/5 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Five"
+      Choice "Ten/10 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Ten"
+      Choice "Fifteen/15 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Fifteen"
+      Choice "Twenty/20 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Twenty"
+      Choice "TwentyFive/25 Seconds" "%% FoomaticRIPOptionSetting: DryTime=TwentyFive"
+      Choice "Thirty/30 Seconds" "%% FoomaticRIPOptionSetting: DryTime=Thirty"
+  Group "PrintoutMode/Printout Mode"
+    Option "Quality/Resolution, Quality, Ink Type, Media Type" PickOne AnySetup 100.0
+      *Choice "FromPrintoutMode/Controlled by 'Printout Mode'" "%% FoomaticRIPOptionSetting: Quality=@PrintoutMode"
+      Choice "300ColorCMYK/300 dpi, Color, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=300ColorCMYK"
+      Choice "300ColorCMYKFullBleed/300 dpi, Color, Full Bleed, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=300ColorCMYKFullBleed"
+      Choice "300DraftColorCMYK/300 dpi, Draft, Color, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=300DraftColorCMYK"
+      Choice "300DraftGrayscaleK/300 dpi, Draft, Grayscale, Black Cartr." "%% FoomaticRIPOptionSetting: Quality=300DraftGrayscaleK"
+      Choice "300FastDraftColorCMYK/300 dpi, FastDraft, Color, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=300FastDraftColorCMYK"
+      Choice "300FastDraftGrayscaleK/300 dpi, FastDraft, Grayscale, Black Cartr." "%% FoomaticRIPOptionSetting: Quality=300FastDraftGrayscaleK"
+      Choice "300GrayscaleK/300 dpi, Grayscale, Black Cartr." "%% FoomaticRIPOptionSetting: Quality=300GrayscaleK"
+      Choice "600ColorCMYK/600 dpi, Color, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=600ColorCMYK"
+      Choice "600ColorCMYKFullBleed/600 dpi, Color, Full Bleed, Black + Color Cartr." "%% FoomaticRIPOptionSetting: Quality=600ColorCMYKFullBleed"
+      Choice "600GrayscaleK/600 dpi, Grayscale, Black Cartr." "%% FoomaticRIPOptionSetting: Quality=600GrayscaleK"
+      Choice "1200PhotoCMYK/1200 dpi, Photo, Black + Color Cartr., Photo Paper" "%% FoomaticRIPOptionSetting: Quality=1200PhotoCMYK"
+      Choice "1200PhotoCMYKFullBleed/1200 dpi, Photo, Full Bleed, Black + Color Cartr., Photo Paper" "%% FoomaticRIPOptionSetting: Quality=1200PhotoCMYKFullBleed"
+  *CustomMedia "Letter/Letter" 612.00 792.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Letter" "%% FoomaticRIPOptionSetting: PageSize=Letter"
+  CustomMedia "A4/A4" 595.00 842.00 9.72 36.00 9.72 9.00 "%% FoomaticRIPOptionSetting: PageSize=A4" "%% FoomaticRIPOptionSetting: PageSize=A4"
+  CustomMedia "Photo/Photo or 4x6 inch index card" 288.00 432.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Photo" "%% FoomaticRIPOptionSetting: PageSize=Photo"
+  CustomMedia "Photo5x7/Photo or 5x7 inch index card" 360.00 504.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Photo5x7" "%% FoomaticRIPOptionSetting: PageSize=Photo5x7"
+  CustomMedia "PhotoTearOff/Photo with tear-off tab" 288.00 432.00 0.00 0.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=PhotoTearOff" "%% FoomaticRIPOptionSetting: PageSize=PhotoTearOff"
+  CustomMedia "3x5/3x5 inch index card" 216.00 360.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=3x5" "%% FoomaticRIPOptionSetting: PageSize=3x5"
+  CustomMedia "5x8/5x8 inch index card" 360.00 576.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=5x8" "%% FoomaticRIPOptionSetting: PageSize=5x8"
+  CustomMedia "A5/A5" 420.00 595.00 9.00 36.00 9.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=A5" "%% FoomaticRIPOptionSetting: PageSize=A5"
+  CustomMedia "A6/A6" 297.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=A6" "%% FoomaticRIPOptionSetting: PageSize=A6"
+  CustomMedia "A6TearOff/A6 with tear-off tab" 297.00 420.00 0.00 0.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=A6TearOff" "%% FoomaticRIPOptionSetting: PageSize=A6TearOff"
+  CustomMedia "B5JIS/B5 (JIS)" 516.00 729.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=B5JIS" "%% FoomaticRIPOptionSetting: PageSize=B5JIS"
+  CustomMedia "CDDVD80/CD or DVD 80 mm" 237.00 237.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=CDDVD80" "%% FoomaticRIPOptionSetting: PageSize=CDDVD80"
+  CustomMedia "CDDVD120/CD or DVD 120 mm" 360.00 360.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=CDDVD120" "%% FoomaticRIPOptionSetting: PageSize=CDDVD120"
+  CustomMedia "Env10/Envelope #10" 297.00 684.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Env10" "%% FoomaticRIPOptionSetting: PageSize=Env10"
+  CustomMedia "EnvC5/Envelope C5" 459.00 649.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=EnvC5" "%% FoomaticRIPOptionSetting: PageSize=EnvC5"
+  CustomMedia "EnvC6/Envelope C6" 323.00 459.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=EnvC6" "%% FoomaticRIPOptionSetting: PageSize=EnvC6"
+  CustomMedia "EnvDL/Envelope DL" 312.00 624.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=EnvDL" "%% FoomaticRIPOptionSetting: PageSize=EnvDL"
+  CustomMedia "EnvISOB5/Envelope B5" 499.00 709.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5" "%% FoomaticRIPOptionSetting: PageSize=EnvISOB5"
+  CustomMedia "EnvMonarch/Envelope Monarch" 279.00 540.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=EnvMonarch" "%% FoomaticRIPOptionSetting: PageSize=EnvMonarch"
+  CustomMedia "Executive/Executive" 522.00 756.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Executive" "%% FoomaticRIPOptionSetting: PageSize=Executive"
+  CustomMedia "FLSA/American Foolscap" 612.00 936.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=FLSA" "%% FoomaticRIPOptionSetting: PageSize=FLSA"
+  CustomMedia "Hagaki/Hagaki" 283.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Hagaki" "%% FoomaticRIPOptionSetting: PageSize=Hagaki"
+  CustomMedia "Legal/Legal" 612.00 1008.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=Legal" "%% FoomaticRIPOptionSetting: PageSize=Legal"
+  CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
+  CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
+  CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
+  // <%CopperheadIPH:Normal%>
+  {
+    ModelName "HP Envy 5640 Series hpijs"
+    Attribute "NickName" "" "HP Envy 5640 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Envy 5640 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:envy 5640 series;DES:envy 5640 series;"
+    PCFileName "hp-envy_5640_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Envy 5640 E-all-in-one)"
+    Attribute "Product" "" "(HP Envy 5642 E-all-in-one)"
+    Attribute "Product" "" "(HP Envy 5643 E-all-in-one)"
+    Attribute "Product" "" "(HP Envy 5644 E-all-in-one)"
+  }
+  {
+    ModelName "HP Envy 5660 Series hpijs"
+    Attribute "NickName" "" "HP Envy 5660 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Envy 5660 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:envy 5660 series;DES:envy 5660 series;"
+    PCFileName "hp-envy_5660_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Envy 5660 E-all-in-one)"
+    Attribute "Product" "" "(HP Envy 5665 E-all-in-one)"
+  }
+  {
+    ModelName "HP Officejet 5740 Series hpijs"
+    Attribute "NickName" "" "HP Officejet 5740 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Officejet 5740 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 5740 series;DES:officejet 5740 series;"
+    PCFileName "hp-officejet_5740_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Officejet 5740 E-all-in-one)"
+    Attribute "Product" "" "(HP Officejet 5742 E-all-in-one)"
+    Attribute "Product" "" "(HP Officejet 5745 E-all-in-one)"
+  }
+  {
+    ModelName "HP Envy 7640 Series hpijs"
+    Attribute "NickName" "" "HP Envy 7640 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Envy 7640 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:envy 7640 series;DES:envy 7640 series;"
+    PCFileName "hp-envy_7640_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Envy 7640 E-all-in-one)"
+    Attribute "Product" "" "(HP Envy 7645 E-all-in-one)"
+  }
+  {
+    ModelName "HP Officejet 8040 Series hpijs"
+    Attribute "NickName" "" "HP Officejet 8040 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Officejet 8040 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 8040 series;DES:officejet 8040 series;"
+    PCFileName "hp-officejet_8040_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Officejet 8040 E-all-in-one)"
+  }
+} // end CopperheadIPH	
 
 
 ////////// Saipan
@@ -14166,9 +14835,9 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 7610 series;DES:officejet 7610 series;"
     PCFileName "hp-officejet_7610_series-hpijs.ppd"
     Attribute "Product" "" "(HP Officejet 7610 Wide Format E-all-in-one Printer)"
+    Attribute "Product" "" "(HP Officejet 7612 Wide Format E-all-in-one Printer)"
   }
 } // end Saipan
-
 
 ////////// Kapan
 {
@@ -14646,8 +15315,13 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:envy 4500 series;DES:envy 4500 series;"
     PCFileName "hp-envy_4500_series-hpijs.ppd"
     Attribute "Product" "" "(HP Envy 4500 E-all-in-one)"
+    Attribute "Product" "" "(HP Envy 4501 E-all-in-one)"
     Attribute "Product" "" "(HP Envy 4502 E-all-in-one)"
+    Attribute "Product" "" "(HP Envy 4503 E-all-in-one)"
     Attribute "Product" "" "(HP Envy 4504 E-all-in-one)"
+    Attribute "Product" "" "(HP Envy 4505 E-all-in-one)"
+    Attribute "Product" "" "(HP Envy 4507 E-all-in-one)"
+    Attribute "Product" "" "(HP Envy 4508 E-all-in-one)"
   }
   {
     ModelName "HP Deskjet 4510 Series hpijs"
@@ -14689,9 +15363,10 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:envy 5530 series;DES:envy 5530 series;"
     PCFileName "hp-envy_5530_series-hpijs.ppd"
     Attribute "Product" "" "(HP Envy 5530 E-all-in-one Printer)"
-    Attribute "Product" "" "(HP Envy 5535 E-all-in-one Printer)"
-    Attribute "Product" "" "(HP Envy 5532 E-all-in-one Printer)"
     Attribute "Product" "" "(HP Envy 5531 E-all-in-one Printer)"
+    Attribute "Product" "" "(HP Envy 5532 E-all-in-one Printer)"
+    Attribute "Product" "" "(HP Envy 5534 E-all-in-one Printer)"
+    Attribute "Product" "" "(HP Envy 5535 E-all-in-one Printer)"
   }
 
 } // end MimasTDR
@@ -16611,6 +17286,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     PCFileName "hp-officejet_pro_8610-hpijs.ppd"
     Attribute "Product" "" "(HP Officejet Pro 8610 E-all-in-one Printer)"
     Attribute "Product" "" "(HP Officejet Pro 8615 E-all-in-one Printer)"
+    Attribute "Product" "" "(HP Officejet Pro 8616 E-all-in-one Printer)"
   }
   {
     ModelName "HP Officejet Pro 8620 hpijs"
@@ -17434,6 +18110,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 2540 series;DES:deskjet 2540 series;"
     PCFileName "hp-deskjet_2540_series-hpijs.ppd"
     Attribute "Product" "" "(HP Deskjet 2540 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet 2541 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet 2542 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet 2543 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet 2544 All-in-one Printer)"

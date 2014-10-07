@@ -486,83 +486,92 @@ class CoreInstall(object):
 
     def get_distro(self):
         log.debug("Determining distro...")
-        self.distro, self.distro_version = DISTRO_UNKNOWN, '0.0'
-
+        name, ver = '','0.0'
         found = False
 
-        lsb_release = utils.which("lsb_release")
+        try:
+            import platform
+            name = platform.dist()[0].lower()
+            ver = platform.dist()[1]
+            found = True
+        except:
+            found = False
 
-        if lsb_release:
-            log.debug("Using 'lsb_release -is/-rs'")
-            cmd = os.path.join(lsb_release, "lsb_release")
-            status, name = utils.run(cmd + ' -is', self.passwordObj)
-            name = name.lower().strip()
-            log.debug("Distro name=%s" % name)
-            if name.find("redhatenterprise") > -1:
-                name="rhel"
+        # Getting distro information using lsb_release command
+        # platform retrurn 'redhat' even for 'RHEL' so re-reading using lsb_release.
 
-            if not status and name:
-                status, ver = utils.run(cmd + ' -rs', self.passwordObj)
-                ver = ver.lower().strip()
-                log.debug("Distro version=%s" % ver)
-                if name == "rhel" and ver[0] == "5" and ver[1] == ".":
-                      ver="5.0"
-                elif name == "rhel" and ver[0] == "6" and ver[1] == ".":
-                      ver="6.0"
-
-                if not status and ver:
-                    for d in self.distros:
-                        if name.find(d) > -1:
-                            self.distro = self.distros[d]['index']
-                            found = True
-                            self.distro_version = ver
-                            break
+        if not found:
+            lsb_release = utils.which("lsb_release")
+            if lsb_release:
+                log.debug("Using 'lsb_release -is/-rs'")
+                cmd = os.path.join(lsb_release, "lsb_release")
+                status, name = utils.run(cmd + ' -is', self.passwordObj)
+                if not status and name:
+                    status, ver = utils.run(cmd + ' -rs', self.passwordObj)
+                    found = True
 
         if not found:
             try:
                 name = file('/etc/issue', 'r').read().lower().strip()
             except IOError:
                 # Some O/Ss don't have /etc/issue (Mac)
-                self.distro, self.distro_version = DISTRO_UNKNOWN, '0.0'
+                found = False
             else:
-                if name.find("redhatenterprise") > -1:
-                    name="rhel"
+                found = True
+                for n in name.split():
+                    m = n
+                    if '.' in n:
+                        m = '.'.join(n.split('.')[:2])
 
-                for d in self.distros:
-                    if name.find(d) > -1:
-                        self.distro = self.distros[d]['index']
-                        found = True
+                    try:
+                        ver = float(m)
+                    except ValueError:
+                        try:
+                           ver =  int(m)
+                        except ValueError:
+                            ver = '0.0'
+                        else:
+                            ver = m
+                            break
                     else:
-                        for x in self.distros[d].get('alt_names', ''):
-                            if x and name.find(x) > -1:
-                                self.distro = self.distros[d]['index']
-                                found = True
-                                break
-
-                    if found:
+                        ver = m
                         break
 
-                if found:
-                    for n in name.split():
-                        m= n
-                        if '.' in n:
-                            m = '.'.join(n.split('.')[:2])
+                    log.debug("/etc/issue: %s %s" % (name, ver))
 
-                        try:
-                            float(m)
-                        except ValueError:
-                            try:
-                                int(m)
-                            except ValueError:
-                                self.distro_version = '0.0'
-                            else:
-                                self.distro_version = m
-                                break
-                        else:
-                            self.distro_version = m
+
+        if found:
+            name = name.lower().strip()
+            if name in ("redhatenterprise","redhat"):
+                name="rhel"
+
+            log.debug("Distro name=%s" % name)
+
+            ver = ver.lower().strip()
+
+            if name == "rhel" and ver[0] in ("5","6","7"):
+                ver = ver[0] + ".0"
+
+            log.debug("Distro version=%s" % ver)
+
+            found_in_list = False
+            for d in self.distros:
+                if name.find(d) > -1:
+                    self.distro = self.distros[d]['index']
+                    found_in_list = True
+                else:
+                    for x in self.distros[d].get('alt_names', ''):
+                        if x and name.find(x) > -1:
+                            self.distro = self.distros[d]['index']
+                            found_in_list = True
                             break
 
-                    log.debug("/etc/issue: %s %s" % (name, self.distro_version))
+                if found_in_list:
+                    break
+            self.distro_version = ver
+
+        else:
+            self.distro, self.distro_version = DISTRO_UNKNOWN, '0.0'
 
         log.debug("distro=%d, distro_version=%s" % (self.distro, self.distro_version))
 

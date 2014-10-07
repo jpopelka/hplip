@@ -35,6 +35,7 @@ import getopt
 import signal
 import time
 import operator
+import subprocess
 
 # Local
 from base.g import *
@@ -304,6 +305,19 @@ else: # NON_INTERACTIVE_MODE
             mod.usage(error_msg=["No recipients specified. Please use -f, -r, and/or -g to specify recipients."])
 
         allowable_mime_types = cups.getAllowableMIMETypes()
+
+        stat = ''
+        try :
+            p = subprocess.Popen('getenforce', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stat, err = p.communicate()
+        except OSError :
+            pass
+        except :
+            log.exception()
+            sys.exit(1)
+        if stat.strip('\n') == 'Enforcing' :
+            log.error('Unable to add file. Please disable SeLinux.\nEither disable it manually or run hp-doctor from terminal.')
+            sys.exit(0)
 
         for f in mod.args:
             path = os.path.realpath(f)

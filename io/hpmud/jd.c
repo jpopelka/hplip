@@ -669,7 +669,10 @@ static int convert_name_to_dns(const char *name, int name_size, unsigned char *d
    int i, x=0;
    unsigned char *p=dns_name;
 
-   for (i=0; i<name_size; i++)
+   if (name == 0 || name[0] == 0)
+        return 0;
+
+   for (i=0; i<name_size && name[i]; i++)
    {
       if (name[i]=='.')
       {
@@ -682,14 +685,13 @@ static int convert_name_to_dns(const char *name, int name_size, unsigned char *d
 
    if (i)
    {
-      i--;
       *p++ = i-x;     /* length */
       for (; x<i; x++)
          *p++ = name[x]; 
       x++;
    }
 
-   dns_name[x++]=0;
+   p[x++]=0;
 
    return x;   /* return length DOES include null termination */
 }
@@ -717,6 +719,9 @@ enum HPMUD_RESULT hpmud_mdns_lookup(const char *host_name, int sec_timeout, char
    enum HPMUD_RESULT stat = HPMUD_R_IO_ERROR;
 
    DBG("mdns lookup '%s'\n", host_name);
+
+   if(host_name == 0 || host_name[0] == 0)
+        return HPMUD_R_INVALID_MDNS;
 
    if ((udp_socket = socket(AF_INET, SOCK_DGRAM, 0)) == -1)
    {
@@ -847,7 +852,7 @@ enum HPMUD_RESULT hpmud_make_net_uri(const char *ip, int port, char *uri, int ur
 
    uri[0]=0;
 
-   if (ip[0]==0)
+   if (ip == 0 || ip[0]==0)
    {
       BUG("invalid ip %s\n", ip);
       stat = HPMUD_R_INVALID_IP;
@@ -888,7 +893,7 @@ enum HPMUD_RESULT hpmud_make_mdns_uri(const char *host, int port, char *uri, int
 
    uri[0]=0;
 
-   if (host[0]==0)
+   if (host == 0 || host[0]==0)
    {
       BUG("invalid host %s\n", host);
       stat = HPMUD_R_INVALID_MDNS;

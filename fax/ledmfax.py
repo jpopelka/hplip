@@ -33,7 +33,7 @@ import struct
 import time
 from base.g import *
 try:
-   import xml.parsers.expat as expat
+   from xml.parsers import expat as expat
 except ImportError,e:
    log.info("\n")
    log.error("Failed to import xml.parsers.expat(%s).\nThis may be due to the incompatible version of python-xml package.\n"%(e))

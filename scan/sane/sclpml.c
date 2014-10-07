@@ -2072,6 +2072,10 @@ abort:
             {
                 free( ( void * ) session->saneDevice.model );
             }
+            if (session->mfpdtf)
+            {
+                MfpdtfDeallocate (session->mfpdtf);
+            }
             free( session );
             session = NULL;
         }
@@ -2100,6 +2104,18 @@ void sclpml_close(SANE_Handle handle)
     {
        hpmud_close_device(hpaio->deviceid);
        hpaio->deviceid = -1;
+    }
+    if( hpaio->saneDevice.name )
+    {
+        free( ( void * ) hpaio->saneDevice.name );
+    }
+    if( hpaio->saneDevice.model )
+    {
+        free( ( void * ) hpaio->saneDevice.model );
+    }
+    if (hpaio->mfpdtf)
+    {
+        MfpdtfDeallocate (hpaio->mfpdtf);
     }
     free(hpaio);
     session = NULL;

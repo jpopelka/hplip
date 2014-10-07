@@ -813,10 +813,12 @@ int bb_is_paper_in_adf(struct ledm_session *ps) /* 0 = no paper in adf, 1 = pape
 
   if(http_open(ps->dd, HPMUD_S_LEDM_SCAN, &pbb->http_handle) != HTTP_R_OK)
   {
+        _BUG("unable to open channel HPMUD_S_LEDM_SCAN \n");
+        return -1;
   }
   if (http_write(pbb->http_handle, GET_SCANNER_STATUS, sizeof(GET_SCANNER_STATUS)-1, 10) != HTTP_R_OK)
   {
-    //goto bugout;
+    _BUG("unable to get scanner status \n");
   }
   read_http_payload(ps, buf, sizeof(buf), EXCEPTION_TIMEOUT, &bytes_read);
 
@@ -853,12 +855,14 @@ SANE_Status bb_start_scan(struct ledm_session *ps)
   {
     if(http_open(ps->dd, HPMUD_S_LEDM_SCAN, &pbb->http_handle) != HTTP_R_OK)
     {
-       // goto bugout;
+        _BUG("unable to open channel HPMUD_S_LEDM_SCAN \n");
+        goto bugout;
     }
 
     if (http_write(pbb->http_handle, GET_SCANNER_STATUS, sizeof(GET_SCANNER_STATUS)-1, timeout) != HTTP_R_OK)
     {
-       //goto bugout;
+       _BUG("unable to GET_SCANNER_STATUS \n");
+       goto bugout;
     }
  
     read_http_payload(ps, buf, sizeof(buf), timeout, &bytes_read);
@@ -874,6 +878,8 @@ SANE_Status bb_start_scan(struct ledm_session *ps)
 
     if(http_open(ps->dd, HPMUD_S_LEDM_SCAN, &pbb->http_handle) != HTTP_R_OK)
     {
+        _BUG("unable to open channel HPMUD_S_LEDM_SCAN \n");
+        goto bugout;
     }
 
     len = snprintf(buf, sizeof(buf), CREATE_SCAN_JOB_REQUEST,
@@ -962,6 +968,8 @@ SANE_Status bb_start_scan(struct ledm_session *ps)
 
   if(http_open(ps->dd, HPMUD_S_LEDM_SCAN, &pbb->http_handle) != HTTP_R_OK)
   {
+      _BUG("unable to open channel HPMUD_S_LEDM_SCAN \n");
+      goto bugout;
   }
   while(strstr(buf, READY_TO_UPLOAD) == NULL)
   {
@@ -970,8 +978,8 @@ SANE_Status bb_start_scan(struct ledm_session *ps)
 
      if (http_write(pbb->http_handle, buf, strlen(buf), 1) != HTTP_R_OK)
      {
-	//goto bugout;
-	break ;
+        //goto bugout;
+        break ;
      }
      if (read_http_payload (ps, buf, sizeof(buf), 5, &len) != HTTP_R_OK)
      {
@@ -983,19 +991,19 @@ SANE_Status bb_start_scan(struct ledm_session *ps)
      if (NULL == strstr(buf,PRESCANPAGE)) 
      {         //i.e Paper is not present in Scanner
          stat = SANE_STATUS_NO_DOCS;
-       	goto bugout;
+         goto bugout;
      }
      if (strstr(buf,JOBSTATE_CANCELED) || strstr(buf, CANCELED_BY_DEVICE) || strstr(buf, CANCELED_BY_CLIENT))
      {
-       	//_DBG("bb_start_scan() SCAN CANCELLED\n");
-       	stat = SANE_STATUS_GOOD;
-       	ps->user_cancel = 1;
-       	goto bugout;
+        _DBG("bb_start_scan() SCAN CANCELLED\n");
+        stat = SANE_STATUS_GOOD;
+        ps->user_cancel = 1;
+        goto bugout;
      }
      if (strstr(buf, JOBSTATE_COMPLETED))
      {
-	stat = SANE_STATUS_GOOD;
-	goto bugout;
+        stat = SANE_STATUS_GOOD;
+        goto bugout;
      }
      usleep(500000);//0.5 sec delay
   }//end while()

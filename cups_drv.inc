@@ -271,6 +271,9 @@ cups_ppd_printers = \
    ppd/hpcups/hp-envy_120_series.ppd.gz \
    ppd/hpcups/hp-envy_4500_series.ppd.gz \
    ppd/hpcups/hp-envy_5530_series.ppd.gz \
+   ppd/hpcups/hp-envy_5640_series.ppd.gz \
+   ppd/hpcups/hp-envy_5660_series.ppd.gz \
+   ppd/hpcups/hp-envy_7640_series.ppd.gz \
    ppd/hpcups/hp-laserjet_1000.ppd.gz \
    ppd/hpcups/hp-laserjet_1005_series.ppd.gz \
    ppd/hpcups/hp-laserjet_1010.ppd.gz \
@@ -446,6 +449,8 @@ cups_ppd_printers = \
    ppd/hpcups/hp-laserjet_p4515xm.ppd.gz \
    ppd/hpcups/hp-laserjet_pro_mfp_m125a.ppd.gz \
    ppd/hpcups/hp-laserjet_pro_mfp_m125nw.ppd.gz \
+   ppd/hpcups/hp-laserjet_pro_mfp_m125r.ppd.gz \
+   ppd/hpcups/hp-laserjet_pro_mfp_m125ra.ppd.gz \
    ppd/hpcups/hp-laserjet_pro_mfp_m125rnw.ppd.gz \
    ppd/hpcups/hp-laserjet_pro_mfp_m126a.ppd.gz \
    ppd/hpcups/hp-laserjet_pro_mfp_m126nw.ppd.gz \
@@ -516,6 +521,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-officejet_5110v.ppd.gz \
    ppd/hpcups/hp-officejet_5500_series.ppd.gz \
    ppd/hpcups/hp-officejet_5600_series.ppd.gz \
+   ppd/hpcups/hp-officejet_5740_series.ppd.gz \
    ppd/hpcups/hp-officejet_6000_e609a.ppd.gz \
    ppd/hpcups/hp-officejet_6000_e609n.ppd.gz \
    ppd/hpcups/hp-officejet_6100.ppd.gz \
@@ -529,6 +535,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-officejet_6500_e710n-z.ppd.gz \
    ppd/hpcups/hp-officejet_6600.ppd.gz \
    ppd/hpcups/hp-officejet_6700.ppd.gz \
+   ppd/hpcups/hp-officejet_6800.ppd.gz \
    ppd/hpcups/hp-officejet_7000_e809a.ppd.gz \
    ppd/hpcups/hp-officejet_7000_e809a_series.ppd.gz \
    ppd/hpcups/hp-officejet_7100_series.ppd.gz \
@@ -538,6 +545,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-officejet_7400_series.ppd.gz \
    ppd/hpcups/hp-officejet_7500_e910.ppd.gz \
    ppd/hpcups/hp-officejet_7610_series.ppd.gz \
+   ppd/hpcups/hp-officejet_8040_series.ppd.gz \
    ppd/hpcups/hp-officejet_9100_series-pcl3.ppd.gz \
    ppd/hpcups/hp-officejet_d_series.ppd.gz \
    ppd/hpcups/hp-officejet_g55.ppd.gz \
@@ -564,6 +572,8 @@ cups_ppd_printers = \
    ppd/hpcups/hp-officejet_pro_1170c_series.ppd.gz \
    ppd/hpcups/hp-officejet_pro_3610.ppd.gz \
    ppd/hpcups/hp-officejet_pro_3620.ppd.gz \
+   ppd/hpcups/hp-officejet_pro_6230.ppd.gz \
+   ppd/hpcups/hp-officejet_pro_6830.ppd.gz \
    ppd/hpcups/hp-officejet_pro_8000_a809.ppd.gz \
    ppd/hpcups/hp-officejet_pro_8100.ppd.gz \
    ppd/hpcups/hp-officejet_pro_8500_a909a.ppd.gz \

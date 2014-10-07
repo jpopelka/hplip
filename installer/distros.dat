@@ -894,7 +894,7 @@ ui_toolkit=qt3
 # ****************************************
 [rhel]
 index=7
-versions=5.0,6.0
+versions=5.0,6.0,7.0
 display_name=Red Hat Enterprise Linux
 alt_names=red hat enterprise linux
 display=1
@@ -1145,6 +1145,14 @@ packages=wget
 
 [rhel:6.0:avahi-utils]
 packages=avahi-tools
+# ****************************************
+
+[rhel:7.0]
+code_name=Maipo
+packaged_version=3.13.7
+release_date=10/06/2014
+same_as_version=6.0
+
 # ****************************************
 [slackware]
 index=8
@@ -2243,7 +2251,7 @@ packages=avahi
 # ****************************************
 [ubuntu]
 index=12
-versions=10.04,11.10,12.04,12.10,13.04,13.10,14.04
+versions=10.04,11.10,12.04,12.10,13.04,13.10,14.04,14.10
 display_name=Ubuntu
 alt_names=kubuntu,edubuntu,xubuntu
 display=1
@@ -2635,7 +2643,7 @@ code_name=Raring
 supported=1
 scan_supported=1
 fax_supported=1
-pcard_supported=1
+pcard_supported=0
 network_supported=1
 parallel_supported=0
 usb_supported=1
@@ -2878,17 +2886,25 @@ packaged_version=3.14.1
 release_date=17/04/2014
 same_as_version=13.10
 
+# ********************
+[ubuntu:14.10]
+code_name=Utopic
+packaged_version=3.14.6
+release_date=23/10/2014
+same_as_version=13.10
+
+
 # ****************************************
 [debian]
 index=2
-versions=6.0,6.0.1,6.0.2,6.0.3,6.0.4,6.0.5,6.0.6,6.0.7,6.0.8,6.0.9,7.0,7.1,7.2,7.3,7.4,7.5
+versions=6.0,6.0.1,6.0.2,6.0.3,6.0.4,6.0.5,6.0.6,6.0.7,6.0.8,6.0.9,6.0.10,7.0,7.1,7.2,7.3,7.4,7.5,7.6
 display_name=Debian
 alt_names=
 display=1
 notes=
 package_mgrs=dpkg,apt-get,synaptic,update-manager,adept,aptitude
 package_mgr_cmd=su -c "apt-get install --force-yes -y $packages_to_install"
-pre_depend_cmd=su -c "dpkg --configure -a",su -c "apt-get install -f",su -c "apt-get update",su -c "apt-get install --yes cupsys-bsd"
+pre_depend_cmd=su -c "dpkg --configure -a",su -c "apt-get install -f",su -c "apt-get update"
 post_depend_cmd=
 hplip_remove_cmd=su -c "apt-get remove --yes hplip hpijs hplip-data"
 su_sudo=su
@@ -2922,7 +2938,7 @@ policykit=0
 
 
 [debian:6.0:cups]
-packages=libcups2
+packages=cups,libcups2
 
 [debian:6.0:cups-devel]
 packages=libcups2-dev,cups-bsd,cups-client
@@ -3048,6 +3064,9 @@ same_as_version=6.0
 [debian:6.0.9]
 same_as_version=6.0
 
+[debian:6.0.10]
+same_as_version=6.0
+
 # *********************
 
 [debian:7.0]
@@ -3075,7 +3094,7 @@ policykit=0
 libdir_path=/usr/lib/x86_64-linux-gnu
 
 [debian:7.0:cups]
-packages=libcups2
+packages=cups,libcups2
 
 [debian:7.0:cups-devel]
 packages=libcups2-dev,cups-bsd,cups-client
@@ -3186,7 +3205,11 @@ same_as_version=7.0
 
 [debian:7.4]
 same_as_version=7.0
+
 [debian:7.5]
+same_as_version=7.0
+
+[debian:7.6]
 same_as_version=7.0
 
 # *********************
@@ -5212,9 +5235,9 @@ code_name=Maya
 supported=1
 scan_supported=1
 fax_supported=1
-pcard_supported=1
+pcard_supported=0
 network_supported=1
-parallel_supported=1
+parallel_supported=0
 usb_supported=1
 packaged_version=3.12.2
 release_date=2012
@@ -5572,10 +5595,9 @@ packages=avahi-utils
 
 [linuxmint:16]
 code_name=Petra
-packaged_version=3.13.10
+packaged_version=3.14.1
 release_date=30/11/2013
 same_as_version=15
-
 
 # ****************************************
 
@@ -5584,6 +5606,7 @@ code_name=Qiana
 packaged_version=3.14.3
 release_date=31/05/2014
 same_as_version=15
+
 
 # ****************************************
 

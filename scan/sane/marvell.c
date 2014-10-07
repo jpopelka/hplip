@@ -313,9 +313,8 @@ static int set_extents(struct marvell_session *ps)
    }
    else
    {
-     ps->effectiveTlx = 0;  /* current setting is not valid, zero it */
-     ps->effectiveBrx = 0;
-     stat = 1;
+     ps->effectiveTlx = ps->currentTlx = 0;  /* current setting is not valid, zero it */
+     ps->effectiveBrx = ps->currentBrx = ps->brxRange.max;
    }
    if ((ps->currentBry > ps->currentTly) && (ps->currentBry - ps->currentTly > ps->min_height) && (ps->currentBry - ps->currentTly <= ps->tlyRange.max))
    {
@@ -324,9 +323,8 @@ static int set_extents(struct marvell_session *ps)
    }
    else
    {
-     ps->effectiveTly = 0;  /* current setting is not valid, zero it */
-     ps->effectiveBry = 0;
-     stat = 1;
+    ps->effectiveTly = ps->currentTly = 0;  /* current setting is not valid, zero it */
+    ps->effectiveBry = ps->currentBry = ps->bryRange.max;
    }
    return stat;
 }
@@ -675,6 +673,17 @@ SANE_Status marvell_control_option(SANE_Handle handle, SANE_Int option, SANE_Act
          else
          {  /* Set default. */
             ps->current_input_source = ps->input_source_map[0];
+            if(ps->current_input_source == IS_PLATEN) 
+            {
+              i = ps->platen_resolution_list[0] + 1;
+              while(i--) ps->resolution_list[i] = ps->platen_resolution_list[i];
+            }
+            else
+            {
+              i = ps->adf_resolution_list[0] + 1;
+              while(i--) ps->resolution_list[i] = ps->adf_resolution_list[i];
+            }
+            ps->current_resolution = ps->resolution_list[1];
             mset_result |= SANE_INFO_RELOAD_PARAMS | SANE_INFO_RELOAD_OPTIONS;
             stat = SANE_STATUS_GOOD;
          }

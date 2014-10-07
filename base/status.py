@@ -1616,9 +1616,12 @@ def StatusType10Agents(func): # Low End Data Model
                         ink_level = 100
 
                 try:
-                    agent_sku = e.find("ConsumableSelectibilityNumber").text
+                    agent_sku = e.find("ProductNumber").text
                 except:
-                    pass
+                    try :
+                        agent_sku = e.find("ConsumableSelectibilityNumber").text
+                    except :
+                        pass
 
                 log.debug("type '%s' state '%s' ink_type '%s' ink_level %d agent_sku = %s" % (type, state, ink_type, ink_level,agent_sku))
 
