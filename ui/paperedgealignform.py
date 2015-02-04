@@ -23,11 +23,11 @@
 from base.g import *
 
 # Local
-from ui_utils import load_pixmap
+from .ui_utils import load_pixmap
 
 # Qt
 from qt import *
-from paperedgealignform_base import PaperEdgeAlignForm_base
+from .paperedgealignform_base import PaperEdgeAlignForm_base
 
 
 

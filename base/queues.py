@@ -26,10 +26,12 @@ import os
 import re
 
 # Local
-from base.g import *
-from base import utils, tui, password, os_utils, smart_install
+from .g import *
+from . import utils, tui, password, os_utils, smart_install
 from prnt import cups
 from installer import core_install
+from .sixext import to_string_utf8
+
 
 # ppd type
 HPCUPS = 1
@@ -38,7 +40,7 @@ HPPS = 3
 HPOTHER = 4
 
 DEVICE_URI_PATTERN = re.compile(r"""(.*):/(.*?)/(\S*?)\?(?:serial=(\S*)|device=(\S*)|ip=(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}[^&]*)|zc=(\S+))(?:&port=(\d))?""", re.I)
-NICKNAME_PATTERN = re.compile(r'''\*NickName:\s*\"(.*)"''', re.MULTILINE)
+NICKNAME_PATTERN = re.compile(b'''\*NickName:\s*\"(.*)"''', re.MULTILINE)
 NET_PATTERN = re.compile(r"""(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})""")
 NET_ZC_PATTERN = re.compile(r'''zc=(.*)''',re.IGNORECASE)
 NET_OTHER_PATTERN = re.compile(r'''(.*)://(.*)''',re.IGNORECASE)
@@ -82,7 +84,8 @@ def addToDeviceList(Key, printer_name, device_uri,back_end, ppd_fileType,PPDFile
 def parseQueues(mode):
     is_hpcups_installed = to_bool(sys_conf.get('configure', 'hpcups-install', '0'))
     is_hpijs_installed = to_bool(sys_conf.get('configure', 'hpijs-install', '0'))
-    status, output = utils.run('lpstat -v')
+    st, output = utils.run('lpstat -v')
+    status = True
 
     cups_printers = []
     if output.find("No destinations added") != -1 or output.find("lpstat:") != -1:
@@ -126,19 +129,25 @@ def parseQueues(mode):
             else:
                 log.debug("PPD: %s" % ppd_file)
             try:
-                fileptr = file(ppd_file, 'r').read(4096)
+                fileptr = open(ppd_file, 'rb').read()
             except IOError:
                 log.warn("Fail to read ppd=%s file"%ppd_file)
+                if os.access(ppd_file,os.R_OK):
+                    log.debug("File %s has read permissions" %ppd_file)
+                else:
+                    log.warn("Insufficient permission to access file %s" %ppd_file)
+                    status = False
+                    return mapofDevices,status
                 desc=''
             else:
                 try:
-                    desc = NICKNAME_PATTERN.search(fileptr).group(1)
+                    desc = to_string_utf8( NICKNAME_PATTERN.search(fileptr).group(1) )
                 except AttributeError:
                     desc = ''
 
             log.debug("PPD Description: %s" % desc)
             cmd= 'lpstat -p%s' % printer_name
-            status, output = utils.run(cmd)
+            st, output = utils.run(cmd)
             log.debug("Printer status: %s" % output.replace("\n", ""))
 
             #### checking for USb devices ####
@@ -196,7 +205,7 @@ def parseQueues(mode):
 
                 addToDeviceList(Key, printer_name, device_uri,back_end, ppd_fileType,PPDFileError, Is_Print_Q_Enabled)
     log.info("")
-    return mapofDevices
+    return mapofDevices,status
 
 
 # Validate and remove Queue
@@ -304,7 +313,7 @@ def parseDeviceURI(device_uri):
 def main_function(passwordObj = None, mode = GUI_MODE, ui_toolkit= UI_TOOLKIT_QT4, quiet_mode = False, DEVICE_URI=None):
     global Error_Found
     try:
-        from base import device, pml
+        from . import device, pml
         # This can fail due to hpmudext not being present
     except ImportError:
         log.error("Device library is not avail.")
@@ -312,39 +321,42 @@ def main_function(passwordObj = None, mode = GUI_MODE, ui_toolkit= UI_TOOLKIT_QT
 
     if mode == INTERACTIVE_MODE:
         try:
-            from base import password
+            from . import password
         except ImportError:
             log.warn("Failed to import password object")
         else:
             cups.setPasswordCallback(password.showPasswordPrompt)
 
-        mapofDevices = parseQueues(mode)
-        if mapofDevices.items() == 0:
-            log.debug("No queues found.")
+        mapofDevices,status = parseQueues(mode)
+        if status:
+            if list(mapofDevices.items()) == 0:
+                log.debug("No queues found.")
 
-        for key,val in mapofDevices.items():
-            if len(val) >1:
-                if not quiet_mode:
-                    Error_Found = True
-                    log.warn("%d queues of same device %s is configured.\nRemove unwanted queues."%(len(val),val[0].PrinterName))
+            for key,val in list(mapofDevices.items()):
+                if len(val) >1:
+                    if not quiet_mode:
+                        Error_Found = True
+                        log.warn("%d queues of same device %s is configured.\nRemove unwanted queues."%(len(val),val[0].PrinterName))
 
-                for que in val:
-                    reconfigure_Queue(que, mode)
-            else:
-                log.debug("")
-                log.debug("Single print queue is configured for '%s'. " %val[0].PrinterName)
-                reconfigure_Queue(val[0], mode)
-
-        SI_sts, error_str = smart_install.disable(mode, '', None, None, passwordObj)
-        if SI_sts != ERROR_NO_SI_DEVICE:
-            Error_Found = True
-
-        if Error_Found is False:
-            if not quiet_mode:
-                if len(mapofDevices) == 0:
-                    log.warn("No Queue(s) configured.")
+                    for que in val:
+                        reconfigure_Queue(que, mode)
                 else:
-                    log.info("Queue(s) configured correctly using HPLIP.")
+                    log.debug("")
+                    log.debug("Single print queue is configured for '%s'. " %val[0].PrinterName)
+                    reconfigure_Queue(val[0], mode)
+
+            SI_sts, error_str = smart_install.disable(mode, '', None, None, passwordObj)
+            if SI_sts != ERROR_NO_SI_DEVICE:
+                Error_Found = True
+
+            if Error_Found is False:
+                if not quiet_mode:
+                    if len(mapofDevices) == 0:
+                        log.warn("No Queue(s) configured.")
+                    else:
+                        log.info("Queue(s) configured correctly using HPLIP.")
+        else:
+            log.warn("Could not complete Queue(s) configuration check")
 
         cups.releaseCupsInstance()
 
@@ -365,34 +377,37 @@ def main_function(passwordObj = None, mode = GUI_MODE, ui_toolkit= UI_TOOLKIT_QT
         dialog = QueuesDiagnose(None, "","",QUEUES_MSG_SENDING,passwordObj)
 
         cups.setPasswordCallback(setupdialog.showPasswordUI)
-        mapofDevices = parseQueues(mode)
-        if mapofDevices.items() == 0:
-            log.debug("No queues found.")
+        mapofDevices,status = parseQueues(mode)
+        if status:
+            if list(mapofDevices.items()) == 0:
+                log.debug("No queues found.")
 
-        for key,val in mapofDevices.items():
-            if len(val) >1:
-                log.warn('%d queues of same device %s is configured.  Remove unwanted queues.' %(len(val),val[0].PrinterName))
-                if not quiet_mode:
-                    Error_Found = True
-                    dialog.showMessage("%d queues of same device %s is configured.\nRemove unwanted queues."%(len(val),val[0].PrinterName))
-                for que in val:
-                    reconfigure_Queue(que, mode, dialog,app)
+            for key,val in list(mapofDevices.items()):
+                if len(val) >1:
+                    log.warn('%d queues of same device %s is configured.  Remove unwanted queues.' %(len(val),val[0].PrinterName))
+                    if not quiet_mode:
+                        Error_Found = True
+                        dialog.showMessage("%d queues of same device %s is configured.\nRemove unwanted queues."%(len(val),val[0].PrinterName))
+                    for que in val:
+                        reconfigure_Queue(que, mode, dialog,app)
 
-            else:
-                log.debug("")
-                log.debug("Single print queue is configured for '%s'. " %val[0].PrinterName)
-                reconfigure_Queue(val[0], mode, dialog, app)
-
-        SI_sts, error_str = smart_install.disable(mode, ui_toolkit, dialog, app, passwordObj)
-        if SI_sts != ERROR_NO_SI_DEVICE:
-            Error_Found = True
-
-        if Error_Found is False:
-            if not quiet_mode:
-                if len(mapofDevices) == 0:
-                    msg= "No Queue(s) configured."
                 else:
-                    msg= "Queue(s) configured correctly using HPLIP."
-                dialog.showSuccessMessage(msg)
+                    log.debug("")
+                    log.debug("Single print queue is configured for '%s'. " %val[0].PrinterName)
+                    reconfigure_Queue(val[0], mode, dialog, app)
+
+            SI_sts, error_str = smart_install.disable(mode, ui_toolkit, dialog, app, passwordObj)
+            if SI_sts != ERROR_NO_SI_DEVICE:
+                Error_Found = True
+
+            if Error_Found is False:
+                if not quiet_mode:
+                    if len(mapofDevices) == 0:
+                        msg= "No Queue(s) configured."
+                    else:
+                        msg= "Queue(s) configured correctly using HPLIP."
+                    dialog.showSuccessMessage(msg)
+        else:
+            log.warn("Could not complete Queue(s) configuration check")
 
         cups.releaseCupsInstance()

@@ -25,17 +25,17 @@ import string
 
 # Local
 from base.g import *
-from base import device, utils, pml
+from base import device, pml
 from prnt import cups
 from base.codes import *
-from ui_utils import *
+from .ui_utils import *
 
 # Qt
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Ui
-from devicesetupdialog_base import Ui_Dialog
+from .devicesetupdialog_base import Ui_Dialog
 
 TAB_POWER_SETTINGS = 0
 
@@ -67,12 +67,12 @@ class DeviceSetupDialog(QDialog, Ui_Dialog):
         if self.device_uri:
             self.DeviceComboBox.setInitialDevice(self.device_uri)
 
-        self.DurationComboBox.addItem(self.__tr("15 minutes"), QVariant(15))
-        self.DurationComboBox.addItem(self.__tr("30 minutes"), QVariant(30))
-        self.DurationComboBox.addItem(self.__tr("45 minutes"), QVariant(45))
-        self.DurationComboBox.addItem(self.__tr("1 hour"), QVariant(60))
-        self.DurationComboBox.addItem(self.__tr("2 hours"), QVariant(120))
-        self.DurationComboBox.addItem(self.__tr("3 hours"), QVariant(180))
+        self.DurationComboBox.addItem(self.__tr("15 minutes"), 15)
+        self.DurationComboBox.addItem(self.__tr("30 minutes"), 30)
+        self.DurationComboBox.addItem(self.__tr("45 minutes"), 45)
+        self.DurationComboBox.addItem(self.__tr("1 hour"), 60)
+        self.DurationComboBox.addItem(self.__tr("2 hours"), 120)
+        self.DurationComboBox.addItem(self.__tr("3 hours"), 180)
 
         self.connect(self.DurationComboBox, SIGNAL("activated(int)"), self.DurationComboBox_activated)
 
@@ -83,7 +83,7 @@ class DeviceSetupDialog(QDialog, Ui_Dialog):
         i = self.DurationComboBox.currentIndex()
         if i == -1:
             return
-        v, ok = self.DurationComboBox.itemData(i).toInt()
+        v, ok = value_int(self.DurationComboBox.itemData(i))
         if not ok:
             return
 
@@ -155,7 +155,7 @@ class DeviceSetupDialog(QDialog, Ui_Dialog):
             self.OffRadioButton.setChecked(True)
 
             find = int(value)
-            index = self.DurationComboBox.findData(QVariant(find))
+            index = self.DurationComboBox.findData(find)
 
             if index != -1:
                 self.DurationComboBox.setCurrentIndex(index)
@@ -210,7 +210,7 @@ class DeviceSetupDialog(QDialog, Ui_Dialog):
             elif value == pml.OID_POWER_SETTINGS_3HR:
                 find = 180
 
-            index = self.DurationComboBox.findData(QVariant(find))
+            index = self.DurationComboBox.findData(find)
 
             if index != -1:
                 self.DurationComboBox.setCurrentIndex(index)
@@ -235,7 +235,7 @@ class DeviceSetupDialog(QDialog, Ui_Dialog):
     def DurationComboBox_activated(self, i):
         if i == -1:
             return
-        v, ok = self.DurationComboBox.itemData(i).toInt()
+        v, ok = value_int(self.DurationComboBox.itemData(i))
         if not ok:
             return
         if self.power_settings == POWER_SETTINGS_EPML:

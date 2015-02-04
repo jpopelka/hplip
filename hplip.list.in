@@ -186,6 +186,8 @@ f 0644 root root $ppd/HP prnt/ps/*.ppd.gz
 @epm_full@f 755 root root $home/hpssd.py hpssd.py
 @epm_full@d 775 root root $home/base -
 @epm_full@f 644 root root $home/base base/*.py
+@epm_full@d 775 root root $home/base/pexpect -
+@epm_full@f 644 root root $home/base/pexpect/__init__.py base/pexpect/__init__.py
 @epm_full@f 644 root root $home/hpaio.desc scan/sane/hpaio.desc
 @epm_full@f 755 root root $home/align.py align.py
 @epm_full@f 755 root root $home/timedate.py timedate.py

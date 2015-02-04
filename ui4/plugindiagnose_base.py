@@ -27,7 +27,7 @@ class Ui_Dialog(object):
         font.setPointSize(16)
         self.label.setFont(font)
         self.label.setObjectName("label")
-        self.gridlayout1.addWidget(self.label, 0, 0, 1, 1)
+        self.gridlayout1.addWidget(self.label, 0, 0, 1, 2)
         self.line = QtGui.QFrame(self.page)
         self.line.setFrameShape(QtGui.QFrame.HLine)
         self.line.setFrameShadow(QtGui.QFrame.Sunken)

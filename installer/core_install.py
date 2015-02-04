@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
@@ -25,7 +26,6 @@ import os
 import os.path
 import re
 import time
-import cStringIO
 import grp
 import pwd
 import tarfile
@@ -45,14 +45,12 @@ except ImportError:
         return sha.new(s).hexdigest()
 
 
-import urllib # TODO: Replace with urllib2 (urllib is deprecated in Python 3.0)
-
 
 # Local
 from base.g import *
 from base.codes import *
-from base import utils, pexpect, tui, password, services, os_utils
-from dcheck import *
+from base import utils, tui, password, services, os_utils
+from .dcheck import *
 
 
 
@@ -72,7 +70,8 @@ DEPENDENCY_RUN_TIME = 1
 DEPENDENCY_COMPILE_TIME = 2
 DEPENDENCY_RUN_AND_COMPILE_TIME = 3
 
-
+DEPENDENCY_REQUIRED_INDEX = 0
+DEPENDENCY_DISPLAY_INDEX = 2
 
 # Mapping from patterns to probability contribution of pattern
 # Example code from David Mertz' Text Processing in Python.
@@ -144,6 +143,49 @@ CONFIGURE_ERRORS = { 1 : "General/unknown error",
                    }
 
 
+EXTERNALDEP = 1
+GENERALDEP = 2
+COMPILEDEP = 3
+PYEXT = 4 
+SCANCONF = 5
+
+JPEG_STR        = "libjpeg - JPEG library"
+LIBTOOL_STR     = "libtool - Library building support services"
+CUPS_STR        = "CUPS - Common Unix Printing System"
+CUPS_DEV_STR    = "CUPS devel- Common Unix Printing System development files"
+CUPS_IMG_STR    = "CUPS image - CUPS image development files"
+GCC_STR         = "gcc - GNU Project C and C++ Compiler"
+MAKE_STR        = "make - GNU make utility to maintain groups of programs"
+THREAD_STR      = "libpthread - POSIX threads library"
+GS_STR          = "GhostScript - PostScript and PDF language interpreter and previewer"
+USB_STR         = "libusb - USB library"
+CUPS_DDK_STR    = "CUPS DDK - CUPS driver development kit"
+SANE_STR        = "SANE - Scanning library"
+SANE_DEV_STR    = "SANE - Scanning library development files"
+XSANE_STR       = "xsane - Graphical scanner frontend for SANE"
+SCANIMAGE_STR   = "scanimage - Shell scanning program"
+DBUS_STR        = "DBus - Message bus system"
+POLKIT_STR      = "PolicyKit - Administrative policy framework"
+SNMP_DEV_STR    = "libnetsnmp-devel - SNMP networking library development files"
+CRYPTO_STR      = "libcrypto - OpenSSL cryptographic library"
+NETWORK_STR     = "network -wget"
+AVAHI_STR       = "avahi-utils"
+PYTHON_STR      = "Python 2.2 or greater - Python programming language"
+PYNTF_STR       = "Python libnotify - Python bindings for the libnotify Desktop notifications"
+QT4DBUS_STR     = "PyQt 4 DBus - DBus Support for PyQt4"
+QT4_STR         = "PyQt 4- Qt interface for Python (for Qt version 4.x)"
+PYDBUS_STR      = "Python DBus - Python bindings for DBus"
+PYXML_STR       = "Python XML libraries"
+PY_DEV_STR      = "Python devel - Python development files"
+PIL_STR         = "PIL - Python Imaging Library (required for commandline scanning with hp-scan)"
+REPORTLAB_STR   = "Reportlab - PDF library for Python"
+CUPSEXT_STR     = 'CUPS-Extension'
+HPMUDEXT_STR    = 'IO-Extension'
+HPAIO_STR       = 'HPLIP-SANE-Backend'
+SCANEXT_STR     = 'Scan-SANE-Extension'
+QT_STR          = "Python-Qt"
+
+
 try:
     from functools import update_wrapper
 except ImportError: # using Python version < 2.5
@@ -167,7 +209,7 @@ else: # using Python 2.5+
 
 class CoreInstall(object):
     def __init__(self, mode=MODE_INSTALLER, ui_mode=INTERACTIVE_MODE, ui_toolkit='qt4'):
-        os.umask(0022)
+        os.umask(0o022)
         self.mode = mode
         self.ui_mode = ui_mode
         self.passwordObj = password.Password(ui_mode)
@@ -280,54 +322,97 @@ class CoreInstall(object):
         # Note: any change to the list of dependencies must be reflected in base/distros.py
         self.dependencies = {
             # Required base packages
-            'libjpeg':          (True,  ['base'], "libjpeg - JPEG library", self.check_libjpeg, DEPENDENCY_RUN_AND_COMPILE_TIME),
-            'libtool':          (True,  ['base'], "libtool - Library building support services", self.check_libtool, DEPENDENCY_COMPILE_TIME),
-            'cups' :            (True,  ['base'], 'CUPS - Common Unix Printing System', self.check_cups, DEPENDENCY_RUN_TIME),
-            'cups-devel':       (True,  ['base'], 'CUPS devel- Common Unix Printing System development files', self.check_cups_devel, DEPENDENCY_COMPILE_TIME),
-            'cups-image':       (True,  ['base'], "CUPS image - CUPS image development files", self.check_cups_image, DEPENDENCY_COMPILE_TIME),
-            'gcc' :             (True,  ['base'], 'gcc - GNU Project C and C++ Compiler', self.check_gcc, DEPENDENCY_COMPILE_TIME),
-            'make' :            (True,  ['base'], "make - GNU make utility to maintain groups of programs", self.check_make, DEPENDENCY_COMPILE_TIME),
-            'python-devel' :    (True,  ['base'], "Python devel - Python development files", self.check_python_devel, DEPENDENCY_COMPILE_TIME),
-            'libpthread' :      (True,  ['base'], "libpthread - POSIX threads library", self.check_libpthread, DEPENDENCY_RUN_AND_COMPILE_TIME),
-            'python2x':         (True,  ['base'], "Python 2.2 or greater - Python programming language", self.check_python2x, DEPENDENCY_RUN_AND_COMPILE_TIME),
-            'python-xml'  :     (True,  ['base'], "Python XML libraries", self.check_python_xml, DEPENDENCY_RUN_TIME),
-            'gs':               (True,  ['base'], "GhostScript - PostScript and PDF language interpreter and previewer", self.check_gs, DEPENDENCY_RUN_TIME),
-            'libusb':           (True,  ['base'], "libusb - USB library", self.check_libusb, DEPENDENCY_RUN_AND_COMPILE_TIME),
+            'libjpeg':          (True,  ['base'], JPEG_STR, self.check_libjpeg, DEPENDENCY_RUN_AND_COMPILE_TIME,'-',None, GENERALDEP),
+            'libtool':          (True,  ['base'], LIBTOOL_STR, self.check_libtool, DEPENDENCY_COMPILE_TIME,'-','libtool --version',COMPILEDEP),
+            'cups' :            (True,  ['base'], CUPS_STR, self.check_cups, DEPENDENCY_RUN_TIME,'1.1','cups-config --version', EXTERNALDEP),
+            'cups-devel':       (True,  ['base'], CUPS_DEV_STR, self.check_cups_devel, DEPENDENCY_COMPILE_TIME,'-','cups-config --version', GENERALDEP),
+            'cups-image':       (True,  ['base'], CUPS_IMG_STR, self.check_cups_image, DEPENDENCY_COMPILE_TIME,'-','cups-config --version', GENERALDEP),
+            'gcc' :             (True,  ['base'], GCC_STR, self.check_gcc, DEPENDENCY_COMPILE_TIME, '-','gcc --version',COMPILEDEP),
+            'make' :            (True,  ['base'], MAKE_STR, self.check_make, DEPENDENCY_COMPILE_TIME,'3.0','make --version',COMPILEDEP),
+            'libpthread' :      (True,  ['base'], THREAD_STR, self.check_libpthread, DEPENDENCY_RUN_AND_COMPILE_TIME, '-','FUNC#get_libpthread_version', GENERALDEP),
+            'gs':               (True,  ['base'], GS_STR, self.check_gs, DEPENDENCY_RUN_TIME, '7.05','gs --version', EXTERNALDEP),
+            'libusb':           (True,  ['base'], USB_STR, self.check_libusb, DEPENDENCY_RUN_AND_COMPILE_TIME, '-','FUNC#get_libusb_version', GENERALDEP),
 
             # Optional base packages
-            'cups-ddk':          (False, ['base'], "CUPS DDK - CUPS driver development kit", self.check_cupsddk, DEPENDENCY_RUN_TIME), # req. for .drv PPD installs
+            'cups-ddk':          (False, ['base'], CUPS_DDK_STR, self.check_cupsddk, DEPENDENCY_RUN_TIME,'-',None, GENERALDEP), # req. for .drv PPD installs
 
 
             # Required scan packages
-            'sane':             (True,  ['scan'], "SANE - Scanning library", self.check_sane, DEPENDENCY_RUN_TIME),
-            'sane-devel' :      (True,  ['scan'], "SANE - Scanning library development files", self.check_sane_devel, DEPENDENCY_COMPILE_TIME),
+            'sane':             (True,  ['scan'], SANE_STR, self.check_sane, DEPENDENCY_RUN_TIME,'-','sane-config --version',GENERALDEP),
+            'sane-devel' :      (True,  ['scan'], SANE_DEV_STR, self.check_sane_devel, DEPENDENCY_COMPILE_TIME,'-','sane-config --version',GENERALDEP),
 
             # Optional scan packages
-            'xsane':            (False, ['scan'], "xsane - Graphical scanner frontend for SANE", self.check_xsane, DEPENDENCY_RUN_TIME),
-            'scanimage':        (False, ['scan'], "scanimage - Shell scanning program", self.check_scanimage, DEPENDENCY_RUN_TIME),
-            'pil':              (False, ['scan'], "PIL - Python Imaging Library (required for commandline scanning with hp-scan)", self.check_pil, DEPENDENCY_RUN_TIME),
+            'xsane':            (False, ['scan'], XSANE_STR, self.check_xsane, DEPENDENCY_RUN_TIME,'0.9','FUNC#get_xsane_version', EXTERNALDEP),
+            'scanimage':        (False, ['scan'], SCANIMAGE_STR, self.check_scanimage, DEPENDENCY_RUN_TIME, '1.0','scanimage --version', EXTERNALDEP),
 
             # Required fax packages
-            'python23':         (True,  ['fax'], "Python 2.3 or greater - Required for fax functionality", self.check_python23, DEPENDENCY_RUN_TIME),
-            'dbus':             (True,  ['fax'], "DBus - Message bus system", self.check_dbus, DEPENDENCY_RUN_AND_COMPILE_TIME),
-            'python-dbus':      (True,  ['fax'], "Python DBus - Python bindings for DBus", self.check_python_dbus, DEPENDENCY_RUN_TIME),
-
-            # Optional fax packages
-            'reportlab':        (False, ['fax'], "Reportlab - PDF library for Python", self.check_reportlab, DEPENDENCY_RUN_TIME),
+            'dbus':             (True,  ['fax'], DBUS_STR, self.check_dbus, DEPENDENCY_RUN_AND_COMPILE_TIME, '-','dbus-daemon --version', EXTERNALDEP),
 
             # Required and optional qt4 GUI packages
-            'pyqt4':            (True,  ['gui_qt4'], "PyQt 4- Qt interface for Python (for Qt version 4.x)", self.check_pyqt4, DEPENDENCY_RUN_TIME), # PyQt 4.x )
-            'pyqt4-dbus' :      (True,  ['gui_qt4'], "PyQt 4 DBus - DBus Support for PyQt4", self.check_pyqt4_dbus, DEPENDENCY_RUN_TIME),
-            'policykit':        (False, ['gui_qt4'], "PolicyKit - Administrative policy framework", self.check_policykit, DEPENDENCY_RUN_TIME), # optional for non-sudo behavior of plugins (only optional for Qt4 option)
-            'python-notify' :   (False, ['gui_qt4'], "Python libnotify - Python bindings for the libnotify Desktop notifications", self.check_pynotify, DEPENDENCY_RUN_TIME), # Optional for libnotify style popups from hp-systray
+            'policykit':        (False, ['gui_qt4'], POLKIT_STR, self.check_policykit, DEPENDENCY_RUN_TIME,'-','pkexec --version', EXTERNALDEP), # optional for non-sudo behavior of plugins (only optional for Qt4 option)
 
             # Required network I/O packages
-            'libnetsnmp-devel': (True,  ['network'], "libnetsnmp-devel - SNMP networking library development files", self.check_libnetsnmp, DEPENDENCY_RUN_AND_COMPILE_TIME),
-            'libcrypto':        (True,  ['network'], "libcrypto - OpenSSL cryptographic library", self.check_libcrypto, DEPENDENCY_RUN_AND_COMPILE_TIME),
-            'network':        (False, ['network'], "network -wget", self.check_wget, DEPENDENCY_RUN_TIME),
-            'avahi-utils':        (False, ['network'], "avahi-utils", self.check_avahi_utils, DEPENDENCY_RUN_TIME),
-#            'passwd_util':        (False, ['gui_qt4'], "GUI Password utility (gksu/kdesu)", self.check_passwd_util, DEPENDENCY_RUN_TIME),
+            'libnetsnmp-devel': (True,  ['network'], SNMP_DEV_STR, self.check_libnetsnmp, DEPENDENCY_RUN_AND_COMPILE_TIME,'5.0.9','net-snmp-config --version', GENERALDEP),
+            'libcrypto':        (True,  ['network'], CRYPTO_STR, self.check_libcrypto, DEPENDENCY_RUN_AND_COMPILE_TIME, '-','openssl version', GENERALDEP),
+            'network':        (False, ['network'], NETWORK_STR, self.check_wget, DEPENDENCY_RUN_TIME,'-','wget --version', EXTERNALDEP),
+            'avahi-utils':        (False, ['network'], AVAHI_STR, self.check_avahi_utils, DEPENDENCY_RUN_TIME, '-','avahi-browse --version', EXTERNALDEP),
         }
+        
+        python2_dep = {
+            'python2X':         (True,  ['base'], PYTHON_STR, self.check_python, DEPENDENCY_RUN_AND_COMPILE_TIME,'2.2','python --version',GENERALDEP),
+            'python-notify' :   (False, ['gui_qt4'], PYNTF_STR, self.check_pynotify, DEPENDENCY_RUN_TIME,'-','python-notify --version',GENERALDEP), # Optional for libnotify style popups from hp-systray
+            'pyqt4-dbus' :      (True,  ['gui_qt4'], QT4DBUS_STR, self.check_pyqt4_dbus, DEPENDENCY_RUN_TIME,'4.0','FUNC#get_pyQt4_version', GENERALDEP),
+            'pyqt4':            (True,  ['gui_qt4'], QT4_STR, self.check_pyqt4, DEPENDENCY_RUN_TIME,'4.0','FUNC#get_pyQt4_version', GENERALDEP), # PyQt 4.x )
+            'python-dbus':      (True,  ['fax'], PYDBUS_STR, self.check_python_dbus, DEPENDENCY_RUN_TIME,'0.80.0','FUNC#get_python_dbus_ver', GENERALDEP),
+            'python-xml'  :     (True,  ['base'], PYXML_STR, self.check_python_xml, DEPENDENCY_RUN_TIME,'-','FUNC#get_python_xml_version',GENERALDEP),
+            'python-devel' :    (True,  ['base'], PY_DEV_STR, self.check_python_devel, DEPENDENCY_COMPILE_TIME,'2.2','python --version',GENERALDEP),
+            'pil':              (False, ['scan'], PIL_STR, self.check_pil, DEPENDENCY_RUN_TIME,'-','FUNC#get_pil_version',GENERALDEP),
+            # Optional fax packages
+            'reportlab':        (False, ['fax'], REPORTLAB_STR, self.check_reportlab, DEPENDENCY_RUN_TIME,'2.0','FUNC#get_reportlab_version',GENERALDEP),
+
+        }
+
+        python3_dep = {
+            'python3X':           (True,  ['base'], PYTHON_STR, self.check_python, DEPENDENCY_RUN_AND_COMPILE_TIME,'2.2','python --version',GENERALDEP),
+            'python3-notify2' :   (False, ['gui_qt4'], PYNTF_STR, self.check_pynotify, DEPENDENCY_RUN_TIME,'-','python-notify --version',GENERALDEP), # Optional for libnotify style popups from hp-systray
+            'python3-pyqt4-dbus': (False,  ['gui_qt4'], QT4DBUS_STR, self.check_pyqt4_dbus, DEPENDENCY_RUN_TIME,'4.0','FUNC#get_pyQt4_version', GENERALDEP),
+            'python3-pyqt4':      (True,  ['gui_qt4'], QT4_STR, self.check_pyqt4, DEPENDENCY_RUN_TIME,'4.0','FUNC#get_pyQt4_version', GENERALDEP), # PyQt 4.x )
+            'python3-dbus':       (True,  ['fax'], PYDBUS_STR, self.check_python_dbus, DEPENDENCY_RUN_TIME,'0.80.0','FUNC#get_python_dbus_ver', GENERALDEP),
+            'python3-xml'  :      (True,  ['base'], PYXML_STR, self.check_python_xml, DEPENDENCY_RUN_TIME,'-','FUNC#get_python_xml_version',GENERALDEP),
+            'python3-devel' :     (True,  ['base'], PY_DEV_STR, self.check_python_devel, DEPENDENCY_COMPILE_TIME,'2.2','python --version',GENERALDEP),
+            'python3-pil':        (False, ['scan'], PIL_STR, self.check_pil, DEPENDENCY_RUN_TIME,'-','FUNC#get_pil_version',GENERALDEP),
+            # Optional fax packages
+            'python3-reportlab':  (False, ['fax'], REPORTLAB_STR, self.check_reportlab, DEPENDENCY_RUN_TIME,'2.0','FUNC#get_reportlab_version',GENERALDEP),
+        }
+
+        from base.sixext import PY3
+
+        if PY3:
+            self.dependencies.update(python3_dep)
+        else:
+            self.dependencies.update(python2_dep)
+
+        self.hplip_dependencies ={
+            'cupsext' :         (True,  ['base'], CUPSEXT_STR, self.check_cupsext,DEPENDENCY_RUN_AND_COMPILE_TIME,'-','FUNC#get_HPLIP_version',PYEXT),
+            'hpmudext' :        (True,  ['base'], HPMUDEXT_STR, self.check_hpmudext,DEPENDENCY_RUN_AND_COMPILE_TIME,'-','FUNC#get_HPLIP_version',PYEXT),
+            'hpaio' :           (True,  ['scan'], HPAIO_STR, self.check_hpaio,DEPENDENCY_RUN_AND_COMPILE_TIME,'-','FUNC#get_HPLIP_version',SCANCONF), 
+            'scanext' :           (True,  ['scan'], SCANEXT_STR, self.check_scanext,DEPENDENCY_RUN_AND_COMPILE_TIME,'-','FUNC#get_HPLIP_version',SCANCONF), 
+            'pyqt':            (True,  ['gui_qt'], QT_STR, self.check_pyqt,DEPENDENCY_RUN_AND_COMPILE_TIME,'2.3','FUNC#get_pyQt_version',GENERALDEP), 
+        }
+
+        self.version_func={
+            'FUNC#get_python_dbus_ver':get_python_dbus_ver,
+            'FUNC#get_pyQt4_version':get_pyQt4_version,
+            'FUNC#get_pyQt_version':get_pyQt_version,
+            'FUNC#get_reportlab_version':get_reportlab_version,
+            'FUNC#get_xsane_version':get_xsane_version,
+            'FUNC#get_pil_version':get_pil_version,
+            'FUNC#get_libpthread_version':get_libpthread_version,
+            'FUNC#get_python_xml_version':get_python_xml_version,
+            'FUNC#get_HPLIP_version':get_HPLIP_version,
+            'FUNC#get_libusb_version':get_libusb_version,
+            }
+
 
         for opt in self.options:
             update_spinner()
@@ -486,40 +571,41 @@ class CoreInstall(object):
 
     def get_distro(self):
         log.debug("Determining distro...")
-        name, ver = '','0.0'
+        name, ver = '', '0.0'
         found = False
 
+        # Getting distro information using platform module
         try:
             import platform
             name = platform.dist()[0].lower()
             ver = platform.dist()[1]
             found = True
-        except:
+        except ImportError:
             found = False
-
+        
         # Getting distro information using lsb_release command
         # platform retrurn 'redhat' even for 'RHEL' so re-reading using lsb_release.
-
-        if not found:
-            lsb_release = utils.which("lsb_release")
-            if lsb_release:
+        if not found or name == 'redhat': 
+            lsb_rel = utils.which("lsb_release", True)
+            if lsb_rel:
                 log.debug("Using 'lsb_release -is/-rs'")
-                cmd = os.path.join(lsb_release, "lsb_release")
-                status, name = utils.run(cmd + ' -is', self.passwordObj)
+                status, name = utils.run(lsb_rel + ' -is', self.passwordObj)
                 if not status and name:
-                    status, ver = utils.run(cmd + ' -rs', self.passwordObj)
-                    found = True
+                    status, ver = utils.run(lsb_rel + ' -rs', self.passwordObj)
+                    if not status and ver:
+                        ver = ver.lower().strip()
+                        found = True
 
-        if not found:
+        # Getting distro information using /etc/issue file
+        if not found: 
             try:
-                name = file('/etc/issue', 'r').read().lower().strip()
+                name = open('/etc/issue', 'r').read().lower().strip()
             except IOError:
-                # Some O/Ss don't have /etc/issue (Mac)
                 found = False
             else:
                 found = True
                 for n in name.split():
-                    m = n
+                    m= n
                     if '.' in n:
                         m = '.'.join(n.split('.')[:2])
 
@@ -527,32 +613,22 @@ class CoreInstall(object):
                         ver = float(m)
                     except ValueError:
                         try:
-                           ver =  int(m)
+                            ver = int(m)
                         except ValueError:
                             ver = '0.0'
-                        else:
-                            ver = m
-                            break
-                    else:
-                        ver = m
-                        break
 
-                    log.debug("/etc/issue: %s %s" % (name, ver))
-
-
+        # Updating the distro name and version.
         if found:
             name = name.lower().strip()
-            if name in ("redhatenterprise","redhat"):
+            log.debug("Distro name=%s" % name)
+            if name.find("redhatenterprise") > -1  or name.find("redhat") > -1:
                 name="rhel"
 
-            log.debug("Distro name=%s" % name)
-
-            ver = ver.lower().strip()
-
-            if name == "rhel" and ver[0] in ("5","6","7"):
-                ver = ver[0] + ".0"
-
             log.debug("Distro version=%s" % ver)
+            if name == "rhel" and ver[0] == "5" and ver[1] == ".":
+                ver="5.0"
+            elif name == "rhel" and ver[0] == "6" and ver[1] == ".":
+                ver="6.0"
 
             found_in_list = False
             for d in self.distros:
@@ -565,12 +641,12 @@ class CoreInstall(object):
                             self.distro = self.distros[d]['index']
                             found_in_list = True
                             break
-
                 if found_in_list:
                     break
-            self.distro_version = ver
 
+            self.distro_version = ver 
         else:
+            log.warn("Failed to get the distro information.")
             self.distro, self.distro_version = DISTRO_UNKNOWN, '0.0'
 
         log.debug("distro=%d, distro_version=%s" % (self.distro, self.distro_version))
@@ -732,13 +808,14 @@ class CoreInstall(object):
                         vv = self.distros[distro]['versions'][v].copy()
                         vv['same_as_version'] = v
                         self.distros[distro]['versions'][ver] = vv
-
                         for key in distros_dat.keys(ver_section):
                            vv[key] = self.__fixup_data(key, distros_dat.get(ver_section, key))
-
                     except KeyError:
                         log.debug("Missing 'same_as_version=' version in distros.dat for section [%s:%s]." % (distro, v))
                         continue
+
+        #import pprint
+        #pprint.pprint(self.distros)
 
     def pre_install(self):
         pass
@@ -748,11 +825,12 @@ class CoreInstall(object):
         pass
 
 
-    def check_python2x(self):
+    def check_python(self):
         py_ver = sys.version_info
         py_major_ver, py_minor_ver = py_ver[:2]
         log.debug("Python ver=%d.%d" % (py_major_ver, py_minor_ver))
         return py_major_ver >= 2
+    
 
 
     def check_gcc(self):
@@ -899,14 +977,24 @@ class CoreInstall(object):
 
 
     def check_python_devel(self):
-        return check_file('Python.h')
+        dir_list = glob.glob('/usr/include/python%d*'%sys.version_info[0])
+        Found = False
+        for p in dir_list:
+              if check_file('Python.h',dir=p):
+                   Found = True
+                   break
+
+        return Found
 
 
     def check_pynotify(self):
         try:
-            import pynotify
-        except ImportError, RuntimeError:
-            return False
+            import notify2
+        except (ImportError, RuntimeError):
+            try:
+                import pynotify
+            except (ImportError, RuntimeError):
+                return False
         return True
 
 
@@ -1043,7 +1131,7 @@ class CoreInstall(object):
         for path in ['/etc/sane.d/dll.conf','/etc/sane.d/dll.d/hpaio', '/etc/sane.d/dll.d/hplip']:
             log.debug("'Checking for hpaio' in '%s'..." % path)
             try:
-                f = file(path, 'r')
+                f = open(path, 'r')
             except IOError:
                 log.info("'%s' not found." % path)
             else:
@@ -1071,10 +1159,9 @@ class CoreInstall(object):
             if os.path.exists(usrlib_dir+'sane/libsane-hpaio.so.1'):
                 log.debug("'Updating hpaio' in '/etc/sane.d/dll.conf'...")
                 try:
-                    f = file('/etc/sane.d/dll.conf', 'r')
+                    f = open('/etc/sane.d/dll.conf', 'r')
                 except IOError:
                     log.error("'/etc/sane.d/dll.conf' not found. Creating dll.conf file")
-#                    f = file('/etc/sane.d/dll.conf', 'a+')
                     cmd = self.passwordObj.getAuthCmd()%'touch /etc/sane.d/dll.conf'
                     log.debug("cmd=%s"%cmd)
                     utils.run(cmd, self.passwordObj)
@@ -1093,13 +1180,13 @@ class CoreInstall(object):
                     log.debug("cmd=%s"%cmd)
                     utils.run(cmd, self.passwordObj)
                     try:
-                        f = file('/etc/sane.d/dll.conf', 'a+')
+                        f = open('/etc/sane.d/dll.conf', 'a+')
                     except IOError:
                         log.error("'/etc/sane.d/dll.conf' not found. Creating dll.conf file")
                     else:
                         f.write('hpaio')
                         f.close()
-                    actv_permissions = st.st_mode &0777
+                    actv_permissions = st.st_mode &0o777
                     cmd = 'chmod %o /etc/sane.d/dll.conf'%actv_permissions
                     cmd= self.passwordObj.getAuthCmd()%cmd
                     log.debug("cmd=%s"%cmd)
@@ -1159,7 +1246,10 @@ class CoreInstall(object):
     def configure(self):
         configure_cmd = './configure'
         configuration = {}
-        dbus_avail = self.have_dependencies['dbus'] and self.have_dependencies['python-dbus']
+        if PY3:
+            dbus_avail = self.have_dependencies['dbus'] and self.have_dependencies['python3-dbus']
+        else:
+            dbus_avail = self.have_dependencies['dbus'] and self.have_dependencies['python-dbus']
         configuration['network-build'] = self.selected_options['network']
         configuration['fax-build'] = self.selected_options['fax'] and dbus_avail
         configuration['dbus-build'] = dbus_avail
@@ -1268,6 +1358,10 @@ class CoreInstall(object):
             else:
                 configure_cmd += ' --disable-%s' % c
 
+        # For Unit/Functional testing changes.
+        if ".internal" in prop.version and os.path.exists('testcommon/'):
+            configure_cmd += ' --enable-hplip_testing_flag'
+
         return configure_cmd
 
     def configure_html(self):
@@ -1297,40 +1391,40 @@ class CoreInstall(object):
         if self.fax_supported is None:
             configure_cmd += ' --disable-fax-build --disable-dbus-build'
         else:
-	    configure_cmd += ' --enable-fax-build --enable-dbus-build'
+            configure_cmd += ' --enable-fax-build --enable-dbus-build'
 
         self.network_supported = self.get_distro_ver_data('network_supported')
         if self.network_supported is None:
             configure_cmd += ' --disable-network-build'
-	else:
-	    configure_cmd += ' --enable-network-build'
+        else:
+            configure_cmd += ' --enable-network-build'
           
         self.scan_supported = self.get_distro_ver_data('scan_supported')
         if self.scan_supported is None:
             configure_cmd += ' --disable-scan-build'
-	else:
-	    configure_cmd += ' --enable-scan-build'
+        else:
+            configure_cmd += ' --enable-scan-build'
   
         self.policykit = self.get_distro_ver_data('policykit')
         if self.policykit is not None and self.policykit == 1:
             configure_cmd += ' --enable-policykit'
-	else:
-	    configure_cmd += ' --disable-policykit'
+        else:
+            configure_cmd += ' --disable-policykit'
 
         self.libusb01 = self.get_distro_ver_data('libusb01')
         if self.libusb01 is not None and self.libusb01 == 1:
             configure_cmd += ' --enable-libusb01_build'
-	else:
-	    configure_cmd += ' --disable-libusb01_build'
+        else:
+            configure_cmd += ' --disable-libusb01_build'
 
         self.udev_sysfs_rule = self.get_distro_ver_data('udev_sysfs_rule')
         if self.udev_sysfs_rule is not None and self.udev_sysfs_rule == 1:
             configure_cmd += ' --enable-udev_sysfs_rules'
-	else:
-	    configure_cmd += ' --disable-udev_sysfs_rules'
+        else:
+            configure_cmd += ' --disable-udev_sysfs_rules'
 
         configure_cmd += ' --enable-doc-build'
-	
+        
         return configure_cmd
 
 
@@ -1385,7 +1479,7 @@ class CoreInstall(object):
 
 
     def get_dependency_commands(self):
-        dd = self.dependencies.keys()
+        dd = list(self.dependencies.keys())
         dd.sort()
         commands_to_run = []
         packages_to_install = []
@@ -1444,50 +1538,25 @@ class CoreInstall(object):
         return num_opt_missing
 
 
-    def missing_required_dependencies(self): # missing req. deps in req. options
-        for opt in self.components[self.selected_component][1]:
-            if self.options[opt][0]: # required options
-                for d in self.options[opt][2]: # dependencies for option
-                    if self.dependencies[d][0]: # required option
-                        if not self.have_dependencies[d]: # missing
-                            log.debug("Missing required dependency: %s" % d)
-                            yield d, self.dependencies[d][2], opt
-                            # depend, desc, option
+    def missing_required_dependencies(self): # missing req. deps for selected components
+        for comp in self.components[self.selected_component][1]:
+            if self.selected_options[comp]:     # if the component was selected
+                for dep in self.options[comp][2]: # dependencies for this component
+                    if self.dependencies[dep][DEPENDENCY_REQUIRED_INDEX]: # Is it required dependency?
+                        if not self.have_dependencies[dep]: # Is it not already installed?
+                            log.debug("Missing required dependency: %s" % dep)
+                            yield dep, self.dependencies[dep][DEPENDENCY_DISPLAY_INDEX], comp
+
 
     def missing_optional_dependencies(self):
-        # missing deps in opt. options
-        for opt in self.components[self.selected_component][1]:
-            if not self.options[opt][0]: # not required option
-                if self.selected_options[opt]: # only for options that are ON
-                    for d in self.options[opt][2]: # dependencies
-                        if not self.have_dependencies[d]: # missing dependency
-                            log.debug("Missing optional dependency: %s" % d)
-                            yield d, self.dependencies[d][2], self.dependencies[d][0], opt
-                            # depend, desc, required_for_opt, opt
+        for comp in self.components[self.selected_component][1]:
+            if self.selected_options[comp]: # if the component was selected
+                for dep in self.options[comp][2]: # dependencies for this component
+                    if not self.dependencies[dep][DEPENDENCY_REQUIRED_INDEX]: # Is it optional dependency?
+                        if not self.have_dependencies[dep]: # Is it not already installed?
+                            log.debug("Missing optional dependency: %s" % dep)
+                            yield dep, self.dependencies[dep][DEPENDENCY_DISPLAY_INDEX], self.dependencies[dep][0], comp
 
-        # opt. deps in req. options
-        for opt in self.components[self.selected_component][1]:
-            if self.options[opt][0]: # required options
-                for d in self.options[opt][2]: # dependencies for option
-                    if d == 'cups-ddk':
-                        status, output = utils.run('cups-config --version', self.passwordObj)
-                        import string
-                        if status == 0 and (string.count(output, '.') == 1 or string.count(output, '.') == 2):
-                            if string.count(output, '.') == 1:
-                                major, minor = string.split(output, '.', 2)
-                            if string.count(output, '.') == 2:
-                                major, minor, release = string.split(output, '.', 3)
-                            if len(minor) > 1 and minor[1] >= '0' and minor[1] <= '9':
-                                minor = ((ord(minor[0]) - ord('0')) * 10) + (ord(minor[1]) - ord('0'))
-                            else:
-                                minor = ord(minor[0]) - ord('0')
-                            if major > '1' or (major == '1' and minor >= 4):
-                                continue
-                if not self.dependencies[d][0]: # optional dep
-                        if not self.have_dependencies[d]: # missing
-                            log.debug("Missing optional dependency: %s" % d)
-                            yield d, self.dependencies[d][2], self.dependencies[d][0], opt
-                            # depend, desc, option
 
     def select_options(self, answer_callback):
         num_opt_missing = 0
@@ -1679,7 +1748,7 @@ class CoreInstall(object):
         """
         err_score = 0.0
 
-        for pat, prob in err_pats.items():
+        for pat, prob in list(err_pats.items()):
             if err_score > 0.9: break
             if re.search(pat, page):
                 err_score += prob
@@ -1937,6 +2006,8 @@ class CoreInstall(object):
             Is_pkg_mgr_running = True
 
         return User_exit, Is_pkg_mgr_running
+
+
 
 
     #add_groups_to_user()

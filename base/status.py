@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
@@ -19,28 +20,17 @@
 # Author: Don Welch, Narla Naga Samrat Chowdary, Yashwant Kumar Sahu
 #
 
-from __future__ import division
+
 
 # Std Lib
 import struct
-import cStringIO
-from base.g import *
-try:
-   import xml.parsers.expat as expat
-except ImportError,e:
-   log.info("\n")
-   log.error("Failed to import xml.parsers.expat(%s).\nThis may be due to the incompatible version of python-xml package.\n"%(e))
-   if "undefined symbol" in str(e):
-       log.info(log.blue("Please re-install compatible version (other than 2.7.2-7.14.1) due to bug reported at 'https://bugzilla.novell.com/show_bug.cgi?id=766778'."))
-       log.info(log.blue("\n        Run the following commands in root mode to change the python-xml package.(i.e Installing 2.7.2-7.1.2)"))
-       log.info(log.blue("\n        Using zypper:\n        'zypper remove python-xml'\n        'zypper install python-xml-2.7.2-7.1.2'"))
-       log.info(log.blue("\n        Using apt-get:\n        'apt-get remove python-xml'\n        'apt-get install python-xml-2.7.2-7.1.2'"))
-       log.info(log.blue("\n        Using yum:\n        'yum remove python-xml'\n        'yum install python-xml-2.7.2-7.1.2'"))
+import io
+from .sixext import BytesIO, to_bytes_utf8, to_bytes_latin, to_string_latin, to_long
 
-   sys.exit(1)
-
+from .g import *
+import xml.parsers.expat as expat
 import re
-import urllib
+
 try:
     from xml.etree import ElementTree
     etree_loaded = True
@@ -53,11 +43,10 @@ except ImportError:
     etree_loaded = False
 
 # Local
-from g import *
-from codes import *
-import pml, utils
+from .g import *
+from .codes import *
+from . import pml, utils
 import hpmudext
-
 """
 status dict structure:
     { 'revision' :     STATUS_REV_00 .. STATUS_REV_04,
@@ -181,19 +170,19 @@ def parseSStatus(s, z=''):
 
         assert STATUS_REV_00 <= revision <= STATUS_REV_04
 
-        top_door = bool(s1[2] & 0x8L) + s1[2] & 0x1L
-        supply_door = bool(s1[3] & 0x8L) + s1[3] & 0x1L
-        duplexer = bool(s1[4] & 0xcL) +  s1[4] & 0x1L
-        photo_tray = bool(s1[5] & 0x8L) + s1[5] & 0x1L
+        top_door = bool(s1[2] & to_long(0x8)) + s1[2] & to_long(0x1)
+        supply_door = bool(s1[3] & to_long(0x8)) + s1[3] & to_long(0x1)
+        duplexer = bool(s1[4] & to_long(0xc)) +  s1[4] & to_long(0x1)
+        photo_tray = bool(s1[5] & 0x8) + s1[5] & 0x1
 
         if revision == STATUS_REV_02:
-            in_tray1 = bool(s1[6] & 0x8L) + s1[6] & 0x1L
-            in_tray2 = bool(s1[7] & 0x8L) + s1[7] & 0x1L
+            in_tray1 = bool(s1[6] & to_long(0x8)) + s1[6] & to_long(0x1)
+            in_tray2 = bool(s1[7] & to_long(0x8)) + s1[7] & to_long(0x1)
         else:
-            in_tray1 = bool(s1[6] & 0x8L)
-            in_tray2 = bool(s1[7] & 0x8L)
+            in_tray1 = bool(s1[6] & to_long(0x8))
+            in_tray2 = bool(s1[7] & to_long(0x8))
 
-        media_path = bool(s1[8] & 0x8L) + (s1[8] & 0x1L) + ((bool(s1[18] & 0x2L))<<1)
+        media_path = bool(s1[8] & to_long(0x8)) + (s1[8] & to_long(0x1)) + ((bool(s1[18] & to_long(0x2)))<<1)
         status_pos = STATUS_POS[revision]
         status_byte = s1[status_pos]<<4
         if status_byte != 48:
@@ -207,30 +196,30 @@ def parseSStatus(s, z=''):
 
         log.debug("num_pens = %d" % num_pens)
         for p in range(num_pens):
-            info = long(s[c : c + pen_data_size], 16)
+            info = int(s[c : c + pen_data_size], 16)
 
             pen['index'] = index
 
             if pen_data_size == 4:
-                pen['type'] = REVISION_2_TYPE_MAP.get(int((info & 0xf000L) >> 12L), 0)
+                pen['type'] = REVISION_2_TYPE_MAP.get(int((info & to_long(0xf000)) >> to_long(12)), 0)
 
                 if index < (num_pens / 2):
                     pen['kind'] = AGENT_KIND_HEAD
                 else:
                     pen['kind'] = AGENT_KIND_SUPPLY
 
-                pen['level-trigger'] = int ((info & 0x0e00L) >> 9L)
-                pen['health'] = int((info & 0x0180L) >> 7L)
-                pen['level'] = int(info & 0x007fL)
+                pen['level-trigger'] = int ((info & to_long(0x0e00)) >> to_long(9))
+                pen['health'] = int((info & to_long(0x0180)) >> to_long(7))
+                pen['level'] = int(info & to_long(0x007f))
                 pen['id'] = 0x1f
 
             elif pen_data_size == 8:
-                pen['kind'] = bool(info & 0x80000000L) + ((bool(info & 0x40000000L))<<1L)
-                pen['type'] = int((info & 0x3f000000L) >> 24L)
-                pen['id'] = int((info & 0xf80000) >> 19L)
-                pen['level-trigger'] = int((info & 0x70000L) >> 16L)
-                pen['health'] = int((info & 0xc000L) >> 14L)
-                pen['level'] = int(info & 0xffL)
+                pen['kind'] = bool(info & to_long(0x80000000)) + ((bool(info & to_long(0x40000000)))<<to_long(1))
+                pen['type'] = int((info & to_long(0x3f000000)) >> to_long(24))
+                pen['id'] = int((info & 0xf80000) >> to_long(19))
+                pen['level-trigger'] = int((info & to_long(0x70000)) >> to_long(16))
+                pen['health'] = int((info & to_long(0xc000)) >> to_long(14))
+                pen['level'] = int(info & to_long(0xff))
 
             else:
                 log.error("Pen data size error")
@@ -238,11 +227,11 @@ def parseSStatus(s, z=''):
             if len(z1) > 0:
                 # TODO: Determine cause of IndexError for C6100 (defect #1111)
                 try:
-                    pen['dvc'] = long(z1s[d+1:d+5], 16)
-                    pen['virgin'] = bool(z1[d+5] & 0x8L)
-                    pen['hp-ink'] = bool(z1[d+5] & 0x4L)
-                    pen['known'] = bool(z1[d+5] & 0x2L)
-                    pen['ack'] = bool(z1[d+5] & 0x1L)
+                    pen['dvc'] = int(z1s[d+1:d+5], 16)
+                    pen['virgin'] = bool(z1[d+5] & to_long(0x8))
+                    pen['hp-ink'] = bool(z1[d+5] & to_long(0x4))
+                    pen['known'] = bool(z1[d+5] & to_long(0x2))
+                    pen['ack'] = bool(z1[d+5] & to_long(0x1))
                 except IndexError:
                     pen['dvc'] = 0
                     pen['virgin'] = 0
@@ -258,7 +247,7 @@ def parseSStatus(s, z=''):
             c += pen_data_size
             d += Z_SIZE
 
-    except (IndexError, ValueError, TypeError), e:
+    except (IndexError, ValueError, TypeError) as e:
         log.warn("Status parsing error: %s" % str(e))
 
     return {'revision' :    revision,
@@ -479,7 +468,7 @@ def StatusType3( dev, parsedID ): # LaserJet Status (PML/SNMP)
                }
 
     try:
-        detected_error_state = struct.unpack( 'B', value[0])[0]
+        detected_error_state = struct.unpack( 'B', to_bytes_latin(value[0]))[0]
     except (IndexError, TypeError):
         detected_error_state = pml.DETECTED_ERROR_STATE_OFFLINE_MASK
 
@@ -613,7 +602,8 @@ def StatusType3( dev, parsedID ): # LaserJet Status (PML/SNMP)
             else:
                 agent_health = AGENT_HEALTH_OK
 
-        agent_level = int(agent_level/agent_max * 100)
+        agent_level = int(float(agent_level)/agent_max * 100)
+
 
         log.debug("agent%d: kind=%d, type=%d, health=%d, level=%d, level-trigger=%d" % \
             (x, agent_kind, agent_type, agent_health, agent_level, agent_trigger))
@@ -687,12 +677,12 @@ def setup_panel_translator():
                     '='    : '\x20',
                 })
 
-    frm, to = '', ''
-    map_keys = map.keys()
+    frm, to = to_bytes_latin(''), to_bytes_latin('')
+    map_keys = list(map.keys())
     map_keys.sort()
     for x in map_keys:
-        frm = ''.join([frm, x])
-        to = ''.join([to, map[x]])
+        frm = to_bytes_latin('').join([frm, to_bytes_latin(x)])
+        to = to_bytes_latin('').join([to, to_bytes_latin(map[x])])
 
     global PANEL_TRANSLATOR_FUNC
     PANEL_TRANSLATOR_FUNC = utils.Translator(frm, to)
@@ -702,7 +692,7 @@ setup_panel_translator()
 
 
 def PanelCheck(dev):
-    line1, line2 = '', ''
+    line1, line2 = to_bytes_utf8(''), ('')
 
     if dev.io_mode not in (IO_MODE_RAW, IO_MODE_UNI):
 
@@ -719,19 +709,19 @@ def PanelCheck(dev):
                 result, line1 = dev.getPML(oid1)
 
                 if result < pml.ERROR_MAX_OK:
-                    line1 = PANEL_TRANSLATOR_FUNC(line1).rstrip()
+                    line1 = PANEL_TRANSLATOR_FUNC(line1.encode('utf-8')).rstrip()
 
-                    if '\x0a' in line1:
-                        line1, line2 = line1.split('\x0a', 1)
+                    if to_bytes_utf8('\x0a') in line1:
+                        line1, line2 = line1.split(to_bytes_utf8('\x0a'), 1)
                         break
 
                     result, line2 = dev.getPML(oid2)
 
                     if result < pml.ERROR_MAX_OK:
-                        line2 = PANEL_TRANSLATOR_FUNC(line2).rstrip()
+                        line2 = PANEL_TRANSLATOR_FUNC(line2.encode('utf-8')).rstrip()
                         break
 
-    return bool(line1 or line2), line1 or '', line2 or ''
+    return bool(line1 or line2), line1 or to_bytes_utf8(''), line2 or to_bytes_utf8('')
 
 
 BATTERY_HEALTH_MAP = {0 : AGENT_HEALTH_OK,
@@ -1072,13 +1062,13 @@ TYPE6_STATUS_CODE_MAP = {
 }
 
 def StatusType6(dev): #  LaserJet Status (XML)
-    info_device_status = cStringIO.StringIO()
-    info_ssp = cStringIO.StringIO()
-
+    info_device_status = BytesIO()
+    info_ssp = BytesIO()
     try:
         dev.getEWSUrl("/hp/device/info_device_status.xml", info_device_status)
         dev.getEWSUrl("/hp/device/info_ssp.xml", info_ssp)
     except:
+        log.warn("Failed to get Device status information")
         pass
 
     info_device_status = info_device_status.getvalue()
@@ -1089,7 +1079,7 @@ def StatusType6(dev): #  LaserJet Status (XML)
 
     if info_device_status:
         try:
-            log.debug_block("info_device_status", info_device_status)
+            log.debug_block("info_device_status", to_string_latin(info_device_status))
             device_status = utils.XMLToDictParser().parseXML(info_device_status)
             log.debug(device_status)
         except expat.ExpatError:
@@ -1098,7 +1088,7 @@ def StatusType6(dev): #  LaserJet Status (XML)
 
     if info_ssp:
         try:
-            log.debug_block("info_spp", info_ssp)
+            log.debug_block("info_spp", to_string_latin(info_ssp))
             ssp = utils.XMLToDictParser().parseXML(info_ssp)
             log.debug(ssp)
         except expat.ExpatError:
@@ -1349,23 +1339,23 @@ def StatusType8(dev): #  LaserJet PJL (B&W only)
     try:
         # Will error if printer is busy printing...
         dev.openPrint()
-    except Error, e:
+    except Error as e:
         log.warn(e.msg)
         status_code = STATUS_PRINTER_BUSY
     else:
         try:
             try:
-                dev.writePrint("\x1b%-12345X@PJL INFO STATUS \r\n\x1b%-12345X")
+                dev.writePrint(to_bytes_utf8("\x1b%-12345X@PJL INFO STATUS \r\n\x1b%-12345X"))
                 pjl_return = dev.readPrint(1024, timeout=5, allow_short_read=True)
                 dev.close()
 
-                log.debug_block("PJL return:", pjl_return)
+                log.debug_block("PJL return:", to_string_latin(pjl_return))
 
                 str_code = '10001'
 
                 for line in pjl_return.splitlines():
                     line = line.strip()
-                    match = pjl_code_pat.match(line)
+                    match = pjl_code_pat.match(line.decode('utf-8'))
 
                     if match is not None:
                         str_code = match.group(1)
@@ -1513,27 +1503,27 @@ pen_health10_xlate = { 'ok' : AGENT_HEALTH_OK,
 #ExtractXMLData will extract actual data from http response (Transfer-encoding:  chunked).
 #For unchunked response it will not do anything.
 def ExtractXMLData(data):
-    if data[0] is not '<':
+    if data[0:1] != b'<':
         size = -1
-        temp = ""
+        temp = to_bytes_utf8("")
         while size:
-            index = data.find('\r\n')
+            index = data.find(to_bytes_utf8('\r\n'))
             size = int(data[0:index+1], 16)
             temp = temp + data[index+2:index+2+size]
             data = data[index+2+size+2:len(data)]
         data = temp
-    return data
+    return data 
 
 def StatusType10FetchUrl(func, url, footer=""):
-    data_fp = cStringIO.StringIO()
+    data_fp = BytesIO()
     if footer:
         data = func(url, data_fp, footer)
     else:
         data = func(url, data_fp)
         if data:
-            while data.find('\r\n\r\n') != -1:
-                data = data.split('\r\n\r\n', 1)[1]
-                if not data.startswith("HTTP"):
+            while data.find(to_bytes_utf8('\r\n\r\n')) != -1:
+                data = data.split(to_bytes_utf8('\r\n\r\n'), 1)[1]
+                if not data.startswith(to_bytes_utf8("HTTP")):
                     break
 
             if data:
@@ -1576,8 +1566,8 @@ def StatusType10Agents(func): # Low End Data Model
     data = StatusType10FetchUrl(func, "/DevMgmt/ConsumableConfigDyn.xml")
     if not data:
         return status_block
-    data = data.replace("ccdyn:", "").replace("dd:", "")
-   
+    data = data.replace(to_bytes_utf8("ccdyn:"), to_bytes_utf8("")).replace(to_bytes_utf8("dd:"), to_bytes_utf8(""))
+
     # Parse the agent status XML
     agents = []
     try:
@@ -1640,7 +1630,8 @@ def StatusType10Agents(func): # Low End Data Model
     except (expat.ExpatError, UnboundLocalError):
         agents = []
     status_block['agents'] = agents
-    return status_block						  
+
+    return status_block
 
 def StatusType10Media(func): # Low End Data Model
     status_block = {}
@@ -1648,7 +1639,7 @@ def StatusType10Media(func): # Low End Data Model
     data = StatusType10FetchUrl(func, "/DevMgmt/MediaHandlingDyn.xml")
     if not data:
         return status_block
-    data = data.replace("mhdyn:", "").replace("dd:", "")
+    data = data.replace(to_bytes_utf8("mhdyn:"), to_bytes_utf8("")).replace(to_bytes_utf8("dd:"), to_bytes_utf8(""))
 
     # Parse the media handling XML
     try:
@@ -1668,7 +1659,7 @@ def StatusType10Media(func): # Low End Data Model
         elif bin_name == "PhotoTray":
             status_block['photo-tray'] = PHOTO_TRAY_ENGAGED
         else:
-            log.debug("found invalid bin name '%s'" % bin_name)
+            log.error("found invalid bin name '%s'" % bin_name)
 
     try:
         elements = tree.findall("Accessories/MediaHandlingDeviceFunctionType")
@@ -1686,9 +1677,9 @@ def StatusType10Status(func): # Low End Data Model
     data = StatusType10FetchUrl(func, "/DevMgmt/ProductStatusDyn.xml")
     if not data:
         return status_block
-    data = data.replace("psdyn:", "").replace("locid:", "")
-    data = data.replace("pscat:", "").replace("dd:", "").replace("ad:", "")
-	
+    data = data.replace(to_bytes_utf8("psdyn:"), to_bytes_utf8("")).replace(to_bytes_utf8("locid:"), to_bytes_utf8(""))
+    data = data.replace(to_bytes_utf8("pscat:"), to_bytes_utf8("")).replace(to_bytes_utf8("dd:"), to_bytes_utf8("")).replace(to_bytes_utf8("ad:"), to_bytes_utf8(""))
+
     # Parse the product status XML
     try:
         if etree_loaded:
@@ -1765,7 +1756,7 @@ def StatusType10Status(func): # Low End Data Model
             status_block['status-code'] = STATUS_PRINTER_PRINTHEAD_MISSING
 
 
-		#Alert messages for Pentane products RQ 8888
+        #Alert messages for Pentane products RQ 8888
         elif e.text == "scannerADFMispick":
             status_block['status-code'] = STATUS_SCANNER_ADF_MISPICK
 
@@ -1813,6 +1804,5 @@ def StatusType10Status(func): # Low End Data Model
 
         else:
             status_block['status-code'] = STATUS_UNKNOWN_CODE
-
 
     return status_block

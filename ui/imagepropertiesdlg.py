@@ -21,7 +21,7 @@
 
 import sys
 from qt import *
-from imagepropertiesdlg_base import ImagePropertiesDlg_base
+from .imagepropertiesdlg_base import ImagePropertiesDlg_base
 
 class ImagePropertiesDlg(ImagePropertiesDlg_base):
     def __init__(self, filename, location, mimetype, size, exif_info={}, parent = None,name = None,modal = 0,fl = 0):

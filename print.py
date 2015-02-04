@@ -50,7 +50,9 @@ mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS | module.USAGE_FLAG_FILE_ARGS,
 opts, device_uri, printer_name, mode, ui_toolkit, loc = \
     mod.parseStdOpts()
 
-printer_name, device_uri = mod.getPrinterName(printer_name, device_uri)
+sts, printer_name, device_uri = mod.getPrinterName(printer_name, device_uri)
+if not sts:
+    sys.exit(1)
 
 if ui_toolkit == 'qt3':
     if not utils.canEnterGUIMode():
@@ -132,7 +134,6 @@ else: # qt4
 
     if 1:
         app = QApplication(sys.argv)
-
         dlg = PrintDialog(None, printer_name, mod.args)
         dlg.show()
         try:

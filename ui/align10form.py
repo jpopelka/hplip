@@ -24,11 +24,11 @@
 # Local
 from base.g import *
 from base import maint
-from ui_utils import load_pixmap
+from .ui_utils import load_pixmap
 
 # Qt
 from qt import *
-from align10form_base import Align10Form_Base
+from .align10form_base import Align10Form_Base
 
 # Also supports align-type==11
 class Align10Form(Align10Form_Base):
@@ -47,7 +47,7 @@ class Align10Form(Align10Form_Base):
 
     def getValues(self):
         ret = []
-        controls = self.controls.keys()
+        controls = list(self.controls.keys())
         controls.sort()
         
         for line in controls:

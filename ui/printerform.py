@@ -26,11 +26,11 @@ from base.g import *
 from base.codes import *
 from base import utils, device
 from prnt import cups
-from ui_utils import load_pixmap
+from .ui_utils import load_pixmap
 
 # Qt
 from qt import *
-from scrollprint import ScrollPrintView
+from .scrollprint import ScrollPrintView
 
 
 
@@ -84,7 +84,7 @@ class PrinterForm(QMainWindow):
                 max_deviceid_size = max(len(d), max_deviceid_size)
 
             if x == 0:
-                from nodevicesform import NoDevicesForm
+                from .nodevicesform import NoDevicesForm
                 self.FailureUI(self.__tr("<p><b>No devices found.</b><p>Please make sure your device is properly installed and try again."))
                 self.init_failed = True
 
@@ -93,7 +93,7 @@ class PrinterForm(QMainWindow):
                 self.device_uri = devices[0][0]
 
             else:
-                from chooseprinterdlg import ChoosePrinterDlg
+                from .chooseprinterdlg import ChoosePrinterDlg
                 dlg = ChoosePrinterDlg(self.cups_printers)
                 if dlg.exec_loop() == QDialog.Accepted:
                     self.printer_name = dlg.printer_name
@@ -118,7 +118,7 @@ class PrinterForm(QMainWindow):
             try:
                 self.cur_device = device.Device(device_uri=self.device_uri,
                                                  printer_name=self.printer_name)
-            except Error, e:
+            except Error as e:
                 log.error("Invalid device URI or printer name.")
                 self.FailureUI("<b>Invalid device URI or printer name.</b><p>Please check the parameters to hp-print and try again.")
                 self.init_failed = True
@@ -150,7 +150,7 @@ class PrinterForm(QMainWindow):
 
 
     def FailureUI(self, error_text):
-        log.error(unicode(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", " "))
+        log.error(str(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", " "))
         QMessageBox.critical(self,
                              self.caption(),
                              error_text,

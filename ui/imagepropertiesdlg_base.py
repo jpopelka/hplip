@@ -97,7 +97,7 @@ class ImagePropertiesDlg_base(QDialog):
 
 
     def ViewEXIFButton_clicked(self):
-        print "ImagePropertiesDlg_base.ViewEXIFButton_clicked(): Not implemented yet"
+        print("ImagePropertiesDlg_base.ViewEXIFButton_clicked(): Not implemented yet")
 
     def __tr(self,s,c = None):
         return qApp.translate("ImagePropertiesDlg_base",s,c)

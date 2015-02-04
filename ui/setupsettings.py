@@ -21,9 +21,10 @@
 
 from base.g import *
 from base.codes import *
+from base.sixext import  to_unicode
 
 from qt import *
-from setupsettings_base import SetupSettings_base
+from .setupsettings_base import SetupSettings_base
 
 class SetupSettings(SetupSettings_base):
     def __init__(self, bus, filter, search, ttl, timeout, parent=None, name=None, modal=0, fl = 0):
@@ -75,7 +76,7 @@ class SetupSettings(SetupSettings_base):
         self.updateFilter(a0)
 
     def searchTermLineEdit_textChanged(self, a0):
-        self.search = unicode(a0)
+        self.search = to_unicode(a0)
 
     def ttlSpinBox_valueChanged(self, a0):
         self.ttl = a0

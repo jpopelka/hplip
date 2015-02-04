@@ -6,6 +6,8 @@ import time
 import sys
 import tempfile
 
+PY3 = sys.version_info[0] == 3
+
 READ_SIZE = 8192
 
 total_bytes_read = 0
@@ -32,7 +34,10 @@ os.close(temp_out_handle)
 out_handle = open(temp_out_fname, mode='rb')
 while (total_bytes_read < file_len):
       data = out_handle.read(READ_SIZE)
-      sys.stdout.write(data)
+      if PY3:
+          sys.stdout.buffer.write(data)
+      else:
+          sys.stdout.write(data)
       total_bytes_read += READ_SIZE
 out_handle.close()
 

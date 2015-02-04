@@ -27,13 +27,16 @@ __doc__ = "CUPS backend for PC send fax. Generally this backend is run by CUPS, 
 # StdLib
 import sys
 import getopt
-import ConfigParser
 import os.path, os
 import syslog
 import time
 import operator
 import tempfile
 
+if sys.version_info[0] == 3:
+    import configparser
+else:
+    import ConfigParser as configparser
 
 CUPS_BACKEND_OK = 0 # Job completed successfully
 CUPS_BACKEND_FAILED = 1 # Job failed, use error-policy
@@ -56,7 +59,7 @@ def bug(msg):
 
 
 if os.path.exists(config_file):
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     config.read(config_file)
 
     try:
@@ -82,7 +85,7 @@ try:
     from base import device
     from base import utils
     from prnt import cups
-except ImportError, e:
+except ImportError as e:
     bug("Error importing HPLIP modules: %s\n" % (pid, e))
     sys.exit(1)
 
@@ -159,49 +162,49 @@ if len( args ) == 0:
         if mq.get('fax-type', FAX_TYPE_NONE) in (FAX_TYPE_MARVELL,):
             # HP Fax 3
             if bus == 'usb':
-                print 'direct %s "HP Fax 3" "%s USB %s HP Fax HPLIP" "MFG:HP;MDL:Fax 3;DES:HP Fax 3;"' % \
-                    (uri.replace("hp:", "hpfax:"), model.replace('_', ' '), serial)
+                print('direct %s "HP Fax 3" "%s USB %s HP Fax HPLIP" "MFG:HP;MDL:Fax 3;DES:HP Fax 3;"' % \
+                    (uri.replace("hp:", "hpfax:"), model.replace('_', ' '), serial))
 
             else: # par
-                print 'direct %s "HP Fax 3" "%s LPT HP Fax HPLIP" "MFG:HP;MDL:Fax 3;DES:HP Fax 3;"' % \
-                    (uri.replace("hp:", "hpfax:"), model.replace('_', ' '))
+                print('direct %s "HP Fax 3" "%s LPT HP Fax HPLIP" "MFG:HP;MDL:Fax 3;DES:HP Fax 3;"' % \
+                    (uri.replace("hp:", "hpfax:"), model.replace('_', ' ')))
 
         elif mq.get('fax-type', FAX_TYPE_NONE) in (FAX_TYPE_SOAP,) or mq.get('fax-type', FAX_TYPE_NONE) in (FAX_TYPE_LEDMSOAP,):
             # HP Fax 2
             if bus == 'usb':
-                print 'direct %s "HP Fax 2" "%s USB %s HP Fax HPLIP" "MFG:HP;MDL:Fax 2;DES:HP Fax 2;"' % \
-                    (uri.replace("hp:", "hpfax:"), model.replace('_', ' '), serial)
+                print('direct %s "HP Fax 2" "%s USB %s HP Fax HPLIP" "MFG:HP;MDL:Fax 2;DES:HP Fax 2;"' % \
+                    (uri.replace("hp:", "hpfax:"), model.replace('_', ' '), serial))
 
             else: # par
-                print 'direct %s "HP Fax 2" "%s LPT HP Fax HPLIP" "MFG:HP;MDL:Fax 2;DES:HP Fax 2;"' % \
-                    (uri.replace("hp:", "hpfax:"), model.replace('_', ' '))
+                print('direct %s "HP Fax 2" "%s LPT HP Fax HPLIP" "MFG:HP;MDL:Fax 2;DES:HP Fax 2;"' % \
+                    (uri.replace("hp:", "hpfax:"), model.replace('_', ' ')))
         elif mq.get('fax-type', FAX_TYPE_NONE) in (FAX_TYPE_LEDM,):
             # HP Fax 4
             if bus == 'usb':
-                print 'direct %s "HP Fax 4" "%s USB %s HP Fax HPLIP" "MFG:HP;MDL:Fax 4;DES:HP Fax 4;"' % \
-                    (uri.replace("hp:", "hpfax:"), model.replace('_', ' '), serial)
+                print('direct %s "HP Fax 4" "%s USB %s HP Fax HPLIP" "MFG:HP;MDL:Fax 4;DES:HP Fax 4;"' % \
+                    (uri.replace("hp:", "hpfax:"), model.replace('_', ' '), serial))
 
             else: # par
-                print 'direct %s "HP Fax 4" "%s LPT HP Fax HPLIP" "MFG:HP;MDL:Fax 4;DES:HP Fax 4;"' % \
-                    (uri.replace("hp:", "hpfax:"), model.replace('_', ' '))
+                print('direct %s "HP Fax 4" "%s LPT HP Fax HPLIP" "MFG:HP;MDL:Fax 4;DES:HP Fax 4;"' % \
+                    (uri.replace("hp:", "hpfax:"), model.replace('_', ' ')))
 
         else:
             # HP Fax
             if bus == 'usb':
-                print 'direct %s "HP Fax" "%s USB %s HP Fax HPLIP" "MFG:HP;MDL:Fax;DES:HP Fax;"' % \
-                    (uri.replace("hp:", "hpfax:"),  model.replace('_', ' '), serial)
+                print('direct %s "HP Fax" "%s USB %s HP Fax HPLIP" "MFG:HP;MDL:Fax;DES:HP Fax;"' % \
+                    (uri.replace("hp:", "hpfax:"),  model.replace('_', ' '), serial))
 
             else: # par
-                print 'direct %s "HP Fax" "%s LPT HP Fax HPLIP" "MFG:HP;MDL:Fax;DES:HP Fax;"' % \
-                    (uri.replace("hp:", "hpfax:"),  model.replace('_', ' '))
+                print('direct %s "HP Fax" "%s LPT HP Fax HPLIP" "MFG:HP;MDL:Fax;DES:HP Fax;"' % \
+                    (uri.replace("hp:", "hpfax:"),  model.replace('_', ' ')))
 
         good_devices += 1
 
     if good_devices == 0:
         if cups11:
-            print 'direct hpfax:/no_device_found "HP Fax" "no_device_found" ""'
+            print('direct hpfax:/no_device_found "HP Fax" "no_device_found" ""')
         else:
-            print 'direct hpfax "Unknown" "HP Fax (HPLIP)" ""'
+            print('direct hpfax "Unknown" "HP Fax (HPLIP)" ""')
 
     sys.exit(CUPS_BACKEND_OK)
 
@@ -239,7 +242,7 @@ else:
     send_message(device_uri, printer_name, EVENT_START_FAX_PRINT_JOB, username, job_id, title)
 
     try:
-        input_fd = file(args[5], 'r')
+        input_fd = open(args[5], 'r')
     except IndexError:
         input_fd = 0
 
@@ -252,7 +255,7 @@ else:
 
     # Create the named pipe. Make sure it exists before sending
     # message to hppsd.
-    os.umask(0111)
+    os.umask(0o111)
     try:
         os.mkfifo(pipe_name)
     except OSError:

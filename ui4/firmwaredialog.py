@@ -28,14 +28,14 @@ from base.g import *
 from base import device, utils
 from prnt import cups
 from base.codes import *
-from ui_utils import *
+from .ui_utils import *
 
 # Qt
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Ui
-from firmwaredialog_base import Ui_Dialog
+from .firmwaredialog_base import Ui_Dialog
 
 
 class FirmwareDialog(QDialog, Ui_Dialog):

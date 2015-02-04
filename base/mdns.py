@@ -29,11 +29,11 @@ import select
 import struct
 import random
 import re
-import cStringIO
 
 # Local
-from g import *
-import utils
+from .g import *
+from . import utils
+from .sixext import BytesIO, to_bytes_utf8, to_bytes_latin, to_string_latin
 
 MAX_ANSWERS_PER_PACKET = 24
 
@@ -45,16 +45,16 @@ QTYPE_PTR = 12
 
 QCLASS_IN = 1
 
-
+# Caller needs to ensure, data should be in string format.
 def read_utf8(offset, data, l):
-    return offset+l, data[offset:offset+l].decode('utf-8')
+    return offset+l, data[offset:offset+l]
 
 def read_data(offset, data, l):
     return offset+l, data[offset:offset+l]
 
 def read_data_unpack(offset, data, fmt):
     l = struct.calcsize(fmt)
-    return offset+l, struct.unpack(fmt, data[offset:offset+l])
+    return offset+l, struct.unpack(fmt, to_bytes_latin(data[offset:offset+l]))
 
 def read_name(offset, data):
     result = ''
@@ -63,7 +63,7 @@ def read_name(offset, data):
     first = off
 
     while True:
-        l = ord(data[off])
+        l = ord(data[off:off+1])
         off += 1
 
         if l == 0:
@@ -79,7 +79,7 @@ def read_name(offset, data):
             if next < 0:
                 next = off + 1
 
-            off = ((l & 0x3F) << 8) | ord(data[off])
+            off = ((l & 0x3F) << 8) | ord(data[off:off+1])
 
             if off >= first:
                 log.error("Bad domain name (circular) at 0x%04x" % off)
@@ -112,8 +112,8 @@ def create_outgoing_packets(answers):
     num_questions = 1
     first_packet = True
     packets = []
-    packet = cStringIO.StringIO()
-    answer_record = cStringIO.StringIO()
+    packet = BytesIO()
+    answer_record = BytesIO()
 
     while True:
         packet.seek(0)
@@ -184,13 +184,8 @@ def create_outgoing_packets(answers):
 
     return packets
 
-
-
-def detectNetworkDevices(ttl=4, timeout=10):
-    mcast_addr, mcast_port ='224.0.0.251', 5353
-    found_devices = {}
-    answers = []
-
+def createSocketsWithsetOption(ttl=4):
+    s=None
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         x = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -202,7 +197,9 @@ def detectNetworkDevices(ttl=4, timeout=10):
         ttl = struct.pack('B', ttl)
     except socket.error:
         log.error("Network error")
-        return {}
+        if s:
+            s.close()
+        return None
 
     try:
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -214,8 +211,102 @@ def detectNetworkDevices(ttl=4, timeout=10):
         s.setsockopt(socket.SOL_IP, socket.IP_MULTICAST_TTL, ttl)
         s.setsockopt(socket.SOL_IP, socket.IP_MULTICAST_IF, socket.inet_aton(intf) + socket.inet_aton('0.0.0.0'))
         s.setsockopt(socket.SOL_IP, socket.IP_MULTICAST_LOOP ,1)
-    except Exception, e:
+    except Exception as e:
         log.error("Unable to setup multicast socket for mDNS: %s" % e)
+        if s:
+            s.close()
+        return None
+    return s
+
+def updateReceivedData(data, answers):
+    update_spinner()
+    y = {'num_devices' : 1, 'num_ports': 1, 'product_id' : '', 'mac': '',
+         'status_code': 0, 'device2': '0', 'device3': '0', 'note': ''}
+
+    log.debug("Incoming: (%d)" % len(data))
+    log.log_data(data, width=16)
+
+    offset = 0
+    offset, (id, flags, num_questions, num_answers, num_authorities, num_additionals) = \
+        read_data_unpack(offset, data, "!HHHHHH")
+
+    log.debug("Response: ID=%d FLAGS=0x%x Q=%d A=%d AUTH=%d ADD=%d" %
+        (id, flags, num_questions, num_answers, num_authorities, num_additionals))
+
+    for question in range(num_questions):
+        update_spinner()
+        offset, name = read_name(offset, data)
+        offset, (typ, cls) = read_data_unpack(offset, data, "!HH")
+        log.debug("Q: %s TYPE=%d CLASS=%d" % (name, typ, cls))
+
+    fmt = '!HHiH'
+    for record in range(num_answers + num_authorities + num_additionals):
+        update_spinner()
+        offset, name = read_name(offset, data)
+        offset, info = read_data_unpack(offset, data, "!HHiH")
+
+        if info[0] == QTYPE_A: # ipv4 address
+            offset, result = read_data(offset, data, 4)
+            ip = '.'.join([str(ord(x)) for x in result])
+            log.debug("A: %s" % ip)
+            y['ip'] = ip
+
+        elif info[0] == QTYPE_PTR: # PTR
+            offset, name = read_name(offset, data)
+            log.debug("PTR: %s" % name)
+            y['mdns'] = name
+            answers.append(name.replace("._pdl-datastream._tcp.local.", ""))
+
+        elif info[0] == QTYPE_TXT:
+            offset, name = read_data(offset, data, info[3])
+            txt, off = {}, 0
+
+            while off < len(name):
+                l = ord(name[off:off+1])
+                off += 1
+                result = name[off:off+l]
+
+                try:
+                    key, value = result.split('=')
+                    txt[key] = value
+                except ValueError:
+                    pass
+
+                off += l
+
+            log.debug("TXT: %s" % repr(txt))
+            try:
+                y['device1'] = "MFG:Hewlett-Packard;MDL:%s;CLS:PRINTER;" % txt['ty']
+            except KeyError:
+                log.debug("NO ty Key in txt: %s" % repr(txt))
+
+            if 'note' in txt:
+                y['note'] = txt['note']
+
+        elif info[0] == QTYPE_SRV:
+            offset, (priority, weight, port) = read_data_unpack(offset, data, "!HHH")
+            #ttl = info[3]
+            offset, server = read_name(offset, data)
+            #log.debug("SRV: %s TTL=%d PRI=%d WT=%d PORT=%d" % (server, ttl, priority, weight, port))
+            y['hn'] = server.replace('.local.', '')
+
+        elif info[0] == QTYPE_AAAA: # ipv6 address
+            offset, result = read_data(offset, data, 16)
+            log.debug("AAAA: %s" % repr(result))
+
+        else:
+            log.error("Unknown DNS record type (%d)." % info[0])
+            break
+    return y, answers
+
+
+def detectNetworkDevices(ttl=4, timeout=10):
+    mcast_addr, mcast_port ='224.0.0.251', 5353
+    found_devices = {}
+    answers = []
+
+    s = createSocketsWithsetOption(ttl)
+    if not s:
         return {}
 
     now = time.time()
@@ -236,7 +327,7 @@ def detectNetworkDevices(ttl=4, timeout=10):
                     log.log_data(p, width=16)
                     s.sendto(p, 0, (mcast_addr, mcast_port))
 
-            except socket.error, e:
+            except socket.error as e:
                 log.error("Unable to send broadcast DNS packet: %s" % e)
 
             next += delay
@@ -250,91 +341,13 @@ def detectNetworkDevices(ttl=4, timeout=10):
             continue
 
         data, addr = s.recvfrom(16384)
-
+        data = to_string_latin(data)
         if data:
-            update_spinner()
-            y = {'num_devices' : 1, 'num_ports': 1, 'product_id' : '', 'mac': '',
-                 'status_code': 0, 'device2': '0', 'device3': '0', 'note': ''}
-
-            log.debug("Incoming: (%d)" % len(data))
-            log.log_data(data, width=16)
-
-            offset = 0
-            offset, (id, flags, num_questions, num_answers, num_authorities, num_additionals) = \
-                read_data_unpack(offset, data, "!HHHHHH")
-
-            log.debug("Response: ID=%d FLAGS=0x%x Q=%d A=%d AUTH=%d ADD=%d" %
-                (id, flags, num_questions, num_answers, num_authorities, num_additionals))
-
-            for question in range(num_questions):
-                update_spinner()
-                offset, name = read_name(offset, data)
-                offset, (typ, cls) = read_data_unpack(offset, data, "!HH")
-                log.debug("Q: %s TYPE=%d CLASS=%d" % (name, typ, cls))
-
-            fmt = '!HHiH'
-            for record in range(num_answers + num_authorities + num_additionals):
-                update_spinner()
-                offset, name = read_name(offset, data)
-                offset, info = read_data_unpack(offset, data, "!HHiH")
-
-                if info[0] == QTYPE_A: # ipv4 address
-                    offset, result = read_data(offset, data, 4)
-                    ip = '.'.join([str(ord(x)) for x in result])
-                    log.debug("A: %s" % ip)
-                    y['ip'] = ip
-
-                elif info[0] == QTYPE_PTR: # PTR
-                    offset, name = read_name(offset, data)
-                    log.debug("PTR: %s" % name)
-                    y['mdns'] = name
-                    answers.append(name.replace("._pdl-datastream._tcp.local.", ""))
-
-                elif info[0] == QTYPE_TXT:
-                    offset, name = read_data(offset, data, info[3])
-                    txt, off = {}, 0
-
-                    while off < len(name):
-                        l = ord(name[off])
-                        off += 1
-                        result = name[off:off+l]
-
-                        try:
-                            key, value = result.split('=')
-                            txt[key] = value
-                        except ValueError:
-                            pass
-
-                        off += l
-
-                    log.debug("TXT: %s" % repr(txt))
-                    try:
-                        y['device1'] = "MFG:Hewlett-Packard;MDL:%s;CLS:PRINTER;" % txt['ty']
-                    except KeyError:
-                        log.debug("NO ty Key in txt: %s" % repr(txt))
-
-                    if 'note' in txt:
-                        y['note'] = txt['note']
-
-                elif info[0] == QTYPE_SRV:
-                    offset, (priority, weight, port) = read_data_unpack(offset, data, "!HHH")
-                    ttl = info[3]
-                    offset, server = read_name(offset, data)
-                    log.debug("SRV: %s TTL=%d PRI=%d WT=%d PORT=%d" % (server, ttl, priority, weight, port))
-                    y['hn'] = server.replace('.local.', '')
-
-                elif info[0] == QTYPE_AAAA: # ipv6 address
-                    offset, result = read_data(offset, data, 16)
-                    log.debug("AAAA: %s" % repr(result))
-
-                else:
-                    log.error("Unknown DNS record type (%d)." % info[0])
-                    break
-
-        found_devices[y['ip']] = y
+            y, answers = updateReceivedData(data, answers)
+            found_devices[y['ip']] = y
 
     log.debug("Found %d devices" % len(found_devices))
-
+    s.close()
     return found_devices
 
 

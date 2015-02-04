@@ -26,11 +26,11 @@ import os.path
 from base.g import *
 from base import utils
 from prnt import cups
-from ui_utils import load_pixmap
+from .ui_utils import load_pixmap
 
 # Qt
 from qt import *
-from nodevicesform_base import NoDevicesForm_base
+from .nodevicesform_base import NoDevicesForm_base
 
 
 

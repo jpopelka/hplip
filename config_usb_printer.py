@@ -34,8 +34,9 @@ from base.g import *
 from base import device, utils, module, services
 from installer import pluginhandler
 
-DBUS_SERVICE = 'com.hplip.StatusService'
-DBUS_AVIALABLE = False
+
+DBUS_SERVICE='com.hplip.StatusService'
+DBUS_AVIALABLE=False
 
 ##### METHODS #####
 # Send dbus event to hpssd on dbus system bus
@@ -56,6 +57,7 @@ def send_message(device_uri, printer_name, event_code, username, job_id, title, 
 def usage(typ='text'):
     utils.format_text(USAGE, typ, __title__, __mod__, __version__)
     sys.exit(0)
+
 
 # Systray service. If hp-systray is not running, starts.
 def start_systray():
@@ -191,3 +193,4 @@ except KeyboardInterrupt:
     log.error("User exit")
 
 log.debug("Done.")
+

@@ -80,7 +80,7 @@ class SetupManualFind_base(QDialog):
 
 
     def findLineEdit_textChanged(self,a0):
-        print "SetupManualFind_base.findLineEdit_textChanged(const QString&): Not implemented yet"
+        print("SetupManualFind_base.findLineEdit_textChanged(const QString&): Not implemented yet")
 
     def __tr(self,s,c = None):
         return qApp.translate("SetupManualFind_base",s,c)

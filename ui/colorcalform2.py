@@ -23,11 +23,11 @@
 
 # Local
 from base.g import *
-from ui_utils import load_pixmap
+from .ui_utils import load_pixmap
 
 # Qt
 from qt import *
-from colorcalform2_base import ColorCalForm2_base
+from .colorcalform2_base import ColorCalForm2_base
 
 class ColorCalForm2(ColorCalForm2_base):
     def __init__(self,parent = None,name = None,modal = 0,fl = 0):

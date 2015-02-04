@@ -31,7 +31,7 @@ import time
 # Local
 from base.g import *
 from base import device, utils
-from ui_utils import load_pixmap
+from .ui_utils import load_pixmap
 
 # Qt
 try:
@@ -280,7 +280,7 @@ class SystrayIcon(QLabel):
 
         if managerWin != 0:
             # set StructureNotifyMask (1L << 17)
-            XSelectInput(dpy, managerWin, 1L << 17)
+            XSelectInput(dpy, managerWin, 1 << 17)
 
         #XUngrabServer(dpy)
         XFlush(dpy)

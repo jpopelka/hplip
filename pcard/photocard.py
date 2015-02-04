@@ -30,7 +30,7 @@ from base.codes import *
 from base import device, utils, exif
 
 try:
-    import pcardext
+    from . import pcardext
 except ImportError:
     if not os.getenv("HPLIP_BUILD"):
         log.error("PCARDEXT could not be loaded. Please check HPLIP installation.")
@@ -172,7 +172,7 @@ class PhotoCard:
             self.open_channel()
 
         log.debug("Normal sector read sector=%d count=%d" % (sector, nsector))
-        sectors_to_read = range(sector, sector+nsector)
+        sectors_to_read = list(range(sector, sector+nsector))
         request = struct.pack('!HH' + 'I'*nsector, READ_CMD, nsector, *sectors_to_read)
         #log.log_data(request)
         
@@ -239,7 +239,7 @@ class PhotoCard:
             self.open_channel()
 
 
-        sectors_to_write = range(sector, sector+nsector)
+        sectors_to_write = list(range(sector, sector+nsector))
         request = struct.pack('!HHH' + 'I'*nsector, WRITE_CMD, nsector, 0, *sectors_to_write)
         request = ''.join([request, buffer])
 
@@ -287,7 +287,7 @@ class PhotoCard:
     def _check_cache(self, nsector):
         if len(self.sector_buffer) > MAX_CACHE:
             # simple minded: scan for first nsector sectors that has count of 1 and throw it away
-            t, n = self.sector_buffer.keys()[:], 0
+            t, n = list(self.sector_buffer.keys())[:], 0
             for s in t:
                 if self.sector_buffer_counts[s] == 1:
                     del self.sector_buffer[s]
@@ -380,7 +380,7 @@ class PhotoCard:
         self.START_OPERATION('cp')
         total = 0
         try:
-            f = file(local_file, 'w');
+            f = open(local_file, 'w');
             total = pcardext.cp(name, f.fileno())
             f.close()
         finally:

@@ -253,6 +253,7 @@ int getHPLogLevel()
     char    str[258];
     char    *p;
     int iLogLevel = 0;
+
     fp = fopen ("/etc/cups/cupsd.conf", "r");
     if (fp == NULL)
         return 0;
@@ -272,3 +273,5 @@ int getHPLogLevel()
     fclose (fp);
     return iLogLevel;
 }
+
+

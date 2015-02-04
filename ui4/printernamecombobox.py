@@ -24,8 +24,9 @@
 
 # Local
 from base.g import *
-from ui_utils import *
+from .ui_utils import *
 from base import device
+from base.sixext import to_unicode
 
 # Qt
 from PyQt4.QtCore import *
@@ -123,7 +124,7 @@ class PrinterNameComboBox(QWidget):
                     self.printer_index[p.name] = p.device_uri
                     self.ComboBox.insertItem(i, p.name)
 
-                    if self.initial_printer is not None and p.name == self.initial_printer:
+                    if self.initial_printer is not None and to_unicode(p.name).lower() == to_unicode(self.initial_printer).lower():
                         self.initial_printer = None
                         k = i
 
@@ -138,7 +139,7 @@ class PrinterNameComboBox(QWidget):
 
 
     def ComboBox_currentIndexChanged(self, t):
-        self.printer_name = unicode(t)
+        self.printer_name = to_unicode(t)
 
         if self.updating:
             return

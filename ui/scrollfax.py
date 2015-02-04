@@ -22,18 +22,20 @@
 # Local
 from base.g import *
 from base import utils, magic, pml, os_utils
+from base.sixext import  to_unicode
 from prnt import cups
-from ui_utils import load_pixmap
+from .ui_utils import load_pixmap
+from base.sixext.moves import queue
 
 # Qt
 from qt import *
-from scrollview import ScrollView, PixmapLabelButton
-from allowabletypesdlg import AllowableTypesDlg
-from waitform import WaitForm
+from .scrollview import ScrollView, PixmapLabelButton
+from .allowabletypesdlg import AllowableTypesDlg
+from .waitform import WaitForm
 
 # Std Lib
 import os.path, os
-import struct, Queue, time
+import struct, time
 
 
 fax_enabled = prop.fax_build
@@ -72,7 +74,7 @@ if not coverpages_enabled:
 
 if fax_enabled and coverpages_enabled:
     from fax import coverpages
-    from coverpageform import CoverpageForm
+    from .coverpageform import CoverpageForm
 
 
 # Used to store MIME types for files
@@ -97,10 +99,10 @@ class PhoneNumValidator(QValidator):
         QValidator.__init__(self, parent, name)
 
     def validate(self, input, pos):
-        input = unicode(input)
+        input = to_unicode(input)
         if not input:
             return QValidator.Acceptable, pos
-        elif input[pos-1] not in u'0123456789-(+) *#':
+        elif input[pos-1] not in '0123456789-(+) *#':
             return QValidator.Invalid, pos
         elif len(input) > 50:
             return QValidator.Invalid, pos
@@ -128,8 +130,8 @@ class ScrollFaxView(ScrollView):
         self.cover_page_message = ''
         self.cover_page_re = ''
         self.cover_page_name = ''
-        self.update_queue = Queue.Queue() # UI updates from send thread
-        self.event_queue = Queue.Queue() # UI events (cancel) to send thread
+        self.update_queue = queue.Queue() # UI updates from send thread
+        self.event_queue = queue.Queue() # UI events (cancel) to send thread
         self.prev_selected_file_path = ''
         self.prev_selected_recipient = ''
         self.preserve_formatting = False
@@ -614,12 +616,12 @@ class ScrollFaxView(ScrollView):
 
         if dlg.exec_loop() == QDialog.Accepted:
                 results = dlg.selectedFile()
-                working_directory = unicode(dlg.dir().absPath())
+                working_directory = to_unicode(dlg.dir().absPath())
                 log.debug("results: %s" % results)
                 user_conf.setWorkingDirectory(working_directory)
 
                 if results:
-                    path = unicode(results)
+                    path = to_unicode(results)
                     self.processFile(path)
 
 
@@ -707,8 +709,8 @@ class ScrollFaxView(ScrollView):
         if dlg.exec_loop() == QDialog.Accepted:
 
             self.cover_page_func, cover_page_png = dlg.data
-            self.cover_page_message = unicode(dlg.messageTextEdit.text())
-            self.cover_page_re = unicode(dlg.regardingTextEdit.text())
+            self.cover_page_message = to_unicode(dlg.messageTextEdit.text())
+            self.cover_page_re = to_unicode(dlg.regardingTextEdit.text())
             self.cover_page_name = dlg.coverpage_name
             self.preserve_formatting = dlg.preserve_formatting
             return True
@@ -857,7 +859,7 @@ class ScrollFaxView(ScrollView):
             popup.insertItem(QIconSet(load_pixmap('add_user', '16x16')),
                 self.__tr("Add Individual"), ind)
 
-            for e, v in all_entries.items():
+            for e, v in list(all_entries.items()):
                 if not e.startswith('__'):
                     self.ind_map[ind.insertItem(QIconSet(load_pixmap('add_user', '16x16')), e, None)] = e
 
@@ -1026,10 +1028,10 @@ class ScrollFaxView(ScrollView):
         self.addWidget(widget, "recipient_add_from_fab")
 
     def addIndividualPushButton_clicked(self):
-        self.addRecipient(unicode(self.individualComboBox.currentText()))
+        self.addRecipient(to_unicode(self.individualComboBox.currentText()))
 
     def addGroupPushButton_clicked(self):
-        self.addRecipient(unicode(self.groupComboBox.currentText()), True)
+        self.addRecipient(to_unicode(self.groupComboBox.currentText()), True)
 
     def addRecipient(self, name, is_group=False):
         if is_group:
@@ -1050,7 +1052,7 @@ class ScrollFaxView(ScrollView):
         all_entries = self.db.get_all_records()
         self.addIndividualPushButton.setEnabled(len(all_entries))
 
-        for e, v in all_entries.items():
+        for e, v in list(all_entries.items()):
             if not e.startswith('__'):
                 self.individualComboBox.insertItem(e)
 
@@ -1104,8 +1106,8 @@ class ScrollFaxView(ScrollView):
 
 
     def quickAddPushButton_clicked(self):
-        name =  unicode(self.quickAddNameLineEdit.text())
-        self.db.set(name, u'', u'', u'', unicode(self.quickAddFaxLineEdit.text()), [], self.__tr('Added with Quick Add'))
+        name =  to_unicode(self.quickAddNameLineEdit.text())
+        self.db.set(name, '', '', '', to_unicode(self.quickAddFaxLineEdit.text()), [], self.__tr('Added with Quick Add'))
         self.db.save()
         self.addRecipient(name)
 
@@ -1115,9 +1117,9 @@ class ScrollFaxView(ScrollView):
 
     def enableQuickAddButton(self, name=None, fax=None):
         if name is None:
-            name = unicode(self.quickAddNameLineEdit.text())
+            name = to_unicode(self.quickAddNameLineEdit.text())
         if fax is None:
-            fax = unicode(self.quickAddFaxLineEdit.text())
+            fax = to_unicode(self.quickAddFaxLineEdit.text())
 
         existing_name = False
         if name:
@@ -1141,11 +1143,11 @@ class ScrollFaxView(ScrollView):
 
 
     def quickAddNameLineEdit_textChanged(self, name):
-        self.enableQuickAddButton(unicode(name))
+        self.enableQuickAddButton(to_unicode(name))
 
 
     def quickAddFaxLineEdit_textChanged(self, fax):
-        self.enableQuickAddButton(None, unicode(fax))
+        self.enableQuickAddButton(None, to_unicode(fax))
 
 
     def checkSendFaxButton(self):
@@ -1172,12 +1174,12 @@ class ScrollFaxView(ScrollView):
         try:
             try:
                 self.dev.open()
-            except Error, e:
+            except Error as e:
                 log.warn(e.msg)
 
             try:
                 self.dev.queryDevice(quick=True)
-            except Error, e:
+            except Error as e:
                 log.error("Query device error (%s)." % e.msg)
                 self.dev.error_state = ERROR_STATE_ERROR
 
@@ -1211,7 +1213,7 @@ class ScrollFaxView(ScrollView):
 
 
         for f in self.file_list:
-            log.debug(unicode(f))
+            log.debug(to_unicode(f))
 
         self.busy = True
 
@@ -1242,7 +1244,7 @@ class ScrollFaxView(ScrollView):
         while self.update_queue.qsize():
             try:
                 status, page_num, arg = self.update_queue.get(0)
-            except Queue.Empty:
+            except queue.Empty:
                 break
 
             if status == fax.STATUS_IDLE:

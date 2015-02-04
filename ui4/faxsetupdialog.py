@@ -28,15 +28,15 @@ from base.g import *
 from base import device, utils
 from prnt import cups
 from base.codes import *
-from ui_utils import *
-
+from .ui_utils import *
+from base.sixext import to_unicode
 # Qt
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Ui
-from faxsetupdialog_base import Ui_Dialog
-from deviceuricombobox import DEVICEURICOMBOBOX_TYPE_FAX_ONLY
+from .faxsetupdialog_base import Ui_Dialog
+from .deviceuricombobox import DEVICEURICOMBOBOX_TYPE_FAX_ONLY
 
 fax_enabled = prop.fax_build
 
@@ -156,7 +156,7 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
     #
 
     def NameCompanyLineEdit_editingFinished(self):
-        self.saveNameCompany(unicode(self.NameCompanyLineEdit.text()))
+        self.saveNameCompany(to_unicode(self.NameCompanyLineEdit.text()))
 
 
     def NameCompanyLineEdit_textChanged(self, s):
@@ -180,7 +180,7 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
     #
 
     def FaxNumberLineEdit_editingFinished(self):
-        self.saveFaxNumber(unicode(self.FaxNumberLineEdit.text()))
+        self.saveFaxNumber(to_unicode(self.FaxNumberLineEdit.text()))
 
 
     def FaxNumberLineEdit_textChanged(self, s):
@@ -204,7 +204,7 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
     #
 
     def VoiceNumberLineEdit_editingFinished(self):
-        self.saveVoiceNumber(unicode(self.VoiceNumberLineEdit.text()))
+        self.saveVoiceNumber(to_unicode(self.VoiceNumberLineEdit.text()))
 
 
     def VoiceNumberLineEdit_textChanged(self, s):
@@ -223,7 +223,7 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
     #
 
     def EmailLineEdit_editingFinished(self):
-        self.saveEmail(unicode(self.EmailLineEdit.text()))
+        self.saveEmail(to_unicode(self.EmailLineEdit.text()))
 
 
     def EmailLineEdit_textChanged(self, s):
@@ -258,7 +258,7 @@ class FaxSetupDialog(QDialog, Ui_Dialog):
         beginWaitCursor()
         try:
             try:
-                name_company = self.dev.getStationName()
+                name_company = to_unicode(self.dev.getStationName())
                 log.debug("name_company = '%s'" % name_company)
                 self.NameCompanyLineEdit.setText(name_company)
                 fax_number = str(self.dev.getPhoneNum())

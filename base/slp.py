@@ -29,8 +29,9 @@ import random
 import re
 
 # Local
-from g import *
-import utils
+from .g import *
+from . import utils
+from .sixext import to_bytes_utf8, to_unicode, to_string_utf8
 
 prod_pat = re.compile(r"""\(\s*x-hp-prod_id\s*=\s*(.*?)\s*\)""", re.IGNORECASE)
 mac_pat  = re.compile(r"""\(\s*x-hp-mac\s*=\s*(.*?)\s*\)""", re.IGNORECASE)
@@ -41,27 +42,23 @@ p2_pat =   re.compile(r"""\(\s*x-hp-p2\s*=(?:\d\)|\s*(.*?)\s*\))""", re.IGNORECA
 p3_pat =   re.compile(r"""\(\s*x-hp-p3\s*=(?:\d\)|\s*(.*?)\s*\))""", re.IGNORECASE)
 hn_pat =   re.compile(r"""\(\s*x-hp-hn\s*=\s*(.*?)\s*\)""", re.IGNORECASE)
 
-
-def detectNetworkDevices(ttl=4, timeout=10): #, xid=None, qappobj = None):
-    mcast_addr, mcast_port ='224.0.1.60', 427
-    found_devices = {}
-
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-
-    x = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+def createSocketsWithsetOption(ttl=4):
+    s=None
     
     try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        x = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         x.connect(('1.2.3.4', 56))
+        intf = x.getsockname()[0]
+        x.close()
+        s.setblocking(0)
+        ttl = struct.pack('B', ttl) 
     except socket.error:
-        log.error("Network is unreachable. Please check your network connection and try again.")
-        return {}
+        log.error("Network error")
+        if s:
+            s.close()
+        return None
         
-    intf = x.getsockname()[0]
-    x.close()
-
-    s.setblocking(0)
-    ttl = struct.pack('B', ttl) 
-
     try:
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) 
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
@@ -72,16 +69,28 @@ def detectNetworkDevices(ttl=4, timeout=10): #, xid=None, qappobj = None):
         s.setsockopt(socket.SOL_IP, socket.IP_MULTICAST_TTL, ttl)
         s.setsockopt(socket.SOL_IP, socket.IP_MULTICAST_IF, socket.inet_aton(intf) + socket.inet_aton('0.0.0.0'))
         s.setsockopt(socket.SOL_IP, socket.IP_MULTICAST_LOOP ,1)
-    except Exception, e:
+    except Exception as e:
         log.error("Unable to setup multicast socket for SLP: %s" % e)
+        if s:
+            s.close()
+        return None
+    return s
+
+
+def detectNetworkDevices(ttl=4, timeout=10): #, xid=None, qappobj = None):
+    mcast_addr, mcast_port ='224.0.1.60', 427
+    found_devices = {}
+
+    s = createSocketsWithsetOption(ttl)
+    if not s:
         return {}
 
-    packet = ''.join(['\x01\x06\x00\x2c\x00\x00\x65\x6e\x00\x03', 
-        struct.pack('!H', random.randint(1, 65535)), '\x00\x00\x00\x18service:x-hpnp-discover:\x00\x00\x00\x00'])
+    packet = b''.join([to_bytes_utf8('\x01\x06\x00\x2c\x00\x00\x65\x6e\x00\x03'), 
+        struct.pack('!H', random.randint(1, 65535)), to_bytes_utf8('\x00\x00\x00\x18service:x-hpnp-discover:\x00\x00\x00\x00')])
 
     try:
         s.sendto(packet, 0, (mcast_addr, mcast_port))
-    except socket.error, e:
+    except socket.error as e:
         log.error("Unable to send broadcast SLP packet: %s" % e)
 
     time_left = timeout
@@ -103,7 +112,7 @@ def detectNetworkDevices(ttl=4, timeout=10): #, xid=None, qappobj = None):
             x = struct.unpack("!%ds" % attr_length, data[16:])[0].strip()
         except struct.error:
             continue
-
+        x= to_string_utf8(x)
         try:
             num_ports = int(num_port_pat.search(x).group(1))
         except (AttributeError, ValueError):
@@ -172,7 +181,7 @@ def detectNetworkDevices(ttl=4, timeout=10): #, xid=None, qappobj = None):
 
         log.debug("Found device: %s" % y)
 
-
+    s.close()
     return found_devices
 
 

@@ -104,6 +104,6 @@ class Ui_Dialog(object):
         self.NextButton.setText(QtGui.QApplication.translate("Dialog", "Next >", None, QtGui.QApplication.UnicodeUTF8))
         self.CancelButton.setText(QtGui.QApplication.translate("Dialog", "Cancel", None, QtGui.QApplication.UnicodeUTF8))
 
-from printsettingstoolbox import PrintSettingsToolbox
-from printernamecombobox import PrinterNameComboBox
-from filetable import FileTable
+from .printsettingstoolbox import PrintSettingsToolbox
+from .printernamecombobox import PrinterNameComboBox
+from .filetable import FileTable

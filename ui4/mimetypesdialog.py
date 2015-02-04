@@ -22,12 +22,12 @@
 # Local
 from base.g import *
 from base.codes import *
-from ui_utils import *
+from .ui_utils import *
 
 # Qt
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from mimetypesdialog_base import Ui_MimeTypesDialog_base
+from .mimetypesdialog_base import Ui_MimeTypesDialog_base
 
 
 
@@ -37,7 +37,7 @@ class MimeTypesDialog(QDialog, Ui_MimeTypesDialog_base):
         self.setupUi(self)
 
         self.TypesTableWidget.setRowCount(len(mime_types))
-        t = mime_types.keys()
+        t = list(mime_types.keys())
         t.sort()
         for row, m in enumerate(t):
             i = QTableWidgetItem(m)

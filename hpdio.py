@@ -31,14 +31,15 @@ import sys
 import struct
 import os
 import time
-import Queue
+from base.sixext.moves import queue
 import select
-from cPickle import dumps, HIGHEST_PROTOCOL
+from pickle import dumps, HIGHEST_PROTOCOL
 
 # Local
 from base.g import *
 from base.codes import *
 from base import utils, device, status, models
+from base.sixext import PY3
 
 # dBus
 try:
@@ -66,7 +67,7 @@ def run(read_pipe2=None,  # pipe from hpssd
 
     global r2, w3
 #    tmp_dir = '/tmp'
-    os.umask(0111)
+    os.umask(0o111)
 
     try:
         log.set_module("hp-systray(hpdio)")
@@ -85,7 +86,7 @@ def run(read_pipe2=None,  # pipe from hpssd
                 r, w, e = select.select([r2], [], [r2], 1.0)
             except KeyboardInterrupt:
                 break
-            except select.error, e:
+            except select.error as e:
                 if e[0] == errno.EINTR:
                     continue
                 else:
@@ -93,19 +94,20 @@ def run(read_pipe2=None,  # pipe from hpssd
 
             if not r: continue
             if e: break
-
-            m = ''.join([m, os.read(r2, fmt_size)])
-
+            m = os.read(r2, fmt_size)
             if not m:
                 break
 
             while len(m) >= fmt_size:
                 response.clear()
-                event = device.Event(*struct.unpack(fmt, m[:fmt_size]))
+                event = device.Event(*[x.rstrip(b'\x00').decode('utf-8') if isinstance(x, bytes) else x for x in struct.unpack(fmt, m[:fmt_size])])
                 m = m[fmt_size:]
 
                 action = event.event_code
-                device_uri = event.device_uri
+                if PY3:
+                     device_uri = event.device_uri
+                else:
+                     device_uri = str(event.device_uri)
 
                 log.debug("Handling event...")
                 event.debug()
@@ -125,7 +127,7 @@ def run(read_pipe2=None,  # pipe from hpssd
                         try:
                             #print "Device.open()"
                             dev.open()
-                        except Error, e:
+                        except Error as e:
                             log.error(e.msg)
                             response = {'error-state': ERROR_STATE_ERROR,
                                         'device-state': DEVICE_STATE_NOT_FOUND,
@@ -139,7 +141,7 @@ def run(read_pipe2=None,  # pipe from hpssd
                                     #print "Device.queryDevice()"
                                     dev.queryDevice()
 
-                                except Error, e:
+                                except Error as e:
                                     log.error("Query device error (%s)." % e.msg)
                                     dev.error_state = ERROR_STATE_ERROR
                                     dev.status_code = EVENT_ERROR_DEVICE_IO_ERROR
@@ -155,7 +157,7 @@ def run(read_pipe2=None,  # pipe from hpssd
                                 try:
                                     dev.pollDevice()
 
-                                except Error, e:
+                                except Error as e:
                                     log.error("Poll device error (%s)." % e.msg)
                                     dev.error_state = ERROR_STATE_ERROR
 

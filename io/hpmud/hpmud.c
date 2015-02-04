@@ -281,6 +281,7 @@ bugout:
    return stat;
 }
 
+
 static int new_device(const char *uri, enum HPMUD_IO_MODE mode, int *result)
 {
    int index=0;      /* device[0] is unused */
@@ -731,4 +732,3 @@ enum HPMUD_RESULT hpmud_get_dstat(HPMUD_DEVICE dd, struct hpmud_dstat *ds)
 bugout:
    return stat;
 }
-

@@ -22,16 +22,17 @@
 
 
 from qt import *
-from faxsettingsform_base import FaxSettingsForm_base
+from .faxsettingsform_base import FaxSettingsForm_base
 from base.g import *
 from base import device, pml, utils
+from base.sixext import  to_unicode
 
 class PhoneNumValidator(QValidator):
     def __init__(self, parent=None, name=None):
         QValidator.__init__(self, parent, name)
 
     def validate(self, input, pos):
-        input = unicode(input)
+        input = to_unicode(input)
         try:
             input = input.encode('ascii')
         except UnicodeEncodeError:
@@ -52,7 +53,7 @@ class StationNameValidator(QValidator):
         QValidator.__init__(self, parent, name)
 
     def validate(self, input, pos):
-        input = unicode(input)
+        input = to_unicode(input)
 
         try:
             input = input.encode('ascii')
@@ -95,8 +96,8 @@ class FaxSettingsForm(FaxSettingsForm_base):
         if toggle is not None:
             self.pushButtonOK.setEnabled(bool(toggle))
         else:
-            name = unicode(self.nameEdit.text())
-            fax_num = unicode(self.faxEdit.text())
+            name = to_unicode(self.nameEdit.text())
+            fax_num = to_unicode(self.faxEdit.text())
             self.pushButtonOK.setEnabled(bool(name and fax_num))
 
     def accept(self):
@@ -113,7 +114,7 @@ class FaxSettingsForm(FaxSettingsForm_base):
 
         # TODO: This is a problem - user can enter non-ascii chars...
         # user config needs to be in utf-8 encoding (but its not right now)
-        user_conf.set('fax', 'voice_phone', unicode(self.voiceEdit.text()).encode('utf-8'))
-        user_conf.set('fax', 'email_address', unicode(self.emailEdit.text()).encode('utf-8'))
+        user_conf.set('fax', 'voice_phone', to_unicode(self.voiceEdit.text()).encode('utf-8'))
+        user_conf.set('fax', 'email_address', to_unicode(self.emailEdit.text()).encode('utf-8'))
         FaxSettingsForm_base.accept(self)
 

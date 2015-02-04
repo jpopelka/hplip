@@ -28,22 +28,22 @@ from base.g import *
 from base import device, utils
 from prnt import cups
 from base.codes import *
-from ui_utils import *
+from .ui_utils import *
 
 # Qt
 from qt import *
 
 # Ui
-from firmwaredialog_base import FirmwareDialog_Base
+from .firmwaredialog_base import FirmwareDialog_Base
 
 class FirmwareDialog(QDialog, FirmwareDialog_Base):
     def __init__(self, parent, device_uri):
-	QDialog.__init__(self, parent)        
-	self.setupUi(self)        
-	self.device_uri = device_uri
+        QDialog.__init__(self, parent)        
+        self.setupUi(self)        
+        self.device_uri = device_uri
         self.initUi()
         QTimer.singleShot(0, self.updateUi)
-	
+
     def initUi(self):
         self.DeviceComboBox.setFilter({'fw-download' : (operator.gt, 0)})
         self.DeviceComboBox.setParent(self)
@@ -52,7 +52,7 @@ class FirmwareDialog(QDialog, FirmwareDialog_Base):
         signal.signal(signal.SIGINT, signal.SIG_DFL)
 
         # Application icon
-	self.setIcon(load_pixmap('hp_logo', '128x128'))
+        self.setIcon(load_pixmap('hp_logo', '128x128'))
 
         if self.device_uri:
             self.DeviceComboBox.setInitialDevice(self.device_uri)
@@ -107,11 +107,11 @@ class FirmwareDialog(QDialog, FirmwareDialog_Base):
     def FailureUI(self, error_text):
         
         QMessageBox.critical(self,
-		self.caption(),
-		error_text,
-		QMessageBox.Ok,
-		QMessageBox.NoButton,
-		QMessageBox.NoButton)
+                self.caption(),
+                error_text,
+                QMessageBox.Ok,
+                QMessageBox.NoButton,
+                QMessageBox.NoButton)
 
 
     def CheckDeviceUI(self):

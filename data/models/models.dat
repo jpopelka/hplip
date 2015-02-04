@@ -2585,7 +2585,7 @@ usb-vid=3f0
 wifi-config=3
 
 [officejet_100_mobile_l411]
-align-type=10
+align-type=-1
 clean-type=1
 color-cal-type=0
 copy-type=0
@@ -4663,8 +4663,8 @@ usb-vid=3f0
 wifi-config=0
 
 [officejet_150_mobile_l511]
-align-type=0
-clean-type=1
+align-type=-1
+clean-type=-1
 color-cal-type=0
 copy-type=0
 embedded-server-type=0
@@ -53910,7 +53910,6 @@ io-mode=1
 io-support=14
 job-storage=0
 linefeed-cal-type=0
-model1=HP OfficeJet 8040 e-All-in-One
 monitor-type=0
 panel-check-type=0
 pcard-type=0

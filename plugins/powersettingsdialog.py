@@ -20,12 +20,12 @@
 #
 
 from base.g import *
-import powersettings
-import powersettings2
+from . import powersettings
+from . import powersettings2
 from base import pml
 
 from qt import *
-from powersettingsdialog_base import PowerSettingsDialog_base
+from .powersettingsdialog_base import PowerSettingsDialog_base
 
 
 class PowerSettingsDialog(PowerSettingsDialog_base): # Dyn Ctr (DJ4xx)

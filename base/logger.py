@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # (c) Copyright 2002-2008 Hewlett-Packard Development Company, L.P.
@@ -21,7 +22,8 @@
 
 # Std Lib
 import sys
-import thread # TODO: Use threading instead (thread deprecated in Python 3.0)
+from .sixext.moves import _thread
+from .sixext import binary_type
 import syslog
 import traceback
 import string
@@ -29,11 +31,13 @@ import os
 import re
 import pprint
 
-identity = string.maketrans('','')
-unprintable = identity.translate(identity, string.printable)
+#maketrans = ''.maketrans
+#identity = maketrans('','')
+#unprintable = identity.translate(identity, string.printable)
 
 def printable(s):
-    return s.translate(identity, unprintable)
+    #return s.translate(identity, unprintable)
+    return s
 
 DEFAULT_LOG_LEVEL = 'info'
 
@@ -106,7 +110,7 @@ class Logger(object):
         self._log_file = log_file
         self._log_file_f = None
         self._log_datetime = log_datetime
-        self._lock = thread.allocate_lock()
+        self._lock = _thread.allocate_lock()
         self.module = module
         self.pid = os.getpid()
         self.fmt = True
@@ -116,7 +120,7 @@ class Logger(object):
     def set_level(self, level):
         if isinstance(level, str):
             level = level.lower()
-            if level in Logger.logging_levels.keys():
+            if level in list(Logger.logging_levels.keys()):
                 self._level = Logger.logging_levels.get(level, Logger.LOG_LEVEL_INFO)
                 return True
             else:
@@ -147,7 +151,7 @@ class Logger(object):
     def set_logfile(self, log_file):
         self._log_file = log_file
         try:
-            self._log_file_f = file(self._log_file, 'w')
+            self._log_file_f = open(self._log_file, 'w')
         except IOError:
             self._log_file = None
             self._log_file_f = None
@@ -194,7 +198,7 @@ class Logger(object):
                     if newline:
                         out.write('\n')
 
-		    out.flush()
+                    out.flush()
                 finally:
                     self._lock.release()
 
@@ -268,6 +272,12 @@ class Logger(object):
     def log_data(self, data, width=16):
         if self._level <= Logger.LOG_LEVEL_DEBUG:
             if data:
+                if isinstance(data, binary_type):
+                    try:
+                        data = data.decode('utf-8')
+                    except (UnicodeDecodeError, UnicodeEncodeError):
+                        data = data.decode('latin-1')
+
                 index, line = 0, data[0:width]
                 while line:
                     txt = ' '.join(['%04x: ' % index, ' '.join(['%02x' % ord(d) for d in line]),
@@ -296,7 +306,7 @@ class Logger(object):
 
     def warn(self, message):
         if self._level <= Logger.LOG_LEVEL_WARN:
-            txt = "warning: %s" % message
+            txt = "warning: %s" % message#.encode('utf-8')
             self.log(self.color(txt, 'fuscia'), Logger.LOG_LEVEL_WARN)
 
             syslog.syslog(syslog.LOG_WARNING, "%s[%d]: %s" % (self.module, self.pid, txt))
@@ -322,7 +332,7 @@ class Logger(object):
 
     def error(self, message):
         if self._level <= Logger.LOG_LEVEL_ERROR:
-            txt = "error: %s" % message
+            txt = "error: %s" % message#.encode("utf-8")
             self.log(self.color(txt, 'red'), Logger.LOG_LEVEL_ERROR)
 
             syslog.syslog(syslog.LOG_ALERT, "%s[%d]: %s" % (self.module, self.pid, txt))
@@ -334,7 +344,7 @@ class Logger(object):
 
     def fatal(self, message):
         if self._level <= Logger.LOG_LEVEL_FATAL:
-            txt = "fatal error: :%s" % self
+            txt = "fatal error: :%s" % self.module#.encode('utf-8')
             self.log(self.color(txt, 'red'), Logger.LOG_LEVEL_DEBUG)
 
             syslog.syslog(syslog.LOG_ALERT, "%s[%d]: %s" % (self.module, self.pid, txt))

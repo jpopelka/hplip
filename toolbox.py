@@ -35,6 +35,7 @@ import signal
 
 # Local
 from base.g import *
+#from . import base.utils as utils
 import base.utils as utils
 from base import status, tui, module
 
@@ -187,7 +188,7 @@ if ui_toolkit == 'qt3':
                 log.debug("Killing child toolbox process (pid=%d)..." % child_pid)
                 try:
                     os.kill(child_pid, signal.SIGKILL)
-                except OSError, e:
+                except OSError as e:
                     log.debug("Failed: %s" % e.message)
 
             mod.unlockInstance()
@@ -206,7 +207,7 @@ if ui_toolkit == 'qt3':
 
             try:
                 session_bus = dbus.SessionBus()
-            except dbus.exceptions.DBusException, e:
+            except dbus.exceptions.DBusException as e:
                 if os.getuid() != 0:
                     log.error("Unable to connect to dbus session bus. Exiting.")
                     sys.exit(1)
@@ -231,7 +232,7 @@ if ui_toolkit == 'qt3':
                 log.debug("Killing parent toolbox process (pid=%d)..." % parent_pid)
                 try:
                     os.kill(parent_pid, signal.SIGKILL)
-                except OSError, e:
+                except OSError as e:
                     log.debug("Failed: %s" % e.message)
 
             mod.unlockInstance()

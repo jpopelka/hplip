@@ -19,7 +19,7 @@
 #
 # Author: Amarnath Chitumalla
 #
-
+from __future__ import print_function
 __version__ = '1.0'
 __title__ = 'HPLIP logs capture Utility'
 __mod__ = 'hp-logcapture'
@@ -32,6 +32,7 @@ import glob
 
 from base.g import *
 from base import utils,tui,module, os_utils
+from base.sixext import to_string_utf8
 from subprocess import Popen, PIPE
 
 CUPS_FILE='/etc/cups/cupsd.conf'
@@ -59,9 +60,9 @@ def enable_log():
     log.debug ("cmd= %s"%cmd)
     sts,out=utils.run(cmd)
     if sts == 0:
-        cmd = "vi -c '%s/LogLevel warn/LogLevel debug\rhpLogLevel 15/' -c 'wq' %s"%("%s",CUPS_FILE)
+        cmd = "sed -i 's/LogLevel.*warn/LogLevel debug\rhpLogLevel 15/' %s "%CUPS_FILE
         log.debug("Changing 'Log level' to debug. cmd=%s"%cmd)
-        sts, cmd = utils.run(cmd)
+        sts= os.system(cmd)
         if sts != 0:
            log.error("Failed to update Loglevel to Debug in cups=%s"%CUPS_FILE)
 
@@ -168,8 +169,8 @@ try:
                     (INTERACTIVE_MODE,),run_as_root_ok=True, quiet=True)
 
     opts, device_uri, printer_name, mode, ui_toolkit, loc = \
-               mod.parseStdOpts('hl:g', ['help', 'help-rest', 'help-man', 'help-desc', 'logging=', 'debug','user='],handle_device_printer=False)
-except getopt.GetoptError, e:
+               mod.parseStdOpts('hl:g:r', ['help', 'help-rest', 'help-man', 'help-desc', 'logging=', 'debug','user='],handle_device_printer=False)
+except getopt.GetoptError as e:
     log.error(e.msg)
     usage()
 
@@ -187,7 +188,7 @@ for o, a in opts:
         usage('man')
 
     elif o == '--help-desc':
-        print __doc__,
+        print(__doc__, end=' ')
         clean_exit(0,False)
 
     elif o in ('-l', '--logging'):
@@ -208,8 +209,8 @@ if os.getuid() != 0:
     sys.exit()
 
 if not USER_NAME:
-    pout = Popen(["who", "am", "i"], stdout=PIPE)
-    output = pout.communicate()[0]
+    pout = Popen(["who"], stdout=PIPE)
+    output = to_string_utf8(pout.communicate()[0])
     if output:
         USER_NAME = output.split(' ')[0]
 
@@ -261,10 +262,11 @@ if ok and user_input == "y":
     backup_clearLog('/var/log/cups/error_log')
 
 
+
 ######## Waiting for user to completed job #######
 while 1:
     log.info(log.bold("\nPlease perform the tasks (Print, scan, fax) for which you need to collect the logs."))
-    ok,user_input =tui.enter_choice("Are you done with taks?. Press (y=yes*, q=quit):",['y','q'], 'y')
+    ok,user_input =tui.enter_choice("Are you done with tasks?. Press (y=yes*, q=quit):",['y','q'], 'y')
     if ok and user_input == "y":
         break;
     elif not ok or user_input == "q":

@@ -1,3 +1,4 @@
+import collections
 # Library to extract EXIF information in digital camera image files
 #
 # Contains code from "exifdump.py" originally written by Thierry Bousch
@@ -639,7 +640,7 @@ def s2n_motorola(str):
 # extract multibyte integer in Intel format (big endian)
 def s2n_intel(str):
     x=0
-    y=0L
+    y=to_long(0)
     for c in str:
         x=x | (ord(c) << y)
         y=y+8
@@ -759,8 +760,7 @@ class EXIF_header:
             field_type=self.s2n(entry+2, 2)
             if not 0 < field_type < len(FIELD_TYPES):
                 # unknown field type
-                raise ValueError, \
-                      'unknown type %d in tag 0x%04X' % (field_type, tag)
+                raise ValueError('unknown type %d in tag 0x%04X' % (field_type, tag))
             typelen=FIELD_TYPES[field_type][0]
             count=self.s2n(entry+4, 4)
             offset=entry+8
@@ -798,7 +798,7 @@ class EXIF_header:
                 tag_name=tag_entry[0]
                 if len(tag_entry) != 1:
                     # optional 2nd tag element is present
-                    if callable(tag_entry[1]):
+                    if isinstance(tag_entry[1], collections.Callable):
                         # call mapping function
                         printable=tag_entry[1](values)
                     else:
@@ -813,8 +813,8 @@ class EXIF_header:
                                                      values, field_offset,
                                                      count*typelen)
             if self.debug:
-                print '    %s: %s' % (tag_name,
-                                      repr(self.tags[ifd_name+' '+tag_name]))
+                print('    %s: %s' % (tag_name,
+                                      repr(self.tags[ifd_name+' '+tag_name])))
 
     # extract uncompressed TIFF thumbnail (like pulling teeth)
     # we take advantage of the pre-existing layout in the thumbnail IFD as
@@ -934,7 +934,7 @@ class EXIF_header:
         for i in range(1, len(value)):
             x=dict.get(i, ('Unknown', ))
             if self.debug:
-                print i, x
+                print(i, x)
             name=x[0]
             if len(x) > 1:
                 val=x[1].get(value[i], 'Unknown')
@@ -978,7 +978,7 @@ def process_file(file, debug=0):
 
     # deal with the EXIF info we found
     if debug:
-        print {'I': 'Intel', 'M': 'Motorola'}[endian], 'format'
+        print({'I': 'Intel', 'M': 'Motorola'}[endian], 'format')
     hdr=EXIF_header(file, endian, offset, debug)
     ifd_list=hdr.list_IFDs()
     ctr=0
@@ -991,27 +991,27 @@ def process_file(file, debug=0):
         else:
             IFD_name='IFD %d' % ctr
         if debug:
-            print ' IFD %d (%s) at offset %d:' % (ctr, IFD_name, i)
+            print(' IFD %d (%s) at offset %d:' % (ctr, IFD_name, i))
         hdr.dump_IFD(i, IFD_name)
         # EXIF IFD
         exif_off=hdr.tags.get(IFD_name+' ExifOffset')
         if exif_off:
             if debug:
-                print ' EXIF SubIFD at offset %d:' % exif_off.values[0]
+                print(' EXIF SubIFD at offset %d:' % exif_off.values[0])
             hdr.dump_IFD(exif_off.values[0], 'EXIF')
             # Interoperability IFD contained in EXIF IFD
             intr_off=hdr.tags.get('EXIF SubIFD InteroperabilityOffset')
             if intr_off:
                 if debug:
-                    print ' EXIF Interoperability SubSubIFD at offset %d:' \
-                          % intr_off.values[0]
+                    print(' EXIF Interoperability SubSubIFD at offset %d:' \
+                          % intr_off.values[0])
                 hdr.dump_IFD(intr_off.values[0], 'EXIF Interoperability',
                              dict=INTR_TAGS)
         # GPS IFD
         gps_off=hdr.tags.get(IFD_name+' GPSInfo')
         if gps_off:
             if debug:
-                print ' GPS SubIFD at offset %d:' % gps_off.values[0]
+                print(' GPS SubIFD at offset %d:' % gps_off.values[0])
             hdr.dump_IFD(gps_off.values[0], 'GPS', dict=GPS_TAGS)
         ctr+=1
 
@@ -1028,12 +1028,12 @@ def process_file(file, debug=0):
         hdr.tags['JPEGThumbnail']=file.read(size)
 
     # deal with MakerNote contained in EXIF IFD
-    if hdr.tags.has_key('EXIF MakerNote'):
+    if 'EXIF MakerNote' in hdr.tags:
         hdr.decode_maker_note()
 
     # Sometimes in a TIFF file, a JPEG thumbnail is hidden in the MakerNote
     # since it's not allowed in a uncompressed TIFF IFD
-    if not hdr.tags.has_key('JPEGThumbnail'):
+    if 'JPEGThumbnail' not in hdr.tags:
         thumb_off=hdr.tags.get('MakerNote JPEGThumbnail')
         if thumb_off:
             file.seek(offset+thumb_off.values[0])
@@ -1046,33 +1046,33 @@ if __name__ == '__main__':
     import sys
 
     if len(sys.argv) < 2:
-        print 'Usage: %s files...\n' % sys.argv[0]
+        print('Usage: %s files...\n' % sys.argv[0])
         sys.exit(0)
 
     for filename in sys.argv[1:]:
         try:
             file=open(filename, 'rb')
         except:
-            print filename, 'unreadable'
-            print
+            print(filename, 'unreadable')
+            print()
             continue
-        print filename+':'
+        print(filename+':')
         # data=process_file(file, 1) # with debug info
         data=process_file(file)
         if not data:
-            print 'No EXIF information found'
+            print('No EXIF information found')
             continue
 
-        x=data.keys()
+        x=list(data.keys())
         x.sort()
         for i in x:
             if i in ('JPEGThumbnail', 'TIFFThumbnail'):
                 continue
             try:
-                print '   %s (%s): %s' % \
-                      (i, FIELD_TYPES[data[i].field_type][2], data[i].printable)
+                print('   %s (%s): %s' % \
+                      (i, FIELD_TYPES[data[i].field_type][2], data[i].printable))
             except:
-                print 'error', i, '"', data[i], '"'
-        if data.has_key('JPEGThumbnail'):
-            print 'File has JPEG thumbnail'
-        print
+                print('error', i, '"', data[i], '"')
+        if 'JPEGThumbnail' in data:
+            print('File has JPEG thumbnail')
+        print()

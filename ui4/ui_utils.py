@@ -20,7 +20,6 @@
 #
 
 # Std Lib
-import os.path
 import re
 import os
 import time
@@ -30,6 +29,7 @@ from base.g import *
 from base.codes import *
 from base import utils
 from prnt import cups
+from base.sixext import PY3, to_unicode
 
 # Qt
 from PyQt4.QtCore import *
@@ -65,13 +65,13 @@ def load_pixmap(name, subdir=None, resize_to=None):
     name = ''.join([os.path.splitext(name)[0], '.png'])
 
     if subdir is None:
-        dir = prop.image_dir
+        image_dir = prop.image_dir
         ldir = os.path.join(os.getcwd(), 'data', 'images')
     else:
-        dir = os.path.join(prop.image_dir, subdir)
+        image_dir = os.path.join(prop.image_dir, subdir)
         ldir = os.path.join(os.getcwd(), 'data', 'images', subdir)
 
-    for d in [dir, ldir]:
+    for d in [image_dir, ldir]:
         f = os.path.join(d, name)
         if os.path.exists(f):
             if resize_to is not None:
@@ -81,7 +81,7 @@ def load_pixmap(name, subdir=None, resize_to=None):
             else:
                 return QPixmap(f)
 
-        for w in utils.walkFiles(dir, recurse=True, abs_paths=True, return_folders=False, pattern=name):
+        for w in utils.walkFiles(image_dir, recurse=True, abs_paths=True, return_folders=False, pattern=name):
             if resize_to is not None:
                 img = QImage(w)
                 x, y = resize_to
@@ -98,6 +98,54 @@ loadPixmap = load_pixmap
 def getPynotifyIcon(name, subdir='32x32'):
     name = ''.join([os.path.splitext(name)[0], '.png'])
     return "file://" + os.path.join(prop.image_dir, subdir, name)
+
+
+def value_str(data):
+    if data is None:
+        return ""
+    try:
+        if not PY3:
+            data = data.toString()
+    except(ValueError, TypeError) as e:
+        log.warn("value_str() Failed to convert data: %s" % e)
+        
+    return data
+
+
+def value_int(data):
+    i, ok = 0, False
+    if data is None:
+        return i, ok
+    try:
+        if PY3:
+            i =  int(data)
+            ok = True
+        else:
+            i, ok = data.toInt()
+    except (ValueError,TypeError) as e:
+        log.warn("value_int() Failed to convert data[%s]:%s  "%(data,e))
+
+    return i, ok
+
+
+def value_bool( data ):
+    b = False
+    if data is None:
+        return b
+    try:
+        if PY3:
+            if type(data) == str and data.lower() in ['false', '0']:
+                b = False
+            elif data in [False, 0]:
+                b = False
+            else:
+                b= True
+        else:
+            b = data.toBool()
+    except (ValueError,TypeError) as e:
+        log.warn("value_bool() Failed to convert data :%s"%e)
+
+    return b
 
 
 
@@ -139,7 +187,6 @@ class UserSettings(QSettings):
 
         return ''
 
-
     def loadDefaults(self):
         self.cmd_scan = self.__setup(['xsane -V %SANE_URI%', 'kooka', 'xscanimage'])
         self.cmd_fab = self.__setup(['hp-fab'])
@@ -150,63 +197,51 @@ class UserSettings(QSettings):
         self.sync()
 
         self.beginGroup("settings")
-        i, ok = self.value("systray_visible").toInt()
-        if ok:
-            self.systray_visible = i
-
-        i, ok = self.value("systray_messages").toInt()
-        if ok:
-            self.systray_messages = i
-
+        self.systray_visible = value_int(self.value("systray_visible"))[0]
+        
+        self.systray_messages = value_int(self.value("systray_messages"))[0]
+ 
         self.endGroup()
 
         self.beginGroup("last_used")
-        self.last_used_device_uri = unicode(self.value("device_uri").toString()) or self.last_used_device_uri
-        self.last_used_printer = unicode(self.value("printer_name").toString()) or self.last_used_printer
-        self.working_dir = unicode(self.value("working_dir").toString()) or self.working_dir
+        self.last_used_device_uri = value_str(self.value("device_uri")) or self.last_used_device_uri
+        self.last_used_printer = value_str(self.value("printer_name")) or self.last_used_printer
+        self.working_dir = value_str(self.value("working_dir")) or self.working_dir
         self.endGroup()
 
         self.beginGroup("commands")
-        self.cmd_scan = unicode(self.value("scan").toString()) or self.cmd_scan
+        self.cmd_scan = value_str(self.value("scan")) or self.cmd_scan
         self.endGroup()
 
         self.beginGroup("refresh")
-        self.auto_refresh_rate = int(self.value("rate").toString() or self.auto_refresh_rate)
-        self.auto_refresh = bool(self.value("enable").toBool())
-        self.auto_refresh_type = int(self.value("type").toString() or self.auto_refresh_type)
+        self.auto_refresh_rate = value_int(self.value("rate"))[0] or int(self.auto_refresh_rate)
+        self.auto_refresh = value_bool(self.value("enable"))
+        self.auto_refresh_type = value_int(self.value("type"))[0] or int(self.auto_refresh_type)
         self.endGroup()
 
         self.beginGroup("installation")
-        self.version = unicode(self.value("version").toString())
-        self.date_time = unicode(self.value("date_time").toString())
+        self.version = value_str(self.value("version"))
+        self.date_time = value_str(self.value("date_time"))
         self.endGroup()
 
         self.beginGroup("polling")
-        self.polling = bool(self.value("enable").toBool())
-        self.polling_interval = int(self.value("interval").toString() or self.polling_interval)
-        self.polling_device_list = unicode(self.value("device_list").toString() or '').split(u',')
+        self.polling = value_bool(self.value("enable"))
+        self.polling_interval = value_int(self.value("interval"))[0] or int(self.polling_interval)
+        self.polling_device_list = to_unicode(value_str(self.value("device_list"))).split(to_unicode(','))
         self.endGroup()
 
         self.beginGroup("fax")
-        self.voice_phone = unicode(self.value("voice_phone").toString())
-        self.email_address = unicode(self.value("email_address").toString())
+        self.voice_phone = value_str(self.value("voice_phone"))
+        self.email_address = to_unicode(value_str(self.value("email_address")))
         self.endGroup()
         
         self.beginGroup("upgrade")
-        self.upgrade_notify= bool(self.value("notify_upgrade").toBool())
-        self.latest_available_version=str(self.value("latest_available_version").toString())
-            
-        i, Ok = self.value("last_upgraded_time").toInt()
-        if Ok and i >0:
-            self.upgrade_last_update_time =i
-        else:
-            self.upgrade_last_update_time = 0
-            
-        i, Ok = self.value("pending_upgrade_time").toInt()
-        if Ok and i >0 :
-            self.upgrade_pending_update_time = i
-        else:
-            self.upgrade_pending_update_time = 0
+        self.upgrade_notify= value_bool(self.value("notify_upgrade"))
+        self.latest_available_version=value_str(self.value("latest_available_version"))
+        
+        self.upgrade_last_update_time = value_int(self.value("last_upgraded_time"))[0]
+        
+        self.upgrade_pending_update_time = value_int(self.value("pending_upgrade_time"))[0]
             
         self.endGroup()
 
@@ -215,44 +250,44 @@ class UserSettings(QSettings):
         log.debug("Saving user settings...")
 
         self.beginGroup("settings")
-        self.setValue("systray_visible", QVariant(self.systray_visible))
-        self.setValue("systray_messages", QVariant(self.systray_messages))
+        self.setValue("systray_visible", self.systray_visible)
+        self.setValue("systray_messages", self.systray_messages)
         self.endGroup()
 
         self.beginGroup("last_used")
-        self.setValue("device_uri",  QVariant(self.last_used_device_uri))
-        self.setValue("printer_name", QVariant(self.last_used_printer))
-        self.setValue("working_dir", QVariant(self.working_dir))
+        self.setValue("device_uri",  self.last_used_device_uri)
+        self.setValue("printer_name", self.last_used_printer)
+        self.setValue("working_dir", self.working_dir)
         self.endGroup()
 
         self.beginGroup("commands")
-        self.setValue("scan",  QVariant(self.cmd_scan))
+        self.setValue("scan",  self.cmd_scan)
         self.endGroup()
 
         self.beginGroup("refresh")
-        self.setValue("rate", QVariant(self.auto_refresh_rate))
-        self.setValue("enable", QVariant(self.auto_refresh))
-        self.setValue("type", QVariant(self.auto_refresh_type))
+        self.setValue("rate", self.auto_refresh_rate)
+        self.setValue("enable", self.auto_refresh)
+        self.setValue("type", self.auto_refresh_type)
         self.endGroup()
 
         self.beginGroup("polling")
-        self.setValue("enable", QVariant(self.polling))
-        self.setValue("interval", QVariant(self.polling_interval))
-        self.setValue("device_list", QVariant(u','.join(self.polling_device_list)))
+        self.setValue("enable", self.polling)
+        self.setValue("interval", self.polling_interval)
+        self.setValue("device_list", (to_unicode(',').join(self.polling_device_list)))
         self.endGroup()
 
         self.beginGroup("fax")
-        self.setValue("voice_phone", QVariant(self.voice_phone))
-        self.setValue("email_address", QVariant(self.email_address))
+        self.setValue("voice_phone", self.voice_phone)
+        self.setValue("email_address", self.email_address)
         self.endGroup()
         
         self.beginGroup("upgrade")
-        self.setValue("notify_upgrade", QVariant(self.upgrade_notify))
+        self.setValue("notify_upgrade", self.upgrade_notify)
         if self.upgrade_last_update_time <1:
-            self.upgrade_last_update_time = time.time()		# <---Need to verify code once
+            self.upgrade_last_update_time = int(time.time())          # <---Need to verify code once
             
-        self.setValue("last_upgraded_time", QVariant(self.upgrade_last_update_time))
-        self.setValue("pending_upgrade_time", QVariant(self.upgrade_pending_update_time))
+        self.setValue("last_upgraded_time", self.upgrade_last_update_time)
+        self.setValue("pending_upgrade_time", self.upgrade_pending_update_time)
         self.endGroup()
 
 
@@ -276,7 +311,7 @@ DEFAULT_TITLE =  __translate("HP Device Manager")
 
 
 def FailureUI(parent, error_text, title_text=None):
-    log.error(pat_html_remove.sub(' ', unicode(error_text)))
+    log.error(pat_html_remove.sub(' ', to_unicode(error_text)))
 
     if title_text is None:
         if parent is not None:
@@ -295,7 +330,7 @@ showFailureUi = FailureUI
 
 
 def WarningUI(parent,  warn_text, title_text=None):
-    log.warn(pat_html_remove.sub(' ', unicode(warn_text)))
+    log.warn(pat_html_remove.sub(' ', to_unicode(warn_text)))
 
     if title_text is None:
         if parent is not None:
@@ -315,7 +350,7 @@ showWarningUi = WarningUI
 
 
 def SuccessUI(parent, text, title_text=None):
-    log.info(pat_html_remove.sub(' ', unicode(text)))
+    log.info(pat_html_remove.sub(' ', to_unicode(text)))
 
     if title_text is None:
         if parent is not None:
@@ -345,21 +380,26 @@ class PrinterNameValidator(QValidator):
     def __init__(self, parent=None):
         QValidator.__init__(self, parent)
 
-    def validate(self, input, pos):
-        input = unicode(input)
+    def validate(self, input_data, pos):
+        returnCode = QValidator.Invalid
+        input_data = to_unicode(input_data)
 
-        if not input:
-            return QValidator.Acceptable, pos
-
-        if input[pos-1] in cups.INVALID_PRINTER_NAME_CHARS:
-            return QValidator.Invalid, pos
+        if not input_data:
+            returnCode = QValidator.Acceptable
+        elif input_data[pos-1] in cups.INVALID_PRINTER_NAME_CHARS:
+            returnCode = QValidator.Invalid
+        else:
+            returnCode = QValidator.Acceptable
 
         # TODO: How to determine if unicode char is "printable" and acceptable
         # to CUPS?
-        #elif input != utils.printable(input):
+        #elif input_data != utils.printable(input_data):
         #    return QValidator.Invalid, pos
-
-        return QValidator.Acceptable, pos
+        
+        if PY3:
+            return returnCode, input_data, pos
+        else:
+            return returnCode, pos
 
 
 
@@ -367,16 +407,21 @@ class PhoneNumValidator(QValidator):
     def __init__(self, parent=None):
         QValidator.__init__(self, parent)
 
-    def validate(self, input, pos):
-        input = unicode(input)
+    def validate(self, input_data, pos):
+        returnCode = QValidator.Invalid 
+        input_data = to_unicode(input_data)
 
-        if not input:
-            return QValidator.Acceptable, pos
+        if not input_data:
+            returnCode =  QValidator.Acceptable
+        elif input_data[pos-1] not in to_unicode('0123456789-(+).,#* '):
+            returnCode = QValidator.Invalid
+        else:
+            returnCode = QValidator.Acceptable
 
-        if input[pos-1] not in u'0123456789-(+).,#* ':
-            return QValidator.Invalid, pos
-
-        return QValidator.Acceptable, pos
+        if PY3:
+            return returnCode, input_data, pos
+        else:
+            return returnCode, pos
 
 
 class AddressBookNameValidator(QValidator):
@@ -384,19 +429,23 @@ class AddressBookNameValidator(QValidator):
         QValidator.__init__(self, parent)
         self.db = db
 
-    def validate(self, input, pos):
-        input = unicode(input)
+    def validate(self, input_data, pos):
+        returnCode = QValidator.Invalid
+        input_data = to_unicode(input_data)
 
-        if not input:
-            return QValidator.Acceptable, pos
+        if not input_data:
+            returnCode = QValidator.Acceptable
+        elif input_data in self.db.get_all_names():
+            returnCode = QValidator.Invalid
+        elif input_data[pos-1] in to_unicode('''|\\/"'''): # | is the drag 'n drop separator
+            returnCode = QValidator.Invalid
+        else:
+            returnCode = QValidator.Acceptable
 
-        if input in self.db.get_all_names():
-            return QValidator.Invalid, pos
-
-        if input[pos-1] in u'''|\\/"''': # | is the drag 'n drop separator
-            return QValidator.Invalid, pos
-
-        return QValidator.Acceptable, pos
+        if PY3:
+            return returnCode, input_data, pos
+        else:
+            return returnCode, pos
 
 
 
@@ -511,7 +560,7 @@ def getTimeDeltaDesc(past):
     t1.setTime_t(int(past))
     t2 = QDateTime.currentDateTime()
     delta = t1.secsTo(t2)
-    return __translate("(%1 ago)").arg(stringify(delta))
+    return __translate("(%s ago)"%stringify(delta))
 
 
 # "Nicely readable timedelta"
@@ -541,13 +590,13 @@ def stringify(seconds):
     try:
         i18n_amount = NUM_REPRS[amount]
     except KeyError:
-        i18n_amount = unicode(amount)
+        i18n_amount = to_unicode(amount)
 
     if amount == 1:
         i18n_unit = UNIT_NAMES[unit_name][0]
     else:
         i18n_unit = UNIT_NAMES[unit_name][1]
 
-    return QString("%1 %2").arg(i18n_amount).arg(i18n_unit)
+    return QString("%s %s"%(i18n_amount, i18n_unit))
 
 

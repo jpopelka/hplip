@@ -134,16 +134,16 @@ class CoverpageForm_base(QDialog):
 
 
     def coverpageListBox_currentChanged(self,a0):
-        print "CoverpageForm_base.coverpageListBox_currentChanged(QListBoxItem*): Not implemented yet"
+        print("CoverpageForm_base.coverpageListBox_currentChanged(QListBoxItem*): Not implemented yet")
 
     def prevCoverpageButton_clicked(self):
-        print "CoverpageForm_base.prevCoverpageButton_clicked(): Not implemented yet"
+        print("CoverpageForm_base.prevCoverpageButton_clicked(): Not implemented yet")
 
     def nextCoverpageButton_clicked(self):
-        print "CoverpageForm_base.nextCoverpageButton_clicked(): Not implemented yet"
+        print("CoverpageForm_base.nextCoverpageButton_clicked(): Not implemented yet")
 
     def preserveFormattingCheckBox_toggled(self,a0):
-        print "CoverpageForm_base.preserveFormattingCheckBox_toggled(bool): Not implemented yet"
+        print("CoverpageForm_base.preserveFormattingCheckBox_toggled(bool): Not implemented yet")
 
     def __tr(self,s,c = None):
         return qApp.translate("CoverpageForm_base",s,c)

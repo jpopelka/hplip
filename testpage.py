@@ -49,8 +49,12 @@ try:
     opts, device_uri, printer_name, mode, ui_toolkit, loc = \
         mod.parseStdOpts()
 
-    printer_name, device_uri = mod.getPrinterName(printer_name, device_uri)
     wait_for_printout = False
+    sts, printer_name, device_uri = mod.getPrinterName(printer_name, device_uri)
+
+    if not sts:
+        log.error("No installed printers found (or) Invalid printer device selected")
+        sys.exit(1)
 
     if mode == GUI_MODE:
         if not utils.canEnterGUIMode4():
@@ -69,7 +73,6 @@ try:
 
         if 1:
             app = QApplication(sys.argv)
-
             dialog = PrintTestPageDialog(None, printer_name)
             dialog.show()
             try:
@@ -84,7 +87,7 @@ try:
     #else: # INTERACTIVE_MODE
         try:
             d = device.Device(device_uri, printer_name)
-        except Error, e:
+        except Error as e:
             log.error("Device error (%s)." % e.msg)
             sys.exit(1)
 
@@ -104,7 +107,7 @@ try:
                 log.info( "Printing test page to printer %s..." % printer_name)
                 try:
                     d.printTestPage(printer_name)
-                except Error, e:
+                except Error as e:
                     if e.opt == ERROR_NO_CUPS_QUEUE_FOUND_FOR_DEVICE:
                         log.error("No CUPS queue found for device. Please install the printer in CUPS and try again.")
                     else:
@@ -121,7 +124,7 @@ try:
 
                             try:
                                 d.queryDevice(quick=True)
-                            except Error, e:
+                            except Error as e:
                                 log.error("An error has occured.")
 
                             if d.error_state == ERROR_STATE_CLEAR:

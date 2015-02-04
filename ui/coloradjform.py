@@ -23,11 +23,11 @@
 
 # Local
 from base.g import *
-from ui_utils import load_pixmap
+from .ui_utils import load_pixmap
 
 # Qt
 from qt import *
-from coloradjform_base import ColorAdjForm_base
+from .coloradjform_base import ColorAdjForm_base
 
 class ColorAdjForm(ColorAdjForm_base):
     def __init__(self, parent, line, name = None, modal = 0, fl = 0):

@@ -23,15 +23,15 @@
 from base.g import *
 from base import utils, pml
 from copier import copier
+from base.sixext.moves import queue
 
 # Qt
 from qt import *
-from scrollview import ScrollView, PixmapLabelButton
-from waitform import WaitForm
+from .scrollview import ScrollView, PixmapLabelButton
+from .waitform import WaitForm
 
 # Std Lib
 import os.path, os
-import Queue
 
 
 class ScrollCopyView(ScrollView):
@@ -47,8 +47,8 @@ class ScrollCopyView(ScrollView):
         self.reduction = reduction
         self.fit_to_page = fit_to_page
 
-        self.update_queue = Queue.Queue() # UI updates from copy thread
-        self.event_queue = Queue.Queue() # UI events to copy thread
+        self.update_queue = queue.Queue() # UI updates from copy thread
+        self.event_queue = queue.Queue() # UI events to copy thread
 
     def getDeviceSettings(self):
         QApplication.setOverrideCursor(QApplication.waitCursor)
@@ -442,7 +442,7 @@ class ScrollCopyView(ScrollView):
         while self.update_queue.qsize():
             try:
                 status = self.update_queue.get(0)
-            except Queue.Empty:
+            except queue.Empty:
                 break
 
             if status == copier.STATUS_IDLE:

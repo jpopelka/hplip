@@ -24,8 +24,10 @@ import sys
 import struct
 
 # Local
-from g import *
-from base.utils import unprintable
+from .g import *
+from .utils import printable
+from .utils import unprintable
+from .sixext import to_bytes_utf8, to_unicode, to_bytes_latin, PY3, to_string_latin
 
 # Request codes
 GET_REQUEST = 0x00
@@ -96,7 +98,7 @@ def buildPMLGetPacketEx(oid): # OID identifier dict
     return buildPMLGetPacket(oid['oid'])
 
 def buildEmbeddedPMLSetPacket(oid, value, data_type):
-    return ''.join(['PML\x20', buildPMLSetPacket(oid, value, data_type)])
+    return to_bytes_utf8('').join([to_bytes_utf8('PML\x20'), buildPMLSetPacket(oid, value, data_type)])
 
 def buildPMLSetPacket(oid, value, data_type): # String dotted notation
     oid = ''.join([chr(int(b.strip())) for b in oid.split('.')])
@@ -125,9 +127,8 @@ def buildPMLSetPacket(oid, value, data_type): # String dotted notation
     p = struct.pack('>BBB%ss%ss' % (len(oid), len(data)),
                     SET_REQUEST,
                     TYPE_OBJECT_IDENTIFIER,
-                    len(oid), oid,
+                    len(oid), to_bytes_utf8(oid),
                     data)
-
     return p
 
 def ConvertToPMLDataFormat(value, data_type):
@@ -147,7 +148,13 @@ def ConvertToPMLDataFormat(value, data_type):
         data = struct.pack(">f", float(value))
 
     elif data_type == TYPE_STRING:
-        #data = struct.pack(">BB%ss" % len(value), 0x01, 0x15, value)
+        #For PY2: If data is in unicode, converting to string (e.g Fax Name)
+        #For PY3: If data is in string, converting to bytes
+        try:
+            value = value.encode('utf-8')
+        except (UnicodeEncodeError, UnicodeDecodeError) as e:
+            value = value
+
         data = struct.pack(">BB%ss" % len(value), 0x00, 0x0e, value) # changed for K80, seems to work on others...
 
     elif data_type == TYPE_BINARY:
@@ -162,25 +169,23 @@ def ConvertToPMLDataFormat(value, data_type):
 
 def ConvertFromPMLDataFormat(data, data_type, desired_int_size=INT_SIZE_INT):
     if data_type in (TYPE_ENUMERATION, TYPE_SIGNED_INTEGER, TYPE_COLLECTION):
-
         if len(data):
-
-            if data[0] == '\xff':
+            if data[0] == b'\xff':
                 while len(data) < 4:
-                    data = '\xff' + data
+                    data = b'\xff' + data
 
             else:
                 while len(data) < 4:
-                    data = '\x00' + data
+                    data = b'\x00' + data
 
             if desired_int_size == INT_SIZE_INT:
                 return struct.unpack(">i", data)[0]
 
             elif desired_int_size == INT_SIZE_WORD:
-                return struct.unpack(">h", data[-INT_SIZE_WORD])[0]
+                return struct.unpack(">h", data[len(INT_SIZE_WORD)-INT_SIZE_WORD:len(INT_SIZE_WORD)])[0]
 
             elif desired_int_size == INT_SIZE_BYTE:
-                return struct.unpack(">b", data[-INT_SIZE_BYTE])[0]
+                return struct.unpack(">b", data[len(data)-INT_SIZE_BYTE:len(data)])[0]
 
             else:
                 raise Error(ERROR_INTERNAL)
@@ -195,10 +200,13 @@ def ConvertFromPMLDataFormat(data, data_type, desired_int_size=INT_SIZE_INT):
             return 0.0
 
     elif data_type == TYPE_STRING:
-        return ''.join([c for c in data if c not in unprintable])
+        if PY3:
+            return to_string_latin(b''.join([to_bytes_latin(chr(c)) for c in data if to_bytes_latin(chr(c)) not in unprintable]))
+        else:
+            return ''.join([c for c in data if c not in unprintable])
 
     elif data_type == TYPE_BINARY:
-        return data
+        return to_string_latin(data)
 
     return None
 

@@ -24,7 +24,6 @@
 
   Author: Naga Samrat Chowdary Narla, Sarbeswar Meher
 \*****************************************************************************/
-
 #ifdef HAVE_LIBNETSNMP
 
 #ifndef _GNU_SOURCE
@@ -50,7 +49,7 @@ mud_device_vf __attribute__ ((visibility ("hidden"))) jd_mud_device_vf =
 
 static mud_channel_vf jd_channel_vf =
 {
-   .open = jd_s_channel_open,
+   .open = jd_s_channel_open, 
    .close = jd_s_channel_close,
    .channel_write = jd_s_channel_write,
    .channel_read = jd_s_channel_read
@@ -87,11 +86,12 @@ static int device_id(const char *iporhostname, int port, char *buffer, int size)
    maxSize = (size > 1024) ? 1024 : size;   /* RH8 has a size limit for device id */
 
    if ((len = GetSnmp(iporhostname, port, (char *)kStatusOID, (unsigned char *)buffer, maxSize, &dt, &status, &result)) == 0)
-   {
+   {       
+        //Try one more time with previous default community name string "public.1" which was used for old HP printers.  
        if ((len = GetSnmp(iporhostname, PORT_PUBLIC_1, (char *)kStatusOID, (unsigned char *)buffer, maxSize, &dt, &status, &result)) == 0)
-      {
-          BUG("unable to read device-id\n");
-      }
+       {
+            BUG("unable to read device-id\n");
+       }
    }
 
    return len; /* length does not include zero termination */
@@ -172,6 +172,7 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) jd_open(mud_device *pd
          pd->port = strtol(p+5, &tail, 10);
       else
          pd->port = PORT_PUBLIC;
+
       if (pd->port > PORT_PUBLIC_3)
       {
          stat = HPMUD_R_INVALID_IP_PORT;
@@ -773,7 +774,7 @@ enum HPMUD_RESULT hpmud_mdns_lookup(const char *host_name, int sec_timeout, char
    while (1)
    {
 
-      DBG("send socket=%d len=%d\n", udp_socket, n);
+      BUG("send socket=%d len=%d\n", udp_socket, n);
       DBG_DUMP(dnsquery, n);
 
       bzero(&send_addr, sizeof(send_addr));
@@ -790,6 +791,8 @@ enum HPMUD_RESULT hpmud_mdns_lookup(const char *host_name, int sec_timeout, char
 
       readfd = master;
       ret = select(maxfd+1, &readfd, NULL, NULL, &tmo);
+      BUG("In while after select ret=%d maxfd=%d tmo=%d\n", ret, maxfd, tmo);
+
       if (ret < 0)
       {
          BUG("error mdns lookup %s: %m\n", host);
@@ -927,5 +930,9 @@ enum HPMUD_RESULT hpmud_make_mdns_uri(const char *host, int port, char *uri, int
 bugout:
    return stat;
 }
-
 #endif  /* HAVE_LIBNETSNMP */
+
+
+
+
+

@@ -20,7 +20,7 @@
 #
 
 from qt import *
-from aligntype6form2_base import AlignType6Form2_base
+from .aligntype6form2_base import AlignType6Form2_base
 
 class AlignType6Form2(AlignType6Form2_base):
     def __init__(self,parent = None,name = None,modal = 0,fl = 0):

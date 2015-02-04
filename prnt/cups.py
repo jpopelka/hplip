@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
@@ -25,13 +26,13 @@ import os.path
 import gzip
 import re
 import time
-import urllib
 import tempfile
 import glob
 
 # Local
 from base.g import *
 from base import utils, models, os_utils
+from base.sixext import PY3
 
 INVALID_PRINTER_NAME_CHARS = """~`!@#$%^&*()=+[]{}()\\/,.<>?'\";:| """
 
@@ -64,7 +65,6 @@ try:
     os.environ['LC_CTYPE'] = newctype
 
     import cupsext
-
     # restore the old env values
     if current_ctype is not None:
         os.environ['LC_CTYPE'] = current_ctype
@@ -217,7 +217,7 @@ def getAllowableMIMETypes():
         files.extend(glob.glob(path))
     for f in files:
         #log.debug( "Capturing allowable MIME types from: %s" % f )
-        conv_file = file(f, 'r')
+        conv_file = open(f, 'r')
 
         for line in conv_file:
             if not line.startswith("#") and len(line) > 1:
@@ -242,10 +242,10 @@ def getPPDDescription(f):
     if f.endswith('.gz'):
         nickname = gzip.GzipFile(f, 'r').read(4096)
     else:
-        nickname = file(f, 'r').read(4096)
+        nickname = open(f, 'r').read(4096)
 
     try:
-        desc = nickname_pat.search(nickname).group(1)
+        desc = nickname_pat.search(nickname.decode('utf-8')).group(1)
     except AttributeError:
         desc = ''
 
@@ -334,7 +334,7 @@ def levenshtein_distance(a,b):
         a,b = b,a
         n,m = m,n
 
-    current = range(n+1)
+    current = list(range(n+1))
     for i in range(1,m+1):
         previous, current = current, [i]+[0]*m
 
@@ -358,7 +358,7 @@ STRIP_STRINGS2 = ['foomatic:', 'hp-', 'hp_', 'hp ', '.gz', '.ppd',
                  '-jr', '-lidl', '-lidil', '-ldl', '-hpijs']
 
 
-for p in models.TECH_CLASS_PDLS.values():
+for p in list(models.TECH_CLASS_PDLS.values()):
     pp = '-%s' % p
     if pp not in STRIP_STRINGS2:
         STRIP_STRINGS2.append(pp)
@@ -393,7 +393,7 @@ def getPPDFile(stripped_model, ppds): # Old PPD find
     log.debug("1st stage edit distance match")
     mins = {}
     eds = {}
-    min_edit_distance = sys.maxint
+    min_edit_distance = sys.maxsize
 
     log.debug("Determining edit distance from %s (only showing edit distances < 4)..." % stripped_model)
     for f in ppds:
@@ -503,7 +503,7 @@ def getPPDFile2(mq,model, ppds): # New PPD find
     if num_matches == 0:
         log.debug("No PPD found for model %s using new algorithm. Trying old algorithm..." % stripped_model)
         #Using Old algo, ignores the series keyword in ppd searching.
-        matches2 = getPPDFile(stripModel(stripped_model), ppds).items()
+        matches2 = list(getPPDFile(stripModel(stripped_model), ppds).items())
         log.debug(matches2)
         num_matches2 = len(matches2)
         if num_matches2:
@@ -618,7 +618,7 @@ def getFaxPPDFile(mq, model):
 def getErrorLogLevel():
     cups_conf = '/etc/cups/cupsd.conf'
     try:
-        f = file(cups_conf, 'r')
+        f = open(cups_conf, 'r')
     except OSError:
         log.error("%s not found." % cups_conf)
     except IOError:
@@ -644,13 +644,13 @@ def getPrintJobErrorLog(job_id, max_lines=1000, cont_interval=5):
     #if level in ('debug', 'debug2'):
     if 1:
         try:
-            f = file(cups_conf, 'r')
+            f = open(cups_conf, 'r')
         except (IOError, OSError):
             log.error("Could not open the CUPS error_log file: %s" % cups_conf)
             return ''
 
         else:
-            if s in file(cups_conf, 'r').read():
+            if s in open(cups_conf, 'r').read():
                 queue = utils.Queue()
                 job_found = False
 
@@ -792,9 +792,11 @@ def getOptions():
 
 def printFile(printer, filename, title):
     if os.path.exists(filename):
-	printer = printer.encode('utf-8')
-	filename = filename.encode('utf-8')
-	title = title.encode('utf-8')
+        if not PY3:
+            printer = printer.encode('utf-8')
+            filename = filename.encode('utf-8')
+            title = title.encode('utf-8')
+
         return cupsext.printFileWithOptions(printer, filename, title)
 
     else:

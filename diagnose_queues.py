@@ -19,7 +19,7 @@
 #
 # Author: Amarnath Chitumalla
 #
-
+from __future__ import print_function
 __version__ = '1.1'
 __title__ = 'AutoConfig Utility to check queues configuration'
 __mod__ = 'hp-daignose-queues'
@@ -67,7 +67,7 @@ try:
                       handle_device_printer=False)
 
 
-    except getopt.GetoptError, e:
+    except getopt.GetoptError as e:
         log.error(e.msg)
         usage()
         sys.exit(1)
@@ -88,7 +88,7 @@ try:
             usage('man')
 
         elif o == '--help-desc':
-            print __doc__,
+            print(__doc__, end=' ')
             sys.exit(0)
 
         elif o in ('-l', '--logging'):

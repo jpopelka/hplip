@@ -37,6 +37,7 @@ import gzip
 # Local
 from base.g import *
 from base import device, utils, tui, module
+from base.sixext.moves import input
 from prnt import cups
 
 pm = None
@@ -47,7 +48,7 @@ def plugin_download_callback(c, s, t):
 
 
 def plugin_install_callback(s):
-    print s
+    print(s)
 
 def clean_exit(code=0):
     mod.unlockInstance()
@@ -159,7 +160,7 @@ if PKIT:
         try:
             pkit = PolicyKit()
             pkit_installed = True
-        except dbus.DBusException, ex:
+        except dbus.DBusException as ex:
             log.error("PolicyKit support requires DBUS or PolicyKit support files missing")
             pkit_installed = False
     except:
@@ -246,7 +247,6 @@ if mode == GUI_MODE:
             clean_exit(1)
 
         app = QApplication(sys.argv)
-
         if not pkit_installed and not os.geteuid() == 0:
             log.error("You must be root to run this utility.")
 
@@ -275,7 +275,7 @@ else: # INTERACTIVE_MODE
         if not os.geteuid() == 0:
             log.error("You must be root to run this utility.")
             clean_exit(1)
-
+        
         log.info("(Note: Defaults for each question are maked with a '*'. Press <enter> to accept the default.)")
         log.info("")
         
@@ -312,7 +312,7 @@ else: # INTERACTIVE_MODE
 
             else : # p - specify plugin path
                 while True:
-                    plugin_path = raw_input(log.bold("Enter the path to the 'hplip-%s-plugin.run' file (q=quit) : " %
+                    plugin_path = input(log.bold("Enter the path to the 'hplip-%s-plugin.run' file (q=quit) : " %
                         version)).strip()
 
                     if plugin_path.strip().lower() == 'q':

@@ -7,12 +7,14 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtGui
+from PyQt4.QtCore import *
+from base.g import *
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.setWindowModality(QtCore.Qt.ApplicationModal)
+        Dialog.setWindowModality(Qt.ApplicationModal)
         Dialog.resize(700, 500)
         self.gridlayout = QtGui.QGridLayout(Dialog)
         self.gridlayout.setObjectName("gridlayout")
@@ -92,9 +94,9 @@ class Ui_Dialog(object):
         self.hboxlayout2.addWidget(self.NetworkDiscoveryMethodLabel)
         self.NetworkDiscoveryMethodComboBox = QtGui.QComboBox(self.DiscoveryOptionsGroupBox)
         self.NetworkDiscoveryMethodComboBox.setObjectName("NetworkDiscoveryMethodComboBox")
-        self.NetworkDiscoveryMethodComboBox.addItem(QtCore.QString())
-        self.NetworkDiscoveryMethodComboBox.addItem(QtCore.QString())
-        self.NetworkDiscoveryMethodComboBox.addItem(QtCore.QString())
+        self.NetworkDiscoveryMethodComboBox.addItem(QString())
+        self.NetworkDiscoveryMethodComboBox.addItem(QString())
+        self.NetworkDiscoveryMethodComboBox.addItem(QString())
         self.hboxlayout2.addWidget(self.NetworkDiscoveryMethodComboBox)
         self.gridlayout4.addLayout(self.hboxlayout2, 1, 0, 1, 1)
         self.hboxlayout3 = QtGui.QHBoxLayout()
@@ -105,7 +107,7 @@ class Ui_Dialog(object):
         self.NetworkTimeoutSpinBox = QtGui.QSpinBox(self.DiscoveryOptionsGroupBox)
         self.NetworkTimeoutSpinBox.setMinimum(1)
         self.NetworkTimeoutSpinBox.setMaximum(90)
-        self.NetworkTimeoutSpinBox.setProperty("value", QtCore.QVariant(5))
+        self.NetworkTimeoutSpinBox.setProperty("value", 5)
         self.NetworkTimeoutSpinBox.setObjectName("NetworkTimeoutSpinBox")
         self.hboxlayout3.addWidget(self.NetworkTimeoutSpinBox)
         self.gridlayout4.addLayout(self.hboxlayout3, 1, 1, 1, 1)
@@ -117,7 +119,7 @@ class Ui_Dialog(object):
         self.NetworkTTLSpinBox = QtGui.QSpinBox(self.DiscoveryOptionsGroupBox)
         self.NetworkTTLSpinBox.setMinimum(1)
         self.NetworkTTLSpinBox.setMaximum(8)
-        self.NetworkTTLSpinBox.setProperty("value", QtCore.QVariant(4))
+        self.NetworkTTLSpinBox.setProperty("value", 4)
         self.NetworkTTLSpinBox.setObjectName("NetworkTTLSpinBox")
         self.hboxlayout4.addWidget(self.NetworkTTLSpinBox)
         self.gridlayout4.addLayout(self.hboxlayout4, 1, 2, 1, 1)
@@ -181,8 +183,8 @@ class Ui_Dialog(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.DevicesFoundIcon.sizePolicy().hasHeightForWidth())
         self.DevicesFoundIcon.setSizePolicy(sizePolicy)
-        self.DevicesFoundIcon.setMinimumSize(QtCore.QSize(16, 16))
-        self.DevicesFoundIcon.setMaximumSize(QtCore.QSize(16, 16))
+        self.DevicesFoundIcon.setMinimumSize(QSize(16, 16))
+        self.DevicesFoundIcon.setMaximumSize(QSize(16, 16))
         self.DevicesFoundIcon.setFrameShape(QtGui.QFrame.NoFrame)
         self.DevicesFoundIcon.setObjectName("DevicesFoundIcon")
         self.hboxlayout5.addWidget(self.DevicesFoundIcon)
@@ -336,7 +338,7 @@ class Ui_Dialog(object):
         self.retranslateUi(Dialog)
         self.StackedWidget.setCurrentIndex(0)
         self.AdvancedStackedWidget.setCurrentIndex(0)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
+        QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", "HP Device Manager - Setup", None, QtGui.QApplication.UnicodeUTF8))

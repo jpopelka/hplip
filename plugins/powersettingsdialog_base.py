@@ -94,7 +94,7 @@ class PowerSettingsDialog_base(QDialog):
 
 
     def power_setting_clicked(self,a0):
-        print "PowerSettingsDialog_base.power_setting_clicked(int): Not implemented yet"
+        print("PowerSettingsDialog_base.power_setting_clicked(int): Not implemented yet")
 
     def __tr(self,s,c = None):
         return qApp.translate("PowerSettingsDialog_base",s,c)

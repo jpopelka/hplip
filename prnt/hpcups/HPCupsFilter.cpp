@@ -41,6 +41,8 @@
 
 static HPCupsFilter    filter;
 
+
+#ifndef UNITTESTING 
 int main (int  argc, char *argv[])
 {
     openlog("hpcups", LOG_PID,  LOG_DAEMON);
@@ -52,6 +54,7 @@ int main (int  argc, char *argv[])
 
     return filter.StartPrintJob(argc, argv);
 }
+#endif
 
 void HPCancelJob(int sig)
 {
@@ -220,11 +223,17 @@ void HPCupsFilter::cleanup()
 {
     if (m_pPrinterBuffer) {
         delete [] m_pPrinterBuffer;
+        m_pPrinterBuffer = NULL;
     }
 
     if(m_ppd){
        ppdClose(m_ppd);
        m_ppd = NULL;
+    }
+    if (m_pSys)
+    {
+    	delete m_pSys;
+    	m_pSys = NULL;
     }
 }
 
@@ -427,7 +436,8 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
     }
 
     string strPrinterURI="" , strPrinterName= "";
-    m_DBusComm.initDBusComm(DBUS_PATH,DBUS_INTERFACE, getenv("DEVICE_URI"), m_JA.printer_name);
+    if (getenv("DEVICE_URI"))
+        m_DBusComm.initDBusComm(DBUS_PATH,DBUS_INTERFACE, getenv("DEVICE_URI"), m_JA.printer_name);
 
     ptr = strstr(m_argv[5], "job-uuid");
     if (ptr) {
@@ -484,6 +494,11 @@ int HPCupsFilter::StartPrintJob(int  argc, char *argv[])
     strncpy(m_JA.job_start_time, asctime(t), sizeof(m_JA.job_start_time)-1);    // returns Fri Jun  5 08:12:16 2009
     snprintf(m_JA.job_start_time+19, sizeof(m_JA.job_start_time) - 20, ":%ld %d", tv.tv_usec/1000, t->tm_year + 1900); // add milliseconds
 
+#ifdef UNITTESTING
+    memset(m_JA.job_start_time,0,sizeof(m_JA.job_start_time));
+    snprintf(m_JA.job_start_time, sizeof(m_JA.job_start_time),"Mon Dec  9 17:48:58:586 2013" );
+#endif
+
     m_iLogLevel = getHPLogLevel();
     m_JA.job_id = atoi(argv[1]);
     strncpy(m_JA.user_name,argv[2],sizeof(m_JA.user_name)-1);
@@ -514,7 +529,7 @@ int HPCupsFilter::StartPrintJob(int  argc, char *argv[])
         }
     }
 
-    m_pSys = new SystemServices(m_iLogLevel, m_JA.job_id, m_JA.user_name);
+	m_pSys = new SystemServices(m_iLogLevel, m_JA.job_id, m_JA.user_name);
 
 /*
  *  When user cancels a print job, the spooler sends SIGTERM signal
@@ -610,16 +625,18 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
                 return JOB_CANCELED;
             }
 
-            if(m_JA.pre_process_raster) {
-		        err = m_Job.preProcessRasterData(&cups_raster, &cups_header, hpPreProcessedRasterFile);
-				if (err != NO_ERROR) {
-					if (m_iLogLevel & BASIC_LOG) {
-						dbglog ("DEBUG: Job::StartPage failed with err = %d\n", err);
-					}
-					ret_status = JOB_CANCELED;
-					break;
-				}
-			}
+            if (m_JA.pre_process_raster) {
+		    	// CC ToDo: Why pSwapedPagesFileName should be sent as a parameter? 
+                  	// Remove if not required to send it as parameter
+                err = m_Job.preProcessRasterData(&cups_raster, &cups_header, hpPreProcessedRasterFile);
+                if (err != NO_ERROR) {
+                    if (m_iLogLevel & BASIC_LOG) {
+                        dbglog ("DEBUG: Job::StartPage failed with err = %d\n", err);
+                    }
+                    ret_status = JOB_CANCELED;
+                    break;
+                }
+            }
 
             if (cups_header.cupsColorSpace == CUPS_CSPACE_RGBW) {
                 rgbRaster = new BYTE[cups_header.cupsWidth * 3];
@@ -701,7 +718,7 @@ int HPCupsFilter::processRasterData(cups_raster_t *cups_raster)
             if ((y == 0) && !is_ljmono) {
                 //For ljmono, make sure that first line is not a blankRaster line.Otherwise printer
                 //may not skip blank lines before actual data
-                //Need to revisit to crosscheck if it is a firmware issue.
+                //Need to revisit to cross check if it is a firmware issue.
 
                 *m_pPrinterBuffer = 0x01;
                 dbglog("First raster data plane..\n" );
@@ -869,5 +886,3 @@ void HPCupsFilter::printCupsHeaderInfo(cups_page_header2_t *header)
     dbglog ("DEBUG: cupsReal0 = %f\n", header->cupsReal[0]); // Left overspray
     dbglog ("DEBUG: cupsReal1 = %f\n", header->cupsReal[1]); // Top overspray
 }
-
-

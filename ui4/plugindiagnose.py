@@ -25,8 +25,9 @@ from base.g import *
 from base import device, utils, pkit
 from prnt import cups
 from base.codes import *
-from ui_utils import *
+from .ui_utils import *
 from installer import pluginhandler
+from base.sixext import  to_unicode
 
 # Qt
 from PyQt4.QtCore import *
@@ -34,7 +35,7 @@ from PyQt4.QtGui import *
 import signal
 
 # Ui
-from plugindiagnose_base import Ui_Dialog
+from .plugindiagnose_base import Ui_Dialog
 
 
 
@@ -68,7 +69,7 @@ class PluginDiagnose(QDialog, Ui_Dialog):
 
 
     def PathLineEdit_textChanged(self, t):
-        self.plugin_path = unicode(t)
+        self.plugin_path = to_unicode(t)
         self.setPathIndicators()
 
 
@@ -85,13 +86,13 @@ class PluginDiagnose(QDialog, Ui_Dialog):
 
 
     def NextButton_clicked(self):
-	self.NextButton.setEnabled(False)
-	self.CancelButton.setEnabled(False)
+        self.NextButton.setEnabled(False)
+        self.CancelButton.setEnabled(False)
         try:
             plugin = PLUGIN_REQUIRED 
             plugin_reason = PLUGIN_REASON_NONE
             ok, sudo_ok = pkit.run_plugin_command(plugin == PLUGIN_REQUIRED, plugin_reason)
-	
+
             if not ok or self.pluginObj.getStatus() != pluginhandler.PLUGIN_INSTALLED:
                 FailureUI(self, self.__tr("Failed to install Plug-in.\nEither you have chosen to skip the Plug-in installation  or entered incorrect Password."))
 

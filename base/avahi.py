@@ -20,13 +20,12 @@
 #
 
 import sys
-from g import *
+from .g import *
 import socket
 from subprocess import Popen, PIPE
-from base import utils
+from . import utils
+from .sixext import  to_string_utf8
 
-def is_ipv6(a):
-    return ':' in a
 
 def detectNetworkDevices(ttl=4, timeout=10):
     found_devices = {}
@@ -35,40 +34,35 @@ def detectNetworkDevices(ttl=4, timeout=10):
         log.error("Avahi-browse is not installed")
         return found_devices
 
-    addr4 = []
-    addr6 = []
     # Obtain all the resolved services which has service type '_printer._tcp' from avahi-browse
     p = Popen(['avahi-browse', '-kprt', '_printer._tcp'], stdout=PIPE)
-    for line in p.stdout:
+    output = to_string_utf8(p.communicate()[0])
+    for line in output.splitlines():
         if line.startswith('='):
             bits = line.split(';')
-            if is_ipv6(bits[7]) and bits[2] == 'IPv6':
-                addr6.append([bits[7], bits[8]])
-                # We don't support IPv6 yet
-                continue
-            elif bits[2] == 'IPv4':
-                addr4.append([bits[7], bits[8]])
-            ip = bits[7]
-            port = bits[8]
-            # Run through the offered addresses and see if we have a bound local
-            # address for it.
-            try:
-                res = socket.getaddrinfo(ip, port, 0, 0, 0, socket.AI_ADDRCONFIG)
-                if res:
-                    y = {'num_devices' : 1, 'num_ports': 1, 'product_id' : '', 'mac': '',
-                         'status_code': 0, 'device2': '0', 'device3': '0', 'note': ''}
-                    y['ip'] = ip
-                    y['hn'] = bits[6].replace('.local', '')
-                    details = bits[9].split('" "')
-                    for item in details:
-                        key, value = item.split('=', 1)
-                        if key == 'ty':
-                            y['mdns'] = value
-                            y['device1'] = "MFG:Hewlett-Packard;MDL:%s;CLS:PRINTER;" % value
-                    found_devices[y['ip']] = y
-                    log.debug("ip=%s hn=%s ty=%s" %(ip,y['hn'], y['mdns']))
-            except socket.gaierror:
-                pass
+            if bits[2] == 'IPv4' and len(bits[7].split('.')) == 4:
+                ip = bits[7]
+                port = bits[8]
+                # Run through the offered addresses and see if we have a bound local
+                # address for it.
+                try:
+                    res = socket.getaddrinfo(ip, port, 0, 0, 0, socket.AI_ADDRCONFIG)
+                    if res:
+                        y = {'num_devices' : 1, 'num_ports': 1, 'product_id' : '', 'mac': '',
+                             'status_code': 0, 'device2': '0', 'device3': '0', 'note': ''}
+                        y['ip'] = ip
+                        y['hn'] = bits[6].replace('.local', '')
+                        details = bits[9].split('" "')
+                        for item in details:
+                            key, value = item.split('=', 1)
+                            if key == 'ty':
+                                y['mdns'] = value
+                                y['device1'] = "MFG:Hewlett-Packard;MDL:%s;CLS:PRINTER;" % value
+                                break
+                        found_devices[y['ip']] = y
+                        log.debug("ip=%s hn=%s ty=%s" %(ip,y['hn'], y['mdns']))
+                except socket.gaierror:
+                    pass
     log.debug("Found %d devices" % len(found_devices))
 
     return found_devices

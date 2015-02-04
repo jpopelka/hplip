@@ -12,12 +12,12 @@
 
 from qt import *
 
-from deviceuricombobox import DeviceUriComboBox
+from .deviceuricombobox import DeviceUriComboBox
 
 
 class FirmwareDialog_Base(object):
     def setupUi(self,Dialog):
-	Dialog.setModal(True)
+        Dialog.setModal(True)
         Dialog.setName("FirmwareDialog_Base")
 
         self.Download_Firmwar = QLabel(Dialog,"Download_Firmware")

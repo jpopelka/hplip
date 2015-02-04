@@ -112,7 +112,7 @@ supported=0
 
 [suse]
 index=3
-versions=12.2,12.3,13.1
+versions=12.2,12.3,13.1,13.2
 display_name=SUSE Linux
 alt_names=
 display=1
@@ -208,7 +208,7 @@ packages=python-devel,python-xml,libpython2_7-1_0
 [suse:12.2:python23]
 packages=python
 
-[suse:12.2:python2x]
+[suse:12.2:python2X]
 packages=python
 
 [suse:12.2:reportlab]
@@ -249,6 +249,26 @@ packages=wget
 
 [suse:12.2:avahi-utils]
 packages=avahi-utils
+
+[suse:12.2:python3-pyqt4]
+packages=python3-qt4,python3-qt4-devel
+
+[suse:12.2:python3-dbus]
+packages=dbus-1-python3,python3-gobject,python3-gobject2-devel
+
+[suse:12.2:python3-devel]
+packages=python3-devel
+
+[suse:12.2:python3-pyqt4-dbus]
+packages=dbus-1-python3-devel,dbus-1-python3
+
+[suse:12.2:python3-pil]
+packages=PKG_FROM_PIP:pillow
+
+[suse:12.2:python3-xml]
+packages=python3-xml
+
+
 # ********************
 [suse:12.3]
 code_name=Dartmouth
@@ -328,7 +348,7 @@ packages=python-devel,python-xml,libpython2_7-1_0
 [suse:12.3:python23]
 packages=python
 
-[suse:12.3:python2x]
+[suse:12.3:python2X]
 packages=python
 
 [suse:12.3:reportlab]
@@ -369,6 +389,26 @@ packages=wget
 
 [suse:12.3:avahi-utils]
 packages=avahi-utils
+
+[suse:12.3:python3-pyqt4]
+packages=python3-qt4,python3-qt4-devel
+
+[suse:12.3:python3-dbus]
+packages=dbus-1-python3,python3-gobject,python3-gobject2-devel
+
+[suse:12.3:python3-xml]
+packages=python3-xml,python3-lxml
+
+[suse:12.3:python3-devel]
+packages=python3-devel
+
+[suse:12.3:python3-pyqt4-dbus]
+packages=dbus-1-python3-devel,dbus-1-python3
+
+[suse:12.3:python3-pil]
+packages=PKG_FROM_PIP:pillow
+
+
 # ****************************************
 
 [suse:13.1]
@@ -377,6 +417,149 @@ supported=1
 packaged_version=3.13.7
 release_date=19.09.2013
 same_as_version=12.3
+
+# ****************************************
+
+[suse:13.2]
+code_name=Harlequin
+supported=1
+packaged_version=3.14.6
+release_date=04.11.2014
+post_depend_cmd=su -c "zypper --non-interactive --no-gpg-checks in --force --auto-agree-with-licenses cups-filters-ghostscript", su -c"service cups restart"
+scan_supported=1
+fax_supported=1
+pcard_supported=0
+network_supported=1
+parallel_supported=0
+usb_supported=1
+notes=Please be sure to disable the CD repositories in YaST.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/cups/model/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+cups_path_with_bitness=0
+ui_toolkit=qt4
+native_cups=1
+open_mdns_port=/bin/bash ./init-suse-firewall
+pre_depend_cmd=su -c "zypper refresh"
+
+[suse:13.2:cups]
+packages=cups,cups-client
+
+[suse:13.2:cups-devel]
+packages=cups-devel,cupsddk
+
+[suse:13.2:gcc]
+packages=gcc-c++
+
+[suse:13.2:gs]
+packages=ghostscript-library
+
+[suse:13.2:libcrypto]
+packages=openssl
+
+[suse:13.2:libjpeg]
+packages=libjpeg-devel
+
+[suse:13.2:libnetsnmp-devel]
+packages=net-snmp-devel
+
+[suse:13.2:libpthread]
+packages=glibc
+
+[suse:13.2:libtool]
+packages=libtool,libgphoto2-devel
+
+[suse:13.2:libusb]
+packages=libusb-1_0-devel,libusb-1_0-0
+
+[suse:13.2:make]
+packages=make
+
+[suse:13.2:pil]
+packages=python-imaging
+
+[suse:13.2:ppdev]
+packages=
+commands=su -c "modprobe ppdev"
+
+[suse:13.2:pyqt]
+packages=python-qt
+
+[suse:13.2:pyqt4]
+packages=python-qt4
+
+[suse:13.2:pyqt4-dbus]
+packages=dbus-1-python-devel,dbus-1-python
+
+[suse:13.2:python-devel]
+packages=python-devel,python-xml,libpython2_7-1_0
+
+[suse:13.2:python23]
+packages=python
+
+[suse:13.2:python2X]
+packages=python
+
+[suse:13.2:reportlab]
+packages=
+
+[suse:13.2:sane]
+packages=xsane
+
+[suse:13.2:sane-devel]
+packages=sane-backends-devel
+
+[suse:13.2:scanimage]
+packages=sane-backends
+
+[suse:13.2:xsane]
+packages=xsane
+
+[suse:13.2:cups-ddk]
+packages=cupsddk
+
+[suse:13.2:python-dbus]
+packages=dbus-1-python
+
+[suse:13.2:dbus]
+packages=dbus-1-devel,python-gobject2
+
+[suse:13.2:python-xml]
+packages=python-xml,libpython2_7-1_0
+
+[suse:13.2:cups-image]
+packages=cups-devel
+
+[suse:13.2:python-notify]
+packages=python-notify
+
+[suse:13.2:network]
+packages=wget
+
+[suse:13.2:avahi-utils]
+packages=avahi-utils
+
+[suse:13.2:python3-pyqt4]
+packages=python3-qt4,python3-qt4-devel
+
+[suse:13.2:python3-dbus]
+packages=dbus-1-python3,python3-gobject,python3-gobject2-devel
+
+[suse:13.2:python3-xml]
+packages=python3-xml,python3-lxml
+
+[suse:13.2:python3-devel]
+packages=python3-devel
+
+[suse:13.2:python3-pyqt4-dbus]
+packages=dbus-1-python3-devel,dbus-1-python3
+
+[suse:13.2:python3-pil]
+packages=python3-Pillow
+
+
 
 # ****************************************
 [redhat]
@@ -579,7 +762,7 @@ ui_toolkit=qt3
 # ****************************************
 [fedora]
 index=5
-versions=17,18,19,20
+versions=17,18,19,20,21
 display_name=Fedora
 alt_names=Fedora Core
 display=1
@@ -675,7 +858,7 @@ packages=dbus-python
 [fedora:17:python23]
 packages=python
 
-[fedora:17:python2x]
+[fedora:17:python2X]
 packages=python
 
 [fedora:17:reportlab]
@@ -792,7 +975,7 @@ packages=dbus-python
 [fedora:18:python23]
 packages=python
 
-[fedora:18:python2x]
+[fedora:18:python2X]
 packages=python
 
 [fedora:18:reportlab]
@@ -850,6 +1033,16 @@ packaged_version=3.13.9
 release_date=12/11/2013
 same_as_version=19
 
+
+
+# ****************************************
+
+[fedora:21]
+code_name=
+supported=1
+packaged_version=3.14.10
+release_date=09/12/2014
+same_as_version=17
 
 # ****************************************
 [linspire]
@@ -990,7 +1183,7 @@ packages=dbus-python
 [rhel:5.0:python23]
 packages=python
 
-[rhel:5.0:python2x]
+[rhel:5.0:python2X]
 packages=python
 
 [rhel:5.0:reportlab]
@@ -1107,7 +1300,7 @@ packages=dbus-python
 [rhel:6.0:python23]
 packages=python
 
-[rhel:6.0:python2x]
+[rhel:6.0:python2X]
 packages=python
 
 [rhel:6.0:reportlab]
@@ -1434,7 +1627,7 @@ packages=pygobject2
 [centos:any:python23]
 packages=python
 
-[centos:any:python2x]
+[centos:any:python2X]
 packages=python
 
 [centos:any:reportlab]
@@ -1611,7 +1804,7 @@ packages=dbus-python
 [pclinuxos:2006.0:python23]
 packages=python
 
-[pclinuxos:2006.0:python2x]
+[pclinuxos:2006.0:python2X]
 packages=python
 
 [pclinuxos:2006.0:reportlab]
@@ -1726,7 +1919,7 @@ packages=dbus-python
 [pclinuxos:2007.0:python23]
 packages=python
 
-[pclinuxos:2007.0:python2x]
+[pclinuxos:2007.0:python2X]
 packages=python
 
 [pclinuxos:2007.0:reportlab]
@@ -1844,7 +2037,7 @@ packages=dbus-python
 [pclinuxos:2008.0:python23]
 packages=python
 
-[pclinuxos:2008.0:python2x]
+[pclinuxos:2008.0:python2X]
 packages=python
 
 [pclinuxos:2008.0:reportlab]
@@ -1962,7 +2155,7 @@ packages=dbus-python
 [pclinuxos:2009.0:python23]
 packages=python
 
-[pclinuxos:2009.0:python2x]
+[pclinuxos:2009.0:python2X]
 packages=python
 
 [pclinuxos:2009.0:reportlab]
@@ -2080,7 +2273,7 @@ packages=dbus-python
 [pclinuxos:2009.1:python23]
 packages=python
 
-[pclinuxos:2009.1:python2x]
+[pclinuxos:2009.1:python2X]
 packages=python
 
 [pclinuxos:2009.1:reportlab]
@@ -2213,7 +2406,7 @@ packages=
 [igos:1.0:python23]
 packages=python
 
-[igos:1.0:python2x]
+[igos:1.0:python2X]
 packages=python
 
 [igos:1.0:reportlab]
@@ -2346,7 +2539,7 @@ packages=python-qt4-dbus
 #[ubuntu:10.04:python23]
 #packages=python
 
-[ubuntu:10.04:python2x]
+[ubuntu:10.04:python2X]
 packages=python
 
 [ubuntu:10.04:reportlab]
@@ -2387,8 +2580,6 @@ packages=wget
 
 [ubuntu:10.04:avahi-utils]
 packages=avahi-utils
-
-
 # ********************
 [ubuntu:11.10]
 code_name=Oneiric
@@ -2468,7 +2659,7 @@ packages=python-qt4-dbus
 #[ubuntu:11.10:python23]
 #packages=python
 
-[ubuntu:11.10:python2x]
+[ubuntu:11.10:python2X]
 packages=python
 
 [ubuntu:11.10:reportlab]
@@ -2588,8 +2779,11 @@ packages=python-qt4-dbus
 #[ubuntu:12.04:python23]
 #packages=python
 
-[ubuntu:12.04:python2x]
+[ubuntu:12.04:python2X]
 packages=python
+
+[ubuntu:12.04:python3X]
+packages=python3,python3.2
 
 [ubuntu:12.04:reportlab]
 packages=python-reportlab
@@ -2629,6 +2823,28 @@ packages=wget
 
 [ubuntu:12.04:avahi-utils]
 packages=avahi-utils
+
+[ubuntu:12.04:python3-notify2]
+packages=python3-notify2
+
+[ubuntu:12.04:python3-pyqt4-dbus]
+packages=python3-dbus.mainloop.qt
+
+[ubuntu:12.04:python3-pyqt4]
+packages=python3-pyqt4,gtk2-engines-pixbuf
+
+[ubuntu:12.04:python3-dbus]
+packages=python3-dbus,python3-gi
+
+[ubuntu:12.04:python3-xml]
+packages=python3-lxml
+
+[ubuntu:12.04:python3-devel]
+packages=python3-dev
+
+[ubuntu:12.04:python3-pil]
+packages=PKG_FROM_PIP:pillow
+
 
 # ********************
 [ubuntu:12.10]
@@ -2719,6 +2935,9 @@ packages=python-qt4-dbus
 [ubuntu:13.04:python2X]
 packages=python
 
+[ubuntu:13.04:python3X]
+packages=python3,python3.2
+
 [ubuntu:13.04:reportlab]
 packages=python-reportlab
 
@@ -2757,6 +2976,28 @@ packages=wget
 
 [ubuntu:13.04:avahi-utils]
 packages=avahi-utils
+
+[ubuntu:13.04:python3-notify2]
+packages=python3-notify2
+
+[ubuntu:13.04:python3-pyqt4-dbus]
+packages=python3-dbus.mainloop.qt
+
+[ubuntu:13.04:python3-pyqt4]
+packages=python3-pyqt4,gtk2-engines-pixbuf
+
+[ubuntu:13.04:python3-dbus]
+packages=python3-dbus,python3-gi
+
+[ubuntu:13.04:python3-xml]
+packages=python3-lxml
+
+[ubuntu:13.04:python3-devel]
+packages=python3-dev
+
+[ubuntu:13.04:python3-pil]
+packages=python3-imaging
+
 
 # ********************
 [ubuntu:13.10]
@@ -2836,7 +3077,7 @@ packages=python-qt4-dbus
 #[ubuntu:13.10:python23]
 #packages=python
 
-[ubuntu:13.10:python2x]
+[ubuntu:13.10:python2X]
 packages=python
 
 [ubuntu:13.10:reportlab]
@@ -2878,6 +3119,29 @@ packages=wget
 [ubuntu:13.10:avahi-utils]
 packages=avahi-utils
 
+[ubuntu:13.10:python3-notify2]
+packages=python3-notify2
+
+[ubuntu:13.10:python3-pyqt4-dbus]
+packages=python3-dbus.mainloop.qt
+
+[ubuntu:13.10:python3-pyqt4]
+packages=python3-pyqt4,gtk2-engines-pixbuf
+
+[ubuntu:13.10:python3-dbus]
+packages=python3-dbus,python3-gi
+
+[ubuntu:13.10:python3-xml]
+packages=python3-lxml
+
+[ubuntu:13.10:python3-devel]
+packages=python3-dev
+
+[ubuntu:13.10:python3-pil]
+packages=python3-imaging
+
+[ubuntu:13.10:python3-reportlab]
+packages=
 
 # ********************
 [ubuntu:14.04]
@@ -2889,15 +3153,152 @@ same_as_version=13.10
 # ********************
 [ubuntu:14.10]
 code_name=Utopic
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
 packaged_version=3.14.6
 release_date=23/10/2014
-same_as_version=13.10
+notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+native_cups=1
+acl_rules=1
+
+libdir_path=/usr/lib
+[ubuntu:14.10:cups]
+packages=libcups2
+
+[ubuntu:14.10:cups-devel]
+packages=libcups2-dev,cups-bsd,cups-client
+
+[ubuntu:14.10:gcc]
+packages=build-essential
+
+[ubuntu:14.10:gs]
+packages=ghostscript
+
+[ubuntu:14.10:libcrypto]
+packages=openssl
+
+[ubuntu:14.10:libjpeg]
+packages=libjpeg-dev
+
+[ubuntu:14.10:libnetsnmp-devel]
+packages=libsnmp-dev,snmp-mibs-downloader
+
+[ubuntu:14.10:libpthread]
+packages=build-essential
+
+[ubuntu:14.10:libtool]
+packages=libtool
+
+[ubuntu:14.10:libusb]
+packages=libusb-1.0.0-dev
+
+[ubuntu:14.10:make]
+packages=build-essential
+
+[ubuntu:14.10:pil]
+packages=python-imaging
+
+[ubuntu:14.10:ppdev]
+packages=
+commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppdev | sudo tee -a /etc/modules
+
+[ubuntu:14.10:pyqt]
+packages=gtk2-engines-pixbuf,python-qt4
+
+[ubuntu:14.10:python-devel]
+packages=python-dev
+
+[ubuntu:14.10:pyqt4]
+packages=gtk2-engines-pixbuf,python-qt4
+
+[ubuntu:14.10:pyqt4-dbus]
+packages=python-qt4-dbus
+
+#[ubuntu:14.10:python23]
+#packages=python
+
+[ubuntu:14.10:python2X]
+packages=python
+
+[ubuntu:14.10:reportlab]
+packages=python-reportlab
+
+[ubuntu:14.10:sane]
+packages=libsane
+
+[ubuntu:14.10:sane-devel]
+packages=libsane-dev
+
+[ubuntu:14.10:scanimage]
+packages=sane-utils
+
+[ubuntu:14.10:xsane]
+packages=gtk2-engines-pixbuf,xsane
+
+[ubuntu:14.10:python-dbus]
+packages=python-dbus,python-gobject
+
+[ubuntu:14.10:dbus]
+packages=libdbus-1-dev
+
+[ubuntu:14.10:cups-image]
+packages=libcupsimage2-dev
+
+[ubuntu:14.10:cups-ddk]
+packages=cups
+
+[ubuntu:14.10:policykit]
+packages=policykit-1,policykit-1-gnome
+
+[ubuntu:14.10:python-notify]
+packages=python-notify
+
+[ubuntu:14.10:network]
+packages=wget
+
+[ubuntu:14.10:avahi-utils]
+packages=avahi-utils
+
+[ubuntu:14.10:python3-notify2]
+packages=python3-notify2
+
+[ubuntu:14.10:python3-pyqt4-dbus]
+packages=python3-dbus.mainloop.qt
+
+[ubuntu:14.10:python3-pyqt4]
+packages=python3-pyqt4,gtk2-engines-pixbuf
+
+[ubuntu:14.10:python3-dbus]
+packages=python3-dbus,python3-gi
+
+[ubuntu:14.10:python3-xml]
+packages=python3-lxml
+
+[ubuntu:14.10:python3-devel]
+packages=python3-dev
+
+[ubuntu:14.10:python3-pil]
+packages=python3-pil
+
+[ubuntu:14.10:python3-reportlab]
+packages=
 
 
 # ****************************************
 [debian]
 index=2
-versions=6.0,6.0.1,6.0.2,6.0.3,6.0.4,6.0.5,6.0.6,6.0.7,6.0.8,6.0.9,6.0.10,7.0,7.1,7.2,7.3,7.4,7.5,7.6
+versions=6.0,6.0.1,6.0.2,6.0.3,6.0.4,6.0.5,6.0.6,6.0.7,6.0.8,6.0.9,6.0.10,7.0,7.1,7.2,7.3,7.4,7.5,7.6,7.7,7.8
 display_name=Debian
 alt_names=
 display=1
@@ -2992,7 +3393,7 @@ packages=python-qt4-dbus
 [debian:6.0:python23]
 packages=python
 
-[debian:6.0:python2x]
+[debian:6.0:python2X]
 packages=python
 
 [debian:6.0:reportlab]
@@ -3148,7 +3549,7 @@ packages=python-qt4-dbus
 [debian:7.0:python23]
 packages=python
 
-[debian:7.0:python2x]
+[debian:7.0:python2X]
 packages=python
 
 [debian:7.0:reportlab]
@@ -3192,6 +3593,29 @@ packages=wget
 
 [debian:7.0:avahi-utils]
 packages=avahi-utils
+
+[debian:7.0:python3-notify2]
+packages=python3-notify2
+
+[debian:7.0:python3-pyqt4-dbus]
+packages=python3-dbus.mainloop.qt
+
+[debian:7.0:python3-pyqt4]
+packages=python3-pyqt4,gtk2-engines-pixbuf
+
+[debian:7.0:python3-dbus]
+packages=python3-dbus,python3-gi
+
+[debian:7.0:python3-xml]
+packages=python3-lxml
+
+[debian:7.0:python3-devel]
+packages=python3-dev
+
+[debian:7.0:python3-pil]
+packages=PKG_FROM_PIP:pillow
+
+
 # ****************************************
 
 [debian:7.1]
@@ -3210,6 +3634,12 @@ same_as_version=7.0
 same_as_version=7.0
 
 [debian:7.6]
+same_as_version=7.0
+
+[debian:7.7]
+same_as_version=7.0
+
+[debian:7.8]
 same_as_version=7.0
 
 # *********************
@@ -3508,7 +3938,7 @@ packages=python-qt4-dbus
 [mepis:6.0:python23]
 packages=python
 
-[mepis:6.0:python2x]
+[mepis:6.0:python2X]
 packages=python
 
 [mepis:6.0:reportlab]
@@ -3618,7 +4048,7 @@ packages=python-qt4-dbus
 [mepis:6.5:python23]
 packages=python
 
-[mepis:6.5:python2x]
+[mepis:6.5:python2X]
 packages=python
 
 [mepis:6.5:reportlab]
@@ -3729,7 +4159,7 @@ packages=python-qt4-dbus
 [mepis:7.0:python23]
 packages=python
 
-[mepis:7.0:python2x]
+[mepis:7.0:python2X]
 packages=python
 
 [mepis:7.0:reportlab]
@@ -3840,7 +4270,7 @@ packages=python-qt4-dbus
 [mepis:8.0:python23]
 packages=python
 
-[mepis:8.0:python2x]
+[mepis:8.0:python2X]
 packages=python
 
 [mepis:8.0:reportlab]
@@ -4032,7 +4462,7 @@ packages=dbus-python
 [mandriva:10.1:python23]
 packages=python
 
-[mandriva:10.1:python2x]
+[mandriva:10.1:python2X]
 packages=python
 
 [mandriva:10.1:reportlab]
@@ -4143,7 +4573,7 @@ packages=dbus-python
 [mandriva:10.2:python23]
 packages=python
 
-[mandriva:10.2:python2x]
+[mandriva:10.2:python2X]
 packages=python
 
 [mandriva:10.2:reportlab]
@@ -4253,7 +4683,7 @@ packages=dbus-python
 [mandriva:2006.0:python23]
 packages=python
 
-[mandriva:2006.0:python2x]
+[mandriva:2006.0:python2X]
 packages=python
 
 [mandriva:2006.0:reportlab]
@@ -4363,7 +4793,7 @@ packages=dbus-python
 [mandriva:2007.0:python23]
 packages=python
 
-[mandriva:2007.0:python2x]
+[mandriva:2007.0:python2X]
 packages=python
 
 [mandriva:2007.0:reportlab]
@@ -4473,7 +4903,7 @@ packages=dbus-python
 [mandriva:2007.1:python23]
 packages=python
 
-[mandriva:2007.1:python2x]
+[mandriva:2007.1:python2X]
 packages=python
 
 [mandriva:2007.1:reportlab]
@@ -4587,7 +5017,7 @@ packages=dbus-python
 [mandriva:2008.0:python23]
 packages=python
 
-[mandriva:2008.0:python2x]
+[mandriva:2008.0:python2X]
 packages=python
 
 [mandriva:2008.0:reportlab]
@@ -4700,7 +5130,7 @@ packages=dbus-python
 [mandriva:2008.1:python23]
 packages=python
 
-[mandriva:2008.1:python2x]
+[mandriva:2008.1:python2X]
 packages=python
 
 [mandriva:2008.1:reportlab]
@@ -4814,7 +5244,7 @@ packages=dbus-python
 [mandriva:2009:python23]
 packages=python
 
-[mandriva:2009:python2x]
+[mandriva:2009:python2X]
 packages=python
 
 [mandriva:2009:reportlab]
@@ -4931,7 +5361,7 @@ packages=dbus-python
 [mandriva:2009.0:python23]
 packages=python
 
-[mandriva:2009.0:python2x]
+[mandriva:2009.0:python2X]
 packages=python
 
 [mandriva:2009.0:reportlab]
@@ -5048,7 +5478,7 @@ packages=qt4-qtdbus
 [mandriva:2010.0:python23]
 packages=python
 
-[mandriva:2010.0:python2x]
+[mandriva:2010.0:python2X]
 packages=python
 
 [mandriva:2010.0:reportlab]
@@ -5165,7 +5595,7 @@ packages=qt4-qtdbus
 [mandriva:2011.0:python23]
 packages=python
 
-[mandriva:2011.0:python2x]
+[mandriva:2011.0:python2X]
 packages=python
 
 [mandriva:2011.0:reportlab]
@@ -5206,7 +5636,6 @@ packages=wget
 
 [mandriva:2011.0:avahi-utils]
 packages=avahi
-
 # ****************************************
 [linuxmint]
 index=22
@@ -5308,7 +5737,7 @@ packages=python-qt4-dbus
 #[linuxmint:13:python23]
 #packages=python
 
-[linuxmint:13:python2x]
+[linuxmint:13:python2X]
 packages=python
 
 [linuxmint:13:reportlab]
@@ -5349,6 +5778,28 @@ packages=wget
 
 [linuxmint:13:avahi-utils]
 packages=avahi-utils
+
+[linuxmint:13:python3-notify2]
+packages=
+
+[linuxmint:13:python3-pyqt4-dbus]
+packages=python3-dbus.mainloop.qt
+
+[linuxmint:13:python3-pyqt4]
+packages=python3-pyqt4
+
+[linuxmint:13:python3-dbus]
+packages=python3-dbus,python3-gi
+
+[linuxmint:13:python3-xml]
+packages=python3-lxml
+
+[linuxmint:13:python3-devel]
+packages=python3-dev
+
+[linuxmint:13:python3-pil]
+packages=PKG_FROM_PIP:pillow
+
 # ****************************************
 
 [linuxmint:14]
@@ -5469,6 +5920,28 @@ packages=wget
 [linuxmint:14:avahi-utils]
 packages=avahi-utils
 
+[linuxmint:14:python3-notify2]
+packages=python3-notify2
+
+[linuxmint:14:python3-pyqt4-dbus]
+packages=python3-dbus.mainloop.qt
+
+[linuxmint:14:python3-pyqt4]
+packages=python3-pyqt4
+
+[linuxmint:14:python3-dbus]
+packages=python3-dbus,python3-gi
+
+[linuxmint:14:python3-xml]
+packages=python3-lxml
+
+[linuxmint:14:python3-devel]
+packages=python3-dev
+
+[linuxmint:14:python3-pil]
+packages=PKG_FROM_PIP:pillow
+
+
 # ****************************************
 
 [linuxmint:15]
@@ -5549,7 +6022,7 @@ packages=python-qt4-dbus
 #[linuxmint:15:python23]
 #packages=python
 
-[linuxmint:15:python2x]
+[linuxmint:15:python2X]
 packages=python
 
 [linuxmint:15:reportlab]
@@ -5591,6 +6064,28 @@ packages=wget
 [linuxmint:15:avahi-utils]
 packages=avahi-utils
 
+
+[linuxmint:15:python3-notify2]
+packages=python3-notify2
+
+[linuxmint:15:python3-pyqt4-dbus]
+packages=python3-dbus.mainloop.qt
+
+[linuxmint:15:python3-pyqt4]
+packages=python3-pyqt4
+
+[linuxmint:15:python3-dbus]
+packages=python3-dbus,python3-gi
+
+[linuxmint:15:python3-xml]
+packages=python3-lxml
+
+[linuxmint:15:python3-devel]
+packages=python3-dev
+
+[linuxmint:15:python3-pil]
+packages=PKG_FROM_PIP:pillow
+
 # ****************************************
 
 [linuxmint:16]
@@ -5605,7 +6100,144 @@ same_as_version=15
 code_name=Qiana
 packaged_version=3.14.3
 release_date=31/05/2014
-same_as_version=15
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+native_cups=1
+acl_rules=1
+
+libdir_path=/usr/lib/x86_64-linux-gnu
+
+[linuxmint:17:cups]
+packages=libcups2
+
+[linuxmint:17:cups-devel]
+packages=libcups2-dev,cups-bsd,cups-client
+
+[linuxmint:17:gcc]
+packages=build-essential
+
+[linuxmint:17:gs]
+packages=ghostscript
+
+[linuxmint:17:libcrypto]
+packages=openssl
+
+[linuxmint:17:libjpeg]
+packages=libjpeg8-dev
+
+[linuxmint:17:libnetsnmp-devel]
+packages=libsnmp-dev,snmp-mibs-downloader
+
+[linuxmint:17:libpthread]
+packages=build-essential
+
+[linuxmint:17:libtool]
+packages=libtool
+
+[linuxmint:17:libusb]
+packages=libusb-1.0.0-dev
+
+[linuxmint:17:make]
+packages=build-essential
+
+[linuxmint:17:pil]
+packages=python-imaging
+
+[linuxmint:17:ppdev]
+packages=
+commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppdev | sudo tee -a /etc/modules
+
+[linuxmint:17:pyqt]
+packages=python-qt4
+
+[linuxmint:17:python-devel]
+packages=python-dev
+
+[linuxmint:17:pyqt4]
+packages=python-qt4
+
+[linuxmint:17:pyqt4-dbus]
+packages=python-qt4-dbus
+
+#[linuxmint:17:python23]
+#packages=python
+
+[linuxmint:17:python2X]
+packages=python
+
+[linuxmint:17:reportlab]
+packages=python-reportlab
+
+[linuxmint:17:sane]
+packages=libsane
+
+[linuxmint:17:sane-devel]
+packages=libsane-dev
+
+[linuxmint:17:scanimage]
+packages=sane-utils
+
+[linuxmint:17:xsane]
+packages=xsane
+
+[linuxmint:17:python-dbus]
+packages=python-dbus,python-gobject
+
+[linuxmint:17:dbus]
+packages=libdbus-1-dev
+
+[linuxmint:17:cups-image]
+packages=libcupsimage2-dev
+
+[linuxmint:17:cups-ddk]
+packages=cups,libcupsimage2-dev
+
+[linuxmint:17:policykit]
+packages=policykit-1,policykit-1-gnome
+
+[linuxmint:17:python-notify]
+packages=python-notify
+
+[linuxmint:17:network]
+packages=wget
+
+[linuxmint:17:avahi-utils]
+packages=avahi-utils
+
+
+[linuxmint:17:python3-notify2]
+packages=python3-notify2
+
+[linuxmint:17:python3-pyqt4-dbus]
+packages=python3-dbus.mainloop.qt
+
+[linuxmint:17:python3-pyqt4]
+packages=python3-pyqt4
+
+[linuxmint:17:python3-dbus]
+packages=python3-dbus,python3-gi
+
+[linuxmint:17:python3-xml]
+packages=python3-lxml
+
+[linuxmint:17:python3-devel]
+packages=python3-dev
+
+[linuxmint:17:python3-pil]
+packages=python3-pil
+
 
 
 # ****************************************
@@ -5706,7 +6338,7 @@ packages=python-qt4-dbus
 [linpus:9.5:python23]
 packages=python
 
-[linpus:9.5:python2x]
+[linpus:9.5:python2X]
 packages=python
 
 [linpus:9.5:reportlab]
@@ -5821,7 +6453,7 @@ packages=python-qt4-dbus
 [linpus:9.4:python23]
 packages=python
 
-[linpus:9.4:python2x]
+[linpus:9.4:python2X]
 packages=python
 
 [linpus:9.4:reportlab]
@@ -5954,7 +6586,7 @@ packages=python-qt4-dbus
 [gos:8.04.1:python23]
 packages=python
 
-[gos:8.04.1:python2x]
+[gos:8.04.1:python2X]
 packages=python
 
 [gos:8.04.1:reportlab]
@@ -5992,7 +6624,6 @@ packages=wget
 
 [gos:8.04.1:avahi-utils]
 packages=avahi
-
 # ****************************************
 [boss]
 index=34
@@ -6089,7 +6720,7 @@ packages=python-qt4-dbus
 [boss:3.0:python23]
 packages=python
 
-[boss:3.0:python2x]
+[boss:3.0:python2X]
 packages=python
 
 [boss:3.0:reportlab]
@@ -6332,7 +6963,7 @@ packages=python-qt4-dbus
 [lfs:6:python23]
 packages=python
 
-[lfs:6:python2x]
+[lfs:6:python2X]
 packages=python
 
 [lfs:6:reportlab]

@@ -27,15 +27,15 @@ from base.g import *
 from base import device, utils, maint
 #from prnt import cups
 from base.codes import *
-from ui_utils import *
+from .ui_utils import *
 
 # Qt
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Ui
-from linefeedcaldialog_base import Ui_Dialog
-from deviceuricombobox import DEVICEURICOMBOBOX_TYPE_FAX_ONLY
+from .linefeedcaldialog_base import Ui_Dialog
+from .deviceuricombobox import DEVICEURICOMBOBOX_TYPE_FAX_ONLY
 
 
 class LineFeedCalDialog(QDialog, Ui_Dialog):

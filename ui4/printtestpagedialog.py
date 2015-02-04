@@ -23,7 +23,7 @@
 # Local
 from base.g import *
 from base import device
-from ui_utils import *
+from .ui_utils import *
 
 # Qt
 from PyQt4.QtCore import *
@@ -31,7 +31,7 @@ from PyQt4.QtGui import *
 import signal
 
 # Ui
-from printtestpagedialog_base import Ui_Dialog
+from .printtestpagedialog_base import Ui_Dialog
 
 
 class PrintTestPageDialog(QDialog, Ui_Dialog):
@@ -87,7 +87,7 @@ class PrintTestPageDialog(QDialog, Ui_Dialog):
         try:
             try:
                 d = device.Device(self.device_uri, self.printer_name)
-            except Error, e:
+            except Error as e:
                 log.error("Device error (%s)." % e.msg)
             else:
                 try:
@@ -101,7 +101,7 @@ class PrintTestPageDialog(QDialog, Ui_Dialog):
 
             if not ok:
                 QApplication.restoreOverrideCursor()
-                FailureUI(self, self.__tr("<b>Unable to communicate with printer %1.</b><p>Please check the printer and try again.").arg(self.printer_name))
+                FailureUI(self, self.__tr("<b>Unable to communicate with printer %s.</b><p>Please check the printer and try again." % self.printer_name))
 
             d.close()
 
@@ -126,7 +126,7 @@ class PrintTestPageDialog(QDialog, Ui_Dialog):
         try:
             try:
                 d = device.Device(self.device_uri, self.printer_name)
-            except Error, e:
+            except Error as e:
                 log.error("Device error (%s)." % e.msg)
             else:
                 try:
@@ -149,7 +149,7 @@ class PrintTestPageDialog(QDialog, Ui_Dialog):
             self.close()
 
         else:
-            FailureUI(self, self.__tr("<b>A error occured sending the test page to printer %1.</b><p>Please check the printer and try again.").arg(self.printer_name))
+            FailureUI(self, self.__tr("<b>A error occured sending the test page to printer %s.</b><p>Please check the printer and try again."% self.printer_name))
 
         d.close()
 

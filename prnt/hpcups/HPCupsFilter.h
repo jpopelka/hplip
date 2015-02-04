@@ -96,7 +96,6 @@ private:
     DBusCommunicator m_DBusComm;
 	
 private:
-
     void            closeFilter();
     void            cleanup();
     //void            getLogLevel();
@@ -119,6 +118,11 @@ private:
     BYTE   *color_raster;
     BITMAPFILEHEADER    bmfh;
     BITMAPINFOHEADER    bmih;
+
+#ifdef UNITTESTING
+    friend class TestHPCupsFilter;
+#endif
+
 };
 
 #endif  // HP_CUPSFILTER_H

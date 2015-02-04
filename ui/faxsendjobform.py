@@ -26,8 +26,9 @@ import operator
 from base.g import *
 from base.codes import *
 from base import utils, device
+from base.sixext import  to_unicode
 from prnt import cups
-from ui_utils import load_pixmap
+from .ui_utils import load_pixmap
 
 if 1:
 #try:
@@ -41,7 +42,7 @@ if 0:
 
 # Qt/UI
 from qt import *
-from scrollfax import ScrollFaxView
+from .scrollfax import ScrollFaxView
 
 # dBus
 dbus_avail = False
@@ -132,7 +133,7 @@ class FaxSendJobForm(QMainWindow):
             #print devices
 
             if x == 0:
-                from nodevicesform import NoDevicesForm
+                from .nodevicesform import NoDevicesForm
                 self.FailureUI(self.__tr("<p><b>No devices found.</b><p>Please make sure your device is properly installed and try again."))
                 self.init_failed = True
 
@@ -141,7 +142,7 @@ class FaxSendJobForm(QMainWindow):
                 self.device_uri = devices[0][0]
 
             else:
-                from chooseprinterdlg import ChoosePrinterDlg
+                from .chooseprinterdlg import ChoosePrinterDlg
                 dlg = ChoosePrinterDlg(self.cups_printers, ['hpfax'])
 
                 if dlg.exec_loop() == QDialog.Accepted:
@@ -164,7 +165,7 @@ class FaxSendJobForm(QMainWindow):
                 try:
                     self.cur_device = device.Device(device_uri=self.device_uri,
                                                      printer_name=self.printer_name)
-                except Error, e:
+                except Error as e:
                     log.error("Invalid device URI or printer name.")
                     self.FailureUI("<b>Invalid device URI or printer name.</b><p>Please check the parameters to hp-print and try again.")
                     self.init_failed = True
@@ -214,7 +215,7 @@ class FaxSendJobForm(QMainWindow):
                               QMessageBox.NoButton)
 
     def FailureUI(self, error_text):
-        log.error(unicode(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", " "))
+        log.error(to_unicode(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", " "))
         QMessageBox.critical(self,
                              self.caption(),
                              error_text,
@@ -223,7 +224,7 @@ class FaxSendJobForm(QMainWindow):
                               QMessageBox.NoButton)
 
     def WarningUI(self, error_text):
-        log.warn(unicode(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", " "))
+        log.warn(to_unicode(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", " "))
         QMessageBox.warning(self,
                              self.caption(),
                              error_text,

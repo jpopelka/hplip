@@ -22,12 +22,13 @@
 # Local
 from base.g import *
 from base import utils
+from base.sixext import  to_unicode
 from prnt import cups
-from jobstoragemixin import JobStorageMixin
+from .jobstoragemixin import JobStorageMixin
 
 # Qt
 from qt import *
-from scrollview import ScrollView
+from .scrollview import ScrollView
 
 # Std Lib
 import os.path
@@ -39,8 +40,8 @@ class RangeValidator(QValidator):
         QValidator.__init__(self, parent, name)
 
     def validate(self, input, pos):
-        for x in unicode(input)[pos-1:]:
-            if x not in u'0123456789,- ':
+        for x in to_unicode(input)[pos-1:]:
+            if x not in '0123456789,- ':
                 return QValidator.Invalid, pos
 
         return QValidator.Acceptable, pos
@@ -520,7 +521,7 @@ class ScrollPrintSettingsView(ScrollView):
                 cur_outputmode_dpi = cups.findPPDAttribute(quality_attr_name, cur_outputmode)
                 if cur_outputmode_dpi is not None:
                     log.debug("Adding Group: Summary outputmode is : %s" % cur_outputmode)
-                    log.debug("Adding Group: Summary outputmode dpi is : %s" % unicode (cur_outputmode_dpi))                
+                    log.debug("Adding Group: Summary outputmode dpi is : %s" % str (cur_outputmode_dpi))                
                     self.addGroupHeading("summry", self.__tr("Summary"))
                     self.addItem("summry", "colorinput", self.__tr('Color Input / Black Render'),
                         cups.UI_INFO, cur_outputmode_dpi, [], 0)
@@ -547,7 +548,7 @@ class ScrollPrintSettingsView(ScrollView):
 
     def ComboBox_indexChanged(self, currentItem):
         sender = self.sender()
-        currentItem = unicode(currentItem)
+        currentItem = to_unicode(currentItem)
         # Checking for summary control
         labelPQValaue = getattr(self, 'PQValueLabel', None)
         labelPQColorInput = getattr(self, 'PQColorInputLabel', None)
@@ -568,7 +569,7 @@ class ScrollPrintSettingsView(ScrollView):
             log.debug("Outputmode changed, setting value outputmode: %s" % currentItem)            
 
     def optionComboBox_activated(self, a):
-        a = unicode(a)
+        a = to_unicode(a)
         sender = self.sender()
         choice = None
 
@@ -635,7 +636,7 @@ class ScrollPrintSettingsView(ScrollView):
                         # determine printoutmode option combo enable state
                         c.setEnabled(True)
                         QToolTip.remove(c)
-                        a = unicode(c.currentText())
+                        a = to_unicode(c.currentText())
 
                         # determine printoutmode default button state
                         link_choice = None

@@ -226,7 +226,7 @@ class QueuesDiagnose(QDialog, Ui_Dialog):
             FailureUI(self, queryString(ERROR_NO_NETWORK))
         else:
             sts, HPLIP_file = utils.download_from_network(HPLIP_INFO_SITE)
-            if sts is True:
+            if sts == 0:
                 hplip_si_conf = ConfigBase(HPLIP_file)
                 source = hplip_si_conf.get("SMART_INSTALL","url","")
                 if not source :
@@ -236,7 +236,7 @@ class QueuesDiagnose(QDialog, Ui_Dialog):
             response_file, smart_install_run = utils.download_from_network(source)
             response_asc, smart_install_asc = utils.download_from_network(source+'.asc')
             
-            if response_file  and response_asc :
+            if response_file == 0   and response_asc == 0:
 
                 gpg_obj = validation.GPG_Verification()
                 digsig_sts, error_str = gpg_obj.validate(smart_install_run, smart_install_asc)
@@ -250,7 +250,7 @@ class QueuesDiagnose(QDialog, Ui_Dialog):
                         QMessageBox.Yes | QMessageBox.No) == QMessageBox.Yes:
                         # Disabling without verification.
                         sts, out = utils.run("sh %s"%smart_install_run)
- 
+
             else:
                 if response_asc:
                     FailureUI(self, queryString(ERROR_FAILED_TO_DOWNLOAD_FILE, 0, source + ".asc"))

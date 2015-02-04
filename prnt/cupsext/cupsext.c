@@ -79,8 +79,14 @@ Yashwant Kumar Sahu
 #include <cups/cups.h>
 #include <cups/language.h>
 #include <cups/ppd.h>
+#include <syslog.h>
+#include <stdarg.h>
 #include <sys/types.h>
 #include <pwd.h>
+
+
+#include "cupsext.h"
+
 
 /* Ref: PEP 353 (Python 2.5) */
 #if PY_VERSION_HEX < 0x02050000
@@ -88,6 +94,10 @@ typedef int Py_ssize_t;
 #define PY_SSIZE_T_MAX INT_MAX
 #define PY_SSIZE_T_MIN INT_MIN
 #endif
+
+#define _STRINGIZE(x) #x
+#define STRINGIZE(x) _STRINGIZE(x)
+
 
 #if (CUPS_VERSION_MAJOR > 1) || (CUPS_VERSION_MINOR > 5)
     #define HAVE_CUPS_1_6 1
@@ -181,7 +191,6 @@ static char *getUserName()
   }
   return NULL;
 }
-
 /*
  * 'validate_name()' - Make sure the printer name only contains valid chars.
  */
@@ -216,7 +225,8 @@ static PyObject * PyObj_from_UTF8(const char *utf8)
         }
 
         ascii[i] = '\0';
-        val = PyString_FromString( ascii );
+        //val = PyString_FromString( ascii );
+        val = PYUnicode_STRING( ascii );
         free( ascii );
     }
 
@@ -231,7 +241,8 @@ void debug(const char * text)
 
 }
 
-staticforward PyTypeObject printer_Type;
+//staticforward PyTypeObject printer_Type;
+static PyTypeObject printer_Type;
 
 #define printerObject_Check(v) ((v)->ob_type == &printer_Type)
 
@@ -278,8 +289,10 @@ static PyMemberDef printer_members[] =
 
 static PyTypeObject printer_Type =
 {
-    PyObject_HEAD_INIT( &PyType_Type )
-    0,                                     /* ob_size */
+    /* PyObject_HEAD_INIT( &PyType_Type ) */
+    /* 0, */
+    /*                                  /\* ob_size *\/ */
+    PyVarObject_HEAD_INIT( &PyType_Type, 0 )
     "cupsext.Printer",                   /* tp_name */
     sizeof( printer_Object ),              /* tp_basicsize */
     0,                                     /* tp_itemsize */
@@ -938,8 +951,8 @@ abort:
 
 
 
-staticforward PyTypeObject job_Type;
-
+//staticforward PyTypeObject job_Type;
+static PyTypeObject job_Type;
 typedef struct
 {
     PyObject_HEAD
@@ -978,8 +991,9 @@ static PyMemberDef job_members[] =
 
 static PyTypeObject job_Type =
 {
-    PyObject_HEAD_INIT( &PyType_Type )
-    0,                                     /* ob_size */
+    /* PyObject_HEAD_INIT( &PyType_Type ) */
+    /* 0,                                     /\* ob_size *\/ */
+    PyVarObject_HEAD_INIT( &PyType_Type, 0 )
     "Job",                                 /* tp_name */
     sizeof( job_Object ),                  /* tp_basicsize */
     0,                                     /* tp_itemsize */
@@ -1824,15 +1838,9 @@ PyObject * printFileWithOptions( PyObject * self, PyObject * args )
     {
         return Py_BuildValue( "" ); // None
     }
-
     requesting_user_name = getUserName();
     if(requesting_user_name)
     {
-        /*
-         *Sometimes cupsUser() is explicitly set as "root", in order to avoid authentication popup multiple times in toolbox or any other utility.
-         *While submitting the job to cups, we should set the correct user (who initiates print/fax) name  always.
-         */
-
         cupsSetUser(requesting_user_name);
     }
 
@@ -1883,8 +1891,8 @@ const char * password_callback(const char * prompt)
         usernameObj = PyTuple_GetItem(result, 0);
         if (!usernameObj)
             return "";
-        username = PyString_AsString(usernameObj);
-        // printf("usernameObj=%p, username='%s'\n", usernameObj, username); 
+        username = PYUnicode_UNICODE(usernameObj);
+        /*      printf("usernameObj=%p, username='%s'\n", usernameObj, username); */
         if (!username)
             return "";
 
@@ -1893,8 +1901,8 @@ const char * password_callback(const char * prompt)
         passwordObj = PyTuple_GetItem(result, 1);
         if (!passwordObj)
             return "";
-        password = PyString_AsString(passwordObj);
-        // printf("passwrdObj=%p, passwrd='%s'\n", passwordObj, password); 
+        password = PYUnicode_UNICODE(passwordObj);
+        /*      printf("passwordObj=%p, password='%s'\n", passwordObj, password); */
         if (!password)
             return "";
 
@@ -2008,17 +2016,26 @@ static PyMethodDef cupsext_methods[] =
 
 static char cupsext_documentation[] = "Python extension for CUPS 1.x";
 
-void initcupsext( void )
-{
+/* void initcupsext( void ) */
+/* { */
 
-    PyObject * mod = Py_InitModule4( "cupsext", cupsext_methods,
-                                     cupsext_documentation, ( PyObject* ) NULL,
-                                     PYTHON_API_VERSION );
+/*     PyObject * mod = Py_InitModule4( "cupsext", cupsext_methods, */
+/*                                      cupsext_documentation, ( PyObject* ) NULL, */
+/*                                      PYTHON_API_VERSION ); */
 
-    if ( mod == NULL )
-        return ;
+/*     if ( mod == NULL ) */
+/*         return ; */
+/* } */
 
+
+MOD_INIT(cupsext)  {
+
+  PyObject* mod ;
+  MOD_DEF(mod, "cupsext", cupsext_documentation, cupsext_methods);
+  if (mod == NULL)
+    return MOD_ERROR_VAL;
+
+  return MOD_SUCCESS_VAL(mod);
 
 }
-
 

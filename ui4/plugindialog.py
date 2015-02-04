@@ -25,15 +25,16 @@ from base.g import *
 from base import device, utils
 from prnt import cups
 from base.codes import *
-from ui_utils import *
+from .ui_utils import *
 from installer import pluginhandler
+from base.sixext import  to_unicode
 
 # Qt
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Ui
-from plugindialog_base import Ui_Dialog
+from .plugindialog_base import Ui_Dialog
 
 #signal
 import signal
@@ -41,7 +42,6 @@ import signal
 PAGE_SOURCE = 0
 # PAGE_LICENSE = 1 # part of plug-in itself, this is a placeholder
 PAGE_MAX = 1
-
 
 
 class PluginDialog(QDialog, Ui_Dialog):
@@ -100,13 +100,18 @@ class PluginDialog(QDialog, Ui_Dialog):
     def showSourcePage(self):
         reason_text = self.plugin_reason_text()
 
-        if reason_text is not None:
-            if self.install_mode == PLUGIN_REQUIRED:
-                self.TitleLabel.setText(self.__tr("An additional driver plug-in is required to operate this printer. You may download the plug-in directly from an HP authorized server (recommended), or, if you already have a copy of the file, you can specify a path to the file (advanced). <br><br>%1").arg(reason_text))
-                self.SkipRadioButton.setEnabled(False)
+        if self.install_mode == PLUGIN_REQUIRED:
+            self.SkipRadioButton.setEnabled(False)
+            msg = "An additional driver plug-in is required to operate this printer. You may download the plug-in directly from an HP authorized server (recommended), or, if you already have a copy of the file, you can specify a path to the file (advanced)."
+            if reason_text is not None:
+                msg += "<br><br>%s"%reason_text
+            self.TitleLabel.setText(self.__tr(msg))
 
-            elif self.install_mode == PLUGIN_OPTIONAL:
-                self.TitleLabel.setText(self.__tr("An optional driver plug-in is available to enhance the operation of this printer. You may download the plug-in directly from an HP authorized server (recommended), skip this installation (not recommended), or, if you already have a copy of the file, you can specify a path to the file (advanced).<br><br>%1").arg(reason_text))
+        elif self.install_mode == PLUGIN_OPTIONAL:
+            msg = "An optional driver plug-in is available to enhance the operation of this printer. You may download the plug-in directly from an HP authorized server (recommended), skip this installation (not recommended), or, if you already have a copy of the file, you can specify a path to the file (advanced)."
+            if reason_text is not None:
+                msg += "<br><br>%s"%reason_text
+            self.TitleLabel.setText(self.__tr(msg))
 
         self.connect(self.DownloadRadioButton, SIGNAL("toggled(bool)"), self.DownloadRadioButton_toggled)
         self.connect(self.CopyRadioButton, SIGNAL("toggled(bool)"), self.CopyRadioButton_toggled)
@@ -136,7 +141,7 @@ class PluginDialog(QDialog, Ui_Dialog):
         if b:
             self.PathLineEdit.setEnabled(True)
             self.BrowseToolButton.setEnabled(True)
-            self.plugin_path = unicode(self.PathLineEdit.text())
+            self.plugin_path = to_unicode(self.PathLineEdit.text())
             self.setPathIndicators()
 
 
@@ -153,17 +158,17 @@ class PluginDialog(QDialog, Ui_Dialog):
 
 
     def PathLineEdit_textChanged(self, t):
-        self.plugin_path = unicode(t)
+        self.plugin_path = to_unicode(t)
         self.setPathIndicators()
 
 
     def setPathIndicators(self):
         ok = True
         if not self.plugin_path or (self.plugin_path and os.path.isdir(self.plugin_path)):
-            self.PathLineEdit.setToolTip(self.__tr("You must specify a path to the '%1' file.").arg(self.pluginObj.getFileName() ))
+            self.PathLineEdit.setToolTip(self.__tr("You must specify a path to the '%s' file."%self.pluginObj.getFileName() ))
             ok = False
         elif os.path.basename(self.plugin_path) != self.pluginObj.getFileName():
-            self.PathLineEdit.setToolTip(self.__tr("The plugin filename must be '%1'.").arg(self.pluginObj.getFileName()))
+            self.PathLineEdit.setToolTip(self.__tr("The plugin filename must be '%s'."%self.pluginObj.getFileName()))
             ok = False
 
         if not ok:
@@ -182,10 +187,10 @@ class PluginDialog(QDialog, Ui_Dialog):
 
 
     def BrowseToolButton_clicked(self):
-        t = unicode(self.PathLineEdit.text())
+        t = to_unicode(self.PathLineEdit.text())
         path =""
         if not os.path.exists(t):
-            path = unicode(QFileDialog.getOpenFileName(self, self.__tr("Select Plug-in File"),
+            path = to_unicode(QFileDialog.getOpenFileName(self, self.__tr("Select Plug-in File"),
                                                 #user_conf.workingDirectory(),
                                                 self.user_settings.working_dir,
                                                 self.__tr("Plugin Files (*.run)")))
@@ -242,6 +247,7 @@ class PluginDialog(QDialog, Ui_Dialog):
 
             if status in (ERROR_UNABLE_TO_RECV_KEYS, ERROR_DIGITAL_SIGN_NOT_FOUND):
                 endWaitCursor()
+
                 if QMessageBox.question(self, " ",
                         self.__tr("<b>%s</b><p>Without this, it is not possible to authenticate and validate the plug-in prior to installation.</p>Do you still want to install the plug-in?" %error_str),
                         QMessageBox.Yes | QMessageBox.No) != QMessageBox.Yes:
@@ -278,14 +284,14 @@ class PluginDialog(QDialog, Ui_Dialog):
                         except Error:
                             log.error("Error opening device.")
                             endWaitCursor()
-                            FailureUI(self, self.__tr("<b>Firmware download to device failed.</b><p>%1</p>").arg(dev))
+                            FailureUI(self, self.__tr("<b>Firmware download to device failed.</b><p>%s</p>"%dev))
                             continue
 
                         if d.downloadFirmware():
                             log.info("Firmware download successful.\n")
                         else:
                             endWaitCursor()
-                            FailureUI(self, self.__tr("<b>Firmware download to device failed.</b><p>%1</p>").arg(dev))
+                            FailureUI(self, self.__tr("<b>Firmware download to device failed.</b><p>%s</p>"%dev))
 
                     finally:
                         if d is not None:
@@ -304,11 +310,11 @@ class PluginDialog(QDialog, Ui_Dialog):
 
 
     def plugin_install_callback(self, s):
-        print s
+        print(s)
 
 
     def updateStepText(self, p):
-        self.StepText.setText(self.__tr("Step %1 of %2").arg(p+1).arg(PAGE_MAX+1))
+        self.StepText.setText(self.__tr("Step %s of %s"%( p+1, PAGE_MAX+1)))
 
 
     def plugin_reason_text(self):

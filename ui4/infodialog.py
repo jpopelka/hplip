@@ -24,18 +24,19 @@ import os.path
 
 # Local
 from base.g import *
-from base import device, utils
+from base import device
 from prnt import cups
 from base.codes import *
-from ui_utils import *
+from base.sixext import  to_unicode
+from .ui_utils import *
 
 # Qt
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Ui
-from infodialog_base import Ui_Dialog
-from deviceuricombobox import DEVICEURICOMBOBOX_TYPE_PRINTER_AND_FAX
+from .infodialog_base import Ui_Dialog
+from .deviceuricombobox import DEVICEURICOMBOBOX_TYPE_PRINTER_AND_FAX
 
 
 class InfoDialog(QDialog, Ui_Dialog):
@@ -98,7 +99,7 @@ class InfoDialog(QDialog, Ui_Dialog):
             d = device.Device(self.device_uri, None)
         except Error:
             QApplication.restoreOverrideCursor()
-            FailureUI(self, self.__tr("<b>Unable to open device %1.</b>").arg(self.device_uri))
+            FailureUI(self, self.__tr("<b>Unable to open device %s.</b>"%(self.device_uri)))
             #self.close()
             return
 
@@ -107,7 +108,7 @@ class InfoDialog(QDialog, Ui_Dialog):
         self.StaticTableWidget.setColumnCount(len(self.headers))
         self.StaticTableWidget.setHorizontalHeaderLabels(self.headers)
 
-        mq_keys = d.mq.keys()
+        mq_keys = list(d.mq.keys())
         mq_keys.sort()
 
         self.StaticTableWidget.setRowCount(len(mq_keys))
@@ -134,13 +135,13 @@ class InfoDialog(QDialog, Ui_Dialog):
             try:
                 d.open()
                 d.queryDevice()
-            except Error, e:
+            except Error as e:
                 QApplication.restoreOverrideCursor()
-                FailureUI(self, self.__tr("<b>Unable to open device %1.</b>").arg(self.device_uri))
+                FailureUI(self, self.__tr("<b>Unable to open device %s.</b>"%(self.device_uri)))
                 #self.close()
                 return
 
-            dq_keys = d.dq.keys()
+            dq_keys = list(d.dq.keys())
             dq_keys.sort()
 
             self.DynamicTableWidget.setRowCount(len(dq_keys))
@@ -185,13 +186,13 @@ class InfoDialog(QDialog, Ui_Dialog):
         for row, h in enumerate(history):
             dt = QDateTime()
             dt.setTime_t(int(h.timedate))
-            dt = dt.toString()
+            dt = value_str(dt)
 
             ess = device.queryString(h.event_code, 0)
 
             for col, t in enumerate([dt, h.printer_name,
-                           unicode(h.event_code), ess,
-                           h.username, unicode(h.job_id),
+                           to_unicode(h.event_code), ess,
+                           h.username, to_unicode(h.job_id),
                            h.title]):
 
                 i = QTableWidgetItem(QString(t))
@@ -238,10 +239,10 @@ class InfoDialog(QDialog, Ui_Dialog):
                 #current_options['cups_error_log_level'] = cups.getErrorLogLevel()
 
                 try:
-                    f = file(os.path.expanduser('~/.cups/lpoptions'))
-                except IOError, e:
+                    f = open(os.path.expanduser('~/.cups/lpoptions'))
+                except IOError as e:
                     log.debug(str(e))
-                    current_options['lpoptions_file_data'] = QString("(%1)").arg(str(e))
+                    current_options['lpoptions_file_data'] = QString("(%s)"%str(e))
                 else:
                     text = f.read()
                     for d in text.splitlines():
@@ -251,7 +252,7 @@ class InfoDialog(QDialog, Ui_Dialog):
                     else:
                         current_options['lpoptions_file_data'] = self.__tr("(no data)")
 
-                keys = current_options.keys()
+                keys = list(current_options.keys())
                 keys.sort()
 
                 Table.setRowCount(len(keys))
@@ -264,11 +265,11 @@ class InfoDialog(QDialog, Ui_Dialog):
                     if key == 'printer-state':
                         state = int(current_options[key])
                         if state == cups.IPP_PRINTER_STATE_IDLE:
-                            i = QTableWidgetItem(self.__tr("idle (%1)").arg(state))
+                            i = QTableWidgetItem(self.__tr("idle (%s)"%state))
                         elif state == cups.IPP_PRINTER_STATE_PROCESSING:
-                            i = QTableWidgetItem(self.__tr("busy/printing (%1)").arg(state))
+                            i = QTableWidgetItem(self.__tr("busy/printing (%s)"%state))
                         elif state == cups.IPP_PRINTER_STATE_STOPPED:
-                            i = QTableWidgetItem(self.__tr("stopped (%1)").arg(state))
+                            i = QTableWidgetItem(self.__tr("stopped (%s)"%state))
                         else:
                             i = QTableWidgetItem(QString(str(state)))
                     else:

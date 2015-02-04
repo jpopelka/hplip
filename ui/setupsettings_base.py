@@ -187,31 +187,31 @@ class SetupSettings_base(QDialog):
 
 
     def faxCheckBox_toggled(self,a0):
-        print "SetupSettings_base.faxCheckBox_toggled(bool): Not implemented yet"
+        print("SetupSettings_base.faxCheckBox_toggled(bool): Not implemented yet")
 
     def scanCheckBox_toggled(self,a0):
-        print "SetupSettings_base.scanCheckBox_toggled(bool): Not implemented yet"
+        print("SetupSettings_base.scanCheckBox_toggled(bool): Not implemented yet")
 
     def pcardCheckBox_toggled(self,a0):
-        print "SetupSettings_base.pcardCheckBox_toggled(bool): Not implemented yet"
+        print("SetupSettings_base.pcardCheckBox_toggled(bool): Not implemented yet")
 
     def copyCheckBox_toggled(self,a0):
-        print "SetupSettings_base.copyCheckBox_toggled(bool): Not implemented yet"
+        print("SetupSettings_base.copyCheckBox_toggled(bool): Not implemented yet")
 
     def filterButtonGroup_clicked(self,a0):
-        print "SetupSettings_base.filterButtonGroup_clicked(int): Not implemented yet"
+        print("SetupSettings_base.filterButtonGroup_clicked(int): Not implemented yet")
 
     def searchTermLineEdit_textChanged(self,a0):
-        print "SetupSettings_base.searchTermLineEdit_textChanged(const QString&): Not implemented yet"
+        print("SetupSettings_base.searchTermLineEdit_textChanged(const QString&): Not implemented yet")
 
     def ttlSpinBox_valueChanged(self,a0):
-        print "SetupSettings_base.ttlSpinBox_valueChanged(int): Not implemented yet"
+        print("SetupSettings_base.ttlSpinBox_valueChanged(int): Not implemented yet")
 
     def timeoutSpinBox_valueChanged(self,a0):
-        print "SetupSettings_base.timeoutSpinBox_valueChanged(int): Not implemented yet"
+        print("SetupSettings_base.timeoutSpinBox_valueChanged(int): Not implemented yet")
 
     def defaultsPushButton_clicked(self):
-        print "SetupSettings_base.defaultsPushButton_clicked(): Not implemented yet"
+        print("SetupSettings_base.defaultsPushButton_clicked(): Not implemented yet")
 
     def __tr(self,s,c = None):
         return qApp.translate("SetupSettings_base",s,c)

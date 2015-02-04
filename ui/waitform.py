@@ -21,7 +21,7 @@
 
 import sys
 from qt import *
-from waitform_base import WaitForm_base
+from .waitform_base import WaitForm_base
 
 class WaitForm(WaitForm_base):
     def __init__(self, seconds, message=None, cancel_func=None, parent=None, name=None, modal=0, fl=0):

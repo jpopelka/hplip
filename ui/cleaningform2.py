@@ -23,11 +23,11 @@
 
 # Local
 from base.g import *
-from ui_utils import load_pixmap
+from .ui_utils import load_pixmap
 
 # Qt
 from qt import *
-from cleaningform2_base import CleaningForm2_base
+from .cleaningform2_base import CleaningForm2_base
 
 
 class CleaningForm2(CleaningForm2_base):

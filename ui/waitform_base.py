@@ -57,7 +57,7 @@ class WaitForm_base(QDialog):
 
 
     def cancelPushButton_clicked(self):
-        print "WaitForm_base.cancelPushButton_clicked(): Not implemented yet"
+        print("WaitForm_base.cancelPushButton_clicked(): Not implemented yet")
 
     def __tr(self,s,c = None):
         return qApp.translate("WaitForm_base",s,c)

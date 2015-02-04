@@ -59,7 +59,9 @@ try:
     else:
         back_end_filter = ['hp', 'hpfax']
 
-    printer_name, device_uri = mod.getPrinterName(printer_name, device_uri, back_end_filter)
+    sts, printer_name, device_uri = mod.getPrinterName(printer_name, device_uri, back_end_filter)
+    if not sts:
+        sys.exit(1)
 
     if ui_toolkit == 'qt3':
         log.error("%s requires Qt4 support. Use hp-toolbox to adjust print settings. Exiting." % __mod__)
@@ -77,7 +79,6 @@ try:
         sys.exit(1)
 
     app = QApplication(sys.argv)
-
     dialog = PrintSettingsDialog(None, printer_name, fax_mode)
     dialog.show()
     try:

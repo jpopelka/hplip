@@ -26,13 +26,14 @@ import os.path
 import struct
 import time
 import threading
-
+from base.sixext.moves import StringIO
+from io import BytesIO
 # Local
 from base.g import *
 from base.codes import *
 from base import device, utils, pml, codes
 from prnt import cups
-from fax import *
+from .fax import *
 
 
 # **************************************************************************** #
@@ -141,28 +142,32 @@ class PMLFaxDevice(FaxDevice):
         return self.setPML(pml.OID_FAX_LOCAL_PHONE_NUM, str(num))
 
     def getPhoneNum(self):
-        return utils.printable(str(self.getPML(pml.OID_FAX_LOCAL_PHONE_NUM)[1]))
-
+        if PY3:
+            data = utils.printable(self.getPML(pml.OID_FAX_LOCAL_PHONE_NUM)[1].encode('utf-8'))
+            return data.decode('utf-8')
+        else:
+            return utils.printable(self.getPML(pml.OID_FAX_LOCAL_PHONE_NUM)[1])
     phone_num = property(getPhoneNum, setPhoneNum, doc="OID_FAX_LOCAL_PHONE_NUM")
 
 
     def setStationName(self, name):
-        try:
-            name = name.encode('utf-8')
-        except(UnicodeEncodeError, UnicodeDecodeError):
-            log.error("Unicode Error")
         return self.setPML(pml.OID_FAX_STATION_NAME, name)
 
     def getStationName(self):
-        return utils.printable(str(self.getPML(pml.OID_FAX_STATION_NAME)[1]))
+        if PY3:
+            data = utils.printable(self.getPML(pml.OID_FAX_STATION_NAME)[1].encode('utf-8'))
+            return data.decode('utf-8')
+        else:
+            return utils.printable(self.getPML(pml.OID_FAX_STATION_NAME)[1])
 
     station_name = property(getStationName, setStationName, doc="OID_FAX_STATION_NAME")
 
-    def setDateAndTime(self):
-        t = time.localtime()
-        p = struct.pack("BBBBBBB", t[0]-2000, t[1], t[2], t[6]+1, t[3], t[4], t[5])
-        log.debug(repr(p))
-        return self.setPML(pml.OID_DATE_AND_TIME, p)
+    def setDateAndTime(self):    #Need Revisit
+        pass
+        #t = time.localtime()
+        #p = struct.pack("BBBBBBB", t[0]-2000, t[1], t[2], t[6]+1, t[3], t[4], t[5])
+        #log.debug(repr(p))
+        #return self.setPML(pml.OID_DATE_AND_TIME, p.decode('latin-1'))
 
     def uploadLog(self):
         if not self.isUloadLogActive():
@@ -236,7 +241,7 @@ class PMLUploadLogThread(threading.Thread):
                 state = STATE_REQUEST_START
                 try:
                     self.dev.open()
-                except Error, e:
+                except Error as e:
                     log.error("Unable to open device (%s)." % e.msg)
                     state = STATE_ERROR
                 else:
@@ -360,7 +365,7 @@ class PMLFaxSendThread(FaxSendThread):
                 try:
                     try:
                         self.dev.open()
-                    except Error, e:
+                    except Error as e:
                         log.error("Unable to open device (%s)." % e.msg)
                         state = STATE_ERROR
                     else:
@@ -392,7 +397,7 @@ class PMLFaxSendThread(FaxSendThread):
                 state = STATE_COVER_PAGE
 
                 try:
-                    recipient = next_recipient.next()
+                    recipient = next(next_recipient)
                     #print recipient
                     log.debug("Processing for recipient %s" % recipient['name'])
 
@@ -494,7 +499,7 @@ class PMLFaxSendThread(FaxSendThread):
                         fax_send_state = FAX_SEND_STATE_SET_TOKEN
                         try:
                             self.dev.open()
-                        except Error, e:
+                        except Error as e:
                             log.error("Unable to open device (%s)." % e.msg)
                             fax_send_state = FAX_SEND_STATE_ERROR
                         else:
@@ -538,7 +543,7 @@ class PMLFaxSendThread(FaxSendThread):
                             log.debug("Opening fax channel.")
                             try:
                                 self.dev.openFax()
-                            except Error, e:
+                            except Error as e:
                                 log.error("Unable to open channel (%s)." % e.msg)
                                 fax_send_state = FAX_SEND_STATE_ERROR
                         else:
@@ -622,7 +627,7 @@ class PMLFaxSendThread(FaxSendThread):
                             self.dev.setPML(pml.OID_FAXJOB_TX_TYPE, pml.FAXJOB_TX_TYPE_HOST_ONLY)
                             log.debug("Setting date and time on device.")
                             self.dev.setDateAndTime()
-                        except Error, e:
+                        except Error as e:
                             log.error("PML/SNMP error (%s)" % e.msg)
                             fax_send_state = FAX_SEND_STATE_ERROR
 
@@ -668,7 +673,7 @@ class PMLFaxSendThread(FaxSendThread):
                         fax_send_state = FAX_SEND_STATE_SEND_PAGES
 
                         try:
-                            ff = file(self.f, 'r')
+                            ff = open(self.f, 'rb')
                         except IOError:
                             log.error("Unable to read fax file.")
                             fax_send_state = FAX_SEND_STATE_ERROR
@@ -684,7 +689,7 @@ class PMLFaxSendThread(FaxSendThread):
                         magic, version, total_pages, hort_dpi, vert_dpi, page_size, \
                             resolution, encoding, reserved1, reserved2 = self.decode_fax_header(header)
 
-                        if magic != 'hplip_g3':
+                        if magic != b'hplip_g3':
                             log.error("Invalid file header. Bad magic.")
                             fax_send_state = FAX_SEND_STATE_ERROR
                         else:
@@ -705,7 +710,7 @@ class PMLFaxSendThread(FaxSendThread):
                     elif fax_send_state == FAX_SEND_STATE_SEND_PAGES:  # --------------------------------- Send fax pages state machine (110, 130, 0)
                         log.debug("%s State: Send pages" % ("*"*20))
                         fax_send_state = FAX_SEND_STATE_SEND_END_OF_STREAM
-                        page = StringIO()
+                        page = BytesIO()
 
                         for p in range(total_pages):
 
@@ -763,7 +768,7 @@ class PMLFaxSendThread(FaxSendThread):
                                     fax_send_state = FAX_SEND_STATE_ABORT
                                     break
 
-                                if data == '':
+                                if data == b'':
                                     self.create_eop_record(rpp)
 
                                     try:
@@ -1020,7 +1025,7 @@ class PMLFaxSendThread(FaxSendThread):
     def create_mfpdtf_fax_header(self, total_pages):
         self.stream.write(struct.pack("<BBBHBI20s20s20sI",
                             MAJOR_VER, MINOR_VER, SRC_HOST, total_pages,
-                            TTI_PREPENDED_TO_IMAGE, 0, '', '', '', 0))
+                            TTI_PREPENDED_TO_IMAGE, 0, b'', b'', b'', 0))
 
 
     def write_stream(self):

@@ -148,10 +148,10 @@ class FaxSettingsForm_base(QDialog):
 
 
     def faxEdit_textChanged(self,a0):
-        print "FaxSettingsForm_base.faxEdit_textChanged(const QString&): Not implemented yet"
+        print("FaxSettingsForm_base.faxEdit_textChanged(const QString&): Not implemented yet")
 
     def nameEdit_textChanged(self,a0):
-        print "FaxSettingsForm_base.nameEdit_textChanged(const QString&): Not implemented yet"
+        print("FaxSettingsForm_base.nameEdit_textChanged(const QString&): Not implemented yet")
 
     def __tr(self,s,c = None):
         return qApp.translate("FaxSettingsForm_base",s,c)

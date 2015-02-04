@@ -35,6 +35,7 @@ import os
 # Local
 from base.g import *
 from base import device, status, utils, maint, tui, module
+from base.sixext.moves import input
 from prnt import cups
 
 
@@ -73,7 +74,7 @@ def colorCal4():
     values = [0, 0, 0, 0]
     ok = True
     while True:
-        x = raw_input(log.bold("""Enter the letter ('A' thru 'N') and number (1 thru 14) for the GRAY plot (eg, "C5") or "q" to quit: """))
+        x = input(log.bold("""Enter the letter ('A' thru 'N') and number (1 thru 14) for the GRAY plot (eg, "C5") or "q" to quit: """))
 
         if x.lower().strip() == 'q':
             ok = False
@@ -113,7 +114,7 @@ def colorCal4():
 
     if ok:
         while True:
-            x = raw_input(log.bold("""Enter the letter ('P' thru 'V') and number (1 thru 7) for the COLOR plot (eg, "R3") or "q" to quit: """))
+            x = input(log.bold("""Enter the letter ('P' thru 'V') and number (1 thru 7) for the COLOR plot (eg, "R3") or "q" to quit: """))
 
             if x.lower().strip() == 'q':
                 ok = False
@@ -168,6 +169,9 @@ try:
     device_uri = mod.getDeviceUri(device_uri, printer_name,
         filter={'color-cal-type': (operator.ne, COLOR_CAL_TYPE_NONE)})
 
+    if not device_uri:
+        sys.exit(1)
+
     if mode == GUI_MODE:
         if not utils.canEnterGUIMode4():
             log.error("%s -u/--gui requires Qt4 GUI support. Entering interactive mode." % __mod__)
@@ -176,7 +180,7 @@ try:
     if mode == INTERACTIVE_MODE:
         try:
             d = device.Device(device_uri, printer_name)
-        except Error, e:
+        except Error as e:
             log.error("Unable to open device: %s" % e.msg)
             sys.exit(1)
 
@@ -235,7 +239,6 @@ try:
         #try:
         if 1:
             app = QApplication(sys.argv)
-
             dlg = ColorCalDialog(None, device_uri)
             dlg.show()
             try:

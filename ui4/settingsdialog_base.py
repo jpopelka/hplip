@@ -50,7 +50,7 @@ class Ui_SettingsDialog_base(object):
         self.AutoRefreshRateSpinBox.setButtonSymbols(QtGui.QAbstractSpinBox.PlusMinus)
         self.AutoRefreshRateSpinBox.setMinimum(10)
         self.AutoRefreshRateSpinBox.setMaximum(300)
-        self.AutoRefreshRateSpinBox.setProperty("value", QtCore.QVariant(30))
+        self.AutoRefreshRateSpinBox.setProperty("value", 30)
         self.AutoRefreshRateSpinBox.setObjectName("AutoRefreshRateSpinBox")
         self.hboxlayout.addWidget(self.AutoRefreshRateSpinBox)
         self.gridlayout2.addLayout(self.hboxlayout, 0, 1, 1, 1)
@@ -234,4 +234,4 @@ class Ui_SettingsDialog_base(object):
         self.SetDefaultsButton.setText(QtGui.QApplication.translate("SettingsDialog_base", "Set &Defaults", None, QtGui.QApplication.UnicodeUTF8))
         self.TabWidget.setTabText(self.TabWidget.indexOf(self.Commands), QtGui.QApplication.translate("SettingsDialog_base", "Commands (Advanced)", None, QtGui.QApplication.UnicodeUTF8))
 
-from systrayframe import SystrayFrame
+from .systrayframe import SystrayFrame

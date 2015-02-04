@@ -107,19 +107,19 @@ class PluginForm2_base(QDialog):
 
 
     def sourceGroup_clicked(self,a0):
-        print "PluginForm2_base.sourceGroup_clicked(int): Not implemented yet"
+        print("PluginForm2_base.sourceGroup_clicked(int): Not implemented yet")
 
     def browsePushButton_clicked(self):
-        print "PluginForm2_base.browsePushButton_clicked(): Not implemented yet"
+        print("PluginForm2_base.browsePushButton_clicked(): Not implemented yet")
 
     def pathLineEdit_textChanged(self,a0):
-        print "PluginForm2_base.pathLineEdit_textChanged(const QString&): Not implemented yet"
+        print("PluginForm2_base.pathLineEdit_textChanged(const QString&): Not implemented yet")
 
     def actionPushButton_clicked(self):
-        print "PluginForm2_base.actionPushButton_clicked(): Not implemented yet"
+        print("PluginForm2_base.actionPushButton_clicked(): Not implemented yet")
 
     def cancelPushButton_clicked(self):
-        print "PluginForm2_base.cancelPushButton_clicked(): Not implemented yet"
+        print("PluginForm2_base.cancelPushButton_clicked(): Not implemented yet")
 
     def __tr(self,s,c = None):
         return qApp.translate("PluginForm2_base",s,c)

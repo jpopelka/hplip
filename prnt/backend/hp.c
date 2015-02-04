@@ -116,6 +116,7 @@ struct pjl_attributes
 #define DONT_SEND_TO_BACKEND    16
 #define DONT_SEND_TO_PRINTER    32
 
+
 /* Actual vstatus codes are mapped to 1000+vstatus for DeviceError messages. */ 
 typedef enum
 {
@@ -642,8 +643,10 @@ static FILE* create_out_file(char* job_id, char* user_name)
 {
     char    fname[256] = {0,};
     FILE  *temp_fp = NULL;
+
     snprintf(fname, sizeof(fname), "%s/hp_%s_out_%s_XXXXXX",CUPS_TMP_DIR, user_name, job_id);
     createTempFile(fname, &temp_fp);
+
     if (temp_fp)
     {
         chmod(fname, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
@@ -652,30 +655,38 @@ static FILE* create_out_file(char* job_id, char* user_name)
     {
         BUG("ERROR: unable to create Temporary file %s: %m\n", fname);
     }
+
     return temp_fp;
 }
+
 static void save_out_file(int fd, int copies, FILE * temp_fp)
 {
    int len = 0;
    char buf[HPMUD_BUFFER_SIZE];
+
    if (NULL == temp_fp)
    {
        BUG("ERROR: save_out_file function recieved NULL temp_fp pointer\n");
        return;
    }
+
    while (copies > 0)
    {
       copies--;
+
       if (fd != 0)
       {
          lseek(fd, 0, SEEK_SET);
       }
+
       while ((len = read(fd, buf, sizeof(buf))) > 0)
       {
           fwrite (buf, 1, len, temp_fp);
       }
+
    }
 }
+
 int main(int argc, char *argv[])
 {
    int fd;
@@ -742,6 +753,7 @@ int main(int argc, char *argv[])
       if(temp_fp)
           saveoutfile = 1;
    }
+
    if( DONT_SEND_TO_PRINTER & iLogLevel )
    {
        if(temp_fp)
@@ -751,6 +763,9 @@ int main(int argc, char *argv[])
        }
        exit (BACKEND_OK);
    }
+
+  
+
    signal(SIGTERM, SIG_IGN);
    init_dbus();
 
@@ -785,6 +800,7 @@ int main(int argc, char *argv[])
          {
             if (saveoutfile)
                   fwrite (buf, 1, len, temp_fp);
+
             /* Got some data now open the hp device. This will handle any HPIJS device contention. */
             if (hd <= 0)
             {
@@ -864,6 +880,7 @@ int main(int argc, char *argv[])
             } /* if (hd <= 0) */
 
             stat = hpmud_write_channel(hd, cd, buf+total, size, EXCEPTION_TIMEOUT, &n);
+
 
             if (n != size)
             {

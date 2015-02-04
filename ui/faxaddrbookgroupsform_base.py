@@ -77,22 +77,22 @@ class FaxAddrBookGroupsForm_base(QDialog):
 
 
     def newButton_clicked(self):
-        print "FaxAddrBookGroupsForm_base.newButton_clicked(): Not implemented yet"
+        print("FaxAddrBookGroupsForm_base.newButton_clicked(): Not implemented yet")
 
     def editButton_clicked(self):
-        print "FaxAddrBookGroupsForm_base.editButton_clicked(): Not implemented yet"
+        print("FaxAddrBookGroupsForm_base.editButton_clicked(): Not implemented yet")
 
     def deleteButton_clicked(self):
-        print "FaxAddrBookGroupsForm_base.deleteButton_clicked(): Not implemented yet"
+        print("FaxAddrBookGroupsForm_base.deleteButton_clicked(): Not implemented yet")
 
     def groupListView_currentChanged(self,a0):
-        print "FaxAddrBookGroupsForm_base.groupListView_currentChanged(QListViewItem*): Not implemented yet"
+        print("FaxAddrBookGroupsForm_base.groupListView_currentChanged(QListViewItem*): Not implemented yet")
 
     def groupListView_doubleClicked(self,a0):
-        print "FaxAddrBookGroupsForm_base.groupListView_doubleClicked(QListViewItem*): Not implemented yet"
+        print("FaxAddrBookGroupsForm_base.groupListView_doubleClicked(QListViewItem*): Not implemented yet")
 
     def groupListView_rightButtonClicked(self,a0,a1,a2):
-        print "FaxAddrBookGroupsForm_base.groupListView_rightButtonClicked(QListViewItem*,const QPoint&,int): Not implemented yet"
+        print("FaxAddrBookGroupsForm_base.groupListView_rightButtonClicked(QListViewItem*,const QPoint&,int): Not implemented yet")
 
     def __tr(self,s,c = None):
         return qApp.translate("FaxAddrBookGroupsForm_base",s,c)

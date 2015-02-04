@@ -28,11 +28,11 @@ import time
 # Local
 from base.g import *
 from base import device, utils, models, os_utils
-from ui_utils import load_pixmap
+from .ui_utils import load_pixmap
 
 # Qt
 from qt import *
-from upgradeform_base import UpgradeForm_base
+from .upgradeform_base import UpgradeForm_base
 
 MANUAL_INSTALL_LINK = "http://hplipopensource.com/hplip-web/install/manual/index.html"
 
@@ -94,7 +94,7 @@ class UpgradeForm(UpgradeForm_base):
         else:
             log.debug("HPLIP Upgrade, selected Install radiobutton  distro_type=%d" %self.distro_type)
             self.NextButton.setEnabled(False)
-            if self.distro_type != 1:		# not tier 1 distro
+            if self.distro_type != 1:     # not tier 1 distro
                 utils.openURL(MANUAL_INSTALL_LINK)
             else:
                 terminal_cmd = utils.get_terminal()

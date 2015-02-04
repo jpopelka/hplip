@@ -195,7 +195,7 @@ TYPE_MAP = {re.compile('^GIF8[7,9]a')              : ('image/gif', gifsize),
 def imagesize(filename, mime_type=''):
     width, height = -1, -1
 
-    f = file(filename, 'r')
+    f = open(filename, 'r')
     buffer = f.read(4096)
 
     if not mime_type:

@@ -22,6 +22,7 @@
 #Global imports
 import os
 import stat
+import datetime
 
 #Local imports
 from base.codes import *
@@ -30,6 +31,7 @@ from base import utils
 from base import os_utils
 from base.g import *
 from subprocess import Popen, PIPE
+
 
 class DigiSign_Verification(object):
     def __init__(self):
@@ -40,7 +42,6 @@ class DigiSign_Verification(object):
 
 
 class GPG_Verification(DigiSign_Verification):
-
     def __init__(self, pgp_site = 'pgp.mit.edu', key = 0xA59047B9):
         self.__pgp_site = pgp_site
         self.__key = key
@@ -48,23 +49,20 @@ class GPG_Verification(DigiSign_Verification):
 
         sts, self.__hplipdir = os_utils.getHPLIPDir()
         self.__gpg_dir = os.path.join(self.__hplipdir, ".gnupg")
+
+        #Make sure gpg directory is present. GPG keys will be retrieved here from the key server
         
+
         if not os.path.exists(self.__gpg_dir):
             try:
-                os.mkdir(self.__gpg_dir, 0755)
+                os.mkdir(self.__gpg_dir, 0o755)
             except OSError:
                 log.error("Failed to create %s" % self.__gpg_dir)
-
         self.__change_owner()
-
-
     def __change_owner(self, Recursive = False):
         try:
             os.umask(0)
             s = os.stat(self.__hplipdir)
-
-            #When validation is done is sudo mode, files and directories created will have root as owner. 
-            #Changing the ownership back to normal user otherwise next validation operation will fail when run as normal user. 
             os_utils.changeOwner(self.__gpg_dir, s[stat.ST_UID], s[stat.ST_GID], Recursive)
 
         except OSError:

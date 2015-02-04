@@ -372,5 +372,5 @@ class Ui_Dialog(object):
 "</style></head><body style=\" font-family:\'DejaVu Sans\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">Cartridge alignment on this printer is only available by accessing the front panel of the printer. </span>Please refer to the user guide for the printer for more information. Click <span style=\" font-style:italic;\">Finish</span> to exit.</p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
 
-from loadpapergroupbox import LoadPaperGroupBox
-from deviceuricombobox import DeviceUriComboBox
+from .loadpapergroupbox import LoadPaperGroupBox
+from .deviceuricombobox import DeviceUriComboBox

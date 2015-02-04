@@ -26,10 +26,12 @@ import os.path
 import re
 import sys
 from subprocess import Popen, PIPE
+import codecs
 
 # Local
 from base.g import *
 from base import utils, services
+from base.sixext import to_bytes_utf8
 
 ver1_pat = re.compile("""(\d+\.\d+\.\d+)""", re.IGNORECASE)
 ver_pat = re.compile("""(\d+.\d+)""", re.IGNORECASE)
@@ -149,11 +151,12 @@ def check_file_contains(f, s):
     log.debug("Checking file '%s' for contents '%s'..." % (f, s))
     try:
         if os.path.exists(f):
-            for a in file(f, 'r'):
+            s = to_bytes_utf8(s)
+            for a in open(f, 'rb'):
                 update_spinner()
 
                 if s in a:
-                    log.debug("'%s' found in file '%s'." % (s.replace('\n', ''), f))
+                    log.debug("'%s' found in file '%s'." % (s.replace(b'\n', b''), f))
                     return True
 
         log.debug("Contents not found.")
@@ -337,7 +340,8 @@ def get_xsane_version():
     except:
         output =None
     else:
-        output=p1.communicate()[0]
+        output=p1.communicate()[0].decode('utf-8')
+        
 
     if output:
         xsane_ver_pat =re.compile('''xsane-(\d{1,}\.\d{1,}).*''')
@@ -361,10 +365,7 @@ def get_libpthread_version():
         return '-'
     else:
 #        LIBC = ctypes.CDLL(ctypes.util.find_library('c'), use_errno=True)
-        try:
-            LIBC = ctypes.CDLL(ctypes.util.find_library('c'),ctypes.DEFAULT_MODE,None, True)
-        except:
-            LIBC = ctypes.CDLL(ctypes.util.find_library('c'),ctypes.DEFAULT_MODE,None) #python2.4 and below syntax
+        LIBC = ctypes.CDLL(ctypes.util.find_library('c'),ctypes.DEFAULT_MODE,None, True)
         LIBC.gnu_get_libc_version.restype = ctypes.c_char_p
         return LIBC.gnu_get_libc_version()
 
@@ -378,3 +379,11 @@ def get_python_xml_version():
 
 def get_HPLIP_version():
     return prop.version
+
+
+def get_libusb_version():
+    
+    if sys_conf.get('configure', 'libusb01-build', 'no') == "yes":
+        return get_version('libusb-config --version')
+    else:
+        return '1.0'

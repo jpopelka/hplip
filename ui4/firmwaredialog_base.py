@@ -64,4 +64,4 @@ class Ui_Dialog(object):
         self.DownloadFirmwareButton.setText(QtGui.QApplication.translate("Dialog", "Download Firmware", None, QtGui.QApplication.UnicodeUTF8))
         self.CancelButton.setText(QtGui.QApplication.translate("Dialog", "Cancel", None, QtGui.QApplication.UnicodeUTF8))
 
-from deviceuricombobox import DeviceUriComboBox
+from .deviceuricombobox import DeviceUriComboBox

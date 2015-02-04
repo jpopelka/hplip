@@ -22,12 +22,12 @@
 # NOTE: Not used by Qt4 code. Use maint_*.py modules instead.
 
 # Local
-from g import *
-from codes import *
-import status, pml
+from .g import *
+from .codes import *
+from . import status, pml
 from prnt import pcl, ldl, colorcal
 import time
-import cStringIO
+from .sixext import to_bytes_utf8, StringIO
 
 # ************************* LEDM Clean**************************************** #
 CleanXML = """<?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -648,40 +648,40 @@ def dataModelHelper(dev, func, ui2):
         dev.close()
         return 0
 
-    if "ParmsRequested" in data:
+    if to_bytes_utf8("ParmsRequested") in data:
         log.error("Restart device and start alignment")
         dev.close()
         return 1
 
-    if "404 Not Found" in data:
+    if to_bytes_utf8("404 Not Found") in data:
         log.error("Device may not support Alignment")
         dev.close()
         return 1
 
-    if "Printing<" in data:
+    if to_bytes_utf8("Printing<") in data:
         log.warn("Previous alignment job not completed")
         dev.close()
         return 1
 
     data = status.StatusType10FetchUrl(func, "/DevMgmt/ConsumableConfigDyn.xml")
-    if "AlignmentMode" not in data:
+    if to_bytes_utf8("AlignmentMode") not in data:
         log.error("Device may not support Alignment")
         dev.close()
         return 1
 
-    if "automatic" in data:
+    if to_bytes_utf8("automatic") in data:
         log.debug("Device supports automatic calibration")
         status.StatusType10FetchUrl(func, "/Calibration/Session", "<cal:CalibrationState xmlns:cal=\\\"http://www.hp.com/schemas/imaging/con/cnx/markingagentcalibration/2009/04/08\\\" xmlns:dd=\\\"http://www.hp.com/schemas/imaging/con/dictionaries/1.0/\\\">Printing</cal:CalibrationState>")
         dev.close()
         return 0
 
-    if "semiAutomatic" in data:
+    if to_bytes_utf8("semiAutomatic") in data:
         log.debug("Device supports semiAutomatic calibration")
         status.StatusType10FetchUrl(func, "/Calibration/Session", "<cal:CalibrationState xmlns:cal=\\\"http://www.hp.com/schemas/imaging/con/cnx/markingagentcalibration/2009/04/08\\\" xmlns:dd=\\\"http://www.hp.com/schemas/imaging/con/dictionaries/1.0/\\\">Printing</cal:CalibrationState>")
         dev.close()
         return ui2()
 
-    if "manual" in data:
+    if to_bytes_utf8("manual") in data:
         log.debug("Device supports manual calibration")
         data = status.StatusType10FetchUrl(func, "/Calibration/Session", "<cal:CalibrationState xmlns:cal=\\\"http://www.hp.com/schemas/imaging/con/cnx/markingagentcalibration/2009/04/08\\\" xmlns:dd=\\\"http://www.hp.com/schemas/imaging/con/dictionaries/1.0/\\\">Printing</cal:CalibrationState>")
         import string
@@ -1327,7 +1327,6 @@ def cleaning(dev, clean_type, level1, level2, level3,
             else:
                 state = 6
 
-
         elif state == 6: # Load plain paper
             state = -1
             ok = loadpaper_ui()
@@ -1422,14 +1421,14 @@ def wipeAndSpitType2(dev): # LIDIL, Level 3
 
 def setCleanType(name):
     try:
-      xml = CleanXML %(name.encode('utf-8'))
+      xml = CleanXML %(name)
     except(UnicodeEncodeError, UnicodeDecodeError):
       log.error("Unicode Error")
     return xml
 
 
 def getCleanLedmCapacity(dev):
-    data_fp = cStringIO.StringIO()
+    data_fp = StringIO()
     status_type = dev.mq.get('status-type', STATUS_TYPE_NONE)
 
     if status_type == STATUS_TYPE_LEDM:
@@ -1442,7 +1441,7 @@ def getCleanLedmCapacity(dev):
 
     data = func(LEDM_CLEAN_CAP_XML, data_fp)
     if data:
-        data = data.split('\r\n\r\n', 1)[1]
+        data = data.split(b'\r\n\r\n', 1)[1]
         if data:
             data = status.ExtractXMLData(data)
     return data
@@ -1487,7 +1486,7 @@ def cleanTypeVerify(dev,level, print_verification_page = True): #LEDM Test Page
     else:
         log.error("Not an LEDM status-type: %d" % status_type)
 
-    print "Performing level %d cleaning...." % level
+    print("Performing level %d cleaning...." % level)
 
     while state != -1:
        status_block = status.StatusType10Status(func)
@@ -1717,7 +1716,7 @@ def colorCalType3Phase1(dev):
 def colorCalType3Phase2(dev, A, B):
     photo_adj = colorcal.PHOTO_ALIGN_TABLE[A-1][B-1]
     color_adj = colorcal.COLOR_ALIGN_TABLE[A-1][B-1]
-    adj_value = (color_adj << 8L) + photo_adj
+    adj_value = (color_adj << 8) + photo_adj
 
     dev.writeEmbeddedPML(pml.OID_COLOR_CALIBRATION_SELECTION, adj_value)
     dev.closePrint()

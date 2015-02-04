@@ -21,7 +21,7 @@
 #
 #
 
-from __future__ import generators
+
 
 # Std Lib
 import sys
@@ -39,20 +39,20 @@ import errno
 import stat
 import string
 import glob
-import commands # TODO: Replace with subprocess (commands is deprecated in Python 3.0)
-import cStringIO
+import subprocess # TODO: Replace with subprocess (commands is deprecated in Python 3.0)
+import io
 import re
 import getpass
 import locale
-import htmlentitydefs
-import urllib
+from .sixext.moves import html_entities
 
 # Local
-from base.g import *
-from codes import *
-from base import utils, tui
-import pexpect
-import logger
+from .g import *
+from .codes import *
+from . import utils, tui
+from . import logger
+
+
 # System wide logger
 log = logger.Logger('', logger.Logger.LOG_LEVEL_INFO, logger.Logger.LOG_TO_CONSOLE)
 log.set_level('info')
@@ -89,7 +89,7 @@ def run_open_mdns_port(core, passwordObj, callback=None):
         x = 1
         for cmd in open_mdns_port_cmd:
             cmd = passwordObj.getAuthCmd() % cmd
-            status, output = utils.run(cmd, passwordObj,"Need authentication to open mdns port [%s]"%cmd)
+            status, output = utils.run(cmd, passwordObj, "Need authentication to open mdns port [%s]"%cmd)
 
             if status != 0:
                 log.warn("An error occurred running '%s'" % cmd)
@@ -169,7 +169,7 @@ def start_service( service_name, passwordObj):
             if 'stop' in out or 'inactive' in out:
                 cmd_start = passwordObj.getAuthCmd()%("service %s start"%service_name)
                 log.debug("cmd_start=%s"%cmd_start)
-                sts,out = utils.run(cmd_start, passwordObj,"Need authentication to start/restart %s service"%service_name)
+                sts,out = utils.run(cmd_start, passwordObj, "Need authentication to start/restart %s service"%service_name)
                 if sts ==0:
                     ret_Val = True
             elif 'unrecognized service' in out:
@@ -234,7 +234,7 @@ def disable_SmartInstall():
             log.error("Smart Install could not be disabled\n")
     else:
         try:
-            from base import pkit
+            from . import pkit
             plugin = PLUGIN_REQUIRED
             plugin_reason = PLUGIN_REASON_NONE
             ok, sudo_ok = pkit.run_plugin_command(plugin == PLUGIN_REQUIRED, plugin_reason)

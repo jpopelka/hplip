@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # (c) Copyright @ 2013 Hewlett-Packard Development Company, L.P.
@@ -20,13 +21,14 @@
 #
 import os
 import getpass
-import cStringIO
 import time
 import string
 
-from base import utils, tui, os_utils
-from base.g import *
-import pexpect
+from . import utils, tui
+from .g import *
+from .sixext import BytesIO, StringIO
+from .sixext.moves import input
+from . import pexpect
 
 PASSWORD_RETRY_COUNT = 3
 
@@ -59,10 +61,10 @@ AUTH_TYPES ={'mepis':'su',
 # This function promts for the username and password and returns (username,password)
 def showPasswordPrompt(prompt):
     import getpass
-    print ""
-    print ""
-    print log.bold(prompt)
-    username = raw_input("Username: ")
+    print ("")
+    print ("")
+    print (log.bold(prompt))
+    username = input("Username: ")
     password = getpass.getpass("Password: ")
 
     return (username, password)
@@ -71,27 +73,27 @@ def showPasswordPrompt(prompt):
 
 #TBD this function shoud be removed once distro class implemented
 def get_distro_name():
-    os_name = None;
+    os_name = None
     try:
         import platform
-        os_name = platform.dist()[0].lower()
-    except:
+        os_name = platform.dist()[0]
+    except ImportError:
         os_name = None
 
-    if not os_name:
-        if utils.which('lsb_release'):
-           name = os.popen('lsb_release -i | cut -f 2')
-           os_name = name.read().strip()
-           name.close()
+    if not os_name: 
+        name = os.popen('lsb_release -i | cut -f 2')
+        os_name = name.read().strip()
+        name.close()
 
     if not os_name:
        name = os.popen("cat /etc/issue | awk '{print $1}' | head -n 1")
        os_name = name.read().strip()
        name.close()
 
-    if os_name.lower() in ("redhatenterprise","redhat"):
+    os_name = os_name.lower()
+    if "redhatenterprise" in os_name:
         os_name = 'rhel'
-    elif "suse" in os_name.lower():
+    elif "suse" in os_name:
         os_name = 'suse'
 
     return os_name
@@ -157,7 +159,6 @@ class Password(object):
                 pswd_msg = "Please enter the root/superuser password: "
             else:
                 pswd_msg = "Please enter the sudoer (%s)'s password: " % os.getenv('USER')
-
         return getpass.getpass(log.bold(pswd_msg))
 
 
@@ -180,11 +181,12 @@ class Password(object):
 
 
     def __password_check(self, cmd, timeout=1):
-        output = cStringIO.StringIO()
+        import io
+        output = io.StringIO()
         ok, ret = False, ''
 
         try:
-            child = pexpect.spawn(cmd, timeout=timeout)
+            child = pexpect.spawnu(cmd, timeout=timeout)
         except pexpect.ExceptionPexpect:
             return 1, ''
 
@@ -195,13 +197,12 @@ class Password(object):
                 while True:
                     update_spinner()
 
-                    i = child.expect_list(self.__expectList)
+                    i = child.expect(self.__expectList)
+                    
                     cb = child.before
                     if cb:
-                        # output
+
                         start = time.time()
-                        log.log_to_file(cb)
-                        #log.debug(cb)
                         output.write(cb)
 
                     if i == 0: # EOF
@@ -209,12 +210,13 @@ class Password(object):
                         break
 
                     elif i == 1: # TIMEOUT
+                        
                         continue
 
                     else: # password
                         child.sendline(self.__password)
 
-            except (Exception, pexpect.ExceptionPexpect):
+            except (Exception, pexpect.ExceptionPexpect) as e:          
                 log.exception()
 
         finally:
@@ -228,6 +230,7 @@ class Password(object):
         if ok:
             return child.exitstatus, ret
         else:
+            
             return 1, ''
 
 
@@ -323,7 +326,7 @@ class Password(object):
         self.__password =""
         self.__passwordValidated = False
         if self.__authType == 'sudo':
-            os_utils.execute("sudo -K")
+            utils.run("sudo -K")
 
 
     def getAuthType(self):
