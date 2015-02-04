@@ -28,8 +28,8 @@ from qt import *
 
 # Local
 from base.g import *
-from aboutdlg_base import AboutDlg_base
-from ui_utils import load_pixmap
+from .aboutdlg_base import AboutDlg_base
+from .ui_utils import load_pixmap
 
 
 class AboutDlg(AboutDlg_base):

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 ldif - generate and parse LDIF data (see RFC 2849)
 written by Michael Stroeder <michael@stroeder.com>
@@ -41,18 +42,17 @@ __all__ = [
   'LDIFCopy',
 ]
 
-import urlparse
-import urllib # TODO: Replace with urllib2 (urllib is deprecated in Python 3.0)
+from .sixext.moves import urllib2_request, urllib2_parse, urllib2_error
 import base64
 import re
 import types
 
 try:
-    from cStringIO import StringIO
+    from io import StringIO
 except ImportError:
-    from StringIO import StringIO
+    from io import StringIO
 
-from base.g import *    
+from .g import *    
 
 attrtype_pattern = r'[\w;.]+(;[\w_-]+)*'
 attrvalue_pattern = r'(([^,]|\\,)+|".*?")'
@@ -123,7 +123,7 @@ class LDIFWriter:
             String used as line separator
         """
         self._output_file = output_file
-        self._base64_attrs = list_dict([a.lower() for a in (base64_attrs or [])])
+        self._base64_attrs = list_dict([a.lower() for a in (bases64_attrs or [])])
         self._cols = cols
         self._line_sep = line_sep
         self.records_written = 0
@@ -158,7 +158,7 @@ class LDIFWriter:
         attr_value
               attribute value
         """
-        if self._base64_attrs.has_key(attr_type.lower()) or \
+        if attr_type.lower() in self._base64_attrs or \
            needs_base64(attr_value):
             # Encode with base64
             self._unfoldLDIFLine(':: '.join([attr_type, base64.encodestring(attr_value).replace('\n', '')]))
@@ -171,7 +171,7 @@ class LDIFWriter:
         entry
             dictionary holding an entry
         """
-        attr_types = entry.keys()[:]
+        attr_types = list(entry.keys())[:]
         attr_types.sort()
         for attr_type in attr_types:
             for attr_value in entry[attr_type]:
@@ -188,7 +188,7 @@ class LDIFWriter:
         elif mod_len==3:
             changetype = 'modify'
         else:
-            raise ValueError, "modlist item of wrong length"
+            raise ValueError("modlist item of wrong length")
         self._unparseAttrTypeandValue('changetype', changetype)
         for mod in modlist:
             if mod_len==2:
@@ -197,7 +197,7 @@ class LDIFWriter:
                 mod_op, mod_type, mod_vals = mod
                 self._unparseAttrTypeandValue(MOD_OP_STR[mod_op], mod_type)
             else:
-                raise ValueError, "Subsequent modlist item of wrong length"
+                raise ValueError("Subsequent modlist item of wrong length")
             if mod_vals:
                 for mod_val in mod_vals:
                     self._unparseAttrTypeandValue(mod_type, mod_val)
@@ -218,12 +218,12 @@ class LDIFWriter:
         # Start with line containing the distinguished name
         self._unparseAttrTypeandValue('dn', dn)
         # Dispatch to record type specific writers
-        if isinstance(record, types.DictType):
+        if isinstance(record, dict):
             self._unparseEntryRecord(record)
-        elif isinstance(record, types.ListType):
+        elif isinstance(record, list):
             self._unparseChangeRecord(record)
         else:
-            raise ValueError, "Argument record must be dictionary or list"
+            raise ValueError("Argument record must be dictionary or list")
         # Write empty line separating the records
         self._output_file.write(self._line_sep)
         # Count records written
@@ -359,9 +359,9 @@ class LDIFParser:
             url = unfolded_line[colon_pos+2:].strip()
             attr_value = None
             if self._process_url_schemes:
-                u = urlparse.urlparse(url)
-                if self._process_url_schemes.has_key(u[0]):
-                    attr_value = urllib.urlopen(url).read()
+                u = urllib2_parse.urlparse(url)
+                if u[0] in self._process_url_schemes:
+                    attr_value = urllib2_request.urlopen(url).read()
         
         elif value_spec==':\r\n' or value_spec=='\n':
             attr_value = ''
@@ -401,10 +401,10 @@ class LDIFParser:
                     
                     # attr type and value pair was DN of LDIF record
                     if dn is not None:
-                        raise ValueError, 'Two lines starting with dn: in one record.'
+                        raise ValueError('Two lines starting with dn: in one record.')
                     
                     if not is_dn(attr_value):
-                        raise ValueError, 'No valid string-representation of distinguished name %s.' % (repr(attr_value))
+                        raise ValueError('No valid string-representation of distinguished name %s.' % (repr(attr_value)))
                     dn = attr_value
                 
                 elif attr_type == 'version' and dn is None:
@@ -413,18 +413,18 @@ class LDIFParser:
                 elif attr_type == 'changetype':
                     # attr type and value pair was DN of LDIF record
                     if dn is None:
-                        raise ValueError, 'Read changetype: before getting valid dn: line.'
+                        raise ValueError('Read changetype: before getting valid dn: line.')
                     
                     if changetype is not None:
-                        raise ValueError, 'Two lines starting with changetype: in one record.'
+                        raise ValueError('Two lines starting with changetype: in one record.')
                     
                     if not attr_value in valid_changetype_dict:
-                        raise ValueError, 'changetype value %s is invalid.' % (repr(attr_value))
+                        raise ValueError('changetype value %s is invalid.' % (repr(attr_value)))
                     
                     changetype = attr_value
                 
                 elif attr_value is not None and \
-                     not self._ignored_attr_types.has_key(attr_type.lower()):
+                     attr_type.lower() not in self._ignored_attr_types:
                     
                     # Add the attribute to the entry if not ignored attribute
                     if attr_type in entry:

@@ -19,7 +19,7 @@
 # Author: Don Welch
 #
 
-import powersettingsdialog
+from . import powersettingsdialog
 
 def settingsUI(d, parent):
     return powersettingsdialog.settingsUI(d, parent)

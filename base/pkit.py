@@ -25,15 +25,19 @@ import os.path
 import sys
 
 # Local
-from base.g import *
-from base.codes import *
-from base import utils, password
+from .g import *
+from .codes import *
+from . import utils, password
 from installer import pluginhandler
 
 # DBus
 import dbus
 import dbus.service
-import gobject
+
+if PY3:
+    from gi import _gobject as gobject
+else:
+    import gobject
 
 import warnings
 # Ignore: .../dbus/connection.py:242: DeprecationWarning: object.__init__() takes no parameters
@@ -154,7 +158,7 @@ class PolicyKitService(dbus.service.Object):
             log.warning("AccessDeniedException")
             raise
 
-        except dbus.DBusException, ex:
+        except dbus.DBusException as ex:
             log.warning("AccessDeniedException %r", ex)
             raise AccessDeniedException(ex.message)
 
@@ -194,7 +198,7 @@ class PolicyKitService(dbus.service.Object):
 if utils.to_bool(sys_conf.get('configure', 'policy-kit')):
     class BackendService(PolicyKitService):
         INTERFACE_NAME = 'com.hp.hplip'
-        SERVICE_NAME   = 'com.hp.hplip'  
+        SERVICE_NAME   = 'com.hp.hplip'
 
         def __init__(self, connection=None, path='/'):
             if connection is None:
@@ -228,7 +232,7 @@ if utils.to_bool(sys_conf.get('configure', 'policy-kit')):
             if self.version == 0:
                 try:
                     self.check_permission_v0(sender, INSTALL_PLUGIN_ACTION)
-                except AccessDeniedException, e:
+                except AccessDeniedException as e:
                     log.error("installPlugin:  Failed due to permission error [%s]" %e)
                     return False
 
@@ -245,7 +249,7 @@ if utils.to_bool(sys_conf.get('configure', 'policy-kit')):
             log.debug("installPlugin: installing from '%s'" % src_dir)
             try:
                 from installer import pluginhandler
-            except ImportError,e:
+            except ImportError as e:
                 log.error("Failed to Import pluginhandler")
                 return False
 
@@ -292,7 +296,7 @@ class PolicyKit(object):
         try:
             ok = self.iface.installPlugin(src_dir)
             return ok
-        except dbus.DBusException, e:
+        except dbus.DBusException as e:
             log.debug("installPlugin: %s" % str(e))
             return False
 
@@ -307,7 +311,7 @@ class PolicyKit(object):
         try:
             ok = self.iface.shutdown("")
             return ok
-        except dbus.DBusException, e:
+        except dbus.DBusException as e:
             log.debug("shutdown: %s" % str(e))
             return False
 
@@ -325,7 +329,7 @@ def run_plugin_command(required=True, plugin_reason=PLUGIN_REASON_NONE, Mode = G
             su_sudo = "%s"
             need_sudo = False
             log.debug("Using PolicyKit for authentication")
-        except dbus.DBusException, ex:
+        except dbus.DBusException as ex:
             log.error("PolicyKit NOT installed when configured for use. [%s]"%ex)
 
     if os.geteuid() == 0:

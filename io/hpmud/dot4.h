@@ -25,6 +25,7 @@
 
 #ifndef _DOT4_H
 #define _DOT4_H
+#include "mlc.h"
 
 enum DOT4_COMMAND
 {

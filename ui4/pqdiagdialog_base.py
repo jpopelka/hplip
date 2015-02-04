@@ -52,5 +52,5 @@ class Ui_Dialog(object):
         self.RunButton.setText(QtGui.QApplication.translate("Dialog", "Run", None, QtGui.QApplication.UnicodeUTF8))
         self.CancelButton.setText(QtGui.QApplication.translate("Dialog", "Cancel", None, QtGui.QApplication.UnicodeUTF8))
 
-from loadpapergroupbox import LoadPaperGroupBox
-from deviceuricombobox import DeviceUriComboBox
+from .loadpapergroupbox import LoadPaperGroupBox
+from .deviceuricombobox import DeviceUriComboBox

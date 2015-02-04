@@ -437,4 +437,4 @@ class Ui_MainWindow(object):
         self.DiagnoseQueueAction.setText(QtGui.QApplication.translate("MainWindow", "Diagnose Queues...", None, QtGui.QApplication.UnicodeUTF8))
         self.DiagnoseHPLIPAction.setText(QtGui.QApplication.translate("MainWindow", "Diagnose HPLIP Driver...", None, QtGui.QApplication.UnicodeUTF8))
 
-from printsettingstoolbox import PrintSettingsToolbox
+from .printsettingstoolbox import PrintSettingsToolbox

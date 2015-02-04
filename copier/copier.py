@@ -19,7 +19,7 @@
 # Author: Don Welch
 #
 
-from __future__ import generators
+
 
 # Std Lib
 import sys
@@ -27,8 +27,8 @@ import os
 import os.path
 import time
 import threading
-import Queue
-from cStringIO import StringIO
+from base.sixext.moves import queue
+from io import StringIO
 
 # Local
 from base.g import *
@@ -369,7 +369,7 @@ class PMLCopyThread(threading.Thread):
                 if event == COPY_CANCELED:
                     canceled = True
                     log.debug("Cancel pressed!")
-            except Queue.Empty:
+            except queue.Empty:
                 break
 
         return canceled

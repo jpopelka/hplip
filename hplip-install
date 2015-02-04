@@ -1,7 +1,11 @@
 #!/bin/bash
-python ./install.py -i $*
-
-
-
-
-
+MAJOR=`python -c 'import sys; print(sys.version_info[0])'`
+MINOR=`python -c 'import sys; print(sys.version_info[1])'`
+if [ "$MAJOR" -le 2 ] && [ "$MINOR" -lt 6 ];then
+	echo -e "\e[1;31mInstalled python version is ${MAJOR}.${MINOR}\e[0m"
+	echo -e "\e[1;31mThis installer cannot be run on python version < 2.6\e[0m"
+	echo -e "\e[1;31mPlease download the appropriate hplip version form www.hplipopensource.com\e[0m"
+	exit 0
+else
+	python ./install.py -i $*
+fi

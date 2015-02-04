@@ -378,199 +378,199 @@ class DevMgr4_base(QMainWindow):
 
 
     def fileNew(self):
-        print "DevMgr4_base.fileNew(): Not implemented yet"
+        print("DevMgr4_base.fileNew(): Not implemented yet")
 
     def fileOpen(self):
-        print "DevMgr4_base.fileOpen(): Not implemented yet"
+        print("DevMgr4_base.fileOpen(): Not implemented yet")
 
     def fileSave(self):
-        print "DevMgr4_base.fileSave(): Not implemented yet"
+        print("DevMgr4_base.fileSave(): Not implemented yet")
 
     def fileSaveAs(self):
-        print "DevMgr4_base.fileSaveAs(): Not implemented yet"
+        print("DevMgr4_base.fileSaveAs(): Not implemented yet")
 
     def filePrint(self):
-        print "DevMgr4_base.filePrint(): Not implemented yet"
+        print("DevMgr4_base.filePrint(): Not implemented yet")
 
     def fileExit(self):
-        print "DevMgr4_base.fileExit(): Not implemented yet"
+        print("DevMgr4_base.fileExit(): Not implemented yet")
 
     def editUndo(self):
-        print "DevMgr4_base.editUndo(): Not implemented yet"
+        print("DevMgr4_base.editUndo(): Not implemented yet")
 
     def editRedo(self):
-        print "DevMgr4_base.editRedo(): Not implemented yet"
+        print("DevMgr4_base.editRedo(): Not implemented yet")
 
     def editCut(self):
-        print "DevMgr4_base.editCut(): Not implemented yet"
+        print("DevMgr4_base.editCut(): Not implemented yet")
 
     def editCopy(self):
-        print "DevMgr4_base.editCopy(): Not implemented yet"
+        print("DevMgr4_base.editCopy(): Not implemented yet")
 
     def editPaste(self):
-        print "DevMgr4_base.editPaste(): Not implemented yet"
+        print("DevMgr4_base.editPaste(): Not implemented yet")
 
     def editFind(self):
-        print "DevMgr4_base.editFind(): Not implemented yet"
+        print("DevMgr4_base.editFind(): Not implemented yet")
 
     def helpIndex(self):
-        print "DevMgr4_base.helpIndex(): Not implemented yet"
+        print("DevMgr4_base.helpIndex(): Not implemented yet")
 
     def helpContents(self):
-        print "DevMgr4_base.helpContents(): Not implemented yet"
+        print("DevMgr4_base.helpContents(): Not implemented yet")
 
     def helpAbout(self):
-        print "DevMgr4_base.helpAbout(): Not implemented yet"
+        print("DevMgr4_base.helpAbout(): Not implemented yet")
 
     def deviceRescanAction_activated(self):
-        print "DevMgr4_base.deviceRescanAction_activated(): Not implemented yet"
+        print("DevMgr4_base.deviceRescanAction_activated(): Not implemented yet")
 
     def settingsEmailAlertsAction_activated(self):
-        print "DevMgr4_base.settingsEmailAlertsAction_activated(): Not implemented yet"
+        print("DevMgr4_base.settingsEmailAlertsAction_activated(): Not implemented yet")
 
     def DeviceList_currentChanged(self,a0):
-        print "DevMgr4_base.DeviceList_currentChanged(QIconViewItem*): Not implemented yet"
+        print("DevMgr4_base.DeviceList_currentChanged(QIconViewItem*): Not implemented yet")
 
     def CleanPensButton_clicked(self):
-        print "DevMgr4_base.CleanPensButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.CleanPensButton_clicked(): Not implemented yet")
 
     def AlignPensButton_clicked(self):
-        print "DevMgr4_base.AlignPensButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.AlignPensButton_clicked(): Not implemented yet")
 
     def PrintTestPageButton_clicked(self):
-        print "DevMgr4_base.PrintTestPageButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.PrintTestPageButton_clicked(): Not implemented yet")
 
     def AdvancedInfoButton_clicked(self):
-        print "DevMgr4_base.AdvancedInfoButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.AdvancedInfoButton_clicked(): Not implemented yet")
 
     def ColorCalibrationButton_clicked(self):
-        print "DevMgr4_base.ColorCalibrationButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.ColorCalibrationButton_clicked(): Not implemented yet")
 
     def settingsConfigure_activated(self):
-        print "DevMgr4_base.settingsConfigure_activated(): Not implemented yet"
+        print("DevMgr4_base.settingsConfigure_activated(): Not implemented yet")
 
     def PrintButton_clicked(self):
-        print "DevMgr4_base.PrintButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.PrintButton_clicked(): Not implemented yet")
 
     def ScanButton_clicked(self):
-        print "DevMgr4_base.ScanButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.ScanButton_clicked(): Not implemented yet")
 
     def PCardButton_clicked(self):
-        print "DevMgr4_base.PCardButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.PCardButton_clicked(): Not implemented yet")
 
     def SendFaxButton_clicked(self):
-        print "DevMgr4_base.SendFaxButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.SendFaxButton_clicked(): Not implemented yet")
 
     def MakeCopiesButton_clicked(self):
-        print "DevMgr4_base.MakeCopiesButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.MakeCopiesButton_clicked(): Not implemented yet")
 
     def ConfigureFeaturesButton_clicked(self):
-        print "DevMgr4_base.ConfigureFeaturesButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.ConfigureFeaturesButton_clicked(): Not implemented yet")
 
     def CancelJobButton_clicked(self):
-        print "DevMgr4_base.CancelJobButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.CancelJobButton_clicked(): Not implemented yet")
 
     def deviceRefreshAll_activated(self):
-        print "DevMgr4_base.deviceRefreshAll_activated(): Not implemented yet"
+        print("DevMgr4_base.deviceRefreshAll_activated(): Not implemented yet")
 
     def DeviceList_clicked(self,a0):
-        print "DevMgr4_base.DeviceList_clicked(QIconViewItem*): Not implemented yet"
+        print("DevMgr4_base.DeviceList_clicked(QIconViewItem*): Not implemented yet")
 
     def autoRefresh_toggled(self,a0):
-        print "DevMgr4_base.autoRefresh_toggled(bool): Not implemented yet"
+        print("DevMgr4_base.autoRefresh_toggled(bool): Not implemented yet")
 
     def PrintJobList_currentChanged(self,a0):
-        print "DevMgr4_base.PrintJobList_currentChanged(QListViewItem*): Not implemented yet"
+        print("DevMgr4_base.PrintJobList_currentChanged(QListViewItem*): Not implemented yet")
 
     def CancelPrintJobButton_clicked(self):
-        print "DevMgr4_base.CancelPrintJobButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.CancelPrintJobButton_clicked(): Not implemented yet")
 
     def PrintJobList_selectionChanged(self,a0):
-        print "DevMgr4_base.PrintJobList_selectionChanged(QListViewItem*): Not implemented yet"
+        print("DevMgr4_base.PrintJobList_selectionChanged(QListViewItem*): Not implemented yet")
 
     def DeviceList_rightButtonClicked(self,a0,a1):
-        print "DevMgr4_base.DeviceList_rightButtonClicked(QIconViewItem*,const QPoint&): Not implemented yet"
+        print("DevMgr4_base.DeviceList_rightButtonClicked(QIconViewItem*,const QPoint&): Not implemented yet")
 
     def OpenEmbeddedBrowserButton_clicked(self):
-        print "DevMgr4_base.OpenEmbeddedBrowserButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.OpenEmbeddedBrowserButton_clicked(): Not implemented yet")
 
     def deviceSettingsButton_clicked(self):
-        print "DevMgr4_base.deviceSettingsButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.deviceSettingsButton_clicked(): Not implemented yet")
 
     def faxSetupWizardButton_clicked(self):
-        print "DevMgr4_base.faxSetupWizardButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.faxSetupWizardButton_clicked(): Not implemented yet")
 
     def faxSettingsButton_clicked(self):
-        print "DevMgr4_base.faxSettingsButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.faxSettingsButton_clicked(): Not implemented yet")
 
     def setupDevice_activated(self):
-        print "DevMgr4_base.setupDevice_activated(): Not implemented yet"
+        print("DevMgr4_base.setupDevice_activated(): Not implemented yet")
 
     def viewSupportAction_activated(self):
-        print "DevMgr4_base.viewSupportAction_activated(): Not implemented yet"
+        print("DevMgr4_base.viewSupportAction_activated(): Not implemented yet")
 
     def installDevice_activated(self):
-        print "DevMgr4_base.installDevice_activated(): Not implemented yet"
+        print("DevMgr4_base.installDevice_activated(): Not implemented yet")
 
     def deviceInstallAction_activated(self):
-        print "DevMgr4_base.deviceInstallAction_activated(): Not implemented yet"
+        print("DevMgr4_base.deviceInstallAction_activated(): Not implemented yet")
 
     def deviceRemoveAction_activated(self):
-        print "DevMgr4_base.deviceRemoveAction_activated(): Not implemented yet"
+        print("DevMgr4_base.deviceRemoveAction_activated(): Not implemented yet")
 
     def Tabs_currentChanged(self,a0):
-        print "DevMgr4_base.Tabs_currentChanged(QWidget*): Not implemented yet"
+        print("DevMgr4_base.Tabs_currentChanged(QWidget*): Not implemented yet")
 
     def DeviceList_onItem(self,a0):
-        print "DevMgr4_base.DeviceList_onItem(QIconViewItem*): Not implemented yet"
+        print("DevMgr4_base.DeviceList_onItem(QIconViewItem*): Not implemented yet")
 
     def iconList_doubleClicked(self,a0):
-        print "DevMgr4_base.iconList_doubleClicked(QIconViewItem*): Not implemented yet"
+        print("DevMgr4_base.iconList_doubleClicked(QIconViewItem*): Not implemented yet")
 
     def iconList_rightButtonClicked(self,a0,a1):
-        print "DevMgr4_base.iconList_rightButtonClicked(QIconViewItem*,const QPoint&): Not implemented yet"
+        print("DevMgr4_base.iconList_rightButtonClicked(QIconViewItem*,const QPoint&): Not implemented yet")
 
     def iconList_clicked(self,a0):
-        print "DevMgr4_base.iconList_clicked(QIconViewItem*): Not implemented yet"
+        print("DevMgr4_base.iconList_clicked(QIconViewItem*): Not implemented yet")
 
     def iconList_contextMenuRequested(self,a0,a1):
-        print "DevMgr4_base.iconList_contextMenuRequested(QIconViewItem*,const QPoint&): Not implemented yet"
+        print("DevMgr4_base.iconList_contextMenuRequested(QIconViewItem*,const QPoint&): Not implemented yet")
 
     def iconList_returnPressed(self,a0):
-        print "DevMgr4_base.iconList_returnPressed(QIconViewItem*): Not implemented yet"
+        print("DevMgr4_base.iconList_returnPressed(QIconViewItem*): Not implemented yet")
 
     def stopstartPushButton_clicked(self):
-        print "DevMgr4_base.stopstartPushButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.stopstartPushButton_clicked(): Not implemented yet")
 
     def rejectacceptPushButton_clicked(self):
-        print "DevMgr4_base.rejectacceptPushButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.rejectacceptPushButton_clicked(): Not implemented yet")
 
     def defaultPushButton_clicked(self):
-        print "DevMgr4_base.defaultPushButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.defaultPushButton_clicked(): Not implemented yet")
 
     def PrintJobPrinterCombo_activated(self,a0):
-        print "DevMgr4_base.PrintJobPrinterCombo_activated(const QString&): Not implemented yet"
+        print("DevMgr4_base.PrintJobPrinterCombo_activated(const QString&): Not implemented yet")
 
     def PrintSettingsPrinterCombo_activated(self,a0):
-        print "DevMgr4_base.PrintSettingsPrinterCombo_activated(const QString&): Not implemented yet"
+        print("DevMgr4_base.PrintSettingsPrinterCombo_activated(const QString&): Not implemented yet")
 
     def jobList_rightButtonClicked(self,a0,a1,a2):
-        print "DevMgr4_base.jobList_rightButtonClicked(QListViewItem*,const QPoint&,int): Not implemented yet"
+        print("DevMgr4_base.jobList_rightButtonClicked(QListViewItem*,const QPoint&,int): Not implemented yet")
 
     def jobList_clicked(self,a0):
-        print "DevMgr4_base.jobList_clicked(QListViewItem*): Not implemented yet"
+        print("DevMgr4_base.jobList_clicked(QListViewItem*): Not implemented yet")
 
     def infoToolButton_clicked(self):
-        print "DevMgr4_base.infoToolButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.infoToolButton_clicked(): Not implemented yet")
 
     def cancelToolButton_clicked(self):
-        print "DevMgr4_base.cancelToolButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.cancelToolButton_clicked(): Not implemented yet")
 
     def InstallPushButton_clicked(self):
-        print "DevMgr4_base.InstallPushButton_clicked(): Not implemented yet"
+        print("DevMgr4_base.InstallPushButton_clicked(): Not implemented yet")
         
     def jobList_contextMenuRequested(self,a0,a1,a2):
-        print "DevMgr4_base.jobList_contextMenuRequested(QListViewItem*,const QPoint&,int): Not implemented yet"
+        print("DevMgr4_base.jobList_contextMenuRequested(QListViewItem*,const QPoint&,int): Not implemented yet")
 
     def __tr(self,s,c = None):
         return qApp.translate("DevMgr4_base",s,c)

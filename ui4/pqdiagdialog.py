@@ -27,14 +27,14 @@ from base.g import *
 from base import device, utils, maint
 from prnt import cups
 from base.codes import *
-from ui_utils import *
+from .ui_utils import *
 
 # Qt
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Ui
-from pqdiagdialog_base import Ui_Dialog
+from .pqdiagdialog_base import Ui_Dialog
 
 
 class PQDiagDialog(QDialog, Ui_Dialog):

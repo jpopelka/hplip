@@ -27,14 +27,14 @@ import signal
 # Local
 from base.g import *
 from base import device, utils, pkit, os_utils
-from ui_utils import *
+from .ui_utils import *
 
 # Qt
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Ui
-from upgradedialog_base import Ui_Dialog
+from .upgradedialog_base import Ui_Dialog
 
 MANUAL_INSTALL_LINK = "http://hplipopensource.com/hplip-web/install/manual/index.html"
 
@@ -101,7 +101,7 @@ class UpgradeDialog(QDialog, Ui_Dialog):
         else:
             log.debug("HPLIP Upgrade, selected Install radiobutton  distro_type=%d" %self.distro_tier)
             self.NextButton.setEnabled(False)
-            if self.distro_tier != 1:		# not tier 1 distro
+            if self.distro_tier != 1:     # not tier 1 distro
                 log.debug("OK pressed for tier 2 distro pressed")
                 utils.openURL(MANUAL_INSTALL_LINK)
 

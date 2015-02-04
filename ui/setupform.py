@@ -31,8 +31,9 @@ import signal
 # Local
 from base.g import *
 from base import device, utils, models, pkit
+from base.sixext import  to_unicode
 from prnt import cups
-from ui_utils import load_pixmap
+from .ui_utils import load_pixmap
 from installer import pluginhandler
 
 try:
@@ -46,9 +47,9 @@ except ImportError:
 
 # Qt
 from qt import *
-from setupform_base import SetupForm_base
-from setupsettings import SetupSettings
-from setupmanualfind import SetupManualFind
+from .setupform_base import SetupForm_base
+from .setupsettings import SetupSettings
+from .setupmanualfind import SetupManualFind
 
 
 class DeviceListViewItem(QListViewItem):
@@ -69,12 +70,12 @@ class PrinterNameValidator(QValidator):
         QValidator.__init__(self, parent, name)
 
     def validate(self, input, pos):
-        input = unicode(input)
+        input = to_unicode(input)
 
         if not input:
             return QValidator.Acceptable, pos
 
-        elif input[pos-1] in u"""~`!@#$%^&*()-=+[]{}()\\/,.<>?'\";:| """:
+        elif input[pos-1] in """~`!@#$%^&*()-=+[]{}()\\/,.<>?'\";:| """:
             return QValidator.Invalid, pos
 
         # TODO: How to determine if unicode char is "printable" and acceptable
@@ -92,12 +93,12 @@ class PhoneNumValidator(QValidator):
         QValidator.__init__(self, parent, name)
 
     def validate(self, input, pos):
-        input = unicode(input)
+        input = to_unicode(input)
 
         if not input:
             return QValidator.Acceptable, pos
 
-        elif input[pos-1] not in u'0123456789-(+) ':
+        elif input[pos-1] not in '0123456789-(+) ':
             return QValidator.Invalid, pos
 
         else:
@@ -565,7 +566,7 @@ class SetupForm(SetupForm_base):
 
     def otherPPDPushButton_clicked(self):
         ppd_dir = sys_conf.get('dirs', 'ppd')
-        ppd_file = unicode(QFileDialog.getOpenFileName(ppd_dir, "PPD Files (*.ppd *.ppd.gz);;All Files (*)", self, "open file dialog", "Choose a PPD file"))
+        ppd_file = to_unicode(QFileDialog.getOpenFileName(ppd_dir, "PPD Files (*.ppd *.ppd.gz);;All Files (*)", self, "open file dialog", "Choose a PPD file"))
 
         if ppd_file and os.path.exists(ppd_file):
             self.updatePPDPage({ppd_file: cups.getPPDDescription(ppd_file)})
@@ -641,7 +642,7 @@ class SetupForm(SetupForm_base):
 
 
     def printerNameLineEdit_textChanged(self,a0):
-        self.printer_name = unicode(a0)
+        self.printer_name = to_unicode(a0)
         self.defaultPrinterNamePushButton.setEnabled(True)
 
         self.printer_name_ok = True
@@ -675,16 +676,16 @@ class SetupForm(SetupForm_base):
 
 
     def printerLocationLineEdit_textChanged(self, a0):
-        self.location = unicode(a0)
+        self.location = to_unicode(a0)
 
     def printerDescriptionLineEdit_textChanged(self,a0):
-        self.desc = unicode(a0)
+        self.desc = to_unicode(a0)
 
     def faxLocationLineEdit_textChanged(self,a0):
-        self.fax_location = unicode(a0)
+        self.fax_location = to_unicode(a0)
 
     def faxDescriptionLineEdit_textChanged(self,a0):
-        self.fax_desc = unicode(a0)
+        self.fax_desc = to_unicode(a0)
 
     def defaultPrinterNamePushButton_clicked(self):
         self.setDefaultPrinterName()
@@ -722,7 +723,7 @@ class SetupForm(SetupForm_base):
         #self.fax_name_error = False
 
     def faxNameLineEdit_textChanged(self, a0):
-        self.fax_name = unicode(a0)
+        self.fax_name = to_unicode(a0)
         self.defaultFaxNamePushButton.setEnabled(True)
 
         self.fax_name_ok = True
@@ -756,10 +757,10 @@ class SetupForm(SetupForm_base):
 
 
     def faxNumberLineEdit_textChanged(self, a0):
-        self.fax_number = unicode(a0)
+        self.fax_number = to_unicode(a0)
 
     def faxNameCoLineEdit_textChanged(self, a0):
-        self.fax_name_company = unicode(a0)
+        self.fax_name_company = to_unicode(a0)
 
     def faxCheckBox_clicked(self):
         pass
@@ -788,7 +789,7 @@ class SetupForm(SetupForm_base):
                     d.open()
                 except Error:
                     error_text = self.__tr("Unable to communicate with the device. Please check the device and try again.")
-                    log.error(unicode(error_text))
+                    log.error(to_unicode(error_text))
                     if QMessageBox.critical(self,
                                            self.caption(),
                                            error_text,
@@ -807,15 +808,15 @@ class SetupForm(SetupForm_base):
 
                             try:
                                 if read:
-                                    self.fax_number = unicode(d.getPhoneNum())
-                                    self.fax_name_company = unicode(d.getStationName())
+                                    self.fax_number = to_unicode(d.getPhoneNum())
+                                    self.fax_name_company = to_unicode(d.getStationName())
                                 else:
                                     d.setStationName(self.fax_name_company)
                                     d.setPhoneNum(self.fax_number)
 
                             except Error:
                                 error_text = self.__tr("<b>Device I/O Error</b><p>Could not communicate with device. Device may be busy.")
-                                log.error(unicode(error_text))
+                                log.error(to_unicode(error_text))
 
                                 if QMessageBox.critical(self,
                                                        self.caption(),
@@ -856,7 +857,7 @@ class SetupForm(SetupForm_base):
         if self.mq.get('fw-download', False):
             try:
                 d = device.Device(self.device_uri)
-            except Error , e:
+            except Error as e:
                 self.FailureUI(self.__tr("<b>Error opening device. Firmware download is Failed.</b><p>%s (%s)." % (e.msg, e.opt)))
             else:
                 if d.downloadFirmware():
@@ -876,9 +877,9 @@ class SetupForm(SetupForm_base):
 
         #if self.ppd_file.startswith("foomatic:"):
         if not os.path.exists(self.ppd_file): # assume foomatic: or some such
-            add_prnt_args = (self.printer_name.encode('utf8'), self.device_uri,self.location, '', self.ppd_file, self.desc)
+            add_prnt_args = (self.printer_name, self.device_uri,self.location, '', self.ppd_file, self.desc)
         else:
-            add_prnt_args = (self.printer_name.encode('utf8'), self.device_uri, self.location, self.ppd_file, '', self.desc)
+            add_prnt_args = (self.printer_name, self.device_uri, self.location, self.ppd_file, '', self.desc)
 
         status, status_str = cups.cups_operation(cups.addPrinter, GUI_MODE, 'qt3', self, *add_prnt_args)
 
@@ -893,7 +894,6 @@ class SetupForm(SetupForm_base):
 
         QApplication.restoreOverrideCursor()
         return status
-
 
     def setupFax(self):
         status = cups.IPP_BAD_REQUEST
@@ -915,7 +915,7 @@ class SetupForm(SetupForm_base):
 
                 while True:
                     ppd_dir = sys_conf.get('dirs', 'ppd')
-                    fax_ppd = unicode(QFileDialog.getOpenFileName(ppd_dir,
+                    fax_ppd = to_unicode(QFileDialog.getOpenFileName(ppd_dir,
                         "HP Fax PPD Files (*.ppd *.ppd.gz);;All Files (*)", self,
                         "open file dialog", "Choose the fax PPD file"))
 
@@ -957,7 +957,7 @@ class SetupForm(SetupForm_base):
         if self.print_test_page:
             try:
                 d = device.Device(self.device_uri)
-            except Error, e:
+            except Error as e:
                 self.FailureUI(self.__tr("<b>Device error:</b><p>%s (%s)." % (e.msg, e.opt)))
 
             else:
@@ -971,7 +971,7 @@ class SetupForm(SetupForm_base):
 
                         try:
                             d.printTestPage(self.printer_name)
-                        except Error, e:
+                        except Error as e:
                             if e.opt == ERROR_NO_CUPS_QUEUE_FOUND_FOR_DEVICE:
                                 self.FailureUI(self.__tr("<b>No CUPS queue found for device.</b><p>Please install the printer in CUPS and try again."))
                             else:
@@ -988,7 +988,7 @@ class SetupForm(SetupForm_base):
         QWizard.reject(self)
 
     def FailureUI(self, error_text):
-        log.error(unicode(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", " "))
+        log.error(to_unicode(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", " "))
         QMessageBox.critical(self,
                              self.caption(),
                              error_text,
@@ -1054,10 +1054,10 @@ class PasswordDialog(QDialog):
             self.usernameLineEdit.setPaletteBackgroundColor(QColor("lightgray"))
 
     def getUsername(self):
-        return unicode(self.usernameLineEdit.text())
+        return to_unicode(self.usernameLineEdit.text())
 
     def getPassword(self):
-        return unicode(self.passwordLineEdit.text())
+        return to_unicode(self.passwordLineEdit.text())
 
     def languageChange(self):
         self.setCaption(self.__tr("HP Device Manager - Enter Username/Password"))

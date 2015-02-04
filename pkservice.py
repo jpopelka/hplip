@@ -102,5 +102,5 @@ log.debug("using PolicyKit version %d" % pkit_version)
 
 try:
     BackendService().run(pkit_version)
-except dbus.DBusException, ex:
+except dbus.DBusException as ex:
     log.error("Unable to start service (%s)" % ex)

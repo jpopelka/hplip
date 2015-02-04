@@ -26,7 +26,7 @@
 #   104 = no libdl
 
 #AC_PREREQ(2.59)
-AC_INIT([HP Linux Imaging and Printing], [3.14.10], [3.14.10], [hplip])
+AC_INIT([HP Linux Imaging and Printing], [3.15.2], [3.15.2], [hplip])
 #AM_INIT_AUTOMAKE([1.9 foreign])
 AM_INIT_AUTOMAKE
 AC_DISABLE_STATIC
@@ -524,10 +524,13 @@ if test "$hpijs_only_build" = "no" && test "$lite_build" = "no" && test "$hpcups
    AC_ARG_VAR([PYTHON], [Python interpreter/compiler command])
    AM_PATH_PYTHON([2.2])
    AC_MSG_CHECKING([for path to Python.h])
-   PYTHONINCLUDEDIR=`$PYTHON -c "from distutils.sysconfig import get_python_inc; print get_python_inc();"`
-   AC_MSG_RESULT("using $PYTHONINCLUDEDIR")
+   PYTHONINCLUDEDIR=`$PYTHON -c "from distutils.sysconfig import get_python_inc; print (get_python_inc());"`
+   AC_MSG_RESULT("using $PYTHONINCLUDEDIR ....  python${PYTHON_VERSION}/Python.h")
    AC_ARG_VAR(PYTHONINCLUDEDIR, [path to Python.h C header file])
-   AC_CHECK_HEADERS(python$PYTHON_VERSION/Python.h, ,[AC_MSG_ERROR([cannot find python-devel support], 6)])
+   AC_CHECK_HEADERS([python${PYTHON_VERSION}/Python.h python${PYTHON_VERSION}mu/Python.h python${PYTHON_VERSION}m/Python.h ],
+          [FOUND_HEADER=yes; break;])
+   AS_IF([test "x$FOUND_HEADER" != "xyes"],
+          [AC_MSG_ERROR([cannot find python-devel support], 6)])
 fi
 
 if test "$hpijs_only_build" = "no" && test "$scan_build" = "yes" && test "$hpcups_only_build" = "no"; then
@@ -578,7 +581,7 @@ AC_DEFINE_DIR([abs_drvdir], [drvdir])
 AC_SUBST(abs_datadir) 
 AC_SUBST(abs_sbindir) 
 AC_SUBST(abs_hpppddir) 
-AC_SUBST(abs_docdir) 
+AC_SUBST(abs_docdir)  
 AC_SUBST(abs_htmldir) 
 AC_SUBST(abs_ppddir) 
 AC_SUBST(abs_drvdir) 

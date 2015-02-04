@@ -9,7 +9,7 @@
 
 
 from qt import *
-from pluginlicenseform_base import PluginLicenseForm_base
+from .pluginlicenseform_base import PluginLicenseForm_base
 
 class PluginLicenseForm(PluginLicenseForm_base):
     def __init__(self, license_txt, parent=None, name=None, modal=0, fl=0):

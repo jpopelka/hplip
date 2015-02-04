@@ -26,7 +26,7 @@ from base.g import *
 
 # Qt
 from qt import *
-from align13form_base import Align13Form_Base
+from .align13form_base import Align13Form_Base
 
 
 class Align13Form(Align13Form_Base):

@@ -50,9 +50,6 @@ try:
         ("Seconds to delay before download:", "-y<secs> or --delay=<secs> (float value, e.g. 0.5)", "option", False)],
          see_also_list=['hp-plugin', 'hp-toolbox'])
 
-    opts, device_uri, printer_name, mode, ui_toolkit, lang = \
-        mod.parseStdOpts('y:s:', ['delay='])
-
     device_uri = None
     printer_name = None
     usb_bus_node = None
@@ -60,6 +57,9 @@ try:
     usb_device_id = None
     silent = False
     delay = 0.0
+
+    opts, device_uri, printer_name, mode, ui_toolkit, lang = \
+        mod.parseStdOpts('y:s:', ['delay='])
 
     for o, a in opts:
         if o == '-s':
@@ -125,9 +125,8 @@ try:
         device_uri = mod.getDeviceUri(device_uri, printer_name,
             filter={'fw-download': (operator.gt, 0)})
 
-        if 1:
+        if device_uri:
             app = QApplication(sys.argv)
-
             dialog = FirmwareDialog(None, device_uri)
             dialog.show()
             try:
@@ -138,7 +137,7 @@ try:
                    dialog.exec_loop()
             except KeyboardInterrupt:
                 sys.exit(0)
-
+        
         sys.exit(0)
 
     mod.showTitle()
@@ -155,6 +154,9 @@ try:
         device_uri = mod.getDeviceUri(device_uri, printer_name,
             filter={'fw-download': (operator.gt, 0)})
 
+        if not device_uri:
+            sys.exit(1)
+
     try:
         d = device.Device(device_uri, printer_name)
     except Error:
@@ -168,7 +170,7 @@ try:
         try:
             d.open()
             d.queryModel()
-        except Error, e:
+        except Error as e:
             log.error("Error opening device (%s). Exiting." % e.msg)
             sys.exit(1)
 

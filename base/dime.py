@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
@@ -23,7 +24,7 @@
 import struct
 
 # Local
-from g import *
+from .g import *
 
 # DIME constants
 TYPE_T_MIME = 0x01
@@ -86,21 +87,21 @@ class Message(object):
         if data_len % block_size == 0:
             return data_len
         else:
-            return (data_len/block_size+1)*block_size
+            return (int(data_len/block_size+1))*block_size
             
             
 
 
 if __name__ == "__main__":
     log.set_level("debug")
-    import cStringIO
+    import io
     m = Message()
     m.add_record(Record("cid:id0", "http://schemas.xmlsoap.org/soap/envelope/", 
                         TYPE_T_URI, "<test>test</test>"))
     
     m.add_record(Record("test2", "text/xml", TYPE_T_MIME, "<test>test2</test>"))
     
-    output = cStringIO.StringIO()
+    output = io.StringIO()
     
     m.generate(output)
     

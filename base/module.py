@@ -26,8 +26,8 @@ import getopt
 import os
 
 # Local
-from g import *
-import tui, utils, device
+from .g import *
+from . import tui, utils, device
 
 USAGE_FLAG_NONE = 0x00
 USAGE_FLAG_DEVICE_ARGS = 0x01
@@ -47,11 +47,12 @@ class Module(object):
         self.version = version
         self.doc = doc
         self.usage_data = usage_data
-        os.umask(0037)
+        os.umask(0o037)
         log.set_module(mod)
         self.args = []
         self.quiet = quiet
         self.lock_file = None
+        self.help_only_support = False
         prop.prog = sys.argv[0]
 
         if os.getenv("HPLIP_DEBUG"):
@@ -125,7 +126,8 @@ class Module(object):
 
                 else:
                     log.error("%s cannot be run using Qt3 toolkit." % self.mod)
-                    sys.exit(1)
+#                    sys.exit(1)
+                    self.help_only_support = True
 
             elif self.default_ui_toolkit == 'qt4' and UI_TOOLKIT_QT4 not in self.supported_ui_toolkits:
 
@@ -141,7 +143,8 @@ class Module(object):
 
                 else:
                     log.error("%s cannot be run using Qt4 toolkit." % self.mod)
-                    sys.exit(1)
+#                    sys.exit(1)
+                    self.help_only_support = True
 
 
         self.mode = self.default_mode
@@ -206,7 +209,7 @@ class Module(object):
         if include_flags & USAGE_FLAG_SUPRESS_G_DEBUG_FLAG != USAGE_FLAG_SUPRESS_G_DEBUG_FLAG:
             content.append(utils.USAGE_LOGGING3) # Issue with --gg in hp-sendfax
 
-        # -q/--lang
+        # --loc/--lang
         #if self.avail_modes is not None and GUI_MODE in self.avail_modes and prop.gui_build:
         #    content.append(utils.USAGE_LANGUAGE)
 
@@ -306,7 +309,7 @@ class Module(object):
 
         try:
             opts, self.args = getopt.getopt(sys.argv[1:], params, long_params)
-        except getopt.GetoptError, e:
+        except getopt.GetoptError as e:
             error_msg = [e.msg]
 
         else:
@@ -376,7 +379,7 @@ class Module(object):
                         else:
                             error_msg.append("%s does not support Qt4. Unable to enter GUI mode." % self.mod)
 
-                #elif o in ('-q', '--lang', '--loc'):
+                #elif o in ('--lang', '--loc'):
                 #    if a.strip() == '?':
                 #        utils.log_title(self.title, self.version)
                 #        self.showLanguages()
@@ -387,7 +390,14 @@ class Module(object):
         if error_msg:
             show_usage = 'text'
 
-        self.usage(show_usage, error_msg)
+        if self.help_only_support:
+            if show_usage or error_msg:
+                self.usage(show_usage, error_msg)
+            else:
+                log.info(log.bold("\nPlease check usage '%s --help'"%self.mod))
+                show_usage = 'text'
+        else:
+            self.usage(show_usage, error_msg)
 
         if show_usage is not None:
             sys.exit(0)
@@ -399,7 +409,7 @@ class Module(object):
     def showLanguages(self):
         f = tui.Formatter()
         f.header = ("Language Code", "Alternate Name(s)")
-        for loc, ll in supported_locales.items():
+        for loc, ll in list(supported_locales.items()):
             f.add((ll[0], ', '.join(ll[1:])))
 
         f.output()
@@ -416,7 +426,7 @@ class Module(object):
             log.info()
 
         if show_usage == 'desc':
-            print self.doc
+            print(self.doc)
 
         else:
             utils.format_text(self.usage_data, show_usage, self.title, self.mod, self.version)
@@ -444,7 +454,7 @@ class Module(object):
 
             log.info(log.bold("%s ver. %s" % (self.title, self.version)))
             log.info("")
-            log.info("Copyright (c) 2001-13 Hewlett-Packard Development Company, LP")
+            log.info("Copyright (c) 2001-15 Hewlett-Packard Development Company, LP")
             log.info("This software comes with ABSOLUTELY NO WARRANTY.")
             log.info("This is free software, and you are welcome to distribute it")
             log.info("under certain conditions. See COPYING file for more details.")
@@ -484,14 +494,17 @@ class Module(object):
         if devices is None:
             devices = device.getSupportedCUPSDevices(back_end_filter, filter)
             log.debug(devices)
+            if not devices and restrict_to_installed_devices:
+                log.error("No device found that support this feature.")
+                return None
 
         if device_uri is not None:
             if device_uri in devices:
                 device_uri_ok = True
 
             elif restrict_to_installed_devices:
-                log.error("Invalid device URI: %s" % device_uri)
-                device_uri = None
+                log.error("'%s' device doesn't support this feature (or) Invalid device URI" % device_uri)
+                return None
 
             else:
                 device_uri_ok = True
@@ -504,13 +517,18 @@ class Module(object):
                back_end, is_hp, bb, model, serial, dev_file, host, zc, port = \
                             device.parseDeviceURI(uri)
                log.debug("back_end=%s, is_hp=%s, bb=%s, model=%s, serial=%s, dev_file=%s, host=%s, zc=%s, port= %s" % (back_end, is_hp, bb, model, serial, dev_file, host, zc, port))
-               if printer_name.lower() == model.lower():
+               cups_printer = devices[uri]
+               if printer_name.lower() in [m.lower() for m in cups_printer]:
                    printer_name_ok = True 
                    printer_name_device_uri = device_uri = uri
                    device_uri_ok = True
             if printer_name_ok is not True: 
-               log.error("Invalid printer name: %s" % printer_name)
+               log.error("'%s' device doesn't support this feature (or) Invalid printer name" % printer_name)
                printer_name = None
+               if restrict_to_installed_devices:
+                    return None
+
+
 
         if device_uri is not None and printer_name is None and device_uri_ok: # Only device_uri specified
             device_uri_ret = device_uri
@@ -527,11 +545,14 @@ class Module(object):
             device_uri_ret = device.getDeviceURIByPrinterName(printer_name, scan_uri_flag)
 
         elif len(devices) == 1: # Nothing specified, and only 1 device avail.
-            device_uri_ret = devices.keys()[0]
+            device_uri_ret = list(devices.keys())[0]
             log.info("Using device: %s\n" % device_uri_ret)
 
-        if device_uri_ret is None and self.mode == INTERACTIVE_MODE and len(devices):
-            device_uri_ret = tui.device_table(devices, scan_uri_flag)
+        if device_uri_ret is None and len(devices):
+            if self.mode == INTERACTIVE_MODE:
+                device_uri_ret = tui.device_table(devices, scan_uri_flag)
+            else:
+                device_uri_ret = list(devices.keys())[0]
 
         if device_uri_ret is not None:
             user_conf.set('last_used', 'device_uri', device_uri_ret)
@@ -540,14 +561,14 @@ class Module(object):
             if self.mode in (INTERACTIVE_MODE, NON_INTERACTIVE_MODE):
                 log.error("No device selected/specified or that supports this functionality.")
                 sys.exit(1)
-            else:
-                log.debug("No device selected/specified")
+#            else:
+#                log.debug("No device selected/specified")
 
         return device_uri_ret
 
 
     def getPrinterName(self, printer_name, device_uri, back_end_filter=device.DEFAULT_BE_FILTER,
-                       filter=device.DEFAULT_FILTER):
+                       filter=device.DEFAULT_FILTER, restrict_to_installed_devices=True):
         """ Validate passed in parameters, and, if in text mode, have user select desired printer to use.
             Used for tools that are printer queue-centric and accept -p (and maybe also -d).
             Use the filter(s) to restrict what constitute valid printers.
@@ -575,14 +596,20 @@ class Module(object):
         printers = device.getSupportedCUPSPrinterNames(back_end_filter, filter)
         log.debug(printers)
 
+        if not printers:
+            log.error("No device found that support this feature.")
+            return False, None, None
+
         if device_uri is not None:
             devices = device.getSupportedCUPSDevices(back_end_filter, filter)
             if device_uri in devices:
                 device_uri_ok = True
                 device_uri_ret = device_uri
             else:
-                log.error("Invalid device URI: %s" % device_uri)
+                log.error("'%s' device doesn't support this feature (or) Invalid device URI" % device_uri)
                 device_uri = None
+                if restrict_to_installed_devices:
+                    return False, None, None
 
         if printer_name is not None:
             if printer_name == '*':
@@ -595,12 +622,14 @@ class Module(object):
                     printer_name = None
 
             else:
-                if printer_name in printers:
+                if printer_name.lower() in [p.lower() for p in printers]:
                     printer_name_ok = True
                     device_uri_ret = device.getDeviceURIByPrinterName(printer_name)
                 else:
-                    log.error("Invalid printer name")
+                    log.error("'%s' device doesn't support this feature (or) Invalid printer name" % printer_name)
                     printer_name = None
+                    if restrict_to_installed_devices:
+                        return False, None, None
 
         if device_uri is not None and printer_name is None and device_uri_ok: # Only device_uri specified
             if len(devices[device_uri]) == 1:
@@ -639,7 +668,7 @@ class Module(object):
             else:
                 log.debug("No printer selected/specified")
 
-        return printer_name_ret, device_uri_ret
+        return True, printer_name_ret, device_uri_ret
 
 
     def lockInstance(self, suffix='',suppress_error=False):

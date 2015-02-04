@@ -23,6 +23,7 @@
 from base.g import *
 from base import utils
 from prnt import cups
+from base.sixext import  to_unicode
 
 # Qt
 from qt import *
@@ -32,8 +33,8 @@ class PINValidator(QValidator):
         QValidator.__init__(self, parent, name)
 
     def validate(self, input, pos):
-        for x in unicode(input)[pos-1:]:
-            if x not in u'0123456789':
+        for x in to_unicode(input)[pos-1:]:
+            if x not in '0123456789':
                 return QValidator.Invalid, pos
 
         return QValidator.Acceptable, pos 
@@ -43,8 +44,8 @@ class TextValidator(QValidator):
         QValidator.__init__(self, parent, name)
 
     def validate(self, input, pos):
-        for x in unicode(input)[pos-1:]:
-            if x not in u'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -':
+        for x in to_unicode(input)[pos-1:]:
+            if x not in '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -':
                 return QValidator.Invalid, pos
 
         return QValidator.Acceptable, pos 
@@ -57,11 +58,11 @@ class JobStorageMixin(object):
     def initJobStorage(self, print_settings_mode=False):
         self.print_settings_mode = print_settings_mode
         self.job_storage_mode = JOB_STORAGE_TYPE_OFF
-        self.job_storage_pin = u"0000"
+        self.job_storage_pin = "0000"
         self.job_storage_use_pin = False
-        self.job_storage_username = unicode(prop.username[:16])
+        self.job_storage_username = to_unicode(prop.username[:16])
         self.job_storage_auto_username = True
-        self.job_storage_jobname = u"Untitled"
+        self.job_storage_jobname = "Untitled"
         self.job_storage_auto_jobname = True
         self.job_storage_job_exist = 0
         
@@ -80,13 +81,13 @@ class JobStorageMixin(object):
             current_options = dict(cups.getOptions())
             cups.closePPD()
 
-        self.job_storage_pin = unicode(current_options.get('HOLDKEY', '0000')[:4])
+        self.job_storage_pin = to_unicode(current_options.get('HOLDKEY', '0000')[:4])
         self.jobStoragePINEdit.setText(self.job_storage_pin)
         
-        self.job_storage_username = unicode(current_options.get('USERNAME', prop.username)[:16])
+        self.job_storage_username = to_unicode(current_options.get('USERNAME', prop.username)[:16])
         self.jobStorageUsernameEdit.setText(self.job_storage_username)
         
-        self.job_storage_jobname = unicode(current_options.get('JOBNAME', u"Untitled")[:16])
+        self.job_storage_jobname = to_unicode(current_options.get('JOBNAME', "Untitled")[:16])
         self.jobStorageIDEdit.setText(self.job_storage_jobname)
         
         hold = current_options.get('HOLD', 'OFF')
@@ -368,14 +369,14 @@ class JobStorageMixin(object):
             self.jobStoragePINDefaultPushButton.setEnabled(False)
             self.jobStoragePINEdit.setEnabled(False)
             self.job_storage_use_pin = False
-            self.job_storage_pin = u"0000"
+            self.job_storage_pin = "0000"
             self.setPrinterOptionPIN()
             
         else: # On/Private/Use PIN
             self.jobStoragePINDefaultPushButton.setEnabled(True)
             self.jobStoragePINEdit.setEnabled(True)
             self.job_storage_use_pin = True
-            self.job_storage_pin = unicode(self.jobStoragePINEdit.text())
+            self.job_storage_pin = to_unicode(self.jobStoragePINEdit.text())
             self.setPrinterOptionPIN()
                             
     def setPrinterOptionPIN(self):
@@ -394,7 +395,7 @@ class JobStorageMixin(object):
         pass
         
     def jobStoragePINEdit_textChanged(self, a):
-        self.job_storage_pin = unicode(a)
+        self.job_storage_pin = to_unicode(a)
         self.setPrinterOptionPIN()
         
     def jobStoragePINDefaultPushButton_clicked(self):
@@ -466,14 +467,14 @@ class JobStorageMixin(object):
             self.jobStorageUsernameDefaultPushButton.setEnabled(False)
             self.jobStorageUsernameEdit.setEnabled(False)
             self.job_storage_auto_username = True
-            self.job_storage_username = unicode(prop.username[:16])
+            self.job_storage_username = to_unicode(prop.username[:16])
             self.setPrinterOptionUsername()
         
         else: # Custom
             self.jobStorageUsernameDefaultPushButton.setEnabled(True)
             self.jobStorageUsernameEdit.setEnabled(True)
             self.job_storage_auto_username = False
-            self.job_storage_username = unicode(self.jobStorageUsernameEdit.text())
+            self.job_storage_username = to_unicode(self.jobStorageUsernameEdit.text())
             self.setPrinterOptionUsername()
             
     def jobStorageUsernameEdit_lostFocus(self):
@@ -481,7 +482,7 @@ class JobStorageMixin(object):
         pass
         
     def jobStorageUsernameEdit_textChanged(self, a):
-        self.job_storage_username = unicode(a)
+        self.job_storage_username = to_unicode(a)
         self.setPrinterOptionUsername()
         
     def jobStorageUsernameDefaultPushButton_clicked(self):
@@ -489,7 +490,7 @@ class JobStorageMixin(object):
         self.jobStorageUsernameDefaultPushButton.setEnabled(False)
         self.jobStorageUsernameEdit.setEnabled(False)
         self.job_storage_auto_username = True
-        self.job_storage_username = unicode(prop.username[:16])
+        self.job_storage_username = to_unicode(prop.username[:16])
         self.setPrinterOptionUsername()
         
     def setPrinterOptionUsername(self):
@@ -560,14 +561,14 @@ class JobStorageMixin(object):
             self.jobStorageIDDefaultPushButton.setEnabled(False)
             self.jobStorageIDEdit.setEnabled(False)
             self.job_storage_auto_jobname = True
-            self.job_storage_jobname = u"Untitled"
+            self.job_storage_jobname = "Untitled"
             self.setPrinterOptionID()
             
         else: # Custom
             self.jobStorageIDDefaultPushButton.setEnabled(True)
             self.jobStorageIDEdit.setEnabled(True)
             self.job_storage_auto_jobname = False
-            self.job_storage_jobname = unicode(self.jobStorageIDEdit.text())
+            self.job_storage_jobname = to_unicode(self.jobStorageIDEdit.text())
             self.setPrinterOptionID()
         
     def jobStorageIDEdit_lostFocus(self):
@@ -575,7 +576,7 @@ class JobStorageMixin(object):
         pass
         
     def jobStorageIDEdit_textChanged(self, a):
-        self.job_storage_jobname = unicode(a)
+        self.job_storage_jobname = to_unicode(a)
         self.setPrinterOptionID()
                 
     def jobStorageIDDefaultPushButton_clicked(self):
@@ -583,7 +584,7 @@ class JobStorageMixin(object):
         self.jobStorageIDDefaultPushButton.setEnabled(False)
         self.jobStorageIDEdit.setEnabled(False)
         self.job_storage_auto_jobname = True
-        self.job_storage_jobname = u"Untitled"
+        self.job_storage_jobname = "Untitled"
         self.setPrinterOptionID()
         
     def setPrinterOptionID(self):

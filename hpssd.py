@@ -37,19 +37,26 @@ import signal
 import tempfile
 #import threading
 #import Queue
-from cPickle import loads, HIGHEST_PROTOCOL
+from pickle import loads, HIGHEST_PROTOCOL
 
 # Local
 from base.g import *
 from base.codes import *
 from base import utils, device, status, models, module, services, os_utils
-
+from base.sixext import PY3
+from base.sixext import to_bytes_utf8
 # dBus
 try:
     from dbus import lowlevel, SystemBus, SessionBus
     import dbus.service
     from dbus.mainloop.glib import DBusGMainLoop
-    from gobject import MainLoop, timeout_add, threads_init, io_add_watch, IO_IN
+    if PY3:
+        try:
+            from gi._gobject import MainLoop, timeout_add, threads_init, io_add_watch, IO_IN #python3-gi version: 3.4.0
+        except:
+            from gi.repository.GLib import MainLoop, timeout_add, threads_init, io_add_watch, IO_IN #python3-gi version: 3.8.0
+    else:
+        from gobject import MainLoop, timeout_add, threads_init, io_add_watch, IO_IN
     dbus_loaded = True
 except ImportError:
     log.error("dbus failed to load (python-dbus ver. 0.80+ required). Exiting...")
@@ -124,7 +131,7 @@ class StatusService(dbus.service.Object):
         else:
             t = {}
             dq = devices[device_uri].dq
-            [t.setdefault(x, str(dq[x])) for x in dq.keys()]
+            [t.setdefault(x, str(dq[x])) for x in list(dq.keys())]
             log.debug(t)
             return (device_uri, t)
 
@@ -190,7 +197,7 @@ class StatusService(dbus.service.Object):
                 return self.check_for_waiting_fax_return(device_uri, username, job_id)
 
         else: # return any matching one from cache. call mult. times to get all.
-            for u, j in devices[device_uri].faxes.keys():
+            for u, j in list(devices[device_uri].faxes.keys()):
                 if u == username:
                     return self.check_for_waiting_fax_return(device_uri, u, j)
 
@@ -215,6 +222,9 @@ class StatusService(dbus.service.Object):
 
 
 def check_device(device_uri):
+    if not PY3:
+        device_uri = str(device_uri)
+
     try:
         devices[device_uri]
     except KeyError:
@@ -319,7 +329,7 @@ def show_waiting_faxes(d):
 # Qt4 only
 def handle_hpdio_event(event, bytes_written):
     log.debug("Reading %d bytes from hpdio pipe..." % bytes_written)
-    total_read, data = 0, ''
+    total_read, data = 0, to_bytes_utf8('')
 
     while True:
         r, w, e = select.select([r3], [], [r3], 0.0)
@@ -328,7 +338,7 @@ def handle_hpdio_event(event, bytes_written):
         x = os.read(r3, PIPE_BUF)
         if not x: break
 
-        data = ''.join([data, x])
+        data = to_bytes_utf8('').join([data, x])
         total_read += len(x)
 
         if total_read == bytes_written: break
@@ -349,7 +359,7 @@ def handle_hpdio_event(event, bytes_written):
 def handle_plugin_install():
 
     child_process=os.fork()
-    if child_process== 0:	# child process
+    if child_process== 0:    # child process
         lockObj = utils.Sync_Lock("/tmp/pluginInstall.tmp")
         lockObj.acquire()
         child_pid=os.getpid()
@@ -573,13 +583,13 @@ def run(write_pipe1=None,  # write pipe to systemtray
 
     try:
         system_bus = SystemBus(mainloop=dbus_loop)
-    except dbus.exceptions.DBusException, e:
+    except dbus.exceptions.DBusException as e:
         log.error("Unable to connect to dbus system bus. Exiting.")
         sys.exit(1)
 
     try:
         session_bus = dbus.SessionBus()
-    except dbus.exceptions.DBusException, e:
+    except dbus.exceptions.DBusException as e:
         if os.getuid() != 0:
             log.error("Unable to connect to dbus session bus. Exiting.")
             sys.exit(1)

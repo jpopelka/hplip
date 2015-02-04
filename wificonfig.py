@@ -65,7 +65,6 @@ try:
         sys.exit(1)
 
     app = QApplication(sys.argv)
-
     dlg = WifiSetupDialog(None, device_uri, standalone=True)
     dlg.show()
     try:

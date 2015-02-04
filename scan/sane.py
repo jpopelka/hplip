@@ -51,7 +51,7 @@
 # http://www.mostang.com/sane/ .
 #
 # Original authors: Andrew Kuchling, Ralph Heinkel
-# Modified by: Don Welch
+# Modified by: Don Welch, Sarbeswar Meher
 #
 
 # Std Lib
@@ -59,11 +59,12 @@ import scanext
 import threading
 import time
 import os
-import Queue
 
 # Local
 from base.g import *
 from base import utils
+from base.sixext import to_bytes_utf8
+from base.sixext.moves import queue
 
 EVENT_SCAN_CANCELED = 1
 
@@ -79,8 +80,8 @@ UNIT_STR = { scanext.UNIT_NONE:        "UNIT_NONE",
              scanext.UNIT_PERCENT:     "UNIT_PERCENT",
              scanext.UNIT_MICROSECOND: "UNIT_MICROSECOND" }
 
-MAX_READSIZE = 65536
 
+MAX_READSIZE = 65536
 
 class Option:
     """Class representing a SANE option.
@@ -164,7 +165,7 @@ isSettable:  %s\n""" % (self.name, curValue,
             elif type(self.constraint) == type([]):
                 if value not in self.constraint:
                     v = self.constraint[0]
-                    min_dist = sys.maxint
+                    min_dist = sys.maxsize
                     for x in self.constraint:
                         if abs(value-x) < min_dist:
                             min_dist = abs(value-x)
@@ -283,24 +284,24 @@ class ScanDevice:
         opts = self.options
 
         if key == 'optlist':
-            return opts.keys()
+            return list(opts.keys())
 
         if key == 'area':
             return (opts["tl-x"], opts["tl-y"]), (opts["br-x"], opts["br-y"])
 
         if key not in opts:
-            raise AttributeError, 'No such attribute: %s' % key
+            raise AttributeError('No such attribute: %s' % key)
 
         opt = opts[key]
 
         if opt.type == scanext.TYPE_BUTTON:
-            raise AttributeError, "Buttons don't have values: %s" % key
+            raise AttributeError("Buttons don't have values: %s" % key)
 
         if opt.type == scanext.TYPE_GROUP:
-            raise AttributeError, "Groups don't have values: %s " % key
+            raise AttributeError("Groups don't have values: %s " % key)
 
         if not scanext.isOptionActive(opt.cap):
-            raise AttributeError, 'Inactive option: %s' % key
+            raise AttributeError('Inactive option: %s' % key)
 
         return self.dev.getOption(opt.index)
 
@@ -360,7 +361,7 @@ class ScanDevice:
             s = self.scan_thread
 
             return s.buffer, s.format, s.format_name, s.pixels_per_line, \
-                s.lines, s.depth, s.bytes_per_line, s.pad_bytes, s.total_read
+                s.lines, s.depth, s.bytes_per_line, s.pad_bytes, s.total_read, s.total_write
 
 
     def freeScan(self):
@@ -414,7 +415,7 @@ class ScanDevice:
     def closeScan(self):
         "Close the SANE device after a scan."
         self.dev.closeScan()
-
+        
 
 
 class ScanThread(threading.Thread):
@@ -435,8 +436,8 @@ class ScanThread(threading.Thread):
         self.bytes_per_line = -1
         self.pad_bytes = -1
         self.total_read = 0
-        self.total_write = 0
         self.byte_format = byte_format
+        self.total_write = 0
 
 
     def updateQueue(self, status, bytes_read):
@@ -451,6 +452,7 @@ class ScanThread(threading.Thread):
 
 
     def run(self):
+        from base.sixext import to_bytes_utf8
         #self.scan_active = True
         self.format, self.format_name, self.last_frame, self.pixels_per_line, \
             self.lines, self.depth, self.bytes_per_line = self.dev.getParameters()
@@ -465,7 +467,6 @@ class ScanThread(threading.Thread):
         log.debug("byte_format=%s" % self.byte_format)
 
         w = self.buffer.write
-        #To get the exact buffer to read
         readbuffer = self.bytes_per_line
 
         if self.format == scanext.FRAME_RGB: # "Color"
@@ -480,16 +481,14 @@ class ScanThread(threading.Thread):
 
                 try:
                     st, t = self.dev.readScan(readbuffer)
-                except scanext.error, st:
+                except scanext.error as stObj:
+                    st = stObj.args[0]
                     self.updateQueue(st, 0)
 
-                #print st
                 while st == scanext.SANE_STATUS_GOOD:
-
                     if t:
                         len_t = len(t)
-                        w("".join([t[index:index+3:dir] + '\xff' for index in range(0,len_t - self.pad_bytes,3)]))
-
+                        w(b"".join([t[index:index+3:dir] + b'\xff' for index in range(0,len_t - self.pad_bytes,3)]))
                         self.total_read += len_t
                         self.total_write +=  len_t+(len_t - self.pad_bytes)/3
                         self.updateQueue(st, self.total_read)
@@ -500,7 +499,8 @@ class ScanThread(threading.Thread):
 
                     try:
                         st, t = self.dev.readScan(readbuffer)
-                    except scanext.error, st:
+                    except scanext.error as stObj:
+                        st = stObj.args[0]
                         self.updateQueue(st, self.total_read)
                         break
 
@@ -516,28 +516,14 @@ class ScanThread(threading.Thread):
 
                 try:
                     st, t = self.dev.readScan(readbuffer)
-                except scanext.error, st:
+                except scanext.error as stObj:
+                    st = stObj.args[0]
                     self.updateQueue(st, 0)
 
                 while st == scanext.SANE_STATUS_GOOD:
-
                     if t:
                         len_t = len(t)
-                        index = 0
-                        while index < len_t - self.pad_bytes:
-                            k = 0x80
-                            j = ord(t[index])
-
-                            for b in range(8):
-                                if k & j:
-                                    w("\x00\x00\x00\xff")
-                                else:
-                                    w("\xff\xff\xff\xff")
-
-                                k = k >> 1
-
-                            index += 1
-
+                        w(b''.join([b''.join([b"\x00\x00\x00\xff" if k & ord(t[index:index+1]) else b"\xff\xff\xff\xff" for k in [0x80, 0x40, 0x20, 0x10, 0x8, 0x4, 0x2, 0x1]]) for index in range(0, len_t - self.pad_bytes)]))
                         self.total_read += len_t
                         self.total_write += ((len_t - self.pad_bytes) * 32)
                         self.updateQueue(st, self.total_read)
@@ -547,29 +533,26 @@ class ScanThread(threading.Thread):
 
                     try:
                         st, t = self.dev.readScan(readbuffer)
-                    except scanext.error, st:
+                    except scanext.error as stObj:
+                        st = stObj.args[0]
                         self.updateQueue(st, self.total_read)
                         break
 
                     if self.checkCancel():
                         break
-
             elif self.depth == 8: # 8 bpp grayscale
                 self.pad_bytes = self.bytes_per_line - self.pixels_per_line
 
                 log.debug("pad_bytes=%d" % self.pad_bytes)
-
                 try:
                     st, t = self.dev.readScan(readbuffer)
-                except scanext.error, st:
+                except scanext.error as stObj:
+                    st = stObj.args[0]
                     self.updateQueue(st, 0)
-
                 while st == scanext.SANE_STATUS_GOOD:
-
                     if t:
                         len_t = len(t)
-                        w("".join([3*t[index:index+1] + '\xff' for index in range(0, len_t - self.pad_bytes)]))
-
+                        w(b"".join([3*t[index:index+1] + b'\xff' for index in range(0, len_t - self.pad_bytes)]))
                         self.total_read += len_t 
                         self.total_write += ((len_t  - self.pad_bytes) * 4)
                         self.updateQueue(st, self.total_read)
@@ -579,7 +562,8 @@ class ScanThread(threading.Thread):
 
                     try:
                         st, t = self.dev.readScan(readbuffer)
-                    except scanext.error, st:
+                    except scanext.error as stObj:
+                        st = stObj.args[0]
                         self.updateQueue(st, self.total_read)
                         break
 
@@ -592,6 +576,7 @@ class ScanThread(threading.Thread):
         log.debug("Scan thread exiting...")
 
 
+
     def checkCancel(self):
         canceled = False
         while self.event_queue.qsize():
@@ -600,9 +585,10 @@ class ScanThread(threading.Thread):
                 if event == EVENT_SCAN_CANCELED:
                     canceled = True
                     log.debug("Cancel pressed!")
-                    self.dev.cancelScan()
+                    self.dev.canclScan()
 
-            except Queue.Empty:
+
+            except queue.Empty:
                 break
 
         return canceled

@@ -22,7 +22,7 @@
 # Local
 from base.g import *
 from base.codes import *
-from ui_utils import *
+from .ui_utils import *
 
 # Qt
 from PyQt4.QtCore import *
@@ -79,10 +79,10 @@ class SystrayFrame(QFrame):
         self.MessageShowComboBox = QComboBox(self.groupBox_3)
         self.gridlayout3.addWidget(self.MessageShowComboBox,1,0,1,1)
 
-        self.MessageShowComboBox.addItem(self.__tr("All"), QVariant(SYSTRAY_MESSAGES_SHOW_ALL))
-        self.MessageShowComboBox.addItem(self.__tr("Errors and Warnings"), QVariant(SYSTRAY_MESSAGES_SHOW_ERRORS_AND_WARNINGS))
-        self.MessageShowComboBox.addItem(self.__tr("Errors Only"), QVariant(SYSTRAY_MESSAGES_SHOW_ERRORS_ONLY))
-        self.MessageShowComboBox.addItem(self.__tr("None"), QVariant(SYSTRAY_MESSAGES_SHOW_NONE))
+        self.MessageShowComboBox.addItem(self.__tr("All"), SYSTRAY_MESSAGES_SHOW_ALL)
+        self.MessageShowComboBox.addItem(self.__tr("Errors and Warnings"), SYSTRAY_MESSAGES_SHOW_ERRORS_AND_WARNINGS)
+        self.MessageShowComboBox.addItem(self.__tr("Errors Only"), SYSTRAY_MESSAGES_SHOW_ERRORS_ONLY)
+        self.MessageShowComboBox.addItem(self.__tr("None"), SYSTRAY_MESSAGES_SHOW_NONE)
 
         spacerItem = QSpacerItem(20,40,QSizePolicy.Minimum,QSizePolicy.Minimum)
         self.gridlayout3.addItem(spacerItem,2,0,1,1)
@@ -187,14 +187,16 @@ class SystrayFrame(QFrame):
 
 
     def updateMessages(self):
-        i = self.MessageShowComboBox.findData(QVariant(self.systray_messages))
+        #i = self.MessageShowComboBox.findData(QVariant(self.systray_messages))
+        i = self.MessageShowComboBox.findData(self.systray_messages)
         if i != -1:
             self.MessageShowComboBox.setCurrentIndex(i)
 
 
     def MessageShowComboBox_activated(self, i):
         sender = self.sender()
-        mode, ok = sender.itemData(i).toInt()
+        mode, ok = value_int(sender.itemData(i))
+
         if ok:
             self.systray_messages = mode
 

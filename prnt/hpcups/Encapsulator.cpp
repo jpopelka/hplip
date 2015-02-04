@@ -77,6 +77,8 @@ DRIVER_ERROR Encapsulator::StartJob(SystemServices *pSystemServices, JobAttribut
 
 //  Now add other header info
 
+
+#ifndef UNITTESTING
     if (jobAttrPJLAllowed())
     {
         addToHeader("@PJL SET STRINGCODESET=UTF8\012");
@@ -104,6 +106,7 @@ DRIVER_ERROR Encapsulator::StartJob(SystemServices *pSystemServices, JobAttribut
 
         addToHeader("@PJL SET USERNAME=\"%s\"\012", m_pJA->user_name);
     }
+#endif
 
 //  Add platform specific PJL here
     addJobSettings();

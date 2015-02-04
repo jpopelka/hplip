@@ -78,10 +78,10 @@ class FaxAddrBookGroupEditForm_base(QDialog):
 
 
     def groupnameEdit_textChanged(self,a0):
-        print "FaxAddrBookGroupEditForm_base.groupnameEdit_textChanged(const QString&): Not implemented yet"
+        print("FaxAddrBookGroupEditForm_base.groupnameEdit_textChanged(const QString&): Not implemented yet")
 
     def entriesListView_clicked(self,a0):
-        print "FaxAddrBookGroupEditForm_base.entriesListView_clicked(QListViewItem*): Not implemented yet"
+        print("FaxAddrBookGroupEditForm_base.entriesListView_clicked(QListViewItem*): Not implemented yet")
 
     def __tr(self,s,c = None):
         return qApp.translate("FaxAddrBookGroupEditForm_base",s,c)

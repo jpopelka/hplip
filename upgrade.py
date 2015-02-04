@@ -19,14 +19,14 @@
 #
 # Author: Amarnath Chitumalla
 #
-
+from __future__ import print_function
 __version__ = '1.0'
 __title__ = 'HPLIP upgrade latest version'
 __mod__ = 'hp-upgrade'
 __doc__ = "HPLIP installer to upgrade to latest version."
 
 # Std Lib
-import getopt, os, sys, re, time
+import getopt, os, sys, re, time, datetime
 
 # Local
 from base.g import *
@@ -67,13 +67,11 @@ IS_QUIET_MODE = False
 DONOT_CLOSE_TERMINAL = False
 CURRENT_WORKING_DIR = ''
 
-
 def hold_terminal():
     if DONOT_CLOSE_TERMINAL:
         log.info("\n\nPlease close this terminal manually. ")
         try:
             while 1:
-                raw_input("")
                 pass
         except KeyboardInterrupt:
             pass
@@ -103,11 +101,10 @@ def parse_HPLIP_version(hplip_version_file, pat):
         return ver
 
     try:
-        fp= file(hplip_version_file, 'r')
+        fp= open(hplip_version_file, 'r')
     except IOError:
         log.error("Failed to get hplip version since %s file is not found."%hplip_version_file)
         return ver
-
     data = fp.read()
     for line in data.splitlines():
         if pat.search(line):
@@ -123,7 +120,7 @@ def get_hplip_version_from_sourceforge():
 
     # get HPLIP version info from hplip_web.conf file
     sts, HPLIP_Ver_file = utils.download_from_network(HPLIP_VERSION_INFO_SOURCEFORGE_SITE)
-    if sts is True:
+    if sts == 0:
         hplip_version_conf = ConfigBase(HPLIP_Ver_file)
         HPLIP_latest_ver = hplip_version_conf.get("HPLIP","Latest_version","0.0.0")
         os.unlink(HPLIP_Ver_file)
@@ -135,7 +132,7 @@ def get_hplip_version_from_hplipopensource():
     HPLIP_latest_ver="0.0.0"
     pat = re.compile(r"""The current version of the HPLIP solution is version (\d{1,}\.\d{1,}\.\d{1,}[a-z]{0,})\. \(.*""")
     sts, HPLIP_Ver_file = utils.download_from_network(HPLIP_WEB_SITE)
-    if sts is True:
+    if sts == 0:
         HPLIP_latest_ver = parse_HPLIP_version(HPLIP_Ver_file, pat)
         os.unlink(HPLIP_Ver_file)
 
@@ -196,7 +193,9 @@ try:
                mod.parseStdOpts('hl:gniup:d:of:sw', ['notify','check','help', 'help-rest', 'help-man', 'help-desc', 'interactive', 'gui', 'lang=','logging=', 'debug'],
                      handle_device_printer=False)
 
-except getopt.GetoptError, e:
+
+
+except getopt.GetoptError as e:
     log.error(e.msg)
     usage()
 
@@ -221,7 +220,7 @@ for o, a in opts:
         language = a.lower()
 
     elif o == '--help-desc':
-        print __doc__,
+        print(__doc__, end=' ')
         clean_exit(0,False)
 
     elif o in ('-l', '--logging'):
@@ -426,5 +425,4 @@ except KeyboardInterrupt:
         log.error("User exit")
 
     clean_exit(1)
-
 

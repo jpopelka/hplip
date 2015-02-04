@@ -20,7 +20,7 @@
 #
 
 from qt import *
-from colorcalform_base import ColorCalForm_base
+from .colorcalform_base import ColorCalForm_base
 
 class ColorCalForm(ColorCalForm_base):
     def __init__(self,parent = None,name = None,modal = 0,fl = 0):

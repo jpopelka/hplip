@@ -46,6 +46,7 @@ def logBarGraph(agent_level, agent_type, size=DEFAULT_BAR_GRAPH_SIZE, use_colors
     adj = 100.0/size
     if adj==0.0: adj=100.0
     bar = int(agent_level/adj)
+    size = int(size)
     if bar > (size-2): bar = size-2
 
     if use_colors:
@@ -67,7 +68,7 @@ def logBarGraph(agent_level, agent_type, size=DEFAULT_BAR_GRAPH_SIZE, use_colors
         if agent_type in (AGENT_TYPE_CMY, AGENT_TYPE_KCM):
             color = log.codes['fuscia']
 
-    log.info(("-"*size)+color)
+    log.info(("-"*(size))+color)
 
     color = ''
     if use_colors:
@@ -75,14 +76,15 @@ def logBarGraph(agent_level, agent_type, size=DEFAULT_BAR_GRAPH_SIZE, use_colors
             color = log.codes['yellow']
 
     log.info("%s%s%s%s (approx. %d%%)%s" % ("|", bar_char*bar,
-             " "*(size-bar-2), "|", agent_level, color))
+             " "*((size)-bar-2), "|", agent_level, color))
+
 
     color = ''
     if use_colors:
         color = log.codes['reset']
 
-    log.info(("-"*size)+color)
-
+    log.info(("-"*int(size))+color)
+    #log.info(("-"*(size))+color)
 
 
 log.set_module('hp-levels')
@@ -102,6 +104,8 @@ try:
         mod.parseStdOpts('s:ca:', ['size=', 'color', 'char='])
 
     device_uri = mod.getDeviceUri(device_uri, printer_name)
+    if not device_uri:
+        sys.exit(1)
 
     size = DEFAULT_BAR_GRAPH_SIZE
     color = True
@@ -139,7 +143,7 @@ try:
         try:
             d.open()
             d.queryDevice()
-        except Error, e:
+        except Error as e:
             log.error("Error opening device (%s). Exiting." % e.msg)
             sys.exit(1)
 
@@ -159,8 +163,7 @@ try:
                 else:
                     sorted_supplies.append((a, agent_kind, agent_type, agent_sku))
                 a += 1
-
-            sorted_supplies.sort(lambda x, y: cmp(x[1], y[1]) or cmp(x[3], y[3]))
+            sorted_supplies.sort(key=utils.cmp_to_key(utils.levelsCmp))
 
             for x in sorted_supplies:
                 a, agent_kind, agent_type, agent_sku = x

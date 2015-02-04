@@ -23,8 +23,9 @@
 
 # Local
 from base.g import *
-from ui_utils import *
+from .ui_utils import *
 from base import device, utils
+from base.sixext import  to_unicode
 
 # Qt3
 from qt import *
@@ -124,8 +125,8 @@ class DeviceUriComboBox(QWidget):
             self.updating = True
             try:
                 k = 0
-                str_devices = self.devices.keys() 
-                d = str(str_devices[0])
+                str_devices = list(self.devices.keys()) 
+                d = to_unicode(str_devices[0])
                 for i in range(0, num_devices):
                     self.ComboBox.insertItem(str_devices[i], i)
                     if self.initial_device is not None and d == self.initial_device:
@@ -146,7 +147,7 @@ class DeviceUriComboBox(QWidget):
         if self.updating:
             return
 
-        self.device_uri = unicode(t)
+        self.device_uri = str(t)
         if self.device_uri:
             #user_conf.set('last_used', 'device_uri', self.device_uri)
             self.user_settings.last_used_device_uri = self.device_uri

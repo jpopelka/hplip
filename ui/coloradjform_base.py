@@ -243,7 +243,7 @@ class ColorAdjForm_base(QDialog):
 
 
     def buttonGroup_clicked(self,a0):
-        print "ColorAdjForm_base.buttonGroup_clicked(int): Not implemented yet"
+        print("ColorAdjForm_base.buttonGroup_clicked(int): Not implemented yet")
 
     def __tr(self,s,c = None):
         return qApp.translate("ColorAdjForm_base",s,c)

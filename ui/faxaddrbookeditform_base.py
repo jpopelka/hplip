@@ -173,25 +173,25 @@ class FaxAddrBookEditForm_base(QDialog):
 
 
     def firstnameEdit_textChanged(self,a0):
-        print "FaxAddrBookEditForm_base.firstnameEdit_textChanged(const QString&): Not implemented yet"
+        print("FaxAddrBookEditForm_base.firstnameEdit_textChanged(const QString&): Not implemented yet")
 
     def lastnameEdit_textChanged(self,a0):
-        print "FaxAddrBookEditForm_base.lastnameEdit_textChanged(const QString&): Not implemented yet"
+        print("FaxAddrBookEditForm_base.lastnameEdit_textChanged(const QString&): Not implemented yet")
 
     def checkBox3_toggled(self,a0):
-        print "FaxAddrBookEditForm_base.checkBox3_toggled(bool): Not implemented yet"
+        print("FaxAddrBookEditForm_base.checkBox3_toggled(bool): Not implemented yet")
 
     def isGroupCheckBox_toggled(self,a0):
-        print "FaxAddrBookEditForm_base.isGroupCheckBox_toggled(bool): Not implemented yet"
+        print("FaxAddrBookEditForm_base.isGroupCheckBox_toggled(bool): Not implemented yet")
 
     def groupsButton2_clicked(self):
-        print "FaxAddrBookEditForm_base.groupsButton2_clicked(): Not implemented yet"
+        print("FaxAddrBookEditForm_base.groupsButton2_clicked(): Not implemented yet")
 
     def nicknameEdit_textChanged(self,a0):
-        print "FaxAddrBookEditForm_base.nicknameEdit_textChanged(const QString&): Not implemented yet"
+        print("FaxAddrBookEditForm_base.nicknameEdit_textChanged(const QString&): Not implemented yet")
 
     def faxEdit_textChanged(self,a0):
-        print "FaxAddrBookEditForm_base.faxEdit_textChanged(const QString&): Not implemented yet"
+        print("FaxAddrBookEditForm_base.faxEdit_textChanged(const QString&): Not implemented yet")
 
     def __tr(self,s,c = None):
         return qApp.translate("FaxAddrBookEditForm_base",s,c)

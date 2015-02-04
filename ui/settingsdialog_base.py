@@ -235,58 +235,58 @@ class SettingsDialog_base(QDialog):
 
 
     def PrintCmdChangeButton_clicked(self):
-        print "SettingsDialog_base.PrintCmdChangeButton_clicked(): Not implemented yet"
+        print("SettingsDialog_base.PrintCmdChangeButton_clicked(): Not implemented yet")
 
     def ScanCmdChangeButton_clicked(self):
-        print "SettingsDialog_base.ScanCmdChangeButton_clicked(): Not implemented yet"
+        print("SettingsDialog_base.ScanCmdChangeButton_clicked(): Not implemented yet")
 
     def AccessPCardCmdChangeButton_clicked(self):
-        print "SettingsDialog_base.AccessPCardCmdChangeButton_clicked(): Not implemented yet"
+        print("SettingsDialog_base.AccessPCardCmdChangeButton_clicked(): Not implemented yet")
 
     def SendFaxCmdChangeButton_clicked(self):
-        print "SettingsDialog_base.SendFaxCmdChangeButton_clicked(): Not implemented yet"
+        print("SettingsDialog_base.SendFaxCmdChangeButton_clicked(): Not implemented yet")
 
     def MakeCopiesCmdChangeButton_clicked(self):
-        print "SettingsDialog_base.MakeCopiesCmdChangeButton_clicked(): Not implemented yet"
+        print("SettingsDialog_base.MakeCopiesCmdChangeButton_clicked(): Not implemented yet")
 
     def CleaningLevel_clicked(self,a0):
-        print "SettingsDialog_base.CleaningLevel_clicked(int): Not implemented yet"
+        print("SettingsDialog_base.CleaningLevel_clicked(int): Not implemented yet")
 
     def pushButton5_clicked(self):
-        print "SettingsDialog_base.pushButton5_clicked(): Not implemented yet"
+        print("SettingsDialog_base.pushButton5_clicked(): Not implemented yet")
 
     def DefaultsButton_clicked(self):
-        print "SettingsDialog_base.DefaultsButton_clicked(): Not implemented yet"
+        print("SettingsDialog_base.DefaultsButton_clicked(): Not implemented yet")
 
     def TabWidget_currentChanged(self,a0):
-        print "SettingsDialog_base.TabWidget_currentChanged(QWidget*): Not implemented yet"
+        print("SettingsDialog_base.TabWidget_currentChanged(QWidget*): Not implemented yet")
 
     def pushButton6_clicked(self):
-        print "SettingsDialog_base.pushButton6_clicked(): Not implemented yet"
+        print("SettingsDialog_base.pushButton6_clicked(): Not implemented yet")
 
     def EmailTestButton_clicked(self):
-        print "SettingsDialog_base.EmailTestButton_clicked(): Not implemented yet"
+        print("SettingsDialog_base.EmailTestButton_clicked(): Not implemented yet")
 
     def autoRefreshCheckBox_clicked(self):
-        print "SettingsDialog_base.autoRefreshCheckBox_clicked(): Not implemented yet"
+        print("SettingsDialog_base.autoRefreshCheckBox_clicked(): Not implemented yet")
 
     def refreshScopeButtonGroup_clicked(self,a0):
-        print "SettingsDialog_base.refreshScopeButtonGroup_clicked(int): Not implemented yet"
+        print("SettingsDialog_base.refreshScopeButtonGroup_clicked(int): Not implemented yet")
 
     def printButtonGroup_clicked(self,a0):
-        print "SettingsDialog_base.printButtonGroup_clicked(int): Not implemented yet"
+        print("SettingsDialog_base.printButtonGroup_clicked(int): Not implemented yet")
 
     def scanButtonGroup_clicked(self,a0):
-        print "SettingsDialog_base.scanButtonGroup_clicked(int): Not implemented yet"
+        print("SettingsDialog_base.scanButtonGroup_clicked(int): Not implemented yet")
 
     def faxButtonGroup_clicked(self,a0):
-        print "SettingsDialog_base.faxButtonGroup_clicked(int): Not implemented yet"
+        print("SettingsDialog_base.faxButtonGroup_clicked(int): Not implemented yet")
 
     def pcardButtonGroup_clicked(self,a0):
-        print "SettingsDialog_base.pcardButtonGroup_clicked(int): Not implemented yet"
+        print("SettingsDialog_base.pcardButtonGroup_clicked(int): Not implemented yet")
 
     def copyButtonGroup_clicked(self,a0):
-        print "SettingsDialog_base.copyButtonGroup_clicked(int): Not implemented yet"
+        print("SettingsDialog_base.copyButtonGroup_clicked(int): Not implemented yet")
 
     def __tr(self,s,c = None):
         return qApp.translate("SettingsDialog_base",s,c)

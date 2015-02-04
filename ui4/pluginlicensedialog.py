@@ -22,14 +22,14 @@
 
 # Local
 from base.g import *
-from ui_utils import *
+from .ui_utils import *
 
 # Qt
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Ui
-from pluginlicensedialog_base import Ui_Dialog
+from .pluginlicensedialog_base import Ui_Dialog
 
 
 

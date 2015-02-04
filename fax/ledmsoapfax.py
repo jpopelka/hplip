@@ -19,24 +19,23 @@
 # Author: Don Welch
 #
 
-from __future__ import division
+
 
 # Std Lib
 import sys
 import os
 import time
-import cStringIO
-import urllib # TODO: Replace with urllib2 (urllib is deprecated in Python 3.0)
+from base.sixext import BytesIO
 import re
 
 # Local
 from base.g import *
 from base.codes import *
 from base import device, utils, codes, dime
-from fax import *
-from ledmfax import *
-from soapfax import SOAPFaxSendThread
-from soapfax import SOAPFaxDevice
+from .fax import *
+from .ledmfax import *
+from .soapfax import SOAPFaxSendThread
+from .soapfax import SOAPFaxDevice
 
 
 # **************************************************************************** #
@@ -61,16 +60,16 @@ User-agent: hplip/2.0\r
 Host: %s\r
 Content-length: %d\r
 \r
-%s""" % (url, str(self.http_host), len(post), post)
+%s""" % (url, self.http_host, len(post), post)
         log.log_data(data)
-        self.writeEWS_LEDM(data)
-        response = cStringIO.StringIO()
+        self.writeEWS_LEDM(data.encode('utf-8'))
+        response = BytesIO()
 
         while self.readEWS_LEDM(4096, response, timeout=5):
             pass
 
         response = response.getvalue()
-        log.log_data(response)
+        log.log_data(response.decode('utf-8'))
         self.closeEWS_LEDM()        
         
         match = http_result_pat.match(response)
@@ -97,7 +96,7 @@ Content-length: %d\r
 
     def setStationName(self, name):
         try:
-            xml = setStationNameXML %(name.encode('utf-8'))
+            xml = setStationNameXML %name
         except(UnicodeEncodeError, UnicodeDecodeError):
             log.error("Unicode Error")
 

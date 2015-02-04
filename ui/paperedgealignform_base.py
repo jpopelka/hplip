@@ -129,7 +129,7 @@ class PaperEdgeAlignForm_base(QDialog):
 
 
     def buttonGroup_clicked(self,a0):
-        print "PaperEdgeAlignForm_base.buttonGroup_clicked(int): Not implemented yet"
+        print("PaperEdgeAlignForm_base.buttonGroup_clicked(int): Not implemented yet")
 
     def __tr(self,s,c = None):
         return qApp.translate("PaperEdgeAlignForm_base",s,c)

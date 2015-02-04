@@ -117,6 +117,9 @@ try:
     device_uri = mod.getDeviceUri(device_uri, printer_name,
        filter={'clean-type': (operator.ne, CLEAN_TYPE_NONE)})
 
+    if not device_uri:
+        sys.exit(1)
+
     if mode == GUI_MODE:
         if not utils.canEnterGUIMode4():
             log.error("%s -u/--gui requires Qt4 GUI support. Entering interactive mode." % __mod__)
@@ -125,7 +128,7 @@ try:
     if mode == INTERACTIVE_MODE:
         try:
             d = device.Device(device_uri, printer_name)
-        except Error, e:
+        except Error as e:
             log.error("Unable to open device: %s" % e.msg)
             sys.exit(0)
 
@@ -172,7 +175,7 @@ try:
                     else:
                         log.error("Cleaning not needed or supported on this device.")
 
-                except Error, e:
+                except Error as e:
                     log.error("An error occured: %s" % e[0])
 
             else:
@@ -193,7 +196,6 @@ try:
         #try:
         if 1:
             app = QApplication(sys.argv)
-
             dlg = CleanDialog(None, device_uri)
             dlg.show()
             try:

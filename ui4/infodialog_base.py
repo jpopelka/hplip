@@ -100,4 +100,4 @@ class Ui_Dialog(object):
         self.TabWidget.setTabText(self.TabWidget.indexOf(self.tab_3), QtGui.QApplication.translate("Dialog", "Status History", None, QtGui.QApplication.UnicodeUTF8))
         self.CancelButton.setText(QtGui.QApplication.translate("Dialog", "Close", None, QtGui.QApplication.UnicodeUTF8))
 
-from deviceuricombobox import DeviceUriComboBox
+from .deviceuricombobox import DeviceUriComboBox

@@ -20,7 +20,7 @@
 #
 
 from qt import *
-from allowabletypesdlg_base import AllowableTypesDlg_base
+from .allowabletypesdlg_base import AllowableTypesDlg_base
 
 class AllowableTypesDlg(AllowableTypesDlg_base):
     def __init__(self, allowables, parent=None, name=None, modal=0, fl=0):

@@ -25,38 +25,25 @@ from __future__ import division
 import sys
 import os
 import time
-import cStringIO
-import urllib # TODO: Replace with urllib2 (urllib is deprecated in Python 3.0)
+from base.sixext import BytesIO, to_bytes_utf8, to_unicode
 import re
 import threading
 import struct
 import time
-from base.g import *
-try:
-   from xml.parsers import expat as expat
-except ImportError,e:
-   log.info("\n")
-   log.error("Failed to import xml.parsers.expat(%s).\nThis may be due to the incompatible version of python-xml package.\n"%(e))
-   if "undefined symbol" in str(e):
-       log.info(log.blue("Please re-install compatible version (other than 2.7.2-7.14.1) due to bug reported at 'https://bugzilla.novell.com/show_bug.cgi?id=766778'."))
-       log.info(log.blue("\n        Run the following commands in root mode to change the python-xml package.(i.e Installing 2.7.2-7.1.2)"))
-       log.info(log.blue("\n        Using zypper:\n        'zypper remove python-xml'\n        'zypper install python-xml-2.7.2-7.1.2'"))
-       log.info(log.blue("\n        Using apt-get:\n        'apt-get remove python-xml'\n        'apt-get install python-xml-2.7.2-7.1.2'"))
-       log.info(log.blue("\n        Using yum:\n        'yum remove python-xml'\n        'yum install python-xml-2.7.2-7.1.2'"))
-
-   sys.exit(1)
+import xml.parsers.expat as expat
 
 from stat import *
 # Local
 from base.g import *
 from base.codes import *
 from base import device, utils, codes, dime, status
-from fax import *
+from base.sixext import to_bytes_utf8
+from .fax import *
 
 
 # **************************************************************************** #
 
-http_result_pat = re.compile("""HTTP/\d.\d\s(\d+)""", re.I)
+http_result_pat = re.compile(b"""HTTP/\d.\d\s(\d+)""", re.I)
 
 HTTP_OK = 200
 HTTP_ACCEPTED = 202
@@ -107,10 +94,10 @@ User-agent: hplip/2.0\r
 Host: %s\r
 Content-length: %d\r
 \r
-%s""" % (url, str(self.http_host), len(post), post)
+%s""" % (url, self.http_host, len(post), post)
         log.log_data(data)
-        self.writeLEDM(data)
-        response = cStringIO.StringIO()
+        self.writeLEDM(data.encode('utf-8'))
+        response = BytesIO()
 
         while self.readLEDM(512, response, timeout=5):
             pass
@@ -137,14 +124,13 @@ Content-length: %d\r
 
 
     def getPhoneNum(self):
-        return self.readAttributeFromXml("/DevMgmt/FaxConfigDyn.xml",'faxcfgdyn:faxconfigdyn-faxcfgdyn:systemsettings-dd:phonenumber')
-
+        return self.readAttributeFromXml("/DevMgmt/FaxConfigDyn.xml",'faxcfgdyn:faxconfigdyn-faxcfgdyn:systemsettings-dd:phonenumber')       
     phone_num = property(getPhoneNum, setPhoneNum)
 
 
     def setStationName(self, name):
         try:
-           xml = setStationNameXML %(name.encode('utf-8'))
+           xml = setStationNameXML % name
         except(UnicodeEncodeError, UnicodeDecodeError):
            log.error("Unicode Error")
         
@@ -152,7 +138,7 @@ Content-length: %d\r
 
 
     def getStationName(self):
-        return self.readAttributeFromXml("/DevMgmt/FaxConfigDyn.xml",'faxcfgdyn:faxconfigdyn-faxcfgdyn:systemsettings-dd:companyname')
+        return to_unicode(self.readAttributeFromXml("/DevMgmt/FaxConfigDyn.xml",'faxcfgdyn:faxconfigdyn-faxcfgdyn:systemsettings-dd:companyname'))
 
     station_name = property(getStationName, setStationName) 
 
@@ -262,7 +248,7 @@ class LEDMFaxSendThread(FaxSendThread):
                 try:
                     try:
                         self.dev.open()
-                    except Error, e:
+                    except Error as  e:
                         log.error("Unable to open device (%s)." % e.msg)
                         state = STATE_ERROR
                     else:
@@ -292,7 +278,7 @@ class LEDMFaxSendThread(FaxSendThread):
                 state = STATE_COVER_PAGE
 
                 try:
-                    recipient = next_recipient.next()
+                    recipient = next(next_recipient)
                     log.debug("Processing for recipient %s" % recipient['name'])
                     self.write_queue((STATUS_SENDING_TO_RECIPIENT, 0, recipient['name']))
                 except StopIteration:
@@ -378,7 +364,7 @@ class LEDMFaxSendThread(FaxSendThread):
                         fax_send_state = FAX_SEND_STATE_BEGINJOB
                         try:
                             self.dev.open()
-                        except Error, e:
+                        except Error as e:
                             log.error("Unable to open device (%s)." % e.msg)
                             fax_send_state = FAX_SEND_STATE_ERROR
                         else:
@@ -388,7 +374,7 @@ class LEDMFaxSendThread(FaxSendThread):
                     elif fax_send_state == FAX_SEND_STATE_BEGINJOB: # -------------- BeginJob (110, 50, 0)
                         log.debug("%s State: BeginJob" % ("*"*20))
                         try:
-                            ff = file(self.f, 'r')
+                            ff = open(self.f, 'rb')
                         except IOError:
                             log.error("Unable to read fax file.")
                             fax_send_state = FAX_SEND_STATE_ERROR
@@ -404,7 +390,7 @@ class LEDMFaxSendThread(FaxSendThread):
                         magic, version, total_pages, hort_dpi, vert_dpi, page_size, \
                             resolution, encoding, reserved1, reserved2 = self.decode_fax_header(header)
 
-                        if magic != 'hplip_g3':
+                        if magic != to_bytes_utf8('hplip_g3'):
                             log.error("Invalid file header. Bad magic.")
                             fax_send_state = FAX_SEND_STATE_ERROR
                         else:
@@ -412,15 +398,15 @@ class LEDMFaxSendThread(FaxSendThread):
                                       (magic, version, total_pages, hort_dpi, vert_dpi, page_size,
                                        resolution, encoding))
                         
-                        faxnum = recipient['fax'].encode('ascii')                       
+                        faxnum = recipient['fax'] 
 
                         createJob = createJobXML  %(faxnum, total_pages)
                         data = self.format_http_post("/FaxPCSend/Job",len(createJob),createJob)
-                        log.log_data(data)                        
+                        log.log_data(data)
 
                         self.dev.openLEDM()
-                        self.dev.writeLEDM(data)
-                        response = cStringIO.StringIO()
+                        self.dev.writeLEDM(to_bytes_utf8(data))
+                        response = BytesIO()
                         try:
                             while self.dev.readLEDM(512, response, timeout=5):
                                 pass
@@ -431,23 +417,24 @@ class LEDMFaxSendThread(FaxSendThread):
                         self.dev.closeLEDM()
 
                         response = response.getvalue()
-                        log.log_data(response)                         
+                        log.log_data(response)
                         if self.get_error_code(response) == HTTP_CREATED:
                             fax_send_state = FAX_SEND_STATE_DOWNLOADPAGES
                         else:
                             fax_send_state = FAX_SEND_STATE_ERROR
                             log.error("Create Job request failed")
                             break
-                        
-                        responsestr = str(response)                        
-                        pos = responsestr.find("/Jobs/JobList/",0,len(responsestr))
-                        pos1 = responsestr.find("Content-Length",0,len(responsestr))
-                        jobListURI = responsestr[pos:pos1].strip()
-                        log.debug("jobListURI = [%s]" %(jobListURI))
+                        pos = response.find(b"/Jobs/JobList/",0,len(response))
+                        pos1 = response.find(b"Content-Length",0,len(response))
+                        jobListURI = response[pos:pos1].strip()
+                        jobListURI = jobListURI.replace(b'\r',b'').replace(b'\n',b'')
+                        log.debug("jobListURI = [%s] type=%s" %(jobListURI, type(jobListURI)))
+                        if type(jobListURI) != str:
+                             jobListURI = jobListURI.decode('utf-8')
 
                     elif fax_send_state == FAX_SEND_STATE_DOWNLOADPAGES: # -------------- DownloadPages (110, 60, 0)
                         log.debug("%s State: DownloadPages" % ("*"*20))
-                        page = StringIO()
+                        page = BytesIO()
                         log.debug("Total Number of pages are:%d" %total_pages)
                         for p in range(total_pages):
 
@@ -484,7 +471,7 @@ class LEDMFaxSendThread(FaxSendThread):
                                 fax_send_state = FAX_SEND_STATE_ERROR
                                 break
 
-                            if data == '':
+                            if data == b'':
                                 log.error("No data!")
                                 fax_send_state = FAX_SEND_STATE_ERROR
                                 break
@@ -504,10 +491,10 @@ class LEDMFaxSendThread(FaxSendThread):
                                 self.dev.closeLEDM() 
                                 break
 
-                            response = cStringIO.StringIO()
+                            response = BytesIO()
                             try:
                                 while self.dev.readLEDM(512, response, timeout=5):
-                            	    pass
+                                    pass
                             except Error:
                                 fax_send_state = FAX_SEND_STATE_ERROR
                                 self.dev.closeLEDM()
@@ -520,7 +507,7 @@ class LEDMFaxSendThread(FaxSendThread):
                                 fax_send_state = FAX_SEND_STATE_ERROR
                                 log.error("Page config data is not accepted by the device")
                                 break                                                    
-                            			   
+                                                   
                             pageImageURI = self.dev.readAttributeFromXml(jobListURI,"j:job-faxpcsendstatus-resourceuri")                                
                             while(True):
                                 if self.check_for_cancel():
@@ -537,13 +524,13 @@ class LEDMFaxSendThread(FaxSendThread):
                                     break
                                 elif Status == FAX_SEND_STATE_SUCCESS:
                                     break  
-				                            
+                         
                             if fax_send_state == FAX_SEND_STATE_ABORT or fax_send_state  == FAX_SEND_STATE_ERROR:
                                 break
                           
                             
                             xmldata = self.format_http_post(pageImageURI,len(data),"","application/octet-stream")
-                            log.debug("Sending Page Image XML Data [%s] to the device" %str(xmldata))                           
+                            log.debug("Sending Page Image XML Data [%s] to the device" %xmldata)                           
                             self.dev.openLEDM()
                             self.dev.writeLEDM(xmldata)
                             log.debug("Sending Raw Data to printer............")
@@ -554,10 +541,10 @@ class LEDMFaxSendThread(FaxSendThread):
                                 self.dev.closeLEDM() 
                                 break  
                               
-                            response = cStringIO.StringIO()
+                            response = BytesIO()
                             try:
                                 while self.dev.readLEDM(512, response, timeout=10):
-                            	    pass
+                                    pass
                             except Error:
                                 fax_send_state = FAX_SEND_STATE_ERROR
                                 self.dev.closeLEDM()
@@ -580,20 +567,20 @@ class LEDMFaxSendThread(FaxSendThread):
 
 
                     elif fax_send_state == FAX_SEND_STATE_ENDJOB: # -------------- EndJob (110, 70, 0)
-			fax_send_state = FAX_SEND_STATE_SUCCESS
+                        fax_send_state = FAX_SEND_STATE_SUCCESS
                         
 
                     elif fax_send_state == FAX_SEND_STATE_CANCELJOB: # -------------- CancelJob (110, 80, 0)
                         log.debug("%s State: CancelJob" % ("*"*20))                        
-			
+                        
                         xmldata = cancelJobXML %(jobListURI)                        
                         data = self.format_http_put(jobListURI,len(xmldata),xmldata)
                         log.log_data(data)
                         
                         self.dev.openLEDM()
-                        self.dev.writeLEDM(data)
+                        self.dev.writeLEDM(to_bytes_utf8(data))
                         
-                        response = cStringIO.StringIO()
+                        response = BytesIO()
                         try:
                             while self.dev.readLEDM(512, response, timeout=10):
                                 pass
@@ -603,9 +590,9 @@ class LEDMFaxSendThread(FaxSendThread):
                             break
                         self.dev.closeLEDM()
                         response = response.getvalue()
-                        log.log_data(response)        		
+                        log.log_data(response)
 
-        		if self.get_error_code(response) == HTTP_OK:
+                        if self.get_error_code(response) == HTTP_OK:
                             fax_send_state = FAX_SEND_STATE_CLOSE_SESSION
                         else:
                             fax_send_state = FAX_SEND_STATE_ERROR
@@ -655,7 +642,7 @@ class LEDMFaxSendThread(FaxSendThread):
         return code        
         
     def checkForError(self,uri):
-        stream = cStringIO.StringIO()
+        stream = BytesIO()
         data = self.dev.FetchLEDMUrl(uri)
         if not data:
             log.error("Unable To read the XML data from device")
@@ -669,23 +656,23 @@ class LEDMFaxSendThread(FaxSendThread):
         state = FAX_SEND_STATE_ERROR
         Fax_send_state = STATUS_ERROR   
 
-        if cmp(str(xmlDict['j:job-faxpcsendstatus-faxtxmachinestatus']),"Transmitting")==0 \
-            and cmp(str(xmlDict['j:job-faxpcsendstatus-faxtxerrorstatus']),"CommunicationError")== 0:
+        if cmp(xmlDict['j:job-faxpcsendstatus-faxtxmachinestatus'],"Transmitting")==0 \
+            and cmp(xmlDict['j:job-faxpcsendstatus-faxtxerrorstatus'],"CommunicationError")== 0:
             state = FAX_SEND_STATE_ERROR
             Fax_send_state = STATUS_ERROR_IN_TRANSMITTING
-        elif(cmp(str(xmlDict['j:job-faxpcsendstatus-faxtxmachinestatus']),"Connecting")==0 \
-            and cmp(str(xmlDict['j:job-faxpcsendstatus-faxtxerrorstatus']),"NoAnswer")== 0):
+        elif(cmp(xmlDict['j:job-faxpcsendstatus-faxtxmachinestatus'],"Connecting")==0 \
+            and cmp(xmlDict['j:job-faxpcsendstatus-faxtxerrorstatus'],"NoAnswer")== 0):
             state = FAX_SEND_STATE_ERROR
             Fax_send_state = STATUS_ERROR_IN_CONNECTING
-        elif(cmp(str(xmlDict['j:job-faxpcsendstatus-faxtxerrorstatus']),"PcDisconnect")==0 \
-            and cmp(str(xmlDict['j:job-faxpcsendstatus-pagestatus-state']),"Error")== 0):
+        elif(cmp(xmlDict['j:job-faxpcsendstatus-faxtxerrorstatus'],"PcDisconnect")==0 \
+            and cmp(xmlDict['j:job-faxpcsendstatus-pagestatus-state'],"Error")== 0):
             state = FAX_SEND_STATE_ERROR
             Fax_send_state = STATUS_ERROR_PROBLEM_IN_FAXLINE
-        elif(cmp(str(xmlDict['j:job-faxpcsendstatus-faxtxerrorstatus']),"Stop")==0 \
-            and cmp(str(xmlDict['j:job-faxpcsendstatus-pagestatus-state']),"Error")== 0):
+        elif(cmp(xmlDict['j:job-faxpcsendstatus-faxtxerrorstatus'],"Stop")==0 \
+            and cmp(xmlDict['j:job-faxpcsendstatus-pagestatus-state'],"Error")== 0):
             state = FAX_SEND_STATE_ERROR
             Fax_send_state = STATUS_JOB_CANCEL 
-        elif(cmp(str(xmlDict['j:job-faxpcsendstatus-faxtxmachinestatus']),"Transmitting")== 0):
+        elif(cmp(xmlDict['j:job-faxpcsendstatus-faxtxmachinestatus'],"Transmitting")== 0):
             state = FAX_SEND_STATE_SUCCESS
             Fax_send_state = FAX_SEND_STATE_SUCCESS
         return state,Fax_send_state   

@@ -21,11 +21,11 @@
 
 # Std Lib
 import struct
-import cStringIO
+import io
 
 # Local
-from g import *
-from codes import *
+from .g import *
+from .codes import *
 
 # Page flags
 NEW_PAGE =            0x01
@@ -151,7 +151,7 @@ def parseRecord(buffer):
 
 
 def readChannelToStream(device, channel_id, stream, single_read=True, callback=None):
-    STATE_END, STATE_FIXED_HEADER, STATE_VARIANT_HEADER, STATE_RECORD = range(4)
+    STATE_END, STATE_FIXED_HEADER, STATE_VARIANT_HEADER, STATE_RECORD = list(range(4))
     state, total_bytes, block_remaining, header_remaining, data_remaining = 1, 0, 0, 0, 0
     endScan = False
     while state != STATE_END:
@@ -308,7 +308,7 @@ def buildMFPDTFBlock(data_type, page_flags=0, send_variant=False, data=None):
     # [Variant header - dial, fax, or scan]
     # Data Record
 
-    block = cStringIO.StringIO()
+    block = io.StringIO()
     block.write(struct.pack("<I", 0)) # Block len (4bytes)
     header_len = FIXED_HEADER_SIZE
 

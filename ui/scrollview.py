@@ -25,7 +25,8 @@
 from base.g import *
 from prnt import cups
 from base import device
-from ui_utils import load_pixmap
+from base.sixext import  to_unicode
+from .ui_utils import load_pixmap
 
 # Qt
 from qt import *
@@ -179,7 +180,7 @@ class ScrollView(QScrollView):
         if printer_name == self.cur_printer or printer_name is None:
             return
 
-        self.cur_printer = unicode(printer_name)
+        self.cur_printer = to_unicode(printer_name)
 
         if self.cur_device is not None and self.cur_device.supported:
             #self.isFax()
@@ -266,7 +267,7 @@ class ScrollView(QScrollView):
 
         layout.addWidget(textLabel2, 0, 0)
 
-        self.addWidget(widget, "g:"+unicode(group))
+        self.addWidget(widget, "g:"+to_unicode(group))
 
 
     def addActionButton(self, name, action_text, action_func, 

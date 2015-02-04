@@ -76,13 +76,13 @@ class NoDevicesForm_base(QDialog):
 
 
     def CUPSButton_clicked(self):
-        print "NoDevicesForm_base.CUPSButton_clicked(): Not implemented yet"
+        print("NoDevicesForm_base.CUPSButton_clicked(): Not implemented yet")
 
     def ExitButton_clicked(self):
-        print "NoDevicesForm_base.ExitButton_clicked(): Not implemented yet"
+        print("NoDevicesForm_base.ExitButton_clicked(): Not implemented yet")
 
     def setupPushButton_clicked(self):
-        print "NoDevicesForm_base.setupPushButton_clicked(): Not implemented yet"
+        print("NoDevicesForm_base.setupPushButton_clicked(): Not implemented yet")
 
     def __tr(self,s,c = None):
         return qApp.translate("NoDevicesForm_base",s,c)

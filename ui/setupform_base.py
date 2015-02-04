@@ -462,79 +462,79 @@ class SetupForm_base(QWizard):
 
 
     def connectionTypeButtonGroup_clicked(self,a0):
-        print "SetupForm_base.connectionTypeButtonGroup_clicked(int): Not implemented yet"
+        print("SetupForm_base.connectionTypeButtonGroup_clicked(int): Not implemented yet")
 
     def probedDevicesListView_currentChanged(self,a0):
-        print "SetupForm_base.probedDevicesListView_currentChanged(QListViewItem*): Not implemented yet"
+        print("SetupForm_base.probedDevicesListView_currentChanged(QListViewItem*): Not implemented yet")
 
     def printerNameLineEdit_textChanged(self,a0):
-        print "SetupForm_base.printerNameLineEdit_textChanged(const QString&): Not implemented yet"
+        print("SetupForm_base.printerNameLineEdit_textChanged(const QString&): Not implemented yet")
 
     def defaultPrinterNamePushButton_clicked(self):
-        print "SetupForm_base.defaultPrinterNamePushButton_clicked(): Not implemented yet"
+        print("SetupForm_base.defaultPrinterNamePushButton_clicked(): Not implemented yet")
 
     def ppdBrowsePushButton_clicked(self):
-        print "SetupForm_base.ppdBrowsePushButton_clicked(): Not implemented yet"
+        print("SetupForm_base.ppdBrowsePushButton_clicked(): Not implemented yet")
 
     def ppdFileLineEdit_textChanged(self,a0):
-        print "SetupForm_base.ppdFileLineEdit_textChanged(const QString&): Not implemented yet"
+        print("SetupForm_base.ppdFileLineEdit_textChanged(const QString&): Not implemented yet")
 
     def ppdListView_currentChanged(self,a0):
-        print "SetupForm_base.ppdListView_currentChanged(QListViewItem*): Not implemented yet"
+        print("SetupForm_base.ppdListView_currentChanged(QListViewItem*): Not implemented yet")
 
     def probeUpdatePushButton_clicked(self):
-        print "SetupForm_base.probeUpdatePushButton_clicked(): Not implemented yet"
+        print("SetupForm_base.probeUpdatePushButton_clicked(): Not implemented yet")
 
     def searchFiltersPushButton_clicked(self):
-        print "SetupForm_base.searchFiltersPushButton_clicked(): Not implemented yet"
+        print("SetupForm_base.searchFiltersPushButton_clicked(): Not implemented yet")
 
     def searchFiltersPushButton2_clicked(self):
-        print "SetupForm_base.searchFiltersPushButton2_clicked(): Not implemented yet"
+        print("SetupForm_base.searchFiltersPushButton2_clicked(): Not implemented yet")
 
     def manualFindPushButton_clicked(self):
-        print "SetupForm_base.manualFindPushButton_clicked(): Not implemented yet"
+        print("SetupForm_base.manualFindPushButton_clicked(): Not implemented yet")
 
     def printerLocationLineEdit_textChanged(self,a0):
-        print "SetupForm_base.printerLocationLineEdit_textChanged(const QString&): Not implemented yet"
+        print("SetupForm_base.printerLocationLineEdit_textChanged(const QString&): Not implemented yet")
 
     def printerDescriptionLineEdit_textChanged(self,a0):
-        print "SetupForm_base.printerDescriptionLineEdit_textChanged(const QString&): Not implemented yet"
+        print("SetupForm_base.printerDescriptionLineEdit_textChanged(const QString&): Not implemented yet")
 
     def faxNameLineEdit_textChanged(self,a0):
-        print "SetupForm_base.faxNameLineEdit_textChanged(const QString&): Not implemented yet"
+        print("SetupForm_base.faxNameLineEdit_textChanged(const QString&): Not implemented yet")
 
     def faxNumberLineEdit_textChanged(self,a0):
-        print "SetupForm_base.faxNumberLineEdit_textChanged(const QString&): Not implemented yet"
+        print("SetupForm_base.faxNumberLineEdit_textChanged(const QString&): Not implemented yet")
 
     def faxNameCoLineEdit_textChanged(self,a0):
-        print "SetupForm_base.faxNameCoLineEdit_textChanged(const QString&): Not implemented yet"
+        print("SetupForm_base.faxNameCoLineEdit_textChanged(const QString&): Not implemented yet")
 
     def printTestPageCheckBox_clicked(self):
-        print "SetupForm_base.printTestPageCheckBox_clicked(): Not implemented yet"
+        print("SetupForm_base.printTestPageCheckBox_clicked(): Not implemented yet")
 
     def faxCheckBox_clicked(self):
-        print "SetupForm_base.faxCheckBox_clicked(): Not implemented yet"
+        print("SetupForm_base.faxCheckBox_clicked(): Not implemented yet")
 
     def faxCheckBox_toggled(self,a0):
-        print "SetupForm_base.faxCheckBox_toggled(bool): Not implemented yet"
+        print("SetupForm_base.faxCheckBox_toggled(bool): Not implemented yet")
 
     def printTestPageCheckBox_toggled(self,a0):
-        print "SetupForm_base.printTestPageCheckBox_toggled(bool): Not implemented yet"
+        print("SetupForm_base.printTestPageCheckBox_toggled(bool): Not implemented yet")
 
     def defaultFaxNamePushButton_clicked(self):
-        print "SetupForm_base.defaultFaxNamePushButton_clicked(): Not implemented yet"
+        print("SetupForm_base.defaultFaxNamePushButton_clicked(): Not implemented yet")
 
     def otherPPDPushButton_clicked(self):
-        print "SetupForm_base.otherPPDPushButton_clicked(): Not implemented yet"
+        print("SetupForm_base.otherPPDPushButton_clicked(): Not implemented yet")
 
     def ppdDefaultsPushButton_clicked(self):
-        print "SetupForm_base.ppdDefaultsPushButton_clicked(): Not implemented yet"
+        print("SetupForm_base.ppdDefaultsPushButton_clicked(): Not implemented yet")
 
     def faxLocationLineEdit_textChanged(self,a0):
-        print "SetupForm_base.faxLocationLineEdit_textChanged(const QString&): Not implemented yet"
+        print("SetupForm_base.faxLocationLineEdit_textChanged(const QString&): Not implemented yet")
 
     def faxDescriptionLineEdit_textChanged(self,a0):
-        print "SetupForm_base.faxDescriptionLineEdit_textChanged(const QString&): Not implemented yet"
+        print("SetupForm_base.faxDescriptionLineEdit_textChanged(const QString&): Not implemented yet")
 
     def __tr(self,s,c = None):
         return qApp.translate("SetupForm_base",s,c)

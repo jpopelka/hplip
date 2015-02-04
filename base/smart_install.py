@@ -28,8 +28,8 @@ import re
 import os
 
 # Local
-from base.g import *
-from base import utils, tui
+from .g import *
+from . import utils, tui
 from base import password, validation
 from base.codes import *
 from base.strings import *
@@ -37,7 +37,6 @@ from base.strings import *
 
 ##### Global variables ###
 HPLIP_INFO_SITE ="http://hplip.sourceforge.net/hplip_web.conf"
-
 
 
 
@@ -138,7 +137,7 @@ def get_SmartInstall_tool_info():
         log.error("Internet connection not found.")
     else:
         sts, HPLIP_file = utils.download_from_network(HPLIP_INFO_SITE)
-        if sts is True:
+        if sts == 0:
             hplip_si_conf = ConfigBase(HPLIP_file)
             url = hplip_si_conf.get("SMART_INSTALL","reference","")
             if url:
@@ -159,12 +158,13 @@ def validate(mode, smart_install_run, smart_install_asc, req_checksum=''):
     if req_checksum and req_checksum != calc_checksum:
         return ERROR_FILE_CHECKSUM, queryString(ERROR_CHECKSUM_ERROR, 0, plugin_file)
 
-
-    #Validate Digital signatures
+    #Validate Digital Signature
     gpg_obj = validation.GPG_Verification()
     digsig_sts, error_str = gpg_obj.validate(smart_install_run, smart_install_asc)
 
     return digsig_sts, smart_install_run, smart_install_asc, error_str
+
+
 
 def download(mode, passwordObj):
     if not utils.check_network_connection():
@@ -173,7 +173,7 @@ def download(mode, passwordObj):
 
     else:
         sts, HPLIP_file = utils.download_from_network(HPLIP_INFO_SITE)
-        if sts is True:
+        if sts == 0:
             hplip_si_conf = ConfigBase(HPLIP_file)
             source = hplip_si_conf.get("SMART_INSTALL","url","")
             if not source:
@@ -181,12 +181,12 @@ def download(mode, passwordObj):
                 return ERROR_FAILED_TO_DOWNLOAD_FILE, "" , "", queryString(ERROR_FAILED_TO_DOWNLOAD_FILE, 0, HPLIP_INFO_SITE)
 
         sts, smart_install_run = utils.download_from_network(source)
-        if not sts:
+        if sts:
             log.error("Failed to download %s."%source)
             return ERROR_FAILED_TO_DOWNLOAD_FILE, "" , "", queryString(ERROR_FAILED_TO_DOWNLOAD_FILE, 0, source)
 
         sts, smart_install_asc = utils.download_from_network(source+'.asc')
-        if not sts:
+        if sts:
             log.error("Failed to download %s."%(source+'.asc'))
             return ERROR_FAILED_TO_DOWNLOAD_FILE, "" , "", queryString(ERROR_FAILED_TO_DOWNLOAD_FILE, 0, source + ".asc")
 
@@ -252,10 +252,13 @@ def disable(mode, ui_toolkit='qt4', dialog=None, app=None, passwordObj = None):
 
             else:
                 sts, smart_install_run, smart_install_asc, error_str = download(mode, passwordObj)
+
                 disable_si = False
                 return_val = sts
+
                 if sts == ERROR_SUCCESS:
                     disable_si = True
+
                 elif sts in (ERROR_UNABLE_TO_RECV_KEYS, ERROR_DIGITAL_SIGN_NOT_FOUND):
                     response, value = tui.enter_yes_no("Digital Sign verification failed, Do you want to continue?")
                     if not response or not value:

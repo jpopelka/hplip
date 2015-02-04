@@ -155,5 +155,5 @@ class Ui_MainWindow(object):
         self.RemoveFromGroupAction.setText(QtGui.QApplication.translate("MainWindow", "Leave Group", None, QtGui.QApplication.UnicodeUTF8))
         self.AddToGroupAction.setText(QtGui.QApplication.translate("MainWindow", "Join Group...", None, QtGui.QApplication.UnicodeUTF8))
 
-from fabgrouptable import FABGroupTable
-from fabnametable import FABNameTable
+from .fabgrouptable import FABGroupTable
+from .fabnametable import FABNameTable

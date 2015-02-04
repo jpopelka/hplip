@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
@@ -84,6 +85,9 @@ ERROR_INCORRECT_PASSWORD = 109
 ERROR_UNKNOWN_VALIDATION_ERROR = 110
 ERROR_NO_SI_DEVICE = 111
 ERROR_FAILED_TO_DISABLE_SI = 112
+
+
+
 # If you add new codes, also add the appropriate description
 # to g.py for exception description strings.
 # Thank you, The Management

@@ -21,6 +21,7 @@
 
 # Local
 from base.g import *
+from base.sixext import  to_unicode
 
 # Qt
 from PyQt4.QtCore import *
@@ -42,13 +43,13 @@ class FABGroupTable(QTableWidget):
     def dragMoveEvent(self, e):
         item = self.itemAt(e.pos())
         if item is not None:
-            group = unicode(item.text())
+            group = to_unicode(item.text())
             
-            if group  == u'All':
+            if group  == to_unicode('All'):
                 e.ignore()
                 return
 
-            names = unicode(e.mimeData().data(u'text/plain')).split(u'|')
+            names = to_unicode(e.mimeData().data(to_unicode('text/plain'))).split(to_unicode('|'))
             group_members = self.db.group_members(group)
             
             if not group_members:
@@ -57,19 +58,19 @@ class FABGroupTable(QTableWidget):
             
             for n in names:
                 if n not in group_members:
-                   e.accept()
-                   return
+                    e.accept()
+                    return
                 
         e.ignore()
         
         
     def dropMimeData(self, row, col, data, action):
-        items = unicode(data.data(u'text/plain')).split(u'|')
+        items = to_unicode(data.data(to_unicode('text/plain'))).split(to_unicode('|'))
         self.emit(SIGNAL("namesAddedToGroup"), row, items)
         return False
         
         
     def mimeTypes(self):
-        return QStringList([u'text/plain'])
+        return QStringList([to_unicode('text/plain')])
         
         

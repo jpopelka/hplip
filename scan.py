@@ -21,7 +21,7 @@
 # Contributors: Sarbeswar Meher
 #
 
-from __future__ import division
+
 
 __version__ = '2.2'
 __mod__ = 'hp-scan'
@@ -40,6 +40,7 @@ import operator
 
 # Local
 from base.g import *
+from base.sixext import PY3
 from base import tui, device, module, utils, os_utils
 from prnt import cups
 
@@ -171,7 +172,7 @@ try:
         ("", "Coordinates are relative to the upper left corner of the scan area.", "option", False),
         ("", "Units are specified by -t/--units (default is 'mm').", "option", False),
         ("Specify the scan area based on a paper size:", "--size=<paper size name>", "option", False),
-        ("", "where <paper size name> is one of: %s" % ', '.join(PAGE_SIZES.keys()), "option", False),
+        ("", "where <paper size name> is one of: %s" % ', '.join(list(PAGE_SIZES.keys())), "option", False),
         utils.USAGE_SPACE,
         ("[OPTIONS] ('file' dest)", "", "header", False),
         ("Filename for 'file' destination:", "-o<file> or -f<file> or --file=<file> or --output=<file>", "option", False),
@@ -221,9 +222,11 @@ try:
                          ])
 
 
-
     device_uri = mod.getDeviceUri(device_uri, printer_name,
         back_end_filter=['hpaio'], filter={'scan-type': (operator.gt, 0)})
+
+    if not device_uri:
+        sys.exit(1)
 
     for o, a in opts:
         if o in ('-x', '--compression'):
@@ -416,7 +419,7 @@ try:
                 tlx, tly = 0, 0
                 page_size = size
             else:
-                log.error("Invalid page size. Valid page sizes are: %s" % ', '.join(PAGE_SIZES.keys()))
+                log.error("Invalid page size. Valid page sizes are: %s" % ', '.join(list(PAGE_SIZES.keys())))
                 log.error("Using defaults.")
 
         elif o in ('-o', '--output', '-f', '--file'):
@@ -598,10 +601,9 @@ try:
 
 
     else: # INTERACTIVE_MODE
-        import Queue
+        from base.sixext.moves import queue
         from scan import sane
         import scanext
-        import cStringIO
 
         try:
             import subprocess
@@ -613,6 +615,8 @@ try:
             from PIL import Image
         except ImportError:
             log.error("%s requires the Python Imaging Library (PIL). Exiting." % __mod__)
+            if PY3:          # Workaround due to incomplete Python3 support in Linux distros.
+                log.notice(log.bold("Manually install the PIL package. More information is available at http://hplipopensource.com/node/369"))
             sys.exit(1)
 
         sane.init()
@@ -631,8 +635,8 @@ try:
 
         try:
             device = sane.openDevice(device_uri)
-        except scanext.error, e:
-            sane.reportError(e)
+        except scanext.error as e:
+            sane.reportError(e.args[0])
             sys.exit(1)
 
         try:
@@ -698,7 +702,7 @@ try:
             log.warn("Invalid resolution. Using closest valid resolution of %d dpi" % res)
             log.warn("Valid resolutions are %s dpi." % ', '.join([str(x) for x in valid_res]))
             res = valid_res[0]
-            min_dist = sys.maxint
+            min_dist = sys.maxsize
             for x in valid_res:
                   if abs(r-x) < min_dist:
                         min_dist = abs(r-x)
@@ -735,6 +739,8 @@ try:
                     contrast = int(valid_contrast[0])
                 elif contrast > int(valid_contrast[1]):
                     contrast = int(valid_contrast[1])
+
+
             device.setOption('contrast', contrast)
 
         if set_brightness:
@@ -807,8 +813,8 @@ try:
         if 'file' in dest:
             log.info("Output file: %s" % output)
 
-        update_queue = Queue.Queue()
-        event_queue = Queue.Queue()
+        update_queue = queue.Queue()
+        event_queue = queue.Queue()
 
         available_scan_mode = device.getOptionObj("mode").constraint
         available_scan_mode = [x.lower() for x in available_scan_mode]
@@ -883,8 +889,8 @@ try:
                         ok, expected_bytes, status = device.startScan("RGBA", update_queue, event_queue)
                         # Note: On some scanners (Marvell) expected_bytes will be < 0 (if lines == -1)
                         log.debug("expected_bytes = %d" % expected_bytes)
-                    except scanext.error, e:
-                        sane.reportError(e)
+                    except scanext.error as e:
+                        sane.reportError(e.args[0])
                         sys.exit(1)
                     except KeyboardInterrupt:
                         log.error("Aborted.")
@@ -907,7 +913,7 @@ try:
                             log.debug("Expecting to read %s from scanner." % utils.format_bytes(expected_bytes))
 
                     device.waitForScanActive()
-                    
+
                     pm = tui.ProgressMeter("Reading data:")
 
                     while device.isScanActive():
@@ -927,7 +933,7 @@ try:
                                     log.error("Error in reading data. Status=%d bytes_read=%d." % (status, bytes_read))
                                     sys.exit(1)
 
-                            except Queue.Empty:
+                            except queue.Empty:
                                 break
 
 
@@ -959,10 +965,10 @@ try:
                     log.info("Read %s from scanner." % utils.format_bytes(bytes_read))
 
                     buffer, format, format_name, pixels_per_line, \
-                        lines, depth, bytes_per_line, pad_bytes, total_read = device.getScan()
+                        lines, depth, bytes_per_line, pad_bytes, total_read, total_write = device.getScan()
 
-                    log.debug("PPL=%d lines=%d depth=%d BPL=%d pad=%d total=%d" %
-                        (pixels_per_line, lines, depth, bytes_per_line, pad_bytes, total_read))
+                    log.debug("PPL=%d lines=%d depth=%d BPL=%d pad=%d total_read=%d total_write=%d" %
+                        (pixels_per_line, lines, depth, bytes_per_line, pad_bytes, total_read, total_write))
 
                     #For Marvell devices, expected bytes is not same as total_read
                     if lines == -1 or total_read != expected_bytes:
@@ -1052,14 +1058,14 @@ try:
 
             try:
                 im.save(output)
-            except IOError, e:
+            except IOError as e:
                 log.error("Error saving file: %s (I/O)" % e)
                 try:
                     os.remove(output)
                 except OSError:
                     pass
                 sys.exit(1)
-            except ValueError, e:
+            except ValueError as e:
                 log.error("Error saving file: %s (PIL)" % e)
                 try:
                     os.remove(output)
@@ -1077,7 +1083,7 @@ try:
             output_fd, output = utils.make_temp_file(suffix='.png')
             try:
                 im.save(output)
-            except IOError, e:
+            except IOError as e:
                 log.error("Error saving temporary file: %s" % e)
 
                 try:
@@ -1125,8 +1131,8 @@ try:
                 if dest_printer is not None:
                    cmd = '%s -p %s %s &' % (hp_print, dest_printer, output)
                 elif dest_devUri is not None:
-		   tmp = dest_devUri.partition(":")[2]
-		   dest_devUri = "hp:" + tmp
+                   tmp = dest_devUri.partition(":")[2]
+                   dest_devUri = "hp:" + tmp
                    cmd = '%s -d %s %s &' % (hp_print, dest_devUri, output)
                 else:
                    cmd = '%s %s &' % (hp_print, output)
@@ -1187,7 +1193,7 @@ try:
                         std_out, std_err = sp.communicate(msg.as_string())
                         if std_err != '':
                             err = std_err
-                    except OSError, e:
+                    except OSError as e:
                         err = str(e)
                     cleanup_spinner()
 

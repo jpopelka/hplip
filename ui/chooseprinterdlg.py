@@ -21,6 +21,7 @@
 
 from base.g import *
 from base import device
+from base.sixext import  to_unicode
 import sys
 from qt import *
 
@@ -119,7 +120,7 @@ class ChoosePrinterDlg(QDialog):
     def DevicesButtonGroup_clicked(self,a0):
         for p in self.printer_index:
             pp = self.printer_index[p]
-            if unicode(self.radio_buttons[a0].text()).startswith(pp[0]):
+            if to_unicode(self.radio_buttons[a0].text()).startswith(pp[0]):
                 self.device_uri = pp[1]
                 self.printer_name = pp[0]
                 break

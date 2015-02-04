@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
@@ -44,6 +44,8 @@ except ImportError:
 from base.g import *
 from base import device, utils, tui, models, module, services, os_utils
 from prnt import cups
+from base.sixext.moves import input
+from base.sixext import to_unicode, from_unicode_to_str
 
 pm = None
 
@@ -282,8 +284,8 @@ if mode == GUI_MODE:
         try:
             from PyQt4.QtGui import QApplication, QMessageBox
             from ui4.setupdialog import SetupDialog
-        except ImportError:
-            log.error("Unable to load Qt4 support. Is it installed?")
+        except ImportError as e:
+            log.error("Unable to load Qt4 support. Is it installed? %s" % e)
             clean_exit(1)
 
         app = QApplication(sys.argv)
@@ -309,15 +311,15 @@ else: # INTERACTIVE_MODE
         #Removing Queue
         if remove:
             tui.header("REMOVING PRINT/FAX QUEUE")
-            remove_device = mod.getPrinterName(selected_device_name,None,['hp','hpfax'])
-            selected_device_name = remove_device[0]
-            log.info (log.bold("Removing '%s : %s' Queue"%(remove_device[0],remove_device[1])))
+            sts, printer_name, device_uri = mod.getPrinterName(selected_device_name,None,['hp','hpfax'])
+            selected_device_name = printer_name
+            log.info (log.bold("Removing '%s : %s' Queue"%(printer_name, device_uri)))
 
             status, status_str = cups.cups_operation(cups.delPrinter, INTERACTIVE_MODE, '', None, selected_device_name)
 
             if cups.IPP_OK == status:
                 log.info("Successfully deleted %s Print/Fax queue"%selected_device_name)
-                utils.sendEvent(EVENT_CUPS_QUEUES_REMOVED,remove_device[1], remove_device[0])
+                utils.sendEvent(EVENT_CUPS_QUEUES_REMOVED,device_uri, printer_name)
                 clean_exit(0)
             else:
                 log.error("Failed to delete %s Print/Fax queue. Error : %s"%(selected_device_name,status_str))
@@ -408,12 +410,12 @@ else: # INTERACTIVE_MODE
         default_model = utils.xstrip(model.replace('series', '').replace('Series', ''), '_')
 
         installed_print_devices = device.getSupportedCUPSDevices(['hp'])
-        for d in installed_print_devices.keys():
+        for d in list(installed_print_devices.keys()):
             for p in installed_print_devices[d]:
                 log.debug("found print queue '%s'" % p)
 
         installed_fax_devices = device.getSupportedCUPSDevices(['hpfax'])
-        for d in installed_fax_devices.keys():
+        for d in list(installed_fax_devices.keys()):
             for f in installed_fax_devices[d]:
                 log.debug("found fax queue '%s'" % f)
 
@@ -450,7 +452,7 @@ else: # INTERACTIVE_MODE
             if not auto:
                 if printer_name is None:
                     while True:
-                        printer_name = raw_input(log.bold("\nPlease enter a name for this print queue (m=use model name:'%s'*, q=quit) ?" % printer_default_model))
+                        printer_name = input(log.bold("\nPlease enter a name for this print queue (m=use model name:'%s'*, q=quit) ?" % printer_default_model))
 
                         if printer_name.lower().strip() == 'q':
                             log.info("OK, done.")
@@ -461,14 +463,14 @@ else: # INTERACTIVE_MODE
 
                         name_ok = True
 
-                        for d in installed_print_devices.keys():
+                        for d in list(installed_print_devices.keys()):
                             for p in installed_print_devices[d]:
                                 if printer_name == p:
                                     log.error("A print queue with that name already exists. Please enter a different name.")
                                     name_ok = False
                                     break
 
-                        for d in installed_fax_devices.keys():
+                        for d in list(installed_fax_devices.keys()):
                             for f in installed_fax_devices[d]:
                                 if printer_name == f:
                                     log.error("A fax queue with that name already exists. Please enter a different name.")
@@ -521,7 +523,7 @@ else: # INTERACTIVE_MODE
                     ok = False
 
                     while True:
-                        user_input = raw_input(log.bold("\nPlease enter the full filesystem path to the PPD file to use (q=quit) :"))
+                        user_input = input(log.bold("\nPlease enter the full filesystem path to the PPD file to use (q=quit) :"))
 
                         if user_input.lower().strip() == 'q':
                             log.info("OK, done.")
@@ -534,7 +536,7 @@ else: # INTERACTIVE_MODE
                             if file_path.endswith('.gz'):
                                 nickname = gzip.GzipFile(file_path, 'r').read(4096)
                             else:
-                                nickname = file(file_path, 'r').read(4096)
+                                nickname = open(file_path, 'r').read(4096)
 
                             try:
                                 desc = nickname_pat.search(nickname).group(1)
@@ -563,7 +565,7 @@ else: # INTERACTIVE_MODE
                 location, info = '', '%s Device (Automatically setup by HPLIP)'%(default_model.replace('_',' '))
             else:
                 while True:
-                    location = raw_input(log.bold("Enter a location description for this printer (q=quit) ?"))
+                    location = input(log.bold("Enter a location description for this printer (q=quit) ?"))
 
                     if location.strip().lower() == 'q':
                         log.info("OK, done.")
@@ -573,7 +575,7 @@ else: # INTERACTIVE_MODE
                     break
 
                 while True:
-                    info = raw_input(log.bold("Enter additonal information or notes for this printer (q=quit) ?"))
+                    info = input(log.bold("Enter additonal information or notes for this printer (q=quit) ?"))
 
                     if info.strip().lower() == 'q':
                         log.info("OK, done.")
@@ -595,9 +597,9 @@ else: # INTERACTIVE_MODE
 
             time.sleep(1)
             if not os.path.exists(print_ppd): # assume foomatic: or some such
-                add_prnt_args = (printer_name.encode('utf8'), print_uri, location, '', print_ppd, info)
+                add_prnt_args = (printer_name, print_uri, location, '', print_ppd, info)
             else:
-                add_prnt_args = (printer_name.encode('utf8'), print_uri, location, print_ppd, '', info)
+                add_prnt_args = (printer_name, print_uri, location, print_ppd, '', info)
 
             status, status_str = cups.cups_operation(cups.addPrinter, INTERACTIVE_MODE, '', None, *add_prnt_args)
 
@@ -670,7 +672,7 @@ else: # INTERACTIVE_MODE
             if not auto:
                 if fax_name is None:
                     while True:
-                        fax_name = raw_input(log.bold("\nPlease enter a name for this fax queue (m=use model name:'%s'*, q=quit) ?" % fax_default_model))
+                        fax_name = input(log.bold("\nPlease enter a name for this fax queue (m=use model name:'%s'*, q=quit) ?" % fax_default_model))
 
                         if fax_name.lower().strip() == 'q':
                             log.info("OK, done.")
@@ -681,14 +683,14 @@ else: # INTERACTIVE_MODE
 
                         name_ok = True
 
-                        for d in installed_print_devices.keys():
+                        for d in list(installed_print_devices.keys()):
                             for p in installed_print_devices[d]:
                                 if fax_name == p:
                                     log.error("A print queue with that name already exists. Please enter a different name.")
                                     name_ok = False
                                     break
 
-                        for d in installed_fax_devices.keys():
+                        for d in list(installed_fax_devices.keys()):
                             for f in installed_fax_devices[d]:
                                 if fax_name == f:
                                     log.error("A fax queue with that name already exists. Please enter a different name.")
@@ -717,7 +719,7 @@ else: # INTERACTIVE_MODE
                 location, info = '', '%s Fax Device (Automatically setup by HPLIP)'%(default_model.replace('_',' '))
             else:
                 while True:
-                    location = raw_input(log.bold("Enter a location description for this printer (q=quit) ?"))
+                    location = input(log.bold("Enter a location description for this printer (q=quit) ?"))
 
                     if location.strip().lower() == 'q':
                         log.info("OK, done.")
@@ -727,7 +729,7 @@ else: # INTERACTIVE_MODE
                     break
 
                 while True:
-                    info = raw_input(log.bold("Enter additonal information or notes for this printer (q=quit) ?"))
+                    info = input(log.bold("Enter additonal information or notes for this printer (q=quit) ?"))
 
                     if info.strip().lower() == 'q':
                         log.info("OK, done.")
@@ -745,10 +747,10 @@ else: # INTERACTIVE_MODE
 
             cups.setPasswordPrompt("You do not have permission to add a fax device.")
             if not os.path.exists(fax_ppd): # assume foomatic: or some such
-                status, status_str = cups.addPrinter(fax_name.encode('utf8'), fax_uri,
+                status, status_str = cups.addPrinter(fax_name, fax_uri,
                     location, '', fax_ppd, info)
             else:
-                status, status_str = cups.addPrinter(fax_name.encode('utf8'), fax_uri,
+                status, status_str = cups.addPrinter(fax_name, fax_uri,
                     location, fax_ppd, '', info)
 
             log.debug("addPrinter() returned (%d, %s)" % (status, status_str))
@@ -770,7 +772,7 @@ else: # INTERACTIVE_MODE
                 setup_fax = False
             else:
                 while True:
-                    user_input = raw_input(log.bold("\nWould you like to perform fax header setup (y=yes*, n=no, q=quit) ?")).strip().lower()
+                    user_input = input(log.bold("\nWould you like to perform fax header setup (y=yes*, n=no, q=quit) ?")).strip().lower()
 
                     if user_input == 'q':
                         log.info("OK, done.")
@@ -803,7 +805,7 @@ else: # INTERACTIVE_MODE
 
                             try:
                                 current_phone_num = str(d.getPhoneNum())
-                                current_station_name = d.getStationName()
+                                current_station_name = to_unicode(d.getStationName())
                             except Error:
                                 log.error("Could not communicate with device. Device may be busy. Please wait for retry...")
                                 time.sleep(5)
@@ -819,9 +821,9 @@ else: # INTERACTIVE_MODE
                         if ok:
                             while True:
                                 if current_phone_num:
-                                    phone_num = raw_input(log.bold("\nEnter the fax phone number for this device (c=use current:'%s'*, q=quit) ?" % current_phone_num))
+                                    phone_num = input(log.bold("\nEnter the fax phone number for this device (c=use current:'%s'*, q=quit) ?" % current_phone_num))
                                 else:
-                                    phone_num = raw_input(log.bold("\nEnter the fax phone number for this device (q=quit) ?"))
+                                    phone_num = input(log.bold("\nEnter the fax phone number for this device (q=quit) ?"))
                                 if phone_num.strip().lower() == 'q':
                                     log.info("OK, done.")
                                     clean_exit(0)
@@ -847,20 +849,22 @@ else: # INTERACTIVE_MODE
 
                             while True:
                                 if current_station_name:
-                                    station_name = raw_input(log.bold("\nEnter the name and/or company for this device (c=use current:'%s'*, q=quit) ?" % current_station_name.encode('utf-8')))
+                                    station_name = input(log.bold("\nEnter the name and/or company for this device (c=use current:'%s'*, q=quit) ?"%from_unicode_to_str(current_station_name)))
                                 else:
-                                    station_name = raw_input(log.bold("\nEnter the name and/or company for this device (q=quit) ?"))
-                                    
+                                    station_name = input(log.bold("\nEnter the name and/or company for this device (q=quit) ?"))
                                 if station_name.strip().lower() == 'q':
                                     log.info("OK, done.")
                                     clean_exit(0)
 
                                 if current_station_name and (not station_name or station_name.strip().lower() == 'c'):
                                     station_name = current_station_name
-                                    
-                                if isinstance(station_name, str):
-                                    station_name = station_name.decode('utf-8')
 
+                                ### Here station_name can be unicode or utf-8 sequence. 
+                                ### making sure to convert data to unicode for all the cases.
+                                try:
+                                    station_name.encode('utf-8')
+                                except (UnicodeEncodeError,UnicodeDecodeError):
+                                    station_name = station_name.decode('utf-8')
 
                                 if len(station_name) > 50:
                                     log.error("Name/company length is too long (>50 characters). Please enter a shorter name/company.")

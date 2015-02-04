@@ -9,6 +9,8 @@
 
 from PyQt4 import QtCore, QtGui
 
+
+
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
@@ -99,4 +101,4 @@ class Ui_Dialog(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QtGui.QApplication.translate("Dialog", "Coverpage", None, QtGui.QApplication.UnicodeUTF8))
         self.CancelButton.setText(QtGui.QApplication.translate("Dialog", "Close", None, QtGui.QApplication.UnicodeUTF8))
 
-from deviceuricombobox import DeviceUriComboBox
+from .deviceuricombobox import DeviceUriComboBox

@@ -82,4 +82,4 @@ class Ui_Dialog(object):
         self.TabWidget.setTabText(self.TabWidget.indexOf(self.PowerSettingsTab), QtGui.QApplication.translate("Dialog", "Power Settings", None, QtGui.QApplication.UnicodeUTF8))
         self.CancelButton.setText(QtGui.QApplication.translate("Dialog", "Close", None, QtGui.QApplication.UnicodeUTF8))
 
-from deviceuricombobox import DeviceUriComboBox
+from .deviceuricombobox import DeviceUriComboBox

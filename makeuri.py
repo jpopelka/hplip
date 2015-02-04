@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # (c) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
@@ -127,27 +127,27 @@ try:
         sys.exit(1)
 
     if cups_quiet_mode:
-        print cups_uri
+        print(cups_uri)
 
     elif not quiet_mode:    
-        print "CUPS URI: %s" % cups_uri
+        print("CUPS URI: %s" % cups_uri)
 
     if sane_uri:
         if sane_quiet_mode:
-            print sane_uri
+            print(sane_uri)
         
         elif not quiet_mode:
-            print "SANE URI: %s" % sane_uri
+            print("SANE URI: %s" % sane_uri)
     
     elif not sane_uri and sane_quiet_mode:
         log.error("Device does not support scan.")
 
     if fax_uri:
         if fax_quiet_mode:
-            print fax_uri
+            print(fax_uri)
         
         elif not quiet_mode:
-            print "HP Fax URI: %s" % fax_uri
+            print("HP Fax URI: %s" % fax_uri)
             
     elif not fax_uri and fax_quiet_mode:
         log.error("Device does not support fax.")

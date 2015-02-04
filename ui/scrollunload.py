@@ -22,13 +22,14 @@
 # Local
 from base.g import *
 from base import utils, magic
+from base.sixext import  to_unicode
 from pcard import photocard
-from ui_utils import load_pixmap
+from .ui_utils import load_pixmap
 
 # Qt
 from qt import *
-from scrollview import ScrollView, PixmapLabelButton
-from imagepropertiesdlg import ImagePropertiesDlg
+from .scrollview import ScrollView, PixmapLabelButton
+from .imagepropertiesdlg import ImagePropertiesDlg
 #from waitform import WaitForm
 
 # Std Lib
@@ -117,7 +118,7 @@ class ScrollUnloadView(ScrollView):
 
             try:
                 self.pc = photocard.PhotoCard(None, self.cur_device.device_uri, self.cur_printer)
-            except Error, e:
+            except Error as e:
                 QApplication.restoreOverrideCursor()
                 self.form.FailureUI(self.__tr("An error occured: %s" % e[0]))
                 self.cleanup(EVENT_PCARD_UNABLE_TO_MOUNT)
@@ -486,7 +487,7 @@ class ScrollUnloadView(ScrollView):
         self.addWidget(widget, "folder")
 
     def UnloadDirectoryEdit_textChanged(self, dir):
-        self.unload_dir = unicode(dir)
+        self.unload_dir = to_unicode(dir)
 
         if not os.path.exists(self.unload_dir):
             self.UnloadDirectoryEdit.setPaletteBackgroundColor(QColor(0xff, 0x99, 0x99))
@@ -495,7 +496,7 @@ class ScrollUnloadView(ScrollView):
 
     def UnloadDirectoryBrowseButton_clicked(self):
         old_dir = self.unload_dir
-        self.unload_dir = unicode(QFileDialog.getExistingDirectory(self.unload_dir, self))
+        self.unload_dir = to_unicode(QFileDialog.getExistingDirectory(self.unload_dir, self))
 
         if not len(self.unload_dir):
             return
@@ -540,7 +541,7 @@ class ScrollUnloadView(ScrollView):
         was_cancelled = False
         self.busy = True
         self.unloadButton.setEnabled(False)
-        self.unload_dir = unicode(self.UnloadDirectoryEdit.text())
+        self.unload_dir = to_unicode(self.UnloadDirectoryEdit.text())
         dir_error = False
 
         try:

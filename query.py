@@ -19,7 +19,7 @@
 #
 # Author: Don Welch
 #
-
+from __future__ import print_function
 __version__ = '0.2'
 __title__ = 'Model Query Utility'
 __mod__ = 'hp-query'
@@ -131,7 +131,7 @@ try:
 
     output = ''
     if all_keys:
-        kk = data.keys()
+        kk = list(data.keys())
         kk.sort()
         for k in kk:
             if not output:
@@ -153,9 +153,9 @@ try:
         sys.exit(1)
 
     if suppress_trailing_linefeed:
-        print output,
+        print(output, end=' ')
     else:
-        print output
+        print(output)
 
 
 except KeyboardInterrupt:

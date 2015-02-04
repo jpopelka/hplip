@@ -26,11 +26,11 @@ from base.g import *
 from prnt import cups
 from base import device, utils, pml
 from copier import copier
-from ui_utils import load_pixmap
+from .ui_utils import load_pixmap
 
 # Qt
 from qt import *
-from scrollcopy import ScrollCopyView
+from .scrollcopy import ScrollCopyView
 
 class MakeCopiesForm(QMainWindow):
     def __init__(self, bus='cups', device_uri=None, printer_name=None,
@@ -88,7 +88,7 @@ class MakeCopiesForm(QMainWindow):
                 max_deviceid_size = max(len(d), max_deviceid_size)
 
             if x == 0:
-                from nodevicesform import NoDevicesForm
+                from .nodevicesform import NoDevicesForm
                 self.FailureUI(self.__tr("<p><b>No devices found.</b><p>Please make sure your device is properly installed and try again."))
                 self.init_failed = True
 
@@ -98,7 +98,7 @@ class MakeCopiesForm(QMainWindow):
 
 
             else:
-                from choosedevicedlg import ChooseDeviceDlg
+                from .choosedevicedlg import ChooseDeviceDlg
                 dlg = ChooseDeviceDlg(devices) #, ['hp'])
 
                 if dlg.exec_loop() == QDialog.Accepted:

@@ -21,11 +21,12 @@
 
 from base.g import *
 from base import device, utils
+from base.sixext import  to_unicode
 from installer import pluginhandler
 
 
 from qt import *
-from pluginform2_base import PluginForm2_base
+from .pluginform2_base import PluginForm2_base
 import signal
 
 class PluginForm2(PluginForm2_base):
@@ -51,10 +52,10 @@ class PluginForm2(PluginForm2_base):
             self.actionPushButton.setEnabled(True)
             self.path = None
         else: # path
-            self.path = unicode(self.pathLineEdit.text())
+            self.path = to_unicode(self.pathLineEdit.text())
             self.pathLineEdit.emit(SIGNAL("textChanged(const QString&)"), (self.path,))
 
-            if self.path.startswith(u"http://"):
+            if self.path.startswith("http://"):
                 self.actionPushButton.setText(self.__tr("Download and Install"))
             else:
                 self.actionPushButton.setText(self.__tr("Copy and Install"))
@@ -70,19 +71,19 @@ class PluginForm2(PluginForm2_base):
 
         if dlg.exec_loop() == QDialog.Accepted:
             results = dlg.selectedFile()
-            working_directory = unicode(dlg.dir().absPath())
+            working_directory = to_unicode(dlg.dir().absPath())
             log.debug("results: %s" % results)
             user_conf.setWorkingDirectory(working_directory)
 
             if results:
-                self.path = unicode(results)
+                self.path = to_unicode(results)
                 self.pathLineEdit.setText(self.path)
 
 
     def pathLineEdit_textChanged(self, path):
-        path, ok = unicode(path), True
+        path, ok = to_unicode(path), True
 
-        if not path.startswith(u'http://'):
+        if not path.startswith('http://'):
             self.actionPushButton.setText(self.__tr("Copy and Install"))
 
             if not path or not os.path.exists(path):
@@ -191,7 +192,7 @@ class PluginForm2(PluginForm2_base):
 
 
     def plugin_install_callback(self, s):
-        print s
+        print(s)
 
 
     def cancelPushButton_clicked(self):

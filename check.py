@@ -19,18 +19,20 @@
 #
 # Author: Don Welch, Amarnath Chitumalla
 #
-
+from __future__ import print_function
 __version__ = '15.1'
 __title__ = 'Dependency/Version Check Utility'
 __mod__ = 'hp-check'
 __doc__ = """Checks dependency versions,permissions of HPLIP. (Run as 'python ./check.py' from the HPLIP tarball before installation.)"""
+
 
 # Std Lib
 import sys
 import os
 import getopt
 import re
-import StringIO
+from base.sixext import PY3, to_string_utf8
+from base.sixext import to_string_utf8
 
 # Local
 from base.g import *
@@ -166,12 +168,6 @@ def get_comment(package, Inst_status, installed_ver):
             comment = "'%s needs to be installed'"%package
     return comment
 
-def get_libusb_version():
-    if IS_LIBUSB01_ENABLED == "yes":
-        return get_version('libusb-config --version')
-    else:
-        return '1.0'
-
 
 
 ########## Classes ###########
@@ -183,6 +179,7 @@ class DependenciesCheck(CoreInstall):
         self.num_warns = 0
         
 #        self.missing_user_grps = ''
+        self.ui_toolkit = ui_toolkit
         self.disable_selinux = False
         self.req_deps_to_be_installed = []
         self.opt_deps_to_be_installed =[]
@@ -193,67 +190,71 @@ class DependenciesCheck(CoreInstall):
         
         self.user_grps_cmd = ''
 
-        self.hplip_dependencies ={ EXTERNALDEP:
-             {
-#            <packageName>: (<Is Req/Opt Pack>, <Module>, <Package description>, <Installed check>, <min vrsion>, <cmd for installed version>),
-            'dbus':             (True,  ['fax'], "DBus", self.check_dbus,'-','dbus-daemon --version'),
-            'cups' :            (True,  ['base'], 'CUPS', self.check_cups,'1.1','cups-config --version'),
-            'gs':               (True,  ['base'], "Ghostscript", self.check_gs,'7.05','gs --version'),
-            'policykit':        (False, ['gui_qt4'], "Admin-Policy-framework", self.check_policykit,'-','pkexec --version'), # optional for non-sudo behavior of plugins (only optional for Qt4 option)
-            'xsane':            (False, ['scan'], "SANE-GUI", self.check_xsane,'0.9','FUNC#get_xsane_version'),
-            'scanimage':        (False, ['scan'], "Shell-Scanning", self.check_scanimage,'1.0','scanimage --version'),
-            'network':        (False, ['network'], "Network-wget", self.check_wget,'-','wget --version'),
-            'avahi-utils':        (False, ['network'], "avahi-utils", self.check_avahi_utils, '-','avahi-browse --version'),
-            },
-            GENERALDEP:
-            {'libpthread':       (True,  ['base'], "POSIX-Threads-Lib", self.check_libpthread,'-','FUNC#get_libpthread_version'),
-            'libusb':           (True,  ['base'], "USB-Lib", self.check_libusb,'-','FUNC#get_libusb_version'),
-            'libcrypto':        (True,  ['network'], "OpenSSL-Crypto-Lib", self.check_libcrypto,'-','openssl version'),
-            'libjpeg':          (True,  ['base'], "JPEG-Lib", self.check_libjpeg,'-',None),
-            'libnetsnmp-devel': (True,  ['network'], "SNMP-Networking-SDK", self.check_libnetsnmp,'5.0.9','net-snmp-config --version'),
-            'cups-image':       (True,  ['base'], "CUPS-Image-Lib", self.check_cups_image,'-','cups-config --version'),
-            'cups-devel':       (True,  ['base'], 'CUPS-SDK', self.check_cups_devel,'-','cups-config --version'),
-            'cups-ddk':          (False, ['base'], "CUPS-DDK", self.check_cupsddk,'-',None), # req. for .drv PPD installs
-            'python-dbus':      (True,  ['fax'], "Python-DBUS", self.check_python_dbus,'0.80.0','FUNC#get_python_dbus_ver'),
-            'pyqt4':            (True,  ['gui_qt4'], "Python-Qt4", self.check_pyqt4,'4.0','FUNC#get_pyQt4_version'), # PyQt 4.x )
-            'pyqt4-dbus' :      (True,  ['gui_qt4'], "PyQt4-DBUS", self.check_pyqt4_dbus,'4.0','FUNC#get_pyQt4_version'), 
-            'pyqt':            (True,  ['gui_qt'], "Python-Qt", self.check_pyqt,'2.3','FUNC#get_pyQt_version'), 
-            'python-devel' :    (True,  ['base'], "Python-SDK", self.check_python_devel,'2.2','python --version'),
-            'python-notify' :   (False, ['gui_qt4'], "Desktop-notifications", self.check_pynotify,'-','python-notify --version'), # Optional for libnotify style popups from hp-systray
-            'python-xml'  :     (True,  ['base'], "Python-XML-Lib", self.check_python_xml,'-','FUNC#get_python_xml_version'),
-            'pil':              (False, ['scan'], "Python-Image-Lib", self.check_pil,'-','FUNC#get_pil_version'), #required for commandline scanning with hp-scan
-            'sane':             (True,  ['scan'], "Scan-Lib", self.check_sane,'-','sane-config --version'),
-            'sane-devel' :      (True,  ['scan'], "SANE-SDK", self.check_sane_devel,'-','sane-config --version'),
-            'reportlab':        (False, ['fax'], "Python-PDF-Lib", self.check_reportlab,'2.0','FUNC#get_reportlab_version'),
-            },
-            COMPILEDEP:
-            { 'gcc' :             (True,  ['base'], 'gcc-Compiler', self.check_gcc, '-','gcc --version'),
-            'libtool':          (True,  ['base'], "Build-tools", self.check_libtool,'-','libtool --version'),
-            'make' :            (True,  ['base'], "GNU-Build-tools", self.check_make,'3.0','make --version'),
-            },
-            PYEXT: 
-             { 'cupsext' :         (True,  ['base'], 'CUPS-Extension', self.check_cupsext,'-','FUNC#get_HPLIP_version'),
-            'hpmudext' :        (True,  ['base'], 'IO-Extension', self.check_hpmudext,'-','FUNC#get_HPLIP_version'),
-            'pcardext' :        (True,  ['base'], 'PhotoCard-Extension', self.check_pcardext,'-','FUNC#get_HPLIP_version'),
-            },
-            SCANCONF:
-            { 'hpaio' :           (True,  ['scan'], 'HPLIP-SANE-Backend', self.check_hpaio,'-','FUNC#get_HPLIP_version'), 
-            'scanext' :           (True,  ['scan'], 'Scan-SANE-Extension', self.check_scanext,'-','FUNC#get_HPLIP_version'), 
-            }
-        }
 
-        self.version_func={
-            'FUNC#get_python_dbus_ver':get_python_dbus_ver,
-            'FUNC#get_pyQt4_version':get_pyQt4_version,
-            'FUNC#get_pyQt_version':get_pyQt_version,
-            'FUNC#get_reportlab_version':get_reportlab_version,
-            'FUNC#get_xsane_version':get_xsane_version,
-            'FUNC#get_pil_version':get_pil_version,
-            'FUNC#get_libpthread_version':get_libpthread_version,
-            'FUNC#get_python_xml_version':get_python_xml_version,
-            'FUNC#get_HPLIP_version':get_HPLIP_version,
-            'FUNC#get_libusb_version':get_libusb_version,
-            }
+    def __update_deps_info(self, sup_dist_vers, d, deps_info):
+        if d == 'cups-ddk' and self.cups_ddk_not_req == True:
+            return
+        elif self.ui_toolkit != 'qt4' and self.ui_toolkit != 'qt3' and d == 'pyqt':
+            return
+        elif d == 'pyqt' and self.ui_toolkit == 'qt4':
+            return
+        elif d == 'pyqt4' and self.ui_toolkit == 'qt3':
+            return
+        elif d == 'hpaio' and not self.scanning_enabled:
+            return
+        elif self.distro_name =="rhel" and "5." in self.distro_version:
+            if d in ['dbus','python-devel','python-dbus','pyqt4-dbus','libnetsnmp-devel','gcc','make','reportlab','policykit','sane-devel','cups-ddk']:
+                return
+
+        if deps_info[6] is None:
+            installed_ver = '-'
+        elif Ver_Func_Pat.search(deps_info[6]):
+            if deps_info[6] in self.version_func:
+                installed_ver = self.version_func[deps_info[6]]()
+            else:
+                installed_ver = '-'
+        else:
+            installed_ver = get_version(deps_info[6])
+        Status = Status_Type(deps_info[3](),deps_info[5],installed_ver) 
+        comment = get_comment(d, Status, installed_ver)
+        packages_to_install, commands=[],[]
+        if self.is_auto_installer_support():
+            packages_to_install, commands = self.get_dependency_data(d)
+            if not packages_to_install and d == 'hpaio':
+                packages_to_install.append(d)
+        else:
+            packages_to_install, commands = self.get_dependency_data(d,sup_dist_vers)
+            if not packages_to_install and d == 'hpaio':
+                packages_to_install.append(d)
+                
+        if deps_info[0]:
+            package_type = "REQUIRED"
+        else:
+            package_type = "OPTIONAL"
+            
+        if d == 'cups' and ((installed_ver == '-') or check_version(installed_ver,'1.4')):
+            self.cups_ddk_not_req = True
+            log.debug("cups -ddk not required as cups version [%s] is => 1.4 "%installed_ver)
+        if d == 'hpmudext' and Status == 'OK':
+            self.hpmudext_avail = True
+            
+        if Status == 'OK':
+            log.info(" %-20s %-60s %-15s %-15s %-15s %-10s %s" %(d,deps_info[2], package_type,deps_info[5],installed_ver,Status,comment))
+        else:
+            log.info(log.red(" error: %-13s %-60s %-15s %-15s %-15s %-10s %s" %(d,deps_info[2], package_type,deps_info[5],installed_ver,Status,comment)))
+            self.num_errors += 1
+            for cmd in commands:
+                if cmd:
+                    self.cmds_to_be_run.append(cmd)
+            if package_type == "OPTIONAL":
+                for pkg in packages_to_install:
+                    if pkg:
+                        self.opt_deps_to_be_installed.append(pkg)
+            else:
+                for pkg in packages_to_install:
+                    if pkg:
+                        self.req_deps_to_be_installed.append(pkg)
+
 
     def get_required_deps(self):
         return self.req_deps_to_be_installed
@@ -293,9 +294,9 @@ class DependenciesCheck(CoreInstall):
 
     def validate(self,time_flag=DEPENDENCY_RUN_AND_COMPILE_TIME, is_quiet_mode= False):
         ############ Variables #######################
-        cups_ddk_not_req = False
-        hpmudext_avail = False
-        ui_toolkit = sys_conf.get('configure','ui-toolkit')
+        self.cups_ddk_not_req = False
+        self.hpmudext_avail = False
+        self.ui_toolkit = sys_conf.get('configure','ui-toolkit')
         org_log_location = log.get_where()
 
         if is_quiet_mode:
@@ -330,8 +331,8 @@ class DependenciesCheck(CoreInstall):
             log.info()
             log.info(log.bold("Current contents of '/etc/hp/hplip.conf' file:"))
             try:
-                output = file('/etc/hp/hplip.conf', 'r').read()
-            except (IOError, OSError), e:
+                output = open('/etc/hp/hplip.conf', 'r').read()
+            except (IOError, OSError) as e:
                 log.error("Could not access file: %s. Check HPLIP installation." % e.strerror)
                 self.num_errors += 1
             else:
@@ -340,8 +341,8 @@ class DependenciesCheck(CoreInstall):
             log.info()
             log.info(log.bold("Current contents of '/var/lib/hp/hplip.state' file:"))
             try:
-                output = file(os.path.expanduser('/var/lib/hp/hplip.state'), 'r').read()
-            except (IOError, OSError), e:
+                output = open(os.path.expanduser('/var/lib/hp/hplip.state'), 'r').read()
+            except (IOError, OSError) as e:
                 log.info("Plugins are not installed. Could not access file: %s" % e.strerror)
             else:
                 log.info(output)
@@ -349,96 +350,53 @@ class DependenciesCheck(CoreInstall):
             log.info()
             log.info(log.bold("Current contents of '~/.hplip/hplip.conf' file:"))
             try:
-                output = file(os.path.expanduser('~/.hplip/hplip.conf'), 'r').read()
-            except (IOError, OSError), e:
+                output = open(os.path.expanduser('~/.hplip/hplip.conf'), 'r').read()
+            except (IOError, OSError) as e:
                 log.warn("Could not access file: %s" % e.strerror)
                 self.num_warns += 1
             else:
                 log.info(output)
 
-            scanning_enabled = utils.to_bool(sys_conf.get('configure', 'scanner-build', '0'))
+            self.scanning_enabled = utils.to_bool(sys_conf.get('configure', 'scanner-build', '0'))
             log.info(" %-20s %-20s %-10s %-10s %-10s %-10s %s"%( "<Package-name>", " <Package-Desc>", "<Required/Optional>", "<Min-Version>","<Installed-Version>", "<Status>", "<Comment>"))
-            for s in self.hplip_dependencies:
-                if s == EXTERNALDEP: 
-                    if time_flag == DEPENDENCY_RUN_AND_COMPILE_TIME or time_flag == DEPENDENCY_RUN_TIME:
-                        tui.header(" External Dependencies")
-                    else: continue
-                elif s == GENERALDEP: 
-                    if time_flag == DEPENDENCY_RUN_AND_COMPILE_TIME or time_flag == DEPENDENCY_RUN_TIME:
-                        tui.header(" General Dependencies")
-                    else: continue
-                elif s == COMPILEDEP: 
-                    if time_flag == DEPENDENCY_RUN_AND_COMPILE_TIME or time_flag == DEPENDENCY_COMPILE_TIME:
-                        tui.header(" Compile Time Dependencies")
-                    else: continue
-                elif s == PYEXT: tui.header(" Python Extentions")
-                elif s == SCANCONF: tui.header(" Scan Configuration")
-                else: tui.header(" Other Dependencies")
-                for d in self.hplip_dependencies[s]:
-                    if d == 'cups-ddk' and cups_ddk_not_req == True:
-                        continue
-                    elif ui_toolkit != 'qt4' and ui_toolkit != 'qt3' and d == 'pyqt':
-                        continue
-                    elif d == 'pyqt' and ui_toolkit == 'qt4':
-                        continue
-                    elif d == 'pyqt4' and ui_toolkit == 'qt3':
-                        continue
-                    elif d == 'hpaio' and not scanning_enabled:
-                        continue
-                    elif self.distro_name =="rhel" and "5." in self.distro_version:
-                        if d in ['dbus','python-devel','python-dbus','pyqt4-dbus','libnetsnmp-devel','gcc','make','reportlab','policykit','sane-devel','cups-ddk']:
-                            continue
 
-                    if self.hplip_dependencies[s][d][5] is None:
-                        installed_ver = '-'
-                    elif Ver_Func_Pat.search(self.hplip_dependencies[s][d][5]):
-                        if self.hplip_dependencies[s][d][5] in self.version_func:
-                            installed_ver = self.version_func[self.hplip_dependencies[s][d][5]]()
-                        else:
-                            installed_ver = '-'
-                    else:
-                        installed_ver = get_version(self.hplip_dependencies[s][d][5])
-                    Status = Status_Type(self.hplip_dependencies[s][d][3](),self.hplip_dependencies[s][d][4],installed_ver) 
-                    comment = get_comment(d, Status, installed_ver)
-                    packages_to_install, commands=[],[]
-                    if self.is_auto_installer_support():
-                        packages_to_install, commands = self.get_dependency_data(d)
-                        if not packages_to_install and d == 'hpaio':
-                            packages_to_install.append(d)
-                    else:
-                        packages_to_install, commands = self.get_dependency_data(d,supported_distro_vrs)
-                        if not packages_to_install and d == 'hpaio':
-                            packages_to_install.append(d)
-                            
-                    if self.hplip_dependencies[s][d][0]:
-                        package_type = "REQUIRED"
-                    else:
-                        package_type = "OPTIONAL"
-                        
-                    if d == 'cups' and ((installed_ver == '-') or check_version(installed_ver,'1.4')):
-                        cups_ddk_not_req = True
-                        log.debug("cups -ddk not required as cups version [%s] is => 1.4 "%installed_ver)
-                    if d == 'hpmudext' and Status == 'OK':
-                        hpmudext_avail = True
-                        
-                    if Status == 'OK':
-                        log.info(" %-20s %-25s %-15s %-15s %-15s %-10s %s" %(d,self.hplip_dependencies[s][d][2], package_type,self.hplip_dependencies[s][d][4],installed_ver,Status,comment))
-                    else:
-                        log.info(log.red(" error: %-13s %-25s %-15s %-15s %-15s %-10s %s" %(d,self.hplip_dependencies[s][d][2], package_type,self.hplip_dependencies[s][d][4],installed_ver,Status,comment)))
-                        self.num_errors += 1
-                        for cmd in commands:
-                            if cmd:
-                                self.cmds_to_be_run.append(cmd)
-                        if package_type == "OPTIONAL":
-                            for pkg in packages_to_install:
-                                if pkg:
-                                    self.opt_deps_to_be_installed.append(pkg)
-                        else:
-                            for pkg in packages_to_install:
-                                if pkg:
-                                    self.req_deps_to_be_installed.append(pkg)
+            self.dependencies.update(self.hplip_dependencies)
+            if time_flag == DEPENDENCY_RUN_AND_COMPILE_TIME or time_flag == DEPENDENCY_RUN_TIME:
+                tui.header(" External Dependencies")
+                for dep in self.dependencies:
+                    if self.dependencies[dep][7] == EXTERNALDEP:
+                        self.__update_deps_info(supported_distro_vrs, dep, self.dependencies[dep])
 
-            if scanning_enabled:
+                tui.header(" General Dependencies")
+                for dep in self.dependencies:
+                    if self.dependencies[dep][7] == GENERALDEP:
+                        self.__update_deps_info(supported_distro_vrs, dep, self.dependencies[dep])
+
+                tui.header(" COMPILEDEP")
+                for dep in self.dependencies:
+                    if self.dependencies[dep][7] == COMPILEDEP:
+                        self.__update_deps_info(supported_distro_vrs, dep, self.dependencies[dep])
+
+                tui.header(" Python Extentions")
+                for dep in self.dependencies:
+                    if self.dependencies[dep][7] == PYEXT:
+                        self.__update_deps_info(supported_distro_vrs, dep, self.dependencies[dep])
+
+                tui.header(" Scan Configuration")
+                for dep in self.dependencies:
+                    if self.dependencies[dep][7] == SCANCONF:
+                        self.__update_deps_info(supported_distro_vrs, dep, self.dependencies[dep])
+
+                tui.header(" Other Dependencies")
+                for dep in self.dependencies:
+                    if self.dependencies[dep][7] != SCANCONF and    \
+                        self.dependencies[dep][7] != PYEXT and  \
+                        self.dependencies[dep][7] != COMPILEDEP and     \
+                        self.dependencies[dep][7] != GENERALDEP and     \
+                        self.dependencies[dep][7] != EXTERNALDEP:
+                        self.__update_deps_info(supported_distro_vrs, dep, self.dependencies[dep])
+
+            if self.scanning_enabled:
                 tui.header("DISCOVERED SCANNER DEVICES")
                 if utils.which('scanimage'):
                     status, output = utils.run("scanimage -L")
@@ -473,7 +431,7 @@ class DependenciesCheck(CoreInstall):
                         f = tui.Formatter()
                         f.header = ("Device URI", "Model")
 
-                        for d, dd in devices.items():
+                        for d, dd in list(devices.items()):
                             f.add((d, dd[0]))
 
                         f.output()
@@ -544,7 +502,7 @@ class DependenciesCheck(CoreInstall):
                             log.info("PPD: %s" % ppd)
                             nickname_pat = re.compile(r'''\*NickName:\s*\"(.*)"''', re.MULTILINE)
                             try:
-                                f = file(ppd, 'r').read(4096)
+                                f = to_string_utf8(open(ppd, 'rb').read())
                             except IOError:
                                 log.warn("Failed to read %s ppd file"%ppd)
                                 desc = ''
@@ -610,7 +568,7 @@ class DependenciesCheck(CoreInstall):
                                 if bus in ('par', 'usb'):
                                     try:
                                         d.open()
-                                    except Error, e:
+                                    except Error as e:
                                         log.error(e.msg)
                                         deviceid = ''
                                     else:
@@ -656,7 +614,7 @@ class DependenciesCheck(CoreInstall):
 #                self.num_errors += 1
 #                self.missing_user_grps = out
 
-            if hpmudext_avail:
+            if self.hpmudext_avail:
                 lsusb = utils.which('lsusb')
                 if lsusb:
                     lsusb = os.path.join(lsusb, 'lsusb')
@@ -681,6 +639,7 @@ class DependenciesCheck(CoreInstall):
                                 result_code, deviceuri = hpmudext.make_usb_uri(bus, dev)
 
                                 if result_code == hpmudext.HPMUD_R_OK:
+                                    deviceuri = to_string_utf8(deviceuri)
                                 #    log.info("    Device URI: %s" %  deviceuri)
                                     d = None
                                     try:
@@ -723,13 +682,13 @@ class DependenciesCheck(CoreInstall):
                                                     out = out +' '+ pat.search(g).group(1)
                                         log.info("%-15s %-30s %-15s %-8s %-8s %-8s %s"%("USB", printer_name, "Required", "-", "-", "OK", "Node:'%s' Perm:'%s'"%(devnode,out)))
                                     else:
-                                        log.info("%-15s %-30s %-15s %-8s %-8s %-8s %s"%("USB", printer_name, "Required","-","-","OK", "Node:'%s' Mode:'%s'"%(devnode,st_mode&0777)))
+                                        log.info("%-15s %-30s %-15s %-8s %-8s %-8s %s"%("USB", printer_name, "Required","-","-","OK", "Node:'%s' Mode:'%s'"%(devnode,st_mode&0o777)))
 
             selinux_file = '/etc/selinux/config'
             if os.path.exists(selinux_file):
                 tui.header("SELINUX")
                 try:
-                    selinux_fp = file(selinux_file, 'r')
+                    selinux_fp = open(selinux_file, 'r')
                 except IOError:
                     log.error("Failed to open %s file."%selinux_file)
                 else:
@@ -828,7 +787,7 @@ if __name__ == "__main__":
 
         try:
             opts, args = getopt.getopt(sys.argv[1:], 'hl:gtcrbsi', ['help', 'help-rest', 'help-man', 'help-desc', 'logging=', 'run', 'runtime', 'compile', 'both','fix'])
-        except getopt.GetoptError, e:
+        except getopt.GetoptError as e:
             log.error(e.msg)
             usage()
             sys.exit(1)
@@ -848,7 +807,7 @@ if __name__ == "__main__":
             elif o == '--help-man':
                 usage('man')
             elif o == '--help-desc':
-                print __doc__,
+                print(__doc__, end=' ')
                 sys.exit(0)
             elif o in ('-l', '--logging'):
                 log_level = a.lower().strip()

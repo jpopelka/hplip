@@ -33,14 +33,13 @@ import sys
 import getopt
 import re
 from xml.dom.minidom import Document, parse, parseString
-from types import StringType, UnicodeType
 import string
 
 # Local
 from base.g import *
 from base import utils, tui, models
 #from prnt import printable_areas
-
+from base.sixext import text_type
 # Globals
 errors = 0
 count = 0
@@ -93,7 +92,7 @@ def usage(typ='text'):
 
 
 def _encode(v):
-    if isinstance(v, UnicodeType):
+    if isinstance(v, text_type):
         v = v.encode(enc)
     return v
 
@@ -133,7 +132,7 @@ class XMLElement:
 
     def add(self, tag, **kwargs):
         el = self.doc.createElement(tag)
-        for k, v in kwargs.items():
+        for k, v in list(kwargs.items()):
             el.setAttribute(k, _encode(str(v)))
         return self._inst(self.el.appendChild(el))
 
@@ -155,7 +154,7 @@ class XMLElement:
         return _encode(string.join(rc, sep))
 
     def getAll(self, tag):
-        return map(self._inst, self.el.getElementsByTagName(tag))
+        return list(map(self._inst, self.el.getElementsByTagName(tag)))
 
 
 class XMLDocument(XMLElement):
@@ -315,10 +314,14 @@ def load_models(unreleased=True):
             if models_dict[m]['support-type'] == SUPPORT_TYPE_NONE:
                 unsupported_models.append((c, m))
 
-    norm_models_keys = norm_models.keys()
-    norm_models_keys.sort(lambda x, y: sort_product(x, y))
+    norm_models_keys = list(norm_models.keys())
+    try:
+        norm_models_keys.sort(key=lambda y: pat_prod_num.search(y).group(1))
+    except:
+        norm_models_keys.sort(key=str.lower)
 
-    unsupported_models.sort(lambda x, y: sort_product2(x, y))
+    unsupported_models.sort(key= lambda x: x[0])
+ 
 
     total_models = len(norm_models)
 
@@ -348,7 +351,7 @@ def main(args):
                                     'help-rest', 'help-man',
                                     'drv=', 'output=',
                                     'verbose', 'quiet'])
-    except getopt.GetoptError, e:
+    except getopt.GetoptError as e:
         log.error(e.msg)
         usage()
         sys.exit(0)
@@ -474,8 +477,10 @@ def main(args):
                         matches.append(m)
 
                 if matches:
-                    matches.sort(lambda x, y: sort_product(x, y))
-
+                    try:
+                        matches.sort(key=lambda y: pat_prod_num.search(y).group(1))
+                    except:
+                        matches.sort(key=str.lower)
                     for p in matches:
 
                         if verbose:
@@ -553,6 +558,8 @@ def main(args):
                         pp = p.replace('_', ' ')
                         if 'apollo' in p.lower():
                             devid = "MFG:Apollo;MDL:%s;DES:%s;" % (pp, pp)
+                        elif 'laserjet' in p.lower() or 'designjet' in p.lower():
+                            devid = "MFG:Hewlett-Packard;MDL:%s;DES:%s;" % (pp, pp)
                         else:
                             devid = "MFG:HP;MDL:%s;DES:%s;" % (pp, pp)
 
@@ -616,7 +623,8 @@ def main(args):
         for f in files_to_delete:
             os.remove(f)
 
-        driver_f = file(driver_path, 'w')
+        driver_f = open(driver_path, 'w')
+
 
         driver_doc = XMLDocument("driver", id="driver/hplip")
         name_node = driver_doc.add("name")
@@ -810,7 +818,7 @@ def outputModel(model, fixed_model, stripped_model, make, postscriptppd, ieee128
     if verbose:
         log.info("\n\n%s:" % output_filename)
 
-    output_f = file(output_filename, 'w')
+    output_f = open(output_filename, 'w')
 
     doc = XMLDocument("printer", id="printer/%s" % printerID)
     make_node = doc.add("make")

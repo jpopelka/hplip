@@ -24,7 +24,7 @@ import sys
 
 # Local
 from base.g import *
-from ui_utils import *
+from .ui_utils import *
 
 # Qt
 from PyQt4.QtCore import *
@@ -87,7 +87,7 @@ class LoadPaperGroupBox(QGroupBox):
         else:
             paper_name = self.__tr("photo paper")
 
-        self.Text.setText(self.__tr("Please load <b>%1</b> in the printer and then click <i>%2</i> to continue.").arg(paper_name).arg(self.button_name))
+        self.Text.setText(self.__tr("Please load <b>%s</b> in the printer and then click <i>%s</i> to continue." %(paper_name, self.button_name)))
 
 
     def setType(self, typ):

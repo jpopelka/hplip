@@ -153,9 +153,13 @@ basedir = $(hplipdir)/base
 dist_base_DATA = base/maint.py base/codes.py base/g.py base/pml.py base/status.py  \
 	base/__init__.py base/mfpdtf.py base/utils.py base/wifi.py base/LedmWifi.py \
 	base/device.py base/logger.py base/slp.py base/exif.py base/strings.py base/magic.py \
-	base/imagesize.py base/pexpect.py base/models.py base/mdns.py base/tui.py base/dime.py \
-	base/ldif.py base/vcard.py base/module.py base/pkit.py base/queues.py base/password.py \
-	base/services.py base/os_utils.py base/smart_install.py base/avahi.py base/validation.py
+	base/imagesize.py base/models.py base/validation.py base/sixext.py base/avahi.py \
+	base/mdns.py base/tui.py base/dime.py base/ldif.py base/vcard.py base/module.py \
+	base/pkit.py base/queues.py base/password.py base/services.py base/os_utils.py \
+	base/smart_install.py base/six.py
+
+basepexpectdir = $(hplipdir)/base/pexpect
+dist_basepexpect_DATA=base/pexpect/__init__.py
 
 # installer
 installdir = $(hplipdir)/installer
@@ -248,7 +252,7 @@ dist_prnt_DATA = prnt/cups.py prnt/__init__.py prnt/ldl.py prnt/pcl.py prnt/colo
 cupsextdir = $(pyexecdir)
 cupsext_LTLIBRARIES = cupsext.la
 cupsext_la_LDFLAGS = -module -avoid-version
-cupsext_la_SOURCES =  prnt/cupsext/cupsext.c
+cupsext_la_SOURCES =  prnt/cupsext/cupsext.c prnt/cupsext/cupsext.h
 cupsext_la_CFLAGS = -I$(PYTHONINCLUDEDIR)
 cupsext_la_LIBADD = -lcups
 

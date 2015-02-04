@@ -26,12 +26,13 @@ import operator
 # Local
 from base.g import *
 from base import utils, device
+from base.sixext import  to_unicode
 from prnt import cups
-from ui_utils import load_pixmap
+from .ui_utils import load_pixmap
 
 # Qt
 from qt import *
-from scrollunload import ScrollUnloadView
+from .scrollunload import ScrollUnloadView
 
 
 class UnloadForm(QMainWindow):
@@ -77,7 +78,7 @@ class UnloadForm(QMainWindow):
                     max_deviceid_size = max(len(d), max_deviceid_size)
 
             if x == 0:
-                from nodevicesform import NoDevicesForm
+                from .nodevicesform import NoDevicesForm
                 self.FailureUI(self.__tr("<p><b>No devices found that support photo card access.</b><p>Please make sure your device is properly installed and try again."))
                 self.init_failed = True
 
@@ -86,7 +87,7 @@ class UnloadForm(QMainWindow):
                 self.device_uri = devices[0][0]
 
             else:
-                from choosedevicedlg import ChooseDeviceDlg
+                from .choosedevicedlg import ChooseDeviceDlg
                 dlg = ChooseDeviceDlg(devices)
                 if dlg.exec_loop() == QDialog.Accepted:
                     self.device_uri = dlg.device_uri
@@ -105,7 +106,7 @@ class UnloadForm(QMainWindow):
             try:
                 self.cur_device = device.Device(device_uri=self.device_uri,
                                                  printer_name=self.printer_name)
-            except Error, e:
+            except Error as e:
                 log.error("Invalid device URI or printer name.")
                 self.FailureUI("<b>Invalid device URI or printer name.</b><p>Please check the parameters to hp-print and try again.")
                 self.init_failed = True
@@ -130,7 +131,7 @@ class UnloadForm(QMainWindow):
         self.UnloadView.onDeviceChange(self.cur_device)
 
     def FailureUI(self, error_text):
-        log.error(unicode(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", " "))
+        log.error(to_unicode(error_text).replace("<b>", "").replace("</b>", "").replace("<p>", " "))
         QMessageBox.critical(self,
                              self.caption(),
                              error_text,

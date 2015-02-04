@@ -22,12 +22,13 @@
 # Local
 from base.g import *
 from base.codes import *
-from ui_utils import *
+from base.sixext import  to_unicode
+from .ui_utils import *
 
 # Qt
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from settingsdialog_base import Ui_SettingsDialog_base
+from .settingsdialog_base import Ui_SettingsDialog_base
 
 
 
@@ -78,7 +79,7 @@ class SettingsDialog(QDialog, Ui_SettingsDialog_base):
     def updateData(self):
         self.user_settings.systray_visible = self.SystemTraySettings.systray_visible
         self.user_settings.systray_messages = self.SystemTraySettings.systray_messages
-        self.user_settings.cmd_scan = unicode(self.ScanCommandLineEdit.text())
+        self.user_settings.cmd_scan = to_unicode(self.ScanCommandLineEdit.text())
         self.user_settings.auto_refresh = bool(self.AutoRefreshCheckBox.isChecked())
         self.user_settings.upgrade_notify = self.SystemTraySettings.upgrade_notify
 

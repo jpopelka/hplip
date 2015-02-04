@@ -31,7 +31,7 @@ import re
 import getopt
 import operator
 import os
-
+#from __future__ import absolute_import
 # Local
 from base.g import *
 from base import device, status, utils, maint, tui, module
@@ -100,7 +100,7 @@ def aioUI1():
 def type10and11and14Align(pattern, align_type):
     controls = maint.align10and11and14Controls(pattern, align_type)
     values = []
-    s_controls = controls.keys()
+    s_controls = list(controls.keys())
     s_controls.sort()
 
     for line in s_controls:
@@ -142,6 +142,9 @@ try:
     device_uri = mod.getDeviceUri(device_uri, printer_name,
          filter={'align-type': (operator.ne, ALIGN_TYPE_NONE)})
 
+    if not device_uri:
+        sys.exit(1)
+
     if mode == GUI_MODE:
         if not utils.canEnterGUIMode4():
             log.error("%s -u/--gui requires Qt4 GUI support. Entering interactive mode." % __mod__)
@@ -150,7 +153,7 @@ try:
     if mode == INTERACTIVE_MODE:
         try:
             d = device.Device(device_uri, printer_name)
-        except Error, e:
+        except Error as e:
             log.error("Unable to open device: %s" % e.msg)
             sys.exit(0)
 
@@ -236,7 +239,6 @@ try:
         #try:
         if 1:
             app = QApplication(sys.argv)
-
             dlg = AlignDialog(None, device_uri)
             dlg.show()
             try:

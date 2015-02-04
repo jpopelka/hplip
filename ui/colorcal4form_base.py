@@ -211,19 +211,19 @@ class ColorCal4Form_base(QDialog):
 
 
     def ColorNumberComboBox_highlighted(self,a0):
-        print "ColorCal4Form_base.ColorNumberComboBox_highlighted(const QString&): Not implemented yet"
+        print("ColorCal4Form_base.ColorNumberComboBox_highlighted(const QString&): Not implemented yet")
 
     def ColorLetterComboBox_highlighted(self,a0):
-        print "ColorCal4Form_base.ColorLetterComboBox_highlighted(const QString&): Not implemented yet"
+        print("ColorCal4Form_base.ColorLetterComboBox_highlighted(const QString&): Not implemented yet")
 
     def GrayLetterComboBox_highlighted(self,a0):
-        print "ColorCal4Form_base.GrayLetterComboBox_highlighted(const QString&): Not implemented yet"
+        print("ColorCal4Form_base.GrayLetterComboBox_highlighted(const QString&): Not implemented yet")
 
     def GrayNumberComboBox_highlighted(self,a0):
-        print "ColorCal4Form_base.GrayNumberComboBox_highlighted(const QString&): Not implemented yet"
+        print("ColorCal4Form_base.GrayNumberComboBox_highlighted(const QString&): Not implemented yet")
 
     def UseDefaultsButton_clicked(self):
-        print "ColorCal4Form_base.UseDefaultsButton_clicked(): Not implemented yet"
+        print("ColorCal4Form_base.UseDefaultsButton_clicked(): Not implemented yet")
 
     def __tr(self,s,c = None):
         return qApp.translate("ColorCal4Form_base",s,c)

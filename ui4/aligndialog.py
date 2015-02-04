@@ -28,14 +28,14 @@ from base.g import *
 from base import device, utils, maint, status
 #from prnt import cups
 from base.codes import *
-from ui_utils import *
+from .ui_utils import *
 
 # Qt
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Ui
-from aligndialog_base import Ui_Dialog
+from .aligndialog_base import Ui_Dialog
 
 PAGE_START = 0
 PAGE_LOAD_PAPER = 1
@@ -473,7 +473,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                         t.append(p)
 
             try:
-                log.debug("%s(%s)" % (seq.func_name, ','.join([repr(x) for x in t])))
+                log.debug("%s(%s)" % (seq.__name__, ','.join([repr(x) for x in t])))
             except AttributeError:
                 pass
 
@@ -539,12 +539,12 @@ class AlignDialog(QDialog, Ui_Dialog):
         # colors: 'k' or 'c' or 'kc'
         # line_count: 2 or 3
         # choice_count: 5, 7, 9, 11, etc. (odd)
-        self.AlignmentNumberTitle.setText(self.__tr("From the printed Alignment page, Choose the set of lines in group %1 where the line segments are <b>best</b> aligned.").arg(line_id))
+        self.AlignmentNumberTitle.setText(self.__tr("From the printed Alignment page, Choose the set of lines in group %s where the line segments are <b>best</b> aligned." % line_id))
         self.AlignmentNumberIcon.setPixmap(load_pixmap('%s-%s-%d' % (orientation, colors, line_count), 'other'))
         self.AlignmentNumberComboBox.clear()
 
         for x in range(choice_count):
-            self.AlignmentNumberComboBox.addItem(QString("%1%2").arg(line_id).arg(x+1))
+            self.AlignmentNumberComboBox.addItem(QString("%s%s"% (line_id, x+1)))
 
         self.displayPage(PAGE_ALIGNMENT_NUMBER)
         return
@@ -596,9 +596,9 @@ class AlignDialog(QDialog, Ui_Dialog):
         self.PageEdgeComboBox.clear()
         for x in range(count):
             if prefix is None:
-                self.PageEdgeComboBox.addItem(QString("%1").arg(x+1))
+                self.PageEdgeComboBox.addItem(QString("%s" % x+1))
             else:
-                self.PageEdgeComboBox.addItem(QString("%1%2").arg(prefix).arg(x+1)) # for xBow
+                self.PageEdgeComboBox.addItem(QString("%s%s" % (prefix, x+1))) # for xBow
 
         self.displayPage(PAGE_EDGE)
 
@@ -626,7 +626,7 @@ class AlignDialog(QDialog, Ui_Dialog):
             # TODO: ...
 
         self.controls = maint.align10and11and14Controls(pattern, self.align_type)
-        keys = self.controls.keys()
+        keys = list(self.controls.keys())
         keys.sort()
         max_line = 'A'
         for line in keys:
@@ -635,7 +635,7 @@ class AlignDialog(QDialog, Ui_Dialog):
             else:
                 break
 
-        self.LBowTitle.setText(self.__tr("For each row A - %1, select the label representing the box in which in the inner lines are the <b>least</b> visible.").arg(max_line))
+        self.LBowTitle.setText(self.__tr("For each row A - %s, select the label representing the box in which in the inner lines are the <b>least</b> visible." % max_line))
 
         for line in self.controls:
             if not self.controls[line][0]:
@@ -650,7 +650,7 @@ class AlignDialog(QDialog, Ui_Dialog):
 
     def endLBowPage(self):
         self.values = []
-        controls = self.controls.keys()
+        controls = list(self.controls.keys())
         controls.sort()
 
         for line in controls:
@@ -678,10 +678,10 @@ class AlignDialog(QDialog, Ui_Dialog):
     def showColorAdjustPage(self, line_id, count=21):
         self.ColorAdjustComboBox.clear()
         self.ColorAdjustIcon.setPixmap(load_pixmap('color_adj', 'other'))
-        self.ColorAdjustLabel.setText(self.__tr("Line %1:").arg(line_id))
+        self.ColorAdjustLabel.setText(self.__tr("Line %s:" % line_id))
 
         for x in range(count):
-            self.ColorAdjustComboBox.addItem(QString("%1%2").arg(line_id).arg(x+1))
+            self.ColorAdjustComboBox.addItem(QString("%s%s" % (line_id, x+1)))
 
         self.displayPage(PAGE_COLOR_ADJ)
 
@@ -761,7 +761,7 @@ class AlignDialog(QDialog, Ui_Dialog):
         if p is None or not self.step_max:
             self.StepText.setText(QString(""))
         else:
-            self.StepText.setText(self.__tr("Step %1 of %2").arg(p).arg(self.step_max))
+            self.StepText.setText(self.__tr("Step %s of %s" % (p, self.step_max)))
 
 
     def setAlignButton(self, typ=BUTTON_ALIGN):

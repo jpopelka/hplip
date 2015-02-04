@@ -7,7 +7,9 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtGui
+from PyQt4.QtCore import *
+from base.g import *
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -76,13 +78,13 @@ class Ui_Dialog(object):
         self.hboxlayout.addWidget(self.label_4)
         self.Deskjet450ComboBox = QtGui.QComboBox(self.Deskjet450Page)
         self.Deskjet450ComboBox.setObjectName("Deskjet450ComboBox")
-        self.Deskjet450ComboBox.addItem(QtCore.QString())
-        self.Deskjet450ComboBox.addItem(QtCore.QString())
-        self.Deskjet450ComboBox.addItem(QtCore.QString())
-        self.Deskjet450ComboBox.addItem(QtCore.QString())
-        self.Deskjet450ComboBox.addItem(QtCore.QString())
-        self.Deskjet450ComboBox.addItem(QtCore.QString())
-        self.Deskjet450ComboBox.addItem(QtCore.QString())
+        self.Deskjet450ComboBox.addItem(QString())
+        self.Deskjet450ComboBox.addItem(QString())
+        self.Deskjet450ComboBox.addItem(QString())
+        self.Deskjet450ComboBox.addItem(QString())
+        self.Deskjet450ComboBox.addItem(QString())
+        self.Deskjet450ComboBox.addItem(QString())
+        self.Deskjet450ComboBox.addItem(QString())
         self.hboxlayout.addWidget(self.Deskjet450ComboBox)
         self.gridlayout4.addLayout(self.hboxlayout, 2, 1, 1, 1)
         spacerItem4 = QtGui.QSpacerItem(221, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
@@ -110,7 +112,7 @@ class Ui_Dialog(object):
         self.CrickSpinBox = QtGui.QSpinBox(self.CrickPage)
         self.CrickSpinBox.setMinimum(1)
         self.CrickSpinBox.setMaximum(81)
-        self.CrickSpinBox.setProperty("value", QtCore.QVariant(41))
+        self.CrickSpinBox.setProperty("value", 41)
         self.CrickSpinBox.setObjectName("CrickSpinBox")
         self.hboxlayout1.addWidget(self.CrickSpinBox)
         self.gridlayout5.addLayout(self.hboxlayout1, 2, 1, 1, 1)
@@ -137,8 +139,8 @@ class Ui_Dialog(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.LBowIcon.sizePolicy().hasHeightForWidth())
         self.LBowIcon.setSizePolicy(sizePolicy)
-        self.LBowIcon.setMinimumSize(QtCore.QSize(85, 90))
-        self.LBowIcon.setMaximumSize(QtCore.QSize(85, 90))
+        self.LBowIcon.setMinimumSize(QSize(85, 90))
+        self.LBowIcon.setMaximumSize(QSize(85, 90))
         self.LBowIcon.setFrameShape(QtGui.QFrame.NoFrame)
         self.LBowIcon.setObjectName("LBowIcon")
         self.gridlayout6.addWidget(self.LBowIcon, 2, 1, 1, 1)
@@ -184,8 +186,8 @@ class Ui_Dialog(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.ConneryGrayPatchIcon.sizePolicy().hasHeightForWidth())
         self.ConneryGrayPatchIcon.setSizePolicy(sizePolicy)
-        self.ConneryGrayPatchIcon.setMinimumSize(QtCore.QSize(75, 75))
-        self.ConneryGrayPatchIcon.setMaximumSize(QtCore.QSize(75, 75))
+        self.ConneryGrayPatchIcon.setMinimumSize(QSize(75, 75))
+        self.ConneryGrayPatchIcon.setMaximumSize(QSize(75, 75))
         self.ConneryGrayPatchIcon.setFrameShape(QtGui.QFrame.NoFrame)
         self.ConneryGrayPatchIcon.setObjectName("ConneryGrayPatchIcon")
         self.gridlayout8.addWidget(self.ConneryGrayPatchIcon, 0, 1, 1, 2)
@@ -210,8 +212,8 @@ class Ui_Dialog(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.ConneryColorPatchIcon.sizePolicy().hasHeightForWidth())
         self.ConneryColorPatchIcon.setSizePolicy(sizePolicy)
-        self.ConneryColorPatchIcon.setMinimumSize(QtCore.QSize(75, 75))
-        self.ConneryColorPatchIcon.setMaximumSize(QtCore.QSize(75, 75))
+        self.ConneryColorPatchIcon.setMinimumSize(QSize(75, 75))
+        self.ConneryColorPatchIcon.setMaximumSize(QSize(75, 75))
         self.ConneryColorPatchIcon.setFrameShape(QtGui.QFrame.NoFrame)
         self.ConneryColorPatchIcon.setObjectName("ConneryColorPatchIcon")
         self.gridlayout9.addWidget(self.ConneryColorPatchIcon, 0, 1, 1, 2)
@@ -269,9 +271,9 @@ class Ui_Dialog(object):
 
         self.retranslateUi(Dialog)
         self.StackedWidget.setCurrentIndex(0)
-        QtCore.QObject.connect(self.ConneryUseFactoryDefaultsCheckBox, QtCore.SIGNAL("clicked(bool)"), self.groupBox_2.setDisabled)
-        QtCore.QObject.connect(self.ConneryUseFactoryDefaultsCheckBox, QtCore.SIGNAL("clicked(bool)"), self.groupBox_3.setDisabled)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
+        QObject.connect(self.ConneryUseFactoryDefaultsCheckBox, SIGNAL("clicked(bool)"), self.groupBox_2.setDisabled)
+        QObject.connect(self.ConneryUseFactoryDefaultsCheckBox, SIGNAL("clicked(bool)"), self.groupBox_3.setDisabled)
+        QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", "HP Device Manager - Printer Color Calibration", None, QtGui.QApplication.UnicodeUTF8))
@@ -322,5 +324,5 @@ class Ui_Dialog(object):
         self.NextButton.setText(QtGui.QApplication.translate("Dialog", "Next >", None, QtGui.QApplication.UnicodeUTF8))
         self.CancelButton.setText(QtGui.QApplication.translate("Dialog", "Cancel", None, QtGui.QApplication.UnicodeUTF8))
 
-from loadpapergroupbox import LoadPaperGroupBox
-from deviceuricombobox import DeviceUriComboBox
+from .loadpapergroupbox import LoadPaperGroupBox
+from .deviceuricombobox import DeviceUriComboBox

@@ -23,11 +23,11 @@
 
 # Local
 from base.g import *
-from ui_utils import load_pixmap
+from .ui_utils import load_pixmap
 
 # Qt
 from qt import *
-from colorcal4form_base import ColorCal4Form_base
+from .colorcal4form_base import ColorCal4Form_base
 
 
 class ColorCal4Form(ColorCal4Form_base):

@@ -73,9 +73,12 @@ try:
         filter={'fax-type': (operator.gt, 0)},
         back_end_filter=['hpfax'])
 
+    if not device_uri:
+        sys.exit(1)
+
     try:
         d = faxdevice.FaxDevice(device_uri, printer_name, disable_dbus=True)
-    except Error, e:
+    except Error as e:
         if e.opt == ERROR_DEVICE_DOES_NOT_SUPPORT_OPERATION:
             log.error("Device does not support setting time/date.")
             sys.exit(1)

@@ -22,8 +22,9 @@
 from base.g import *
 from base.codes import *
 from base import utils
+from base.sixext import  to_unicode
 from qt import *
-from settingsdialog_base import SettingsDialog_base
+from .settingsdialog_base import SettingsDialog_base
 
 class SettingsDialog(SettingsDialog_base):
     def __init__(self, parent = None,name = None,modal = 0,fl = 0):
@@ -87,19 +88,19 @@ class SettingsDialog(SettingsDialog_base):
 ##            self.copyButtonGroup.setButton(1)    
 
     def updateData(self):
-        self.user_settings.cmd_print = unicode(self.PrintCommand.text())
+        self.user_settings.cmd_print = to_unicode(self.PrintCommand.text())
         #self.user_settings.cmd_print_int = (self.printButtonGroup.selectedId() == 0)
 
-        self.user_settings.cmd_scan = unicode(self.ScanCommand.text())
+        self.user_settings.cmd_scan = to_unicode(self.ScanCommand.text())
         #self.user_settings.cmd_scan_int = (self.scanButtonGroup.selectedId() == 0)
 
-        self.user_settings.cmd_pcard = unicode(self.AccessPCardCommand.text())
+        self.user_settings.cmd_pcard = to_unicode(self.AccessPCardCommand.text())
         #self.user_settings.cmd_pcard_int = (self.pcardButtonGroup.selectedId() == 0)
 
-        self.user_settings.cmd_fax   = unicode(self.SendFaxCommand.text())
+        self.user_settings.cmd_fax   = to_unicode(self.SendFaxCommand.text())
         #self.user_settings.cmd_fax_int = (self.faxButtonGroup.selectedId() == 0)
 
-        self.user_settings.cmd_copy  = unicode(self.MakeCopiesCommand.text())
+        self.user_settings.cmd_copy  = to_unicode(self.MakeCopiesCommand.text())
         #self.user_settings.cmd_copy_int = (self.copyButtonGroup.selectedId() == 0)
 
 ##        self.user_settings.email_alerts = bool(self.EmailCheckBox.isChecked())

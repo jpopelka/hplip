@@ -23,16 +23,16 @@
 from base.g import *
 from base import device
 from prnt import cups
-from ui_utils import *
+from .ui_utils import *
 
 # Qt
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Ui
-from printsettingsdialog_base import Ui_Dialog
-from printsettingstoolbox import PrintSettingsToolbox
-from printernamecombobox import PRINTERNAMECOMBOBOX_TYPE_PRINTER_AND_FAX, PRINTERNAMECOMBOBOX_TYPE_FAX_ONLY
+from .printsettingsdialog_base import Ui_Dialog
+from .printsettingstoolbox import PrintSettingsToolbox
+from .printernamecombobox import PRINTERNAMECOMBOBOX_TYPE_PRINTER_AND_FAX, PRINTERNAMECOMBOBOX_TYPE_FAX_ONLY
 
 #signal
 import signal

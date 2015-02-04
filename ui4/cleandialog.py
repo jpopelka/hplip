@@ -28,14 +28,14 @@ from base.g import *
 from base import device, utils, maint
 from prnt import cups
 from base.codes import *
-from ui_utils import *
+from .ui_utils import *
 
 # Qt
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Ui
-from cleandialog_base import Ui_Dialog
+from .cleandialog_base import Ui_Dialog
 
 
 CLEAN_TYPE_INITIAL = 1000
@@ -51,7 +51,8 @@ BUTTON_CLEAN = 0
 BUTTON_NEXT = 1
 BUTTON_FINISH = 2
 
-LEDM_CLEAN_VERIFY_PAGE_JOB="<ipdyn:JobType>cleaningVerificationPage</ipdyn:JobType>"
+LEDM_CLEAN_VERIFY_PAGE_JOB=b"<ipdyn:JobType>cleaningVerificationPage</ipdyn:JobType>"
+
 
 #d = None
 def true():
@@ -193,7 +194,7 @@ class CleanDialog(QDialog, Ui_Dialog):
                         t.append(p)
 
             try:
-                log.debug("%s(%s)" % (seq.func_name, ','.join([repr(x) for x in t])))
+                log.debug("%s(%s)" % (seq.__name__, ','.join([repr(x) for x in t])))
             except AttributeError:
                 pass
 
@@ -373,7 +374,7 @@ class CleanDialog(QDialog, Ui_Dialog):
         if p is None or not self.step_max:
             self.StepText.setText(QString(""))
         else:
-            self.StepText.setText(self.__tr("Step %1 of %2").arg(p).arg(self.step_max))
+            self.StepText.setText(self.__tr("Step %s of %s" % (p, self.step_max)))
 
 
     def setCleanButton(self, typ=BUTTON_CLEAN):

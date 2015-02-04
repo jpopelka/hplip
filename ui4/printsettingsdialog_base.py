@@ -53,5 +53,5 @@ class Ui_Dialog(object):
         self.TitleLabel.setText(QtGui.QApplication.translate("Dialog", "Print Settings", None, QtGui.QApplication.UnicodeUTF8))
         self.CloseButton.setText(QtGui.QApplication.translate("Dialog", "Close", None, QtGui.QApplication.UnicodeUTF8))
 
-from printsettingstoolbox import PrintSettingsToolbox
-from printernamecombobox import PrinterNameComboBox
+from .printsettingstoolbox import PrintSettingsToolbox
+from .printernamecombobox import PrinterNameComboBox

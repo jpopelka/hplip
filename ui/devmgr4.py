@@ -19,7 +19,7 @@
 # Authors: Don Welch, Pete Parks, Naga Samrat Chowdary Narla,
 #
 
-from __future__ import generators
+
 
 # Std Lib
 import sys
@@ -29,50 +29,51 @@ import gzip
 import select
 import struct
 import threading
-import Queue
 import signal
 
 # Local
+from base.sixext.moves import queue
 from base.g import *
 from base import device, utils, pml, maint, pkit, os_utils
+from base.sixext import  to_unicode
 from prnt import cups
 from base.codes import *
-from ui_utils import load_pixmap
+from .ui_utils import load_pixmap
 from installer.core_install import *
 
 # Qt
 from qt import *
 
 # Main form
-from devmgr4_base import DevMgr4_base
+from .devmgr4_base import DevMgr4_base
 
 # Scrollviews
-from scrollview import ScrollView
-from scrollprintsettings import ScrollPrintSettingsView
+from .scrollview import ScrollView
+from .scrollprintsettings import ScrollPrintSettingsView
 
 # Alignment and ColorCal forms
-from alignform import AlignForm
-from aligntype6form1 import AlignType6Form1
-from aligntype6form2 import AlignType6Form2
-from paperedgealignform import PaperEdgeAlignForm
-from colorcalform import ColorCalForm # Type 1 color cal
-from coloradjform import ColorAdjForm  # Type 5 and 6 color adj
-from colorcalform2 import ColorCalForm2 # Type 2 color cal
-from colorcal4form import ColorCal4Form # Type 4 color cal
-from align10form import Align10Form # Type 10 and 11 alignment
-from align13form import Align13Form # Type 13 alignment
+from .alignform import AlignForm
+from .aligntype6form1 import AlignType6Form1
+from .aligntype6form2 import AlignType6Form2
+from .paperedgealignform import PaperEdgeAlignForm
+from .colorcalform import ColorCalForm # Type 1 color cal
+from .coloradjform import ColorAdjForm  # Type 5 and 6 color adj
+from .colorcalform2 import ColorCalForm2 # Type 2 color cal
+from .colorcal4form import ColorCal4Form # Type 4 color cal
+from .align10form import Align10Form # Type 10 and 11 alignment
+from .align13form import Align13Form # Type 13 alignment
 
 # Misc forms
-from loadpaperform import LoadPaperForm
-from settingsdialog import SettingsDialog
-from aboutdlg import AboutDlg
-from cleaningform import CleaningForm
-from cleaningform2 import CleaningForm2
-from waitform import WaitForm
-from faxsettingsform import FaxSettingsForm
-from nodevicesform import NoDevicesForm
-from settingsdialog import SettingsDialog
-from firmwaredialog import FirmwareDialog
+from .loadpaperform import LoadPaperForm
+from .settingsdialog import SettingsDialog
+from .aboutdlg import AboutDlg
+from .cleaningform import CleaningForm
+from .cleaningform2 import CleaningForm2
+from .waitform import WaitForm
+from .faxsettingsform import FaxSettingsForm
+from .nodevicesform import NoDevicesForm
+from .settingsdialog import SettingsDialog
+from .firmwaredialog import FirmwareDialog
 
 # all in seconds
 MIN_AUTO_REFRESH_RATE = 5
@@ -191,10 +192,10 @@ class PasswordDialog(QDialog):
         self.connect(self.okPushButton,SIGNAL("clicked()"),self.accept)
         self.connect(self.passwordLineEdit,SIGNAL("returnPressed()"),self.accept)
     def getUsername(self):
-        return unicode(self.usernameLineEdit.text())
+        return to_unicode(self.usernameLineEdit.text())
 
     def getPassword(self):
-        return unicode(self.passwordLineEdit.text())
+        return to_unicode(self.passwordLineEdit.text())
 
     def languageChange(self):
         self.setCaption(self.__tr("HP Device Manager - Enter Username/Password"))
@@ -369,7 +370,7 @@ class UpdateThread(QThread):
                 if dev.supported:
                     try:
                         dev.open()
-                    except Error, e:
+                    except Error as e:
                         log.warn(e.msg)
 
                     time.sleep(0.1)
@@ -380,7 +381,7 @@ class UpdateThread(QThread):
                         try:
                             dev.queryDevice()
 
-                        except Error, e:
+                        except Error as e:
                             log.error("Query device error (%s)." % e.msg)
                             dev.error_state = ERROR_STATE_ERROR
 
@@ -449,8 +450,8 @@ class DevMgr4(DevMgr4_base):
 
 
         # Update thread setup
-        self.request_queue = Queue.Queue()
-        self.response_queue = Queue.Queue()
+        self.request_queue = queue.Queue()
+        self.response_queue = queue.Queue()
         self.update_thread = UpdateThread(self.response_queue, self.request_queue)
         self.update_thread.start()
 
@@ -1183,15 +1184,15 @@ class DevMgr4(DevMgr4_base):
                 self.PrintSettingsPrinterCombo.insertItem(c.decode("utf-8"))
                 self.PrintJobPrinterCombo.insertItem(c.decode("utf-8"))
 
-            self.cur_printer = unicode(self.PrintSettingsPrinterCombo.currentText())
+            self.cur_printer = to_unicode(self.PrintSettingsPrinterCombo.currentText())
 
     def PrintSettingsPrinterCombo_activated(self, s):
-        self.cur_printer = unicode(s)
+        self.cur_printer = to_unicode(s)
         self.PrintJobPrinterCombo.setCurrentText(self.cur_printer.encode("latin1")) # TODO: ?
         return self.PrinterCombo_activated(self.cur_printer)
 
     def PrintJobPrinterCombo_activated(self, s):
-        self.cur_printer = unicode(s)
+        self.cur_printer = to_unicode(s)
         self.PrintSettingsPrinterCombo.setCurrentText(self.cur_printer.encode("latin1")) # TODO: ?
         return self.PrinterCombo_activated(self.cur_printer)
 
@@ -1406,7 +1407,7 @@ class DevMgr4(DevMgr4_base):
 
             for filter, text, icon, tooltip, cmd in self.ICONS:
                 if filter is not None:
-                    if not filter():
+                    if not list(filter()):
                         continue
 
                 FuncViewItem(self.iconList, text,
@@ -2062,9 +2063,9 @@ class DevMgr4(DevMgr4_base):
                 tt = QString("%1 %2").arg(dt.toString()).arg(desc)
 
                 if e.job_id:
-                    job_id = unicode(e.job_id)
+                    job_id = to_unicode(e.job_id)
                 else:
-                    job_id = u''
+                    job_id = ''
 
                 error_state = STATUS_TO_ERROR_STATE_MAP.get(e.event_code, ERROR_STATE_CLEAR)
                 tech_type = self.cur_device.tech_type
@@ -2077,8 +2078,8 @@ class DevMgr4(DevMgr4_base):
                 except KeyError:
                     status_pix = self.STATUS_ICONS[ERROR_STATE_CLEAR][0]
 
-                StatusListViewItem(self.statusListView, status_pix, ess, tt, unicode(e.event_code),
-                    job_id, unicode(e.username))
+                StatusListViewItem(self.statusListView, status_pix, ess, tt, to_unicode(e.event_code),
+                    job_id, to_unicode(e.username))
 
                 row -= 1
 
@@ -2122,7 +2123,7 @@ class DevMgr4(DevMgr4_base):
         try:
             i18n_amount = self.num_repr[amount]
         except KeyError:
-            i18n_amount = unicode(amount)
+            i18n_amount = to_unicode(amount)
 
         if amount == 1:
             i18n_unit = self.unit_names[unit_name][0]
@@ -2496,13 +2497,13 @@ class DevMgr4(DevMgr4_base):
         jobs = cups.getJobs()
         num_jobs = 0
         for j in jobs:
-            if j.dest.decode('utf-8') == unicode(self.cur_printer):
+            if j.dest.decode('utf-8') == to_unicode(self.cur_printer):
                 num_jobs += 1
 
         for j in jobs:
             if j.dest == self.cur_printer:
                 JobListViewItem(self.jobList, self.JOB_STATE_ICONS[j.state],
-                    j.title, self.JOB_STATES[j.state], unicode(j.id))
+                    j.title, self.JOB_STATES[j.state], to_unicode(j.id))
 
         i = self.jobList.firstChild()
         if i is not None:
@@ -2564,7 +2565,7 @@ class DevMgr4(DevMgr4_base):
             if text:
                 dlg = JobInfoDialog(text, self)
                 dlg.setCaption(self.__tr("HP Device Manager - Job Log - %1 - Job %2").\
-                    arg(self.cur_printer).arg(unicode(item.job_id)))
+                    arg(self.cur_printer).arg(to_unicode(item.job_id)))
 
                 dlg.exec_loop()
 
@@ -2701,7 +2702,7 @@ class DevMgr4(DevMgr4_base):
     def defaultPushButton_clicked(self):
         QApplication.setOverrideCursor(QApplication.waitCursor)
         try:
-            result, result_str = cups.cups_operation(cups.setDefaultPrinter, GUI_MODE, 'qt3', self, self.cur_printer.encode('utf8'))
+            result, result_str = cups.cups_operation(cups.setDefaultPrinter.encode('utf8'), GUI_MODE, 'qt3', self, self.cur_printer.encode('utf8'))
 
             if result != cups.IPP_OK:
                 log.error("Set default printer failed.")
@@ -3005,16 +3006,16 @@ class ScrollDeviceInfoView(ScrollView):
 
         layout37.addMultiCellWidget(self.infoListView,1,1,0,3)
 
-        mq_keys = self.cur_device.mq.keys()
+        mq_keys = list(self.cur_device.mq.keys())
         mq_keys.sort()
         mq_keys.reverse()
-        for key,i in zip(mq_keys, range(len(mq_keys))):
+        for key,i in zip(mq_keys, list(range(len(mq_keys)))):
             QListViewItem(self.infoListView, self.__tr("Static"), key, str(self.cur_device.mq[key]))
 
-        dq_keys = self.cur_device.dq.keys()
+        dq_keys = list(self.cur_device.dq.keys())
         dq_keys.sort()
         dq_keys.reverse()
-        for key,i in zip(dq_keys, range(len(dq_keys))):
+        for key,i in zip(dq_keys, list(range(len(dq_keys)))):
             QListViewItem(self.infoListView, self.__tr("Dynamic"), key, str(self.cur_device.dq[key]))
 
         self.addWidget(widget, "file_list", maximize=True)

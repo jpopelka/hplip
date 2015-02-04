@@ -23,14 +23,15 @@
 
 # Local
 from base.g import *
-from ui_utils import *
+from .ui_utils import *
+from base.sixext import to_unicode
 
 # Qt
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Main window
-from fabwindow_base import Ui_MainWindow
+from .fabwindow_base import Ui_MainWindow
 
 fax_avail = True
 try:
@@ -46,7 +47,7 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
     def __init__(self, parent):
         QMainWindow.__init__(self, parent)
         self.setupUi(self)
-        self.group = u'All' # current group
+        self.group = to_unicode('All') # current group
         self.name = None # current name
         self.updating_group = False
         self.updating_name = False
@@ -67,11 +68,11 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
         # Fixup data from old-style database
         data = self.db.get_all_records()
         for d in data:
-            if u'All' not in data[d]['groups']:
-                data[d]['groups'].append(u'All')
+            if to_unicode('All') not in data[d]['groups']:
+                data[d]['groups'].append(to_unicode('All'))
 
         if not data:
-            self.db.set('__' + utils.gen_random_uuid(), '', '', '', '', [u'All'], '')
+            self.db.set('__' + utils.gen_random_uuid(), '', '', '', '', [to_unicode('All')], '')
 
 
     def initUi(self):
@@ -194,7 +195,7 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
 
             j = 1
             for g in groups:
-                if g == u'All':
+                if g == to_unicode('All'):
                     continue
 
                 i = QTableWidgetItem(QString(g))
@@ -221,9 +222,9 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
         if not self.updating_group:
             selected_items = self.GroupTableWidget.selectedItems()
             if selected_items:
-                self.group = unicode(selected_items[0].text())
-                self.RemoveGroupAction.setEnabled(self.group != u'All')
-                self.RenameGroupAction.setEnabled(self.group != u'All')
+                self.group = to_unicode(selected_items[0].text())
+                self.RemoveGroupAction.setEnabled(self.group != to_unicode('All'))
+                self.RenameGroupAction.setEnabled(self.group != to_unicode('All'))
             else: # shouldn't happen?!
                 self.RemoveGroupAction.setEnabled(False)
                 self.RenameGroupAction.setEnabled(False)
@@ -245,17 +246,17 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
                 self.AddToGroupAction.setEnabled(False)
 
             elif num_selected_items == 1:
-                self.name = unicode(selected_items[0].text())
+                self.name = to_unicode(selected_items[0].text())
                 self.RemoveNameAction.setEnabled(True)
                 self.NewGroupFromSelectionAction.setEnabled(True)
 
-                self.RemoveFromGroupAction.setEnabled(self.group != u'All')
+                self.RemoveFromGroupAction.setEnabled(self.group != to_unicode('All'))
                 self.AddToGroupAction.setEnabled(True) #self.group != u'All')
 
             else: # > 1
                 self.RemoveNameAction.setEnabled(True)
                 self.NewGroupFromSelectionAction.setEnabled(True)
-                self.RemoveFromGroupAction.setEnabled(self.group != u'All')
+                self.RemoveFromGroupAction.setEnabled(self.group != to_unicode('All'))
                 self.AddToGroupAction.setEnabled(True) #self.group != u'All')
                 self.name = None
 
@@ -311,7 +312,7 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
         rows = self.NameTableWidget.rowCount()
         for r in range(rows):
             i = self.NameTableWidget.item(r, 0)
-            i.setSelected(name == unicode(i.text()))
+            i.setSelected(name == to_unicode(i.text()))
 
 
     def updateDetailsFrame(self):
@@ -331,9 +332,9 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
 
     def NameLineEdit_editingFinished(self):
         if self.name is not None:
-            new_name = unicode(self.NameLineEdit.text())
+            new_name = to_unicode(self.NameLineEdit.text())
             if new_name != self.name:
-                if QMessageBox.question(self, self.__tr("Rename?"), self.__tr("Rename '%1' to '%2'?").arg(self.name).arg(new_name), \
+                if QMessageBox.question(self, self.__tr("Rename?"), "Rename '%s' to '%s'?"%(self.name,new_name), \
                                         QMessageBox.Yes | QMessageBox.No) == QMessageBox.Yes:
 
                     self.db.rename(self.name, new_name)
@@ -346,13 +347,13 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
 
     def FaxNumberLineEdit_editingFinished(self):
         if self.name is not None:
-            self.db.set_key_value(self.name, 'fax', unicode(self.FaxNumberLineEdit.text()))
+            self.db.set_key_value(self.name, 'fax', to_unicode(self.FaxNumberLineEdit.text()))
             self.emit(SIGNAL("databaseChanged"), FAB_NAME_DETAILS_CHANGED, self.name)
 
 
     def NotesTextEdit_textChanged(self):
         if self.name is not None:
-            self.db.set_key_value(self.name, 'notes', unicode(self.NotesTextEdit.document().toPlainText()))
+            self.db.set_key_value(self.name, 'notes', to_unicode(self.NotesTextEdit.document().toPlainText()))
 
 
     def NotesTextEdit_editingFinished(self):
@@ -363,14 +364,14 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
     def NewGroupAction_triggered(self):
         ok = False
         g, ok = QInputDialog.getText(self, self.__tr("Enter New Group Name"), self.__tr("Name for New Group:"))
-        g = unicode(g)
+        g = to_unicode(g)
 
-        if g == u'All':
+        if g == to_unicode('All'):
             FailureUI(self, self.__tr("<b>Sorry, the group name cannot be 'All'.</b><p>Please choose a different name."))
             ok = False
 
         if ok:
-            self.db.set('__' + utils.gen_random_uuid(), '', '', '', '', [u'All', g], '')
+            self.db.set('__' + utils.gen_random_uuid(), '', '', '', '', [to_unicode('All'), g], '')
             self.group = g
             log.debug("New empty group %s" % self.group)
             self.emit(SIGNAL("databaseChanged"), FAB_GROUP_ADD, self.group)
@@ -378,11 +379,11 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
 
 
     def NewGroupFromSelectionAction_triggered(self):
-        selected_names = [unicode(n.text()) for n in self.NameTableWidget.selectedItems()]
+        selected_names = [to_unicode(n.text()) for n in self.NameTableWidget.selectedItems()]
         if selected_names:
             ok = False
             g, ok = QInputDialog.getText(self, self.__tr("Enter New Group Name"), self.__tr("Name for New Group:"))
-            g = unicode(g)
+            g = str(g)
 
             groups = self.db.get_all_groups()
 
@@ -401,10 +402,10 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
     def RenameGroupAction_triggered(self):
         selected_items = self.GroupTableWidget.selectedItems()
         if selected_items:
-            old_group = unicode(selected_items[0].text())
+            old_group = to_unicode(selected_items[0].text())
             ok = False
-            new_group, ok = QInputDialog.getText(self, self.__tr("Rename Group"), self.__tr("New Name for Group '%1':").arg(old_group))
-            new_group = unicode(new_group)
+            new_group, ok = QInputDialog.getText(self, self.__tr("Rename Group"), "New Name for Group '%s':"%old_group)
+            new_group = to_unicode(new_group)
             groups = self.db.get_all_groups()
 
             if new_group in groups:
@@ -431,15 +432,15 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
         ok = False
         t, ok = QInputDialog.getText(self, self.__tr("Enter New Name"), self.__tr("New Name:"))
         if ok:
-            t = unicode(t)
+            t = to_unicode(t)
             self.addName(t)
 
 
     def addName(self, name, fax=''):
-        if self.group == u'All':
-            g = [u'All']
+        if self.group == to_unicode('All'):
+            g = [to_unicode('All')]
         else:
-            g = [u'All', self.group]
+            g = [to_unicode('All'), self.group]
 
         self.db.set(name, '', '', '', fax, g, '')
         self.name = name
@@ -449,7 +450,7 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
 
 
     def RemoveNameAction_triggered(self):
-        selected_names = [unicode(n.text()) for n in self.NameTableWidget.selectedItems()]
+        selected_names = [to_unicode(n.text()) for n in self.NameTableWidget.selectedItems()]
         if selected_names:
             for n in selected_names:
                 self.db.delete(n)
@@ -461,7 +462,7 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
 
 
     def RemoveFromGroupAction_triggered(self):
-        selected_names = [unicode(n.text()) for n in self.NameTableWidget.selectedItems()]
+        selected_names = [str(n.text()) for n in self.NameTableWidget.selectedItems()]
         if selected_names:
             log.debug("%s leaving group %s" % (','.join(selected_names), self.group))
             self.db.remove_from_group(self.group, selected_names)
@@ -471,7 +472,7 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
 
 
     def GroupTableWidget_namesAddedToGroup(self, row, items): # drag n' drop handler
-        self.group = unicode(self.GroupTableWidget.item(row, 0).text())
+        self.group = to_unicode(self.GroupTableWidget.item(row, 0).text())
         self.db.add_to_group(self.group, items)
         log.debug("Adding %s to group %s" % (','.join(items), self.group))
         self.emit(SIGNAL("databaseChanged"), FAB_GROUP_MEMBERSHIP_CHANGED, self.group)
@@ -479,13 +480,13 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
 
 
     def AddToGroupAction_triggered(self):
-        selected_names = [unicode(n.text()) for n in self.NameTableWidget.selectedItems()]
+        selected_names = [to_unicode(n.text()) for n in self.NameTableWidget.selectedItems()]
         if selected_names:
             ok = False
             all_groups = self.db.get_all_groups()
 
             if all_groups:
-                all_groups = [g for g in all_groups if g != u'All']
+                all_groups = [g for g in all_groups if g != to_unicode('All')]
                 all_groups.sort()
 
                 dlg = JoinDialog(self, all_groups)
@@ -504,14 +505,14 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
 
 
     def ImportAction_triggered(self):
-        result = unicode(QFileDialog.getOpenFileName(self,
+        result = str(QFileDialog.getOpenFileName(self,
                          self.__tr("Import fax addresses from LDIF or vCard"),
                          #user_conf.workingDirectory(),
                          self.user_settings.working_dir,
                          "vCard (*.vcf);;LDIF (*.ldif *.ldi)"))
 
         if result:
-            working_directory = unicode(os.path.dirname(result))
+            working_directory = to_unicode(os.path.dirname(result))
             log.debug("result: %s" % result)
             #user_conf.setWorkingDirectory(working_directory)
             self.user_settings.working_dir = working_directory
@@ -531,7 +532,7 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
 
 
     def __tr(self,s,c = None):
-        return qApp.translate("FABWindow",s,c)
+        return qApp.translate("FABWindow",s.encode('utf-8'),c)
 
 
 
@@ -597,7 +598,7 @@ class JoinDialog(QDialog):
 
 
     def GroupJoinComboBox_currentIndexChanged(self, i):
-        self.group = unicode(self.GroupJoinComboBox.currentText())
+        self.group = to_unicode(self.GroupJoinComboBox.currentText())
 
 
     def retranslateUi(self):

@@ -23,11 +23,9 @@
 from base.g import *
 from prnt import cups
 from base import device, codes
-from soapfax import SOAPFaxDevice
-from pmlfax import PMLFaxDevice
-from marvellfax import MarvellFaxDevice
-from ledmfax import LEDMFaxDevice
-from ledmsoapfax import LEDMSOAPFaxDevice
+from .soapfax import SOAPFaxDevice
+from .pmlfax import PMLFaxDevice
+from .marvellfax import MarvellFaxDevice
 
 def FaxDevice(device_uri=None, printer_name=None,
               callback=None, 
@@ -58,12 +56,14 @@ def FaxDevice(device_uri=None, printer_name=None,
         return SOAPFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
 
     elif fax_type == FAX_TYPE_LEDMSOAP:
+        from .ledmsoapfax import LEDMSOAPFaxDevice
         return LEDMSOAPFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
 
     elif fax_type == FAX_TYPE_MARVELL:
         return MarvellFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
         
     elif fax_type == FAX_TYPE_LEDM:
+        from .ledmfax import LEDMFaxDevice
         return LEDMFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
         
 

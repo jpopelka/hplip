@@ -15,6 +15,10 @@
 #include "jpeglib.h"
 #include "jerror.h"
 
+//Define JMETHOD macro here if not defined already in jmorecfg.h. JMETHOD macro has been removed from libjpeg-turbo 1.3.90.2
+#ifndef JMETHOD
+#define JMETHOD(type,methodname,arglist)  type (*methodname) ()
+#endif
 
 /* Expanded data destination object for stdio output */
 

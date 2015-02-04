@@ -32,15 +32,15 @@
 #
 
 # Local
-from base.g import *
+from .g import *
 
 # Std Lib
 import quopri
 import base64
 import codecs
-import cStringIO
+import io
 import re
-import StringIO
+import io
 import codecs
 
 
@@ -93,15 +93,15 @@ def opentextfile(name):
     appropriate unicode decoding, else returns the file using standard
     open function"""
     #with file(name, 'rb') as f:
-    f = file(name, 'rb')
+    f = open(name, 'rb')
     start = f.read(_maxbomlen)
     for bom,codec in _boms:
         if start.startswith(bom):
             # some codecs don't do readline, so we have to vector via stringio
             # many postings also claim that the BOM is returned as the first
             # character but that hasn't been the case in my testing
-            return StringIO.StringIO(codecs.open(name, "r", codec).read())
-    return file(name, "rtU")
+            return io.StringIO(codecs.open(name, "r", codec).read())
+    return open(name, "rtU")
 
 
 _notdigits = re.compile("[^0-9]*")
@@ -140,7 +140,7 @@ def nameparser_formatsimplename(name):
 
 def nameparser_getfullname(name):
     """Gets the full name, joining the first/middle/last if necessary"""
-    if name.has_key("full"):
+    if "full" in name:
         return name["full"]
     return ' '.join([x for x in nameparser_getparts(name) if x])
 
@@ -229,11 +229,11 @@ def nameparser_getparts(name):
 
     # do we have any of the parts?
     for i in ("first", "middle", "last"):
-        if name.has_key(i):
+        if i in name:
             return (name.get("first", ""), name.get("middle", ""), name.get("last", ""))
 
     # check we have full.  if not return nickname
-    if not name.has_key("full"):
+    if "full" not in name:
         return (name.get("nickname", ""), "", "")
 
     n = name.nameparser_get("full")
@@ -265,7 +265,7 @@ class VFile:
         return self
 
         
-    def next(self):
+    def __next__(self):
         # Get the next non-blank line
         while True:  # python desperately needs do-while
             line = self._getnextline()
@@ -326,7 +326,7 @@ class VFile:
         items = b4.upper().split(";")
 
         newitems = []
-        if isinstance(line, unicode):
+        if isinstance(line, str):
             charset = None
             
         else:
@@ -358,7 +358,7 @@ class VFile:
                 else:
                     raise VFileException("unknown encoding: "+i)
                     
-            except Exception,e:
+            except Exception as e:
                 if isinstance(e,VFileException):
                     raise e
                 raise VFileException("Exception %s while processing encoding %s on data '%s'" % (str(e), i, line))
@@ -425,7 +425,7 @@ class VCards:
         return self
 
         
-    def next(self):
+    def __next__(self):
         # find vcard start
         field = value = None
         for field,value in self.vfile:
@@ -524,9 +524,9 @@ class VCard:
         field then "email2" is returned, etc"""
         if name not in dict:
             return name
-        for i in xrange(2,99999):
-            if name+`i` not in dict:
-                return name+`i`
+        for i in range(2,99999):
+            if name+repr(i) not in dict:
+                return name+repr(i)
 
                 
     def _parse(self, lines, result):
@@ -546,7 +546,7 @@ class VCard:
             
     def _update_groups(self, result):
         """Update the groups info """
-        for k,e in self._groups.items():
+        for k,e in list(self._groups.items()):
             self._setvalue(result, *e)
 
             
@@ -857,13 +857,13 @@ class VCard:
         # we need to insert our value at the begining
         values = [value]
         
-        for suffix in [""]+range(2,99):
+        for suffix in [""]+list(range(2,99)):
             if type+str(suffix) in result:
                 values.append(result[type+str(suffix)])
             else:
                 break
                 
-        suffixes = [""]+range(2,len(values)+1)
+        suffixes = [""]+list(range(2,len(values)+1))
         
         for l in range(len(suffixes)):
             result[type+str(suffixes[l])] = values[l]
@@ -1246,7 +1246,7 @@ _out_tel_mapping = {
                    
 def out_tel(vals, formatter):
     # ::TODO:: limit to one type of each number
-    phones = ['phone'+str(x) for x in ['']+range(2,len(vals)+1)]
+    phones = ['phone'+str(x) for x in ['']+list(range(2,len(vals)+1))]
     res = ""
     first = True
     idx = 0
@@ -1361,7 +1361,7 @@ def output_entry(entry, profile, limit_fields=None):
         assert len([f for f in limit_fields if f not in _field_order]) == 0
     
     fmt = profile["_formatter"]
-    io = cStringIO.StringIO()
+    io = io.StringIO()
     io.write(out_line("BEGIN", None, "VCARD", None))
     io.write(out_line("VERSION", None, profile["_version"], None))
 
@@ -1374,7 +1374,7 @@ def output_entry(entry, profile, limit_fields=None):
         if f in entry and f in profile:
             func = profile[f]
             # does it have a limit?  (nice scary introspection :-)
-            if "limit" in func.func_code.co_varnames[:func.func_code.co_argcount]:
+            if "limit" in func.__code__.co_varnames[:func.__code__.co_argcount]:
                 lines = func(entry[f], fmt, limit = profile["_limit"])
             else:
                 lines = func(entry[f], fmt)

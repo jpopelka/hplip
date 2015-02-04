@@ -54,7 +54,6 @@ try:
         filter={'fax-type': (operator.gt, 0)})
 
     if device_uri is None:
-        log.error("Device doesn't support FAX functionality")
         sys.exit(1)
 
     if not utils.canEnterGUIMode4():
@@ -69,7 +68,6 @@ try:
         sys.exit(1)        
 
     app = QApplication(sys.argv)
-
     dlg = FaxSetupDialog(None, device_uri)
     dlg.show()
     try:

@@ -19,15 +19,14 @@
 # Author: Don Welch
 #
 
-from __future__ import generators
+
 
 # Std Lib
 import sys
 import os
 import threading
-import cPickle
+import pickle
 import time
-from cStringIO import StringIO
 import struct
 
 # Local
@@ -36,9 +35,10 @@ from base.codes import *
 from base.ldif import LDIFParser
 from base import device, utils, vcard
 from prnt import cups
-
+from base.sixext import BytesIO
+from base.sixext import to_bytes_utf8, to_long, to_unicode
 try:
-    import coverpages
+    from . import coverpages
 except ImportError:
     pass
 
@@ -180,7 +180,7 @@ class FaxLDIFParser(LDIFParser):
             except KeyError:
                 pass
 
-            grps.append(u'All')
+            grps.append(to_unicode('All'))
             groups = [g for g in grps if g]
 
             if nickname:
@@ -213,25 +213,26 @@ class FaxAddressBook(object): # Pickle based address book
 
             # Load the existing pickle if present
             if os.path.exists(self._fab):
-               pickle_file = open(self._fab, "r")
-               self._data = cPickle.load(pickle_file)
+               pickle_file = open(self._fab, "rb")
+               self._data = pickle.load(pickle_file)
                pickle_file.close()
             else:
                self.save() # save the empty file to create the file
 
 
     def set(self, name, title, firstname, lastname, fax, groups, notes):
-        try:
-            grps = [unicode(s) for s in groups]
-        except UnicodeDecodeError:
-            grps = [unicode(s.decode('utf-8')) for s in groups]
+        # try:
+        #     grps = [to_unicode(s) for s in groups]
+        # except UnicodeDecodeError:
+        #     grps = [to_unicode(s.decode('utf-8')) for s in groups]
+        grps = [to_unicode(s) for s in groups]
 
-        self._data[unicode(name)] = {'name' : unicode(name),
-                                    'title': unicode(title),  # NOT USED STARTING IN 2.8.9
-                                    'firstname': unicode(firstname), # NOT USED STARTING IN 2.8.9
-                                    'lastname': unicode(lastname), # NOT USED STARTING IN 2.8.9
-                                    'fax': unicode(fax),
-                                    'notes': unicode(notes),
+        self._data[to_unicode(name)] = {'name' : to_unicode(name),
+                                    'title': to_unicode(title),  # NOT USED STARTING IN 2.8.9
+                                    'firstname': to_unicode(firstname), # NOT USED STARTING IN 2.8.9
+                                    'lastname': to_unicode(lastname), # NOT USED STARTING IN 2.8.9
+                                    'fax': to_unicode(fax),
+                                    'notes': to_unicode(notes),
                                     'groups': grps}
 
         self.save()
@@ -240,7 +241,7 @@ class FaxAddressBook(object): # Pickle based address book
 
 
     def set_key_value(self, name, key, value):
-        self._data[unicode(name)][key] = value
+        self._data[to_unicode(name)][key] = value
         self.save()
 
 
@@ -266,7 +267,7 @@ class FaxAddressBook(object): # Pickle based address book
 
     def get_all_groups(self):
         all_groups = []
-        for e, v in self._data.items():
+        for e, v in list(self._data.items()):
             for g in v['groups']:
                 if g not in all_groups:
                     all_groups.append(g)
@@ -278,13 +279,13 @@ class FaxAddressBook(object): # Pickle based address book
 
 
     def get_all_names(self):
-        return self._data.keys()
+        return list(self._data.keys())
 
 
     def save(self):
         try:
-            pickle_file = open(self._fab, "w")
-            cPickle.dump(self._data, pickle_file, cPickle.HIGHEST_PROTOCOL)
+            pickle_file = open(self._fab, "wb")
+            pickle.dump(self._data, pickle_file, protocol=2)
             pickle_file.close()
         except IOError:
             log.error("I/O error saving fab file.")
@@ -312,26 +313,26 @@ class FaxAddressBook(object): # Pickle based address book
 
 
     def update_groups(self, group, members):
-        for e, v in self._data.items():
+        for e, v in list(self._data.items()):
             if v['name'] in members: # membership indicated
                 if not group in v['groups']:
-                    v['groups'].append(unicode(group))
+                    v['groups'].append(to_unicode(group))
             else:
                 if group in v['groups']:
-                    v['groups'].remove(unicode(group))
+                    v['groups'].remove(to_unicode(group))
         self.save()
 
 
     def delete_group(self, group):
-        for e, v in self._data.items():
+        for e, v in list(self._data.items()):
             if group in v['groups']:
-                v['groups'].remove(unicode(group))
+                v['groups'].remove(to_unicode(group))
         self.save()
 
 
     def group_members(self, group):
         members = []
-        for e, v in self._data.items():
+        for e, v in list(self._data.items()):
             if group in v['groups']:
                 members.append(e)
         return members
@@ -371,12 +372,12 @@ class FaxAddressBook(object): # Pickle based address book
             parser.parse()
             self.save()
             return True, ''
-        except ValueError, e:
+        except ValueError as e:
             return False, e.message
 
 
     def import_vcard(self, filename):
-        data = file(filename, 'r').read()
+        data = open(filename, 'r').read()
         log.debug_block(filename, data)
 
         for card in vcard.VCards(vcard.VFile(vcard.opentextfile(filename))):
@@ -407,13 +408,13 @@ class FaxAddressBook(object): # Pickle based address book
                     if not org:
                         org = []
 
-                org.append(u'All')
+                org.append(to_unicode('All'))
                 groups = [o for o in org if o]
 
                 name = card['name']
-                notes = card.get('notes', u'')
+                notes = card.get('notes', to_unicode(''))
                 log.debug("Import: name=%s, fax=%s group(s)=%s notes=%s" % (name, fax, ','.join(groups), notes))
-                self.set(name, u'', u'', u'', fax, groups, notes)
+                self.set(name, to_unicode(''), to_unicode(''), to_unicode(''), fax, groups, notes)
 
         return True, ''
 
@@ -517,23 +518,23 @@ def getFaxDevice(device_uri=None, printer_name=None,
     log.debug("fax-type=%d" % fax_type)
 
     if fax_type in (FAX_TYPE_BLACK_SEND_EARLY_OPEN, FAX_TYPE_BLACK_SEND_LATE_OPEN):
-        from pmlfax import PMLFaxDevice
+        from .pmlfax import PMLFaxDevice
         return PMLFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
 
     elif fax_type == FAX_TYPE_SOAP:
-        from soapfax import SOAPFaxDevice
+        from .soapfax import SOAPFaxDevice
         return SOAPFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
 
     elif fax_type == FAX_TYPE_LEDMSOAP:
-        from ledmsoapfax import LEDMSOAPFaxDevice
+        from .ledmsoapfax import LEDMSOAPFaxDevice
         return LEDMSOAPFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
 
     elif fax_type == FAX_TYPE_MARVELL:
-        from marvellfax import MarvellFaxDevice
+        from .marvellfax import MarvellFaxDevice
         return MarvellFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
 
     elif fax_type == FAX_TYPE_LEDM:
-        from ledmfax import LEDMFaxDevice
+        from .ledmfax import LEDMFaxDevice
         return LEDMFaxDevice(device_uri, printer_name, callback, fax_type, disable_dbus)
 
     else:
@@ -578,7 +579,7 @@ class FaxSendThread(threading.Thread):
         self.cover_re = cover_re
         self.cover_func = cover_func
         self.current_printer = printer_name
-        self.stream = StringIO()
+        self.stream = BytesIO()
         self.prev_update = ''
         self.remove_temp_file = False
         self.preserve_formatting = preserve_formatting
@@ -642,14 +643,14 @@ class FaxSendThread(threading.Thread):
 
             if os.path.exists(fax_file_name):
                 self.results[fax_file_name] = ERROR_SUCCESS
-                fax_file_fd = file(fax_file_name, 'r')
+                fax_file_fd = open(fax_file_name, 'rb')
                 header = fax_file_fd.read(FILE_HEADER_SIZE)
 
                 magic, version, total_pages, hort_dpi, vert_dpi, page_size, \
                     resolution, encoding, reserved1, reserved2 = \
                         self.decode_fax_header(header)
 
-                if magic != 'hplip_g3':
+                if magic != b'hplip_g3':
                     log.error("Invalid file header. Bad magic.")
                     self.results[fax_file_name] = ERROR_FAX_INVALID_FAX_FILE
                     state = STATE_ERROR
@@ -742,7 +743,7 @@ class FaxSendThread(threading.Thread):
         self.f = self.recipient_file_list[0][0]
 
         try:
-            f_fd = file(self.f, 'r')
+            f_fd = open(self.f, 'rb')
         except IOError:
             log.error("Unable to open fax file: %s" % self.f)
             state = STATE_ERROR
@@ -754,7 +755,7 @@ class FaxSendThread(threading.Thread):
 
             self.results[self.f] = ERROR_SUCCESS
 
-            if magic != 'hplip_g3':
+            if magic != b'hplip_g3':
                 log.error("Invalid file header. Bad magic.")
                 self.results[self.f] = ERROR_FAX_INVALID_FAX_FILE
                 state = STATE_ERROR
@@ -778,10 +779,10 @@ class FaxSendThread(threading.Thread):
             f_fd, self.f = utils.make_temp_file()
             log.debug("Temp file=%s" % self.f)
 
-            data = struct.pack(">8sBIHHBBBII", "hplip_g3", 1L, self.job_total_pages,
+            data = struct.pack(">8sBIHHBBBII", b"hplip_g3", to_long(1), self.job_total_pages,
                 self.job_hort_dpi, self.job_vert_dpi, self.job_page_size,
                 self.job_resolution, self.job_encoding,
-                0L, 0L)
+                to_long(0), to_long(0))
 
             os.write(f_fd, data)
 
@@ -792,13 +793,13 @@ class FaxSendThread(threading.Thread):
                 log.debug("Processing file: %s..." % fax_file_name)
 
                 if self.results[fax_file_name] == ERROR_SUCCESS:
-                    fax_file_fd = file(fax_file_name, 'r')
+                    fax_file_fd = open(fax_file_name, 'rb')
                     header = fax_file_fd.read(FILE_HEADER_SIZE)
 
                     magic, version, total_pages, hort_dpi, vert_dpi, page_size, \
                         resolution, encoding, reserved1, reserved2 = self.decode_fax_header(header)
 
-                    if magic != 'hplip_g3':
+                    if magic != b'hplip_g3':
                         log.error("Invalid file header. Bad magic.")
                         state = STATE_ERROR
                         break
@@ -817,7 +818,7 @@ class FaxSendThread(threading.Thread):
                             state - STATE_ERROR
                             break
 
-                        header = struct.pack(">IIIIII", job_page_num, ppr, rpp, bytes_to_read, thumbnail_bytes, 0L)
+                        header = struct.pack(">IIIIII", job_page_num, ppr, rpp, bytes_to_read, thumbnail_bytes, to_long(0))
                         os.write(f_fd, header)
 
                         self.write_queue((STATUS_PROCESSING_FILES, job_page_num, ''))
@@ -889,7 +890,7 @@ class FaxSendThread(threading.Thread):
 
         end_time = time.time() + 300.0 # wait for 5 min. max
         while time.time() < end_time:
-            log.debug("Waiting for fax...")
+            log.debug("Waiting for fax... type =%s"%type(self.dev.device_uri))
 
             result = list(self.service.CheckForWaitingFax(self.dev.device_uri, prop.username, sent_job_id))
 
@@ -930,7 +931,10 @@ class FaxSendThread(threading.Thread):
     def render_cover_page(self, a):
         log.debug("Creating cover page...")
 
+        #Read file again just before creating the coverpage, so that we get updated voice_phone and email_address from /hplip.conf file
+        #hplip.conf file get updated, whenever user changes coverpage info from hp-faxsetup window.
         user_conf.read()
+
         pdf = self.cover_func(page_size=coverpages.PAGE_SIZE_LETTER,
                               total_pages=self.job_total_pages,
 

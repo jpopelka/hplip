@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
@@ -22,6 +23,7 @@
 # StdLib
 import socket
 import operator
+import subprocess
 import signal
 
 # Local
@@ -29,17 +31,18 @@ from base.g import *
 from base import device, utils, models, pkit
 from prnt import cups
 from base.codes import *
-from ui_utils import *
+from .ui_utils import *
 from installer import pluginhandler
-
+from base.sixext import to_unicode, PY3, from_unicode_to_str
 # Qt
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+
 # Ui
-from setupdialog_base import Ui_Dialog
-from plugindialog import PluginDialog
-from wifisetupdialog import WifiSetupDialog, SUCCESS_CONNECTED
+from .setupdialog_base import Ui_Dialog
+from .plugindialog import PluginDialog
+from .wifisetupdialog import WifiSetupDialog, SUCCESS_CONNECTED
 
 # Fax
 try:
@@ -118,11 +121,11 @@ class PasswordDialog(QDialog):
             self.UsernameLineEdit.setStyleSheet("QLineEdit {background-color: lightgray}")
     
     def getUsername(self):
-        return unicode(self.UsernameLineEdit.text())
+        return to_unicode(self.UsernameLineEdit.text())
 
 
     def getPassword(self):
-        return unicode(self.PasswordLineEdit.text())
+        return to_unicode(self.PasswordLineEdit.text())
 
 
     def languageChange(self):
@@ -138,7 +141,7 @@ class PasswordDialog(QDialog):
 
 
 def FailureMessageUI(prompt):
-    try:	
+    try:
         dlg = PasswordDialog(prompt, None)
         FailureUI(dlg, prompt)
     finally:
@@ -146,7 +149,7 @@ def FailureMessageUI(prompt):
 
 
 def showPasswordUI(prompt, userName=None, allowUsernameEdit=True):
-    try:	
+    try:
         dlg = PasswordDialog(prompt, None)
 
         if userName != None:
@@ -308,9 +311,9 @@ class SetupDialog(QDialog, Ui_Dialog):
             self.setUsbRadioButton(True)
 
         if prop.fax_build and prop.scan_build:
-            self.DeviceTypeComboBox.addItem("All devices/printers", QVariant(DEVICE_DESC_ALL))
-            self.DeviceTypeComboBox.addItem("Single function printers only", QVariant(DEVICE_DESC_SINGLE_FUNC))
-            self.DeviceTypeComboBox.addItem("All-in-one/MFP devices only", QVariant(DEVICE_DESC_MULTI_FUNC))
+            self.DeviceTypeComboBox.addItem("All devices/printers", DEVICE_DESC_ALL)
+            self.DeviceTypeComboBox.addItem("Single function printers only", DEVICE_DESC_SINGLE_FUNC)
+            self.DeviceTypeComboBox.addItem("All-in-one/MFP devices only", DEVICE_DESC_MULTI_FUNC)
         else:
             self.DeviceTypeComboBox.setEnabled(False)
 
@@ -573,7 +576,7 @@ class SetupDialog(QDialog, Ui_Dialog):
             if len(self.devices) == 1:
                 self.DevicesFoundLabel.setText(self.__tr("<b>1 device found.</b> Click <i>Next</i> to continue."))
             else:
-                self.DevicesFoundLabel.setText(self.__tr("<b>%1 devices found.</b> Select the device to install and click <i>Next</i> to continue.").arg(len(self.devices)))
+                self.DevicesFoundLabel.setText(self.__tr("<b>%s devices found.</b> Select the device to install and click <i>Next</i> to continue."%(len(self.devices))))
 
             self.loadDevicesTable()
 
@@ -617,8 +620,6 @@ class SetupDialog(QDialog, Ui_Dialog):
             self.DevicesTableWidget.setItem(row, device_uri_col, i)
 
             if self.bus == 'net':
-                #if device.ip_pat.search(host) is None:
-                     #host = socket.gethostbyname(host)
                 i = QTableWidgetItem(QString(host))
                 i.setFlags(flags)
                 self.DevicesTableWidget.setItem(row, 1, i)
@@ -695,7 +696,8 @@ class SetupDialog(QDialog, Ui_Dialog):
 
         self.setNextButton(BUTTON_ADD_PRINTER)
 
-        self.setDefaultPrinterName()
+        if not self.printer_name:
+            self.setDefaultPrinterName()
 
         self.findPrinterPPD()
 
@@ -706,7 +708,8 @@ class SetupDialog(QDialog, Ui_Dialog):
             self.SetupFaxGroupBox.setChecked(True)
             self.SetupFaxGroupBox.setEnabled(True)
 
-            self.setDefaultFaxName()
+            if not self.fax_name:
+                self.setDefaultFaxName()
 
             self.findFaxPPD()
 
@@ -747,7 +750,7 @@ class SetupDialog(QDialog, Ui_Dialog):
 
 
     def OtherPPDButton_clicked(self, b):
-        ppd_file = unicode(QFileDialog.getOpenFileName(self, self.__tr("Select PPD File"),
+        ppd_file = to_unicode(QFileDialog.getOpenFileName(self, self.__tr("Select PPD File"),
                                                        sys_conf.get('dirs', 'ppd'),
                                                        self.__tr("PPD Files (*.ppd *.ppd.gz);;All Files (*)")))
 
@@ -776,7 +779,7 @@ class SetupDialog(QDialog, Ui_Dialog):
                 self.fax_setup_ok = True
             else:
                 self.fax_setup_ok = False
-                FailureUI(self, self.__tr("<b>Unable to locate the HPLIP Fax PPD file:</b><p>%1.ppd.gz</p><p>Fax setup has been disabled.").arg(fax_ppd_name))
+                FailureUI(self, self.__tr("<b>Unable to locate the HPLIP Fax PPD file:</b><p>%s.ppd.gz</p><p>Fax setup has been disabled."%fax_ppd_name))
                 self.fax_setup = False
                 self.SetupFaxGroupBox.setChecked(False)
                 self.SetupFaxGroupBox.setEnabled(False)
@@ -840,7 +843,7 @@ class SetupDialog(QDialog, Ui_Dialog):
 
 
     def PrinterNameLineEdit_textEdited(self, t):
-        self.printer_name = unicode(t)
+        self.printer_name = to_unicode(t)
         self.printer_name_ok = True
 
         if not self.printer_name:
@@ -872,7 +875,7 @@ class SetupDialog(QDialog, Ui_Dialog):
 
 
     def FaxNameLineEdit_textEdited(self, t):
-        self.fax_name = unicode(t)
+        self.fax_name = to_unicode(t)
         self.fax_name_ok = True
 
         if not self.fax_name:
@@ -963,7 +966,7 @@ class SetupDialog(QDialog, Ui_Dialog):
         if self.mq.get('fw-download', False):
             try:
                 d = device.Device(self.device_uri)
-            except Error , e:
+            except Error as e:
                 FailureUI(self, self.__tr("<b>Error opening device. Firmware download is Failed.</b><p>%s (%s)." % (e.msg, e.opt)))
             else:
                 if d.downloadFirmware():
@@ -971,7 +974,6 @@ class SetupDialog(QDialog, Ui_Dialog):
                 else:
                     FailureUI(self, self.__tr("<b>Firmware download is Failed.</b>"))
                 d.close()
-
 
     #
     # SETUP PRINTER/FAX
@@ -982,9 +984,9 @@ class SetupDialog(QDialog, Ui_Dialog):
         QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
         try:
             if not os.path.exists(self.print_ppd[0]): # assume foomatic: or some such
-                add_prnt_args = (self.printer_name.encode('utf8'), self.device_uri, self.print_location, '', self.print_ppd[0], self.print_desc)
+                add_prnt_args = (from_unicode_to_str(self.printer_name), self.device_uri, self.print_location, '', self.print_ppd[0], self.print_desc)
             else:
-                add_prnt_args = (self.printer_name.encode('utf8'), self.device_uri, self.print_location, self.print_ppd[0], '', self.print_desc)
+                add_prnt_args = (from_unicode_to_str(self.printer_name), self.device_uri, self.print_location, self.print_ppd[0], '', self.print_desc)
 
             status, status_str = cups.cups_operation(cups.addPrinter, GUI_MODE, 'qt4', self, *add_prnt_args)
             log.debug(device.getSupportedCUPSDevices(['hp']))
@@ -1006,10 +1008,10 @@ class SetupDialog(QDialog, Ui_Dialog):
         QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
         try:
             if not os.path.exists(self.fax_ppd):
-                status, status_str = cups.addPrinter(self.fax_name.encode('utf8'),
+                status, status_str = cups.addPrinter(self.fax_name,
                     self.fax_uri, self.fax_location, '', self.fax_ppd,  self.fax_desc)
             else:
-                status, status_str = cups.addPrinter(self.fax_name.encode('utf8'),
+                status, status_str = cups.addPrinter(self.fax_name,
                     self.fax_uri, self.fax_location, self.fax_ppd, '', self.fax_desc)
 
             log.debug(device.getSupportedCUPSDevices(['hpfax']))
@@ -1038,7 +1040,7 @@ class SetupDialog(QDialog, Ui_Dialog):
                     d.open()
                 except Error:
                     error_text = self.__tr("Unable to communicate with the device. Please check the device and try again.")
-                    log.error(unicode(error_text))
+                    log.error(to_unicode(error_text))
                     if QMessageBox.critical(self,
                                            self.windowTitle(),
                                            error_text,
@@ -1057,15 +1059,17 @@ class SetupDialog(QDialog, Ui_Dialog):
 
                             try:
                                 if read:
-                                    self.fax_number = unicode(d.getPhoneNum())
-                                    self.fax_name_company = unicode(d.getStationName())
+                                    #self.fax_number = str(d.getPhoneNum()) 
+                                    #self.fax_name_company = str(d.getStationName())
+                                    self.fax_number = to_unicode(d.getPhoneNum())
+                                    self.fax_name_company = to_unicode(d.getStationName())
                                 else:
                                     d.setStationName(self.fax_name_company)
                                     d.setPhoneNum(self.fax_number)
 
                             except Error:
                                 error_text = self.__tr("<b>Device I/O Error</b><p>Could not communicate with device. Device may be busy.")
-                                log.error(unicode(error_text))
+                                log.error(to_unicode(error_text))
 
                                 if QMessageBox.critical(self,
                                                        self.windowTitle(),
@@ -1102,7 +1106,7 @@ class SetupDialog(QDialog, Ui_Dialog):
     def printTestPage(self):
         try:
             d = device.Device(self.device_uri)
-        except Error, e:
+        except Error as e:
             FailureUI(self, self.__tr("<b>Device error:</b><p>%s (%s)." % (e.msg, e.opt)))
 
         else:
@@ -1116,7 +1120,7 @@ class SetupDialog(QDialog, Ui_Dialog):
 
                     try:
                         d.printTestPage(self.printer_name)
-                    except Error, e:
+                    except Error as e:
                         if e.opt == ERROR_NO_CUPS_QUEUE_FOUND_FOR_DEVICE:
                             FailureUI(self, self.__tr("<b>No CUPS queue found for device.</b><p>Please install the printer in CUPS and try again."))
                         else:
@@ -1172,7 +1176,7 @@ class SetupDialog(QDialog, Ui_Dialog):
 
             i = QTableWidgetItem(QString(p.name))
             i.setFlags(flags)
-            i.setData(Qt.UserRole, QVariant(p.name))
+            i.setData(Qt.UserRole, p.name) 
             self.RemoveDevicesTableWidget.setItem(row, 1, i)
 
             if back_end == 'hpfax':
@@ -1194,7 +1198,7 @@ class SetupDialog(QDialog, Ui_Dialog):
 
 
     def CheckBox_stateChanged(self, i):
-        for row in xrange(self.RemoveDevicesTableWidget.rowCount()):
+        for row in range(self.RemoveDevicesTableWidget.rowCount()):
             widget = self.RemoveDevicesTableWidget.cellWidget(row, 0)
             if widget.checkState() == Qt.Checked:
                 self.NextButton.setEnabled(True)
@@ -1211,10 +1215,10 @@ class SetupDialog(QDialog, Ui_Dialog):
         p = self.StackedWidget.currentIndex()
         if p == PAGE_DISCOVERY:
             self.manual = self.ManualGroupBox.isChecked()
-            self.param = unicode(self.ManualParamLineEdit.text())
+            self.param = to_unicode(self.ManualParamLineEdit.text())
             self.jd_port = self.JetDirectSpinBox.value()
-            self.search = unicode(self.SearchLineEdit.text())
-            self.device_desc = int(self.DeviceTypeComboBox.itemData(self.DeviceTypeComboBox.currentIndex()).toInt()[0])
+            self.search = to_unicode(self.SearchLineEdit.text())
+            self.device_desc = value_int(self.DeviceTypeComboBox.itemData(self.DeviceTypeComboBox.currentIndex()))[0]
             self.discovery_method = self.NetworkDiscoveryMethodComboBox.currentIndex()
 
             if self.WirelessButton.isChecked():
@@ -1238,21 +1242,22 @@ class SetupDialog(QDialog, Ui_Dialog):
 
         elif p == PAGE_ADD_PRINTER:
             self.print_test_page = self.SendTestPageCheckBox.isChecked()
-            self.print_desc = unicode(self.PrinterDescriptionLineEdit.text()).encode('utf8')
-            self.print_location = unicode(self.PrinterLocationLineEdit.text()).encode('utf8')
             self.fax_setup = self.SetupFaxGroupBox.isChecked()
-            self.fax_desc = unicode(self.FaxDescriptionLineEdit.text())
-            self.fax_location = unicode(self.FaxLocationLineEdit.text())
-            self.fax_name_company = unicode(self.NameCompanyLineEdit.text())
-            self.fax_number = unicode(self.FaxNumberLineEdit.text())
+            self.print_location = from_unicode_to_str(to_unicode(self.PrinterLocationLineEdit.text()))
+            self.print_desc = from_unicode_to_str(to_unicode(self.PrinterDescriptionLineEdit.text()))
+            self.fax_desc = from_unicode_to_str(to_unicode(self.FaxDescriptionLineEdit.text()))
+            self.fax_location = from_unicode_to_str(to_unicode(self.FaxLocationLineEdit.text()))
+
+            self.fax_name_company = to_unicode(self.NameCompanyLineEdit.text())
+            self.fax_number = to_unicode(self.FaxNumberLineEdit.text())
             self.addPrinter()
 
         elif p == PAGE_REMOVE:
-            for row in xrange(self.RemoveDevicesTableWidget.rowCount()):
+            for row in range(self.RemoveDevicesTableWidget.rowCount()):
                 widget = self.RemoveDevicesTableWidget.cellWidget(row, 0)
                 if widget.checkState() == Qt.Checked:
                     item = self.RemoveDevicesTableWidget.item(row, 1)
-                    printer = unicode(item.data(Qt.UserRole).toString()).encode('utf-8')
+                    printer = to_unicode(value_str(item.data(Qt.UserRole)))
                     uri = device.getDeviceURIByPrinterName(printer)
                     log.debug("Removing printer: %s" % printer)
                     status, status_str = cups.cups_operation(cups.delPrinter, GUI_MODE, 'qt4', self, printer)
@@ -1305,7 +1310,7 @@ class SetupDialog(QDialog, Ui_Dialog):
 
 
     def updateStepText(self, p):
-        self.StepText.setText(self.__tr("Step %1 of %2").arg(p+1).arg(self.max_page+1))
+        self.StepText.setText(self.__tr("Step %s of %s"%(p+1, self.max_page+1)))  #Python 3.2
 
 
     def __tr(self,s,c = None):

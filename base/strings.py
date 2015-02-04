@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
-# Author: Don Welch, Naga Samrat Chowdary Narla, Yashwant Kumar Sahu
+# Author: Don Welch, Naga Samrat Chowdary Narla, Yashwant Kumar Sahu, Sanjay Kumar
 #
 
 # string_table := { 'string_id' : 'short', 'long' ), ... }
@@ -47,6 +47,7 @@ class StringTable:
             '110' : (self.__tr('Unknown error'), ''),
             '111' : (self.__tr('No device found having smart install enabled'), ''),
             '112' : (self.__tr('Failed to disable smart install'), ''),
+
             '500' : (self.__tr('Started a print job'), ''),
             '501' : (self.__tr('Print job has completed'), ''),
             '502' : (self.__tr("Print job failed - required plug-in not found"), self.__tr("Please run hp-plugin (as root) to install the required plug-in")),
@@ -328,9 +329,9 @@ class StringTable:
 
     def __tr(self,s,c = None):
         return s
-		
+
 import re
-from base import logger
+from . import logger
 log = logger.Logger('', logger.Logger.LOG_LEVEL_INFO, logger.Logger.LOG_TO_CONSOLE)
 
 inter_pat = re.compile(r"""%(.*)%""", re.IGNORECASE)

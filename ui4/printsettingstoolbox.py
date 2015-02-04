@@ -27,7 +27,9 @@ from base.g import *
 from base import utils
 from prnt import cups
 from base.codes import *
-from ui_utils import *
+from .ui_utils import *
+from base.sixext import PY3
+from base.sixext import  to_unicode
 
 # Qt
 from PyQt4.QtCore import *
@@ -41,11 +43,16 @@ class RangeValidator(QValidator):
 
 
     def validate(self, input, pos):
-        for x in unicode(input)[pos-1:]:
-            if x not in u'0123456789,- ':
-                return QValidator.Invalid, pos
-
-        return QValidator.Acceptable, pos
+        for x in to_unicode(input)[pos-1:]:
+            if x not in to_unicode('0123456789,- '):
+                if PY3:
+                    return QValidator.Invalid, input, pos
+                else:
+                    return QValidator.Invalid, pos
+        if PY3:
+            return QValidator.Acceptable, input, pos
+        else:
+            return QValidator.Acceptable, pos
 
 
 
@@ -55,11 +62,16 @@ class PinValidator(QValidator):
 
 
     def validate(self, input, pos):
-        for x in unicode(input)[pos-1:]:
-            if x not in u'0123456789':
-                return QValidator.Invalid, pos
-
-        return QValidator.Acceptable, pos
+        for x in to_unicode(input)[pos-1:]:
+            if x not in to_unicode('0123456789'):
+                if PY3:
+                    return QValidator.Invalid, input, pos
+                else:
+                    return QValidator.Invalid, pos
+        if PY3:
+            return QValidator.Acceptable, input, pos
+        else:
+            return QValidator.Acceptable, pos
 
 
 
@@ -69,11 +81,16 @@ class UsernameAndJobnameValidator(QValidator):
 
 
     def validate(self, input, pos):
-        for x in unicode(input)[pos-1:]:
-            if x in u' /=,.:;\'"[]{}-+!@#$%^&*()':
-                return QValidator.Invalid, pos
-
-        return QValidator.Acceptable, pos
+        for x in to_unicode(input)[pos-1:]:
+            if x in to_unicode(' /=,.:;\'"[]{}-+!@#$%^&*()'):
+                if PY3:
+                    return QValidator.Invalid, input, pos
+                else:
+                    return QValidator.Invalid, pos
+        if PY3:
+            return QValidator.Acceptable, input, pos
+        else:
+            return QValidator.Acceptable, pos
 
 
 
@@ -450,17 +467,13 @@ class PrintSettingsToolbox(QToolBox):
 
                     read_only = 'install' in g.lower()
 
-                    try:
-                        text = text.decode('utf-8')
-                    except UnicodeDecodeError:
-                        pass
 
                     if g.lower() == 'printoutmode':
                         text = self.__tr("Quality (also see 'Printout Mode' under 'General')")
 
                     self.beginControlGroup(g, QString(text))
 
-                    log.debug("  Text: %s" % repr(text))
+                    log.debug("  Text: %s" % str(text))
                     log.debug("Num subgroups: %d" % num_subgroups)
 
                     options = cups.getOptionList(g)
@@ -480,10 +493,6 @@ class PrintSettingsToolbox(QToolBox):
                             log.warn("Option %s in group %s returned None" % (o, g))
                             continue
 
-                        try:
-                            option_text = option_text.decode('utf-8')
-                        except UnicodeDecodeError:
-                            pass
 
                         if o.lower() == 'quality':
                             option_text = self.__tr("Quality")
@@ -505,10 +514,6 @@ class PrintSettingsToolbox(QToolBox):
 
                             choice_text, marked = cups.getChoice(g, o, c)
 
-                            try:
-                                choice_text = choice_text.decode('utf-8')
-                            except UnicodeDecodeError:
-                                pass
 
                             log.debug("      Text: %s" % repr(choice_text))
 
@@ -784,10 +789,10 @@ class PrintSettingsToolbox(QToolBox):
                 cur_outputmode_dpi = cups.findPPDAttribute(quality_attr_name, cur_outputmode)
                 if cur_outputmode_dpi is not None:
                     log.debug("Adding Group: Summary outputmode is : %s" % cur_outputmode)
-                    log.debug("Adding Group: Summary outputmode dpi is : %s" % unicode (cur_outputmode_dpi))                                    
+                    log.debug("Adding Group: Summary outputmode dpi is : %s" % to_unicode (cur_outputmode_dpi))
                     self.beginControlGroup("sumry", self.__tr("Summary"))
                     self.addControlRow("colorinput", self.__tr('Color Input / Black Render'),
-                        cups.UI_INFO, unicode (cur_outputmode_dpi), [], read_only)
+                        cups.UI_INFO, to_unicode (cur_outputmode_dpi), [], read_only)
                     self.addControlRow("quality", self.__tr('Print Quality'),
                         cups.UI_INFO, cur_outputmode, [], read_only)
                     self.endControlGroup()
@@ -798,13 +803,13 @@ class PrintSettingsToolbox(QToolBox):
 
 
                 if self.job_storage_enable:
-                    self.job_storage_pin = unicode(current_options.get('HOLDKEY', '0000')[:4])
-                    self.job_storage_username = unicode(current_options.get('USERNAME', prop.username)[:16])
-                    self.job_storage_jobname = unicode(current_options.get('JOBNAME', u'Untitled')[:16])
-                    hold = unicode(current_options.get('HOLD', u'OFF'))
-                    holdtype = unicode(current_options.get('HOLDTYPE', u'PUBLIC'))
+                    self.job_storage_pin = to_unicode(current_options.get('HOLDKEY', '0000')[:4])
+                    self.job_storage_username = to_unicode(current_options.get('USERNAME', prop.username)[:16])
+                    self.job_storage_jobname = to_unicode(current_options.get('JOBNAME', to_unicode('Untitled'))[:16])
+                    hold = to_unicode(current_options.get('HOLD', to_unicode('OFF')))
+                    holdtype = to_unicode(current_options.get('HOLDTYPE', to_unicode('PUBLIC')))
                     self.job_storage_use_pin = False
-                    duplicate = unicode(current_options.get('DUPLICATEJOB', u'REPLACE'))
+                    duplicate = to_unicode(current_options.get('DUPLICATEJOB', to_unicode('REPLACE')))
                     self.job_storage_auto_username = True
                     self.job_storage_auto_jobname = True
                     self.job_storage_mode = JOB_STORAGE_TYPE_OFF
@@ -813,25 +818,25 @@ class PrintSettingsToolbox(QToolBox):
                         self.job_storage_mode = JOB_STORAGE_TYPE_OFF
 
                     elif hold == 'ON':
-                        if holdtype == u'PUBLIC':
+                        if holdtype == to_unicode('PUBLIC'):
                             self.job_storage_mode = JOB_STORAGE_TYPE_QUICK_COPY
 
                         else: # 'PRIVATE'
                             self.job_storage_mode = JOB_STORAGE_TYPE_PERSONAL
                             self.job_storage_use_pin = True
 
-                    elif hold == u'PROOF':
-                        if holdtype == u'PUBLIC':
+                    elif hold == to_unicode('PROOF'):
+                        if holdtype == to_unicode('PUBLIC'):
                             self.job_storage_mode = JOB_STORAGE_TYPE_PROOF_AND_HOLD
                         else:
                             self.job_storage_mode = JOB_STORAGE_TYPE_PERSONAL
                             self.job_storage_use_pin = True
 
-                    elif hold == u'STORE':
+                    elif hold == to_unicode('STORE'):
                         self.job_storage_mode = JOB_STORAGE_TYPE_STORE
-                        self.job_storage_use_pin = (holdtype == u'PRIVATE')
+                        self.job_storage_use_pin = (holdtype == 'PRIVATE')
 
-                    if duplicate == u'REPLACE':
+                    if duplicate == to_unicode('REPLACE'):
                         self.job_storage_job_exist = JOB_STORAGE_EXISTING_JOB_REPLACE
                     else: # u'APPEND'
                         self.job_storage_job_exist = JOB_STORAGE_EXISTING_JOB_APPEND_1_99
@@ -1235,11 +1240,11 @@ class PrintSettingsToolbox(QToolBox):
             OptionLabel.setText(text)
             self.JobStorageModeDefaultButton.setText(self.__tr("Default"))
 
-            self.JobStorageModeComboBox.addItem(self.__tr("Off/Disabled"), QVariant(JOB_STORAGE_TYPE_OFF))
-            self.JobStorageModeComboBox.addItem(self.__tr("Proof and Hold"), QVariant(JOB_STORAGE_TYPE_PROOF_AND_HOLD))
-            self.JobStorageModeComboBox.addItem(self.__tr("Personal/Private Job"), QVariant(JOB_STORAGE_TYPE_PERSONAL))
-            self.JobStorageModeComboBox.addItem(self.__tr("Quick Copy"), QVariant(JOB_STORAGE_TYPE_QUICK_COPY))
-            self.JobStorageModeComboBox.addItem(self.__tr("Stored Job"), QVariant(JOB_STORAGE_TYPE_STORE))
+            self.JobStorageModeComboBox.addItem(self.__tr("Off/Disabled"), JOB_STORAGE_TYPE_OFF)
+            self.JobStorageModeComboBox.addItem(self.__tr("Proof and Hold"), JOB_STORAGE_TYPE_PROOF_AND_HOLD)
+            self.JobStorageModeComboBox.addItem(self.__tr("Personal/Private Job"), JOB_STORAGE_TYPE_PERSONAL)
+            self.JobStorageModeComboBox.addItem(self.__tr("Quick Copy"), JOB_STORAGE_TYPE_QUICK_COPY)
+            self.JobStorageModeComboBox.addItem(self.__tr("Stored Job"), JOB_STORAGE_TYPE_STORE)
 
             self.connect(self.JobStorageModeComboBox, SIGNAL("activated(int)"),
                         self.JobStorageModeComboBox_activated)
@@ -1416,10 +1421,10 @@ class PrintSettingsToolbox(QToolBox):
             HBoxLayout.addWidget(self.JobStorageExistingDefaultButton)
 
             self.JobStorageExistingComboBox.addItem(self.__tr("Replace existing job"),
-                             QVariant(JOB_STORAGE_EXISTING_JOB_REPLACE))
+                             JOB_STORAGE_EXISTING_JOB_REPLACE)
 
             self.JobStorageExistingComboBox.addItem(self.__tr("Use job name appended with 1-99"),
-                             QVariant(JOB_STORAGE_EXISTING_JOB_APPEND_1_99))
+                             JOB_STORAGE_EXISTING_JOB_APPEND_1_99)
 
             self.JobStorageExistingDefaultButton.setText(self.__tr("Default"))
 
@@ -1469,7 +1474,7 @@ class PrintSettingsToolbox(QToolBox):
 
 
     def BannerComboBox_activated(self, a): # cups.UI_BANNER_JOB_SHEETS
-        a = unicode(a)
+        a = to_unicode(a)
         sender = self.sender()
         choice = None
 
@@ -1503,7 +1508,7 @@ class PrintSettingsToolbox(QToolBox):
 
 
     def ComboBox_highlighted(self, t):
-        t = unicode(t)
+        t = to_unicode(t)
         sender = self.sender()
         choice = None
 
@@ -1611,7 +1616,7 @@ class PrintSettingsToolbox(QToolBox):
 
     def ComboBox_indexChanged(self, currentItem):
         sender = self.sender()
-        currentItem = unicode(currentItem)
+        currentItem = to_unicode(currentItem)
         # Checking for summary control
         labelPQValaue = getattr(self, 'PQValueLabel', None)
         labelPQColorInput = getattr(self, 'PQColorInputLabel', None)
@@ -1719,31 +1724,24 @@ class PrintSettingsToolbox(QToolBox):
             sender = self.sender()
             sender.pushbutton.setEnabled(True)
             sender.edit_control.setEnabled(True)
-            self.job_options['pagerange'] = unicode(sender.edit_control.text())
+            self.job_options['pagerange'] = to_unicode(sender.edit_control.text())
 
 
     def PageRangeEdit_editingFinished(self):
         sender = self.sender()
         t, ok, x = self.job_options['pagerange'], True, []
 
-        #[Sanjay]Start Range Validation here as the editing is finished
+
         try:
             x = utils.expand_range(t)   
         except ValueError:
             ok = False
 
-        if t == '':
-            ok = False
-
         if ok:
-            if 0 in x:
-                ok = False
-
-            if ok:
-                for y in x:
-                    if y > 999:
-                        ok = False
-                        break
+            for y in x:
+                if y <= 0  or y > 999:
+                    ok = False
+                    break
 
         if not ok:
             self.job_options['pagerange'] = ''
@@ -1753,7 +1751,7 @@ class PrintSettingsToolbox(QToolBox):
 
 
     def PageRangeEdit_textChanged(self, t):
-        self.job_options['pagerange'] = unicode(t) # Do range validation only in PageRangeEdit_editingFinished method
+        self.job_options['pagerange'] = to_unicode(t) # Do range validation only in PageRangeEdit_editingFinished method
 
     #
     # Job Storage
@@ -1763,7 +1761,7 @@ class PrintSettingsToolbox(QToolBox):
         beginWaitCursor()
         try:
             # Mode
-            self.JobStorageModeComboBox.setCurrentIndex(self.JobStorageModeComboBox.findData(QVariant(self.job_storage_mode)))
+            self.JobStorageModeComboBox.setCurrentIndex(self.JobStorageModeComboBox.findData(self.job_storage_mode))
             self.JobStorageModeDefaultButton.setEnabled(self.job_storage_mode != JOB_STORAGE_TYPE_OFF)
 
             # PIN
@@ -1776,7 +1774,7 @@ class PrintSettingsToolbox(QToolBox):
             self.JobStorageIDAutoRadioButton.setChecked(self.job_storage_auto_jobname)
 
             # Dup/existing ID
-            self.JobStorageExistingComboBox.setCurrentIndex(self.JobStorageExistingComboBox.findData(QVariant(self.job_storage_job_exist)))
+            self.JobStorageExistingComboBox.setCurrentIndex(self.JobStorageExistingComboBox.findData(self.job_storage_job_exist))
 
             if self.job_storage_mode == JOB_STORAGE_TYPE_OFF:
                 # PIN
@@ -1900,7 +1898,7 @@ class PrintSettingsToolbox(QToolBox):
 
     def JobStorageModeComboBox_activated(self, i):
         sender = self.sender()
-        mode, ok = sender.itemData(i).toInt()
+        mode, ok = value_int(sender.itemData(i))
         if ok:
             self.job_storage_mode = mode
             self.saveJobStorageOptions()
@@ -1932,7 +1930,7 @@ class PrintSettingsToolbox(QToolBox):
 
 
     def JobStoragePinEdit_textEdited(self, s):
-        self.job_storage_pin = unicode(s)
+        self.job_storage_pin = to_unicode(s)
         self.setPrinterOption('HOLDKEY', self.job_storage_pin.encode('ascii'))
 
 
@@ -1958,7 +1956,7 @@ class PrintSettingsToolbox(QToolBox):
 
 
     def JobStorageUsernameEdit_textEdited(self, s):
-        self.job_storage_username = unicode(s)
+        self.job_storage_username = to_unicode(s)
         self.setPrinterOption('USERNAME', self.job_storage_username.encode('ascii'))
 
     #
@@ -1982,7 +1980,7 @@ class PrintSettingsToolbox(QToolBox):
 
 
     def JobStorageIDEdit_textEdited(self, s):
-        self.job_storage_jobname = unicode(s)
+        self.job_storage_jobname = to_unicode(s)
         self.setPrinterOption('JOBNAME', self.job_storage_jobname.encode('ascii'))
 
     #
@@ -1991,7 +1989,7 @@ class PrintSettingsToolbox(QToolBox):
 
     def JobStorageExistingComboBox_activated(self, i):
         sender = self.sender()
-        opt, ok = sender.itemData(i).toInt()
+        opt, ok = value_int(sender.itemData(i))
         if ok:
             self.job_storage_job_exist = opt
             self.updateJobStorageControls()

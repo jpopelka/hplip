@@ -23,8 +23,9 @@
 
 # Local
 from base.g import *
-from ui_utils import *
+from .ui_utils import *
 from base import device
+from base.sixext import  to_unicode
 
 # Qt
 from PyQt4.QtCore import *
@@ -150,7 +151,7 @@ class DeviceUriComboBox(QWidget):
         if self.updating:
             return
 
-        self.device_uri = unicode(t)
+        self.device_uri = to_unicode(t)
         if self.device_uri:
             #user_conf.set('last_used', 'device_uri', self.device_uri)
             self.user_settings.last_used_device_uri = self.device_uri

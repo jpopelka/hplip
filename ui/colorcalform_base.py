@@ -98,13 +98,13 @@ class ColorCalForm_base(QDialog):
 
 
     def buttonGroup2_clicked(self,a0):
-        print "ColorCalForm_base.buttonGroup2_clicked(int): Not implemented yet"
+        print("ColorCalForm_base.buttonGroup2_clicked(int): Not implemented yet")
 
     def ColorCalGroup_released(self,a0):
-        print "ColorCalForm_base.ColorCalGroup_released(int): Not implemented yet"
+        print("ColorCalForm_base.ColorCalGroup_released(int): Not implemented yet")
 
     def ColorCalGroup_clicked(self,a0):
-        print "ColorCalForm_base.ColorCalGroup_clicked(int): Not implemented yet"
+        print("ColorCalForm_base.ColorCalGroup_clicked(int): Not implemented yet")
 
     def __tr(self,s,c = None):
         return qApp.translate("ColorCalForm_base",s,c)

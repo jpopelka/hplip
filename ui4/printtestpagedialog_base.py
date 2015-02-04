@@ -73,5 +73,5 @@ class Ui_Dialog(object):
         self.PrintTestpageButton.setText(QtGui.QApplication.translate("Dialog", "Print Test Page", None, QtGui.QApplication.UnicodeUTF8))
         self.CancelButton.setText(QtGui.QApplication.translate("Dialog", "Cancel", None, QtGui.QApplication.UnicodeUTF8))
 
-from printernamecombobox import PrinterNameComboBox
-from loadpapergroupbox import LoadPaperGroupBox
+from .printernamecombobox import PrinterNameComboBox
+from .loadpapergroupbox import LoadPaperGroupBox

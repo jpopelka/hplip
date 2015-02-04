@@ -23,14 +23,14 @@
 # Local
 from base.g import *
 from base import device, utils
-from ui_utils import *
+from .ui_utils import *
 
 # Qt
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Ui
-from nodevicesdialog_base import Ui_NoDevicesDialog_base
+from .nodevicesdialog_base import Ui_NoDevicesDialog_base
 
 
 class NoDevicesDialog(QDialog, Ui_NoDevicesDialog_base):

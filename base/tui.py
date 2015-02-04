@@ -24,9 +24,10 @@ import sys
 import re
 
 # Local
-from g import *
-import pexpect
-import utils
+from .g import *
+from . import utils
+from .sixext import PY3
+from .sixext.moves import input
 
 
 def enter_yes_no(question, default_value='y', choice_prompt=None):
@@ -48,7 +49,7 @@ def enter_yes_no(question, default_value='y', choice_prompt=None):
 
     while True:
         try:
-            user_input = raw_input(log.bold(question)).lower().strip()
+            user_input = input(log.bold(question)).lower().strip()
         except EOFError:
             continue
 
@@ -70,7 +71,7 @@ def enter_yes_no(question, default_value='y', choice_prompt=None):
 def enter_range(question, min_value, max_value, default_value=None):
     while True:
         try:
-            user_input = raw_input(log.bold(question)).lower().strip()
+            user_input = input(log.bold(question)).lower().strip()
         except EOFError:
             continue
 
@@ -102,7 +103,7 @@ def enter_choice(question, choices, default_value=None):
 
     while True:
         try:
-            user_input = raw_input(log.bold(question)).lower().strip()
+            user_input = input(log.bold(question)).lower().strip()
         except EOFError:
             continue
 
@@ -156,7 +157,7 @@ def load_photo_paper_prompt():
 def continue_prompt(prompt=''):
     while True:
         try:
-            x = raw_input(log.bold(prompt + " Press <enter> to continue or 'q' to quit: ")).lower().strip()
+            x = input(log.bold(prompt + " Press <enter> to continue or 'q' to quit: ")).lower().strip()
         except EOFError:
             continue
 
@@ -173,7 +174,7 @@ def enter_regex(regex, prompt, pattern, default_value=None):
     re_obj = re.compile(regex)
     while True:
         try:
-            x = raw_input(log.bold(prompt))
+            x = input(log.bold(prompt))
         except EOFError:
             continue
 
@@ -194,8 +195,12 @@ def enter_regex(regex, prompt, pattern, default_value=None):
 
 def ttysize():
     try:
-        import commands # TODO: Replace with subprocess (commands is deprecated in Python 3.0)
-        ln1 = commands.getoutput('stty -a').splitlines()[0]
+        if PY3:
+            import subprocess # TODO: Replace with subprocess (commands is deprecated in Python 3.0)
+            ln1 = subprocess.getoutput('stty -a').splitlines()[0]
+        else:
+            import commands
+            ln1 = commands.getoutput('stty -a').splitlines()[0]
         vals = {'rows':None, 'columns':None}
         for ph in ln1.split(';'):
             x = ph.split()
@@ -220,7 +225,7 @@ class ProgressMeter(object):
     def update(self, progress, msg=''): # progress in %
         self.progress = progress
 
-        x = self.progress * self.max_size / 100
+        x = int(self.progress * self.max_size / 100)
         if x > self.max_size: x = self.max_size
 
         if self.progress >= 100:
@@ -319,7 +324,7 @@ class Formatter(object):
 
             sep = []
             for c in col_widths:
-                sep.append('-'*c)
+                sep.append('-'*int(c))
 
             log.info(formatter.compose(tuple(sep)))
 
@@ -402,6 +407,8 @@ def printer_table(printers):
     if ok:
         ret = printers[i]
 
+    else :
+        sys.exit(0)
     return ret
 
 
@@ -444,6 +451,8 @@ def device_table(devices, scan_flag=False):
     if ok:
         ret = device_index[i]
 
+    else :
+        sys.exit(0)
     return ret
 
 
@@ -464,7 +473,7 @@ def connection_table():
         table = Formatter(header=('Num', 'Connection Type', 'Description'),
                           max_widths=(8, 20, 80), min_widths=(8, 10, 40))
 
-        for x, data in ios.items():
+        for x, data in list(ios.items()):
             if x == 0:
                 table.add((str(x) + "*", data[0], data[1]))
             else:

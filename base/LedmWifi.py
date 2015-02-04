@@ -21,28 +21,15 @@
 
 # StdLib
 import time
-import cStringIO
-
-from base.g import *
-try:
-   import xml.parsers.expat
-except ImportError,e:
-   log.info("\n")
-   log.error("Failed to import xml.parsers.expat(%s).\nThis may be due to the incompatible version of python-xml package.\n"%(e))
-   if "undefined symbol" in str(e):
-       log.info(log.blue("Please re-install compatible version (other than 2.7.2-7.14.1) due to bug reported at 'https://bugzilla.novell.com/show_bug.cgi?id=766778'."))
-       log.info(log.blue("\n        Run the following commands in root mode to change the python-xml package.(i.e Installing 2.7.2-7.1.2)"))
-       log.info(log.blue("\n        Using zypper:\n        'zypper remove python-xml'\n        'zypper install python-xml-2.7.2-7.1.2'"))
-       log.info(log.blue("\n        Using apt-get:\n        'apt-get remove python-xml'\n        'apt-get install python-xml-2.7.2-7.1.2'"))
-       log.info(log.blue("\n        Using yum:\n        'yum remove python-xml'\n        'yum install python-xml-2.7.2-7.1.2'"))
-
-   sys.exit(1)
-
+import io
+import binascii
+import xml.parsers.expat
 from string import *
 
 # Local
-from base.g import *
-from base import device, utils
+from .g import *
+from . import device, utils
+from .sixext import to_bytes_utf8
 
 http_result_pat = re.compile("""HTTP/\d.\d\s(\d+)""", re.I)
 HTTP_OK = 200
@@ -86,17 +73,17 @@ def getAdaptorList(dev):
                 ret['adaptorstate-%d' % a] = ''
                 try:
                     ret['adaptorid-%d' % a] = params['io:adapter-map:resourcenode-map:resourcelink-dd:resourceuri']
-                except KeyError, e:
+                except KeyError as e:
                     log.debug("Missing response key: %s" % e)    #changed from error to debug
                     ret['adaptorid-%d' % a]=""
                 try:
                     ret['adaptorname-%d' % a] = params['io:adapter-io:hardwareconfig-dd:name']
-                except KeyError, e:
+                except KeyError as e:
                     log.debug("Missing response key: %s" % e)    #changed from error to debug
                     ret['adaptorname-%d' % a] = ""
                 try:
                     ret['adaptortype-%d' % a] = params['io:adapter-io:hardwareconfig-dd:deviceconnectivityporttype']
-                except KeyError, e:
+                except KeyError as e:
                     log.debug("Missing response key: %s" % e)    #changed from error to debug
                     ret['adaptortype-%d' % a] = ""
                     
@@ -113,7 +100,7 @@ def getWifiAdaptorID(dev):
     except KeyError:
         num_adaptors = 0
 
-    for n in xrange(num_adaptors):
+    for n in range(num_adaptors):
         try:
             name = ret['adaptortype-%d' % n]
         except KeyError:
@@ -187,7 +174,7 @@ def performScan(dev, adapterName, ssid=None):
             try:
                 ssid = str(params['io:wifinetworks-io:wifinetwork-wifi:ssid']).decode("hex")
                 if not ssid:
-                    ret['ssid-0'] = u'(unknown)'
+                    ret['ssid-0'] = to_unicode('(unknown)')
                 else:
                     ret['ssid-0'] = ssid
                 try:
@@ -200,37 +187,37 @@ def performScan(dev, adapterName, ssid=None):
                 ret['dbm-0'] = params['io:wifinetworks-io:wifinetwork-io:signalinfo-wifi:dbm']
                 ret['encryptiontype-0'] = params['io:wifinetworks-io:wifinetwork-wifi:encryptiontype']
                 ret['signalstrength-0'] = params['io:wifinetworks-io:wifinetwork-io:signalinfo-wifi:signalstrength']                
-            except KeyError, e:
+            except KeyError as e:
                 log.debug("Missing response key: %s" % e)  
         else:
-            for a in xrange(elementCount):
-                try:                
+            for a in range(elementCount):
+                try:
                     try:
-                        ssid = str(params['io:wifinetworks-io:wifinetwork-wifi:ssid-%d' % a]).decode("hex")
-                        #ssid = params['io:wifinetworks-io:wifinetwork-wifi:ssid-%d' % a]
-                    except:
+                        ssid = binascii.unhexlify(str(params['io:wifinetworks-io:wifinetwork-wifi:ssid-%d' % a]).encode('utf-8')).decode('utf-8')
+                    except TypeError: 
+                        # Some devices returns one invalid SSID (i.e. 0) along with valid SSIDs. e.g. Epic.
                         ssid = params['io:wifinetworks-io:wifinetwork-wifi:ssid-%d' % a]
-                        #ssid = str(params['io:wifinetworks-io:wifinetwork-wifi:ssid-%d' % a]).decode("hex")
+
                     if not ssid:
-                        ret['ssid-%d' % a] = u'(unknown)'
+                        ret['ssid-%d' % a] = to_unicode('(unknown)')
                     else:
                         ret['ssid-%d' % a] = ssid
                     try:
                         ret['bssid-%d' % a] = str(params['io:wifinetworks-io:wifinetwork-wifi:bssid-%d' % a]).decode("hex")
                     except:
                         ret['bssid-%d' % a] = params['io:wifinetworks-io:wifinetwork-wifi:bssid-%d' % a]
-            	    ret['channel-%d' % a] = params['io:wifinetworks-io:wifinetwork-wifi:channel-%d' % a]
-            	    ret['communicationmode-%d' % a] = params['io:wifinetworks-io:wifinetwork-wifi:communicationmode-%d' % a]
-            	    ret['dbm-%d' % a] = params['io:wifinetworks-io:wifinetwork-io:signalinfo-wifi:dbm-%d' % a]
-            	    ret['encryptiontype-%d' % a] = params['io:wifinetworks-io:wifinetwork-wifi:encryptiontype-%d' % a]
-                    ret['signalstrength-%d' % a] = params['io:wifinetworks-io:wifinetwork-io:signalinfo-wifi:signalstrength-%d' % a]            	    
-            	
-                except KeyError, e:
+                    ret['channel-%d' % a] = params['io:wifinetworks-io:wifinetwork-wifi:channel-%d' % a]
+                    ret['communicationmode-%d' % a] = params['io:wifinetworks-io:wifinetwork-wifi:communicationmode-%d' % a]
+                    ret['dbm-%d' % a] = params['io:wifinetworks-io:wifinetwork-io:signalinfo-wifi:dbm-%d' % a]
+                    ret['encryptiontype-%d' % a] = params['io:wifinetworks-io:wifinetwork-wifi:encryptiontype-%d' % a]
+                    ret['signalstrength-%d' % a] = params['io:wifinetworks-io:wifinetwork-io:signalinfo-wifi:signalstrength-%d' % a]                        
+                
+                except KeyError as e:
                     log.debug("Missing response key: %s" % e)  
                 try:                    
                     ret['signalstrengthmax'] = 5
                     ret['signalstrengthmin'] = 0
-                except KeyError, e:
+                except KeyError as e:
                     log.debug("Missing response key: %s" % e)       
     return ret    
 
@@ -276,12 +263,12 @@ def getIPConfiguration(dev, adapterName):
                     if elementCount ==1:
                         pridns = params['io:protocols-io:protocol-dd:dnsserveripaddress']
                         sec_dns = params['io:protocols-io:protocol-dd:secondarydnsserveripaddress']          
-                        for a in xrange(elementCount):
+                        for a in range(elementCount):
                             if params['io:protocols-io:protocol-dd:dnsserveripaddress-%d' %a] !="::":
                                 pridns = params['io:protocols-io:protocol-dd:dnsserveripaddress-%d' %a]
                                 sec_dns = params['io:protocols-io:protocol-dd:secondarydnsserveripaddress-%d' %a]
                                 break
-            except KeyError, e:
+            except KeyError as e:
                 log.error("Missing response key: %s" % str(e))
     else:
         if params is not None and code == HTTP_OK:
@@ -323,7 +310,7 @@ def getIPConfiguration(dev, adapterName):
             #        pridns = params['io:protocols-io:protocol-dd:dnsserveripaddress-%d' %a]
             #        sec_dns = params['io:protocols-io:protocol-dd:secondarydnsserveripaddress-%d' %a]
             #        break
-            except KeyError, e:
+            except KeyError as e:
                 log.error("Missing response key: %s" % str(e))        
 
     log.debug("ip=%s, hostname=%s, addressmode=%s, subnetmask=%s, gateway=%s, pridns=%s, sec_dns=%s"%(ip, hostname, addressmode, subnetmask, gateway, pridns, sec_dns))
@@ -351,7 +338,7 @@ def getCryptoSuite(dev, adapterName):
             mode = parms['io:profile-io:adapterprofile-io:wifiprofile-wifi:communicationmode']
             alg = parms['io:profile-io:adapterprofile-io:wifiprofile-wifi:encryptiontype']
             secretid = parms['io:profile-io:adapterprofile-io:wifiprofile-wifi:bssid']    
-        except KeyError, e:
+        except KeyError as e:
             log.debug("Missing response key: %s" % str(e))
     
     return  alg, mode, secretid
@@ -363,12 +350,12 @@ def associate(dev, adapterName, ssid, communication_mode, encryption_type, key):
 
     if encryption_type == 'none':
         authMode = 'open'
-        ppXml = passPhraseXml%(ssid.encode('hex'),communication_mode,encryption_type,authMode)
+        ppXml = passPhraseXml%(binascii.hexlify(to_bytes_utf8(ssid)).decode('utf-8'), communication_mode,encryption_type,authMode)
     else:
         authMode = encryption_type
         pos = passPhraseXml.find("</io:WifiProfile>",0,len(passPhraseXml))
-        ppXml = (passPhraseXml[:pos] + keyInfoXml + passPhraseXml[pos:])%(ssid.encode('hex'),communication_mode,encryption_type,\
-        authMode,key.encode('hex'))        
+        ppXml = (passPhraseXml[:pos] + keyInfoXml + passPhraseXml[pos:])%(binascii.hexlify(to_bytes_utf8(ssid)).decode('utf-8'),communication_mode,encryption_type,\
+        authMode,binascii.hexlify(to_bytes_utf8(key)).decode('utf-8'))        
 
     code = writeXmlDataToURI(dev,URI,ppXml,10)    
     ret['errorreturn'] = code
@@ -427,7 +414,7 @@ def getHostname(dev):
     if params is not None:        
         try:               
             hostName = params['io:ioconfig-io:iodeviceconfig-dd3:hostname']            
-        except KeyError, e:
+        except KeyError as e:
             log.debug("Missing response key: %s" % e)
 
     return  hostName
@@ -458,7 +445,7 @@ def getSignalStrength(dev, adapterName, ssid, adaptor_id=0):
             try:                
                 ss_dbm = params['io:wifinetworks-io:wifinetwork-io:signalinfo-wifi:dbm']                
                 ss_val = params['io:wifinetworks-io:wifinetwork-io:signalinfo-wifi:signalstrength']                
-            except KeyError, e:
+            except KeyError as e:
                 log.error("Missing response key: %s" % e)
 
     return  ss_max, ss_min, ss_val, ss_dbm
@@ -469,7 +456,7 @@ def readXmlTagDataFromURI(dev,URI,xmlRootNode,xmlReqDataNode,timeout=5):
     
     data = format_http_get(URI,0,"")
     log.info(data)
-    response = cStringIO.StringIO()
+    response = io.BytesIO()
     if dev.openLEDM() == -1:
         dev.closeLEDM()
         if dev.openEWS_LEDM() == -1:
@@ -495,11 +482,10 @@ def readXmlTagDataFromURI(dev,URI,xmlRootNode,xmlReqDataNode,timeout=5):
             dev.readLEDMData(dev.readLEDM, response, timeout)
         except Error:
             dev.closeLEDM()
-            log.error("Unable to read LEDM Channel") 
-
-    #dev.closeEWS_LEDM()    
-    strResp = str(response.getvalue())
-    if strResp is not None:                         	
+            log.error("Unable to read LEDM Channel")
+        
+    strResp = response.getvalue().decode('utf-8')
+    if strResp is not None:                             
         code = get_error_code(strResp)
         if code == HTTP_OK:
             strResp = utils.unchunck_xml_data(strResp)
@@ -510,18 +496,17 @@ def readXmlTagDataFromURI(dev,URI,xmlRootNode,xmlReqDataNode,timeout=5):
             try:
                 parser_object = utils.extendedExpat()
                 root_element = parser_object.Parse(repstr)
-                xmlReqDataNode = filter(lambda c: c not in "<>", xmlReqDataNode) # To remove '<' and '>' characters
+                xmlReqDataNode = ''.join(l for l in filter(lambda x: x not in '<>', xmlReqDataNode)) # [c for c in xmlReqDataNode if c not in "<>"] # To remove '<' and '>' characters
                 reqDataElementList = root_element.getElementsByTagName(xmlReqDataNode)
                 for node in reqDataElementList:
                     repstr = node.toString()
                     repstr = repstr.replace('\r','').replace('\t','').replace('\n','') # To remove formating characters from the received xml
-                    params = utils.XMLToDictParser().parseXML(repstr)
+                    params = utils.XMLToDictParser().parseXML(to_bytes_utf8(repstr))
                     paramsList.append(params)
-            except xml.parsers.expat.ExpatError, e:
+            except xml.parsers.expat.ExpatError as e:
                 log.debug("XML parser failed: %s" % e)  #changed from error to debug 
         else:
             log.debug("HTTP Responce failed with %s code"%code)
-
     return paramsList,code
 
 
@@ -531,7 +516,7 @@ def readXmlDataFromURI(dev,URI,xmlRootNode,xmlChildNode,timeout=5):
     
     data = format_http_get(URI,0,"")
     log.info(data)
-    response = cStringIO.StringIO()
+    response = io.BytesIO()
     if dev.openLEDM() == -1:
         dev.closeLEDM()
         if dev.openEWS_LEDM() == -1:
@@ -559,19 +544,19 @@ def readXmlDataFromURI(dev,URI,xmlRootNode,xmlChildNode,timeout=5):
             dev.closeLEDM()
             log.error("Unable to read LEDM Channel") 
     #dev.closeEWS_LEDM()    
-    strResp = str(response.getvalue())
-    if strResp is not None:                         	
-        code = get_error_code(strResp)        
+    strResp = response.getvalue().decode('utf-8')
+    if strResp is not None:                             
+        code = get_error_code(strResp)
         if code == HTTP_OK:
             strResp = utils.unchunck_xml_data(strResp)
             pos = strResp.find(xmlRootNode,0,len(strResp))    
             repstr = strResp[pos:].strip()
             repstr = repstr.replace('\r','').replace('\t','').replace('\n','') # To remove formating characters from the received xml
             repstr = repstr.rstrip('0')   # To remove trailing zero from the received xml
-            elementCount = repstr.count(xmlChildNode)          	    	
+            elementCount = repstr.count(xmlChildNode)
             try:
                 params = utils.XMLToDictParser().parseXML(repstr)            
-            except xml.parsers.expat.ExpatError, e:
+            except xml.parsers.expat.ExpatError as e:
                 log.debug("XML parser failed: %s" % e)  #changed from error to debug 
         else:
             log.debug(" HTTP Responce failed with %s code"%code)
@@ -583,7 +568,7 @@ def writeXmlDataToURI(dev,URI,xml,timeout=5):
     code = HTTP_ERROR
 
     data = format_http_put(URI,len(xml),xml)
-    response = cStringIO.StringIO()
+    response = io.BytesIO()
 
     if dev.openLEDM() == -1:
         if dev.openEWS_LEDM() == -1:
@@ -605,7 +590,6 @@ def writeXmlDataToURI(dev,URI,xml,timeout=5):
             
     else:
         dev.writeLEDM(data)
-    #response = cStringIO.StringIO()
         try:
             dev.readLEDMData(dev.readLEDM, response,timeout )
         except Error:
@@ -613,7 +597,7 @@ def writeXmlDataToURI(dev,URI,xml,timeout=5):
             log.error("Unable to read LEDM Channel") 
         
 
-    strResp = str(response.getvalue())    
+    strResp = response.getvalue().decode('utf-8')
     if strResp is not None:
         code = get_error_code(strResp)           
     return code
@@ -652,4 +636,3 @@ Content-Type: $content_type\r
 Content-Length: $ledmlen\r
 \r
 $xmldata""")    
-    

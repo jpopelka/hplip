@@ -23,11 +23,11 @@
 
 # Local
 from base.g import *
-from ui_utils import load_pixmap
+from .ui_utils import load_pixmap
 
 # Qt
 from qt import *
-from loadpaperform_base import LoadPaperForm_base
+from .loadpaperform_base import LoadPaperForm_base
 
 
 class LoadPaperForm(LoadPaperForm_base):

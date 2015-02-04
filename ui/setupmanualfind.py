@@ -20,9 +20,10 @@
 #
 
 from base.g import *
+from base.sixext import  to_unicode
 
 from qt import *
-from setupmanualfind_base import SetupManualFind_base
+from .setupmanualfind_base import SetupManualFind_base
 
 class SetupManualFind(SetupManualFind_base):
     def __init__(self, bus, parent=None, name=None, modal=0, fl = 0):
@@ -47,7 +48,7 @@ class SetupManualFind(SetupManualFind_base):
             self.findTextLabel.setText(self.__tr("""Device Node:"""))
 
     def findLineEdit_textChanged(self,a0):
-        self.param = unicode(a0)
+        self.param = to_unicode(a0)
 
         if self.bus == 'usb':
             bus, dev = self.param.split(':')

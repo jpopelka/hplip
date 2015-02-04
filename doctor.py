@@ -202,7 +202,7 @@ try:
                mod.parseStdOpts('hl:gnid:f:w', ['summary-only','help', 'help-rest', 'help-man', 'help-desc', 'interactive', 'gui', 'lang=','logging=', 'debug'],
                      handle_device_printer=False)
 
-except getopt.GetoptError, e:
+except getopt.GetoptError as e:
     log.error(e.msg)
     usage()
 
