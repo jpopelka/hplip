@@ -7383,8 +7383,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
           // <%CopperheadXLP:Normal%>
 
-}// End CopperheadXLP
-
+} // end CopperheadXLP
 
 ////////// Copperhead12
 {
@@ -7609,7 +7608,8 @@ lity:PenSet=2,Quality:FullBleed=1"
   // <%Copperhead12:Advanced%>  
 } // end Copperhead12	
 
-////////// CopperheadIPH
+
+//////////CopperheadIPH 
 {
   Attribute "DefaultResolution" "" "1200dpi"
 
@@ -7829,7 +7829,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%CopperheadIPH:Normal%>
-} // end CopperheadIPH	
+} // end CopperheadIPH
 
 
 ////////// Saipan

@@ -375,12 +375,34 @@ def start(language, auto=True, test_depends=False,
         package_mgr_cmd = core.get_distro_data('package_mgr_cmd')
         depends_to_install = []
         depends_to_install_using_pip = []
+
+        if num_req_missing or num_opt_missing:
+            tui.title("MISSING DEPENDENCIES")
+            log.info("Following dependencies are not installed. HPLIP will not work if all REQUIRED dependencies are not installed and some of the HPLIP features will not work if OPTIONAL dependencies are not installed.")
+
+            log.info("%-20s %-20s %-20s"%( "Package-Name", "Component", "Required/Optional"))
+            for d in core.dependencies:
+                if (not core.have_dependencies[d]):
+                    if core.dependencies[d][0]:
+                        deptype = "REQUIRED"
+                    else:
+                        deptype = "OPTIONAL"
+                        
+                    log.info("%-20s %-20s %-20s" %(d, core.dependencies[d][1][0], deptype))
+
+            ok, ans = tui.enter_yes_no("Do you want to install these missing dependencies")
+            if not ok:
+                sys.exit(0)  
+
+            if not ans and num_req_missing:
+                log.error("Installation can not continue because all REQUIRED dependencies are not installed.")                
+                sys.exit(0)  
+
+
         if num_req_missing:
             tui.title("INSTALL MISSING REQUIRED DEPENDENCIES")
-
-            log.warn("There are %d missing REQUIRED dependencies." % num_req_missing)
             log.notice("Installation of dependencies requires an active internet connection.")
-
+            
             for depend, desc, option in core.missing_required_dependencies():
                 log.warning("Missing REQUIRED dependency: %s (%s)" % (depend, desc))
                 if Fedora_Py3:              # Workaround due to incomplete Python3 support in Linux distros.
@@ -431,8 +453,6 @@ def start(language, auto=True, test_depends=False,
         #
         if num_opt_missing:
             tui.title("INSTALL MISSING OPTIONAL DEPENDENCIES")
-            log.warn("There are %d missing OPTIONAL dependencies." % num_opt_missing)
-
             log.notice("Installation of dependencies requires an active internet connection.")
 
             for depend, desc, required_for_opt, opt in core.missing_optional_dependencies():
@@ -626,7 +646,7 @@ def start(language, auto=True, test_depends=False,
 
                                 log.error("Package install command failed with error code %d" % status)
                                 if PY3:
-                                    log.notice("Some installation may not get installed on python3 due to distro incompatibilites")
+                                    log.notice("Some packages may not get installed on python3 due to distro incompatibilites")
                                     log.info("")
                                     log.notice("Please check for more information at http://hplipopensource.com/node/369")
                                 ok, ans = tui.enter_yes_no("Would you like to retry installing the missing package(s)")

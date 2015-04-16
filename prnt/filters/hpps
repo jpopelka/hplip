@@ -196,7 +196,7 @@ except IOError:
     bug("Unabel to read PPD File")
     sys.exit(CUPS_FILTER_FAILED)
 
-key_list = [x for x in ['HPAccountingInfo', 'HPBOD', 'HPPJLEconoMode', 'HPPJLOutputMode', 'HPPJLDryTime', 
+key_list = [x for x in ['HPAccountingInfo', 'HPBOD', 'HPPJLEconoMode', 'HPPJLEconoMode2',  'HPPJLOutputMode', 'HPPJLDryTime', 
                         'HPPJLSaturation', 'HPPJLInkBleed', 'HPPJLColorAsGray'] if x in ppd_str]
 
 if 'HPAccountingInfo' in key_list:
@@ -237,8 +237,23 @@ if 'HPPJLEconoMode' in key_list:
                 os.write(output_fd, b"@PJL SET ECONOMODE=ON\x0a")
         else:
                 os.write(output_fd, b"@PJL SET ECONOMODE=OFF\x0a")
+
         os.write(output_fd, b"@PJL SET RESOLUTION=600\x0a")
         os.write(output_fd, b"@PJL SET BITSPERPIXEL=2\x0a")
+
+
+if 'HPPJLEconoMode2' in key_list:
+        try:
+            if opts['HPPJLEconoMode2'] == 'yes':
+                os.write(output_fd, b"@PJL SET ECONOMODE=ON\x0a")
+            elif opts['HPPJLEconoMode2'] == 'no':
+                os.write(output_fd, b"@PJL SET ECONOMODE=OFF\x0a")
+
+            os.write(output_fd, b"@PJL SET RESOLUTION=600\x0a")
+            os.write(output_fd, b"@PJL SET BITSPERPIXEL=1\x0a")
+
+        except:
+            pass
 
 if 'HPPJLPrintQuality' in key_list:
         try:
@@ -315,10 +330,17 @@ if 'HPPJLColorAsGray' in key_list:
                 elif opts['HPPJLColorAsGray'] == 'HighQuality':
                         os.write(output_fd, b'@PJL SET GRAYSCALE=COMPOSITE\x0a') 
                 elif opts['HPPJLColorAsGray'] == 'BlackInkOnly':
-                        os.write(output_fd, b'@PJL SET GRAYSCALE=BLACKONLY\x0a') 
+                        os.write(output_fd, b'@PJL SET GRAYSCALE=BLACKONLY\x0a')
+                elif opts['HPPJLColorAsGray'] == 'yes':
+                        os.write(output_fd, b'@PJL SET RESOLUTION=600\x0a')
+                        os.write(output_fd, b'@PJL SET BITSPERPIXEL=8\x0a')
+                        os.write(output_fd, b'@PJL SET GRAYSCALE=COMPOSITE\x0a')
+                elif opts['HPPJLColorAsGray'] == 'no':
+                        os.write(output_fd, b'@PJL SET RESOLUTION=600\x0a')
+                        os.write(output_fd, b'@PJL SET BITSPERPIXEL=8\x0a')
         except:
                 os.write(output_fd, b'@PJL SET GRAYSCALE=OFF\x0a')
-                
+
 os.write(output_fd, UEL)
 
 while True:

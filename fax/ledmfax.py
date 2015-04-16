@@ -49,6 +49,9 @@ HTTP_OK = 200
 HTTP_ACCEPTED = 202
 HTTP_CREATED = 201
 HTTP_ERROR = 500
+HTTP_SERVICE_UNAVALIABLE = 503
+
+MAX_TRIES = 3
 
 PIXELS_PER_LINE = 1728
 
@@ -211,6 +214,7 @@ class LEDMFaxSendThread(FaxSendThread):
         state = STATE_READ_SENDER_INFO
         error_state = STATUS_ERROR
         self.rendered_file_list = []
+        num_tries = 0
 
         while state != STATE_DONE: # --------------------------------- Fax state machine
             if self.check_for_cancel():
@@ -420,7 +424,12 @@ class LEDMFaxSendThread(FaxSendThread):
                         log.log_data(response)
                         if self.get_error_code(response) == HTTP_CREATED:
                             fax_send_state = FAX_SEND_STATE_DOWNLOADPAGES
+                        elif self.get_error_code(response) == HTTP_SERVICE_UNAVALIABLE and num_tries <= MAX_TRIES:
+                            fax_send_state = FAX_SEND_STATE_BEGINJOB
+                            num_tries += 1
                         else:
+                            if num_tries > MAX_TRIES:
+                                log.error("HTTP ERROR CODE: 531, Server Temporary Unavailable")
                             fax_send_state = FAX_SEND_STATE_ERROR
                             log.error("Create Job request failed")
                             break

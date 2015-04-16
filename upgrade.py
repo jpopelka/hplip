@@ -33,6 +33,7 @@ from base.g import *
 from base.strings import *
 from base import utils, tui, module, os_utils, services, validation
 from installer.core_install import *
+from base.sixext.moves import input
 
 
 USAGE = [(__doc__, "", "name", True),
@@ -48,7 +49,7 @@ USAGE = [(__doc__, "", "name", True),
          ("Check for update and notify:","--notify","option",False),
          ("Check only available version:","--check","option",False),
 #         ("Non-interactive mode:","-n(Without asking permissions)(future use)","option",False),
-         ("Download Path to install from local system:","-p<path>","option", False),
+         ("Specify the path to the .run file on local system:","-p<path>","option", False),
          ("Download HPLIP package location:","-d<path> (default location ~/Downloads)","option", False),
          ("Override existing HPLIP installation even if latest vesrion is installed:","-o","option",False),
 #         ("Take options from the file instead of command line:","-f<file> (future use)","option",False)
@@ -383,6 +384,23 @@ try:
             digsig_file = "%s/hplip-%s.run.asc"%(EXISTING_PACKAGE_PATH, HPLIP_latest_ver)
             PATH_TO_DOWNLOAD_INSTALLER = EXISTING_PACKAGE_PATH
         else:
+            log.debug("\n Calling download_hplip_installer(...) \n")
+            log.debug("\n System Time : %s \n"%datetime.datetime.now().time().isoformat())
+
+            if not os.path.exists(PATH_TO_DOWNLOAD_INSTALLER):
+                log.error(log.bold("No such file or directory%s"%PATH_TO_DOWNLOAD_INSTALLER))
+                download_path = input(log.bold("Please specify the path to download. Press 'q' to quit:"))
+                if download_path == 'q':
+                    log.info("User selected to quit.")
+                    clean_exit(1)            
+                elif not os.path.exists(download_path):
+                    log.error(log.bold("Specified path does not exist. Exiting...%s\n"%download_path)) 
+                    clean_exit(1)
+                elif not os.access(download_path, os.R_OK | os.W_OK):
+                    log.error(log.bold("Specified path do not have enough permissions Exiting...%s\n"%download_path)) 
+                    clean_exit(1)          
+                else:
+                    PATH_TO_DOWNLOAD_INSTALLER = download_path
             downloaded_file, digsig_file = download_hplip_installer(PATH_TO_DOWNLOAD_INSTALLER, HPLIP_latest_ver)
 
 

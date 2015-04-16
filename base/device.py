@@ -1688,6 +1688,10 @@ class Device(object):
                 log.debug("Type 11: LEDM_FF_CC_0")
                 status_block = status.StatusType10(self.getUrl_LEDM)
 
+            elif status_type == STATUS_TYPE_IPP:
+                log.debug("Type 12: IPP")
+                status_block = status.StatusTypeIPP(self.device_uri)
+
             else:
                 log.error("Unimplemented status type: %d" % status_type)
 

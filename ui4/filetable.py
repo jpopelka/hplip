@@ -32,7 +32,7 @@ from base import utils, magic
 from prnt import cups
 from base.codes import *
 from .ui_utils import *
-from base.sixext import to_unicode, to_string_utf8
+from base.sixext import to_unicode, to_string_utf8, from_unicode_to_str
 # Qt
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -283,7 +283,6 @@ class FileTable(QWidget):
             self.working_dir, self.__tr("All files (*)")))
 
         files = [to_unicode(f) for f in files]
-
         if files:
             self.addFileList(files)
 
@@ -299,7 +298,6 @@ class FileTable(QWidget):
     def addFileFromUI(self, f, title='', num_pages=0):
         f = os.path.abspath(os.path.expanduser(f))
         log.debug("Trying to add file: %s" % f)
-
         if os.path.exists(f) and os.access(f, os.R_OK):
             mime_type = magic.mime_type(f)
             mime_type_desc = mime_type
@@ -335,6 +333,7 @@ class FileTable(QWidget):
         i = self.FileTable.item(self.FileTable.currentRow(), 0)
         if i is None:
             return None
+
         return value_str(i.data(Qt.UserRole))
 
 
@@ -350,7 +349,7 @@ class FileTable(QWidget):
         temp = self.file_list[:]
         index = 0
         for f, mime_type, mime_type_desc, title, num_pages in temp:
-            if f == filename:
+            if f == to_unicode(filename):
                 del self.file_list[index]
                 self.emit(SIGNAL("fileListChanged"))
                 self.updateUi(False)

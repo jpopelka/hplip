@@ -13895,8 +13895,7 @@ lity:PenSet=2,Quality:FullBleed=1"
             Attribute "Product" "" "(HP Officejet Pro 6835 E-all-in-one)"
           }
 
-}// End CopperheadXLP
-
+} // end CopperheadXLP
 
 ////////// Copperhead12
 {
@@ -14171,7 +14170,8 @@ lity:PenSet=2,Quality:FullBleed=1"
   }
 } // end Copperhead12	
 
-////////// CopperheadIPH
+
+//////////CopperheadIPH 
 {
   Attribute "DefaultResolution" "" "1200dpi"
 
@@ -14438,7 +14438,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     PCFileName "hp-officejet_8040_series-hpijs.ppd"
     Attribute "Product" "" "(HP Officejet 8040 Series)"
   }
-} // end CopperheadIPH	
+} // end CopperheadIPH
 
 
 ////////// Saipan

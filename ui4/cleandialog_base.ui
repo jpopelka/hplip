@@ -10,7 +10,7 @@
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>HP Device Manager - Clean Print Cartridges</string>
+   <string>HP Device Manager - Clean Printheads</string>
   </property>
   <layout class="QGridLayout" >
    <item row="0" column="0" colspan="2" >
@@ -21,7 +21,7 @@
       </font>
      </property>
      <property name="text" >
-      <string>Clean Print Cartridges</string>
+      <string>Clean Print Printheads</string>
      </property>
     </widget>
    </item>

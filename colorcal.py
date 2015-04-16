@@ -171,7 +171,7 @@ try:
 
     if not device_uri:
         sys.exit(1)
-
+    log.info("Using device : %s\n" % device_uri)
     if mode == GUI_MODE:
         if not utils.canEnterGUIMode4():
             log.error("%s -u/--gui requires Qt4 GUI support. Entering interactive mode." % __mod__)

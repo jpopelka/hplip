@@ -75,13 +75,9 @@ coverpages_enabled = False
 if fax_enabled:
     try:
         import reportlab
-        ver = reportlab.Version
-        try:
-            ver_f = float(ver)
-        except ValueError:
-            ver_f = 0.0
+        ver = str(reportlab.Version)
 
-        if ver_f >= 2.0:
+        if ver >= "2.0":
             coverpages_enabled = True
         else:
             log.warn("Pre-2.0 version of Reportlab installed. Fax coverpages disabled.")

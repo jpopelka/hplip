@@ -611,7 +611,7 @@ if mode in (INTERACTIVE_MODE, NON_INTERACTIVE_MODE):
 
         if not device_uri:
             sys.exit(1)
-
+        log.info("Using device : %s\n" % device_uri)
         try:
             pc = photocard.PhotoCard( None, device_uri, printer_name )
         except Error as e:

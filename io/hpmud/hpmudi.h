@@ -110,6 +110,7 @@ enum HPMUD_CHANNEL_ID
    HPMUD_MARVELL_EWS_CHANNEL = 0x19, /*MARVELL EWS interface found in Cicad Series*/
    HPMUD_WIFI_CHANNEL = 0x2b,      /* WIFI config */
    HPMUD_DEVMGMT_CHANNEL = 0x2c,      /* decimal 44 */
+   HPMUD_IPP_CHANNEL = 0x2d,
    HPMUD_MAX_CHANNEL_ID
 };
 

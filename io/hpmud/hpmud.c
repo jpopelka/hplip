@@ -226,9 +226,13 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) service_to_channel(mud
       *index = HPMUD_LEDM_SCAN_CHANNEL;
    }
    else if (strncasecmp(sn, "hp-marvell-ews", 11) == 0)
-     {
+   {
        *index = HPMUD_MARVELL_EWS_CHANNEL;
-     }
+   }
+   else if (strncasecmp(sn, "hp-ipp", 6) == 0)
+   {
+       *index = HPMUD_IPP_CHANNEL;
+   }
    /* All the following services require MLC/1284.4. */
    else if (pd->io_mode == HPMUD_RAW_MODE || pd->io_mode == HPMUD_UNI_MODE)
    {

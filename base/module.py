@@ -546,7 +546,6 @@ class Module(object):
 
         elif len(devices) == 1: # Nothing specified, and only 1 device avail.
             device_uri_ret = list(devices.keys())[0]
-            log.info("Using device: %s\n" % device_uri_ret)
 
         if device_uri_ret is None and len(devices):
             if self.mode == INTERACTIVE_MODE:
@@ -647,7 +646,6 @@ class Module(object):
 
         elif len(printers) == 1: # nothing specified, and only 1 avail. printer
             printer_name_ret = printers[0]
-            log.info("Using printer: %s\n" % printer_name_ret)
 
         if printer_name_ret is None and self.mode in (INTERACTIVE_MODE, NON_INTERACTIVE_MODE) and len(printers):
             printer_name_ret = tui.printer_table(printers)

@@ -132,6 +132,10 @@ class StringTable:
             '1063' : (self.__tr('Printhead(s) Failed'), ''),
             '1064' : (self.__tr('Incompatible Printhead(s)'), ''),
             '1065' : (self.__tr('Unknown status'), ''),
+            '1066' : (self.__tr('Unable to process jobs. Please resolve printer error and then try again'), ''),
+            '1067' : (self.__tr('Printer paused'), ''),
+            '1068' : (self.__tr('Input tray is missing'), ''),
+
 
             '1501' : (self.__tr('Black cartridge is low on ink'), ''),
             '1502' : (self.__tr('Tri-color cartridge is low on ink'), ''),
@@ -156,6 +160,7 @@ class StringTable:
             '1805' : (self.__tr('No toner'), '%try_again%'),
             '1806' : (self.__tr('Service request'), '%try_again%'),
             '1807' : (self.__tr('Fuser error'), '%try_again%'),
+            '1808' : (self.__tr('Empty toner'), ''),
             '1900' : (self.__tr('Unsupported printer model'), ''),
             '2000' : (self.__tr('Scan job started'), ''),
             '2001' : (self.__tr('Scan job completed'), ''),

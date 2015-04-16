@@ -82,6 +82,12 @@
 :model "HP Color LaserJet cm4730fsk Multifunction Printer"
 :status :good
 
+:model "HP Color LaserJet MFP m277dw"
+:status :good
+
+:model "HP Color LaserJet MFP m277n"
+:status :good
+
 :model "HP Color LaserJet Pro MFP m476dn"
 :status :good
 

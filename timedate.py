@@ -75,7 +75,7 @@ try:
 
     if not device_uri:
         sys.exit(1)
-
+    log.info("Using device : %s\n" % device_uri)
     try:
         d = faxdevice.FaxDevice(device_uri, printer_name, disable_dbus=True)
     except Error as e:

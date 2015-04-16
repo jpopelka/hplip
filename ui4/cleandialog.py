@@ -279,7 +279,7 @@ class CleanDialog(QDialog, Ui_Dialog):
 
 
     def DeviceUriComboBox_noDevices(self):
-        FailureUI(self, self.__tr("<b>No devices that support print cartridge cleaning found.</b><p>Click <i>OK</i> to exit.</p>"))
+        FailureUI(self, self.__tr("<b>No devices that support printhead cleaning found.</b><p>Click <i>OK</i> to exit.</p>"))
         self.close()
 
 

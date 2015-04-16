@@ -1122,7 +1122,7 @@ class DevMgr5(QMainWindow,  Ui_MainWindow):
                     lambda : AlignDialog(self, self.cur_device_uri)),
 
                     (lambda: printer and d.clean_type != CLEAN_TYPE_NONE,
-                    self.__tr("Clean Cartridges"),
+                    self.__tr("Clean Printheads"),
                     "clean",
                     self.__tr("You only need to perform this action if you are<br>having problems with poor printout quality due to clogged ink nozzles."),
                     lambda : CleanDialog(self, self.cur_device_uri)),

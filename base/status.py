@@ -30,6 +30,7 @@ from .sixext import BytesIO, to_bytes_utf8, to_bytes_latin, to_string_latin, to_
 from .g import *
 import xml.parsers.expat as expat
 import re
+import cupsext
 
 try:
     from xml.etree import ElementTree
@@ -1658,8 +1659,6 @@ def StatusType10Media(func): # Low End Data Model
             status_block['in-tray2'] = IN_TRAY_PRESENT
         elif bin_name == "PhotoTray":
             status_block['photo-tray'] = PHOTO_TRAY_ENGAGED
-        else:
-            log.error("found invalid bin name '%s'" % bin_name)
 
     try:
         elements = tree.findall("Accessories/MediaHandlingDeviceFunctionType")
@@ -1806,3 +1805,151 @@ def StatusType10Status(func): # Low End Data Model
             status_block['status-code'] = STATUS_UNKNOWN_CODE
 
     return status_block
+
+#IPP Status Code 
+IPP_PRINTER_STATE_IDLE = 0x03
+IPP_PRINTER_STATE_PROCESSING = 0x04
+IPP_PRINTER_STATE_STOPPED = 0x05
+
+marker_kind_xlate =    { 'ink' : AGENT_KIND_SUPPLY,
+                         'inkCartridge' : AGENT_KIND_SUPPLY,
+                         'printhead' : AGENT_KIND_HEAD,
+                         'toner' : AGENT_KIND_TONER_CARTRIDGE,
+                         'tonerCartridge' : AGENT_KIND_TONER_CARTRIDGE,
+                         'toner-cartridge' : AGENT_KIND_TONER_CARTRIDGE,
+                         'maintenanceKit' : AGENT_KIND_MAINT_KIT,
+                       }
+
+marker_type_xlate = {'magenta ink' : AGENT_TYPE_MAGENTA,
+                     'cyan ink' : AGENT_TYPE_CYAN,
+                     'yellow ink' : AGENT_TYPE_YELLOW,
+                     'black ink' : AGENT_TYPE_BLACK,
+                     'Black Cartridge' : AGENT_TYPE_BLACK,
+                     'Maintenance Kit' : AGENT_TYPE_NONE,
+
+                    }
+
+marker_leveltrigger_xlate = { 'ok' : AGENT_LEVEL_TRIGGER_SUFFICIENT_0,
+                              'low' : AGENT_LEVEL_TRIGGER_MAY_BE_LOW,
+                              'out' : AGENT_LEVEL_TRIGGER_ALMOST_DEFINITELY_OUT,
+                              'empty' : AGENT_LEVEL_TRIGGER_ALMOST_DEFINITELY_OUT,
+                              'missing' : AGENT_LEVEL_TRIGGER_ALMOST_DEFINITELY_OUT,
+                            }
+
+marker_state_xlate = { 'ok' : AGENT_HEALTH_OK,
+                       'misinstalled' : AGENT_HEALTH_MISINSTALLED,
+                       'missing' : AGENT_HEALTH_MISINSTALLED,
+                     }
+
+printer_state_reasons_xlate = { 'none' : STATUS_PRINTER_IDLE,
+                               'media-needed' : STATUS_PRINTER_OUT_OF_PAPER,
+                               'media-jam' : STATUS_PRINTER_MEDIA_JAM,
+                               'shutdown' : STATUS_PRINTER_TURNING_OFF,
+                               'toner-low' : STATUS_PRINTER_LOW_TONER,
+                               'toner-empty' : STATUS_PRINTER_EMPTY_TONER,
+                               'cover-open' : STATUS_PRINTER_DOOR_OPEN,
+                               'door-open' : STATUS_PRINTER_DOOR_OPEN,
+                               'input-tray-missing' : STATUS_PRINTER_TRAY_2_3_DOOR_OPEN,
+                               'media-low' : STATUS_PRINTER_OUT_OF_PAPER, 
+                               'media-empty' : STATUS_PRINTER_OUT_OF_PAPER,
+                               'output-tray-missing' : STATUS_PRINTER_TRAY_2_MISSING,
+                               'output-area-almost-full' : STATUS_PRINTER_CLEAR_OUTPUT_AREA,
+                               'output-area-full' : STATUS_PRINTER_CLEAR_OUTPUT_AREA,
+                               'marker-supply-low' : STATUS_PRINTER_VERY_LOW_ON_INK,
+                               'marker-supply-empty' : STATUS_PRINTER_VERY_LOW_ON_INK,
+                               'paused' : STATUS_PRINTER_PAUSED,
+                               'other' : STATUS_UNKNOWN_CODE,
+                             }
+
+def StatusTypeIPPStatus(attrs): 
+
+    status_block = {}
+    if not attrs:
+        return status_block
+
+    try:
+        printer_state = attrs['printer-state'][0]  
+        printer_state_reasons = attrs['printer-state-reasons'][0]  
+
+        if printer_state == IPP_PRINTER_STATE_IDLE:
+            status_block['status-code'] = STATUS_PRINTER_IDLE
+        elif printer_state == IPP_PRINTER_STATE_PROCESSING:
+            status_block['status-code'] = STATUS_PRINTER_PRINTING
+        else:
+            printer_state_reasons = printer_state_reasons.replace("-error", "")
+            printer_state_reasons = printer_state_reasons.replace("-warning", "")
+            printer_state_reasons = printer_state_reasons.replace("-report", "")
+            status_block['status-code'] = printer_state_reasons_xlate.get(printer_state_reasons, STATUS_PRINTER_IDLE)
+
+    except Exception as e:
+        log.debug("Exception occured while updating printer-state [%s]" %e.args[0])
+        status_block = {}
+
+    return status_block
+
+    
+def StatusTypeIPPAgents(attrs): 
+
+    status_block = {}
+    agents = []
+        
+    if not attrs:
+        return status_block
+
+    loopcntr = 0    
+    while(True ):        
+        try:
+            if loopcntr >= len(attrs['marker-names']):
+                break
+
+            if attrs['marker-types'][loopcntr] == 'maintenanceKit':
+                loopcntr = loopcntr + 1
+                continue
+
+            if attrs['marker-levels'][loopcntr] > attrs['marker-low-levels'][loopcntr] :
+                state = 'ok'
+            else: 
+                state = 'low'
+
+            entry = { 'kind' : marker_kind_xlate.get(attrs['marker-types'][loopcntr], AGENT_KIND_NONE),
+                      'type' : marker_type_xlate.get(attrs['marker-names'][loopcntr], AGENT_TYPE_NONE),
+                      'health' : marker_state_xlate.get(state, AGENT_HEALTH_OK),
+                      'level' : attrs['marker-levels'][loopcntr],
+                      'level-trigger' : marker_leveltrigger_xlate.get(state, AGENT_LEVEL_TRIGGER_SUFFICIENT_0), 
+                      'agent-sku' : ''  
+                    }
+
+            log.debug("%s" % entry)
+            agents.append(entry)
+        except AttributeError:
+            log.error("no value found for attribute")
+            return []     
+
+        loopcntr = loopcntr + 1
+
+    status_block['agents'] = agents
+   
+    return status_block
+
+def StatusTypeIPP(device_uri): 
+    status_block = { 'revision' :    STATUS_REV_UNKNOWN,
+                     'agents' :      [],
+                     'top-door' :    TOP_DOOR_NOT_PRESENT,
+                     'supply-door' : TOP_DOOR_NOT_PRESENT,
+                     'duplexer' :    DUPLEXER_NOT_PRESENT,
+                     'photo-tray' :  PHOTO_TRAY_NOT_PRESENT,
+                     'in-tray1' :    IN_TRAY_NOT_PRESENT,
+                     'in-tray2' :    IN_TRAY_NOT_PRESENT,
+                     'media-path' :  MEDIA_PATH_NOT_PRESENT,
+                     'status-code' : STATUS_PRINTER_IDLE,
+                   }
+
+    status_attrs = cupsext.getStatusAttributes(device_uri)
+
+    if status_attrs:
+        status_block.update(StatusTypeIPPAgents(status_attrs) ) 
+        status_block.update(StatusTypeIPPStatus (status_attrs) ) 
+
+    return status_block   
+
+

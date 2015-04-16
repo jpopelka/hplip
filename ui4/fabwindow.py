@@ -383,7 +383,7 @@ class FABWindow(QMainWindow,  Ui_MainWindow):
         if selected_names:
             ok = False
             g, ok = QInputDialog.getText(self, self.__tr("Enter New Group Name"), self.__tr("Name for New Group:"))
-            g = str(g)
+            g = to_unicode(g)
 
             groups = self.db.get_all_groups()
 

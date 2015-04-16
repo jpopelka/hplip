@@ -103,7 +103,10 @@ DIST_COMMON = $(am__configure_deps) $(am__dist_base_DATA_DIST) \
 
 # hppgsz
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am__append_7 = ptest hppgsz
-@FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@am__append_8 = ui/colorcalform2_base.ui ui/settingsdialog_base.ui ui/aligntype6form1_base.ui \
+
+# IPP library
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am__append_8 = libhpipp.la
+@FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@am__append_9 = ui/colorcalform2_base.ui ui/settingsdialog_base.ui ui/aligntype6form1_base.ui \
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@	ui/aboutdlg_base.ui ui/imagepropertiesdlg_base.ui ui/paperedgealignform_base.ui ui/aligntype6form2_base.ui \
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@	ui/nodevicesform_base.ui ui/cleaningform_base.ui ui/colorcalform_base.ui ui/devmgr4_base.ui ui/loadpaperform_base.ui \
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@	ui/cleaningform2_base.ui ui/waitform_base.ui ui/coloradjform_base.ui ui/faxaddrbookeditform_base.ui \
@@ -113,12 +116,12 @@ DIST_COMMON = $(am__configure_deps) $(am__dist_base_DATA_DIST) \
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@	ui/allowabletypesdlg_base.ui ui/setupform_base.ui ui/setupmanualfind_base.ui \
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@	ui/setupsettings_base.ui ui/pluginlicenseform_base.ui ui/align13form_base.ui ui/firmwaredialog_base.ui
 
-@FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT4_INSTALL_TRUE@am__append_9 = ui4/*.ui
+@FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT4_INSTALL_TRUE@am__append_10 = ui4/*.ui
 @HPIJS_INSTALL_TRUE@bin_PROGRAMS = hpijs$(EXEEXT)
 @HPCUPS_INSTALL_TRUE@hpcups_PROGRAMS = hpcups$(EXEEXT)
 @FAX_BUILD_TRUE@@HPCUPS_INSTALL_TRUE@@HPCUPS_ONLY_BUILD_FALSE@hpcupsfax_PROGRAMS = hpcupsfax$(EXEEXT)
-@FOOMATIC_PPD_INSTALL_TRUE@am__append_10 = $(foomatic_ppd_printers)
-@CUPS_PPD_INSTALL_TRUE@am__append_11 = $(cups_ppd_printers)
+@FOOMATIC_PPD_INSTALL_TRUE@am__append_11 = $(foomatic_ppd_printers)
+@CUPS_PPD_INSTALL_TRUE@am__append_12 = $(cups_ppd_printers)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -191,7 +194,8 @@ LTLIBRARIES = $(cupsext_LTLIBRARIES) $(hpmudext_LTLIBRARIES) \
 	$(lib_LTLIBRARIES) $(libsane_hpaio_LTLIBRARIES) \
 	$(noinst_LTLIBRARIES) $(pcardext_LTLIBRARIES) \
 	$(scanext_LTLIBRARIES)
-cupsext_la_DEPENDENCIES =
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@cupsext_la_DEPENDENCIES =  \
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	libhpipp.la
 am__cupsext_la_SOURCES_DIST = prnt/cupsext/cupsext.c \
 	prnt/cupsext/cupsext.h
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am_cupsext_la_OBJECTS =  \
@@ -277,6 +281,18 @@ libhpip_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libhpip_la_LDFLAGS) $(LDFLAGS) -o $@
 @HPLIP_BUILD_TRUE@am_libhpip_la_rpath = -rpath $(libdir)
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@libhpipp_la_DEPENDENCIES =  \
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	libhpmud.la
+am__libhpipp_la_SOURCES_DIST = protocol/hp_ipp.c protocol/hp_ipp.h \
+	protocol/hp_ipp_i.h
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am_libhpipp_la_OBJECTS =  \
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	libhpipp_la-hp_ipp.lo
+libhpipp_la_OBJECTS = $(am_libhpipp_la_OBJECTS)
+libhpipp_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libhpipp_la_CFLAGS) \
+	$(CFLAGS) $(libhpipp_la_LDFLAGS) $(LDFLAGS) -o $@
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am_libhpipp_la_rpath = -rpath \
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	$(libdir)
 libhpmud_la_LIBADD =
 am__libhpmud_la_SOURCES_DIST = io/hpmud/hpmud.c io/hpmud/mlc.c \
 	io/hpmud/model.c io/hpmud/pml.c io/hpmud/hpmud.h \
@@ -571,13 +587,15 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(cupsext_la_SOURCES) $(hpmudext_la_SOURCES) \
 	$(libapdk_la_SOURCES) $(libhpip_la_SOURCES) \
-	$(libhpmud_la_SOURCES) $(libsane_hpaio_la_SOURCES) \
-	$(pcardext_la_SOURCES) $(scanext_la_SOURCES) $(hp_SOURCES) \
-	$(hpcups_SOURCES) $(hpcupsfax_SOURCES) $(hpijs_SOURCES) \
-	$(hppgsz_SOURCES) $(ptest_SOURCES)
+	$(libhpipp_la_SOURCES) $(libhpmud_la_SOURCES) \
+	$(libsane_hpaio_la_SOURCES) $(pcardext_la_SOURCES) \
+	$(scanext_la_SOURCES) $(hp_SOURCES) $(hpcups_SOURCES) \
+	$(hpcupsfax_SOURCES) $(hpijs_SOURCES) $(hppgsz_SOURCES) \
+	$(ptest_SOURCES)
 DIST_SOURCES = $(am__cupsext_la_SOURCES_DIST) \
 	$(am__hpmudext_la_SOURCES_DIST) $(libapdk_la_SOURCES) \
-	$(am__libhpip_la_SOURCES_DIST) $(am__libhpmud_la_SOURCES_DIST) \
+	$(am__libhpip_la_SOURCES_DIST) $(am__libhpipp_la_SOURCES_DIST) \
+	$(am__libhpmud_la_SOURCES_DIST) \
 	$(am__libsane_hpaio_la_SOURCES_DIST) \
 	$(am__pcardext_la_SOURCES_DIST) $(am__scanext_la_SOURCES_DIST) \
 	$(am__hp_SOURCES_DIST) $(am__hpcups_SOURCES_DIST) \
@@ -696,6 +714,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	prnt/ps/hp-laserjet_100_color_mfp_m175-ps.ppd.gz \
 	prnt/ps/hp-color_laserjet_mfp_m680-ps.ppd.gz \
 	prnt/ps/hp-laserjet_mfp_m630-ps.ppd.gz \
+	prnt/ps/hp-color_laserjet_pro_mfp_m277-ps.ppd.gz \
 	prnt/ps/hp-designjet_t920-postscript.ppd.gz \
 	prnt/ps/hp-laserjet_4100_series-ps.ppd.gz \
 	prnt/ps/hp-laserjet_pro_mfp_m435-ps.ppd.gz \
@@ -758,6 +777,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	prnt/ps/hp-laserjet_3050-ps.ppd.gz \
 	prnt/ps/hp-designjet_t795ps_44in-ps.ppd.gz \
 	prnt/ps/hp-color_laserjet_cp5225dn-ps.ppd.gz \
+	prnt/ps/hp-color_laserjet_m552-ps.ppd.gz \
 	prnt/ps/hp-designjet_z6100ps_60in_photo-ps.ppd.gz \
 	prnt/ps/hp-laserjet_4345_mfp-ps.ppd.gz \
 	prnt/ps/hp-color_laserjet-ps.ppd.gz \
@@ -781,6 +801,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	prnt/ps/hp-laserjet_9000_mfp-ps.ppd.gz \
 	prnt/ps/hp-color_laserjet_4700-ps.ppd.gz \
 	prnt/ps/hp-laserjet_4si-ps.ppd.gz \
+	prnt/ps/hp-color_laserjet_pro_m252-ps.ppd.gz \
 	prnt/ps/hp-color_laserjet_cp1518ni-ps.ppd.gz \
 	prnt/ps/hp-laserjet_4200-ps.ppd.gz \
 	prnt/ps/hp-laserjet_5p-ps.ppd.gz \
@@ -908,6 +929,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	prnt/ps/hp-designjet_4020ps-ps.ppd.gz \
 	prnt/ps/hp-designjet_t7100ps-ps.ppd.gz \
 	prnt/ps/hp-color_laserjet_9500_mfp-ps.ppd.gz \
+	prnt/ps/hp-color_laserjet_m553-ps.ppd.gz \
 	prnt/ps/hp-laserjet_5200l-ps.ppd.gz \
 	prnt/ps/hp-mopier_240-ps.ppd.gz \
 	prnt/ps/hp-laserjet_9050_mfp-ps.ppd.gz \
@@ -915,6 +937,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	prnt/ps/hp-designjet_t1100ps_44in-ps.ppd.gz \
 	prnt/ps/hp-laserjet_1200n-ps.ppd.gz \
 	prnt/ps/hp-laserjet_3390-ps.ppd.gz \
+	prnt/ps/hp-laserjet_m604_m605_m606-ps.ppd.gz \
 	prnt/ps/hp-laserjet_m4349_mfp-ps.ppd.gz \
 	prnt/ps/hp-designjet_4500mfp.ppd.gz \
 	prnt/ps/hp-color_laserjet_m855-ps.ppd.gz \
@@ -2719,8 +2742,8 @@ hplipdir = $(datadir)/hplip
 doc_DATA = COPYING copyright prnt/hpijs/README_LIBJPG
 EXTRA_DIST = prnt/hpijs/gdevijs-krgb-1.5-gs8.61.patch prnt/hpijs/README_LIBJPG copyright
 dist_noinst_SCRIPTS = $(am__append_6)
-dist_noinst_DATA = $(am__append_5) $(am__append_8) $(am__append_9)
-lib_LTLIBRARIES = $(am__append_1)
+dist_noinst_DATA = $(am__append_5) $(am__append_9) $(am__append_10)
+lib_LTLIBRARIES = $(am__append_1) $(am__append_8)
 foomatic_ppd_printers = \
     ppd/hpijs/hp-officejet_7400_series-hpijs.ppd.gz \
     ppd/hpijs/hp-psc_1358_series-hpijs.ppd.gz \
@@ -3500,6 +3523,7 @@ foomatic_ps_printers = \
     prnt/ps/hp-laserjet_100_color_mfp_m175-ps.ppd.gz \
     prnt/ps/hp-color_laserjet_mfp_m680-ps.ppd.gz \
     prnt/ps/hp-laserjet_mfp_m630-ps.ppd.gz \
+    prnt/ps/hp-color_laserjet_pro_mfp_m277-ps.ppd.gz \
     prnt/ps/hp-designjet_t920-postscript.ppd.gz \
     prnt/ps/hp-laserjet_4100_series-ps.ppd.gz \
     prnt/ps/hp-laserjet_pro_mfp_m435-ps.ppd.gz \
@@ -3562,6 +3586,7 @@ foomatic_ps_printers = \
     prnt/ps/hp-laserjet_3050-ps.ppd.gz \
     prnt/ps/hp-designjet_t795ps_44in-ps.ppd.gz \
     prnt/ps/hp-color_laserjet_cp5225dn-ps.ppd.gz \
+    prnt/ps/hp-color_laserjet_m552-ps.ppd.gz \
     prnt/ps/hp-designjet_z6100ps_60in_photo-ps.ppd.gz \
     prnt/ps/hp-laserjet_4345_mfp-ps.ppd.gz \
     prnt/ps/hp-color_laserjet-ps.ppd.gz \
@@ -3585,6 +3610,7 @@ foomatic_ps_printers = \
     prnt/ps/hp-laserjet_9000_mfp-ps.ppd.gz \
     prnt/ps/hp-color_laserjet_4700-ps.ppd.gz \
     prnt/ps/hp-laserjet_4si-ps.ppd.gz \
+    prnt/ps/hp-color_laserjet_pro_m252-ps.ppd.gz \
     prnt/ps/hp-color_laserjet_cp1518ni-ps.ppd.gz \
     prnt/ps/hp-laserjet_4200-ps.ppd.gz \
     prnt/ps/hp-laserjet_5p-ps.ppd.gz \
@@ -3712,6 +3738,7 @@ foomatic_ps_printers = \
     prnt/ps/hp-designjet_4020ps-ps.ppd.gz \
     prnt/ps/hp-designjet_t7100ps-ps.ppd.gz \
     prnt/ps/hp-color_laserjet_9500_mfp-ps.ppd.gz \
+    prnt/ps/hp-color_laserjet_m553-ps.ppd.gz \
     prnt/ps/hp-laserjet_5200l-ps.ppd.gz \
     prnt/ps/hp-mopier_240-ps.ppd.gz \
     prnt/ps/hp-laserjet_9050_mfp-ps.ppd.gz \
@@ -3719,6 +3746,7 @@ foomatic_ps_printers = \
     prnt/ps/hp-designjet_t1100ps_44in-ps.ppd.gz \
     prnt/ps/hp-laserjet_1200n-ps.ppd.gz \
     prnt/ps/hp-laserjet_3390-ps.ppd.gz \
+    prnt/ps/hp-laserjet_m604_m605_m606-ps.ppd.gz \
     prnt/ps/hp-laserjet_m4349_mfp-ps.ppd.gz \
     prnt/ps/hp-designjet_4500mfp.ppd.gz \
     prnt/ps/hp-color_laserjet_m855-ps.ppd.gz \
@@ -4669,14 +4697,20 @@ cups_drv = prnt/drv/hpcups.drv
 # prnt
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@prntdir = $(hplipdir)/prnt
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@dist_prnt_DATA = prnt/cups.py prnt/__init__.py prnt/ldl.py prnt/pcl.py prnt/colorcal.py
+#hpipp_LTLIBRARIES = hpipp.la
+#hpipp_la_LDFLAGS = -module -avoid-version
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@libhpipp_la_SOURCES = protocol/hp_ipp.c protocol/hp_ipp.h protocol/hp_ipp_i.h
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@libhpipp_la_CFLAGS = -DCONFDIR=\"$(hplip_confdir)\"
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@libhpipp_la_LDFLAGS = -version-info 0:1:0
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@libhpipp_la_LIBADD = libhpmud.la
 
 # cupsext
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@cupsextdir = $(pyexecdir)
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@cupsext_LTLIBRARIES = cupsext.la
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@cupsext_la_LDFLAGS = -module -avoid-version
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@cupsext_la_SOURCES = prnt/cupsext/cupsext.c prnt/cupsext/cupsext.h
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@cupsext_la_CFLAGS = -I$(PYTHONINCLUDEDIR)
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@cupsext_la_LIBADD = -lcups
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@cupsext_la_CFLAGS = -I$(PYTHONINCLUDEDIR) -Iprotocol
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@cupsext_la_LIBADD = -lcups libhpipp.la
 
 # scan
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@scandir = $(hplipdir)/scan
@@ -4854,6 +4888,7 @@ libapdk_la_CFLAGS = $(libapdk_la_CXXFLAGS) -Iprnt/hpijs
 
 @HPCUPS_INSTALL_TRUE@hpcups_CXXFLAGS = $(APDK_ENDIAN_FLAG) $(DBUS_CFLAGS)
 @HPCUPS_INSTALL_TRUE@hpcups_LDADD = -ljpeg -ldl -lcups -lcupsimage $(DBUS_LIBS)
+
 #else
 #hpcupsdir = $(cupsfilterdir)
 #hpcups_PROGRAMS = hpcups
@@ -4873,8 +4908,8 @@ libapdk_la_CFLAGS = $(libapdk_la_CXXFLAGS) -Iprnt/hpijs
 
 # PPDs
 ppddir = $(hpppddir)
-dist_ppd_DATA = $(foomatic_ps_printers) $(am__append_10) \
-	$(am__append_11)
+dist_ppd_DATA = $(foomatic_ps_printers) $(am__append_11) \
+	$(am__append_12)
 @FOOMATIC_DRV_INSTALL_TRUE@cupsdrvdir = $(drvdir)
 @FOOMATIC_DRV_INSTALL_TRUE@cupsdrv_DATA = $(foomatic_drv)
 @CUPS_DRV_INSTALL_TRUE@cupsdrv2dir = $(drvdir)
@@ -5134,6 +5169,8 @@ libapdk.la: $(libapdk_la_OBJECTS) $(libapdk_la_DEPENDENCIES)
 	$(libapdk_la_LINK)  $(libapdk_la_OBJECTS) $(libapdk_la_LIBADD) $(LIBS)
 libhpip.la: $(libhpip_la_OBJECTS) $(libhpip_la_DEPENDENCIES) 
 	$(libhpip_la_LINK) $(am_libhpip_la_rpath) $(libhpip_la_OBJECTS) $(libhpip_la_LIBADD) $(LIBS)
+libhpipp.la: $(libhpipp_la_OBJECTS) $(libhpipp_la_DEPENDENCIES) 
+	$(libhpipp_la_LINK) $(am_libhpipp_la_rpath) $(libhpipp_la_OBJECTS) $(libhpipp_la_LIBADD) $(LIBS)
 libhpmud.la: $(libhpmud_la_OBJECTS) $(libhpmud_la_DEPENDENCIES) 
 	$(libhpmud_la_LINK) $(am_libhpmud_la_rpath) $(libhpmud_la_OBJECTS) $(libhpmud_la_LIBADD) $(LIBS)
 libsane-hpaio.la: $(libsane_hpaio_la_OBJECTS) $(libsane_hpaio_la_DEPENDENCIES) 
@@ -5718,6 +5755,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapdk_la-utils.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapdk_la-version.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapdk_la-versioncode.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libhpipp_la-hp_ipp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libhpmud_la-dot4.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libhpmud_la-hpmud.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libhpmud_la-jd.Plo@am__quote@
@@ -6044,6 +6082,13 @@ xyxtract.lo: ip/xyxtract.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ip/xyxtract.c' object='xyxtract.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o xyxtract.lo `test -f 'ip/xyxtract.c' || echo '$(srcdir)/'`ip/xyxtract.c
+
+libhpipp_la-hp_ipp.lo: protocol/hp_ipp.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libhpipp_la_CFLAGS) $(CFLAGS) -MT libhpipp_la-hp_ipp.lo -MD -MP -MF $(DEPDIR)/libhpipp_la-hp_ipp.Tpo -c -o libhpipp_la-hp_ipp.lo `test -f 'protocol/hp_ipp.c' || echo '$(srcdir)/'`protocol/hp_ipp.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libhpipp_la-hp_ipp.Tpo $(DEPDIR)/libhpipp_la-hp_ipp.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='protocol/hp_ipp.c' object='libhpipp_la-hp_ipp.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libhpipp_la_CFLAGS) $(CFLAGS) -c -o libhpipp_la-hp_ipp.lo `test -f 'protocol/hp_ipp.c' || echo '$(srcdir)/'`protocol/hp_ipp.c
 
 libhpmud_la-hpmud.lo: io/hpmud/hpmud.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libhpmud_la_CFLAGS) $(CFLAGS) -MT libhpmud_la-hpmud.lo -MD -MP -MF $(DEPDIR)/libhpmud_la-hpmud.Tpo -c -o libhpmud_la-hpmud.lo `test -f 'io/hpmud/hpmud.c' || echo '$(srcdir)/'`io/hpmud/hpmud.c

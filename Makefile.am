@@ -248,13 +248,24 @@ pcardext_la_CFLAGS = -I$(PYTHONINCLUDEDIR)
 prntdir = $(hplipdir)/prnt
 dist_prnt_DATA = prnt/cups.py prnt/__init__.py prnt/ldl.py prnt/pcl.py prnt/colorcal.py
 
+
+# IPP library
+lib_LTLIBRARIES += libhpipp.la
+#hpipp_LTLIBRARIES = hpipp.la
+#hpipp_la_LDFLAGS = -module -avoid-version
+libhpipp_la_SOURCES = protocol/hp_ipp.c protocol/hp_ipp.h protocol/hp_ipp_i.h
+libhpipp_la_CFLAGS = -DCONFDIR=\"$(hplip_confdir)\"
+libhpipp_la_LDFLAGS = -version-info 0:1:0
+libhpipp_la_LIBADD = libhpmud.la
+
+
 # cupsext
 cupsextdir = $(pyexecdir)
 cupsext_LTLIBRARIES = cupsext.la
 cupsext_la_LDFLAGS = -module -avoid-version
 cupsext_la_SOURCES =  prnt/cupsext/cupsext.c prnt/cupsext/cupsext.h
-cupsext_la_CFLAGS = -I$(PYTHONINCLUDEDIR)
-cupsext_la_LIBADD = -lcups
+cupsext_la_CFLAGS = -I$(PYTHONINCLUDEDIR) -Iprotocol
+cupsext_la_LIBADD = -lcups libhpipp.la
 
 if SCAN_BUILD
 # scan
@@ -484,6 +495,7 @@ hpcups_SOURCES = prnt/hpcups/HPCupsFilter.cpp prnt/hpcups/HPCupsFilter.h prnt/hp
 
 hpcups_CXXFLAGS = $(APDK_ENDIAN_FLAG) $(DBUS_CFLAGS)
 hpcups_LDADD = -ljpeg -ldl -lcups -lcupsimage $(DBUS_LIBS)
+
 #else
 #hpcupsdir = $(cupsfilterdir)
 #hpcups_PROGRAMS = hpcups

@@ -274,7 +274,6 @@ class CoreInstall(object):
             'package_available' : TYPE_BOOL,
             'package_arch' : TYPE_LIST,
             'open_mdns_port' : TYPE_LIST, # command to use to open mdns multicast port 5353
-            'acl_rules' : TYPE_BOOL, # Use ACL uDEV rules (Ubuntu 9.10+)
             'libdir_path' : TYPE_STRING,
         }
 
@@ -318,7 +317,7 @@ class CoreInstall(object):
         }
 
         # dependencies
-        # 'name': (<required for option>, [<option list>], <display_name>, <check_func>, <runtime/compiletime>), ...
+        # 'name': (<required or option>, [<option list>], <display_name>, <check_func>, <runtime/compiletime>), ...
         # Note: any change to the list of dependencies must be reflected in base/distros.py
         self.dependencies = {
             # Required base packages
@@ -880,20 +879,14 @@ class CoreInstall(object):
             log.debug("Trying to import 'reportlab'...")
             import reportlab
 
-            ver = reportlab.Version
-            try:
-                ver_f = float(ver)
-            except ValueError:
-                log.debug("Can't determine version.")
-                return False
+            ver = str(reportlab.Version)
+            log.debug("Version: %.1s" % ver)
+            if ver >= "2.0":
+                log.debug("Success.")
+                return True
             else:
-                log.debug("Version: %.1f" % ver_f)
-                if ver_f >= 2.0:
-                    log.debug("Success.")
-                    return True
-                else:
-                    return False
-
+                return False
+                
         except ImportError:
             log.debug("Failed.")
             return False
@@ -1340,9 +1333,6 @@ class CoreInstall(object):
 
         if self.get_distro_ver_data('cups_path_with_bitness', False) and self.bitness == 64:
             configure_cmd += ' --with-cupsbackenddir=/usr/lib64/cups/backend --with-cupsfilterdir=/usr/lib64/cups/filter'
-
-        if self.get_distro_ver_data('acl_rules', False):
-            configure_cmd += ' --enable-udev-acl-rules'
 
         if self.enable is not None:
             for c in self.enable:

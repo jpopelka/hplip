@@ -1030,6 +1030,12 @@ try:
                 except NameError:
                     log.error("A problem has occurred with PDF generation. This is a known bug in ReportLab. Please update your install of ReportLab to version 2.0 or greater.")
                     sys.exit(1)
+                except AssertionError as e:
+                    log.error(e)
+                    if PY3:
+                        log.note("You might be running an older version of reportlab. Please update to the latest version")
+                        log.note("More information is available at http://hplipopensource.com/node/369")
+                        sys.exit(1)
 
                 c.showPage()
                 os.unlink(p)

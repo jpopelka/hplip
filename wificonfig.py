@@ -43,16 +43,17 @@ try:
     mod = module.Module(__mod__, __title__, __version__, __doc__, None,
                        (GUI_MODE,), (UI_TOOLKIT_QT4,))
 
-    mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS,
+    mod.setUsage(module.USAGE_FLAG_NONE,
                  see_also_list=['hp-setup'])
 
     opts, device_uri, printer_name, mode, ui_toolkit, lang = \
         mod.parseStdOpts()
+#Commented as device_uri returned here is not used to configure the device currently
+    #device_uri = mod.getDeviceUri(device_uri, printer_name,
+    #                              filter={'wifi-config': (operator.gt, 0)},
+    #                              restrict_to_installed_devices=False)
 
-    device_uri = mod.getDeviceUri(device_uri, printer_name,
-                                  filter={'wifi-config': (operator.gt, 0)},
-                                  restrict_to_installed_devices=False)
-
+    device_uri = None
     if not utils.canEnterGUIMode4():
         log.error("%s -u/--gui requires Qt4 GUI support. Exiting." % __mod__)
         sys.exit(1)

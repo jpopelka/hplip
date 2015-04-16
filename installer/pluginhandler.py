@@ -91,6 +91,8 @@ class PluginHandle(object):
         processor = utils.getProcessor()
         if processor == 'power_machintosh':
             ARCH = 'ppc'
+        elif (processor == 'armv6l' or processor == 'armv7l' or processor == 'aarch64' or processor == 'aarch32'):
+            ARCH = 'arm%d' % BITNESS
         else:
             ARCH = 'x86_%d' % BITNESS
 
@@ -345,10 +347,11 @@ class PluginHandle(object):
         cwd = os.getcwd()
         os.chdir(self.__plugin_path)
 
+        exec_str = sys.executable
         if mode == GUI_MODE:
-            cmd = "sh %s --keep --nox11 -- -u" % plugin_file
+            cmd = "sh %s --keep --nox11 -- -u %s" % (plugin_file, exec_str)
         else:
-            cmd = "sh %s --keep --nox11 -- -i" % plugin_file
+            cmd = "sh %s --keep --nox11 -- -i %s" % (plugin_file, exec_str)
 
         if os_utils.execute(cmd) == 0:
             result = True

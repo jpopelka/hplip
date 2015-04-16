@@ -172,13 +172,13 @@ def performScan(dev, adapterName, ssid=None):
     if params is not None:              
         if elementCount == 1:
             try:
-                ssid = str(params['io:wifinetworks-io:wifinetwork-wifi:ssid']).decode("hex")
+                ssid = binascii.unhexlify(str(params['io:wifinetworks-io:wifinetwork-wifi:ssid']).encode('utf-8')).decode("utf-8")
                 if not ssid:
                     ret['ssid-0'] = to_unicode('(unknown)')
                 else:
                     ret['ssid-0'] = ssid
                 try:
-                    ret['bssid-0'] = str(params['io:wifinetworks-io:wifinetwork-wifi:bssid']).decode("hex")
+                    ret['bssid-0'] = binascii.unhexlify(str(params['io:wifinetworks-io:wifinetwork-wifi:bssid']).encode('utf-8')).decode("utf-8")
                 except:
                     ret['bssid-0'] = params['io:wifinetworks-io:wifinetwork-wifi:bssid']
                                    
@@ -203,7 +203,7 @@ def performScan(dev, adapterName, ssid=None):
                     else:
                         ret['ssid-%d' % a] = ssid
                     try:
-                        ret['bssid-%d' % a] = str(params['io:wifinetworks-io:wifinetwork-wifi:bssid-%d' % a]).decode("hex")
+                        ret['bssid-%d' % a] = binascii.unhexlify(str(params['io:wifinetworks-io:wifinetwork-wifi:bssid-%d' % a]).encode('utf-8')).decode("utf-8")
                     except:
                         ret['bssid-%d' % a] = params['io:wifinetworks-io:wifinetwork-wifi:bssid-%d' % a]
                     ret['channel-%d' % a] = params['io:wifinetworks-io:wifinetwork-wifi:channel-%d' % a]
@@ -491,7 +491,7 @@ def readXmlTagDataFromURI(dev,URI,xmlRootNode,xmlReqDataNode,timeout=5):
             strResp = utils.unchunck_xml_data(strResp)
             pos = strResp.find(xmlRootNode,0,len(strResp))    
             repstr = strResp[pos:].strip()
-            repstr = repstr.replace('\r','').replace('\t','').replace('\n','') # To remove formating characters from the received xml
+            repstr = repstr.replace('\r',' ').replace('\t',' ').replace('\n',' ') # To remove formating characters from the received xml
             repstr = repstr.rstrip('0')   # To remove trailing zero from the received xml
             try:
                 parser_object = utils.extendedExpat()
@@ -500,7 +500,7 @@ def readXmlTagDataFromURI(dev,URI,xmlRootNode,xmlReqDataNode,timeout=5):
                 reqDataElementList = root_element.getElementsByTagName(xmlReqDataNode)
                 for node in reqDataElementList:
                     repstr = node.toString()
-                    repstr = repstr.replace('\r','').replace('\t','').replace('\n','') # To remove formating characters from the received xml
+                    repstr = repstr.replace('\r',' ').replace('\t',' ').replace('\n',' ') # To remove formating characters from the received xml
                     params = utils.XMLToDictParser().parseXML(to_bytes_utf8(repstr))
                     paramsList.append(params)
             except xml.parsers.expat.ExpatError as e:
@@ -551,7 +551,7 @@ def readXmlDataFromURI(dev,URI,xmlRootNode,xmlChildNode,timeout=5):
             strResp = utils.unchunck_xml_data(strResp)
             pos = strResp.find(xmlRootNode,0,len(strResp))    
             repstr = strResp[pos:].strip()
-            repstr = repstr.replace('\r','').replace('\t','').replace('\n','') # To remove formating characters from the received xml
+            repstr = repstr.replace('\r',' ').replace('\t',' ').replace('\n',' ') # To remove formating characters from the received xml
             repstr = repstr.rstrip('0')   # To remove trailing zero from the received xml
             elementCount = repstr.count(xmlChildNode)
             try:

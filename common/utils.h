@@ -10,6 +10,8 @@
 #define STRINGIZE(x) _STRINGIZE(x)
 
 #define BUG(args...) syslog(LOG_ERR, __FILE__ " " STRINGIZE(__LINE__) ": " args)
+#define DBG(args...) syslog(LOG_INFO, __FILE__ " " STRINGIZE(__LINE__) ": " args)
+
 #define UTILS_LINE_SIZE 256     /* Length of a line. */
 #define UTILS_BUFFER_SIZE 16384  /* General Read/Write buffer. */
 

@@ -110,11 +110,16 @@ f 0644 root root $ppd/HP prnt/ps/*.ppd.gz
 @epm_print_only_exclude@l 0755 root root $libdir/libhpmud.dylib libhpmud.0.0.6.dylib
 @epm_print_only_exclude@f 0755 root root $libdir/libhpip.0.0.1.dylib .libs/libhpip.0.0.1.dylib
 @epm_print_only_exclude@l 0755 root root $libdir/libhpip.dylib libhpip.0.0.1.dylib
+@epm_print_only_exclude@f 0755 root root $libdir/libhpipp.0.0.1.dylib .libs/libhpipp.0.0.1.dylib
+@epm_print_only_exclude@l 0755 root root $libdir/libhpipp.dylib libhpipp.0.0.1.dylib
 %system !darwin
 @epm_print_only_exclude@f 0755 root root $libdir/libhpmud.so.0.0.6 .libs/libhpmud.so.0.0.6
 @epm_print_only_exclude@l 0755 root root $libdir/libhpmud.so libhpmud.so.0.0.6
 @epm_print_only_exclude@f 0755 root root $libdir/libhpip.so.0.0.1 .libs/libhpip.so.0.0.1
 @epm_print_only_exclude@l 0755 root root $libdir/libhpip.so libhpip.so.0.0.1
+@epm_print_only_exclude@f 0755 root root $libdir/libhpipp.so.0.0.1 .libs/libhpipp.so.0.0.1
+@epm_print_only_exclude@l 0755 root root $libdir/libhpipp.so libhpipp.so.0.0.1
+
 # Ugly fix for inconsistent libcrypto soname
 #l 0755 root root $libdir/libcrypto.so.6 libcrypto.so.0.9.8
 %system all

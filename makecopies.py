@@ -64,7 +64,7 @@ device_uri = mod.getDeviceUri(device_uri, printer_name,
 if not device_uri:
     sys.exit(1)
 
-
+log.info("Using device : %s\n" % device_uri)
 num_copies = None
 reduction = None
 reduction_spec = False

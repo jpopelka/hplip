@@ -408,6 +408,12 @@ packages=dbus-1-python3-devel,dbus-1-python3
 [suse:12.3:python3-pil]
 packages=PKG_FROM_PIP:pillow
 
+[suse:12.3:python3-reportlab]
+packages=python3-reportlab
+
+[suse:12.3:python3-notify2]
+packages=python3-notify2
+
 
 # ****************************************
 
@@ -425,7 +431,7 @@ code_name=Harlequin
 supported=1
 packaged_version=3.14.6
 release_date=04.11.2014
-post_depend_cmd=su -c "zypper --non-interactive --no-gpg-checks in --force --auto-agree-with-licenses cups-filters-ghostscript", su -c"service cups restart"
+post_depend_cmd=su -c "zypper --non-interactive --no-gpg-checks in --force --auto-agree-with-licenses cups-filters-ghostscript",su -c "service cups restart"
 scan_supported=1
 fax_supported=1
 pcard_supported=0
@@ -558,6 +564,12 @@ packages=dbus-1-python3-devel,dbus-1-python3
 
 [suse:13.2:python3-pil]
 packages=python3-Pillow
+
+[suse:13.2:python3-reportlab]
+packages=python3-reportlab
+
+[suse:13.2:python3-notify2]
+packages=python3-notify2
 
 
 
@@ -2444,7 +2456,7 @@ packages=avahi
 # ****************************************
 [ubuntu]
 index=12
-versions=10.04,11.10,12.04,12.10,13.04,13.10,14.04,14.10
+versions=10.04,11.10,12.04,12.10,13.04,13.10,14.04,14.10,15.04
 display_name=Ubuntu
 alt_names=kubuntu,edubuntu,xubuntu
 display=1
@@ -3141,7 +3153,7 @@ packages=python3-dev
 packages=python3-imaging
 
 [ubuntu:13.10:python3-reportlab]
-packages=
+packages=python3-reportlab
 
 # ********************
 [ubuntu:14.04]
@@ -3292,13 +3304,157 @@ packages=python3-dev
 packages=python3-pil
 
 [ubuntu:14.10:python3-reportlab]
+packages=python3-reportlab
+
+# ********************
+[ubuntu:15.04]
+code_name=Vivid
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=3.15.2
+release_date=17/04/2015
+notes=Enable the universe/multiverse repositories. Also be sure you are using the Ubuntu "Main" Repositories. See: https://help.ubuntu.com/community/Repositories/Ubuntu for more information.  Disable the CD-ROM/DVD source if you do not have the Ubuntu installation media inserted in the drive.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+native_cups=1
+acl_rules=1
+
+libdir_path=/usr/lib
+[ubuntu:15.04:cups]
+packages=libcups2
+
+[ubuntu:15.04:cups-devel]
+packages=libcups2-dev,cups-bsd,cups-client
+
+[ubuntu:15.04:gcc]
+packages=build-essential
+
+[ubuntu:15.04:gs]
+packages=ghostscript
+
+[ubuntu:15.04:libcrypto]
+packages=openssl
+
+[ubuntu:15.04:libjpeg]
+packages=libjpeg-dev
+
+[ubuntu:15.04:libnetsnmp-devel]
+packages=libsnmp-dev,snmp-mibs-downloader
+
+[ubuntu:15.04:libpthread]
+packages=build-essential
+
+[ubuntu:15.04:libtool]
+packages=libtool,libtool-bin
+
+[ubuntu:15.04:libusb]
+packages=libusb-1.0.0-dev
+
+[ubuntu:15.04:make]
+packages=build-essential
+
+[ubuntu:15.04:pil]
+packages=python-imaging
+
+[ubuntu:15.04:ppdev]
 packages=
+commands=sudo modprobe ppdev,sudo cp -f /etc/modules /etc/modules.hplip,echo ppdev | sudo tee -a /etc/modules
+
+[ubuntu:15.04:pyqt]
+packages=gtk2-engines-pixbuf,python-qt4
+
+[ubuntu:15.04:python-devel]
+packages=python-dev
+
+[ubuntu:15.04:pyqt4]
+packages=gtk2-engines-pixbuf,python-qt4
+
+[ubuntu:15.04:pyqt4-dbus]
+packages=python-qt4-dbus
+
+#[ubuntu:15.04:python23]
+#packages=python
+
+[ubuntu:15.04:python2X]
+packages=python
+
+[ubuntu:15.04:reportlab]
+packages=python-reportlab
+
+[ubuntu:15.04:sane]
+packages=libsane
+
+[ubuntu:15.04:sane-devel]
+packages=libsane-dev
+
+[ubuntu:15.04:scanimage]
+packages=sane-utils
+
+[ubuntu:15.04:xsane]
+packages=gtk2-engines-pixbuf,xsane
+
+[ubuntu:15.04:python-dbus]
+packages=python-dbus,python-gobject
+
+[ubuntu:15.04:dbus]
+packages=libdbus-1-dev
+
+[ubuntu:15.04:cups-image]
+packages=libcupsimage2-dev
+
+[ubuntu:15.04:cups-ddk]
+packages=cups
+
+[ubuntu:15.04:policykit]
+packages=policykit-1,policykit-1-gnome
+
+[ubuntu:15.04:python-notify]
+packages=python-notify
+
+[ubuntu:15.04:network]
+packages=wget
+
+[ubuntu:15.04:avahi-utils]
+packages=avahi-utils
+
+[ubuntu:15.04:python3-notify2]
+packages=python3-notify2
+
+[ubuntu:15.04:python3-pyqt4-dbus]
+packages=python3-dbus.mainloop.qt
+
+[ubuntu:15.04:python3-pyqt4]
+packages=python3-pyqt4,gtk2-engines-pixbuf
+
+[ubuntu:15.04:python3-dbus]
+packages=python3-dbus,python3-gi
+
+[ubuntu:15.04:python3-xml]
+packages=python3-lxml
+
+[ubuntu:15.04:python3-devel]
+packages=python3-dev
+
+[ubuntu:15.04:python3-pil]
+packages=python3-pil
+
+[ubuntu:15.04:python3-reportlab]
+packages=python3-reportlab
 
 
 # ****************************************
 [debian]
 index=2
-versions=6.0,6.0.1,6.0.2,6.0.3,6.0.4,6.0.5,6.0.6,6.0.7,6.0.8,6.0.9,6.0.10,7.0,7.1,7.2,7.3,7.4,7.5,7.6,7.7,7.8
+versions=6.0,6.0.1,6.0.2,6.0.3,6.0.4,6.0.5,6.0.6,6.0.7,6.0.8,6.0.9,6.0.10,7.0,7.1,7.2,7.3,7.4,7.5,7.6,7.7,7.8,8.0
 display_name=Debian
 alt_names=
 display=1
@@ -3615,6 +3771,8 @@ packages=python3-dev
 [debian:7.0:python3-pil]
 packages=PKG_FROM_PIP:pillow
 
+[debian:7.0:python3-reportlab]
+packages=python3-reportlab
 
 # ****************************************
 
@@ -3642,6 +3800,158 @@ same_as_version=7.0
 [debian:7.8]
 same_as_version=7.0
 
+# *********************
+
+[debian:8.0]
+code_name=Jessie
+supported=1
+scan_supported=1
+fax_supported=1
+pcard_supported=1
+network_supported=1
+parallel_supported=1
+usb_supported=1
+packaged_version=3.15.2
+release_date=04/05/2015
+notes=NOTE: Disable the CD Sources in your apt sources.list or the install will fail and hang.
+ppd_install=drv
+udev_mode_fix=1
+ppd_dir=/usr/share/ppd/HP
+fix_ppd_symlink=0
+drv_dir=/usr/share/cups/drv/HP
+ui_toolkit=qt4
+native_cups=1
+policykit=0
+
+# This libdir_path will be used only for 64 bit machine.
+libdir_path=/usr/lib/x86_64-linux-gnu
+
+[debian:8.0:cups]
+packages=cups,libcups2
+
+[debian:8.0:cups-devel]
+packages=libcups2-dev,cups-bsd,cups-client
+
+[debian:8.0:gcc]
+packages=g++
+
+[debian:8.0:gs]
+packages=ghostscript,ghostscript-cups,ghostscript-x
+
+[debian:8.0:libcrypto]
+packages=libssl-dev
+
+[debian:8.0:libjpeg]
+packages=libjpeg62-turbo-dev
+
+[debian:8.0:libnetsnmp-devel]
+packages=libsnmp-dev
+
+[debian:8.0:libpthread]
+packages=libc6
+
+[debian:8.0:libtool]
+packages=libtool,libtool-bin
+
+[debian:8.0:libusb]
+packages=libusb-1.0.0-dev
+
+[debian:8.0:make]
+packages=make
+
+[debian:8.0:pil]
+packages=python-imaging
+
+[debian:8.0:ppdev]
+packages=
+commands=su -c "modprobe ppdev",su -c cp -f /etc/modules /etc/modules.hplip,echo ppdev | su -c tee -a /etc/modules
+
+[debian:8.0:pyqt]
+packages=python-qt3
+
+[debian:8.0:python-devel]
+packages=python-dev
+
+[debian:8.0:pyqt4]
+packages=python-qt4
+
+[debian:8.0:pyqt4-dbus]
+packages=python-qt4-dbus
+
+[debian:8.0:python23]
+packages=python
+
+[debian:8.0:python2X]
+packages=python
+
+[debian:8.0:reportlab]
+packages=python-reportlab
+
+[debian:8.0:sane]
+packages=sane
+
+[debian:8.0:sane-devel]
+packages=libsane-dev
+
+[debian:8.0:scanimage]
+packages=sane-utils
+
+[debian:8.0:xsane]
+packages=xsane
+
+[debian:8.0:cups-ddk]
+packages=
+
+[debian:8.0:python-dbus]
+packages=python-dbus,python-gobject
+
+[debian:8.0:dbus]
+packages=libdbus-1-dev
+
+[debian:8.0:python-ctypes]
+packages=python-ctypes
+
+[debian:8.0:cups-image]
+packages=libcupsimage2,libcupsimage2-dev
+
+[debian:8.0:policykit]
+packages=policykit-1,policykit-1-gnome
+
+[debian:8.0:python-notify]
+packages=python-notify
+
+[debian:8.0:network]
+packages=wget
+
+[debian:8.0:avahi-utils]
+packages=avahi-utils
+
+[debian:8.0:gtk]
+packages=libcanberra-gtk-module
+
+[debian:8.0:python3-notify2]
+packages=python3-notify2
+
+[debian:8.0:python3-pyqt4-dbus]
+packages=python3-dbus.mainloop.qt
+
+[debian:8.0:python3-pyqt4]
+packages=python3-pyqt4,gtk2-engines-pixbuf
+
+[debian:8.0:python3-dbus]
+packages=python3-dbus,python3-gi
+
+[debian:8.0:python3-xml]
+packages=python3-lxml
+
+[debian:8.0:python3-devel]
+packages=python3-dev
+
+[debian:8.0:python3-pil]
+packages=python3-pil
+
+[debian:8.0:python3-reportlab]
+packages=python3-reportlab
 # *********************
 
 [xandros]
@@ -5639,7 +5949,7 @@ packages=avahi
 # ****************************************
 [linuxmint]
 index=22
-versions=13,14,15,16,17
+versions=13,14,15,16,17,17.1
 display_name=Linux Mint
 alt_names=mint, mint linux
 display=1
@@ -6216,10 +6526,6 @@ packages=wget
 [linuxmint:17:avahi-utils]
 packages=avahi-utils
 
-
-[linuxmint:17:python3-notify2]
-packages=python3-notify2
-
 [linuxmint:17:python3-pyqt4-dbus]
 packages=python3-dbus.mainloop.qt
 
@@ -6238,6 +6544,20 @@ packages=python3-dev
 [linuxmint:17:python3-pil]
 packages=python3-pil
 
+[linuxmint:17:python3-reportlab]
+packages=python3-reportlab
+
+[linuxmint:17:python3-notify2]
+packages=python3-notify2
+
+
+# ****************************************
+
+[linuxmint:17.1]
+code_name=Rebecca
+packaged_version=3.14.3
+release_date=29/11/2014
+same_as_version=17
 
 
 # ****************************************

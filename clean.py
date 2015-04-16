@@ -21,9 +21,9 @@
 #
 
 __version__ = '4.0'
-__title__ = 'Printer Cartridge Cleaning Utility'
+__title__ = 'Printer Printhead Cleaning Utility'
 __mod__ = 'hp-clean'
-__doc__ = "Cartridge cleaning utility for HPLIP supported inkjet printers."
+__doc__ = "Printhead cleaning utility for HPLIP supported inkjet printers."
 
 #Std Lib
 import sys
@@ -100,7 +100,7 @@ def CleanUI3(msg =""):
     if msg:
         log.info(msg)
     else:
-        log.info("\nLevel 3 cleaning complete. Check this page to see if the problem was fixed. If the test page was not printed OK, replace the print cartridge(s).")
+        log.info("\nLevel 3 cleaning complete. Check this page to see if the problem was fixed. If the test page was not printed OK, replace the printhead(s).")
 
 
 try:
@@ -119,7 +119,7 @@ try:
 
     if not device_uri:
         sys.exit(1)
-
+    log.info("Using device : %s\n" % device_uri)
     if mode == GUI_MODE:
         if not utils.canEnterGUIMode4():
             log.error("%s -u/--gui requires Qt4 GUI support. Entering interactive mode." % __mod__)
@@ -146,7 +146,7 @@ try:
 
                 try:
                     if clean_type == CLEAN_TYPE_UNSUPPORTED:
-                        log.error("Cleaning through HPLIP not supported for this printer. Please use the printer's front panel to perform cartridge cleaning.")
+                        log.error("Cleaning through HPLIP not supported for this printer. Please use the printer's front panel to perform printhead cleaning.")
 
                     elif clean_type == CLEAN_TYPE_PCL:
                         maint.cleaning(d, clean_type, maint.cleanType1, maint.primeType1,

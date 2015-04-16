@@ -308,7 +308,7 @@ def get_reportlab_version():
     try:
         log.debug("Trying to import 'reportlab'...")
         import reportlab
-        ver = reportlab.Version
+        ver = str(reportlab.Version)
     except ImportError:
         return '-'
     else:

@@ -1334,7 +1334,7 @@ class DevMgr4(DevMgr4_base):
                 self.AlignPensButton_clicked),
 
                 (lambda: printer and d.clean_type,
-                self.__tr("Clean Cartridges"),
+                self.__tr("Clean Printheads"),
                 "clean",
                 self.__tr("You only need to perform this action if you are<br>having problems with poor printout quality due to clogged ink nozzles."),
                 self.CleanPensButton_clicked),
