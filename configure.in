@@ -26,7 +26,7 @@
 #   104 = no libdl
 
 #AC_PREREQ(2.59)
-AC_INIT([HP Linux Imaging and Printing], [3.15.4], [3.15.4], [hplip])
+AC_INIT([HP Linux Imaging and Printing], [3.15.6], [3.15.6], [hplip])
 #AM_INIT_AUTOMAKE([1.9 foreign])
 AM_INIT_AUTOMAKE
 AC_DISABLE_STATIC
@@ -107,7 +107,7 @@ AM_CONDITIONAL(DOC_BUILD, test x$doc_build = xyes)
 
 AC_MSG_CHECKING([for hpijs only build])
 AC_ARG_ENABLE(hpijs_only_build,
-  [  --enable-hpijs-only-build     enable hpijs only build (default=yes)],
+  [  --enable-hpijs-only-build     enable hpijs only build (default=yes)(Deprecated)],
   hpijs_only_build=$enableval, hpijs_only_build=no)
 if test "$hpijs_only_build" = "yes"; then
    AC_MSG_RESULT(yes)
@@ -116,6 +116,7 @@ if test "$hpijs_only_build" = "yes"; then
    epm_hpcups_only=\#
    epm_print_only_exclude=\#
    epm_hpijs_only=
+   AC_MSG_WARN(HPIJS build is deprecated. Feature can be used as is. Fixes or updates will not be provided)
 else
    AC_MSG_RESULT(no)
    epm_hpijs_only=\#
@@ -168,11 +169,12 @@ AM_CONDITIONAL(FULL_BUILD, test x$hpcups_only_build = xno && test x$lite_build =
 
 AC_MSG_CHECKING([for hpijs install])
 AC_ARG_ENABLE(hpijs_install,
-  [  --enable-hpijs-install     enable hpijs install (default=no)],
+  [  --enable-hpijs-install     enable hpijs install (default=no)(Deprecated)],
   hpijs_install=$enableval, hpijs_install=no)
 if test "$hpijs_install" = "yes"; then
    AC_MSG_RESULT(yes)
    epm_hpijs_install=yes
+   AC_MSG_WARN(HPIJS is deprecated. Feature can be used as is. Fixes or updates will not be provided)
 else
    AC_MSG_RESULT(no)
 fi
@@ -214,10 +216,11 @@ AM_CONDITIONAL(NETWORK_BUILD, test x$network_build = xyes)
 
 AC_MSG_CHECKING([for parallel port build])
 AC_ARG_ENABLE(pp_build,
-  [  --enable-pp-build    (**Deprecated) enable parallel port build (default=no) ],
+  [  --enable-pp-build    enable parallel port build (default=no)(Deprecated) ],
   pp_build=$enableval, pp_build=no)
 if test "$pp_build" = "yes"; then
-   AC_MSG_RESULT(yes(**Support Deprecated))
+   AC_MSG_RESULT(yes)
+   AC_MSG_WARN(Parallel Port support deprecated. Feature can be used as is. Fixes or updates will not be provided)
    AC_DEFINE(HAVE_PPORT) 
 else
    AC_MSG_RESULT(no)
@@ -344,11 +347,12 @@ AC_ARG_WITH(htmldir, AC_HELP_STRING([--with-htmldir=DIR], [set hplip html docume
 
 AC_MSG_CHECKING([for foomatic ppd install])
 AC_ARG_ENABLE(foomatic_ppd_install,
-  [  --enable-foomatic-ppd-install    enable foomatic static ppd install (default=no), uses hpppddir],
+  [  --enable-foomatic-ppd-install    enable foomatic static ppd install (default=no)(Deprecated), uses hpppddir],
   foomatic_ppd_install=$enableval, foomatic_ppd_install=no)
 if test $foomatic_ppd_install = yes; then
    AC_MSG_RESULT(yes)
    epm_foomatic_ppd_install=yes
+   AC_MSG_WARN(foomatic static ppd install is deprecated. Feature can be used as is. Fixes or updates will not be provided)
 else
    AC_MSG_RESULT(no)
 fi
@@ -359,11 +363,12 @@ AC_ARG_WITH(drvdir, AC_HELP_STRING([--with-drvdir=DIR], [set cups drv install di
 
 AC_MSG_CHECKING([for foomatic drv install])
 AC_ARG_ENABLE(foomatic_drv_install,
-  [  --enable-foomatic-drv-install    enable foomatic dynamic ppd install (default=no), uses drvdir and hpppddir],
+  [  --enable-foomatic-drv-install    enable foomatic dynamic ppd install (default=no)(Deprecated), uses drvdir and hpppddir],
   foomatic_drv_install=$enableval, foomatic_drv_install=no)
 if test $foomatic_drv_install = yes; then
    AC_MSG_RESULT(yes)
    epm_foomatic_drv_install=yes
+   AC_MSG_WARN(foomatic dynamic ppd install is deprecated. Feature can be used as is. Fixes or updates will not be provided)
 else
    AC_MSG_RESULT(no)
 fi
@@ -395,12 +400,13 @@ AM_CONDITIONAL(CUPS_PPD_INSTALL, test x$cups_ppd_install = xyes && test x$hpijs_
 
 AC_MSG_CHECKING([for foomatic-rip-hplip install])
 AC_ARG_ENABLE(foomatic_rip_hplip_install,
-  [  --enable-foomatic-rip-hplip-install    enable foomatic-rip-hplip install (default=no), uses cupsfilterdir],
+  [  --enable-foomatic-rip-hplip-install    enable foomatic-rip-hplip install (default=no)(Deprecated), uses cupsfilterdir],
   foomatic_rip_hplip_install=$enableval, foomatic_rip_hplip_install=no)
 if test "$foomatic_rip_hplip_install" = "yes"; then
    AC_MSG_RESULT(yes)
    foomatic_filter="foomatic-rip-hplip"
    epm_foomatic_rip_hplip_install=yes
+   AC_MSG_WARN(foomatic-rip-hplip install is deprecated. Feature can be used as is. Fixes or updates will not be provided)
 else
    AC_MSG_RESULT(no)
    foomatic_filter="foomatic-rip"

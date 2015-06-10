@@ -319,6 +319,47 @@ def cleanup_spinner():
         sys.stdout.write("\b \b")
         sys.stdout.flush()
 
+# Convert string to int and return a list.
+def xint(ver):
+    try:
+        l = [int(x) for x in ver.split('.')]
+    except:
+        pass
+    return l
+
+# In case of import failure of extension modules, check whether its a mixed python environment issue.   
+def check_extension_module_env(ext_mod):
+
+    flag = 0
+    ext_mod_so = ext_mod + '.so'
+
+    python_ver = xint((sys.version).split(' ')[0])              #find the current python version ; xint() to convert string to int, returns a list
+    if python_ver[0] == 3 :
+        python_ver = 3
+    else :
+        python_ver = 2
+
+    for dirpath, dirname, filenames in os.walk('/usr/lib/'):    #find the .so path
+        if ext_mod_so in filenames:
+            ext_path = dirpath
+            flag = 1
+
+    if flag == 0:
+        log.error('%s not present in the system. Please re-install HPLIP.' %ext_mod)
+        sys.exit(1)
+
+    m = re.search('python(\d(\.\d){0,2})', ext_path)            #get the python version where the .so file is found
+    ext_ver = xint(m.group(1))
+
+    if ext_ver[0] == 3:
+        ver = 3
+    else:
+        ver = 2
+
+    if python_ver != ver :                                      #compare the python version and the version where .so files are present
+        log.error("%s Extension module is missing from Python's path." %ext_mod)
+        log.info("To fix this issue, please refer to this 'http://hplipopensource.com/node/372'")
+        sys.exit(1)
 
 # Internal/messaging errors
 

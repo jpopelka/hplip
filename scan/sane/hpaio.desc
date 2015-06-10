@@ -139,6 +139,12 @@
 :model "HP Deskjet 2050 j510 All-in-one Printer"
 :status :good
 
+:model "HP Deskjet 2130 All-in-one Printer Series"
+:status :good
+
+:model "HP Deskjet 2132 All-in-one Printer"
+:status :good
+
 :model "HP Deskjet 2510 All-in-one Printer"
 :status :good
 
@@ -164,6 +170,15 @@
 :status :good
 
 :model "HP Deskjet 2544 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet 2546b All-in-one Printer"
+:status :good
+
+:model "HP Deskjet 2546p All-in-one Printer"
+:status :good
+
+:model "HP Deskjet 2546r All-in-one Printer"
 :status :good
 
 :model "HP Deskjet 2549 All-in-one Printer"
@@ -233,6 +248,12 @@
 :status :good
 
 :model "HP Deskjet 3526 E-all-in-one Printer"
+:status :good
+
+:model "HP Deskjet 3630 All-in-one Printer Series"
+:status :good
+
+:model "HP Deskjet 3632 All-in-one"
 :status :good
 
 :model "HP Deskjet f2110 All-in-one Printer"
@@ -1352,6 +1373,9 @@
 :status :good
 
 :model "HP Officejet 5742 E-all-in-one"
+:status :good
+
+:model "HP Officejet 5744 E-all-in-one"
 :status :good
 
 :model "HP Officejet 5745 E-all-in-one"

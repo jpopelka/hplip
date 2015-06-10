@@ -41,7 +41,7 @@ from prnt import cups
 
 try:
     mod = module.Module(__mod__, __title__, __version__, __doc__, None,
-                        (GUI_MODE,), (UI_TOOLKIT_QT4,))
+                        (GUI_MODE,), (UI_TOOLKIT_QT4,), False, False, True)
 
     mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS,
                  see_also_list=['hp-align', 'hp-clean', 'hp-colorcal',

@@ -46,8 +46,6 @@ except ImportError:
 from base.g import *
 from base import device, utils, tui, module
 from prnt import cups
-from pcard import photocard
-
 
 # Console class (from ASPN Python Cookbook)
 # Author:   James Thiele
@@ -580,7 +578,7 @@ def status_callback(src, trg, size):
 
 mod = module.Module(__mod__, __title__, __version__, __doc__, None,
                     (GUI_MODE, INTERACTIVE_MODE, NON_INTERACTIVE_MODE),
-                    (UI_TOOLKIT_QT3,))
+                    (UI_TOOLKIT_QT3,), False, False, True)
 
 mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS,
     extra_options=[("Output directory:", "-o<dir> or --output=<dir> (Defaults to current directory)(Only used for non-GUI modes)", "option", False)],
@@ -588,6 +586,8 @@ mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS,
 
 opts, device_uri, printer_name, mode, ui_toolkit, loc = \
     mod.parseStdOpts('o', ['output='])
+
+from pcard import photocard
 
 output_dir = os.getcwd()
 

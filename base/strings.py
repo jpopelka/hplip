@@ -161,6 +161,7 @@ class StringTable:
             '1806' : (self.__tr('Service request'), '%try_again%'),
             '1807' : (self.__tr('Fuser error'), '%try_again%'),
             '1808' : (self.__tr('Empty toner'), ''),
+            '1809' : (self.__tr('Missing/Empty or incompatible toner'), ''),
             '1900' : (self.__tr('Unsupported printer model'), ''),
             '2000' : (self.__tr('Scan job started'), ''),
             '2001' : (self.__tr('Scan job completed'), ''),

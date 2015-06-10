@@ -644,6 +644,7 @@ class CoreInstall(object):
                     break
 
             self.distro_version = ver 
+            self.distro_name = name
         else:
             log.warn("Failed to get the distro information.")
             self.distro, self.distro_version = DISTRO_UNKNOWN, '0.0'
@@ -1069,9 +1070,8 @@ class CoreInstall(object):
     def check_cupsddk(self):
         log.debug("Checking for cups-ddk...")
         # TODO: Compute these paths some way or another...
-        #return check_tool("/usr/lib/cups/driver/drv list") and os.path.exists("/usr/share/cupsddk/include/media.defs")
-        return (check_file('drv', "/usr/lib/cups/driver") or check_file('drv', "/usr/lib64/cups/driver")) and \
-            check_file('media.defs', "/usr/share/cupsddk/include")
+        return check_file('media.defs', "/usr/share/cups/ppdc/")
+
 
 
     def check_policykit(self):
@@ -1359,7 +1359,10 @@ class CoreInstall(object):
         configure_cmd += ' --prefix=/usr' 
         configure_cmd += ' --with-hpppddir=%s' % self.ppd_dir
 
-        if self.bitness == 64:
+        libdir_path = self.get_distro_ver_data('libdir_path',False)
+        if libdir_path and self.bitness == 64:
+            configure_cmd += ' --libdir=%s' % (libdir_path)
+        elif self.bitness == 64:
             configure_cmd += ' --libdir=/usr/lib64'
 
         self.ui_toolkit =  self.get_distro_ver_data('ui_toolkit') 
@@ -1490,7 +1493,7 @@ class CoreInstall(object):
                 if cmds:
                     commands_to_run.extend(cmds)
 
-        package_mgr_cmd = self.get_distro_data('package_mgr_cmd')
+        package_mgr_cmd = self.get_distro_ver_data('package_mgr_cmd')
 
         overall_commands_to_run.extend(commands_to_run)
 
@@ -1626,9 +1629,12 @@ class CoreInstall(object):
             x = 1
             for cmd in pre_cmd:
                 status, output = utils.run(cmd, self.passwordObj)
-
-                if status != 0:
-                    log.warn("An error occurred running '%s'" % cmd)
+                if any(['yum' in cmd,'zypper' in cmd,'dnf' in cmd]):
+                    if status == 1:
+                        log.warn("An error occurred running '%s'" % cmd)
+                else:
+                    if status != 0:
+                        log.warn("An error occurred running '%s'" % cmd)
 
                 if callback is not None:
                     callback(cmd, "Pre-depend step %d" % x)
@@ -1704,7 +1710,7 @@ class CoreInstall(object):
 
     def remove_hplip(self, callback=None):
         failed = True
-        hplip_remove_cmd = self.get_distro_data('hplip_remove_cmd')
+        hplip_remove_cmd = self.get_distro_ver_data('hplip_remove_cmd')
         if hplip_remove_cmd:
             if callback is not None:
                 callback(hplip_remove_cmd, "Removing old HPLIP version")
@@ -2070,8 +2076,8 @@ class CoreInstall(object):
 
 
     def install_missing_dependencies(self, mode=INTERACTIVE_MODE, required_dependencies=[],optional_dependencies=[], missing_cmd=[]):     # Move to core_install
-        package_mgr_cmd = self.get_distro_data('package_mgr_cmd')
-        pre_depend_cmd  = self.get_distro_data('pre_depend_cmd')
+        package_mgr_cmd = self.get_distro_ver_data('package_mgr_cmd')
+        pre_depend_cmd  = self.get_distro_ver_data('pre_depend_cmd')
         overall_install_cmds={}
 
         if len(required_dependencies):

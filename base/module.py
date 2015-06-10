@@ -40,7 +40,7 @@ class Module(object):
     def __init__(self, mod, title, version, doc,
                  usage_data=None, avail_modes=None,
                  supported_ui_toolkits=None,
-                 run_as_root_ok=False, quiet=False):
+                 run_as_root_ok=False, quiet=False, deprecated=False):
 
         self.mod = mod
         self.title = title
@@ -51,6 +51,7 @@ class Module(object):
         log.set_module(mod)
         self.args = []
         self.quiet = quiet
+        self.deprecated = deprecated
         self.lock_file = None
         self.help_only_support = False
         prop.prog = sys.argv[0]
@@ -459,6 +460,9 @@ class Module(object):
             log.info("This is free software, and you are welcome to distribute it")
             log.info("under certain conditions. See COPYING file for more details.")
             log.info("")
+            if self.deprecated:
+                log.warn(log.bold("%s support is deprecated. Feature can be used as is. Fixes or updates will not be provided" %self.title))
+                log.info("")
 
 
     def getDeviceUri(self, device_uri=None, printer_name=None, back_end_filter=device.DEFAULT_BE_FILTER,

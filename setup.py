@@ -591,11 +591,6 @@ else: # INTERACTIVE_MODE
             log.info("Location: %s" % location)
             log.info("Information: %s" % info)
 
-            log.debug("Restarting CUPS...")
-            status, output = utils.run(services.restart_cups())
-            log.debug("Restart CUPS returned: exit=%d output=%s" % (status, output))
-
-            time.sleep(1)
             if not os.path.exists(print_ppd): # assume foomatic: or some such
                 add_prnt_args = (printer_name, print_uri, location, '', print_ppd, info)
             else:

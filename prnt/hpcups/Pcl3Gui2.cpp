@@ -185,23 +185,35 @@ DRIVER_ERROR Pcl3Gui2::StartPage(JobAttributes *pJA)
 
     if (m_pJA->print_borderless) {
         BYTE cBuf[4];
-        BYTE TopOverSpraySeq[]  = {0x1b, 0x2A, 0x6F, 0x35, 0x57, 0x0E, 0x02, 0x00};
-                                // "Esc*o5W 0E 02 00 00 00" Top edge overspray for full-bleed printing
+        
+        // For SPD products
+        if (strcmp(m_pJA->printer_platform, "Pyramid15") == 0)
+        {
+            BYTE TopOverSpraySeq[]  = {0x1b, 0x2A, 0x6F, 0x35, 0x57, 0x0E, 0x0D, 0x00, 0x00, 0x01};
+                                    // "Esc*o5W 0E 0D 00 00 01" Top edge overspray for full-bleed printing
 
-        BYTE LeftOverSpraySeq[] = {0x1b, 0x2A, 0x6F, 0x35, 0x57, 0x0E, 0x01, 0x00};
-                                // "Esc*o5W 0E 01 00 00 00" Left edge overspray for full-bleed printing
+            addToHeader((const BYTE *) TopOverSpraySeq, sizeof(TopOverSpraySeq));
+        }
+        else
+        {
+		BYTE TopOverSpraySeq[]  = {0x1b, 0x2A, 0x6F, 0x35, 0x57, 0x0E, 0x02, 0x00};
+		// "Esc*o5W 0E 02 00 00 00" Top edge overspray for full-bleed printing
 
-        cBuf[1] = (m_pMA->top_overspray) & 0xFF;
-        cBuf[0] = (m_pMA->top_overspray) >> 8;
+		BYTE LeftOverSpraySeq[] = {0x1b, 0x2A, 0x6F, 0x35, 0x57, 0x0E, 0x01, 0x00};
+		// "Esc*o5W 0E 01 00 00 00" Left edge overspray for full-bleed printing
 
-        addToHeader((const BYTE *) TopOverSpraySeq, sizeof(TopOverSpraySeq));
-        addToHeader((const BYTE *) cBuf, 2);
+		cBuf[1] = (m_pMA->top_overspray) & 0xFF;
+		cBuf[0] = (m_pMA->top_overspray) >> 8;
 
-        cBuf[1] = (m_pMA->left_overspray) & 0xFF;
-        cBuf[0] = (m_pMA->left_overspray) >> 8;
+		addToHeader((const BYTE *) TopOverSpraySeq, sizeof(TopOverSpraySeq));
+		addToHeader((const BYTE *) cBuf, 2);
 
-        addToHeader((const BYTE *) LeftOverSpraySeq, sizeof(LeftOverSpraySeq));
-        addToHeader((const BYTE *) cBuf, 2);
+		cBuf[1] = (m_pMA->left_overspray) & 0xFF;
+		cBuf[0] = (m_pMA->left_overspray) >> 8;
+
+		addToHeader((const BYTE *) LeftOverSpraySeq, sizeof(LeftOverSpraySeq));
+		addToHeader((const BYTE *) cBuf, 2);
+	}
     }
 
 //  Now send media pre-load command

@@ -108,6 +108,8 @@ def parseQueues(mode):
 
             if device_uri.startswith("cups-pdf:/"):
                 continue
+            if device_uri.startswith("ipp:/"):
+                continue
 
             log.debug(log.bold(printer_name))
             log.debug(log.bold('-'*len(printer_name)))

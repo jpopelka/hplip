@@ -37,6 +37,8 @@
 #include <cups/cups.h>
 #include "hpmud.h"
 #include "hpip.h"
+#include "hp_ipp.h"
+
 #include "soap.h"
 #include "soapht.h"
 #include "marvell.h"
@@ -46,47 +48,6 @@
 
 #define DEBUG_DECLARE_ONLY
 #include "sanei_debug.h"
-
-#if (CUPS_VERSION_MAJOR > 1) || (CUPS_VERSION_MINOR > 5)
-#define HAVE_CUPS_1_6 1
-#endif
-
-#ifndef HAVE_CUPS_1_6
-#define ippGetGroupTag(attr)  attr->group_tag
-#define ippGetValueTag(attr)  attr->value_tag
-#define ippGetName(attr)      attr->name
-#define ippGetString(attr, element, language) attr->values[element].string.text
-
-static ipp_attribute_t * ippFirstAttribute( ipp_t *ipp )
-{
-    if (!ipp)
-        return (NULL);
-    return (ipp->current = ipp->attrs);
-}
-
-static ipp_attribute_t * ippNextAttribute( ipp_t *ipp )
-{
-    if (!ipp || !ipp->current)
-        return (NULL);
-    return (ipp->current = ipp->current->next);
-}
-
-static int ippSetOperation( ipp_t *ipp, ipp_op_t op )
-{
-    if (!ipp)
-        return (0);
-    ipp->request.op.operation_id = op;
-    return (1);
-}
-
-static int ippSetRequestId( ipp_t *ipp, int request_id )
-{
-    if (!ipp)
-        return (0);
-    ipp->request.any.request_id = request_id;
-    return (1);
-}
-#endif
 
 static SANE_Device **DeviceList = NULL;
 

@@ -103,6 +103,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-deskjet_2000_j210_series.ppd.gz \
    ppd/hpcups/hp-deskjet_2020_series.ppd.gz \
    ppd/hpcups/hp-deskjet_2050_j510_series.ppd.gz \
+   ppd/hpcups/hp-deskjet_2130_series.ppd.gz \
    ppd/hpcups/hp-deskjet_2510_series.ppd.gz \
    ppd/hpcups/hp-deskjet_2520_series.ppd.gz \
    ppd/hpcups/hp-deskjet_2540_series.ppd.gz \
@@ -122,6 +123,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-deskjet_3540_series.ppd.gz \
    ppd/hpcups/hp-deskjet_3550.ppd.gz \
    ppd/hpcups/hp-deskjet_3600.ppd.gz \
+   ppd/hpcups/hp-deskjet_3630_series.ppd.gz \
    ppd/hpcups/hp-deskjet_3650.ppd.gz \
    ppd/hpcups/hp-deskjet_3740.ppd.gz \
    ppd/hpcups/hp-deskjet_3810.ppd.gz \

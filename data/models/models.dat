@@ -31034,6 +31034,9 @@ model7=HP Deskjet Ink Advantage 2540 All-in-One Printer Series
 model8=HP Deskjet Ink Advantage 2545 All-in-One Printer
 model9=HP Deskjet Ink Advantage 2546 All-in-One Printer
 model10=HP Deskjet Ink Advantage 2548 All-in-One Printer
+model11=HP Deskjet 2546B All-in-One Printer
+model12=HP Deskjet 2546P All-in-One Printer
+model13=HP Deskjet 2546R All-in-One Printer
 monitor-type=0
 panel-check-type=0
 pcard-type=0
@@ -46010,6 +46013,7 @@ linefeed-cal-type=0
 model1=HP Officejet 5740 e-All-in-One
 model2=HP Officejet 5742 e-All-in-One
 model3=HP Officejet 5745 e-All-in-One
+model4=HP Officejet 5744 e-All-in-One
 monitor-type=0
 panel-check-type=0
 pcard-type=0
@@ -57292,7 +57296,7 @@ ppd-name=hp-laserjet_m604_m605_m606-ps.ppd
 pq-diag-type=0
 r-type=0
 r0-agent1-kind=4
-r0-agent1-sku=CF281A/CF281X
+r0-agent1-sku=CF281A
 r0-agent1-type=1
 scan-src=0
 scan-type=0
@@ -57399,6 +57403,85 @@ usb-pid=3f2a
 usb-vid=3f0
 wifi-config=0
 
+[deskjet_3630_series]
+align-type=15
+clean-type=4
+color-cal-type=0
+copy-type=0
+embedded-server-type=1
+fax-type=0
+fw-download=False
+icon=default_printer.png
+io-mfp-mode=1
+io-mode=1
+io-support=10
+job-storage=0
+linefeed-cal-type=0
+model1=HP DeskJet 3630 All-in-One Printer series
+model2=HP DeskJet 3632 All-in-One
+monitor-type=0
+panel-check-type=0
+pcard-type=0
+plugin=0
+plugin-reason=0
+power-settings=0
+pq-diag-type=0
+r-type=0
+scan-src=1
+scan-type=7
+status-battery-check=0
+status-dynamic-counters=0
+status-type=10
+support-released=True
+support-subtype=447b
+support-type=2
+support-ver=3.15.6
+tech-class=Pyramid15
+tech-subclass=Normal
+tech-type=2
+usb-pid=e311
+usb-vid=3f0
+wifi-config=3
+
+[deskjet_2130_series]
+align-type=15
+clean-type=3
+color-cal-type=0
+copy-type=0
+embedded-server-type=0
+fax-type=0
+fw-download=False
+icon=hp_deskjet_f4200.png
+io-mfp-mode=1
+io-mode=1
+io-support=2
+job-storage=0
+linefeed-cal-type=0
+model1=HP DeskJet 2130 All-in-One Printer series
+model2=HP DeskJet 2132 All-in-One Printer
+monitor-type=0
+panel-check-type=0
+pcard-type=0
+plugin=0
+plugin-reason=0
+power-settings=0
+pq-diag-type=0
+r-type=0
+scan-src=1
+scan-type=7
+status-battery-check=0
+status-dynamic-counters=0
+status-type=10
+support-released=True
+support-subtype=219b2b
+support-type=2
+support-ver=3.15.6
+tech-class=PyramidRefresh15
+tech-subclass=Normal
+tech-type=2
+usb-pid=e111
+usb-vid=3f0
+wifi-config=0
 
 # align-type
 # ----------
@@ -57697,7 +57780,7 @@ wifi-config=0
 # 9 : PML + PJL over print channel
 # 10 : Low End Data Model
 # 11 : Low End Data Model via FF/CC/0 channel
-#
+# 12 : IPP
 #
 # support-released
 # ----------------
@@ -57776,6 +57859,7 @@ wifi-config=0
 # PSP470
 # Postscript
 # Pyramid
+# Pyramid15
 # PyramidPlus
 # Python
 # Python10
@@ -57790,7 +57874,7 @@ wifi-config=0
 # ViperMinusVIP
 # ViperPlusTrim
 # ViperPlusVIP
-#
+# PyramidRefresh15
 #
 # tech-subclass
 # -------------

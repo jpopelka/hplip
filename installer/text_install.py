@@ -184,7 +184,7 @@ def start(language, auto=True, test_depends=False,
         if not ok:
             sys.exit(0)
 
-        if PY3 and core.distro_name.lower() == 'fedora':
+        if PY3 and core.distro_name.lower() == 'fedora' and int(core.distro_version) < 22:
              global Fedora_Py3               # Workaround due to incomplete Python3 support in Linux distros.
              Fedora_Py3 = True
 
@@ -372,7 +372,7 @@ def start(language, auto=True, test_depends=False,
         #
         # REQUIRED DEPENDENCIES INSTALL
         #
-        package_mgr_cmd = core.get_distro_data('package_mgr_cmd')
+        package_mgr_cmd = core.get_distro_ver_data('package_mgr_cmd')
         depends_to_install = []
         depends_to_install_using_pip = []
 
@@ -564,7 +564,7 @@ def start(language, auto=True, test_depends=False,
 
             packages = []
             commands_to_run = []
-            package_mgr_cmd = core.get_distro_data('package_mgr_cmd')
+            package_mgr_cmd = core.get_distro_ver_data('package_mgr_cmd')
 
             # HACK!
             individual_pkgs = True

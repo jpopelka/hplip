@@ -98,6 +98,7 @@ TECH_CLASSES = [
     "Python",
     "OJ7000",
     "Pyramid",
+    "Pyramid15",
     "Python10",
     "Mimas",
     "StingrayOJ",
@@ -105,6 +106,7 @@ TECH_CLASSES = [
     "CopperheadXLP",
     "Copperhead12",
     "CopperheadIPH",
+    "PyramidRefresh15",
     "Ampere",
     "Python11",
     "Saipan",
@@ -165,14 +167,16 @@ TECH_CLASS_PDLS = {
     "Python10"      : 'pcl3',
     "Mimas"      : 'pcl3',
     "StingrayOJ"   : 'pcl3',
+    "Pyramid15"   : 'pcl3',
     "Copperhead"   : 'pcl3',
     "CopperheadXLP"   : 'pcl3',
     "Copperhead12"   : 'pcl3',
     "CopperheadIPH"   : 'pcl3',
+    "PyramidRefresh15": 'pcl3',
     "Ampere"        : 'pcl3',
     "Hbpl1"         : 'hbpl1',
     "Kapan"         : 'pcl3',
-    "MimasTDR"      : 'pcl3'
+    "MimasTDR"      : 'pcl3',
 }
 
 PDL_TYPE_PCL = 0  # less preferred

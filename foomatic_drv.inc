@@ -114,6 +114,7 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-deskjet_d730-hpijs.ppd.gz \
     ppd/hpijs/hp-officejet_6150_series-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_1120-hpijs.ppd.gz \
+    ppd/hpijs/hp-deskjet_3630_series-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_2430-hpijs-pcl3.ppd.gz \
     ppd/hpijs/hp-officejet_g55-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_cm1415fn-hpijs-pcl3.ppd.gz \
@@ -450,6 +451,7 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-color_laserjet_3500-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_656c-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_pro_mfp_m128fn-hpijs.ppd.gz \
+    ppd/hpijs/hp-deskjet_2130_series-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_3900-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_930c-hpijs.ppd.gz \
     ppd/hpijs/hp-photosmart_b8500_series-hpijs.ppd.gz \

@@ -34,7 +34,15 @@ import getpass
 
 #local import
 from base.g import *
-from base import utils, tui, module,queues, os_utils, services, smart_install
+try:
+    from base import utils, tui, module,queues, os_utils, services, smart_install
+except ImportError as e:
+    if 'cupsext' in e.args[0] :
+        check_extension_module_env('cupsext')
+    else:
+        log.exception("")
+        sys.exit(1)
+        
 from installer.core_install import *
 from check import DependenciesCheck
 

@@ -29,11 +29,13 @@ import os
 import sys
 import getopt
 import glob
+import datetime
 
 from base.g import *
 from base import utils,tui,module, os_utils
 from base.sixext import to_string_utf8
 from subprocess import Popen, PIPE
+from installer.core_install import *
 
 CUPS_FILE='/etc/cups/cupsd.conf'
 CUPS_BACKUP_FILE='/etc/cups/cupsd.conf_orginal'
@@ -43,6 +45,19 @@ LOG_FILES=LOG_FOLDER_PATH + LOG_FOLDER_NAME
 TMP_DIR = "/var/spool/cups/tmp"
 USER_NAME =""
 USERS={}
+################ is_journal() function ##############
+#Capture logs from system journal for Fedora 21 onwards
+
+def is_journal():
+    core =  CoreInstall(MODE_INSTALLER, INTERACTIVE_MODE)
+    core.get_distro()
+    distro_name = core.distro_name
+    distro_ver = core.distro_version
+    if distro_name == "fedora" and distro_ver >=" 21" :
+        journal = True
+    else:
+        journal = False
+    return journal
 
 ############ enable_log() function ############
 #This function changes CUPS conf log level to debug and restarts CUPS service.
@@ -250,21 +265,23 @@ for u in USERS:
 enable_log()
 
 #### Clearing previous logs.. ###########
-ok,user_input = tui.enter_choice("Archiving system logs (i.e. syslog, message, error_log). Press (y=yes*, n=no, q=quit):",['y', 'n','q'], 'y')
-if not ok or user_input == "q":
-    restore_loglevels()
-    log.warn("User exit")
-    sys.exit(1)
+if not is_journal():
+    ok,user_input = tui.enter_choice("Archiving system logs (i.e. syslog, message, error_log). Press (y=yes*, n=no, q=quit):",['y', 'n','q'], 'y')
+    if not ok or user_input == "q":
+        restore_loglevels()
+        log.warn("User exit")
+        sys.exit(1)
 
-if ok and user_input == "y":
-    backup_clearLog('/var/log/syslog')
-    backup_clearLog('/var/log/messages')
-    backup_clearLog('/var/log/cups/error_log')
+    if ok and user_input == "y":
+        backup_clearLog('/var/log/syslog')
+        backup_clearLog('/var/log/messages')
+        backup_clearLog('/var/log/cups/error_log')
 
 
 
 ######## Waiting for user to completed job #######
 while 1:
+    log_time = datetime.datetime.strftime(datetime.datetime.now(),'%Y-%m-%d %H:%M:%S')
     log.info(log.bold("\nPlease perform the tasks (Print, scan, fax) for which you need to collect the logs."))
     ok,user_input =tui.enter_choice("Are you done with tasks?. Press (y=yes*, q=quit):",['y','q'], 'y')
     if ok and user_input == "y":
@@ -280,20 +297,34 @@ if sts != 0:
     log.error("Failed to run hp-check command")
 
 log.debug("Copying logs to Temporary folder =%s"%LOG_FILES)
-if os.path.exists('/var/log/syslog'):
-    sts,out = utils.run ('cp -f /var/log/syslog %s/syslog.log'%LOG_FILES)
-    if sts != 0:
-      log.error("Failed to capture %s log file."%("/var/log/syslog"))
+if not is_journal():
+    if os.path.exists('/var/log/syslog'):
+        sts,out = utils.run ('cp -f /var/log/syslog %s/syslog.log'%LOG_FILES)
+        if sts != 0:
+           log.error("Failed to capture %s log file."%("/var/log/syslog"))
 
-if os.path.exists('/var/log/messages'):
-    sts,out = utils.run('cp -f /var/log/messages %s/messages.log'%LOG_FILES)
-    if sts != 0:
-      log.error("Failed to capture %s log file."%("/var/log/messages"))
+    if os.path.exists('/var/log/messages'):
+        sts,out = utils.run('cp -f /var/log/messages %s/messages.log'%LOG_FILES)
+        if sts != 0:
+           log.error("Failed to capture %s log file."%("/var/log/messages"))
 
-if os.path.exists('/var/log/cups/error_log'):
-    sts,out = utils.run('cp -f /var/log/cups/error_log %s/cups_error_log.log'%LOG_FILES)
+    if os.path.exists('/var/log/cups/error_log'):
+        sts,out = utils.run('cp -f /var/log/cups/error_log %s/cups_error_log.log'%LOG_FILES)
+        if sts != 0:
+           log.error("Failed to capture %s log file."%("/var/log/cups/error_log"))
+else:
+    log.debug("Collecting cups logs from system journal")
+    cmd = "journalctl -u cups.service -e --since '%s' " %log_time
+    sts = os.system(cmd + "> %s/cups_error.log"%LOG_FILES)
     if sts != 0:
-      log.error("Failed to capture %s log file."%("/var/log/cups/error_log"))
+        log.error("Failed to capture logs from journal")
+
+
+    log.debug("Collecting messages from system journal")
+    cmd = "journalctl --since '%s' " %log_time
+    sts = os.system(cmd + "> %s/messages.log"%LOG_FILES)
+    if sts != 0:
+        log.error("Failed to capture messages from journal")
 
 for u in USERS:
     sts = os.system('cp -f %s/*.log  %s/%s 2>/devnull '%(USERS[u],LOG_FILES,u))
