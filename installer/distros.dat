@@ -1241,7 +1241,7 @@ ui_toolkit=qt3
 # ****************************************
 [rhel]
 index=7
-versions=5.0,6.0,7.0
+versions=5.0,6.0,7.0,7.1
 display_name=Red Hat Enterprise Linux
 alt_names=red hat enterprise linux
 display=1
@@ -1499,6 +1499,12 @@ code_name=Maipo
 packaged_version=3.13.7
 release_date=10/06/2014
 same_as_version=6.0
+
+# ****************************************
+[rhel:7.1]
+packaged_version=3.14.7
+release_date=05/03/2015
+same_as_version=7.0
 
 # ****************************************
 [slackware]
@@ -3596,7 +3602,7 @@ packages=python3-reportlab
 # ****************************************
 [debian]
 index=2
-versions=6.0,6.0.1,6.0.2,6.0.3,6.0.4,6.0.5,6.0.6,6.0.7,6.0.8,6.0.9,6.0.10,7.0,7.1,7.2,7.3,7.4,7.5,7.6,7.7,7.8,8.0
+versions=6.0,6.0.1,6.0.2,6.0.3,6.0.4,6.0.5,6.0.6,6.0.7,6.0.8,6.0.9,6.0.10,7.0,7.1,7.2,7.3,7.4,7.5,7.6,7.7,7.8,8.0,8.1
 display_name=Debian
 alt_names=
 display=1
@@ -4094,6 +4100,12 @@ packages=python3-pil
 
 [debian:8.0:python3-reportlab]
 packages=python3-reportlab
+
+# *********************
+
+[debian:8.1]
+same_as_version=8.0
+
 # *********************
 
 [xandros]

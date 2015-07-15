@@ -107,6 +107,8 @@ EVENT_START_PRINT_JOB = 500 # sent by hp: backend
 EVENT_END_PRINT_JOB = 501 # sent by hp: backend
 EVENT_PRINT_FAILED_MISSING_PLUGIN = 502
 
+ERROR_RUNNING_AS_ROOT = 503
+
 EVENT_START_FAX_PRINT_JOB = 600 # sent by hpfax: backend
 EVENT_END_FAX_PRINT_JOB = 601 # sent by hpfax: backend
 

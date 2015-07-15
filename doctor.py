@@ -34,6 +34,7 @@ import getpass
 
 #local import
 from base.g import *
+from base.strings import *
 try:
     from base import utils, tui, module,queues, os_utils, services, smart_install
 except ImportError as e:
@@ -138,16 +139,13 @@ def install_plugin(core):
 
     if ok and user_input == 'y':
 #        authenticate(core)
-        cmd=utils.which('hp-plugin',True)
-        if cmd:
-            cmd = core.passwordObj.getAuthCmd() %append_options(cmd)
-            sts = os_utils.execute(cmd)
-            if sts == 0:
-                return True
+        cmd='hp-plugin'
+        cmd = append_options(cmd)
+        sts = os_utils.execute(cmd)
+        if sts == 0:
+            return True
         else:
-            log.error("Failed to locate hp-plugin command")
-    else:
-        log.info(log.bold("Please run 'hp-plugin' command in root mode to install the Plugin's"))
+            log.info(log.bold("Failed to install Plugin. Please run 'hp-plugin' command to install plugin manually"))
     return False
 
 
@@ -204,7 +202,7 @@ log.set_module(__mod__)
 try:
     mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
                     (INTERACTIVE_MODE, GUI_MODE),
-                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4), True, True)
+                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4), True)
 
     opts, device_uri, printer_name, mode, ui_toolkit, loc = \
                mod.parseStdOpts('hl:gnid:f:w', ['summary-only','help', 'help-rest', 'help-man', 'help-desc', 'interactive', 'gui', 'lang=','logging=', 'debug'],
@@ -248,7 +246,7 @@ for o, a in opts:
 
 try:
     if os.geteuid() == 0:
-        log.error("Please run %s as a non-root user"%__mod__)
+        log.error("%s %s"  %(__mod__, queryString(ERROR_RUNNING_AS_ROOT)))
         sys.exit(1)
 
     mod.lockInstance('')

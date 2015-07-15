@@ -142,6 +142,9 @@
 :model "HP Deskjet 2130 All-in-one Printer Series"
 :status :good
 
+:model "HP Deskjet 2131 All-in-one Printer"
+:status :good
+
 :model "HP Deskjet 2132 All-in-one Printer"
 :status :good
 
@@ -250,10 +253,10 @@
 :model "HP Deskjet 3526 E-all-in-one Printer"
 :status :good
 
-:model "HP Deskjet 3630 All-in-one Printer Series"
+:model "HP Deskjet 3630 All-in-one Printer"
 :status :good
 
-:model "HP Deskjet 3632 All-in-one"
+:model "HP Deskjet 3632 All-in-one Printer"
 :status :good
 
 :model "HP Deskjet f2110 All-in-one Printer"
@@ -538,6 +541,15 @@
 :model "HP Deskjet Ink Advantage 1518 All-in-one Printer"
 :status :good
 
+:model "HP Deskjet Ink Advantage 2130 All-in One Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 2135 All-in One Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 2138 All-in One Printer"
+:status :good
+
 :model "HP Deskjet Ink Advantage 2510 All-in-one"
 :status :good
 
@@ -584,6 +596,24 @@
 :status :good
 
 :model "HP Deskjet Ink Advantage 3546 E-all-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 3630 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 3635 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 3636 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 3638 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 3830 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 3835 All-in-one Printer"
 :status :good
 
 :model "HP Deskjet Ink Advantage 4515 E-all-in-one Printer"
@@ -1150,6 +1180,15 @@
 :model "HP Officejet 2622 All-in-one"
 :status :good
 
+:model "HP Officejet 3830 All-in-one Printer"
+:status :good
+
+:model "HP Officejet 3832 All-in-one Printer"
+:status :good
+
+:model "HP Officejet 3834 All-in-one Printer"
+:status :good
+
 :model "HP Officejet 4100 Series All-in-one Printer"
 :status :good
 
@@ -1586,6 +1625,9 @@
 :status :good
 
 :model "HP Officejet 7500 e910"
+:status :good
+
+:model "HP Officejet 7510 Wide Format E-all-in-one Printer"
 :status :good
 
 :model "HP Officejet 7610 Wide Format E-all-in-one Printer"

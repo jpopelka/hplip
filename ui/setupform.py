@@ -236,7 +236,7 @@ class SetupForm(SetupForm_base):
                     return
                 if not ok or pluginObj.getStatus() != pluginhandler.PLUGIN_INSTALLED:
                     if plugin == PLUGIN_REQUIRED:
-                        self.FailureUI(self.__tr("<b>The printer you are trying to setup requires a binary driver plug-in and it failed to install.</b><p>Please check your internet connection and try again.</p><p>Visit <u>http://hplipopensource.com</u> for more information.</p>"))
+                        self.FailureUI(self.__tr("<b>The device you are trying to setup requires a binary plug-in. Some functionalities may not work as expected without plug-ins.<p> Please run 'hp-plugin' as normal user to install plug-ins.</b></p><p>Visit <u>http://hplipopensource.com</u> for more infomation.</p>"))
                         return
                     else:
                         self.WarningUI(self.__tr("Either you have chosen to skip the installation of the optional plug-in or that installation has failed.  Your printer may not function at optimal performance."))
@@ -597,6 +597,15 @@ class SetupForm(SetupForm_base):
         # Check for duplicate names
         if (self.device_uri in self.installed_print_devices and printer_name in self.installed_print_devices[self.device_uri]) \
            or (printer_name in installed_printer_names):
+            warn_text = self.__tr("<b>One or more print queues already exist for this device: %s</b>.<br> <b>Would you like to install another print queue for this device ?</b>" %
+                    ', '.join([printer.encode('utf-8') for printer in installed_printer_names if printer_name in printer]))
+            if ( QMessageBox.warning(self,
+                                self.caption(),
+                                warn_text,
+                                QMessageBox.Yes,
+                                QMessageBox.No,
+                                QMessageBox.NoButton) == QMessageBox.Yes ):
+
                 i = 2
                 while True:
                     t = printer_name + "_%d" % i
@@ -604,6 +613,8 @@ class SetupForm(SetupForm_base):
                         printer_name += "_%d" % i
                         break
                     i += 1
+            else:
+                self.close()
 
         self.printer_name_ok = True
         self.printerNameLineEdit.setText(printer_name)

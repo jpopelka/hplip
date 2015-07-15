@@ -14662,13 +14662,30 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
   // <%PyramidRefresh15:Normal%>
   {
+    ModelName "HP Deskjet 1110 Series hpijs"
+    Attribute "NickName" "" "HP Deskjet 1110 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Deskjet 1110 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 1110 series;DES:deskjet 1110 series;"
+    PCFileName "hp-deskjet_1110_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Deskjet 1110 Printer)"
+    Attribute "Product" "" "(HP Deskjet 1111 Printer)"
+    Attribute "Product" "" "(HP Deskjet 1112 Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 1110 Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 1115 Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 1118 Printer)"
+  }
+  {
     ModelName "HP Deskjet 2130 Series hpijs"
     Attribute "NickName" "" "HP Deskjet 2130 Series hpijs, $Version"
     Attribute "ShortNickName" "" "HP Deskjet 2130 Series hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 2130 series;DES:deskjet 2130 series;"
     PCFileName "hp-deskjet_2130_series-hpijs.ppd"
     Attribute "Product" "" "(HP Deskjet 2130 All-in-one Printer Series)"
+    Attribute "Product" "" "(HP Deskjet 2131 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet 2132 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 2130 All-in One Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 2135 All-in One Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 2138 All-in One Printer)"
   }
 } // end PyramidRefresh15
 
@@ -14934,6 +14951,15 @@ lity:PenSet=2,Quality:FullBleed=1"
     PCFileName "hp-officejet_7610_series-hpijs.ppd"
     Attribute "Product" "" "(HP Officejet 7610 Wide Format E-all-in-one Printer)"
     Attribute "Product" "" "(HP Officejet 7612 Wide Format E-all-in-one Printer)"
+  }
+  // <%Saipan15B:Normal%>
+  {
+    ModelName "HP Officejet 7510 Series hpijs"
+    Attribute "NickName" "" "HP Officejet 7510 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Officejet 7510 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 7510 series;DES:officejet 7510 series;"
+    PCFileName "hp-officejet_7510_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Officejet 7510 Wide Format E-all-in-one Printer)"
   }
 } // end Saipan
 
@@ -18742,8 +18768,31 @@ lity:PenSet=2,Quality:FullBleed=1"
             Attribute "ShortNickName" "" "HP Deskjet 3630 Series hpijs"
             Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 3630 series;DES:deskjet 3630 series;"
             PCFileName "hp-deskjet_3630_series-hpijs.ppd"
-            Attribute "Product" "" "(HP Deskjet 3630 All-in-one Printer Series)"
-            Attribute "Product" "" "(HP Deskjet 3632 All-in-one)"
+            Attribute "Product" "" "(HP Deskjet 3630 All-in-one Printer)"
+            Attribute "Product" "" "(HP Deskjet 3632 All-in-one Printer)"
+            Attribute "Product" "" "(HP Deskjet Ink Advantage 3630 All-in-one Printer)"
+            Attribute "Product" "" "(HP Deskjet Ink Advantage 3635 All-in-one Printer)"
+            Attribute "Product" "" "(HP Deskjet Ink Advantage 3636 All-in-one Printer)"
+            Attribute "Product" "" "(HP Deskjet Ink Advantage 3638 All-in-one Printer)"
+          }
+          {
+            ModelName "HP Officejet 3830 Series hpijs"
+            Attribute "NickName" "" "HP Officejet 3830 Series hpijs, $Version"
+            Attribute "ShortNickName" "" "HP Officejet 3830 Series hpijs"
+            Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 3830 series;DES:officejet 3830 series;"
+            PCFileName "hp-officejet_3830_series-hpijs.ppd"
+            Attribute "Product" "" "(HP Officejet 3830 All-in-one Printer)"
+            Attribute "Product" "" "(HP Officejet 3832 All-in-one Printer)"
+            Attribute "Product" "" "(HP Officejet 3834 All-in-one Printer)"
+          }
+          {
+            ModelName "HP Deskjet 3830 Series hpijs"
+            Attribute "NickName" "" "HP Deskjet 3830 Series hpijs, $Version"
+            Attribute "ShortNickName" "" "HP Deskjet 3830 Series hpijs"
+            Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 3830 series;DES:deskjet 3830 series;"
+            PCFileName "hp-deskjet_3830_series-hpijs.ppd"
+            Attribute "Product" "" "(HP Deskjet Ink Advantage 3830 All-in-one Printer)"
+            Attribute "Product" "" "(HP Deskjet Ink Advantage 3835 All-in-one Printer)"
           }
 
 }// End Pyramid15

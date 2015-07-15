@@ -659,6 +659,8 @@ class SetupDialog(QDialog, Ui_Dialog):
         self.connect(self.FaxNameLineEdit, SIGNAL("textEdited(const QString &)"),
                      self.FaxNameLineEdit_textEdited)
 
+        self.connect(self.SetupPrintGroupBox, SIGNAL("clicked(bool)"),self.SetupPrintGroupBox_clicked)
+        self.connect(self.SetupFaxGroupBox, SIGNAL("clicked(bool)"), self.SetupFaxGroupBox_clicked)
         self.PrinterNameLineEdit.setValidator(PrinterNameValidator(self.PrinterNameLineEdit))
         self.FaxNameLineEdit.setValidator(PrinterNameValidator(self.FaxNameLineEdit))
         self.FaxNumberLineEdit.setValidator(PhoneNumValidator(self.FaxNumberLineEdit))
@@ -673,6 +675,7 @@ class SetupDialog(QDialog, Ui_Dialog):
         self.fax_name = ''
         self.fax_setup_ok = True
         self.fax_setup = False
+        self.print_setup = False
 
 
     def showAddPrinterPage(self):
@@ -689,31 +692,41 @@ class SetupDialog(QDialog, Ui_Dialog):
                     return
                 if not ok or pluginObj.getStatus() != pluginhandler.PLUGIN_INSTALLED:
                     if plugin == PLUGIN_REQUIRED:
-                        FailureUI(self, self.__tr("<b>The printer you are trying to setup requires a binary driver plug-in and it failed to install.</b><p>Please check your internet connection and try again.</p><p>Visit <u>http://hplipopensource.com</u> for more infomation.</p>"))
+                        FailureUI(self, self.__tr("<b>The device you are trying to setup requires a binary plug-in. Some functionalities may not work as expected without plug-ins.<p> Please run 'hp-plugin' as normal user to install plug-ins.</b></p><p>Visit <u>http://hplipopensource.com</u> for more infomation.</p>"))
                         return
                     else:
                         WarningUI(self, self.__tr("Either you have chosen to skip the installation of the optional plug-in or that installation has failed.  Your printer may not function at optimal performance."))
 
         self.setNextButton(BUTTON_ADD_PRINTER)
-
-        if not self.printer_name:
-            self.setDefaultPrinterName()
-
-        self.findPrinterPPD()
+        self.print_setup = self.setDefaultPrinterName()
+        if self.print_setup:
+            self.SetupPrintGroupBox.setCheckable(True)
+            self.SetupPrintGroupBox.setEnabled(True)
+            self.SendTestPageCheckBox.setCheckable(True)
+            self.SendTestPageCheckBox.setEnabled(True)
+            self.findPrinterPPD()
+            self.updatePPD()
+        else:
+            self.print_ppd = None
+            self.SetupPrintGroupBox.setCheckable(False)
+            self.SetupPrintGroupBox.setEnabled(False)
+            self.SendTestPageCheckBox.setCheckable(False)
+            self.SendTestPageCheckBox.setEnabled(False)
 
         if fax_import_ok and prop.fax_build and \
             self.mq.get('fax-type', FAX_TYPE_NONE) not in (FAX_TYPE_NONE, FAX_TYPE_NOT_SUPPORTED):
-
             self.fax_setup = True
             self.SetupFaxGroupBox.setChecked(True)
             self.SetupFaxGroupBox.setEnabled(True)
 
-            if not self.fax_name:
-                self.setDefaultFaxName()
-
-            self.findFaxPPD()
-
-            self.readwriteFaxInformation()
+            self.fax_setup = self.setDefaultFaxName()
+            if self.fax_setup:
+                self.findFaxPPD()
+                self.readwriteFaxInformation()
+            else:
+                self.fax_setup = False
+                self.SetupFaxGroupBox.setChecked(False)
+                self.SetupFaxGroupBox.setEnabled(False)
 
         else:
             self.SetupFaxGroupBox.setChecked(False)
@@ -723,9 +736,14 @@ class SetupDialog(QDialog, Ui_Dialog):
             self.fax_setup = False
             self.fax_setup_ok = True
 
-        self.updatePPD()
-        self.setAddPrinterButton()
-        self.displayPage(PAGE_ADD_PRINTER)
+
+
+        if self.print_setup or self.fax_setup:
+            self.setAddPrinterButton()
+            self.displayPage(PAGE_ADD_PRINTER)
+        else:
+            log.info("Exiting the setup...")
+            self.close()
 
 
 
@@ -801,6 +819,15 @@ class SetupDialog(QDialog, Ui_Dialog):
         # Check for duplicate names
         if (self.device_uri in self.installed_print_devices and printer_name in self.installed_print_devices[self.device_uri]) \
            or (printer_name in installed_printer_names):
+            warn_text = self.__tr("<b>One or more print queues already exist for this device: %s</b>.<br> <b>Would you like to install another print queue for this device ?</b>" %
+                    ', '.join([printer for printer in installed_printer_names if printer_name in printer]))
+            if ( QMessageBox.warning(self,
+                                self.windowTitle(),
+                                warn_text,
+                                QMessageBox.Yes,
+                                QMessageBox.No,
+                                QMessageBox.NoButton) == QMessageBox.Yes ):
+
                 i = 2
                 while True:
                     t = printer_name + "_%d" % i
@@ -808,11 +835,15 @@ class SetupDialog(QDialog, Ui_Dialog):
                         printer_name += "_%d" % i
                         break
                     i += 1
+            else:
+                self.printer_name_ok = False
+                return False
 
         self.printer_name_ok = True
         self.PrinterNameLineEdit.setText(printer_name)
         log.debug(printer_name)
         self.printer_name = printer_name
+        return True
 
 
     def setDefaultFaxName(self):
@@ -829,6 +860,15 @@ class SetupDialog(QDialog, Ui_Dialog):
         # Check for duplicate names
         if (self.fax_uri in self.installed_fax_devices and fax_name in self.installed_fax_devices[self.fax_uri]) \
            or (fax_name in installed_fax_names):
+            warn_text = self.__tr(
+                "<b>One or more fax queues already exist for this device: %s</b>.<br> <b>Would you like to install another fax queue for this device ?</b>" %
+                ', '.join([fax_device for fax_device in installed_fax_names if fax_name in fax_device]))
+            if ( QMessageBox.warning(self,
+                                 self.windowTitle(),
+                                 warn_text,
+                                 QMessageBox.Yes,
+                                 QMessageBox.No,
+                                 QMessageBox.NoButton) == QMessageBox.Yes ):
                 i = 2
                 while True:
                     t = fax_name + "_%d" % i
@@ -836,10 +876,14 @@ class SetupDialog(QDialog, Ui_Dialog):
                         fax_name += "_%d" % i
                         break
                     i += 1
+            else:
+                self.fax_name_ok = False
+                return False
 
         self.fax_name_ok = True
         self.FaxNameLineEdit.setText(fax_name)
         self.fax_name = fax_name
+        return True
 
 
     def PrinterNameLineEdit_textEdited(self, t):
@@ -905,6 +949,18 @@ class SetupDialog(QDialog, Ui_Dialog):
         self.setIndicators()
         self.setAddPrinterButton()
 
+    def SetupPrintGroupBox_clicked(self):
+        if not self.SetupPrintGroupBox.isChecked():
+            self.SendTestPageCheckBox.setCheckable(False)
+            self.SendTestPageCheckBox.setEnabled(False)
+        else:
+            self.SendTestPageCheckBox.setCheckable(True)
+            self.SendTestPageCheckBox.setEnabled(True)
+        self.setAddPrinterButton()
+
+    def SetupFaxGroupBox_clicked(self):
+        self.setAddPrinterButton()
+
 
     def setIndicators(self):
         if self.printer_name_ok:
@@ -933,8 +989,11 @@ class SetupDialog(QDialog, Ui_Dialog):
 
 
     def setAddPrinterButton(self):
-        self.NextButton.setEnabled((self.printer_name_ok and self.print_ppd is not None) and
-                                   ((self.fax_setup and self.fax_name_ok) or not self.fax_setup))
+        if self.SetupPrintGroupBox.isChecked() or self.SetupFaxGroupBox.isChecked():
+            self.NextButton.setEnabled((self.print_setup and self.printer_name_ok and self.print_ppd is not None) or
+                                   (self.fax_setup and self.fax_name_ok))
+        else:
+            self.NextButton.setEnabled(False)
 
 
     #
@@ -942,19 +1001,18 @@ class SetupDialog(QDialog, Ui_Dialog):
     #
 
     def addPrinter(self):
-        print_sts = self.setupPrinter()
-        if print_sts == cups.IPP_FORBIDDEN or print_sts == cups.IPP_NOT_AUTHENTICATED or print_sts == cups.IPP_NOT_AUTHORIZED:
-            pass  # User doesn't have sufficient permissions so ignored.
-        else:
-            if self.fax_setup:
-                if self.setupFax() == cups.IPP_OK:
-                    self.readwriteFaxInformation(False)
-
+        if self.print_setup:
+            print_sts = self.setupPrinter()
+            if print_sts == cups.IPP_FORBIDDEN or print_sts == cups.IPP_NOT_AUTHENTICATED or print_sts == cups.IPP_NOT_AUTHORIZED:
+                pass  # User doesn't have sufficient permissions so ignored.
             if print_sts == cups.IPP_OK:
                 self.flashFirmware()
-
-                if self.print_test_page:
-                    self.printTestPage()
+            if self.print_test_page:
+                self.printTestPage()
+                
+        if self.fax_setup:
+            if self.setupFax() == cups.IPP_OK:
+                self.readwriteFaxInformation(False)
 
         self.close()
 
@@ -1242,12 +1300,12 @@ class SetupDialog(QDialog, Ui_Dialog):
 
         elif p == PAGE_ADD_PRINTER:
             self.print_test_page = self.SendTestPageCheckBox.isChecked()
+            self.print_setup = self.SetupPrintGroupBox.isChecked()
             self.fax_setup = self.SetupFaxGroupBox.isChecked()
             self.print_location = from_unicode_to_str(to_unicode(self.PrinterLocationLineEdit.text()))
             self.print_desc = from_unicode_to_str(to_unicode(self.PrinterDescriptionLineEdit.text()))
             self.fax_desc = from_unicode_to_str(to_unicode(self.FaxDescriptionLineEdit.text()))
             self.fax_location = from_unicode_to_str(to_unicode(self.FaxLocationLineEdit.text()))
-
             self.fax_name_company = to_unicode(self.NameCompanyLineEdit.text())
             self.fax_number = to_unicode(self.FaxNumberLineEdit.text())
             self.addPrinter()

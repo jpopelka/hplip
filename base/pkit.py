@@ -320,8 +320,6 @@ class PolicyKit(object):
 
 
 def run_plugin_command(required=True, plugin_reason=PLUGIN_REASON_NONE, Mode = GUI_MODE):
-    su_sudo = None
-    need_sudo = True
 
     if utils.to_bool(sys_conf.get('configure', 'policy-kit')):
         try:
@@ -332,18 +330,6 @@ def run_plugin_command(required=True, plugin_reason=PLUGIN_REASON_NONE, Mode = G
         except dbus.DBusException as ex:
             log.error("PolicyKit NOT installed when configured for use. [%s]"%ex)
 
-    if os.geteuid() == 0:
-        su_sudo = "%s"
-        need_sudo = False
-        
-    passwordObj = password.Password(Mode)
-    if need_sudo:
-        su_sudo = passwordObj.getAuthType()
-
-    if su_sudo is None:
-        log.error("Unable to find a suitable sudo command to run 'hp-plugin'")
-        return (False, False)
-
     req = '--required'
     if not required:
         req = '--optional'
@@ -353,16 +339,9 @@ def run_plugin_command(required=True, plugin_reason=PLUGIN_REASON_NONE, Mode = G
     else:
         p_path="python ./plugin.py"
 
-    if 'gksu' in su_sudo:
-        cmd = passwordObj.getAuthCmd() % ("%s -u %s --reason %s" % (p_path, req, plugin_reason))
-        cmd +=" -m" 
-        cmd += (" \"hp-plugin:- HP Device requires to install HP proprietary plugin. Please enter root password to continue\"")
-    else:
-        cmd = passwordObj.getAuthCmd() % ("%s -u %s --reason %s To_install_plugin_for_HP_Device" % (p_path, req, plugin_reason))
-
-        
+    cmd = "%s -u %s --reason %s" %(p_path, req, plugin_reason)   
     log.debug("%s" % cmd)
-    status, output = utils.run(cmd, passwordObj)
+    status = os_utils.execute(cmd)
 
     return (status == 0, True)
 

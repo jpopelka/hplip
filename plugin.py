@@ -36,7 +36,8 @@ import gzip
 
 # Local
 from base.g import *
-from base import device, utils, tui, module
+from base.strings import *
+from base import device, utils, tui, module, services
 from base.sixext.moves import input
 from prnt import cups
 
@@ -76,7 +77,7 @@ USAGE = [ (__doc__, "", "name", True),
 
 mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
                     (INTERACTIVE_MODE, GUI_MODE),
-                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4), True,True)
+                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4), True)
 
 opts, device_uri, printer_name, mode, ui_toolkit, loc = \
     mod.parseStdOpts('sp:', ['path=', 'plugin=', 'plug-in=', 'reason=',
@@ -106,7 +107,9 @@ for o, a in opts:
         
     elif o == '-s':
         Is_quiet_mode = True
-
+if services.running_as_root():
+    log.error("%s %s"  %(__mod__, queryString(ERROR_RUNNING_AS_ROOT)))
+    sys.exit(1)
 
 if not Is_quiet_mode:
     mod.quiet= False
@@ -169,7 +172,11 @@ if PKIT:
 else:
     pkit_installed = False
 
-
+from installer import pluginhandler
+pluginObj = pluginhandler.PluginHandle()
+plugin_installed = False
+if pluginObj.getStatus() == pluginhandler.PLUGIN_INSTALLED and plugin_path is None:
+    plugin_installed = True
 if mode == GUI_MODE:
     if ui_toolkit == 'qt3':
         try:
@@ -219,19 +226,7 @@ if mode == GUI_MODE:
                 locale.setlocale(locale.LC_ALL, locale.normalize(loc))
             except locale.Error:
                 pass
-
-        if not pkit_installed and not os.geteuid() == 0:
-            log.error("You must be root to run this utility.")
-
-            QMessageBox.critical(None,
-                                 "HP Device Manager - Plug-in Installer",
-                                 "You must be root to run hp-plugin.",
-                                  QMessageBox.Ok,
-                                  QMessageBox.NoButton,
-                                  QMessageBox.NoButton)
-
-            clean_exit(1)
-
+        
         w = pluginform2.PluginForm2()
         app.setMainWidget(w)
         w.show()
@@ -247,18 +242,12 @@ if mode == GUI_MODE:
             clean_exit(1)
 
         app = QApplication(sys.argv)
-        if not pkit_installed and not os.geteuid() == 0:
-            log.error("You must be root to run this utility.")
-
-            QMessageBox.critical(None,
-                                 "HP Device Manager - Plug-in Installer",
-                                 "You must be root to run hp-plugin.",
-                                  QMessageBox.Ok,
-                                  QMessageBox.NoButton,
-                                  QMessageBox.NoButton)
-
-            clean_exit(1)
-
+        if plugin_installed:
+            if QMessageBox.question(None,
+                                 " ",
+                                 "The driver plugin for HPLIP %s appears to already be installed. Do you wish to download and re-install the plug-in?"%version,
+                                  QMessageBox.Yes | QMessageBox.No) != QMessageBox.Yes:
+                clean_exit(1)
 
         dialog = PluginDialog(None, install_mode, plugin_reason)
         dialog.show()
@@ -272,18 +261,13 @@ if mode == GUI_MODE:
 
 else: # INTERACTIVE_MODE
     try:
-        if not os.geteuid() == 0:
-            log.error("You must be root to run this utility.")
-            clean_exit(1)
         
         log.info("(Note: Defaults for each question are maked with a '*'. Press <enter> to accept the default.)")
         log.info("")
         
-        from installer import pluginhandler
         tui.header("PLUG-IN INSTALLATION FOR HPLIP %s" % version)
-        pluginObj = pluginhandler.PluginHandle()
 
-        if pluginObj.getStatus() == pluginhandler.PLUGIN_INSTALLED and plugin_path is None:
+        if plugin_installed:
             log.info("The driver plugin for HPLIP %s appears to already be installed." % version)
 
             cont, ans = tui.enter_yes_no("Do you wish to download and re-install the plug-in?")
@@ -294,7 +278,7 @@ else: # INTERACTIVE_MODE
 
         if plugin_path is None:
             table = tui.Formatter(header=('Option', 'Description'), min_widths=(10, 50))
-            table.add(('d', 'Download plug-in from HP (recomended)'))
+            table.add(('d', 'Download plug-in from HP (recommended)'))
             table.add(('p', 'Specify a path to the plug-in (advanced)'))
             table.add(('q', 'Quit hp-plugin (skip installation)'))
 

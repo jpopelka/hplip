@@ -393,16 +393,10 @@ else: # INTERACTIVE_MODE
                 hp_plugin = utils.which('hp-plugin')
                 if hp_plugin:
                     cmd = "hp-plugin -i"
-                    if os.getuid() != 0:
-                        from base import password
-                        PasswordObj = password.Password(INTERACTIVE_MODE)
-                        PasswordObj.clearPassword()
-                        log.info("Enter Password to install the plugin")
-                        cmd = PasswordObj.getAuthCmd()%cmd
 
-                    # su -c '%s' --> su -c 'hp-plugin -i'
                     if os_utils.execute(cmd) != 0:
                         log.error("Failed to install Plugin.")
+                        log.error("The device you are trying to setup requires a binary plug-in. Some functionalities may not work as expected without plug-ins. Please run 'hp-plugin' as normal user to install plug-ins.Visit http://hplipopensource.com for more infomation.")
                         clean_exit(1)
 
         ppds = cups.getSystemPPDs()

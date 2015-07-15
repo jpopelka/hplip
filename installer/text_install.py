@@ -891,15 +891,13 @@ def start(language, auto=True, test_depends=False,
             if ok and choice == 'y':
                 ok, choice = tui.enter_choice("Do you want to install plug-in's in GUI mode?. (u=GUI mode*, i=Interactive mode) : ",['u', 'i'], 'u')
                 if ok and choice == 'u':
-                    if not services.run_hp_tools_with_auth('hp-plugin', core.passwordObj):
-                        log.error("hp-plugin command failed. Please run hp-plugin manually.")
+                    plugin_cmd = 'hp-plugin  -u'
                 elif ok and choice == 'i':
-                    plugin_cmd = core.passwordObj.getAuthCmd() % 'hp-plugin  -i'
-                    log.info("Running '%s' command...."%plugin_cmd)
-                    if os_utils.execute(plugin_cmd) != 0:
-                        log.error("hp-plugin command failed. Please run hp-plugin manually.")
+                    plugin_cmd = 'hp-plugin  -i'
                 else:
                     log.info(log.bold("Please install hp plugin's manually, otherwise some functionality may break"))
+                if os_utils.execute(plugin_cmd) != 0:
+                    log.error("hp-plugin command failed. Please run hp-plugin manually.")
             else:
                 log.info(log.bold("Please install hp plugin's manually, otherwise some functionality may break"))
 

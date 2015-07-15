@@ -22,7 +22,7 @@
 import os
 import shutil
 
-from base import utils, tui, os_utils, validation
+from base import utils, tui, os_utils, validation, password
 from base.g import *
 from base.codes import *
 from base.strings import *
@@ -350,19 +350,18 @@ class PluginHandle(object):
         exec_str = sys.executable
         if mode == GUI_MODE:
             cmd = "sh %s --keep --nox11 -- -u %s" % (plugin_file, exec_str)
+            status = os_utils.execute(cmd)
         else:
             cmd = "sh %s --keep --nox11 -- -i %s" % (plugin_file, exec_str)
-
-        if os_utils.execute(cmd) == 0:
+            status = os_utils.execute(cmd)
+        if status == 0:
             result = True
         else:
             log.error("Python gobject/dbus may be not installed")
             result = False
 
-        try:
-            shutil.rmtree('./plugin_tmp')
-        except OSError:
-            log.warn("Failed to remove the temporary files")
+
+        utils.remove('./plugin_tmp')
 
         os.chdir(cwd)
         return result

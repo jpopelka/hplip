@@ -697,8 +697,8 @@ def dataModelHelper(dev, func, ui2):
         dev.close()
     return 0
 
-def AlignType16Manual(dev, a, b, c, d, e, f, g, h, i):
-    log.debug("a=%s b=%s c=%s d=%s e=%s f=%s g=%s h=%s i=%s" % (a, b, c, d, e, f, g, h, i ))
+def AlignType16Manual(dev, a, b, c, d, e, f, g, h, i, j):
+    log.debug("a=%s b=%s c=%s d=%s e=%s f=%s g=%s h=%s i=%s j=%s" % (a, b, c, d, e, f, g, h, i, j ))
     func = dev.getEWSUrl_LEDM
     data = status.StatusType10FetchUrl(func, "/Calibration/State")
 
@@ -709,7 +709,7 @@ def AlignType16Manual(dev, a, b, c, d, e, f, g, h, i):
         if "CalibrationValid" in data:
             return
         data = status.StatusType10FetchUrl(func, "/Calibration/State")
-    data = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- THIS DATA SUBJECT TO DISCLAIMER(S) INCLUDED WITH THE PRODUCT OF ORIGIN. -->\n<ManualSelectedPatterns xmlns=\"http://www.hp.com/schemas/imaging/con/cnx/markingagentcalibration/2009/04/08\" xmlns:locid=\"http://www.hp.com/schemas/imaging/con/ledm/localizationids/2007/10/31/\" xmlns:psdyn=\"http://www.hp.com/schemas/imaging/con/ledm/productstatdyn/2007/10/31\"><SelectedPattern><Identifier><Id>1</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>2</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>3</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>4</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>5</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>6</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>7</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>8</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>9</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern></ManualSelectedPattern>" % ( a, b, c, d, e, f, g, h, i )
+    data = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- THIS DATA SUBJECT TO DISCLAIMER(S) INCLUDED WITH THE PRODUCT OF ORIGIN. -->\n<ManualSelectedPatterns xmlns=\"http://www.hp.com/schemas/imaging/con/cnx/markingagentcalibration/2009/04/08\" xmlns:locid=\"http://www.hp.com/schemas/imaging/con/ledm/localizationids/2007/10/31/\" xmlns:psdyn=\"http://www.hp.com/schemas/imaging/con/ledm/productstatdyn/2007/10/31\"><SelectedPattern><Identifier><Id>1</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>2</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>3</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>4</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>5</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>6</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>7</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>8</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern><SelectedPattern><Identifier><Id>9</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern></SelectedPattern><SelectedPattern><Identifier><Id>10</Id></Identifier><Choice><Identifier><Id>%s</Id></Identifier></Choice></SelectedPattern></ManualSelectedPattern>" % ( a, b, c, d, e, f, g, h, i, j )
     data = "PUT %s HTTP/1.1\r\nHost: localhost\r\nUser-Agent: hp\r\nAccept: text/plain\r\nAccept-Language: en-us,en\r\nAccept-Charset:utf-8\r\nContent-Type: text/xml\r\nContent-Length: %s\r\n\r\n" % ( calibrationSession, len(data)) + data
     data = status.StatusType10FetchUrl(func, calibrationSession, data)
 
@@ -734,7 +734,7 @@ def AlignType16(dev, loadpaper_ui, align_ui):
     if not loadpaper_ui():
         return
     dataModelHelper(dev, dev.getEWSUrl_LEDM, align_ui)
-    state, a, b, c, d, e, f, g, h, i = 0, 6, 6, 3, 3, 6, 6, 6, 6, 6
+    state, a, b, c, d, e, f, g, h, i, j = 0, 6, 6, 3, 3, 6, 6, 6, 6, 6, 6
     ok = False
     while state != -1:
         if state == 0:
@@ -745,7 +745,7 @@ def AlignType16(dev, loadpaper_ui, align_ui):
 
         elif state == 1:
             state = -1
-            ok, b = align_ui('B', 'h', 'kc', 3, 11)
+            ok, b = align_ui('B', 'h', 'kc', 3, 17)
             if ok:
                 state = 2
 
@@ -769,37 +769,43 @@ def AlignType16(dev, loadpaper_ui, align_ui):
 
         elif state == 5:
             state = -1
-            ok, e = align_ui('F', 'h', 'k', 3, 11)
+            ok, f = align_ui('F', 'h', 'k', 3, 11)
             if ok:
                 state = 6
 
         elif state == 6:
             state = -1
-            ok, e = align_ui('G', 'h', 'k', 3, 11)
+            ok, g = align_ui('G', 'h', 'k', 3, 11)
             if ok:
                 state = 7
 
         elif state == 7:
             state = -1
-            ok, e = align_ui('H', 'h', 'k', 3, 11)
+            ok, h = align_ui('H', 'h', 'k', 3, 11)
             if ok:
                 state = 8
 
         elif state == 8:
             state = -1
-            ok, e = align_ui('I', 'h', 'k', 3, 11)
+            ok, i = align_ui('I', 'v', 'k', 3, 19)
             if ok:
                 state = 9
 
         elif state == 9:
             state = -1
+            ok, j = align_ui('J', 'v', 'k', 3, 19)
+            if ok:
+                state = 10
 
-    AlignType16Manual(dev, a, b, c, d, e, f, g, h, i)
+        elif state == 10:
+            state = -1
+
+    AlignType16Manual(dev, a, b, c, d, e, f, g, h, i, j)
 
     return ok
 
-def AlignType16Phase1(dev, a, b, c, d, e, f, g, h, i):
-    AlignType16Manual(dev, a, b, c, d, e, f, g, h, i)
+def AlignType16Phase1(dev, a, b, c, d, e, f, g, h, i, j):
+    AlignType16Manual(dev, a, b, c, d, e, f, g, h, i, j)
 
 def AlignType14(dev, loadpaper_ui, align_ui, invalidpen_ui):
     pattern = alignType14SetPattern(dev)

@@ -380,7 +380,7 @@ class AlignDialog(QDialog, Ui_Dialog):
                                (maint.AlignType15Phase1, (lambda : self.dev, lambda: true)),
                                (self.showAlignmentNumberPage, ('A', 'v', 'kc', 3, 23)),
                                (self.endAlignmentNumberPage, ('A',)),
-                               (self.showAlignmentNumberPage, ('B', 'h', 'kc', 3, 11)),
+                               (self.showAlignmentNumberPage, ('B', 'h', 'kc', 3, 17)),
                                (self.endAlignmentNumberPage, ('B',)),
                                (self.showAlignmentNumberPage, ('C', 'v', 'k', 3, 23)),
                                (self.endAlignmentNumberPage, ('C',)),
@@ -392,14 +392,16 @@ class AlignDialog(QDialog, Ui_Dialog):
                                (self.endAlignmentNumberPage, ('F',)),
                                (self.showAlignmentNumberPage, ('G', 'h', 'k', 3, 11)),
                                (self.endAlignmentNumberPage, ('G',)),
-                               (self.showAlignmentNumberPage, ('H', 'v', 'k', 3, 9)),
+                               (self.showAlignmentNumberPage, ('H', 'v', 'k', 3, 11)),
                                (self.endAlignmentNumberPage, ('H',)),
-                               (self.showAlignmentNumberPage, ('I', 'v', 'c', 3, 9)),
+                               (self.showAlignmentNumberPage, ('I', 'v', 'c', 3, 19)),
                                (self.endAlignmentNumberPage, ('I',)),
+                               (self.showAlignmentNumberPage, ('J', 'v', 'c', 3, 19)),
+                               (self.endAlignmentNumberPage, ('J',)),
                                (maint.AlignType16Phase1, (lambda: self.dev, lambda: self.a, lambda: self.b,
                                                           lambda: self.c, lambda: self.d, lambda: self.e,
                                                           lambda: self.f, lambda: self.g, lambda: self.h,
-                                                          lambda: self.i)),
+                                                          lambda: self.i, lambda: self.j)),
                                (self.closeAll, None),
                                (self.close, None),
                             ],
@@ -588,6 +590,10 @@ class AlignDialog(QDialog, Ui_Dialog):
         elif line_id == 'I':
             self.i = v
             log.debug("I=%d" % v)
+
+        elif line_id == 'J':
+            self.j = v
+            log.debug("J=%d" % v)
 
     def showPageEdgePage(self, prefix=None, count=13):
         self.PageEdgeTitle.setText(self.__tr("Choose the <b>numbered arrow</b> that <b>best </b>marks the edge of the paper."))

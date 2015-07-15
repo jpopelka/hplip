@@ -438,15 +438,18 @@ class PrintSettingsToolbox(QToolBox):
                     log.debug("Option: outputorder")
                     log.debug("Current value: %s" % current)
 
-                    current = utils.to_bool(current_options.get('Collate', '0'))
+                    #If collate section is not in the PPD, only then add a collate section.
+                    to_add = cups.duplicateSection("collate")
+                    if to_add == 0:
+                        current = utils.to_bool(current_options.get('Collate', '0'))
 
-                    self.addControlRow("Collate",
-                        self.__tr("Collate (Group together multiple copies)"),
-                        cups.PPD_UI_BOOLEAN, current,
-                        [], 0)
+                        self.addControlRow("Collate",
+                            self.__tr("Collate (Group together multiple copies)"),
+                            cups.PPD_UI_BOOLEAN, current,
+                            [], 0)
 
-                    log.debug("Option: Collate")
-                    log.debug("Current value: %s" % current)
+                        log.debug("Option: Collate")
+                        log.debug("Current value: %s" % current)
 
                     self.endControlGroup()
 

@@ -54,21 +54,9 @@ try:
 
     os.environ['LANG'] = newlang
 
-    # the same works for LC_CTYPE, in case it's not set
-    current_ctype = os.getenv("LC_CTYPE")
-    newctype = "C"
-
-    if current_ctype is not None and current_ctype.count('.'):
-        newctype, encoding = current_ctype.split('.')
-        newctype += ".UTF-8"
-
-    os.environ['LC_CTYPE'] = newctype
-
     import cupsext
-    # restore the old env values
-    if current_ctype is not None:
-        os.environ['LC_CTYPE'] = current_ctype
 
+    # restore the old env values
     if current_language is not None:
         os.environ['LANG'] = current_language
 
@@ -789,6 +777,9 @@ def addOption(option):
 
 def getOptions():
     return cupsext.getOptions()
+
+def duplicateSection(section):
+    return cupsext.duplicateSection(section)
 
 def printFile(printer, filename, title):
     if os.path.exists(filename):

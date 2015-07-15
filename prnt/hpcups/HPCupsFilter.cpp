@@ -350,6 +350,16 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
         m_JA.mech_offset = atoi(attr->value);
     }
 
+    if(cups_header->PageSize[0] > 612) // Check for B size paper. B Size paper has width > 8.5 inch (612 points)
+    {
+        //Check if HPMechOffsetBSize attribute is defined. If it is defined then use this offset value.
+        if (((attr = ppdFindAttr(m_ppd, "HPMechOffsetBSize", NULL)) != NULL) && (attr && attr->value != NULL)) 
+        {
+            m_JA.mech_offset = atoi(attr->value);
+        }
+
+    }
+
 //  Get printer platform name
     if (((attr = ppdFindAttr(m_ppd, "hpPrinterPlatform", NULL)) != NULL) && (attr->value != NULL)) {
 
@@ -375,6 +385,16 @@ DRIVER_ERROR HPCupsFilter::startPage (cups_page_header2_t *cups_header)
           m_JA.pre_process_raster = atoi(attr->value);
     }
 
+    if (((attr = ppdFindAttr(m_ppd, "HPSPDClass", NULL)) == NULL) ||
+         (attr && attr->value == NULL)) 
+    {
+        m_JA.HPSPDClass = 0;
+    }
+    else
+    {
+        m_JA.HPSPDClass = atoi(attr->value);
+    }
+    
 
 // Get the encapsulation technology from ppd
 

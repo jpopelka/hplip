@@ -1513,7 +1513,7 @@ def ExtractXMLData(data):
             temp = temp + data[index+2:index+2+size]
             data = data[index+2+size+2:len(data)]
         data = temp
-    return data 
+    return data
 
 def StatusType10FetchUrl(func, url, footer=""):
     data_fp = BytesIO()
@@ -1806,7 +1806,7 @@ def StatusType10Status(func): # Low End Data Model
 
     return status_block
 
-#IPP Status Code 
+#IPP Status Code
 IPP_PRINTER_STATE_IDLE = 0x03
 IPP_PRINTER_STATE_PROCESSING = 0x04
 IPP_PRINTER_STATE_STOPPED = 0x05
@@ -1861,15 +1861,15 @@ printer_state_reasons_xlate = { 'none' : STATUS_PRINTER_IDLE,
                                'other' : STATUS_UNKNOWN_CODE,
                              }
 
-def StatusTypeIPPStatus(attrs): 
+def StatusTypeIPPStatus(attrs):
 
     status_block = {}
     if not attrs:
         return status_block
 
     try:
-        printer_state = attrs['printer-state'][0]  
-        printer_state_reasons = attrs['printer-state-reasons'][0]  
+        printer_state = attrs['printer-state'][0]
+        printer_state_reasons = attrs['printer-state-reasons'][0]
 
         if printer_state == IPP_PRINTER_STATE_IDLE:
             status_block['status-code'] = STATUS_PRINTER_IDLE
@@ -1887,17 +1887,17 @@ def StatusTypeIPPStatus(attrs):
 
     return status_block
 
-    
-def StatusTypeIPPAgents(attrs): 
+
+def StatusTypeIPPAgents(attrs):
 
     status_block = {}
     agents = []
-        
+
     if not attrs:
         return status_block
 
-    loopcntr = 0    
-    while(True ):        
+    loopcntr = 0
+    while(True ):
         try:
             if loopcntr >= len(attrs['marker-names']):
                 break
@@ -1908,30 +1908,30 @@ def StatusTypeIPPAgents(attrs):
 
             if attrs['marker-levels'][loopcntr] > attrs['marker-low-levels'][loopcntr] :
                 state = 'ok'
-            else: 
+            else:
                 state = 'low'
 
             entry = { 'kind' : marker_kind_xlate.get(attrs['marker-types'][loopcntr], AGENT_KIND_NONE),
                       'type' : marker_type_xlate.get(attrs['marker-names'][loopcntr], AGENT_TYPE_NONE),
                       'health' : marker_state_xlate.get(state, AGENT_HEALTH_OK),
                       'level' : attrs['marker-levels'][loopcntr],
-                      'level-trigger' : marker_leveltrigger_xlate.get(state, AGENT_LEVEL_TRIGGER_SUFFICIENT_0), 
-                      'agent-sku' : ''  
+                      'level-trigger' : marker_leveltrigger_xlate.get(state, AGENT_LEVEL_TRIGGER_SUFFICIENT_0),
+                      'agent-sku' : ''
                     }
 
             log.debug("%s" % entry)
             agents.append(entry)
         except AttributeError:
             log.error("no value found for attribute")
-            return []     
+            return []
 
         loopcntr = loopcntr + 1
 
     status_block['agents'] = agents
-   
+
     return status_block
 
-def StatusTypeIPP(device_uri): 
+def StatusTypeIPP(device_uri):
     status_block = { 'revision' :    STATUS_REV_UNKNOWN,
                      'agents' :      [],
                      'top-door' :    TOP_DOOR_NOT_PRESENT,
@@ -1947,9 +1947,9 @@ def StatusTypeIPP(device_uri):
     status_attrs = cupsext.getStatusAttributes(device_uri)
 
     if status_attrs:
-        status_block.update(StatusTypeIPPAgents(status_attrs) ) 
-        status_block.update(StatusTypeIPPStatus (status_attrs) ) 
+        status_block.update(StatusTypeIPPAgents(status_attrs) )
+        status_block.update(StatusTypeIPPStatus (status_attrs) )
 
-    return status_block   
+    return status_block
 
 

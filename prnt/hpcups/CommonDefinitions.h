@@ -441,6 +441,7 @@ typedef struct JobAttributes_s
 {
     int                media_source;
     int                color_mode;
+    int                HPSPDClass;
     DUPLEXMODE         e_duplex_mode;
     int                print_borderless;
     int                krgb_mode;

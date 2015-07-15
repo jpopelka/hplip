@@ -188,7 +188,7 @@ log.set_module(__mod__)
 try:
     mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
                     (INTERACTIVE_MODE, GUI_MODE),
-                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4), True, True)
+                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4), True)
 
     opts, device_uri, printer_name, mode, ui_toolkit, loc = \
                mod.parseStdOpts('hl:gniup:d:of:sw', ['notify','check','help', 'help-rest', 'help-man', 'help-desc', 'interactive', 'gui', 'lang=','logging=', 'debug'],
@@ -201,7 +201,7 @@ except getopt.GetoptError as e:
     usage()
 
 if os.geteuid() == 0:
-    log.error("hp-upgrade should not be run as root/superuser")
+    log.error("%s %s"  %(__mod__, queryString(ERROR_RUNNING_AS_ROOT)))
     clean_exit(1)
 
 if os.getenv("HPLIP_DEBUG"):

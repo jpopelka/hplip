@@ -1189,6 +1189,32 @@ PyObject * getOptions( PyObject * self, PyObject * args )
     return option_list;
 }
 
+PyObject * duplicateSection( PyObject * self, PyObject * args )
+{
+    int i = 0, j, k, len;
+    const char *section;
+    
+    if ( !PyArg_ParseTuple( args, "z", &section ) )
+    {
+        return Py_BuildValue( "" ); // None
+    }
+
+    len = strlen(section);
+    if ( ppd != NULL )
+    {
+        for( j = 0; j < ppd->num_groups; j++)
+        {
+            for( k = 0; k < ppd->groups[j].num_options; k++)
+            {
+                if(strncasecmp(ppd->groups[j].options[k].keyword, section, len) == 0)
+                {
+                    i = 1;
+                }
+            }
+        }
+    }
+    return Py_BuildValue( "i", i);
+}
 
 // ***************************************************************************************************
 
@@ -1624,6 +1650,7 @@ static PyMethodDef cupsext_methods[] =
     { "getChoice", ( PyCFunction ) getChoice, METH_VARARGS },
     { "setOptions", ( PyCFunction ) setOptions, METH_VARARGS },
     { "getOptions", ( PyCFunction ) getOptions, METH_VARARGS },
+    { "duplicateSection", ( PyCFunction ) duplicateSection, METH_VARARGS },
     { "setPasswordPrompt", (PyCFunction) setPasswordPrompt, METH_VARARGS },
     { "setPasswordCallback", ( PyCFunction ) setPasswordCallback, METH_VARARGS },
     { "getPassword", ( PyCFunction ) getPassword, METH_VARARGS },

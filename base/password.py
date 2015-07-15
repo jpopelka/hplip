@@ -301,10 +301,8 @@ class Password(object):
         distro_name =  get_distro_name().lower()
         if self.__authType == "sudo":
             AuthType, AuthCmd = 'sudo', 'sudo %s'
-        elif distro_name == 'rhel':
-            AuthType, AuthCmd  = 'su', 'su -c "%s"'
         else:
-            AuthType, AuthCmd  = 'su', 'su - -c "%s"'
+            AuthType, AuthCmd  = 'su', 'su -c "%s"'
         '''
         if utils.which('kdesu'):
             AuthType, AuthCmd = 'kdesu', 'kdesu -- %s'

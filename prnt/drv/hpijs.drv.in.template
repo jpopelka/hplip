@@ -8275,6 +8275,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   // <%Saipan:Normal%>
   // <%Saipan:AutoDuplex%> 
   // <%Saipan:Advanced%> 
+  // <%Saipan15B:Normal%>
 } // end Saipan
 
 ////////// Kapan

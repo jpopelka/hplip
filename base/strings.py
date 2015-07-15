@@ -50,7 +50,8 @@ class StringTable:
 
             '500' : (self.__tr('Started a print job'), ''),
             '501' : (self.__tr('Print job has completed'), ''),
-            '502' : (self.__tr("Print job failed - required plug-in not found"), self.__tr("Please run hp-plugin (as root) to install the required plug-in")),
+            '502' : (self.__tr("Print job failed - required plug-in not found"), self.__tr("Please run hp-plugin to install the required plug-in")),
+            '503' : (self.__tr('should not be run as root/superuser'), ''),
             '600' : (self.__tr('Started a fax job'), ''),
             '601' : (self.__tr('Fax job is ready for send'), ''),
             '700' : (self.__tr('Printer queue stopped'), ''),
