@@ -8050,8 +8050,9 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
+  // <%CopperheadIPH15:Normal%>
   // <%PyramidRefresh15:Normal%>
-} // end PyramidRefresh15
+} // end CopperheadIPH15
 
 ////////// Saipan
 {
@@ -8720,7 +8721,8 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
-  // <%MimasTDR:Normal%>
+  // <%MimasTDR:Normal%>  
+  // <%Mimas15:Normal%>
 
 } // end MimasTDR
 

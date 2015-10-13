@@ -274,7 +274,10 @@ cups_ppd_printers = \
    ppd/hpcups/hp-envy_110_series.ppd.gz \
    ppd/hpcups/hp-envy_120_series.ppd.gz \
    ppd/hpcups/hp-envy_4500_series.ppd.gz \
+   ppd/hpcups/hp-envy_4510_series.ppd.gz \
+   ppd/hpcups/hp-envy_4520_series.ppd.gz \
    ppd/hpcups/hp-envy_5530_series.ppd.gz \
+   ppd/hpcups/hp-envy_5540_series.ppd.gz \
    ppd/hpcups/hp-envy_5640_series.ppd.gz \
    ppd/hpcups/hp-envy_5660_series.ppd.gz \
    ppd/hpcups/hp-envy_7640_series.ppd.gz \
@@ -520,6 +523,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-officejet_4610_series.ppd.gz \
    ppd/hpcups/hp-officejet_4620_series.ppd.gz \
    ppd/hpcups/hp-officejet_4630_series.ppd.gz \
+   ppd/hpcups/hp-officejet_4650_series.ppd.gz \
    ppd/hpcups/hp-officejet_5100_series.ppd.gz \
    ppd/hpcups/hp-officejet_5105.ppd.gz \
    ppd/hpcups/hp-officejet_5110.ppd.gz \

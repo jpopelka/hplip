@@ -720,7 +720,7 @@ def start(language, auto=True, test_depends=False,
 
             if num_req_missing == 0 and core.hplip_present and core.selected_component == 'hplip' and core.distro_version_supported:
                 path = utils.which('hp-uninstall')
-                ok, choice = tui.enter_choice("HPLIP-%s exists, this may conflict with the new one being installed.\nDo you want to ('i'= Remove and Install*, 'o'= Overwrite, 'q'= Quit)?    :"%(prev_hplip_version),['i','o','q'],'i')
+                ok, choice = tui.enter_choice("HPLIP-%s exists, this may conflict with the new one being installed.\nDo you want to ('i'= Remove and Install*, 'q'= Quit)?    :"%(prev_hplip_version),['i','q'],'i')
                 if not ok or choice=='q':
                     log.error("User Exit")
                     sys.exit(0)

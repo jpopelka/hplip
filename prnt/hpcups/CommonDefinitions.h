@@ -441,7 +441,6 @@ typedef struct JobAttributes_s
 {
     int                media_source;
     int                color_mode;
-    int                HPSPDClass;
     DUPLEXMODE         e_duplex_mode;
     int                print_borderless;
     int                krgb_mode;
@@ -466,6 +465,7 @@ typedef struct JobAttributes_s
     int                integer_values[16];
     int                printer_platform_version;
     int                pre_process_raster;
+    int                HPSPDClass;
 } JobAttributes;
 
 #endif // COMMON_DEFINITIONS_H

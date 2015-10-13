@@ -13884,6 +13884,7 @@ lity:PenSet=2,Quality:FullBleed=1"
             Attribute "Product" "" "(HP Officejet 6810 E-all-in-one Printer Series)"
             Attribute "Product" "" "(HP Officejet 6812 E-all-in-one Printer)"
             Attribute "Product" "" "(HP Officejet 6815 E-all-in-one Printer)"
+            Attribute "Product" "" "(HP Officejet 6820 E-all-in-one Printer)"
           }
           {
             ModelName "HP Officejet Pro 6830 hpijs"
@@ -14437,7 +14438,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "ShortNickName" "" "HP Officejet 8040 Series hpijs"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 8040 series;DES:officejet 8040 series;"
     PCFileName "hp-officejet_8040_series-hpijs.ppd"
-    Attribute "Product" "" "(HP Officejet 8040 Series)"
+    Attribute "Product" "" "(HP Officejet 8040 E-all-in-one)"
   }
 } // end CopperheadIPH
 
@@ -14660,6 +14661,17 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
+  // <%CopperheadIPH15:Normal%>
+  {
+    ModelName "HP Envy 5540 Series hpijs"
+    Attribute "NickName" "" "HP Envy 5540 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Envy 5540 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:envy 5540 series;DES:envy 5540 series;"
+    PCFileName "hp-envy_5540_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Envy 5540 All-in-one Printer Series)"
+    Attribute "Product" "" "(HP Envy 5540 All-in-one Printer)"
+    Attribute "Product" "" "(HP Envy 5545 All-in-one Printer)"
+  }
   // <%PyramidRefresh15:Normal%>
   {
     ModelName "HP Deskjet 1110 Series hpijs"
@@ -14685,9 +14697,10 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Deskjet 2132 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 2130 All-in One Printer)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 2135 All-in One Printer)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage 2136 All-in One Printer)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 2138 All-in One Printer)"
   }
-} // end PyramidRefresh15
+} // end CopperheadIPH15
 
 ////////// Saipan
 {
@@ -15421,7 +15434,7 @@ lity:PenSet=2,Quality:FullBleed=1"
   CustomMedia "Oufuku/Oufuku-Hagaki" 567.00 420.00 0.00 36.00 0.00 0.00 "%% FoomaticRIPOptionSetting: PageSize=Oufuku" "%% FoomaticRIPOptionSetting: PageSize=Oufuku"
   CustomMedia "w558h774/16K" 558.00 774.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w558h774" "%% FoomaticRIPOptionSetting: PageSize=w558h774"
   CustomMedia "w612h935/Executive (JIS)" 612.00 935.00 18.00 36.00 18.00 9.00 "%% FoomaticRIPOptionSetting: PageSize=w612h935" "%% FoomaticRIPOptionSetting: PageSize=w612h935"
-  // <%MimasTDR:Normal%>
+  // <%MimasTDR:Normal%>  
   {
     ModelName "HP Deskjet 3540 Series hpijs"
     Attribute "NickName" "" "HP Deskjet 3540 Series hpijs, $Version"
@@ -15491,6 +15504,38 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Envy 5532 E-all-in-one Printer)"
     Attribute "Product" "" "(HP Envy 5534 E-all-in-one Printer)"
     Attribute "Product" "" "(HP Envy 5535 E-all-in-one Printer)"
+  }
+  // <%Mimas15:Normal%>
+  {
+    ModelName "HP Envy 4510 Series hpijs"
+    Attribute "NickName" "" "HP Envy 4510 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Envy 4510 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:envy 4510 series;DES:envy 4510 series;"
+    PCFileName "hp-envy_4510_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Envy 4510 All-in-one)"
+    Attribute "Product" "" "(HP Envy 4512 All-in-one)"
+    Attribute "Product" "" "(HP Envy 4516 All-in-one)"
+  }
+  {
+    ModelName "HP Envy 4520 Series hpijs"
+    Attribute "NickName" "" "HP Envy 4520 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Envy 4520 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:envy 4520 series;DES:envy 4520 series;"
+    PCFileName "hp-envy_4520_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Envy 4520 All-in-one Printer Series)"
+    Attribute "Product" "" "(HP Envy 4520 All-in-one Printer)"
+    Attribute "Product" "" "(HP Envy 4522 All-in-one Printer)"
+  }
+  {
+    ModelName "HP Officejet 4650 Series hpijs"
+    Attribute "NickName" "" "HP Officejet 4650 Series hpijs, $Version"
+    Attribute "ShortNickName" "" "HP Officejet 4650 Series hpijs"
+    Attribute "1284DeviceID" "" "MFG:HP;MDL:officejet 4650 series;DES:officejet 4650 series;"
+    PCFileName "hp-officejet_4650_series-hpijs.ppd"
+    Attribute "Product" "" "(HP Officejet 4650 All-in-one Printer Series)"
+    Attribute "Product" "" "(HP Officejet 4650 All-in-one Printer)"
+    Attribute "Product" "" "(HP Officejet 4652 All-in-one Printer)"
+    Attribute "Product" "" "(HP Officejet 4655 All-in-one Printer)"
   }
 
 } // end MimasTDR
@@ -18238,6 +18283,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "Product" "" "(HP Deskjet 2542 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet 2543 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet 2544 All-in-one Printer)"
+    Attribute "Product" "" "(HP Deskjet 2545 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet 2549 All-in-one Printer)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 2540 All-in-one Printer Series)"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 2545 All-in-one Printer)"
@@ -18793,6 +18839,7 @@ lity:PenSet=2,Quality:FullBleed=1"
             PCFileName "hp-deskjet_3830_series-hpijs.ppd"
             Attribute "Product" "" "(HP Deskjet Ink Advantage 3830 All-in-one Printer)"
             Attribute "Product" "" "(HP Deskjet Ink Advantage 3835 All-in-one Printer)"
+            Attribute "Product" "" "(HP Deskjet Ink Advantage 3836 All-in-one Printer)"
           }
 
 }// End Pyramid15

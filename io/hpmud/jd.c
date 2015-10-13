@@ -788,7 +788,7 @@ enum HPMUD_RESULT hpmud_mdns_lookup(const char *host_name, int sec_timeout, char
    while (1)
    {
 
-      BUG("send socket=%d len=%d\n", udp_socket, n);
+      DBG("send socket=%d len=%d\n", udp_socket, n);
       DBG_DUMP(dnsquery, n);
 
       bzero(&send_addr, sizeof(send_addr));

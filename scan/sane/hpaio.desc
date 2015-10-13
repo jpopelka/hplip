@@ -175,6 +175,9 @@
 :model "HP Deskjet 2544 All-in-one Printer"
 :status :good
 
+:model "HP Deskjet 2545 All-in-one Printer"
+:status :good
+
 :model "HP Deskjet 2546b All-in-one Printer"
 :status :good
 
@@ -547,6 +550,9 @@
 :model "HP Deskjet Ink Advantage 2135 All-in One Printer"
 :status :good
 
+:model "HP Deskjet Ink Advantage 2136 All-in One Printer"
+:status :good
+
 :model "HP Deskjet Ink Advantage 2138 All-in One Printer"
 :status :good
 
@@ -614,6 +620,9 @@
 :status :good
 
 :model "HP Deskjet Ink Advantage 3835 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage 3836 All-in-one Printer"
 :status :good
 
 :model "HP Deskjet Ink Advantage 4515 E-all-in-one Printer"
@@ -697,6 +706,24 @@
 :model "HP Envy 4508 E-all-in-one"
 :status :good
 
+:model "HP Envy 4510 All-in-one"
+:status :good
+
+:model "HP Envy 4512 All-in-one"
+:status :good
+
+:model "HP Envy 4516 All-in-one"
+:status :good
+
+:model "HP Envy 4520 All-in-one Printer"
+:status :good
+
+:model "HP Envy 4520 All-in-one Printer Series"
+:status :good
+
+:model "HP Envy 4522 All-in-one Printer"
+:status :good
+
 :model "HP Envy 5530 E-all-in-one Printer"
 :status :good
 
@@ -710,6 +737,15 @@
 :status :good
 
 :model "HP Envy 5535 E-all-in-one Printer"
+:status :good
+
+:model "HP Envy 5540 All-in-one Printer"
+:status :good
+
+:model "HP Envy 5540 All-in-one Printer Series"
+:status :good
+
+:model "HP Envy 5545 All-in-one Printer"
 :status :good
 
 :model "HP Envy 5640 E-all-in-one"
@@ -1336,6 +1372,18 @@
 :model "HP Officejet 4636 E-all-in-one Printer"
 :status :good
 
+:model "HP Officejet 4650 All-in-one Printer"
+:status :good
+
+:model "HP Officejet 4650 All-in-one Printer Series"
+:status :good
+
+:model "HP Officejet 4652 All-in-one Printer"
+:status :good
+
+:model "HP Officejet 4655 All-in-one Printer"
+:status :good
+
 :model "HP Officejet 5100 All-in-one Printer"
 :status :good
 
@@ -1546,6 +1594,9 @@
 :model "HP Officejet 6815 E-all-in-one Printer"
 :status :good
 
+:model "HP Officejet 6820 E-all-in-one Printer"
+:status :good
+
 :model "HP Officejet 700 All-in-one Printer"
 :status :good
 
@@ -1636,7 +1687,7 @@
 :model "HP Officejet 7612 Wide Format E-all-in-one Printer"
 :status :good
 
-:model "HP Officejet 8040 Series"
+:model "HP Officejet 8040 E-all-in-one"
 :status :good
 
 :model "HP Officejet 9110 All-in-one Printer"
