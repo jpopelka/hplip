@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2015 HP Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -455,7 +455,7 @@ class Module(object):
 
             log.info(log.bold("%s ver. %s" % (self.title, self.version)))
             log.info("")
-            log.info("Copyright (c) 2001-15 Hewlett-Packard Development Company, LP")
+            log.info("Copyright (c) 2001-15 HP Development Company, LP")
             log.info("This software comes with ABSOLUTELY NO WARRANTY.")
             log.info("This is free software, and you are welcome to distribute it")
             log.info("under certain conditions. See COPYING file for more details.")

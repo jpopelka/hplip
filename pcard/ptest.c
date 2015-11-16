@@ -2,7 +2,7 @@
 
   ptest.c - HP MFP photo card file manager
  
-  (c) 2004 Copyright Hewlett-Packard Development Company, LP
+  (c) 2004 Copyright HP Development Company, LP
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -318,7 +318,7 @@ bugout:
 void usage()
 {
    fprintf(stdout, "HP MFP Photo Card File Manager %s\n", VERSION);
-   fprintf(stdout, "(c) 2004-2007 Copyright Hewlett-Packard Development Company, LP\n");
+   fprintf(stdout, "(c) 2004-2007 Copyright HP Development Company, LP\n");
    fprintf(stdout, "usage: ptest [-v] [-u uri] -c ls [-p path]  (list directory)\n");
    fprintf(stdout, "       ptest [-v] [-u uri] -c read -p path  (read file to stdout)\n");
    fprintf(stdout, "       ptest [-v] [-u uri] -c rm -p path    (delete file)\n");

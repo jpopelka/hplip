@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2015 HP Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -272,10 +272,10 @@ class FileTable(QWidget):
                 pass
             except :
                 log.exception()
-            if stat.strip('\n') == 'Enforcing' :
-                FailureUI(self, self.__tr("<b>Unable to add file. Please disable SeLinux.</b><p>Either disable it manually or run hp-doctor from terminal.</p>"),
-                    self.__tr("HP Device Manager"))
-                return
+            # if stat.strip('\n') == 'Enforcing' :
+            #     FailureUI(self, self.__tr("<b>Unable to add file. Please disable SeLinux.</b><p>Either disable it manually or run hp-doctor from terminal.</p>"),
+            #         self.__tr("HP Device Manager"))
+            #     return
 
             s = self.__tr("Select File(s) to Send")
 

@@ -2,7 +2,7 @@
 
   musb.h - USB support for multi-point transport driver
  
-  (c) 2010-2014 Copyright Hewlett-Packard Development Company, LP
+  (c) 2010-2014 Copyright HP Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy 
   of this software and associated documentation files (the "Software"), to deal 
@@ -54,6 +54,7 @@ enum FD_ID
    FD_ff_1_0,        /* Marvell fax support*/
    FD_ff_cc_0,
    FD_ff_2_10,
+   FD_ff_9_1,
    MAX_FD
 };
 
@@ -125,7 +126,7 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_dot4_channel_clos
 enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_dot4_channel_write(struct _mud_channel *pc, const void *buf, int length, int sec_timeout, int *bytes_wrote);
 enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_dot4_channel_read(struct _mud_channel *pc, void *buf, int length, int sec_timeout, int *bytes_read);
 
-int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int lst_size, int *cnt);
+int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int lst_size, int *cnt, enum HPMUD_DEVICE_TYPE devtype);
 int __attribute__ ((visibility ("hidden"))) power_up(struct _mud_device *pd, int fd);
 
 #endif // _MUSB_H

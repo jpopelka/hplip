@@ -2,7 +2,7 @@
 
   hp.c - hp cups backend 
  
-  (c) 2004-2008 Copyright Hewlett-Packard Development Company, LP
+  (c) 2004-2008 Copyright HP Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy 
   of this software and associated documentation files (the "Software"), to deal 
@@ -495,7 +495,7 @@ static int device_discovery()
    int cnt=0, bytes_read, r=1;  
    enum HPMUD_RESULT stat;
 
-   stat = hpmud_probe_devices(HPMUD_BUS_ALL, buf, sizeof(buf), &cnt, &bytes_read);
+   stat = hpmud_probe_printers(HPMUD_BUS_ALL, buf, sizeof(buf), &cnt, &bytes_read);
 
    if (stat != HPMUD_R_OK)
       goto bugout;
@@ -717,7 +717,7 @@ int main(int argc, char *argv[])
       if ((arg[0] == '-') && (arg[1] == 'h'))
       {
          fprintf(stdout, "HP Linux Imaging and Printing System\nCUPS Backend %s\n", VERSION);
-         fprintf(stdout, "(c) 2003-2008 Copyright Hewlett-Packard Development Company, LP\n");
+         fprintf(stdout, "(c) 2003-2008 Copyright HP Development Company, LP\n");
          exit(0);
       }
    }

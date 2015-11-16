@@ -1,7 +1,7 @@
 /*****************************************************************************\
     hpcupsfax.h : HP Cups Fax Filter
 
-    Copyright (c) 2001 - 2002, Hewlett-Packard Co.
+    Copyright (c) 2001 - 2015, HP Co.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without

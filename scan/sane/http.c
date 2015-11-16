@@ -1,7 +1,7 @@
 /************************************************************************************\
   http.c - HTTP/1.1 feeder and consumer
 
-  (c) 2008 Copyright Hewlett-Packard Development Company, LP
+  (c) 2008 Copyright HP Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy 
   of this software and associated documentation files (the "Software"), to deal 
@@ -82,70 +82,31 @@ struct http_session
    struct stream_buffer s;
 };
 
-#if 0
-static char *strnstr(const char *haystack, const char *needle, size_t n)
-{
-   int i, len=strlen(needle);
 
-   for (i=0; *haystack && i<n; ++haystack, i++)
+/* Copy stream data to data buffer and then clear stream. */
+int __attribute__ ((visibility ("hidden"))) clear_stream(HTTP_HANDLE handle, void *data, int max_size, int *bytes_read)
+{
+
+   DBG("clear_stream entry...\n");
+   struct http_session *ps = (struct http_session *)handle;
+   int len=0, stat=1;
+
+   if (ps->s.cnt > 0 && ps->s.cnt <= max_size )
    {
-      if (strncmp(haystack, needle, len) == 0)
-      {
-         return ((char *)haystack);
-      }
+         len = ps->s.cnt;
+         DBG("Clearing (%d) bytes from the stream\n", len);
+         memcpy(data, &ps->s.buf[ps->s.index], len);
+         ps->s.index = ps->s.cnt = 0;       /* stream is empty reset */
+         stat = 0;
    }
-   return 0;
+
+   *bytes_read = len;
+
+   DBG("clear_stream returning with (stat = %d, bytes_read = %d)...\n", stat, *bytes_read);
+   return stat;
+
 }
-#endif
 
-#if 0
-static void sysdump(const void *data, int size)
-{
-    /* Dump size bytes of *data. Output looks like:
-     * [0000] 75 6E 6B 6E 6F 77 6E 20 30 FF 00 00 00 00 39 00 unknown 0.....9.
-     */
-
-    unsigned char *p = (unsigned char *)data;
-    unsigned char c;
-    int n;
-    char bytestr[4] = {0};
-    char addrstr[10] = {0};
-    char hexstr[16*3 + 5] = {0};
-    char charstr[16*1 + 5] = {0};
-    for(n=1;n<=size;n++) {
-        if (n%16 == 1) {
-            /* store address for this line */
-            snprintf(addrstr, sizeof(addrstr), "%.4d", (int)((p-(unsigned char *)data) & 0xffff));
-        }
-            
-        c = *p;
-        if (isprint(c) == 0) {
-            c = '.';
-        }
-
-        /* store hex str (for left side) */
-        snprintf(bytestr, sizeof(bytestr), "%02X ", *p);
-        strncat(hexstr, bytestr, sizeof(hexstr)-strlen(hexstr)-1);
-
-        /* store char str (for right side) */
-        snprintf(bytestr, sizeof(bytestr), "%c", c);
-        strncat(charstr, bytestr, sizeof(charstr)-strlen(charstr)-1);
-
-        if(n%16 == 0) { 
-            /* line completed */
-            DBG_SZ("[%4.4s]   %-50.50s  %s\n", addrstr, hexstr, charstr);
-            hexstr[0] = 0;
-            charstr[0] = 0;
-        }
-        p++; /* next byte */
-    }
-
-    if (strlen(hexstr) > 0) {
-        /* print rest of buffer if not empty */
-        DBG_SZ("[%4.4s]   %-50.50s  %s\n", addrstr, hexstr, charstr);
-    }
-}
-#endif
 
 /* Read data into stream buffer. Return specified "size" or less. Unused data is left in the stream. */
 static int read_stream(struct http_session *ps, char *data, int size, int sec_timeout, int *bytes_read)
@@ -154,8 +115,9 @@ static int read_stream(struct http_session *ps, char *data, int size, int sec_ti
    int tmo=sec_timeout;        /* initial timeout */
    int max=sizeof(ps->s.buf);
    enum HPMUD_RESULT ret;
+   int retry = 3;
 
-   DBG("read_stream() ps=%p data=%p size=%d timeout=%d s.index=%d s.cnt=%d\n", ps, data, size, sec_timeout, ps->s.index, ps->s.cnt);
+   //DBG("read_stream() ps=%p data=%p size=%d timeout=%d s.index=%d s.cnt=%d\n", ps, data, size, sec_timeout, ps->s.index, ps->s.cnt);
 
    *bytes_read = 0;
 
@@ -178,16 +140,17 @@ static int read_stream(struct http_session *ps, char *data, int size, int sec_ti
          ps->s.index = ps->s.cnt = 0;       /* stream is empty reset */
       }
       *bytes_read = len;
-      DBG("-read_stream() bytes_read=%d s.index=%d s.cnt=%d\n", len, ps->s.index, ps->s.cnt);
+      //DBG("-read_stream() bytes_read=%d s.index=%d s.cnt=%d\n", len, ps->s.index, ps->s.cnt);
       return 0;
    }
 
    /* Stream is empty read more data from device. */
    ret = hpmud_read_channel(ps->dd, ps->cd, &ps->s.buf[ps->s.index], max-(ps->s.index + ps->s.cnt), tmo, &len);
-   if (ret == HPMUD_R_IO_TIMEOUT)
+   while ( (ret == HPMUD_R_IO_TIMEOUT || ret == HPMUD_R_IO_ERROR) && retry--)
    {
-      BUG("timeout reading data sec_timeout=%d\n", tmo);
-      goto bugout;
+      usleep(100000); //Pause for 0.1 sec. Sometimes devices like scanjet 3500 take some time to prepare data.
+      ret = hpmud_read_channel(ps->dd, ps->cd, &ps->s.buf[ps->s.index], max-(ps->s.index + ps->s.cnt), tmo, &len);
+      DBG("hpmud_read_channel failed retrying (%d) more times)\n", retry);
    }
    if (ret != HPMUD_R_OK)
    {
@@ -221,9 +184,9 @@ static int read_stream(struct http_session *ps, char *data, int size, int sec_ti
 
    *bytes_read = len;
    stat = 0;
-   DBG("-read_stream() bytes_read=%d s.index=%d s.cnt=%d\n", len, ps->s.index, ps->s.cnt);
 
 bugout:
+   DBG("-read_stream() bytes_read=%d s.index=%d s.cnt=%d stat=%d\n", len, ps->s.index, ps->s.cnt, stat);
    return stat;
 }
 
@@ -315,10 +278,14 @@ bugout:
 enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_close(HTTP_HANDLE handle)
 {
    struct http_session *ps = (struct http_session *)handle;
-   DBG("http_close() handle=%p\n", handle);
-   if (ps->cd > 0)
-      hpmud_close_channel(ps->dd, ps->cd);
-   free(ps);
+
+   if(ps)
+   {
+       DBG("http_close() handle=%p\n", handle);
+       if (ps->cd > 0)
+          hpmud_close_channel(ps->dd, ps->cd);
+       free(ps);
+   }
    return HTTP_R_OK;
 }
 
@@ -335,8 +302,17 @@ enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_read_header(HTTP_H
    *bytes_read = 0;
 
    /* Read initial HTTP/1.1 header status line. */
-   if (read_line(ps, data, max_size, tmo, &len))
-      goto bugout;
+    while(1)
+    {
+       if (read_line(ps, data, max_size, tmo, &len))
+          goto bugout;
+        if( !strncmp(data, "HTTP/1.1", 8)) 
+            break;
+        else
+        {
+            DBG("HTTP Header not found. Searching header in next line (%d)\n", len); 
+        }           
+    }
    ps->http_status = strtol(data+9, NULL, 10);
    *bytes_read = total = len;
 
@@ -346,8 +322,11 @@ enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_read_header(HTTP_H
       BUG("invalid http_status=%d\n", ps->http_status);
 
       /* Dump any outstanding payload here. */
-      while (!read_stream(ps, data, max_size, 1, &len))
+      while (!read_stream(ps, data + total, max_size, 1, &len))
+      {
+         total = (total+len) % max_size;
          BUG("dumping len=%d\n", len);
+      }
       goto bugout;                
    }
 
@@ -444,6 +423,29 @@ bugout:
    return stat;
 };
 
+enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_read2(HTTP_HANDLE handle, void *data, int max_size, int tmo, int *bytes_read)
+{
+   struct http_session *ps = (struct http_session *)handle;
+   enum HTTP_RESULT stat = HTTP_R_IO_ERROR;
+   int len = 0, ret;
+   int retry = 5;
+
+   while(retry--)
+   {
+       DBG("http_read2 entry.\n" );
+       ret = hpmud_read_channel(ps->dd, ps->cd, (char *)data, max_size, tmo, bytes_read);
+       if(*bytes_read > 0)
+       {
+           DBG("http_read2 successful. (%d bytes read). \n", *bytes_read);
+           stat = HTTP_R_OK;
+           return 0;
+       }
+       DBG("http_read2 failed. Retrying (%d) more times before exiting.\n", retry);
+       usleep(100000);
+   }
+   DBG("http_read2 failed to read (bytes_read=%d)\n", *bytes_read);
+   return stat;
+}
 /* Reads data from HTTP/1.1 chunked data stream until EOF. Returns max_size or less. */
 enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_read(HTTP_HANDLE handle, void *data, int max_size, int sec_timeout, int *bytes_read)
 {
@@ -511,6 +513,7 @@ enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_read_size(HTTP_HAN
 {
   struct http_session *ps = (struct http_session *)handle;
   enum HTTP_RESULT stat = HTTP_R_IO_ERROR;
+  int ch;
 
   if(ps && ps->state == HTTP_R_EOF) return HTTP_R_EOF;
   if(max_size == -1) 
@@ -524,7 +527,14 @@ enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_read_size(HTTP_HAN
   *bytes_read=0;
   while(*bytes_read < max_size)
   {
-    *((char*)data + (*bytes_read)) = read_char(ps, sec_timeout);
+    ch = read_char(ps, sec_timeout);
+    if(ch == -1)
+    {   
+        DBG("http_read_size(): IO error after %d bytes.\n",*bytes_read);
+        return HTTP_R_IO_ERROR;
+    }
+
+    *((char*)data + (*bytes_read)) = ch;
     *bytes_read = *bytes_read+1;
   }
 

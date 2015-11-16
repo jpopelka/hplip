@@ -2,7 +2,7 @@
 
   hpiom.c - HP I/O message handler
  
-  (c) 2003-2004 Copyright Hewlett-Packard Development Company, LP
+  (c) 2003-2004 Copyright HP Development Company, LP
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -12,7 +12,7 @@
   2. Redistributions in binary form must reproduce the above copyright
      notice, this list of conditions and the following disclaimer in the
      documentation and/or other materials provided with the distribution.
-  3. Neither the name of Hewlett-Packard nor the names of its
+  3. Neither the name of HP nor the names of its
      contributors may be used to endorse or promote products derived
      from this software without specific prior written permission.
 

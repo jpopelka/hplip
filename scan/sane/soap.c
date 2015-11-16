@@ -2,7 +2,7 @@
 
   soap.c - HP SANE backend support for soap based multi-function peripherals
 
-  (c) 2006,2008 Copyright Hewlett-Packard Development Company, LP
+  (c) 2006,2008 Copyright HP Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy 
   of this software and associated documentation files (the "Software"), to deal 

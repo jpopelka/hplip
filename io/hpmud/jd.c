@@ -2,7 +2,7 @@
 
   jd.c - JetDirect support for multi-point transport driver 
  
-  (c) 2004-2007 Copyright Hewlett-Packard Development Company, LP
+  (c) 2004-2007 Copyright HP Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy 
   of this software and associated documentation files (the "Software"), to deal 
@@ -159,9 +159,16 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) jd_open(mud_device *pd
    char model[128];
    char *p, *tail;
    int len=0;
+   int printqueue = 0;
    enum HPMUD_RESULT stat = HPMUD_R_IO_ERROR;
 
    pthread_mutex_lock(&pd->mutex);
+
+   //Check whether the URI is generated dynamically by using bonjour discovery. If yes, then
+   //there is no need of validating the MDL string against Device ID MDL string. If URI belongs to
+   //an existing print queue then we need to validate the MDL, because the same IP address might get
+   //assigned to some other device after adding a print queue.
+   printqueue = ( strstr(pd->uri, "queue=false") )? 0:1;
 
    if (pd->id[0] == 0)
    {
@@ -180,22 +187,28 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) jd_open(mud_device *pd
          goto blackout;
       }
 
-      len = device_id(pd->ip, pd->port, pd->id, sizeof(pd->id));  /* get new copy and cache it  */ 
-      if (len == 0)
+      if(printqueue)
       {
-         stat = HPMUD_R_IO_ERROR;
-         goto blackout;
+          len = device_id(pd->ip, pd->port, pd->id, sizeof(pd->id));  /* get new copy and cache it  */
+          if (len == 0)
+          {
+             stat = HPMUD_R_IO_ERROR;
+             goto blackout;
+          }
       }
    }
 
-   /* Make sure uri model matches device id model. */
-   hpmud_get_uri_model(pd->uri, uri_model, sizeof(uri_model));
-   hpmud_get_model(pd->id, model, sizeof(model));
-   if (strcmp(uri_model, model) != 0)
+   if(printqueue)
    {
-      stat = HPMUD_R_INVALID_URI;  /* different device plugged in */  
-      BUG("invalid uri model %s != %s\n", uri_model, model);
-      goto blackout;
+       /* Make sure uri model matches device id model. */
+       hpmud_get_uri_model(pd->uri, uri_model, sizeof(uri_model));
+       hpmud_get_model(pd->id, model, sizeof(model));
+       if (strcmp(uri_model, model) != 0)
+       {
+          stat = HPMUD_R_INVALID_URI;  /* different device plugged in */
+          BUG("invalid uri model %s != %s\n", uri_model, model);
+          goto blackout;
+       }
    }
 
    stat = HPMUD_R_OK;
@@ -488,6 +501,7 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) jd_s_channel_open(mud_
          break;
       case HPMUD_LEDM_SCAN_CHANNEL:
       case HPMUD_EWS_LEDM_CHANNEL:
+      case HPMUD_ESCL_SCAN_CHANNEL:
          port = 8080;  
          pin.sin_port = htons(port);
          if ((pc->socket = socket(AF_INET, SOCK_STREAM, 0)) == -1)
@@ -552,7 +566,7 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) jd_s_channel_close(mud
       close(pc->socket);
 
       /* Delay for back-to-back scanning using scanimage. Otherwise next channel_open(HPMUD_SCAN_CHANNEL) can fail. */
-      sleep(1);
+      usleep(100000);
    }
 
    pc->socket = -1;  
@@ -678,185 +692,6 @@ bugout:
    return stat;
 }
 
-/* Convert "www.google.com" to "3www6google3com". */
-static int convert_name_to_dns(const char *name, int name_size, unsigned char *dns_name)
-{
-   int i, x=0;
-   unsigned char *p=dns_name;
-
-   if (name == 0 || name[0] == 0)
-        return 0;
-
-   for (i=0; i<name_size && name[i]; i++)
-   {
-      if (name[i]=='.')
-      {
-         *p++ = i-x;     /* length */
-         for (; x<i; x++)
-            *p++ = name[x]; 
-         x++;
-      }
-   }
-
-   if (i)
-   {
-      *p++ = i-x;     /* length */
-      for (; x<i; x++)
-         *p++ = name[x]; 
-      x++;
-   }
-
-   p[x++]=0;
-
-   return x;   /* return length DOES include null termination */
-}
-
-/* 
- * Lookup IP for MDNS host name.  
- * MDNS host name example: "npi7c8a3e" (LaserJet p2055dn)
- */
-enum HPMUD_RESULT hpmud_mdns_lookup(const char *host_name, int sec_timeout, char *ip)
-{
-   struct sockaddr_in send_addr;
-   struct sockaddr_in recv_addr;
-   struct sockaddr_in addr;
-   socklen_t addrlen;
-   struct timeval tmo;
-   fd_set master;
-   fd_set readfd;
-   int i, len, n, host_len, yes=1;
-   int maxfd, ret;
-   int udp_socket;
-   char recvbuffer[256], host[256];
-   unsigned char dnsquery[256]={0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
-   unsigned char tail[] = {0x0, 0x1, 0x0, 0x1};
-   unsigned char loop=0, ttl=255;
-   enum HPMUD_RESULT stat = HPMUD_R_IO_ERROR;
-
-   DBG("mdns lookup '%s'\n", host_name);
-
-   if(host_name == 0 || host_name[0] == 0)
-        return HPMUD_R_INVALID_MDNS;
-
-   if ((udp_socket = socket(AF_INET, SOCK_DGRAM, 0)) == -1)
-   {
-      BUG("unable to create udp socket: %m\n");
-      goto bugout;
-   }
-
-   /* Get rid of "address already in use" error message. */
-   if (setsockopt(udp_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1)
-   {
-      BUG("unable to setsockopt: %m\n");
-      goto bugout;
-   }
-
-   /* Bind the socket to port and IP equal to INADDR_ANY. */
-   bzero(&recv_addr, sizeof(recv_addr));
-   recv_addr.sin_family = AF_INET;
-   recv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-   recv_addr.sin_port = htons(5353);
-   if (bind(udp_socket, (struct sockaddr *)&recv_addr, sizeof(recv_addr)) == -1)
-   {
-      BUG("unable to bind udp socket: %m\n");
-      goto bugout;
-   }
-
-   /* Set multicast loopback off. */
-   if (setsockopt(udp_socket, IPPROTO_IP, IP_MULTICAST_LOOP, &loop, sizeof(loop)) == -1)
-   {
-      BUG("unable to setsockopt: %m\n");
-      goto bugout;
-   }
-
-   /* Set ttl to 255. Required by mdns. */
-   if (setsockopt(udp_socket, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl)) == -1)
-   {
-      BUG("unable to setsockopt: %m\n");
-      goto bugout;
-   }
-
-   /* Convert host name to mdns host name. */
-   host_len = snprintf(host, sizeof(host), "%s.local", host_name) + 1;
-
-   /* Create dns message. (header + question) */
-   n = convert_name_to_dns(host, host_len, dnsquery+12);
-   memcpy(dnsquery+12+n, tail, sizeof(tail));
-   n = 12+n+sizeof(tail);
-
-   i=0;
-   while (1)
-   {
-
-      DBG("send socket=%d len=%d\n", udp_socket, n);
-      DBG_DUMP(dnsquery, n);
-
-      bzero(&send_addr, sizeof(send_addr));
-      send_addr.sin_family = AF_INET;
-      send_addr.sin_addr.s_addr = inet_addr("224.0.0.251");
-      send_addr.sin_port = htons(5353);
-      sendto(udp_socket, dnsquery, n, 0, (struct sockaddr *)&send_addr, sizeof(send_addr));
-
-      FD_ZERO(&master);
-      FD_SET(udp_socket, &master);
-      maxfd = udp_socket;
-      tmo.tv_sec = 0;
-      tmo.tv_usec = 500000;
-
-      readfd = master;
-      ret = select(maxfd+1, &readfd, NULL, NULL, &tmo);
-      BUG("In while after select ret=%d maxfd=%d tmo=%d\n", ret, maxfd, tmo);
-
-      if (ret < 0)
-      {
-         BUG("error mdns lookup %s: %m\n", host);
-         goto bugout;
-      }
-      if (ret == 0)
-      {
-         goto retry;
-      }
-      else
-      {
-         bzero(&addr, sizeof(addr));
-         addrlen = sizeof(addr);
-         if ((len = recvfrom(udp_socket, recvbuffer, sizeof(recvbuffer), 0, (struct sockaddr *)&addr, &addrlen)) < 0)
-         {
-            BUG("error mdns lookup %s: %m\n", host);
-            goto bugout;
-         }
-
-         /* Make sure reply is from specified host. */
-         if (strncasecmp((const char *)dnsquery+12, (const char *)recvbuffer+12, n)==0)
-            break;
-         BUG("error mdns lookup %s: bad hostname in reply from ip=%s port=%d\n", host, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
-      }
-
-retry:
-      if (i++ >= 2 * sec_timeout)
-      {
-         BUG("error timeout mdns lookup %s\n", host);
-         goto bugout;
-      }
-
-      BUG("mdns lookup %s retry %d...\n", host, i);
-   }
-
-   strcpy(ip, inet_ntoa(addr.sin_addr));
-
-   DBG("recv socket=%d len=%d port=%d ip=%s\n", udp_socket, len, ntohs(addr.sin_port), ip);
-   DBG_DUMP(recvbuffer, len);
-
-   stat = HPMUD_R_OK;
-
-bugout:
-
-   if (udp_socket >= 0)
-      close(udp_socket);
-
-   return stat;
-}
-
 enum HPMUD_RESULT hpmud_make_net_uri(const char *ip, int port, char *uri, int uri_size, int *bytes_read)
 {
    char id[1024];
@@ -917,7 +752,7 @@ enum HPMUD_RESULT hpmud_make_mdns_uri(const char *host, int port, char *uri, int
       goto bugout;
    }
 
-   if (hpmud_mdns_lookup(host, HPMUD_MDNS_TIMEOUT, ip) != HPMUD_R_OK)
+   if (mdns_lookup(host, ip) != MDNS_STATUS_OK)
    {
       BUG("invalid host %s, check firewall UDP/5353 or try using IP\n", host);
       stat = HPMUD_R_INVALID_MDNS;
@@ -928,9 +763,9 @@ enum HPMUD_RESULT hpmud_make_mdns_uri(const char *host, int port, char *uri, int
    {
       hpmud_get_model(id, model, sizeof(model));
       if (port == 1)
-         *bytes_read = snprintf(uri, uri_size, "hp:/net/%s?zc=%s", model, host); 
+         *bytes_read = snprintf(uri, uri_size, "hp:/net/%s?zc=%s", model, host);
       else
-         *bytes_read = snprintf(uri, uri_size, "hp:/net/%s?zc=%s&port=%d", model, host, port); 
+         *bytes_read = snprintf(uri, uri_size, "hp:/net/%s?zc=%s&port=%d", model, host, port);
    }
    else
    {
@@ -944,6 +779,7 @@ enum HPMUD_RESULT hpmud_make_mdns_uri(const char *host, int port, char *uri, int
 bugout:
    return stat;
 }
+
 #endif  /* HAVE_LIBNETSNMP */
 
 

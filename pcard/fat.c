@@ -2,7 +2,7 @@
 
   fat.c - FAT12/FAT16 file system
 
-  (c) 2004 Copyright Hewlett-Packard Development Company, LP
+  (c) 2004 Copyright HP Development Company, LP
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by

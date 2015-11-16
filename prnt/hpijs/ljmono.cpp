@@ -1,7 +1,7 @@
 /*****************************************************************************\
   ljmono.cpp : Implimentation for the LJMono class
 
-  Copyright (c) 1996 - 2001, Hewlett-Packard Co.
+  Copyright (c) 1996 - 2015, HP Co.
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -12,7 +12,7 @@
   2. Redistributions in binary form must reproduce the above copyright
      notice, this list of conditions and the following disclaimer in the
      documentation and/or other materials provided with the distribution.
-  3. Neither the name of Hewlett-Packard nor the names of its
+  3. Neither the name of HP nor the names of its
      contributors may be used to endorse or promote products derived
      from this software without specific prior written permission.
 

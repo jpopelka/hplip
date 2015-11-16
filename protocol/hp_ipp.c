@@ -1,7 +1,7 @@
 
 /******************************************************************************\
 
-Copyright 2015 Hewlett-Packard Development Company, L.P.
+Copyright 2015 HP Development Company, L.P.
 
 This program is free software; you can redistribute it and/or modify it under 
 the terms of version 2 of the GNU General Public License as published by the 
@@ -670,7 +670,7 @@ HPIPP_RESULT parseResponseHeader(char *header, int *content_length, int *chunked
         *chunked = 1;
         *content_length = 0;
     }
-    else if (ptr = strcasestr(header, "Content-Length:"))
+    else if (ptr = strstr(header,"Content-Length:"))
     {
         *content_length = strtol(ptr + strlen("Content-Length:"), NULL, BASE_DECIMAL);
         *chunked = 0;
@@ -845,8 +845,11 @@ enum HPMUD_RESULT sendUSBRequest(char *buf, int size, raw_ipp *responseptr, char
     /* Open ipp channel. */
     if  ((stat = hpmud_open_channel(hd, HPMUD_S_IPP_CHANNEL, &cd)) != HPMUD_R_OK)
     {
-        BUG("Channel open failed with status code = %d\n", stat);
-        goto abort;
+        if ((stat = hpmud_open_channel(hd, HPMUD_S_IPP_CHANNEL2, &cd)) != HPMUD_R_OK)
+        {
+            BUG("Channel open failed with status code = %d\n", stat);
+            goto abort;
+        }
     }
 
     //Write request on the channel 

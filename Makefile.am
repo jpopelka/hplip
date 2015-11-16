@@ -1,14 +1,14 @@
 #
 #  Makefile.am - hplip automake input file
 #
-#  (c) 2004-2015 Copyright Hewlett-Packard Development Company, LP
+#  (c) 2004-2015 Copyright HP Development Company, LP
 #  Author: David Suffield, Naga Samrat Chowdary Narla, Sarbeswar Meher
 INCLUDES = -Iip -Iio/hpmud -Iscan/sane -Iprnt/hpijs -Icommon/
 CFLAGS+= -DCONFDIR=\"$(hplip_confdir)\"
 CXXFLAGS+= -DCONFDIR=\"$(hplip_confdir)\"
 
 hplipdir = $(datadir)/hplip
-
+apparmordir = /etc/apparmor.d
 docdir = $(hpdocdir)
 htmldir = $(hphtmldir)
 doc_DATA = COPYING copyright prnt/hpijs/README_LIBJPG
@@ -52,47 +52,56 @@ libsane_hpaio_la_SOURCES = scan/sane/hpaio.c scan/sane/mfpdtf.c scan/sane/pml.c 
 	  scan/sane/common.c scan/sane/common.h scan/sane/soap.h scan/sane/soapht.h scan/sane/sanei_debug.h scan/sane/sanei.h \
 	  scan/sane/sanei_init_debug.c scan/sane/marvell.h scan/sane/marvelli.h scan/sane/marvell.c scan/sane/soapht.c scan/sane/soap.c \
         scan/sane/soaphti.h scan/sane/soapi.h scan/sane/xml.c scan/sane/xml.h scan/sane/ledm.h scan/sane/ledmi.h scan/sane/ledm.c \
-        scan/sane/bb_ledm.c scan/sane/http.h scan/sane/http.c scan/sane/sclpml.c scan/sane/sclpml.h common/utils.c common/utils.h
+        scan/sane/bb_ledm.c scan/sane/http.h scan/sane/http.c scan/sane/sclpml.c scan/sane/sclpml.h common/utils.c common/utils.h \
+	scan/sane/escl.h scan/sane/escli.h scan/sane/escl.c
 if DARWIN_BUILD
 libsane_hpaio_la_LDFLAGS = -module -framework CoreFoundation -version-info 1:0:0
 else
 libsane_hpaio_la_LDFLAGS = -version-info 1:0:0
 endif
 # The following is a interlibrary dependency that must be compiled first.
-libsane_hpaio_la_LIBADD = libhpip.la libhpmud.la libhpipp.la $(DBUS_LIBS) -lcups -ldl
+libsane_hpaio_la_LIBADD = libhpip.la libhpdiscovery.la libhpmud.la libhpipp.la $(DBUS_LIBS) -lcups -ldl
 #libsane_hpaio_la_CFLAGS = -DWITH_NONAMESPACES -DSOAP_DEBUG
-libsane_hpaio_la_CFLAGS = $(DBUS_CFLAGS) -Iprotocol
+libsane_hpaio_la_CFLAGS = $(DBUS_CFLAGS) -Iprotocol -Iprotocol/discovery
 endif # SCAN_BUILD
+
+
+# HP Service Discovery library
+if NETWORK_BUILD
+lib_LTLIBRARIES += libhpdiscovery.la
+libhpdiscovery_la_SOURCES = protocol/discovery/mdns.c protocol/discovery/mdns.h
+libhpdiscovery_la_CFLAGS  = -DCONFDIR=\"$(hplip_confdir)\"
+libhpdiscovery_la_LDFLAGS = -version-info 0:1:0
+libhpdiscovery_la_LIBADD  = -l$(SNMPLIB) -lcrypto
+
+
+endif
 
 # hpmud library
 MUDNAME=hpmud
 lib_LTLIBRARIES += libhpmud.la
+libhpmud_la_CFLAGS  = -DMUDNAME=\"$(MUDNAME)\" -DCONFDIR=\"$(hplip_confdir)\" -Iprotocol -Iprotocol/discovery 
+libhpmud_la_LDFLAGS = -version-info 0:6:0 -lpthread -ldl 
+libhpmud_la_SOURCES = io/hpmud/hpmud.c io/hpmud/mlc.c io/hpmud/model.c io/hpmud/pml.c \
+	  io/hpmud/hpmud.h io/hpmud/hpmudi.h io/hpmud/list.h io/hpmud/mlc.h io/hpmud/pml.h io/hpmud/dot4.c \
+	  io/hpmud/dot4.h io/hpmud/jd.c io/hpmud/jd.h io/hpmud/pp.c io/hpmud/pp.h io/hpmud/musb.h \
+	  common/utils.c common/utils.h
 
 if LIBUSB01_BUILD
-libhpmud_la_CFLAGS = -DMUDNAME=\"$(MUDNAME)\" -DCONFDIR=\"$(hplip_confdir)\"
-libhpmud_la_SOURCES = io/hpmud/hpmud.c io/hpmud/mlc.c io/hpmud/model.c io/hpmud/pml.c \
-	  io/hpmud/hpmud.h io/hpmud/hpmudi.h io/hpmud/list.h io/hpmud/mlc.h io/hpmud/pml.h io/hpmud/dot4.c \
-	  io/hpmud/dot4.h io/hpmud/jd.c io/hpmud/jd.h io/hpmud/pp.c io/hpmud/pp.h io/hpmud/musb.h io/hpmud/musb_libusb01.c \
-	  common/utils.c common/utils.h
+libhpmud_la_SOURCES += io/hpmud/musb_libusb01.c 
+libhpmud_la_LDFLAGS += -lusb
 else
-libhpmud_la_CFLAGS = -I/usr/include/libusb-1.0 -DMUDNAME=\"$(MUDNAME)\" -DCONFDIR=\"$(hplip_confdir)\"
-libhpmud_la_SOURCES = io/hpmud/hpmud.c io/hpmud/mlc.c io/hpmud/model.c io/hpmud/pml.c \
-	  io/hpmud/hpmud.h io/hpmud/hpmudi.h io/hpmud/list.h io/hpmud/mlc.h io/hpmud/pml.h io/hpmud/dot4.c \
-	  io/hpmud/dot4.h io/hpmud/jd.c io/hpmud/jd.h io/hpmud/pp.c io/hpmud/pp.h io/hpmud/musb.h io/hpmud/musb.c \
-	  common/utils.c common/utils.h
+libhpmud_la_SOURCES += io/hpmud/musb.c 
+libhpmud_la_CFLAGS  += -I/usr/include/libusb-1.0
+libhpmud_la_LDFLAGS += -lusb-1.0
 endif
-
-libhpmud_la_LDFLAGS = -version-info 0:6:0 -lpthread -ldl
 
 if NETWORK_BUILD
 libhpmud_la_LDFLAGS += -l$(SNMPLIB) -lcrypto
+libhpmud_la_LIBADD  =  libhpdiscovery.la
 endif
 
-if LIBUSB01_BUILD
-libhpmud_la_LDFLAGS += -lusb
-else
-libhpmud_la_LDFLAGS += -lusb-1.0
-endif
+
 
 # ip library
 lib_LTLIBRARIES += libhpip.la
@@ -188,6 +197,22 @@ if HPCUPS_INSTALL
 dist_hpcupsfaxppd_DATA = fax/ppd/HP-Fax-hpcups.ppd.gz fax/ppd/HP-Fax2-hpcups.ppd.gz fax/ppd/HP-Fax3-hpcups.ppd.gz fax/ppd/HP-Fax4-hpcups.ppd.gz
 endif # HPCUPS_INSTALL
 endif # FAX_BUILD
+
+# AppArmor Changes
+if APPARMOR_BUILD
+apparmor_profiledir = /etc/apparmor.d
+apparmor_profile_DATA = apparmor/usr.share.hplip
+dist_apparmor_profile_DATA = apparmor/usr.share.hplip
+
+apparmor_abstractiondir = /etc/apparmor.d/abstractions
+apparmor_abstraction_DATA = apparmor/abstractions/hplip
+dist_apparmor_abstraction_DATA = apparmor/abstractions/hplip
+
+endif #APPARMOR_BUILD
+
+selinuxdir = 
+dist_selinux_DATA = selinux/hplip.te selinux/hplip.fc selinux/hplip.pp selinux/hplip.if
+
 
 # ptest
 noinst_PROGRAMS += ptest
@@ -285,12 +310,11 @@ hpmudextdir = $(pyexecdir)
 hpmudext_LTLIBRARIES = hpmudext.la
 hpmudext_la_LDFLAGS = -module -avoid-version
 hpmudext_la_SOURCES = io/mudext/hpmudext.c
-hpmudext_la_LIBADD = libhpmud.la
+hpmudext_la_LIBADD = libhpmud.la libhpdiscovery.la
+hpmudext_la_CFLAGS = -I$(PYTHONINCLUDEDIR) -Iprotocol/discovery
 
-if LIBUSB01_BUILD
-hpmudext_la_CFLAGS = -I$(PYTHONINCLUDEDIR)
-else
-hpmudext_la_CFLAGS =-I/usr/include/libusb-1.0 -I$(PYTHONINCLUDEDIR)
+if !LIBUSB01_BUILD
+hpmudext_la_CFLAGS +=-I/usr/include/libusb-1.0 
 endif
 
 # ui (qt3)
@@ -565,9 +589,19 @@ if FULL_BUILD
 	   mv $(DESTDIR)$(hpfaxdir)/hpfax.py $(DESTDIR)$(hpfaxdir)/hpfax; \
 	   chmod 700 $(DESTDIR)$(hpfaxdir)/hpfax; \
 	fi
-#
+
+	if [ "$(apparmor_build)" = "yes" ];then \
+	  chmod 644 $(DESTDIR)$(apparmor_profiledir)/usr.share.hplip;\
+	  chmod 644 $(DESTDIR)$(apparmor_profiledir)/abstractions/hplip;\
+	fi
+
 #       Make backend run as root.
-#	chmod 700 $(DESTDIR)$(hpdir)/hp
+	chmod 700 $(DESTDIR)$(hpdir)/hp
+
+#AppArmor
+
+
+
 endif # FULL_BUILD
 endif # HPLIP_BUILD
 
@@ -581,6 +615,9 @@ if HPLIP_BUILD
 #
 #	   Remove fax support.
 	rm -f $(DESTDIR)$(hpfaxdir)/hpfax
+# 	Remove apparmor profiles
+	rm -f $(DESTDIR)$(apparmor_profiledir)/usr.share.hplip
+	rm -f $(DESTDIR)$(apparmor_profiledir)/abstractions/hplip
 endif
 
 rpm:

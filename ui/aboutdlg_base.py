@@ -107,7 +107,7 @@ class AboutDlg_base(QDialog):
         self.textLabel4_2.setText(self.__tr("<b>Device Manager Software Version:</b>"))
         self.ToolboxVersionText.setText(self.__tr("0.0.0"))
         self.textLabel2.setText(self.__tr("<b>Authors and Contributors:</b>\nDavid Suffield, Don Welch, Shiyun Yie, Raghothama Cauligi, John Oleinik, Cory Meisch, Foster Nuffer, Pete Parks, Jacqueline Pitter, David Paschal,\nSteve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wiesner, Henrique M. Holschuh, Till Kamppeter, Linus Araque, Mark Crawford, Charlie Moore, Naga Samrat Choudary, Suma Byrappa, Parul Singh, Srikant Lokare, Sanjay Kumar, Sarbeswar Meher, Goutam Kodu, Gaurav Sood, Raghavendra Chitpadi, Amarnath Chitumalla"))
-        self.textLabel3.setText(self.__tr("<b>License and Copyright:</b>\n(c) Copyright 2007 Hewlett-Packard Development Company, L.P. This software is licensed under the GNU General Public License (GPL), BSD, and MIT licenses. See the software sources for details."))
+        self.textLabel3.setText(self.__tr("<b>License and Copyright:</b>\n(c) Copyright 2015 HP Development Company, L.P. This software is licensed under the GNU General Public License (GPL), BSD, and MIT licenses. See the software sources for details."))
 
 
     def __tr(self,s,c = None):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2014 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2015 HP Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -360,6 +360,23 @@ def start(language, auto=True, test_depends=False,
                 if not tui.continue_prompt("Please read the installation notes."):
                     sys.exit(0)
 
+        sec_package_name, is_sec_installed = core.security_package_status()
+
+        if sec_package_name:
+            tui.title("SECURITY PACKAGES")
+            log.info("%s is installed. " % sec_package_name)
+            log.info("%s protects the application from external intrusion attempts making the application secure" % sec_package_name )
+            ok, answer = tui.enter_yes_no("\nWould you like to have this installer install the hplip specific policy/profile", default_value='')
+            if not ok:
+                sys.exit(0)
+            elif answer:
+                if sec_package_name == "SELinux":
+                    core.selinux_install()
+                core.security_package = sec_package_name
+            else:
+                pass
+
+
         #
         # PRE-INSTALL COMMANDS
         #
@@ -546,6 +563,20 @@ def start(language, auto=True, test_depends=False,
                         log.debug("Continuing installation without network")
                 else:
                     log.info("Network connection present.")
+
+            # sec_package_name, is_sec_installed = core.security_package_status()
+
+            # if sec_package_name:
+            #     tui.title("SECURITY PACKAGES")
+            #     log.info("%s is installed. " % sec_package_name)
+            #     log.info("%s protects the application from external intrusion attempts making the application secure" % sec_package_name )
+            #     ok, answer = tui.enter_yes_no("\nWould you like to have this installer install the hplip specific policy/profile")
+            #     if not ok:
+            #         sys.exit(0)
+            #     elif answer:
+            #         core.security_package = sec_package_name
+            #     else:
+            #         pass
 
             #
             # PRE-DEPEND

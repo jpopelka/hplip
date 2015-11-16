@@ -40,9 +40,9 @@ Steve DeRoos, Mark Overton, Aaron Albright, Smith Kennedy, John Hosszu, Chris Wi
     </message>
     <message>
         <source>&lt;b&gt;License and Copyright:&lt;/b&gt;
-(c) Copyright 2006 Hewlett-Packard Development Company, L.P. This software is licensed under the GNU General Public License (GPL), BSD, and MIT licenses. See the software sources for details.</source>
+(c) Copyright 2015 HP Development Company, L.P. This software is licensed under the GNU General Public License (GPL), BSD, and MIT licenses. See the software sources for details.</source>
         <translation>&lt;b&gt;Licence et copyright :&lt;/b&gt;
-(c) Copyright 2006 Hewlett-Packard Development Company, L.P. Ce logiciel bénéficie des licences GPL GNU, BSD et MIT. Pour plus d&apos;informations, consultez les sources du logiciel.</translation>
+(c) Copyright 2015 HP Development Company, L.P. Ce logiciel bénéficie des licences GPL GNU, BSD et MIT. Pour plus d&apos;informations, consultez les sources du logiciel.</translation>
     </message>
 </context>
 <context>

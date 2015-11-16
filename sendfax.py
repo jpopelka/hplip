@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2015 HP Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -311,19 +311,19 @@ else: # NON_INTERACTIVE_MODE
 
         allowable_mime_types = cups.getAllowableMIMETypes()
 
-        stat = ''
-        try :
-            p = subprocess.Popen('getenforce', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            stat, err = p.communicate()
-            stat = to_string_utf8(stat)
-        except OSError :
-            pass
-        except :
-            log.exception()
-            sys.exit(1)
-        if stat.strip('\n') == 'Enforcing' :
-            log.error('Unable to add file. Please disable SeLinux.\nEither disable it manually or run hp-doctor from terminal.')
-            sys.exit(0)
+        # stat = ''
+        # try :
+        #     p = subprocess.Popen('getenforce', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        #     stat, err = p.communicate()
+        #     stat = to_string_utf8(stat)
+        # except OSError :
+        #     pass
+        # except :
+        #     log.exception()
+        #     sys.exit(1)
+        # if stat.strip('\n') == 'Enforcing' :
+        #     log.error('Unable to add file. Please disable SeLinux.\nEither disable it manually or run hp-doctor from terminal.')
+        #     sys.exit(0)
 
         for f in mod.args:
             path = os.path.realpath(f)

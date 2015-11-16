@@ -1,7 +1,7 @@
 /*******************************************************************
 scanext - Python extension class for SANE
 
-Portions (c) Copyright 2007 Hewlett-Packard Development Company, L.P.
+Portions (c) Copyright 2015 HP Development Company, L.P.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

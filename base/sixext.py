@@ -170,7 +170,6 @@ else:
 
     import cStringIO
     StringIO = BytesIO = cStringIO.StringIO
-    import gobject
     import commands as subprocess
 
 

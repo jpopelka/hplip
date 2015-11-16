@@ -1,7 +1,7 @@
 /*****************************************************************************\
  hpmudext - Python extension for HP multi-point transport driver (HPMUD)
 
- (c) Copyright 2010 Hewlett-Packard Development Company, L.P.
+ (c) Copyright 2015 HP Development Company, L.P.
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -313,8 +313,8 @@ static PyObject *make_zc_uri(PyObject *self, PyObject *args)
     char *hn;
     int port;
     char uri[HPMUD_BUFFER_SIZE];
-    enum HPMUD_RESULT result = HPMUD_R_OK;
     int bytes_read = 0;
+    enum HPMUD_RESULT result = HPMUD_R_OK;
 
     if (!PyArg_ParseTuple(args, "si", &hn, &port))
             return NULL;
@@ -336,14 +336,17 @@ static PyObject *make_zc_uri(PyObject *self, PyObject *args)
 static PyObject *get_zc_ip_address(PyObject *self, PyObject *args)
 {
     char *hn;
-    char ip[HPMUD_BUFFER_SIZE];
+    char ip[HPMUD_BUFFER_SIZE] = {0,};
     enum HPMUD_RESULT result = HPMUD_R_OK;
 
     if (!PyArg_ParseTuple(args, "s", &hn))
             return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-    result = hpmud_mdns_lookup(hn, HPMUD_MDNS_TIMEOUT, ip);
+
+    if(mdns_lookup(hn, ip) != MDNS_STATUS_OK)
+        result =  HPMUD_R_INVALID_MDNS;
+
     Py_END_ALLOW_THREADS
 
     return Py_BuildValue("(is)", result, ip);

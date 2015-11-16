@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2001-2009 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2001-2015 HP Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1793,7 +1793,7 @@ encoding: utf8
                 log.info(text1)
 
         log.info(".SH AUTHOR")
-        log.info("HPLIP (Hewlett-Packard Linux Imaging and Printing) is an")
+        log.info("HPLIP (HP Linux Imaging and Printing) is an")
         log.info("HP developed solution for printing, scanning, and faxing with")
         log.info("HP inkjet and laser based printers in Linux.")
 
@@ -1805,7 +1805,7 @@ encoding: utf8
         log.info("contact the HPLIP Team.")
 
         log.info(".SH COPYRIGHT")
-        log.info("Copyright (c) 2001-15 Hewlett-Packard Development Company, L.P.")
+        log.info("Copyright (c) 2001-15 HP Development Company, L.P.")
         log.info(".LP")
         log.info("This software comes with ABSOLUTELY NO WARRANTY.")
         log.info("This is free software, and you are welcome to distribute it")
@@ -1824,7 +1824,7 @@ def log_title(program_name, version, show_ver=True): # TODO: Move to base/module
 
     log.info(log.bold("%s ver. %s" % (program_name, version)))
     log.info("")
-    log.info("Copyright (c) 2001-15 Hewlett-Packard Development Company, LP")
+    log.info("Copyright (c) 2001-15 HP Development Company, LP")
     log.info("This software comes with ABSOLUTELY NO WARRANTY.")
     log.info("This is free software, and you are welcome to distribute it")
     log.info("under certain conditions. See COPYING file for more details.")
@@ -2355,3 +2355,28 @@ def find_pip():
         return 'pip-python'
     else:
         log.error("python pip command not found. Please install '%s' package(s) manually"%depends_to_install_using_pip)
+
+
+def check_lan():
+    try:
+        x = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        x.connect(('1.2.3.4', 56))
+        x.close()
+        return True
+    except socket.error:
+        return False
+ 
+def extract_xml_chunk(data):
+    if data.find('\r\n\r\n'):
+        index = data.find('\r\n\r\n')
+        data = data[index+4:]
+    if data[0:1] != '<':            # Check for source encoding chunked or content length in http respose header.
+        size = -1
+        temp = ""
+        while size:
+            index = data.find('\r\n')
+            size = int(data[0:index+1], 16)
+            temp = temp + data[index+2:index+2+size]
+            data = data[index+2+size+2:len(data)]
+        data = temp
+    return data

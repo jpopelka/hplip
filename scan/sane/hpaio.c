@@ -2,7 +2,7 @@
 
   hpaio.c - HP SANE backend for multi-function peripherals (libsane-hpaio)
 
-  (c) 2001-2008 Copyright Hewlett-Packard Development Company, LP
+  (c) 2001-2008 Copyright HP Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -38,13 +38,13 @@
 #include "hpmud.h"
 #include "hpip.h"
 #include "hp_ipp.h"
-
 #include "soap.h"
 #include "soapht.h"
 #include "marvell.h"
 #include "hpaio.h"
-# include "ledm.h"
+#include "ledm.h"
 #include "sclpml.h"
+#include "escl.h"
 
 #define DEBUG_DECLARE_ONLY
 #include "sanei_debug.h"
@@ -53,7 +53,7 @@ static SANE_Device **DeviceList = NULL;
 
 static int AddDeviceList(char *uri, char *model, SANE_Device ***pd)
 {
-   int i;
+   int i = 0, uri_length = 0;
 
    if (*pd == NULL)
    {
@@ -62,21 +62,31 @@ static int AddDeviceList(char *uri, char *model, SANE_Device ***pd)
       memset(*pd, 0, sizeof(SANE_Device *) * MAX_DEVICE);
    }
 
+   uri += 3; /* Skip "hp:" */
+   uri_length = strlen(uri);
+   if(strstr(uri, "&queue=false"))
+       uri_length -= 12; // Last 12 bytes of URI i.e "&queue=false"
+
    /* Find empty slot in array of pointers. */
-   for (i=0; i<MAX_DEVICE; i++)
+   for (i=0; i < MAX_DEVICE; i++)
    {
       if ((*pd)[i] == NULL)
       {
          /* Allocate Sane_Device and members. */
          (*pd)[i] = malloc(sizeof(SANE_Device));
-         (*pd)[i]->name = malloc(strlen(uri));
-         strcpy((char *)(*pd)[i]->name, uri+3);       /* remove "hp:" */
+         (*pd)[i]->name = malloc(strlen(uri)+1);
+         strcpy((char *)(*pd)[i]->name, uri);
          (*pd)[i]->model = strdup(model);
          (*pd)[i]->vendor = "Hewlett-Packard";
          (*pd)[i]->type = "all-in-one";
          break;
       }
+
+      //Check for Duplicate URI. If URI is added already then don't add it again.
+      if( strncasecmp((*pd)[i]->name, uri, uri_length) == 0 )
+          break;
    }
+
    return 0;
 }
 
@@ -225,63 +235,71 @@ static int GetCupsPrinters(char ***printer)
    return cnt;
 }
 
+static int AddDevice(char *uri)
+{
+    struct hpmud_model_attributes ma;
+    char model[HPMUD_LINE_SIZE];
+    int scan_type;
+    int device_added = 0;
+
+    hpmud_query_model(uri, &ma);
+    if (ma.scantype > 0)
+    {
+       hpmud_get_uri_model(uri, model, sizeof(model));
+       AddDeviceList(uri, model, &DeviceList);
+       device_added = 1;
+    }
+    else
+    {
+       DBG(6,"unsupported scantype=%d %s\n", ma.scantype, uri);
+    }
+
+    return device_added;
+}
+
 static int DevDiscovery(int localOnly)
 {
-   struct hpmud_model_attributes ma;
-   char message[HPMUD_LINE_SIZE*64];
-   char uri[HPMUD_LINE_SIZE];
-   char model[HPMUD_LINE_SIZE];
-   char *tail;
-   int i, scan_type, cnt=0, total=0, bytes_read;
-   char **cups_printer=NULL;     /* list of printers */
-   enum HPMUD_RESULT stat;
+    char message[HPMUD_LINE_SIZE*64];
+    char uri[HPMUD_LINE_SIZE];
+    char *tail = message;
+    int i, scan_type, cnt=0, total=0, bytes_read;
+    char **cups_printer=NULL;     /* list of printers */
+    char* token = NULL;
+    enum HPMUD_RESULT stat;
 
-   stat = hpmud_probe_devices(HPMUD_BUS_ALL, message, sizeof(message), &cnt, &bytes_read);
-
-   if (stat != HPMUD_R_OK)
+    stat = hpmud_probe_devices(HPMUD_BUS_ALL, message, sizeof(message), &cnt, &bytes_read);
+    if (stat != HPMUD_R_OK)
       goto bugout;
 
-   /* Look for local all-in-one scan devices (defined by hpmud). */
-   tail = message;
-   for (i=0; i<cnt; i++)
-   {
-      scan_type = 0;
-      GetUriLine(tail, uri, &tail);
-      hpmud_query_model(uri, &ma);
-      if (ma.scantype > 0)
-      {
-         hpmud_get_uri_model(uri, model, sizeof(model));
-         AddDeviceList(uri, model, &DeviceList);
-         total++;
-      }
-      else
-      {
-         DBG(6,"unsupported scantype=%d %s\n", ma.scantype, uri);
-      }
-   }
+    /* Look for local all-in-one scan devices (defined by hpmud). */
+    for (i=0; i<cnt; i++)
+    {
+        GetUriLine(tail, uri, &tail);
+        total += AddDevice(uri);
+    }
 
-    /* Check localOnly flag (used by saned) to decide whether to look for network all-in-one scan devices (defined by cups). */
-	if (!localOnly)
-	{
-		cnt = GetCupsPrinters(&cups_printer);
-		for (i=0; i<cnt; i++)
-		{
-			hpmud_query_model(cups_printer[i], &ma);
-			if (ma.scantype > 0)
-			{
-				hpmud_get_uri_model(cups_printer[i], model, sizeof(model));
-				AddDeviceList(cups_printer[i], model, &DeviceList);
-				total++;
-			}
-			else
-			{
-				DBG(6,"unsupported scantype=%d %s\n", ma.scantype, cups_printer[i]);
-			}
-			free(cups_printer[i]);
-		}
-		if (cups_printer)
-			free(cups_printer);
-	}
+    /* Look for Network Scan devices if localonly flag if FALSE. */
+    if (!localOnly)
+    {
+        /* Look for all-in-one scan devices for which print queue created */
+        cnt = GetCupsPrinters(&cups_printer);
+        for (i=0; i<cnt; i++)
+        {
+            total += AddDevice(cups_printer[i]);
+            free(cups_printer[i]);
+        }
+        if (cups_printer)
+            free(cups_printer);
+
+        /* Discover NW scanners using Bonjour*/
+        bytes_read = mdns_probe_nw_scanners(message, sizeof(message), &cnt);
+        token = strtok(message, ";");
+        while (token)
+        {
+            total += AddDevice(token);
+            token = strtok(NULL, ";");
+        }
+    }
 
 bugout:
    return total;
@@ -342,6 +360,8 @@ extern SANE_Status sane_hpaio_open(SANE_String_Const devicename, SANE_Handle * p
        return ledm_open(devicename, pHandle);
     if ((ma.scantype == HPMUD_SCANTYPE_SCL) || (ma.scantype == HPMUD_SCANTYPE_SCL_DUPLEX) ||(ma.scantype == HPMUD_SCANTYPE_PML))
        return sclpml_open(devicename, pHandle);
+    if (ma.scantype == HPMUD_SCANTYPE_ESCL)
+       return escl_open(devicename, pHandle);
     else
        return SANE_STATUS_UNSUPPORTED;
 }   /* sane_hpaio_open() */
@@ -358,6 +378,8 @@ extern void sane_hpaio_close(SANE_Handle handle)
        return ledm_close(handle);
     if (strcmp(*((char **)handle), "SCL-PML") == 0)
        return sclpml_close(handle);
+    if (strcmp(*((char **)handle), "ESCL") == 0)
+       return escl_close(handle);
 }  /* sane_hpaio_close() */
 
 extern const SANE_Option_Descriptor * sane_hpaio_get_option_descriptor(SANE_Handle handle, SANE_Int option)
@@ -372,6 +394,8 @@ extern const SANE_Option_Descriptor * sane_hpaio_get_option_descriptor(SANE_Hand
        return ledm_get_option_descriptor(handle, option);
     if (strcmp(*((char **)handle), "SCL-PML") == 0)
        return sclpml_get_option_descriptor(handle, option);
+    if (strcmp(*((char **)handle), "ESCL") == 0)
+       return escl_get_option_descriptor(handle, option);
     else
        return NULL;
 }  /* sane_hpaio_get_option_descriptor() */
@@ -388,6 +412,8 @@ extern SANE_Status sane_hpaio_control_option(SANE_Handle handle, SANE_Int option
        return ledm_control_option(handle, option, action, pValue, pInfo);
     if (strcmp(*((char **)handle), "SCL-PML") == 0)
        return sclpml_control_option(handle, option, action, pValue, pInfo);
+    if (strcmp(*((char **)handle), "ESCL") == 0)
+       return escl_control_option(handle, option, action, pValue, pInfo);
     else
        return SANE_STATUS_UNSUPPORTED;
 }   /* sane_hpaio_control_option() */
@@ -404,6 +430,8 @@ extern SANE_Status sane_hpaio_get_parameters(SANE_Handle handle, SANE_Parameters
        return ledm_get_parameters(handle, pParams);
     if (strcmp(*((char **)handle), "SCL-PML") == 0)
        return sclpml_get_parameters(handle, pParams);
+    if (strcmp(*((char **)handle), "ESCL") == 0)
+       return escl_get_parameters(handle, pParams);
     else
        return SANE_STATUS_UNSUPPORTED;
 }  /* sane_hpaio_get_parameters() */
@@ -420,6 +448,8 @@ extern SANE_Status sane_hpaio_start(SANE_Handle handle)
        return ledm_start(handle);
     if (strcmp(*((char **)handle), "SCL-PML") == 0)
        return sclpml_start(handle);
+    if (strcmp(*((char **)handle), "ESCL") == 0)
+       return escl_start(handle);
     else
        return SANE_STATUS_UNSUPPORTED;
 }   /* sane_hpaio_start() */
@@ -437,6 +467,8 @@ extern SANE_Status sane_hpaio_read(SANE_Handle handle, SANE_Byte *data, SANE_Int
        return soapht_read(handle, data, maxLength, pLength);
     if (strcmp(*((char **)handle), "SCL-PML") == 0)
        return sclpml_read(handle, data, maxLength, pLength);
+    if (strcmp(*((char **)handle), "ESCL") == 0)
+       return escl_read(handle, data, maxLength, pLength);
     else
        return SANE_STATUS_UNSUPPORTED;
 
@@ -455,6 +487,8 @@ extern void sane_hpaio_cancel( SANE_Handle handle )
        return ledm_cancel(handle);
     if (strcmp(*((char **)handle), "SCL-PML") == 0)
        return sclpml_cancel(handle);
+    if (strcmp(*((char **)handle), "ESCL") == 0)
+       return escl_cancel(handle);
 }  /* sane_hpaio_cancel() */
 
 extern SANE_Status sane_hpaio_set_io_mode(SANE_Handle handle, SANE_Bool nonBlocking)

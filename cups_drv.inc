@@ -142,10 +142,13 @@ cups_ppd_printers = \
    ppd/hpcups/hp-deskjet_400.ppd.gz \
    ppd/hpcups/hp-deskjet_400l.ppd.gz \
    ppd/hpcups/hp-deskjet_4510_series.ppd.gz \
+   ppd/hpcups/hp-deskjet_4530_series.ppd.gz \
    ppd/hpcups/hp-deskjet_460.ppd.gz \
    ppd/hpcups/hp-deskjet_4610_series.ppd.gz \
    ppd/hpcups/hp-deskjet_4620_series.ppd.gz \
    ppd/hpcups/hp-deskjet_4640_series.ppd.gz \
+   ppd/hpcups/hp-deskjet_4670_series.ppd.gz \
+   ppd/hpcups/hp-deskjet_4720_series.ppd.gz \
    ppd/hpcups/hp-deskjet_500.ppd.gz \
    ppd/hpcups/hp-deskjet_500c.ppd.gz \
    ppd/hpcups/hp-deskjet_505j.ppd.gz \
@@ -159,7 +162,9 @@ cups_ppd_printers = \
    ppd/hpcups/hp-deskjet_5550.ppd.gz \
    ppd/hpcups/hp-deskjet_5551.ppd.gz \
    ppd/hpcups/hp-deskjet_5552.ppd.gz \
+   ppd/hpcups/hp-deskjet_5570_series.ppd.gz \
    ppd/hpcups/hp-deskjet_5600.ppd.gz \
+   ppd/hpcups/hp-deskjet_5640_series.ppd.gz \
    ppd/hpcups/hp-deskjet_5650.ppd.gz \
    ppd/hpcups/hp-deskjet_5652.ppd.gz \
    ppd/hpcups/hp-deskjet_5700.ppd.gz \
@@ -770,5 +775,6 @@ cups_ppd_printers = \
    ppd/hpcups/hp-psc_920.ppd.gz \
    ppd/hpcups/hp-psc_950.ppd.gz \
    ppd/hpcups/hp-psc_950vr.ppd.gz \
-   ppd/hpcups/hp-psc_950xi.ppd.gz
+   ppd/hpcups/hp-psc_950xi.ppd.gz \
+   ppd/hpcups/hp-scanjet_pro_3500_f1.ppd.gz
 cups_drv = prnt/drv/hpcups.drv

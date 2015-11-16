@@ -1,7 +1,7 @@
 /*****************************************************************************\
     hpijs.cpp : HP Inkjet Server
 
-    Copyright (c) 2001 - 2008, Hewlett-Packard Co.
+    Copyright (c) 2001 - 2008, HP Co.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -597,8 +597,8 @@ int main (int argc, char *argv[], char *evenp[])
       const char *arg = argv[1];
       if ((arg[0] == '-') && (arg[1] == 'h'))
       {
-         fprintf(stdout, "\nHewlett-Packard Co. Inkjet Server %s\n", VERSION);
-         fprintf(stdout, "Copyright (c) 2001-2004, Hewlett-Packard Co.\n");
+         fprintf(stdout, "\nHP Co. Inkjet Server %s\n", VERSION);
+         fprintf(stdout, "Copyright (c) 2001-2004, HP Co.\n");
          exit(0);
       }
    }

@@ -1,7 +1,7 @@
 #
 #  configure.in - hplip autoconf input file
 # 
-#  (c) 2004-2007 Copyright Hewlett-Packard Development Company, LP
+#  (c) 2004-2007 Copyright HP Development Company, LP
 # 
 # exit status:
 #   0 = ok
@@ -26,7 +26,7 @@
 #   104 = no libdl
 
 #AC_PREREQ(2.59)
-AC_INIT([HP Linux Imaging and Printing], [3.15.9], [3.15.9], [hplip])
+AC_INIT([HP Linux Imaging and Printing], [3.15.11], [3.15.11], [hplip])
 #AM_INIT_AUTOMAKE([1.9 foreign])
 AM_INIT_AUTOMAKE
 AC_DISABLE_STATIC
@@ -261,6 +261,23 @@ else
 fi
 AM_CONDITIONAL(FAX_BUILD, test x$fax_build = xyes)
 
+#AppArmor Changes
+AC_MSG_CHECKING([for apparmor profile])
+AC_ARG_ENABLE(apparmor_build,
+  [  --enable-apparmor_build    enable apparmor build (default=no)],
+  apparmor_build=$enableval, apparmor_build=no)
+if test "$apparmor_build" = "yes"; then
+   if test -d /etc/apparmor.d/; then
+      AC_MSG_RESULT(yes)
+   else
+      AC_MSG_ERROR([cannot find apparmor support])
+   fi
+else
+   AC_MSG_RESULT(no)
+fi
+AM_CONDITIONAL(APPARMOR_BUILD, test x$apparmor_build = xyes)
+
+
 AC_MSG_CHECKING([for dbus build])
 AC_ARG_ENABLE(dbus_build,
   [  --enable-dbus-build    enable dbus build (default=yes)],
@@ -330,6 +347,10 @@ AC_ARG_WITH(systraydir, AC_HELP_STRING([--with-systraydir=DIR], [set hplip-systr
 
 AC_ARG_WITH(hpppddir, AC_HELP_STRING([--with-hpppddir=DIR], [set hp ppd install directory [default=datadir/ppd/HP]]),
    hpppddir=$withval, hpppddir="$datadir/ppd/HP")
+   
+# AppArmor Changes
+AC_ARG_WITH(apparmordir, AC_HELP_STRING([--with-apparmordir=DIR], [set apparmor profile install directory [default=/etc/apparmor.d]]),
+   apparmordir=$withval, apparmordir="/etc/apparmor.d")
 
 if test -f "/usr/share/cups/mime/mime.types"; then 
    abs_mimedir="/usr/share/cups/mime/"
@@ -584,15 +605,19 @@ AC_DEFINE_DIR([abs_htmldir], [hphtmldir])
 abs_ppddir=${abs_hpppddir%/*}
 AC_DEFINE_DIR([abs_drvdir], [drvdir])
 
-AC_SUBST(abs_datadir) 
-AC_SUBST(abs_sbindir) 
-AC_SUBST(abs_hpppddir) 
-AC_SUBST(abs_docdir)  
-AC_SUBST(abs_htmldir) 
-AC_SUBST(abs_ppddir) 
-AC_SUBST(abs_drvdir) 
-AC_SUBST(abs_mimedir) 
-AC_SUBST(mimedir) 
+AC_SUBST(abs_datadir)
+AC_SUBST(abs_sbindir)
+AC_SUBST(abs_hpppddir)
+AC_SUBST(abs_docdir)
+AC_SUBST(abs_htmldir)
+AC_SUBST(abs_ppddir)
+AC_SUBST(abs_drvdir)
+AC_SUBST(abs_mimedir)
+
+# AppArmor Changes
+AC_SUBST(apparmordir)
+AC_SUBST(apparmor_build)
+AC_SUBST(mimedir)
 AC_SUBST(icondir)
 AC_SUBST(systraydir)
 AC_SUBST(cupsbackenddir)

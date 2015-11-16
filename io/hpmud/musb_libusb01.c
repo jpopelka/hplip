@@ -2,7 +2,7 @@
 
   musb.c - USB support for multi-point transport driver
 
-  (c) 2010 Copyright Hewlett-Packard Development Company, LP
+  (c) 2010 Copyright HP Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -95,21 +95,22 @@ static char *fd_name[MAX_FD] =
     "ff/1/0",
     "ff/cc/0",
     "ff/2/10",
+    "ff/9/1",
 };
 
 static int fd_class[MAX_FD] =
 {
-    0,0x7,0x7,0x7,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+    0,0x7,0x7,0x7,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
 };
 
 static int fd_subclass[MAX_FD] =
 {
-    0,0x1,0x1,0x1,0x1,0x2,0x3,0xff,0xd4,0x4,0x1,0xcc,0x2,
+    0,0x1,0x1,0x1,0x1,0x2,0x3,0xff,0xd4,0x4,0x1,0xcc,0x2,0x9,
 };
 
 static int fd_protocol[MAX_FD] =
 {
-    0,0x2,0x3,0x4,0x1,0x1,0x1,0xff,0,0x1,0,0,0x10,
+    0,0x2,0x3,0x4,0x1,0x1,0x1,0xff,0,0x1,0,0,0x10,0x1,
 };
 
 static const unsigned char venice_power_on[] = {0x1b, '%','P','u','i','f','p','.','p','o','w','e','r',' ','1',';',
@@ -186,6 +187,30 @@ static int is_interface(struct usb_device *dev, int dclass)
             {
                 pi = &dev->config[i].interface[j].altsetting[k];
                 if (pi->bInterfaceClass == dclass)
+                {
+                    return 1;            /* found interface */
+                }
+            }
+        }
+    }
+    return 0;    /* no interface found */
+}
+
+
+/* Check for USB interface descriptor with print interface. */
+static int is_printer(struct usb_device *dev)
+{
+    struct usb_interface_descriptor *pi;
+    int i, j, k;
+
+    for (i=0; i<dev->descriptor.bNumConfigurations; i++)
+    {
+        for (j=0; j<dev->config[i].bNumInterfaces; j++)
+        {
+            for (k=0; k<dev->config[i].interface[j].num_altsetting; k++)
+            {
+                pi = &dev->config[i].interface[j].altsetting[k];
+                if (pi->bInterfaceClass == 0x07 && pi->bInterfaceProtocol == 0x02)
                 {
                     return 1;            /* found interface */
                 }
@@ -911,7 +936,7 @@ static int new_channel(mud_device *pd, int index, const char *sn)
             index == HPMUD_SOAPSCAN_CHANNEL || index == HPMUD_SOAPFAX_CHANNEL ||
             index == HPMUD_MARVELL_SCAN_CHANNEL || index == HPMUD_MARVELL_FAX_CHANNEL ||
             index == HPMUD_LEDM_SCAN_CHANNEL || index == HPMUD_MARVELL_EWS_CHANNEL ||
-            index == HPMUD_IPP_CHANNEL) {
+            index == HPMUD_IPP_CHANNEL || index == HPMUD_IPP_CHANNEL2 || index == HPMUD_ESCL_SCAN_CHANNEL) {
         pd->channel[index].vf = musb_comp_channel_vf;
     }
     else if (pd->io_mode == HPMUD_RAW_MODE || pd->io_mode == HPMUD_UNI_MODE) {
@@ -962,6 +987,7 @@ static void write_thread(file_descriptor *pfd)
     if ((ep = get_out_ep(libusb_device, pfd->config, pfd->interface, pfd->alt_setting, USB_ENDPOINT_TYPE_BULK)) < 0)
     {
         BUG("invalid bulk out endpoint\n");
+        pfd->write_return = -ENOTCONN;
         goto bugout;
     }
 
@@ -1427,7 +1453,7 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_raw_channel_write
                     BUG("unable to write data %s: %d second io timeout\n", msp->device[pc->dindex].uri, sec_timeout);
             }
             else
-                BUG("unable to write data %s: %m\n", msp->device[pc->dindex].uri);
+                BUG("unable to write data %s (len = %d): %m\n", msp->device[pc->dindex].uri, len);
             goto bugout;
         }
         size-=len;
@@ -1509,6 +1535,7 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_comp_channel_open
             fd = FD_ff_1_0;
             break;
         case HPMUD_LEDM_SCAN_CHANNEL:  //using vendor specific C/S/P codes for fax too
+        case HPMUD_ESCL_SCAN_CHANNEL:
             fd = FD_ff_cc_0;
             break;
         case HPMUD_MARVELL_EWS_CHANNEL:
@@ -1516,6 +1543,9 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_comp_channel_open
             break;
         case HPMUD_IPP_CHANNEL:
             fd = FD_7_1_4;
+            break;
+        case HPMUD_IPP_CHANNEL2:
+            fd = FD_ff_9_1;
             break;
         default:
             stat = HPMUD_R_INVALID_SN;
@@ -2016,7 +2046,7 @@ bugout:
  * USB probe devices, walk the USB bus(s) looking for HP products.
  */
 
-int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int lst_size, int *cnt)
+int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int lst_size, int *cnt, enum HPMUD_DEVICE_TYPE devtype)
 {
     struct usb_bus *bus;
     struct usb_device *dev;
@@ -2043,6 +2073,11 @@ int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int ls
 
             if (dev->descriptor.idVendor == 0x3f0 && is_interface(dev, 7))
             {
+                if((devtype == HPMUD_PRINTER) && !is_printer(dev))
+                {
+                    continue; /*Skip all HP devices which do not have print interface*/
+                }
+                
                 if((hd = usb_open(dev)) == NULL)
                 {
                     BUG("Invalid usb_open: %m\n");

@@ -2,7 +2,7 @@
 
   hpmud.h - public definitions for multi-point transport driver
 
-  (c) 2004-2015 Copyright Hewlett-Packard Development Company, LP
+  (c) 2004-2015 Copyright HP Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -68,6 +68,13 @@ enum HPMUD_BUS_ID
    HPMUD_BUS_ALL
 };
 
+enum HPMUD_DEVICE_TYPE
+{
+   HPMUD_AIO=0,
+   HPMUD_PRINTER=1,
+   HPMUD_SCANNER=2,
+};
+
 enum HPMUD_SCANTYPE
 {
    HPMUD_SCANTYPE_NA = 0,
@@ -79,6 +86,7 @@ enum HPMUD_SCANTYPE
    HPMUD_SCANTYPE_SCL_DUPLEX = 6,
    HPMUD_SCANTYPE_LEDM = 7,
    HPMUD_SCANTYPE_MARVELL2 = 8,     /* (Tsunami lj 1212  and series) */
+   HPMUD_SCANTYPE_ESCL=9,
 };
 
 enum HPMUD_SCANSRC
@@ -134,6 +142,8 @@ enum HPMUD_PLUGIN_TYPE
 #define HPMUD_S_WIFI_CHANNEL "HP-WIFICONFIG"
 #define HPMUD_S_MARVELL_EWS_CHANNEL "HP-MARVELL-EWS"
 #define HPMUD_S_IPP_CHANNEL "HP-IPP"
+#define HPMUD_S_IPP_CHANNEL2 "HP-IPP2"
+#define HPMUD_S_ESCL_SCAN "HP-ESCL-SCAN"
 
 typedef int HPMUD_DEVICE;       /* usb, parallel or jetdirect */
 #define HPMUD_DEVICE_MAX 2      /* zero is not used */
@@ -235,6 +245,21 @@ enum HPMUD_RESULT hpmud_get_device_status(HPMUD_DEVICE dd, unsigned int *status)
  *  return value - see enum definition
  */
 enum HPMUD_RESULT hpmud_probe_devices(enum HPMUD_BUS_ID bus, char *buf, int buf_size, int *cnt, int *bytes_read);
+
+/*
+ * hpmud_probe_printers - probe local buses for HP supported printers, call normally does not block
+ *
+ * inputs:
+ *  bus - see enum definiton
+ *  buf_size - size of read buffer
+ *
+ * outputs:
+ *  buf - zero terminated CUPS backend formatted data
+ *  cnt - number of HP devices found
+ *  bytes_read - number of bytes actually read
+ *  return value - see enum definition
+ */
+enum HPMUD_RESULT hpmud_probe_printers(enum HPMUD_BUS_ID bus, char *buf, int buf_size, int *cnt, int *bytes_read);
 
 /*
  * hpmud_channel_open - open specified channel, call will block
@@ -513,20 +538,6 @@ enum HPMUD_RESULT hpmud_make_net_uri(const char *ip, int port, char *uri, int ur
  */
 enum HPMUD_RESULT hpmud_make_par_uri(const char *dnode, char *uri, int uri_size, int *bytes_read);
 
-/*
- * hpmud_mdns_lookup - lookup IP for MDNS host name
- *
- * This function is a stateless hpmud helper function.
- *
- * inputs:
- *  host_name - zero terminated string (ie: "npi7c8a3e")
- *  sec_timeout - in seconds
- *
- * outputs:
- *  ip - zero terminated string
- *  return value - see enum definition
- */
-enum HPMUD_RESULT hpmud_mdns_lookup(const char *host_name, int sec_timeout, char *ip);
 
 /*
  * hpmud_make_mdns_uri - make a network uri from host name

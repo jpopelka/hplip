@@ -2,7 +2,7 @@
 
   hpmudi.h - internal definitions for multi-point transport driver
 
-  (c) 2004-2007 Copyright Hewlett-Packard Development Company, LP
+  (c) 2004-2007 Copyright HP Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -52,12 +52,13 @@
 #include "pml.h"
 #ifdef HAVE_LIBNETSNMP
 #include "jd.h"
+#include "mdns.h"
 #endif
 #ifdef HAVE_PPORT
 #include "pp.h"
 #endif
 
-// Don DO NOT commit with HPMUD_DEBUG enabled :(
+// DO NOT commit with HPMUD_DEBUG enabled :(
 //#define HPMUD_DEBUG
 
 #define _STRINGIZE(x) #x
@@ -108,9 +109,11 @@ enum HPMUD_CHANNEL_ID
    HPMUD_EWS_LEDM_CHANNEL = 0x17,     /* Embeded Web Server interface ff/4/1, any unused socket id */
    HPMUD_LEDM_SCAN_CHANNEL = 0x18,  /* LEDM scan interface ff/cc/0, any unused socket id */
    HPMUD_MARVELL_EWS_CHANNEL = 0x19, /*MARVELL EWS interface found in Cicad Series*/
+   HPMUD_ESCL_SCAN_CHANNEL = 0x1a,  /* ESCL scan interface ff/cc/0, any unused socket id */
    HPMUD_WIFI_CHANNEL = 0x2b,      /* WIFI config */
    HPMUD_DEVMGMT_CHANNEL = 0x2c,      /* decimal 44 */
    HPMUD_IPP_CHANNEL = 0x2d,
+   HPMUD_IPP_CHANNEL2 = 0x2e,
    HPMUD_MAX_CHANNEL_ID
 };
 

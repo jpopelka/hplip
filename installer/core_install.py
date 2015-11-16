@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2015 HP Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -186,6 +186,13 @@ SCANEXT_STR     = 'Scan-SANE-Extension'
 QT_STR          = "Python-Qt"
 
 
+APPARMOR_DIR = "/etc/apparmor.d"
+SELINUX_DIR = "/etc/selinux/targeted/policy/policy*"
+SEC_DICT = {"AppArmor": (APPARMOR_DIR, ["/etc/apparmor.d/usr.share.hplip", "/etc/apparmor.d/abstractions/hplip"]),
+            "SELinux": (SELINUX_DIR, ["/etc/selinux/targeted/modules/active/modules/hplip.pp"])
+}
+
+
 try:
     from functools import update_wrapper
 except ImportError: # using Python version < 2.5
@@ -229,6 +236,7 @@ class CoreInstall(object):
         self.enable = None
         self.disable = None
         self.reload_dbus = False
+        self.security_package = ""
 
 
         self.FIELD_TYPES = {
@@ -372,13 +380,13 @@ class CoreInstall(object):
         }
 
         python3_dep = {
-            'python3X':           (True,  ['base'], PYTHON_STR, self.check_python, DEPENDENCY_RUN_AND_COMPILE_TIME,'2.2','python --version',GENERALDEP),
+            'python3X':           (True,  ['base'], PYTHON_STR, self.check_python, DEPENDENCY_RUN_AND_COMPILE_TIME,'2.2','python3 --version',GENERALDEP),
             'python3-notify2' :   (False, ['gui_qt4'], PYNTF_STR, self.check_pynotify, DEPENDENCY_RUN_TIME,'-','python-notify --version',GENERALDEP), # Optional for libnotify style popups from hp-systray
             'python3-pyqt4-dbus': (False,  ['gui_qt4'], QT4DBUS_STR, self.check_pyqt4_dbus, DEPENDENCY_RUN_TIME,'4.0','FUNC#get_pyQt4_version', GENERALDEP),
             'python3-pyqt4':      (True,  ['gui_qt4'], QT4_STR, self.check_pyqt4, DEPENDENCY_RUN_TIME,'4.0','FUNC#get_pyQt4_version', GENERALDEP), # PyQt 4.x )
             'python3-dbus':       (True,  ['fax'], PYDBUS_STR, self.check_python_dbus, DEPENDENCY_RUN_TIME,'0.80.0','FUNC#get_python_dbus_ver', GENERALDEP),
             'python3-xml'  :      (True,  ['base'], PYXML_STR, self.check_python_xml, DEPENDENCY_RUN_TIME,'-','FUNC#get_python_xml_version',GENERALDEP),
-            'python3-devel' :     (True,  ['base'], PY_DEV_STR, self.check_python_devel, DEPENDENCY_COMPILE_TIME,'2.2','python --version',GENERALDEP),
+            'python3-devel' :     (True,  ['base'], PY_DEV_STR, self.check_python_devel, DEPENDENCY_COMPILE_TIME,'2.2','python3 --version',GENERALDEP),
             'python3-pil':        (False, ['scan'], PIL_STR, self.check_pil, DEPENDENCY_RUN_TIME,'-','FUNC#get_pil_version',GENERALDEP),
             # Optional fax packages
             'python3-reportlab':  (False, ['fax'], REPORTLAB_STR, self.check_reportlab, DEPENDENCY_RUN_TIME,'2.0','FUNC#get_reportlab_version',GENERALDEP),
@@ -1198,6 +1206,29 @@ class CoreInstall(object):
         return found
 
 
+
+    def security_package_status(self):
+        found = ["", False]
+
+        for key in SEC_DICT.keys():
+            if glob.glob(SEC_DICT[key][0]):
+                found[0] = key
+                found[1] = all(map(glob.glob, SEC_DICT[key][1]))
+
+                return found
+
+        return found
+
+
+    def selinux_install(self):
+        src_dir = os.getcwd()
+        profile_location = src_dir + "/selinux/hplip.pp"
+        profile_cmd = "semodule -n -i " +  profile_location
+        cmd = self.passwordObj.getAuthCmd()%profile_cmd
+        log.info("Installing SELinux profile...")
+        status, output = utils.run(cmd, self.passwordObj)
+
+
     def get_hplip_version(self):
         self.version_description, self.version_public, self.version_internal = '', '', ''
 
@@ -1347,6 +1378,12 @@ class CoreInstall(object):
                 configure_cmd += ' --enable-%s' % c
             else:
                 configure_cmd += ' --disable-%s' % c
+
+        # For AppArmor Profiles
+        if self.security_package == "AppArmor":
+            configure_cmd += ' --enable-apparmor_build'
+        if self.security_package == "SELinux":
+            configure_cmd += ' --enable-selinux_build'
 
         # For Unit/Functional testing changes.
         if ".internal" in prop.version and os.path.exists('testcommon/'):
@@ -1860,6 +1897,12 @@ class CoreInstall(object):
                     continue
 
                 utils.remove(p, self.passwordObj, checkSudo)
+
+        #Removing Security profiles/policies
+        package_st = self.security_package_status()
+        if package_st[1]:
+            log.debug("Removing Security Profiles")
+            [utils.remove(f, self.passwordObj, checkSudo) for f in SEC_DICT[package_st[0]][1]]
 
         #remove the binaries and libraries
         pat=re.compile(r"""(\S.*)share\/hplip""")

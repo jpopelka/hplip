@@ -2,7 +2,7 @@
 
   pml.h - get/set pml api for hpmud
  
-  (c) 2004-2007 Copyright Hewlett-Packard Development Company, LP
+  (c) 2004-2007 Copyright HP Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy 
   of this software and associated documentation files (the "Software"), to deal 
@@ -20,7 +20,7 @@
   COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-  (c) 2003-2004 Copyright Hewlett-Packard Development Company, LP
+  (c) 2003-2004 Copyright HP Development Company, LP
 
 \*****************************************************************************/
 

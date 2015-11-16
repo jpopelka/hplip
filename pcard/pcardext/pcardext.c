@@ -1,7 +1,7 @@
 /*****************************************************************************\
 pcardext - Python extension for HP photocard services
  
- (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+ (c) Copyright 2003-2015 HP Development Company, L.P.
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by

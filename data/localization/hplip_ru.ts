@@ -40,9 +40,9 @@
     </message>
     <message>
         <source>&lt;b&gt;License and Copyright:&lt;/b&gt;
-(c) Copyright 2006 Hewlett-Packard Development Company, L.P. This software is licensed under the GNU General Public License (GPL), BSD, and MIT licenses. See the software sources for details.</source>
+(c) Copyright 2015 HP Development Company, L.P. This software is licensed under the GNU General Public License (GPL), BSD, and MIT licenses. See the software sources for details.</source>
         <translation>&lt;b&gt;Лицензия и авторское право:&lt;/b&gt;
-(c) Компания Hewlett-Packard Development, L.P., 2006 г. Данное программное обеспечение имеет стандартную общедоступную лицензию GNU (GPL), лицензии BSD и MIT. Подробнее см. в исходных текстах ПО.</translation>
+(c) Компания HP Development, L.P., 2006 г. Данное программное обеспечение имеет стандартную общедоступную лицензию GNU (GPL), лицензии BSD и MIT. Подробнее см. в исходных текстах ПО.</translation>
     </message>
 </context>
 <context>

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2009 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2015 HP Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -548,7 +548,8 @@ def readXmlDataFromURI(dev,URI,xmlRootNode,xmlChildNode,timeout=5):
     if strResp is not None:                             
         code = get_error_code(strResp)
         if code == HTTP_OK:
-            strResp = utils.unchunck_xml_data(strResp)
+            #strResp = utils.unchunck_xml_data(strResp)
+            strResp = utils.extract_xml_chunk(strResp)
             pos = strResp.find(xmlRootNode,0,len(strResp))    
             repstr = strResp[pos:].strip()
             repstr = repstr.replace('\r',' ').replace('\t',' ').replace('\n',' ') # To remove formating characters from the received xml

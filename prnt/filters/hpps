@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2012 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2015 HP Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -233,113 +233,113 @@ if 'HPBOD' in key_list:
 
 # -------------------------Other Features ----------------------------
 if 'HPPJLEconoMode' in key_list:
-        if 'HPPJLEconoMode' in options and 'noHPPJLEconoMode' not in options:
-                os.write(output_fd, b"@PJL SET ECONOMODE=ON\x0a")
-        else:
-                os.write(output_fd, b"@PJL SET ECONOMODE=OFF\x0a")
+    if 'HPPJLEconoMode' in options and 'noHPPJLEconoMode' not in options:
+        os.write(output_fd, b"@PJL SET ECONOMODE=ON\x0a")
+    else:
+        os.write(output_fd, b"@PJL SET ECONOMODE=OFF\x0a")
 
-        os.write(output_fd, b"@PJL SET RESOLUTION=600\x0a")
-        os.write(output_fd, b"@PJL SET BITSPERPIXEL=2\x0a")
+    os.write(output_fd, b"@PJL SET RESOLUTION=600\x0a")
+    os.write(output_fd, b"@PJL SET BITSPERPIXEL=2\x0a")
 
 
 if 'HPPJLEconoMode2' in key_list:
-        try:
-            if opts['HPPJLEconoMode2'] == 'yes':
-                os.write(output_fd, b"@PJL SET ECONOMODE=ON\x0a")
-            elif opts['HPPJLEconoMode2'] == 'no':
-                os.write(output_fd, b"@PJL SET ECONOMODE=OFF\x0a")
+    try:
+        if opts['HPPJLEconoMode2'] == 'yes' or opts['HPPJLEconoMode2'] == 'on':
+            os.write(output_fd, b"@PJL SET ECONOMODE=ON\x0a")
+        elif opts['HPPJLEconoMode2'] == 'no' or opts['HPPJLEconoMode2'] == 'off':
+            os.write(output_fd, b"@PJL SET ECONOMODE=OFF\x0a")
 
-            os.write(output_fd, b"@PJL SET RESOLUTION=600\x0a")
-            os.write(output_fd, b"@PJL SET BITSPERPIXEL=1\x0a")
+        os.write(output_fd, b"@PJL SET RESOLUTION=600\x0a")
+        os.write(output_fd, b"@PJL SET BITSPERPIXEL=1\x0a")
 
-        except:
-            pass
+    except:
+        pass
 
 if 'HPPJLPrintQuality' in key_list:
-        try:
-                if opts['HPPJLPrintQuality'] == 'FastRes1200':
-                        os.write(output_fd, b"@PJL SET RESOLUTION=600<0A>@PJL SET BITSPERPIXEL=2<0A>")
-                elif opts['HPPJLPrintQuality'] == '600dpi':
-                        os.write(output_fd, b"@PJL SET RESOLUTION=600<0A>@PJL SET BITSPERPIXEL=1<0A>")
-                elif opts['HPPJLPrintQuality'] == 'ProRes1200':
-                        os.write(output_fd, b"@PJL SET RESOLUTION=1200<0A>@PJL SET BITSPERPIXEL=1<0A>")   
-        except:
-                os.write(output_fd, b"@PJL SET RESOLUTION=600<0A>@PJL SET BITSPERPIXEL=2<0A>")
+    try:
+        if opts['HPPJLPrintQuality'] == 'FastRes1200':
+            os.write(output_fd, b"@PJL SET RESOLUTION=600<0A>@PJL SET BITSPERPIXEL=2<0A>")
+        elif opts['HPPJLPrintQuality'] == '600dpi':
+            os.write(output_fd, b"@PJL SET RESOLUTION=600<0A>@PJL SET BITSPERPIXEL=1<0A>")
+        elif opts['HPPJLPrintQuality'] == 'ProRes1200':
+            os.write(output_fd, b"@PJL SET RESOLUTION=1200<0A>@PJL SET BITSPERPIXEL=1<0A>")   
+    except:
+        os.write(output_fd, b"@PJL SET RESOLUTION=600<0A>@PJL SET BITSPERPIXEL=2<0A>")
              
 
 if 'HPPJLOutputMode' in key_list:
-        try:
-                if opts['HPPJLOutputMode'] == 'GeneralOffice':
-                        os.write(output_fd, b'@PJL SET PRINTQUALITY=DRAFT\x0a') 
-                elif opts['HPPJLOutputMode'] == 'Professional':
-                        os.write(output_fd, b'@PJL SET PRINTQUALITY=NORMAL\x0a') 
-                elif opts['HPPJLOutputMode'] == 'Presentation':
-                        os.write(output_fd, b'@PJL SET PRINTQUALITY=BEST\x0a') 
-                if opts['HPPJLOutputMode'] == 'MaximumDPI':
-                        os.write(output_fd, b'@PJL SET PRINTQUALITY=MAX\x0a') 
-        except:
-                os.write(output_fd, b'@PJL SET PRINTQUALITY=NORMAL\x0a')
+    try:
+        if opts['HPPJLOutputMode'] == 'GeneralOffice':
+            os.write(output_fd, b'@PJL SET PRINTQUALITY=DRAFT\x0a') 
+        elif opts['HPPJLOutputMode'] == 'Professional':
+            os.write(output_fd, b'@PJL SET PRINTQUALITY=NORMAL\x0a') 
+        elif opts['HPPJLOutputMode'] == 'Presentation':
+            os.write(output_fd, b'@PJL SET PRINTQUALITY=BEST\x0a') 
+        if opts['HPPJLOutputMode'] == 'MaximumDPI':
+            os.write(output_fd, b'@PJL SET PRINTQUALITY=MAX\x0a') 
+    except:
+        os.write(output_fd, b'@PJL SET PRINTQUALITY=NORMAL\x0a')
 
 if 'HPPJLDryTime' in key_list:
-        try:
-                if opts['HPPJLDryTime'] == '0':
-                        os.write(output_fd, b'@PJL SET DRYTIME=0\x0a') 
-                elif opts['HPPJLDryTime'] == 'Medium':
-                        os.write(output_fd, b'@PJL SET DRYTIME=4\x0a') 
-                if opts['HPPJLDryTime'] == 'Long':
-                        os.write(output_fd, b'@PJL SET DRYTIME=7\x0a') 
-        except:
-                os.write(output_fd, b'@PJL SET DRYTIME=0\x0a')
+    try:
+        if opts['HPPJLDryTime'] == '0':
+            os.write(output_fd, b'@PJL SET DRYTIME=0\x0a') 
+        elif opts['HPPJLDryTime'] == 'Medium':
+            os.write(output_fd, b'@PJL SET DRYTIME=4\x0a') 
+        if opts['HPPJLDryTime'] == 'Long':
+            os.write(output_fd, b'@PJL SET DRYTIME=7\x0a') 
+    except:
+        os.write(output_fd, b'@PJL SET DRYTIME=0\x0a')
 
 if 'HPPJLSaturation' in key_list:
-        try:
-                if opts['HPPJLSaturation'] == '-2':
-                        os.write(output_fd, b'@PJL SET SATURATION=0\x0a') 
-                elif opts['HPPJLSaturation'] == '-1':
-                        os.write(output_fd, b'@PJL SET SATURATION=2\x0a') 
-                elif opts['HPPJLSaturation'] == '0':
-                        os.write(output_fd, b'@PJL SET SATURATION=4\x0a') 
-                elif opts['HPPJLSaturation'] == '+1':
-                        os.write(output_fd, b'@PJL SET SATURATION=6\x0a') 
-                if opts['HPPJLSaturation'] == '+2':
-                        os.write(output_fd, b'@PJL SET SATURATION=8\x0a')
-        except:
-                os.write(output_fd, b'@PJL SET SATURATION=4\x0a')
+    try:
+        if opts['HPPJLSaturation'] == '-2':
+            os.write(output_fd, b'@PJL SET SATURATION=0\x0a') 
+        elif opts['HPPJLSaturation'] == '-1':
+            os.write(output_fd, b'@PJL SET SATURATION=2\x0a') 
+        elif opts['HPPJLSaturation'] == '0':
+            os.write(output_fd, b'@PJL SET SATURATION=4\x0a') 
+        elif opts['HPPJLSaturation'] == '+1':
+            os.write(output_fd, b'@PJL SET SATURATION=6\x0a') 
+        if opts['HPPJLSaturation'] == '+2':
+            os.write(output_fd, b'@PJL SET SATURATION=8\x0a')
+    except:
+            os.write(output_fd, b'@PJL SET SATURATION=4\x0a')
 
 if 'HPPJLInkBleed' in key_list:
-        try:
-                if opts['HPPJLInkBleed'] == '-2' or opts['HPPJLInkBleed'] == 'Default':
-                        os.write(output_fd, b'@PJL SET INKBLEED=0\x0a') 
-                elif opts['HPPJLInkBleed'] == '-1':
-                        os.write(output_fd, b'@PJL SET INKBLEED=2\x0a') 
-                elif opts['HPPJLInkBleed'] == '0' or opts['HPPJLInkBleed'] == 'Less':
-                        os.write(output_fd, b'@PJL SET INKBLEED=4\x0a') 
-                elif opts['HPPJLInkBleed'] == '+1':
-                        os.write(output_fd, b'@PJL SET INKBLEED=6\x0a') 
-                elif opts['HPPJLInkBleed'] == 'Least':
-                        os.write(output_fd, b'@PJL SET INKBLEED=7\x0a') 
-                elif opts['HPPJLInkBleed'] == '+2':
-                        os.write(output_fd, b'@PJL SET INKBLEED=8\x0a') 
-        except:
-                os.write(output_fd, b'@PJL SET INKBLEED=4\x0a')
+    try:
+        if opts['HPPJLInkBleed'] == '-2' or opts['HPPJLInkBleed'] == 'Default':
+            os.write(output_fd, b'@PJL SET INKBLEED=0\x0a') 
+        elif opts['HPPJLInkBleed'] == '-1':
+            os.write(output_fd, b'@PJL SET INKBLEED=2\x0a') 
+        elif opts['HPPJLInkBleed'] == '0' or opts['HPPJLInkBleed'] == 'Less':
+            os.write(output_fd, b'@PJL SET INKBLEED=4\x0a') 
+        elif opts['HPPJLInkBleed'] == '+1':
+            os.write(output_fd, b'@PJL SET INKBLEED=6\x0a') 
+        elif opts['HPPJLInkBleed'] == 'Least':
+            os.write(output_fd, b'@PJL SET INKBLEED=7\x0a') 
+        elif opts['HPPJLInkBleed'] == '+2':
+            os.write(output_fd, b'@PJL SET INKBLEED=8\x0a') 
+    except:
+        os.write(output_fd, b'@PJL SET INKBLEED=4\x0a')
 
 if 'HPPJLColorAsGray' in key_list:
-        try:
-                if opts['HPPJLColorAsGray'] == 'Off':
-                        os.write(output_fd, b'@PJL SET GRAYSCALE=OFF\x0a') 
-                elif opts['HPPJLColorAsGray'] == 'HighQuality':
-                        os.write(output_fd, b'@PJL SET GRAYSCALE=COMPOSITE\x0a') 
-                elif opts['HPPJLColorAsGray'] == 'BlackInkOnly':
-                        os.write(output_fd, b'@PJL SET GRAYSCALE=BLACKONLY\x0a')
-                elif opts['HPPJLColorAsGray'] == 'yes':
-                        os.write(output_fd, b'@PJL SET RESOLUTION=600\x0a')
-                        os.write(output_fd, b'@PJL SET BITSPERPIXEL=8\x0a')
-                        os.write(output_fd, b'@PJL SET GRAYSCALE=COMPOSITE\x0a')
-                elif opts['HPPJLColorAsGray'] == 'no':
-                        os.write(output_fd, b'@PJL SET RESOLUTION=600\x0a')
-                        os.write(output_fd, b'@PJL SET BITSPERPIXEL=8\x0a')
-        except:
-                os.write(output_fd, b'@PJL SET GRAYSCALE=OFF\x0a')
+    try:
+        if opts['HPPJLColorAsGray'] == 'Off' or opts['HPPJLColorAsGray'] == 'off':
+            os.write(output_fd, b'@PJL SET GRAYSCALE=OFF\x0a') 
+        elif opts['HPPJLColorAsGray'] == 'HighQuality':
+            os.write(output_fd, b'@PJL SET GRAYSCALE=COMPOSITE\x0a') 
+        elif opts['HPPJLColorAsGray'] == 'BlackInkOnly':
+            os.write(output_fd, b'@PJL SET GRAYSCALE=BLACKONLY\x0a')
+        elif opts['HPPJLColorAsGray'] == 'yes' or opts['HPPJLColorAsGray'] == 'on' :
+            os.write(output_fd, b'@PJL SET RESOLUTION=600\x0a')
+            os.write(output_fd, b'@PJL SET BITSPERPIXEL=8\x0a')
+            os.write(output_fd, b'@PJL SET GRAYSCALE=COMPOSITE\x0a')
+        elif opts['HPPJLColorAsGray'] == 'no':
+            os.write(output_fd, b'@PJL SET RESOLUTION=600\x0a')
+            os.write(output_fd, b'@PJL SET BITSPERPIXEL=8\x0a')
+    except:
+        os.write(output_fd, b'@PJL SET GRAYSCALE=OFF\x0a')
 
 os.write(output_fd, UEL)
 

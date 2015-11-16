@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2011 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2015 HP Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -37,12 +37,14 @@ import signal
 import time
 import socket
 import operator
+import scanext
 
 # Local
 from base.g import *
 from base.sixext import PY3
 from base import tui, device, module, utils, os_utils
 from prnt import cups
+from scan import sane
 
 
 username = prop.username
@@ -222,8 +224,19 @@ try:
                          ])
 
 
+    sane.init()
+    sane_devices = sane.getDevices()
+    devicelist = {}
+    for d, mfg, mdl, t in sane_devices:
+        try:
+            devicelist[d]
+        except KeyError:
+            devicelist[d] = [mdl]
+        else:
+            devicelist[d].append(mdl)
+    sane.deInit()
     device_uri = mod.getDeviceUri(device_uri, printer_name,
-        back_end_filter=['hpaio'], filter={'scan-type': (operator.gt, 0)})
+        back_end_filter=['hpaio'], filter={'scan-type': (operator.gt, 0)}, devices=devicelist)
 
     if not device_uri:
         sys.exit(1)
@@ -602,8 +615,6 @@ try:
 
     else: # INTERACTIVE_MODE
         from base.sixext.moves import queue
-        from scan import sane
-        import scanext
 
         try:
             import subprocess

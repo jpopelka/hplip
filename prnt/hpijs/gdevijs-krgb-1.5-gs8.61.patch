@@ -7,7 +7,7 @@ diff -uNr old/gdevijs.c new/gdevijs.c
   * before opening this device.
 + *
 + * 11/26/03 David Suffield (gdevijs-krgb-1.0.patch)
-+ * (c) 2003-2004 Copyright Hewlett-Packard Development Company, LP
++ * (c) 2003-2004 Copyright HP Development Company, LP
 + *
 + * 1. Removed hpijs 1.0-1.0.2 workarounds, use hpijs 1.0.3 or higher.
 + * 2. Added krgb support.

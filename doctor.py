@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2012-2020 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2012-2020 HP Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -305,8 +305,8 @@ try:
 
         log.info(log.bold("\n\nChecking Permissions...."))
 #        if not core.get_missing_user_grps() and not core.get_disable_selinux_status():
-        if not core.get_disable_selinux_status():
-            log.info("Permissions are correct.")
+        # if not core.get_disable_selinux_status():
+        #     log.info("Permissions are correct.")
 
 #        if core.get_missing_user_grps():
 #            log.info(log.bold("Missing User Groups"))
@@ -316,13 +316,13 @@ try:
 #            if core.add_groups_to_user(core.get_missing_user_grps(), core.get_user_grp_cmd()):
 #                IS_RESTART_REQ = True
 
-        if core.get_disable_selinux_status():
-            log.info(log.bold("SELinux Status"))
-            log.info(log.bold('-'*len("SELinux Status")))
-            log.info("SELinux is enabled. Needs to be disabled")
-            authenticate(core)
-            if core.disable_SELinux():
-                IS_RESTART_REQ = True
+        # if core.get_disable_selinux_status():
+        #     log.info(log.bold("SELinux Status"))
+        #     log.info(log.bold('-'*len("SELinux Status")))
+        #     log.info("SELinux is enabled. Needs to be disabled")
+        #     authenticate(core)
+        #     if core.disable_SELinux():
+        #         IS_RESTART_REQ = True
 
     log.info(log.bold("\n\nChecking for Configured Queues...."))
     queues.main_function(core.passwordObj, MODE,ui_toolkit, False, DEVICE_URI)

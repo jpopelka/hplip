@@ -2,7 +2,7 @@
 
   hpmud.cpp - multi-point transport driver
  
-  (c) 2004-2007 Copyright Hewlett-Packard Development Company, LP
+  (c) 2004-2007 Copyright HP Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy 
   of this software and associated documentation files (the "Software"), to deal 
@@ -231,7 +231,14 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) service_to_channel(mud
    }
    else if (strncasecmp(sn, "hp-ipp", 6) == 0)
    {
-       *index = HPMUD_IPP_CHANNEL;
+       if (strncasecmp(sn, "hp-ipp2", 7) == 0)
+            *index = HPMUD_IPP_CHANNEL2;
+       else
+            *index = HPMUD_IPP_CHANNEL;
+   }
+   else if (strncasecmp(sn, "hp-escl-scan", 12) == 0)
+   {
+      *index = HPMUD_ESCL_SCAN_CHANNEL;
    }
    /* All the following services require MLC/1284.4. */
    else if (pd->io_mode == HPMUD_RAW_MODE || pd->io_mode == HPMUD_UNI_MODE)
@@ -499,10 +506,10 @@ int hpmud_get_uri_datalink(const char *uri, char *buf, int buf_size)
    if (zc)
    {
 #ifdef HAVE_LIBNETSNMP
-      if (hpmud_mdns_lookup(p, HPMUD_MDNS_TIMEOUT, ip) != HPMUD_R_OK)
-	 return 0;
-      for (i=0; (ip[i] != 0) && (i < buf_size); i++)
-         buf[i] = ip[i];
+    if (mdns_lookup(p, ip) != MDNS_STATUS_OK)
+        return 0;
+    for (i=0; (ip[i] != 0) && (i < buf_size); i++)
+        buf[i] = ip[i];
 #else
       return 0;
 #endif
@@ -619,7 +626,7 @@ enum HPMUD_RESULT hpmud_probe_devices(enum HPMUD_BUS_ID bus, char *buf, int buf_
 
    if (bus == HPMUD_BUS_USB)
    {
-      len = musb_probe_devices(buf, buf_size, cnt);
+      len = musb_probe_devices(buf, buf_size, cnt, HPMUD_AIO);
    }
 #ifdef HAVE_PPORT
    else if (bus == HPMUD_BUS_PARALLEL)
@@ -629,7 +636,32 @@ enum HPMUD_RESULT hpmud_probe_devices(enum HPMUD_BUS_ID bus, char *buf, int buf_
 #endif
    else if (bus == HPMUD_BUS_ALL)
    {
-      len = musb_probe_devices(buf, buf_size, cnt);
+      len = musb_probe_devices(buf, buf_size, cnt, HPMUD_AIO);
+#ifdef HAVE_PPORT
+      len += pp_probe_devices(buf+len, buf_size-len, cnt);
+#endif
+   }
+
+   *bytes_read = len;
+
+   return HPMUD_R_OK;
+}
+
+enum HPMUD_RESULT hpmud_probe_printers(enum HPMUD_BUS_ID bus, char *buf, int buf_size, int *cnt, int *bytes_read)
+{
+   int len=0;
+
+   DBG("[%d] hpmud_probe_printers() bus=%d\n", getpid(), bus);
+
+   if (buf == NULL || buf_size <= 0)
+        return HPMUD_R_INVALID_LENGTH;
+    
+   buf[0] = 0;
+   *cnt = 0;
+
+   if (bus == HPMUD_BUS_ALL)
+   {
+      len = musb_probe_devices(buf, buf_size, cnt, HPMUD_PRINTER);
 #ifdef HAVE_PPORT
       len += pp_probe_devices(buf+len, buf_size-len, cnt);
 #endif

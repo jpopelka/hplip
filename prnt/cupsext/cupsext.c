@@ -1,7 +1,7 @@
 /*
 cupsext - Python extension class for CUPS 1.1+
 
-(c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+(c) Copyright 2003-2015 HP Development Company, L.P.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ notice, this list of conditions and the following disclaimer.
 2. Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
-3. Neither the name of Hewlett-Packard nor the names of its
+3. Neither the name of HP nor the names of its
 contributors may be used to endorse or promote products derived
 from this software without specific prior written permission.
 

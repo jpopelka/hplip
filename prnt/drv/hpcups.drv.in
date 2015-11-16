@@ -267,7 +267,7 @@
 #define Version "$_VERSION"
 
 // Copyright for all drivers...
-Copyright "(c) 2008 Copyright Hewlett-Packard Development Company, LP"
+Copyright "(c) 2008 Copyright HP Development Company, LP"
 
 // Driver version
 Version $Version
@@ -5827,6 +5827,15 @@ Manufacturer "HP"
       Attribute "Product" "" "(HP Envy 5644 E-all-in-one)"
     }
     {
+      ModelName "HP Deskjet 5640 Series"
+      Attribute "NickName" "" "HP Deskjet 5640 Series, hpcups $Version"
+      Attribute "ShortNickName" "" "HP Deskjet 5640 Series"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 5640 series;DES:deskjet 5640 series;"
+      PCFileName "hp-deskjet_5640_series.ppd"
+      Attribute "Product" "" "(HP Deskjet Ink Advantage 5640 All-in-one Printer Series)"
+      Attribute "Product" "" "(HP Deskjet Ink Advantage 5645 All-in-one Printer)"
+    }
+    {
       ModelName "HP Envy 5660 Series"
       Attribute "NickName" "" "HP Envy 5660 Series, hpcups $Version"
       Attribute "ShortNickName" "" "HP Envy 5660 Series"
@@ -6177,7 +6186,19 @@ Manufacturer "HP"
       PCFileName "hp-envy_5540_series.ppd"
       Attribute "Product" "" "(HP Envy 5540 All-in-one Printer Series)"
       Attribute "Product" "" "(HP Envy 5540 All-in-one Printer)"
+      Attribute "Product" "" "(HP Envy 5542 All-in-one Printer)"
+      Attribute "Product" "" "(HP Envy 5543 All-in-one Printer)"
+      Attribute "Product" "" "(HP Envy 5544 All-in-one Printer)"
       Attribute "Product" "" "(HP Envy 5545 All-in-one Printer)"
+    }
+    {
+      ModelName "HP Deskjet 5570 Series"
+      Attribute "NickName" "" "HP Deskjet 5570 Series, hpcups $Version"
+      Attribute "ShortNickName" "" "HP Deskjet 5570 Series"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 5570 series;DES:deskjet 5570 series;"
+      PCFileName "hp-deskjet_5570_series.ppd"
+      Attribute "Product" "" "(HP Deskjet Ink Advantage 5570 All-in-one)"
+      Attribute "Product" "" "(HP Deskjet Ink Advantage 5575 All-in-one)"
     }
      
 } // End CopperheadIPH15
@@ -10657,6 +10678,18 @@ Manufacturer "HP"
             Attribute "Product" "" "(HP Envy 4520 All-in-one Printer Series)"
             Attribute "Product" "" "(HP Envy 4520 All-in-one Printer)"
             Attribute "Product" "" "(HP Envy 4522 All-in-one Printer)"
+            Attribute "Product" "" "(HP Envy 4523 All-in-one Printer)"
+            Attribute "Product" "" "(HP Envy 4524 All-in-one Printer)"
+          }
+          {
+            ModelName "HP Deskjet 4530 Series"
+            Attribute "NickName" "" "HP Deskjet 4530 Series, hpcups $Version"
+            Attribute "ShortNickName" "" "HP Deskjet 4530 Series"
+            Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 4530 series;DES:deskjet 4530 series;"
+            PCFileName "hp-deskjet_4530_series.ppd"
+            Attribute "Product" "" "(HP Deskjet Ink Advantage 4530 All-in-one)"
+            Attribute "Product" "" "(HP Deskjet Ink Advantage 4535 All-in-one)"
+            Attribute "Product" "" "(HP Deskjet Ink Advantage 4536 All-in-one)"
           }
           {
             ModelName "HP Officejet 4650 Series"
@@ -10667,7 +10700,18 @@ Manufacturer "HP"
             Attribute "Product" "" "(HP Officejet 4650 All-in-one Printer Series)"
             Attribute "Product" "" "(HP Officejet 4650 All-in-one Printer)"
             Attribute "Product" "" "(HP Officejet 4652 All-in-one Printer)"
+            Attribute "Product" "" "(HP Officejet 4654 All-in-one Printer)"
             Attribute "Product" "" "(HP Officejet 4655 All-in-one Printer)"
+          }
+          {
+            ModelName "HP Deskjet 4670 Series"
+            Attribute "NickName" "" "HP Deskjet 4670 Series, hpcups $Version"
+            Attribute "ShortNickName" "" "HP Deskjet 4670 Series"
+            Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 4670 series;DES:deskjet 4670 series;"
+            PCFileName "hp-deskjet_4670_series.ppd"
+            Attribute "Product" "" "(HP Deskjet Ink Advantage 4670 All-in-one)"
+            Attribute "Product" "" "(HP Deskjet Ink Advantage 4675 All-in-one)"
+            Attribute "Product" "" "(HP Deskjet Ink Advantage 4676 All-in-one)"
           }
 
 }// End Mimas15
@@ -10987,6 +11031,8 @@ Manufacturer "HP"
       Attribute "Product" "" "(HP Envy 5532 E-all-in-one Printer)"
       Attribute "Product" "" "(HP Envy 5534 E-all-in-one Printer)"
       Attribute "Product" "" "(HP Envy 5535 E-all-in-one Printer)"
+      Attribute "Product" "" "(HP Envy 5536 E-all-in-one Printer)"
+      Attribute "Product" "" "(HP Envy 5539 E-all-in-one Printer)"
     }
 
 } // End MimasTDR
@@ -11246,6 +11292,7 @@ Manufacturer "HP"
      Attribute "Product" "" "(HP Deskjet 2130 All-in-one Printer Series)"
      Attribute "Product" "" "(HP Deskjet 2131 All-in-one Printer)"
      Attribute "Product" "" "(HP Deskjet 2132 All-in-one Printer)"
+     Attribute "Product" "" "(HP Deskjet 2134 All-in-one Printer)"
      Attribute "Product" "" "(HP Deskjet Ink Advantage 2130 All-in One Printer)"
      Attribute "Product" "" "(HP Deskjet Ink Advantage 2135 All-in One Printer)"
      Attribute "Product" "" "(HP Deskjet Ink Advantage 2136 All-in One Printer)"
@@ -12002,6 +12049,8 @@ Manufacturer "HP"
             PCFileName "hp-deskjet_3630_series.ppd"
             Attribute "Product" "" "(HP Deskjet 3630 All-in-one Printer)"
             Attribute "Product" "" "(HP Deskjet 3632 All-in-one Printer)"
+            Attribute "Product" "" "(HP Deskjet 3633 All-in-one Printer)"
+            Attribute "Product" "" "(HP Deskjet 3634 All-in-one Printer)"
             Attribute "Product" "" "(HP Deskjet Ink Advantage 3630 All-in-one Printer)"
             Attribute "Product" "" "(HP Deskjet Ink Advantage 3635 All-in-one Printer)"
             Attribute "Product" "" "(HP Deskjet Ink Advantage 3636 All-in-one Printer)"
@@ -12026,6 +12075,15 @@ Manufacturer "HP"
             Attribute "Product" "" "(HP Deskjet Ink Advantage 3830 All-in-one Printer)"
             Attribute "Product" "" "(HP Deskjet Ink Advantage 3835 All-in-one Printer)"
             Attribute "Product" "" "(HP Deskjet Ink Advantage 3836 All-in-one Printer)"
+          }
+          {
+            ModelName "HP Deskjet 4720 Series"
+            Attribute "NickName" "" "HP Deskjet 4720 Series, hpcups $Version"
+            Attribute "ShortNickName" "" "HP Deskjet 4720 Series"
+            Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 4720 series;DES:deskjet 4720 series;"
+            PCFileName "hp-deskjet_4720_series.ppd"
+            Attribute "Product" "" "(HP Deskjet Ink Advantage Ultra 4720 All-in-one Printer Series)"
+            Attribute "Product" "" "(HP Deskjet Ink Advantage Ultra 4729 All-in-one Printer)"
           }
 
 }// End Pyramid15
@@ -12895,6 +12953,14 @@ Manufacturer "HP"
       Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 3325;DES:deskjet 3325;"
       PCFileName "hp-deskjet_3325.ppd"
       Attribute "Product" "" "(HP Deskjet 3325 Printer/scanjet 3530c)"
+    }
+    {
+      ModelName "HP Scanjet Pro 3500 f1"
+      Attribute "NickName" "" "HP Scanjet Pro 3500 f1, hpcups $Version"
+      Attribute "ShortNickName" "" "HP Scanjet Pro 3500 f1"
+      Attribute "1284DeviceID" "" "MFG:HP;MDL:hp scanjet pro 3500 f1;DES:hp scanjet pro 3500 f1;"
+      PCFileName "hp-scanjet_pro_3500_f1.ppd"
+      Attribute "Product" "" "(HP Scanjet Pro 3500 f1 Flatbed Scanner)"
     }
     {
       ModelName "HP Deskjet 3500"

@@ -40,9 +40,9 @@ Steve DeRoos、Mark Overton、Aaron Albright、Smith Kennedy、John Hosszu、Chr
     </message>
     <message>
         <source>&lt;b&gt;License and Copyright:&lt;/b&gt;
-(c) Copyright 2006 Hewlett-Packard Development Company, L.P. This software is licensed under the GNU General Public License (GPL), BSD, and MIT licenses. See the software sources for details.</source>
+(c) Copyright 2015 HP Development Company, L.P. This software is licensed under the GNU General Public License (GPL), BSD, and MIT licenses. See the software sources for details.</source>
         <translation>&lt;b&gt;许可证与版权：&lt;/b&gt;
-(c) 版权所有 2006 Hewlett-Packard Development Company, L.P. 本软件已获经 GNU 通用公共许可证 (GPL)、BSD 以及 MIT 许可证的授权。有关详细信息，请参阅软件原始资料。</translation>
+(c) 版权所有 2015 HP Development Company, L.P. 本软件已获经 GNU 通用公共许可证 (GPL)、BSD 以及 MIT 许可证的授权。有关详细信息，请参阅软件原始资料。</translation>
     </message>
 </context>
 <context>

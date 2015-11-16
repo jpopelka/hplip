@@ -1,7 +1,7 @@
 /*****************************************************************************\
     hpcupsfax.cpp : HP CUPS fax filter
 
-    Copyright (c) 2001 - 2010, Hewlett-Packard Co.
+    Copyright (c) 2001 - 2010, HP Co.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without

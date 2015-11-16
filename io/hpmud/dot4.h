@@ -2,7 +2,7 @@
 
   dot4.h - 1284.4 support for multi-point transport driver 
  
-  (c) 2005-2007 Copyright Hewlett-Packard Development Company, LP
+  (c) 2005-2007 Copyright HP Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy 
   of this software and associated documentation files (the "Software"), to deal 

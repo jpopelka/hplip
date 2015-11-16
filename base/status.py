@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2007 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2015 HP Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1825,8 +1825,10 @@ marker_type_xlate = {'magenta ink' : AGENT_TYPE_MAGENTA,
                      'yellow ink' : AGENT_TYPE_YELLOW,
                      'black ink' : AGENT_TYPE_BLACK,
                      'Black Cartridge' : AGENT_TYPE_BLACK,
+                     'Magenta Cartridge' : AGENT_TYPE_MAGENTA,
+                     'Cyan Cartridge' : AGENT_TYPE_CYAN,
+                     'Yellow Cartridge' : AGENT_TYPE_YELLOW,
                      'Maintenance Kit' : AGENT_TYPE_NONE,
-
                     }
 
 marker_leveltrigger_xlate = { 'ok' : AGENT_LEVEL_TRIGGER_SUFFICIENT_0,
@@ -1911,8 +1913,11 @@ def StatusTypeIPPAgents(attrs):
             else:
                 state = 'low'
 
+            #match the type if marker-type is something like 'Black Cartridge HP XXXX'
+            mtype = [v for k,v in marker_type_xlate.items() if attrs['marker-names'][loopcntr].startswith(k)]
+
             entry = { 'kind' : marker_kind_xlate.get(attrs['marker-types'][loopcntr], AGENT_KIND_NONE),
-                      'type' : marker_type_xlate.get(attrs['marker-names'][loopcntr], AGENT_TYPE_NONE),
+                      'type' : mtype[0] if len(mtype) > 0 else 0,
                       'health' : marker_state_xlate.get(state, AGENT_HEALTH_OK),
                       'level' : attrs['marker-levels'][loopcntr],
                       'level-trigger' : marker_leveltrigger_xlate.get(state, AGENT_LEVEL_TRIGGER_SUFFICIENT_0),

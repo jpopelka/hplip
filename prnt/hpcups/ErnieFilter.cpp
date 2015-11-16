@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//    Copyright (c) 1996 - 2008, Hewlett-Packard Development Company, L.P.
+//    Copyright (c) 1996 - 2008, HP Development Company, L.P.
 //    All rights reserved.
 //    
 //    This software is licensed solely for use with HP products.  Redistribution
@@ -11,11 +11,11 @@
 //    -   Redistributions in binary form must reproduce the above copyright
 //        notice, this list of conditions and the following disclaimer in the
 //        documentation and/or other materials provided with the distribution.
-//    -   Neither the name of Hewlett-Packard nor the names of its contributors
+//    -   Neither the name of HP nor the names of its contributors
 //        may be used to endorse or promote products derived from this software
 //        without specific prior written permission.
 //    -   Redistributors making defect corrections to source code grant to
-//        Hewlett-Packard the right to use and redistribute such defect
+//        HP the right to use and redistribute such defect
 //        corrections.
 //    
 //    This software contains technology licensed from third parties; use with
@@ -24,7 +24,7 @@
 //    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 //    'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 //    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-//    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL HEWLETT-PACKARD OR ITS
+//    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL HP OR ITS
 //    CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
 //    EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 //    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;

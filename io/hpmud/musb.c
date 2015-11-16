@@ -2,7 +2,7 @@
 
   musb.c - USB support for multi-point transport driver
 
-  (c) 2010 - 2014 Copyright Hewlett-Packard Development Company, LP
+  (c) 2010 - 2014 Copyright HP Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -97,21 +97,22 @@ static char *fd_name[MAX_FD] =
     "ff/1/0",
     "ff/cc/0",
     "ff/2/10",
+    "ff/9/1",
 };
 
 static int fd_class[MAX_FD] =
 {
-    0,0x7,0x7,0x7,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+    0,0x7,0x7,0x7,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
 };
 
 static int fd_subclass[MAX_FD] =
 {
-    0,0x1,0x1,0x1,0x1,0x2,0x3,0xff,0xd4,0x4,0x1,0xcc,0x2,
+    0,0x1,0x1,0x1,0x1,0x2,0x3,0xff,0xd4,0x4,0x1,0xcc,0x2,0x9,
 };
 
 static int fd_protocol[MAX_FD] =
 {
-    0,0x2,0x3,0x4,0x1,0x1,0x1,0xff,0,0x1,0,0,0x10,
+    0,0x2,0x3,0x4,0x1,0x1,0x1,0xff,0,0x1,0,0,0x10,0x1,
 };
 
 static const unsigned char venice_power_on[] = {0x1b, '%','P','u','i','f','p','.','p','o','w','e','r',' ','1',';',
@@ -515,6 +516,8 @@ static int claim_interface(libusb_device *dev, file_descriptor *pfd)
         goto bugout;
     }
 
+    if(pfd->alt_setting)
+    {
     if (libusb_set_interface_alt_setting(pfd->hd, pfd->interface, pfd->alt_setting))
     {
         libusb_release_interface(pfd->hd, pfd->interface);
@@ -522,6 +525,7 @@ static int claim_interface(libusb_device *dev, file_descriptor *pfd)
         pfd->hd = NULL;
         BUG("invalid set_altinterface %s altset=%d: %m\n", fd_name[pfd->fd], pfd->alt_setting);
         goto bugout;
+	    }
     }
 
     pfd->write_active=0;
@@ -929,14 +933,14 @@ static int new_channel(mud_device *pd, int index, const char *sn)
             index == HPMUD_SOAPSCAN_CHANNEL || index == HPMUD_SOAPFAX_CHANNEL ||
             index == HPMUD_MARVELL_SCAN_CHANNEL || index == HPMUD_MARVELL_FAX_CHANNEL ||
             index == HPMUD_LEDM_SCAN_CHANNEL || index == HPMUD_MARVELL_EWS_CHANNEL ||
-            index == HPMUD_IPP_CHANNEL) {
+            index == HPMUD_IPP_CHANNEL || index == HPMUD_IPP_CHANNEL2 || index == HPMUD_ESCL_SCAN_CHANNEL) {
         pd->channel[index].vf = musb_comp_channel_vf;
     }
     else if (pd->io_mode == HPMUD_RAW_MODE || pd->io_mode == HPMUD_UNI_MODE) {
-                pd->channel[index].vf = musb_raw_channel_vf;
+        pd->channel[index].vf = musb_raw_channel_vf;
     }
     else if (pd->io_mode == HPMUD_MLC_GUSHER_MODE || pd->io_mode == HPMUD_MLC_MISER_MODE) {
-                pd->channel[index].vf = musb_mlc_channel_vf;
+        pd->channel[index].vf = musb_mlc_channel_vf;
     }
     else {
         pd->channel[index].vf = musb_dot4_channel_vf;
@@ -981,6 +985,7 @@ static void write_thread(file_descriptor *pfd)
     if (ep < 0)
     {
         BUG("invalid bulk out endpoint\n");
+        pfd->write_return = -ENOTCONN;
         goto bugout;
     }
 
@@ -1414,12 +1419,12 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_raw_channel_close
 
     if (( ep = get_in_ep(libusb_dev, fd_table[fd].config, fd_table[fd].interface, fd_table[fd].alt_setting, LIBUSB_TRANSFER_TYPE_BULK)) >= 0)
     {
-        libusb_clear_halt(fd_table[fd].hd,  ep);
+		//libusb_clear_halt(fd_table[fd].hd,  ep);
     }
 
     if (( ep = get_out_ep(libusb_dev, fd_table[fd].config, fd_table[fd].interface, fd_table[fd].alt_setting, LIBUSB_TRANSFER_TYPE_BULK)) >= 0)
     {
-        libusb_clear_halt(fd_table[fd].hd,  ep);
+		//libusb_clear_halt(fd_table[fd].hd,  ep);
     }
     release_interface(&fd_table[fd]);
 
@@ -1448,7 +1453,7 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_raw_channel_write
                     BUG("unable to write data %s: %d second io timeout\n", msp->device[pc->dindex].uri, sec_timeout);
             }
             else
-                BUG("unable to write data %s: %m\n", msp->device[pc->dindex].uri);
+                BUG("unable to write data (len = %d) %s: %m\n", msp->device[pc->dindex].uri, len);
             goto bugout;
         }
         size-=len;
@@ -1530,6 +1535,7 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_comp_channel_open
             fd = FD_ff_1_0;
             break;
         case HPMUD_LEDM_SCAN_CHANNEL:  //using vendor specific C/S/P codes for fax too
+        case HPMUD_ESCL_SCAN_CHANNEL:
             fd = FD_ff_cc_0;
             break;
         case HPMUD_MARVELL_EWS_CHANNEL:
@@ -1537,6 +1543,9 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) musb_comp_channel_open
             break;
         case HPMUD_IPP_CHANNEL:
             fd = FD_7_1_4;
+            break;
+        case HPMUD_IPP_CHANNEL2:
+            fd = FD_ff_9_1;
             break;
         default:
             stat = HPMUD_R_INVALID_SN;
@@ -2019,7 +2028,7 @@ bugout:
  * USB probe devices, walk the USB bus(s) looking for HP products.
  */
 
-int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int lst_size, int *cnt)
+int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int lst_size, int *cnt, enum HPMUD_DEVICE_TYPE devtype)
 {
     libusb_context *ctx = NULL;
     libusb_device **list; /*List of connected USB devices */
@@ -2073,6 +2082,11 @@ int __attribute__ ((visibility ("hidden"))) musb_probe_devices(char *lst, int ls
                 {
                     if (altptr->bInterfaceClass == LIBUSB_CLASS_PRINTER )  /* Printer */
                     {
+                        if( (devtype == HPMUD_PRINTER) && (altptr->bInterfaceProtocol != 0x02) )
+                        {
+                            continue; /*Check for only print interface (7/1/2) */
+                        }
+                        
                         libusb_open(dev, &hd);
                         if (hd == NULL)
                         {

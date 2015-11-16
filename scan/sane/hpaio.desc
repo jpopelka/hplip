@@ -88,6 +88,9 @@
 :model "HP Color LaserJet MFP m277n"
 :status :good
 
+:model "HP Color LaserJet Pro MFP m274n"
+:status :good
+
 :model "HP Color LaserJet Pro MFP m476dn"
 :status :good
 
@@ -95,6 +98,15 @@
 :status :good
 
 :model "HP Color LaserJet Pro MFP m476nw"
+:status :good
+
+:model "HP Color LaserJet Pro MFP m477 Fdn"
+:status :good
+
+:model "HP Color LaserJet Pro MFP m477 Fdw"
+:status :good
+
+:model "HP Color LaserJet Pro MFP m477 Fnw"
 :status :good
 
 :model "HP Color LaserJet Pro Mpf m176n"
@@ -146,6 +158,9 @@
 :status :good
 
 :model "HP Deskjet 2132 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet 2134 All-in-one Printer"
 :status :good
 
 :model "HP Deskjet 2510 All-in-one Printer"
@@ -260,6 +275,12 @@
 :status :good
 
 :model "HP Deskjet 3632 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet 3633 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet 3634 All-in-one Printer"
 :status :good
 
 :model "HP Deskjet f2110 All-in-one Printer"
@@ -631,6 +652,15 @@
 :model "HP Deskjet Ink Advantage 4518 E-all-in-one Printer"
 :status :good
 
+:model "HP Deskjet Ink Advantage 4530 All-in-one"
+:status :good
+
+:model "HP Deskjet Ink Advantage 4535 All-in-one"
+:status :good
+
+:model "HP Deskjet Ink Advantage 4536 All-in-one"
+:status :good
+
 :model "HP Deskjet Ink Advantage 4610 All-in-one Printer Series"
 :status :good
 
@@ -655,13 +685,40 @@
 :model "HP Deskjet Ink Advantage 4648 E-all-in-one Printer"
 :status :good
 
+:model "HP Deskjet Ink Advantage 4670 All-in-one"
+:status :good
+
+:model "HP Deskjet Ink Advantage 4675 All-in-one"
+:status :good
+
+:model "HP Deskjet Ink Advantage 4676 All-in-one"
+:status :good
+
 :model "HP Deskjet Ink Advantage 5525 E-all-in-one"
+:status :good
+
+:model "HP Deskjet Ink Advantage 5570 All-in-one"
+:status :good
+
+:model "HP Deskjet Ink Advantage 5575 All-in-one"
+:status :good
+
+:model "HP Deskjet Ink Advantage 5640 All-in-one Printer Series"
+:status :good
+
+:model "HP Deskjet Ink Advantage 5645 All-in-one Printer"
 :status :good
 
 :model "HP Deskjet Ink Advantage 6525 E-all-in-one"
 :status :good
 
 :model "HP Deskjet Ink Advantage k209a All-in-one Printer"
+:status :good
+
+:model "HP Deskjet Ink Advantage Ultra 4720 All-in-one Printer Series"
+:status :good
+
+:model "HP Deskjet Ink Advantage Ultra 4729 All-in-one Printer"
 :status :good
 
 :model "HP Envy 100 d410 Series"
@@ -724,6 +781,12 @@
 :model "HP Envy 4522 All-in-one Printer"
 :status :good
 
+:model "HP Envy 4523 All-in-one Printer"
+:status :good
+
+:model "HP Envy 4524 All-in-one Printer"
+:status :good
+
 :model "HP Envy 5530 E-all-in-one Printer"
 :status :good
 
@@ -739,10 +802,25 @@
 :model "HP Envy 5535 E-all-in-one Printer"
 :status :good
 
+:model "HP Envy 5536 E-all-in-one Printer"
+:status :good
+
+:model "HP Envy 5539 E-all-in-one Printer"
+:status :good
+
 :model "HP Envy 5540 All-in-one Printer"
 :status :good
 
 :model "HP Envy 5540 All-in-one Printer Series"
+:status :good
+
+:model "HP Envy 5542 All-in-one Printer"
+:status :good
+
+:model "HP Envy 5543 All-in-one Printer"
+:status :good
+
+:model "HP Envy 5544 All-in-one Printer"
 :status :good
 
 :model "HP Envy 5545 All-in-one Printer"
@@ -1135,6 +1213,24 @@
 :model "HP LaserJet Pro MFP m226dw"
 :status :good
 
+:model "HP LaserJet Pro MFP m426dw"
+:status :good
+
+:model "HP LaserJet Pro MFP m426fdn"
+:status :good
+
+:model "HP LaserJet Pro MFP m426fdw"
+:status :good
+
+:model "HP LaserJet Pro MFP m427dn"
+:status :good
+
+:model "HP LaserJet Pro MFP m427dw"
+:status :good
+
+:model "HP LaserJet Pro MFP m427fdw"
+:status :good
+
 :model "HP LaserJet Pro MFP m435nw"
 :status :good
 
@@ -1379,6 +1475,9 @@
 :status :good
 
 :model "HP Officejet 4652 All-in-one Printer"
+:status :good
+
+:model "HP Officejet 4654 All-in-one Printer"
 :status :good
 
 :model "HP Officejet 4655 All-in-one Printer"
@@ -3161,5 +3260,8 @@
 :status :good
 
 :model "HP PSC 950xi All-in-one Printer"
+:status :good
+
+:model "HP Scanjet Pro 3500 f1 Flatbed Scanner"
 :status :good
 

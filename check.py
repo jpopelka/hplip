@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# (c) Copyright 2003-2014 Hewlett-Packard Development Company, L.P.
+# (c) Copyright 2003-2015 HP Development Company, L.P.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -180,7 +180,7 @@ class DependenciesCheck(CoreInstall):
         
 #        self.missing_user_grps = ''
         self.ui_toolkit = ui_toolkit
-        self.disable_selinux = False
+#        self.disable_selinux = False
         self.req_deps_to_be_installed = []
         self.opt_deps_to_be_installed =[]
         self.cmds_to_be_run = []
@@ -268,8 +268,8 @@ class DependenciesCheck(CoreInstall):
         return self.cmds_to_be_run
 
 
-    def get_disable_selinux_status(self):
-        return self.disable_selinux
+    # def get_disable_selinux_status(self):
+    #     return self.disable_selinux
 
 
     def get_communication_error_devs(self):
@@ -684,25 +684,25 @@ class DependenciesCheck(CoreInstall):
                                     else:
                                         log.info("%-15s %-30s %-15s %-8s %-8s %-8s %s"%("USB", printer_name, "Required","-","-","OK", "Node:'%s' Mode:'%s'"%(devnode,st_mode&0o777)))
 
-            selinux_file = '/etc/selinux/config'
-            if os.path.exists(selinux_file):
-                tui.header("SELINUX")
-                try:
-                    selinux_fp = open(selinux_file, 'r')
-                except IOError:
-                    log.error("Failed to open %s file."%selinux_file)
-                else:
-                    for line in selinux_fp:
-                        line=re.sub(r'\s','',line)
-                        if line == "SELINUX=enforcing":
-                            self.num_warns += 1
-                            log.warn("%-12s %-12s %-10s %-3s %-3s %-8s %s" \
-                                          %("SELinux",  "enabled", "Optional", "-", "-", "INCOMPAT", "'SELinux needs to be disabled for Plugin printers and Fax functionality.'"))
-                            self.disable_selinux = True
-                            break
-                    if self.disable_selinux == False:
-                        log.info("%-15s %-15s %-10s %-3s %-3s %-8s %s"\
-                                                  %("SELinux",  "disabled", "Optional", "-", "-", "OK", "-"))
+            # selinux_file = '/etc/selinux/config'
+            # if os.path.exists(selinux_file):
+            #     tui.header("SELINUX")
+            #     try:
+            #         selinux_fp = open(selinux_file, 'r')
+            #     except IOError:
+            #         log.error("Failed to open %s file."%selinux_file)
+            #     else:
+            #         for line in selinux_fp:
+            #             line=re.sub(r'\s','',line)
+            #             if line == "SELINUX=enforcing":
+            #                 self.num_warns += 1
+            #                 log.warn("%-12s %-12s %-10s %-3s %-3s %-8s %s" \
+            #                               %("SELinux",  "enabled", "Optional", "-", "-", "INCOMPAT", "'SELinux needs to be disabled for Plugin printers and Fax functionality.'"))
+            #                 self.disable_selinux = True
+            #                 break
+            #         if self.disable_selinux == False:
+            #             log.info("%-15s %-15s %-10s %-3s %-3s %-8s %s"\
+            #                                       %("SELinux",  "disabled", "Optional", "-", "-", "OK", "-"))
 
             self.smart_install_devices = smart_install.get_smartinstall_enabled_devices()
             if len(self.smart_install_devices):
@@ -750,11 +750,11 @@ class DependenciesCheck(CoreInstall):
             log.info(log.bold('-'*len("Plug-in Status")))
             log.error("Plug-ins need to be installed")
         
-        if self.disable_selinux == True:
-            log.info("")
-            log.info(log.bold("SELINUX"))
-            log.info(log.bold('-'*len("SELINUX")))
-            log.error("SELINUX need to be disabled")
+        # if self.disable_selinux == True:
+        #     log.info("")
+        #     log.info(log.bold("SELINUX"))
+        #     log.info(log.bold('-'*len("SELINUX")))
+        #     log.error("SELINUX need to be disabled")
         
 #        if self.missing_user_grps:
 #            log.info("")
@@ -776,8 +776,8 @@ class DependenciesCheck(CoreInstall):
         log.info("Total Warnings: %d" % self.num_warns)
         log.info()
 #        if self.disable_selinux or self.missing_user_grps or (self.plugin_status == PLUGIN_VERSION_MISMATCH) or (self.plugin_status == PLUGIN_NOT_INSTALLED) or len(self.req_deps_to_be_installed) or len(self.opt_deps_to_be_installed):
-        if self.disable_selinux or (self.plugin_status == PLUGIN_VERSION_MISMATCH) or (self.plugin_status == PLUGIN_NOT_INSTALLED) or len(self.req_deps_to_be_installed) or len(self.opt_deps_to_be_installed):
-             log.info("Run 'hp-doctor' command to prompt and fix the issues. ")
+        # if self.disable_selinux or (self.plugin_status == PLUGIN_VERSION_MISMATCH) or (self.plugin_status == PLUGIN_NOT_INSTALLED) or len(self.req_deps_to_be_installed) or len(self.opt_deps_to_be_installed):
+        #      log.info("Run 'hp-doctor' command to prompt and fix the issues. ")
              
 
 ############ Main #######################

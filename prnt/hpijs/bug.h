@@ -2,7 +2,7 @@
 
     bug.h - debug support
 
-    (c) 2009 Copyright Hewlett-Packard Development Company, LP
+    (c) 2009 Copyright HP Development Company, LP
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions

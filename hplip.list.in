@@ -2,7 +2,7 @@
 #
 #  ESP Package Manager (EPM) "list" file.
 #
-#  (c) 2008-2009 Copyright Hewlett-Packard Development Company, LP
+#  (c) 2008-2009 Copyright HP Development Company, LP
 #
 #  Use this configuration for new distributions that support CUPSDDK 1.2.3 or higher.
 #    ./configure --prefix=/usr
@@ -22,8 +22,8 @@
 #
 
 %product HPLIP
-%copyright (c) 2004-2009 Copyright Hewlett-Packard Development Company, LP
-%vendor Hewlett-Packard
+%copyright (c) 2004-2009 Copyright HP Development Company, LP
+%vendor HP
 %if PLUGIN
 %license prnt/plugins/license.txt
 %else
@@ -31,7 +31,7 @@
 %endif
 %readme doc/index.html
 %version @VERSION@
-%description The Hewlett-Packard Linux Imaging and Printing (HPLIP) system
+%description The HP Linux Imaging and Printing (HPLIP) system
 %description provides a unified single and multi-function connectivity
 %description driver solution. HPLIPLITE provides support for print and scan only.
 %description HPLIPFULL provides support for print, scan, fax and toolbox.
@@ -112,6 +112,8 @@ f 0644 root root $ppd/HP prnt/ps/*.ppd.gz
 @epm_print_only_exclude@l 0755 root root $libdir/libhpip.dylib libhpip.0.0.1.dylib
 @epm_print_only_exclude@f 0755 root root $libdir/libhpipp.0.0.1.dylib .libs/libhpipp.0.0.1.dylib
 @epm_print_only_exclude@l 0755 root root $libdir/libhpipp.dylib libhpipp.0.0.1.dylib
+@epm_print_only_exclude@f 0755 root root $libdir/libhpdiscovery.0.0.1.dylib .libs/libhpdiscovery.0.0.1.dylib
+@epm_print_only_exclude@l 0755 root root $libdir/libhpdiscovery.dylib libhpdiscovery.0.0.1.dylib
 %system !darwin
 @epm_print_only_exclude@f 0755 root root $libdir/libhpmud.so.0.0.6 .libs/libhpmud.so.0.0.6
 @epm_print_only_exclude@l 0755 root root $libdir/libhpmud.so libhpmud.so.0.0.6
@@ -119,6 +121,8 @@ f 0644 root root $ppd/HP prnt/ps/*.ppd.gz
 @epm_print_only_exclude@l 0755 root root $libdir/libhpip.so libhpip.so.0.0.1
 @epm_print_only_exclude@f 0755 root root $libdir/libhpipp.so.0.0.1 .libs/libhpipp.so.0.0.1
 @epm_print_only_exclude@l 0755 root root $libdir/libhpipp.so libhpipp.so.0.0.1
+@epm_print_only_exclude@f 0755 root root $libdir/libhpdiscovery.so.0.0.1 .libs/libhpdiscovery.so.0.0.1
+@epm_print_only_exclude@l 0755 root root $libdir/libhpdiscovery.so libhpdiscovery.so.0.0.1
 
 # Ugly fix for inconsistent libcrypto soname
 #l 0755 root root $libdir/libcrypto.so.6 libcrypto.so.0.9.8
@@ -203,6 +207,13 @@ f 0644 root root $ppd/HP prnt/ps/*.ppd.gz
 @epm_full@f 755 root root $home/unload.py unload.py
 @epm_full@f 755 root root $home/scan.py scan.py
 @epm_full@f 755 root root $home/sendfax.py sendfax.py
+
+@epm_full@d 775 root root $home/selinux -
+@epm_full@f 755 root root $home/selinux/hplip.te selinux/hplip.te
+@epm_full@f 755 root root $home/selinux/hplip.fc selinux/hplip.fc
+@epm_full@f 755 root root $home/selinux/hplip.if selinux/hplip.if
+@epm_full@f 755 root root $home/selinux/hplip.pp selinux/hplip.pp
+
 @epm_full@d 775 root root $home/data -
 @epm_full@d 775 root root $home/data/pcl -
 @epm_full@f 644 root root $home/data/pcl data/pcl/*.pcl.gz
@@ -486,6 +497,7 @@ l 0755 root root $home/prnt/plugins/hbpl1.so hbpl1-${machine}.so
 %postinstall <<EOF
 ver=`echo $version | sed 's/\([0-9]*.[0-9]*.[0-9]*\).*/\1/'`
 touch $home/data/plugin/hplip-$${ver}-plugin.run
+semodule -n -i $home/selinux/hplip.pp
 EOF
 %postremove <<EOF
 ver=`echo $version | sed 's/\([0-9]*.[0-9]*.[0-9]*\).*/\1/'`

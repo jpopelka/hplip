@@ -1,6 +1,6 @@
 /************************************************************************************\
   bb_ledm.c - HP SANE backend support for ledm based multi-function peripherals
-  (c) 2010 Copyright Hewlett-Packard Development Company, LP
+  (c) 2010 Copyright HP Development Company, LP
 
   Primary Author: Naga Samrat Chowdary, Narla
   Contributing Authors: Yashwant Kumar Sahu, Sarbeswar Meher

@@ -1,7 +1,7 @@
 /*****************************************************************************\
     hpijs.cpp : HP Inkjet Server
 
-    Copyright (c) 2001 - 2004, Hewlett-Packard Co.
+    Copyright (c) 2001 - 2004, HP Co.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without

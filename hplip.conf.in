@@ -15,7 +15,7 @@ cupsbackend=@cupsbackenddir@
 cupsfilter=@cupsfilterdir@
 drv=@abs_drvdir@
 bin=/usr/bin
-
+apparmor=@apparmordir@
 # Following values are determined at configure time and cannot be changed.
 [configure]
 network-build=@network_build@
@@ -45,3 +45,4 @@ lite-build=@lite_build@
 udev_sysfs_rules=@udev_sysfs_rules@
 hpcups-only-build=@hpcups_only_build@
 hpijs-only-build=@hpijs_only_build@
+apparmor_build=@apparmor_build@

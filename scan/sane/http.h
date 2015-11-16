@@ -2,7 +2,7 @@
 
   http.h - HTTP/1.1 feeder and consumer
 
-  (c) 2008 Copyright Hewlett-Packard Development Company, LP
+  (c) 2008 Copyright HP Development Company, LP
 
   Permission is hereby granted, free of charge, to any person obtaining a copy 
   of this software and associated documentation files (the "Software"), to deal 
@@ -49,7 +49,9 @@ enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_read_payload(HTTP_
 enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_read(HTTP_HANDLE handle, void *data, int max_size, int sec_timout, int *bytes_read);
 enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_read_size(HTTP_HANDLE handle, void *data, int max_size, int sec_timout, int *bytes_read);
 enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_write(HTTP_HANDLE handle, void *data, int data_size, int sec_timout);
+enum HTTP_RESULT __attribute__ ((visibility ("hidden"))) http_read2(HTTP_HANDLE handle, void *data, int max_size, int tmo, int *bytes_read);
 void __attribute__ ((visibility ("hidden"))) http_unchunk_data(char *buffer);
+int __attribute__ ((visibility ("hidden"))) clear_stream(HTTP_HANDLE handle, void *data, int max_size, int *bytes_read);
 #endif  // _HTTP_H
 
 
