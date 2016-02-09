@@ -187,6 +187,7 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-deskjet_f4500_series-hpijs.ppd.gz \
     ppd/hpijs/hp-envy_7640_series-hpijs.ppd.gz \
     ppd/hpijs/hp-photosmart_a440_series-hpijs.ppd.gz \
+    ppd/hpijs/hp-laserjet_pro_mfp_m127fs-hpijs.ppd.gz \
     ppd/hpijs/hp-officejet_h470-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_f300_series-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_4150_series-hpijs.ppd.gz \
@@ -636,7 +637,6 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-officejet_series_520-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_895c-hpijs.ppd.gz \
     ppd/hpijs/hp-psc_2200_series-hpijs.ppd.gz \
-    ppd/hpijs/hp-scanjet_pro_3500_f1-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_843c-hpijs.ppd.gz \
     ppd/hpijs/hp-photosmart_c4500_series-hpijs.ppd.gz \
     ppd/hpijs/hp-officejet_7110_series-hpijs.ppd.gz \

@@ -993,11 +993,12 @@ def start(language, auto=True, test_depends=False,
                 log.info("Please make sure your printer is connected and powered on at this time.")
                 ok, choice = tui.enter_choice("Do you want to setup printer in GUI mode? (u=GUI mode*, i=Interactive mode) : ",['u', 'i'], 'u')
                 if ok and choice == 'u':
-                    if not services.run_hp_tools_with_auth('hp-setup', core.passwordObj):
+                    setup_cmd = 'hp-setup  -u'
+                    if os_utils.execute(setup_cmd) != 0:
                         log.error("hp-setup failed. Please run hp-setup manually.")
 
                 elif ok and choice == 'i':
-                    setup_cmd = core.passwordObj.getAuthCmd() % 'hp-setup  -i'
+                    setup_cmd = 'hp-setup  -i'
                     log.info("Running '%s' command...."%setup_cmd)
                     if os_utils.execute(setup_cmd) != 0:
                         log.error("hp-setup failed. Please run hp-setup manually.")

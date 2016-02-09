@@ -468,6 +468,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-laserjet_pro_mfp_m126nw.ppd.gz \
    ppd/hpcups/hp-laserjet_pro_mfp_m127fn.ppd.gz \
    ppd/hpcups/hp-laserjet_pro_mfp_m127fp.ppd.gz \
+   ppd/hpcups/hp-laserjet_pro_mfp_m127fs.ppd.gz \
    ppd/hpcups/hp-laserjet_pro_mfp_m127fw.ppd.gz \
    ppd/hpcups/hp-laserjet_pro_mfp_m128fn.ppd.gz \
    ppd/hpcups/hp-laserjet_pro_mfp_m128fp.ppd.gz \
@@ -775,6 +776,5 @@ cups_ppd_printers = \
    ppd/hpcups/hp-psc_920.ppd.gz \
    ppd/hpcups/hp-psc_950.ppd.gz \
    ppd/hpcups/hp-psc_950vr.ppd.gz \
-   ppd/hpcups/hp-psc_950xi.ppd.gz \
-   ppd/hpcups/hp-scanjet_pro_3500_f1.ppd.gz
+   ppd/hpcups/hp-psc_950xi.ppd.gz
 cups_drv = prnt/drv/hpcups.drv

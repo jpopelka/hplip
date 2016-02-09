@@ -129,10 +129,14 @@ class ConfigBase(object):
                 fp = open(self.filename, "r")
                 try:
                     self.conf.readfp(fp)
+                except configparser.MissingSectionHeaderError:
+                    print("")
+                    log.error("Found No Section in %s. Please set the http proxy for root and try again." % self.filename)
                 except (configparser.DuplicateOptionError):
                     log.warn("Found Duplicate Entery in %s" % self.filename)
                     self.CheckDuplicateEntries()
-                fp.close()
+                finally:
+                    fp.close()
             except (OSError, IOError, configparser.MissingSectionHeaderError):
                 log.debug("Unable to open file %s for reading." % self.filename)
 

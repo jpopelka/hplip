@@ -586,9 +586,9 @@ class SetupDialog(QDialog, Ui_Dialog):
             log.error("No devices found on bus: %s" % self.bus)
             self.DevicesFoundLabel.setText(self.__tr("<b>No devices found.</b><br>Click <i>Back</i> to change discovery options, or <i>Refresh</i> to search again."))
             if self.bus == 'net' and utils.check_lan():
-                FailureUI(self, self.__tr('''<b>HPLIP cannot detect printers in your network.</b><p>This may be due to existing firewall settings blocking the required ports.
+                WarningUI(self, self.__tr('''<b>HPLIP cannot detect printers in your network.</b><p>This may be due to existing firewall settings blocking the required ports.
                 When you are in a trusted network environment, you may open the ports for network services like mdns and slp in the firewall. For detailed steps follow the link.
-                <b>http://hplipopensource.com/node/374</b></p>'''),
+                <b>http://hplipopensource.com/node/375</b></p>'''),
                         self.__tr("HP Device Manager"))
             
 

@@ -60,9 +60,14 @@ else
 libsane_hpaio_la_LDFLAGS = -version-info 1:0:0
 endif
 # The following is a interlibrary dependency that must be compiled first.
-libsane_hpaio_la_LIBADD = libhpip.la libhpdiscovery.la libhpmud.la libhpipp.la $(DBUS_LIBS) -lcups -ldl
+libsane_hpaio_la_LIBADD = libhpip.la libhpmud.la libhpipp.la $(DBUS_LIBS) -lcups -ldl
 #libsane_hpaio_la_CFLAGS = -DWITH_NONAMESPACES -DSOAP_DEBUG
-libsane_hpaio_la_CFLAGS = $(DBUS_CFLAGS) -Iprotocol -Iprotocol/discovery
+libsane_hpaio_la_CFLAGS = $(DBUS_CFLAGS) -Iprotocol
+
+if NETWORK_BUILD
+libsane_hpaio_la_LIBADD += libhpdiscovery.la
+libsane_hpaio_la_CFLAGS += -Iprotocol/discovery
+endif
 endif # SCAN_BUILD
 
 
@@ -75,12 +80,13 @@ libhpdiscovery_la_LDFLAGS = -version-info 0:1:0
 libhpdiscovery_la_LIBADD  = -l$(SNMPLIB) -lcrypto
 
 
+
 endif
 
 # hpmud library
 MUDNAME=hpmud
 lib_LTLIBRARIES += libhpmud.la
-libhpmud_la_CFLAGS  = -DMUDNAME=\"$(MUDNAME)\" -DCONFDIR=\"$(hplip_confdir)\" -Iprotocol -Iprotocol/discovery 
+libhpmud_la_CFLAGS  = -DMUDNAME=\"$(MUDNAME)\" -DCONFDIR=\"$(hplip_confdir)\" -Iprotocol
 libhpmud_la_LDFLAGS = -version-info 0:6:0 -lpthread -ldl 
 libhpmud_la_SOURCES = io/hpmud/hpmud.c io/hpmud/mlc.c io/hpmud/model.c io/hpmud/pml.c \
 	  io/hpmud/hpmud.h io/hpmud/hpmudi.h io/hpmud/list.h io/hpmud/mlc.h io/hpmud/pml.h io/hpmud/dot4.c \
@@ -97,6 +103,7 @@ libhpmud_la_LDFLAGS += -lusb-1.0
 endif
 
 if NETWORK_BUILD
+libhpmud_la_CFLAGS  += -Iprotocol/discovery
 libhpmud_la_LDFLAGS += -l$(SNMPLIB) -lcrypto
 libhpmud_la_LIBADD  =  libhpdiscovery.la
 endif
@@ -310,8 +317,13 @@ hpmudextdir = $(pyexecdir)
 hpmudext_LTLIBRARIES = hpmudext.la
 hpmudext_la_LDFLAGS = -module -avoid-version
 hpmudext_la_SOURCES = io/mudext/hpmudext.c
-hpmudext_la_LIBADD = libhpmud.la libhpdiscovery.la
-hpmudext_la_CFLAGS = -I$(PYTHONINCLUDEDIR) -Iprotocol/discovery
+hpmudext_la_CFLAGS = -I$(PYTHONINCLUDEDIR)
+hpmudext_la_LIBADD = libhpmud.la
+
+if NETWORK_BUILD
+hpmudext_la_LIBADD += libhpdiscovery.la
+hpmudext_la_CFLAGS += -Iprotocol/discovery
+endif
 
 if !LIBUSB01_BUILD
 hpmudext_la_CFLAGS +=-I/usr/include/libusb-1.0 

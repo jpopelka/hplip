@@ -73,6 +73,7 @@ static int mdns_open_socket(int *psocket)
     int udp_socket = -1, yes = 1;
     char loop = 0, ttl = 255;
     struct sockaddr_in recv_addr , addr;
+    struct ip_mreq mreq;
 
     DBG("mdns_open_socket entry.\n");
 
@@ -114,8 +115,17 @@ static int mdns_open_socket(int *psocket)
         goto bugout;
     }
 
-    DBG("pSocket = [%d]: %m\n", *psocket);
+    /* Join the .local multicast group */
+    mreq.imr_multiaddr.s_addr = inet_addr("224.0.0.251");
+    mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+    if (setsockopt(udp_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(struct ip_mreq)) == -1) {
+        BUG("unable to add to multicast group: %m\n");
+        close(udp_socket);
+        goto bugout;
+    }
+
     *psocket = udp_socket;
+    DBG("pSocket = [%d]: %m\n", *psocket);
     stat = MDNS_STATUS_OK;
 
 bugout:

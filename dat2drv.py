@@ -246,6 +246,9 @@ def categorize2(m):
 
         i = MODEL_TYPE2_DESIGNJET
 
+    elif "scanjet" in m:
+        i = MODEL_TYPE2_SCANJET
+
     else: # Other
         i = MODEL_TYPE2_OTHER
 

@@ -62,7 +62,7 @@ class Ui_Dialog(object):
         Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", "HP Device Manager - Plug-in Installer", None, QtGui.QApplication.UnicodeUTF8))
         self.label.setText(QtGui.QApplication.translate("Dialog", "Driver Plug-in Required", None, QtGui.QApplication.UnicodeUTF8))
         if self.upgradePlugin is False:
-            self.TitleLabel.setText(QtGui.QApplication.translate("Dialog", "HP Device proprietary plug-in is missing. Click 'Next' to continue plug-in installation.", None, QtGui.QApplication.UnicodeUTF8))
+            self.TitleLabel.setText(QtGui.QApplication.translate("Dialog", "HP Device proprietary plug-in is missing. Click 'Next' to continue plug-in installation. In case of plugin download failure, run 'hp-plugin' command from the terminal manually.", None, QtGui.QApplication.UnicodeUTF8))
         else:
             self.TitleLabel.setText(QtGui.QApplication.translate("Dialog", "HP Device plug-in version mismatch or some files are corrupted.\nClick 'Next' to install required plug-in.", None, QtGui.QApplication.UnicodeUTF8))
         self.NextButton.setText(QtGui.QApplication.translate("Dialog", "Next >", None, QtGui.QApplication.UnicodeUTF8))

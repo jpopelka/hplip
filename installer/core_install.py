@@ -813,11 +813,24 @@ class CoreInstall(object):
                     v = self.__fixup_data("same_as_version", distros_dat.get(ver_section, 'same_as_version'))
 
                     try:
-                        vv = self.distros[distro]['versions'][v].copy()
+                        import copy
+                        vv = copy.deepcopy(self.distros[distro]['versions'][v])
+                        #vv = self.distros[distro]['versions'][v].copy()
                         vv['same_as_version'] = v
                         self.distros[distro]['versions'][ver] = vv
                         for key in distros_dat.keys(ver_section):
                            vv[key] = self.__fixup_data(key, distros_dat.get(ver_section, key))
+                        dd = {}
+                        for dep in self.dependencies:
+                            dep_section = "%s:%s:%s" % (distro,ver,dep)
+                            if not distros_dat.has_section(dep_section):
+                                continue
+
+                            for key in distros_dat.keys(dep_section):
+                                dd[key] =  self.__fixup_data(key, distros_dat.get(dep_section, key))
+
+                            self.distros[distro]['versions'][ver]['dependency_cmds'][dep] = dd
+
                     except KeyError:
                         log.debug("Missing 'same_as_version=' version in distros.dat for section [%s:%s]." % (distro, v))
                         continue

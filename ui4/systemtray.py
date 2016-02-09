@@ -660,7 +660,12 @@ class SystemTrayApp(QApplication):
                 m = os.read(self.read_pipe, self.fmt_size)
                 while len(m) >= self.fmt_size:
                     event = device.Event(*[x.rstrip(b'\x00').decode('utf-8') if isinstance(x, bytes) else x for x in struct.unpack(self.fmt, m[:self.fmt_size])])
-                    m = m[self.fmt_size:]
+                    m = m[self.fmt_size:]                   
+
+                    if event.event_code == EVENT_ERROR_NO_PROBED_DEVICES_FOUND:
+                        newmsg = "HPLIP cannot detect devices in your network. This may be due to existing firewall settings blocking the required ports like (5353/udp). When you are in a trusted network environment, you may open the ports for network services like mdns and slp in the firewall. For detailed steps follow the link.\n\n http://hplipopensource.com/node/375"
+                        FailureUI(None, newmsg, "")
+                        continue
                     
                     if event.event_code == EVENT_CUPS_QUEUES_REMOVED or event.event_code == EVENT_CUPS_QUEUES_ADDED:
                         self.resetDevice()

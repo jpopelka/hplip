@@ -3621,11 +3621,13 @@ packaged_version=3.15.7
 release_date=22/10/2015
 same_as_version=15.04
 
+[ubuntu:15.10:python3-devel]
+packages=python3-dev,python3.4-dev,python3.5-dev
 
 # ****************************************
 [debian]
 index=2
-versions=6.0,6.0.1,6.0.2,6.0.3,6.0.4,6.0.5,6.0.6,6.0.7,6.0.8,6.0.9,6.0.10,7.0,7.1,7.2,7.3,7.4,7.5,7.6,7.7,7.8,7.9,8.0,8.1,8.2
+versions=6.0,6.0.1,6.0.2,6.0.3,6.0.4,6.0.5,6.0.6,6.0.7,6.0.8,6.0.9,6.0.10,7.0,7.1,7.2,7.3,7.4,7.5,7.6,7.7,7.8,7.9,8.0,8.1,8.2,8.3
 display_name=Debian
 alt_names=
 display=1
@@ -3986,7 +3988,7 @@ pcard_supported=1
 network_supported=1
 parallel_supported=1
 usb_supported=1
-packaged_version=3.15.2
+packaged_version=3.14.6
 release_date=04/05/2015
 notes=NOTE: Disable the CD Sources in your apt sources.list or the install will fail and hang.
 ppd_install=drv
@@ -4133,9 +4135,14 @@ packages=python3-reportlab
 [debian:8.1]
 same_as_version=8.0
 
-# ****************************************
+# *********************
 
 [debian:8.2]
+same_as_version=8.0
+
+# *********************
+
+[debian:8.3]
 same_as_version=8.0
 
 # *********************
@@ -6135,7 +6142,7 @@ packages=avahi
 # ****************************************
 [linuxmint]
 index=22
-versions=13,14,15,16,17,17.1,17.2
+versions=13,14,15,16,17,17.1,17.2,17.3
 display_name=Linux Mint
 alt_names=mint, mint linux
 display=1
@@ -6752,6 +6759,17 @@ code_name=Rafaela
 packaged_version=3.15.2
 release_date=07/08/2015
 same_as_version=17
+
+# ****************************************
+
+[linuxmint:17.3]
+code_name=Rosa
+packaged_version=3.15.4
+release_date=20/12/2015
+same_as_version=17
+
+[linuxmint:17.3:python-notify]
+packages=python-notify,mate-notification-daemon
 
 # ****************************************
 

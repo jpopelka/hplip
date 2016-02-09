@@ -107,23 +107,21 @@ ERROR_DIGITAL_SIGN_BAD =3
 MAJ_VER = sys.version_info[0]
 MIN_VER = sys.version_info[1]
 
-
-
 EXPECT_WORD_LIST = [
     pexpect.EOF, # 0
     pexpect.TIMEOUT, # 1
-    "Continue?", # 2 (for zypper)
-    "passwor[dt]:", # en/de/it/ru
-    "kennwort", # de?
-    "password for", # en
-    "mot de passe", # fr
-    "contraseña", # es
-    "palavra passe", # pt
-    "口令", # zh
-    "wachtwoord", # nl
-    "heslo", # czech
-    "密码",
-    "Lösenord", #sv
+    u"Continue?", # 2 (for zypper)
+    u"passwor[dt]:", # en/de/it/ru
+    u"kennwort", # de?
+    u"password for", # en
+    u"mot de passe", # fr
+    u"contraseña", # es
+    u"palavra passe", # pt
+    u"口令", # zh
+    u"wachtwoord", # nl
+    u"heslo", # czech
+    u"密码",
+    u"Lösenord", #sv
 ]
 
 
@@ -1260,6 +1258,17 @@ def run(cmd, passwordObj = None, pswd_msg='', log_output=True, spinner=True, tim
     import io
     output = io.StringIO()
 
+    pwd_prompt_str = ""
+    if passwordObj and ('su' in cmd or 'sudo' in cmd) and os.geteuid() != 0:
+        pwd_prompt_str = passwordObj.getPasswordPromptString()
+        log.debug("cmd = %s pwd_prompt_str = [%s]"%(cmd, pwd_prompt_str))
+        if(pwd_prompt_str == ""):
+            passwd = passwordObj.getPassword(pswd_msg, 0)
+            pwd_prompt_str = passwordObj.getPasswordPromptString()
+            log.debug("pwd_prompt_str2 = [%s]"%(pwd_prompt_str))
+            if(passwd == ""):
+               return 127, ""
+
     try:
         child = pexpect.spawnu(cmd, timeout=timeout)
     except pexpect.ExceptionPexpect as e:
@@ -1277,15 +1286,22 @@ def run(cmd, passwordObj = None, pswd_msg='', log_output=True, spinner=True, tim
                 continue
 
             if child.before:
+                if(pwd_prompt_str and pwd_prompt_str not in EXPECT_LIST):
+                    log.debug("Adding %s to EXPECT LIST"%pwd_prompt_str)
+                    try:
+                        p = re.compile(pwd_prompt_str, re.I)
+                    except TypeError:
+                        EXPECT_LIST.append(pwd_prompt_str)
+                    else:
+                        EXPECT_LIST.append(p)
+                        EXPECT_LIST.append(pwd_prompt_str)
+
                 try:
                     output.write(child.before)
+                    if log_output:
+                        log.debug(child.before)
                 except Exception:
                     pass
-                if log_output:
-                    try:
-                        log.debug(child.before)
-                    except Exception:
-                        pass
 
             if i == 0: # EOF
                 break
@@ -2018,7 +2034,7 @@ def download_from_network(weburl, outputFile = None, useURLLIB=False):
 
         if useURLLIB:
 		
-            sys.stdout.write("Download in progress..........")
+            #sys.stdout.write("Download in progress..........")
             try:
                 response = urllib2_request.urlopen(weburl)    
                 file_fd = open(outputFile, 'wb')

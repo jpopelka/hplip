@@ -168,7 +168,12 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) jd_open(mud_device *pd
    //there is no need of validating the MDL string against Device ID MDL string. If URI belongs to
    //an existing print queue then we need to validate the MDL, because the same IP address might get
    //assigned to some other device after adding a print queue.
-   printqueue = ( strstr(pd->uri, "queue=false") )? 0:1;
+   printqueue = (strstr(pd->uri, "queue=false") )? 0:1;
+
+   //Scanimage discards "&queue=false" from the device URI and hence above check will not work.
+   //Since Scanjets do not support SNMP hence skip device_id call by setting printqueue to 0
+   if(strstr(pd->uri, "scanjet"))
+      printqueue = 0;
 
    if (pd->id[0] == 0)
    {
@@ -203,7 +208,7 @@ enum HPMUD_RESULT __attribute__ ((visibility ("hidden"))) jd_open(mud_device *pd
        /* Make sure uri model matches device id model. */
        hpmud_get_uri_model(pd->uri, uri_model, sizeof(uri_model));
        hpmud_get_model(pd->id, model, sizeof(model));
-       if (strcmp(uri_model, model) != 0)
+       if (strcasecmp(uri_model, model) != 0)
        {
           stat = HPMUD_R_INVALID_URI;  /* different device plugged in */
           BUG("invalid uri model %s != %s\n", uri_model, model);

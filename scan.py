@@ -1047,6 +1047,10 @@ try:
                         log.note("You might be running an older version of reportlab. Please update to the latest version")
                         log.note("More information is available at http://hplipopensource.com/node/369")
                         sys.exit(1)
+                except Exception as e:
+                    log.error(e)
+                    log.note("Try Updating to reportlab version >= 3.2")
+                    sys.exit(1)
 
                 c.showPage()
                 os.unlink(p)

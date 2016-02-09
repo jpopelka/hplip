@@ -45,6 +45,7 @@
 #include "ledm.h"
 #include "sclpml.h"
 #include "escl.h"
+#include "io.h"
 
 #define DEBUG_DECLARE_ONLY
 #include "sanei_debug.h"
@@ -290,7 +291,7 @@ static int DevDiscovery(int localOnly)
         }
         if (cups_printer)
             free(cups_printer);
-
+#ifdef HAVE_LIBNETSNMP
         /* Discover NW scanners using Bonjour*/
         bytes_read = mdns_probe_nw_scanners(message, sizeof(message), &cnt);
         token = strtok(message, ";");
@@ -298,6 +299,11 @@ static int DevDiscovery(int localOnly)
         {
             total += AddDevice(token);
             token = strtok(NULL, ";");
+        }
+#endif
+        if(!total)
+        {          
+          SendScanEvent("hpaio:/net/HP_Scan_Devices?ip=1.1.1.1", EVENT_ERROR_NO_PROBED_DEVICES_FOUND);
         }
     }
 

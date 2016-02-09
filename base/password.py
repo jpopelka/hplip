@@ -104,6 +104,7 @@ def get_distro_name():
 class Password(object):
     def __init__(self, Mode = INTERACTIVE_MODE):
         self.__password =""
+        self.__password_prompt_str=""
         self.__passwordValidated = False
         self.__mode = Mode
         self.__readAuthType()  #self.__authType   
@@ -200,8 +201,7 @@ class Password(object):
                     i = child.expect(self.__expectList)
                     
                     cb = child.before
-                    if cb:
-
+                    if cb:  
                         start = time.time()
                         output.write(cb)
 
@@ -209,11 +209,26 @@ class Password(object):
                         ok, ret = True, output.getvalue()
                         break
 
-                    elif i == 1: # TIMEOUT
-                        
+                    elif i == 1: # TIMEOUT                        
+                        if('true' in cmd and self.__password_prompt_str == ""): #sudo true or su -c "true"
+                            cb = cb.replace("[", "\[")
+                            cb = cb.replace("]", "\]")
+
+                            self.__password_prompt_str = cb
+                            try:
+                                p = re.compile(cb, re.I)
+                            except TypeError:
+                                self.__expectList.append(cb)
+                            else:
+                                self.__expectList.append(p)
+                            log.debug("Adding missing password prompt string [%s]"%self.__password_prompt_str)
                         continue
 
                     else: # password
+                        if(self.__password_prompt_str == ""): 
+                            self.__password_prompt_str = utils.EXPECT_WORD_LIST[i]
+                            log.debug("Updating password prompt string [%s]"%self.__password_prompt_str)
+
                         child.sendline(self.__password)
 
             except (Exception, pexpect.ExceptionPexpect) as e:          
@@ -354,4 +369,8 @@ class Password(object):
 
         self.__validatePassword( pswd_msg)
         return self.__password
+
+    def getPasswordPromptString(self):
+        return self.__password_prompt_str
+
 

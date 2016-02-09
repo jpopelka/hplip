@@ -4676,14 +4676,6 @@ ality:Quality=2,Quality:ColorMode=2,Quality:MediaType=2,Quality:PenSet&&
     Attribute "Product" "" "(HP Deskjet 3325 Printer/scanjet 3530c)"
   }
   {
-    ModelName "HP Scanjet Pro 3500 f1 hpijs"
-    Attribute "NickName" "" "HP Scanjet Pro 3500 f1 hpijs, $Version"
-    Attribute "ShortNickName" "" "HP Scanjet Pro 3500 f1 hpijs"
-    Attribute "1284DeviceID" "" "MFG:HP;MDL:hp scanjet pro 3500 f1;DES:hp scanjet pro 3500 f1;"
-    PCFileName "hp-scanjet_pro_3500_f1-hpijs.ppd"
-    Attribute "Product" "" "(HP Scanjet Pro 3500 f1 Flatbed Scanner)"
-  }
-  {
     ModelName "HP Deskjet 3500 hpijs"
     Attribute "NickName" "" "HP Deskjet 3500 hpijs, $Version"
     Attribute "ShortNickName" "" "HP Deskjet 3500 hpijs"
@@ -12596,6 +12588,14 @@ Transparency"
     Attribute "Product" "" "(HP LaserJet Pro MFP m126nw)"
   }
   {
+    ModelName "HP LaserJet Pro MFP m127fs hpijs"
+    Attribute "NickName" "" "HP LaserJet Pro MFP m127fs hpijs, $Version, requires proprietary plugin"
+    Attribute "ShortNickName" "" "HP LJ Pro MFP m127fs hpijs"
+    Attribute "1284DeviceID" "" "MFG:Hewlett-Packard;MDL:hp laserjet pro mfp m127fs;DES:hp laserjet pro mfp m127fs;"
+    PCFileName "hp-laserjet_pro_mfp_m127fs-hpijs.ppd"
+    Attribute "Product" "" "(HP LaserJet Pro MFP m127fs)"
+  }
+  {
     ModelName "HP LaserJet Pro MFP m127fp hpijs"
     Attribute "NickName" "" "HP LaserJet Pro MFP m127fp hpijs, $Version, requires proprietary plugin"
     Attribute "ShortNickName" "" "HP LJ Pro MFP m127fp hpijs"
@@ -14687,10 +14687,11 @@ lity:PenSet=2,Quality:FullBleed=1"
     PCFileName "hp-envy_5540_series-hpijs.ppd"
     Attribute "Product" "" "(HP Envy 5540 All-in-one Printer Series)"
     Attribute "Product" "" "(HP Envy 5540 All-in-one Printer)"
-    Attribute "Product" "" "(HP Envy 5542 All-in-one Printer)"
+    Attribute "Product" "" "(HP Envy 5545 E-all-in-one Printer)"
     Attribute "Product" "" "(HP Envy 5543 All-in-one Printer)"
     Attribute "Product" "" "(HP Envy 5544 All-in-one Printer)"
-    Attribute "Product" "" "(HP Envy 5545 All-in-one Printer)"
+    Attribute "Product" "" "(HP Envy 5542 E-all-in-one Printer)"
+    Attribute "Product" "" "(HP Envy 5546 All-in-one Printer)"
   }
   {
     ModelName "HP Deskjet 5570 Series hpijs"
@@ -18602,6 +18603,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 2020 series;DES:deskjet 2020 series;"
     PCFileName "hp-deskjet_2020_series-hpijs.ppd"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 2020hc Printer)"
+    Attribute "Product" "" "(HP Deskjet Ultra Ink Advantage 2029 Printer)"
   }
   {
     ModelName "HP Deskjet 2510 Series hpijs"
@@ -18624,6 +18626,7 @@ lity:PenSet=2,Quality:FullBleed=1"
     Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 2520 series;DES:deskjet 2520 series;"
     PCFileName "hp-deskjet_2520_series-hpijs.ppd"
     Attribute "Product" "" "(HP Deskjet Ink Advantage 2520hc All-in-one)"
+    Attribute "Product" "" "(HP Deskjet Ink Advantage Ultra 2529 All-in-one Printer)"
   }
   {
     ModelName "HP Deskjet 3510 Series hpijs"

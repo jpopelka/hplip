@@ -107,9 +107,11 @@ for o, a in opts:
         
     elif o == '-s':
         Is_quiet_mode = True
+
 if services.running_as_root():
-    log.error("%s %s"  %(__mod__, queryString(ERROR_RUNNING_AS_ROOT)))
-    sys.exit(1)
+    log.warn("It is not recommended to run 'hp-plugin' in a root mode.")
+    mode = INTERACTIVE_MODE
+    #sys.exit(1)
 
 if not Is_quiet_mode:
     mod.quiet= False

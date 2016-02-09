@@ -83,19 +83,22 @@ DIST_COMMON = $(am__configure_deps) \
 	$(top_srcdir)/prnt/drv/hpijs.drv.in COPYING config.guess \
 	config.sub depcomp install-sh ltmain.sh missing
 @HPLIP_BUILD_TRUE@hp_PROGRAMS = hp$(EXEEXT)
+@HPLIP_BUILD_TRUE@@NETWORK_BUILD_TRUE@@SCAN_BUILD_TRUE@am__append_1 = libhpdiscovery.la
+@HPLIP_BUILD_TRUE@@NETWORK_BUILD_TRUE@@SCAN_BUILD_TRUE@am__append_2 = -Iprotocol/discovery
 
 # HP Service Discovery library
-@HPLIP_BUILD_TRUE@@NETWORK_BUILD_TRUE@am__append_1 = libhpdiscovery.la
+@HPLIP_BUILD_TRUE@@NETWORK_BUILD_TRUE@am__append_3 = libhpdiscovery.la
 
 # ip library
-@HPLIP_BUILD_TRUE@am__append_2 = libhpmud.la libhpip.la
-@HPLIP_BUILD_TRUE@@LIBUSB01_BUILD_TRUE@am__append_3 = io/hpmud/musb_libusb01.c 
-@HPLIP_BUILD_TRUE@@LIBUSB01_BUILD_TRUE@am__append_4 = -lusb
-@HPLIP_BUILD_TRUE@@LIBUSB01_BUILD_FALSE@am__append_5 = io/hpmud/musb.c 
-@HPLIP_BUILD_TRUE@@LIBUSB01_BUILD_FALSE@am__append_6 = -I/usr/include/libusb-1.0
-@HPLIP_BUILD_TRUE@@LIBUSB01_BUILD_FALSE@am__append_7 = -lusb-1.0
-@HPLIP_BUILD_TRUE@@NETWORK_BUILD_TRUE@am__append_8 = -l$(SNMPLIB) -lcrypto
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am__append_9 =  \
+@HPLIP_BUILD_TRUE@am__append_4 = libhpmud.la libhpip.la
+@HPLIP_BUILD_TRUE@@LIBUSB01_BUILD_TRUE@am__append_5 = io/hpmud/musb_libusb01.c 
+@HPLIP_BUILD_TRUE@@LIBUSB01_BUILD_TRUE@am__append_6 = -lusb
+@HPLIP_BUILD_TRUE@@LIBUSB01_BUILD_FALSE@am__append_7 = io/hpmud/musb.c 
+@HPLIP_BUILD_TRUE@@LIBUSB01_BUILD_FALSE@am__append_8 = -I/usr/include/libusb-1.0
+@HPLIP_BUILD_TRUE@@LIBUSB01_BUILD_FALSE@am__append_9 = -lusb-1.0
+@HPLIP_BUILD_TRUE@@NETWORK_BUILD_TRUE@am__append_10 = -Iprotocol/discovery
+@HPLIP_BUILD_TRUE@@NETWORK_BUILD_TRUE@am__append_11 = -l$(SNMPLIB) -lcrypto
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am__append_12 =  \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	scan/sane/hpaio.desc \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	prnt/drv/hpijs.drv.in.template \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	installer/text_install.py \
@@ -106,17 +109,19 @@ DIST_COMMON = $(am__configure_deps) \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	data/localization/hplip_pt.ts \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	data/localization/hplip_ru.ts \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	data/localization/hplip_zh.ts
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am__append_10 = dat2drv.py install.py hplip-install init-suse-firewall init-iptables-firewall
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am__append_13 = dat2drv.py install.py hplip-install init-suse-firewall init-iptables-firewall
 
 # ptest
 
 # hppgsz
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am__append_11 = ptest hppgsz
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am__append_14 = ptest hppgsz
 
 # IPP library
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am__append_12 = libhpipp.la
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@@LIBUSB01_BUILD_FALSE@am__append_13 = -I/usr/include/libusb-1.0 
-@FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@am__append_14 = ui/colorcalform2_base.ui ui/settingsdialog_base.ui ui/aligntype6form1_base.ui \
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am__append_15 = libhpipp.la
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@@NETWORK_BUILD_TRUE@am__append_16 = libhpdiscovery.la
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@@NETWORK_BUILD_TRUE@am__append_17 = -Iprotocol/discovery
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@@LIBUSB01_BUILD_FALSE@am__append_18 = -I/usr/include/libusb-1.0 
+@FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@am__append_19 = ui/colorcalform2_base.ui ui/settingsdialog_base.ui ui/aligntype6form1_base.ui \
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@	ui/aboutdlg_base.ui ui/imagepropertiesdlg_base.ui ui/paperedgealignform_base.ui ui/aligntype6form2_base.ui \
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@	ui/nodevicesform_base.ui ui/cleaningform_base.ui ui/colorcalform_base.ui ui/devmgr4_base.ui ui/loadpaperform_base.ui \
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@	ui/cleaningform2_base.ui ui/waitform_base.ui ui/coloradjform_base.ui ui/faxaddrbookeditform_base.ui \
@@ -126,12 +131,12 @@ DIST_COMMON = $(am__configure_deps) \
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@	ui/allowabletypesdlg_base.ui ui/setupform_base.ui ui/setupmanualfind_base.ui \
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@	ui/setupsettings_base.ui ui/pluginlicenseform_base.ui ui/align13form_base.ui ui/firmwaredialog_base.ui
 
-@FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT4_INSTALL_TRUE@am__append_15 = ui4/*.ui
+@FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT4_INSTALL_TRUE@am__append_20 = ui4/*.ui
 @HPIJS_INSTALL_TRUE@bin_PROGRAMS = hpijs$(EXEEXT)
 @HPCUPS_INSTALL_TRUE@hpcups_PROGRAMS = hpcups$(EXEEXT)
 @FAX_BUILD_TRUE@@HPCUPS_INSTALL_TRUE@@HPCUPS_ONLY_BUILD_FALSE@hpcupsfax_PROGRAMS = hpcupsfax$(EXEEXT)
-@FOOMATIC_PPD_INSTALL_TRUE@am__append_16 = $(foomatic_ppd_printers)
-@CUPS_PPD_INSTALL_TRUE@am__append_17 = $(cups_ppd_printers)
+@FOOMATIC_PPD_INSTALL_TRUE@am__append_21 = $(foomatic_ppd_printers)
+@CUPS_PPD_INSTALL_TRUE@am__append_22 = $(cups_ppd_printers)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -222,7 +227,7 @@ cupsext_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	$(cupsextdir)
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@hpmudext_la_DEPENDENCIES =  \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	libhpmud.la \
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	libhpdiscovery.la
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	$(am__append_16)
 am__hpmudext_la_SOURCES_DIST = io/mudext/hpmudext.c
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@am_hpmudext_la_OBJECTS =  \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	hpmudext_la-hpmudext.lo
@@ -344,10 +349,10 @@ libhpmud_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 @HPLIP_BUILD_TRUE@am_libhpmud_la_rpath = -rpath $(libdir)
 am__DEPENDENCIES_1 =
 @HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@libsane_hpaio_la_DEPENDENCIES =  \
-@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@	libhpip.la \
-@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@	libhpdiscovery.la \
-@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@	libhpmud.la libhpipp.la \
-@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@	$(am__DEPENDENCIES_1)
+@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@	libhpip.la libhpmud.la \
+@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@	libhpipp.la \
+@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@	$(am__DEPENDENCIES_1) \
+@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@	$(am__append_1)
 am__libsane_hpaio_la_SOURCES_DIST = scan/sane/hpaio.c \
 	scan/sane/mfpdtf.c scan/sane/pml.c scan/sane/scl.c \
 	scan/sane/io.c scan/sane/hpaio.h scan/sane/pml.h \
@@ -1164,6 +1169,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	ppd/hpijs/hp-deskjet_f4500_series-hpijs.ppd.gz \
 	ppd/hpijs/hp-envy_7640_series-hpijs.ppd.gz \
 	ppd/hpijs/hp-photosmart_a440_series-hpijs.ppd.gz \
+	ppd/hpijs/hp-laserjet_pro_mfp_m127fs-hpijs.ppd.gz \
 	ppd/hpijs/hp-officejet_h470-hpijs.ppd.gz \
 	ppd/hpijs/hp-deskjet_f300_series-hpijs.ppd.gz \
 	ppd/hpijs/hp-laserjet_4150_series-hpijs.ppd.gz \
@@ -1613,7 +1619,6 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	ppd/hpijs/hp-officejet_series_520-hpijs.ppd.gz \
 	ppd/hpijs/hp-deskjet_895c-hpijs.ppd.gz \
 	ppd/hpijs/hp-psc_2200_series-hpijs.ppd.gz \
-	ppd/hpijs/hp-scanjet_pro_3500_f1-hpijs.ppd.gz \
 	ppd/hpijs/hp-deskjet_843c-hpijs.ppd.gz \
 	ppd/hpijs/hp-photosmart_c4500_series-hpijs.ppd.gz \
 	ppd/hpijs/hp-officejet_7110_series-hpijs.ppd.gz \
@@ -2209,6 +2214,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	ppd/hpcups/hp-laserjet_pro_mfp_m126nw.ppd.gz \
 	ppd/hpcups/hp-laserjet_pro_mfp_m127fn.ppd.gz \
 	ppd/hpcups/hp-laserjet_pro_mfp_m127fp.ppd.gz \
+	ppd/hpcups/hp-laserjet_pro_mfp_m127fs.ppd.gz \
 	ppd/hpcups/hp-laserjet_pro_mfp_m127fw.ppd.gz \
 	ppd/hpcups/hp-laserjet_pro_mfp_m128fn.ppd.gz \
 	ppd/hpcups/hp-laserjet_pro_mfp_m128fp.ppd.gz \
@@ -2511,8 +2517,7 @@ am__dist_ppd_DATA_DIST = prnt/ps/hp-laserjet_4v-ps.ppd.gz \
 	ppd/hpcups/hp-psc_780xi.ppd.gz \
 	ppd/hpcups/hp-psc_900_series.ppd.gz \
 	ppd/hpcups/hp-psc_920.ppd.gz ppd/hpcups/hp-psc_950.ppd.gz \
-	ppd/hpcups/hp-psc_950vr.ppd.gz ppd/hpcups/hp-psc_950xi.ppd.gz \
-	ppd/hpcups/hp-scanjet_pro_3500_f1.ppd.gz
+	ppd/hpcups/hp-psc_950vr.ppd.gz ppd/hpcups/hp-psc_950xi.ppd.gz
 am__dist_prnt_DATA_DIST = prnt/cups.py prnt/__init__.py prnt/ldl.py \
 	prnt/pcl.py prnt/colorcal.py
 am__dist_rules_DATA_DIST = data/rules/56-hpmud.rules \
@@ -2815,9 +2820,9 @@ INCLUDES = -Iip -Iio/hpmud -Iscan/sane -Iprnt/hpijs -Icommon/
 hplipdir = $(datadir)/hplip
 doc_DATA = COPYING copyright prnt/hpijs/README_LIBJPG
 EXTRA_DIST = prnt/hpijs/gdevijs-krgb-1.5-gs8.61.patch prnt/hpijs/README_LIBJPG copyright
-dist_noinst_SCRIPTS = $(am__append_10)
-dist_noinst_DATA = $(am__append_9) $(am__append_14) $(am__append_15)
-lib_LTLIBRARIES = $(am__append_1) $(am__append_2) $(am__append_12)
+dist_noinst_SCRIPTS = $(am__append_13)
+dist_noinst_DATA = $(am__append_12) $(am__append_19) $(am__append_20)
+lib_LTLIBRARIES = $(am__append_3) $(am__append_4) $(am__append_15)
 foomatic_ppd_printers = \
     ppd/hpijs/hp-officejet_7400_series-hpijs.ppd.gz \
     ppd/hpijs/hp-psc_1358_series-hpijs.ppd.gz \
@@ -3007,6 +3012,7 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-deskjet_f4500_series-hpijs.ppd.gz \
     ppd/hpijs/hp-envy_7640_series-hpijs.ppd.gz \
     ppd/hpijs/hp-photosmart_a440_series-hpijs.ppd.gz \
+    ppd/hpijs/hp-laserjet_pro_mfp_m127fs-hpijs.ppd.gz \
     ppd/hpijs/hp-officejet_h470-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_f300_series-hpijs.ppd.gz \
     ppd/hpijs/hp-laserjet_4150_series-hpijs.ppd.gz \
@@ -3456,7 +3462,6 @@ foomatic_ppd_printers = \
     ppd/hpijs/hp-officejet_series_520-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_895c-hpijs.ppd.gz \
     ppd/hpijs/hp-psc_2200_series-hpijs.ppd.gz \
-    ppd/hpijs/hp-scanjet_pro_3500_f1-hpijs.ppd.gz \
     ppd/hpijs/hp-deskjet_843c-hpijs.ppd.gz \
     ppd/hpijs/hp-photosmart_c4500_series-hpijs.ppd.gz \
     ppd/hpijs/hp-officejet_7110_series-hpijs.ppd.gz \
@@ -4326,6 +4331,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-laserjet_pro_mfp_m126nw.ppd.gz \
    ppd/hpcups/hp-laserjet_pro_mfp_m127fn.ppd.gz \
    ppd/hpcups/hp-laserjet_pro_mfp_m127fp.ppd.gz \
+   ppd/hpcups/hp-laserjet_pro_mfp_m127fs.ppd.gz \
    ppd/hpcups/hp-laserjet_pro_mfp_m127fw.ppd.gz \
    ppd/hpcups/hp-laserjet_pro_mfp_m128fn.ppd.gz \
    ppd/hpcups/hp-laserjet_pro_mfp_m128fp.ppd.gz \
@@ -4633,8 +4639,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-psc_920.ppd.gz \
    ppd/hpcups/hp-psc_950.ppd.gz \
    ppd/hpcups/hp-psc_950vr.ppd.gz \
-   ppd/hpcups/hp-psc_950xi.ppd.gz \
-   ppd/hpcups/hp-scanjet_pro_3500_f1.ppd.gz
+   ppd/hpcups/hp-psc_950xi.ppd.gz
 
 cups_drv = prnt/drv/hpcups.drv
 @DOC_BUILD_TRUE@wwwsrc = doc
@@ -4666,9 +4671,14 @@ cups_drv = prnt/drv/hpcups.drv
 @DARWIN_BUILD_FALSE@@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@libsane_hpaio_la_LDFLAGS = -version-info 1:0:0
 @DARWIN_BUILD_TRUE@@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@libsane_hpaio_la_LDFLAGS = -module -framework CoreFoundation -version-info 1:0:0
 # The following is a interlibrary dependency that must be compiled first.
-@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@libsane_hpaio_la_LIBADD = libhpip.la libhpdiscovery.la libhpmud.la libhpipp.la $(DBUS_LIBS) -lcups -ldl
+@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@libsane_hpaio_la_LIBADD =  \
+@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@	libhpip.la libhpmud.la \
+@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@	libhpipp.la $(DBUS_LIBS) \
+@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@	-lcups -ldl $(am__append_1)
 #libsane_hpaio_la_CFLAGS = -DWITH_NONAMESPACES -DSOAP_DEBUG
-@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@libsane_hpaio_la_CFLAGS = $(DBUS_CFLAGS) -Iprotocol -Iprotocol/discovery
+@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@libsane_hpaio_la_CFLAGS =  \
+@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@	$(DBUS_CFLAGS) -Iprotocol \
+@HPLIP_BUILD_TRUE@@SCAN_BUILD_TRUE@	$(am__append_2)
 @HPLIP_BUILD_TRUE@@NETWORK_BUILD_TRUE@libhpdiscovery_la_SOURCES = protocol/discovery/mdns.c protocol/discovery/mdns.h
 @HPLIP_BUILD_TRUE@@NETWORK_BUILD_TRUE@libhpdiscovery_la_CFLAGS = -DCONFDIR=\"$(hplip_confdir)\"
 @HPLIP_BUILD_TRUE@@NETWORK_BUILD_TRUE@libhpdiscovery_la_LDFLAGS = -version-info 0:1:0
@@ -4678,10 +4688,10 @@ cups_drv = prnt/drv/hpcups.drv
 @HPLIP_BUILD_TRUE@MUDNAME = hpmud
 @HPLIP_BUILD_TRUE@libhpmud_la_CFLAGS = -DMUDNAME=\"$(MUDNAME)\" \
 @HPLIP_BUILD_TRUE@	-DCONFDIR=\"$(hplip_confdir)\" -Iprotocol \
-@HPLIP_BUILD_TRUE@	-Iprotocol/discovery $(am__append_6)
+@HPLIP_BUILD_TRUE@	$(am__append_8) $(am__append_10)
 @HPLIP_BUILD_TRUE@libhpmud_la_LDFLAGS = -version-info 0:6:0 -lpthread \
-@HPLIP_BUILD_TRUE@	-ldl $(am__append_4) $(am__append_7) \
-@HPLIP_BUILD_TRUE@	$(am__append_8)
+@HPLIP_BUILD_TRUE@	-ldl $(am__append_6) $(am__append_9) \
+@HPLIP_BUILD_TRUE@	$(am__append_11)
 @HPLIP_BUILD_TRUE@libhpmud_la_SOURCES = io/hpmud/hpmud.c \
 @HPLIP_BUILD_TRUE@	io/hpmud/mlc.c io/hpmud/model.c \
 @HPLIP_BUILD_TRUE@	io/hpmud/pml.c io/hpmud/hpmud.h \
@@ -4690,8 +4700,8 @@ cups_drv = prnt/drv/hpcups.drv
 @HPLIP_BUILD_TRUE@	io/hpmud/dot4.c io/hpmud/dot4.h \
 @HPLIP_BUILD_TRUE@	io/hpmud/jd.c io/hpmud/jd.h io/hpmud/pp.c \
 @HPLIP_BUILD_TRUE@	io/hpmud/pp.h io/hpmud/musb.h common/utils.c \
-@HPLIP_BUILD_TRUE@	common/utils.h $(am__append_3) \
-@HPLIP_BUILD_TRUE@	$(am__append_5)
+@HPLIP_BUILD_TRUE@	common/utils.h $(am__append_5) \
+@HPLIP_BUILD_TRUE@	$(am__append_7)
 @HPLIP_BUILD_TRUE@@NETWORK_BUILD_TRUE@libhpmud_la_LIBADD = libhpdiscovery.la
 @HPLIP_BUILD_TRUE@libhpip_la_LDFLAGS = -version-info 0:1:0
 @HPLIP_BUILD_TRUE@libhpip_la_LIBADD = -lm
@@ -4862,11 +4872,12 @@ cups_drv = prnt/drv/hpcups.drv
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@hpmudext_LTLIBRARIES = hpmudext.la
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@hpmudext_la_LDFLAGS = -module -avoid-version
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@hpmudext_la_SOURCES = io/mudext/hpmudext.c
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@hpmudext_la_LIBADD = libhpmud.la libhpdiscovery.la
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@hpmudext_la_CFLAGS =  \
 @FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	-I$(PYTHONINCLUDEDIR) \
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	-Iprotocol/discovery \
-@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	$(am__append_13)
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	$(am__append_17) \
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	$(am__append_18)
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@hpmudext_la_LIBADD = libhpmud.la \
+@FULL_BUILD_TRUE@@HPLIP_BUILD_TRUE@	$(am__append_16)
 
 # ui (qt3)
 @FULL_BUILD_TRUE@@GUI_BUILD_TRUE@@HPLIP_BUILD_TRUE@@QT3_INSTALL_TRUE@uidir = $(hplipdir)/ui
@@ -5044,8 +5055,8 @@ libapdk_la_CFLAGS = $(libapdk_la_CXXFLAGS) -Iprnt/hpijs
 
 # PPDs
 ppddir = $(hpppddir)
-dist_ppd_DATA = $(foomatic_ps_printers) $(am__append_16) \
-	$(am__append_17)
+dist_ppd_DATA = $(foomatic_ps_printers) $(am__append_21) \
+	$(am__append_22)
 @FOOMATIC_DRV_INSTALL_TRUE@cupsdrvdir = $(drvdir)
 @FOOMATIC_DRV_INSTALL_TRUE@cupsdrv_DATA = $(foomatic_drv)
 @CUPS_DRV_INSTALL_TRUE@cupsdrv2dir = $(drvdir)

@@ -517,13 +517,13 @@ class DependenciesCheck(CoreInstall):
                             status, output = utils.run('lpstat -p%s' % printer_name)
                             log.info("Printer status: %s" % output.replace("\n", ""))
 
-                            if back_end == 'hpfax' and not 'HP Fax' in desc:
+                            if back_end == 'hpfax' and not 'HP Fax' in desc and desc != '':
                                 self.num_errors += 1
-                                log.error("Incorrect PPD file for fax queue '%s'. Fax queues must use 'HP-Fax-hplip.ppd'." % printer_name)
+                                log.error("Incorrect PPD file for fax queue '%s'. Fax queues must use 'HP-Fax(n)-hpcups.ppd'." % printer_name)
 
-                            elif back_end == 'hp' and 'HP Fax' in desc:
+                            elif back_end == 'hp' and 'HP Fax' in desc and desc != '':
                                 self.num_errors += 1
-                                log.error("Incorrect PPD file for a print queue '%s'. Print queues must not use 'HP-Fax-hplip.ppd'." % printer_name)
+                                log.error("Incorrect PPD file for a print queue '%s'. Print queues must not use 'HP-Fax(n)-hpcups.ppd'." % printer_name)
 
                             elif back_end not in ('hp', 'hpfax'):
                                 log.warn("Printer is not HPLIP installed. Printers must use the hp: or hpfax: CUPS backend for HP-Devices.")
