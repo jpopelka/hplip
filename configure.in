@@ -26,7 +26,7 @@
 #   104 = no libdl
 
 #AC_PREREQ(2.59)
-AC_INIT([HP Linux Imaging and Printing], [3.16.2], [3.16.2], [hplip])
+AC_INIT([HP Linux Imaging and Printing], [3.16.3], [3.16.3], [hplip])
 #AM_INIT_AUTOMAKE([1.9 foreign])
 AM_INIT_AUTOMAKE
 AC_DISABLE_STATIC
@@ -352,7 +352,7 @@ AC_ARG_WITH(hpppddir, AC_HELP_STRING([--with-hpppddir=DIR], [set hp ppd install 
 AC_ARG_WITH(apparmordir, AC_HELP_STRING([--with-apparmordir=DIR], [set apparmor profile install directory [default=/etc/apparmor.d]]),
    apparmordir=$withval, apparmordir="/etc/apparmor.d")
 
-if test -f "/usr/share/cups/mime/mime.types"; then 
+if test -f "/usr/share/cups/mime/mime.types"; then
    abs_mimedir="/usr/share/cups/mime/"
 else
    abs_mimedir="/etc/cups/"
@@ -523,7 +523,7 @@ if test "$hpijs_only_build" = "no" && test "$network_build" = "yes" && test "$hp
    AC_CHECK_LIB([crypto], [CRYPTO_free],, [AC_MSG_ERROR([cannot find net-snmp support (or --disable-network-build)], 4)])
    AC_CHECK_LIB([netsnmp], [snmp_timeout], [LIBS="$old_LIBS" AC_DEFINE([HAVE_LIBNETSNMP]) SNMPLIB="netsnmp"], check_ucd=yes)
 if test "$check_ucd" = "yes"; then
-   AC_CHECK_LIB([snmp], [snmp_timeout], [LIBS="$old_LIBS" AC_DEFINE([HAVE_LIBNETSNMP]) AC_DEFINE([HAVE_UCDSNMP]) SNMPLIB="snmp"], 
+   AC_CHECK_LIB([snmp], [snmp_timeout], [LIBS="$old_LIBS" AC_DEFINE([HAVE_LIBNETSNMP]) AC_DEFINE([HAVE_UCDSNMP]) SNMPLIB="snmp"],
           [AC_MSG_ERROR([cannot find net/ucd-snmp support (or --disable-network-build)], 4)])
    AC_CHECK_HEADERS(ucd-snmp/ucd-snmp-config.h,, [AC_MSG_ERROR([cannot find ucd-snmp-devel support (or --disable-network-build)], 5)])
 else

@@ -255,10 +255,14 @@ class Password(object):
             if self.__mode == INTERACTIVE_MODE:
                 self.__password = self.__get_password(pswd_msg)
             else:
-                if self.getAuthType() == 'su':
-                    self.__password = self.__get_password_ui(pswd_msg, "root")
-                else:
-                    self.__password = self.__get_password_ui(pswd_msg, os.getenv("USER"))
+                try:
+                    if self.getAuthType() == 'su':
+                        self.__password = self.__get_password_ui(pswd_msg, "root")
+                    else:
+                        self.__password = self.__get_password_ui(pswd_msg, os.getenv("USER"))
+                except Exception as ex:
+                    log.debug(ex)
+                    break
 
             cmd = self.getAuthCmd() % "true"
             log.debug(cmd)

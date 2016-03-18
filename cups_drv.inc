@@ -169,6 +169,8 @@ cups_ppd_printers = \
    ppd/hpcups/hp-deskjet_5652.ppd.gz \
    ppd/hpcups/hp-deskjet_5700.ppd.gz \
    ppd/hpcups/hp-deskjet_5800.ppd.gz \
+   ppd/hpcups/hp-deskjet_5810_series.ppd.gz \
+   ppd/hpcups/hp-deskjet_5820_series.ppd.gz \
    ppd/hpcups/hp-deskjet_5850.ppd.gz \
    ppd/hpcups/hp-deskjet_5900_series.ppd.gz \
    ppd/hpcups/hp-deskjet_600.ppd.gz \

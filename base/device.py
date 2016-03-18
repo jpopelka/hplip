@@ -959,6 +959,7 @@ AGENT_healths = {AGENT_HEALTH_OK           : 'ok',
                   AGENT_HEALTH_OVERTEMP     : 'overtemp', # battery
                   AGENT_HEALTH_CHARGING     : 'charging', # battery
                   AGENT_HEALTH_DISCHARGING  : 'discharging', # battery
+                  AGENT_HEALTH_UNKNOWN      : 'unknown',
                 }
 
 

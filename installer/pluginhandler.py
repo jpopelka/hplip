@@ -184,7 +184,7 @@ class PluginHandle(object):
                 else:
                     wget = utils.which("wget", True)
                     if wget:
-                        status, output = utils.run("%s --timeout=60 --output-document=%s %s --cache=off" %(wget, local_conf, self.__plugin_conf_file))
+                        status, output = utils.run("%s --tries=3 --timeout=60 --output-document=%s %s --cache=off" %(wget, local_conf, self.__plugin_conf_file))
                         if status:
                             log.error("Plugin download failed with error code = %d" %status)
                             return status, url, check_sum

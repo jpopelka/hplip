@@ -12088,6 +12088,22 @@ Manufacturer "HP"
             Attribute "Product" "" "(HP Deskjet Ink Advantage Ultra 4720 All-in-one Printer Series)"
             Attribute "Product" "" "(HP Deskjet Ink Advantage Ultra 4729 All-in-one Printer)"
           }
+          {
+            ModelName "HP Deskjet 5810 Series"
+            Attribute "NickName" "" "HP Deskjet 5810 Series, hpcups $Version"
+            Attribute "ShortNickName" "" "HP Deskjet 5810 Series"
+            Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 5810 series;DES:deskjet 5810 series;"
+            PCFileName "hp-deskjet_5810_series.ppd"
+            Attribute "Product" "" "(HP Deskjet Gt 5810 All-in-one Printer)"
+          }
+          {
+            ModelName "HP Deskjet 5820 Series"
+            Attribute "NickName" "" "HP Deskjet 5820 Series, hpcups $Version"
+            Attribute "ShortNickName" "" "HP Deskjet 5820 Series"
+            Attribute "1284DeviceID" "" "MFG:HP;MDL:deskjet 5820 series;DES:deskjet 5820 series;"
+            PCFileName "hp-deskjet_5820_series.ppd"
+            Attribute "Product" "" "(HP Deskjet Gt 5820 All-in-one Printer)"
+          }
 
 }// End Pyramid15
 

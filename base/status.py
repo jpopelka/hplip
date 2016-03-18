@@ -1493,11 +1493,13 @@ pen_level10_xlate = { 'ok' : AGENT_LEVEL_TRIGGER_SUFFICIENT_0,
                       'out' : AGENT_LEVEL_TRIGGER_ALMOST_DEFINITELY_OUT,
                       'empty' : AGENT_LEVEL_TRIGGER_ALMOST_DEFINITELY_OUT,
                       'missing' : AGENT_LEVEL_TRIGGER_ALMOST_DEFINITELY_OUT,
+                      'unknown' : AGENT_LEVEL_UNKNOWN,
                     }
 
 pen_health10_xlate = { 'ok' : AGENT_HEALTH_OK,
                        'misinstalled' : AGENT_HEALTH_MISINSTALLED,
                        'missing' : AGENT_HEALTH_MISINSTALLED,
+                       'unknown' : AGENT_HEALTH_UNKNOWN,
                      }
 
 
@@ -1584,6 +1586,7 @@ def StatusType10Agents(func): # Low End Data Model
             try:
                 type = e.find("ConsumableTypeEnum").text
                 state = e.find("ConsumableLifeState/ConsumableState").text
+                quantityState = e.find("ConsumableLifeState/MeasuredQuantityState").text
 
                 # level
                 if type == "ink" or type == "inkCartridge" or type == "toner" or type == "tonerCartridge":
@@ -1591,7 +1594,9 @@ def StatusType10Agents(func): # Low End Data Model
                     if state != "missing":
                         try:
                            ink_level = int(e.find("ConsumablePercentageLevelRemaining").text)
-                           if ink_level == 0:
+                           if ink_level == 0 and quantityState == 'unknown':
+                                state = "unknown"
+                           elif ink_level == 0:
                                state = "empty"
                            elif ink_level <=10:
                                state = "low"

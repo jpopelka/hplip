@@ -550,6 +550,12 @@
 :model "HP Deskjet f735 All-in-one Printer"
 :status :good
 
+:model "HP Deskjet Gt 5810 All-in-one Printer"
+:status :good
+
+:model "HP Deskjet Gt 5820 All-in-one Printer"
+:status :good
+
 :model "HP Deskjet Ink Adv 2060 k110"
 :status :good
 
@@ -1052,6 +1058,9 @@
 :status :good
 
 :model "HP LaserJet 9065 Multifunction Printer"
+:status :good
+
+:model "HP LaserJet Enterprise Flow MFP m630h"
 :status :good
 
 :model "HP LaserJet Enterprise Flow MFP m630z"
@@ -2189,6 +2198,18 @@
 :status :good
 
 :model "HP Oficejet 6500 e710n-z"
+:status :good
+
+:model "HP Pagewide Pro 477dn Multifunction Printer"
+:status :good
+
+:model "HP Pagewide Pro 477dw Multifunction Printer"
+:status :good
+
+:model "HP Pagewide Pro 577dw Multifunction Printer"
+:status :good
+
+:model "HP Pagewide Pro 577z Multifunction Printer"
 :status :good
 
 :model "HP Photosmart 2570 All-in-one Printer"
