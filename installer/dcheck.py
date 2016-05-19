@@ -304,6 +304,20 @@ def get_pyQt4_version():
         ver = QtCore.PYQT_VERSION_STR
     return ver
 
+
+def get_pyQt5_version():
+    log.debug("Checking PyQt 5.x version...")
+    ver ='-'
+    # PyQt 5
+    try:
+        import PyQt5
+    except ImportError:
+        ver='-'
+    else:
+        from PyQt5 import QtCore
+        ver = QtCore.PYQT_VERSION_STR
+    return ver
+
 def get_reportlab_version():
     try:
         log.debug("Trying to import 'reportlab'...")

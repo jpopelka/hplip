@@ -59,7 +59,7 @@ try:
     log.set_module(__mod__)
     mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
                     (INTERACTIVE_MODE, GUI_MODE),
-                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4),
+                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4, UI_TOOLKIT_QT5),
                     run_as_root_ok=True,quiet=True)
     try:
         opts, device_uri, printer_name, mode, ui_toolkit, loc = mod.parseStdOpts('hl:gsiu',
@@ -104,7 +104,7 @@ try:
         usage()
     if not quiet_mode:
         utils.log_title(__title__, __version__)
-        
+
     mod.lockInstance(__mod__, True)
     log_file = os.path.normpath('%s/hplip_queues.log'%prop.user_dir)
     log.debug(log.bold("Saving output in log file: %s" % log_file))
@@ -118,8 +118,8 @@ try:
 
     passwordObj = password.Password(mode)
     queues.main_function(passwordObj, mode,ui_toolkit, quiet_mode )
-    
-               
+
+
 except KeyboardInterrupt:
     log.error("User exit")
 

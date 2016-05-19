@@ -514,6 +514,7 @@ cups_ppd_printers = \
    ppd/hpcups/hp-officejet.ppd.gz \
    ppd/hpcups/hp-officejet_100_mobile_l411.ppd.gz \
    ppd/hpcups/hp-officejet_150_mobile_l511.ppd.gz \
+   ppd/hpcups/hp-officejet_200_mobile_series.ppd.gz \
    ppd/hpcups/hp-officejet_2620_series.ppd.gz \
    ppd/hpcups/hp-officejet_3830_series.ppd.gz \
    ppd/hpcups/hp-officejet_4000_k210.ppd.gz \
@@ -604,6 +605,8 @@ cups_ppd_printers = \
    ppd/hpcups/hp-officejet_pro_8630.ppd.gz \
    ppd/hpcups/hp-officejet_pro_8640.ppd.gz \
    ppd/hpcups/hp-officejet_pro_8660.ppd.gz \
+   ppd/hpcups/hp-officejet_pro_8710.ppd.gz \
+   ppd/hpcups/hp-officejet_pro_8720.ppd.gz \
    ppd/hpcups/hp-officejet_pro_k5300.ppd.gz \
    ppd/hpcups/hp-officejet_pro_k5400.ppd.gz \
    ppd/hpcups/hp-officejet_pro_k550.ppd.gz \

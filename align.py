@@ -31,12 +31,18 @@ import re
 import getopt
 import operator
 import os
-#from __future__ import absolute_import
+
+
 # Local
 from base.g import *
 from base import device, status, utils, maint, tui, module
 from prnt import cups
 
+try:
+    from importlib import import_module
+except ImportError as e:
+    log.debug(e)
+    from base.utils import dyn_import_mod as import_module
 
 def enterAlignmentNumber(letter, hortvert, colors, line_count, maximum):
     ok, value = tui.enter_range("From the printed Alignment page, Enter the best aligned value for line %s (1-%d): " %
@@ -130,7 +136,7 @@ def aioUI2():
 
 try:
     mod = module.Module(__mod__, __title__, __version__, __doc__, None,
-                        (INTERACTIVE_MODE, GUI_MODE), (UI_TOOLKIT_QT4,))
+                        (INTERACTIVE_MODE, GUI_MODE), (UI_TOOLKIT_QT4, UI_TOOLKIT_QT5))
 
     mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS,
                  see_also_list=['hp-clean', 'hp-colorcal', 'hp-linefeedcal',
@@ -228,18 +234,20 @@ try:
             d.close()
 
     else: # GUI_MODE (qt4)
-        try:
-            from PyQt4.QtGui import QApplication
-            from ui4.aligndialog import AlignDialog
-        except ImportError:
-            log.error("Unable to load Qt4 support. Is it installed?")
-            sys.exit(1)
+        # try:
+        #     from PyQt4.QtGui import QApplication
+        #     from ui4.aligndialog import AlignDialog
+        # except ImportError:
+        #     log.error("Unable to load Qt4 support. Is it installed?")
+        #     sys.exit(1)
+        QApplication, ui_package = utils.import_dialog(ui_toolkit)
+        ui = import_module(ui_package + ".aligndialog")
 
 
         #try:
         if 1:
             app = QApplication(sys.argv)
-            dlg = AlignDialog(None, device_uri)
+            dlg = ui.AlignDialog(None, device_uri)
             dlg.show()
             try:
                 log.debug("Starting GUI loop...")

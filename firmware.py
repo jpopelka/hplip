@@ -33,16 +33,23 @@ import operator
 import time
 import os
 
+
 # Local
 from base.g import *
 from base import device, status, utils, tui, module
 from prnt import cups
 
+try:
+    from importlib import import_module
+except ImportError as e:
+    log.debug(e)
+    from base.utils import dyn_import_mod as import_module
+
 
 try:
     mod = module.Module(__mod__, __title__, __version__, __doc__, None,
                         (INTERACTIVE_MODE, GUI_MODE, NON_INTERACTIVE_MODE),
-                        (UI_TOOLKIT_QT4, UI_TOOLKIT_QT3), True, True)
+                        (UI_TOOLKIT_QT5, UI_TOOLKIT_QT4, UI_TOOLKIT_QT3), True, True)
 
     mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS,
         extra_options=[
@@ -89,10 +96,10 @@ try:
             mode = NON_INTERACTIVE_MODE
 
 
-    if mode == GUI_MODE and ui_toolkit == 'qt4':
+    if mode == GUI_MODE and (ui_toolkit == 'qt4' or ui_toolkit == 'qt5'):
         if not utils.canEnterGUIMode4():
-            log.error("%s -u/--gui requires Qt4 GUI support. Entering interactive mode." % __mod__)
-            mode = INTERACTIVE_MODE
+            log.error("%s -u/--gui requires Qt4/Qt5 GUI support. Entering interactive mode." % __mod__)
+            mode = INTERACTIVE_MODE4
 
     elif mode == GUI_MODE and ui_toolkit == 'qt3':
        if not utils.canEnterGUIMode():
@@ -103,13 +110,15 @@ try:
         mod.quiet = False
 
     if mode == GUI_MODE:
-        if ui_toolkit == 'qt4':
-           try:
-            from PyQt4.QtGui import QApplication
-            from ui4.firmwaredialog import FirmwareDialog
-           except ImportError:
-            log.error("Unable to load Qt4 support. Is it installed?")
-            sys.exit(1)
+        if ui_toolkit == 'qt4'or ui_toolkit == 'qt5':
+           # try:
+           #  from PyQt4.QtGui import QApplication
+           #  from ui4.firmwaredialog import FirmwareDialog
+           # except ImportError:
+           #  log.error("Unable to load Qt4 support. Is it installed?")
+           #  sys.exit(1)
+            QApplication, ui_package = utils.import_dialog(ui_toolkit)
+            ui = import_module(ui_package + ".firmwaredialog")
 
         if ui_toolkit == 'qt3':
            try:
@@ -127,11 +136,11 @@ try:
 
         if device_uri:
             app = QApplication(sys.argv)
-            dialog = FirmwareDialog(None, device_uri)
+            dialog = ui.FirmwareDialog(None, device_uri)
             dialog.show()
             try:
                 log.debug("Starting GUI loop...")
-                if ui_toolkit == 'qt4':
+                if ui_toolkit == 'qt4' or ui_toolkit == 'qt5':
                    app.exec_()
                 elif ui_toolkit == 'qt3':
                    dialog.exec_loop()

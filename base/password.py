@@ -110,11 +110,12 @@ class Password(object):
         self.__readAuthType()  #self.__authType   
         self.__expectList =[]
 
-        if not utils.to_bool(sys_conf.get('configure','qt4', '0')) and utils.to_bool(sys_conf.get('configure','qt3', '0')):
+        if not utils.to_bool(sys_conf.get('configure','qt5', '0')) and not not utils.to_bool(sys_conf.get('configure','qt4', '0')) and utils.to_bool(sys_conf.get('configure','qt3', '0')):
             self.__ui_toolkit = 'qt3'
-        else:
+        elif not utils.to_bool(sys_conf.get('configure','qt5', '0')) and not utils.to_bool(sys_conf.get('configure','qt3', '0')) and utils.to_bool(sys_conf.get('configure','qt4', '0')):
             self.__ui_toolkit = 'qt4'
-            
+        elif not utils.to_bool(sys_conf.get('configure','qt3', '0')) and not utils.to_bool(sys_conf.get('configure','qt4', '0')) and utils.to_bool(sys_conf.get('configure','qt5', '0')):
+            self.__ui_toolkit = 'qt5'
             
         for s in utils.EXPECT_WORD_LIST:
             try:
@@ -170,6 +171,9 @@ class Password(object):
 
         if self.__ui_toolkit == "qt3":
             from ui.setupform import showPasswordUI
+            username, password = showPasswordUI(pswd_msg, user, False)
+        elif self.__ui_toolkit == "qt5":
+            from ui5.setupdialog import showPasswordUI
             username, password = showPasswordUI(pswd_msg, user, False)
         else:       #self.__ui_toolkit == "qt4" --> default qt4
             from ui4.setupdialog import showPasswordUI
@@ -273,7 +277,9 @@ class Password(object):
             if self.__mode == GUI_MODE:
                 if self.__ui_toolkit == "qt4":
                     from ui4.setupdialog import FailureMessageUI
-                if self.__ui_toolkit == "qt3":
+                elif self.__ui_toolkit == "qt5":
+                    from ui5.setupdialog import FailureMessageUI
+                elif self.__ui_toolkit == "qt3":
                     from ui.setupform import FailureMessageUI
 
 

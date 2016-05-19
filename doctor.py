@@ -202,7 +202,7 @@ log.set_module(__mod__)
 try:
     mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
                     (INTERACTIVE_MODE, GUI_MODE),
-                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4), True)
+                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4, UI_TOOLKIT_QT5), True)
 
     opts, device_uri, printer_name, mode, ui_toolkit, loc = \
                mod.parseStdOpts('hl:gnid:f:w', ['summary-only','help', 'help-rest', 'help-man', 'help-desc', 'interactive', 'gui', 'lang=','logging=', 'debug'],
@@ -272,11 +272,11 @@ try:
 
     ui_toolkit = sys_conf.get('configure','ui-toolkit')
 
-    core =  DependenciesCheck(MODE_CHECK,INTERACTIVE_MODE,ui_toolkit)
-    core.init()
+    dep =  DependenciesCheck(MODE_CHECK,INTERACTIVE_MODE,ui_toolkit)
+    dep.core.init()
     log.info(log.bold("\n\nChecking for Deprecated items...."))
 
-    deprecated_check(core)
+    deprecated_check(dep.core)
 
     log.info(log.bold("\n\nChecking for HPLIP updates...."))
     upgrade_cmd = utils.which('hp-upgrade',True)
@@ -292,16 +292,16 @@ try:
     ### Dependency check
     log.info(log.bold("\n\nChecking for Dependencies...."))
     if SUMMARY_ONLY:
-        num_errors, num_warns = core.validate(DEPENDENCY_RUN_AND_COMPILE_TIME, True)
+        num_errors, num_warns = dep.validate(DEPENDENCY_RUN_AND_COMPILE_TIME, True)
     else:
-        num_errors, num_warns = core.validate(DEPENDENCY_RUN_AND_COMPILE_TIME, False)
+        num_errors, num_warns = dep.validate(DEPENDENCY_RUN_AND_COMPILE_TIME, False)
 
     if num_errors or num_warns:
 
-        if core.get_required_deps() or core.get_optional_deps() or core.get_cmd_to_run():
-            display_missing_dependencies(core.get_required_deps(),core.get_optional_deps(), core.get_cmd_to_run())
-            authenticate(core)
-            core.install_missing_dependencies(INTERACTIVE_MODE,core.get_required_deps(),core.get_optional_deps(), core.get_cmd_to_run())
+        if dep.get_required_deps() or dep.get_optional_deps() or dep.get_cmd_to_run():
+            display_missing_dependencies(dep.get_required_deps(),dep.get_optional_deps(), dep.get_cmd_to_run())
+            authenticate(dep.core)
+            dep.core.install_missing_dependencies(INTERACTIVE_MODE,dep.get_required_deps(),dep.get_optional_deps(), dep.get_cmd_to_run())
 
         log.info(log.bold("\n\nChecking Permissions...."))
 #        if not core.get_missing_user_grps() and not core.get_disable_selinux_status():
@@ -325,11 +325,11 @@ try:
         #         IS_RESTART_REQ = True
 
     log.info(log.bold("\n\nChecking for Configured Queues...."))
-    queues.main_function(core.passwordObj, MODE,ui_toolkit, False, DEVICE_URI)
+    queues.main_function(dep.core.passwordObj, MODE,ui_toolkit, False, DEVICE_URI)
 
     log.info(log.bold("\n\nChecking for HP Properitery Plugin's...."))
     ### Check for Plugin Printers
-    install_plugin(core)
+    install_plugin(dep)
 
     smart_ins_dev_list = smart_install.get_smartinstall_enabled_devices()
     if smart_ins_dev_list:
@@ -339,7 +339,7 @@ try:
             log.error("Smart Install is Enabled in '%s' Printer. This needs to be disabled."%printer)
         log.info(log.bold("\nRefer link '%s' to disable Smart Install manually.\n"%(url)))
 
-    comm_err_dev = core.get_communication_error_devs()
+    comm_err_dev = dep.get_communication_error_devs()
     if comm_err_dev:
         log.info(log.bold("\n\nChecking for Printer Status...."))
         for printer in comm_err_dev:

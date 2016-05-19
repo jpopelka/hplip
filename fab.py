@@ -30,10 +30,18 @@ import cmd
 import getopt
 import os
 
+
 # Local
 from base.g import *
 from base import utils, tui, module
 from base.sixext.moves import input
+
+try:
+    from importlib import import_module
+except ImportError as e:
+    log.debug(e)
+    from base.utils import dyn_import_mod as import_module
+
 
 # Console class (from ASPN Python Cookbook)
 # Author:   James Thiele
@@ -761,7 +769,7 @@ class Console(cmd.Cmd):
 
 mod = module.Module(__mod__, __title__, __version__, __doc__, None,
                     (GUI_MODE, INTERACTIVE_MODE),
-                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4))
+                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4, UI_TOOLKIT_QT5))
 
 mod.setUsage(module.USAGE_FLAG_NONE)
 
@@ -844,18 +852,16 @@ if mode == GUI_MODE:
         sys.exit(0)
 
     else: # qt4
-        try:
-            from PyQt4.QtGui import QApplication
-            from ui4.fabwindow import FABWindow
-        except ImportError:
-            log.error("Unable to load Qt4 support. Is it installed?")
-            sys.exit(1)
+
+        QApplication, ui_package = utils.import_dialog(ui_toolkit)
+        ui = import_module(ui_package + ".fabwindow")
+
 
         log.set_module("hp-fab(qt4)")
 
         if 1:
             app = QApplication(sys.argv)
-            fab = FABWindow(None)
+            fab = ui.FABWindow(None)
             fab.show()
 
             try:

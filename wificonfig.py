@@ -38,10 +38,16 @@ from base.g import *
 from base import device, utils, maint, tui, module
 from prnt import cups
 
+try:
+    from importlib import import_module
+except ImportError as e:
+    log.debug(e)
+    from base.utils import dyn_import_mod as import_module
+
 
 try:
     mod = module.Module(__mod__, __title__, __version__, __doc__, None,
-                       (GUI_MODE,), (UI_TOOLKIT_QT4,))
+                       (GUI_MODE,), (UI_TOOLKIT_QT4, UI_TOOLKIT_QT5))
 
     mod.setUsage(module.USAGE_FLAG_NONE,
                  see_also_list=['hp-setup'])
@@ -58,15 +64,18 @@ try:
         log.error("%s -u/--gui requires Qt4 GUI support. Exiting." % __mod__)
         sys.exit(1)
 
-    try:
-        from PyQt4.QtGui import QApplication
-        from ui4.wifisetupdialog import WifiSetupDialog
-    except ImportError:
-        log.error("Unable to load Qt4 support. Is it installed?")
-        sys.exit(1)
+    # try:
+    #     from PyQt4.QtGui import QApplication
+    #     from ui4.wifisetupdialog import WifiSetupDialog
+    # except ImportError:
+    #     log.error("Unable to load Qt4 support. Is it installed?")
+    #     sys.exit(1)
+
+    QApplication, ui_package = utils.import_dialog(ui_toolkit)
+    ui = import_module(ui_package + ".wifisetupdialog")
 
     app = QApplication(sys.argv)
-    dlg = WifiSetupDialog(None, device_uri, standalone=True)
+    dlg = ui.WifiSetupDialog(None, device_uri, standalone=True)
     dlg.show()
     try:
         log.debug("Starting GUI loop...")

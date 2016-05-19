@@ -161,7 +161,8 @@ except ImportError:
         log.error("hp-check-plugin Tool requires dBus and python-dbus")
         sys.exit(1)
 try:
-    mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE, (INTERACTIVE_MODE, GUI_MODE), (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4), run_as_root_ok=True, quiet=True)
+    mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
+    (INTERACTIVE_MODE, GUI_MODE), (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4, UI_TOOLKIT_QT5), run_as_root_ok=True, quiet=True)
     opts, device_uri, printer_name, mode, ui_toolkit, loc = \
          mod.parseStdOpts('l:hHuUmMfFpPgG',['gui','help', 'help-rest', 'help-man', 'help-desc','logging='],handle_device_printer=False)
 

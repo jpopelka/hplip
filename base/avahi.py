@@ -66,5 +66,3 @@ def detectNetworkDevices(ttl=4, timeout=10):
     log.debug("Found %d devices" % len(found_devices))
 
     return found_devices
-
-

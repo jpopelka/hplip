@@ -33,9 +33,17 @@ import os.path
 import re
 import os
 
+
 # Local
 from base.g import *
 from base import utils, module
+
+try:
+    from importlib import import_module
+except ImportError as e:
+    log.debug(e)
+    from base.utils import dyn_import_mod as import_module
+
 
 def usage(typ='text'):
     if typ == 'text':
@@ -59,7 +67,7 @@ USAGE = [ (__doc__, "", "name", True),
 
 mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
                     (INTERACTIVE_MODE, GUI_MODE),
-                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4), True)
+                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4, UI_TOOLKIT_QT5), True)
 
 opts, device_uri, printer_name, mode, ui_toolkit, loc = \
     mod.parseStdOpts( handle_device_printer=False)
@@ -77,13 +85,17 @@ if mode == GUI_MODE:
             log.error("%s requires GUI support . Is Qt4 installed?" % __mod__)
             sys.exit(1)
 
-        try:
-            from PyQt4.QtGui import QApplication, QMessageBox
-            from ui4.plugindiagnose import PluginDiagnose
-            from installer import pluginhandler
-        except ImportError:
-            log.error("Unable to load Qt4 support. Is it installed?")
-            sys.exit(1)
+        # try:
+        #     from PyQt4.QtGui import QApplication, QMessageBox
+        #     from ui4.plugindiagnose import PluginDiagnose
+        #     from installer import pluginhandler
+        # except ImportError:
+        #     log.error("Unable to load Qt4 support. Is it installed?")
+        #     sys.exit(1)
+
+        QApplication, ui_package = utils.import_dialog(ui_toolkit)
+        ui = import_module(ui_package + ".plugindiagnose")
+        from installer import pluginhandler
 
         app = QApplication(sys.argv)
         pluginObj = pluginhandler.PluginHandle()
@@ -92,9 +104,9 @@ if mode == GUI_MODE:
             log.info("Device Plugin is already installed")
             sys.exit(0)
         elif plugin_sts == PLUGIN_NOT_INSTALLED:
-            dialog = PluginDiagnose(None, install_mode, plugin_reason)
+            dialog = ui.PluginDiagnose(None, install_mode, plugin_reason)
         else:
-            dialog = PluginDiagnose(None, install_mode, plugin_reason, True)
+            dialog = ui.PluginDiagnose(None, install_mode, plugin_reason, True)
 
         dialog.show()
         try:

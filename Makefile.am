@@ -376,6 +376,17 @@ dist_noinst_DATA += ui4/*.ui
 endif
 endif
 
+#ui5 (qt5)
+if GUI_BUILD
+if QT5_INSTALL
+ui5dir=$(hplipdir)/ui5
+dist_ui5_DATA = ui5/*.py
+dist_noinst_DATA += ui5/*.ui
+endif
+endif
+
+
+
 # ui plugins (qt3)
 if GUI_BUILD
 if QT3_INSTALL
@@ -392,6 +403,15 @@ plugins4dir = $(hplipdir)/ui4/plugins
 dist_plugins4_SCRIPTS =
 endif
 endif
+
+# ui plugins (qt5)
+if GUI_BUILD
+if QT5_INSTALL
+plugins5dir = $(hplipdir)/ui5/plugins
+dist_plugins5_SCRIPTS =
+endif
+endif
+
 
 # PolicyKit
 if POLICYKIT_INSTALL

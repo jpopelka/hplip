@@ -69,11 +69,6 @@ USAGE = [(__doc__, "", "name", True),
         
 Ver_Func_Pat = re.compile('''FUNC#(.*)''')
 
-EXTERNALDEP = 1
-GENERALDEP = 2
-COMPILEDEP = 3
-PYEXT = 4 
-SCANCONF = 5
 IS_LIBUSB01_ENABLED = 'no'
 
 ############ Functions #########
@@ -172,12 +167,12 @@ def get_comment(package, Inst_status, installed_ver):
 
 ########## Classes ###########
 #DependenciesCheck class derived from CoreInstall
-class DependenciesCheck(CoreInstall):
-    def __init__(self,mode=MODE_CHECK, ui_mode=INTERACTIVE_MODE, ui_toolkit='qt4'):
-        CoreInstall.__init__(self,mode,ui_mode,ui_toolkit)
+class DependenciesCheck(object):
+    def __init__(self, mode=MODE_CHECK, ui_mode=INTERACTIVE_MODE, ui_toolkit='qt4'):
+        # CoreInstall.__init__(self,mode,ui_mode,ui_toolkit)
         self.num_errors = 0
         self.num_warns = 0
-        
+        self.core = CoreInstall(mode, ui_mode, ui_toolkit)
 #        self.missing_user_grps = ''
         self.ui_toolkit = ui_toolkit
 #        self.disable_selinux = False
@@ -187,14 +182,16 @@ class DependenciesCheck(CoreInstall):
         self.comm_error_devices = {}
         self.plugin_status = ''
         self.smart_install_devices = []
-        
+
         self.user_grps_cmd = ''
 
 
     def __update_deps_info(self, sup_dist_vers, d, deps_info):
         if d == 'cups-ddk' and self.cups_ddk_not_req == True:
             return
-        elif self.ui_toolkit != 'qt4' and self.ui_toolkit != 'qt3' and d == 'pyqt':
+        elif self.ui_toolkit != 'qt5' and self.ui_toolkit != 'qt4' and self.ui_toolkit != 'qt3' and d == 'pyqt':
+            return
+        elif d == 'pyqt' and self.ui_toolkit == 'qt5':
             return
         elif d == 'pyqt' and self.ui_toolkit == 'qt4':
             return
@@ -202,15 +199,15 @@ class DependenciesCheck(CoreInstall):
             return
         elif d == 'hpaio' and not self.scanning_enabled:
             return
-        elif self.distro_name =="rhel" and "5." in self.distro_version:
+        elif self.core.distro =="rhel" and "5." in self.distro_version:
             if d in ['dbus','python-devel','python-dbus','pyqt4-dbus','libnetsnmp-devel','gcc','make','reportlab','policykit','sane-devel','cups-ddk']:
                 return
 
         if deps_info[6] is None:
             installed_ver = '-'
         elif Ver_Func_Pat.search(deps_info[6]):
-            if deps_info[6] in self.version_func:
-                installed_ver = self.version_func[deps_info[6]]()
+            if deps_info[6] in self.core.version_func:
+                installed_ver = self.core.version_func[deps_info[6]]()
             else:
                 installed_ver = '-'
         else:
@@ -218,26 +215,26 @@ class DependenciesCheck(CoreInstall):
         Status = Status_Type(deps_info[3](),deps_info[5],installed_ver) 
         comment = get_comment(d, Status, installed_ver)
         packages_to_install, commands=[],[]
-        if self.is_auto_installer_support():
-            packages_to_install, commands = self.get_dependency_data(d)
+        if self.core.is_auto_installer_support():
+            packages_to_install, commands = self.core.get_dependency_data(d)
             if not packages_to_install and d == 'hpaio':
                 packages_to_install.append(d)
         else:
-            packages_to_install, commands = self.get_dependency_data(d,sup_dist_vers)
+            packages_to_install, commands = self.core.get_dependency_data(d,sup_dist_vers)
             if not packages_to_install and d == 'hpaio':
                 packages_to_install.append(d)
-                
+
         if deps_info[0]:
             package_type = "REQUIRED"
         else:
             package_type = "OPTIONAL"
-            
+
         if d == 'cups' and ((installed_ver == '-') or check_version(installed_ver,'1.4')):
             self.cups_ddk_not_req = True
             log.debug("cups -ddk not required as cups version [%s] is => 1.4 "%installed_ver)
         if d == 'hpmudext' and Status == 'OK':
             self.hpmudext_avail = True
-            
+
         if Status == 'OK':
             log.info(" %-20s %-60s %-15s %-15s %-15s %-10s %s" %(d,deps_info[2], package_type,deps_info[5],installed_ver,Status,comment))
         else:
@@ -303,19 +300,19 @@ class DependenciesCheck(CoreInstall):
             log.set_where(log.LOG_TO_FILE)
 
         IS_LIBUSB01_ENABLED = sys_conf.get('configure', 'libusb01-build', 'no')
-        vrs =self.get_distro_data('versions_list')
-        supported_distro_vrs= self.distro_version
-        if self.distro_version not in vrs and len(vrs):
+        vrs =self.core.get_distro_data('versions_list')
+        supported_distro_vrs= self.core.distro_version
+        if self.core.distro_version not in vrs and len(vrs):
             supported_distro_vrs= vrs[len(vrs)-1]
             log.warn(log.bold("%s-%s version is not supported. Using %s-%s versions dependencies to verify and install..." \
-                     %(self.distro_name, self.distro_version, self.distro_name, supported_distro_vrs)))
-          
+                     %(self.core.distro, self.core.distro_version, self.core.distro, supported_distro_vrs)))
+
         tui.header("SYSTEM INFO")
         Sts, Kernel_info =utils.run("uname -r -v -o")
         Sts, Host_info =utils.run("uname -n")
         Sts, Proc_info =utils.run("uname -r -v -o")
         log.info(" Kernel: %s Host: %s Proc: %s Distribution: %s %s"\
-             %(Kernel_info,Host_info,Proc_info,self.distro_name, self.distro_version))
+             %(Kernel_info,Host_info,Proc_info,self.core.distro, self.core.distro_version))
         log.info(" Bitness: %s bit\n"%utils.getBitness())
         tui.header("HPLIP CONFIGURATION")
         v = sys_conf.get('hplip', 'version')
@@ -323,10 +320,10 @@ class DependenciesCheck(CoreInstall):
             home = sys_conf.get('dirs', 'home')
             log.info("HPLIP-Version: HPLIP %s" %v)
             log.info("HPLIP-Home: %s" %home)
-            if self.is_auto_installer_support():
-                log.info("HPLIP-Installation: Auto installation is supported for %s distro  %s version " %(self.distro_name, self.distro_version))
+            if self.core.is_auto_installer_support():
+                log.info("HPLIP-Installation: Auto installation is supported for %s distro  %s version " %(self.core.distro_name, self.core.distro_version))
             else:
-                log.warn("HPLIP-Installation: Auto installation is not supported for %s distro  %s version " %(self.distro_name, self.distro_version))
+                log.warn("HPLIP-Installation: Auto installation is not supported for %s distro  %s version " %(self.core.distro, self.core.distro_version))
 
             log.info()
             log.info(log.bold("Current contents of '/etc/hp/hplip.conf' file:"))
@@ -360,41 +357,50 @@ class DependenciesCheck(CoreInstall):
             self.scanning_enabled = utils.to_bool(sys_conf.get('configure', 'scanner-build', '0'))
             log.info(" %-20s %-20s %-10s %-10s %-10s %-10s %s"%( "<Package-name>", " <Package-Desc>", "<Required/Optional>", "<Min-Version>","<Installed-Version>", "<Status>", "<Comment>"))
 
-            self.dependencies.update(self.hplip_dependencies)
+            self.core.dependencies.update(self.core.hplip_dependencies)
             if time_flag == DEPENDENCY_RUN_AND_COMPILE_TIME or time_flag == DEPENDENCY_RUN_TIME:
-                tui.header(" External Dependencies")
-                for dep in self.dependencies:
-                    if self.dependencies[dep][7] == EXTERNALDEP:
-                        self.__update_deps_info(supported_distro_vrs, dep, self.dependencies[dep])
+                dep_dict = { "External Dependencies": EXTERNALDEP, "General Dependencies": GENERALDEP, "COMPILEDEP": COMPILEDEP, "Python Extentions": PYEXT, "Scan Configuration": SCANCONF }
+                for dep_check in dep_dict:
+                    tui.header(dep_check)
+                    for dep in self.core.dependencies:
+                        if self.core.dependencies[dep][7] == dep_dict[dep_check] and any([self.core.selected_options[x] for x in self.core.dependencies[dep][1]]):
+                            self.__update_deps_info(supported_distro_vrs, dep,
+                            self.core.dependencies[dep])
 
-                tui.header(" General Dependencies")
-                for dep in self.dependencies:
-                    if self.dependencies[dep][7] == GENERALDEP:
-                        self.__update_deps_info(supported_distro_vrs, dep, self.dependencies[dep])
+                # tui.header(" External Dependencies")
+                # for dep in self.dependencies:
+                #     if self.dependencies[dep][7] == EXTERNALDEP:
+                #         self.__update_deps_info(supported_distro_vrs, dep, self.dependencies[dep])
 
-                tui.header(" COMPILEDEP")
-                for dep in self.dependencies:
-                    if self.dependencies[dep][7] == COMPILEDEP:
-                        self.__update_deps_info(supported_distro_vrs, dep, self.dependencies[dep])
+                # tui.header(" General Dependencies")
+                # for dep in self.dependencies:
+                #     if self.dependencies[dep][7] == GENERALDEP:
+                #         self.__update_deps_info(supported_distro_vrs, dep, self.dependencies[dep])
 
-                tui.header(" Python Extentions")
-                for dep in self.dependencies:
-                    if self.dependencies[dep][7] == PYEXT:
-                        self.__update_deps_info(supported_distro_vrs, dep, self.dependencies[dep])
+                # tui.header(" COMPILEDEP")
+                # for dep in self.dependencies:
+                #     if self.dependencies[dep][7] == COMPILEDEP:
+                #         self.__update_deps_info(supported_distro_vrs, dep, self.dependencies[dep])
 
-                tui.header(" Scan Configuration")
-                for dep in self.dependencies:
-                    if self.dependencies[dep][7] == SCANCONF:
-                        self.__update_deps_info(supported_distro_vrs, dep, self.dependencies[dep])
+                # tui.header(" Python Extentions")
+                # for dep in self.dependencies:
+                #     if self.dependencies[dep][7] == PYEXT:
+                #         self.__update_deps_info(supported_distro_vrs, dep, self.dependencies[dep])
 
-                tui.header(" Other Dependencies")
-                for dep in self.dependencies:
-                    if self.dependencies[dep][7] != SCANCONF and    \
-                        self.dependencies[dep][7] != PYEXT and  \
-                        self.dependencies[dep][7] != COMPILEDEP and     \
-                        self.dependencies[dep][7] != GENERALDEP and     \
-                        self.dependencies[dep][7] != EXTERNALDEP:
-                        self.__update_deps_info(supported_distro_vrs, dep, self.dependencies[dep])
+                # tui.header(" Scan Configuration")
+                # for dep in self.dependencies:
+                #     if self.dependencies[dep][7] == SCANCONF:
+                #         self.__update_deps_info(supported_distro_vrs, dep, self.dependencies[dep])
+
+                # tui.header(" Other Dependencies")
+                # for dep in self.dependencies:
+                #     if self.dependencies[dep][7] in dep_dict:
+                #     # if self.dependencies[dep][7] != SCANCONF and    \
+                #     #     self.dependencies[dep][7] != PYEXT and  \
+                #     #     self.dependencies[dep][7] != COMPILEDEP and     \
+                #     #     self.dependencies[dep][7] != GENERALDEP and     \
+                #     #     self.dependencies[dep][7] != EXTERNALDEP:
+                #         self.__update_deps_info(supported_distro_vrs, dep, self.dependencies[dep])
 
             if self.scanning_enabled:
                 tui.header("DISCOVERED SCANNER DEVICES")
@@ -517,13 +523,13 @@ class DependenciesCheck(CoreInstall):
                             status, output = utils.run('lpstat -p%s' % printer_name)
                             log.info("Printer status: %s" % output.replace("\n", ""))
 
-                            if back_end == 'hpfax' and not 'HP Fax' in desc and desc != '':
+                            if back_end == 'hpfax' and desc and not 'HP Fax' in desc:
                                 self.num_errors += 1
-                                log.error("Incorrect PPD file for fax queue '%s'. Fax queues must use 'HP-Fax(n)-hpcups.ppd'." % printer_name)
+                                log.error("Incorrect PPD file for fax queue '%s'. Fax queues must use 'HP-Fax-hplip.ppd'." % printer_name)
 
-                            elif back_end == 'hp' and 'HP Fax' in desc and desc != '':
+                            elif back_end == 'hp' and desc and 'HP Fax' in desc:
                                 self.num_errors += 1
-                                log.error("Incorrect PPD file for a print queue '%s'. Print queues must not use 'HP-Fax(n)-hpcups.ppd'." % printer_name)
+                                log.error("Incorrect PPD file for a print queue '%s'. Print queues must not use 'HP-Fax-hplip.ppd'." % printer_name)
 
                             elif back_end not in ('hp', 'hpfax'):
                                 log.warn("Printer is not HPLIP installed. Printers must use the hp: or hpfax: CUPS backend for HP-Devices.")
@@ -851,12 +857,12 @@ if __name__ == "__main__":
 
         show_title()
         ui_toolkit = sys_conf.get('configure','ui-toolkit')
-        core =  DependenciesCheck(MODE_CHECK,INTERACTIVE_MODE,ui_toolkit)
-        core.init()
-        num_errors, num_warns = core.validate(time_flag, is_quiet_mode)
+        dep =  DependenciesCheck(MODE_CHECK,INTERACTIVE_MODE,ui_toolkit)
+        dep.core.init()
+        num_errors, num_warns = dep.validate(time_flag, is_quiet_mode)
 
         if num_errors or num_warns:
-            core.display_summary()
+            dep.display_summary()
         else:
             log.info(log.green("No errors or warnings."))
 

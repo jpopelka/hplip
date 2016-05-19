@@ -399,13 +399,28 @@ def start(language, auto=True, test_depends=False,
 
             log.info("%-20s %-20s %-20s"%( "Package-Name", "Component", "Required/Optional"))
             for d in core.dependencies:
-                if (not core.have_dependencies[d]):
+                comp_list = core.dependencies[d][1]
+                comp_tuple = [(x, core.selected_options[x]) for x in comp_list if
+                              core.selected_options[x]]
+
+                # if not core.have_dependencies[d] and core.selected_options[core.dependencies[d][1][0]]:
+                #     if core.dependencies[d][0]:
+                #         deptype = "REQUIRED"
+                #     else:
+                #         deptype = "OPTIONAL"
+                        
+                #     log.info("%-20s %-20s %-20s" %(d,
+                #     core.dependencies[d][1][0], deptype))
+
+                if not core.have_dependencies[d] and comp_tuple and comp_tuple[0][1]:
                     if core.dependencies[d][0]:
                         deptype = "REQUIRED"
                     else:
                         deptype = "OPTIONAL"
                         
-                    log.info("%-20s %-20s %-20s" %(d, core.dependencies[d][1][0], deptype))
+                    log.info("%-20s %-20s %-20s" %(d, comp_tuple[0][0],
+                    deptype)) 
+                
 
             ok, ans = tui.enter_yes_no("Do you want to install these missing dependencies")
             if not ok:
@@ -996,6 +1011,8 @@ def start(language, auto=True, test_depends=False,
                     setup_cmd = 'hp-setup  -u'
                     if os_utils.execute(setup_cmd) != 0:
                         log.error("hp-setup failed. Please run hp-setup manually.")
+                    #if not services.run_hp_tools_with_auth('hp-setup', core.passwordObj):
+                        #log.error("hp-setup failed. Please run hp-setup manually.")
 
                 elif ok and choice == 'i':
                     setup_cmd = 'hp-setup  -i'

@@ -40,6 +40,7 @@ restricted-build=no
 ui-toolkit=@ui_toolkit@
 qt3=@qt3@
 qt4=@qt4@
+qt5=@qt5@
 policy-kit=@policykit@
 lite-build=@lite_build@
 udev_sysfs_rules=@udev_sysfs_rules@

@@ -30,6 +30,7 @@ import sys
 import os
 import getopt
 
+
 # Local
 from base.g import *
 from base import utils, device, tui, module
@@ -37,12 +38,19 @@ from prnt import cups
 
 log.set_module('hp-print')
 
+try:
+    from importlib import import_module
+except ImportError as e:
+    log.debug(e)
+    from base.utils import dyn_import_mod as import_module
+
+
 app = None
 printdlg = None
 
 
 mod = module.Module(__mod__, __title__, __version__, __doc__, None,
-                    (GUI_MODE,), (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4))
+                    (GUI_MODE,), (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4, UI_TOOLKIT_QT5))
 
 mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS | module.USAGE_FLAG_FILE_ARGS,
              see_also_list=['hp-printsettings'])
@@ -125,16 +133,18 @@ if ui_toolkit == 'qt3':
 
 
 else: # qt4
-    try:
-        from PyQt4.QtGui import QApplication
-        from ui4.printdialog import PrintDialog
-    except ImportError:
-        log.error("Unable to load Qt4 support. Is it installed?")
-        sys.exit(1)
+    # try:
+    #     from PyQt4.QtGui import QApplication
+    #     from ui4.printdialog import PrintDialog
+    # except ImportError:
+    #     log.error("Unable to load Qt4 support. Is it installed?")
+    #     sys.exit(1)
+    QApplication, ui_package = utils.import_dialog(ui_toolkit)
+    ui = import_module(ui_package + ".printdialog")
 
     if 1:
         app = QApplication(sys.argv)
-        dlg = PrintDialog(None, printer_name, mod.args)
+        dlg = ui.PrintDialog(None, printer_name, mod.args)
         dlg.show()
         try:
             log.debug("Starting GUI loop...")

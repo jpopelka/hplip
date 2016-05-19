@@ -33,7 +33,8 @@ BROWSER_MODE = 3 # -w
 # Supported UI toolkits
 UI_TOOLKIT_QT3 = 0
 UI_TOOLKIT_QT4 = 1
-UI_TOOLKIT_GTK = 2 # Not used
+UI_TOOLKIT_QT5 = 2
+UI_TOOLKIT_GTK = 3 # Not used
 
 # device types (CUPS queue or SANE types)
 DEVICE_TYPE_UNKNOWN = 0

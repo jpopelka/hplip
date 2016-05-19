@@ -2086,6 +2086,21 @@
 :model "HP Officejet Pro 8660 E-all-in-one Printer"
 :status :good
 
+:model "HP Officejet Pro 8710 All-in-one Printer"
+:status :good
+
+:model "HP Officejet Pro 8715 All-in-one Printer"
+:status :good
+
+:model "HP Officejet Pro 8720 All-in-one Printer"
+:status :good
+
+:model "HP Officejet Pro 8725 All-in-one Printer"
+:status :good
+
+:model "HP Officejet Pro 8740 All-in-one Printer"
+:status :good
+
 :model "HP Officejet Pro l7300 Series All-in-one Printer"
 :status :good
 

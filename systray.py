@@ -49,7 +49,7 @@ if __name__ == '__main__':
         os.setsid()
 
     mod = module.Module(__mod__, __title__, __version__, __doc__, None,
-                       (GUI_MODE,), (UI_TOOLKIT_QT4, UI_TOOLKIT_QT3))
+                       (GUI_MODE,), (UI_TOOLKIT_QT5, UI_TOOLKIT_QT4, UI_TOOLKIT_QT3))
 
     mod.setUsage(module.USAGE_FLAG_NONE,
         extra_options=[("Startup even if no hplip CUPS queues are present:", "-x or --force-startup", "option", False)])
@@ -104,9 +104,13 @@ if __name__ == '__main__':
         
         else: # qt4
             try:
-                import ui4.systemtray as systray
-            except ImportError:
-                log.error("Unable to load Qt4 support. Is it installed?")
+                if ui_toolkit == "qt4":
+                    import ui4.systemtray as systray
+                elif ui_toolkit == "qt5":
+                    import ui5.systemtray as systray
+            except ImportError as e:
+                log.error(e)
+                log.error("Unable to load Qt4/Qt5 support. Is it installed?")
                 mod.unlockInstance()
                 sys.exit(1)        
 
@@ -118,8 +122,8 @@ if __name__ == '__main__':
     else:
         # child (dbus & device i/o [qt4] or dbus [qt3])
         os.close(r1)
-        
-        if ui_toolkit == 'qt4':
+
+        if ui_toolkit in  ('qt4', 'qt5'):
             r2, w2 = os.pipe()
             r3, w3 = os.pipe()
             

@@ -79,6 +79,10 @@ class Module(object):
             self.installed_ui_toolkits.append(UI_TOOLKIT_QT4)
             self.num_installed_ui_toolkits += 1
 
+        if utils.to_bool(sys_conf.get('configure', 'qt5', '0')):
+            self.installed_ui_toolkits.append(UI_TOOLKIT_QT5)
+            self.num_installed_ui_toolkits += 1
+
         self.default_mode = INTERACTIVE_MODE
 
         self.num_valid_modes = 0
@@ -109,14 +113,17 @@ class Module(object):
                 self.default_ui_toolkit = 'none'
 
             elif (UI_TOOLKIT_QT4 in self.supported_ui_toolkits and self.default_ui_toolkit == 'qt4' and UI_TOOLKIT_QT4 in self.installed_ui_toolkits) or \
-                 (UI_TOOLKIT_QT3 in self.supported_ui_toolkits and self.default_ui_toolkit == 'qt3' and UI_TOOLKIT_QT3 in self.installed_ui_toolkits):
-
+                 (UI_TOOLKIT_QT3 in self.supported_ui_toolkits and self.default_ui_toolkit == 'qt3' and UI_TOOLKIT_QT3 in self.installed_ui_toolkits) or \
+                 (UI_TOOLKIT_QT5 in self.supported_ui_toolkits and self.default_ui_toolkit == 'qt5' and UI_TOOLKIT_QT5 in self.installed_ui_toolkits):
                 self.default_mode = GUI_MODE
 
             elif self.default_ui_toolkit == 'qt3' and UI_TOOLKIT_QT3 not in self.supported_ui_toolkits:
 
                 if UI_TOOLKIT_QT4 in self.supported_ui_toolkits and UI_TOOLKIT_QT4 in self.installed_ui_toolkits: # (e.g, hp-linefeedcal?)
                     self.default_ui_toolkit = 'qt4'
+                    self.default_mode = GUI_MODE
+                if UI_TOOLKIT_QT5 in self.supported_ui_toolkits and UI_TOOLKIT_QT5 in self.installed_ui_toolkits:
+                    self.default_ui_toolkit = 'qt5'
                     self.default_mode = GUI_MODE
 
                 elif INTERACTIVE_MODE in self.avail_modes:
@@ -204,6 +211,10 @@ class Module(object):
 
             if UI_TOOLKIT_QT4 in self.supported_ui_toolkits and UI_TOOLKIT_QT4 in self.installed_ui_toolkits:
                 content.append(utils.USAGE_USE_QT4)
+
+            if UI_TOOLKIT_QT5 in self.supported_ui_toolkits and UI_TOOLKIT_QT5 in self.installed_ui_toolkits:
+                content.append(utils.USAGE_USE_QT5)
+                
 
         content.append(utils.USAGE_LOGGING1)
         content.append(utils.USAGE_LOGGING2)
@@ -379,6 +390,18 @@ class Module(object):
                             ui_toolkit = 'qt4'
                         else:
                             error_msg.append("%s does not support Qt4. Unable to enter GUI mode." % self.mod)
+ 
+                elif o in ('--qt5', '--use-qt5'):
+                    if self.avail_modes is not None and GUI_MODE in self.avail_modes:
+                        if self.supported_ui_toolkits is not None and \
+                            UI_TOOLKIT_QT5 in self.supported_ui_toolkits and prop.gui_build and \
+                            UI_TOOLKIT_QT5 in self.installed_ui_toolkits:
+
+                            mode = GUI_MODE
+                            ui_toolkit = 'qt5'
+                        else:
+                            error_msg.append("%s does not support Qt4. Unable to enter GUI mode." % self.mod)
+               
 
                 #elif o in ('--lang', '--loc'):
                 #    if a.strip() == '?':

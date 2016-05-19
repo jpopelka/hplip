@@ -117,6 +117,8 @@ TECH_CLASSES = [
     "Kapan",
     "MimasTDR",
     "Saipan15B",
+    "Gemstone",
+    "SPDOfficejetProAsize",
 ]
 
 TECH_CLASSES.sort()
@@ -183,6 +185,8 @@ TECH_CLASS_PDLS = {
     "Kapan"         : 'pcl3',
     "MimasTDR"      : 'pcl3',
     "Saipan15B"     : 'pcl3',
+    "Gemstone"      : 'pcl3',
+    "SPDOfficejetProAsize" : 'pcl3',
 }
 
 PDL_TYPE_PCL = 0  # less preferred

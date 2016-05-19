@@ -26,7 +26,7 @@ import re
 import gzip
 import os.path
 import time
-from .sixext.moves import urllib_request, urllib_parse, urllib_error # TODO: Replace with urllib2 (urllib is deprecated in Python 3.0)
+from .sixext.moves import urllib_request, urllib_parse, urllib_error
 import io
 from io import BytesIO
 from .sixext.moves import http_client

@@ -32,6 +32,12 @@ from prnt import cups
 from installer import core_install
 from .sixext import to_string_utf8
 
+try:
+    from importlib import import_module
+except ImportError as e:
+    log.debug(e)
+    from .utils import dyn_import_mod as import_module
+
 
 # ppd type
 HPCUPS = 1
@@ -368,15 +374,12 @@ def main_function(passwordObj = None, mode = GUI_MODE, ui_toolkit= UI_TOOLKIT_QT
             log.error("This is not supported in Qt3, requires GUI support (try running with --qt4). Also, try using interactive (-i) mode.")
             sys.exit(1)
 
-        try:
-            from PyQt4.QtGui import QApplication, QMessageBox
-            from ui4.queuesconf import QueuesDiagnose
-            from ui4 import setupdialog
-        except ImportError:
-            log.error("Unable to load Qt4 support. Is it installed?")
-            sys.exit(1)
+        QApplication, ui_package = utils.import_dialog(ui_toolkit)
+        ui = import_module(ui_package + ".queuesconf")
+        setupdialog = import_module(ui_package + ".setupdialog")
+
         app = QApplication(sys.argv)
-        dialog = QueuesDiagnose(None, "","",QUEUES_MSG_SENDING,passwordObj)
+        dialog = ui.QueuesDiagnose(None, "","",QUEUES_MSG_SENDING,passwordObj)
 
         cups.setPasswordCallback(setupdialog.showPasswordUI)
         mapofDevices,status = parseQueues(mode)

@@ -35,10 +35,13 @@ import re
 import os
 import gzip
 
+
 try:
     import readline
 except ImportError:
     pass
+
+
 
 # Local
 from base.g import *
@@ -46,6 +49,13 @@ from base import device, utils, tui, models, module, services, os_utils
 from prnt import cups
 from base.sixext.moves import input
 from base.sixext import to_unicode, from_unicode_to_str
+
+
+try:
+    from importlib import import_module
+except ImportError as e:
+    log.debug(e)
+    from base.utils import dyn_import_mod as import_module
 
 pm = None
 
@@ -116,7 +126,7 @@ USAGE = [ (__doc__, "", "name", True),
 
 mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
                     (INTERACTIVE_MODE, GUI_MODE),
-                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4),
+                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4, UI_TOOLKIT_QT5),
                     run_as_root_ok=True)
 
 opts, device_uri, printer_name, mode, ui_toolkit, loc = \
@@ -281,19 +291,33 @@ if mode == GUI_MODE:
         cups.releaseCupsInstance()
 
     else: # qt4
-        try:
-            from PyQt4.QtGui import QApplication, QMessageBox
-            from ui4.setupdialog import SetupDialog
-        except ImportError as e:
-            log.error("Unable to load Qt4 support. Is it installed? %s" % e)
-            clean_exit(1)
+        # if utils.ui_status[1] == "PyQt4":
+        #     try:
+        #         from PyQt4.QtGui import QApplication, QMessageBox
+        #         from ui4.setupdialog import SetupDialog
+        #     except ImportError as e:
+        #         log.error(e)
+        #         clean_exit(1)
+        # elif utils.ui_status[1] == "PyQt5":
+        #     try:
+        #         from PyQt5.QtWidgets import QApplication, QMessageBox
+        #         from ui5.setupdialog import SetupDialog
+        #     except ImportError as e:
+        #         log.error(e)
+        #         clean_exit(1)
+        # else:
+        #     log.error("Unable to load Qt support. Is it installed?")
+        #     clean_exit(1)
+
+        QApplication, ui_package = utils.import_dialog(ui_toolkit)
+        ui = import_module(ui_package + ".setupdialog")
 
         app = QApplication(sys.argv)
         log.debug("Sys.argv=%s printer_name=%s param=%s jd_port=%s device_uri=%s remove=%s" % (sys.argv, printer_name, param, jd_port, device_uri, remove))
-        dlg = SetupDialog(None, param, jd_port, device_uri, remove)
+        dlg = ui.SetupDialog(None, param, jd_port, device_uri, remove)
         dlg.show()
         try:
-            log.debug("Starting GUI loop...")
+            log.debug("Starting GUI Event Loop...")
             app.exec_()
         except KeyboardInterrupt:
             clean_exit(0)

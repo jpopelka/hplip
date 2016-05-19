@@ -188,7 +188,7 @@ log.set_module(__mod__)
 try:
     mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
                     (INTERACTIVE_MODE, GUI_MODE),
-                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4), True)
+                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4, UI_TOOLKIT_QT5), True)
 
     opts, device_uri, printer_name, mode, ui_toolkit, loc = \
                mod.parseStdOpts('hl:gniup:d:of:sw', ['notify','check','help', 'help-rest', 'help-man', 'help-desc', 'interactive', 'gui', 'lang=','logging=', 'debug'],

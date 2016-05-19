@@ -174,6 +174,8 @@ PYTHON_STR      = "Python 2.2 or greater - Python programming language"
 PYNTF_STR       = "Python libnotify - Python bindings for the libnotify Desktop notifications"
 QT4DBUS_STR     = "PyQt 4 DBus - DBus Support for PyQt4"
 QT4_STR         = "PyQt 4- Qt interface for Python (for Qt version 4.x)"
+QT5DBUS_STR     = "PyQt 5 DBus - DBus Support for PyQt5"
+QT5_STR         = "PyQt 5- Qt interface for Python (for Qt version 4.x)"
 PYDBUS_STR      = "Python DBus - Python bindings for DBus"
 PYXML_STR       = "Python XML libraries"
 PY_DEV_STR      = "Python devel - Python development files"
@@ -215,7 +217,8 @@ else: # using Python 2.5+
 
 
 class CoreInstall(object):
-    def __init__(self, mode=MODE_INSTALLER, ui_mode=INTERACTIVE_MODE, ui_toolkit='qt4'):
+    def __init__(self, mode=MODE_INSTALLER, ui_mode=INTERACTIVE_MODE,
+                 ui_toolkit='qt4'):
         os.umask(0o022)
         self.mode = mode
         self.ui_mode = ui_mode
@@ -289,7 +292,7 @@ class CoreInstall(object):
         # 'name': ('description', [<option list>])
         self.components = {
             'hplip': ("HP Linux Imaging and Printing System", ['base', 'network', 'gui_qt4',
-                                                               'fax', 'scan', 'docs']),
+                                                               'gui_qt5', 'fax', 'scan', 'docs']),
         }
 
         self.selected_component = 'hplip'
@@ -300,6 +303,8 @@ class CoreInstall(object):
             'base':     (True,  'Required HPLIP base components (including hpcups)', []), # HPLIP
             'network' : (False, 'Network/JetDirect I/O', []),
             'gui_qt4' : (False, 'Graphical User Interfaces (Qt4)', []),
+            'gui_qt5' : (False, 'Graphical User Interfaces (Qt5)', []),
+            'gui_qt'  : (False, 'Graphical User Interfaces (Qt)', []),
             'fax' :     (False, 'PC Send Fax support', []),
             'scan':     (False, 'Scanning support', []),
             'docs':     (False, 'HPLIP documentation (HTML)', []),
@@ -314,7 +319,9 @@ class CoreInstall(object):
         self.selected_options = {
             'base':        True,
             'network':     True,
-            'gui_qt4':     True,
+            'gui_qt4':     False,
+            'gui_qt5':     False,
+            'gui_qt':      False,
             'fax':         True,
             'scan':        True,
             'docs':        True,
@@ -356,7 +363,7 @@ class CoreInstall(object):
             'dbus':             (True,  ['fax'], DBUS_STR, self.check_dbus, DEPENDENCY_RUN_AND_COMPILE_TIME, '-','dbus-daemon --version', EXTERNALDEP),
 
             # Required and optional qt4 GUI packages
-            'policykit':        (False, ['gui_qt4'], POLKIT_STR, self.check_policykit, DEPENDENCY_RUN_TIME,'-','pkexec --version', EXTERNALDEP), # optional for non-sudo behavior of plugins (only optional for Qt4 option)
+            'policykit':        (False, ['gui_qt4', 'gui_qt5'], POLKIT_STR, self.check_policykit, DEPENDENCY_RUN_TIME,'-','pkexec --version', EXTERNALDEP), # optional for non-sudo behavior of plugins (only optional for Qt4 option)
 
             # Required network I/O packages
             'libnetsnmp-devel': (True,  ['network'], SNMP_DEV_STR, self.check_libnetsnmp, DEPENDENCY_RUN_AND_COMPILE_TIME,'5.0.9','net-snmp-config --version', GENERALDEP),
@@ -364,12 +371,14 @@ class CoreInstall(object):
             'network':        (False, ['network'], NETWORK_STR, self.check_wget, DEPENDENCY_RUN_TIME,'-','wget --version', EXTERNALDEP),
             'avahi-utils':        (False, ['network'], AVAHI_STR, self.check_avahi_utils, DEPENDENCY_RUN_TIME, '-','avahi-browse --version', EXTERNALDEP),
         }
-        
+
         python2_dep = {
             'python2X':         (True,  ['base'], PYTHON_STR, self.check_python, DEPENDENCY_RUN_AND_COMPILE_TIME,'2.2','python --version',GENERALDEP),
-            'python-notify' :   (False, ['gui_qt4'], PYNTF_STR, self.check_pynotify, DEPENDENCY_RUN_TIME,'-','python-notify --version',GENERALDEP), # Optional for libnotify style popups from hp-systray
+            'python-notify' :   (False, ['gui_qt5', 'gui_qt4'], PYNTF_STR, self.check_pynotify, DEPENDENCY_RUN_TIME,'-','python-notify --version',GENERALDEP), # Optional for libnotify style popups from hp-systray
             'pyqt4-dbus' :      (True,  ['gui_qt4'], QT4DBUS_STR, self.check_pyqt4_dbus, DEPENDENCY_RUN_TIME,'4.0','FUNC#get_pyQt4_version', GENERALDEP),
             'pyqt4':            (True,  ['gui_qt4'], QT4_STR, self.check_pyqt4, DEPENDENCY_RUN_TIME,'4.0','FUNC#get_pyQt4_version', GENERALDEP), # PyQt 4.x )
+            'pyqt5-dbus' :      (True,  ['gui_qt5'], QT5DBUS_STR, self.check_pyqt5_dbus, DEPENDENCY_RUN_TIME,'5.0','FUNC#get_pyQt5_version', GENERALDEP),
+            'pyqt5':            (True,  ['gui_qt5'], QT5_STR, self.check_pyqt5, DEPENDENCY_RUN_TIME,'5.0','FUNC#get_pyQt5_version', GENERALDEP), # PyQt 5.x )
             'python-dbus':      (True,  ['fax'], PYDBUS_STR, self.check_python_dbus, DEPENDENCY_RUN_TIME,'0.80.0','FUNC#get_python_dbus_ver', GENERALDEP),
             'python-xml'  :     (True,  ['base'], PYXML_STR, self.check_python_xml, DEPENDENCY_RUN_TIME,'-','FUNC#get_python_xml_version',GENERALDEP),
             'python-devel' :    (True,  ['base'], PY_DEV_STR, self.check_python_devel, DEPENDENCY_COMPILE_TIME,'2.2','python --version',GENERALDEP),
@@ -381,9 +390,11 @@ class CoreInstall(object):
 
         python3_dep = {
             'python3X':           (True,  ['base'], PYTHON_STR, self.check_python, DEPENDENCY_RUN_AND_COMPILE_TIME,'2.2','python3 --version',GENERALDEP),
-            'python3-notify2' :   (False, ['gui_qt4'], PYNTF_STR, self.check_pynotify, DEPENDENCY_RUN_TIME,'-','python-notify --version',GENERALDEP), # Optional for libnotify style popups from hp-systray
-            'python3-pyqt4-dbus': (False,  ['gui_qt4'], QT4DBUS_STR, self.check_pyqt4_dbus, DEPENDENCY_RUN_TIME,'4.0','FUNC#get_pyQt4_version', GENERALDEP),
+            'python3-notify2' :   (False, ['gui_qt5', 'gui_qt4'], PYNTF_STR, self.check_pynotify, DEPENDENCY_RUN_TIME,'-','python-notify --version',GENERALDEP), # Optional for libnotify style popups from hp-systray
+            'python3-pyqt4-dbus': (False, ['gui_qt4'], QT4DBUS_STR, self.check_pyqt4_dbus, DEPENDENCY_RUN_TIME,'4.0','FUNC#get_pyQt4_version', GENERALDEP),
             'python3-pyqt4':      (True,  ['gui_qt4'], QT4_STR, self.check_pyqt4, DEPENDENCY_RUN_TIME,'4.0','FUNC#get_pyQt4_version', GENERALDEP), # PyQt 4.x )
+            'python3-pyqt5-dbus': (False, ['gui_qt5'], QT5DBUS_STR, self.check_pyqt5_dbus, DEPENDENCY_RUN_TIME,'5.0','FUNC#get_pyQt5_version', GENERALDEP),
+            'python3-pyqt5':      (True,  ['gui_qt5'], QT5_STR, self.check_pyqt5, DEPENDENCY_RUN_TIME,'5.0','FUNC#get_pyQt5_version', GENERALDEP), # PyQt 5.x )
             'python3-dbus':       (True,  ['fax'], PYDBUS_STR, self.check_python_dbus, DEPENDENCY_RUN_TIME,'0.80.0','FUNC#get_python_dbus_ver', GENERALDEP),
             'python3-xml'  :      (True,  ['base'], PYXML_STR, self.check_python_xml, DEPENDENCY_RUN_TIME,'-','FUNC#get_python_xml_version',GENERALDEP),
             'python3-devel' :     (True,  ['base'], PY_DEV_STR, self.check_python_devel, DEPENDENCY_COMPILE_TIME,'2.2','python3 --version',GENERALDEP),
@@ -409,6 +420,7 @@ class CoreInstall(object):
 
         self.version_func={
             'FUNC#get_python_dbus_ver':get_python_dbus_ver,
+            'FUNC#get_pyQt5_version':get_pyQt5_version,
             'FUNC#get_pyQt4_version':get_pyQt4_version,
             'FUNC#get_pyQt_version':get_pyQt_version,
             'FUNC#get_reportlab_version':get_reportlab_version,
@@ -686,28 +698,38 @@ class CoreInstall(object):
         self.native_cups = self.get_distro_ver_data('native_cups', False)
 
         # Adjust required flag based on the distro ver ui_toolkit value
-        ui_toolkit = self.get_distro_ver_data('ui_toolkit',  'qt4').lower()
+        ui_toolkit = self.get_distro_ver_data('ui_toolkit', 'qt4').lower()
 
         if ui_toolkit == 'qt4':
             log.debug("Default UI toolkit: Qt4")
             self.ui_toolkit = 'qt4'
             self.selected_options['gui_qt4'] = True
+        elif ui_toolkit == 'qt5':
+            log.debug("Default UI toolkit: Qt5")
+            self.ui_toolkit = 'qt5'
+            self.selected_options['gui_qt5'] = True
 
         # todo: gtk
-        else:
-            self.selected_options['gui_qt4'] = False
-
         # Override with --qt4 command args
         if self.enable is not None:
             if 'qt4' in self.enable:
                 log.debug("User selected UI toolkit: Qt4")
                 self.ui_toolkit = 'qt4'
                 self.selected_options['gui_qt4'] = True
+            elif 'qt5' in self.enable:
+                log.debug("User selected UI toolkit: Qt5")
+                self.ui_toolkit = 'qt5'
+                self.selected_options['gui_qt5'] = True
+
 
         if self.disable is not None:
             if 'qt4' in self.disable:
                 log.debug("User deselected UI toolkit: Qt4")
                 self.selected_options['gui_qt4'] = False
+            elif 'qt5' in self.disable:
+                log.debug("User deselected UI toolkit: Qt5")
+                self.selected_options['gui_qt5'] = False
+                
 
 
     def __fixup_data(self, key, data):
@@ -962,7 +984,17 @@ class CoreInstall(object):
                 return False
             else:
                 return True
+        else:
+            return False
 
+    def check_pyqt5(self):
+        if self.ui_toolkit == 'qt5':
+            try:
+                import PyQt5
+            except ImportError:
+                return False
+            else:
+                return True
         else:
             return False
 
@@ -971,6 +1003,17 @@ class CoreInstall(object):
         if self.ui_toolkit == 'qt4':
             try:
                 from dbus.mainloop.qt import DBusQtMainLoop
+            except ImportError:
+                return False
+            else:
+                return True
+        else:
+            return False
+
+    def check_pyqt5_dbus(self):
+        if self.ui_toolkit == 'qt5':
+            try:
+                from dbus.mainloop.pyqt5 import DBusQtMainLoop
             except ImportError:
                 return False
             else:
@@ -1291,6 +1334,7 @@ class CoreInstall(object):
         configuration['fax-build'] = self.selected_options['fax'] and dbus_avail
         configuration['dbus-build'] = dbus_avail
         configuration['qt4'] = self.selected_options['gui_qt4']
+        configuration['qt5'] =self.selected_options['gui_qt5']
         configuration['scan-build'] = self.selected_options['scan']
         configuration['doc-build'] = self.selected_options['docs']
         configuration['policykit'] = self.selected_options['policykit']

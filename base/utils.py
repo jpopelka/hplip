@@ -61,7 +61,7 @@ except ImportError:
 
 try:
     import dbus
-    from dbus import SystemBus, lowlevel
+    from dbus import SystemBus, lowlevel, SessionBus
     dbus_avail=True
 except ImportError:
     dbus_avail=False
@@ -711,9 +711,15 @@ def canEnterGUIMode4(): # qt4
         log.warn("No display found.")
         return False
 
-    elif not checkPyQtImport4():
-        log.warn("Qt/PyQt 4 initialization failed.")
-        return False
+    # elif not checkPyQtImport4():
+    #     log.warn("Qt4/PyQt 4 initialization failed.")
+    #     return False
+    else:
+        try:
+            checkPyQtImport45()
+        except ImportError as e:
+            log.warn(e)
+            return False
 
     return True
 
@@ -774,10 +780,22 @@ def checkPyQtImport4():
         import PyQt4
         import ui4
     except ImportError:
-        log.error("HPLIP is not installed properly or is installed without graphical support. Please reinstall HPLIP")
-        return False
+        import PyQt5
+        import ui5
     else:
-        return True
+        log.debug("HPLIP is not installed properly or is installed without graphical support. Please reinstall HPLIP again")
+        return False
+    return True
+
+# def checkPyQtImport5():
+#     try:
+#         import PyQt5
+#         import ui5
+#     except ImportError:
+#         log.error("HPLIP is not installed properly or is installed without graphical support PyQt5. Please reinstall HPLIP")
+#         return False
+#     else:
+#         return True
 
 
 try:
@@ -1567,10 +1585,15 @@ USAGE_INTERACTIVE_MODE = ("Run in interactive mode:", "-i or --interactive", "op
 if sys_conf.get('configure', 'ui-toolkit', 'qt3') == 'qt3':
     USAGE_USE_QT3 = ("Use Qt3:",  "--qt3 (Default)",  "option",  False)
     USAGE_USE_QT4 = ("Use Qt4:",  "--qt4",  "option",  False)
-else:
+    USAGE_USE_QT5 = ("Use Qt5:",  "--qt5",  "option",  False)
+elif sys_conf.get('configure', 'ui-toolkit', 'qt4') == 'qt4':
     USAGE_USE_QT3 = ("Use Qt3:",  "--qt3",  "option",  False)
     USAGE_USE_QT4 = ("Use Qt4:",  "--qt4 (Default)",  "option",  False)
-
+    USAGE_USE_QT5 = ("Use Qt5:",  "--qt5",  "option",  False)
+elif sys_conf.get('configure', 'ui-toolkit', 'qt5') == 'qt5':
+    USAGE_USE_QT3 = ("Use Qt3:",  "--qt3",  "option",  False)
+    USAGE_USE_QT4 = ("Use Qt4:",  "--qt4",  "option",  False)
+    USAGE_USE_QT5 = ("Use Qt5:",  "--qt5 (Default)",  "option",  False)
 
 def ttysize(): # TODO: Move to base/tui
     ln1 = subprocess.getoutput('stty -a').splitlines()[0]
@@ -2081,7 +2104,7 @@ def sendEvent(event_code,device_uri, printer_name, username="", job_id=0, title=
 
     log.debug("send_message() entered")
     args = [device_uri, printer_name, event_code, username, job_id, title, pipe_name]
-    msg = lowlevel.SignalMessage('/', DBUS_SERVICE, 'Event')
+    msg = lowlevel.SignalMessage(path='/', interface=DBUS_SERVICE, name='Event')
     msg.append(signature='ssisiss', *args)
     SystemBus().send_message(msg)
     log.debug("send_message() returning")
@@ -2396,3 +2419,59 @@ def extract_xml_chunk(data):
             data = data[index+2+size+2:len(data)]
         data = temp
     return data
+
+
+def checkPyQtImport45():
+    try:
+        import PyQt5
+        return "PyQt5"
+    except ImportError as e:
+        log.debug(e)
+
+    try:
+        import PyQt4
+        return "PyQt4"
+    except ImportError as e:
+        log.debug(e)
+
+    raise ImportError("GUI Modules PyQt4 and PyQt5 are not installed")
+
+
+def ui_status():
+    _ui_status = ""
+    try:
+        _ui_status = checkPyQtImport45()
+        log.note("Using GUI Module %s" % _ui_status)
+        return _ui_status
+    except ImportError as e:
+        log.error(e)
+
+
+def import_dialog(ui_toolkit):
+    if ui_toolkit == "qt4":
+        try:
+            from PyQt4.QtGui import QApplication
+            log.debug("Using PyQt4")
+            return  (QApplication, "ui4")
+        except ImportError as e:
+            log.error(e)
+            sys.exit(1)
+    elif ui_toolkit == "qt5":
+        try:
+            from PyQt5.QtWidgets import QApplication
+            log.debug("Using PyQt5")
+            return (QApplication, "ui5")
+        except ImportError as e:
+            log.error(e)
+            sys.exit(1)
+        else:
+            log.error("Unable to load Qt support. Is it installed?")
+            sys.exit(1)
+
+
+def dyn_import_mod(mod_name_as_str):
+    components = mod_name_as_str.split('.')
+    mod = __import__(mod_name_as_str)
+    for comp in components[1:]:
+        mod = getattr(mod, comp)
+    return mod

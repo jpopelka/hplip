@@ -34,12 +34,20 @@ import re
 import os
 import gzip
 
+
 # Local
 from base.g import *
 from base.strings import *
 from base import device, utils, tui, module, services
 from base.sixext.moves import input
 from prnt import cups
+
+try:
+    from importlib import import_module
+except ImportError as e:
+    log.debug(e)
+    from base.utils import dyn_import_mod as import_module
+
 
 pm = None
 
@@ -77,7 +85,7 @@ USAGE = [ (__doc__, "", "name", True),
 
 mod = module.Module(__mod__, __title__, __version__, __doc__, USAGE,
                     (INTERACTIVE_MODE, GUI_MODE),
-                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4), True)
+                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4, UI_TOOLKIT_QT5), True)
 
 opts, device_uri, printer_name, mode, ui_toolkit, loc = \
     mod.parseStdOpts('sp:', ['path=', 'plugin=', 'plug-in=', 'reason=',
@@ -236,13 +244,19 @@ if mode == GUI_MODE:
         app.exec_loop()
 
     else: # qt4
-        try:
-            from PyQt4.QtGui import QApplication, QMessageBox
-            from ui4.plugindialog import PluginDialog
-        except ImportError:
-            log.error("Unable to load Qt4 support. Is it installed?")
-            clean_exit(1)
+        # try:
+        #     from PyQt4.QtGui import QApplication, QMessageBox
+        #     from ui4.plugindialog import PluginDialog
+        # except ImportError:
+        #     log.error("Unable to load Qt4 support. Is it installed?")
+        #     clean_exit(1)
 
+        QApplication, ui_package = utils.import_dialog(ui_toolkit)
+        ui = import_module(ui_package + ".plugindialog")
+        if ui_toolkit == "qt5":
+            from PyQt5.QtWidgets import QMessageBox
+        elif ui_toolkit == "qt4":
+            from PyQt4.QtGui import QMessageBox
         app = QApplication(sys.argv)
         if plugin_installed:
             if QMessageBox.question(None,
@@ -251,7 +265,7 @@ if mode == GUI_MODE:
                                   QMessageBox.Yes | QMessageBox.No) != QMessageBox.Yes:
                 clean_exit(1)
 
-        dialog = PluginDialog(None, install_mode, plugin_reason)
+        dialog = ui.PluginDialog(None, install_mode, plugin_reason)
         dialog.show()
         try:
             log.debug("Starting GUI loop...")

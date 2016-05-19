@@ -37,11 +37,20 @@ import time
 import operator
 import subprocess
 
+
 # Local
 from base.g import *
 import base.utils as utils
 from base import device, tui, module
 from base.sixext import to_unicode, to_string_utf8
+
+try:
+    from importlib import import_module
+except ImportError as e:
+    log.debug(e)
+    from base.utils import dyn_import_mod as import_module
+
+
 username = prop.username
 faxnum_list = []
 recipient_list = []
@@ -50,7 +59,7 @@ prettyprint = False
 
 mod = module.Module(__mod__, __title__, __version__, __doc__, None,
                     (GUI_MODE, NON_INTERACTIVE_MODE),
-                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4))
+                    (UI_TOOLKIT_QT3, UI_TOOLKIT_QT4, UI_TOOLKIT_QT5))
 
 mod.setUsage(module.USAGE_FLAG_DEVICE_ARGS | module.USAGE_FLAG_SUPRESS_G_DEBUG_FLAG,
     extra_options=[
@@ -192,17 +201,20 @@ if mode == GUI_MODE:
             pass
 
     else: # qt4
-        #try:
-        if 1:
-            from PyQt4.QtGui import QApplication
-            from ui4.sendfaxdialog import SendFaxDialog
-        #except ImportError:
-        if 0:
-            log.error("Unable to load Qt4 support. Is it installed?")
-            sys.exit(1)
+        # #try:
+        # if 1:
+        #     from PyQt4.QtGui import QApplication
+        #     from ui4.sendfaxdialog import SendFaxDialog
+        # #except ImportError:
+        # if 0:
+        #     log.error("Unable to load Qt4 support. Is it installed?")
+        #     sys.exit(1)
+
+        QApplication, ui_package = utils.import_dialog(ui_toolkit)
+        ui = import_module(ui_package + ".sendfaxdialog")
 
         app = QApplication(sys.argv)
-        dlg = SendFaxDialog(None, printer_name, device_uri, mod.args)
+        dlg = ui.SendFaxDialog(None, printer_name, device_uri, mod.args)
         dlg.show()
 
         try:
